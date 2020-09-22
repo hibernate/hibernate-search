@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.extractor.builtin.impl;
 
 import java.util.Collection;
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
@@ -19,7 +19,12 @@ public class CollectionElementExtractor<T> implements ContainerExtractor<Collect
 	}
 
 	@Override
-	public Stream<T> extract(Collection<T> container) {
-		return container == null ? Stream.empty() : container.stream();
+	public void extract(Collection<T> container, Consumer<T> consumer) {
+		if ( container == null ) {
+			return;
+		}
+		for ( T element : container ) {
+			consumer.accept( element );
+		}
 	}
 }

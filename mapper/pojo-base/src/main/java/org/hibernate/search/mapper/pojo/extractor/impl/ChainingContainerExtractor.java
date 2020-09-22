@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.extractor.impl;
 
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 
@@ -22,8 +22,8 @@ class ChainingContainerExtractor<C, U, V> implements ContainerExtractor<C, V> {
 	}
 
 	@Override
-	public Stream<V> extract(C container) {
-		return parent.extract( container ).flatMap( chained::extract );
+	public void extract(C container, Consumer<V> consumer) {
+		parent.extract( container, (U container1) -> chained.extract( container1, consumer ) );
 	}
 
 	@Override

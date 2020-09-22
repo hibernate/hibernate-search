@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.processing.impl;
 
-import java.util.stream.Stream;
-
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorSessionContext;
@@ -49,9 +47,7 @@ public class PojoIndexingProcessorContainerElementNode<C, V> extends PojoIndexin
 
 	@Override
 	public final void process(DocumentElement target, C source, PojoIndexingProcessorSessionContext sessionContext) {
-		try ( Stream<V> stream = extractorHolder.get().extract( source ) ) {
-			stream.forEach( sourceItem -> processItem( target, sourceItem, sessionContext ) );
-		}
+		extractorHolder.get().extract( source, sourceItem -> processItem( target, sourceItem, sessionContext ) );
 	}
 
 	private void processItem(DocumentElement target, V sourceItem, PojoIndexingProcessorSessionContext sessionContext) {

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.util;
 
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
@@ -49,7 +49,7 @@ public class StartupStubContainerExtractor implements ContainerExtractor<Object,
 	}
 
 	@Override
-	public Stream<Object> extract(Object container) {
+	public void extract(Object container, Consumer<Object> consumer) {
 		throw unexpectedRuntimeUse();
 	}
 

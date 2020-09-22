@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.extractor.builtin.impl;
 
 import java.util.OptionalInt;
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
@@ -19,12 +19,12 @@ public class OptionalIntValueExtractor implements ContainerExtractor<OptionalInt
 	}
 
 	@Override
-	public Stream<Integer> extract(OptionalInt container) {
-		if ( container != null && container.isPresent() ) {
-			return Stream.of( container.getAsInt() );
+	public void extract(OptionalInt container, Consumer<Integer> consumer) {
+		if ( container == null ) {
+			return;
 		}
-		else {
-			return Stream.empty();
+		if ( container.isPresent() ) {
+			consumer.accept( container.getAsInt() );
 		}
 	}
 

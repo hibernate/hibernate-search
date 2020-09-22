@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.extractor.builtin.impl;
 
 import java.util.OptionalDouble;
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
@@ -19,12 +19,12 @@ public class OptionalDoubleValueExtractor implements ContainerExtractor<Optional
 	}
 
 	@Override
-	public Stream<Double> extract(OptionalDouble container) {
-		if ( container != null && container.isPresent() ) {
-			return Stream.of( container.getAsDouble() );
+	public void extract(OptionalDouble container, Consumer<Double> consumer) {
+		if ( container == null ) {
+			return;
 		}
-		else {
-			return Stream.empty();
+		if ( container.isPresent() ) {
+			consumer.accept( container.getAsDouble() );
 		}
 	}
 
