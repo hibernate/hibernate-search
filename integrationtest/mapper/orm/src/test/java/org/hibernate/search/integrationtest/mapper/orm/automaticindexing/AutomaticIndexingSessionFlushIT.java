@@ -28,11 +28,11 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Tests the behaviour of different kinds of {@link Session#flush()}.
- * Each of ones has to trigger a {@link PojoIndexingPlan#process()} exactly when the flush is expected.
+ * Tests the impact of different kinds of {@link Session#flush()} on automatic indexing.
+ * Each one has to trigger a {@link PojoIndexingPlan#process()} exactly when the flush is expected.
  */
 @TestForIssue( jiraKey = "HSEARCH-3360" )
-public class SearchSessionFlushIT {
+public class AutomaticIndexingSessionFlushIT {
 
 	@Rule
 	public BackendMock backendMock = new BackendMock();
