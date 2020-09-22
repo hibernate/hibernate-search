@@ -169,7 +169,7 @@ public class BackendMock implements TestRule {
 	}
 
 	public IndexScaleWorkCallListContext expectIndexScaleWorks(String indexName, String tenantId) {
-		CallQueue<IndexScaleWorkCall> callQueue = backendBehavior().getIndexScaleWorkCalls();
+		CallQueue<IndexScaleWorkCall> callQueue = backendBehavior().getIndexScaleWorkCalls( indexName );
 		return new IndexScaleWorkCallListContext(
 				indexName, tenantId,
 				callQueue::expectInOrder
