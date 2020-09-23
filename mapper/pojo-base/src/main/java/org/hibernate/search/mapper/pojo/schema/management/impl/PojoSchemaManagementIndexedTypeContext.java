@@ -11,8 +11,8 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface PojoSchemaManagementIndexedTypeContext {
 
-	PojoRawTypeIdentifier<?> getTypeIdentifier();
+	PojoRawTypeIdentifier<?> typeIdentifier();
 
-	IndexSchemaManager getSchemaManager();
+	IndexSchemaManager schemaManager();
 
 }

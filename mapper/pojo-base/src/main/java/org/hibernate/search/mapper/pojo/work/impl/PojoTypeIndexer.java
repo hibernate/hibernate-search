@@ -34,7 +34,7 @@ public class PojoTypeIndexer<I, E> {
 	CompletableFuture<?> add(Object providedId, String providedRoutingKey, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
-		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
+		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
 
 		PojoWorkRouter router = typeContext.createRouter( sessionContext, identifier, entitySupplier );
 		DocumentRouteImpl currentRoute = router.currentRoute( providedRoutingKey );
@@ -55,7 +55,7 @@ public class PojoTypeIndexer<I, E> {
 	CompletableFuture<?> addOrUpdate(Object providedId, String providedRoutingKey, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
-		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
+		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
 
 		PojoWorkRouter router = typeContext.createRouter( sessionContext, identifier, entitySupplier );
 		DocumentRouteImpl currentRoute = router.currentRoute( providedRoutingKey );
@@ -86,7 +86,7 @@ public class PojoTypeIndexer<I, E> {
 	CompletableFuture<?> delete(Object providedId, String providedRoutingKey, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
-		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
+		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
 
 		PojoWorkRouter router = typeContext.createRouter( sessionContext, identifier, entitySupplier );
 		DocumentRouteImpl currentRoute = router.currentRoute( providedRoutingKey );
@@ -110,7 +110,7 @@ public class PojoTypeIndexer<I, E> {
 
 	CompletableFuture<?> purge(Object providedId, String providedRoutingKey,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId );
+		I identifier = typeContext.identifierMapping().getIdentifier( providedId );
 		String documentIdentifier = typeContext.toDocumentIdentifier( sessionContext, identifier );
 		DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
 				providedRoutingKey, identifier );
