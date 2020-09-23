@@ -57,31 +57,31 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 
 	@Override
 	public void add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity) {
-		AbstractPojoTypeIndexingPlan delegate = getDelegate( typeIdentifier );
+		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegate( typeIdentifier );
 		delegate.add( providedId, providedRoutingKey, entity );
 	}
 
 	@Override
 	public void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity) {
-		AbstractPojoTypeIndexingPlan delegate = getDelegate( typeIdentifier );
+		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegate( typeIdentifier );
 		delegate.update( providedId, providedRoutingKey, entity );
 	}
 
 	@Override
 	public void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity, String... dirtyPaths) {
-		AbstractPojoTypeIndexingPlan delegate = getDelegate( typeIdentifier );
+		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegate( typeIdentifier );
 		delegate.update( providedId, providedRoutingKey, entity, dirtyPaths );
 	}
 
 	@Override
 	public void delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity) {
-		AbstractPojoTypeIndexingPlan delegate = getDelegate( typeIdentifier );
+		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegate( typeIdentifier );
 		delegate.delete( providedId, providedRoutingKey, entity );
 	}
 
 	@Override
 	public void purge(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey) {
-		AbstractPojoTypeIndexingPlan delegate = getDelegate( typeIdentifier );
+		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegate( typeIdentifier );
 		delegate.purge( providedId, providedRoutingKey );
 	}
 
@@ -148,8 +148,8 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 		return introspector;
 	}
 
-	private AbstractPojoTypeIndexingPlan getDelegate(PojoRawTypeIdentifier<?> typeIdentifier) {
-		AbstractPojoTypeIndexingPlan delegate = indexedTypeDelegates.get( typeIdentifier );
+	private AbstractPojoTypeIndexingPlan<?, ?, ?> getDelegate(PojoRawTypeIdentifier<?> typeIdentifier) {
+		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = indexedTypeDelegates.get( typeIdentifier );
 		if ( delegate == null ) {
 			delegate = containedTypeDelegates.get( typeIdentifier );
 			if ( delegate == null ) {
@@ -159,7 +159,7 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 		return delegate;
 	}
 
-	private AbstractPojoTypeIndexingPlan createDelegate(PojoRawTypeIdentifier<?> typeIdentifier) {
+	private AbstractPojoTypeIndexingPlan<?, ?, ?> createDelegate(PojoRawTypeIdentifier<?> typeIdentifier) {
 		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> indexedTypeContextOptional =
 				indexedTypeContextProvider.getByExactType( typeIdentifier );
 		if ( indexedTypeContextOptional.isPresent() ) {

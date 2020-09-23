@@ -147,7 +147,7 @@ public class PojoIndexedTypeManager<I, E>
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoWorkSessionContext<?> sessionContext,
-			I identifier, Supplier<E> entitySupplier, Set<String> dirtyPaths) {
+			Object identifier, Supplier<E> entitySupplier, Set<String> dirtyPaths) {
 		try {
 			reindexingResolver.resolveEntitiesToReindex( collector, sessionContext.runtimeIntrospector(),
 					entitySupplier.get(), dirtyPaths );
