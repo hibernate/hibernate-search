@@ -7,11 +7,7 @@
 package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -27,13 +23,11 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
  * @param <E> The entity type mapped to the index.
  * @param <R> The type of entity references returned in the {@link #executeAndReport() failure report}.
  */
-public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexingPlan {
+public class PojoIndexedTypeIndexingPlan<I, E, R>
+		extends AbstractPojoTypeIndexingPlan<I, E, PojoIndexedTypeIndexingPlan<I, E, R>.IndexedEntityState> {
 
 	private final PojoWorkIndexedTypeContext<I, E> typeContext;
 	private final IndexIndexingPlan<R> delegate;
-
-	// Use a LinkedHashMap for deterministic iteration
-	private final Map<I, IndexedEntityIndexingPlan> indexingPlansPerId = new LinkedHashMap<>();
 
 	public PojoIndexedTypeIndexingPlan(PojoWorkIndexedTypeContext<I, E> typeContext,
 			PojoWorkSessionContext<?> sessionContext,
@@ -44,60 +38,40 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 	}
 
 	@Override
-	void add(Object providedId, String providedRoutingKey, Object entity) {
-		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
-		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
-		getPlan( identifier ).add( entitySupplier, providedRoutingKey );
-	}
-
-	@Override
-	void update(Object providedId, String providedRoutingKey, Object entity) {
-		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
-		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
-		getPlan( identifier ).update( entitySupplier, providedRoutingKey );
-	}
-
-	@Override
-	void update(Object providedId, String providedRoutingKey, Object entity, String... dirtyPaths) {
-		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
-		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
-		getPlan( identifier ).update( entitySupplier, providedRoutingKey, dirtyPaths );
-	}
-
-	@Override
-	void delete(Object providedId, String providedRoutingKey, Object entity) {
-		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
-		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
-		getPlan( identifier ).delete( entitySupplier, providedRoutingKey );
-	}
-
-	@Override
 	void purge(Object providedId, String providedRoutingKey) {
 		I identifier = typeContext.identifierMapping().getIdentifier( providedId );
-		getPlan( identifier ).purge( providedRoutingKey );
+		getState( identifier ).purge( providedRoutingKey );
 	}
 
 	void updateBecauseOfContained(Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.identifierMapping().getIdentifier( null, entitySupplier );
-		if ( !indexingPlansPerId.containsKey( identifier ) ) {
-			getPlan( identifier ).updateBecauseOfContained( entitySupplier );
+		if ( !statesPerId.containsKey( identifier ) ) {
+			getState( identifier ).updateBecauseOfContained( entitySupplier );
 		}
 		// If the entry is already there, no need for an additional update
 	}
 
+	@Override
 	void resolveDirty(PojoReindexingCollector containingEntityCollector) {
-		// We need to iterate on a "frozen snapshot" of the indexingPlansPerId values
-		// because of HSEARCH-3857
-		List<IndexedEntityIndexingPlan> frozenIndexingPlansPerId = new ArrayList<>( indexingPlansPerId.values() );
-		for ( IndexedEntityIndexingPlan plan : frozenIndexingPlansPerId ) {
+		// We need to iterate on a "frozen snapshot" of the states because of HSEARCH-3857
+		List<IndexedEntityState> frozenIndexingPlansPerId = new ArrayList<>( statesPerId.values() );
+		for ( IndexedEntityState plan : frozenIndexingPlansPerId ) {
 			plan.resolveDirty( containingEntityCollector );
 		}
 	}
 
+	void discard() {
+		delegate.discard();
+	}
+
+	void discardNotProcessed() {
+		this.statesPerId.clear();
+	}
+
 	void process() {
 		sendCommandsToDelegate();
-		getDelegate().process();
+		delegate.process();
 	}
 
 	CompletableFuture<IndexIndexingPlanExecutionReport<R>> executeAndReport() {
@@ -109,108 +83,68 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 		return delegate.executeAndReport();
 	}
 
-	void discard() {
-		delegate.discard();
+	@Override
+	PojoWorkIndexedTypeContext<I, E> typeContext() {
+		return typeContext;
 	}
 
-	void discardNotProcessed() {
-		this.indexingPlansPerId.clear();
+	@Override
+	I toIdentifier(Object providedId, Supplier<E> entitySupplier) {
+		return typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
 	}
 
-	private IndexedEntityIndexingPlan getPlan(I identifier) {
-		IndexedEntityIndexingPlan plan = indexingPlansPerId.get( identifier );
-		if ( plan == null ) {
-			plan = new IndexedEntityIndexingPlan( identifier );
-			indexingPlansPerId.put( identifier, plan );
-		}
-		return plan;
-	}
-
-	private IndexIndexingPlan<?> getDelegate() {
-		return delegate;
+	@Override
+	protected IndexedEntityState createState(I identifier) {
+		return new IndexedEntityState( identifier );
 	}
 
 	private void sendCommandsToDelegate() {
 		try {
-			indexingPlansPerId.values().forEach( IndexedEntityIndexingPlan::sendCommandsToDelegate );
+			statesPerId.values().forEach( IndexedEntityState::sendCommandsToDelegate );
 		}
 		finally {
-			indexingPlansPerId.clear();
+			statesPerId.clear();
 		}
 	}
 
-	private class IndexedEntityIndexingPlan {
-		private final I identifier;
+	class IndexedEntityState
+			extends AbstractPojoTypeIndexingPlan<I, E, IndexedEntityState>.AbstractEntityState {
+
 		private String providedRoutingKey;
-		private Supplier<E> entitySupplier;
 
-		private boolean delete;
-		private boolean add;
-
-		private boolean shouldResolveToReindex;
-		private boolean considerAllDirty;
 		private boolean updatedBecauseOfContained;
-		private Set<String> dirtyPaths;
 
-		private IndexedEntityIndexingPlan(I identifier) {
-			this.identifier = identifier;
+		private IndexedEntityState(I identifier) {
+			super( identifier );
 		}
 
+		@Override
 		void add(Supplier<E> entitySupplier, String providedRoutingKey) {
-			this.entitySupplier = entitySupplier;
+			super.add( entitySupplier, providedRoutingKey );
 			this.providedRoutingKey = providedRoutingKey;
-			shouldResolveToReindex = true;
-			add = true;
 		}
 
-		void update(Supplier<E> entitySupplier, String providedRoutingKey) {
-			doUpdate( entitySupplier, providedRoutingKey );
-			shouldResolveToReindex = true;
-			considerAllDirty = true;
-			dirtyPaths = null;
-		}
-
-		void update(Supplier<E> entitySupplier, String providedRoutingKey, String... dirtyPaths) {
-			doUpdate( entitySupplier, providedRoutingKey );
-			shouldResolveToReindex = true;
-			if ( !considerAllDirty ) {
-				for ( String dirtyPropertyName : dirtyPaths ) {
-					addDirtyPath( dirtyPropertyName );
-				}
-			}
+		@Override
+		void doUpdate(Supplier<E> entitySupplier, String providedRoutingKey) {
+			super.doUpdate( entitySupplier, providedRoutingKey );
+			this.providedRoutingKey = providedRoutingKey;
 		}
 
 		void updateBecauseOfContained(Supplier<E> entitySupplier) {
 			doUpdate( entitySupplier, null );
 			updatedBecauseOfContained = true;
-			/*
-			 * We don't want contained entities that haven't been modified to trigger an update of their
-			 * containing entities.
-			 * Thus we don't set 'shouldResolveToReindex' to true here, but leave it as is.
-			 */
+			// We don't want contained entities that haven't been modified to trigger an update of their
+			// containing entities.
+			// Thus we don't set 'shouldResolveToReindex' to true here, but leave it as is.
 		}
 
+		@Override
 		void delete(Supplier<E> entitySupplier, String providedRoutingKey) {
-			this.entitySupplier = entitySupplier;
+			super.delete( entitySupplier, providedRoutingKey );
 			this.providedRoutingKey = providedRoutingKey;
-			if ( add && !delete ) {
-				/*
-				 * We called add() in the same plan, so we don't expect the document to be in the index.
-				 * Don't delete, just cancel the addition.
-				 */
-				add = false;
-				delete = false;
-			}
-			else {
-				add = false;
-				delete = true;
-			}
 
 			// Reindexing does not make sense for a deleted entity
-			shouldResolveToReindex = false;
-			considerAllDirty = false;
 			updatedBecauseOfContained = false;
-			dirtyPaths = null;
 		}
 
 		void purge(String providedRoutingKey) {
@@ -223,16 +157,6 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 			dirtyPaths = null;
 			add = false;
 			delete = true;
-		}
-
-		void resolveDirty(PojoReindexingCollector containingEntityCollector) {
-			if ( shouldResolveToReindex ) {
-				shouldResolveToReindex = false; // Avoid infinite looping
-				typeContext.resolveEntitiesToReindex(
-						containingEntityCollector, sessionContext, identifier, entitySupplier,
-						considerAllDirty ? null : dirtyPaths
-				);
-			}
 		}
 
 		void sendCommandsToDelegate() {
@@ -250,26 +174,6 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 			else if ( delete ) {
 				delegateDelete();
 			}
-		}
-
-		private void doUpdate(Supplier<E> entitySupplier, String providedRoutingKey) {
-			this.entitySupplier = entitySupplier;
-			this.providedRoutingKey = providedRoutingKey;
-			/*
-			 * If add is true, either this is already an update (in which case we don't need to change the flags)
-			 * or we called add() in the same plan (in which case we don't expect the document to be in the index).
-			 */
-			if ( !add ) {
-				delete = true;
-				add = true;
-			}
-		}
-
-		private void addDirtyPath(String dirtyPath) {
-			if ( dirtyPaths == null ) {
-				dirtyPaths = new HashSet<>();
-			}
-			dirtyPaths.add( dirtyPath );
 		}
 
 		private void delegateAdd() {
