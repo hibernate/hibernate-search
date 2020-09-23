@@ -52,7 +52,7 @@ public class MassIndexingFailureDefaultBackgroundFailureHandlerIT extends Abstra
 	}
 
 	@Override
-	protected void expectEntityGetterFailureHandling(String entityName, String entityReferenceAsString,
+	protected void expectEntityIdGetterFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
 		logged.expectEvent(
 				Level.ERROR,
@@ -69,7 +69,32 @@ public class MassIndexingFailureDefaultBackgroundFailureHandlerIT extends Abstra
 	}
 
 	@Override
-	protected void assertEntityGetterFailureHandling(String entityName, String entityReferenceAsString,
+	protected void assertEntityNonIdGetterFailureHandling(String entityName, String entityReferenceAsString,
+			String exceptionMessage, String failingOperationAsString) {
+		// If we get there, everything works fine.
+	}
+
+	@Override
+	protected void expectEntityNonIdGetterFailureHandling(String entityName, String entityReferenceAsString,
+			String exceptionMessage, String failingOperationAsString) {
+		logged.expectEvent(
+				Level.ERROR,
+				ExceptionMatcherBuilder.isException( SearchException.class )
+						.withMessage( "Exception while building document for entity '" + entityReferenceAsString + "'" )
+						.causedBy( SearchException.class )
+						.withMessage( "Exception while invoking" )
+						.causedBy( SimulatedFailure.class )
+						.withMessage( exceptionMessage )
+						.build(),
+				failingOperationAsString,
+				"Entities that could not be indexed correctly:",
+				entityReferenceAsString
+		)
+				.once();
+	}
+
+	@Override
+	protected void assertEntityIdGetterFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
 		// If we get there, everything works fine.
 	}

@@ -64,7 +64,7 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 	}
 
 	@Override
-	protected void expectEntityGetterFailureHandling(String entityName, String entityReferenceAsString,
+	protected void expectEntityIdGetterFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
 		reset( failureHandler );
 		failureHandler.handle( capture( entityFailureContextCapture ) );
@@ -72,12 +72,44 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 	}
 
 	@Override
-	protected void assertEntityGetterFailureHandling(String entityName, String entityReferenceAsString,
+	protected void assertEntityIdGetterFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
 		verify( failureHandler );
 
 		MassIndexingEntityFailureContext context = entityFailureContextCapture.getValue();
 		assertThat( context.throwable() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Exception while invoking" )
+				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
+				.isInstanceOf( SimulatedFailure.class )
+				.hasMessageContaining( exceptionMessage );
+		assertThat( context.failingOperation() ).asString()
+				.isEqualTo( failingOperationAsString );
+		assertThat( context.entityReferences() )
+				.hasSize( 1 )
+				.element( 0 )
+				.asString()
+				.isEqualTo( entityReferenceAsString );
+	}
+
+	@Override
+	protected void expectEntityNonIdGetterFailureHandling(String entityName, String entityReferenceAsString,
+			String exceptionMessage, String failingOperationAsString) {
+		reset( failureHandler );
+		failureHandler.handle( capture( entityFailureContextCapture ) );
+		replay( failureHandler );
+	}
+
+	@Override
+	protected void assertEntityNonIdGetterFailureHandling(String entityName, String entityReferenceAsString,
+			String exceptionMessage, String failingOperationAsString) {
+		verify( failureHandler );
+
+		MassIndexingEntityFailureContext context = entityFailureContextCapture.getValue();
+		assertThat( context.throwable() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Exception while building document for entity '%s'", entityReferenceAsString )
+				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Exception while invoking" )
 				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )

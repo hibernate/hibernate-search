@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -21,6 +23,7 @@ import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionCon
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -37,6 +40,7 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * @param <I> The identifier type for the mapped entity type.
@@ -45,6 +49,7 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 public class PojoIndexedTypeManager<I, E>
 		implements AutoCloseable, ToStringTreeAppendable,
 		PojoWorkIndexedTypeContext<I, E>, PojoScopeIndexedTypeContext<I, E> {
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String entityName;
 	private final PojoRawTypeIdentifier<E> typeIdentifier;
@@ -130,8 +135,9 @@ public class PojoIndexedTypeManager<I, E>
 	}
 
 	@Override
-	public PojoDocumentContributor<E> toDocumentContributor(Supplier<E> entitySupplier, PojoWorkSessionContext<?> sessionContext) {
-		return new PojoDocumentContributor<>( processor, sessionContext, entitySupplier );
+	public PojoDocumentContributor<E> toDocumentContributor(PojoWorkSessionContext<?> sessionContext, I identifier,
+			Supplier<E> entitySupplier) {
+		return new PojoDocumentContributor<>( entityName, processor, sessionContext, identifier, entitySupplier );
 	}
 
 	@Override
@@ -140,11 +146,17 @@ public class PojoIndexedTypeManager<I, E>
 	}
 
 	@Override
-	public void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoRuntimeIntrospector runtimeIntrospector,
-			Supplier<E> entitySupplier, Set<String> dirtyPaths) {
-		reindexingResolver.resolveEntitiesToReindex(
-				collector, runtimeIntrospector, entitySupplier.get(), dirtyPaths
-		);
+	public void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoWorkSessionContext<?> sessionContext,
+			I identifier, Supplier<E> entitySupplier, Set<String> dirtyPaths) {
+		try {
+			reindexingResolver.resolveEntitiesToReindex( collector, sessionContext.runtimeIntrospector(),
+					entitySupplier.get(), dirtyPaths );
+		}
+		catch (RuntimeException e) {
+			Object entityReference = EntityReferenceFactory.safeCreateEntityReference(
+					sessionContext.entityReferenceFactory(), entityName, identifier, e::addSuppressed );
+			throw log.errorResolvingEntitiesToReindex( entityReference, e.getMessage(), e );
+		}
 	}
 
 	@Override

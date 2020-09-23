@@ -74,13 +74,14 @@ public class PojoContainedTypeIndexingPlan<E> extends AbstractPojoTypeIndexingPl
 	private ContainedEntityIndexingPlan getPlan(Object identifier) {
 		ContainedEntityIndexingPlan plan = indexingPlansPerId.get( identifier );
 		if ( plan == null ) {
-			plan = new ContainedEntityIndexingPlan();
+			plan = new ContainedEntityIndexingPlan( identifier );
 			indexingPlansPerId.put( identifier, plan );
 		}
 		return plan;
 	}
 
 	private class ContainedEntityIndexingPlan {
+		private final Object identifier;
 		private Supplier<E> entitySupplier;
 
 		private Boolean createdInThisPlan;
@@ -88,6 +89,10 @@ public class PojoContainedTypeIndexingPlan<E> extends AbstractPojoTypeIndexingPl
 		private boolean shouldResolveToReindex;
 		private boolean considerAllDirty;
 		private Set<String> dirtyPaths;
+
+		private ContainedEntityIndexingPlan(Object identifier) {
+			this.identifier = identifier;
+		}
 
 		void add(Supplier<E> entitySupplier) {
 			this.entitySupplier = entitySupplier;
@@ -138,7 +143,7 @@ public class PojoContainedTypeIndexingPlan<E> extends AbstractPojoTypeIndexingPl
 			if ( shouldResolveToReindex ) {
 				shouldResolveToReindex = false; // Avoid infinite looping
 				typeContext.resolveEntitiesToReindex(
-						containingEntityCollector, sessionContext, entitySupplier,
+						containingEntityCollector, sessionContext, identifier, entitySupplier,
 						considerAllDirty ? null : dirtyPaths
 				);
 			}

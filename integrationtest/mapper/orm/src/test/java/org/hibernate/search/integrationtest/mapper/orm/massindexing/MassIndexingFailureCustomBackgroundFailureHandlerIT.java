@@ -58,17 +58,31 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 	}
 
 	@Override
-	protected void expectEntityGetterFailureHandling(String entityName, String entityReferenceAsString,
+	protected void expectEntityIdGetterFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
 		// We'll check in the assert*() method, see below.
 	}
 
 	@Override
-	protected void assertEntityGetterFailureHandling(String entityName, String entityReferenceAsString,
+	protected void assertEntityIdGetterFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 1 );
+	}
+
+	@Override
+	protected void expectEntityNonIdGetterFailureHandling(String entityName, String entityReferenceAsString,
+			String exceptionMessage, String failingOperationAsString) {
+		// We'll check in the assert*() method, see below.
+	}
+
+	@Override
+	protected void assertEntityNonIdGetterFailureHandling(String entityName, String entityReferenceAsString,
+			String exceptionMessage, String failingOperationAsString) {
+		// Same expectations as for the ID getter
+		assertEntityIdGetterFailureHandling( entityName, entityReferenceAsString, exceptionMessage,
+				failingOperationAsString );
 	}
 
 	@Override

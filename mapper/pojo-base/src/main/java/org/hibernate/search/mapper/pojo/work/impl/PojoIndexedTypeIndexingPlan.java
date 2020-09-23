@@ -227,7 +227,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 			if ( shouldResolveToReindex ) {
 				shouldResolveToReindex = false; // Avoid infinite looping
 				typeContext.resolveEntitiesToReindex(
-						containingEntityCollector, sessionContext.runtimeIntrospector(), entitySupplier,
+						containingEntityCollector, sessionContext, identifier, entitySupplier,
 						considerAllDirty ? null : dirtyPaths
 				);
 			}
@@ -284,7 +284,8 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 			}
 			DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
 					currentRoute.routingKey(), identifier );
-			delegate.add( referenceProvider, typeContext.toDocumentContributor( entitySupplier, sessionContext ) );
+			delegate.add( referenceProvider,
+					typeContext.toDocumentContributor( sessionContext, identifier, entitySupplier ) );
 		}
 
 		private void delegateUpdate() {
@@ -304,7 +305,8 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 			}
 			DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
 					currentRoute.routingKey(), identifier );
-			delegate.update( referenceProvider, typeContext.toDocumentContributor( entitySupplier, sessionContext ) );
+			delegate.update( referenceProvider,
+					typeContext.toDocumentContributor( sessionContext, identifier, entitySupplier ) );
 		}
 
 		private void delegateDelete() {

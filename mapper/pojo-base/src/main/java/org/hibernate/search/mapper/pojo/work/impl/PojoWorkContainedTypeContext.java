@@ -23,7 +23,7 @@ public interface PojoWorkContainedTypeContext<E> {
 	Supplier<E> toEntitySupplier(PojoWorkSessionContext<?> sessionContext, Object entity);
 
 	void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoWorkSessionContext<?> sessionContext,
-			Supplier<E> entitySupplier, Set<String> dirtyPaths);
+			Object identifier, Supplier<E> entitySupplier, Set<String> dirtyPaths);
 
 	PojoContainedTypeIndexingPlan<E> createIndexingPlan(PojoWorkSessionContext<?> sessionContext);
 

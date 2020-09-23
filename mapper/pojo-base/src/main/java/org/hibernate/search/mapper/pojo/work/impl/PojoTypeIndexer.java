@@ -48,7 +48,8 @@ public class PojoTypeIndexer<I, E> {
 		String documentIdentifier = typeContext.toDocumentIdentifier( sessionContext, identifier );
 		DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
 				currentRoute.routingKey(), identifier );
-		return delegate.add( referenceProvider, typeContext.toDocumentContributor( entitySupplier, sessionContext ),
+		return delegate.add( referenceProvider,
+				typeContext.toDocumentContributor( sessionContext, identifier, entitySupplier ),
 				commitStrategy, refreshStrategy );
 	}
 
@@ -78,7 +79,8 @@ public class PojoTypeIndexer<I, E> {
 		// the backend is responsible for preserving relative order of works on the same index/shard + docId,
 		// and we don't care about relative order of works on different indexes/shards.
 		return deletePreviousFuture.thenCombine(
-				delegate.update( referenceProvider, typeContext.toDocumentContributor( entitySupplier, sessionContext ),
+				delegate.update( referenceProvider,
+						typeContext.toDocumentContributor( sessionContext, identifier, entitySupplier ),
 						commitStrategy, refreshStrategy ),
 				(deletePreviousResult, updateResult) -> updateResult );
 	}
