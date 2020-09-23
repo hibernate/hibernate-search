@@ -46,40 +46,40 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 	@Override
 	void add(Object providedId, String providedRoutingKey, Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
-		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
+		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
 		getPlan( identifier ).add( entitySupplier, providedRoutingKey );
 	}
 
 	@Override
 	void update(Object providedId, String providedRoutingKey, Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
-		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
+		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
 		getPlan( identifier ).update( entitySupplier, providedRoutingKey );
 	}
 
 	@Override
 	void update(Object providedId, String providedRoutingKey, Object entity, String... dirtyPaths) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
-		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
+		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
 		getPlan( identifier ).update( entitySupplier, providedRoutingKey, dirtyPaths );
 	}
 
 	@Override
 	void delete(Object providedId, String providedRoutingKey, Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
-		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
+		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
 		getPlan( identifier ).delete( entitySupplier, providedRoutingKey );
 	}
 
 	@Override
 	void purge(Object providedId, String providedRoutingKey) {
-		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId );
+		I identifier = typeContext.identifierMapping().getIdentifier( providedId );
 		getPlan( identifier ).purge( providedRoutingKey );
 	}
 
 	void updateBecauseOfContained(Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
-		I identifier = typeContext.getIdentifierMapping().getIdentifier( null, entitySupplier );
+		I identifier = typeContext.identifierMapping().getIdentifier( null, entitySupplier );
 		if ( !indexingPlansPerId.containsKey( identifier ) ) {
 			getPlan( identifier ).updateBecauseOfContained( entitySupplier );
 		}

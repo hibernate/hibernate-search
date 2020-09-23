@@ -76,9 +76,9 @@ public class PojoScopeSchemaManagerImpl implements PojoScopeSchemaManager {
 		int typeCounter = 0;
 
 		for ( PojoSchemaManagementIndexedTypeContext typeContext : targetedTypeContexts ) {
-			IndexSchemaManager delegate = typeContext.getSchemaManager();
+			IndexSchemaManager delegate = typeContext.schemaManager();
 			ContextualFailureCollector typeFailureCollector =
-					failureCollector.withContext( PojoEventContexts.fromType( typeContext.getTypeIdentifier() ) );
+					failureCollector.withContext( PojoEventContexts.fromType( typeContext.typeIdentifier() ) );
 			futures[typeCounter++] = operation.apply( delegate, typeFailureCollector )
 					.exceptionally( Futures.handler( e -> {
 						typeFailureCollector.add( Throwables.expectException( e ) );

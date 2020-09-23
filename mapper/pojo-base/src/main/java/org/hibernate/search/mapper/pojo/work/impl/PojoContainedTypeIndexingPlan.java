@@ -62,7 +62,7 @@ public class PojoContainedTypeIndexingPlan<E> extends AbstractPojoTypeIndexingPl
 
 	@Override
 	void purge(Object providedId, String providedRoutingKey) {
-		throw log.cannotPurgeNonIndexedContainedType( typeContext.getTypeIdentifier(), providedId );
+		throw log.cannotPurgeNonIndexedContainedType( typeContext.typeIdentifier(), providedId );
 	}
 
 	void resolveDirty(PojoReindexingCollector containingEntityCollector) {

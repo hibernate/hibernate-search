@@ -86,7 +86,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 		}
 		Set<PojoRawTypeIdentifier<?>> typeIdentifiers = new LinkedHashSet<>();
 		for ( PojoIndexedTypeManager<?, ?> typeManager : indexedTypeManagers.getAll() ) {
-			typeIdentifiers.add( typeManager.getTypeIdentifier() );
+			typeIdentifiers.add( typeManager.typeIdentifier() );
 		}
 		return Optional.of( PojoScopeDelegateImpl.create(
 				mappingContext,

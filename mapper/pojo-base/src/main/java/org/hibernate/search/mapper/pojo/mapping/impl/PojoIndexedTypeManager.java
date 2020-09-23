@@ -96,12 +96,12 @@ public class PojoIndexedTypeManager<I, E>
 	}
 
 	@Override
-	public PojoRawTypeIdentifier<E> getTypeIdentifier() {
+	public PojoRawTypeIdentifier<E> typeIdentifier() {
 		return typeIdentifier;
 	}
 
 	@Override
-	public IdentifierMappingImplementor<I, E> getIdentifierMapping() {
+	public IdentifierMappingImplementor<I, E> identifierMapping() {
 		return identifierMapping;
 	}
 
@@ -145,7 +145,7 @@ public class PojoIndexedTypeManager<I, E>
 	}
 
 	@Override
-	public IndexSchemaManager getSchemaManager() {
+	public IndexSchemaManager schemaManager() {
 		return indexManager.schemaManager();
 	}
 

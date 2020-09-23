@@ -25,9 +25,9 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
  */
 public interface PojoWorkIndexedTypeContext<I, E> {
 
-	PojoRawTypeIdentifier<E> getTypeIdentifier();
+	PojoRawTypeIdentifier<E> typeIdentifier();
 
-	IdentifierMappingImplementor<I, E> getIdentifierMapping();
+	IdentifierMappingImplementor<I, E> identifierMapping();
 
 	Supplier<E> toEntitySupplier(PojoWorkSessionContext<?> sessionContext, Object entity);
 

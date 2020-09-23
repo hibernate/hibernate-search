@@ -58,7 +58,7 @@ public class PojoContainedTypeManager<E>
 	}
 
 	@Override
-	public PojoRawTypeIdentifier<E> getTypeIdentifier() {
+	public PojoRawTypeIdentifier<E> typeIdentifier() {
 		return typeIdentifier;
 	}
 
