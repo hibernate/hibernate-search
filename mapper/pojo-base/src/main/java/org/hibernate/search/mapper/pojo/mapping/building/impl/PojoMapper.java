@@ -227,7 +227,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 					.applyBinder( routingBinderOptional.get() );
 		}
 
-		PojoIndexedTypeManagerBuilder<E> builder = new PojoIndexedTypeManagerBuilder<>( indexedEntityType,
+		PojoIndexedTypeManagerBuilder<E> builder = new PojoIndexedTypeManagerBuilder<>( entityName, indexedEntityType,
 				mappingHelper, indexManagerBuilder,
 				delegate.createIndexedTypeExtendedMappingCollector( indexedEntityType, entityName, indexName ),
 				providedIdentifierBridge, routingBridge, mappingHelper.beanResolver() );
@@ -367,12 +367,14 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		Optional<? extends PojoImplicitReindexingResolver<T, Set<String>>> reindexingResolverOptional =
 				reindexingResolverBuildingHelper.buildOptional( entityType, pathFilterFactory );
 		if ( reindexingResolverOptional.isPresent() ) {
+			String entityName = entityTypeMetadata.getEntityName();
+
 			// Nothing to contribute to contained types at the moment,
 			// but create the collector just so the mapper knows the type is contained
-			delegate.createContainedTypeExtendedMappingCollector( entityType, entityTypeMetadata.getEntityName() );
+			delegate.createContainedTypeExtendedMappingCollector( entityType, entityName );
 
 			PojoContainedTypeManager<T> typeManager = new PojoContainedTypeManager<>(
-					entityType.typeIdentifier(), entityType.caster(),
+					entityName, entityType.typeIdentifier(), entityType.caster(),
 					reindexingResolverOptional.get()
 			);
 			log.createdPojoContainedTypeManager( typeManager );
