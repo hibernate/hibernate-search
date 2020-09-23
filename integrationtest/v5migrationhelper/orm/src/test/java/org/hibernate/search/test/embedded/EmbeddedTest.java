@@ -35,7 +35,6 @@ import org.junit.Test;
 public class EmbeddedTest extends SearchTestBase {
 
 	@Test
-	@Ignore("HSEARCH-3999: we need to get rid of the LazyInitializationException in the last transaction")
 	public void testEmbeddedIndexing() throws Exception {
 		Tower tower = new Tower();
 		tower.setName( "JBoss tower" );
