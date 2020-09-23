@@ -11,8 +11,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
 
 import org.hibernate.Session;
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.mapper.orm.common.EntityReference;
-import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingEntityFailureContext;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureContext;
@@ -125,9 +125,9 @@ class MassIndexingNotifier {
 			HibernateOrmMassIndexingSessionContext sessionContext, Object entity, Throwable throwable) {
 		try {
 			Session session = sessionContext.session();
-			return new EntityReferenceImpl(
-					type.typeIdentifier(), type.jpaEntityName(), session.getIdentifier( entity )
-			);
+			Object identifier = session.getIdentifier( entity );
+			return EntityReferenceFactory.safeCreateEntityReference( sessionContext.entityReferenceFactory(),
+					type.jpaEntityName(), identifier, throwable::addSuppressed );
 		}
 		catch (RuntimeException e) {
 			// We failed to extract a reference.

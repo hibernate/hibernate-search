@@ -78,15 +78,8 @@ class ElasticsearchIndexIndexingPlanExecution<R> {
 			if ( future.isCompletedExceptionally() ) {
 				reportBuilder.throwable( Futures.getThrowableNow( future ) );
 				SingleDocumentIndexingWork work = works.get( i );
-				try {
-					reportBuilder.failingEntityReference(
-							entityReferenceFactory,
-							work.getEntityTypeName(), work.getEntityIdentifier()
-					);
-				}
-				catch (RuntimeException e) {
-					reportBuilder.throwable( e );
-				}
+				reportBuilder.failingEntityReference( entityReferenceFactory, work.getEntityTypeName(),
+						work.getEntityIdentifier() );
 			}
 		}
 		return reportBuilder.build();

@@ -103,15 +103,10 @@ public final class IndexIndexingPlanExecutionReport<R> {
 
 		public Builder<R> failingEntityReference(EntityReferenceFactory<R> referenceFactory,
 				String typeName, Object entityIdentifier) {
-			try {
-				failingEntityReference(
-						referenceFactory.createEntityReference( typeName, entityIdentifier )
-				);
-			}
-			catch (RuntimeException e) {
-				// We failed to create a reference.
-				// Let's skip it, but report the failure.
-				throwable( e );
+			R reference = EntityReferenceFactory.safeCreateEntityReference( referenceFactory,
+					typeName, entityIdentifier, this::throwable );
+			if ( reference != null ) {
+				failingEntityReference( reference );
 			}
 			return this;
 		}
