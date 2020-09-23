@@ -46,6 +46,7 @@ public class PojoIndexedTypeManager<I, E>
 		implements AutoCloseable, ToStringTreeAppendable,
 		PojoWorkIndexedTypeContext<I, E>, PojoScopeIndexedTypeContext<I, E> {
 
+	private final String entityName;
 	private final PojoRawTypeIdentifier<E> typeIdentifier;
 	private final PojoCaster<E> caster;
 	private final IdentifierMappingImplementor<I, E> identifierMapping;
@@ -54,12 +55,13 @@ public class PojoIndexedTypeManager<I, E>
 	private final MappedIndexManager indexManager;
 	private final PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver;
 
-	public PojoIndexedTypeManager(PojoRawTypeIdentifier<E> typeIdentifier,
+	public PojoIndexedTypeManager(String entityName, PojoRawTypeIdentifier<E> typeIdentifier,
 			PojoCaster<E> caster,
 			IdentifierMappingImplementor<I, E> identifierMapping,
 			BeanHolder<? extends RoutingBridge<? super E>> routingBridgeHolder,
 			PojoIndexingProcessor<E> processor, MappedIndexManager indexManager,
 			PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver) {
+		this.entityName = entityName;
 		this.typeIdentifier = typeIdentifier;
 		this.caster = caster;
 		this.identifierMapping = identifierMapping;
@@ -71,7 +73,7 @@ public class PojoIndexedTypeManager<I, E>
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[javaType = " + typeIdentifier + "]";
+		return getClass().getSimpleName() + "[entityName = " + entityName + ", javaType = " + typeIdentifier + "]";
 	}
 
 	@Override
@@ -87,7 +89,8 @@ public class PojoIndexedTypeManager<I, E>
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "typeIdentifier", typeIdentifier )
+		builder.attribute( "entityName", entityName )
+				.attribute( "typeIdentifier", typeIdentifier )
 				.attribute( "indexManager", indexManager )
 				.attribute( "identifierMapping", identifierMapping )
 				.attribute( "routingBridgeHolder", routingBridgeHolder )

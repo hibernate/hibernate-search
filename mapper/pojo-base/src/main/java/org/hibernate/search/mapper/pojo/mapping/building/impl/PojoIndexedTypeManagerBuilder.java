@@ -37,7 +37,9 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 class PojoIndexedTypeManagerBuilder<E> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final String entityName;
 	private final PojoRawTypeModel<E> typeModel;
+
 	private final MappedIndexManagerBuilder indexManagerBuilder;
 	private final PojoIndexedTypeExtendedMappingCollector extendedMappingCollector;
 
@@ -48,13 +50,14 @@ class PojoIndexedTypeManagerBuilder<E> {
 
 	private boolean closed = false;
 
-	PojoIndexedTypeManagerBuilder(PojoRawTypeModel<E> typeModel,
+	PojoIndexedTypeManagerBuilder(String entityName, PojoRawTypeModel<E> typeModel,
 			PojoMappingHelper mappingHelper,
 			MappedIndexManagerBuilder indexManagerBuilder,
 			PojoIndexedTypeExtendedMappingCollector extendedMappingCollector,
 			BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge,
 			BoundRoutingBridge<E> routingBridge,
 			BeanResolver beanResolver) {
+		this.entityName = entityName;
 		this.typeModel = typeModel;
 		this.indexManagerBuilder = indexManagerBuilder;
 		this.extendedMappingCollector = extendedMappingCollector;
@@ -137,7 +140,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 		extendedMappingCollector.indexManager( indexManager );
 
 		PojoIndexedTypeManager<?, E> typeManager = new PojoIndexedTypeManager<>(
-				typeModel.typeIdentifier(), typeModel.caster(),
+				entityName, typeModel.typeIdentifier(), typeModel.caster(),
 				identityMappingCollector.identifierMapping,
 				identityMappingCollector.routingBridge == null ? null
 						: identityMappingCollector.routingBridge.getBridgeHolder(),

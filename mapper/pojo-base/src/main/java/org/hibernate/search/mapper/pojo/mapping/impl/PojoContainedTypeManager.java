@@ -29,13 +29,15 @@ public class PojoContainedTypeManager<E>
 		implements AutoCloseable, ToStringTreeAppendable,
 		PojoWorkContainedTypeContext<E>, PojoScopeContainedTypeContext<E> {
 
+	private final String entityName;
 	private final PojoRawTypeIdentifier<E> typeIdentifier;
 	private final PojoCaster<E> caster;
 	private final PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver;
 
-	public PojoContainedTypeManager(PojoRawTypeIdentifier<E> typeIdentifier,
+	public PojoContainedTypeManager(String entityName, PojoRawTypeIdentifier<E> typeIdentifier,
 			PojoCaster<E> caster,
 			PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver) {
+		this.entityName = entityName;
 		this.typeIdentifier = typeIdentifier;
 		this.caster = caster;
 		this.reindexingResolver = reindexingResolver;
@@ -43,7 +45,7 @@ public class PojoContainedTypeManager<E>
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[javaType = " + typeIdentifier + "]";
+		return getClass().getSimpleName() + "[entityName = " + entityName + ", javaType = " + typeIdentifier + "]";
 	}
 
 	@Override
@@ -53,7 +55,8 @@ public class PojoContainedTypeManager<E>
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "typeIdentifier", typeIdentifier )
+		builder.attribute( "entityName", entityName )
+				.attribute( "typeIdentifier", typeIdentifier )
 				.attribute( "reindexingResolver", reindexingResolver );
 	}
 
