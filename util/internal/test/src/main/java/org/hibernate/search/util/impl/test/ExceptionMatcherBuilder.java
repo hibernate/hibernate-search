@@ -22,10 +22,18 @@ import org.hamcrest.TypeSafeMatcher;
 
 public class ExceptionMatcherBuilder {
 
+	/**
+	 * @param clazz The expected type of the exception.
+	 * @return A matcher builder.
+	 */
 	public static ExceptionMatcherBuilder isException(Class<? extends Throwable> clazz) {
 		return new ExceptionMatcherBuilder( CoreMatchers.instanceOf( clazz ) );
 	}
 
+	/**
+	 * @param throwable The expected exception.
+	 * @return A matcher builder.
+	 */
 	public static ExceptionMatcherBuilder isException(Throwable throwable) {
 		return new ExceptionMatcherBuilder( CoreMatchers.sameInstance( throwable ) );
 	}

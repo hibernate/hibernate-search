@@ -14,9 +14,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.HamcrestCondition.matching;
 import static org.awaitility.Awaitility.await;
-import static org.hibernate.search.util.impl.test.ExceptionMatcherBuilder.isException;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.io.IOException;
@@ -83,6 +81,7 @@ import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.log4j.Level;
+import org.assertj.core.api.InstanceOfAssertFactories;
 
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.DefaultElasticsearchClientFactoryTest")
 public class ElasticsearchClientFactoryImplIT {
@@ -206,13 +205,14 @@ public class ElasticsearchClientFactoryImplIT {
 				doPost( client, "/myIndex/myType", payload );
 			}
 		} )
-				.is( matching( isException( AssertionFailure.class )
-						.causedBy( CompletionException.class )
-						.causedBy( SearchException.class )
-								.withMessage( "HSEARCH400089" )
-						.causedBy( JsonSyntaxException.class )
-						.build()
-				) );
+				.isInstanceOf( AssertionFailure.class )
+				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
+				.isInstanceOf( CompletionException.class )
+				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "HSEARCH400089" )
+				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
+				.isInstanceOf( JsonSyntaxException.class );
 	}
 
 	@Test
@@ -235,11 +235,11 @@ public class ElasticsearchClientFactoryImplIT {
 				doPost( client, "/myIndex/myType", payload );
 			}
 		} )
-				.is( matching( isException( AssertionFailure.class )
-						.causedBy( CompletionException.class )
-						.causedBy( IOException.class )
-						.build()
-				) );
+				.isInstanceOf( AssertionFailure.class )
+				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
+				.isInstanceOf( CompletionException.class )
+				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
+				.isInstanceOf( IOException.class );
 	}
 
 	@Test
@@ -263,12 +263,12 @@ public class ElasticsearchClientFactoryImplIT {
 				doPost( client, "/myIndex/myType", payload );
 			}
 		} )
-				.is( matching( isException( AssertionFailure.class )
-						.causedBy( CompletionException.class )
-						.causedBy( SearchException.class )
-								.withMessage( "Request exceeded the timeout of 1s, 0ms and 0ns: 'POST /myIndex/myType with parameters {}'." )
-						.build()
-				) );
+				.isInstanceOf( AssertionFailure.class )
+				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
+				.isInstanceOf( CompletionException.class )
+				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Request exceeded the timeout of 1s, 0ms and 0ns: 'POST /myIndex/myType with parameters {}'." );
 	}
 
 	@Test

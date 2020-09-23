@@ -16,11 +16,10 @@ import org.hibernate.search.mapper.orm.massindexing.MassIndexingEntityFailureCon
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureContext;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.hamcrest.MatcherAssert;
 
 public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends AbstractMassIndexingFailureIT {
 
@@ -52,12 +51,9 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 		verify( failureHandler );
 
 		MassIndexingEntityFailureContext context = entityFailureContextCapture.getValue();
-		MatcherAssert.assertThat(
-				context.throwable(),
-				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
-						.withMessage( exceptionMessage )
-						.build()
-		);
+		assertThat( context.throwable() )
+				.isInstanceOf( SimulatedFailure.class )
+				.hasMessage( exceptionMessage );
 		assertThat( context.failingOperation() ).asString()
 				.isEqualTo( failingOperationAsString );
 		assertThat( context.entityReferences() )
@@ -81,14 +77,12 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 		verify( failureHandler );
 
 		MassIndexingEntityFailureContext context = entityFailureContextCapture.getValue();
-		MatcherAssert.assertThat(
-				context.throwable(),
-				ExceptionMatcherBuilder.isException( SearchException.class )
-						.withMessage( "Exception while invoking" )
-						.causedBy( SimulatedFailure.class )
-						.withMessage( exceptionMessage )
-						.build()
-		);
+		assertThat( context.throwable() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Exception while invoking" )
+				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
+				.isInstanceOf( SimulatedFailure.class )
+				.hasMessageContaining( exceptionMessage );
 		assertThat( context.failingOperation() ).asString()
 				.isEqualTo( failingOperationAsString );
 		assertThat( context.entityReferences() )
@@ -114,12 +108,9 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 		verify( failureHandler );
 
 		MassIndexingFailureContext context = genericFailureContextCapture.getValue();
-		MatcherAssert.assertThat(
-				context.throwable(),
-				ExceptionMatcherBuilder.isException( exceptionType )
-						.withMessage( exceptionMessage )
-						.build()
-		);
+		assertThat( context.throwable() )
+				.isInstanceOf( exceptionType )
+				.hasMessageContaining( exceptionMessage );
 		assertThat( context.failingOperation() ).asString()
 				.isEqualTo( failingOperationAsString );
 	}
@@ -143,12 +134,9 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 		verify( failureHandler );
 
 		MassIndexingEntityFailureContext entityFailureContext = entityFailureContextCapture.getValue();
-		MatcherAssert.assertThat(
-				entityFailureContext.throwable(),
-				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
-						.withMessage( failingEntityIndexingExceptionMessage )
-						.build()
-		);
+		assertThat( entityFailureContext.throwable() )
+				.isInstanceOf( SimulatedFailure.class )
+				.hasMessage( failingEntityIndexingExceptionMessage );
 		assertThat( entityFailureContext.failingOperation() ).asString()
 				.isEqualTo( failingEntityIndexingOperationAsString );
 		assertThat( entityFailureContext.entityReferences() )
@@ -159,12 +147,9 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 
 
 		MassIndexingFailureContext massIndexerOperationFailureContext = genericFailureContextCapture.getValue();
-		MatcherAssert.assertThat(
-				massIndexerOperationFailureContext.throwable(),
-				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
-						.withMessage( failingMassIndexerOperationExceptionMessage )
-						.build()
-		);
+		assertThat( massIndexerOperationFailureContext.throwable() )
+				.isInstanceOf( SimulatedFailure.class )
+				.hasMessage( failingMassIndexerOperationExceptionMessage );
 		assertThat( massIndexerOperationFailureContext.failingOperation() ).asString()
 				.isEqualTo( failingMassIndexerOperationAsString );
 	}

@@ -14,9 +14,9 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 import org.assertj.core.api.AbstractObjectAssert;
+import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.Assertions;
-import org.hamcrest.Matcher;
-import org.hamcrest.MatcherAssert;
+import org.assertj.core.api.ThrowableAssert;
 
 
 public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Future<T>> {
@@ -95,19 +95,22 @@ public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Futur
 	}
 
 	public FutureAssert<T> isFailed() {
-		return isFailed( throwable -> { } );
+		getFailure();
+		return this;
 	}
 
 	public FutureAssert<T> isFailed(Throwable expectedThrowable) {
-		return isFailed( throwable -> Assertions.assertThat( throwable ).isEqualTo( expectedThrowable ) );
-	}
-
-	public FutureAssert<T> isFailed(Matcher<? super Throwable> exceptionMatcher) {
-		return isFailed( throwable -> MatcherAssert.assertThat( throwable, exceptionMatcher ) );
+		getFailure().isSameAs( expectedThrowable );
+		return this;
 	}
 
 	public FutureAssert<T> isFailed(Consumer<Throwable> exceptionAssertion) {
-		Object result;
+		getFailure().satisfies( exceptionAssertion );
+		return this;
+	}
+
+	public AbstractThrowableAssert<?, Throwable> getFailure() {
+		Object result = null;
 		try {
 			result = getNow();
 			failWithMessage( "future <%s> should have failed, but instead it succeeded with result <%s>", actual, result );
@@ -119,14 +122,10 @@ public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Futur
 			failWithCauseAndMessage( e, "future <%s> should have failed, but instead it's been cancelled", actual, e );
 		}
 		catch (ExecutionException e) {
-			try {
-				exceptionAssertion.accept( e.getCause() );
-			}
-			catch (AssertionError e2) {
-				failWithCauseAndMessage( e2, "future <%s> failed as expected, but the exception is wrong: %s", actual, e2 );
-			}
+			return new ThrowableAssert( e.getCause() )
+					.as( "failure reported by future <%s>", actual );
 		}
-		return this;
+		throw new IllegalStateException( "We should never reach this line" );
 	}
 
 	public FutureAssert<T> isCancelled() {

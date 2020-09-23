@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.client.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.HamcrestCondition.matching;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
@@ -20,13 +19,13 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import com.google.gson.JsonObject;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.easymock.EasyMock;
 
 @RunWith(Parameterized.class)
@@ -85,17 +84,16 @@ public class ElasticsearchClientUtilsGetElasticsearchVersionTest {
 		String invalidVersionString = versionString.substring( 0, versionString.length() - 1 ) + "-A-B";
 		doMock( invalidVersionString );
 		assertThatThrownBy( () -> ElasticsearchClientUtils.getElasticsearchVersion( clientMock ) )
-				.is( matching( ExceptionMatcherBuilder.isException( SearchException.class )
-						.withMessage( "HSEARCH400080" )
-						.causedBy( SearchException.class )
-								.withMessage( "HSEARCH400007" )
-								.withMessage( invalidVersionString )
-						.causedBy( SearchException.class )
-								.withMessage( "Invalid Elasticsearch version" )
-								.withMessage( "'" + invalidVersionString.toLowerCase( Locale.ROOT ) + "'" )
-								.withMessage( "The version must be in the form 'x.y.z-qualifier'" )
-						.build()
-				) );
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "HSEARCH400080" )
+				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "HSEARCH400007", invalidVersionString )
+				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "Invalid Elasticsearch version",
+						"'" + invalidVersionString.toLowerCase( Locale.ROOT ) + "'",
+						"The version must be in the form 'x.y.z-qualifier'" );
 	}
 
 	private void doMock(String theVersionString) {

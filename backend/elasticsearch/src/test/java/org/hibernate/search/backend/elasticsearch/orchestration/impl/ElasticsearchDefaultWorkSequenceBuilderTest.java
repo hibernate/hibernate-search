@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 import static org.easymock.EasyMock.expect;
-import static org.hibernate.search.util.impl.test.ExceptionMatcherBuilder.isException;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThat;
 
 import java.util.concurrent.CompletableFuture;
@@ -420,21 +419,18 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		bulkWorkFuture.completeExceptionally( exception );
 		verifyAll();
 		assertThat( sequenceBuilderBulkResultFuture ).isFailed( exception );
-		assertThat( work1FutureFromSequenceBuilder ).isFailed(
-				isException( SearchException.class )
-						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
-						.causedBy( exception ).build()
-		);
-		assertThat( work2FutureFromSequenceBuilder ).isFailed(
-				isException( SearchException.class )
-						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
-						.causedBy( exception ).build()
-		);
-		assertThat( work3FutureFromSequenceBuilder ).isFailed(
-				isException( SearchException.class )
-						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
-						.causedBy( exception ).build()
-		);
+		assertThat( work1FutureFromSequenceBuilder ).getFailure()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "operation failed due to the failure of the call to the bulk REST API" )
+				.hasCauseReference( exception );
+		assertThat( work2FutureFromSequenceBuilder ).getFailure()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "operation failed due to the failure of the call to the bulk REST API" )
+				.hasCauseReference( exception );
+		assertThat( work3FutureFromSequenceBuilder ).getFailure()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "operation failed due to the failure of the call to the bulk REST API" )
+				.hasCauseReference( exception );
 		assertThat( work4FutureFromSequenceBuilder ).isPending();
 		assertThat( sequenceFuture ).isPending();
 
@@ -516,21 +512,18 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		bulkResultFuture.completeExceptionally( exception );
 		verifyAll();
 		assertThat( sequenceBuilderBulkResultFuture ).isFailed( exception );
-		assertThat( work1FutureFromSequenceBuilder ).isFailed(
-				isException( SearchException.class )
-						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
-						.causedBy( exception ).build()
-		);
-		assertThat( work2FutureFromSequenceBuilder ).isFailed(
-				isException( SearchException.class )
-						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
-						.causedBy( exception ).build()
-		);
-		assertThat( work3FutureFromSequenceBuilder ).isFailed(
-				isException( SearchException.class )
-						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
-						.causedBy( exception ).build()
-		);
+		assertThat( work1FutureFromSequenceBuilder ).getFailure()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "operation failed due to the failure of the call to the bulk REST API" )
+				.hasCauseReference( exception );
+		assertThat( work2FutureFromSequenceBuilder ).getFailure()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "operation failed due to the failure of the call to the bulk REST API" )
+				.hasCauseReference( exception );
+		assertThat( work3FutureFromSequenceBuilder ).getFailure()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "operation failed due to the failure of the call to the bulk REST API" )
+				.hasCauseReference( exception );
 		assertThat( work4FutureFromSequenceBuilder ).isPending();
 		assertThat( sequenceFuture ).isPending();
 
