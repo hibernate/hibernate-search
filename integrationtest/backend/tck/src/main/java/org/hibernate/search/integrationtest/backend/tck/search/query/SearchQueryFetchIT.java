@@ -326,7 +326,8 @@ public class SearchQueryFetchIT {
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllQuerySortByDefault() {
 		StubMappingScope scope = index.createScope();
-		return scope.query().where( f -> f.match().field( "text" ).matching( "someword" ) );
+		return scope.query().where( f -> f.simpleQueryString().field( "text" )
+				.matching( "mostimportantword^100 lessimportantword^10 leastimportantword^0.1" ) );
 	}
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchFirstHalfQuery() {
@@ -358,13 +359,13 @@ public class SearchQueryFetchIT {
 							String text = null;
 							switch ( i ) {
 								case 0:
-									text = "someword someword someword someword and something else";
+									text = "leastimportantword lessimportantword mostimportantword";
 									break;
 								case 1:
-									text = "someword someword and something else";
+									text = "leastimportantword lessimportantword";
 									break;
 								default:
-									text = "something else something else and well finally someword";
+									text = "leastimportantword";
 									break;
 							}
 							document.addValue( index.binding().text, text );
