@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -68,7 +69,7 @@ public class EmbeddedTest extends SearchTestBase {
 		result = session.createFullTextQuery( query, Tower.class ).list();
 		assertEquals( "unable to find property in embedded", 1, result.size() );
 
-		query = parser.parse( "address.id:" + a.getId().toString() );
+		query = LongPoint.newExactQuery( "address.id", a.getId() );
 		result = session.createFullTextQuery( query, Tower.class ).list();
 		assertEquals( "unable to find property by id of embedded", 1, result.size() );
 
