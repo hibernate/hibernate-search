@@ -9,10 +9,12 @@ package org.hibernate.search.batch.jsr352.core.massindexing.util.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.batch.jsr352.core.context.jpa.spi.EntityManagerFactoryRegistry;
 import org.hibernate.search.batch.jsr352.core.logging.impl.Log;
+import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -57,10 +59,11 @@ public final class ValidationUtil {
 				entityManagerFactoryReference
 		);
 
-		// TODO HSEARCH-3269 load classes from the metadata
-		Set<String> failingTypes = new HashSet<>();
-		Set<String> indexedTypes = new HashSet<>();
+		Set<String> indexedTypes = Search.mapping( emf ).allIndexedEntities().stream()
+				.map( ie -> ie.javaClass().getName() )
+				.collect( Collectors.toSet() );
 
+		Set<String> failingTypes = new HashSet<>();
 		for ( String type : serializedEntityTypes.split( "," ) ) {
 			if ( !indexedTypes.contains( type ) ) {
 				failingTypes.add( type );

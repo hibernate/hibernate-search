@@ -10,10 +10,11 @@ import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJo
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.batch.runtime.context.JobContext;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.criteria.Predicate;
@@ -22,6 +23,8 @@ import org.hibernate.search.batch.jsr352.core.context.jpa.impl.ActiveSessionFact
 import org.hibernate.search.batch.jsr352.core.context.jpa.spi.EntityManagerFactoryRegistry;
 import org.hibernate.search.batch.jsr352.core.logging.impl.Log;
 import org.hibernate.search.batch.jsr352.core.massindexing.impl.JobContextData;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.StringHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -91,9 +94,13 @@ public final class JobContextUtil {
 
 	private static JobContextData createData(EntityManagerFactory emf, String entityTypes, String serializedCustomQueryCriteria)
 			throws ClassNotFoundException, IOException {
+		SearchMapping mapping = Search.mapping( emf );
+		List<String> entityNamesToIndex = Arrays.asList( entityTypes.split( "," ) );
 
-		// TODO HSEARCH-3269 load classes from the metadata
-		Set<Class<?>> entityTypesToIndex = new HashSet<>();
+		Set<Class<?>> entityTypesToIndex = mapping.allIndexedEntities().stream()
+				.map( ie -> ie.javaClass() )
+				.filter( ie -> entityNamesToIndex.contains( ie.getName() ) )
+				.collect( Collectors.toSet() );
 
 		List<EntityTypeDescriptor> descriptors = PersistenceUtil.createDescriptors( emf, entityTypesToIndex );
 
