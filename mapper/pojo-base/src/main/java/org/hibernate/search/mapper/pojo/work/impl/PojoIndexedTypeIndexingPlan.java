@@ -198,10 +198,6 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 				 * We called add() in the same plan, so we don't expect the document to be in the index.
 				 * Don't delete, just cancel the addition.
 				 */
-				shouldResolveToReindex = false;
-				considerAllDirty = false;
-				updatedBecauseOfContained = false;
-				dirtyPaths = null;
 				add = false;
 				delete = false;
 			}
@@ -209,6 +205,12 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 				add = false;
 				delete = true;
 			}
+
+			// Reindexing does not make sense for a deleted entity
+			shouldResolveToReindex = false;
+			considerAllDirty = false;
+			updatedBecauseOfContained = false;
+			dirtyPaths = null;
 		}
 
 		void purge(String providedRoutingKey) {
