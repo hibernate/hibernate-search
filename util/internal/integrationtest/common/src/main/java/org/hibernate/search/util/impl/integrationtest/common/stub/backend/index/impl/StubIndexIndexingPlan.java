@@ -120,9 +120,7 @@ class StubIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 			if ( future.isCompletedExceptionally() ) {
 				builder.throwable( Futures.getThrowableNow( future ) );
 				StubDocumentWork work = worksToExecute.get( i );
-				builder.failingEntityReference(
-						entityReferenceFactory.createEntityReference( typeName, work.getEntityIdentifier() )
-				);
+				builder.failingEntityReference( entityReferenceFactory, typeName, work.getEntityIdentifier() );
 			}
 		}
 		return builder.build();

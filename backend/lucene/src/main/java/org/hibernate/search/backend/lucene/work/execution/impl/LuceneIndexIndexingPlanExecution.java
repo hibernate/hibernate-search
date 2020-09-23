@@ -109,15 +109,8 @@ class LuceneIndexIndexingPlanExecution<R> {
 			}
 			if ( commitOrRefreshThrowable != null || future.isCompletedExceptionally() ) {
 				SingleDocumentIndexingWork work = works.get( i );
-				try {
-					reportBuilder.failingEntityReference(
-							entityReferenceFactory,
-							work.getEntityTypeName(), work.getEntityIdentifier()
-					);
-				}
-				catch (RuntimeException e) {
-					reportBuilder.throwable( e );
-				}
+				reportBuilder.failingEntityReference( entityReferenceFactory, work.getEntityTypeName(),
+						work.getEntityIdentifier() );
 			}
 		}
 		if ( commitOrRefreshThrowable != null ) {
