@@ -1036,7 +1036,9 @@ public class IndexedEmbeddedBaseIT {
 				session.indexingPlan().add( entity1 );
 			}
 		} )
-				.isInstanceOf( ClassCastException.class );
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Exception while building document for entity 'IndexedEntity#1'" )
+				.hasCauseInstanceOf( ClassCastException.class );
 	}
 
 	@Test

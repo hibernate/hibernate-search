@@ -492,4 +492,13 @@ public interface Log extends BasicLogger {
 					+ " or set the type parameter V to a definite, raw type.")
 	SearchException invalidGenericParameterToInferValueType(Object bridge, @FormatWith(TypeFormatter.class) Type type);
 
+	@Message(id = ID_OFFSET_2 + 83,
+			value = "Exception while building document for entity '%1$s': %2$s")
+	SearchException errorBuildingDocument(Object entityReference,
+			String message, @Cause Exception e);
+
+	@Message(id = ID_OFFSET_2 + 84,
+			value = "Exception while resolving other entities to reindex as a result of changes on entity '%1$s': %2$s")
+	SearchException errorResolvingEntitiesToReindex(Object entityReference,
+			String message, @Cause Exception e);
 }

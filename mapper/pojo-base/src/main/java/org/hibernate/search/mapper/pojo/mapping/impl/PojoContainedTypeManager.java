@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -21,6 +24,7 @@ import org.hibernate.search.mapper.pojo.work.impl.PojoWorkContainedTypeContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * @param <E> The contained entity type.
@@ -28,6 +32,7 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 public class PojoContainedTypeManager<E>
 		implements AutoCloseable, ToStringTreeAppendable,
 		PojoWorkContainedTypeContext<E>, PojoScopeContainedTypeContext<E> {
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String entityName;
 	private final PojoRawTypeIdentifier<E> typeIdentifier;
@@ -73,11 +78,16 @@ public class PojoContainedTypeManager<E>
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoWorkSessionContext<?> sessionContext,
-			Supplier<E> entitySupplier, Set<String> dirtyPaths) {
-		PojoRuntimeIntrospector introspector = sessionContext.runtimeIntrospector();
-		reindexingResolver.resolveEntitiesToReindex(
-				collector, introspector, entitySupplier.get(), dirtyPaths
-		);
+			Object identifier, Supplier<E> entitySupplier, Set<String> dirtyPaths) {
+		try {
+			reindexingResolver.resolveEntitiesToReindex( collector, sessionContext.runtimeIntrospector(),
+					entitySupplier.get(), dirtyPaths );
+		}
+		catch (RuntimeException e) {
+			Object entityReference = EntityReferenceFactory.safeCreateEntityReference(
+					sessionContext.entityReferenceFactory(), entityName, identifier, e::addSuppressed );
+			throw log.errorResolvingEntitiesToReindex( entityReference, e.getMessage(), e );
+		}
 	}
 
 	@Override

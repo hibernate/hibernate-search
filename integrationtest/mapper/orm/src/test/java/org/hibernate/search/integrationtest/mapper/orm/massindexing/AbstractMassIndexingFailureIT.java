@@ -108,7 +108,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		String exceptionMessage = "getId failure";
 		String failingOperationAsString = "Indexing instance of entity '" + entityName + "' during mass indexing";
 
-		expectEntityGetterFailureHandling(
+		expectEntityIdGetterFailureHandling(
 				entityName, entityReferenceAsString,
 				exceptionMessage, failingOperationAsString
 		);
@@ -134,7 +134,7 @@ public abstract class AbstractMassIndexingFailureIT {
 				expectIndexScaleWork( StubIndexScaleWork.Type.REFRESH, ExecutionExpectation.SUCCEED )
 		);
 
-		assertEntityGetterFailureHandling(
+		assertEntityIdGetterFailureHandling(
 				entityName, entityReferenceAsString,
 				exceptionMessage, failingOperationAsString
 		);
@@ -149,7 +149,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		String exceptionMessage = "getTitle failure";
 		String failingOperationAsString = "Indexing instance of entity '" + entityName + "' during mass indexing";
 
-		expectEntityGetterFailureHandling(
+		expectEntityNonIdGetterFailureHandling(
 				entityName, entityReferenceAsString,
 				exceptionMessage, failingOperationAsString
 		);
@@ -175,7 +175,7 @@ public abstract class AbstractMassIndexingFailureIT {
 				expectIndexScaleWork( StubIndexScaleWork.Type.REFRESH, ExecutionExpectation.SUCCEED )
 		);
 
-		assertEntityGetterFailureHandling(
+		assertEntityNonIdGetterFailureHandling(
 				entityName, entityReferenceAsString,
 				exceptionMessage, failingOperationAsString
 		);
@@ -427,10 +427,16 @@ public abstract class AbstractMassIndexingFailureIT {
 	protected abstract void assertEntityIndexingFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString);
 
-	protected abstract void expectEntityGetterFailureHandling(String entityName, String entityReferenceAsString,
+	protected abstract void expectEntityIdGetterFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString);
 
-	protected abstract void assertEntityGetterFailureHandling(String entityName, String entityReferenceAsString,
+	protected abstract void assertEntityIdGetterFailureHandling(String entityName, String entityReferenceAsString,
+			String exceptionMessage, String failingOperationAsString);
+
+	protected abstract void expectEntityNonIdGetterFailureHandling(String entityName, String entityReferenceAsString,
+			String exceptionMessage, String failingOperationAsString);
+
+	protected abstract void assertEntityNonIdGetterFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString);
 
 	protected abstract void expectMassIndexerOperationFailureHandling(

@@ -16,7 +16,6 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 /**
@@ -35,13 +34,13 @@ public interface PojoWorkIndexedTypeContext<I, E> {
 
 	PojoWorkRouter createRouter(PojoWorkSessionContext<?> sessionContext, I identifier, Supplier<E> entitySupplier);
 
-	PojoDocumentContributor<E> toDocumentContributor(Supplier<E> entitySupplier,
-			PojoWorkSessionContext<?> sessionContext);
+	PojoDocumentContributor<E> toDocumentContributor(PojoWorkSessionContext<?> sessionContext, I identifier,
+			Supplier<E> entitySupplier);
 
 	boolean requiresSelfReindexing(Set<String> dirtyPaths);
 
-	void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoRuntimeIntrospector runtimeIntrospector,
-			Supplier<E> entitySupplier, Set<String> dirtyPaths);
+	void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoWorkSessionContext<?> sessionContext,
+			I identifier, Supplier<E> entitySupplier, Set<String> dirtyPaths);
 
 	<R> PojoIndexedTypeIndexingPlan<I, E, R> createIndexingPlan(PojoWorkSessionContext<R> sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
