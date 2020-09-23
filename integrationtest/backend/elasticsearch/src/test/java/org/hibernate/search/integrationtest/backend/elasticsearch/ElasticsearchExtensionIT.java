@@ -55,7 +55,6 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubLoadingOptionsStep;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -68,7 +67,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.apache.http.nio.client.HttpAsyncClient;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.api.HamcrestCondition;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
@@ -235,18 +233,12 @@ public class ElasticsearchExtensionIT {
 				.toQuery();
 
 		// Non-existing document
-		assertThatThrownBy(
-				() -> query.explain( "InvalidId" )
-		)
-				.has( new HamcrestCondition<>(
-						ExceptionMatcherBuilder.isException( SearchException.class )
-								.causedBy( SearchException.class )
-								.withMessage(
-										"Document with id 'InvalidId' does not exist in the targeted index"
-								)
-								.withMessage( "its match cannot be explained" )
-								.build()
-				) );
+		assertThatThrownBy( () -> query.explain( "InvalidId" ) )
+				.isInstanceOf( SearchException.class )
+				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "Document with id 'InvalidId' does not exist in the targeted index",
+						"its match cannot be explained" );
 	}
 
 	@Test
