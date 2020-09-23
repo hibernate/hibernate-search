@@ -132,11 +132,13 @@ public class PojoContainedTypeIndexingPlan<E> extends AbstractPojoTypeIndexingPl
 				 * in existing documents.
 				 * Cancel everything.
 				 */
-				shouldResolveToReindex = false;
-				considerAllDirty = false;
-				dirtyPaths = null;
 				createdInThisPlan = null;
 			}
+
+			// Reindexing does not make sense for a deleted entity
+			shouldResolveToReindex = false;
+			considerAllDirty = false;
+			dirtyPaths = null;
 		}
 
 		void resolveDirty(PojoReindexingCollector containingEntityCollector) {
