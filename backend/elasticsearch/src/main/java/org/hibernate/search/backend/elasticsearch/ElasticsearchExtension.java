@@ -91,16 +91,16 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	 *
 	 * @param <H> The type of query hits.
 	 * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
-	 * {@code .extension( ElasticsearchExtension.get() }.
+	 * {@code .extension( ElasticsearchExtension.get() )}.
 	 * @param <R> The entity reference type for projections.
 	 * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
-	 * {@code .extension( ElasticsearchExtension.get() }.
+	 * {@code .extension( ElasticsearchExtension.get() )}.
 	 * @param <E> The entity type for projections.
 	 * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
-	 * {@code .extension( ElasticsearchExtension.get() }.
+	 * {@code .extension( ElasticsearchExtension.get() )}.
 	 * @param <LOS> The type of the initial step of the loading options definition DSL.
 	 * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
-	 * {@code .extension( ElasticsearchExtension.get() }.
+	 * {@code .extension( ElasticsearchExtension.get() )}.
 	 * @return The extension.
 	 */
 	@SuppressWarnings("unchecked") // The instance works for any H, R, E and LOS

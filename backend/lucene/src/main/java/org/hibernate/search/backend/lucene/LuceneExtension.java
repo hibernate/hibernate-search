@@ -60,16 +60,16 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *
  * @param <H> The type of query hits.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
- * {@code .extension( LuceneExtension.get() }.
+ * {@code .extension( LuceneExtension.get() )}.
  * @param <R> The entity reference type for projections.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
- * {@code .extension( LuceneExtension.get() }.
+ * {@code .extension( LuceneExtension.get() )}.
  * @param <E> entity type for projections.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
- * {@code .extension( LuceneExtension.get() }.
+ * {@code .extension( LuceneExtension.get() )}.
  * @param <LOS> The type of the initial step of the loading options definition DSL.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
- * {@code .extension( LuceneExtension.get() }.
+ * {@code .extension( LuceneExtension.get() )}.
  *
  * @see #get()
  */
