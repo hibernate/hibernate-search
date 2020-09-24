@@ -175,6 +175,24 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 		}
 
 		@Override
+		public SortedSet<ContainedEntity> getContainedIndexedEmbeddedShallowReindexOnUpdate(
+				ContainingEntity containingEntity) {
+			return containingEntity.getContainedIndexedEmbeddedShallowReindexOnUpdate();
+		}
+
+		@Override
+		public void setContainedIndexedEmbeddedShallowReindexOnUpdate(ContainingEntity containingEntity,
+				SortedSet<ContainedEntity> containedEntities) {
+			containingEntity.setContainedIndexedEmbeddedShallowReindexOnUpdate( containedEntities );
+		}
+
+		@Override
+		public List<ContainingEntity> getContainingAsIndexedEmbeddedShallowReindexOnUpdate(
+				ContainedEntity containedEntity) {
+			return containedEntity.getContainingAsIndexedEmbeddedShallowReindexOnUpdate();
+		}
+
+		@Override
 		public SortedSet<ContainedEntity> getContainedIndexedEmbeddedNoReindexOnUpdate(ContainingEntity containingEntity) {
 			return containingEntity.getContainedIndexedEmbeddedNoReindexOnUpdate();
 		}
@@ -278,6 +296,9 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 				"containedIndexedEmbedded.indexedField",
 				"containedIndexedEmbedded.indexedElementCollectionField",
 				"containedIndexedEmbedded.containedDerivedField",
+				"containedIndexedEmbeddedShallowReindexOnUpdate.indexedField",
+				"containedIndexedEmbeddedShallowReindexOnUpdate.indexedElementCollectionField",
+				"containedIndexedEmbeddedShallowReindexOnUpdate.containedDerivedField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.containedDerivedField",
@@ -296,6 +317,13 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 		@JoinTable(name = "indexed_containedNonIndexedEmbedded")
 		@SortNatural
 		private SortedSet<ContainedEntity> containedNonIndexedEmbedded = new TreeSet<>();
+
+		@ManyToMany
+		@JoinTable(name = "indexed_indexedEmbeddedShallowReindexOnUpdateContained")
+		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
+		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
+		@SortNatural
+		private SortedSet<ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate = new TreeSet<>();
 
 		@ManyToMany
 		@JoinTable(name = "indexed_indexedEmbeddedNoReindexOnUpdateContained")
@@ -353,6 +381,15 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 
 		public void setContainedNonIndexedEmbedded(SortedSet<ContainedEntity> containedNonIndexedEmbedded) {
 			this.containedNonIndexedEmbedded = containedNonIndexedEmbedded;
+		}
+
+		public SortedSet<ContainedEntity> getContainedIndexedEmbeddedShallowReindexOnUpdate() {
+			return containedIndexedEmbeddedShallowReindexOnUpdate;
+		}
+
+		public void setContainedIndexedEmbeddedShallowReindexOnUpdate(
+				SortedSet<ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate) {
+			this.containedIndexedEmbeddedShallowReindexOnUpdate = containedIndexedEmbeddedShallowReindexOnUpdate;
 		}
 
 		public SortedSet<ContainedEntity> getContainedIndexedEmbeddedNoReindexOnUpdate() {
@@ -416,6 +453,10 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsNonIndexedEmbedded = new ArrayList<>();
 
+		@ManyToMany(mappedBy = "containedIndexedEmbeddedShallowReindexOnUpdate")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		private List<ContainingEntity> containingAsIndexedEmbeddedShallowReindexOnUpdate = new ArrayList<>();
+
 		@ManyToMany(mappedBy = "containedIndexedEmbeddedNoReindexOnUpdate")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
@@ -477,6 +518,10 @@ public class AutomaticIndexingSortedSetAssociationIT extends AbstractAutomaticIn
 
 		public List<ContainingEntity> getContainingAsNonIndexedEmbedded() {
 			return containingAsNonIndexedEmbedded;
+		}
+
+		public List<ContainingEntity> getContainingAsIndexedEmbeddedShallowReindexOnUpdate() {
+			return containingAsIndexedEmbeddedShallowReindexOnUpdate;
 		}
 
 		public List<ContainingEntity> getContainingAsIndexedEmbeddedNoReindexOnUpdate() {

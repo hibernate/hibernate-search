@@ -170,6 +170,24 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 		}
 
 		@Override
+		public List<ContainedEntity> getContainedIndexedEmbeddedShallowReindexOnUpdate(
+				ContainingEntity containingEntity) {
+			return containingEntity.getContainedIndexedEmbeddedShallowReindexOnUpdate();
+		}
+
+		@Override
+		public void setContainedIndexedEmbeddedShallowReindexOnUpdate(ContainingEntity containingEntity,
+				List<ContainedEntity> containedEntities) {
+			containingEntity.setContainedIndexedEmbeddedShallowReindexOnUpdate( containedEntities );
+		}
+
+		@Override
+		public List<ContainingEntity> getContainingAsIndexedEmbeddedShallowReindexOnUpdate(
+				ContainedEntity containedEntity) {
+			return containedEntity.getContainingAsIndexedEmbeddedShallowReindexOnUpdate();
+		}
+
+		@Override
 		public List<ContainedEntity> getContainedIndexedEmbeddedNoReindexOnUpdate(ContainingEntity containingEntity) {
 			return containingEntity.getContainedIndexedEmbeddedNoReindexOnUpdate();
 		}
@@ -273,6 +291,9 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 				"containedIndexedEmbedded.indexedField",
 				"containedIndexedEmbedded.indexedElementCollectionField",
 				"containedIndexedEmbedded.containedDerivedField",
+				"containedIndexedEmbeddedShallowReindexOnUpdate.indexedField",
+				"containedIndexedEmbeddedShallowReindexOnUpdate.indexedElementCollectionField",
+				"containedIndexedEmbeddedShallowReindexOnUpdate.containedDerivedField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.containedDerivedField",
@@ -289,6 +310,12 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 		@ManyToMany
 		@JoinTable(name = "indexed_containedNonIndexedEmbedded")
 		private List<ContainedEntity> containedNonIndexedEmbedded = new ArrayList<>();
+
+		@ManyToMany
+		@JoinTable(name = "indexed_indexedEmbeddedShallowReindexOnUpdateContained")
+		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
+		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
+		private List<ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate = new ArrayList<>();
 
 		@ManyToMany
 		@JoinTable(name = "indexed_indexedEmbeddedNoReindexOnUpdateContained")
@@ -343,6 +370,15 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 
 		public void setContainedNonIndexedEmbedded(List<ContainedEntity> containedNonIndexedEmbedded) {
 			this.containedNonIndexedEmbedded = containedNonIndexedEmbedded;
+		}
+
+		public List<ContainedEntity> getContainedIndexedEmbeddedShallowReindexOnUpdate() {
+			return containedIndexedEmbeddedShallowReindexOnUpdate;
+		}
+
+		public void setContainedIndexedEmbeddedShallowReindexOnUpdate(
+				List<ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate) {
+			this.containedIndexedEmbeddedShallowReindexOnUpdate = containedIndexedEmbeddedShallowReindexOnUpdate;
 		}
 
 		public List<ContainedEntity> getContainedIndexedEmbeddedNoReindexOnUpdate() {
@@ -411,6 +447,10 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsNonIndexedEmbedded = new ArrayList<>();
 
+		@ManyToMany(mappedBy = "containedIndexedEmbeddedShallowReindexOnUpdate")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		private List<ContainingEntity> containingAsIndexedEmbeddedShallowReindexOnUpdate = new ArrayList<>();
+
 		@ManyToMany(mappedBy = "containedIndexedEmbeddedNoReindexOnUpdate")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
@@ -467,6 +507,10 @@ public class AutomaticIndexingListAssociationIT extends AbstractAutomaticIndexin
 
 		public List<ContainingEntity> getContainingAsNonIndexedEmbedded() {
 			return containingAsNonIndexedEmbedded;
+		}
+
+		public List<ContainingEntity> getContainingAsIndexedEmbeddedShallowReindexOnUpdate() {
+			return containingAsIndexedEmbeddedShallowReindexOnUpdate;
 		}
 
 		public List<ContainingEntity> getContainingAsIndexedEmbeddedNoReindexOnUpdate() {

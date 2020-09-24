@@ -174,6 +174,24 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 		}
 
 		@Override
+		public Map<String, ContainedEntity> getContainedIndexedEmbeddedShallowReindexOnUpdate(
+				ContainingEntity containingEntity) {
+			return containingEntity.getContainedIndexedEmbeddedShallowReindexOnUpdate();
+		}
+
+		@Override
+		public void setContainedIndexedEmbeddedShallowReindexOnUpdate(ContainingEntity containingEntity,
+				Map<String, ContainedEntity> containedEntities) {
+			containingEntity.setContainedIndexedEmbeddedShallowReindexOnUpdate( containedEntities );
+		}
+
+		@Override
+		public List<ContainingEntity> getContainingAsIndexedEmbeddedShallowReindexOnUpdate(
+				ContainedEntity containedEntity) {
+			return containedEntity.getContainingAsIndexedEmbeddedShallowReindexOnUpdate();
+		}
+
+		@Override
 		public Map<String, ContainedEntity> getContainedIndexedEmbeddedNoReindexOnUpdate(ContainingEntity containingEntity) {
 			return containingEntity.getContainedIndexedEmbeddedNoReindexOnUpdate();
 		}
@@ -277,6 +295,9 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 				"containedIndexedEmbedded.indexedField",
 				"containedIndexedEmbedded.indexedElementCollectionField",
 				"containedIndexedEmbedded.containedDerivedField",
+				"containedIndexedEmbeddedShallowReindexOnUpdate.indexedField",
+				"containedIndexedEmbeddedShallowReindexOnUpdate.indexedElementCollectionField",
+				"containedIndexedEmbeddedShallowReindexOnUpdate.containedDerivedField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.containedDerivedField",
@@ -305,6 +326,18 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 		@MapKeyColumn(name = "map_key")
 		@OrderBy("id asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		private Map<String, ContainedEntity> containedNonIndexedEmbedded = new LinkedHashMap<>();
+
+		@ManyToMany
+		@JoinTable(
+				name = "indexed_containedIndexedEmbeddedShallowReindexOnUpdate",
+				joinColumns = @JoinColumn(name = "mapHolder"),
+				inverseJoinColumns = @JoinColumn(name = "value")
+		)
+		@MapKeyColumn(name = "map_key")
+		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
+		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
+		@OrderBy("id asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
+		private Map<String, ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate = new LinkedHashMap<>();
 
 		@ManyToMany
 		@JoinTable(
@@ -379,6 +412,15 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 			this.containedNonIndexedEmbedded = containedNonIndexedEmbedded;
 		}
 
+		public Map<String, ContainedEntity> getContainedIndexedEmbeddedShallowReindexOnUpdate() {
+			return containedIndexedEmbeddedShallowReindexOnUpdate;
+		}
+
+		public void setContainedIndexedEmbeddedShallowReindexOnUpdate(
+				Map<String, ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate) {
+			this.containedIndexedEmbeddedShallowReindexOnUpdate = containedIndexedEmbeddedShallowReindexOnUpdate;
+		}
+
 		public Map<String, ContainedEntity> getContainedIndexedEmbeddedNoReindexOnUpdate() {
 			return containedIndexedEmbeddedNoReindexOnUpdate;
 		}
@@ -440,6 +482,10 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsNonIndexedEmbedded = new ArrayList<>();
 
+		@ManyToMany(mappedBy = "containedIndexedEmbeddedShallowReindexOnUpdate")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		private List<ContainingEntity> containingAsIndexedEmbeddedShallowReindexOnUpdate = new ArrayList<>();
+
 		@ManyToMany(mappedBy = "containedIndexedEmbeddedNoReindexOnUpdate")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
@@ -496,6 +542,10 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 
 		public List<ContainingEntity> getContainingAsNonIndexedEmbedded() {
 			return containingAsNonIndexedEmbedded;
+		}
+
+		public List<ContainingEntity> getContainingAsIndexedEmbeddedShallowReindexOnUpdate() {
+			return containingAsIndexedEmbeddedShallowReindexOnUpdate;
 		}
 
 		public List<ContainingEntity> getContainingAsIndexedEmbeddedNoReindexOnUpdate() {

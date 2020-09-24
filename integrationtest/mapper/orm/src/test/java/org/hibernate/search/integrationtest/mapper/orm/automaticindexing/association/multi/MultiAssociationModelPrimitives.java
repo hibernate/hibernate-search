@@ -36,6 +36,20 @@ public interface MultiAssociationModelPrimitives<
 	}
 
 	@Override
+	default void setContainedIndexedEmbeddedShallowReindexOnUpdateSingle(TContaining containing, TContained contained) {
+		TContainedAssociation containedAssociation = getContainedIndexedEmbeddedShallowReindexOnUpdate( containing );
+		clearContained( containedAssociation );
+		addContained( containedAssociation, contained );
+	}
+
+	@Override
+	default void setContainingAsIndexedEmbeddedShallowReindexOnUpdateSingle(TContained contained, TContaining containing) {
+		TContainingAssociation containingAssociation = getContainingAsIndexedEmbeddedShallowReindexOnUpdate( contained );
+		clearContaining( containingAssociation );
+		addContaining( containingAssociation, containing );
+	}
+
+	@Override
 	default void setContainedIndexedEmbeddedNoReindexOnUpdateSingle(TContaining containing, TContained contained) {
 		TContainedAssociation containedAssociation = getContainedIndexedEmbeddedNoReindexOnUpdate( containing );
 		clearContained( containedAssociation );
@@ -104,6 +118,12 @@ public interface MultiAssociationModelPrimitives<
 	void setContainedNonIndexedEmbedded(TContaining containing, TContainedAssociation association);
 
 	TContainingAssociation getContainingAsNonIndexedEmbedded(TContained contained);
+
+	TContainedAssociation getContainedIndexedEmbeddedShallowReindexOnUpdate(TContaining containing);
+
+	void setContainedIndexedEmbeddedShallowReindexOnUpdate(TContaining containing, TContainedAssociation association);
+
+	TContainingAssociation getContainingAsIndexedEmbeddedShallowReindexOnUpdate(TContained contained);
 
 	TContainedAssociation getContainedIndexedEmbeddedNoReindexOnUpdate(TContaining containing);
 
