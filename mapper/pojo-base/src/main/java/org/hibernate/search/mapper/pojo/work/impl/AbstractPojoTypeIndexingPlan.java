@@ -82,8 +82,8 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		final I identifier;
 		Supplier<E> entitySupplier;
 
-		boolean delete;
-		boolean add;
+		boolean deleted;
+		boolean added;
 
 		boolean shouldResolveToReindex;
 		boolean considerAllDirty;
@@ -96,7 +96,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		void add(Supplier<E> entitySupplier, String providedRoutingKey) {
 			this.entitySupplier = entitySupplier;
 			shouldResolveToReindex = true;
-			add = true;
+			added = true;
 		}
 
 		void update(Supplier<E> entitySupplier, String providedRoutingKey) {
@@ -118,9 +118,9 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 
 		void doUpdate(Supplier<E> entitySupplier, String providedRoutingKey) {
 			this.entitySupplier = entitySupplier;
-			if ( !add ) {
-				delete = true;
-				add = true;
+			if ( !added ) {
+				deleted = true;
+				added = true;
 			}
 			// else: If add is true, either this is already an update (in which case update + update = update)
 			// or we called add() in the same plan (in which case add + update = add).
@@ -129,17 +129,17 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 
 		void delete(Supplier<E> entitySupplier, String providedRoutingKey) {
 			this.entitySupplier = entitySupplier;
-			if ( add && !delete ) {
+			if ( added && !deleted ) {
 				// We called add() in the same plan, so the entity didn't exist.
 				// Don't delete, just cancel the addition.
-				add = false;
-				delete = false;
+				added = false;
+				deleted = false;
 			}
 			else {
 				// No add or update yet, or already deleted.
 				// Either way, delete.
-				add = false;
-				delete = true;
+				added = false;
+				deleted = true;
 			}
 
 			// Reindexing does not make sense for a deleted entity
