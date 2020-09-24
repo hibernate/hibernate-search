@@ -4,16 +4,14 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.mapper.orm.reindexing.reindexonupdate;
+package org.hibernate.search.documentation.mapper.orm.reindexing.reindexonupdate.shallow.incorrect;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 
 //tag::include[]
 @Entity
@@ -27,7 +25,6 @@ public class Book {
 
 	@ManyToOne // <1>
 	@IndexedEmbedded // <2>
-	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO) // <3>
 	private BookCategory category;
 
 	public Book() {
