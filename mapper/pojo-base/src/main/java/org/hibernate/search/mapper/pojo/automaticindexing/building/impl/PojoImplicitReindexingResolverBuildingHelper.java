@@ -146,31 +146,29 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		return extractorBinder.create( boundExtractorPath );
 	}
 
-	ReindexOnUpdate composeReindexOnUpdate(ReindexOnUpdate parentReindexOnUpdate,
-			PojoTypeModel<?> typeModel, String propertyName, ContainerExtractorPath extractorPath) {
-		if ( ReindexOnUpdate.NO.equals( parentReindexOnUpdate ) ) {
-			return ReindexOnUpdate.NO;
-		}
-		else {
-			PojoTypeAdditionalMetadata typeAdditionalMetadata =
-					typeAdditionalMetadataProvider.get( typeModel.rawType() );
-			Optional<ReindexOnUpdate> reindexOnUpdateOptional =
-					typeAdditionalMetadata.getPropertyAdditionalMetadata( propertyName )
-							.getValueAdditionalMetadata( extractorPath )
-							.getReindexOnUpdate();
-			if ( !reindexOnUpdateOptional.isPresent() ) {
-				if ( extractorBinder.isDefaultExtractorPath(
-						typeModel.property( propertyName ).typeModel(),
-						extractorPath
-				) ) {
-					reindexOnUpdateOptional = typeAdditionalMetadata.getPropertyAdditionalMetadata( propertyName )
-							.getValueAdditionalMetadata( ContainerExtractorPath.defaultExtractors() )
-							.getReindexOnUpdate();
-				}
-			}
+	ReindexOnUpdate getDefaultReindexOnUpdate() {
+		return defaultReindexOnUpdate;
+	}
 
-			return reindexOnUpdateOptional.orElse( defaultReindexOnUpdate );
+	ReindexOnUpdate getMetadataReindexOnUpdateOrNull(PojoTypeModel<?> typeModel,
+			String propertyName, ContainerExtractorPath extractorPath) {
+		PojoTypeAdditionalMetadata typeAdditionalMetadata =
+				typeAdditionalMetadataProvider.get( typeModel.rawType() );
+		Optional<ReindexOnUpdate> reindexOnUpdateOptional =
+				typeAdditionalMetadata.getPropertyAdditionalMetadata( propertyName )
+						.getValueAdditionalMetadata( extractorPath )
+						.getReindexOnUpdate();
+		if ( reindexOnUpdateOptional.isPresent() ) {
+			return reindexOnUpdateOptional.get();
 		}
+
+		if ( extractorBinder.isDefaultExtractorPath( typeModel.property( propertyName ).typeModel(), extractorPath ) ) {
+			reindexOnUpdateOptional = typeAdditionalMetadata.getPropertyAdditionalMetadata( propertyName )
+					.getValueAdditionalMetadata( ContainerExtractorPath.defaultExtractors() )
+					.getReindexOnUpdate();
+		}
+
+		return reindexOnUpdateOptional.orElse( null );
 	}
 
 	Set<PojoModelPathValueNode> getMetadataDerivedFrom(PojoTypeModel<?> typeModel, String propertyName,

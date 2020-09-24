@@ -61,14 +61,6 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 	 */
 	private final BoundPojoModelPathValueNode<?, P, V> modelPathFromLastTypeNode;
 	private final PojoModelPathValueNode unboundModelPathFromLastTypeNode;
-	/**
-	 * The last entity node among the ancestor nodes.
-	 * The "last entity node" might be the same as the last type node (see {@link #modelPathFromLastTypeNode})
-	 * if the last type node represents an entity type.
-	 * If not (e.g. if the parent type is an embeddable type),
-	 * then the "last entity node" will be the closest ancestor type node representing an entity type.
-	 */
-	private final PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode;
 	private final BoundPojoModelPathValueNode<?, P, V> modelPathFromLastEntityNode;
 
 	private final ReindexOnUpdate reindexOnUpdate;
@@ -80,7 +72,6 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 
 	PojoIndexingDependencyCollectorValueNode(PojoIndexingDependencyCollectorPropertyNode<?, P> parentNode,
 			BoundPojoModelPathValueNode<?, P, V> modelPathFromLastTypeNode,
-			PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode,
 			BoundPojoModelPathValueNode<?, P, V> modelPathFromLastEntityNode,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
@@ -88,18 +79,15 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 		this.modelPathFromLastTypeNode = modelPathFromLastTypeNode;
 		// The path is used for comparisons (equals), so we need it unbound
 		this.unboundModelPathFromLastTypeNode = modelPathFromLastTypeNode.toUnboundPath();
-		this.lastEntityNode = lastEntityNode;
 		this.modelPathFromLastEntityNode = modelPathFromLastEntityNode;
 
 		BoundPojoModelPathValueNode<?, P, V> modelPathValueNode = modelPathFromLastTypeNode;
 		BoundPojoModelPathPropertyNode<?, P> modelPathPropertyNode = modelPathFromLastTypeNode.getParent();
 		BoundPojoModelPathTypeNode<?> modelPathTypeNode = modelPathPropertyNode.getParent();
-		this.reindexOnUpdate = buildingHelper.composeReindexOnUpdate(
-				parentNode.reindexOnUpdate(),
-				modelPathTypeNode.getTypeModel(),
-				modelPathPropertyNode.getPropertyModel().name(),
-				modelPathValueNode.getExtractorPath()
-		);
+		ReindexOnUpdate metadataReindexOnUpdateOrNull = buildingHelper.getMetadataReindexOnUpdateOrNull(
+				modelPathTypeNode.getTypeModel(), modelPathPropertyNode.getPropertyModel().name(),
+				modelPathValueNode.getExtractorPath() );
+		this.reindexOnUpdate = parentNode.composeReindexOnUpdate( lastEntityNode(), metadataReindexOnUpdateOrNull );
 		this.derivedFrom = buildingHelper.getMetadataDerivedFrom(
 				modelPathTypeNode.getTypeModel(),
 				modelPathPropertyNode.getPropertyModel().name(),
@@ -110,7 +98,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 	public PojoIndexingDependencyCollectorTypeNode<V> type() {
 		return new PojoIndexingDependencyCollectorTypeNode<>(
 				this,
-				lastEntityNode, modelPathFromLastEntityNode.type(),
+				modelPathFromLastEntityNode.type(),
 				buildingHelper
 		);
 	}
@@ -118,7 +106,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 	public <U> PojoIndexingDependencyCollectorTypeNode<U> castedType(PojoRawTypeModel<U> typeModel) {
 		return new PojoIndexingDependencyCollectorTypeNode<>(
 				this,
-				lastEntityNode, modelPathFromLastEntityNode.castedType( typeModel ),
+				modelPathFromLastEntityNode.castedType( typeModel ),
 				buildingHelper
 		);
 	}
@@ -141,6 +129,19 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 	}
 
 	void doCollectDependency(PojoIndexingDependencyCollectorValueNode<?, ?> initialNodeCollectingDependency) {
+		// See the handling of derived properties below to get an idea of
+		// what "reindexOnUpdateFromDerivedProperty" is for:
+		// essentially it allows marking a derived property with ReindexOnUpdate.SHALLOW
+		// so that, in the context of that derived property,
+		// the properties it's derived from are handled as SHALLOW,
+		// i.e. we only collect dependency up to entity boundaries.
+		ReindexOnUpdate composedReindexOnUpdate = initialNodeCollectingDependency == null ? reindexOnUpdate
+				: initialNodeCollectingDependency.composeReindexOnUpdate( lastEntityNode(), reindexOnUpdate );
+		if ( ReindexOnUpdate.NO.equals( composedReindexOnUpdate ) ) {
+			// Updates are ignored
+			return;
+		}
+
 		if ( initialNodeCollectingDependency != null ) {
 			if ( initialNodeCollectingDependency.unboundModelPathFromLastTypeNode.equals( unboundModelPathFromLastTypeNode ) ) {
 				/*
@@ -165,31 +166,34 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 			initialNodeCollectingDependency = this;
 		}
 
-		if ( ReindexOnUpdate.DEFAULT.equals( reindexOnUpdate ) ) {
-			if ( derivedFrom.isEmpty() ) {
-				parentNode.parentNode().collectDependency( this.modelPathFromLastEntityNode );
-			}
-			else {
-				/*
-				 * The value represented by this node is derived from other, base values.
-				 * If we rely on the value represented by this node when indexing,
-				 * then we indirectly rely on these base values.
-				 *
-				 * We don't just call lastEntityNode.collectDependency() for each path to the base values,
-				 * because the paths may cross the entity boundaries, meaning they may have a prefix
-				 * leading to a different entity, and a suffix leading to the value we rely on.
-				 * This means we must go through the dependency collector tree to properly resolve
-				 * the entities that should trigger reindexing of our root entity when they change.
-				 */
-				PojoIndexingDependencyCollectorTypeNode<?> lastTypeNode = parentNode.parentNode();
-				for ( PojoModelPathValueNode path : derivedFrom ) {
-					PojoModelPathBinder.bind(
-							lastTypeNode, path,
-							PojoIndexingDependencyCollectorNode.walker( initialNodeCollectingDependency )
-					);
-				}
+		if ( derivedFrom.isEmpty() ) {
+			parentNode.parentNode().collectDependency( this.modelPathFromLastEntityNode );
+		}
+		else {
+			/*
+			 * The value represented by this node is derived from other, base values.
+			 * If we rely on the value represented by this node when indexing,
+			 * then we indirectly rely on these base values.
+			 *
+			 * We don't just call lastEntityNode.collectDependency() for each path to the base values,
+			 * because the paths may cross the entity boundaries, meaning they may have a prefix
+			 * leading to a different entity, and a suffix leading to the value we rely on.
+			 * This means we must go through the dependency collector tree to properly resolve
+			 * the entities that should trigger reindexing of our root entity when they change.
+			 */
+			PojoIndexingDependencyCollectorTypeNode<?> lastTypeNode = parentNode.parentNode();
+			for ( PojoModelPathValueNode path : derivedFrom ) {
+				PojoModelPathBinder.bind(
+						lastTypeNode, path,
+						PojoIndexingDependencyCollectorNode.walker( initialNodeCollectingDependency )
+				);
 			}
 		}
+	}
+
+	@Override
+	PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode() {
+		return parentNode.lastEntityNode();
 	}
 
 	@Override
@@ -232,7 +236,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 		Map<PojoRawTypeModel<?>, PojoModelPathValueNode> result = inverseAssociationPathCache.get( inverseSideRawEntityType );
 		if ( result == null ) {
 			if ( !inverseAssociationPathCache.containsKey( inverseSideRawEntityType ) ) {
-				PojoTypeModel<?> originalSideEntityType = lastEntityNode.typeModel();
+				PojoTypeModel<?> originalSideEntityType = lastEntityNode().typeModel();
 				PojoRawTypeModel<?> originalSideRawEntityType = originalSideEntityType.rawType();
 
 				// Use a LinkedHashMap for deterministic iteration
@@ -284,7 +288,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 			);
 
 			PojoRawTypeModel<?> inverseSideRawType = valueNodeBuilderDelegate.getTypeModel().rawType();
-			valueNodeTypeConcreteEntitySubTypes = lastEntityNode.getConcreteEntitySubTypesForTypeToReindex(
+			valueNodeTypeConcreteEntitySubTypes = lastEntityNode().getConcreteEntitySubTypesForTypeToReindex(
 					originalSideRawConcreteEntityType, inverseSideRawType
 			);
 		}
@@ -297,7 +301,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 			);
 		}
 
-		lastEntityNode.markForReindexing(
+		lastEntityNode().markForReindexing(
 				valueNodeBuilderDelegate,
 				valueNodeTypeConcreteEntitySubTypes,
 				dependencyPathFromInverseSideEntityTypeNode
