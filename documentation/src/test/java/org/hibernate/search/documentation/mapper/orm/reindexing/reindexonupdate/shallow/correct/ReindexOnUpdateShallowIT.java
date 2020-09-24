@@ -4,17 +4,17 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.mapper.orm.reindexing.reindexonupdate;
+package org.hibernate.search.documentation.mapper.orm.reindexing.reindexonupdate.shallow.correct;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
@@ -26,7 +26,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class ReindexOnUpdateIT {
+public class ReindexOnUpdateShallowIT {
 
 	@Parameterized.Parameters(name = "{0}")
 	public static List<?> params() {
@@ -38,7 +38,7 @@ public class ReindexOnUpdateIT {
 					bookMapping.indexed();
 					bookMapping.property( "category" )
 							.indexedEmbedded()
-							.indexingDependency().reindexOnUpdate( ReindexOnUpdate.NO );
+							.indexingDependency().reindexOnUpdate( ReindexOnUpdate.SHALLOW );
 					TypeMappingStep bookCategoryMapping = mapping.type( BookCategory.class );
 					bookCategoryMapping.property( "name" )
 							.fullTextField().analyzer( "english" );
@@ -58,7 +58,7 @@ public class ReindexOnUpdateIT {
 	}
 
 	@Test
-	public void noReindexing() {
+	public void reindexOnUpdateShallow() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			BookCategory category = new BookCategory();
 			category.setId( 1 );
@@ -75,12 +75,8 @@ public class ReindexOnUpdateIT {
 		} );
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-
-			long hitCount = searchSession.search( Book.class )
-					.where( f -> f.match().field( "category.name" ).matching( "science" ) )
-					.fetchTotalHitCount();
-			assertThat( hitCount ).isEqualTo( 100L );
+			assertThat( countBooksByCategory( entityManager, "science" ) )
+					.isEqualTo( 100L );
 		} );
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
@@ -90,15 +86,39 @@ public class ReindexOnUpdateIT {
 		} );
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			SearchSession searchSession = Search.session( entityManager );
-
-			long hitCount = searchSession.search( Book.class )
-					.where( f -> f.match().field( "category.name" ).matching( "science" ) )
-					.fetchTotalHitCount();
-			// The books haven't been reindexed, as expected.
-			assertThat( hitCount ).isEqualTo( 100L );
+			// The books weren't reindexed, as expected.
+			assertThat( countBooksByCategory( entityManager, "science" ) )
+					.isEqualTo( 100L );
+			assertThat( countBooksByCategory( entityManager, "anticipation" ) )
+					.isEqualTo( 0L );
 		} );
 
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			assertThat( countBooksByCategory( entityManager, "crime" ) )
+					.isEqualTo( 0L );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			BookCategory category = new BookCategory();
+			category.setId( 2 );
+			category.setName( "Crime fiction" );
+			entityManager.persist( category );
+
+			Book book = entityManager.getReference( Book.class, 5 );
+			book.setCategory( category );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			// The book was reindexed, as expected.
+			assertThat( countBooksByCategory( entityManager, "crime" ) )
+					.isEqualTo( 1L );
+		} );
+	}
+
+	private long countBooksByCategory(EntityManager entityManager, String categoryNameTerms) {
+		return Search.session( entityManager ).search( Book.class )
+				.where( f -> f.match().field( "category.name" ).matching( categoryNameTerms ) )
+				.fetchTotalHitCount();
 	}
 
 }

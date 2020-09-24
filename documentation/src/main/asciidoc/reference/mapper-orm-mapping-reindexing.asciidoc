@@ -116,37 +116,148 @@ that whenever the list of authors changes, the result of `getMainAuthor()` may h
 ====
 
 [[mapper-orm-reindexing-reindexonupdate]]
-== Disabling reindexing with `@IndexingDependency`
+== Limiting automatic reindexing with `@IndexingDependency`
 
-In some cases, automatic reindexing is not realistically achievable:
+In some cases, fully automatic reindexing is not realistically achievable:
 
-* When a property mapped to the index is updated very frequently,
-leading to a very frequent reindexing and unacceptable usage of disks or database.
 * When an association is massive,
 for example a single entity instance is <<mapper-orm-indexedembedded,indexed-embedded>>
 in thousands of other entities.
+* When a property mapped to the index is updated very frequently,
+leading to a very frequent reindexing and unacceptable usage of disks or database.
 * Etc.
 
 When that happens, it is possible to tell Hibernate Search to ignore updates
 to a particular property (and, in the case of `@IndexedEmbedded`, anything beyond that property).
-The index will become slightly out-of-sync whenever the property is modified,
-but this can be solved by <<mapper-orm-indexing-massindexer,reindexing>>,
-for example every night.
 
-.Disabling automatic reindexing with `@IndexingDependency.reindexOnUpdate`
+Several options are available to control exactly how updates to a given property affect reindexing.
+See the sections below for an explanation of each option.
+
+=== `ReindexingOnUpdate.SHALLOW`: limiting automatic reindexing to same-entity updates only
+
+`ReindexingOnUpdate.SHALLOW` is most useful when an association is highly asymmetric and therefore unidirectional.
+Think associations to "reference" data such as categories, types, cities, countries, ...
+
+It essentially tells Hibernate Search that changing an association
+-- adding or removing associated elements, i.e. "shallow" updates -- should trigger automatic reindexing,
+but changing properties of associated entities -- "deep" updates -- should not.
+
+For example, let's consider the (incorrect) mapping below:
+
+.A highly-asymmetric, unidirectional association
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/reindexonupdate/Book.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/reindexonupdate/shallow/incorrect/Book.java[tags=include;!getters-setters]
 ----
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/reindexonupdate/shallow/incorrect/BookCategory.java[tags=include;!getters-setters]
+----
+
 <1> Each book has an association to a `BookCategory` entity.
-There are many, potentially thousands of books for each category.
-<2> We want to index-embed the `BookCategory` into the `Book` ...
-<3> ... but we really don't want to model the (huge) inverse association from `BookCategory` to `Book`.
-Thus we use `@IndexingDependency.reindexOnUpdate` to tell Hibernate Search that `Book`
-should not be reindexed when the content of a `BookCategory` changes.
-If we rename a `BookCategory`, we will need to reindex the corresponding books manually.
+<2> We want to <<mapper-orm-indexedembedded,index-embed>> the `BookCategory` into the `Book` ...
+<3> ... but we really don't want to model the (huge) inverse association from `BookCategory` to `Book`:
+There are potentially thousands of books for each category, so calling a `getBooks()` method
+would lead to loading thousands of entities into the Hibernate ORM session at once,
+and would perform badly.
+Thus there isn't any `getBooks()` method to list all books in a category.
 ====
+
+With this mapping, Hibernate Search will not be able to reindex all books when the category name changes:
+the getter that would list all books for that category simply doesn't exist.
+Since Hibernate Search tries to be safe by default,
+it will reject this mapping and throw an exception at bootstrap,
+saying it needs an inverse side to the `Book` -> `BookCategory` association.
+
+However, in this case, we don't expect the name of a `BookCategory` to change.
+That's really "reference" data, which changes so rarely that we can conceivably plan ahead such change
+and <<mapper-orm-indexing-massindexer,reindex all books>> whenever that happens.
+So we would really not mind if Hibernate Search just ignored changes to `BookCategory`...
+
+That's what `@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)` is for:
+it tells Hibernate Search to ignore the impact of updates to an associated entity.
+See the modified mapping below:
+
+.Limiting automatic reindexing to same-entity updates with `ReindexOnUpdate.SHALLOW`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/reindexonupdate/shallow/correct/Book.java[tags=include;!getters-setters]
+----
+<1> We use `ReindexOnUpdate.SHALLOW` to tell Hibernate Search that `Book`
+should be reindexed automatically when it's assigned a new category (`book.setCategory( newCategory )`),
+but not when properties of its category change (`category.setName( newName )`).
+====
+
+Hibernate Search will accept the mapping above and boot successfully,
+since the inverse side of the association from `Book` to `BookCategory` is no longer deemed necessary.
+
+Only _shallow_ changes to a book's category will trigger automatic reindexing:
+
+* When a book is assigned a new category (`book.setCategory( newCategory )`),
+Hibernate Search will consider it a "shallow" change, since it only affects the `Book` entity.
+Thus, Hibernate Search will reindex the book automatically.
+* When a category itself changes (`category.setName( newName )`),
+Hibernate Search will consider it a "deep" change, since it occurs beyond the boundaries of the `Book` entity.
+Thus, Hibernate Search will *not* reindex books of that category automatically.
+The index will become slightly out-of-sync,
+but this can be solved by <<mapper-orm-indexing-massindexer,reindexing>> `Book` entities,
+for example every night.
+
+=== `ReindexingOnUpdate.NO`: disabling automatic reindexing for updates of a particular property
+
+`ReindexingOnUpdate.NO` is most useful for properties that change very frequently
+and don't need to be up-to-date in the index.
+
+It essentially tells Hibernate Search that changes to that property should not trigger automatic reindexing,
+
+For example, let's consider the mapping below:
+
+.A frequently-changing property
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/reindexonupdate/no/incorrect/Sensor.java[tags=include;!getters-setters]
+----
+<1> The sensor name and status get updated very rarely.
+<2> The sensor value gets updated every few milliseconds
+<3> When the sensor value gets updated, we also update the rolling average over the last few seconds
+(based on data not shown here).
+====
+
+Updates to the name and status, which are rarely updated, can perfectly well trigger automatic reindexing.
+But considering there are thousands of sensors,
+updates to the sensor value cannot reasonably trigger automatic reindexing:
+reindexing thousands of sensors every few milliseconds probably won't perform well.
+
+In this scenario, however, search on sensor value is not considered critical and indexes don't need to be as fresh.
+We can accept indexes to lag behind a few minutes when it comes to sensor value.
+We can consider setting up a batch process that runs every few seconds
+to reindex all sensors, either through a <<mapper-orm-indexing-massindexer,mass indexer>>
+or <<mapper-orm-indexing-manual,other means>>.
+So we would really not mind if Hibernate Search just ignored changes to sensor values...
+
+That's what `@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)` is for:
+it tells Hibernate Search to ignore the impact of updates to the `rollingAverage` property.
+See the modified mapping below:
+
+.Disabling automatic reindexing for a particular property with `ReindexOnUpdate.NO`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/reindexonupdate/no/correct/Sensor.java[tags=include;!getters-setters]
+----
+<1> We use `ReindexOnUpdate.NO` to tell Hibernate Search that updates to `rollingAverage`
+should not trigger automatic reindexing.
+====
+
+With this mapping:
+
+* When a sensor is assigned a new name (`sensor.setName( newName )`) or status (`sensor.setStatus( newStatus )`),
+Hibernate Search will reindex the sensor automatically.
+* When a sensor is assigned a new rolling average (`sensor.setRollingAverage( newName )`),
+Hibernate Search will *not* reindex the sensor automatically.
 
 [[mapper-orm-reindexing-programmatic]]
 == Programmatic mapping
@@ -170,10 +281,10 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/de
 ----
 ====
 
-.Disabling automatic reindexing with `.indexingDependency().reindexOnUpdate(...)`
+.Limiting automatic reindexing with `.indexingDependency().reindexOnUpdate(...)`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/reindexonupdate/ReindexOnUpdateIT.java[tags=programmatic]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/reindexing/reindexonupdate/shallow/correct/ReindexOnUpdateShallowIT.java[tags=programmatic]
 ----
 ====
