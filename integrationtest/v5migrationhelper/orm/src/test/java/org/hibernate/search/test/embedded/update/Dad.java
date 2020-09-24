@@ -57,7 +57,7 @@ public class Dad {
 	}
 
 	@ManyToOne
-	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 	public Grandpa getGrandpa() {
 		return grandpa;
 	}

@@ -39,7 +39,7 @@ public class Product {
 
 	@ManyToMany(cascade = CascadeType.REMOVE) //just to make the test easier, cascade doesn't really make any business sense
 	@IndexedEmbedded
-	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 	private Set<Author> authors = new HashSet<Author>();
 
 	@ManyToMany(cascade = CascadeType.REMOVE) //just to make the test easier, cascade doesn't really make any business sense
