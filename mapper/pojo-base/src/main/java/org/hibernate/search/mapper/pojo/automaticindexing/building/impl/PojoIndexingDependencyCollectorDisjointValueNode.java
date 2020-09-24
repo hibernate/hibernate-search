@@ -66,8 +66,8 @@ public class PojoIndexingDependencyCollectorDisjointValueNode<V>
 	}
 
 	@Override
-	ReindexOnUpdate getReindexOnUpdate() {
-		return parentNode.getReindexOnUpdate();
+	ReindexOnUpdate reindexOnUpdate() {
+		return parentNode.reindexOnUpdate();
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public class PojoIndexingDependencyCollectorDisjointValueNode<V>
 			BoundPojoModelPathValueNode<?, ?, ?> dependencyPathFromInverseSideEntityTypeNode) {
 		PojoTypeModel<?> inverseSideEntityType = inverseSideEntityTypeNodeBuilder.getTypeModel();
 		PojoRawTypeModel<?> inverseSideRawEntityType = inverseSideEntityType.rawType();
-		PojoRawTypeModel<?> originalSideRawConcreteEntityType = parentNode.getTypeModel().rawType();
+		PojoRawTypeModel<?> originalSideRawConcreteEntityType = parentNode.typeModel().rawType();
 
 		PojoModelPathValueNode inverseAssociationUnboundPath = inverseAssociationPath.toUnboundPath();
 

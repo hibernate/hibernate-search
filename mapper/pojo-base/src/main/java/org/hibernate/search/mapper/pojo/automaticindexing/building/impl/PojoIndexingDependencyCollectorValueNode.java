@@ -94,13 +94,13 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 		BoundPojoModelPathValueNode<?, P, V> modelPathValueNode = modelPathFromLastTypeNode;
 		BoundPojoModelPathPropertyNode<?, P> modelPathPropertyNode = modelPathFromLastTypeNode.getParent();
 		BoundPojoModelPathTypeNode<?> modelPathTypeNode = modelPathPropertyNode.getParent();
-		this.reindexOnUpdate = buildingHelper.getReindexOnUpdate(
-				parentNode.getReindexOnUpdate(),
+		this.reindexOnUpdate = buildingHelper.composeReindexOnUpdate(
+				parentNode.reindexOnUpdate(),
 				modelPathTypeNode.getTypeModel(),
 				modelPathPropertyNode.getPropertyModel().name(),
 				modelPathValueNode.getExtractorPath()
 		);
-		this.derivedFrom = buildingHelper.getDerivedFrom(
+		this.derivedFrom = buildingHelper.getMetadataDerivedFrom(
 				modelPathTypeNode.getTypeModel(),
 				modelPathPropertyNode.getPropertyModel().name(),
 				modelPathValueNode.getExtractorPath()
@@ -130,7 +130,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 	@Override
 	void collectDependency(BoundPojoModelPathValueNode<?, ?, ?> dirtyPathFromEntityType) {
 		if ( derivedFrom.isEmpty() ) {
-			parentNode.getParentNode().collectDependency( dirtyPathFromEntityType );
+			parentNode.parentNode().collectDependency( dirtyPathFromEntityType );
 		}
 		else {
 			// This value is derived from other properties.
@@ -167,7 +167,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 
 		if ( ReindexOnUpdate.DEFAULT.equals( reindexOnUpdate ) ) {
 			if ( derivedFrom.isEmpty() ) {
-				parentNode.getParentNode().collectDependency( this.modelPathFromLastEntityNode );
+				parentNode.parentNode().collectDependency( this.modelPathFromLastEntityNode );
 			}
 			else {
 				/*
@@ -181,7 +181,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 				 * This means we must go through the dependency collector tree to properly resolve
 				 * the entities that should trigger reindexing of our root entity when they change.
 				 */
-				PojoIndexingDependencyCollectorTypeNode<?> lastTypeNode = parentNode.getParentNode();
+				PojoIndexingDependencyCollectorTypeNode<?> lastTypeNode = parentNode.parentNode();
 				for ( PojoModelPathValueNode path : derivedFrom ) {
 					PojoModelPathBinder.bind(
 							lastTypeNode, path,
@@ -193,7 +193,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 	}
 
 	@Override
-	ReindexOnUpdate getReindexOnUpdate() {
+	ReindexOnUpdate reindexOnUpdate() {
 		return reindexOnUpdate;
 	}
 
@@ -232,7 +232,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 		Map<PojoRawTypeModel<?>, PojoModelPathValueNode> result = inverseAssociationPathCache.get( inverseSideRawEntityType );
 		if ( result == null ) {
 			if ( !inverseAssociationPathCache.containsKey( inverseSideRawEntityType ) ) {
-				PojoTypeModel<?> originalSideEntityType = lastEntityNode.getTypeModel();
+				PojoTypeModel<?> originalSideEntityType = lastEntityNode.typeModel();
 				PojoRawTypeModel<?> originalSideRawEntityType = originalSideEntityType.rawType();
 
 				// Use a LinkedHashMap for deterministic iteration
@@ -242,7 +242,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 						buildingHelper.getConcreteEntitySubTypesForEntitySuperType( originalSideRawEntityType ) ) {
 					BoundPojoModelPathValueNode<?, ?, ?> modelPathFromConcreteEntitySubType =
 							applyProcessingPathToSubType( concreteEntityType, modelPathFromLastEntityNode );
-					PojoModelPathValueNode inverseAssociationPath = buildingHelper.getPathInverter()
+					PojoModelPathValueNode inverseAssociationPath = buildingHelper.pathInverter()
 							.invertPath( inverseSideEntityType, modelPathFromConcreteEntitySubType )
 							.orElse( null );
 					if ( inverseAssociationPath == null ) {
@@ -309,7 +309,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 		return PojoModelPathBinder.bind(
 				BoundPojoModelPath.root( rootSubType ),
 				source.toUnboundPath(),
-				BoundPojoModelPath.walker( buildingHelper.getExtractorBinder() )
+				BoundPojoModelPath.walker( buildingHelper.extractorBinder() )
 		);
 	}
 

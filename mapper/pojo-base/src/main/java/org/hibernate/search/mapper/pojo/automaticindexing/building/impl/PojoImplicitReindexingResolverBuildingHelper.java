@@ -105,7 +105,7 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		}
 	}
 
-	PojoAssociationPathInverter getPathInverter() {
+	PojoAssociationPathInverter pathInverter() {
 		return pathInverter;
 	}
 
@@ -137,7 +137,7 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		return builder;
 	}
 
-	ContainerExtractorBinder getExtractorBinder() {
+	ContainerExtractorBinder extractorBinder() {
 		return extractorBinder;
 	}
 
@@ -146,7 +146,7 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		return extractorBinder.create( boundExtractorPath );
 	}
 
-	ReindexOnUpdate getReindexOnUpdate(ReindexOnUpdate parentReindexOnUpdate,
+	ReindexOnUpdate composeReindexOnUpdate(ReindexOnUpdate parentReindexOnUpdate,
 			PojoTypeModel<?> typeModel, String propertyName, ContainerExtractorPath extractorPath) {
 		if ( ReindexOnUpdate.NO.equals( parentReindexOnUpdate ) ) {
 			return ReindexOnUpdate.NO;
@@ -173,7 +173,7 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		}
 	}
 
-	Set<PojoModelPathValueNode> getDerivedFrom(PojoTypeModel<?> typeModel, String propertyName,
+	Set<PojoModelPathValueNode> getMetadataDerivedFrom(PojoTypeModel<?> typeModel, String propertyName,
 			ContainerExtractorPath extractorPath) {
 		PojoTypeAdditionalMetadata typeAdditionalMetadata =
 				typeAdditionalMetadataProvider.get( typeModel.rawType() );
