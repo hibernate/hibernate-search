@@ -155,13 +155,13 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 			// This is a purge: force deletion even if it doesn't seem this document was added
 			considerAllDirty = false;
 			dirtyPaths = null;
-			add = false;
-			delete = true;
+			added = false;
+			deleted = true;
 		}
 
 		void sendCommandsToDelegate() {
-			if ( add ) {
-				if ( delete ) {
+			if ( added ) {
+				if ( deleted ) {
 					if ( considerAllDirty || updatedBecauseOfContained
 							|| typeContext.requiresSelfReindexing( dirtyPaths ) ) {
 						delegateUpdate();
@@ -171,7 +171,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 					delegateAdd();
 				}
 			}
-			else if ( delete ) {
+			else if ( deleted ) {
 				delegateDelete();
 			}
 		}
