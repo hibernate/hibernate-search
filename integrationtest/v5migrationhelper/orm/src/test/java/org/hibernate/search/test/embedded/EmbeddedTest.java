@@ -25,7 +25,6 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -232,7 +231,6 @@ public class EmbeddedTest extends SearchTestBase {
 	}
 
 	@Test
-	@Ignore("HSEARCH-4001: we need to use ReindexOnUpdate.SHALLOW for Product.authors")
 	public void testIndexedEmbeddedAndCollections() throws Exception {
 		Author a = new Author();
 		a.setName( "Voltaire" );
