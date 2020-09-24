@@ -10,7 +10,7 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
 /**
- * Defines the various strategies for handling updates to a value in an entity.
+ * Defines the impact that an update to a value in an entity will have on automatic indexing.
  * <p>
  * A "value" here means either an entity property or something extracted from that property
  * using a {@link ContainerExtractor}.
@@ -18,26 +18,28 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 public enum ReindexOnUpdate {
 
 	/**
-	 * Apply the default, safe behavior:
-	 * <ul>
-	 *     <li>If a parent value was assigned {@link #NO}, ignore an updates to this value.</li>
-	 *     <li>
-	 *         Otherwise, track updates to this value, or any nested value,
-	 *         but only if they are used in the indexing process.
-	 *         Whenever an update is detected, trigger reindexing of the entity holding the updated value,
-	 *         and of any other entity accessing this value through an {@link IndexedEmbedded} for example.
-	 *      </li>
-	 * </ul>
+	 * Default behavior: updates to the targeted value will trigger automatic reindexing
+	 * if it's actually used in the indexing process of an indexed entity,
+	 * unless a property on the path from the indexed entity to the targeted value
+	 * prevents it through a different {@link ReindexOnUpdate} setting.
 	 * <p>
-	 * Note that updates to nested values that were assigned {@link #NO} will always be ignored.
+	 * To be precise:
+	 * <ul>
+	 *     <li>If an indexed entity accesses the targeted value indirectly (e.g. through an {@code @IndexedEmbedded}),
+	 *     and a property in the path from the indexed entity to the targeted value was assigned {@link #NO},
+	 *     then updates to the targeted value <strong>will not</strong> automatically trigger reindexing of the indexed entity.</li>
+	 *     <li>Otherwise, assuming the targeted value is actually used in the indexing process of an indexed entity,
+	 *     either directly (e.g. {@code @GenericField}) or indirectly (e.g. through {@code @IndexedEmbedded}),
+	 *     then updates to the targeted value <strong>will</strong> automatically trigger reindexing of the indexed entity.</li>
+	 * </ul>
 	 */
 	DEFAULT,
 	/**
-	 * Ignore updates to the values (or to any nested value)
-	 * and as a consequence never trigger reindexing,
-	 * unless an indexed entity is deleted or another, sibling value configured with {@link #DEFAULT} is updated.
+	 * Updates to the targeted value, or to any "nested" value (values that are accessed through the targeted value),
+	 * will never trigger automatic reindexing.
 	 * <p>
-	 * This generally means indexing should be triggered externally to periodically refresh the index.
+	 * Applications relying on this setting should have periodic batch processes in place
+	 * to refresh the index of affected entities in case the targeted value changed.
 	 */
 	NO
 
