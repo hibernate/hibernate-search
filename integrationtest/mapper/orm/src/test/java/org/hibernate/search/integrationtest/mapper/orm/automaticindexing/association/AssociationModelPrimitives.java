@@ -37,6 +37,10 @@ public interface AssociationModelPrimitives<
 
 	void setContainingAsIndexedEmbeddedSingle(TContained contained, TContaining containing);
 
+	void setContainedIndexedEmbeddedShallowReindexOnUpdateSingle(TContaining containing, TContained contained);
+
+	void setContainingAsIndexedEmbeddedShallowReindexOnUpdateSingle(TContained contained, TContaining containing);
+
 	void setContainedIndexedEmbeddedNoReindexOnUpdateSingle(TContaining containing, TContained contained);
 
 	void setContainingAsIndexedEmbeddedNoReindexOnUpdateSingle(TContained contained, TContaining containing);

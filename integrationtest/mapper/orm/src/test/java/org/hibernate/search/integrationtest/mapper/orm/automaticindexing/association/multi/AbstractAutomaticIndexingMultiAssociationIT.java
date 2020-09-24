@@ -303,6 +303,154 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 
 	/**
 	 * Test that updating an IndexedEmbedded association in an indexed entity
+	 * does trigger reindexing of the entity
+	 * if the association is marked with ReindexOnUpdate = SHALLOW.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4001")
+	public void directAssociationUpdate_indexedEmbeddedShallowReindexOnUpdate() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> { } )
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+
+			TContained contained = primitives.newContained( 2 );
+			primitives.setIndexedField( contained, VALUE_1 );
+
+			primitives.addContained( primitives.getContainedIndexedEmbeddedShallowReindexOnUpdate( entity1 ), contained );
+			primitives.addContaining( primitives.getContainingAsIndexedEmbeddedShallowReindexOnUpdate( contained ), entity1 );
+
+			session.persist( contained );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.update( "1", b -> b
+							.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b2 -> b2
+									.field( "indexedField", VALUE_1 )
+							)
+					)
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a second value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+
+			TContained contained = primitives.newContained( 3 );
+			primitives.setIndexedField( contained, VALUE_2 );
+
+			primitives.addContained( primitives.getContainedIndexedEmbeddedShallowReindexOnUpdate( entity1 ), contained );
+			primitives.addContaining( primitives.getContainingAsIndexedEmbeddedShallowReindexOnUpdate( contained ), entity1 );
+
+			session.persist( contained );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.update( "1", b -> b
+							.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b2 -> b2
+									.field( "indexedField", VALUE_1 )
+							)
+							.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b2 -> b2
+									.field( "indexedField", VALUE_2 )
+							)
+					)
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+
+			TContained contained = session.get( primitives.getContainedClass(), 2 );
+
+			primitives.removeContaining( primitives.getContainingAsIndexedEmbeddedShallowReindexOnUpdate( contained ), entity1 );
+			primitives.removeContained( primitives.getContainedIndexedEmbeddedShallowReindexOnUpdate( entity1 ), contained );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.update( "1", b -> b
+							.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b2 -> b2
+									.field( "indexedField", VALUE_2 )
+							)
+					)
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that replacing an IndexedEmbeddedNoReindexOnUpdate association in an indexed entity
+	 * does trigger reindexing of the entity
+	 * if the association is marked with ReindexOnUpdate = SHALLOW.
+	 * <p>
+	 * We need dedicated tests for this because Hibernate ORM does not handle
+	 * replaced collections the same way as it does updated collections.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4001")
+	public void directAssociationReplace_indexedEmbeddedShallowReindexOnUpdate() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			TContained contained = primitives.newContained( 2 );
+			primitives.setIndexedField( contained, VALUE_1 );
+
+			primitives.addContained( primitives.getContainedIndexedEmbeddedShallowReindexOnUpdate( entity1 ), contained );
+			primitives.addContaining( primitives.getContainingAsIndexedEmbeddedShallowReindexOnUpdate( contained ), entity1 );
+
+			session.persist( contained );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> b
+							.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b2 -> b2
+									.field( "indexedField", VALUE_1 )
+							)
+					)
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = session.get( primitives.getIndexedClass(), 1 );
+
+			TContained contained = primitives.newContained( 3 );
+			primitives.setIndexedField( contained, VALUE_2 );
+
+			TContainedAssociation newAssociation = primitives.newContainedAssociation(
+					primitives.getContainedIndexedEmbeddedShallowReindexOnUpdate( entity1 )
+			);
+			primitives.addContained( newAssociation, contained );
+			primitives.setContainedIndexedEmbeddedShallowReindexOnUpdate( entity1, newAssociation );
+			primitives.addContaining( primitives.getContainingAsIndexedEmbeddedShallowReindexOnUpdate( contained ), entity1 );
+
+			session.persist( contained );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.update( "1", b -> b
+							.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b2 -> b2
+									.field( "indexedField", VALUE_1 )
+							)
+							.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b2 -> b2
+									.field( "indexedField", VALUE_2 )
+							)
+					)
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that updating an IndexedEmbedded association in an indexed entity
 	 * does not trigger reindexing of the entity
 	 * if the association is marked with ReindexOnUpdate = NO.
 	 */
@@ -739,6 +887,179 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			backendMock.expectWorks( primitives.getIndexName() )
 					.update( "1", b -> b
 							.objectField( "child", b2 -> { } )
+					)
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that updating an IndexedEmbedded association in an entity
+	 * that is IndexedEmbedded in an indexed entity
+	 * does trigger reindexing of the indexed entity
+	 * if the first association is marked with ReindexOnUpdate = SHALLOW.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4001")
+	public void indirectAssociationUpdate_indexedEmbeddedShallowReindexOnUpdate() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			TContaining containingEntity1 = primitives.newContaining( 2 );
+			primitives.setChild( entity1, containingEntity1 );
+			primitives.setParent( containingEntity1, entity1 );
+
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> { } )
+					)
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
+
+			TContained contained = primitives.newContained( 4 );
+			primitives.setIndexedField( contained, VALUE_1 );
+
+			primitives.addContained( primitives.getContainedIndexedEmbeddedShallowReindexOnUpdate( containingEntity1 ), contained );
+			primitives.addContaining( primitives.getContainingAsIndexedEmbeddedShallowReindexOnUpdate( contained ), containingEntity1 );
+
+			session.persist( contained );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b3 -> b3
+											.field( "indexedField", VALUE_1 )
+									)
+							)
+					)
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test adding another value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
+
+			TContained contained = primitives.newContained( 5 );
+			primitives.setIndexedField( contained, VALUE_2 );
+
+			primitives.addContained( primitives.getContainedIndexedEmbeddedShallowReindexOnUpdate( containingEntity1 ), contained );
+			primitives.addContaining( primitives.getContainingAsIndexedEmbeddedShallowReindexOnUpdate( contained ), containingEntity1 );
+
+			session.persist( contained );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b3 -> b3
+											.field( "indexedField", VALUE_1 )
+									)
+									.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b3 -> b3
+											.field( "indexedField", VALUE_2 )
+									)
+							)
+					)
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test removing a value
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
+
+			TContained contained = session.get( primitives.getContainedClass(), 4 );
+
+			primitives.removeContaining( primitives.getContainingAsIndexedEmbeddedShallowReindexOnUpdate( contained ), containingEntity1 );
+			primitives.removeContained( primitives.getContainedIndexedEmbeddedShallowReindexOnUpdate( containingEntity1 ), contained );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b3 -> b3
+											.field( "indexedField", VALUE_2 )
+									)
+							)
+					)
+					.processedThenExecuted();
+
+			// Do not expect any work
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that replacing an IndexedEmbedded association in an entity
+	 * that is IndexedEmbedded in an indexed entity
+	 * does trigger reindexing of the indexed entity
+	 * if the first association is marked with ReindexOnUpdate = SHALLOW.
+	 * <p>
+	 * We need dedicated tests for this because Hibernate ORM does not handle
+	 * replaced collections the same way as it does updated collections.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4001")
+	public void indirectAssociationReplace_indexedEmbeddedShallowReindexOnUpdate() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+
+			TContaining containingEntity1 = primitives.newContaining( 2 );
+			primitives.setChild( entity1, containingEntity1 );
+			primitives.setParent( containingEntity1, entity1 );
+
+			TContained contained = primitives.newContained( 3 );
+			primitives.setIndexedField( contained, VALUE_1 );
+			primitives.addContained( primitives.getContainedIndexedEmbeddedShallowReindexOnUpdate( containingEntity1 ), contained );
+			primitives.addContaining( primitives.getContainingAsIndexedEmbeddedShallowReindexOnUpdate( contained ), containingEntity1 );
+
+			session.persist( contained );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b3 -> b3
+											.field( "indexedField", VALUE_1 )
+									)
+							)
+					)
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TContaining containingEntity1 = session.get( primitives.getContainingClass(), 2 );
+
+			TContained contained = primitives.newContained( 4 );
+			primitives.setIndexedField( contained, VALUE_2 );
+
+			TContainedAssociation newAssociation = primitives.newContainedAssociation(
+					primitives.getContainedIndexedEmbeddedShallowReindexOnUpdate( containingEntity1 )
+			);
+			primitives.addContained( newAssociation, contained );
+			primitives.setContainedIndexedEmbeddedShallowReindexOnUpdate( containingEntity1, newAssociation );
+			primitives.addContaining( primitives.getContainingAsIndexedEmbeddedShallowReindexOnUpdate( contained ), containingEntity1 );
+
+			session.persist( contained );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b3 -> b3
+											.field( "indexedField", VALUE_1 )
+									)
+									.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b3 -> b3
+											.field( "indexedField", VALUE_2 )
+									)
+							)
 					)
 					.processedThenExecuted();
 		} );

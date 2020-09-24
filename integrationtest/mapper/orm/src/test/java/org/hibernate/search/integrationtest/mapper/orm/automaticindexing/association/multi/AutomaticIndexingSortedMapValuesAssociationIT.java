@@ -177,6 +177,24 @@ public class AutomaticIndexingSortedMapValuesAssociationIT extends AbstractAutom
 		}
 
 		@Override
+		public SortedMap<String, ContainedEntity> getContainedIndexedEmbeddedShallowReindexOnUpdate(
+				ContainingEntity containingEntity) {
+			return containingEntity.getContainedIndexedEmbeddedShallowReindexOnUpdate();
+		}
+
+		@Override
+		public void setContainedIndexedEmbeddedShallowReindexOnUpdate(ContainingEntity containingEntity,
+				SortedMap<String, ContainedEntity> containedEntities) {
+			containingEntity.setContainedIndexedEmbeddedShallowReindexOnUpdate( containedEntities );
+		}
+
+		@Override
+		public List<ContainingEntity> getContainingAsIndexedEmbeddedShallowReindexOnUpdate(
+				ContainedEntity containedEntity) {
+			return containedEntity.getContainingAsIndexedEmbeddedShallowReindexOnUpdate();
+		}
+
+		@Override
 		public SortedMap<String, ContainedEntity> getContainedIndexedEmbeddedNoReindexOnUpdate(ContainingEntity containingEntity) {
 			return containingEntity.getContainedIndexedEmbeddedNoReindexOnUpdate();
 		}
@@ -281,6 +299,9 @@ public class AutomaticIndexingSortedMapValuesAssociationIT extends AbstractAutom
 				"containedIndexedEmbedded.indexedField",
 				"containedIndexedEmbedded.indexedElementCollectionField",
 				"containedIndexedEmbedded.containedDerivedField",
+				"containedIndexedEmbeddedShallowReindexOnUpdate.indexedField",
+				"containedIndexedEmbeddedShallowReindexOnUpdate.indexedElementCollectionField",
+				"containedIndexedEmbeddedShallowReindexOnUpdate.containedDerivedField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.indexedElementCollectionField",
 				"containedIndexedEmbeddedNoReindexOnUpdate.containedDerivedField",
@@ -309,6 +330,18 @@ public class AutomaticIndexingSortedMapValuesAssociationIT extends AbstractAutom
 		@MapKeyColumn(name = "map_key")
 		@SortNatural
 		private SortedMap<String, ContainedEntity> containedNonIndexedEmbedded = new TreeMap<>();
+
+		@ManyToMany
+		@JoinTable(
+				name = "indexed_containedIndexedEmbeddedShallowReindexOnUpdate",
+				joinColumns = @JoinColumn(name = "mapHolder"),
+				inverseJoinColumns = @JoinColumn(name = "value")
+		)
+		@MapKeyColumn(name = "map_key")
+		@IndexedEmbedded(includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" })
+		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
+		@SortNatural
+		private SortedMap<String, ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate = new TreeMap<>();
 
 		@ManyToMany
 		@JoinTable(
@@ -383,6 +416,15 @@ public class AutomaticIndexingSortedMapValuesAssociationIT extends AbstractAutom
 			this.containedNonIndexedEmbedded = containedNonIndexedEmbedded;
 		}
 
+		public SortedMap<String, ContainedEntity> getContainedIndexedEmbeddedShallowReindexOnUpdate() {
+			return containedIndexedEmbeddedShallowReindexOnUpdate;
+		}
+
+		public void setContainedIndexedEmbeddedShallowReindexOnUpdate(
+				SortedMap<String, ContainedEntity> containedIndexedEmbeddedShallowReindexOnUpdate) {
+			this.containedIndexedEmbeddedShallowReindexOnUpdate = containedIndexedEmbeddedShallowReindexOnUpdate;
+		}
+
 		public SortedMap<String, ContainedEntity> getContainedIndexedEmbeddedNoReindexOnUpdate() {
 			return containedIndexedEmbeddedNoReindexOnUpdate;
 		}
@@ -444,6 +486,10 @@ public class AutomaticIndexingSortedMapValuesAssociationIT extends AbstractAutom
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsNonIndexedEmbedded = new ArrayList<>();
 
+		@ManyToMany(mappedBy = "containedIndexedEmbeddedShallowReindexOnUpdate")
+		@OrderBy("id asc") // Make sure the iteration order is predictable
+		private List<ContainingEntity> containingAsIndexedEmbeddedShallowReindexOnUpdate = new ArrayList<>();
+
 		@ManyToMany(mappedBy = "containedIndexedEmbeddedNoReindexOnUpdate")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
@@ -500,6 +546,10 @@ public class AutomaticIndexingSortedMapValuesAssociationIT extends AbstractAutom
 
 		public List<ContainingEntity> getContainingAsNonIndexedEmbedded() {
 			return containingAsNonIndexedEmbedded;
+		}
+
+		public List<ContainingEntity> getContainingAsIndexedEmbeddedShallowReindexOnUpdate() {
+			return containingAsIndexedEmbeddedShallowReindexOnUpdate;
 		}
 
 		public List<ContainingEntity> getContainingAsIndexedEmbeddedNoReindexOnUpdate() {
