@@ -191,12 +191,6 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		}
 
 		@Override
-		public List<ContainingEntity> getContainingAsIndexedEmbeddedShallowReindexOnUpdate(
-				ContainedEntity containedEntity) {
-			return containedEntity.getContainingAsIndexedEmbeddedShallowReindexOnUpdate();
-		}
-
-		@Override
 		public Map<ContainedEntity, String> getContainedIndexedEmbeddedNoReindexOnUpdate(ContainingEntity containingEntity) {
 			return containingEntity.getContainedIndexedEmbeddedNoReindexOnUpdate();
 		}
@@ -205,11 +199,6 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		public void setContainedIndexedEmbeddedNoReindexOnUpdate(ContainingEntity containingEntity,
 				Map<ContainedEntity, String> containedEntities) {
 			containingEntity.setContainedIndexedEmbeddedNoReindexOnUpdate( containedEntities );
-		}
-
-		@Override
-		public List<ContainingEntity> getContainingAsIndexedEmbeddedNoReindexOnUpdate(ContainedEntity containedEntity) {
-			return containedEntity.getContainingAsIndexedEmbeddedNoReindexOnUpdate();
 		}
 
 		@Override
@@ -535,38 +524,6 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		 * No mappedBy here, same reasons as above.
 		 */
 		@ManyToMany
-		@JoinTable(name = "contained_indexedShallowReindexOnUpdateMapHolder")
-		@OrderBy("id asc") // Make sure the iteration order is predictable
-		@AssociationInverseSide(
-				inversePath = @ObjectPath(
-						@PropertyValue(
-								propertyName = "containedIndexedEmbeddedShallowReindexOnUpdate",
-								extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY)
-						)
-				)
-		)
-		private List<ContainingEntity> containingAsIndexedEmbeddedShallowReindexOnUpdate = new ArrayList<>();
-
-		/*
-		 * No mappedBy here, same reasons as above.
-		 */
-		@ManyToMany
-		@JoinTable(name = "contained_indexedNoReindexOnUpdateMapHolder")
-		@OrderBy("id asc") // Make sure the iteration order is predictable
-		@AssociationInverseSide(
-				inversePath = @ObjectPath(
-						@PropertyValue(
-								propertyName = "containedIndexedEmbeddedNoReindexOnUpdate",
-								extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_KEY)
-						)
-				)
-		)
-		private List<ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
-
-		/*
-		 * No mappedBy here, same reasons as above.
-		 */
-		@ManyToMany
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		@AssociationInverseSide(
 				inversePath = @ObjectPath(
@@ -640,14 +597,6 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 
 		public List<ContainingEntity> getContainingAsNonIndexedEmbedded() {
 			return containingAsNonIndexedEmbedded;
-		}
-
-		public List<ContainingEntity> getContainingAsIndexedEmbeddedShallowReindexOnUpdate() {
-			return containingAsIndexedEmbeddedShallowReindexOnUpdate;
-		}
-
-		public List<ContainingEntity> getContainingAsIndexedEmbeddedNoReindexOnUpdate() {
-			return containingAsIndexedEmbeddedNoReindexOnUpdate;
 		}
 
 		public List<ContainingEntity> getContainingAsUsedInCrossEntityDerivedProperty() {

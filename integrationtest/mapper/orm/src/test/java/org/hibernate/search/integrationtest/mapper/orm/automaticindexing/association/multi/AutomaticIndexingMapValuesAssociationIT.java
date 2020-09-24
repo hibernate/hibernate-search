@@ -186,12 +186,6 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 		}
 
 		@Override
-		public List<ContainingEntity> getContainingAsIndexedEmbeddedShallowReindexOnUpdate(
-				ContainedEntity containedEntity) {
-			return containedEntity.getContainingAsIndexedEmbeddedShallowReindexOnUpdate();
-		}
-
-		@Override
 		public Map<String, ContainedEntity> getContainedIndexedEmbeddedNoReindexOnUpdate(ContainingEntity containingEntity) {
 			return containingEntity.getContainedIndexedEmbeddedNoReindexOnUpdate();
 		}
@@ -200,11 +194,6 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 		public void setContainedIndexedEmbeddedNoReindexOnUpdate(ContainingEntity containingEntity,
 				Map<String, ContainedEntity> containedEntities) {
 			containingEntity.setContainedIndexedEmbeddedNoReindexOnUpdate( containedEntities );
-		}
-
-		@Override
-		public List<ContainingEntity> getContainingAsIndexedEmbeddedNoReindexOnUpdate(ContainedEntity containedEntity) {
-			return containedEntity.getContainingAsIndexedEmbeddedNoReindexOnUpdate();
 		}
 
 		@Override
@@ -482,14 +471,6 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsNonIndexedEmbedded = new ArrayList<>();
 
-		@ManyToMany(mappedBy = "containedIndexedEmbeddedShallowReindexOnUpdate")
-		@OrderBy("id asc") // Make sure the iteration order is predictable
-		private List<ContainingEntity> containingAsIndexedEmbeddedShallowReindexOnUpdate = new ArrayList<>();
-
-		@ManyToMany(mappedBy = "containedIndexedEmbeddedNoReindexOnUpdate")
-		@OrderBy("id asc") // Make sure the iteration order is predictable
-		private List<ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
-
 		@ManyToMany(mappedBy = "containedUsedInCrossEntityDerivedProperty")
 		@OrderBy("id asc") // Make sure the iteration order is predictable
 		private List<ContainingEntity> containingAsUsedInCrossEntityDerivedProperty = new ArrayList<>();
@@ -542,14 +523,6 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 
 		public List<ContainingEntity> getContainingAsNonIndexedEmbedded() {
 			return containingAsNonIndexedEmbedded;
-		}
-
-		public List<ContainingEntity> getContainingAsIndexedEmbeddedShallowReindexOnUpdate() {
-			return containingAsIndexedEmbeddedShallowReindexOnUpdate;
-		}
-
-		public List<ContainingEntity> getContainingAsIndexedEmbeddedNoReindexOnUpdate() {
-			return containingAsIndexedEmbeddedNoReindexOnUpdate;
 		}
 
 		public List<ContainingEntity> getContainingAsUsedInCrossEntityDerivedProperty() {

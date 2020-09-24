@@ -756,7 +756,6 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TContained contained1 = primitives.newContained( 4 );
 			primitives.setIndexedField( contained1, "initialValue" );
 			primitives.setContainedIndexedEmbeddedShallowReindexOnUpdateSingle( containingEntity1, contained1 );
-			primitives.setContainingAsIndexedEmbeddedShallowReindexOnUpdateSingle( contained1, containingEntity1 );
 
 			session.persist( contained1 );
 			session.persist( containingEntity1 );
@@ -803,7 +802,6 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TContained contained1 = primitives.newContained( 4 );
 			primitives.getIndexedElementCollectionField( contained1 ).add( "firstValue" );
 			primitives.setContainedIndexedEmbeddedShallowReindexOnUpdateSingle( containingEntity1, contained1 );
-			primitives.setContainingAsIndexedEmbeddedShallowReindexOnUpdateSingle( contained1, containingEntity1 );
 
 			session.persist( contained1 );
 			session.persist( containingEntity1 );
@@ -866,7 +864,6 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TContained contained1 = primitives.newContained( 4 );
 			primitives.getIndexedElementCollectionField( contained1 ).add( "firstValue" );
 			primitives.setContainedIndexedEmbeddedShallowReindexOnUpdateSingle( containingEntity1, contained1 );
-			primitives.setContainingAsIndexedEmbeddedShallowReindexOnUpdateSingle( contained1, containingEntity1 );
 
 			session.persist( contained1 );
 			session.persist( containingEntity1 );
@@ -913,7 +910,6 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TContained contained1 = primitives.newContained( 4 );
 			primitives.setIndexedField( contained1, "initialValue" );
 			primitives.setContainedIndexedEmbeddedNoReindexOnUpdateSingle( containingEntity1, contained1 );
-			primitives.setContainingAsIndexedEmbeddedNoReindexOnUpdateSingle( contained1, containingEntity1 );
 
 			session.persist( contained1 );
 			session.persist( containingEntity1 );
@@ -960,7 +956,6 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TContained contained1 = primitives.newContained( 4 );
 			primitives.getIndexedElementCollectionField( contained1 ).add( "firstValue" );
 			primitives.setContainedIndexedEmbeddedNoReindexOnUpdateSingle( containingEntity1, contained1 );
-			primitives.setContainingAsIndexedEmbeddedNoReindexOnUpdateSingle( contained1, containingEntity1 );
 
 			session.persist( contained1 );
 			session.persist( containingEntity1 );
@@ -1023,7 +1018,6 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			TContained contained1 = primitives.newContained( 4 );
 			primitives.getIndexedElementCollectionField( contained1 ).add( "firstValue" );
 			primitives.setContainedIndexedEmbeddedNoReindexOnUpdateSingle( containingEntity1, contained1 );
-			primitives.setContainingAsIndexedEmbeddedNoReindexOnUpdateSingle( contained1, containingEntity1 );
 
 			session.persist( contained1 );
 			session.persist( containingEntity1 );
