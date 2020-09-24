@@ -49,7 +49,7 @@ public class Music {
 			fetch = FetchType.EAGER,
 			targetEntity = Author.class)
 	@IndexedEmbedded(depth = 1)
-	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 	public Set<Author> getAuthors() {
 		return authors;
 	}

@@ -51,7 +51,7 @@ public class Address {
 
 	@ManyToOne(cascade = CascadeType.ALL)
 	@IndexedEmbedded
-	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 	private Country country;
 
 	public Long getId() {

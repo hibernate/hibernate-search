@@ -41,7 +41,7 @@ public class Country {
 	//FIXME with JPA 2, move to @OrderColumn
 	@IndexColumn(name = "list_position")
 	@IndexedEmbedded
-	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 	private List<State> states = new ArrayList<State>();
 
 	public Integer getId() {

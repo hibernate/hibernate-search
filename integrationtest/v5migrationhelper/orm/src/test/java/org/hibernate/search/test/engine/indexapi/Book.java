@@ -42,7 +42,7 @@ public class Book {
 
 	@IndexedEmbedded
 	@ManyToOne
-	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 	public Author getMainAuthor() {
 		return mainAuthor;
 	}

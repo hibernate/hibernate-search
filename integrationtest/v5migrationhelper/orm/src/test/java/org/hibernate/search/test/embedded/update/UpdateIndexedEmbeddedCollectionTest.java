@@ -162,7 +162,7 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestBase {
 
 		@IndexedEmbedded(includeEmbeddedObjectId = true)
 		@OneToOne(cascade = CascadeType.ALL)
-		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 		public Truck getTruck() { return truck; }
 		public void setTruck(Truck truck) { this.truck = truck; }
 		private Truck truck;
@@ -192,7 +192,7 @@ public class UpdateIndexedEmbeddedCollectionTest extends SearchTestBase {
 		private String numberPlate;
 
 		@IndexedEmbedded @OneToMany(cascade = CascadeType.ALL)
-		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 		public Set<Item> getItems() { return items; }
 		public void setItems(Set<Item> items) { this.items = items; }
 		private Set<Item> items;

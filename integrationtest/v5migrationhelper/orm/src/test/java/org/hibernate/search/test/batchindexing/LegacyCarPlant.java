@@ -52,7 +52,7 @@ public class LegacyCarPlant {
 	}
 
 	@IndexedEmbedded
-	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 	@ManyToOne
 	@JoinColumn(name = "CAR_ID", insertable = false, updatable = false)
 	public LegacyCar getCar() {

@@ -36,7 +36,7 @@ public class Entite {
 
 	@IndexedEmbedded
 	@ManyToOne(fetch = FetchType.LAZY)
-	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 	private Categorie categorie;
 
 	public Entite() {
