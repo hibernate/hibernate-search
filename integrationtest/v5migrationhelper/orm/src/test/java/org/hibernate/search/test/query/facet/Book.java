@@ -37,7 +37,7 @@ public class Book {
 
 	@ManyToMany
 	@IndexedEmbedded
-	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 	private Set<Author> authors = new HashSet<>();
 
 	public String getName() {

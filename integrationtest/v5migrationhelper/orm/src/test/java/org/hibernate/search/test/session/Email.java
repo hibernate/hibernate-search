@@ -38,7 +38,7 @@ public class Email {
 
 	@IndexedEmbedded
 	@ManyToOne(fetch = FetchType.LAZY)
-	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 	private Domain domain;
 
 	public Domain getDomain() {

@@ -54,7 +54,7 @@ public class Book implements TitleAble {
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@Fetch(FetchMode.SELECT)
 	@IndexedEmbedded(depth = 3)
-	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 	public Nation getFirstPublishedIn() {
 		return firstPublishedIn;
 	}

@@ -31,7 +31,7 @@ public class DepthMatchesPathDepthCase {
 
 	@ManyToOne
 	@IndexedEmbedded(depth = 4, includePaths = { "a.b.c.indexed" })
-	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 	public ReferencesIndexedEmbeddedA e;
 
 }

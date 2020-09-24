@@ -45,7 +45,7 @@ public class Product {
 	@ManyToMany(cascade = CascadeType.REMOVE) //just to make the test easier, cascade doesn't really make any business sense
 	@MapKeyColumn(name = "CUST_NAME", nullable = false)
 	@IndexedEmbedded
-	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 	private Map<String, Order> orders = new HashMap<String, Order>();
 
 	public Integer getId() {

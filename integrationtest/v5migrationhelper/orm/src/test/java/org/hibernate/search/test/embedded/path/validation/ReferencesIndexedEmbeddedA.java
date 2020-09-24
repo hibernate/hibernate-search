@@ -30,7 +30,7 @@ public class ReferencesIndexedEmbeddedA {
 
 	@ManyToOne
 	@IndexedEmbedded
-	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 	public A a;
 
 }

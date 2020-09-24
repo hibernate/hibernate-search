@@ -28,12 +28,12 @@ public class IndexedEmbeddedProxyRootEntity {
 
 	@OneToOne(optional = false, fetch = FetchType.LAZY)
 	@IndexedEmbedded
-	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 	private IndexedEmbeddedProxyLazyEntity lazyEntity;
 
 	@OneToOne(optional = false, fetch = FetchType.LAZY)
 	@IndexedEmbedded
-	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
+	@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 	private IndexedEmbeddedProxyLazyEntity lazyEntity2;
 
 	public Integer getId() {
