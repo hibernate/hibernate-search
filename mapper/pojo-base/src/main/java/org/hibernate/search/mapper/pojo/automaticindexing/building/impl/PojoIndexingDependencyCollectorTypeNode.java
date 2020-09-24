@@ -118,8 +118,8 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 	}
 
 	@Override
-	ReindexOnUpdate getReindexOnUpdate() {
-		return parentNode == null ? ReindexOnUpdate.DEFAULT : parentNode.getReindexOnUpdate();
+	ReindexOnUpdate reindexOnUpdate() {
+		return parentNode == null ? ReindexOnUpdate.DEFAULT : parentNode.reindexOnUpdate();
 	}
 
 	void collectDependency(BoundPojoModelPathValueNode<?, ?, ?> dirtyPathFromEntityType) {
@@ -231,7 +231,7 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 		}
 	}
 
-	PojoTypeModel<T> getTypeModel() {
+	PojoTypeModel<T> typeModel() {
 		return modelPathFromLastEntityNode.getTypeModel();
 	}
 }

@@ -58,7 +58,7 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends PojoIndex
 	public PojoIndexingDependencyCollectorValueNode<P, ?> value(
 			ContainerExtractorPath extractorPath) {
 		BoundContainerExtractorPath<P, ?> boundExtractorPath =
-				buildingHelper.getExtractorBinder().bindPath(
+				buildingHelper.extractorBinder().bindPath(
 						modelPathFromLastEntityNode.getPropertyModel().typeModel(),
 						extractorPath
 				);
@@ -66,11 +66,11 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends PojoIndex
 	}
 
 	@Override
-	ReindexOnUpdate getReindexOnUpdate() {
-		return parentNode.getReindexOnUpdate();
+	ReindexOnUpdate reindexOnUpdate() {
+		return parentNode.reindexOnUpdate();
 	}
 
-	PojoIndexingDependencyCollectorTypeNode<T> getParentNode() {
+	PojoIndexingDependencyCollectorTypeNode<T> parentNode() {
 		return parentNode;
 	}
 }

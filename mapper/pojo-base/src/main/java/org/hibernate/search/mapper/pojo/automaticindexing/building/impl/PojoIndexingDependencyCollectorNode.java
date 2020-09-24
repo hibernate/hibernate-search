@@ -26,7 +26,7 @@ public abstract class PojoIndexingDependencyCollectorNode {
 		this.buildingHelper = buildingHelper;
 	}
 
-	abstract ReindexOnUpdate getReindexOnUpdate();
+	abstract ReindexOnUpdate reindexOnUpdate();
 
 	static class Walker implements PojoModelPathWalker<
 			PojoIndexingDependencyCollectorTypeNode<?>,
