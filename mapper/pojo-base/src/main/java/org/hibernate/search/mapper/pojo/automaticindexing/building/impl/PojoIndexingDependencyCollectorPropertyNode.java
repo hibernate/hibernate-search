@@ -25,22 +25,15 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends PojoIndex
 	 * The path to this node from the parent node, i.e. from the node representing the type holding this property.
 	 */
 	private final BoundPojoModelPathPropertyNode<T, P> modelPathFromParentNode;
-	/**
-	 * The last entity node among the ancestor nodes,
-	 * i.e. the closest type node representing an entity type.
-	 */
-	private final PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode;
 	private final BoundPojoModelPathPropertyNode<T, P> modelPathFromLastEntityNode;
 
 	PojoIndexingDependencyCollectorPropertyNode(PojoIndexingDependencyCollectorTypeNode<T> parentNode,
 			BoundPojoModelPathPropertyNode<T, P> modelPathFromParentNode,
-			PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode,
 			BoundPojoModelPathPropertyNode<T, P> modelPathFromLastEntityNode,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
 		this.parentNode = parentNode;
 		this.modelPathFromParentNode = modelPathFromParentNode;
-		this.lastEntityNode = lastEntityNode;
 		this.modelPathFromLastEntityNode = modelPathFromLastEntityNode;
 	}
 
@@ -49,7 +42,6 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends PojoIndex
 		return new PojoIndexingDependencyCollectorValueNode<>(
 				this,
 				modelPathFromParentNode.value( boundExtractorPath ),
-				lastEntityNode,
 				modelPathFromLastEntityNode.value( boundExtractorPath ),
 				buildingHelper
 		);
@@ -63,6 +55,11 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends PojoIndex
 						extractorPath
 				);
 		return value( boundExtractorPath );
+	}
+
+	@Override
+	PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode() {
+		return parentNode.lastEntityNode();
 	}
 
 	@Override

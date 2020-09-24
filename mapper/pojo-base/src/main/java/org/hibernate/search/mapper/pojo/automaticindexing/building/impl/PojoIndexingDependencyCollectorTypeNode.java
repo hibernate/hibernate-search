@@ -43,6 +43,8 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 	private final PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode;
 	private final BoundPojoModelPathTypeNode<T> modelPathFromLastEntityNode;
 
+	private final ReindexOnUpdate reindexOnUpdate;
+
 	PojoIndexingDependencyCollectorTypeNode(PojoRawTypeModel<T> typeModel,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
@@ -50,10 +52,10 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 		this.modelPathFromCurrentNode = BoundPojoModelPath.root( typeModel );
 		this.lastEntityNode = this;
 		this.modelPathFromLastEntityNode = modelPathFromCurrentNode;
+		this.reindexOnUpdate = buildingHelper.getDefaultReindexOnUpdate();
 	}
 
 	PojoIndexingDependencyCollectorTypeNode(PojoIndexingDependencyCollectorValueNode<?, ?> parentNode,
-			PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode,
 			BoundPojoModelPathTypeNode<T> modelPathFromLastEntityNode,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
@@ -65,9 +67,10 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 			this.modelPathFromLastEntityNode = modelPathFromCurrentNode;
 		}
 		else {
-			this.lastEntityNode = lastEntityNode;
+			this.lastEntityNode = parentNode.lastEntityNode();
 			this.modelPathFromLastEntityNode = modelPathFromLastEntityNode;
 		}
+		this.reindexOnUpdate = parentNode.composeReindexOnUpdate( lastEntityNode, null );
 	}
 
 	PojoIndexingDependencyCollectorTypeNode(PojoIndexingDependencyCollectorDisjointValueNode<T> parentNode,
@@ -78,6 +81,7 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 		this.modelPathFromCurrentNode = BoundPojoModelPath.root( typeModel );
 		this.lastEntityNode = this;
 		this.modelPathFromLastEntityNode = modelPathFromCurrentNode;
+		this.reindexOnUpdate = parentNode.composeReindexOnUpdate( lastEntityNode, null );
 	}
 
 	/*
@@ -89,8 +93,7 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 	public PojoIndexingDependencyCollectorPropertyNode<T, ?> property(String propertyName) {
 		return new PojoIndexingDependencyCollectorPropertyNode<>(
 				this,
-				(BoundPojoModelPathPropertyNode) modelPathFromCurrentNode.property( propertyName ),
-				lastEntityNode,
+				modelPathFromCurrentNode.property( propertyName ),
 				(BoundPojoModelPathPropertyNode) modelPathFromLastEntityNode.property( propertyName ),
 				buildingHelper
 		);
@@ -118,8 +121,13 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 	}
 
 	@Override
+	PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode() {
+		return lastEntityNode;
+	}
+
+	@Override
 	ReindexOnUpdate reindexOnUpdate() {
-		return parentNode == null ? ReindexOnUpdate.DEFAULT : parentNode.reindexOnUpdate();
+		return reindexOnUpdate;
 	}
 
 	void collectDependency(BoundPojoModelPathValueNode<?, ?, ?> dirtyPathFromEntityType) {

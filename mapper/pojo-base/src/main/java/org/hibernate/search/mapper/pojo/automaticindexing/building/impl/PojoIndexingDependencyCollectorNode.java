@@ -26,6 +26,36 @@ public abstract class PojoIndexingDependencyCollectorNode {
 		this.buildingHelper = buildingHelper;
 	}
 
+	ReindexOnUpdate composeReindexOnUpdate(PojoIndexingDependencyCollectorTypeNode<?> otherEntityNode,
+			ReindexOnUpdate otherReindexOnUpdate) {
+		if ( otherReindexOnUpdate == null ) {
+			otherReindexOnUpdate = buildingHelper.getDefaultReindexOnUpdate();
+		}
+		// Whatever reindexOnUpdate is strictest wins.
+		ReindexOnUpdate strictestReindexOnUpdate = getStrictestReindexOnUpdate( reindexOnUpdate(), otherReindexOnUpdate );
+		if ( ReindexOnUpdate.SHALLOW.equals( strictestReindexOnUpdate )
+				&& !lastEntityNode().equals( otherEntityNode ) ) {
+			// We crossed entity boundaries: SHALLOW becomes NO.
+			return ReindexOnUpdate.NO;
+		}
+		return strictestReindexOnUpdate;
+	}
+
+	private ReindexOnUpdate getStrictestReindexOnUpdate(ReindexOnUpdate left, ReindexOnUpdate right) {
+		// From the least strict to most strict: DEFAULT, SHALLOW, NO.
+		// That's also the ordinal order, so we just usse that.
+		return left.ordinal() < right.ordinal() ? right : left;
+	}
+
+	/**
+	 * The last entity node among the ancestor nodes (this node included).
+	 * The "last entity node" might be the same as the last type node
+	 * if the last type node represents an entity type.
+	 * If not (e.g. if the last type node represents an embeddable type),
+	 * then the "last entity node" will be the closest ancestor type node representing an entity type.
+	 */
+	abstract PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode();
+
 	abstract ReindexOnUpdate reindexOnUpdate();
 
 	static class Walker implements PojoModelPathWalker<

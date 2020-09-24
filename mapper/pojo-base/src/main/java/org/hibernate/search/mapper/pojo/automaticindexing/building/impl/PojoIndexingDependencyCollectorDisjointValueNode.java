@@ -66,6 +66,11 @@ public class PojoIndexingDependencyCollectorDisjointValueNode<V>
 	}
 
 	@Override
+	PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode() {
+		return parentNode.lastEntityNode();
+	}
+
+	@Override
 	ReindexOnUpdate reindexOnUpdate() {
 		return parentNode.reindexOnUpdate();
 	}
