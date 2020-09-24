@@ -216,7 +216,6 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			containedEntity.setIndexedField( "initialValue" );
 
 			entity1.setContainedIndexedEmbeddedShallowReindexOnUpdate( containedEntity );
-			containedEntity.setContainingAsIndexedEmbeddedShallowReindexOnUpdate( entity1 );
 
 			session.persist( containedEntity );
 
@@ -238,10 +237,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			containedEntity.setId( 3 );
 			containedEntity.setIndexedField( "updatedValue" );
 
-			entity1.getContainedIndexedEmbeddedShallowReindexOnUpdate()
-					.setContainingAsIndexedEmbeddedShallowReindexOnUpdate( null );
 			entity1.setContainedIndexedEmbeddedShallowReindexOnUpdate( containedEntity );
-			containedEntity.setContainingAsIndexedEmbeddedShallowReindexOnUpdate( entity1 );
 
 			session.persist( containedEntity );
 
@@ -259,8 +255,6 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 
-			entity1.getContainedIndexedEmbeddedShallowReindexOnUpdate()
-					.setContainingAsIndexedEmbeddedShallowReindexOnUpdate( null );
 			entity1.setContainedIndexedEmbeddedShallowReindexOnUpdate( null );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -299,7 +293,6 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			containedEntity.setIndexedField( "initialValue" );
 
 			entity1.setContainedIndexedEmbeddedNoReindexOnUpdate( containedEntity );
-			containedEntity.setContainingAsIndexedEmbeddedNoReindexOnUpdate( entity1 );
 
 			session.persist( containedEntity );
 
@@ -315,9 +308,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			containedEntity.setId( 3 );
 			containedEntity.setIndexedField( "updatedValue" );
 
-			entity1.getContainedIndexedEmbeddedNoReindexOnUpdate().setContainingAsIndexedEmbeddedNoReindexOnUpdate( null );
 			entity1.setContainedIndexedEmbeddedNoReindexOnUpdate( containedEntity );
-			containedEntity.setContainingAsIndexedEmbeddedNoReindexOnUpdate( entity1 );
 
 			session.persist( containedEntity );
 
@@ -329,7 +320,6 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
 
-			entity1.getContainedIndexedEmbeddedNoReindexOnUpdate().setContainingAsIndexedEmbeddedNoReindexOnUpdate( null );
 			entity1.setContainedIndexedEmbeddedNoReindexOnUpdate( null );
 
 			// Do not expect any work
@@ -562,7 +552,6 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			containedEntity.setIndexedField( "initialValue" );
 
 			containingEntity1.setContainedIndexedEmbeddedShallowReindexOnUpdate( containedEntity );
-			containedEntity.setContainingAsIndexedEmbeddedShallowReindexOnUpdate( containingEntity1 );
 
 			session.persist( containedEntity );
 
@@ -586,10 +575,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			containedEntity.setId( 5 );
 			containedEntity.setIndexedField( "updatedValue" );
 
-			containingEntity1.getContainedIndexedEmbeddedShallowReindexOnUpdate()
-					.setContainingAsIndexedEmbeddedShallowReindexOnUpdate( null );
 			containingEntity1.setContainedIndexedEmbeddedShallowReindexOnUpdate( containedEntity );
-			containedEntity.setContainingAsIndexedEmbeddedShallowReindexOnUpdate( containingEntity1 );
 
 			session.persist( containedEntity );
 
@@ -609,7 +595,6 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
 
-			containingEntity1.getContainedIndexedEmbeddedShallowReindexOnUpdate().setContainingAsIndexedEmbeddedNoReindexOnUpdate( null );
 			containingEntity1.setContainedIndexedEmbeddedShallowReindexOnUpdate( null );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -659,7 +644,6 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			containedEntity.setIndexedField( "initialValue" );
 
 			containingEntity1.setContainedIndexedEmbeddedNoReindexOnUpdate( containedEntity );
-			containedEntity.setContainingAsIndexedEmbeddedNoReindexOnUpdate( containingEntity1 );
 
 			session.persist( containedEntity );
 
@@ -675,9 +659,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			containedEntity.setId( 5 );
 			containedEntity.setIndexedField( "updatedValue" );
 
-			containingEntity1.getContainedIndexedEmbeddedNoReindexOnUpdate().setContainingAsIndexedEmbeddedNoReindexOnUpdate( null );
 			containingEntity1.setContainedIndexedEmbeddedNoReindexOnUpdate( containedEntity );
-			containedEntity.setContainingAsIndexedEmbeddedNoReindexOnUpdate( containingEntity1 );
 
 			session.persist( containedEntity );
 
@@ -689,7 +671,6 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			ContainingEntity containingEntity1 = session.get( ContainingEntity.class, 2 );
 
-			containingEntity1.getContainedIndexedEmbeddedNoReindexOnUpdate().setContainingAsIndexedEmbeddedNoReindexOnUpdate( null );
 			containingEntity1.setContainedIndexedEmbeddedNoReindexOnUpdate( null );
 
 			// Do not expect any work
@@ -895,21 +876,9 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		}
 
 		@Override
-		public void setContainingAsIndexedEmbeddedShallowReindexOnUpdateSingle(ContainedEntity containedEntity,
-				ContainingEntity containingEntity) {
-			containedEntity.setContainingAsIndexedEmbeddedShallowReindexOnUpdate( containingEntity );
-		}
-
-		@Override
 		public void setContainedIndexedEmbeddedNoReindexOnUpdateSingle(ContainingEntity containingEntity,
 				ContainedEntity containedEntity) {
 			containingEntity.setContainedIndexedEmbeddedNoReindexOnUpdate( containedEntity );
-		}
-
-		@Override
-		public void setContainingAsIndexedEmbeddedNoReindexOnUpdateSingle(ContainedEntity containedEntity,
-				ContainingEntity containingEntity) {
-			containedEntity.setContainingAsIndexedEmbeddedNoReindexOnUpdate( containingEntity );
 		}
 
 		@Override
@@ -1152,12 +1121,6 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		@OneToOne(mappedBy = "containedNonIndexedEmbedded")
 		private ContainingEntity containingAsNonIndexedEmbedded;
 
-		@OneToOne(mappedBy = "containedIndexedEmbeddedShallowReindexOnUpdate")
-		private ContainingEntity containingAsIndexedEmbeddedShallowReindexOnUpdate;
-
-		@OneToOne(mappedBy = "containedIndexedEmbeddedNoReindexOnUpdate")
-		private ContainingEntity containingAsIndexedEmbeddedNoReindexOnUpdate;
-
 		@OneToOne(mappedBy = "containedUsedInCrossEntityDerivedProperty")
 		private ContainingEntity containingAsUsedInCrossEntityDerivedProperty;
 
@@ -1216,24 +1179,6 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 
 		public void setContainingAsNonIndexedEmbedded(ContainingEntity containingAsNonIndexedEmbedded) {
 			this.containingAsNonIndexedEmbedded = containingAsNonIndexedEmbedded;
-		}
-
-		public ContainingEntity getContainingAsIndexedEmbeddedShallowReindexOnUpdate() {
-			return containingAsIndexedEmbeddedShallowReindexOnUpdate;
-		}
-
-		public void setContainingAsIndexedEmbeddedShallowReindexOnUpdate(
-				ContainingEntity containingAsIndexedEmbeddedShallowReindexOnUpdate) {
-			this.containingAsIndexedEmbeddedShallowReindexOnUpdate = containingAsIndexedEmbeddedShallowReindexOnUpdate;
-		}
-
-		public ContainingEntity getContainingAsIndexedEmbeddedNoReindexOnUpdate() {
-			return containingAsIndexedEmbeddedNoReindexOnUpdate;
-		}
-
-		public void setContainingAsIndexedEmbeddedNoReindexOnUpdate(
-				ContainingEntity containingAsIndexedEmbeddedNoReindexOnUpdate) {
-			this.containingAsIndexedEmbeddedNoReindexOnUpdate = containingAsIndexedEmbeddedNoReindexOnUpdate;
 		}
 
 		public ContainingEntity getContainingAsUsedInCrossEntityDerivedProperty() {

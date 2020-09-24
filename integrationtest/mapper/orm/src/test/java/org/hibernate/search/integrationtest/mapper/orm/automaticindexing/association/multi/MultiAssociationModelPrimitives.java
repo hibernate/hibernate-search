@@ -43,24 +43,10 @@ public interface MultiAssociationModelPrimitives<
 	}
 
 	@Override
-	default void setContainingAsIndexedEmbeddedShallowReindexOnUpdateSingle(TContained contained, TContaining containing) {
-		TContainingAssociation containingAssociation = getContainingAsIndexedEmbeddedShallowReindexOnUpdate( contained );
-		clearContaining( containingAssociation );
-		addContaining( containingAssociation, containing );
-	}
-
-	@Override
 	default void setContainedIndexedEmbeddedNoReindexOnUpdateSingle(TContaining containing, TContained contained) {
 		TContainedAssociation containedAssociation = getContainedIndexedEmbeddedNoReindexOnUpdate( containing );
 		clearContained( containedAssociation );
 		addContained( containedAssociation, contained );
-	}
-
-	@Override
-	default void setContainingAsIndexedEmbeddedNoReindexOnUpdateSingle(TContained contained, TContaining containing) {
-		TContainingAssociation containingAssociation = getContainingAsIndexedEmbeddedNoReindexOnUpdate( contained );
-		clearContaining( containingAssociation );
-		addContaining( containingAssociation, containing );
 	}
 
 	@Override
@@ -123,13 +109,9 @@ public interface MultiAssociationModelPrimitives<
 
 	void setContainedIndexedEmbeddedShallowReindexOnUpdate(TContaining containing, TContainedAssociation association);
 
-	TContainingAssociation getContainingAsIndexedEmbeddedShallowReindexOnUpdate(TContained contained);
-
 	TContainedAssociation getContainedIndexedEmbeddedNoReindexOnUpdate(TContaining containing);
 
 	void setContainedIndexedEmbeddedNoReindexOnUpdate(TContaining containing, TContainedAssociation association);
-
-	TContainingAssociation getContainingAsIndexedEmbeddedNoReindexOnUpdate(TContained contained);
 
 	TContainedAssociation getContainedUsedInCrossEntityDerivedProperty(TContaining containing);
 

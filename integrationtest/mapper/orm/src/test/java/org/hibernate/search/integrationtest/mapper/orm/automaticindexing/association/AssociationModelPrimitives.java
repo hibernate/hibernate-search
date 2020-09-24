@@ -39,11 +39,7 @@ public interface AssociationModelPrimitives<
 
 	void setContainedIndexedEmbeddedShallowReindexOnUpdateSingle(TContaining containing, TContained contained);
 
-	void setContainingAsIndexedEmbeddedShallowReindexOnUpdateSingle(TContained contained, TContaining containing);
-
 	void setContainedIndexedEmbeddedNoReindexOnUpdateSingle(TContaining containing, TContained contained);
-
-	void setContainingAsIndexedEmbeddedNoReindexOnUpdateSingle(TContained contained, TContaining containing);
 
 	void setContainedUsedInCrossEntityDerivedPropertySingle(TContaining containing, TContained contained);
 
