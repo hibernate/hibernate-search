@@ -170,7 +170,7 @@ public interface Log extends BasicLogger {
 					+ " either with annotations specific to your integration (@OneToMany(mappedBy = ...) in Hibernate ORM) "
 					+ " or with the Hibernate Search @AssociationInverseSide annotation."
 					+ " Alternatively, if you do not need to reindex '%2$s' when '%1$s' is modified,"
-					+ " you can disable reindexing with @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)."
+					+ " you can disable automatic reindexing with @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)."
 	)
 	SearchException cannotInvertAssociationForReindexing(
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> inverseSideTypeModel,
