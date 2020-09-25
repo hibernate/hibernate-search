@@ -1,0 +1,159 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl;
+
+import java.io.Serializable;
+import java.lang.invoke.MethodHandles;
+import java.util.List;
+import javax.batch.api.BatchProperty;
+import javax.batch.api.chunk.AbstractItemWriter;
+import javax.batch.runtime.context.JobContext;
+import javax.batch.runtime.context.StepContext;
+import javax.inject.Inject;
+import javax.naming.NamingException;
+import javax.persistence.EntityManagerFactory;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.search.batch.jsr352.core.logging.impl.Log;
+import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters;
+import org.hibernate.search.batch.jsr352.core.massindexing.impl.JobContextData;
+import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.MassIndexingPartitionProperties;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+
+@SuppressWarnings("deprecation")
+public class EntityWriter extends AbstractItemWriter {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	@Inject
+	private JobContext jobContext;
+
+	@Inject
+	private StepContext stepContext;
+
+	@Inject
+	@BatchProperty(name = MassIndexingPartitionProperties.ENTITY_NAME)
+	private String entityName;
+
+	@Inject
+	@BatchProperty(name = MassIndexingPartitionProperties.PARTITION_ID)
+	private String partitionIdStr;
+
+	@Inject
+	@BatchProperty(name = MassIndexingJobParameters.TENANT_ID)
+	private String tenantId;
+
+	private EntityManagerFactory emf;
+	private SearchMapping searchMapping;
+	private BatchMappingContext mappingContext;
+	private PojoRawTypeIdentifier<?> typeIdentifier;
+
+	private WriteMode writeMode;
+
+	/**
+	 * The open method prepares the writer to write items.
+	 *
+	 * @param checkpoint the last checkpoint
+	 *
+	 * @throws SearchException if the entityName does not match any indexed class type in the job context data.
+	 * @throws NamingException if JNDI lookup for entity manager failed
+	 */
+	@Override
+	@SuppressWarnings("unchecked") // mapping impl the SPI
+	public void open(Serializable checkpoint) throws Exception {
+		log.openingEntityWriter( partitionIdStr, entityName );
+		JobContextData jobContextData = (JobContextData) jobContext.getTransientUserData();
+
+		emf = jobContextData.getEntityManagerFactory();
+		searchMapping = Search.mapping( emf );
+		mappingContext = (BatchMappingContext) searchMapping;
+		typeIdentifier = mappingContext.typeContextProvider().typeIdentifierForEntityName( entityName );
+
+		/*
+		 * Always execute works as updates on the first checkpoint interval,
+		 * because we may be recovering from a failure, and there's no way
+		 * to accurately detect that situation.
+		 * Indeed, JSR-352 only specify that checkpoint state will be
+		 * saved *after* each chunk, so when we fail during the very first checkpoint,
+		 * we have no way of detecting this failure.
+		 */
+		this.writeMode = WriteMode.UPDATE;
+	}
+
+	@Override
+	public void writeItems(List<Object> entities) throws Exception {
+		try ( Session session = emf.unwrap( SessionFactory.class )
+				.withOptions()
+				.tenantIdentifier( tenantId )
+				.openSession() ) {
+
+			PojoIndexer indexer = mappingContext.sessionContext( session ).createIndexer();
+
+			for ( Object entity : entities ) {
+				writeItem( indexer, entity );
+			}
+		}
+
+		/*
+		 * Flush after each write operation
+		 * This ensures the writes have actually been persisted,
+		 * which is necessary because the runtime will perform a checkpoint
+		 * just after we return from this method.
+		 */
+		getScope().workspace().flush();
+
+		// update work count
+		PartitionContextData partitionData = (PartitionContextData) stepContext.getTransientUserData();
+		partitionData.documentAdded( entities.size() );
+
+		/*
+		 * We can switch to a faster mode, without checks, because we know the next items
+		 * we'll write haven't been written to the index yet.
+		 */
+		this.writeMode = WriteMode.ADD;
+
+		log.closingEntityWriter( partitionIdStr, entityName );
+	}
+
+	private void writeItem(PojoIndexer indexer, Object entity) {
+		log.processEntity( entity );
+
+		switch ( writeMode ) {
+			case ADD:
+				indexer.add( typeIdentifier, null, null, entity,
+						// Commit and refresh are handled globally after all documents are indexed.
+						DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+				);
+				break;
+			case UPDATE:
+				indexer.addOrUpdate( typeIdentifier, null, null, entity,
+						// Commit and refresh are handled globally after all documents are indexed.
+						DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+				);
+				break;
+		}
+	}
+
+	private SearchScope<?> getScope() {
+		return searchMapping.scope( typeIdentifier.javaClass(), entityName );
+	}
+
+	private enum WriteMode {
+		ADD,
+		UPDATE;
+	}
+}
