@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~ Hibernate Search, full-text search for your domain model
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    version="2.1" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+    <persistence-unit name="primary_pu" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <properties>
+            <property name="hibernate.dialect" value="${db.dialect}" />
+            <property name="hibernate.connection.driver_class" value="${jdbc.driver}" />
+            <property name="hibernate.connection.url" value="${jdbc.url}" />
+            <property name="hibernate.connection.user" value="${jdbc.user}" />
+            <property name="hibernate.connection.password" value="${jdbc.pass}" />
+            <property name="hibernate.hbm2ddl.auto" value="create-drop" />
+            <property name="hibernate.search.default.directory_provider" value="local-heap" />
+            <property name="hibernate.search.indexing_strategy" value="manual" />
+            <property name="hibernate.session_factory_name" value="primary_session_factory" />
+            <property name="hibernate.session_factory_name_is_jndi" value="false" />
+        </properties>
+    </persistence-unit>
+</persistence>
