@@ -19,11 +19,13 @@ import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataP
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContextProvider;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRawTypeIdentifierResolver;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
+import org.hibernate.search.mapper.orm.spi.BatchTypeIdentifierProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class HibernateOrmTypeContextContainer implements HibernateOrmListenerTypeContextProvider, HibernateOrmSessionTypeContextProvider {
+class HibernateOrmTypeContextContainer implements HibernateOrmListenerTypeContextProvider,
+		HibernateOrmSessionTypeContextProvider, BatchTypeIdentifierProvider {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
