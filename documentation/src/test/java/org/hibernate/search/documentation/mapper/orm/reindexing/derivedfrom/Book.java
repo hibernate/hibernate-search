@@ -37,6 +37,9 @@ public class Book {
 
 	public Book() {
 	}
+
+	// Getters and setters
+	// ...
 	//tag::getters-setters[]
 
 	public Integer getId() {
