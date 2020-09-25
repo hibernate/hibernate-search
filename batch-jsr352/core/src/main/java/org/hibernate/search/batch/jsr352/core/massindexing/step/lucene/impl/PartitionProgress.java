@@ -27,7 +27,7 @@ public class PartitionProgress implements Serializable {
 	/**
 	 * documentsAdded is an elementary count. It records how many items have been written in the current chunk. This
 	 * value is overwritten be the item writer at the end of each
-	 * {@link LuceneDocWriter#writeItems}
+	 * {@link EntityWriter#writeItems}
 	 */
 	public void documentsAdded(int increment) {
 		this.workDone += increment;
