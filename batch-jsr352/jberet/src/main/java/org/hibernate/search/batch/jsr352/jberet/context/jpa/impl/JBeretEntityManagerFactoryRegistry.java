@@ -83,7 +83,7 @@ public class EntityManagerFactoriesProducer {
  * @author Yoann Rodiere
  */
 @ApplicationScoped
-public class CDIEntityManagerFactoryRegistry implements EntityManagerFactoryRegistry {
+public class JBeretEntityManagerFactoryRegistry implements EntityManagerFactoryRegistry {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -174,7 +174,7 @@ public class CDIEntityManagerFactoryRegistry implements EntityManagerFactoryRegi
 	}
 
 	/**
-	 * @see CDIEntityManagerFactoryRegistry#getVetoedBeanReference(BeanManager, Class)
+	 * @see JBeretEntityManagerFactoryRegistry#getVetoedBeanReference(BeanManager, Class)
 	 */
 	@Vetoed
 	private static class PersistenceUnitAccessor {
