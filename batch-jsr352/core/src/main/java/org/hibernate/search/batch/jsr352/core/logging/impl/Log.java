@@ -148,16 +148,6 @@ public interface Log extends BasicLogger {
 	)
 	void processEntity(Object entityId);
 
-	@LogMessage(level = Level.DEBUG)
-	@Message(id = ID_OFFSET_2 + 24,
-			value = "Opening LuceneDocWriter of partitionId='%1$s', entity='%2$s'.")
-	void openingDocWriter(String partitionId, String entityName);
-
-	@LogMessage(level = Level.DEBUG)
-	@Message(id = ID_OFFSET_2 + 25,
-			value = "Closing LuceneDocWriter of partitionId='%1$s', entity='%2$s'.")
-	void closingDocWriter(String partitionId, String entityName);
-
 	@LogMessage(level = Level.INFO)
 	@Message(id = ID_OFFSET_2 + 26,
 			value = "%1$d partitions, %2$d threads."
@@ -207,5 +197,15 @@ public interface Log extends BasicLogger {
 	// New messages from Search 6 onwards
 	// -----------------------------------
 	int ID_OFFSET_3 = MessageConstants.BATCH_JSR352_CORE_ID_RANGE_MIN + 500;
+
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = ID_OFFSET_3 + 1,
+			value = "Opening EntityWriter of partitionId='%1$s', entity='%2$s'.")
+	void openingEntityWriter(String partitionId, String entityName);
+
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = ID_OFFSET_3 + 2,
+			value = "Closing EntityWriter of partitionId='%1$s', entity='%2$s'.")
+	void closingEntityWriter(String partitionId, String entityName);
 
 }
