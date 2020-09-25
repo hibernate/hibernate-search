@@ -215,7 +215,7 @@ public class DependencyIT {
 								"if you do not need to reindex '"
 										+ CannotInvertAssociation.A.class.getName() + "' when '"
 										+ CannotInvertAssociation.B.class.getName() + "' is modified",
-								"@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)"
+								"@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)"
 						)
 						.build()
 				);
