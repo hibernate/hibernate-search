@@ -7,11 +7,13 @@
 package org.hibernate.search.backend.elasticsearch.aws.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.function.Function;
+import java.util.Optional;
 
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.signer.params.Aws4SignerParams;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsBackendSettings;
@@ -47,31 +49,38 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 					.asString()
 					.build();
 
-	private static final String ELASTICSEARCH_SERVICE_NAME = "es";
-
 	@Override
 	public void configure(HttpAsyncClientBuilder builder, ConfigurationPropertySource propertySource) {
 		if ( !SIGNING_ENABLED.get( propertySource ) ) {
 			return;
 		}
 
-		String accessKey = getMandatory( ACCESS_KEY, propertySource, Function.identity() );
-		String secretKey = getMandatory( SECRET_KEY, propertySource, Function.identity() );
-		Region region = getMandatory( REGION, propertySource, Region::of );
-		Aws4SignerParams signerParams = Aws4SignerParams.builder()
-				.awsCredentials( AwsBasicCredentials.create( accessKey, secretKey ) )
-				.signingRegion( region )
-				.signingName( ELASTICSEARCH_SERVICE_NAME )
-				.build();
+		Region region = REGION.getAndMapOrThrow( propertySource, Region::of, log::missingPropertyForSigning );
 
-		AwsSigningRequestInterceptor signingInterceptor = new AwsSigningRequestInterceptor( signerParams );
+		AwsCredentialsProvider credentialsProvider = createCredentialsProvider( propertySource );
+
+		AwsSigningRequestInterceptor signingInterceptor = new AwsSigningRequestInterceptor( region, credentialsProvider );
 
 		builder.addInterceptorLast( signingInterceptor );
 	}
 
-	private <T, R> R getMandatory(OptionalConfigurationProperty<T> property, ConfigurationPropertySource propertySource,
-			Function<T, R> transform) {
-		return property.getAndMapOrThrow( propertySource, transform, log::missingPropertyForSigning );
+	private AwsCredentialsProvider createCredentialsProvider(ConfigurationPropertySource propertySource) {
+		Optional<String> accessKeyOptional = ACCESS_KEY.get( propertySource );
+		Optional<String> secretKeyOptional = SECRET_KEY.get( propertySource );
+		if ( accessKeyOptional.isPresent() || secretKeyOptional.isPresent() ) {
+			if ( !accessKeyOptional.isPresent() ) {
+				throw log.missingAccessKeyForSigningWithSecretKeySet( ACCESS_KEY.resolveOrRaw( propertySource ) );
+			}
+			if ( !secretKeyOptional.isPresent() ) {
+				throw log.missingSecretKeyForSigningWithAccessKeySet( SECRET_KEY.resolveOrRaw( propertySource ) );
+			}
+			return StaticCredentialsProvider.create(
+					AwsBasicCredentials.create( accessKeyOptional.get(), secretKeyOptional.get() )
+			);
+		}
+		else {
+			return DefaultCredentialsProvider.create();
+		}
 	}
 
 }

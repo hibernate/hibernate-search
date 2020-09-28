@@ -27,22 +27,28 @@ import org.apache.http.RequestLine;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.signer.Aws4Signer;
 import software.amazon.awssdk.auth.signer.params.Aws4SignerParams;
 import software.amazon.awssdk.http.ContentStreamProvider;
 import software.amazon.awssdk.http.SdkHttpFullRequest;
 import software.amazon.awssdk.http.SdkHttpMethod;
+import software.amazon.awssdk.regions.Region;
 
 class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Aws4Signer signer;
-	private final Aws4SignerParams signerParams;
+	private static final String ELASTICSEARCH_SERVICE_NAME = "es";
 
-	AwsSigningRequestInterceptor(Aws4SignerParams signerParams) {
+	private final Aws4Signer signer;
+	private final Region region;
+	private final AwsCredentialsProvider credentialsProvider;
+
+	AwsSigningRequestInterceptor(Region region, AwsCredentialsProvider credentialsProvider) {
 		this.signer = Aws4Signer.create();
-		this.signerParams = signerParams;
+		this.region = region;
+		this.credentialsProvider = credentialsProvider;
 	}
 
 	@Override
@@ -59,6 +65,12 @@ class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
 			log.tracef( "HTTP request (before signing): %s", request );
 			log.tracef( "AWS request (before signing): %s", awsRequest );
 		}
+
+		Aws4SignerParams signerParams = Aws4SignerParams.builder()
+				.awsCredentials( credentialsProvider.resolveCredentials() )
+				.signingRegion( region )
+				.signingName( ELASTICSEARCH_SERVICE_NAME )
+				.build();
 
 		awsRequest = signer.sign( awsRequest, signerParams );
 
