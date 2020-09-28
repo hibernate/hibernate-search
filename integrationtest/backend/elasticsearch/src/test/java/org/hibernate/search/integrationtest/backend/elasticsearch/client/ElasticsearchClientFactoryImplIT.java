@@ -35,6 +35,7 @@ import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClien
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchHttpClientConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
@@ -78,7 +79,6 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.log4j.Level;
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -666,12 +666,10 @@ public class ElasticsearchClientFactoryImplIT {
 		);
 		try ( BeanHolder<ElasticsearchClientFactory> factoryHolder =
 				beanResolver.resolve( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
-			return factoryHolder.get().create(
-					clientPropertySource,
+			return factoryHolder.get().create( beanResolver, clientPropertySource,
 					threadPoolProvider.threadProvider(), "Client",
 					timeoutExecutorService,
-					GsonProvider.create( GsonBuilder::new, true )
-			);
+					GsonProvider.create( GsonBuilder::new, true ) );
 		}
 	}
 
@@ -765,10 +763,9 @@ public class ElasticsearchClientFactoryImplIT {
 					ElasticsearchHttpClientConfigurer.class,
 					BeanReference.ofInstance( new ElasticsearchHttpClientConfigurer() {
 						@Override
-						public void configure(HttpAsyncClientBuilder builder,
-								ConfigurationPropertySource propertySource) {
-							builder.setSSLHostnameVerifier( NoopHostnameVerifier.INSTANCE );
-							builder.setSSLContext( buildAllowAnythingSSLContext() );
+						public void configure(ElasticsearchHttpClientConfigurationContext context) {
+							context.clientBuilder().setSSLHostnameVerifier( NoopHostnameVerifier.INSTANCE );
+							context.clientBuilder().setSSLContext( buildAllowAnythingSSLContext() );
 						}
 					} )
 			);

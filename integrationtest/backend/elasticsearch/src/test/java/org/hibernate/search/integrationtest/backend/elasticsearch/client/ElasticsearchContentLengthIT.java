@@ -200,12 +200,10 @@ public class ElasticsearchContentLengthIT {
 		BeanResolver beanResolver = testConfigurationProvider.createBeanResolverForTest();
 		try ( BeanHolder<ElasticsearchClientFactory> factoryHolder =
 				beanResolver.resolve( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
-			return factoryHolder.get().create(
-					clientPropertySource,
+			return factoryHolder.get().create( beanResolver, clientPropertySource,
 					threadPoolProvider.threadProvider(), "Client",
 					timeoutExecutorService,
-					GsonProvider.create( GsonBuilder::new, true )
-			);
+					GsonProvider.create( GsonBuilder::new, true ) );
 		}
 	}
 

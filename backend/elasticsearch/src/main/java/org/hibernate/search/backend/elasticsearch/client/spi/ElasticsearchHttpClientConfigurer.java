@@ -6,10 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.client.spi;
 
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
-
 /**
  * An extension point allowing fine tuning of the Apache HTTP Client used by the Elasticsearch integration.
  * <p>
@@ -35,13 +31,9 @@ public interface ElasticsearchHttpClientConfigurer {
 	 * For example an authentication configurer could decide not to do anything if no username is provided,
 	 * or if the configuration property {@code my.configurer.enabled} is {@code false}.
 	 *
-	 * @param builder An Apache HTTP client builder, to set the configuration to be applied.
-	 * @param propertySource The property source for the Elasticsearch backend being configured.
-	 * Properties are masked, i.e. {@code hibernate.search.backend.my.property}
-	 * will be accessed as simply {@code my.property}.
-	 *
-	 * @see <a href="http://hc.apache.org/httpcomponents-client-ga/">the Apache HTTP Client documentation</a>
+	 * @param context A configuration context giving access to the Apache HTTP client builder
+	 * and configuration properties in particular.
 	 */
-	void configure(HttpAsyncClientBuilder builder, ConfigurationPropertySource propertySource);
+	void configure(ElasticsearchHttpClientConfigurationContext context);
 
 }

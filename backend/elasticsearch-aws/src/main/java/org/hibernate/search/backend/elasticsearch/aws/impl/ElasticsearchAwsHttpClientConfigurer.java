@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.aws.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
@@ -18,6 +17,7 @@ import software.amazon.awssdk.regions.Region;
 
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsBackendSettings;
 import org.hibernate.search.backend.elasticsearch.aws.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchHttpClientConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -50,7 +50,9 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 					.build();
 
 	@Override
-	public void configure(HttpAsyncClientBuilder builder, ConfigurationPropertySource propertySource) {
+	public void configure(ElasticsearchHttpClientConfigurationContext context) {
+		ConfigurationPropertySource propertySource = context.configurationPropertySource();
+
 		if ( !SIGNING_ENABLED.get( propertySource ) ) {
 			return;
 		}
@@ -61,7 +63,7 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 
 		AwsSigningRequestInterceptor signingInterceptor = new AwsSigningRequestInterceptor( region, credentialsProvider );
 
-		builder.addInterceptorLast( signingInterceptor );
+		context.clientBuilder().addInterceptorLast( signingInterceptor );
 	}
 
 	private AwsCredentialsProvider createCredentialsProvider(ConfigurationPropertySource propertySource) {

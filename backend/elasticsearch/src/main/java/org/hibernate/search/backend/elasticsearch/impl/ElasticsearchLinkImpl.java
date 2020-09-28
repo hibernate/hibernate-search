@@ -26,6 +26,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elas
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -121,10 +122,10 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 		return elasticsearchVersion;
 	}
 
-	void onStart(ConfigurationPropertySource propertySource) {
+	void onStart(BeanResolver beanResolver, ConfigurationPropertySource propertySource) {
 		if ( clientImplementor == null ) {
 			clientImplementor = clientFactoryHolder.get().create(
-					propertySource, threads.getThreadProvider(), threads.getPrefix(),
+					beanResolver, propertySource, threads.getThreadProvider(), threads.getPrefix(),
 					threads.getWorkExecutor(), defaultGsonProvider
 			);
 			clientFactoryHolder.close(); // We won't need it anymore
