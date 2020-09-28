@@ -193,7 +193,7 @@ stage('Configure') {
 			],
 			compiler: [
 					new CompilerBuildEnvironment(name: 'eclipse', mavenProfile: 'compiler-eclipse',
-							condition: TestCondition.BEFORE_MERGE),
+							condition: TestCondition.BEFORE_MERGE)
 			],
 			database: [
 					new DatabaseBuildEnvironment(dbName: 'h2', mavenProfile: 'h2',
@@ -235,7 +235,7 @@ stage('Configure') {
 					new EsLocalBuildEnvironment(versionRange: '[7.7,7.x)', mavenProfile: 'elasticsearch-7.7',
 							jdkTool: 'OpenJDK 11 Latest',
 							condition: TestCondition.BEFORE_MERGE,
-							isDefault: true),
+							isDefault: true)
 			],
 			// Note that each of these environments will only be tested if the appropriate
 			// environment variable with the AWS ES Service URL is defined in CI.
@@ -265,7 +265,7 @@ stage('Configure') {
 					new EsAwsBuildEnvironment(version: '7.4', mavenProfile: 'elasticsearch-7.3',
 							condition: TestCondition.AFTER_MERGE),
 					new EsAwsBuildEnvironment(version: '7.7', mavenProfile: 'elasticsearch-7.7',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.AFTER_MERGE)
 			]
 	])
 
