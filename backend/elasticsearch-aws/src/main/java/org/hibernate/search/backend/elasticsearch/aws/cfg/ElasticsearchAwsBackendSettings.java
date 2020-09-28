@@ -28,24 +28,6 @@ public final class ElasticsearchAwsBackendSettings {
 	public static final String SIGNING_ENABLED = "aws.signing.enabled";
 
 	/**
-	 * The AWS access key.
-	 * <p>
-	 * Expects a String value such as {@code AKIDEXAMPLE}.
-	 * <p>
-	 * No default: must be provided when signing is enabled.
-	 */
-	public static final String SIGNING_ACCESS_KEY = "aws.signing.access_key";
-
-	/**
-	 * The AWS secret key.
-	 * <p>
-	 * Expects a String value such as {@code wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY}
-	 * <p>
-	 * No default: must be provided when signing is enabled.
-	 */
-	public static final String SIGNING_SECRET_KEY = "aws.signing.secret_key";
-
-	/**
 	 * The AWS region.
 	 * <p>
 	 * Expects a String value such as {@code us-east-1}.
@@ -53,6 +35,35 @@ public final class ElasticsearchAwsBackendSettings {
 	 * No default: must be provided when signing is enabled.
 	 */
 	public static final String SIGNING_REGION = "aws.signing.region";
+
+	/**
+	 * The type of credentials to use when signing is {@link #SIGNING_ENABLED enabled}.
+	 * <p>
+	 * Expects one of the names listed as constants in {@link ElasticsearchAwsCredentialsTypeNames}.
+	 * <p>
+	 * Defaults to {@link Defaults#CREDENTIALS_TYPE}.
+	 */
+	public static final String CREDENTIALS_TYPE = "aws.credentials.type";
+
+	/**
+	 * The AWS access key ID when using {@link ElasticsearchAwsCredentialsTypeNames#STATIC static credentials}.
+	 * <p>
+	 * Expects a String value such as {@code AKIDEXAMPLE}.
+	 * <p>
+	 * No default: must be provided when signing is enabled and
+	 * the credentials type is set to {@link ElasticsearchAwsCredentialsTypeNames#STATIC}.
+	 */
+	public static final String CREDENTIALS_ACCESS_KEY_ID = "aws.credentials.access_key_id";
+
+	/**
+	 * The AWS secret access key when using {@link ElasticsearchAwsCredentialsTypeNames#STATIC static credentials}.
+	 * <p>
+	 * Expects a String value such as {@code wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY}
+	 * <p>
+	 * No default: must be provided when signing is enabled and
+	 * the credentials type is set to {@link ElasticsearchAwsCredentialsTypeNames#STATIC}.
+	 */
+	public static final String CREDENTIALS_SECRET_ACCESS_KEY = "aws.credentials.secret_access_key";
 
 	/**
 	 * Default values for the different settings if no values are given.
@@ -63,5 +74,6 @@ public final class ElasticsearchAwsBackendSettings {
 		}
 
 		public static final boolean SIGNING_ENABLED = false;
+		public static final String CREDENTIALS_TYPE = ElasticsearchAwsCredentialsTypeNames.DEFAULT;
 	}
 }

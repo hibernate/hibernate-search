@@ -605,8 +605,9 @@ stage('Non-default environments') {
 									-Dtest.elasticsearch.connection.hosts=$buildEnv.endpointHostAndPort \
 									-Dtest.elasticsearch.connection.protocol=$buildEnv.endpointProtocol \
 									-Dtest.elasticsearch.connection.aws.signing.enabled=true \
-									-Dtest.elasticsearch.connection.aws.signing.access_key=$AWS_ACCESS_KEY_ID \
-									-Dtest.elasticsearch.connection.aws.signing.secret_key=$AWS_SECRET_ACCESS_KEY \
+									-Dtest.elasticsearch.connection.aws.credentials.type=static \
+									-Dtest.elasticsearch.connection.aws.credentials.access_key_id=$AWS_ACCESS_KEY_ID \
+									-Dtest.elasticsearch.connection.aws.credentials.secret_access_key=$AWS_SECRET_ACCESS_KEY \
 									-Dtest.elasticsearch.connection.aws.signing.region=$buildEnv.awsRegion \
 								"""
 							}
