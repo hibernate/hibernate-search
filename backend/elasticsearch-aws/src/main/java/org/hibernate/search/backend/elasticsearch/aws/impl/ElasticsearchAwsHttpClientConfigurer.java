@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.aws.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.function.Function;
 
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
@@ -14,12 +15,16 @@ import software.amazon.awssdk.auth.signer.params.Aws4SignerParams;
 import software.amazon.awssdk.regions.Region;
 
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsBackendSettings;
+import org.hibernate.search.backend.elasticsearch.aws.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpClientConfigurer {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<Boolean> SIGNING_ENABLED =
 			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.SIGNING_ENABLED )
@@ -66,13 +71,7 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 
 	private <T, R> R getMandatory(OptionalConfigurationProperty<T> property, ConfigurationPropertySource propertySource,
 			Function<T, R> transform) {
-		return property.getAndMapOrThrow(
-				propertySource,
-				transform,
-				key -> new IllegalStateException(
-						"AWS request signing is enabled, but mandatory property '" + key + "' is not set"
-				)
-		);
+		return property.getAndMapOrThrow( propertySource, transform, log::missingPropertyForSigning );
 	}
 
 }

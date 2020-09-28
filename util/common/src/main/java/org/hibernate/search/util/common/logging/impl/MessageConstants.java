@@ -37,12 +37,15 @@ public final class MessageConstants {
 	 */
 
 	public static final int BACKEND_ES_ID_RANGE_MIN = 400000;
-	public static final int BACKEND_ES_ID_RANGE_MAX = 409999;
+	public static final int BACKEND_ES_ID_RANGE_MAX = 408999;
 
 	/*
 	 * Legacy range from Search 5:
 	 * Elasticsearch: min = 400001, max = 499999 (max used: 400094)
 	 */
+
+	public static final int BACKEND_ES_AWS_ID_RANGE_MIN = 409000;
+	public static final int BACKEND_ES_AWS_ID_RANGE_MAX = 409999;
 
 	/*
 	 * Legacy range from Search 5:
