@@ -29,4 +29,18 @@ public interface Log extends BasicLogger {
 	)
 	SearchException missingPropertyForSigning(String propertyKey);
 
+	@Message(id = ID_OFFSET + 1,
+			value = "AWS request signing is enabled and the access key is set,"
+					+ " but the secret key (property '%1$s') is not set."
+					+ " You must set both the access key and secret key, or neither to rely on default credentials."
+	)
+	SearchException missingSecretKeyForSigningWithAccessKeySet(String secretKeyPropertyKey);
+
+	@Message(id = ID_OFFSET + 2,
+			value = "AWS request signing is enabled and the secret key is set,"
+						+ " but the access key (property '%1$s') is not set."
+						+ " You must set both the access key and secret key, or neither to rely on default credentials."
+	)
+	SearchException missingAccessKeyForSigningWithSecretKeySet(String accessKeyPropertyKey);
+
 }
