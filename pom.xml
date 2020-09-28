@@ -463,10 +463,10 @@
         <test.elasticsearch.connection.username></test.elasticsearch.connection.username>
         <test.elasticsearch.connection.password></test.elasticsearch.connection.password>
         <test.elasticsearch.connection.aws.signing.enabled>false</test.elasticsearch.connection.aws.signing.enabled>
+        <test.elasticsearch.connection.aws.region></test.elasticsearch.connection.aws.region>
         <test.elasticsearch.connection.aws.credentials.type></test.elasticsearch.connection.aws.credentials.type>
         <test.elasticsearch.connection.aws.credentials.access_key_id></test.elasticsearch.connection.aws.credentials.access_key_id>
         <test.elasticsearch.connection.aws.credentials.secret_access_key></test.elasticsearch.connection.aws.credentials.secret_access_key>
-        <test.elasticsearch.connection.aws.signing.region></test.elasticsearch.connection.aws.signing.region>
         <!-- Control how integration tests format the requests sent to Elasticsearch -->
         <test.elasticsearch.testdialect></test.elasticsearch.testdialect>
 

@@ -73,14 +73,14 @@
                       value="${test.elasticsearch.connection.password}"/>
             <property name="hibernate.search.backend.aws.signing.enabled"
                       value="${test.elasticsearch.connection.aws.signing.enabled}"/>
+            <property name="hibernate.search.backend.aws.region"
+                      value="${test.elasticsearch.connection.aws.region}"/>
             <property name="hibernate.search.backend.aws.credentials.type"
                       value="${test.elasticsearch.connection.aws.credentials.type}"/>
             <property name="hibernate.search.backend.aws.credentials.access_key_id"
                       value="${test.elasticsearch.connection.aws.credentials.access_key_id}"/>
             <property name="hibernate.search.backend.aws.credentials.secret_access_key"
                       value="${test.elasticsearch.connection.aws.credentials.secret_access_key}"/>
-            <property name="hibernate.search.backend.aws.signing.region"
-                      value="${test.elasticsearch.connection.aws.signing.region}"/>
             <!-- Make this test work even if there is only a single node in the cluster -->
             <property name="hibernate.search.backend.schema_management.minimal_required_status"
                       value="yellow"/>
@@ -141,14 +141,14 @@
                       value="${test.elasticsearch.connection.password}"/>
             <property name="hibernate.search.backend.aws.signing.enabled"
                       value="${test.elasticsearch.connection.aws.signing.enabled}"/>
+            <property name="hibernate.search.backend.aws.region"
+                      value="${test.elasticsearch.connection.aws.region}"/>
             <property name="hibernate.search.backend.aws.credentials.type"
                       value="${test.elasticsearch.connection.aws.credentials.type}"/>
             <property name="hibernate.search.backend.aws.credentials.access_key_id"
                       value="${test.elasticsearch.connection.aws.credentials.access_key_id}"/>
             <property name="hibernate.search.backend.aws.credentials.secret_access_key"
                       value="${test.elasticsearch.connection.aws.credentials.secret_access_key}"/>
-            <property name="hibernate.search.backend.aws.signing.region"
-                      value="${test.elasticsearch.connection.aws.signing.region}"/>
             <!-- Make this test work even if there is only a single node in the cluster -->
             <property name="hibernate.search.backend.schema_management.minimal_required_status"
                       value="yellow"/>

@@ -28,10 +28,10 @@ public class ElasticsearchTestHostConnectionConfiguration {
 	private final String username;
 	private final String password;
 	private final boolean awsSigningEnabled;
+	private final String awsRegion;
 	private final String awsCredentialsType;
 	private final String awsCredentialsAccessKeyId;
 	private final String awsCredentialsSecretAccessKey;
-	private final String awsSigningRegion;
 
 	private ElasticsearchTestHostConnectionConfiguration() {
 		this.hosts = System.getProperty( "test.elasticsearch.connection.hosts" );
@@ -39,10 +39,10 @@ public class ElasticsearchTestHostConnectionConfiguration {
 		this.username = System.getProperty( "test.elasticsearch.connection.username" );
 		this.password = System.getProperty( "test.elasticsearch.connection.password" );
 		this.awsSigningEnabled = Boolean.getBoolean( "test.elasticsearch.connection.aws.signing.enabled" );
+		this.awsRegion = System.getProperty( "test.elasticsearch.connection.aws.region" );
 		this.awsCredentialsType = System.getProperty( "test.elasticsearch.connection.aws.credentials.type" );
 		this.awsCredentialsAccessKeyId = System.getProperty( "test.elasticsearch.connection.aws.credentials.access_key_id" );
 		this.awsCredentialsSecretAccessKey = System.getProperty( "test.elasticsearch.connection.aws.credentials.secret_access_key" );
-		this.awsSigningRegion = System.getProperty( "test.elasticsearch.connection.aws.signing.region" );
 
 		log.infof(
 				"Integration tests will connect to '%s' using protocol '%s' (AWS signing enabled: '%s')",
@@ -56,9 +56,9 @@ public class ElasticsearchTestHostConnectionConfiguration {
 		properties.put( "username", username );
 		properties.put( "password", password );
 		properties.put( "aws.signing.enabled", String.valueOf( awsSigningEnabled ) );
+		properties.put( "aws.region", awsRegion );
 		properties.put( "aws.credentials.type", awsCredentialsType );
 		properties.put( "aws.credentials.access_key_id", awsCredentialsAccessKeyId );
 		properties.put( "aws.credentials.secret_access_key", awsCredentialsSecretAccessKey );
-		properties.put( "aws.signing.region", awsSigningRegion );
 	}
 }

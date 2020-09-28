@@ -36,7 +36,7 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 					.build();
 
 	private static final OptionalConfigurationProperty<String> REGION =
-			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.SIGNING_REGION )
+			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.REGION )
 					.asString()
 					.build();
 
