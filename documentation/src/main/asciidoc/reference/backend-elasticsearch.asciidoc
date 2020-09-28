@@ -165,35 +165,52 @@ You will need to add this dependency:
 </dependency>
 ----
 
-With that dependency in your classpath,
-Hibernate Search will be able to understand the following configuration properties.
+With that dependency in your classpath, you will still need to configure it.
+
+The following configuration is mandatory:
 
 [source]
 ----
-hibernate.search.backend.aws.signing.enabled = false (default)
-hibernate.search.backend.aws.signing.access_key = AKIDEXAMPLE (no default)
-hibernate.search.backend.aws.signing.secret_key = wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY (no default)
-hibernate.search.backend.aws.signing.region = us-east-1 (no default)
+hibernate.search.backend.aws.signing.enabled = true
+hibernate.search.backend.aws.region = us-east-1
 ----
 
 * `aws.signing.enabled` defines whether request signing is enabled.
-Expects a boolean value.
-* `aws.signing.access_key` defines the access key.
-Expects a string value.
-This property has no default and must be provided for the AWS authentication to work.
-* `aws.signing.secret_key` defines the secret key.
-Expects a string value.
-This property has no default and must be provided for the AWS authentication to work.
-* `aws.signing.region` defines the AWS region.
+Expects a boolean value. Defaults to `false`.
+* `aws.region` defines the http://docs.aws.amazon.com/general/latest/gr/rande.html[AWS region].
 Expects a string value.
 This property has no default and must be provided for the AWS authentication to work.
 
-[TIP]
-====
-Should you need help with finding the correct values for these properties,
-please refer to the AWS documentation related to http://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html[security credentials]
-and http://docs.aws.amazon.com/general/latest/gr/rande.html[regions].
-====
+By default, Hibernate Search will rely on the default credentials provider from the AWS SDK.
+This provider will look for credentials in the following place and in the following order:
+
+1. Java System Properties: `aws.accessKeyId` and `aws.secretKey`.
+2. Environment Variables: `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
+3. Credential profiles file at the default location (`~/.aws/credentials`) shared by all AWS SDKs and the AWS CLI.
+4. Credentials delivered through the Amazon EC2 container service if `AWS_CONTAINER_CREDENTIALS_RELATIVE_URI` environment
+   variable is set and security manager has permission to access the variable.
+5. Instance profile credentials delivered through the Amazon EC2 metadata service.
+
+Optionally, you can set static credentials with the following options:
+
+[source]
+----
+hibernate.search.backend.aws.credentials.type = static
+hibernate.search.backend.aws.credentials.access_key_id = AKIDEXAMPLE
+hibernate.search.backend.aws.credentials.secret_access_key = wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY
+----
+
+* `aws.credentials.type` defines the type of credentials.
+Set to `default` to get the default behavior (as explained above),
+or to `static` to provide credentials using the properties below.
+* `aws.credentials.access_key_id` defines the
+http://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html[access key ID].
+Expects a string value.
+This property has no default and must be provided when the credentials type is set to `static`.
+* `aws.credentials.secret_access_key` defines the
+http://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html[secret access key].
+Expects a string value.
+This property has no default and must be provided when the credentials type is set to `static`.
 
 === Connection tuning
 

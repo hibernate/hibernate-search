@@ -259,6 +259,14 @@ mvn clean install -Dtest.elasticsearch.connection.hosts=<host:port> \
         -Dtest.elasticsearch.connection.aws.credentials.secret_access_key=<Your secret access key>
 ```
 
+Or more simply, if your AWS credentials are already stored in `~/.aws/credentials`:
+
+```bash
+mvn clean install -Dtest.elasticsearch.connection.hosts=<host:port> \
+        -Dtest.elasticsearch.connection.aws.signing.enabled=true \
+        -Dtest.elasticsearch.connection.aws.region=<Your AWS region ID>
+```
+
 When building Hibernate Search with new JDKs,
 you may want to run Elasticsearch with a different JDK than the one used by Maven.
 This can be done by setting a property
