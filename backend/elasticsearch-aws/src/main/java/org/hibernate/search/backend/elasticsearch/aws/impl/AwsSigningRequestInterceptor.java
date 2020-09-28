@@ -27,6 +27,7 @@ import org.apache.http.RequestLine;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
+import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.signer.Aws4Signer;
 import software.amazon.awssdk.auth.signer.params.Aws4SignerParams;
@@ -66,8 +67,11 @@ class AwsSigningRequestInterceptor implements HttpRequestInterceptor {
 			log.tracef( "AWS request (before signing): %s", awsRequest );
 		}
 
+		AwsCredentials credentials = credentialsProvider.resolveCredentials();
+		log.tracef( "AWS credentials: %s", credentials );
+
 		Aws4SignerParams signerParams = Aws4SignerParams.builder()
-				.awsCredentials( credentialsProvider.resolveCredentials() )
+				.awsCredentials( credentials )
 				.signingRegion( region )
 				.signingName( ELASTICSEARCH_SERVICE_NAME )
 				.build();
