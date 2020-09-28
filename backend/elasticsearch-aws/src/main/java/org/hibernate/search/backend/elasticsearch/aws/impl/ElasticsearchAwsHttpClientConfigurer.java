@@ -61,12 +61,16 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 		ConfigurationPropertySource propertySource = context.configurationPropertySource();
 
 		if ( !SIGNING_ENABLED.get( propertySource ) ) {
+			log.debug( "AWS request signing is disabled." );
 			return;
 		}
 
 		Region region = REGION.getAndMapOrThrow( propertySource, Region::of, log::missingPropertyForSigning );
 
 		AwsCredentialsProvider credentialsProvider = createCredentialsProvider( context.beanResolver(), propertySource );
+
+		log.debugf( "AWS request signing is enabled [region = '%s', credentialsProvider = '%s'].",
+				region, credentialsProvider );
 
 		AwsSigningRequestInterceptor signingInterceptor = new AwsSigningRequestInterceptor( region, credentialsProvider );
 
