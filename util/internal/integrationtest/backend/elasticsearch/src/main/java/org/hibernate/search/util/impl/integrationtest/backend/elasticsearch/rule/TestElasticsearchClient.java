@@ -744,12 +744,10 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		 */
 		try ( BeanHolder<ElasticsearchClientFactory> factoryHolder =
 				beanResolver.resolve( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
-			client = factoryHolder.get().create(
-					backendProperties,
+			client = factoryHolder.get().create( beanResolver, backendProperties,
 					threadPoolProvider.threadProvider(), "Client",
 					timeoutExecutorService,
-					GsonProvider.create( GsonBuilder::new, true )
-			);
+					GsonProvider.create( GsonBuilder::new, true ) );
 		}
 	}
 

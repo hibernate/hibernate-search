@@ -133,7 +133,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 	}
 
 	@Override
-	public ElasticsearchClientImplementor create(ConfigurationPropertySource propertySource,
+	public ElasticsearchClientImplementor create(BeanResolver beanResolver, ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider, String threadNamePrefix,
 			ScheduledExecutorService timeoutExecutorService,
 			GsonProvider gsonProvider) {
@@ -141,7 +141,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		int connectionTimeoutMs = CONNECTION_TIMEOUT.get( propertySource );
 
 		ServerUris hosts = ServerUris.fromStrings( PROTOCOL.get( propertySource ), HOSTS.get( propertySource ) );
-		RestClient restClient = createClient( propertySource, threadProvider, threadNamePrefix, hosts );
+		RestClient restClient = createClient( beanResolver, propertySource, threadProvider, threadNamePrefix, hosts );
 		Sniffer sniffer = createSniffer( propertySource, restClient, hosts );
 
 		return new ElasticsearchClientImpl(
@@ -151,7 +151,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		);
 	}
 
-	private RestClient createClient(ConfigurationPropertySource propertySource,
+	private RestClient createClient(BeanResolver beanResolver, ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider, String threadNamePrefix,
 			ServerUris hosts) {
 		return RestClient.builder( hosts.asHostsArray() )
@@ -159,7 +159,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 				.setHttpClientConfigCallback(
 						b -> customizeHttpClientConfig(
 								b,
-								propertySource,
+								beanResolver, propertySource,
 								threadProvider, threadNamePrefix,
 								hosts,
 								httpClientConfigurers
@@ -168,7 +168,8 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 				.build();
 	}
 
-	private Sniffer createSniffer(ConfigurationPropertySource propertySource, RestClient client, ServerUris hosts) {
+	private Sniffer createSniffer(ConfigurationPropertySource propertySource,
+			RestClient client, ServerUris hosts) {
 		boolean discoveryEnabled = DISCOVERY_ENABLED.get( propertySource );
 		if ( discoveryEnabled ) {
 			SnifferBuilder builder = Sniffer.builder( client )
@@ -193,7 +194,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 	}
 
 	private HttpAsyncClientBuilder customizeHttpClientConfig(HttpAsyncClientBuilder builder,
-			ConfigurationPropertySource propertySource,
+			BeanResolver beanResolver, ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider, String threadNamePrefix,
 			ServerUris hosts,
 			Iterable<ElasticsearchHttpClientConfigurer> configurers) {
@@ -222,8 +223,11 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 			builder.setDefaultCredentialsProvider( credentialsProvider );
 		}
 
+		ElasticsearchHttpClientConfigurationContextImpl clientConfigurationContext =
+				new ElasticsearchHttpClientConfigurationContextImpl( beanResolver, propertySource, builder );
+
 		for ( ElasticsearchHttpClientConfigurer configurer : configurers ) {
-			configurer.configure( builder, propertySource );
+			configurer.configure( clientConfigurationContext );
 		}
 
 		return builder;
