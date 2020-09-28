@@ -93,8 +93,8 @@ they make the intent of your patch less clear.
     ```
 
 _Prior to committing, if you want to pull in the latest upstream changes (highly
-appreciated by the way), please use rebasing rather than merging (see instructions below).  Merging creates
-"merge commits" that really muck up the project timeline._
+appreciated by the way), please use rebasing rather than merging (see instructions below).
+Merging creates "merge commits" that really muck up the project timeline._
 
 Add the original Hibernate Search repository as a remote repository called upstream:
 ```bash
@@ -110,7 +110,8 @@ git pull --rebase upstream master
 
 * Push your changes to a topic branch in your fork of the repository.
 * Initiate a [pull request](http://help.github.com/send-pull-requests/).
-* Update the JIRA issue, using the "Link to pull request" button to include a link to the created pull request.
+* Update the JIRA issue, using the "Link to pull request" button to include a link to
+the created pull request.
 
 ## Source code structure
 
@@ -119,11 +120,13 @@ The project is split in several Maven modules:
 * `backend`: The backends, i.e. the modules that provide integration to actual indexing services.
   * `elasticsearch`: A backend that connects to a remote Elasticsearch cluster.
   * `lucene`: A backend that uses an embedded (same JVM) Lucene instance.
-* `build-config`: Code-related artifacts like [checkstyle](https://checkstyle.org/) and [forbiddenapis](https://github.com/policeman-tools/forbidden-apis) rules.
+* `build-config`: Code-related artifacts like [checkstyle](https://checkstyle.org/) and
+[forbiddenapis](https://github.com/policeman-tools/forbidden-apis) rules.
 * `distribution`: Builds the distribution package.
 * `documentation`: The project documentation.
 * `engine`: The Hibernate Search engine.
-This module handles most of the basic integration work (configuration properties, bean instantiation, ...),
+This module handles most of the basic integration work
+(configuration properties, bean instantiation, ...),
 defines APIs common to every mapper/backend (the Search DSL in particular),
 and provides the "glue" between mappers and backends.
 * `integrationtest`: Integration tests for backends (Elasticsearch, Lucene) and mappers (Hibernate ORM),
@@ -223,20 +226,24 @@ mvn clean install -Dtest.elasticsearch.connection.hosts=localhost:9200
 If you want to use HTTPS:
 
 ```bash
-mvn clean install -Dtest.elasticsearch.connection.hosts=localhost:9200 -Dtest.elasticsearch.connection.protocol=https
+mvn clean install -Dtest.elasticsearch.connection.hosts=localhost:9200 \
+        -Dtest.elasticsearch.connection.protocol=https
 ```
 
 If you want to run tests against a different Elasticsearch version  (6.x for instance),
 you will still have to select a profile among those listed above, and specify the version:
 
 ```bash
-mvn clean install -Pelasticsearch-6.0 -Dtest.elasticsearch.connection.version=6.0.0 -Dtest.elasticsearch.connection.hosts=localhost:9200
+mvn clean install -Pelasticsearch-6.0 -Dtest.elasticsearch.connection.version=6.0.0 \
+        -Dtest.elasticsearch.connection.hosts=localhost:9200
 ```
 
 You may also use authentication:
 
 ```bash
-mvn clean install -Dtest.elasticsearch.connection.hosts=localhost:9200 -Dtest.elasticsearch.connection.username=ironman -Dtest.elasticsearch.connection.password=j@rV1s
+mvn clean install -Dtest.elasticsearch.connection.hosts=localhost:9200 \
+        -Dtest.elasticsearch.connection.username=ironman \
+        -Dtest.elasticsearch.connection.password=j@rV1s
 ```
 
 Also, the elasticsearch integration tests can be executed
@@ -244,10 +251,14 @@ against an Elasticsearch service on AWS.
 You will need to execute something along the lines of:
 
 ```bash
-mvn clean install -Dtest.elasticsearch.connection.hosts=<host:port> -Dtest.elasticsearch.connection.aws.signing.access_key=<Your access key> -Dtest.elasticsearch.connection.aws.signing.secret_key=<Your secret key> -Dtest.elasticsearch.connection.aws.signing.region=<Your AWS region ID>
+mvn clean install -Dtest.elasticsearch.connection.hosts=<host:port> \
+        -Dtest.elasticsearch.connection.aws.signing.access_key=<Your access key> \
+        -Dtest.elasticsearch.connection.aws.signing.secret_key=<Your secret key> \
+        -Dtest.elasticsearch.connection.aws.signing.region=<Your AWS region ID>
 ```
 
-When building Hibernate Search with new JDKs, you may want to run Elasticsearch with a different JDK than the one used by Maven.
+When building Hibernate Search with new JDKs,
+you may want to run Elasticsearch with a different JDK than the one used by Maven.
 This can be done by setting a property
 (**this will only work with the profiles for Elasticsearch 5 and above**):
 
@@ -311,12 +322,14 @@ The exact keyword differs depending on the module, but is generally fairly obvio
 
 For example:
  
-* If you add a non-abstract class in the Lucene backend that implements an interface defined in the engine module,
-it should be named `Lucene<something>`
-* If you add a class in the Lucene backend that is the only implementation of an interface that is also in the Lucene backend,
-it should be named `<name of the interface>Impl`.
-* If you add a class in the Lucene backend that is one of multiple implementations of an interface that is also in the Lucene backend,
-its name should not have an `Impl` suffix and should meaningfully describe what is specific to this implementation.
+* If you add a non-abstract class in the Lucene backend that implements an interface
+defined in the engine module, it should be named `Lucene<something>`
+* If you add a class in the Lucene backend that is the only implementation of an interface
+that is also in the Lucene backend, it should be named `<name of the interface>Impl`.
+* If you add a class in the Lucene backend that is one of multiple implementations
+of an interface that is also in the Lucene backend,
+its name should not have an `Impl` suffix and should meaningfully describe
+what is specific to this implementation.
 
 Architecture rules are a bit more complex;
 feel free to ignore them, submit your PR and let the reviewer guide you.
