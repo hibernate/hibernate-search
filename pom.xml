@@ -229,6 +229,10 @@
         <version.javax.batch>1.0</version.javax.batch>
         <version.org.jberet>1.3.7.Final</version.org.jberet>
 
+        <!-- >>> JSR 352 test -->
+        <version.com.ibm.jbatch>1.0</version.com.ibm.jbatch>
+        <version.org.apache.derby>10.13.1.1</version.org.apache.derby>
+
         <!-- >>> Java EE/Jakarta EE dependencies -->
         <!-- Used in the JSR352 integration in particular, but also in the ORM integration (?) and various tests -->
         <version.javax.inject>1</version.javax.inject>
@@ -598,6 +602,12 @@
                 <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-batch-jsr352-core</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-batch-jsr352-core</artifactId>
+                <version>${project.version}</version>
+                <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
