@@ -34,7 +34,7 @@ public final class ElasticsearchAwsBackendSettings {
 	 * <p>
 	 * No default: must be provided when signing is enabled.
 	 */
-	public static final String SIGNING_REGION = "aws.signing.region";
+	public static final String REGION = "aws.region";
 
 	/**
 	 * The type of credentials to use when signing is {@link #SIGNING_ENABLED enabled}.
