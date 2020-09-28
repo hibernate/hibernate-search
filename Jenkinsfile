@@ -265,6 +265,11 @@ stage('Configure') {
 					new EsAwsBuildEnvironment(version: '7.4', mavenProfile: 'elasticsearch-7.3',
 							condition: TestCondition.AFTER_MERGE),
 					new EsAwsBuildEnvironment(version: '7.7', mavenProfile: 'elasticsearch-7.7',
+							condition: TestCondition.AFTER_MERGE),
+
+					// Also test static credentials, but only for the latest version
+					new EsAwsBuildEnvironment(version: '7.7', mavenProfile: 'elasticsearch-7.7',
+							staticCredentials: true,
 							condition: TestCondition.AFTER_MERGE)
 			]
 	])
@@ -581,35 +586,63 @@ stage('Non-default environments') {
 		if (!buildEnv.awsRegion) {
 			throw new IllegalStateException("Unexpected empty AWS region")
 		}
-		def awsCredentialsId = helper.configuration.file?.aws?.credentials
-		if (!awsCredentialsId) {
-			throw new IllegalStateException("Missing AWS credentials")
+		def awsCredentialsId = null
+		if (buildEnv.staticCredentials) {
+			awsCredentialsId = helper.configuration.file?.aws?.credentials
+			if (!awsCredentialsId) {
+				throw new IllegalStateException("Missing AWS credentials")
+			}
 		}
 		executions.put(buildEnv.tag, {
 			lock(label: buildEnv.lockedResourcesLabel) {
 				runBuildOnNode(NODE_PATTERN_BASE + '&&AWS') {
-					helper.withMavenWorkspace {
-						withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
-										 credentialsId   : awsCredentialsId,
-										 usernameVariable: 'AWS_ACCESS_KEY_ID',
-										 passwordVariable: 'AWS_SECRET_ACCESS_KEY'
-						]]) {
+					if (awsCredentialsId == null) {
+						// By default, rely on credentials provided by the EC2 infrastructure
+
+						helper.withMavenWorkspace {
 							// Tests may fail because of hourly AWS snapshots,
 							// which prevent deleting indexes while they are being executed.
 							// So if this fails, we re-try twice.
 							retry(count: 3) {
 								mavenNonDefaultBuild buildEnv, """ \
-									clean install \
-									-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
-									${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
-									-Dtest.elasticsearch.connection.hosts=$buildEnv.endpointHostAndPort \
-									-Dtest.elasticsearch.connection.protocol=$buildEnv.endpointProtocol \
-									-Dtest.elasticsearch.connection.aws.signing.enabled=true \
-									-Dtest.elasticsearch.connection.aws.region=$buildEnv.awsRegion \
-									-Dtest.elasticsearch.connection.aws.credentials.type=static \
-									-Dtest.elasticsearch.connection.aws.credentials.access_key_id=$AWS_ACCESS_KEY_ID \
-									-Dtest.elasticsearch.connection.aws.credentials.secret_access_key=$AWS_SECRET_ACCESS_KEY \
-								"""
+										clean install \
+										-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
+										${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
+										-Dtest.elasticsearch.connection.hosts=$buildEnv.endpointHostAndPort \
+										-Dtest.elasticsearch.connection.protocol=$buildEnv.endpointProtocol \
+										-Dtest.elasticsearch.connection.aws.signing.enabled=true \
+										-Dtest.elasticsearch.connection.aws.region=$buildEnv.awsRegion \
+									"""
+							}
+						}
+					}
+					else {
+						// For a few builds only, rely on static credentials provided by Jenkins
+						// (just to check that statically-provided credentials work correctly)
+
+						helper.withMavenWorkspace {
+							withCredentials([[$class          : 'AmazonWebServicesCredentialsBinding',
+											  credentialsId   : awsCredentialsId,
+											  usernameVariable: 'AWS_ACCESS_KEY_ID',
+											  passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+											 ]]) {
+								// Tests may fail because of hourly AWS snapshots,
+								// which prevent deleting indexes while they are being executed.
+								// So if this fails, we re-try twice.
+								retry(count: 3) {
+									mavenNonDefaultBuild buildEnv, """ \
+										clean install \
+										-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
+										${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
+										-Dtest.elasticsearch.connection.hosts=$buildEnv.endpointHostAndPort \
+										-Dtest.elasticsearch.connection.protocol=$buildEnv.endpointProtocol \
+										-Dtest.elasticsearch.connection.aws.signing.enabled=true \
+										-Dtest.elasticsearch.connection.aws.region=$buildEnv.awsRegion \
+										-Dtest.elasticsearch.connection.aws.credentials.type=static \
+										-Dtest.elasticsearch.connection.aws.credentials.access_key_id=$AWS_ACCESS_KEY_ID \
+										-Dtest.elasticsearch.connection.aws.credentials.secret_access_key=$AWS_SECRET_ACCESS_KEY \
+									"""
+								}
 							}
 						}
 					}
@@ -758,8 +791,9 @@ class EsAwsBuildEnvironment extends BuildEnvironment {
 	String endpointHostAndPort = null
 	String endpointProtocol = null
 	String awsRegion = null
+	boolean staticCredentials = false
 	@Override
-	String getTag() { "elasticsearch-aws-$version" }
+	String getTag() { "elasticsearch-aws-$version" + (staticCredentials ? "-credentials-static" : "") }
 	@Override
 	String getElasticsearchJdkTool(def allEnvironments) {
 		null // No JDK needed for Elasticsearch: the Elasticsearch instance is remote.
