@@ -7,22 +7,23 @@
 package org.hibernate.search.backend.elasticsearch.aws.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Optional;
-
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
 
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsBackendSettings;
+import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsCredentialsTypeNames;
 import org.hibernate.search.backend.elasticsearch.aws.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.aws.spi.ElasticsearcAwsCredentialsProvider;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchHttpClientConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchHttpClientConfigurer;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
 
 public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpClientConfigurer {
 
@@ -34,18 +35,24 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 					.withDefault( ElasticsearchAwsBackendSettings.Defaults.SIGNING_ENABLED )
 					.build();
 
-	private static final OptionalConfigurationProperty<String> ACCESS_KEY =
-			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.SIGNING_ACCESS_KEY )
-					.asString()
-					.build();
-
-	private static final OptionalConfigurationProperty<String> SECRET_KEY =
-			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.SIGNING_SECRET_KEY )
-					.asString()
-					.build();
-
 	private static final OptionalConfigurationProperty<String> REGION =
 			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.SIGNING_REGION )
+					.asString()
+					.build();
+
+	private static final ConfigurationProperty<BeanReference<? extends ElasticsearcAwsCredentialsProvider>> CREDENTIALS_TYPE =
+			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.CREDENTIALS_TYPE )
+					.asBeanReference( ElasticsearcAwsCredentialsProvider.class )
+					.withDefault( BeanReference.of( ElasticsearcAwsCredentialsProvider.class, ElasticsearchAwsCredentialsTypeNames.DEFAULT ) )
+					.build();
+
+	private static final OptionalConfigurationProperty<String> LEGACY_ACCESS_KEY =
+			ConfigurationProperty.forKey( "aws.signing.access_key" )
+					.asString()
+					.build();
+
+	private static final OptionalConfigurationProperty<String> LEGACY_SECRET_KEY =
+			ConfigurationProperty.forKey( "aws.signing.secret_key" )
 					.asString()
 					.build();
 
@@ -59,29 +66,29 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 
 		Region region = REGION.getAndMapOrThrow( propertySource, Region::of, log::missingPropertyForSigning );
 
-		AwsCredentialsProvider credentialsProvider = createCredentialsProvider( propertySource );
+		AwsCredentialsProvider credentialsProvider = createCredentialsProvider( context.beanResolver(), propertySource );
 
 		AwsSigningRequestInterceptor signingInterceptor = new AwsSigningRequestInterceptor( region, credentialsProvider );
 
 		context.clientBuilder().addInterceptorLast( signingInterceptor );
 	}
 
-	private AwsCredentialsProvider createCredentialsProvider(ConfigurationPropertySource propertySource) {
-		Optional<String> accessKeyOptional = ACCESS_KEY.get( propertySource );
-		Optional<String> secretKeyOptional = SECRET_KEY.get( propertySource );
-		if ( accessKeyOptional.isPresent() || secretKeyOptional.isPresent() ) {
-			if ( !accessKeyOptional.isPresent() ) {
-				throw log.missingAccessKeyForSigningWithSecretKeySet( ACCESS_KEY.resolveOrRaw( propertySource ) );
-			}
-			if ( !secretKeyOptional.isPresent() ) {
-				throw log.missingSecretKeyForSigningWithAccessKeySet( SECRET_KEY.resolveOrRaw( propertySource ) );
-			}
-			return StaticCredentialsProvider.create(
-					AwsBasicCredentials.create( accessKeyOptional.get(), secretKeyOptional.get() )
-			);
+	private AwsCredentialsProvider createCredentialsProvider(BeanResolver beanResolver,
+			ConfigurationPropertySource propertySource) {
+		if ( LEGACY_ACCESS_KEY.get( propertySource ).isPresent()
+				|| LEGACY_SECRET_KEY.get( propertySource ).isPresent() ) {
+			throw log.obsoleteAccessKeyIdOrSecretAccessKeyForSigning(
+					LEGACY_ACCESS_KEY.resolveOrRaw( propertySource ),
+					LEGACY_SECRET_KEY.resolveOrRaw( propertySource ),
+					CREDENTIALS_TYPE.resolveOrRaw( propertySource ),
+					ElasticsearchAwsCredentialsTypeNames.STATIC,
+					ElasticsearchAwsStaticCredentialsProvider.CREDENTIALS_ACCESS_KEY_ID.resolveOrRaw( propertySource ),
+					ElasticsearchAwsStaticCredentialsProvider.CREDENTIALS_SECRET_ACCESS_KEY.resolveOrRaw( propertySource ) );
 		}
-		else {
-			return DefaultCredentialsProvider.create();
+
+		try ( BeanHolder<? extends ElasticsearcAwsCredentialsProvider> credentialsProviderHolder =
+				CREDENTIALS_TYPE.getAndTransform( propertySource, beanResolver::resolve ) ) {
+			return credentialsProviderHolder.get().create( propertySource );
 		}
 	}
 

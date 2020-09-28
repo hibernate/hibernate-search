@@ -28,8 +28,9 @@ public class ElasticsearchTestHostConnectionConfiguration {
 	private final String username;
 	private final String password;
 	private final boolean awsSigningEnabled;
-	private final String awsSigningAccessKey;
-	private final String awsSigningSecretKey;
+	private final String awsCredentialsType;
+	private final String awsCredentialsAccessKeyId;
+	private final String awsCredentialsSecretAccessKey;
 	private final String awsSigningRegion;
 
 	private ElasticsearchTestHostConnectionConfiguration() {
@@ -38,8 +39,9 @@ public class ElasticsearchTestHostConnectionConfiguration {
 		this.username = System.getProperty( "test.elasticsearch.connection.username" );
 		this.password = System.getProperty( "test.elasticsearch.connection.password" );
 		this.awsSigningEnabled = Boolean.getBoolean( "test.elasticsearch.connection.aws.signing.enabled" );
-		this.awsSigningAccessKey = System.getProperty( "test.elasticsearch.connection.aws.signing.access_key" );
-		this.awsSigningSecretKey = System.getProperty( "test.elasticsearch.connection.aws.signing.secret_key" );
+		this.awsCredentialsType = System.getProperty( "test.elasticsearch.connection.aws.credentials.type" );
+		this.awsCredentialsAccessKeyId = System.getProperty( "test.elasticsearch.connection.aws.credentials.access_key_id" );
+		this.awsCredentialsSecretAccessKey = System.getProperty( "test.elasticsearch.connection.aws.credentials.secret_access_key" );
 		this.awsSigningRegion = System.getProperty( "test.elasticsearch.connection.aws.signing.region" );
 
 		log.infof(
@@ -54,8 +56,9 @@ public class ElasticsearchTestHostConnectionConfiguration {
 		properties.put( "username", username );
 		properties.put( "password", password );
 		properties.put( "aws.signing.enabled", String.valueOf( awsSigningEnabled ) );
-		properties.put( "aws.signing.access_key", awsSigningAccessKey );
-		properties.put( "aws.signing.secret_key", awsSigningSecretKey );
+		properties.put( "aws.credentials.type", awsCredentialsType );
+		properties.put( "aws.credentials.access_key_id", awsCredentialsAccessKeyId );
+		properties.put( "aws.credentials.secret_access_key", awsCredentialsSecretAccessKey );
 		properties.put( "aws.signing.region", awsSigningRegion );
 	}
 }

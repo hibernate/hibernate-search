@@ -7,10 +7,12 @@ spring.jpa:
         protocol: ${ELASTICSEARCH_PROTOCOL} # From environment variable
         username: ${ELASTICSEARCH_USERNAME} # From environment variable
         password: ${ELASTICSEARCH_PASSWORD} # From environment variable
-        aws.signing:
-          enabled: ${ELASTICSEARCH_AWS_SIGNING_ENABLED} # From environment variable
-          access_key: ${ELASTICSEARCH_AWS_SIGNING_ACCESS_KEY} # From environment variable
-          secret_key: ${ELASTICSEARCH_AWS_SIGNING_SECRET_LEY} # From environment variable
-          region: ${ELASTICSEARCH_AWS_SIGNING_REGION} # From environment variable
+        aws:
+          signing.enabled: ${ELASTICSEARCH_AWS_SIGNING_ENABLED} # From environment variable
+          credentials:
+            type: ${ELASTICSEARCH_AWS_CREDENTIALS_TYPE}
+            access_key_id: ${ELASTICSEARCH_AWS_CREDENTIALS_ACCESS_KEY_ID} # From environment variable
+            secret_access_key: ${ELASTICSEARCH_AWS_CREDENTIALS_SECRET_ACCESS_KEY} # From environment variable
+          signing.region: ${ELASTICSEARCH_AWS_SIGNING_REGION} # From environment variable
         discovery.enabled: true
         analysis.configurer: elasticsearchAnalysisConfigurer

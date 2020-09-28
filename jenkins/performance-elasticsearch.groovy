@@ -104,8 +104,9 @@ lock(label: esAwsBuildEnv.lockedResourcesLabel) {
 							-jvmArgsAppend -Dhosts=$esAwsBuildEnv.endpointHostAndPort \
 							-jvmArgsAppend -Dprotocol=$esAwsBuildEnv.endpointProtocol \
 							-jvmArgsAppend -Daws.signing.enabled=true \
-							-jvmArgsAppend -Daws.signing.access_key=$AWS_ACCESS_KEY_ID \
-							-jvmArgsAppend -Daws.signing.secret_key=$AWS_SECRET_ACCESS_KEY \
+							-jvmArgsAppend -Daws.credentials.type=static \
+							-jvmArgsAppend -Daws.credentials.access_key_id=$AWS_ACCESS_KEY_ID \
+							-jvmArgsAppend -Daws.credentials.secret_access_key=$AWS_SECRET_ACCESS_KEY \
 							-jvmArgsAppend -Daws.signing.region=$esAwsBuildEnv.awsRegion \
 							-e OnTheFlyIndexingBenchmarks.concurrentReadWrite \
 							-e OnTheFlyIndexingBenchmarks.query \

@@ -30,17 +30,20 @@ public interface Log extends BasicLogger {
 	SearchException missingPropertyForSigning(String propertyKey);
 
 	@Message(id = ID_OFFSET + 1,
-			value = "AWS request signing is enabled and the access key is set,"
-					+ " but the secret key (property '%1$s') is not set."
-					+ " You must set both the access key and secret key, or neither to rely on default credentials."
+			value = "AWS request signing is enabled with credentials of type '%1$s', but mandatory property '%2$s' is not set"
 	)
-	SearchException missingSecretKeyForSigningWithAccessKeySet(String secretKeyPropertyKey);
+	SearchException missingPropertyForSigningWithCredentialsType(String credentialsType, String propertyKey);
 
 	@Message(id = ID_OFFSET + 2,
-			value = "AWS request signing is enabled and the secret key is set,"
-						+ " but the access key (property '%1$s') is not set."
-						+ " You must set both the access key and secret key, or neither to rely on default credentials."
+			value = "Invalid credentials configuration for AWS request signing."
+					+ " The configuration properties '%1$s' and ' '%2$s' are now obsolete."
+					+ " In order to specify static credentials, set '%3$s' to '%4$s',"
+					+ " then set the access key ID using property '%5$s'"
+					+ " and the secret access key using property '%6$s'."
 	)
-	SearchException missingAccessKeyForSigningWithSecretKeySet(String accessKeyPropertyKey);
+	SearchException obsoleteAccessKeyIdOrSecretAccessKeyForSigning(String legacyAccessKeyIdPropertyKey,
+			String legacySecretAccessKeyPropertyKey,
+			String credentialsTypePropertyKey, String credentialsTypePropertyValueStatic,
+			String accessKeyIdPropertyKey, String secretAccessKeyPropertyKey);
 
 }

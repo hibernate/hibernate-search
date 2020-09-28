@@ -253,8 +253,9 @@ You will need to execute something along the lines of:
 ```bash
 mvn clean install -Dtest.elasticsearch.connection.hosts=<host:port> \
         -Dtest.elasticsearch.connection.aws.signing.enabled=true \
-        -Dtest.elasticsearch.connection.aws.signing.access_key=<Your access key> \
-        -Dtest.elasticsearch.connection.aws.signing.secret_key=<Your secret key> \
+        -Dtest.elasticsearch.connection.aws.credentials.type=static \
+        -Dtest.elasticsearch.connection.aws.credentials.access_key_id=<Your access key ID> \
+        -Dtest.elasticsearch.connection.aws.credentials.secret_access_key=<Your secret access key> \
         -Dtest.elasticsearch.connection.aws.signing.region=<Your AWS region ID>
 ```
 
