@@ -75,8 +75,6 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, event.getPersister() );
 		if ( typeContext != null ) {
 			Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
-			// TODO Check whether deletes work with hibernate.use_identifier_rollback enabled (see HSEARCH-650)
-			// I think they should, but better safe than sorry
 			getCurrentIndexingPlan( contextProvider, event.getSession() )
 					.delete( typeContext.typeIdentifier(), providedId, null, entity );
 		}
