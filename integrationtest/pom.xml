@@ -26,6 +26,7 @@
         <module>showcase/library</module>
         <module>v5migrationhelper/engine</module>
         <module>v5migrationhelper/orm</module>
+        <module>batch-jsr352</module>
     </modules>
 
     <profiles>
