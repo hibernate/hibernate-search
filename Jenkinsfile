@@ -603,9 +603,12 @@ stage('Non-default environments') {
 							// Tests may fail because of hourly AWS snapshots,
 							// which prevent deleting indexes while they are being executed.
 							// So if this fails, we re-try twice.
+							// Note that because we expect frequent failure and retries,
+							// we use --fail-fast here, to make sure we don't waste time.
 							retry(count: 3) {
 								mavenNonDefaultBuild buildEnv, """ \
 										clean install \
+										--fail-fast \
 										-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
 										${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
 										-Dtest.elasticsearch.connection.hosts=$buildEnv.endpointHostAndPort \
@@ -629,9 +632,12 @@ stage('Non-default environments') {
 								// Tests may fail because of hourly AWS snapshots,
 								// which prevent deleting indexes while they are being executed.
 								// So if this fails, we re-try twice.
+								// Note that because we expect frequent failure and retries,
+								// we use --fail-fast here, to make sure we don't waste time.
 								retry(count: 3) {
 									mavenNonDefaultBuild buildEnv, """ \
 										clean install \
+										--fail-fast \
 										-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
 										${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
 										-Dtest.elasticsearch.connection.hosts=$buildEnv.endpointHostAndPort \
