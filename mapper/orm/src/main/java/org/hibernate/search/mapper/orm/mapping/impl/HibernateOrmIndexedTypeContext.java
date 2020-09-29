@@ -34,7 +34,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 	private HibernateOrmIndexedTypeContext(Builder<E> builder, SessionFactoryImplementor sessionFactory) {
 		super( sessionFactory, builder.typeIdentifier, builder.jpaEntityName, builder.hibernateOrmEntityName );
 
-		if ( entityPersister().getIdentifierPropertyName().equals( builder.documentIdSourcePropertyName ) ) {
+		if ( builder.documentIdSourcePropertyName.equals( entityPersister().getIdentifierPropertyName() ) ) {
 			documentIdIsEntityId = true;
 			loaderFactory = HibernateOrmEntityIdEntityLoader.factory(
 					sessionFactory, entityPersister()
