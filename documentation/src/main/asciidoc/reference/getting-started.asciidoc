@@ -67,6 +67,54 @@ others because of more fundamental changes
 (like moving away from using Lucene types in Hibernate Search APIs).
 ====
 
+[[gettingstarted-framework]]
+== Framework support
+
+=== Quarkus
+
+link:{quarkusUrl}[Quarkus] has an official extension for Hibernate Search with Elasticsearch.
+We recommend you follow Quarkus's https://quarkus.io/guides/hibernate-search-elasticsearch[Hibernate Search Guide]:
+it is a great hands-on introduction to Hibernate Search,
+_and_ it covers the specifics of Quarkus (different dependencies, different configuration properties, ...).
+
+=== Spring Boot
+
+Hibernate Search can easily be integrated into a link:{springBootUrl}[Spring Boot] application.
+Just add the dependencies mentioned below, and follow the guide.
+
+One thing to keep in mind, though: Spring Boot automatically sets the version of dependencies without your knowledge.
+While this is ordinarily a good thing, from time to time Spring Boot dependencies will be a little out of date.
+Thus, it is recommended to override Spring Boot's defaults at least for some key dependencies.
+
+With Maven, add this to your POM's `<properties>`:
+
+[source, XML, subs="+attributes"]
+----
+<properties>
+    <hibernate.version>{hibernateVersion}</hibernate.version>
+    <elasticsearch.version>{elasticsearchClientVersions}</elasticsearch.version>
+    <!-- ... plus any other properties of yours ... -->
+</properties>
+----
+
+[TIP]
+====
+If, after setting the properties above,
+you still have problems (e.g. `NoClassDefFoundError`) with some of Hibernate Search's dependencies,
+look for the version of that dependency in
+https://search.maven.org/artifact/org.springframework.boot/spring-boot-dependencies/{testSpringBootVersion}/pom[Spring Boot's POM]
+and https://search.maven.org/artifact/org.hibernate.search/hibernate-search-parent/{hibernateSearchVersion}/pom[Hibernate Search's POM]:
+there will probably be a mistmatch,
+and generally overriding Spring Boot's version to match Hibernate Search's version will work fine.
+====
+
+=== Other
+
+If your framework of choice is not mentioned in the previous sections, don't worry:
+Hibernate Search works just fine with plenty of other frameworks.
+
+Just skip right to the next section to try it out.
+
 [[gettingstarted-dependencies]]
 == Dependencies
 
