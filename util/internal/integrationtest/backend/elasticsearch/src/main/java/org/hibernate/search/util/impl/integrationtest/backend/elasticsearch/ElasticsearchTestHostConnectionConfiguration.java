@@ -8,6 +8,8 @@ package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch;
 
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
+
 import org.jboss.logging.Logger;
 
 public class ElasticsearchTestHostConnectionConfiguration {
@@ -60,5 +62,11 @@ public class ElasticsearchTestHostConnectionConfiguration {
 		properties.put( "aws.credentials.type", awsCredentialsType );
 		properties.put( "aws.credentials.access_key_id", awsCredentialsAccessKeyId );
 		properties.put( "aws.credentials.secret_access_key", awsCredentialsSecretAccessKey );
+		if ( awsSigningEnabled ) {
+			// AWS Elasticsearch Service is (sometimes) super slow for index creation.
+			// Just raise the default timeout so that we don't fail a full 30-min
+			// test run just for one small freeze.
+			properties.put( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT, "60000" );
+		}
 	}
 }
