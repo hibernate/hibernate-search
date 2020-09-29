@@ -12,7 +12,9 @@ import java.util.Locale;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 
+import org.hibernate.search.integrationtest.batch.jsr352.massindexing.bridge.DateIdBridge;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.id.EmbeddableDateId;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -25,7 +27,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 public class EntityWithEmbeddedId {
 
 	@EmbeddedId
-	@DocumentId
+	@DocumentId(identifierBridge = @IdentifierBridgeRef(type = DateIdBridge.class))
 	private EmbeddableDateId embeddableDateId;
 
 	@GenericField
