@@ -264,11 +264,14 @@
                         <luceneVersion>${version.org.apache.lucene}</luceneVersion>
                         <luceneJavadocUrl>${javadoc.org.apache.lucene.core.url}</luceneJavadocUrl>
                         <elasticsearchDocUrl>${documentation.org.elasticsearch.url}</elasticsearchDocUrl>
+                        <elasticsearchClientVersions>${version.org.elasticsearch.client}</elasticsearchClientVersions>
                         <elasticsearchCompatibleVersions>${version.org.elasticsearch.compatible.text}</elasticsearchCompatibleVersions>
                         <elasticsearchOtherPotentiallyCompatibleVersions>${version.org.elasticsearch.compatible.potentially.text}</elasticsearchOtherPotentiallyCompatibleVersions>
                         <wildflyUrl>https://wildfly.org/</wildflyUrl>
                         <quarkusUrl>https://quarkus.io/</quarkusUrl>
                         <springUrl>https://spring.io/</springUrl>
+                        <springBootUrl>https://spring.io/projects/spring-boot</springBootUrl>
+                        <testSpringBootVersion>${version.org.springframework.boot}</testSpringBootVersion>
                         <gsonUrl>https://github.com/google/gson</gsonUrl>
                     </attributes>
                 </configuration>
