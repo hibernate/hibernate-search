@@ -7,11 +7,13 @@
 package org.hibernate.search.integrationtest.mapper.orm.nonregression.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -66,6 +68,30 @@ public class IdClassIT {
 
 			backendMock.expectWorks( NonIdClassIndexed.NAME )
 					.add( "1", b -> { } )
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4025")
+	public void idClass_indexed_WithDocumentId() {
+		backendMock.expectAnySchema( IdClassIndexedWithDocumentId.NAME );
+
+		SessionFactory sessionFactory = ormSetupHelper.start()
+				.setup( IdClassIndexedWithDocumentId.class );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IdClassIndexedWithDocumentId entity = new IdClassIndexedWithDocumentId();
+			entity.setId1( 10 );
+			entity.setId2( 7 );
+			entity.setDocId( 8 );
+
+			session.persist( entity );
+
+			backendMock.expectWorks( IdClassIndexedWithDocumentId.NAME )
+					.add( "8", b -> { } )
 					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
@@ -145,11 +171,84 @@ public class IdClassIT {
 		}
 	}
 
-	static class MyIdClass implements Serializable {
+	@Entity(name = IdClassIndexedWithDocumentId.NAME)
+	@IdClass(MyIdClass.class)
+	@Indexed(index = IdClassIndexedWithDocumentId.NAME)
+	public static class IdClassIndexedWithDocumentId {
+		static final String NAME = "idclsidxwdocid";
 
-		public Integer id1;
+		@Id
+		private Integer id1;
 
-		public Integer id2;
+		@Id
+		private Integer id2;
 
+		@DocumentId
+		private Integer docId;
+
+		public Integer getId1() {
+			return id1;
+		}
+
+		public void setId1(Integer id1) {
+			this.id1 = id1;
+		}
+
+		public Integer getId2() {
+			return id2;
+		}
+
+		public void setId2(Integer id2) {
+			this.id2 = id2;
+		}
+
+		public Integer getDocId() {
+			return docId;
+		}
+
+		public void setDocId(Integer docId) {
+			this.docId = docId;
+		}
+	}
+
+	public static class MyIdClass implements Serializable {
+
+		Integer id1;
+
+		Integer id2;
+
+		public Integer getId1() {
+			return id1;
+		}
+
+		public void setId1(Integer id1) {
+			this.id1 = id1;
+		}
+
+		public Integer getId2() {
+			return id2;
+		}
+
+		public void setId2(Integer id2) {
+			this.id2 = id2;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if ( this == o ) {
+				return true;
+			}
+			if ( o == null || getClass() != o.getClass() ) {
+				return false;
+			}
+			MyIdClass myIdClass = (MyIdClass) o;
+			return Objects.equals( id1, myIdClass.id1 ) &&
+					Objects.equals( id2, myIdClass.id2 );
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash( id1, id2 );
+		}
 	}
 }
