@@ -79,6 +79,8 @@ public class IdClassIT {
 		backendMock.expectAnySchema( IdClassIndexedWithDocumentId.NAME );
 
 		SessionFactory sessionFactory = ormSetupHelper.start()
+				// See HHH-14241
+				.withProperty( "hibernate.implicit_naming_strategy", "default" )
 				.setup( IdClassIndexedWithDocumentId.class );
 		backendMock.verifyExpectationsMet();
 
