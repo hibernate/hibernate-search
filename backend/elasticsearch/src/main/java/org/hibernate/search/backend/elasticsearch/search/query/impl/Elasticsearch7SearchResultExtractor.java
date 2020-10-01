@@ -78,7 +78,16 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 				responseBody
 		);
 
+		Integer took = TOOK_ACCESSOR.get( responseBody ).get();
+		boolean timedOut = TIMED_OUT_ACCESSOR.get( responseBody ).get();
+
 		SearchResultTotal total = extractTotal( responseBody );
+		if ( timedOut ) {
+			// Elasticsearch doesn't return the correct relation in this case:
+			// it tells us the count is exact, but it obviously isn't.
+			total = SimpleSearchResultTotal.lowerBound( total.hitCountLowerBound() );
+		}
+
 		List<Object> extractedHits = ( total.isHitCountLowerBound() || total.hitCount() > 0 ) ?
 				extractHits( extractContext ) : Collections.emptyList();
 
@@ -86,9 +95,6 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 				Collections.emptyMap() : extractAggregations( extractContext, responseBody );
 
 		String scrollId = extractScrollId( responseBody );
-
-		Integer took = TOOK_ACCESSOR.get( responseBody ).get();
-		Boolean timedOut = TIMED_OUT_ACCESSOR.get( responseBody ).get();
 
 		return new ElasticsearchLoadableSearchResult<>(
 				extractContext,
