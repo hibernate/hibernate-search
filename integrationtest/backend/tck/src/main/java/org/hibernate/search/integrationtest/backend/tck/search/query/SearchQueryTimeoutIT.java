@@ -82,7 +82,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void timeout_slowQuery_smallTimeout_raiseAnException() {
+	public void fetch_failAfter_slowQuery_smallTimeout() {
 		SearchQuery<DocumentReference> query = startSlowQuery()
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
@@ -93,7 +93,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void timeout_slowCount_smallTimeout_raiseAnException() {
+	public void fetchTotalHitCount_failAfter_slowQuery_smallTimeout() {
 		SearchQuery<DocumentReference> query = startSlowQuery()
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
@@ -104,7 +104,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void timeout_slowScrolling_smallTimeout_raiseAnException() {
+	public void scroll_failAfter_slowQuery_smallTimeout() {
 		SearchQuery<DocumentReference> query = startSlowQuery()
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
@@ -115,12 +115,11 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void timeout_slowQuery_smallTimeout_limitFetching() {
+	public void fetch_truncateAfter_slowQuery_smallTimeout() {
 		Assume.assumeTrue(
 				"backend should have a fast timeout resolution in order to run this test correctly",
 				TckConfiguration.get().getBackendFeatures().fastTimeoutResolution()
 		);
-
 		SearchResult<DocumentReference> result = startSlowQuery()
 				.truncateAfter( 1, TimeUnit.NANOSECONDS )
 				.fetchAll();
@@ -136,7 +135,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void timeout_fastQuery_largeTimeout() {
+	public void fetch_failAfter_fastQuery_largeTimeout() {
 		SearchResult<DocumentReference> result = startFastQuery()
 				.failAfter( 1, TimeUnit.DAYS )
 				.fetchAll();
@@ -148,7 +147,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void timeout_fastCount_largeTimeout() {
+	public void fetchTotalHitCount_failAfter_fastQuery_largeTimeout() {
 		SearchQuery<DocumentReference> query = startFastQuery()
 				.failAfter( 1, TimeUnit.DAYS )
 				.toQuery();
