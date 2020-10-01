@@ -193,6 +193,31 @@ public class SearchQueryTimeoutIT {
 		}
 	}
 
+	@Test
+	public void fetch_truncateAfter_fastQuery_largeTimeout() {
+		SearchResult<DocumentReference> result = startFastQuery()
+				.truncateAfter( 1, TimeUnit.DAYS )
+				.fetchAll();
+
+		assertThat( result.took() ).isLessThan( Duration.ofDays( 1L ) );
+		assertThat( result.timedOut() ).isFalse();
+	}
+
+	@Test
+	public void scroll_truncateAfter_fastQuery_largeTimeout() {
+		SearchQuery<DocumentReference> query = startFastQuery()
+				.truncateAfter( 1, TimeUnit.DAYS )
+				.toQuery();
+
+		try ( SearchScroll<DocumentReference> scroll = query.scroll( 5 ) ) {
+			SearchScrollResult<DocumentReference> result = scroll.next();
+			assertThat( result.took() ).isLessThan( Duration.ofDays( 1L ) );
+			assertThat( result.timedOut() ).isFalse();
+
+			assertThat( result.hits() ).hasSize( 0 );
+		}
+	}
+
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> startSlowQuery() {
 		return index.createScope().query()
 				.where( f -> f.bool( b -> {
