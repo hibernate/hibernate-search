@@ -7,7 +7,6 @@
 package org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Set;
 import java.util.function.BiFunction;
 import javax.batch.api.BatchProperty;
 import javax.batch.api.listener.AbstractStepListener;
@@ -17,7 +16,6 @@ import javax.inject.Inject;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -67,8 +65,7 @@ public class StepProgressSetupListener extends AbstractStepListener {
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();
 
-			Set<Predicate> customQueryCriteria = jobData.getCustomQueryCriteria();
-			IndexScope indexScope = PersistenceUtil.getIndexScope( customQueryHql, customQueryCriteria );
+			IndexScope indexScope = PersistenceUtil.getIndexScope( customQueryHql );
 			BiFunction<Session, Class<?>, Long> rowCountFunction;
 			switch ( indexScope ) {
 				case HQL:
@@ -76,9 +73,8 @@ public class StepProgressSetupListener extends AbstractStepListener {
 					rowCountFunction = (session, clazz) -> null;
 					break;
 
-				case CRITERIA:
 				case FULL_ENTITY:
-					rowCountFunction = (session, clazz) -> rowCountCriteria( session, clazz, customQueryCriteria );
+					rowCountFunction = (session, clazz) -> rowCount( session, clazz );
 					break;
 
 				default:
@@ -107,11 +103,10 @@ public class StepProgressSetupListener extends AbstractStepListener {
 		stepContext.setPersistentUserData( stepProgress );
 	}
 
-	private static Long rowCountCriteria(Session session, Class<?> entityType, Set<Predicate> predicates) {
+	private static Long rowCount(Session session, Class<?> entityType) {
 		CriteriaBuilder builder = session.getCriteriaBuilder();
 		CriteriaQuery<Long> criteria = builder.createQuery( Long.class );
 		criteria.select( builder.count( criteria.from( entityType ) ) );
-		criteria.where( predicates.toArray( new Predicate[predicates.size()] ) );
 
 		Query<Long> query = session.createQuery( criteria );
 		query.setCacheable( false )

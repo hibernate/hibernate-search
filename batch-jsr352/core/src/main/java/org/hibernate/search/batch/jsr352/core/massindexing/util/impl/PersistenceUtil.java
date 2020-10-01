@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.criteria.Predicate;
 
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
@@ -82,12 +81,9 @@ public final class PersistenceUtil {
 	 *
 	 * @see IndexScope
 	 */
-	public static IndexScope getIndexScope(String hql, Set<Predicate> predicateSet) {
+	public static IndexScope getIndexScope(String hql) {
 		if ( StringHelper.isNotEmpty( hql ) ) {
 			return IndexScope.HQL;
-		}
-		else if ( predicateSet != null && predicateSet.size() > 0 ) {
-			return IndexScope.CRITERIA;
 		}
 		else {
 			return IndexScope.FULL_ENTITY;
