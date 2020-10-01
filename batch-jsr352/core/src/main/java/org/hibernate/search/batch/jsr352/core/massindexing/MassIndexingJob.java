@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.batch.jsr352.core.massindexing;
 
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.HashSet;
@@ -15,12 +14,10 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.criteria.Predicate;
 
 import org.hibernate.CacheMode;
 import org.hibernate.search.batch.jsr352.core.logging.impl.Log;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.Defaults;
-import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.SerializationUtil;
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.ValidationUtil;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -107,7 +104,6 @@ public final class MassIndexingJob {
 		private Integer checkpointInterval;
 		private Integer rowsPerPartition;
 		private Integer maxThreads;
-		private Set<Predicate> customQueryCriteria;
 		private String customQueryHql;
 		private Integer maxResultsPerEntity;
 		private String tenantId;
@@ -119,7 +115,6 @@ public final class MassIndexingJob {
 			this.entityTypes = new HashSet<>();
 			this.entityTypes.add( entityType );
 			Collections.addAll( this.entityTypes, entityTypes );
-			customQueryCriteria = new HashSet<>();
 		}
 
 		/**
@@ -331,26 +326,6 @@ public final class MassIndexingJob {
 		}
 
 		/**
-		 * Add predicate to construct a customized selection of mass-indexing under the criteria approach. You
-		 * can call this method multiple times to add multiple criteria: only entities matching every predicate
-		 * will be indexed. However, mixing this approach with the HQL restriction is not allowed.
-		 *
-		 * @param predicate predicate.
-		 *
-		 * @return itself
-		 */
-		public ParametersBuilder restrictedBy(Predicate predicate) {
-			if ( customQueryHql != null ) {
-				throw new IllegalArgumentException( "Cannot use HQL approach and Criteria approach in the same time." );
-			}
-			if ( predicate == null ) {
-				throw new NullPointerException( "The predicate is null." );
-			}
-			customQueryCriteria.add( predicate );
-			return this;
-		}
-
-		/**
 		 * Use HQL / JPQL to index entities of a target entity type. Your query should contain only one entity type.
 		 * Mixing this approach with the criteria restriction is not allowed. Please notice that there's no query
 		 * validation for your input.
@@ -362,9 +337,6 @@ public final class MassIndexingJob {
 		public ParametersBuilder restrictedBy(String hql) {
 			if ( hql == null ) {
 				throw new NullPointerException( "The HQL is null." );
-			}
-			if ( customQueryCriteria.size() > 0 ) {
-				throw new IllegalArgumentException( "Cannot use HQL approach and Criteria approach in the same time." );
 			}
 			this.customQueryHql = hql;
 			return this;
@@ -443,18 +415,6 @@ public final class MassIndexingJob {
 			addIfNotNull( jobParams, MassIndexingJobParameters.TENANT_ID, tenantId );
 			if ( cacheMode != null ) {
 				jobParams.put( MassIndexingJobParameters.CACHE_MODE, cacheMode.name() );
-			}
-
-			if ( !customQueryCriteria.isEmpty() ) {
-				try {
-					jobParams.put(
-							MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA,
-							SerializationUtil.serialize( customQueryCriteria )
-					);
-				}
-				catch (IOException e) {
-					throw log.failedToSerializeJobParameter( Predicate.class, e );
-				}
 			}
 
 			return jobParams;

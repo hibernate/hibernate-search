@@ -6,18 +6,14 @@
  */
 package org.hibernate.search.batch.jsr352.core.massindexing.util.impl;
 
-import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA;
 
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.batch.runtime.context.JobContext;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.criteria.Predicate;
 
 import org.hibernate.search.batch.jsr352.core.context.jpa.impl.ActiveSessionFactoryRegistry;
 import org.hibernate.search.batch.jsr352.core.context.jpa.spi.EntityManagerFactoryRegistry;
@@ -50,11 +46,11 @@ public final class JobContextUtil {
 	public static JobContextData getOrCreateData(JobContext jobContext,
 			EntityManagerFactoryRegistry emfRegistry,
 			String entityManagerFactoryNamespace, String entityManagerFactoryReference,
-			String entityTypes, String serializedCustomQueryCriteria) throws ClassNotFoundException, IOException {
+			String entityTypes) {
 		JobContextData data = (JobContextData) jobContext.getTransientUserData();
 		if ( data == null ) {
 			EntityManagerFactory emf = getEntityManagerFactory( emfRegistry, entityManagerFactoryNamespace, entityManagerFactoryReference );
-			data = createData( emf, entityTypes, serializedCustomQueryCriteria );
+			data = createData( emf, entityTypes );
 			jobContext.setTransientUserData( data );
 		}
 		return data;
@@ -92,8 +88,7 @@ public final class JobContextUtil {
 		}
 	}
 
-	private static JobContextData createData(EntityManagerFactory emf, String entityTypes, String serializedCustomQueryCriteria)
-			throws ClassNotFoundException, IOException {
+	private static JobContextData createData(EntityManagerFactory emf, String entityTypes) {
 		SearchMapping mapping = Search.mapping( emf );
 		List<String> entityNamesToIndex = Arrays.asList( entityTypes.split( "," ) );
 
@@ -104,16 +99,8 @@ public final class JobContextUtil {
 
 		List<EntityTypeDescriptor> descriptors = PersistenceUtil.createDescriptors( emf, entityTypesToIndex );
 
-		@SuppressWarnings("unchecked")
-		Set<Predicate> criteria = SerializationUtil.parseParameter( Set.class, CUSTOM_QUERY_CRITERIA, serializedCustomQueryCriteria );
-		if ( criteria == null ) {
-			criteria = Collections.emptySet();
-		}
-		log.criteriaSize( criteria.size() );
-
 		JobContextData jobContextData = new JobContextData();
 		jobContextData.setEntityManagerFactory( emf );
-		jobContextData.setCustomQueryCriteria( criteria );
 		jobContextData.setEntityTypeDescriptors( descriptors );
 		return jobContextData;
 	}

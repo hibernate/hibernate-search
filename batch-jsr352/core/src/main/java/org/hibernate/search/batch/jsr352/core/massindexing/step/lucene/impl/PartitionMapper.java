@@ -14,10 +14,8 @@ import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJo
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import javax.batch.api.BatchProperty;
 import javax.batch.api.partition.PartitionPlan;
 import javax.batch.api.partition.PartitionPlanImpl;
@@ -27,7 +25,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.LockModeType;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.SingularAttribute;
@@ -153,22 +150,16 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 			List<EntityTypeDescriptor> entityTypeDescriptors = jobData.getEntityTypeDescriptors();
 			List<PartitionBound> partitionBounds = new ArrayList<>();
 
-			switch ( PersistenceUtil.getIndexScope( customQueryHql, jobData.getCustomQueryCriteria() ) ) {
+			switch ( PersistenceUtil.getIndexScope( customQueryHql ) ) {
 				case HQL:
 					Class<?> clazz = entityTypeDescriptors.get( 0 ).getJavaClass();
 					partitionBounds.add( new PartitionBound( clazz, null, null, IndexScope.HQL ) );
 					break;
 
-				case CRITERIA:
-					partitionBounds = buildPartitionUnitsFrom( emf, ss, entityTypeDescriptors.get( 0 ),
-							jobData.getCustomQueryCriteria(), maxResults, idFetchSize, rowsPerPartition,
-							IndexScope.CRITERIA );
-					break;
-
 				case FULL_ENTITY:
 					for ( EntityTypeDescriptor entityTypeDescriptor : entityTypeDescriptors ) {
 						partitionBounds.addAll( buildPartitionUnitsFrom( emf, ss, entityTypeDescriptor,
-								Collections.emptySet(), maxResults, idFetchSize, rowsPerPartition,
+								maxResults, idFetchSize, rowsPerPartition,
 								IndexScope.FULL_ENTITY ) );
 					}
 					break;
@@ -210,7 +201,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 	}
 
 	private List<PartitionBound> buildPartitionUnitsFrom(EntityManagerFactory emf, StatelessSession ss,
-			EntityTypeDescriptor entityTypeDescriptor, Set<Predicate> customQueryCriteria,
+			EntityTypeDescriptor entityTypeDescriptor,
 			Integer maxResults, int fetchSize, int rowsPerPartition,
 			IndexScope indexScope) {
 		Class<?> javaClass = entityTypeDescriptor.getJavaClass();

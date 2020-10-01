@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.Set;
 import javax.batch.api.BatchProperty;
 import javax.batch.api.chunk.AbstractItemReader;
 import javax.batch.runtime.context.JobContext;
@@ -87,10 +86,6 @@ public class EntityReader extends AbstractItemReader {
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.ENTITY_TYPES)
 	private String serializedEntityTypes;
-
-	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA)
-	private String serializedCustomQueryCriteria;
 
 	@Inject
 	private EntityManagerFactoryRegistry emfRegistry;
@@ -227,7 +222,6 @@ public class EntityReader extends AbstractItemReader {
 				fetchingStrategy = createHqlFetchingStrategy( cacheMode, entityFetchSize, maxResults );
 				break;
 
-			case CRITERIA:
 			case FULL_ENTITY:
 				fetchingStrategy = createCriteriaFetchingStrategy( cacheMode, entityFetchSize, maxResults );
 				break;
@@ -307,7 +301,7 @@ public class EntityReader extends AbstractItemReader {
 	private JobContextData getOrCreateJobContextData() throws ClassNotFoundException, IOException {
 		return JobContextUtil.getOrCreateData(
 				jobContext, emfRegistry, entityManagerFactoryNamespace, entityManagerFactoryReference,
-				serializedEntityTypes, serializedCustomQueryCriteria
+				serializedEntityTypes
 		);
 	}
 
@@ -361,7 +355,6 @@ public class EntityReader extends AbstractItemReader {
 		Class<?> entityType = jobData.getEntityType( entityName );
 		Object upperBound = SerializationUtil.deserialize( serializedUpperBound );
 		Object lowerBound = SerializationUtil.deserialize( serializedLowerBound );
-		Set<Predicate> customQueryCriteria = jobData.getCustomQueryCriteria();
 
 		EntityTypeDescriptor typeDescriptor = jobData.getEntityTypeDescriptor( entityType );
 		IdOrder idOrder = typeDescriptor.getIdOrder();
@@ -374,10 +367,7 @@ public class EntityReader extends AbstractItemReader {
 			// build orders for this entity
 			idOrder.addAscOrder( builder, criteria, root );
 
-			ArrayList<Predicate> predicates = new ArrayList<>( customQueryCriteria.size() + 1 );
-
-			// build criteria using job context data
-			predicates.addAll( customQueryCriteria );
+			ArrayList<Predicate> predicates = new ArrayList<>( 2 );
 
 			// build criteria using bounds
 			if ( upperBound != null ) {
@@ -390,7 +380,9 @@ public class EntityReader extends AbstractItemReader {
 				predicates.add( idOrder.idGreaterOrEqual( builder, root, lowerBound ) );
 			}
 
-			criteria.where( predicates.toArray( new Predicate[predicates.size()] ) );
+			if ( !predicates.isEmpty() ) {
+				criteria.where( predicates.toArray( new Predicate[predicates.size()] ) );
+			}
 
 			Query<?> query = session.createQuery( criteria );
 

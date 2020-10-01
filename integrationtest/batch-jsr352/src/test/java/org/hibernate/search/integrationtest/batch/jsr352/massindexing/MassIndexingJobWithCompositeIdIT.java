@@ -11,12 +11,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Properties;
-import java.util.function.BiFunction;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
 import org.hibernate.search.batch.jsr352.core.massindexing.test.util.JobTestUtil;
@@ -99,11 +95,10 @@ public class MassIndexingJobWithCompositeIdIT {
 	}
 
 	@Test
-	public void canHandleIdClass_strategyCriteria() throws Exception {
+	public void canHandleIdClass_strategyHql() throws Exception {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithIdClass.class )
-				.restrictedBy( predicate( (builder, root) -> builder.equal( root.get( "month" ), 6 ),
-						EntityWithIdClass.class ) )
+				.restrictedBy( "select e from EntityWithIdClass e where e.month = 6" )
 				.rowsPerPartition( 13 ) // Ensure there're more than 1 partition, so that a WHERE clause is applied.
 				.checkpointInterval( 4 )
 				.build();
@@ -130,11 +125,10 @@ public class MassIndexingJobWithCompositeIdIT {
 	}
 
 	@Test
-	public void canHandleEmbeddedId_strategyCriteria() throws Exception {
+	public void canHandleEmbeddedId_strategyHql() throws Exception {
 		Properties props = MassIndexingJob.parameters()
 				.forEntities( EntityWithEmbeddedId.class )
-				.restrictedBy( predicate( (builder, root) -> builder.equal( root.get( "embeddableDateId.month" ), 6 ),
-						EntityWithEmbeddedId.class ) )
+				.restrictedBy( "select e from EntityWithIdClass e where e.embeddableDateId.month = 6" )
 				.rowsPerPartition( 13 ) // Ensure there're more than 1 partition, so that a WHERE clause is applied.
 				.checkpointInterval( 4 )
 				.build();
@@ -143,11 +137,5 @@ public class MassIndexingJobWithCompositeIdIT {
 		int expectedDays = (int) ChronoUnit.DAYS.between( LocalDate.of( 2017, 7, 1 ), END );
 		int actualDays = JobTestUtil.nbDocumentsInIndex( emf, EntityWithEmbeddedId.class );
 		assertThat( actualDays ).isEqualTo( expectedDays );
-	}
-
-	private <T> Predicate predicate(BiFunction<CriteriaBuilder, Root<T>, Predicate> predicateFunction, Class<T> type) {
-		CriteriaBuilder builder = emf.getCriteriaBuilder();
-		Root<T> from = builder.createQuery( type ).from( type );
-		return predicateFunction.apply( builder, from );
 	}
 }

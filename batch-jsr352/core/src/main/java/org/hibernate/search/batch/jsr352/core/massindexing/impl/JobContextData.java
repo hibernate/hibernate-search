@@ -11,10 +11,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.criteria.Predicate;
 
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.EntityTypeDescriptor;
 
@@ -33,8 +31,6 @@ public class JobContextData {
 	 * used too. So this map has string keys to facilitate lookup for values extracted from job properties.
 	 */
 	private Map<String, EntityTypeDescriptor> entityTypeDescriptorMap;
-
-	private Set<Predicate> customQueryCriteria;
 
 	public JobContextData() {
 		entityTypeDescriptorMap = new HashMap<>();
@@ -80,21 +76,12 @@ public class JobContextData {
 		return getEntityTypeDescriptor( entityName ).getJavaClass();
 	}
 
-	public Set<Predicate> getCustomQueryCriteria() {
-		return customQueryCriteria;
-	}
-
-	public void setCustomQueryCriteria(Set<Predicate> criteria) {
-		this.customQueryCriteria = criteria;
-	}
-
 	@Override
 	public String toString() {
 		return new StringBuilder()
 				.append( "JobContextData [" )
 				.append( "entityManagerFactory=" ).append( entityManagerFactory )
 				.append( ", entityTypeDescriptorMap=" ).append( entityTypeDescriptorMap )
-				.append( ", customQueryCriteria=" ).append( customQueryCriteria )
 				.append( "]" )
 				.toString();
 	}

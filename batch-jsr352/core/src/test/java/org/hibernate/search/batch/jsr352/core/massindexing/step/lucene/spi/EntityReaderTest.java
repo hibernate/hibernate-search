@@ -14,7 +14,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
@@ -109,7 +108,6 @@ public class EntityReaderTest {
 	public void testReadItem_withoutBoundary() throws Exception {
 		JobContextData jobData = new JobContextData();
 		jobData.setEntityManagerFactory( emf );
-		jobData.setCustomQueryCriteria( new HashSet<>() );
 		jobData.setEntityTypeDescriptors( Arrays.asList( JobTestUtil.createSimpleEntityTypeDescriptor( emf, Company.class ) ) );
 
 		when( mockedJobContext.getTransientUserData() ).thenReturn( jobData );
