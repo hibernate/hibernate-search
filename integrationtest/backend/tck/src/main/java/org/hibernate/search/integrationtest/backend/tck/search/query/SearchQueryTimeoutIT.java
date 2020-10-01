@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -35,8 +36,6 @@ import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 public class SearchQueryTimeoutIT {
 
@@ -89,7 +88,7 @@ public class SearchQueryTimeoutIT {
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
 
-		Assertions.assertThatThrownBy( () -> query.fetchAll() )
+		assertThatThrownBy( () -> query.fetchAll() )
 				.isInstanceOf( SearchTimeoutException.class )
 				.hasMessageContaining( " exceeded the timeout of 0s, 0ms and 1ns: " );
 	}
@@ -100,7 +99,7 @@ public class SearchQueryTimeoutIT {
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
 
-		Assertions.assertThatThrownBy( () -> query.fetchTotalHitCount() )
+		assertThatThrownBy( () -> query.fetchTotalHitCount() )
 				.isInstanceOf( SearchTimeoutException.class )
 				.hasMessageContaining( " exceeded the timeout of 0s, 0ms and 1ns: " );
 	}
@@ -111,7 +110,7 @@ public class SearchQueryTimeoutIT {
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
 
-		Assertions.assertThatThrownBy( () -> query.scroll( 5 ).next() )
+		assertThatThrownBy( () -> query.scroll( 5 ).next() )
 				.isInstanceOf( SearchTimeoutException.class )
 				.hasMessageContaining( " exceeded the timeout of 0s, 0ms and 1ns: " );
 	}
@@ -132,7 +131,7 @@ public class SearchQueryTimeoutIT {
 
 		// we cannot have an exact hit count in case of limitFetching-timeout event
 		assertThat( result.total().hitCountLowerBound() ).isLessThan( DOCUMENT_COUNT );
-		Assertions.assertThatThrownBy( () -> result.total().hitCount() )
+		assertThatThrownBy( () -> result.total().hitCount() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Trying to get the exact total hit count, but it is a lower bound" );
 	}
