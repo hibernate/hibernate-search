@@ -28,7 +28,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConf
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.SearchTimeoutException;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils;
 
@@ -142,7 +141,7 @@ public class SearchQueryTimeoutIT {
 				.failAfter( 1, TimeUnit.DAYS )
 				.fetchAll();
 
-		SearchResultAssert.assertThat( result ).hasNoHits();
+		assertThat( result.hits() ).hasSize( 0 );
 
 		assertThat( result.took() ).isLessThan( Duration.ofDays( 1L ) );
 		assertThat( result.timedOut() ).isFalse();
