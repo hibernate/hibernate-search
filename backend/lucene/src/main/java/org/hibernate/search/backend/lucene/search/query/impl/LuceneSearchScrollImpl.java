@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.time.Duration;
 import java.util.Collections;
 import java.util.Set;
 
@@ -76,7 +75,15 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 	@Override
 	public LuceneSearchScrollResult<H> next() {
 		timeoutManager.start();
+		try {
+			return doNext();
+		}
+		finally {
+			timeoutManager.stop();
+		}
+	}
 
+	private LuceneSearchScrollResult<H> doNext() {
 		if ( search == null || scrollIndex + chunkSize > queryFetchSize ) {
 			if ( search != null ) {
 				queryFetchSize *= 2;
@@ -86,7 +93,8 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 
 		// no more results check
 		if ( scrollIndex >= search.hitSize() ) {
-			return new LuceneSearchScrollResultImpl<>( false, Collections.emptyList(), Duration.ZERO, false );
+			return new LuceneSearchScrollResultImpl<>( false, Collections.emptyList(),
+					timeoutManager.tookTime(), timeoutManager.isTimedOut() );
 		}
 
 		int endIndexExclusive = scrollIndex + chunkSize;
@@ -108,8 +116,6 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 		 * so we may choose to throw exceptions for those.
 		 */
 		LuceneSearchResult<H> result = loadableSearchResult.loadBlocking();
-
-		timeoutManager.stop();
 
 		// increasing the index for further next(s)
 		scrollIndex += chunkSize;
