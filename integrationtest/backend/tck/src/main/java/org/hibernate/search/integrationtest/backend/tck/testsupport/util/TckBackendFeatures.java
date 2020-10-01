@@ -66,4 +66,8 @@ public class TckBackendFeatures {
 	public boolean supportsTotalHitsThreshold() {
 		return true;
 	}
+
+	public boolean supportsTruncateAfterForScroll() {
+		return true;
+	}
 }
