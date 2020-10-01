@@ -20,6 +20,7 @@ import java.util.stream.IntStream;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.SearchScroll;
@@ -40,7 +41,10 @@ import org.junit.Test;
 
 public class SearchQueryTimeoutIT {
 
-	private static final int FIELD_COUNT = 20;
+	// Increasing this will increase query execution time on ES proportionally, with a factor of ~1.1
+	// Increasing this will increase the risk of Elasticsearch failing to index, due to documents getting bigger
+	// and taking up more memory.
+	private static final int FIELD_COUNT = 400;
 	private static final List<String> FIELD_NAMES = Collections.unmodifiableList(
 			IntStream.range( 0 , FIELD_COUNT )
 					.mapToObj( i -> "field_" + i )
@@ -48,22 +52,19 @@ public class SearchQueryTimeoutIT {
 	);
 	private static final String EMPTY_FIELD_NAME = "emptyFieldName";
 
-	// Taken from our current documentation (https://docs.jboss.org/hibernate/search/6.0/reference/en-US/html_single/):
-	private static final String[] TEXTS = {
-			"Fine-grained dirty checking consists in keeping track of which properties are dirty in a given entity, so as to only reindex"
-					+ "\"containing\" entities that actually use at least one of the dirty properties.",
-			"Whenever we create a type node in the reindexing resolver building tree, we take care to determine all the possible concrete "
-					+ "entity types for the considered type, and create one reindexing resolver type node builder per possible entity type.",
-			"The only thing left to do is register the path that is depended on (in our example, longField). With this path registered, "
-					+ "we will be able to build a PojoPathFilter, so that whenever SecondLevelEmbeddedEntityClass changes, we will walk through the tree, but not all the tree: "
-					+ "if at some point we notice that a node is relevant only if longField changed, but the \"dirtiness state\" tells us that longField did not change, "
-					+ "we can skip a whole branch of the tree, avoiding useless lazy loading and reindexing."
-	};
+	private static final String MATCHING_WORD = "111word";
 
-	private static final String BUZZ_WORDS = "tree search avoid nested reference thread concurrency scaling reindexing node track";
-	private static final int ANY_INTEGER = 739;
+	private static final int NON_MATCHING_INTEGER = 739;
 
-	private static final int DOCUMENT_COUNT = 3000;
+	// Increasing this will increase query execution time on ES proportionally, with a factor of ~1.0
+	// Increasing this will not increase the risk of Elasticsearch failing to index,
+	// because BulkIndexer takes care of limiting the amount of documents indexed in parallel.
+	private static final int DOCUMENT_COUNT = 10_000;
+
+	// Increasing this will increase query execution time on ES proportionally, with a factor of ~0.9
+	// Increasing this will increase the risk of Elasticsearch failing to index, due to documents getting bigger
+	// and taking up more memory.
+	private static final int WORDS_PER_STRING = 5;
 
 	@ClassRule
 	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -76,8 +77,9 @@ public class SearchQueryTimeoutIT {
 
 		index.bulkIndexer()
 				.add( DOCUMENT_COUNT, i -> StubMapperUtils.documentProvider( String.valueOf( i ), document -> {
-					for ( IndexFieldReference<String> field : index.binding().fields ) {
-						document.addValue( field, TEXTS[i % TEXTS.length] );
+					for ( int fieldOrdinal = 0; fieldOrdinal < index.binding().fields.size(); fieldOrdinal++ ) {
+						IndexFieldReference<String> field = index.binding().fields.get( fieldOrdinal );
+						document.addValue( field, generateText( i, fieldOrdinal ) );
 					}
 				} ) )
 				.join();
@@ -89,7 +91,7 @@ public class SearchQueryTimeoutIT {
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
 
-		assertThatThrownBy( () -> query.fetchAll() )
+		assertThatThrownBy( () -> query.fetch( 20 ) )
 				.isInstanceOf( SearchTimeoutException.class )
 				.hasMessageContaining( " exceeded the timeout of 0s, 0ms and 1ns: " );
 	}
@@ -126,7 +128,7 @@ public class SearchQueryTimeoutIT {
 		);
 		SearchResult<DocumentReference> result = startSlowQuery()
 				.truncateAfter( 1, TimeUnit.NANOSECONDS )
-				.fetchAll();
+				.fetch( 20 );
 
 		assertThat( result.took() ).isNotNull(); // May be 0 due to low resolution
 		assertThat( result.timedOut() ).isTrue();
@@ -161,7 +163,7 @@ public class SearchQueryTimeoutIT {
 	public void fetch_failAfter_fastQuery_largeTimeout() {
 		SearchResult<DocumentReference> result = startFastQuery()
 				.failAfter( 1, TimeUnit.DAYS )
-				.fetchAll();
+				.fetch( 20 );
 
 		assertThat( result.hits() ).hasSize( 0 );
 
@@ -197,7 +199,7 @@ public class SearchQueryTimeoutIT {
 	public void fetch_truncateAfter_fastQuery_largeTimeout() {
 		SearchResult<DocumentReference> result = startFastQuery()
 				.truncateAfter( 1, TimeUnit.DAYS )
-				.fetchAll();
+				.fetch( 20 );
 
 		assertThat( result.took() ).isLessThan( Duration.ofDays( 1L ) );
 		assertThat( result.timedOut() ).isFalse();
@@ -221,15 +223,36 @@ public class SearchQueryTimeoutIT {
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> startSlowQuery() {
 		return index.createScope().query()
 				.where( f -> f.bool( b -> {
-					for ( String fieldName : FIELD_NAMES ) {
-						b.must( f.match().field( fieldName ).matching( BUZZ_WORDS ) );
+					for ( int fieldOrdinal = 0; fieldOrdinal < FIELD_NAMES.size(); fieldOrdinal++ ) {
+						String fieldName = FIELD_NAMES.get( fieldOrdinal );
+						// Suffix query => this should be slow.
+						SearchPredicate predicate = f.wildcard().field( fieldName )
+								.matching( "*" + MATCHING_WORD )
+								.boost( fieldOrdinal + 1 )
+								.toPredicate();
+						// should + different boost per predicate
+						// => all predicates must be executed to compute the score
+						// => even slower
+						b.should( predicate );
 					}
 				} ) );
 	}
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> startFastQuery() {
 		return index.createScope().query()
-				.where( f -> f.match().field( EMPTY_FIELD_NAME ).matching( ANY_INTEGER ) );
+				.where( f -> f.match().field( EMPTY_FIELD_NAME ).matching( NON_MATCHING_INTEGER ) );
+	}
+
+	private static String generateText(int documentId, int fieldOrdinal) {
+		StringBuilder builder = new StringBuilder();
+		int base = documentId * WORDS_PER_STRING * FIELD_NAMES.size() + fieldOrdinal * WORDS_PER_STRING;
+		// Generate lots of words, as unique as possible
+		for ( int wordIndex = 0; wordIndex < WORDS_PER_STRING; wordIndex++ ) {
+			builder.append( " " ).append( base + wordIndex );
+		}
+		// And then add a matching word
+		builder.append( base + "_" + MATCHING_WORD );
+		return builder.toString();
 	}
 
 	private static class IndexBinding {
