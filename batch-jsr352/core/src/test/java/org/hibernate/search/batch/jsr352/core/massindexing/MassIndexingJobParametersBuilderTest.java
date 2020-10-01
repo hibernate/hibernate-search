@@ -16,10 +16,6 @@ import java.util.List;
 import java.util.Properties;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 
 import org.hibernate.CacheMode;
 import org.hibernate.search.util.common.SearchException;
@@ -160,11 +156,6 @@ public class MassIndexingJobParametersBuilderTest {
 		MassIndexingJob.parameters().forEntity( String.class ).restrictedBy( (String) null );
 	}
 
-	@Test(expected = NullPointerException.class)
-	public void testRestrictedBy_criterionNull() {
-		MassIndexingJob.parameters().forEntity( String.class ).restrictedBy( (Predicate) null );
-	}
-
 	@Test(expected = SearchException.class)
 	public void testSessionClearInterval_greaterThanCheckpointInterval() {
 		MassIndexingJob.parameters()
@@ -215,23 +206,6 @@ public class MassIndexingJobParametersBuilderTest {
 				.forEntity( UnusedEntity.class )
 				.checkpointInterval( MassIndexingJobParameters.Defaults.ROWS_PER_PARTITION + 1 )
 				.build();
-	}
-
-	/**
-	 * A batch indexing job cannot have 2 types of restrictions in the same time. Either JPQL / HQL or Criteria approach
-	 * is used. Using both will leads to illegal argument exception.
-	 */
-	@Test(expected = IllegalArgumentException.class)
-	public void testRestrictedBy_twoRestrictionTypes() {
-		CriteriaBuilder builder = emf.getCriteriaBuilder();
-		CriteriaQuery<String> criteria = builder.createQuery( String.class );
-		Root<String> from = criteria.from( String.class );
-		Predicate predicate = builder.isEmpty( from.get( "dummy" ) );
-
-		MassIndexingJob.parameters()
-				.forEntity( String.class )
-				.restrictedBy( "from string" )
-				.restrictedBy( predicate );
 	}
 
 	@Test

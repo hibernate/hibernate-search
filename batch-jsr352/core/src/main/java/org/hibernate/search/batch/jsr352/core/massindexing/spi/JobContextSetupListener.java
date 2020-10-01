@@ -8,8 +8,6 @@ package org.hibernate.search.batch.jsr352.core.massindexing.spi;
 
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.CACHE_MODE;
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.CHECKPOINT_INTERVAL;
-import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA;
-import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.CUSTOM_QUERY_HQL;
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.ENTITY_FETCH_SIZE;
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_NAMESPACE;
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE;
@@ -28,7 +26,6 @@ import javax.batch.api.listener.AbstractJobListener;
 import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.criteria.Predicate;
 
 import org.hibernate.search.batch.jsr352.core.context.jpa.spi.EntityManagerFactoryRegistry;
 import org.hibernate.search.batch.jsr352.core.inject.scope.spi.HibernateSearchJobScoped;
@@ -115,10 +112,6 @@ public class JobContextSetupListener extends AbstractJobListener {
 	private String serializedRowsPerPartition;
 
 	@Inject
-	@BatchProperty(name = CUSTOM_QUERY_CRITERIA)
-	private String serializedCustomQueryCriteria;
-
-	@Inject
 	private EntityManagerFactoryRegistry emfRegistry;
 
 	@Override
@@ -126,7 +119,7 @@ public class JobContextSetupListener extends AbstractJobListener {
 		validateParameters();
 		JobContextUtil.getOrCreateData( jobContext,
 				emfRegistry, entityManagerFactoryNamespace, entityManagerFactoryReference,
-				serializedEntityTypes, serializedCustomQueryCriteria );
+				serializedEntityTypes );
 	}
 
 	/**
@@ -198,10 +191,6 @@ public class JobContextSetupListener extends AbstractJobListener {
 		}
 
 		SerializationUtil.parseCacheModeParameter( CACHE_MODE, serializedCacheMode, Defaults.CACHE_MODE );
-
-		if ( StringHelper.isNotEmpty( serializedCustomQueryCriteria ) ) {
-			SerializationUtil.parseParameter( Predicate.class, CUSTOM_QUERY_HQL, serializedCustomQueryCriteria );
-		}
 	}
 
 }

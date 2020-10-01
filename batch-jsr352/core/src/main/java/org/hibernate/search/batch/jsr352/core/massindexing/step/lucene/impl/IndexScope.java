@@ -17,10 +17,6 @@ public enum IndexScope {
 	 */
 	HQL,
 	/**
-	 * Index entities restricted the {@link javax.persistence.criteria.Predicate} given by user.
-	 */
-	CRITERIA,
-	/**
 	 * Index all the entities found.
 	 */
 	FULL_ENTITY

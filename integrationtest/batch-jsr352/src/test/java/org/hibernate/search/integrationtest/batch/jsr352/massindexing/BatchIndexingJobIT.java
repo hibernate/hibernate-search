@@ -15,7 +15,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.StepExecution;
@@ -23,7 +22,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.hibernate.search.batch.jsr352.core.logging.impl.Log;
@@ -181,34 +179,6 @@ public class BatchIndexingJobIT extends AbstractBatchIndexingIT {
 	}
 
 	@Test
-	public void criteria() throws InterruptedException,
-			IOException {
-		// searches before mass index,
-		// expected no results for each search
-		assertEquals( 0, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" ).size() );
-		assertEquals( 0, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Red Hat" ).size() );
-		assertEquals( 0, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Microsoft" ).size() );
-
-		long executionId = jobOperator.start(
-				MassIndexingJob.NAME,
-				MassIndexingJob.parameters()
-						.forEntity( Company.class )
-						.checkpointInterval( CHECKPOINT_INTERVAL )
-						.restrictedBy( predicate( (builder, root) -> builder.or(
-								builder.equal( root.get( "name" ), "Google" ),
-								builder.equal( root.get( "name" ), "Red Hat" )
-						) ) )
-						.build()
-		);
-		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
-		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
-
-		assertEquals( INSTANCES_PER_DATA_TEMPLATE, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" ).size() );
-		assertEquals( INSTANCES_PER_DATA_TEMPLATE, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Red Hat" ).size() );
-		assertEquals( 0, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Microsoft" ).size() );
-	}
-
-	@Test
 	public void purge() throws InterruptedException, IOException {
 		int expectedCount = 10;
 
@@ -225,9 +195,7 @@ public class BatchIndexingJobIT extends AbstractBatchIndexingIT {
 				MassIndexingJob.parameters()
 						.forEntity( Company.class )
 						.purgeAllOnStart( true )
-						.restrictedBy(
-								predicate( (builder, root) -> builder.equal( root.get( "name" ), "NEVER_MATCH" ) )
-						)
+						.restrictedBy( "select c from Company c where c.name like 'NEVER_MATCH'" )
 						.build()
 		);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
@@ -253,9 +221,7 @@ public class BatchIndexingJobIT extends AbstractBatchIndexingIT {
 				MassIndexingJob.parameters()
 						.forEntity( Company.class )
 						.purgeAllOnStart( false )
-						.restrictedBy(
-								predicate( (builder, root) -> builder.equal( root.get( "name" ), "NEVER_MATCH" ) )
-						)
+						.restrictedBy( "select c from Company c where c.name like 'NEVER_MATCH'" )
 						.build()
 		);
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
@@ -287,33 +253,6 @@ public class BatchIndexingJobIT extends AbstractBatchIndexingIT {
 		assertEquals( INSTANCES_PER_DATA_TEMPLATE, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" ).size() );
 		assertEquals( INSTANCES_PER_DATA_TEMPLATE, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Red Hat" ).size() );
 		assertEquals( 0, JobTestUtil.findIndexedResults( emf, Company.class, "name", "Microsoft" ).size() );
-	}
-
-	@Test
-	public void criteria_maxResults() throws InterruptedException,
-			IOException {
-		// searches before mass index,
-		// expected no results for each search
-		assertEquals( 0, JobTestUtil.nbDocumentsInIndex( emf, Company.class ) );
-
-		int maxResults = CHECKPOINT_INTERVAL + 1;
-
-		long executionId = jobOperator.start(
-				MassIndexingJob.NAME,
-				MassIndexingJob.parameters()
-						.forEntity( Company.class )
-						.checkpointInterval( CHECKPOINT_INTERVAL )
-						.restrictedBy( predicate( (builder, root) -> builder.or(
-								builder.equal( root.get( "name" ), "Google" ),
-								builder.equal( root.get( "name" ), "Red Hat" )
-						) ) )
-						.maxResultsPerEntity( maxResults )
-						.build()
-		);
-		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
-		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
-
-		assertEquals( maxResults, JobTestUtil.nbDocumentsInIndex( emf, Company.class ) );
 	}
 
 	@Test
@@ -421,11 +360,5 @@ public class BatchIndexingJobIT extends AbstractBatchIndexingIT {
 			}
 		}
 		throw new AssertionFailure( "Missing step progress for step '" + MAIN_STEP_NAME + "'" );
-	}
-
-	private Predicate predicate(BiFunction<CriteriaBuilder, Root<Company>, Predicate> predicateFunction) {
-		CriteriaBuilder builder = emf.getCriteriaBuilder();
-		Root<Company> from = builder.createQuery( Company.class ).from( Company.class );
-		return predicateFunction.apply( builder, from );
 	}
 }

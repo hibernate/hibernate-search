@@ -12,7 +12,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Properties;
 import javax.batch.api.partition.PartitionPlan;
 import javax.batch.runtime.context.JobContext;
@@ -102,7 +101,6 @@ public class PartitionMapperTest {
 	public void testMapPartitions() throws Exception {
 		JobContextData jobData = new JobContextData();
 		jobData.setEntityManagerFactory( emf );
-		jobData.setCustomQueryCriteria( new HashSet<>() );
 		jobData.setEntityTypeDescriptors( Arrays.asList(
 				JobTestUtil.createSimpleEntityTypeDescriptor( emf, Company.class ),
 				JobTestUtil.createSimpleEntityTypeDescriptor( emf, Person.class )

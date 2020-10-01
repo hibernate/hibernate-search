@@ -48,8 +48,6 @@ public final class MassIndexingJobParameters {
 
 	public static final String CUSTOM_QUERY_HQL = "customQueryHQL";
 
-	public static final String CUSTOM_QUERY_CRITERIA = "customQueryCriteria";
-
 	public static final String TENANT_ID = "tenantId";
 
 	public static final class Defaults {

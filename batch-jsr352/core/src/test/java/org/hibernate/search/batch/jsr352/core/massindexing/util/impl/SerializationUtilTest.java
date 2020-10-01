@@ -10,13 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.fail;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.util.common.SearchException;
 
 import org.junit.Test;
@@ -111,38 +104,4 @@ public class SerializationUtilTest {
 			}
 		}
 	}
-
-	@Test
-	@SuppressWarnings("unchecked")
-	public void deserializeCriteria() throws Exception {
-		Criterion criterion1 = Restrictions.in( "keyA", "value1", "value2" );
-		Criterion criterion2 = Restrictions.between( "keyB", "low", "high" );
-
-		// Given a serialized criteria
-		Set<Criterion> inputCriteria = new HashSet<>();
-		inputCriteria.add( criterion1 );
-		inputCriteria.add( criterion2 );
-		String serializedCriteria = SerializationUtil.serialize( inputCriteria );
-
-		// When it is deserialized
-		Set<Criterion> actualCriteria = SerializationUtil
-				.parseParameter( Set.class, MassIndexingJobParameters.CUSTOM_QUERY_CRITERIA, serializedCriteria );
-
-		// Then there're 2 criteria found.
-
-		/*
-		 * Hibernate ORM Issue:
-		 *
-		 * The implementations of interface 'org.hibernate.criterion.Criterion' haven't overridden the
-		 * methods #equals and #hashCode, so the equality-by-value is actually equality-by-reference.
-		 * Enable the following lines to see what happens.
-		 */
-//		assertThat( actualCriteria ).containsOnly( criterion1, criterion2 );
-
-		Set<String> actualCriteriaAsStrings = actualCriteria.stream()
-				.map( Object::toString )
-				.collect( Collectors.toSet() );
-		assertThat( actualCriteriaAsStrings ).containsOnly( criterion1.toString(), criterion2.toString() );
-	}
-
 }
