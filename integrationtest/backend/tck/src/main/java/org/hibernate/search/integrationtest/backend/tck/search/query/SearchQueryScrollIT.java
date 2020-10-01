@@ -13,7 +13,6 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -22,12 +21,9 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -84,25 +80,6 @@ public class SearchQueryScrollIT {
 	public void all_exactDivisorPageSize() {
 		try ( SearchScroll<DocumentReference> scroll = matchAllQuery().scroll( EXACT_DIVISOR_CHUNK_SIZE ) ) {
 			checkScrolling( scroll, DOCUMENT_COUNT, EXACT_DIVISOR_CHUNK_SIZE );
-		}
-	}
-
-	@Test
-	public void all_failAfter() {
-		Assertions.assertThatThrownBy( () -> matchAllQuery().failAfter( 1L, TimeUnit.NANOSECONDS ).scroll( CHUNK_SIZE ).next() )
-				.isInstanceOf( SearchTimeoutException.class )
-				.hasMessageContaining( " exceeded the timeout of 0s, 0ms and 1ns: " );
-	}
-
-	@Test
-	public void all_truncateAfter() {
-		Assume.assumeTrue(
-				"backend should have a fast timeout resolution in order to run this test correctly",
-				TckConfiguration.get().getBackendFeatures().fastTimeoutResolution()
-		);
-
-		try ( SearchScroll<DocumentReference> scroll = matchAllQuery().truncateAfter( 1L, TimeUnit.NANOSECONDS ).scroll( DOCUMENT_COUNT ) ) {
-			Assertions.assertThat( scroll.next().hits() ).hasSizeLessThan( DOCUMENT_COUNT );
 		}
 	}
 

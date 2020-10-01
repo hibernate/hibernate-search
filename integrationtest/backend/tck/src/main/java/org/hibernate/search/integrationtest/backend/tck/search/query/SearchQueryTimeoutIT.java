@@ -22,6 +22,8 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.engine.search.query.SearchScroll;
+import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -109,9 +111,11 @@ public class SearchQueryTimeoutIT {
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
 
-		assertThatThrownBy( () -> query.scroll( 5 ).next() )
-				.isInstanceOf( SearchTimeoutException.class )
-				.hasMessageContaining( " exceeded the timeout of 0s, 0ms and 1ns: " );
+		try ( SearchScroll<DocumentReference> scroll = query.scroll( 5 ) ) {
+			assertThatThrownBy( () -> scroll.next() )
+					.isInstanceOf( SearchTimeoutException.class )
+					.hasMessageContaining( " exceeded the timeout of 0s, 0ms and 1ns: " );
+		}
 	}
 
 	@Test
@@ -135,6 +139,25 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
+	public void scroll_truncateAfter_slowQuery_smallTimeout() {
+		Assume.assumeTrue(
+				"backend should have a fast timeout resolution in order to run this test correctly",
+				TckConfiguration.get().getBackendFeatures().fastTimeoutResolution()
+		);
+		SearchQuery<DocumentReference> query = startSlowQuery()
+				.truncateAfter( 1, TimeUnit.NANOSECONDS )
+				.toQuery();
+
+		try ( SearchScroll<DocumentReference> scroll = query.scroll( 5 ) ) {
+			SearchScrollResult<DocumentReference> result = scroll.next();
+			assertThat( result.took() ).isNotNull(); // May be 0 due to low resolution
+			assertThat( result.timedOut() ).isTrue();
+
+			assertThat( result.hits() ).hasSizeLessThan( 5 );
+		}
+	}
+
+	@Test
 	public void fetch_failAfter_fastQuery_largeTimeout() {
 		SearchResult<DocumentReference> result = startFastQuery()
 				.failAfter( 1, TimeUnit.DAYS )
@@ -153,6 +176,21 @@ public class SearchQueryTimeoutIT {
 				.toQuery();
 
 		assertThat( query.fetchTotalHitCount() ).isEqualTo( 0 );
+	}
+
+	@Test
+	public void scroll_failAfter_fastQuery_largeTimeout() {
+		SearchQuery<DocumentReference> query = startFastQuery()
+				.failAfter( 1, TimeUnit.DAYS )
+				.toQuery();
+
+		try ( SearchScroll<DocumentReference> scroll = query.scroll( 5 ) ) {
+			SearchScrollResult<DocumentReference> result = scroll.next();
+			assertThat( result.took() ).isLessThan( Duration.ofDays( 1L ) );
+			assertThat( result.timedOut() ).isFalse();
+
+			assertThat( result.hits() ).hasSize( 0 );
+		}
 	}
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> startSlowQuery() {
