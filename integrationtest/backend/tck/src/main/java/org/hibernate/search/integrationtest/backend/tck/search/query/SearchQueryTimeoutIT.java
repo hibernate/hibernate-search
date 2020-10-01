@@ -28,14 +28,15 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.assertj.core.api.Assertions;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils;
 
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+
+import org.assertj.core.api.Assertions;
 
 public class SearchQueryTimeoutIT {
 
@@ -48,20 +49,21 @@ public class SearchQueryTimeoutIT {
 	private static final String EMPTY_FIELD_NAME = "emptyFieldName";
 
 	// Taken from our current documentation (https://docs.jboss.org/hibernate/search/6.0/reference/en-US/html_single/):
-	private static final String TEXT_1 = "Fine-grained dirty checking consists in keeping track of which properties are dirty in a given entity, so as to only reindex" +
-			"\"containing\" entities that actually use at least one of the dirty properties.";
-	private static final String TEXT_2 = "Whenever we create a type node in the reindexing resolver building tree, we take care to determine all the possible concrete " +
-			"entity types for the considered type, and create one reindexing resolver type node builder per possible entity type.";
-	private static final String TEXT_3 = "The only thing left to do is register the path that is depended on (in our example, longField). With this path registered, " +
-			"we will be able to build a PojoPathFilter, so that whenever SecondLevelEmbeddedEntityClass changes, we will walk through the tree, but not all the tree: " +
-			"if at some point we notice that a node is relevant only if longField changed, but the \"dirtiness state\" tells us that longField did not change, " +
-			"we can skip a whole branch of the tree, avoiding useless lazy loading and reindexing.";
+	private static final String[] TEXTS = {
+			"Fine-grained dirty checking consists in keeping track of which properties are dirty in a given entity, so as to only reindex"
+					+ "\"containing\" entities that actually use at least one of the dirty properties.",
+			"Whenever we create a type node in the reindexing resolver building tree, we take care to determine all the possible concrete "
+					+ "entity types for the considered type, and create one reindexing resolver type node builder per possible entity type.",
+			"The only thing left to do is register the path that is depended on (in our example, longField). With this path registered, "
+					+ "we will be able to build a PojoPathFilter, so that whenever SecondLevelEmbeddedEntityClass changes, we will walk through the tree, but not all the tree: "
+					+ "if at some point we notice that a node is relevant only if longField changed, but the \"dirtiness state\" tells us that longField did not change, "
+					+ "we can skip a whole branch of the tree, avoiding useless lazy loading and reindexing."
+	};
 
 	private static final String BUZZ_WORDS = "tree search avoid nested reference thread concurrency scaling reindexing node track";
 	private static final int ANY_INTEGER = 739;
 
-	private static final int INIT_DATA_ROUNDS = 1000;
-	private static final int TOTAL_DOCUMENT_COUNT = 3 * INIT_DATA_ROUNDS;
+	private static final int DOCUMENT_COUNT = 3000;
 
 	@ClassRule
 	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -72,7 +74,13 @@ public class SearchQueryTimeoutIT {
 	public static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
-		initData();
+		index.bulkIndexer()
+				.add( DOCUMENT_COUNT, i -> StubMapperUtils.documentProvider( String.valueOf( i ), document -> {
+					for ( IndexFieldReference<String> field : index.binding().fields ) {
+						document.addValue( field, TEXTS[i % TEXTS.length] );
+					}
+				} ) )
+				.join();
 	}
 
 	@Test
@@ -123,7 +131,7 @@ public class SearchQueryTimeoutIT {
 		assertThat( result.timedOut() ).isTrue();
 
 		// we cannot have an exact hit count in case of limitFetching-timeout event
-		assertThat( result.total().hitCountLowerBound() ).isLessThan( TOTAL_DOCUMENT_COUNT );
+		assertThat( result.total().hitCountLowerBound() ).isLessThan( DOCUMENT_COUNT );
 		Assertions.assertThatThrownBy( () -> result.total().hitCount() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Trying to get the exact total hit count, but it is a lower bound" );
@@ -162,37 +170,6 @@ public class SearchQueryTimeoutIT {
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> startFastQuery() {
 		return index.createScope().query()
 				.where( f -> f.match().field( EMPTY_FIELD_NAME ).matching( ANY_INTEGER ) );
-	}
-
-	private static void initData() {
-		BulkIndexer indexer = index.bulkIndexer();
-		for ( int i = 0; i < INIT_DATA_ROUNDS; i++ ) {
-			indexer.add(
-					i + "a",
-					document -> {
-						for ( IndexFieldReference<String> field : index.binding().fields ) {
-							document.addValue( field, TEXT_1 );
-						}
-					}
-			);
-			indexer.add(
-					i + "b",
-					document -> {
-						for ( IndexFieldReference<String> field : index.binding().fields ) {
-							document.addValue( field, TEXT_2 );
-						}
-					}
-			);
-			indexer.add(
-					i + "c",
-					document -> {
-						for ( IndexFieldReference<String> field : index.binding().fields ) {
-							document.addValue( field, TEXT_3 );
-						}
-					}
-			);
-		}
-		indexer.join();
 	}
 
 	private static class IndexBinding {
