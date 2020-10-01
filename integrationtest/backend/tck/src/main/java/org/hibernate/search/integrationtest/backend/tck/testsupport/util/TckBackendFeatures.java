@@ -47,10 +47,6 @@ public class TckBackendFeatures {
 		return false;
 	}
 
-	public boolean fastTimeoutResolution() {
-		return true;
-	}
-
 	public boolean sortByFieldValue(TestedFieldStructure fieldStructure, Class<?> fieldType, SortMode sortMode) {
 		return true;
 	}

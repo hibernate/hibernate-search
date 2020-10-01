@@ -27,14 +27,12 @@ import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils;
 
-import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -122,10 +120,6 @@ public class SearchQueryTimeoutIT {
 
 	@Test
 	public void fetch_truncateAfter_slowQuery_smallTimeout() {
-		Assume.assumeTrue(
-				"backend should have a fast timeout resolution in order to run this test correctly",
-				TckConfiguration.get().getBackendFeatures().fastTimeoutResolution()
-		);
 		SearchResult<DocumentReference> result = startSlowQuery()
 				.truncateAfter( 1, TimeUnit.NANOSECONDS )
 				.fetch( 20 );
@@ -142,10 +136,6 @@ public class SearchQueryTimeoutIT {
 
 	@Test
 	public void scroll_truncateAfter_slowQuery_smallTimeout() {
-		Assume.assumeTrue(
-				"backend should have a fast timeout resolution in order to run this test correctly",
-				TckConfiguration.get().getBackendFeatures().fastTimeoutResolution()
-		);
 		SearchQuery<DocumentReference> query = startSlowQuery()
 				.truncateAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();

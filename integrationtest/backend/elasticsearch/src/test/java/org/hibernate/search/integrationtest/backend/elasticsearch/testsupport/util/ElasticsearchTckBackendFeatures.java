@@ -68,12 +68,6 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
-	public boolean fastTimeoutResolution() {
-		// TODO HSEARCH-3785 Elasticsearch timeout resolution is not very fast
-		return false;
-	}
-
-	@Override
 	public boolean sortByFieldValue(TestedFieldStructure fieldStructure, Class<?> fieldType, SortMode sortMode) {
 		if (
 				fieldStructure.isInNested()
