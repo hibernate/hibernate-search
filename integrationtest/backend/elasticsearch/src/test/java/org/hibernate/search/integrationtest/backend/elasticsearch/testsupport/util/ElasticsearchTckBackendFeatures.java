@@ -109,4 +109,10 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	public boolean supportsTotalHitsThreshold() {
 		return dialect.supportsSkipOrLimitingTotalHitCount();
 	}
+
+	@Override
+	public boolean supportsTruncateAfterForScroll() {
+		// See https://hibernate.atlassian.net/browse/HSEARCH-4029
+		return false;
+	}
 }
