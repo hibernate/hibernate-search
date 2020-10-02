@@ -30,7 +30,8 @@ import org.hibernate.search.util.common.impl.Futures;
  */
 public class BulkIndexer {
 
-	private static final int BATCH_SIZE = 500;
+	private static final int BATCH_SIZE = 250;
+	private static final int PARALLELISM = 2;
 
 	private final MappedIndexManager indexManager;
 	private final DetachedBackendSessionContext sessionContext;
@@ -38,13 +39,20 @@ public class BulkIndexer {
 	private final boolean refresh;
 
 	private List<StubDocumentProvider> buildingBatch = new ArrayList<>();
-	private CompletableFuture<?> future = CompletableFuture.completedFuture( null );
+
+	private final List<IndexingQueue> indexingQueues;
+	private int currentQueueIndex;
 
 	BulkIndexer(MappedIndexManager indexManager, StubBackendSessionContext sessionContext, boolean refresh) {
 		this.indexManager = indexManager;
 		this.sessionContext = DetachedBackendSessionContext.of( sessionContext );
 		this.indexer = indexManager.createIndexer( sessionContext );
 		this.refresh = refresh;
+		this.indexingQueues = new ArrayList<>( PARALLELISM );
+		for ( int i = 0; i < PARALLELISM; i++ ) {
+			indexingQueues.add( new IndexingQueue() );
+		}
+		currentQueueIndex = 0;
 	}
 
 	public BulkIndexer add(String identifier, DocumentContributor contributor) {
@@ -116,6 +124,11 @@ public class BulkIndexer {
 
 	private CompletableFuture<?> end() {
 		sendBatch();
+		CompletableFuture<?>[] indexingFutures = new CompletableFuture[indexingQueues.size()];
+		for ( int i = 0; i < indexingQueues.size(); i++ ) {
+			indexingFutures[i] = indexingQueues.get( i ).future;
+		}
+		CompletableFuture<?> future = CompletableFuture.allOf( indexingFutures );
 		if ( refresh ) {
 			IndexWorkspace workspace = indexManager.createWorkspace( sessionContext );
 			future = future.thenCompose( ignored -> workspace.refresh() );
@@ -127,22 +140,29 @@ public class BulkIndexer {
 		if ( buildingBatch.isEmpty() ) {
 			return;
 		}
-		List<StubDocumentProvider> sendingBatch = buildingBatch;
+		indexingQueues.get( currentQueueIndex ).sendBatch( buildingBatch );
 		buildingBatch = new ArrayList<>();
-		int sendingBatchSize = sendingBatch.size();
-		// Poor man's rate limiting: we only ever send one batch at a time,
-		// because Elasticsearch tends to fail if we send too many documents at once.
-		future = future.thenCompose( ignored -> {
-			CompletableFuture<?>[] batchFutures = new CompletableFuture[sendingBatchSize];
-			for ( int i = 0; i < sendingBatchSize; i++ ) {
-				StubDocumentProvider documentProvider = sendingBatch.get( i );
-				batchFutures[i] = indexer.add(
-						documentProvider.getReferenceProvider(), documentProvider.getContributor(),
-						DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
-				);
-			}
-			return CompletableFuture.allOf( batchFutures );
-		} );
+		currentQueueIndex = ( currentQueueIndex + 1 ) % indexingQueues.size();
 	}
 
+	private class IndexingQueue {
+		private CompletableFuture<?> future = CompletableFuture.completedFuture( null );
+
+		void sendBatch(List<StubDocumentProvider> batch) {
+			int sendingBatchSize = batch.size();
+			// Poor man's rate limiting: we only ever send one batch per queue at a time,
+			// because Elasticsearch tends to fail if we send too many documents at once.
+			future = future.thenCompose( ignored -> {
+				CompletableFuture<?>[] batchFutures = new CompletableFuture[sendingBatchSize];
+				for ( int i = 0; i < sendingBatchSize; i++ ) {
+					StubDocumentProvider documentProvider = batch.get( i );
+					batchFutures[i] = indexer.add(
+							documentProvider.getReferenceProvider(), documentProvider.getContributor(),
+							DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+					);
+				}
+				return CompletableFuture.allOf( batchFutures );
+			} );
+		}
+	}
 }
