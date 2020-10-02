@@ -7,10 +7,8 @@
 package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.easymock.EasyMock.capture;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.reset;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingEntityFailureContext;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureContext;
@@ -18,14 +16,19 @@ import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.util.common.SearchException;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
-import org.easymock.Capture;
-import org.easymock.EasyMock;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
 
 public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends AbstractMassIndexingFailureIT {
 
-	private final MassIndexingFailureHandler failureHandler = EasyMock.createMock( MassIndexingFailureHandler.class );
-	private final Capture<MassIndexingFailureContext> genericFailureContextCapture = EasyMock.newCapture();
-	private final Capture<MassIndexingEntityFailureContext> entityFailureContextCapture = EasyMock.newCapture();
+	@Mock
+	private MassIndexingFailureHandler failureHandler;
+
+	@Captor
+	private ArgumentCaptor<MassIndexingFailureContext> genericFailureContextCapture;
+	@Captor
+	private ArgumentCaptor<MassIndexingEntityFailureContext> entityFailureContextCapture;
 
 	@Override
 	protected String getBackgroundFailureHandlerReference() {
@@ -40,15 +43,14 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 	@Override
 	protected void expectEntityIndexingFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
-		reset( failureHandler );
-		failureHandler.handle( capture( entityFailureContextCapture ) );
-		replay( failureHandler );
+		// We'll check in the assert*() method, see below.
 	}
 
 	@Override
 	protected void assertEntityIndexingFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
-		verify( failureHandler );
+		verify( failureHandler ).handle( entityFailureContextCapture.capture() );
+		verifyNoMoreInteractions( failureHandler );
 
 		MassIndexingEntityFailureContext context = entityFailureContextCapture.getValue();
 		assertThat( context.throwable() )
@@ -66,15 +68,14 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 	@Override
 	protected void expectEntityIdGetterFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
-		reset( failureHandler );
-		failureHandler.handle( capture( entityFailureContextCapture ) );
-		replay( failureHandler );
+		// We'll check in the assert*() method, see below.
 	}
 
 	@Override
 	protected void assertEntityIdGetterFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
-		verify( failureHandler );
+		verify( failureHandler ).handle( entityFailureContextCapture.capture() );
+		verifyNoMoreInteractions( failureHandler );
 
 		MassIndexingEntityFailureContext context = entityFailureContextCapture.getValue();
 		assertThat( context.throwable() )
@@ -95,15 +96,14 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 	@Override
 	protected void expectEntityNonIdGetterFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
-		reset( failureHandler );
-		failureHandler.handle( capture( entityFailureContextCapture ) );
-		replay( failureHandler );
+		// We'll check in the assert*() method, see below.
 	}
 
 	@Override
 	protected void assertEntityNonIdGetterFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
-		verify( failureHandler );
+		verify( failureHandler ).handle( entityFailureContextCapture.capture() );
+		verifyNoMoreInteractions( failureHandler );
 
 		MassIndexingEntityFailureContext context = entityFailureContextCapture.getValue();
 		assertThat( context.throwable() )
@@ -128,16 +128,15 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 	protected void expectMassIndexerOperationFailureHandling(
 			Class<? extends Throwable> exceptionType, String exceptionMessage,
 			String failingOperationAsString) {
-		reset( failureHandler );
-		failureHandler.handle( capture( genericFailureContextCapture ) );
-		replay( failureHandler );
+		// We'll check in the assert*() method, see below.
 	}
 
 	@Override
 	protected void assertMassIndexerOperationFailureHandling(
 			Class<? extends Throwable> exceptionType, String exceptionMessage,
 			String failingOperationAsString) {
-		verify( failureHandler );
+		verify( failureHandler ).handle( genericFailureContextCapture.capture() );
+		verifyNoMoreInteractions( failureHandler );
 
 		MassIndexingFailureContext context = genericFailureContextCapture.getValue();
 		assertThat( context.throwable() )
@@ -152,10 +151,7 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 			String entityReferenceAsString,
 			String failingEntityIndexingExceptionMessage, String failingEntityIndexingOperationAsString,
 			String failingMassIndexerOperationExceptionMessage, String failingMassIndexerOperationAsString) {
-		reset( failureHandler );
-		failureHandler.handle( capture( entityFailureContextCapture ) );
-		failureHandler.handle( capture( genericFailureContextCapture ) );
-		replay( failureHandler );
+		// We'll check in the assert*() method, see below.
 	}
 
 	@Override
@@ -163,7 +159,9 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 			String entityReferenceAsString,
 			String failingEntityIndexingExceptionMessage, String failingEntityIndexingOperationAsString,
 			String failingMassIndexerOperationExceptionMessage, String failingMassIndexerOperationAsString) {
-		verify( failureHandler );
+		verify( failureHandler ).handle( entityFailureContextCapture.capture() );
+		verify( failureHandler ).handle( genericFailureContextCapture.capture() );
+		verifyNoMoreInteractions( failureHandler );
 
 		MassIndexingEntityFailureContext entityFailureContext = entityFailureContextCapture.getValue();
 		assertThat( entityFailureContext.throwable() )
@@ -176,7 +174,6 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 				.element( 0 )
 				.asString()
 				.isEqualTo( entityReferenceAsString );
-
 
 		MassIndexingFailureContext massIndexerOperationFailureContext = genericFailureContextCapture.getValue();
 		assertThat( massIndexerOperationFailureContext.throwable() )

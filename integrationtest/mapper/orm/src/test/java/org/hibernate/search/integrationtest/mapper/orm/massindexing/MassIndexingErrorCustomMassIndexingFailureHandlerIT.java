@@ -6,17 +6,16 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.reset;
-import static org.easymock.EasyMock.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler;
 
-import org.easymock.EasyMock;
+import org.mockito.Mock;
 
 public class MassIndexingErrorCustomMassIndexingFailureHandlerIT extends AbstractMassIndexingErrorIT {
 
-	private final MassIndexingFailureHandler failureHandler = EasyMock.createMock( MassIndexingFailureHandler.class );
+	@Mock
+	private MassIndexingFailureHandler failureHandler;
 
 	@Override
 	protected String getBackgroundFailureHandlerReference() {
@@ -30,14 +29,12 @@ public class MassIndexingErrorCustomMassIndexingFailureHandlerIT extends Abstrac
 
 	@Override
 	protected void expectNoFailureHandling() {
-		reset( failureHandler );
 		// No expected call
-		replay( failureHandler );
 	}
 
 	@Override
 	protected void assertNoFailureHandling() {
-		verify( failureHandler );
+		verifyNoInteractions( failureHandler );
 	}
 
 }

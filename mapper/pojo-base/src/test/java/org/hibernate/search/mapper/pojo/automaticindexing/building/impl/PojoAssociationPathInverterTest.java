@@ -7,6 +7,9 @@
 package org.hibernate.search.mapper.pojo.automaticindexing.building.impl;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,19 +31,25 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.SearchException;
 
+import org.junit.Rule;
 import org.junit.Test;
 
-import org.easymock.EasyMock;
-import org.easymock.EasyMockSupport;
-import org.easymock.IAnswer;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class PojoAssociationPathInverterTest extends EasyMockSupport {
+public class PojoAssociationPathInverterTest {
 
-	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProviderMock =
-			createMock( PojoTypeAdditionalMetadataProvider.class );
-	private final ContainerExtractorBinder extractorBinderMock =
-			createMock( ContainerExtractorBinder.class );
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+
+	@Mock
+	private PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProviderMock;
+	@Mock
+	private ContainerExtractorBinder extractorBinderMock;
 
 	@Test
 	public void detectInfiniteRecursion() {
@@ -52,7 +61,6 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 		PojoAssociationPathInverter inverter =
 				new PojoAssociationPathInverter( typeAdditionalMetadataProviderMock, extractorBinderMock );
 
-		resetAll();
 		/*
 		 * Original side model:
 		 *
@@ -60,30 +68,30 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 		 * -- property
 		 */
 		PojoRawTypeModel<?> originalSideEntityTypeMock =
-				createMock( "originalSideEntityTypeMock", PojoRawTypeModel.class );
-		EasyMock.expect( originalSideEntityTypeMock.rawType() )
-				.andStubReturn( (PojoRawTypeModel) originalSideEntityTypeMock );
+				mock( PojoRawTypeModel.class, "originalSideEntityTypeMock" );
+		when( originalSideEntityTypeMock.rawType() )
+				.thenReturn( (PojoRawTypeModel) originalSideEntityTypeMock );
 
 		PojoGenericTypeModel<?> originalSidePropertyTypeMock =
-				createMock( "originalSidePropertyTypeMock", PojoGenericTypeModel.class );
+				mock( PojoGenericTypeModel.class, "originalSidePropertyTypeMock" );
 		setupPropertyStub(
 				originalSideEntityTypeMock, originalSidePropertyName, originalSidePropertyTypeMock
 		);
 
 		PojoTypeAdditionalMetadata originalSideEntityTypeAdditionalMetadataMock =
-				createMock( "originalSideEntityTypeAdditionalMetadataMock", PojoTypeAdditionalMetadata.class );
+				mock( PojoTypeAdditionalMetadata.class, "originalSideEntityTypeAdditionalMetadataMock" );
 		PojoPropertyAdditionalMetadata originalSidePropertyAdditionalMetadataMock =
-				createMock( "originalSidePropertyAdditionalMetadataMock", PojoPropertyAdditionalMetadata.class );
+				mock( PojoPropertyAdditionalMetadata.class, "originalSidePropertyAdditionalMetadataMock" );
 		PojoValueAdditionalMetadata originalSideValueAdditionalMetadataMock =
-				createMock( "originalSideValueAdditionalMetadataMock", PojoValueAdditionalMetadata.class );
-		EasyMock.expect( typeAdditionalMetadataProviderMock.get( originalSideEntityTypeMock ) )
-				.andStubReturn( originalSideEntityTypeAdditionalMetadataMock );
-		EasyMock.expect( originalSideEntityTypeAdditionalMetadataMock.getPropertyAdditionalMetadata( originalSidePropertyName ) )
-				.andStubReturn( originalSidePropertyAdditionalMetadataMock );
-		EasyMock.expect( originalSidePropertyAdditionalMetadataMock.getValueAdditionalMetadata( ContainerExtractorPath.noExtractors() ) )
-				.andStubReturn( originalSideValueAdditionalMetadataMock );
-		EasyMock.expect( originalSideValueAdditionalMetadataMock.getInverseSidePath() )
-				.andStubReturn( Optional.empty() );
+				mock( PojoValueAdditionalMetadata.class, "originalSideValueAdditionalMetadataMock" );
+		when( typeAdditionalMetadataProviderMock.get( originalSideEntityTypeMock ) )
+				.thenReturn( originalSideEntityTypeAdditionalMetadataMock );
+		when( originalSideEntityTypeAdditionalMetadataMock.getPropertyAdditionalMetadata( originalSidePropertyName ) )
+				.thenReturn( originalSidePropertyAdditionalMetadataMock );
+		when( originalSidePropertyAdditionalMetadataMock.getValueAdditionalMetadata( ContainerExtractorPath.noExtractors() ) )
+				.thenReturn( originalSideValueAdditionalMetadataMock );
+		when( originalSideValueAdditionalMetadataMock.getInverseSidePath() )
+				.thenReturn( Optional.empty() );
 
 		/*
 		 * Inverse side model:
@@ -94,75 +102,64 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 		 * ------ property3 (embeddableType1) <- CYCLE
 		 */
 		PojoRawTypeModel<?> inverseSideEntityTypeMock =
-				createMock( "inverseSideEntityTypeMock", PojoRawTypeModel.class );
+				mock( PojoRawTypeModel.class, "inverseSideEntityTypeMock" );
 		PojoRawTypeModel<?> inverseSideEmbeddableType1Mock =
-				createMock( "inverseSideEmbeddableType1Mock", PojoRawTypeModel.class );
+				mock( PojoRawTypeModel.class, "inverseSideEmbeddableType1Mock" );
 		PojoRawTypeModel<?> inverseSideEmbeddableType2Mock =
-				createMock( "inverseSideEmbeddableType2Mock", PojoRawTypeModel.class );
-		EasyMock.expect( inverseSideEntityTypeMock.rawType() )
-				.andStubReturn( (PojoRawTypeModel) inverseSideEntityTypeMock );
-		EasyMock.expect( inverseSideEntityTypeMock.name() )
-				.andStubReturn( "inverseSideEntityTypeMock" );
+				mock( PojoRawTypeModel.class, "inverseSideEmbeddableType2Mock" );
+		when( inverseSideEntityTypeMock.rawType() )
+				.thenReturn( (PojoRawTypeModel) inverseSideEntityTypeMock );
+		when( inverseSideEntityTypeMock.name() )
+				.thenReturn( "inverseSideEntityTypeMock" );
 
 		PojoGenericTypeModel<?> inverseSideProperty1TypeMock =
-				createMock( "inverseSideProperty1TypeMock", PojoGenericTypeModel.class );
+				mock( PojoGenericTypeModel.class, "inverseSideProperty1TypeMock" );
 		setupPropertyStub(
 				inverseSideEntityTypeMock, inverseSideProperty1Name, inverseSideProperty1TypeMock
 		);
-		EasyMock.expect( inverseSideProperty1TypeMock.rawType() )
-				.andStubReturn( (PojoRawTypeModel) inverseSideEmbeddableType1Mock );
+		when( inverseSideProperty1TypeMock.rawType() )
+				.thenReturn( (PojoRawTypeModel) inverseSideEmbeddableType1Mock );
 
 		PojoGenericTypeModel<?> inverseSideProperty2TypeMock =
-				createMock( "inverseSideProperty2TypeMock", PojoGenericTypeModel.class );
+				mock( PojoGenericTypeModel.class, "inverseSideProperty2TypeMock" );
 		setupPropertyStub(
 				inverseSideProperty1TypeMock, inverseSideProperty2Name, inverseSideProperty2TypeMock
 		);
-		EasyMock.expect( inverseSideProperty2TypeMock.rawType() )
-				.andStubReturn( (PojoRawTypeModel) inverseSideEmbeddableType2Mock );
+		when( inverseSideProperty2TypeMock.rawType() )
+				.thenReturn( (PojoRawTypeModel) inverseSideEmbeddableType2Mock );
 
-		PojoGenericTypeModel<?> inverseSideProperty3TypeMock =
-				createMock( "inverseSideProperty3TypeMock", PojoGenericTypeModel.class );
 		setupPropertyStub(
 				inverseSideProperty2TypeMock, inverseSideProperty3Name, inverseSideProperty2TypeMock
 		);
-		EasyMock.expect( inverseSideProperty3TypeMock.rawType() )
-				.andStubReturn( (PojoRawTypeModel) inverseSideEmbeddableType1Mock );
 
 		PojoTypeAdditionalMetadata inverseSideEntityTypeAdditionalMetadataMock =
-				createMock( "inverseSideEntityTypeAdditionalMetadataMock", PojoTypeAdditionalMetadata.class );
-		EasyMock.expect( typeAdditionalMetadataProviderMock.get( inverseSideEntityTypeMock ) )
-				.andStubReturn( inverseSideEntityTypeAdditionalMetadataMock );
+				mock( PojoTypeAdditionalMetadata.class, "inverseSideEntityTypeAdditionalMetadataMock" );
+		when( typeAdditionalMetadataProviderMock.get( inverseSideEntityTypeMock ) )
+				.thenReturn( inverseSideEntityTypeAdditionalMetadataMock );
 		setupSingletonEmbeddedPropertiesAdditionalMetadataStub( inverseSideEntityTypeAdditionalMetadataMock, inverseSideProperty1Name );
 
 		PojoTypeAdditionalMetadata inverseSideEmbeddableType1AdditionalMetadataMock =
-				createMock( "inverseSideEmbeddableType1AdditionalMetadataMock", PojoTypeAdditionalMetadata.class );
-		EasyMock.expect( typeAdditionalMetadataProviderMock.get( inverseSideEmbeddableType1Mock ) )
-				.andStubReturn( inverseSideEmbeddableType1AdditionalMetadataMock );
+				mock( PojoTypeAdditionalMetadata.class, "inverseSideEmbeddableType1AdditionalMetadataMock" );
+		when( typeAdditionalMetadataProviderMock.get( inverseSideEmbeddableType1Mock ) )
+				.thenReturn( inverseSideEmbeddableType1AdditionalMetadataMock );
 		setupSingletonEmbeddedPropertiesAdditionalMetadataStub( inverseSideEmbeddableType1AdditionalMetadataMock, inverseSideProperty2Name );
 
 		PojoTypeAdditionalMetadata inverseSideEmbeddableType2AdditionalMetadataMock =
-				createMock( "inverseSideEmbeddableType2AdditionalMetadataMock", PojoTypeAdditionalMetadata.class );
-		EasyMock.expect( typeAdditionalMetadataProviderMock.get( inverseSideEmbeddableType2Mock ) )
-				.andStubReturn( inverseSideEmbeddableType2AdditionalMetadataMock );
+				mock( PojoTypeAdditionalMetadata.class, "inverseSideEmbeddableType2AdditionalMetadataMock" );
+		when( typeAdditionalMetadataProviderMock.get( inverseSideEmbeddableType2Mock ) )
+				.thenReturn( inverseSideEmbeddableType2AdditionalMetadataMock );
 		setupSingletonEmbeddedPropertiesAdditionalMetadataStub( inverseSideEmbeddableType2AdditionalMetadataMock, inverseSideProperty3Name );
 
 		// Let's not complicate things any further: assume that none of the paths is the default one
-		EasyMock.expect( extractorBinderMock.isDefaultExtractorPath(
-				EasyMock.anyObject(), EasyMock.anyObject()
-		) )
-				.andStubReturn( false );
+		when( extractorBinderMock.isDefaultExtractorPath( any(), any() ) )
+				.thenReturn( false );
 		// Let's not complicate things any further: assume that all extractor paths are noExtractors() paths
-		EasyMock.expect( extractorBinderMock.bindPath(
-				EasyMock.anyObject(),
-				EasyMock.eq( ContainerExtractorPath.noExtractors() )
-		) )
-				.andStubAnswer( (IAnswer) () -> {
-					PojoGenericTypeModel<?> sourceType =
-							(PojoGenericTypeModel<?>) EasyMock.getCurrentArguments()[0];
+		when( extractorBinderMock.bindPath( any(), Mockito.eq( ContainerExtractorPath.noExtractors() ) ) )
+				.thenAnswer( invocationOnMock -> {
+					PojoGenericTypeModel<?> sourceType = invocationOnMock.getArgument( 0 );
 					return BoundContainerExtractorPath.noExtractors( sourceType );
 				} );
 
-		replayAll();
 		BoundPojoModelPathValueNode<?, ?, ?> boundPathToInvert =
 				BoundPojoModelPathValueNode.root( originalSideEntityTypeMock )
 						.property( originalSidePropertyName )
@@ -181,42 +178,39 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 										.toPathString()
 								+ "' on type '" + inverseSideEntityTypeMock.name() + "'"
 				);
-		verifyAll();
 	}
 
 	private void setupPropertyStub(PojoTypeModel<?> holdingTypeMock, String propertyName,
 			PojoGenericTypeModel<?> propertyTypeMock) {
-		ValueReadHandle<?> valueReadHandleMock =
-				createMock( propertyName + "HandleMock", ValueReadHandle.class );
-		PojoPropertyModel<?> propertyModelMock =
-				createMock( propertyName + "ModelMock", PojoPropertyModel.class );
-		EasyMock.expect( holdingTypeMock.property( propertyName ) )
-				.andStubReturn( (PojoPropertyModel) propertyModelMock );
-		EasyMock.expect( propertyModelMock.name() ).andStubReturn( propertyName );
-		EasyMock.expect( propertyModelMock.handle() ).andStubReturn( (ValueReadHandle) valueReadHandleMock );
-		EasyMock.expect( propertyModelMock.typeModel() )
-				.andStubReturn( (PojoGenericTypeModel) propertyTypeMock );
+		ValueReadHandle<?> valueReadHandleMock = mock( ValueReadHandle.class, propertyName + "HandleMock" );
+		PojoPropertyModel<?> propertyModelMock = mock( PojoPropertyModel.class, propertyName + "ModelMock" );
+		when( holdingTypeMock.property( propertyName ) )
+				.thenReturn( (PojoPropertyModel) propertyModelMock );
+		when( propertyModelMock.name() ).thenReturn( propertyName );
+		when( propertyModelMock.handle() ).thenReturn( (ValueReadHandle) valueReadHandleMock );
+		when( propertyModelMock.typeModel() )
+				.thenReturn( (PojoGenericTypeModel) propertyTypeMock );
 	}
 
 	private void setupSingletonEmbeddedPropertiesAdditionalMetadataStub(PojoTypeAdditionalMetadata typeAdditionalMetadata, String propertyName) {
 		PojoPropertyAdditionalMetadata propertyAdditionalMetadataMock =
-				createMock( propertyName + "PropertyAdditionalMetadataMock", PojoPropertyAdditionalMetadata.class );
+				mock( PojoPropertyAdditionalMetadata.class, propertyName + "PropertyAdditionalMetadataMock" );
 		PojoValueAdditionalMetadata valueAdditionalMetadataMock =
-				createMock( propertyName + "ValueAdditionalMetadataMock", PojoValueAdditionalMetadata.class );
+				mock( PojoValueAdditionalMetadata.class, propertyName + "ValueAdditionalMetadataMock" );
 
 		Map<String, PojoPropertyAdditionalMetadata> properties = new HashMap<>();
 		properties.put( propertyName, propertyAdditionalMetadataMock );
 		Map<ContainerExtractorPath, PojoValueAdditionalMetadata> values = new HashMap<>();
 		values.put( ContainerExtractorPath.noExtractors(), valueAdditionalMetadataMock );
 
-		EasyMock.expect( typeAdditionalMetadata.getPropertiesAdditionalMetadata() )
-				.andStubReturn( properties );
-		EasyMock.expect( propertyAdditionalMetadataMock.getValuesAdditionalMetadata() )
-				.andStubReturn( values );
-		EasyMock.expect( valueAdditionalMetadataMock.getInverseSidePath() )
-				.andStubReturn( Optional.empty() );
-		EasyMock.expect( valueAdditionalMetadataMock.isAssociationEmbedded() )
-				.andStubReturn( true );
+		when( typeAdditionalMetadata.getPropertiesAdditionalMetadata() )
+				.thenReturn( properties );
+		when( propertyAdditionalMetadataMock.getValuesAdditionalMetadata() )
+				.thenReturn( values );
+		when( valueAdditionalMetadataMock.getInverseSidePath() )
+				.thenReturn( Optional.empty() );
+		when( valueAdditionalMetadataMock.isAssociationEmbedded() )
+				.thenReturn( true );
 	}
 
 }
