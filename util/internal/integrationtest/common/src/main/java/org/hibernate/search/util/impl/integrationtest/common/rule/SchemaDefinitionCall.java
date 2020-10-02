@@ -9,16 +9,15 @@ package org.hibernate.search.util.impl.integrationtest.common.rule;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.StubTreeNodeAssert.assertThatTree;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
-
-import org.easymock.Capture;
 
 class SchemaDefinitionCall extends Call<SchemaDefinitionCall> {
 
 	private final String indexName;
 	private final StubIndexSchemaNode schemaNode;
-	private final Capture<StubIndexSchemaNode> capture;
+	private final Consumer<StubIndexSchemaNode> capture;
 
 	SchemaDefinitionCall(String indexName, StubIndexSchemaNode schemaNode) {
 		this.indexName = indexName;
@@ -26,7 +25,7 @@ class SchemaDefinitionCall extends Call<SchemaDefinitionCall> {
 		this.capture = null;
 	}
 
-	SchemaDefinitionCall(String indexName, StubIndexSchemaNode schemaNode, Capture<StubIndexSchemaNode> capture) {
+	SchemaDefinitionCall(String indexName, StubIndexSchemaNode schemaNode, Consumer<StubIndexSchemaNode> capture) {
 		this.indexName = indexName;
 		this.schemaNode = schemaNode;
 		this.capture = capture;
@@ -38,7 +37,7 @@ class SchemaDefinitionCall extends Call<SchemaDefinitionCall> {
 					.as( "Schema for index '" + indexName + "' did not match:\n" )
 					.matches( schemaNode );
 			return () -> {
-				capture.setValue( actualCall.schemaNode );
+				capture.accept( actualCall.schemaNode );
 				return null;
 			};
 		}

@@ -44,8 +44,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import org.easymock.Capture;
-
 /**
  * Test default value bridges for the {@code @GenericField} annotation.
  */
@@ -83,8 +81,6 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 
 	@Before
 	public void setup() {
-		Capture<StubIndexSchemaNode> schemaCapture1 = Capture.newInstance();
-		Capture<StubIndexSchemaNode> schemaCapture2 = Capture.newInstance();
 		backendMock.expectSchema(
 				DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME, b -> {
 					b.field( FIELD_NAME, expectations.getIndexFieldJavaType() );
@@ -92,7 +88,8 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 					if ( typeDescriptor.isNullable() ) {
 						b.field( FIELD_INDEXNULLAS_NAME, expectations.getIndexFieldJavaType(), f -> f.indexNullAs( expectations.getNullAsValueBridge1() ) );
 					}
-				}, schemaCapture1
+				},
+				schema -> this.index1FieldSchemaNode = schema.getChildren().get( FIELD_NAME ).get( 0 )
 		);
 		backendMock.expectSchema(
 				DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME, b -> {
@@ -101,15 +98,14 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 					if ( typeDescriptor.isNullable() ) {
 						b.field( FIELD_INDEXNULLAS_NAME, expectations.getIndexFieldJavaType(), f -> f.indexNullAs( expectations.getNullAsValueBridge2() ) );
 					}
-				}, schemaCapture2
+				},
+				schema -> this.index2FieldSchemaNode = schema.getChildren().get( FIELD_NAME ).get( 0 )
 		);
 		mapping = setupHelper.start()
 				.withAnnotatedEntityType( expectations.getTypeWithValueBridge1(), DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME )
 				.withAnnotatedEntityType( expectations.getTypeWithValueBridge2(), DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME )
 				.setup();
 		backendMock.verifyExpectationsMet();
-		index1FieldSchemaNode = schemaCapture1.getValue().getChildren().get( FIELD_NAME ).get( 0 );
-		index2FieldSchemaNode = schemaCapture2.getValue().getChildren().get( FIELD_NAME ).get( 0 );
 	}
 
 	@Test
