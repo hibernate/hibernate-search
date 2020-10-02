@@ -23,13 +23,17 @@ import org.hibernate.search.jsr352.test.util.JobTestUtil;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.strictMock;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.when;
+
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 /**
  * Unit test for partition plan validation.
@@ -42,8 +46,12 @@ public class PartitionMapperTest {
 	private static final int COMP_ROWS = 3;
 	private static final int PERS_ROWS = 8;
 
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+
 	private EntityManagerFactory emf;
 
+	@Mock
 	private JobContext mockedJobContext;
 
 	private PartitionMapper partitionMapper;
@@ -74,7 +82,6 @@ public class PartitionMapperTest {
 		final String maxThreads = String.valueOf( 1 );
 		final String rowsPerPartition = String.valueOf( 3 );
 
-		mockedJobContext = strictMock( JobContext.class );
 		partitionMapper = new PartitionMapper(
 				fetchSize,
 				hql,
@@ -108,8 +115,7 @@ public class PartitionMapperTest {
 				JobTestUtil.createSimpleEntityTypeDescriptor( emf, Company.class ),
 				JobTestUtil.createSimpleEntityTypeDescriptor( emf, Person.class )
 				) );
-		expect( mockedJobContext.getTransientUserData() ).andReturn( jobData );
-		replay( mockedJobContext );
+		when( mockedJobContext.getTransientUserData() ).thenReturn( jobData );
 
 		PartitionPlan partitionPlan = partitionMapper.mapPartitions();
 
