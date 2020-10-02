@@ -22,14 +22,17 @@ import org.hibernate.search.jsr352.test.util.JobTestUtil;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.niceMock;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.when;
+
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 /**
  * Unit test for item reader validation.
@@ -46,10 +49,14 @@ public class EntityReaderTest {
 			new Company( "Microsoft" )
 	);
 
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+
 	private EntityManagerFactory emf;
 
+	@Mock
 	private JobContext mockedJobContext;
-
+	@Mock
 	private StepContext mockedStepContext;
 
 	private EntityReader entityReader;
@@ -79,8 +86,6 @@ public class EntityReaderTest {
 		final String maxResults = String.valueOf( Integer.MAX_VALUE );
 		final String partitionId = String.valueOf( 0 );
 
-		mockedJobContext = niceMock( JobContext.class );
-		mockedStepContext = niceMock( StepContext.class );
 
 		entityReader = new EntityReader( cacheMode,
 				entityName,
@@ -111,9 +116,7 @@ public class EntityReaderTest {
 		jobData.setCustomQueryCriteria( new HashSet<>() );
 		jobData.setEntityTypeDescriptors( Arrays.asList( JobTestUtil.createSimpleEntityTypeDescriptor( emf, Company.class ) ) );
 
-		expect( mockedJobContext.getTransientUserData() ).andReturn( jobData );
-		mockedStepContext.setTransientUserData( anyObject() );
-		replay( mockedJobContext, mockedStepContext );
+		when( mockedJobContext.getTransientUserData() ).thenReturn( jobData );
 
 		try {
 			entityReader.open( null );
