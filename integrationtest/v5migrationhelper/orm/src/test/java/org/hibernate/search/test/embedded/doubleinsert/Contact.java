@@ -86,7 +86,7 @@ public class Contact implements Serializable {
 	}
 
 	public String getEmail() {
-		if ( null == this.email || "".equals( this.email ) ) {
+		if ( null == this.email || this.email.isEmpty() ) {
 			return "N/A";
 		}
 		return email;

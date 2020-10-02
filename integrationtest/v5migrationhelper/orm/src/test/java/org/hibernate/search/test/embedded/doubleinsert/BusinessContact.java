@@ -39,7 +39,7 @@ public class BusinessContact extends Contact {
 	}
 
 	public String getUrl() {
-		if ( null == this.url || "".equals( this.url ) ) {
+		if ( null == this.url || this.url.isEmpty() ) {
 			return "Not provided";
 		}
 		return url;

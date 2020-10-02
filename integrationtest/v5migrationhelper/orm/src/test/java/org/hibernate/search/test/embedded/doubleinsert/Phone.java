@@ -75,7 +75,7 @@ public class Phone implements Serializable {
 	}
 
 	public String getType() {
-		if ( null == this.type || "".equals( this.type ) ) {
+		if ( null == this.type || this.type.isEmpty() ) {
 			return "N/A";
 		}
 		return type;

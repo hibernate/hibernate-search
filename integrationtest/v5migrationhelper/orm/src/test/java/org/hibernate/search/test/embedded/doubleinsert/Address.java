@@ -109,7 +109,7 @@ public class Address implements Serializable {
 	}
 
 	public String getAddress2() {
-		if ( null == this.address2 || "".equals( this.address2 ) ) {
+		if ( null == this.address2 || this.address2.isEmpty() ) {
 			return "N/A";
 		}
 		return address2;
@@ -128,7 +128,7 @@ public class Address implements Serializable {
 	}
 
 	public String getCounty() {
-		if ( null == this.county || "".equals( this.county ) ) {
+		if ( null == this.county || this.county.isEmpty() ) {
 			return "N/A";
 		}
 		return county;
