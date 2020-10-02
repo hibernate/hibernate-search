@@ -37,8 +37,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import org.easymock.Capture;
-
 /**
  * Test default identifier bridges for the {@code @DocumentId} annotation.
  */
@@ -73,25 +71,21 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 
 	@Before
 	public void setup() {
-		Capture<StubIndexSchemaNode> schemaCapture1 = Capture.newInstance();
-		Capture<StubIndexSchemaNode> schemaCapture2 = Capture.newInstance();
 		backendMock.expectSchema(
 				DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,
 				b -> { },
-				schemaCapture1
+				schema -> this.index1RootSchemaNode = schema
 		);
 		backendMock.expectSchema(
 				DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME,
 				b -> { },
-				schemaCapture2
+				schema -> this.index2RootSchemaNode = schema
 		);
 		mapping = setupHelper.start()
 				.withAnnotatedEntityType( expectations.getTypeWithIdentifierBridge1(), DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME )
 				.withAnnotatedEntityType( expectations.getTypeWithIdentifierBridge2(), DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME )
 				.setup();
 		backendMock.verifyExpectationsMet();
-		index1RootSchemaNode = schemaCapture1.getValue();
-		index2RootSchemaNode = schemaCapture2.getValue();
 	}
 
 	@Test

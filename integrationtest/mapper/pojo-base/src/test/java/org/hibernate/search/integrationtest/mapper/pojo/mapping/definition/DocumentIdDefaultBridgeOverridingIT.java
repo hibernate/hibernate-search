@@ -38,8 +38,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import org.easymock.Capture;
-
 /**
  * Test overriding default identifier bridges for the {@code @DocumentId} annotation,
  * for example assigning a different default identifier bridge for properties of type {@link String}.
@@ -77,11 +75,10 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 
 	@Before
 	public void setup() {
-		Capture<StubIndexSchemaNode> schemaCapture1 = Capture.newInstance();
 		backendMock.expectSchema(
 				DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,
 				b -> { },
-				schemaCapture1
+				schema -> this.rootSchemaNode = schema
 		);
 		mapping = setupHelper.start()
 				.withAnnotatedEntityType( expectations.getTypeWithIdentifierBridge1(),
@@ -91,7 +88,6 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 						.identifierBridge( new OverridingDefaultBridge() ) )
 				.setup();
 		backendMock.verifyExpectationsMet();
-		rootSchemaNode = schemaCapture1.getValue();
 	}
 
 	@Test

@@ -37,8 +37,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import org.easymock.Capture;
-
 /**
  * Test overriding default value bridges for the {@code @GenericField} annotation,
  * for example assigning a different default value bridge for properties of type {@link String}.
@@ -77,7 +75,6 @@ public class FieldDefaultBridgeOverridingIT<V, F> {
 
 	@Before
 	public void setup() {
-		Capture<StubIndexSchemaNode> schemaCapture1 = Capture.newInstance();
 		backendMock.expectSchema(
 				DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME, b -> {
 					b.field( FIELD_NAME, FieldTypeForOverridingDefaultBridge.class );
@@ -86,7 +83,8 @@ public class FieldDefaultBridgeOverridingIT<V, F> {
 						b.field( FIELD_INDEXNULLAS_NAME, FieldTypeForOverridingDefaultBridge.class,
 								f -> f.indexNullAs( new FieldTypeForOverridingDefaultBridge( "NULL_AS" ) ) );
 					}
-				}, schemaCapture1
+				},
+				schema -> this.fieldSchemaNode = schema.getChildren().get( FIELD_NAME ).get( 0 )
 		);
 		mapping = setupHelper.start()
 				.withAnnotatedEntityType( expectations.getTypeWithValueBridge1(),
@@ -96,7 +94,6 @@ public class FieldDefaultBridgeOverridingIT<V, F> {
 						.valueBridge( new OverridingDefaultBridge<>() ) )
 				.setup();
 		backendMock.verifyExpectationsMet();
-		fieldSchemaNode = schemaCapture1.getValue().getChildren().get( FIELD_NAME ).get( 0 );
 	}
 
 	@Test

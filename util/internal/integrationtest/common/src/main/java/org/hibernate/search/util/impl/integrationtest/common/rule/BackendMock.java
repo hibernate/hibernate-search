@@ -36,8 +36,6 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-import org.easymock.Capture;
-
 public class BackendMock implements TestRule {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -111,11 +109,11 @@ public class BackendMock implements TestRule {
 	}
 
 	public BackendMock expectSchema(String indexName, Consumer<StubIndexSchemaNode.Builder> contributor) {
-		return expectSchema( indexName, contributor, Capture.newInstance() );
+		return expectSchema( indexName, contributor, ignored -> { } );
 	}
 
 	public BackendMock expectSchema(String indexName, Consumer<StubIndexSchemaNode.Builder> contributor,
-			Capture<StubIndexSchemaNode> capture) {
+			Consumer<StubIndexSchemaNode> capture) {
 		CallQueue<SchemaDefinitionCall> callQueue = backendBehavior().getSchemaDefinitionCalls( indexName );
 		StubIndexSchemaNode.Builder builder = StubIndexSchemaNode.schema();
 		contributor.accept( builder );
