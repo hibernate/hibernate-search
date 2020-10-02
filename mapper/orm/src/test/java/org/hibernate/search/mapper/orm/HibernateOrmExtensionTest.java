@@ -29,37 +29,38 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.impl.ValueBridgeToIndexed
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 
+import org.junit.Rule;
 import org.junit.Test;
 
-import org.easymock.EasyMockSupport;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
-public class HibernateOrmExtensionTest extends EasyMockSupport {
-	private final HibernateOrmMappingContextMock mappingContext = createMock( HibernateOrmMappingContextMock.class );
-	private final HibernateOrmSessionContextMock sessionContext = createMock( HibernateOrmSessionContextMock.class );
+public class HibernateOrmExtensionTest {
+
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+
+	@Mock
+	private HibernateOrmMappingContextMock mappingContext;
+	@Mock
+	private HibernateOrmSessionContextMock sessionContext;
 
 	@Test
 	public void identifierBridge() {
 		IdentifierBridgeToDocumentIdentifierContext toDocumentContext =
 				new IdentifierBridgeToDocumentIdentifierContextImpl( mappingContext );
-		resetAll();
-		replayAll();
 		assertThat( toDocumentContext.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
-		verifyAll();
 
 		IdentifierBridgeFromDocumentIdentifierContext fromDocumentContext = new SessionBasedBridgeOperationContext( sessionContext );
-		resetAll();
-		replayAll();
 		assertThat( fromDocumentContext.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
-		verifyAll();
 	}
 
 	@Test
 	public void routingBridge() {
 		RoutingBridgeRouteContext context = new SessionBasedBridgeOperationContext( sessionContext );
-		resetAll();
-		replayAll();
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
-		verifyAll();
 	}
 
 	@Test
@@ -67,61 +68,40 @@ public class HibernateOrmExtensionTest extends EasyMockSupport {
 	public void routingKeyBridge() {
 		org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext context =
 				new SessionBasedBridgeOperationContext( sessionContext );
-		resetAll();
-		replayAll();
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
-		verifyAll();
 	}
 
 	@Test
 	public void typeBridge() {
 		TypeBridgeWriteContext context = new SessionBasedBridgeOperationContext( sessionContext );
-		resetAll();
-		replayAll();
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
-		verifyAll();
 	}
 
 	@Test
 	public void propertyBridge() {
 		PropertyBridgeWriteContext context = new SessionBasedBridgeOperationContext( sessionContext );
-		resetAll();
-		replayAll();
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
-		verifyAll();
 	}
 
 	@Test
 	public void valueBridge() {
 		ValueBridgeToIndexedValueContext toIndexedValueContext = new ValueBridgeToIndexedValueContextImpl( mappingContext );
-		resetAll();
-		replayAll();
 		assertThat( toIndexedValueContext.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
-		verifyAll();
 
 		ValueBridgeFromIndexedValueContext fromIndexedValueContext = new SessionBasedBridgeOperationContext( sessionContext );
-		resetAll();
-		replayAll();
 		assertThat( fromIndexedValueContext.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
-		verifyAll();
 	}
 
 	@Test
 	public void toIndexValueConverter() {
 		ToDocumentFieldValueConvertContext context = new ToDocumentFieldValueConvertContextImpl( mappingContext );
-		resetAll();
-		replayAll();
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
-		verifyAll();
 	}
 
 	@Test
 	public void fromIndexValueConverter() {
 		FromDocumentFieldValueConvertContext context = new FromDocumentFieldValueConvertContextImpl( sessionContext );
-		resetAll();
-		replayAll();
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
-		verifyAll();
 	}
 
 	private interface HibernateOrmMappingContextMock
