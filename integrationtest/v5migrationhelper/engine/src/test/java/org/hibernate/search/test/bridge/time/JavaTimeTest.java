@@ -207,7 +207,7 @@ public class JavaTimeTest {
 
 		Query query = queryBuilder().keyword().onField( field ).matching( expectedValue ).createQuery();
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.from( Sample.class )
 				.projecting( field )
 				.matchesExactlySingleProjections( expectedValue );

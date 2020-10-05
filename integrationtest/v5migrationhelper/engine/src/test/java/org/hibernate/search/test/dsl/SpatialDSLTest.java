@@ -47,7 +47,7 @@ public class SpatialDSLTest {
 						.ofCoordinates( coordinates )
 					.createQuery();
 
-		helper.assertThat( query ).from( POI.class )
+		helper.assertThatQuery( query ).from( POI.class )
 				.matchesExactlyIds( 2 );
 
 		query = builder
@@ -57,7 +57,7 @@ public class SpatialDSLTest {
 						.ofLatitude( 48.858333d ).andLongitude( 2.294444d )
 					.createQuery();
 
-		helper.assertThat( query ).from( POI.class )
+		helper.assertThatQuery( query ).from( POI.class )
 				.matchesExactlyIds( 1 );
 	}
 

@@ -51,7 +51,7 @@ public class DefaultPathsWithNestedIndexedEmbeddedTest {
 		c.id = 2L;
 		helper.add( c );
 
-		helper.assertThat( "b.a.foo", a.foo )
+		helper.assertThatQuery( "b.a.foo", a.foo )
 				.from( C.class )
 				.hasResultSize( 1 );
 	}

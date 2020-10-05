@@ -137,7 +137,7 @@ public class ProjectionConversionTest {
 	}
 
 	void projectionTestHelper(String projectionField, Object expectedValue) {
-		helper.assertThat()
+		helper.assertThatQuery()
 				.from( ExampleEntity.class )
 				.projecting( projectionField )
 				.matchesExactlySingleProjections( expectedValue );

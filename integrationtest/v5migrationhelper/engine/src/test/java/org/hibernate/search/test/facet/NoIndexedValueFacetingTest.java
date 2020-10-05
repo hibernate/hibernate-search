@@ -90,7 +90,7 @@ public class NoIndexedValueFacetingTest {
 		// Mainly, we're testing that executing the query with faceting enabled won't explode
 		HSQuery hsQuery = helper.hsQuery( FacetedEntity.class );
 		hsQuery.getFacetManager().enableFaceting( request );
-		helper.assertThat( hsQuery )
+		helper.assertThatQuery( hsQuery )
 				.facets( "myRequest" )
 				.isEmpty();
 	}
@@ -109,7 +109,7 @@ public class NoIndexedValueFacetingTest {
 		// Mainly, we're testing that executing the query with faceting enabled won't explode
 		HSQuery hsQuery = helper.hsQuery( FacetedEntity.class );
 		hsQuery.getFacetManager().enableFaceting( request );
-		helper.assertThat( hsQuery )
+		helper.assertThatQuery( hsQuery )
 				.facets( "myRequest" )
 				.includes( "[0, 1000]", 0 )
 				.includes( "[1001, 1500]", 0 )
@@ -130,7 +130,7 @@ public class NoIndexedValueFacetingTest {
 		// Mainly, we're testing that executing the query with faceting enabled won't explode
 		HSQuery hsQuery = helper.hsQuery( FacetedEntity.class );
 		hsQuery.getFacetManager().enableFaceting( request );
-		helper.assertThat( hsQuery )
+		helper.assertThatQuery( hsQuery )
 				.facets( "myRequest" )
 				.includes( "[0.0, 1000.0)", 0 )
 				.includes( "[1000.0, 1500.0)", 0 )

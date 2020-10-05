@@ -88,11 +88,11 @@ public class NumericFieldTest {
 	public void testNumericFieldProjections() {
 		Query latitudeQuery = helper.queryBuilder( Location.class ).range().onField( "latitude" )
 				.from( -20d ).to( -20d ).createQuery();
-		helper.assertThat( latitudeQuery ).from( Location.class )
+		helper.assertThatQuery( latitudeQuery ).from( Location.class )
 				.projecting( "latitude" )
 				.matchesExactlySingleProjections( -20d );
 
-		helper.assertThat( latitudeQuery ).from( Location.class )
+		helper.assertThatQuery( latitudeQuery ).from( Location.class )
 				.projecting( "importance", "popularity" )
 				.matchesExactlyProjections( new Object[] {
 						(short) 10,
@@ -104,14 +104,14 @@ public class NumericFieldTest {
 		Query matchQuery = helper.queryBuilder( Location.class ).keyword().onField( fieldName )
 				.matching( value )
 				.createQuery();
-		return helper.assertThat( matchQuery ).from( Location.class );
+		return helper.assertThatQuery( matchQuery ).from( Location.class );
 	}
 
 	private AssertBuildingHSQueryContext assertRangeQuery(String fieldName, Object from, Object to) {
 		Query query = helper.queryBuilder( Location.class ).range().onField( fieldName )
 				.from( from ).to( to )
 				.createQuery();
-		return helper.assertThat( query ).from( Location.class );
+		return helper.assertThatQuery( query ).from( Location.class );
 	}
 
 	private AssertBuildingHSQueryContext assertRangeQuery(String fieldName, Object from, Object to, boolean includeLower, boolean includeUpper) {
@@ -126,7 +126,7 @@ public class NumericFieldTest {
 			toContext = toContext.excludeLimit();
 		}
 		Query query = toContext.createQuery();
-		return helper.assertThat( query ).from( Location.class );
+		return helper.assertThatQuery( query ).from( Location.class );
 	}
 
 	private void prepareData() {
