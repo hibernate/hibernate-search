@@ -10,6 +10,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueDistanceFromCenterValues.CENTER_POINT;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
+import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +39,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -170,7 +171,7 @@ public class DistanceSearchSortBaseIT {
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3103" })
 	public void medianWithNestedField() {
-		Assume.assumeTrue(
+		assumeTrue(
 				"This test is only relevant when using SortMode.MEDIAN in nested fields",
 				isMedianWithNestedField()
 		);
@@ -188,7 +189,7 @@ public class DistanceSearchSortBaseIT {
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3103" })
 	public void sum() {
-		Assume.assumeTrue(
+		assumeTrue(
 				"This test is only relevant when using SortMode.SUM",
 				isSum()
 		);
@@ -205,7 +206,7 @@ public class DistanceSearchSortBaseIT {
 	}
 
 	private void assumeTestParametersWork() {
-		Assume.assumeFalse(
+		assumeFalse(
 				"This combination is not expected to work",
 				isMedianWithNestedField() || isSum()
 		);

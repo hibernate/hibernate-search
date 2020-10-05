@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.Assume.assumeTrue;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -34,7 +35,6 @@ import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils;
 
-import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -138,7 +138,7 @@ public class SearchQueryTimeoutIT {
 
 	@Test
 	public void scroll_truncateAfter_slowQuery_smallTimeout() {
-		Assume.assumeTrue(
+		assumeTrue(
 				"The backend doesn't support truncateAfter() on scrolls",
 				TckConfiguration.get().getBackendFeatures().supportsTruncateAfterForScroll()
 		);

@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.lucene.search;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
+import static org.junit.Assume.assumeFalse;
 
 import java.time.MonthDay;
 import java.time.temporal.Temporal;
@@ -37,7 +38,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -224,7 +224,7 @@ public class LuceneSearchTopDocsMergeFieldSortIT<F> {
 	}
 
 	private void assumeTestParametersWork() {
-		Assume.assumeFalse(
+		assumeFalse(
 				"This combination is not expected to work",
 				isMedianWithNestedField() || isSumOrAvgOrMedianWithStringField() || isSumWithTemporalField()
 		);

@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.work;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -146,7 +146,7 @@ public class IndexingFieldTypesIT<F> {
 
 	@Test
 	public void dynamic_withPath() {
-		Assume.assumeTrue(
+		assumeTrue(
 				"This backend does not support dynamic fields for this type",
 				TckConfiguration.get().getBackendFeatures()
 						.supportsValuesForDynamicField( typeDescriptor.getJavaType() )

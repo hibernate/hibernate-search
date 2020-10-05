@@ -12,6 +12,7 @@ import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,6 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -362,7 +362,7 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 
 	@Test
 	public void failure_commit() {
-		Assume.assumeTrue(
+		assumeTrue(
 				"This test only makes sense when commit is forced",
 				DocumentCommitStrategy.FORCE.equals( commitStrategy )
 		);
@@ -430,7 +430,7 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 
 	@Test
 	public void failure_refresh() {
-		Assume.assumeTrue(
+		assumeTrue(
 				"This test only makes sense when refresh is forced",
 				DocumentRefreshStrategy.FORCE.equals( refreshStrategy )
 		);
@@ -501,7 +501,7 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 
 	@Test
 	public void failure_workAndCommit() {
-		Assume.assumeTrue(
+		assumeTrue(
 				"This test only makes sense when commit is forced",
 				DocumentCommitStrategy.FORCE.equals( commitStrategy )
 		);
@@ -570,7 +570,7 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 
 	@Test
 	public void failure_workAndRefresh() {
-		Assume.assumeTrue(
+		assumeTrue(
 				"This test only makes sense when refresh is forced",
 				DocumentRefreshStrategy.FORCE.equals( refreshStrategy )
 		);

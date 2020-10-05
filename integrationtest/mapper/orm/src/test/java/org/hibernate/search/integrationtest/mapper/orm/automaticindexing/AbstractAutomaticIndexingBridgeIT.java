@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
+import static org.junit.Assume.assumeTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Basic;
@@ -30,7 +32,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -693,7 +694,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 	private SessionFactory setupWithMultiValuedPropertyBridge() {
 		PropertyBinder binder = createContainingEntityMultiValuedPropertyBinder();
 
-		Assume.assumeTrue(
+		assumeTrue(
 				"Multi-valued property bridges must be supported",
 				binder != null
 		);

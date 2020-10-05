@@ -8,6 +8,8 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.schema.manage
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
+import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.EnumSet;
 
@@ -23,7 +25,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedInde
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,7 +60,7 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 
 	@Test
 	public void indexMissing() throws Exception {
-		Assume.assumeFalse( "The operation " + operation + " creates an index automatically."
+		assumeFalse( "The operation " + operation + " creates an index automatically."
 				+ " No point running this test.",
 				ElasticsearchIndexSchemaManagerOperation.creating().contains( operation ) );
 
@@ -70,7 +71,7 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 
 	@Test
 	public void invalidIndexStatus_creatingIndex() throws Exception {
-		Assume.assumeTrue( "The operation " + operation + " doesn't create an index automatically."
+		assumeTrue( "The operation " + operation + " doesn't create an index automatically."
 				+ " No point running this test.",
 				ElasticsearchIndexSchemaManagerOperation.creating().contains( operation ) );
 
@@ -92,7 +93,7 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 
 	@Test
 	public void invalidIndexStatus_usingPreexistingIndex() throws Exception {
-		Assume.assumeFalse( "The operation " + operation + " drops the existing index automatically."
+		assumeFalse( "The operation " + operation + " drops the existing index automatically."
 						+ " No point running this test.",
 				ElasticsearchIndexSchemaManagerOperation.dropping().contains( operation ) );
 

@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.buildValidationFailureReportPattern;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.defaultMetadataMappingAndCommaForInitialization;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.EnumSet;
 
@@ -25,7 +26,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedInde
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
-import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -141,7 +141,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 
 	@Test
 	public void mapping_missing() {
-		Assume.assumeTrue(
+		assumeTrue(
 				"Skipping this test as there is always a mapping (be it empty) in " + elasticSearchClient.getDialect(),
 				elasticSearchClient.getDialect().isEmptyMappingPossible()
 		);
