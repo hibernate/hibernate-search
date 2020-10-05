@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.query;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -24,10 +27,16 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.easymock.EasyMockSupport;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 @TestForIssue(jiraKey = "HSEARCH-3988")
-public class SearchQueryLoadingOptionsIT extends EasyMockSupport {
+@SuppressWarnings("unchecked") // Mocking parameterized types
+public class SearchQueryLoadingOptionsIT {
+
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -41,35 +50,26 @@ public class SearchQueryLoadingOptionsIT extends EasyMockSupport {
 
 	@Test
 	public void defaultResultType() {
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				createMock( LoadingContext.class );
-		Consumer<Object> loadingOptionsStepMock = createMock( Consumer.class );
+		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( LoadingContext.class );
+		Consumer<Object> loadingOptionsStepMock = mock( Consumer.class );
 
 		Object someOption = new Object();
-		resetAll();
-		// Expect our loading options to be altered
-		loadingOptionsStepMock.accept( someOption );
-		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
 		scope.query( new StubBackendSessionContext(), loadingContextMock, loadingOptionsStepMock )
 				.where( f -> f.matchAll() )
 				.loading( o -> o.accept( someOption ) )
 				.toQuery();
-		verifyAll();
+		// Expect our loading options to be altered
+		verify( loadingOptionsStepMock ).accept( someOption );
 	}
 
 	@Test
 	public void selectEntity() {
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				createMock( LoadingContext.class );
-		Consumer<Object> loadingOptionsStepMock = createMock( Consumer.class );
+		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( LoadingContext.class );
+		Consumer<Object> loadingOptionsStepMock = mock( Consumer.class );
 
 		Object someOption = new Object();
-		resetAll();
-		// Expect our loading options to be altered
-		loadingOptionsStepMock.accept( someOption );
-		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
 		scope.query( new StubBackendSessionContext(), loadingContextMock, loadingOptionsStepMock )
@@ -77,20 +77,14 @@ public class SearchQueryLoadingOptionsIT extends EasyMockSupport {
 				.where( f -> f.matchAll() )
 				.loading( o -> o.accept( someOption ) )
 				.toQuery();
-		verifyAll();
 	}
 
 	@Test
 	public void selectEntityReference() {
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				createMock( LoadingContext.class );
-		Consumer<Object> loadingOptionsStepMock = createMock( Consumer.class );
+		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( LoadingContext.class );
+		Consumer<Object> loadingOptionsStepMock = mock( Consumer.class );
 
 		Object someOption = new Object();
-		resetAll();
-		// Expect our loading options to be altered
-		loadingOptionsStepMock.accept( someOption );
-		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
 		scope.query( new StubBackendSessionContext(), loadingContextMock, loadingOptionsStepMock )
@@ -98,20 +92,15 @@ public class SearchQueryLoadingOptionsIT extends EasyMockSupport {
 				.where( f -> f.matchAll() )
 				.loading( o -> o.accept( someOption ) )
 				.toQuery();
-		verifyAll();
 	}
 
 	@Test
 	public void select() {
 		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				createMock( LoadingContext.class );
-		Consumer<Object> loadingOptionsStepMock = createMock( Consumer.class );
+				mock( LoadingContext.class );
+		Consumer<Object> loadingOptionsStepMock = mock( Consumer.class );
 
 		Object someOption = new Object();
-		resetAll();
-		// Expect our loading options to be altered
-		loadingOptionsStepMock.accept( someOption );
-		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
 		scope.query( new StubBackendSessionContext(), loadingContextMock, loadingOptionsStepMock )
@@ -119,7 +108,8 @@ public class SearchQueryLoadingOptionsIT extends EasyMockSupport {
 				.where( f -> f.matchAll() )
 				.loading( o -> o.accept( someOption ) )
 				.toQuery();
-		verifyAll();
+		// Expect our loading options to be altered
+		verify( loadingOptionsStepMock ).accept( someOption );
 	}
 
 	private static class IndexBinding {

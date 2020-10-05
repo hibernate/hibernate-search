@@ -24,7 +24,7 @@ import org.hibernate.search.util.common.impl.StreamHelper;
  * Utils allowing to normalize data coming from different backends.
  * <p>
  * Mainly useful in search result assertions to compare different types of {@link DocumentReference},
- * but also in {@link EasyMockUtils#projectionMatcher(Object...) EasyMock matchers},
+ * but also in {@link MockUtils#projectionMatcher(Object...) mock argument matchers},
  * or in tests inspecting BigDecimals returned from the backend
  * (since the BigDecimals can have trailing zeros that do not matter).
  */

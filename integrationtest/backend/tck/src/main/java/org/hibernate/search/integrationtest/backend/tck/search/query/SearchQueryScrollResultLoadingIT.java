@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.query;
 
+import static org.hibernate.search.integrationtest.backend.tck.testsupport.stub.MapperMockUtils.expectHitMapping;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import java.util.concurrent.TimeUnit;
 
@@ -20,7 +23,6 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.MapperEasyMockUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubDocumentReferenceConverter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntityLoader;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubLoadedObject;
@@ -34,9 +36,14 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.easymock.EasyMockSupport;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
-public class SearchQueryScrollResultLoadingIT extends EasyMockSupport {
+public class SearchQueryScrollResultLoadingIT {
+
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -54,33 +61,26 @@ public class SearchQueryScrollResultLoadingIT extends EasyMockSupport {
 
 	@Test
 	public void resultLoadingOnScrolling() {
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = createMock( LoadingContext.class );
-		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock = createMock( StubDocumentReferenceConverter.class );
-		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock = createMock( StubEntityLoader.class );
+		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( LoadingContext.class );
+		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock = mock( StubDocumentReferenceConverter.class );
+		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock = mock( StubEntityLoader.class );
 
-		resetAll();
-		// No calls expected on the mocks
-		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope = index.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
 				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "integer" ) )
 				.toQuery();
 		SearchScroll<StubLoadedObject> scroll = objectsQuery.scroll( 5 );
-		verifyAll();
 
 		verifyLoading( loadingContextMock, documentReferenceConverterMock, objectLoaderMock, scroll );
 	}
 
 	@Test
 	public void resultLoadingOnScrolling_entityLoadingTimeout() {
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = createMock( LoadingContext.class );
-		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock = createMock( StubDocumentReferenceConverter.class );
-		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock = createMock( StubEntityLoader.class );
+		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( LoadingContext.class );
+		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock = mock( StubDocumentReferenceConverter.class );
+		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock = mock( StubEntityLoader.class );
 
-		resetAll();
-		// No calls expected on the mocks
-		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope = index.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
 				.where( f -> f.matchAll() )
@@ -88,20 +88,16 @@ public class SearchQueryScrollResultLoadingIT extends EasyMockSupport {
 				.failAfter( 1000, TimeUnit.HOURS )
 				.toQuery();
 		SearchScroll<StubLoadedObject> scroll = objectsQuery.scroll( 5 );
-		verifyAll();
 
 		verifyLoading( loadingContextMock, documentReferenceConverterMock, objectLoaderMock, scroll );
 	}
 
 	@Test
 	public void resultLoadingOnScrolling_softTimeout() {
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = createMock( LoadingContext.class );
-		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock = createMock( StubDocumentReferenceConverter.class );
-		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock = createMock( StubEntityLoader.class );
+		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( LoadingContext.class );
+		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock = mock( StubDocumentReferenceConverter.class );
+		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock = mock( StubEntityLoader.class );
 
-		resetAll();
-		// No calls expected on the mocks
-		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope = index.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
 				.where( f -> f.matchAll() )
@@ -109,7 +105,6 @@ public class SearchQueryScrollResultLoadingIT extends EasyMockSupport {
 				.truncateAfter( 1000, TimeUnit.HOURS )
 				.toQuery();
 		SearchScroll<StubLoadedObject> scroll = objectsQuery.scroll( 5 );
-		verifyAll();
 
 		// softTimeout is passed to the entity loading too
 		verifyLoading( loadingContextMock, documentReferenceConverterMock, objectLoaderMock, scroll );
@@ -123,8 +118,7 @@ public class SearchQueryScrollResultLoadingIT extends EasyMockSupport {
 		for ( int j = 0; j < 7; j++ ) {
 			int base = j * 5;
 
-			resetAll();
-			MapperEasyMockUtils.expectHitMapping(
+			expectHitMapping(
 					loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 					c -> {
 						for ( int i = 0; i < 5; i++ ) {
@@ -132,17 +126,18 @@ public class SearchQueryScrollResultLoadingIT extends EasyMockSupport {
 						}
 					}
 			);
-			replayAll();
 			assertThatHits( scroll.next().hits() ).hasHitsAnyOrder(
 					references[base + 0].loadedObject, references[base + 1].loadedObject, references[base + 2].loadedObject,
 					references[base + 3].loadedObject, references[base + 4].loadedObject
 			);
-			verifyAll();
+			// Check in particular that the backend gets the projection hit mapper from the loading context,
+			// which must happen every time we load entities,
+			// so that the mapper can run state checks (session is still open, ...).
+			verify( loadingContextMock ).createProjectionHitMapper();
 		}
 
-		// page with the rest items
-		resetAll();
-		MapperEasyMockUtils.expectHitMapping(
+		// page with the few remaining items
+		expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				c -> {
 					for ( int i = 35; i <= 36; i++ ) {
@@ -150,11 +145,10 @@ public class SearchQueryScrollResultLoadingIT extends EasyMockSupport {
 					}
 				}
 		);
-		replayAll();
 		assertThatHits( scroll.next().hits() ).hasHitsAnyOrder(
 				references[35].loadedObject, references[36].loadedObject
 		);
-		verifyAll();
+		verify( loadingContextMock ).createProjectionHitMapper();
 	}
 
 	private void initData() {

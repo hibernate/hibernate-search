@@ -8,9 +8,11 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.integrationtest.backend.tck.testsupport.stub.MapperMockUtils.expectHitMapping;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
+import static org.mockito.Mockito.mock;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +39,6 @@ import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDsl
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.MapperEasyMockUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubDocumentReferenceConverter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntityLoader;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubLoadedObject;
@@ -54,17 +55,23 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.easymock.EasyMockSupport;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 /**
  * Generic tests for projections. More specific tests can be found in other classes, such as {@link FieldSearchProjectionSingleValuedBaseIT}.
  */
-public class SearchProjectionIT extends EasyMockSupport {
+@SuppressWarnings("unchecked") // Mocking parameterized types
+public class SearchProjectionIT {
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
 	private static final String DOCUMENT_3 = "3";
 	private static final String EMPTY = "empty";
+
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -153,15 +160,12 @@ public class SearchProjectionIT extends EasyMockSupport {
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyReference );
 
 		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				createMock( LoadingContext.class );
+				mock( LoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
-				createMock( StubDocumentReferenceConverter.class );
+				mock( StubDocumentReferenceConverter.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				createMock( StubEntityLoader.class );
+				mock( StubEntityLoader.class );
 
-		resetAll();
-		// No call expected on the mocks
-		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				mainIndex.createGenericScope();
 		SearchQuery<List<?>> query;
@@ -183,10 +187,8 @@ public class SearchProjectionIT extends EasyMockSupport {
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
-		verifyAll();
 
-		resetAll();
-		MapperEasyMockUtils.expectHitMapping(
+		expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				/*
 				 * Expect each reference to be transformed because of the reference projection,
@@ -202,14 +204,12 @@ public class SearchProjectionIT extends EasyMockSupport {
 						.entityReference( emptyReference, emptyTransformedReference )
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
-		replayAll();
 		assertThatQuery( query ).hasListHitsAnyOrder( b -> {
 			b.list( document1Reference, document1TransformedReference, document1LoadedObject );
 			b.list( document2Reference, document2TransformedReference, document2LoadedObject );
 			b.list( document3Reference, document3TransformedReference, document3LoadedObject );
 			b.list( emptyReference, emptyTransformedReference, emptyLoadedObject );
 		} );
-		verifyAll();
 	}
 
 	@Test

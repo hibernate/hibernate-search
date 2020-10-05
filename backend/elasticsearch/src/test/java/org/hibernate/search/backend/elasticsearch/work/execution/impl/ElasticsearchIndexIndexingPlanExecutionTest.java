@@ -8,9 +8,15 @@ package org.hibernate.search.backend.elasticsearch.work.execution.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.easymock.EasyMock.capture;
-import static org.easymock.EasyMock.eq;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,67 +29,72 @@ import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
-import org.easymock.Capture;
-import org.easymock.EasyMock;
-import org.easymock.EasyMockSupport;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
-public class ElasticsearchIndexIndexingPlanExecutionTest extends EasyMockSupport {
+@SuppressWarnings("unchecked") // Raw types are the only way to mock parameterized types
+public class ElasticsearchIndexIndexingPlanExecutionTest {
 
 	private static final String TYPE_NAME = "SomeTypeName";
 
-	private final ElasticsearchSerialWorkOrchestrator orchestratorMock = createStrictMock( ElasticsearchSerialWorkOrchestrator.class );
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
-	private final EntityReferenceFactory<StubEntityReference> entityReferenceFactoryMock =
-			createStrictMock( EntityReferenceFactory.class );
+	@Mock
+	private ElasticsearchSerialWorkOrchestrator orchestratorMock;
+
+	@Mock(lenient = true)
+	private EntityReferenceFactory<StubEntityReference> entityReferenceFactoryMock;
 
 	private final List<SingleDocumentIndexingWork> workMocks = new ArrayList<>();
+
+	@Before
+	public void setup() {
+		when( entityReferenceFactoryMock.createEntityReference( eq( TYPE_NAME ), any() ) )
+				.thenAnswer( invocation -> entityReference( invocation.getArgument( 1 ) ) );
+	}
 
 	@Test
 	public void success() {
 		// Work futures: we will complete them
-		Capture<CompletableFuture<Void>> work1FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Void>> work2FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Void>> work3FutureCapture = Capture.newInstance();
+		ArgumentCaptor<CompletableFuture<Void>> work1FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Void>> work2FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Void>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
 		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> planExecutionFuture;
 
-		resetAll();
 		ElasticsearchIndexIndexingPlanExecution<StubEntityReference> execution = new ElasticsearchIndexIndexingPlanExecution<>(
 				orchestratorMock,
 				entityReferenceFactoryMock,
-				createWorkMocks( 3 )
+				workMocks( 3 )
 		);
-		replayAll();
-		verifyAll();
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		resetAll();
-		orchestratorMock.submit( capture( work1FutureCapture ), eq( workMocks.get( 0 ) ) );
-		orchestratorMock.submit( capture( work2FutureCapture ), eq( workMocks.get( 1 ) ) );
-		orchestratorMock.submit( capture( work3FutureCapture ), eq( workMocks.get( 2 ) ) );
-		replayAll();
 		planExecutionFuture = execution.execute();
-		verifyAll();
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ) );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work2FutureCapture.getValue().complete( null );
-		verifyAll();
+		work2FutureCaptor.getValue().complete( null );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work1FutureCapture.getValue().complete( null );
-		verifyAll();
+		work1FutureCaptor.getValue().complete( null );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work3FutureCapture.getValue().complete( null );
-		verifyAll();
+		work3FutureCaptor.getValue().complete( null );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
 		assertThatFuture( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
@@ -99,48 +110,37 @@ public class ElasticsearchIndexIndexingPlanExecutionTest extends EasyMockSupport
 		RuntimeException work1Exception = new RuntimeException( "work1" );
 
 		// Work futures: we will complete them
-		Capture<CompletableFuture<Void>> work1FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Void>> work2FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Void>> work3FutureCapture = Capture.newInstance();
+		ArgumentCaptor<CompletableFuture<Void>> work1FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Void>> work2FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Void>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
 		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> planExecutionFuture;
 
-		resetAll();
 		ElasticsearchIndexIndexingPlanExecution<StubEntityReference> execution = new ElasticsearchIndexIndexingPlanExecution<>(
 				orchestratorMock,
 				entityReferenceFactoryMock,
-				createWorkMocks( 3 )
+				workMocks( 3 )
 		);
-		replayAll();
-		verifyAll();
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		resetAll();
-		orchestratorMock.submit( capture( work1FutureCapture ), eq( workMocks.get( 0 ) ) );
-		orchestratorMock.submit( capture( work2FutureCapture ), eq( workMocks.get( 1 ) ) );
-		orchestratorMock.submit( capture( work3FutureCapture ), eq( workMocks.get( 2 ) ) );
-		replayAll();
 		planExecutionFuture = execution.execute();
-		verifyAll();
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ) );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work2FutureCapture.getValue().complete( null );
-		verifyAll();
+		work2FutureCaptor.getValue().complete( null );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work1FutureCapture.getValue().completeExceptionally( work1Exception );
-		verifyAll();
+		work1FutureCaptor.getValue().completeExceptionally( work1Exception );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		expectWorkGetInfo( 0 );
-		replayAll();
-		work3FutureCapture.getValue().complete( null );
-		verifyAll();
+		work3FutureCaptor.getValue().complete( null );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
 		assertThatFuture( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
@@ -158,56 +158,43 @@ public class ElasticsearchIndexIndexingPlanExecutionTest extends EasyMockSupport
 		RuntimeException work3Exception = new RuntimeException( "work3" );
 
 		// Work futures: we will complete them
-		Capture<CompletableFuture<Void>> work1FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Void>> work2FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Void>> work3FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Void>> work4FutureCapture = Capture.newInstance();
+		ArgumentCaptor<CompletableFuture<Void>> work1FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Void>> work2FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Void>> work3FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Void>> work4FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
 		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> planExecutionFuture;
 
-		resetAll();
 		ElasticsearchIndexIndexingPlanExecution<StubEntityReference> execution = new ElasticsearchIndexIndexingPlanExecution<>(
 				orchestratorMock,
 				entityReferenceFactoryMock,
-				createWorkMocks( 4 )
+				workMocks( 4 )
 		);
-		replayAll();
-		verifyAll();
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		resetAll();
-		orchestratorMock.submit( capture( work1FutureCapture ), eq( workMocks.get( 0 ) ) );
-		orchestratorMock.submit( capture( work2FutureCapture ), eq( workMocks.get( 1 ) ) );
-		orchestratorMock.submit( capture( work3FutureCapture ), eq( workMocks.get( 2 ) ) );
-		orchestratorMock.submit( capture( work4FutureCapture ), eq( workMocks.get( 3 ) ) );
-		replayAll();
 		planExecutionFuture = execution.execute();
-		verifyAll();
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ) );
+		verify( orchestratorMock ).submit( work4FutureCaptor.capture(), eq( workMocks.get( 3 ) ) );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work2FutureCapture.getValue().complete( null );
-		verifyAll();
+		work2FutureCaptor.getValue().complete( null );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work1FutureCapture.getValue().completeExceptionally( work1Exception );
-		verifyAll();
+		work1FutureCaptor.getValue().completeExceptionally( work1Exception );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work3FutureCapture.getValue().completeExceptionally( work3Exception );
-		verifyAll();
+		work3FutureCaptor.getValue().completeExceptionally( work3Exception );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		expectWorkGetInfo( 0, 2 );
-		replayAll();
-		work4FutureCapture.getValue().complete( null );
-		verifyAll();
+		work4FutureCaptor.getValue().complete( null );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
 		assertThatFuture( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
@@ -227,58 +214,46 @@ public class ElasticsearchIndexIndexingPlanExecutionTest extends EasyMockSupport
 		RuntimeException work3Exception = new RuntimeException( "work3" );
 
 		// Work futures: we will complete them
-		Capture<CompletableFuture<Void>> work1FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Void>> work2FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Void>> work3FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Void>> work4FutureCapture = Capture.newInstance();
+		ArgumentCaptor<CompletableFuture<Void>> work1FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Void>> work2FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Void>> work3FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Void>> work4FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
 		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> planExecutionFuture;
 
-		resetAll();
 		ElasticsearchIndexIndexingPlanExecution<StubEntityReference> execution = new ElasticsearchIndexIndexingPlanExecution<>(
 				orchestratorMock,
 				entityReferenceFactoryMock,
-				createWorkMocks( 4 )
+				workMocks( 4 )
 		);
-		replayAll();
-		verifyAll();
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		resetAll();
-		orchestratorMock.submit( capture( work1FutureCapture ), eq( workMocks.get( 0 ) ) );
-		orchestratorMock.submit( capture( work2FutureCapture ), eq( workMocks.get( 1 ) ) );
-		orchestratorMock.submit( capture( work3FutureCapture ), eq( workMocks.get( 2 ) ) );
-		orchestratorMock.submit( capture( work4FutureCapture ), eq( workMocks.get( 3 ) ) );
-		replayAll();
 		planExecutionFuture = execution.execute();
-		verifyAll();
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ) );
+		verify( orchestratorMock ).submit( work4FutureCaptor.capture(), eq( workMocks.get( 3 ) ) );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work2FutureCapture.getValue().complete( null );
-		verifyAll();
+		work2FutureCaptor.getValue().complete( null );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work1FutureCapture.getValue().completeExceptionally( work1Exception );
-		verifyAll();
+		work1FutureCaptor.getValue().completeExceptionally( work1Exception );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work3FutureCapture.getValue().completeExceptionally( work3Exception );
-		verifyAll();
+		work3FutureCaptor.getValue().completeExceptionally( work3Exception );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
 		RuntimeException entityReferenceFactoryException = new RuntimeException( "EntityReferenceFactory message" );
-		resetAll();
-		expectFailingWorkGetInfo( 0, entityReferenceFactoryException );
-		expectWorkGetInfo( 2 );
-		replayAll();
-		work4FutureCapture.getValue().complete( null );
-		verifyAll();
+		when( entityReferenceFactoryMock.createEntityReference( TYPE_NAME, 0 ) )
+				.thenThrow( entityReferenceFactoryException );
+		work4FutureCaptor.getValue().complete( null );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
 		assertThatFuture( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
@@ -295,35 +270,30 @@ public class ElasticsearchIndexIndexingPlanExecutionTest extends EasyMockSupport
 		} );
 	}
 
-	private void expectWorkGetInfo(int ... ids) {
-		for ( int id : ids ) {
-			SingleDocumentIndexingWork workMock = workMocks.get( id );
-			EasyMock.expect( workMock.getEntityTypeName() ).andStubReturn( TYPE_NAME );
-			EasyMock.expect( workMock.getEntityIdentifier() ).andStubReturn( id );
-			EasyMock.expect( entityReferenceFactoryMock.createEntityReference( TYPE_NAME, id ) )
-					.andReturn( entityReference( id ) );
-		}
+	private void verifyNoOtherOrchestratorInteractionsAndReset() {
+		verifyNoMoreInteractions( orchestratorMock );
+		reset( orchestratorMock );
 	}
 
-	private void expectFailingWorkGetInfo(int id, Throwable thrown) {
-		SingleDocumentIndexingWork workMock = workMocks.get( id );
-		EasyMock.expect( workMock.getEntityTypeName() ).andStubReturn( TYPE_NAME );
-		EasyMock.expect( workMock.getEntityIdentifier() ).andStubReturn( id );
-		EasyMock.expect( entityReferenceFactoryMock.createEntityReference( TYPE_NAME, id ) )
-				.andThrow( thrown );
-	}
-
-	private List<SingleDocumentIndexingWork> createWorkMocks(int count) {
+	private List<SingleDocumentIndexingWork> workMocks(int count) {
 		List<SingleDocumentIndexingWork> result = new ArrayList<>();
 		for ( int i = 0; i < count; i++ ) {
-			result.add( createWorkMock() );
+			result.add( workMock() );
 		}
 		return result;
 	}
 
-	private <T> SingleDocumentIndexingWork createWorkMock() {
-		String workName = workInfo( workMocks.size() );
-		SingleDocumentIndexingWork workMock = createStrictMock( workName, SingleDocumentIndexingWork.class );
+	private <T> ArgumentCaptor<CompletableFuture<T>> futureCaptor() {
+		return ArgumentCaptor.forClass( CompletableFuture.class );
+	}
+
+	private SingleDocumentIndexingWork workMock() {
+		int id = workMocks.size();
+		String workName = workInfo( id );
+		SingleDocumentIndexingWork workMock = mock( SingleDocumentIndexingWork.class,
+				withSettings().name( workName ).lenient() );
+		when( workMock.getEntityTypeName() ).thenReturn( TYPE_NAME );
+		when( workMock.getEntityIdentifier() ).thenReturn( id );
 		workMocks.add( workMock );
 		return workMock;
 	}
