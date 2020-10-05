@@ -31,6 +31,19 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${version.org.mockito}</version>
+                <scope>test</scope>
+                <exclusions>
+                    <!-- Bytebuddy is already imported by Hibernate ORM with a different version -->
+                    <exclusion>
+                        <groupId>net.bytebuddy</groupId>
+                        <artifactId>byte-buddy</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -80,6 +93,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <!--
             Leave this dependency here, not in a utils module, so that we don't need to recompile
             the utils to re-run the tests with a different database.
