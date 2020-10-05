@@ -104,10 +104,6 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 			}
 		}
 
-		public final C withBackendProperties(Map<String, Object> relativeProperties) {
-			return withBackendProperties( null, relativeProperties );
-		}
-
 		public final C withBackendProperties(String backendName, Map<String, Object> relativeProperties) {
 			relativeProperties.forEach( (k, v) -> withBackendProperty( backendName, k, v ) );
 			return thisAsC();
@@ -155,10 +151,6 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 		protected abstract R build(B builder);
 
 		protected abstract C thisAsC();
-
-		MappingSetupHelper<C, B, R> getHelper() {
-			return MappingSetupHelper.this;
-		}
 	}
 
 	private static class Configuration<B, R> {
