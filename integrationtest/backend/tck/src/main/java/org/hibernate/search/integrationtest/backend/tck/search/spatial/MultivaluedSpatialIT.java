@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -54,7 +54,7 @@ public class MultivaluedSpatialIT {
 				.where( f -> f.spatial().within().field( "geoPoint" ).boundingBox( AROUND_NORTH_WEST_BOX ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), "1" );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( index.typeName(), "1" );
 	}
 
 	private void initData() {

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.search;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -86,7 +86,7 @@ public class LuceneSearchMultiIndexIT {
 				.sort( f -> f.field( "additionalField" ).asc().missing().last() )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsExactOrder( c -> {
+		assertThatQuery( query ).hasDocRefHitsExactOrder( c -> {
 			c.doc( index1.typeName(), DOCUMENT_1_1, DOCUMENT_1_2 );
 			c.doc( index2.typeName(), DOCUMENT_2_1 );
 		} );
@@ -96,7 +96,7 @@ public class LuceneSearchMultiIndexIT {
 				.sort( f -> f.field( "additionalField" ).desc().missing().last() )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsExactOrder( c -> {
+		assertThatQuery( query ).hasDocRefHitsExactOrder( c -> {
 			c.doc( index1.typeName(), DOCUMENT_1_2, DOCUMENT_1_1 );
 			c.doc( index2.typeName(), DOCUMENT_2_1 );
 		} );

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.lowlevel.reader;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
@@ -76,7 +76,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 				.where( f -> f.match().field( "text" ).matching( "text1" ) )
 				.toQuery();
 
-		assertThat( query ).hasNoHits();
+		assertThatQuery( query ).hasNoHits();
 
 		IndexIndexingPlan<?> plan = index.createIndexingPlan(
 				new StubBackendSessionContext(),
@@ -87,7 +87,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 		plan.execute().join();
 
 		// Readers should be up-to-date immediately after indexing finishes
-		assertThat( query ).hasTotalHitCount( 1 );
+		assertThatQuery( query ).hasTotalHitCount( 1 );
 	}
 
 	@Test
@@ -98,7 +98,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 				.where( f -> f.match().field( "text" ).matching( "text1" ) )
 				.toQuery();
 
-		assertThat( query ).hasNoHits();
+		assertThatQuery( query ).hasNoHits();
 
 		IndexIndexingPlan<?> plan = index.createIndexingPlan(
 				new StubBackendSessionContext(),
@@ -109,7 +109,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 		plan.execute().join();
 
 		// Readers should be up-to-date immediately after indexing finishes
-		assertThat( query ).hasTotalHitCount( 1 );
+		assertThatQuery( query ).hasTotalHitCount( 1 );
 	}
 
 	@Test
@@ -120,7 +120,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 				.where( f -> f.match().field( "text" ).matching( "text1" ) )
 				.toQuery();
 
-		assertThat( query ).hasNoHits();
+		assertThatQuery( query ).hasNoHits();
 
 		IndexIndexingPlan<?> plan = index.createIndexingPlan(
 				new StubBackendSessionContext(),
@@ -131,10 +131,10 @@ public class LuceneIndexReaderRefreshBaseIT {
 		plan.execute().join();
 
 		// Readers should *not* be up-to-date immediately after indexing finishes
-		assertThat( query ).hasNoHits();
+		assertThatQuery( query ).hasNoHits();
 
 		// ... but they should be after some time
-		Awaitility.await().untilAsserted( () -> assertThat( query ).hasTotalHitCount( 1 ) );
+		Awaitility.await().untilAsserted( () -> assertThatQuery( query ).hasTotalHitCount( 1 ) );
 	}
 
 	@Test
@@ -145,7 +145,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 				.where( f -> f.match().field( "text" ).matching( "text1" ) )
 				.toQuery();
 
-		assertThat( query ).hasNoHits();
+		assertThatQuery( query ).hasNoHits();
 
 		IndexIndexingPlan<?> plan = index.createIndexingPlan(
 				new StubBackendSessionContext(),
@@ -156,7 +156,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 		plan.execute().join();
 
 		// Readers should be up-to-date immediately after indexing finishes
-		assertThat( query ).hasTotalHitCount( 1 );
+		assertThatQuery( query ).hasTotalHitCount( 1 );
 	}
 
 	@Test
@@ -167,7 +167,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 				.where( f -> f.match().field( "text" ).matching( "text1" ) )
 				.toQuery();
 
-		assertThat( query ).hasNoHits();
+		assertThatQuery( query ).hasNoHits();
 
 		IndexIndexingPlan<?> plan = index.createIndexingPlan(
 				new StubBackendSessionContext(),
@@ -178,7 +178,7 @@ public class LuceneIndexReaderRefreshBaseIT {
 		plan.execute().join();
 
 		// Readers should be up-to-date immediately after indexing finishes
-		assertThat( query ).hasTotalHitCount( 1 );
+		assertThatQuery( query ).hasTotalHitCount( 1 );
 	}
 
 	private void setup(String ioStrategyName, Integer refreshIntervalMs) {

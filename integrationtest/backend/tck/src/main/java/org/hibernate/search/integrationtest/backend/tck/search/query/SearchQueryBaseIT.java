@@ -7,6 +7,8 @@
 package org.hibernate.search.integrationtest.backend.tck.search.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -32,7 +34,6 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubLoadingContext;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
@@ -168,7 +169,7 @@ public class SearchQueryBaseIT {
 
 		// Mandatory extension, supported
 		QueryWrapper<DocumentReference> extendedQuery = query.extension( new SupportedQueryExtension<>() );
-		SearchResultAssert.assertThat( extendedQuery.extendedFetch() ).fromQuery( query )
+		assertThatResult( extendedQuery.extendedFetch() ).fromQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), "0", "1" );
 
 		// Mandatory extension, unsupported
@@ -189,7 +190,7 @@ public class SearchQueryBaseIT {
 		query = scope.query()
 				.extension( new SupportedQueryDslExtension<>() )
 				.extendedFeature( "string", "value1", "value2" );
-		SearchResultAssert.assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), "1", "2" );
 
 		// Mandatory extension, unsupported

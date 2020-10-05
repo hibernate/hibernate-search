@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.lucene.analysis;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
@@ -15,7 +16,6 @@ import org.hibernate.search.backend.lucene.index.impl.Shard;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -54,7 +54,7 @@ public class LuceneSimilarityIT {
 		index.index( "1", document -> { } );
 
 		// Check that writing succeeded
-		SearchResultAssert.assertThat( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
+		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hasTotalHitCount( 1L );
 	}
 
@@ -78,7 +78,7 @@ public class LuceneSimilarityIT {
 		index.index( "1", document -> { } );
 
 		// Check that writing succeeded
-		SearchResultAssert.assertThat( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
+		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hasTotalHitCount( 1L );
 	}
 

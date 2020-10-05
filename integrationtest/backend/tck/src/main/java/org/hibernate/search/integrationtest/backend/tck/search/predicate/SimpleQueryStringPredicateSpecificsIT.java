@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.EnumSet;
 import java.util.function.Function;
@@ -85,19 +85,19 @@ public class SimpleQueryStringPredicateSpecificsIT {
 				.where( f -> f.simpleQueryString().field( absoluteFieldPath ).matching( queryString ) )
 				.toQuery();
 
-		assertThat( createQuery.apply( TERM_1 + " " + TERM_2 ) )
+		assertThatQuery( createQuery.apply( TERM_1 + " " + TERM_2 ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
-		assertThat( createQuery.apply( TERM_1 + " | " + TERM_2 ) )
+		assertThatQuery( createQuery.apply( TERM_1 + " | " + TERM_2 ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
-		assertThat( createQuery.apply( TERM_1 + " + " + TERM_2 ) )
+		assertThatQuery( createQuery.apply( TERM_1 + " + " + TERM_2 ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
-		assertThat( createQuery.apply( "-" + TERM_1 + " + " + TERM_2 ) )
+		assertThatQuery( createQuery.apply( "-" + TERM_1 + " + " + TERM_2 ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_3 );
 
-		assertThat( createQuery.apply( TERM_1 + " + -" + TERM_2 ) )
+		assertThatQuery( createQuery.apply( TERM_1 + " + -" + TERM_2 ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
 	}
 
@@ -110,13 +110,13 @@ public class SimpleQueryStringPredicateSpecificsIT {
 		// Don't use a whitespace here: there's a bug in ES6.2 that leads the "|",
 		// when interpreted as an (empty) term, to be turned into a match-no-docs query.
 		String orQueryString = TERM_1 + "|" + TERM_2;
-		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+		assertThatQuery( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
 				.matching( orQueryString )
 				.defaultOperator( BooleanOperator.AND )
 				.flags( SimpleQueryFlag.OR ) )
 				.toQuery() )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+		assertThatQuery( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
 				.matching( orQueryString )
 				.defaultOperator( BooleanOperator.AND )
 				.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.OR ) ) ) )
@@ -125,13 +125,13 @@ public class SimpleQueryStringPredicateSpecificsIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
 		String andQueryString = TERM_1 + " + " + TERM_2;
-		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+		assertThatQuery( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
 				.matching( andQueryString )
 				.defaultOperator( BooleanOperator.OR )
 				.flags( SimpleQueryFlag.AND ) )
 				.toQuery() )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
-		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+		assertThatQuery( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
 				.matching( andQueryString )
 				.defaultOperator( BooleanOperator.OR )
 				.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.AND ) ) ) )
@@ -140,12 +140,12 @@ public class SimpleQueryStringPredicateSpecificsIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
 		String notQueryString = "-" + TERM_1 + " + " + TERM_2;
-		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+		assertThatQuery( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
 				.matching( notQueryString )
 				.flags( SimpleQueryFlag.AND, SimpleQueryFlag.NOT ) )
 				.toQuery() )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_3 );
-		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+		assertThatQuery( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
 				.matching( notQueryString )
 				.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.NOT ) ) ) )
 				.toQuery() )
@@ -155,12 +155,12 @@ public class SimpleQueryStringPredicateSpecificsIT {
 		// Don't use a whitespace here: there's a bug in ES6.2 that leads the "("/")",
 		// when interpreted as an (empty) term, to be turned into a match-no-docs query.
 		String precedenceQueryString = TERM_2 + "+(" + TERM_1 + "|" + TERM_3 + ")";
-		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+		assertThatQuery( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
 				.matching( precedenceQueryString )
 				.flags( SimpleQueryFlag.AND, SimpleQueryFlag.OR, SimpleQueryFlag.PRECEDENCE ) )
 				.toQuery() )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
-		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+		assertThatQuery( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
 				.matching( precedenceQueryString )
 				.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.PRECEDENCE ) ) ) )
 				.toQuery() )
@@ -177,19 +177,19 @@ public class SimpleQueryStringPredicateSpecificsIT {
 				.where( f -> f.simpleQueryString().field( absoluteFieldPath ).matching( queryString ) )
 				.toQuery();
 
-		assertThat( createQuery.apply( TERM_1 + " " + TERM_2 ) )
+		assertThatQuery( createQuery.apply( TERM_1 + " " + TERM_2 ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2, DOCUMENT_3 );
 
-		assertThat( createQuery.apply( TERM_1 + " | " + TERM_2 ) )
+		assertThatQuery( createQuery.apply( TERM_1 + " | " + TERM_2 ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2, DOCUMENT_3 );
 
-		assertThat( createQuery.apply( TERM_1 + " + " + TERM_2 ) )
+		assertThatQuery( createQuery.apply( TERM_1 + " + " + TERM_2 ) )
 				.hasNoHits();
 
-		assertThat( createQuery.apply( "-" + TERM_1 + " + " + TERM_2 ) )
+		assertThatQuery( createQuery.apply( "-" + TERM_1 + " + " + TERM_2 ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_3 );
 
-		assertThat( createQuery.apply( TERM_1 + " + -" + TERM_2 ) )
+		assertThatQuery( createQuery.apply( TERM_1 + " + -" + TERM_2 ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
 	}
 
@@ -205,7 +205,7 @@ public class SimpleQueryStringPredicateSpecificsIT {
 				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
 						.matching( TERM_1 + " " + TERM_2 ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
 		query = scope.query()
@@ -213,7 +213,7 @@ public class SimpleQueryStringPredicateSpecificsIT {
 						.matching( TERM_1 + " " + TERM_2 )
 						.defaultOperator( BooleanOperator.OR ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
 		query = scope.query()
@@ -221,7 +221,7 @@ public class SimpleQueryStringPredicateSpecificsIT {
 						.matching( TERM_1 + " " + TERM_2 )
 						.defaultOperator( BooleanOperator.AND ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 	}
 
@@ -235,20 +235,20 @@ public class SimpleQueryStringPredicateSpecificsIT {
 				.where( f -> f.simpleQueryString().field( absoluteFieldPath ).matching( queryString ) )
 				.toQuery();
 
-		assertThat( createQuery.apply( "\"" + PHRASE_WITH_TERM_2 + "\"" ) )
+		assertThatQuery( createQuery.apply( "\"" + PHRASE_WITH_TERM_2 + "\"" ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_3 );
 
-		assertThat( createQuery.apply( TERM_3 + " \"" + PHRASE_WITH_TERM_2 + "\"" ) )
+		assertThatQuery( createQuery.apply( TERM_3 + " \"" + PHRASE_WITH_TERM_2 + "\"" ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2, DOCUMENT_3 );
 
 		// Slop
-		assertThat( createQuery.apply( "\"" + PHRASE_WITH_TERM_4 + "\"" ) )
+		assertThatQuery( createQuery.apply( "\"" + PHRASE_WITH_TERM_4 + "\"" ) )
 				.hasNoHits();
-		assertThat( createQuery.apply( "\"" + PHRASE_WITH_TERM_4 + "\"~1" ) )
+		assertThatQuery( createQuery.apply( "\"" + PHRASE_WITH_TERM_4 + "\"~1" ) )
 				.hasNoHits();
-		assertThat( createQuery.apply( "\"" + PHRASE_WITH_TERM_4 + "\"~2" ) )
+		assertThatQuery( createQuery.apply( "\"" + PHRASE_WITH_TERM_4 + "\"~2" ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_4 );
-		assertThat( createQuery.apply( "\"" + PHRASE_WITH_TERM_4 + "\"~3" ) )
+		assertThatQuery( createQuery.apply( "\"" + PHRASE_WITH_TERM_4 + "\"~3" ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_4 );
 	}
 
@@ -258,14 +258,14 @@ public class SimpleQueryStringPredicateSpecificsIT {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
 						.matching( "\"" + PHRASE_WITH_TERM_2 + "\"" )
 						.flags( SimpleQueryFlag.PHRASE ) )
 				.toQuery() )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_3 );
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
 						.matching( "\"" + PHRASE_WITH_TERM_2 + "\"" )
 						.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.PHRASE ) ) ) )
@@ -273,14 +273,14 @@ public class SimpleQueryStringPredicateSpecificsIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_3 );
 
 		// Slop
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
 						.matching( "\"" + PHRASE_WITH_TERM_4 + "\"~2" )
 						.flags( SimpleQueryFlag.PHRASE, SimpleQueryFlag.NEAR ) )
 				.toQuery() )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_4 );
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
 						.matching( "\"" + PHRASE_WITH_TERM_4 + "\"~2" )
 						.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.NEAR ) ) ) )
@@ -298,13 +298,13 @@ public class SimpleQueryStringPredicateSpecificsIT {
 				.where( f -> f.simpleQueryString().field( absoluteFieldPath ).matching( queryString ) )
 				.toQuery();
 
-		assertThat( createQuery.apply( TERM_1 ) )
+		assertThatQuery( createQuery.apply( TERM_1 ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
 
-		assertThat( createQuery.apply( TERM_1 + "~1" ) )
+		assertThatQuery( createQuery.apply( TERM_1 + "~1" ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_5 );
 
-		assertThat( createQuery.apply( TERM_1 + "~2" ) )
+		assertThatQuery( createQuery.apply( TERM_1 + "~2" ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_5 );
 	}
 
@@ -314,14 +314,14 @@ public class SimpleQueryStringPredicateSpecificsIT {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
 						.matching( TERM_1 + "~1" )
 						.flags( SimpleQueryFlag.FUZZY ) )
 				.toQuery() )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_5 );
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
 						.matching( TERM_1 + "~1" )
 						.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.FUZZY ) ) ) )
@@ -338,10 +338,10 @@ public class SimpleQueryStringPredicateSpecificsIT {
 				.where( f -> f.simpleQueryString().field( absoluteFieldPath ).matching( queryString ) )
 				.toQuery();
 
-		assertThat( createQuery.apply( PREFIX_FOR_TERM_1_AND_TERM_6 + "*" ) )
+		assertThatQuery( createQuery.apply( PREFIX_FOR_TERM_1_AND_TERM_6 + "*" ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_5 );
 
-		assertThat( createQuery.apply( PREFIX_FOR_TERM_6 + "*" ) )
+		assertThatQuery( createQuery.apply( PREFIX_FOR_TERM_6 + "*" ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_5 );
 	}
 
@@ -351,14 +351,14 @@ public class SimpleQueryStringPredicateSpecificsIT {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
 						.matching( PREFIX_FOR_TERM_1_AND_TERM_6 + "*" )
 						.flags( SimpleQueryFlag.PHRASE, SimpleQueryFlag.PREFIX ) )
 				.toQuery() )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_5 );
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
 						.matching( PREFIX_FOR_TERM_1_AND_TERM_6 + "*" )
 						.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.PREFIX ) ) ) )
@@ -376,10 +376,10 @@ public class SimpleQueryStringPredicateSpecificsIT {
 				.where( f -> f.simpleQueryString().field( absoluteFieldPath ).matching( queryString ) )
 				.toQuery();
 
-		assertThat( createQuery.apply( PREFIX_FOR_TERM_1_AND_TERM_6_DIFFERENT_CASE + "*" ) )
+		assertThatQuery( createQuery.apply( PREFIX_FOR_TERM_1_AND_TERM_6_DIFFERENT_CASE + "*" ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_5 );
 
-		assertThat( createQuery.apply( PREFIX_FOR_TERM_6_DIFFERENT_CASE + "*" ) )
+		assertThatQuery( createQuery.apply( PREFIX_FOR_TERM_6_DIFFERENT_CASE + "*" ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_5 );
 	}
 
@@ -390,12 +390,12 @@ public class SimpleQueryStringPredicateSpecificsIT {
 		String absoluteFieldPath = index.binding().nonAnalyzedField.relativeFieldName;
 
 		String whitespaceQueryString = TERM_1 + " " + TERM_2;
-		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+		assertThatQuery( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
 				.matching( whitespaceQueryString )
 				.flags( SimpleQueryFlag.WHITESPACE ) )
 				.toQuery() )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2, DOCUMENT_3 );
-		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+		assertThatQuery( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
 				.matching( whitespaceQueryString )
 				.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.WHITESPACE ) ) ) )
 				.toQuery() )
@@ -410,12 +410,12 @@ public class SimpleQueryStringPredicateSpecificsIT {
 		String absoluteFieldPath = index.binding().analyzedStringField1.relativeFieldName;
 
 		String escapedPrefixQueryString = TERM_1 + "\\*";
-		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+		assertThatQuery( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
 				.matching( escapedPrefixQueryString )
 				.flags( SimpleQueryFlag.AND, SimpleQueryFlag.NOT, SimpleQueryFlag.ESCAPE ) )
 				.toQuery() )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 );
-		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+		assertThatQuery( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
 				.matching( escapedPrefixQueryString )
 				.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.ESCAPE ) ) ) )
 				.toQuery() )

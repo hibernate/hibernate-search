@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
 import java.time.MonthDay;
@@ -144,17 +145,17 @@ public class FieldSearchSortBaseIT<F> {
 		// Default order
 		dataSet = dataSetForAsc;
 		query = matchNonEmptyQuery( dataSet, b -> b.field( fieldPath ) );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id );
 
 		// Explicit order
 		dataSet = dataSetForAsc;
 		query = matchNonEmptyQuery( dataSet, b -> b.field( fieldPath ).asc() );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id );
 		dataSet = dataSetForDesc;
 		query = matchNonEmptyQuery( dataSet, b -> b.field( fieldPath ).desc() );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id );
 	}
 
@@ -228,17 +229,17 @@ public class FieldSearchSortBaseIT<F> {
 
 		dataSet = dataSetForAsc;
 		query = matchNonEmptyAndEmpty1Query( dataSet, f -> f.field( fieldPath ) );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
 
 		dataSet = dataSetForAsc;
 		query = matchNonEmptyAndEmpty1Query( dataSet, f -> f.field( fieldPath ).asc() );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
 
 		dataSet = dataSetForDesc;
 		query = matchNonEmptyAndEmpty1Query( dataSet, f -> f.field( fieldPath ).desc() );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id, dataSet.emptyDoc1Id );
 	}
 
@@ -254,43 +255,43 @@ public class FieldSearchSortBaseIT<F> {
 		// Explicit order with missing().last()
 		dataSet = dataSetForAsc;
 		query = matchNonEmptyAndEmpty1Query( dataSet, f -> f.field( fieldPath ).asc().missing().last() );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
 		dataSet = dataSetForDesc;
 		query = matchNonEmptyAndEmpty1Query( dataSet, f -> f.field( fieldPath ).desc().missing().last() );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id, dataSet.emptyDoc1Id );
 
 		// Explicit order with missing().first()
 		dataSet = dataSetForAsc;
 		query = matchNonEmptyAndEmpty1Query( dataSet, f -> f.field( fieldPath ).asc().missing().first() );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id );
 		dataSet = dataSetForDesc;
 		query = matchNonEmptyAndEmpty1Query( dataSet, f -> f.field( fieldPath ).desc().missing().first() );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id );
 
 		// Explicit order with missing().use( ... )
 		dataSet = dataSetForAsc;
 		query = matchNonEmptyAndEmpty1Query( dataSet, f -> f.field( fieldPath ).asc()
 				.missing().use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ) );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id );
 		dataSet = dataSetForAsc;
 		query = matchNonEmptyAndEmpty1Query( dataSet, f -> f.field( fieldPath ).asc()
 				.missing().use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) ) );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.emptyDoc1Id, dataSet.doc2Id, dataSet.doc3Id );
 		dataSet = dataSetForAsc;
 		query = matchNonEmptyAndEmpty1Query( dataSet, f -> f.field( fieldPath ).asc()
 				.missing().use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ) ) );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.emptyDoc1Id, dataSet.doc3Id );
 		dataSet = dataSetForAsc;
 		query = matchNonEmptyAndEmpty1Query( dataSet, f -> f.field( fieldPath ).asc()
 				.missing().use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ) ) );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
 	}
 
@@ -307,42 +308,42 @@ public class FieldSearchSortBaseIT<F> {
 		docRefHits = matchAllQuery( dataSet, f -> f.field( fieldPath ).asc()
 				.missing().use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ) )
 				.fetchAllHits();
-		assertThat( docRefHits ).ordinals( 0, 1, 2, 3 )
+		assertThatHits( docRefHits ).ordinals( 0, 1, 2, 3 )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.emptyDoc2Id,
 						dataSet.emptyDoc3Id, dataSet.emptyDoc4Id );
-		assertThat( docRefHits ).ordinal( 4 ).isDocRefHit( index.typeName(), dataSet.doc1Id );
-		assertThat( docRefHits ).ordinal( 5 ).isDocRefHit( index.typeName(), dataSet.doc2Id );
-		assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( index.typeName(), dataSet.doc3Id );
+		assertThatHits( docRefHits ).ordinal( 4 ).isDocRefHit( index.typeName(), dataSet.doc1Id );
+		assertThatHits( docRefHits ).ordinal( 5 ).isDocRefHit( index.typeName(), dataSet.doc2Id );
+		assertThatHits( docRefHits ).ordinal( 6 ).isDocRefHit( index.typeName(), dataSet.doc3Id );
 
 		// using between 1 and 2 value
 		docRefHits = matchAllQuery( dataSet, f -> f.field( fieldPath ).asc()
 				.missing().use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) ) )
 				.fetchAllHits();
-		assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( index.typeName(), dataSet.doc1Id );
-		assertThat( docRefHits ).ordinals( 1, 2, 3, 4 )
+		assertThatHits( docRefHits ).ordinal( 0 ).isDocRefHit( index.typeName(), dataSet.doc1Id );
+		assertThatHits( docRefHits ).ordinals( 1, 2, 3, 4 )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.emptyDoc2Id,
 						dataSet.emptyDoc3Id, dataSet.emptyDoc4Id );
-		assertThat( docRefHits ).ordinal( 5 ).isDocRefHit( index.typeName(), dataSet.doc2Id );
-		assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( index.typeName(), dataSet.doc3Id );
+		assertThatHits( docRefHits ).ordinal( 5 ).isDocRefHit( index.typeName(), dataSet.doc2Id );
+		assertThatHits( docRefHits ).ordinal( 6 ).isDocRefHit( index.typeName(), dataSet.doc3Id );
 
 		// using between 2 and 3 value
 		docRefHits = matchAllQuery( dataSet, f -> f.field( fieldPath ).asc()
 				.missing().use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ) ) )
 				.fetchAllHits();
-		assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( index.typeName(), dataSet.doc1Id );
-		assertThat( docRefHits ).ordinal( 1 ).isDocRefHit( index.typeName(), dataSet.doc2Id );
-		assertThat( docRefHits ).ordinals( 2, 3, 4, 5 )
+		assertThatHits( docRefHits ).ordinal( 0 ).isDocRefHit( index.typeName(), dataSet.doc1Id );
+		assertThatHits( docRefHits ).ordinal( 1 ).isDocRefHit( index.typeName(), dataSet.doc2Id );
+		assertThatHits( docRefHits ).ordinals( 2, 3, 4, 5 )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.emptyDoc2Id,
 						dataSet.emptyDoc3Id, dataSet.emptyDoc4Id );
-		assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( index.typeName(), dataSet.doc3Id );
+		assertThatHits( docRefHits ).ordinal( 6 ).isDocRefHit( index.typeName(), dataSet.doc3Id );
 
 		// using after 3 value
 		docRefHits = matchAllQuery( dataSet, f -> f.field( fieldPath ).asc()
 				.missing().use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ) ) ).fetchAllHits();
-		assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( index.typeName(), dataSet.doc1Id );
-		assertThat( docRefHits ).ordinal( 1 ).isDocRefHit( index.typeName(), dataSet.doc2Id );
-		assertThat( docRefHits ).ordinal( 2 ).isDocRefHit( index.typeName(), dataSet.doc3Id );
-		assertThat( docRefHits ).ordinals( 3, 4, 5, 6 )
+		assertThatHits( docRefHits ).ordinal( 0 ).isDocRefHit( index.typeName(), dataSet.doc1Id );
+		assertThatHits( docRefHits ).ordinal( 1 ).isDocRefHit( index.typeName(), dataSet.doc2Id );
+		assertThatHits( docRefHits ).ordinal( 2 ).isDocRefHit( index.typeName(), dataSet.doc3Id );
+		assertThatHits( docRefHits ).ordinals( 3, 4, 5, 6 )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.emptyDoc2Id,
 						dataSet.emptyDoc3Id, dataSet.emptyDoc4Id );
 	}
@@ -364,29 +365,29 @@ public class FieldSearchSortBaseIT<F> {
 		docRefHits = matchAllQuery( dataSet, f -> f.field( fieldPath ).asc()
 				.missing().use( docValue1 ) )
 				.fetchAllHits();
-		assertThat( docRefHits ).ordinals( 0, 1, 2, 3, 4 )
+		assertThatHits( docRefHits ).ordinals( 0, 1, 2, 3, 4 )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.doc1Id, dataSet.emptyDoc1Id,
 						dataSet.emptyDoc2Id, dataSet.emptyDoc3Id, dataSet.emptyDoc4Id );
-		assertThat( docRefHits ).ordinal( 5 ).isDocRefHit( index.typeName(), dataSet.doc2Id );
-		assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( index.typeName(), dataSet.doc3Id );
+		assertThatHits( docRefHits ).ordinal( 5 ).isDocRefHit( index.typeName(), dataSet.doc2Id );
+		assertThatHits( docRefHits ).ordinal( 6 ).isDocRefHit( index.typeName(), dataSet.doc3Id );
 
 		// using doc 2 value
 		docRefHits = matchAllQuery( dataSet, f -> f.field( fieldPath ).asc()
 				.missing().use( docValue2 ) )
 				.fetchAllHits();
-		assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( index.typeName(), dataSet.doc1Id );
-		assertThat( docRefHits ).ordinals( 1, 2, 3, 4, 5 )
+		assertThatHits( docRefHits ).ordinal( 0 ).isDocRefHit( index.typeName(), dataSet.doc1Id );
+		assertThatHits( docRefHits ).ordinals( 1, 2, 3, 4, 5 )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.doc2Id, dataSet.emptyDoc1Id,
 						dataSet.emptyDoc2Id, dataSet.emptyDoc3Id, dataSet.emptyDoc4Id );
-		assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( index.typeName(), dataSet.doc3Id );
+		assertThatHits( docRefHits ).ordinal( 6 ).isDocRefHit( index.typeName(), dataSet.doc3Id );
 
 		// using doc 3 value
 		docRefHits = matchAllQuery( dataSet, f -> f.field( fieldPath ).asc()
 				.missing().use( docValue3 ) )
 				.fetchAllHits();
-		assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( index.typeName(), dataSet.doc1Id );
-		assertThat( docRefHits ).ordinal( 1 ).isDocRefHit( index.typeName(), dataSet.doc2Id );
-		assertThat( docRefHits ).ordinals( 2, 3, 4, 5, 6 )
+		assertThatHits( docRefHits ).ordinal( 0 ).isDocRefHit( index.typeName(), dataSet.doc1Id );
+		assertThatHits( docRefHits ).ordinal( 1 ).isDocRefHit( index.typeName(), dataSet.doc2Id );
+		assertThatHits( docRefHits ).ordinals( 2, 3, 4, 5, 6 )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.doc3Id, dataSet.emptyDoc1Id,
 						dataSet.emptyDoc2Id, dataSet.emptyDoc3Id, dataSet.emptyDoc4Id );
 	}

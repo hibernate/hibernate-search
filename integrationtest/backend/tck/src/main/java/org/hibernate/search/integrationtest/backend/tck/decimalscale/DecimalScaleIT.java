@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.decimalscale;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -692,7 +692,7 @@ public class DecimalScaleIT {
 				.query().selectEntityReference()
 				.where( p -> p.range().field( "scaled" ).greaterThan( value ) )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), "1" );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( index.typeName(), "1" );
 	}
 
 	private void matchGreaterThan(StubMappedIndex index, BigInteger value) {
@@ -700,7 +700,7 @@ public class DecimalScaleIT {
 				.query().selectEntityReference()
 				.where( p -> p.range().field( "scaled" ).greaterThan( value ) )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), "1" );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( index.typeName(), "1" );
 	}
 
 	public void doNotMatchGreaterThan(StubMappedIndex index, BigDecimal value) {
@@ -708,7 +708,7 @@ public class DecimalScaleIT {
 				.query().selectEntityReference()
 				.where( p -> p.range().field( "scaled" ).greaterThan( value ) )
 				.toQuery();
-		assertThat( query ).hasNoHits();
+		assertThatQuery( query ).hasNoHits();
 	}
 
 	public void doNotMatchGreaterThan(StubMappedIndex index, BigInteger value) {
@@ -716,7 +716,7 @@ public class DecimalScaleIT {
 				.query().selectEntityReference()
 				.where( p -> p.range().field( "scaled" ).greaterThan( value ) )
 				.toQuery();
-		assertThat( query ).hasNoHits();
+		assertThatQuery( query ).hasNoHits();
 	}
 
 	public void projection(StubMappedIndex index, BigDecimal value) {
@@ -724,7 +724,7 @@ public class DecimalScaleIT {
 				.select( p -> p.field( "scaled" ) )
 				.where( p -> p.matchAll() )
 				.toQuery();
-		assertThat( query ).hasHitsExactOrder( value );
+		assertThatQuery( query ).hasHitsExactOrder( value );
 	}
 
 	public void projection(StubMappedIndex index, BigInteger value) {
@@ -732,7 +732,7 @@ public class DecimalScaleIT {
 				.select( p -> p.field( "scaled" ) )
 				.where( p -> p.matchAll() )
 				.toQuery();
-		assertThat( query ).hasHitsExactOrder( value );
+		assertThatQuery( query ).hasHitsExactOrder( value );
 	}
 
 	private void match(StubMappedIndex index, BigDecimal matching, String match1, String match2) {
@@ -740,7 +740,7 @@ public class DecimalScaleIT {
 				.query().selectEntityReference()
 				.where( p -> p.match().field( "scaled" ).matching( matching ) )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), match1, match2 );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( index.typeName(), match1, match2 );
 	}
 
 	private void match(StubMappedIndex index, BigInteger matching, String match1, String match2) {
@@ -748,7 +748,7 @@ public class DecimalScaleIT {
 				.query().selectEntityReference()
 				.where( p -> p.match().field( "scaled" ).matching( matching ) )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), match1, match2 );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( index.typeName(), match1, match2 );
 	}
 
 	/**

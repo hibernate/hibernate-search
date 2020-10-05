@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.work;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.ArrayList;
@@ -100,7 +100,7 @@ public class IndexingFieldTypesIT<F> {
 					.where( f -> f.matchAll() )
 					.toQuery();
 
-			assertThat( query ).hasHitsAnyOrder( expectedDocuments );
+			assertThatQuery( query ).hasHitsAnyOrder( expectedDocuments );
 		}
 	}
 
@@ -140,7 +140,7 @@ public class IndexingFieldTypesIT<F> {
 					.where( f -> f.matchAll() )
 					.toQuery();
 
-			assertThat( query ).hasHitsAnyOrder( expectedDocuments );
+			assertThatQuery( query ).hasHitsAnyOrder( expectedDocuments );
 		}
 	}
 
@@ -187,7 +187,7 @@ public class IndexingFieldTypesIT<F> {
 					.where( f -> f.matchAll() )
 					.toQuery();
 
-			assertThat( query ).hasHitsAnyOrder( expectedDocuments );
+			assertThatQuery( query ).hasHitsAnyOrder( expectedDocuments );
 		}
 	}
 

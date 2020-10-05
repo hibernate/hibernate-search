@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.indexnull;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,7 +57,7 @@ public class IndexNullAsValueIT {
 					.where( f -> f.match().field( absoluteFieldPath ).matching( valueToMatch ) )
 					.toQuery();
 
-			assertThat( query )
+			assertThatQuery( query )
 					.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_WITH_INDEX_NULL_AS_VALUES, DOCUMENT_WITH_NULL_VALUES );
 		}
 	}
@@ -74,7 +74,7 @@ public class IndexNullAsValueIT {
 				.where( f -> f.spatial().within().field( "geoPointField" ).circle( GeoPoint.of( 0.0, 0.0 ), 1 ) )
 				.toQuery();
 
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_WITH_INDEX_NULL_AS_VALUES, DOCUMENT_WITH_NULL_VALUES );
 	}
 

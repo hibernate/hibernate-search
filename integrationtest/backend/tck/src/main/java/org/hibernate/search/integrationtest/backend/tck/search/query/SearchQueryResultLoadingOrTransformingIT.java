@@ -9,7 +9,8 @@ package org.hibernate.search.integrationtest.backend.tck.search.query;
 import static org.easymock.EasyMock.expect;
 import static org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils.projectionMatcher;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDate;
@@ -118,7 +119,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
 		replayAll();
-		assertThat( objectsQuery ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
+		assertThatQuery( objectsQuery ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
 		verifyAll();
 
 		// check the same for the scroll API
@@ -130,7 +131,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
 		replayAll();
-		assertThat( hitsUsingScroll( objectsQuery ) ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
+		assertThatHits( hitsUsingScroll( objectsQuery ) ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
 		verifyAll();
 	}
 
@@ -174,7 +175,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
 		replayAll();
-		assertThat( objectsQuery ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
+		assertThatQuery( objectsQuery ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
 		verifyAll();
 
 		// check the same for the scroll API
@@ -186,7 +187,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
 		replayAll();
-		assertThat( hitsUsingScroll( objectsQuery ) ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
+		assertThatHits( hitsUsingScroll( objectsQuery ) ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
 		verifyAll();
 	}
 
@@ -198,11 +199,11 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 				.selectEntityReference()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
 
 		// check the same for the scroll API
-		assertThat( hitsUsingScroll( query ) )
+		assertThatHits( hitsUsingScroll( query ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
 	}
 
@@ -214,11 +215,11 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 				.selectEntity()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
 
 		// check the same for the scroll API
-		assertThat( hitsUsingScroll( query ) )
+		assertThatHits( hitsUsingScroll( query ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
 	}
 
@@ -260,7 +261,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 						.entityReference( emptyReference, emptyTransformedReference )
 		);
 		replayAll();
-		assertThat( referencesQuery ).hasHitsAnyOrder( mainTransformedReference, emptyTransformedReference );
+		assertThatQuery( referencesQuery ).hasHitsAnyOrder( mainTransformedReference, emptyTransformedReference );
 		verifyAll();
 
 		// check the same for the scroll API
@@ -272,7 +273,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 						.entityReference( emptyReference, emptyTransformedReference )
 		);
 		replayAll();
-		assertThat( hitsUsingScroll( referencesQuery ) ).hasHitsAnyOrder( mainTransformedReference, emptyTransformedReference );
+		assertThatHits( hitsUsingScroll( referencesQuery ) ).hasHitsAnyOrder( mainTransformedReference, emptyTransformedReference );
 		verifyAll();
 	}
 
@@ -316,7 +317,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
 		replayAll();
-		assertThat( objectsQuery ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
+		assertThatQuery( objectsQuery ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
 		verifyAll();
 
 		// check the same for the scroll API
@@ -328,7 +329,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
 		replayAll();
-		assertThat( hitsUsingScroll( objectsQuery ) ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
+		assertThatHits( hitsUsingScroll( objectsQuery ) ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
 		verifyAll();
 	}
 
@@ -385,7 +386,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
 		replayAll();
-		assertThat( projectionsQuery ).hasListHitsAnyOrder( b -> {
+		assertThatQuery( projectionsQuery ).hasListHitsAnyOrder( b -> {
 			b.list( STRING_VALUE, mainReference, mainTransformedReference, mainLoadedObject );
 			b.list( null, emptyReference, emptyTransformedReference, emptyLoadedObject );
 		} );
@@ -406,7 +407,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
 		replayAll();
-		assertThat( hitsUsingScroll( projectionsQuery ) ).hasListHitsAnyOrder( b -> {
+		assertThatHits( hitsUsingScroll( projectionsQuery ) ).hasListHitsAnyOrder( b -> {
 			b.list( STRING_VALUE, mainReference, mainTransformedReference, mainLoadedObject );
 			b.list( null, emptyReference, emptyTransformedReference, emptyLoadedObject );
 		} );
@@ -456,7 +457,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		) ) )
 				.andReturn( emptyTransformedHit );
 		replayAll();
-		assertThat( query ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
+		assertThatQuery( query ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
 		verifyAll();
 
 		// check the same for the scroll API
@@ -472,7 +473,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		) ) )
 				.andReturn( emptyTransformedHit );
 		replayAll();
-		assertThat( hitsUsingScroll( query ) ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
+		assertThatHits( hitsUsingScroll( query ) ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
 		verifyAll();
 	}
 
@@ -541,7 +542,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		) ) )
 				.andReturn( emptyTransformedHit );
 		replayAll();
-		assertThat( query ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
+		assertThatQuery( query ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
 		verifyAll();
 
 		// check the same for the scroll API
@@ -567,7 +568,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		) ) )
 				.andReturn( emptyTransformedHit );
 		replayAll();
-		assertThat( hitsUsingScroll( query ) ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
+		assertThatHits( hitsUsingScroll( query ) ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
 		verifyAll();
 	}
 
@@ -580,11 +581,11 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 				.asEntityReference()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
 
 		// check the same for the scroll API
-		assertThat( hitsUsingScroll( query ) )
+		assertThatHits( hitsUsingScroll( query ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
 	}
 
@@ -597,11 +598,11 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 				.asEntity()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
 
 		// check the same for the scroll API
-		assertThat( hitsUsingScroll( query ) )
+		assertThatHits( hitsUsingScroll( query ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), MAIN_ID, EMPTY_ID );
 	}
 
@@ -649,7 +650,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		) ) )
 				.andReturn( emptyTransformedHit );
 		replayAll();
-		assertThat( query ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
+		assertThatQuery( query ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
 		verifyAll();
 
 		// check the same for the scroll API
@@ -665,7 +666,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		) ) )
 				.andReturn( emptyTransformedHit );
 		replayAll();
-		assertThat( hitsUsingScroll( query ) ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
+		assertThatHits( hitsUsingScroll( query ) ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
 		verifyAll();
 	}
 
@@ -790,7 +791,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		);
 		replayAll();
 		// Expect the main document to be excluded from hits, since it could not be loaded.
-		assertThat( objectsQuery ).hasHitsAnyOrder( emptyLoadedObject );
+		assertThatQuery( objectsQuery ).hasHitsAnyOrder( emptyLoadedObject );
 		verifyAll();
 	}
 

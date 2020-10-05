@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.multitenancy;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.List;
@@ -82,7 +82,7 @@ public class MultiTenancyBaseIT {
 				)
 				.where( f -> f.match().field( "string" ).matching( STRING_VALUE_1 ) )
 				.toQuery();
-		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
+		assertThatQuery( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
 		query = scope.query( tenant2SessionContext )
 				.select( f ->
@@ -93,7 +93,7 @@ public class MultiTenancyBaseIT {
 				)
 				.where( f -> f.match().field( "string" ).matching( STRING_VALUE_1 ) )
 				.toQuery();
-		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_3 ) );
+		assertThatQuery( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_3 ) );
 	}
 
 	// In Elasticsearch, we used to expect the user to provide the ID already prefixed with the tenant ID, which is wrong
@@ -111,7 +111,7 @@ public class MultiTenancyBaseIT {
 				)
 				.where( f -> f.id().matching( DOCUMENT_ID_1 ) )
 				.toQuery();
-		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
+		assertThatQuery( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
 		query = scope.query( tenant2SessionContext )
 				.select( f ->
@@ -122,7 +122,7 @@ public class MultiTenancyBaseIT {
 				)
 				.where( f -> f.id().matching( DOCUMENT_ID_1 ) )
 				.toQuery();
-		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_3 ) );
+		assertThatQuery( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_3 ) );
 	}
 
 	@Test
@@ -142,7 +142,7 @@ public class MultiTenancyBaseIT {
 						)
 				)
 				.toQuery();
-		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
+		assertThatQuery( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
 		query = scope.query( tenant2SessionContext )
 				.select( f ->
@@ -157,7 +157,7 @@ public class MultiTenancyBaseIT {
 						)
 				)
 				.toQuery();
-		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_3 ) );
+		assertThatQuery( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_3 ) );
 	}
 
 	@Test
@@ -168,7 +168,7 @@ public class MultiTenancyBaseIT {
 		SearchQuery<DocumentReference> query = scope.query( tenant2SessionContext )
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		SearchQuery<List<?>> projectionQuery = scope.query( tenant2SessionContext )
@@ -180,7 +180,7 @@ public class MultiTenancyBaseIT {
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( projectionQuery ).hasListHitsAnyOrder( b -> {
+		assertThatQuery( projectionQuery ).hasListHitsAnyOrder( b -> {
 				b.list( STRING_VALUE_1, INTEGER_VALUE_3 );
 				b.list( STRING_VALUE_2, INTEGER_VALUE_4 );
 		} );
@@ -189,7 +189,7 @@ public class MultiTenancyBaseIT {
 
 		plan.execute().join();
 
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_ID_2 );
 		projectionQuery = scope.query( tenant2SessionContext )
 				.select( f ->
@@ -200,14 +200,14 @@ public class MultiTenancyBaseIT {
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( projectionQuery ).hasListHitsAnyOrder( b -> {
+		assertThatQuery( projectionQuery ).hasListHitsAnyOrder( b -> {
 				b.list( STRING_VALUE_2, INTEGER_VALUE_4 );
 		} );
 
 		query = scope.query( tenant1SessionContext )
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_ID_1, DOCUMENT_ID_2 );
 	}
 
@@ -219,7 +219,7 @@ public class MultiTenancyBaseIT {
 		SearchQuery<DocumentReference> checkQuery = scope.query( tenant2SessionContext )
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( checkQuery )
+		assertThatQuery( checkQuery )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		plan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
@@ -244,7 +244,7 @@ public class MultiTenancyBaseIT {
 				)
 				.where( f -> f.match().field( "string" ).matching( UPDATED_STRING ) )
 				.toQuery();
-		assertThat( query ).hasListHitsAnyOrder( b -> b.list( UPDATED_STRING, INTEGER_VALUE_4 ) );
+		assertThatQuery( query ).hasListHitsAnyOrder( b -> b.list( UPDATED_STRING, INTEGER_VALUE_4 ) );
 
 		query = scope.query( tenant2SessionContext )
 				.select( f ->
@@ -259,7 +259,7 @@ public class MultiTenancyBaseIT {
 						)
 				)
 				.toQuery();
-		assertThat( query ).hasListHitsAnyOrder( b -> b.list( UPDATED_STRING, INTEGER_VALUE_4 ) );
+		assertThatQuery( query ).hasListHitsAnyOrder( b -> b.list( UPDATED_STRING, INTEGER_VALUE_4 ) );
 
 		// The tenant 1 has not been updated.
 
@@ -272,7 +272,7 @@ public class MultiTenancyBaseIT {
 				)
 				.where( f -> f.match().field( "nestedObject.string" ).matching( UPDATED_STRING ) )
 				.toQuery();
-		assertThat( query ).hasNoHits();
+		assertThatQuery( query ).hasNoHits();
 
 		query = scope.query( tenant1SessionContext )
 				.select( f ->
@@ -287,7 +287,7 @@ public class MultiTenancyBaseIT {
 						)
 				)
 				.toQuery();
-		assertThat( query ).hasNoHits();
+		assertThatQuery( query ).hasNoHits();
 
 		query = scope.query( tenant1SessionContext )
 				.select( f ->
@@ -298,7 +298,7 @@ public class MultiTenancyBaseIT {
 				)
 				.where( f -> f.match().field( "string" ).matching( STRING_VALUE_1 ) )
 				.toQuery();
-		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
+		assertThatQuery( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
 		query = scope.query( tenant1SessionContext )
 				.select( f ->
@@ -313,7 +313,7 @@ public class MultiTenancyBaseIT {
 						)
 				)
 				.toQuery();
-		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
+		assertThatQuery( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 	}
 
 	@Test
@@ -435,7 +435,7 @@ public class MultiTenancyBaseIT {
 		SearchQuery<DocumentReference> query = scope.query( tenant1SessionContext )
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		SearchQuery<List<?>> projectionQuery = scope.query( tenant1SessionContext )
@@ -447,7 +447,7 @@ public class MultiTenancyBaseIT {
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( projectionQuery ).hasListHitsAnyOrder( b -> {
+		assertThatQuery( projectionQuery ).hasListHitsAnyOrder( b -> {
 				b.list( STRING_VALUE_1, INTEGER_VALUE_1 );
 				b.list( STRING_VALUE_2, INTEGER_VALUE_2 );
 		} );
@@ -455,7 +455,7 @@ public class MultiTenancyBaseIT {
 		query = scope.query( tenant2SessionContext )
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		projectionQuery = scope.query( tenant2SessionContext )
@@ -467,7 +467,7 @@ public class MultiTenancyBaseIT {
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( projectionQuery ).hasListHitsAnyOrder( b -> {
+		assertThatQuery( projectionQuery ).hasListHitsAnyOrder( b -> {
 				b.list( STRING_VALUE_1, INTEGER_VALUE_3 );
 				b.list( STRING_VALUE_2, INTEGER_VALUE_4 );
 		} );

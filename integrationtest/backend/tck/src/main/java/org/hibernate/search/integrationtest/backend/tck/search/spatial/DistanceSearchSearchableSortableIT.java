@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -57,7 +57,7 @@ public class DistanceSearchSearchableSortableIT {
 				.sort( f -> f.distance( "searchableSortable", METRO_GARIBALDI ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), CHEZ_MARGOTTE_ID, IMOUTO_ID );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( index.typeName(), CHEZ_MARGOTTE_ID, IMOUTO_ID );
 	}
 
 	@Test
@@ -82,7 +82,7 @@ public class DistanceSearchSearchableSortableIT {
 				.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), CHEZ_MARGOTTE_ID, IMOUTO_ID );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( index.typeName(), CHEZ_MARGOTTE_ID, IMOUTO_ID );
 	}
 
 	@Test
@@ -107,7 +107,7 @@ public class DistanceSearchSearchableSortableIT {
 				.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), CHEZ_MARGOTTE_ID, IMOUTO_ID );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( index.typeName(), CHEZ_MARGOTTE_ID, IMOUTO_ID );
 	}
 
 	@Test
@@ -132,7 +132,7 @@ public class DistanceSearchSearchableSortableIT {
 				.sort( f -> f.distance( fieldPath, METRO_GARIBALDI ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), CHEZ_MARGOTTE_ID, IMOUTO_ID, OURSON_QUI_BOIT_ID );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( index.typeName(), CHEZ_MARGOTTE_ID, IMOUTO_ID, OURSON_QUI_BOIT_ID );
 	}
 
 	@Test
@@ -143,7 +143,7 @@ public class DistanceSearchSearchableSortableIT {
 				.sort( f -> f.distance( "defaultSearchableSortable", METRO_GARIBALDI ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), CHEZ_MARGOTTE_ID, IMOUTO_ID );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( index.typeName(), CHEZ_MARGOTTE_ID, IMOUTO_ID );
 	}
 
 	private void initData() {

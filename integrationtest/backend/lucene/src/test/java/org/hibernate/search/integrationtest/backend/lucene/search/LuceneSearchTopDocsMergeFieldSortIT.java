@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.search;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
 import java.time.MonthDay;
@@ -143,9 +143,9 @@ public class LuceneSearchTopDocsMergeFieldSortIT<F> {
 		LuceneSearchQuery<DocumentReference> segment1Query = matchNonEmptySortedByFieldQuery( dataSet, SEGMENT_1, SortOrder.ASC );
 		LuceneSearchResult<?> segment0Result = segment0Query.fetch( 10 );
 		LuceneSearchResult<?> segment1Result = segment1Query.fetch( 10 );
-		assertThat( segment0Result ).fromQuery( segment0Query )
+		assertThatResult( segment0Result ).fromQuery( segment0Query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.seg0Doc1Id, dataSet.seg0Doc0Id );
-		assertThat( segment1Result ).fromQuery( segment1Query )
+		assertThatResult( segment1Result ).fromQuery( segment1Query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.seg1Doc0Id );
 
 		TopFieldDocs[] allTopDocs = retrieveTopDocs( segment0Query, segment0Result, segment1Result );
@@ -167,9 +167,9 @@ public class LuceneSearchTopDocsMergeFieldSortIT<F> {
 		LuceneSearchQuery<DocumentReference> segment1Query = matchNonEmptySortedByFieldQuery( dataSet, SEGMENT_1, SortOrder.DESC );
 		LuceneSearchResult<?> segment0Result = segment0Query.fetch( 10 );
 		LuceneSearchResult<?> segment1Result = segment1Query.fetch( 10 );
-		assertThat( segment0Result ).fromQuery( segment0Query )
+		assertThatResult( segment0Result ).fromQuery( segment0Query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.seg0Doc0Id, dataSet.seg0Doc1Id );
-		assertThat( segment1Result ).fromQuery( segment1Query )
+		assertThatResult( segment1Result ).fromQuery( segment1Query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.seg1Doc0Id );
 
 		TopFieldDocs[] allTopDocs = retrieveTopDocs( segment0Query, segment0Result, segment1Result );

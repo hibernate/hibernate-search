@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.query;
 
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 
 import java.util.concurrent.TimeUnit;
 
@@ -133,7 +133,7 @@ public class SearchQueryScrollResultLoadingIT extends EasyMockSupport {
 					}
 			);
 			replayAll();
-			assertThat( scroll.next().hits() ).hasHitsAnyOrder(
+			assertThatHits( scroll.next().hits() ).hasHitsAnyOrder(
 					references[base + 0].loadedObject, references[base + 1].loadedObject, references[base + 2].loadedObject,
 					references[base + 3].loadedObject, references[base + 4].loadedObject
 			);
@@ -151,7 +151,7 @@ public class SearchQueryScrollResultLoadingIT extends EasyMockSupport {
 				}
 		);
 		replayAll();
-		assertThat( scroll.next().hits() ).hasHitsAnyOrder(
+		assertThatHits( scroll.next().hits() ).hasHitsAnyOrder(
 				references[35].loadedObject, references[36].loadedObject
 		);
 		verifyAll();

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+
 import java.util.Map;
 import java.util.Optional;
 
@@ -21,7 +23,6 @@ import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationD
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
@@ -65,7 +66,7 @@ public class AggregationBaseIT {
 				.aggregation( aggregationKey, f -> f.extension( new SupportedExtension() )
 						.extendedAggregation( "string" ) )
 				.toQuery();
-		SearchResultAssert.assertThat( query )
+		assertThatQuery( query )
 				.aggregation( aggregationKey )
 				.satisfies( map -> Assertions.assertThat( map ).containsExactly(
 						Assertions.entry( STRING_1, 2L ),

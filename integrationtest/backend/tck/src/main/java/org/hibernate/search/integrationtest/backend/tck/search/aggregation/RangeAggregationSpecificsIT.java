@@ -10,6 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalize;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
@@ -37,7 +39,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
@@ -111,7 +112,7 @@ public class RangeAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.range( Range.atMost( ascendingValues.get( 2 ) ) )
@@ -134,7 +135,7 @@ public class RangeAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.range( Range.lessThan( ascendingValues.get( 2 ) ) )
@@ -157,7 +158,7 @@ public class RangeAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.range( Range.atLeast( ascendingValues.get( 3 ) ) )
@@ -182,7 +183,7 @@ public class RangeAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.range( Range.greaterThan( ascendingValues.get( 3 ) ) )
@@ -205,7 +206,7 @@ public class RangeAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.ranges( Arrays.asList(
@@ -236,7 +237,7 @@ public class RangeAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.ranges( Arrays.asList(
@@ -281,7 +282,7 @@ public class RangeAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.ranges( Arrays.asList(
@@ -376,7 +377,7 @@ public class RangeAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				index.createScope().query()
 						.where( f -> f.id().matchingAny( Arrays.asList( dataSet.name + "_document_1", dataSet.name + "_document_5" ) ) )
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
@@ -408,7 +409,7 @@ public class RangeAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatResult(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.range( null, ascendingValues.get( 2 ) )
@@ -437,7 +438,7 @@ public class RangeAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.range( ascendingValues.get( 0 ), null )
@@ -474,7 +475,7 @@ public class RangeAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.range( null, ascendingValues.get( 2 ) )

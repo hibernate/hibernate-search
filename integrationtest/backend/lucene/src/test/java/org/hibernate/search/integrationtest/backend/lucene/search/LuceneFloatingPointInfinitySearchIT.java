@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.lucene.search;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -24,7 +25,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.Standar
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -54,7 +54,7 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 
 		AggregationKey<Map<Range<Float>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, Float.class )
 								.range( Range.canonical( null, 0f ) )
@@ -80,7 +80,7 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 
 		AggregationKey<Map<Range<Float>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, Float.class )
 								.range( Range.between( null, RangeBoundInclusion.EXCLUDED,
@@ -114,7 +114,7 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 
 		AggregationKey<Map<Range<Double>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, Double.class )
 								.range( Range.canonical( null, 0d ) )
@@ -140,7 +140,7 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 
 		AggregationKey<Map<Range<Double>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, Double.class )
 								.range( Range.between( null, RangeBoundInclusion.EXCLUDED,

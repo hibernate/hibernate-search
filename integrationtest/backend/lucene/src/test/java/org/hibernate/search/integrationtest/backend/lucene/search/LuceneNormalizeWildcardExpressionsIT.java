@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.search;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.function.Function;
 
@@ -69,13 +69,13 @@ public class LuceneNormalizeWildcardExpressionsIT {
 				.where( f -> f.wildcard().field( "analyzed" ).matching( queryString ) )
 				.toQuery();
 
-		assertThat( createQuery.apply( PATTERN_1 ) )
+		assertThatQuery( createQuery.apply( PATTERN_1 ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
-		assertThat( createQuery.apply( PATTERN_2 ) )
+		assertThatQuery( createQuery.apply( PATTERN_2 ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2, DOCUMENT_4 );
 
-		assertThat( createQuery.apply( PATTERN_3 ) )
+		assertThatQuery( createQuery.apply( PATTERN_3 ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_3, DOCUMENT_4 );
 	}
 
@@ -87,7 +87,7 @@ public class LuceneNormalizeWildcardExpressionsIT {
 				.toQuery();
 
 		// The matching expression is supposed to be normalized only, never tokenized.
-		assertThat( query ).hasNoHits();
+		assertThatQuery( query ).hasNoHits();
 	}
 
 	private void initData() {

@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,7 +105,7 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 		}
 		final Class<? super F> validSuperClass = closestSuperClass;
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.select( f -> f.field( getFieldPath(), validSuperClass ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
@@ -227,7 +227,7 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 
 		String fieldPath = getFieldWithConverterPath();
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.select( f -> f.field( fieldPath, ValueWrapper.class ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
@@ -245,7 +245,7 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 
 		String fieldPath = getFieldWithConverterPath();
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.select( f -> f.field( fieldPath, fieldType.getJavaType(), ValueConvert.NO ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
@@ -263,7 +263,7 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 
 		String fieldPath = getFieldWithConverterPath();
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.select( f -> f.field( fieldPath, ValueConvert.NO ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
@@ -296,7 +296,7 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 	public void multiIndex_withCompatibleIndex_noProjectionConverter() {
 		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.select( f -> f.field( getFieldPath(), fieldType.getJavaType() ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
@@ -315,7 +315,7 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 
 		String fieldPath = getFieldWithConverterPath();
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.select( f -> f.field( fieldPath, ValueWrapper.class ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
@@ -348,7 +348,7 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 
 		String fieldPath = getFieldWithConverterPath();
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.select( f -> f.field( fieldPath, fieldType.getJavaType(), ValueConvert.NO ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )

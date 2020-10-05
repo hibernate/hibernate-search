@@ -10,7 +10,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.hibernate.search.integrationtest.backend.lucene.testsupport.util.DocumentAssert.containsDocument;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -132,7 +133,7 @@ public class LuceneExtensionIT {
 		LuceneSearchQuery<DocumentReference> query = context4.toQuery();
 		LuceneSearchResult<DocumentReference> result = query.fetchAll();
 
-		assertThat( result ).fromQuery( query )
+		assertThatResult( result ).fromQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID )
 				.hasTotalHitCount( 5 );
 
@@ -162,7 +163,7 @@ public class LuceneExtensionIT {
 		// Put the query and result into variables to check they have the right type
 		LuceneSearchQuery<DocumentReference> query = genericQuery.extension( LuceneExtension.get() );
 		LuceneSearchResult<DocumentReference> result = query.fetchAll();
-		assertThat( result ).fromQuery( query )
+		assertThatResult( result ).fromQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID )
 				.hasTotalHitCount( 5 );
 
@@ -332,7 +333,7 @@ public class LuceneExtensionIT {
 						)
 				)
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID )
 				.hasTotalHitCount( 3 );
 	}
@@ -356,7 +357,7 @@ public class LuceneExtensionIT {
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( booleanPredicate )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID )
 				.hasTotalHitCount( 3 );
 	}
@@ -376,7 +377,7 @@ public class LuceneExtensionIT {
 								.fromLuceneSortField( new SortedSetSortField( "sort3", false ) )
 				)
 				.toQuery();
-		assertThat( query ).hasDocRefHitsExactOrder(
+		assertThatQuery( query ).hasDocRefHitsExactOrder(
 				mainIndex.typeName(),
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
 		);
@@ -396,7 +397,7 @@ public class LuceneExtensionIT {
 						.orElseFail()
 				)
 				.toQuery();
-		assertThat( query ).hasDocRefHitsExactOrder(
+		assertThatQuery( query ).hasDocRefHitsExactOrder(
 				mainIndex.typeName(),
 				THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID
 		);
@@ -428,7 +429,7 @@ public class LuceneExtensionIT {
 				.where( f -> f.matchAll() )
 				.sort( f -> f.composite().add( sort1 ).add( sort2 ).add( sort3 ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID );
 
 		SearchSort sort = scope.sort()
@@ -444,7 +445,7 @@ public class LuceneExtensionIT {
 				.where( f -> f.matchAll() )
 				.sort( sort )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID );
 	}
 
@@ -463,7 +464,7 @@ public class LuceneExtensionIT {
 						) ) ) )
 				)
 				.toQuery();
-		assertThat( query ).hasDocRefHitsExactOrder(
+		assertThatQuery( query ).hasDocRefHitsExactOrder(
 				mainIndex.typeName(),
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
 		);
@@ -480,7 +481,7 @@ public class LuceneExtensionIT {
 						) ) ) )
 				)
 				.toQuery();
-		assertThat( query ).hasDocRefHitsExactOrder(
+		assertThatQuery( query ).hasDocRefHitsExactOrder(
 				mainIndex.typeName(),
 				FIFTH_ID, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID
 		);
@@ -518,7 +519,7 @@ public class LuceneExtensionIT {
 				)
 				.toQuery();
 
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID );
 	}
 
@@ -571,7 +572,7 @@ public class LuceneExtensionIT {
 				.sort( f -> f.extension( LuceneExtension.get() ).fromLuceneSortField( new SortField( "nativeField", Type.LONG ) ) )
 				.toQuery();
 
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), FIFTH_ID, THIRD_ID, FIRST_ID, SECOND_ID, FOURTH_ID );
 	}
 
@@ -584,7 +585,7 @@ public class LuceneExtensionIT {
 				.where( f -> f.match().field( "string" ).matching( "text 1" ) )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder( 37 );
+		assertThatQuery( query ).hasHitsAnyOrder( 37 );
 	}
 
 	@Test
@@ -596,7 +597,7 @@ public class LuceneExtensionIT {
 				.where( f -> f.match().field( "string" ).matching( "text 1" ) )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder( new ValueWrapper<>( 37 ) );
+		assertThatQuery( query ).hasHitsAnyOrder( new ValueWrapper<>( 37 ) );
 	}
 
 	@Test
@@ -608,7 +609,7 @@ public class LuceneExtensionIT {
 				.where( f -> f.match().field( "string" ).matching( "text 1" ) )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder( 37 );
+		assertThatQuery( query ).hasHitsAnyOrder( 37 );
 	}
 
 	@Test
@@ -624,7 +625,7 @@ public class LuceneExtensionIT {
 				)
 				.toQuery();
 
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID );
 
 		// now, let's check that projecting on the field throws an exception
@@ -756,7 +757,7 @@ public class LuceneExtensionIT {
 						) ) ) )
 				)
 				.toQuery();
-		assertThat( query ).aggregation( aggregationKey, agg -> Assertions.assertThat( agg ).containsExactly(
+		assertThatQuery( query ).aggregation( aggregationKey, agg -> Assertions.assertThat( agg ).containsExactly(
 				entry( "five", 1L ),
 				entry( "four", 1L ),
 				entry( "one", 1L ),
@@ -820,12 +821,12 @@ public class LuceneExtensionIT {
 		indexDataSet( otherIndex );
 
 		// Check that all documents are searchable
-		assertThat( mainIndex.createScope().query().where( f -> f.matchAll() ).toQuery() )
+		assertThatQuery( mainIndex.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hasDocRefHitsAnyOrder(
 						mainIndex.typeName(),
 						FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
 				);
-		assertThat( otherIndex.createScope().query().where( f -> f.matchAll() ).toQuery() )
+		assertThatQuery( otherIndex.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hasDocRefHitsAnyOrder(
 						otherIndex.typeName(),
 						FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID

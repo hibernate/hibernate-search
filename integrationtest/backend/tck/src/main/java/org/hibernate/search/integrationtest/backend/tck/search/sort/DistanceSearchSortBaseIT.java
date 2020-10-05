@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueDistanceFromCenterValues.CENTER_POINT;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
 import java.util.ArrayList;
@@ -130,7 +130,7 @@ public class DistanceSearchSortBaseIT {
 
 		dataSet = dataSetForAsc;
 		query = simpleQuery( dataSet, b -> b.distance( fieldPath, CENTER_POINT ) );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
 
 		dataSet = dataSetForAsc;
@@ -138,7 +138,7 @@ public class DistanceSearchSortBaseIT {
 				dataSet,
 				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
 		);
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
 
 		dataSet = dataSetForAsc;
@@ -147,7 +147,7 @@ public class DistanceSearchSortBaseIT {
 				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
 						.asc()
 		);
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
 
 		dataSet = dataSetForDesc;
@@ -155,7 +155,7 @@ public class DistanceSearchSortBaseIT {
 				dataSet,
 				b -> b.distance( fieldPath, CENTER_POINT ).desc()
 		);
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id );
 
 		dataSet = dataSetForDesc;
@@ -164,7 +164,7 @@ public class DistanceSearchSortBaseIT {
 				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
 						.desc()
 		);
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id );
 	}
 

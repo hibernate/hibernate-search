@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,19 +120,19 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
 				.use( new ValueWrapper<>( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ) ) );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
 				.use( new ValueWrapper<>( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) ) ) );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
 				.use( new ValueWrapper<>( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ) ) ) );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
 				.use( new ValueWrapper<>( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ) ) ) );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 	}
 
@@ -143,19 +143,19 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ), ValueConvert.NO ) );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ), ValueConvert.NO ) );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ), ValueConvert.NO ) );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
 		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ), ValueConvert.NO ) );
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 	}
 
@@ -231,7 +231,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		 * It's not what we want to test anyway: we just want to check that fields are correctly
 		 * detected as compatible and that no exception is thrown.
 		 */
-		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( b -> {
 			b.doc( mainIndex.typeName(), EMPTY );
 			b.doc( mainIndex.typeName(), DOCUMENT_1 );
 			b.doc( mainIndex.typeName(), DOCUMENT_2 );
@@ -277,7 +277,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		 * It's not what we want to test anyway: we just want to check that fields are correctly
 		 * detected as compatible and that no exception is thrown.
 		 */
-		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( b -> {
 			b.doc( mainIndex.typeName(), EMPTY );
 			b.doc( mainIndex.typeName(), DOCUMENT_1 );
 			b.doc( mainIndex.typeName(), DOCUMENT_2 );

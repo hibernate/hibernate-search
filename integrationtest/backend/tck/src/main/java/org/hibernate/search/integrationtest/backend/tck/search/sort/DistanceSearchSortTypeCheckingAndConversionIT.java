@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueDistanceFromCenterValues.CENTER_POINT;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -116,7 +116,7 @@ public class DistanceSearchSortTypeCheckingAndConversionIT {
 
 		query = matchAllQuery( f -> f.distance( fieldPath, CENTER_POINT ), scope );
 
-		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( b -> {
 			b.doc( mainIndex.typeName(), EMPTY );
 			b.doc( mainIndex.typeName(), DOCUMENT_1 );
 			b.doc( compatibleIndex.typeName(), COMPATIBLE_INDEX_DOCUMENT_1 );
@@ -134,7 +134,7 @@ public class DistanceSearchSortTypeCheckingAndConversionIT {
 
 		query = matchAllQuery( f -> f.distance( fieldPath, CENTER_POINT ), scope );
 
-		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( b -> {
 			b.doc( mainIndex.typeName(), EMPTY );
 			b.doc( mainIndex.typeName(), DOCUMENT_1 );
 			b.doc( rawFieldCompatibleIndex.typeName(), RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );

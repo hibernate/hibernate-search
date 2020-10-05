@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.work;
 
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
@@ -25,7 +26,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
 import org.junit.Before;
@@ -97,7 +97,7 @@ public class IndexIndexerIT {
 
 		int expectedMatchingBooks = NUMBER_OF_BOOKS;
 		refreshIfNecessary();
-		SearchResultAssert.assertThat( index.createScope().query()
+		assertThatQuery( index.createScope().query()
 				.where( f -> f.match().field( "title" ).matching( "lord" ) )
 				.toQuery() )
 				.hasTotalHitCount( expectedMatchingBooks );
@@ -120,7 +120,7 @@ public class IndexIndexerIT {
 
 		expectedMatchingBooks -= booksToUpdate;
 		refreshIfNecessary();
-		SearchResultAssert.assertThat( index.createScope().query()
+		assertThatQuery( index.createScope().query()
 				.where( f -> f.match().field( "title" ).matching( "lord" ) )
 				.toQuery() )
 				.hasTotalHitCount( expectedMatchingBooks );
@@ -142,7 +142,7 @@ public class IndexIndexerIT {
 
 		expectedMatchingBooks -= booksToDelete;
 		refreshIfNecessary();
-		SearchResultAssert.assertThat( index.createScope().query()
+		assertThatQuery( index.createScope().query()
 				.where( f -> f.match().field( "title" ).matching( "lord" ) )
 				.toQuery() )
 				.hasTotalHitCount( expectedMatchingBooks );

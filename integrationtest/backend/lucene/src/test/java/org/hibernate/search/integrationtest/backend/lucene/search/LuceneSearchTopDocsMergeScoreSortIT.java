@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.search;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
@@ -67,9 +67,9 @@ public class LuceneSearchTopDocsMergeScoreSortIT {
 		LuceneSearchQuery<DocumentReference> segment1Query = matchTextSortedByScoreQuery( SortOrder.DESC, SEGMENT_1 );
 		LuceneSearchResult<DocumentReference> segment0Result = segment0Query.fetch( 10 );
 		LuceneSearchResult<DocumentReference> segment1Result = segment1Query.fetch( 10 );
-		assertThat( segment0Result )
+		assertThatResult( segment0Result )
 				.hasDocRefHitsExactOrder( index.typeName(), SEGMENT_0_DOC_0, SEGMENT_0_DOC_1 );
-		assertThat( segment1Result )
+		assertThatResult( segment1Result )
 				.hasDocRefHitsExactOrder( index.typeName(), SEGMENT_1_DOC_0, SEGMENT_1_DOC_1 );
 
 		TopFieldDocs[] allTopDocs = retrieveTopDocs( segment0Query, segment0Result, segment1Result );
@@ -91,9 +91,9 @@ public class LuceneSearchTopDocsMergeScoreSortIT {
 		LuceneSearchQuery<DocumentReference> segment1Query = matchTextSortedByScoreQuery( SortOrder.ASC, SEGMENT_1 );
 		LuceneSearchResult<DocumentReference> segment0Result = segment0Query.fetch( 10 );
 		LuceneSearchResult<DocumentReference> segment1Result = segment1Query.fetch( 10 );
-		assertThat( segment0Result )
+		assertThatResult( segment0Result )
 				.hasDocRefHitsExactOrder( index.typeName(), SEGMENT_0_DOC_1, SEGMENT_0_DOC_0 );
-		assertThat( segment1Result )
+		assertThatResult( segment1Result )
 				.hasDocRefHitsExactOrder( index.typeName(), SEGMENT_1_DOC_1, SEGMENT_1_DOC_0 );
 
 		TopFieldDocs[] allTopDocs = retrieveTopDocs( segment0Query, segment0Result, segment1Result );

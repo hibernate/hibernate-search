@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -105,7 +105,7 @@ public class ObjectStructureIT {
 						.must( f.match().field( "flattenedObject.localDate" ).matching( MATCHING_LOCAL_DATE ) )
 				)
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), EXPECTED_NON_NESTED_MATCH_ID )
 				.hasTotalHitCount( 1 );
 
@@ -119,7 +119,7 @@ public class ObjectStructureIT {
 						)
 				)
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), EXPECTED_NESTED_MATCH_ID )
 				.hasTotalHitCount( 1 );
 	}
@@ -141,7 +141,7 @@ public class ObjectStructureIT {
 						)
 				)
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), EXPECTED_NON_NESTED_MATCH_ID )
 				.hasTotalHitCount( 1 );
 
@@ -160,7 +160,7 @@ public class ObjectStructureIT {
 						)
 				)
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), EXPECTED_NESTED_MATCH_ID )
 				.hasTotalHitCount( 1 );
 	}

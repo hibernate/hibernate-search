@@ -26,7 +26,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 
 public class SmokeIT {
@@ -50,35 +50,35 @@ public class SmokeIT {
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.match().field( "string" ).matching( "text 1" ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), "1" )
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
 				.where( f -> f.match().field( "string_analyzed" ).matching( "text" ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2", "3" )
 				.hasTotalHitCount( 3 );
 
 		query = scope.query()
 				.where( f -> f.match().field( "integer" ).matching( 1 ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), "1" )
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
 				.where( f -> f.match().field( "localDate" ).matching( LocalDate.of( 2018, 1, 1 ) ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), "1" )
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
 				.where( f -> f.match().field( "flattenedObject.string" ).matching( "text 1_1" ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), "1" )
 				.hasTotalHitCount( 1 );
 	}
@@ -90,21 +90,21 @@ public class SmokeIT {
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.range().field( "string" ).between( "text 2", "text 42" ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), "2", "3" )
 				.hasTotalHitCount( 2 );
 
 		query = scope.query()
 				.where( f -> f.range().field( "string_analyzed" ).between( "2", "42" ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), "2", "3" )
 				.hasTotalHitCount( 2 );
 
 		query = scope.query()
 				.where( f -> f.range().field( "integer" ).between( 2, 42 ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), "2", "3" )
 				.hasTotalHitCount( 2 );
 
@@ -114,14 +114,14 @@ public class SmokeIT {
 								LocalDate.of( 2018, 2, 23 ) )
 				)
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), "2" )
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
 				.where( f -> f.range().field( "flattenedObject.integer" ).between( 201, 242 ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), "2" )
 				.hasTotalHitCount( 1 );
 	}
@@ -136,7 +136,7 @@ public class SmokeIT {
 						.should( f.match().field( "integer" ).matching( 2 ) )
 				)
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2" )
 				.hasTotalHitCount( 2 );
 
@@ -146,7 +146,7 @@ public class SmokeIT {
 						.filter( f.match().field( "integer" ).matching( 1 ) )
 				)
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), "1" )
 				.hasTotalHitCount( 1 );
 
@@ -156,7 +156,7 @@ public class SmokeIT {
 						.mustNot( f.match().field( "integer" ).matching( 2 ) )
 				)
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), "1", "3" )
 				.hasTotalHitCount( 2 );
 	}
@@ -172,7 +172,7 @@ public class SmokeIT {
 						.must( f.match().field( "flattenedObject.integer" ).matching( 101 ) )
 				)
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), "1" )
 				.hasTotalHitCount( 1 );
 
@@ -194,7 +194,7 @@ public class SmokeIT {
 						)
 				)
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasNoHits()
 				.hasTotalHitCount( 0 );
 
@@ -207,7 +207,7 @@ public class SmokeIT {
 						)
 				)
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), "1" )
 				.hasTotalHitCount( 1 );
 	}
@@ -220,7 +220,7 @@ public class SmokeIT {
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( predicate )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), "1" )
 				.hasTotalHitCount( 1 );
 
@@ -228,7 +228,7 @@ public class SmokeIT {
 		query = scope.query()
 				.where( predicate )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2" )
 				.hasTotalHitCount( 2 );
 
@@ -239,7 +239,7 @@ public class SmokeIT {
 		query = scope.query()
 				.where( predicate )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2" )
 				.hasTotalHitCount( 2 );
 	}

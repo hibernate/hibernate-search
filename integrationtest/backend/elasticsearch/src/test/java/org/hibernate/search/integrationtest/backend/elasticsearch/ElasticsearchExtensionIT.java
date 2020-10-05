@@ -10,7 +10,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultPrimaryName;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.util.ArrayList;
@@ -126,7 +127,7 @@ public class ElasticsearchExtensionIT {
 		ElasticsearchSearchQuery<DocumentReference> query = context4.toQuery();
 		ElasticsearchSearchResult<DocumentReference> result = query.fetchAll();
 
-		assertThat( result ).fromQuery( query )
+		assertThatResult( result ).fromQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID )
 				.hasTotalHitCount( 6 );
 
@@ -156,7 +157,7 @@ public class ElasticsearchExtensionIT {
 		// Put the query and result into variables to check they have the right type
 		ElasticsearchSearchQuery<DocumentReference> query = genericQuery.extension( ElasticsearchExtension.get() );
 		ElasticsearchSearchResult<DocumentReference> result = query.fetchAll();
-		assertThat( result ).fromQuery( query )
+		assertThatResult( result ).fromQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID )
 				.hasTotalHitCount( 6 );
 
@@ -345,7 +346,7 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.match().field( "nativeField_dateWithColons" )
 						.matching( new JsonPrimitive( "2018:01:12" ) ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FOURTH_ID )
 				.hasTotalHitCount( 1 );
 	}
@@ -358,7 +359,7 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.match().field( "nativeField_integer_converted" )
 						.matching( new ValueWrapper<>( new JsonPrimitive( 2 ) ) ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), SECOND_ID )
 				.hasTotalHitCount( 1 );
 	}
@@ -371,7 +372,7 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.match().field( "nativeField_integer_converted" )
 						.matching( new JsonPrimitive( 2 ), ValueConvert.NO ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), SECOND_ID )
 				.hasTotalHitCount( 1 );
 	}
@@ -405,7 +406,7 @@ public class ElasticsearchExtensionIT {
 						)
 				)
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID )
 				.hasTotalHitCount( 3 );
 	}
@@ -441,7 +442,7 @@ public class ElasticsearchExtensionIT {
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( booleanPredicate )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID )
 				.hasTotalHitCount( 3 );
 	}
@@ -473,7 +474,7 @@ public class ElasticsearchExtensionIT {
 						)
 				)
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID )
 				.hasTotalHitCount( 3 );
 	}
@@ -508,7 +509,7 @@ public class ElasticsearchExtensionIT {
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( booleanPredicate )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID )
 				.hasTotalHitCount( 3 );
 	}
@@ -526,7 +527,7 @@ public class ElasticsearchExtensionIT {
 						.then().field( "nativeField_sort5" ).asc().missing().first()
 				)
 				.toQuery();
-		assertThat( query ).hasDocRefHitsExactOrder(
+		assertThatQuery( query ).hasDocRefHitsExactOrder(
 				mainIndex.typeName(),
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID
 		);
@@ -540,7 +541,7 @@ public class ElasticsearchExtensionIT {
 						.then().field( "nativeField_sort5" ).asc().missing().first()
 				)
 				.toQuery();
-		assertThat( query ).hasDocRefHitsExactOrder(
+		assertThatQuery( query ).hasDocRefHitsExactOrder(
 				mainIndex.typeName(),
 				FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID
 		);
@@ -570,7 +571,7 @@ public class ElasticsearchExtensionIT {
 						) )
 				)
 				.toQuery();
-		assertThat( query ).hasDocRefHitsExactOrder(
+		assertThatQuery( query ).hasDocRefHitsExactOrder(
 				mainIndex.typeName(),
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID
 		);
@@ -595,7 +596,7 @@ public class ElasticsearchExtensionIT {
 						) )
 				)
 				.toQuery();
-		assertThat( query ).hasDocRefHitsExactOrder(
+		assertThatQuery( query ).hasDocRefHitsExactOrder(
 				mainIndex.typeName(),
 				FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID
 		);
@@ -630,7 +631,7 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.matchAll() )
 				.sort( f -> f.composite().add( sort1Asc ).add( sort2Asc ).add( sort3Asc ).add( sort4Asc ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID );
 
 		SearchSort sort1Desc = scope.sort().extension( ElasticsearchExtension.get() ).fromJson( gson.fromJson(
@@ -658,7 +659,7 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.matchAll() )
 				.sort( f -> f.composite().add( sort1Desc ).add( sort2Desc ).add( sort3Desc ).add( sort4Desc ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID );
 	}
 
@@ -681,7 +682,7 @@ public class ElasticsearchExtensionIT {
 								.fromJson( "{'nativeField_sort5': {'order': 'asc', 'missing': '_first'}}" )
 				)
 				.toQuery();
-		assertThat( query ).hasDocRefHitsExactOrder(
+		assertThatQuery( query ).hasDocRefHitsExactOrder(
 				mainIndex.typeName(),
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID
 		);
@@ -701,7 +702,7 @@ public class ElasticsearchExtensionIT {
 								.fromJson( "{'nativeField_sort5': {'order': 'asc', 'missing': '_first'}}" )
 				)
 				.toQuery();
-		assertThat( query ).hasDocRefHitsExactOrder(
+		assertThatQuery( query ).hasDocRefHitsExactOrder(
 				mainIndex.typeName(),
 				FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID
 		);
@@ -731,7 +732,7 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.matchAll() )
 				.sort( f -> f.composite().add( sort1Asc ).add( sort2Asc ).add( sort3Asc ).add( sort4Asc ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID );
 
 		SearchSort sort1Desc = scope.sort().extension( ElasticsearchExtension.get() )
@@ -754,7 +755,7 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.matchAll() )
 				.sort( f -> f.composite().add( sort1Desc ).add( sort2Desc ).add( sort3Desc ).add( sort4Desc ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID );
 	}
 
@@ -774,7 +775,7 @@ public class ElasticsearchExtensionIT {
 						) )
 				)
 				.toQuery();
-		assertThat( query ).hasDocRefHitsExactOrder(
+		assertThatQuery( query ).hasDocRefHitsExactOrder(
 				mainIndex.typeName(),
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID
 		);
@@ -792,7 +793,7 @@ public class ElasticsearchExtensionIT {
 						) )
 				)
 				.toQuery();
-		assertThat( query ).hasDocRefHitsExactOrder(
+		assertThatQuery( query ).hasDocRefHitsExactOrder(
 				mainIndex.typeName(),
 				FIFTH_ID, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID
 		);
@@ -807,7 +808,7 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.id().matching( SECOND_ID ) )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder( new JsonPrimitive( 2 ) );
+		assertThatQuery( query ).hasHitsAnyOrder( new JsonPrimitive( 2 ) );
 	}
 
 	@Test
@@ -819,7 +820,7 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.id().matching( SECOND_ID ) )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder( new ValueWrapper<>( new JsonPrimitive( 2 ) ) );
+		assertThatQuery( query ).hasHitsAnyOrder( new ValueWrapper<>( new JsonPrimitive( 2 ) ) );
 	}
 
 	@Test
@@ -831,7 +832,7 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.id().matching( SECOND_ID ) )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder( new JsonPrimitive( 2 ) );
+		assertThatQuery( query ).hasHitsAnyOrder( new JsonPrimitive( 2 ) );
 	}
 
 	@Test
@@ -947,7 +948,7 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.matchAll() )
 				.aggregation( documentCountPerValue, f -> f.terms().field( "nativeField_aggregation", JsonElement.class ) )
 				.toQuery();
-		assertThat( query ).aggregation( documentCountPerValue )
+		assertThatQuery( query ).aggregation( documentCountPerValue )
 				.asInstanceOf( InstanceOfAssertFactories.map( JsonElement.class, Long.class ) )
 				.containsExactly(
 						// There are extra quotes because it's a native field: these are JSON-formatted strings representing string values
@@ -1030,7 +1031,7 @@ public class ElasticsearchExtensionIT {
 						) )
 				)
 				.toQuery();
-		assertThat( query ).aggregation( aggregationKey, agg -> Assertions.assertThat( agg ).containsExactly(
+		assertThatQuery( query ).aggregation( aggregationKey, agg -> Assertions.assertThat( agg ).containsExactly(
 				entry( "five", 1L ),
 				entry( "four", 1L ),
 				entry( "one", 1L ),

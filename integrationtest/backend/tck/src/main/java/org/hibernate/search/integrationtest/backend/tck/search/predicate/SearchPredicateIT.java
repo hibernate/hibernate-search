@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -67,7 +67,7 @@ public class SearchPredicateIT {
 				.where( predicate )
 				.toQuery();
 
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
@@ -79,7 +79,7 @@ public class SearchPredicateIT {
 				.where( f -> f.match().field( "string" ).matching( STRING_1 ) )
 				.toQuery();
 
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
@@ -94,7 +94,7 @@ public class SearchPredicateIT {
 				.predicate( predicate )
 				.toQuery();
 
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
@@ -107,7 +107,7 @@ public class SearchPredicateIT {
 				.predicate( f -> f.match().field( "string" ).matching( STRING_1 ) )
 				.toQuery();
 
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
@@ -121,14 +121,14 @@ public class SearchPredicateIT {
 				.where( predicate )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		// reuse the same predicate instance on the same scope
 		query = scope.query()
 				.where( predicate )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		// reuse the same predicate instance on a different scope,
 		// targeting the same index
@@ -136,7 +136,7 @@ public class SearchPredicateIT {
 				.where( predicate )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		predicate = mainIndex.createScope( otherIndex )
 				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
@@ -147,7 +147,7 @@ public class SearchPredicateIT {
 				.where( predicate )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
 	@Test
@@ -189,14 +189,14 @@ public class SearchPredicateIT {
 				.where( f -> f.bool().must( predicate ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		// reuse the same predicate instance on the same scope
 		query = scope.query()
 				.where( f -> f.bool().must( predicate ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		// reuse the same predicate instance on a different scope,
 		// targeting the same index
@@ -204,7 +204,7 @@ public class SearchPredicateIT {
 				.where( f -> f.bool().must( predicate ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		final SearchPredicate multiIndexScopedPredicate = mainIndex.createScope( otherIndex )
 				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
@@ -215,7 +215,7 @@ public class SearchPredicateIT {
 				.where( f -> f.bool().must( multiIndexScopedPredicate ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		query = otherIndex.createScope( mainIndex ).query()
 				.where( f -> f.bool()
@@ -224,7 +224,7 @@ public class SearchPredicateIT {
 				)
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	@Test
@@ -267,7 +267,7 @@ public class SearchPredicateIT {
 						.extendedPredicate( "string", STRING_1 )
 				)
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		// Mandatory extension, unsupported
@@ -290,7 +290,7 @@ public class SearchPredicateIT {
 						.orElseFail()
 				)
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		// Conditional extensions with orElse - two, second supported
@@ -309,7 +309,7 @@ public class SearchPredicateIT {
 						)
 				)
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		// Conditional extensions with orElse - two, both unsupported
@@ -328,7 +328,7 @@ public class SearchPredicateIT {
 						)
 				)
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 

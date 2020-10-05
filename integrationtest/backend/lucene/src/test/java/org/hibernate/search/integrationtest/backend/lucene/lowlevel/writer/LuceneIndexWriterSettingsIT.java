@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.lucene.lowlevel.writer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.assertj.core.data.Percentage.withPercentage;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.function.BiConsumer;
@@ -21,7 +22,6 @@ import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.LoggerInfoStream;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -89,7 +89,7 @@ public class LuceneIndexWriterSettingsIT {
 		plan.execute().join();
 
 		// Check that writing succeeded
-		SearchResultAssert.assertThat( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
+		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hasTotalHitCount( 1L );
 	}
 
@@ -151,7 +151,7 @@ public class LuceneIndexWriterSettingsIT {
 		plan.execute().join();
 
 		// Check that writing succeeded
-		SearchResultAssert.assertThat( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
+		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hasTotalHitCount( 1L );
 	}
 
