@@ -6,21 +6,28 @@
  */
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.expect;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
 
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
-import org.easymock.EasyMockSupport;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 
-public class ElasticsearchBatchedWorkProcessorTest extends EasyMockSupport {
+public class ElasticsearchBatchedWorkProcessorTest {
 
 	/**
 	 * @return A value that should not matter, because it should not be used.
@@ -29,100 +36,82 @@ public class ElasticsearchBatchedWorkProcessorTest extends EasyMockSupport {
 		return null;
 	}
 
-	private ElasticsearchWorkSequenceBuilder sequenceBuilderMock;
-	private ElasticsearchWorkBulker bulkerMock;
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
-	@Before
-	public void initMocks() {
-		sequenceBuilderMock = createStrictMock( ElasticsearchWorkSequenceBuilder.class );
-		bulkerMock = createStrictMock( ElasticsearchWorkBulker.class );
-	}
+	@Mock
+	private ElasticsearchWorkSequenceBuilder sequenceBuilderMock;
+	@Mock
+	private ElasticsearchWorkBulker bulkerMock;
 
 	@Test
 	public void simple_singleWork() {
-		BulkableWork<Object> work = bulkableWork( 1 );
+		BulkableWork<Object> work = bulkableWorkMock( 1 );
 
 		CompletableFuture<Void> sequenceFuture = new CompletableFuture<>();
 
-		replayAll();
 		ElasticsearchBatchedWorkProcessor processor =
 				new ElasticsearchBatchedWorkProcessor( sequenceBuilderMock, bulkerMock );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		bulkerMock.reset();
-		sequenceBuilderMock.init( anyObject() );
-		replayAll();
 		processor.beginBatch();
-		verifyAll();
+		verify( bulkerMock ).reset();
+		verify( sequenceBuilderMock ).init( any() );
+		verifyNoOtherInteractionsAndReset();
 
 		CompletableFuture<Object> workFuture = new CompletableFuture<>();
-		resetAll();
-		expect( bulkerMock.add( work ) ).andReturn( workFuture );
-		replayAll();
+		when( bulkerMock.add( work ) ).thenReturn( workFuture );
 		CompletableFuture<Object> returnedWorkFuture = processor.submit( work );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 		assertThatFuture( returnedWorkFuture ).isSameAs( workFuture );
 
-		resetAll();
-		expect( sequenceBuilderMock.build() ).andReturn( sequenceFuture );
-		bulkerMock.finalizeBulkWork();
-		replayAll();
+		when( sequenceBuilderMock.build() ).thenReturn( sequenceFuture );
 		CompletableFuture<Void> batchFuture = processor.endBatch();
-		verifyAll();
+		verify( bulkerMock ).finalizeBulkWork();
+		verifyNoOtherInteractionsAndReset();
 		assertThatFuture( batchFuture ).isPending();
 
-		resetAll();
 		sequenceFuture.complete( null );
-		replayAll();
+		verifyNoOtherInteractionsAndReset();
 		assertThatFuture( batchFuture ).isSuccessful();
-		verifyAll();
 
 		checkComplete( processor );
 	}
 
 	@Test
 	public void simple_multipleWorks() {
-		BulkableWork<Object> work1 = bulkableWork( 1 );
-		BulkableWork<Object> work2 = bulkableWork( 2 );
+		BulkableWork<Object> work1 = bulkableWorkMock( 1 );
+		BulkableWork<Object> work2 = bulkableWorkMock( 2 );
 
 		CompletableFuture<Void> sequenceFuture = new CompletableFuture<>();
 
-		replayAll();
 		ElasticsearchBatchedWorkProcessor processor =
 				new ElasticsearchBatchedWorkProcessor( sequenceBuilderMock, bulkerMock );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		bulkerMock.reset();
-		sequenceBuilderMock.init( anyObject() );
-		replayAll();
 		processor.beginBatch();
-		verifyAll();
+		verify( bulkerMock ).reset();
+		verify( sequenceBuilderMock ).init( any() );
+		verifyNoOtherInteractionsAndReset();
 
 		CompletableFuture<Object> work1Future = new CompletableFuture<>();
 		CompletableFuture<Object> work2Future = new CompletableFuture<>();
-		resetAll();
-		expect( bulkerMock.add( work1 ) ).andReturn( work1Future );
-		expect( bulkerMock.add( work2 ) ).andReturn( work2Future );
-		replayAll();
+		when( bulkerMock.add( work1 ) ).thenReturn( work1Future );
+		when( bulkerMock.add( work2 ) ).thenReturn( work2Future );
 		CompletableFuture<Object> returnedWork1Future = processor.submit( work1 );
 		CompletableFuture<Object> returnedWork2Future = processor.submit( work2 );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 		assertThatFuture( returnedWork1Future ).isSameAs( work1Future );
 		assertThatFuture( returnedWork2Future ).isSameAs( work2Future );
 
-		resetAll();
-		expect( sequenceBuilderMock.build() ).andReturn( sequenceFuture );
-		bulkerMock.finalizeBulkWork();
-		replayAll();
+		when( sequenceBuilderMock.build() ).thenReturn( sequenceFuture );
 		CompletableFuture<Void> batchFuture = processor.endBatch();
-		verifyAll();
+		verify( bulkerMock ).finalizeBulkWork();
+		verifyNoOtherInteractionsAndReset();
 		assertThatFuture( batchFuture ).isPending();
 
-		resetAll();
 		sequenceFuture.complete( null );
-		replayAll();
+		verifyNoOtherInteractionsAndReset();
 		assertThatFuture( batchFuture ).isSuccessful();
 
 		checkComplete( processor );
@@ -130,81 +119,70 @@ public class ElasticsearchBatchedWorkProcessorTest extends EasyMockSupport {
 
 	@Test
 	public void newSequenceBetweenBatches() {
-		BulkableWork<Object> work1 = bulkableWork( 1 );
+		BulkableWork<Object> work1 = bulkableWorkMock( 1 );
 
-		BulkableWork<Object> work2 = bulkableWork( 2 );
+		BulkableWork<Object> work2 = bulkableWorkMock( 2 );
 
 		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
 		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
 
-		replayAll();
 		ElasticsearchBatchedWorkProcessor processor =
 				new ElasticsearchBatchedWorkProcessor( sequenceBuilderMock, bulkerMock );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		bulkerMock.reset();
-		sequenceBuilderMock.init( anyObject() );
-		replayAll();
 		processor.beginBatch();
-		verifyAll();
+		verify( bulkerMock ).reset();
+		verify( sequenceBuilderMock ).init( any() );
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		expect( bulkerMock.add( work1 ) ).andReturn( unusedReturnValue() );
-		replayAll();
+		when( bulkerMock.add( work1 ) ).thenReturn( unusedReturnValue() );
 		processor.submit( work1 );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
-		bulkerMock.finalizeBulkWork();
-		replayAll();
+		when( sequenceBuilderMock.build() ).thenReturn( sequence1Future );
 		CompletableFuture<Void> batch1Future = processor.endBatch();
-		verifyAll();
+		verify( bulkerMock ).finalizeBulkWork();
+		verifyNoOtherInteractionsAndReset();
 		assertThatFuture( batch1Future ).isPending();
 
-		resetAll();
 		sequence1Future.complete( null );
-		replayAll();
+		verifyNoOtherInteractionsAndReset();
 		assertThatFuture( batch1Future ).isSuccessful();
 
-		resetAll();
-		bulkerMock.reset();
-		sequenceBuilderMock.init( anyObject() );
-		replayAll();
 		processor.beginBatch();
-		verifyAll();
+		verify( bulkerMock ).reset();
+		verify( sequenceBuilderMock ).init( any() );
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		expect( bulkerMock.add( work2 ) ).andReturn( unusedReturnValue() );
-		replayAll();
+		when( bulkerMock.add( work2 ) ).thenReturn( unusedReturnValue() );
 		processor.submit( work2 );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
-		bulkerMock.finalizeBulkWork();
-		replayAll();
+		when( sequenceBuilderMock.build() ).thenReturn( sequence2Future );
 		CompletableFuture<Void> batch2Future = processor.endBatch();
-		verifyAll();
+		verify( bulkerMock ).finalizeBulkWork();
+		verifyNoOtherInteractionsAndReset();
 		assertThatFuture( batch2Future ).isPending();
 
-		resetAll();
 		sequence2Future.complete( null );
-		replayAll();
+		verifyNoOtherInteractionsAndReset();
 		assertThatFuture( batch2Future ).isSuccessful();
 
 		checkComplete( processor );
 	}
 
-	private void checkComplete(ElasticsearchBatchedWorkProcessor processor) {
-		resetAll();
-		replayAll();
-		processor.complete();
-		verifyAll();
+	private void verifyNoOtherInteractionsAndReset() {
+		verifyNoMoreInteractions( sequenceBuilderMock, bulkerMock );
+		reset( sequenceBuilderMock, bulkerMock );
 	}
 
-	private <T> BulkableWork<T> bulkableWork(int index) {
-		return createStrictMock( "bulkableWork" + index, BulkableWork.class );
+	private void checkComplete(ElasticsearchBatchedWorkProcessor processor) {
+		processor.complete();
+		verifyNoOtherInteractionsAndReset();
+	}
+
+	@SuppressWarnings("unchecked") // Raw types are the only way to mock parameterized types
+	private <T> BulkableWork<T> bulkableWorkMock(int index) {
+		return mock( BulkableWork.class, "bulkableWork" + index );
 	}
 }

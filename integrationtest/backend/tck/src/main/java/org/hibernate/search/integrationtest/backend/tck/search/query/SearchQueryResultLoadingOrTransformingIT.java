@@ -6,12 +6,16 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.query;
 
-import static org.easymock.EasyMock.expect;
-import static org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils.projectionMatcher;
+import static org.hibernate.search.integrationtest.backend.tck.testsupport.stub.MapperMockUtils.expectHitMapping;
+import static org.hibernate.search.util.impl.integrationtest.common.MockUtils.projectionMatcher;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -40,7 +44,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTra
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.MapperEasyMockUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
@@ -50,9 +53,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.easymock.EasyMockSupport;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
-public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
+@SuppressWarnings("unchecked") // Mocking parameterized types
+public class SearchQueryResultLoadingOrTransformingIT {
 
 	private static final String MAIN_ID = "main";
 	private static final String EMPTY_ID = "empty";
@@ -66,6 +72,9 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 	private static final String NESTED_OBJECT_STRING_VALUE = "nested object string";
 	private static final Integer FLATTENED_OBJECT_INTEGER_VALUE = 242;
 	private static final String FLATTENED_OBJECT_STRING_VALUE = "flattened object string";
+
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -90,49 +99,39 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyReference );
 
 		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				createMock( LoadingContext.class );
+				mock( LoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
-				createMock( StubDocumentReferenceConverter.class );
+				mock( StubDocumentReferenceConverter.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				createMock( StubEntityLoader.class );
+				mock( StubEntityLoader.class );
 
-		resetAll();
-		// No calls expected on the mocks
-		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
 				.where( f -> f.matchAll() )
 				.toQuery();
-		verifyAll();
 
-		resetAll();
 		/*
 		 * This will check in particular that the backend gets the projection hit mapper from the loading context,
 		 * which must happen every time we execute the query,
 		 * so that the mapper can run state checks (session is still open, ...).
 		 */
-		MapperEasyMockUtils.expectHitMapping(
+		expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				c -> c
 						.load( mainReference, mainTransformedReference, mainLoadedObject )
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
-		replayAll();
 		assertThatQuery( objectsQuery ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
-		verifyAll();
 
 		// check the same for the scroll API
-		resetAll();
-		MapperEasyMockUtils.expectHitMapping(
+		expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				c -> c
 						.load( mainReference, mainTransformedReference, mainLoadedObject )
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
-		replayAll();
 		assertThatHits( hitsUsingScroll( objectsQuery ) ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
-		verifyAll();
 	}
 
 	@Test
@@ -145,50 +144,40 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyReference );
 
 		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				createMock( LoadingContext.class );
+				mock( LoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
-				createMock( StubDocumentReferenceConverter.class );
+				mock( StubDocumentReferenceConverter.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				createMock( StubEntityLoader.class );
+				mock( StubEntityLoader.class );
 
-		resetAll();
-		// No calls expected on the mocks
-		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
 				.where( f -> f.matchAll() )
 				.failAfter( 1000L, TimeUnit.HOURS )
 				.toQuery();
-		verifyAll();
 
-		resetAll();
-		/*
-		 * This will check in particular that the backend gets the projection hit mapper from the loading context,
-		 * which must happen every time we execute the query,
-		 * so that the mapper can run state checks (session is still open, ...).
-		 */
-		MapperEasyMockUtils.expectHitMapping(
+		expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				c -> c
 						.load( mainReference, mainTransformedReference, mainLoadedObject )
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
-		replayAll();
 		assertThatQuery( objectsQuery ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
-		verifyAll();
+		// Check in particular that the backend gets the projection hit mapper from the loading context,
+		// which must happen every time we execute the query,
+		// so that the mapper can run state checks (session is still open, ...).
+		verify( loadingContextMock ).createProjectionHitMapper();
 
 		// check the same for the scroll API
-		resetAll();
-		MapperEasyMockUtils.expectHitMapping(
+		expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				c -> c
 						.load( mainReference, mainTransformedReference, mainLoadedObject )
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
-		replayAll();
 		assertThatHits( hitsUsingScroll( objectsQuery ) ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
-		verifyAll();
+		verify( loadingContextMock ).createProjectionHitMapper();
 	}
 
 	@Test
@@ -231,50 +220,40 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		StubTransformedReference emptyTransformedReference = new StubTransformedReference( emptyReference );
 
 		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				createMock( LoadingContext.class );
+				mock( LoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
-				createMock( StubDocumentReferenceConverter.class );
+				mock( StubDocumentReferenceConverter.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				createMock( StubEntityLoader.class );
+				mock( StubEntityLoader.class );
 
-		resetAll();
-		// No calls expected on the mocks
-		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
 		SearchQuery<StubTransformedReference> referencesQuery = scope.query( loadingContextMock )
 				.selectEntityReference()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		verifyAll();
 
-		resetAll();
-		/*
-		 * This will check in particular that the backend gets the projection hit mapper from the loading context,
-		 * which must happen every time we execute the query,
-		 * so that the mapper can run state checks (session is still open, ...).
-		 */
-		MapperEasyMockUtils.expectHitMapping(
+		expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				c -> c
 						.entityReference( mainReference, mainTransformedReference )
 						.entityReference( emptyReference, emptyTransformedReference )
 		);
-		replayAll();
 		assertThatQuery( referencesQuery ).hasHitsAnyOrder( mainTransformedReference, emptyTransformedReference );
-		verifyAll();
+		// Check in particular that the backend gets the projection hit mapper from the loading context,
+		// which must happen every time we execute the query,
+		// so that the mapper can run state checks (session is still open, ...).
+		verify( loadingContextMock ).createProjectionHitMapper();
 
 		// check the same for the scroll API
-		resetAll();
-		MapperEasyMockUtils.expectHitMapping(
+		expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				c -> c
 						.entityReference( mainReference, mainTransformedReference )
 						.entityReference( emptyReference, emptyTransformedReference )
 		);
-		replayAll();
 		assertThatHits( hitsUsingScroll( referencesQuery ) ).hasHitsAnyOrder( mainTransformedReference, emptyTransformedReference );
-		verifyAll();
+		verify( loadingContextMock ).createProjectionHitMapper();
 	}
 
 	@Test
@@ -287,50 +266,40 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyReference );
 
 		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				createMock( LoadingContext.class );
+				mock( LoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
-				createMock( StubDocumentReferenceConverter.class );
+				mock( StubDocumentReferenceConverter.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				createMock( StubEntityLoader.class );
+				mock( StubEntityLoader.class );
 
-		resetAll();
-		// No calls expected on the mocks
-		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
 				.selectEntity()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		verifyAll();
 
-		resetAll();
-		/*
-		 * This will check in particular that the backend gets the projection hit mapper from the loading context,
-		 * which must happen every time we execute the query,
-		 * so that the mapper can run state checks (session is still open, ...).
-		 */
-		MapperEasyMockUtils.expectHitMapping(
+		expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				c -> c
 						.load( mainReference, mainTransformedReference, mainLoadedObject )
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
-		replayAll();
 		assertThatQuery( objectsQuery ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
-		verifyAll();
+		// Check in particular that the backend gets the projection hit mapper from the loading context,
+		// which must happen every time we execute the query,
+		// so that the mapper can run state checks (session is still open, ...).
+		verify( loadingContextMock ).createProjectionHitMapper();
 
 		// check the same for the scroll API
-		resetAll();
-		MapperEasyMockUtils.expectHitMapping(
+		expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				c -> c
 						.load( mainReference, mainTransformedReference, mainLoadedObject )
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
-		replayAll();
 		assertThatHits( hitsUsingScroll( objectsQuery ) ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
-		verifyAll();
+		verify( loadingContextMock ).createProjectionHitMapper();
 	}
 
 	@Test
@@ -343,15 +312,12 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyReference );
 
 		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				createMock( LoadingContext.class );
+				mock( LoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
-				createMock( StubDocumentReferenceConverter.class );
+				mock( StubDocumentReferenceConverter.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				createMock( StubEntityLoader.class );
+				mock( StubEntityLoader.class );
 
-		resetAll();
-		// No calls expected on the mocks
-		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
 		SearchQuery<List<?>> projectionsQuery = scope.query( loadingContextMock )
@@ -365,15 +331,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
-		verifyAll();
 
-		resetAll();
-		/*
-		 * This will check in particular that the backend gets the projection hit mapper from the loading context,
-		 * which must happen every time we execute the query,
-		 * so that the mapper can run state checks (session is still open, ...).
-		 */
-		MapperEasyMockUtils.expectHitMapping(
+		expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				/*
 				 * Expect each reference to be transformed because of the entity reference projection,
@@ -385,16 +344,17 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 						.entityReference( emptyReference, emptyTransformedReference )
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
-		replayAll();
 		assertThatQuery( projectionsQuery ).hasListHitsAnyOrder( b -> {
 			b.list( STRING_VALUE, mainReference, mainTransformedReference, mainLoadedObject );
 			b.list( null, emptyReference, emptyTransformedReference, emptyLoadedObject );
 		} );
-		verifyAll();
+		// Check in particular that the backend gets the projection hit mapper from the loading context,
+		// which must happen every time we execute the query,
+		// so that the mapper can run state checks (session is still open, ...).
+		verify( loadingContextMock ).createProjectionHitMapper();
 
 		// check the same for the scroll API
-		resetAll();
-		MapperEasyMockUtils.expectHitMapping(
+		expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				/*
 				 * Expect each reference to be transformed because of the entity reference projection,
@@ -406,12 +366,11 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 						.entityReference( emptyReference, emptyTransformedReference )
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
-		replayAll();
 		assertThatHits( hitsUsingScroll( projectionsQuery ) ).hasListHitsAnyOrder( b -> {
 			b.list( STRING_VALUE, mainReference, mainTransformedReference, mainLoadedObject );
 			b.list( null, emptyReference, emptyTransformedReference, emptyLoadedObject );
 		} );
-		verifyAll();
+		verify( loadingContextMock ).createProjectionHitMapper();
 	}
 
 	@Test
@@ -421,11 +380,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		StubTransformedHit mainTransformedHit = new StubTransformedHit( mainReference );
 		StubTransformedHit emptyTransformedHit = new StubTransformedHit( emptyReference );
 
-		Function<List<?>, StubTransformedHit> hitTransformerMock = createMock( StubHitTransformer.class );
+		Function<List<?>, StubTransformedHit> hitTransformerMock = mock( StubHitTransformer.class );
 
-		resetAll();
-		// No calls expected on the mocks
-		replayAll();
 		StubMappingScope scope = index.createScope();
 		SearchQuery<StubTransformedHit> query = scope.query()
 				.select( f ->
@@ -443,38 +399,31 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
-		verifyAll();
 
-		resetAll();
-		expect( hitTransformerMock.apply( projectionMatcher(
+		when( hitTransformerMock.apply( projectionMatcher(
 				STRING_VALUE, STRING_ANALYZED_VALUE, INTEGER_VALUE, LOCAL_DATE_VALUE, GEO_POINT_VALUE,
 				mainReference, mainReference, mainReference
 		) ) )
-				.andReturn( mainTransformedHit );
-		expect( hitTransformerMock.apply( projectionMatcher(
+				.thenReturn( mainTransformedHit );
+		when( hitTransformerMock.apply( projectionMatcher(
 				null, null, null, null, null,
 				emptyReference, emptyReference, emptyReference
 		) ) )
-				.andReturn( emptyTransformedHit );
-		replayAll();
+				.thenReturn( emptyTransformedHit );
 		assertThatQuery( query ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
-		verifyAll();
 
 		// check the same for the scroll API
-		resetAll();
-		expect( hitTransformerMock.apply( projectionMatcher(
+		when( hitTransformerMock.apply( projectionMatcher(
 				STRING_VALUE, STRING_ANALYZED_VALUE, INTEGER_VALUE, LOCAL_DATE_VALUE, GEO_POINT_VALUE,
 				mainReference, mainReference, mainReference
 		) ) )
-				.andReturn( mainTransformedHit );
-		expect( hitTransformerMock.apply( projectionMatcher(
+				.thenReturn( mainTransformedHit );
+		when( hitTransformerMock.apply( projectionMatcher(
 				null, null, null, null, null,
 				emptyReference, emptyReference, emptyReference
 		) ) )
-				.andReturn( emptyTransformedHit );
-		replayAll();
+				.thenReturn( emptyTransformedHit );
 		assertThatHits( hitsUsingScroll( query ) ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
-		verifyAll();
 	}
 
 	@Test
@@ -489,16 +438,13 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyReference );
 
 		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				createMock( LoadingContext.class );
+				mock( LoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
-				createMock( StubDocumentReferenceConverter.class );
+				mock( StubDocumentReferenceConverter.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				createMock( StubEntityLoader.class );
-		Function<List<?>, StubTransformedHit> hitTransformerMock = createMock( StubHitTransformer.class );
+				mock( StubEntityLoader.class );
+		Function<List<?>, StubTransformedHit> hitTransformerMock = mock( StubHitTransformer.class );
 
-		resetAll();
-		// No calls expected on the mocks
-		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
 		SearchQuery<StubTransformedHit> query = scope.query( loadingContextMock )
@@ -513,15 +459,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
-		verifyAll();
 
-		resetAll();
-		/*
-		 * This will check in particular that the backend gets the projection hit mapper from the loading context,
-		 * which must happen every time we execute the query,
-		 * so that the mapper can run state checks (session is still open, ...).
-		 */
-		MapperEasyMockUtils.expectHitMapping(
+		expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				/*
 				 * Expect each reference to be transformed because of the entity reference projection,
@@ -533,21 +472,22 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 						.entityReference( emptyReference, emptyTransformedReference )
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
-		expect( hitTransformerMock.apply( projectionMatcher(
+		when( hitTransformerMock.apply( projectionMatcher(
 				STRING_VALUE, mainReference, mainTransformedReference, mainLoadedObject
 		) ) )
-				.andReturn( mainTransformedHit );
-		expect( hitTransformerMock.apply( projectionMatcher(
+				.thenReturn( mainTransformedHit );
+		when( hitTransformerMock.apply( projectionMatcher(
 				null, emptyReference, emptyTransformedReference, emptyLoadedObject
 		) ) )
-				.andReturn( emptyTransformedHit );
-		replayAll();
+				.thenReturn( emptyTransformedHit );
 		assertThatQuery( query ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
-		verifyAll();
+		// Check in particular that the backend gets the projection hit mapper from the loading context,
+		// which must happen every time we execute the query,
+		// so that the mapper can run state checks (session is still open, ...).
+		verify( loadingContextMock ).createProjectionHitMapper();
 
 		// check the same for the scroll API
-		resetAll();
-		MapperEasyMockUtils.expectHitMapping(
+		expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				/*
 				 * Expect each reference to be transformed because of the entity reference projection,
@@ -559,17 +499,16 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 						.entityReference( emptyReference, emptyTransformedReference )
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
-		expect( hitTransformerMock.apply( projectionMatcher(
+		when( hitTransformerMock.apply( projectionMatcher(
 				STRING_VALUE, mainReference, mainTransformedReference, mainLoadedObject
 		) ) )
-				.andReturn( mainTransformedHit );
-		expect( hitTransformerMock.apply( projectionMatcher(
+				.thenReturn( mainTransformedHit );
+		when( hitTransformerMock.apply( projectionMatcher(
 				null, emptyReference, emptyTransformedReference, emptyLoadedObject
 		) ) )
-				.andReturn( emptyTransformedHit );
-		replayAll();
+				.thenReturn( emptyTransformedHit );
 		assertThatHits( hitsUsingScroll( query ) ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
-		verifyAll();
+		verify( loadingContextMock ).createProjectionHitMapper();
 	}
 
 	@Test
@@ -614,11 +553,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		StubTransformedHit mainTransformedHit = new StubTransformedHit( mainReference );
 		StubTransformedHit emptyTransformedHit = new StubTransformedHit( emptyReference );
 
-		Function<List<?>, StubTransformedHit> hitTransformerMock = createMock( StubHitTransformer.class );
+		Function<List<?>, StubTransformedHit> hitTransformerMock = mock( StubHitTransformer.class );
 
-		resetAll();
-		// No calls expected on the mocks
-		replayAll();
 		StubMappingScope scope = index.createScope();
 		SearchQuery<StubTransformedHit> query = scope.query()
 				.asProjection( f ->
@@ -636,38 +572,31 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
-		verifyAll();
 
-		resetAll();
-		expect( hitTransformerMock.apply( projectionMatcher(
+		when( hitTransformerMock.apply( projectionMatcher(
 				STRING_VALUE, STRING_ANALYZED_VALUE, INTEGER_VALUE, LOCAL_DATE_VALUE, GEO_POINT_VALUE,
 				mainReference, mainReference, mainReference
 		) ) )
-				.andReturn( mainTransformedHit );
-		expect( hitTransformerMock.apply( projectionMatcher(
+				.thenReturn( mainTransformedHit );
+		when( hitTransformerMock.apply( projectionMatcher(
 				null, null, null, null, null,
 				emptyReference, emptyReference, emptyReference
 		) ) )
-				.andReturn( emptyTransformedHit );
-		replayAll();
+				.thenReturn( emptyTransformedHit );
 		assertThatQuery( query ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
-		verifyAll();
 
 		// check the same for the scroll API
-		resetAll();
-		expect( hitTransformerMock.apply( projectionMatcher(
+		when( hitTransformerMock.apply( projectionMatcher(
 				STRING_VALUE, STRING_ANALYZED_VALUE, INTEGER_VALUE, LOCAL_DATE_VALUE, GEO_POINT_VALUE,
 				mainReference, mainReference, mainReference
 		) ) )
-				.andReturn( mainTransformedHit );
-		expect( hitTransformerMock.apply( projectionMatcher(
+				.thenReturn( mainTransformedHit );
+		when( hitTransformerMock.apply( projectionMatcher(
 				null, null, null, null, null,
 				emptyReference, emptyReference, emptyReference
 		) ) )
-				.andReturn( emptyTransformedHit );
-		replayAll();
+				.thenReturn( emptyTransformedHit );
 		assertThatHits( hitsUsingScroll( query ) ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
-		verifyAll();
 	}
 
 	@Test
@@ -722,37 +651,28 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 	@Test
 	public void callGetProjectionHitMapperEveryTime() {
 		LoadingContext<DocumentReference, DocumentReference> loadingContextMock =
-				createMock( LoadingContext.class );
+				mock( LoadingContext.class );
 
-		resetAll();
-		// No calls expected on the mocks
-		replayAll();
 		GenericStubMappingScope<DocumentReference, DocumentReference> scope = index.createGenericScope();
 		SearchQuery<DocumentReference> query = scope.query( loadingContextMock )
 				.selectEntity()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		verifyAll();
 
-		/*
-		 * We expect getProjectionHitMapper to be called *every time* a load is performed,
-		 * so that the mapper can check its state (session is open in ORM, for example).
-		 */
-
-		resetAll();
-		expect( loadingContextMock.createProjectionHitMapper() )
-				.andReturn( new DefaultProjectionHitMapper<>( reference -> reference, EntityLoader.identity() ) );
-		replayAll();
+		when( loadingContextMock.createProjectionHitMapper() )
+				.thenReturn( new DefaultProjectionHitMapper<>( reference -> reference, EntityLoader.identity() ) );
 		query.fetchAll();
-		verifyAll();
+		// Check in particular that the backend gets the projection hit mapper from the loading context,
+		// which must happen every time we execute the query,
+		// so that the mapper can run state checks (session is still open, ...).
+		verify( loadingContextMock ).createProjectionHitMapper();
 
 		// Second query execution to make sure the backend doesn't try to cache the projection hit mapper...
-		resetAll();
-		expect( loadingContextMock.createProjectionHitMapper() )
-				.andReturn( new DefaultProjectionHitMapper<>( reference -> reference, EntityLoader.identity() ) );
-		replayAll();
+		reset( loadingContextMock );
+		when( loadingContextMock.createProjectionHitMapper() )
+				.thenReturn( new DefaultProjectionHitMapper<>( reference -> reference, EntityLoader.identity() ) );
 		query.fetchAll();
-		verifyAll();
+		verify( loadingContextMock ).createProjectionHitMapper();
 	}
 
 	@Test
@@ -765,34 +685,27 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyDocumentReference );
 
 		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				createMock( LoadingContext.class );
+				mock( LoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
-				createMock( StubDocumentReferenceConverter.class );
+				mock( StubDocumentReferenceConverter.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				createMock( StubEntityLoader.class );
+				mock( StubEntityLoader.class );
 
-		resetAll();
-		// No calls expected on the mocks
-		replayAll();
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
 				.where( f -> f.matchAll() )
 				.toQuery();
-		verifyAll();
 
-		resetAll();
-		MapperEasyMockUtils.expectHitMapping(
+		expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				c -> c
 						// Return "null" when loading, meaning the entity failed to load
 						.load( mainDocumentReference, mainEntityReference, null )
 						.load( emptyDocumentReference, emptyEntityReference, emptyLoadedObject )
 		);
-		replayAll();
 		// Expect the main document to be excluded from hits, since it could not be loaded.
 		assertThatQuery( objectsQuery ).hasHitsAnyOrder( emptyLoadedObject );
-		verifyAll();
 	}
 
 	private static <H> List<H> hitsUsingScroll(SearchQuery<H> query) {

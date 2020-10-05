@@ -8,13 +8,18 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.easymock.EasyMock.capture;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
@@ -22,219 +27,203 @@ import org.hibernate.search.backend.lucene.work.impl.IndexingWork;
 import org.hibernate.search.backend.lucene.work.impl.IndexingWorkExecutionContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
-import org.easymock.Capture;
-import org.easymock.EasyMock;
-import org.easymock.EasyMockSupport;
-
-public class LuceneBatchedWorkProcessorTest extends EasyMockSupport {
+public class LuceneBatchedWorkProcessorTest {
 
 	private static final String INDEX_NAME = "SomeIndexName";
 
-	private EventContext indexEventContext = EventContexts.fromIndexName( INDEX_NAME );
-	private IndexAccessor indexAccessorMock = createStrictMock( IndexAccessor.class );
-	private IndexWriterDelegator indexWriterDelegatorMock = createStrictMock( IndexWriterDelegator.class );
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
-	private LuceneBatchedWorkProcessor processor = new LuceneBatchedWorkProcessor(
-			indexEventContext, indexAccessorMock
-	);
+	private final EventContext indexEventContext = EventContexts.fromIndexName( INDEX_NAME );
 
-	private List<IndexingWork<?>> workMocks = new ArrayList<>();
+	@Mock
+	private IndexAccessor indexAccessorMock;
+	@Mock
+	private IndexWriterDelegator indexWriterDelegatorMock;
+
+	private LuceneBatchedWorkProcessor processor;
+
+	private int nextWorkId = 0;
+
+	@Before
+	public void setup() {
+		processor = new LuceneBatchedWorkProcessor( indexEventContext, indexAccessorMock );
+	}
 
 	@Test
 	public void batch() throws IOException {
-		resetAll();
-		replayAll();
 		processor.beginBatch();
-		verifyAll();
+		verifyNoOtherIndexInteractionsAndClear();
 
 		testSuccessfulWriteWorks( 200 );
+		verifyNoOtherIndexInteractionsAndClear();
 
-		resetAll();
-		// Give a chance to the I/O strategy to schedule a delayed commit.
-		indexAccessorMock.commitOrDelay();
-		replayAll();
+		verify( indexAccessorMock, never() ).commitOrDelay();
 		processor.endBatch();
-		verifyAll();
+		// Give a chance to the I/O strategy to schedule a delayed commit.
+		verify( indexAccessorMock ).commitOrDelay();
+		verifyNoOtherIndexInteractionsAndClear();
 
-		resetAll();
-		replayAll();
 		processor.beginBatch();
-		verifyAll();
+		verifyNoOtherIndexInteractionsAndClear();
 
 		testSuccessfulWriteWorks( 100 );
+		verifyNoOtherIndexInteractionsAndClear();
 
-		resetAll();
-		// Give a chance to the I/O strategy to schedule a delayed commit.
-		indexAccessorMock.commitOrDelay();
-		replayAll();
+		verify( indexAccessorMock, never() ).commitOrDelay();
 		processor.endBatch();
-		verifyAll();
+		// Give a chance to the I/O strategy to schedule a delayed commit.
+		verify( indexAccessorMock ).commitOrDelay();
+		verifyNoOtherIndexInteractionsAndClear();
 
 		checkCompleteWithNothingToCommit();
 	}
 
 	@Test
 	public void error_workExecute() throws IOException {
-		resetAll();
-		replayAll();
 		processor.beginBatch();
-		verifyAll();
+		verifyNoOtherIndexInteractionsAndClear();
 
 		// Execute a few successful works
 		testSuccessfulWriteWorks( 50 );
+		verifyNoOtherIndexInteractionsAndClear();
 
 		// ... and suddenly a failing work
 		RuntimeException workException = new RuntimeException( "Some message" );
-		IndexingWork<Object> failingWork = createWorkMock();
-		resetAll();
-		expect( failingWork.execute( EasyMock.anyObject() ) ).andThrow( workException );
-		expectWorkGetInfo( 50 );
-		indexAccessorMock.cleanUpAfterFailure( workException, workInfo( 50 ) );
-		replayAll();
+		IndexingWork<Object> failingWork = workMock();
+		when( failingWork.execute( any() ) ).thenThrow( workException );
 		assertThatThrownBy( () -> processor.submit( failingWork ) )
 				.isSameAs( workException );
-		verifyAll();
+		verify( indexAccessorMock ).cleanUpAfterFailure( workException, workInfo( 50 ) );
+		verifyNoOtherIndexInteractionsAndClear();
 
 		// Subsequent works must be executed regardless of previous failures in the same batch
 		testSuccessfulWriteWorks( 10 );
+		verifyNoOtherIndexInteractionsAndClear();
 
-		resetAll();
-		indexAccessorMock.commitOrDelay();
-		replayAll();
 		processor.endBatch();
-		verifyAll();
+		verify( indexAccessorMock ).commitOrDelay();
+		verifyNoOtherIndexInteractionsAndClear();
 
 		checkCompleteWithNothingToCommit();
 	}
 
 	@Test
 	public void forceCommit() {
-		resetAll();
-		indexAccessorMock.commit();
-		replayAll();
 		processor.forceCommit();
-		verifyAll();
+
+		verify( indexAccessorMock ).commit();
+		verifyNoOtherIndexInteractionsAndClear();
 	}
 
 	@Test
-	public void error_forceCommit() throws IOException {
+	public void error_forceCommit() {
 		RuntimeException commitException = new RuntimeException( "Some message" );
-		resetAll();
-		indexAccessorMock.commit();
-		expectLastCall().andThrow( commitException );
-		indexAccessorMock.cleanUpAfterFailure( commitException, "Commit after a set of index works" );
-		replayAll();
+		doThrow( commitException ).when( indexAccessorMock ).commit();
 		assertThatThrownBy( () -> processor.forceCommit() )
 				.isSameAs( commitException );
-		verifyAll();
+		verify( indexAccessorMock ).cleanUpAfterFailure( commitException, "Commit after a set of index works" );
+		verifyNoOtherIndexInteractionsAndClear();
 
-		resetAll();
-		indexAccessorMock.commitOrDelay();
-		replayAll();
 		processor.endBatch();
-		verifyAll();
+		verify( indexAccessorMock ).commitOrDelay();
+		verifyNoOtherIndexInteractionsAndClear();
 
 		checkCompleteWithNothingToCommit();
 	}
 
 	@Test
 	public void forceRefresh() {
-		resetAll();
-		indexAccessorMock.refresh();
-		replayAll();
 		processor.forceRefresh();
-		verifyAll();
+		verify( indexAccessorMock ).refresh();
+		verifyNoOtherIndexInteractionsAndClear();
 	}
 
 	@Test
 	public void error_forceRefresh() {
 		RuntimeException refreshException = new RuntimeException( "Some message" );
-		resetAll();
-		indexAccessorMock.refresh();
-		expectLastCall().andThrow( refreshException );
-		replayAll();
+		doThrow( refreshException ).when( indexAccessorMock ).refresh();
 		assertThatThrownBy( () -> processor.forceRefresh() )
 				.isSameAs( refreshException );
-		verifyAll();
+		verifyNoOtherIndexInteractionsAndClear();
 	}
 
 	@Test
 	public void error_batchCommit() throws IOException {
 		RuntimeException commitException = new RuntimeException( "Some message" );
 
-		resetAll();
-		replayAll();
 		processor.beginBatch();
-		verifyAll();
+		verifyNoOtherIndexInteractionsAndClear();
 
 		// Execute a few successful works
 		testSuccessfulWriteWorks( 200 );
+		verifyNoOtherIndexInteractionsAndClear();
 
 		// Fail upon batch commit
-		resetAll();
-		indexAccessorMock.commitOrDelay();
-		expectLastCall().andThrow( commitException );
-		indexAccessorMock.cleanUpAfterFailure( commitException, "Commit after a batch of index works" );
-		replayAll();
+		doThrow( commitException ).when( indexAccessorMock ).commitOrDelay();
 		processor.endBatch();
-		verifyAll();
+		verify( indexAccessorMock )
+				.cleanUpAfterFailure( commitException, "Commit after a batch of index works" );
+		verifyNoOtherIndexInteractionsAndClear();
 
 		checkCompleteWithNothingToCommit();
 	}
 
 	private void testSuccessfulWriteWorks(int workCount) throws IOException {
-		Capture<IndexingWorkExecutionContext> contextCapture = Capture.newInstance();
+		ArgumentCaptor<IndexingWorkExecutionContext> contextCapture =
+				ArgumentCaptor.forClass( IndexingWorkExecutionContext.class );
+
+		when( indexAccessorMock.getIndexWriterDelegator() ).thenReturn( indexWriterDelegatorMock );
 
 		for ( int i = 0; i < workCount; ++i ) {
-			IndexingWork<Object> work = createWorkMock();
+			IndexingWork<Object> work = workMock();
 			Object workResult = new Object();
 
-			resetAll();
-			expect( work.execute( capture( contextCapture ) ) ).andReturn( workResult );
-			replayAll();
+			when( work.execute( contextCapture.capture() ) ).thenReturn( workResult );
+
 			assertThat( processor.submit( work ) ).isEqualTo( workResult );
-			verifyAll();
 
 			testContext( contextCapture.getValue() );
 		}
 	}
 
 	private void checkCompleteWithNothingToCommit() {
-		resetAll();
-		// The index accessor (or the underlying writer) is responsible for detecting there is nothing to commit.
-		indexAccessorMock.commitOrDelay();
-		replayAll();
-		processor.complete();
-		verifyAll();
-	}
+		doNothing().when( indexAccessorMock ).commitOrDelay();
 
-	private void expectWorkGetInfo(int ... ids) {
-		for ( int id : ids ) {
-			IndexingWork<?> workMock = workMocks.get( id );
-			EasyMock.expect( workMock.getInfo() ).andReturn( workInfo( id ) );
-		}
+		processor.complete();
+
+		// The index accessor (or the underlying writer) is responsible for detecting there is nothing to commit.
+		verify( indexAccessorMock ).commitOrDelay();
+		verifyNoOtherIndexInteractionsAndClear();
 	}
 
 	private void testContext(IndexingWorkExecutionContext context) throws IOException {
-		resetAll();
-		replayAll();
 		assertThat( context.getEventContext() ).isSameAs( indexEventContext );
-		verifyAll();
 
-		resetAll();
-		expect( indexAccessorMock.getIndexWriterDelegator() ).andReturn( indexWriterDelegatorMock );
-		replayAll();
 		assertThat( context.getIndexWriterDelegator() ).isSameAs( indexWriterDelegatorMock );
-		verifyAll();
 	}
 
-	private <T> IndexingWork<T> createWorkMock() {
-		String workName = workInfo( workMocks.size() );
-		IndexingWork<T> workMock = createStrictMock( workName, IndexingWork.class );
-		workMocks.add( workMock );
+	private void verifyNoOtherIndexInteractionsAndClear() {
+		verifyNoMoreInteractions( indexAccessorMock, indexWriterDelegatorMock );
+		clearInvocations( indexAccessorMock, indexWriterDelegatorMock );
+	}
+
+	@SuppressWarnings("unchecked") // Raw types are the only way to mock parameterized types
+	private <T> IndexingWork<T> workMock() {
+		int id = nextWorkId++;
+		String workName = workInfo( id );
+		IndexingWork<T> workMock = mock( IndexingWork.class, withSettings().name( workName ).lenient() );
+		when( workMock.getInfo() ).thenReturn( workInfo( id ) );
 		return workMock;
 	}
 

@@ -1318,8 +1318,6 @@
                                     <exclude>**/*_$logger.class</exclude>
                                     <!-- JBoss message bundles format messages -->
                                     <exclude>**/*_$bundle.class</exclude>
-                                    <!-- Easymock uses StringBuffer, we can't do anything about that -->
-                                    <exclude>**/EasyMockUtils*.class</exclude>
                                     <!--
                                          SearchException and subclasses are allowed to use SearchException constructors,
                                          on contrary to the rest of the code

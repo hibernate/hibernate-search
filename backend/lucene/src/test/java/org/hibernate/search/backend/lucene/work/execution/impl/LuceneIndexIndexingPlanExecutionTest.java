@@ -8,10 +8,16 @@ package org.hibernate.search.backend.lucene.work.execution.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.easymock.EasyMock.capture;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expectLastCall;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
@@ -27,16 +33,21 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import org.easymock.Capture;
-import org.easymock.EasyMock;
-import org.easymock.EasyMockSupport;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 @RunWith(Parameterized.class)
-public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
+@SuppressWarnings("unchecked") // Raw types are the only way to mock parameterized types
+public class LuceneIndexIndexingPlanExecutionTest {
 
 	private static final String TYPE_NAME = "SomeTypeName";
 
@@ -51,13 +62,17 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 		return params.toArray( new Object[0][] );
 	}
 
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
-	private final LuceneSerialWorkOrchestrator orchestratorMock = createStrictMock( LuceneSerialWorkOrchestrator.class );
+	@Mock
+	private LuceneSerialWorkOrchestrator orchestratorMock;
 
-	private final EntityReferenceFactory<StubEntityReference> entityReferenceFactoryMock =
-			createStrictMock( EntityReferenceFactory.class );
+	@Mock(lenient = true)
+	private EntityReferenceFactory<StubEntityReference> entityReferenceFactoryMock;
 
 	private final List<SingleDocumentIndexingWork> workMocks = new ArrayList<>();
 
@@ -67,6 +82,12 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 		this.refreshStrategy = refreshStrategy;
 	}
 
+	@Before
+	public void setup() {
+		when( entityReferenceFactoryMock.createEntityReference( eq( TYPE_NAME ), any() ) )
+				.thenAnswer( invocation -> entityReference( invocation.getArgument( 1 ) ) );
+	}
+
 	@Test
 	public void success() {
 		Long work1Result = 42L;
@@ -74,54 +95,44 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 		Long work3Result = 43L;
 
 		// Work futures: we will complete them
-		Capture<CompletableFuture<Long>> work1FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Long>> work2FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Long>> work3FutureCapture = Capture.newInstance();
+		ArgumentCaptor<CompletableFuture<Long>> work1FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Long>> work2FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Long>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
 		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> planExecutionFuture;
 
-		resetAll();
 		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
 				orchestratorMock,
 				entityReferenceFactoryMock,
 				commitStrategy, refreshStrategy,
-				createWorkMocks( 3 )
+				workMocks( 3 )
 		);
-		replayAll();
-		verifyAll();
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		resetAll();
-		orchestratorMock.submit( capture( work1FutureCapture ), eq( workMocks.get( 0 ) ) );
-		orchestratorMock.submit( capture( work2FutureCapture ), eq( workMocks.get( 1 ) ) );
-		orchestratorMock.submit( capture( work3FutureCapture ), eq( workMocks.get( 2 ) ) );
-		replayAll();
 		planExecutionFuture = execution.execute();
-		verifyAll();
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ) );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work2FutureCapture.getValue().complete( work2Result );
-		verifyAll();
+		work2FutureCaptor.getValue().complete( work2Result );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work1FutureCapture.getValue().complete( work1Result );
-		verifyAll();
+		work1FutureCaptor.getValue().complete( work1Result );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
+		work3FutureCaptor.getValue().complete( work3Result );
 		if ( DocumentCommitStrategy.FORCE.equals( commitStrategy ) ) {
-			orchestratorMock.forceCommitInCurrentThread();
+			verify( orchestratorMock ).forceCommitInCurrentThread();
 		}
 		if ( DocumentRefreshStrategy.FORCE.equals( refreshStrategy ) ) {
-			orchestratorMock.forceRefreshInCurrentThread();
+			verify( orchestratorMock ).forceRefreshInCurrentThread();
 		}
-		replayAll();
-		work3FutureCapture.getValue().complete( work3Result );
-		verifyAll();
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
 		assertThatFuture( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
@@ -139,55 +150,44 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 		Long work3Result = 43L;
 
 		// Work futures: we will complete them
-		Capture<CompletableFuture<Long>> work1FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Long>> work2FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Long>> work3FutureCapture = Capture.newInstance();
+		ArgumentCaptor<CompletableFuture<Long>> work1FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Long>> work2FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Long>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
 		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> planExecutionFuture;
 
-		resetAll();
 		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
 				orchestratorMock,
 				entityReferenceFactoryMock,
 				commitStrategy, refreshStrategy,
-				createWorkMocks( 3 )
+				workMocks( 3 )
 		);
-		replayAll();
-		verifyAll();
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		resetAll();
-		orchestratorMock.submit( capture( work1FutureCapture ), eq( workMocks.get( 0 ) ) );
-		orchestratorMock.submit( capture( work2FutureCapture ), eq( workMocks.get( 1 ) ) );
-		orchestratorMock.submit( capture( work3FutureCapture ), eq( workMocks.get( 2 ) ) );
-		replayAll();
 		planExecutionFuture = execution.execute();
-		verifyAll();
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ) );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work2FutureCapture.getValue().complete( work2Result );
-		verifyAll();
+		work2FutureCaptor.getValue().complete( work2Result );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work1FutureCapture.getValue().completeExceptionally( work1Exception );
-		verifyAll();
+		work1FutureCaptor.getValue().completeExceptionally( work1Exception );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
+		work3FutureCaptor.getValue().complete( work3Result );
 		if ( DocumentCommitStrategy.FORCE.equals( commitStrategy ) ) {
-			orchestratorMock.forceCommitInCurrentThread();
+			verify( orchestratorMock ).forceCommitInCurrentThread();
 		}
 		if ( DocumentRefreshStrategy.FORCE.equals( refreshStrategy ) ) {
-			orchestratorMock.forceRefreshInCurrentThread();
+			verify( orchestratorMock ).forceRefreshInCurrentThread();
 		}
-		expectWorkGetInfo( 0 );
-		replayAll();
-		work3FutureCapture.getValue().complete( work3Result );
-		verifyAll();
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
 		assertThatFuture( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
@@ -207,63 +207,50 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 		Long work4Result = 44L;
 
 		// Work futures: we will complete them
-		Capture<CompletableFuture<Long>> work1FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Long>> work2FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Long>> work3FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Long>> work4FutureCapture = Capture.newInstance();
+		ArgumentCaptor<CompletableFuture<Long>> work1FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Long>> work2FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Long>> work3FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Long>> work4FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
 		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> planExecutionFuture;
 
-		resetAll();
 		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
 				orchestratorMock,
 				entityReferenceFactoryMock,
 				commitStrategy, refreshStrategy,
-				createWorkMocks( 4 )
+				workMocks( 4 )
 		);
-		replayAll();
-		verifyAll();
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		resetAll();
-		orchestratorMock.submit( capture( work1FutureCapture ), eq( workMocks.get( 0 ) ) );
-		orchestratorMock.submit( capture( work2FutureCapture ), eq( workMocks.get( 1 ) ) );
-		orchestratorMock.submit( capture( work3FutureCapture ), eq( workMocks.get( 2 ) ) );
-		orchestratorMock.submit( capture( work4FutureCapture ), eq( workMocks.get( 3 ) ) );
-		replayAll();
 		planExecutionFuture = execution.execute();
-		verifyAll();
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ) );
+		verify( orchestratorMock ).submit( work4FutureCaptor.capture(), eq( workMocks.get( 3 ) ) );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work2FutureCapture.getValue().complete( work2Result );
-		verifyAll();
+		work2FutureCaptor.getValue().complete( work2Result );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work1FutureCapture.getValue().completeExceptionally( work1Exception );
-		verifyAll();
+		work1FutureCaptor.getValue().completeExceptionally( work1Exception );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work3FutureCapture.getValue().completeExceptionally( work3Exception );
-		verifyAll();
+		work3FutureCaptor.getValue().completeExceptionally( work3Exception );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
+		work4FutureCaptor.getValue().complete( work4Result );
 		if ( DocumentCommitStrategy.FORCE.equals( commitStrategy ) ) {
-			orchestratorMock.forceCommitInCurrentThread();
+			verify( orchestratorMock ).forceCommitInCurrentThread();
 		}
 		if ( DocumentRefreshStrategy.FORCE.equals( refreshStrategy ) ) {
-			orchestratorMock.forceRefreshInCurrentThread();
+			verify( orchestratorMock ).forceRefreshInCurrentThread();
 		}
-		expectWorkGetInfo( 0, 2 );
-		replayAll();
-		work4FutureCapture.getValue().complete( work4Result );
-		verifyAll();
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
 		assertThatFuture( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
@@ -285,65 +272,53 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 		Long work4Result = 44L;
 
 		// Work futures: we will complete them
-		Capture<CompletableFuture<Long>> work1FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Long>> work2FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Long>> work3FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Long>> work4FutureCapture = Capture.newInstance();
+		ArgumentCaptor<CompletableFuture<Long>> work1FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Long>> work2FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Long>> work3FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Long>> work4FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
 		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> planExecutionFuture;
 
-		resetAll();
 		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
 				orchestratorMock,
 				entityReferenceFactoryMock,
 				commitStrategy, refreshStrategy,
-				createWorkMocks( 4 )
+				workMocks( 4 )
 		);
-		replayAll();
-		verifyAll();
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		resetAll();
-		orchestratorMock.submit( capture( work1FutureCapture ), eq( workMocks.get( 0 ) ) );
-		orchestratorMock.submit( capture( work2FutureCapture ), eq( workMocks.get( 1 ) ) );
-		orchestratorMock.submit( capture( work3FutureCapture ), eq( workMocks.get( 2 ) ) );
-		orchestratorMock.submit( capture( work4FutureCapture ), eq( workMocks.get( 3 ) ) );
-		replayAll();
 		planExecutionFuture = execution.execute();
-		verifyAll();
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ) );
+		verify( orchestratorMock ).submit( work4FutureCaptor.capture(), eq( workMocks.get( 3 ) ) );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work2FutureCapture.getValue().complete( work2Result );
-		verifyAll();
+		work2FutureCaptor.getValue().complete( work2Result );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work1FutureCapture.getValue().completeExceptionally( work1Exception );
-		verifyAll();
+		work1FutureCaptor.getValue().completeExceptionally( work1Exception );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
-		resetAll();
-		replayAll();
-		work3FutureCapture.getValue().completeExceptionally( work3Exception );
-		verifyAll();
+		work3FutureCaptor.getValue().completeExceptionally( work3Exception );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
 		RuntimeException entityReferenceFactoryException = new RuntimeException( "EntityReferenceFactory message" );
-		resetAll();
+		when( entityReferenceFactoryMock.createEntityReference( TYPE_NAME, 0 ) )
+				.thenThrow( entityReferenceFactoryException );
+		work4FutureCaptor.getValue().complete( work4Result );
 		if ( DocumentCommitStrategy.FORCE.equals( commitStrategy ) ) {
-			orchestratorMock.forceCommitInCurrentThread();
+			verify( orchestratorMock ).forceCommitInCurrentThread();
 		}
 		if ( DocumentRefreshStrategy.FORCE.equals( refreshStrategy ) ) {
-			orchestratorMock.forceRefreshInCurrentThread();
+			verify( orchestratorMock ).forceRefreshInCurrentThread();
 		}
-		expectFailingWorkGetInfo( 0, entityReferenceFactoryException );
-		expectWorkGetInfo( 2 );
-		replayAll();
-		work4FutureCapture.getValue().complete( work4Result );
-		verifyAll();
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
 		assertThatFuture( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
@@ -372,48 +347,38 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 		Long work3Result = 43L;
 
 		// Work futures: we will complete them
-		Capture<CompletableFuture<Long>> work1FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Long>> work2FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Long>> work3FutureCapture = Capture.newInstance();
+		ArgumentCaptor<CompletableFuture<Long>> work1FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Long>> work2FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Long>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
 		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> planExecutionFuture;
 
-		resetAll();
 		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
 				orchestratorMock,
 				entityReferenceFactoryMock,
 				commitStrategy, refreshStrategy,
-				createWorkMocks( 3 )
+				workMocks( 3 )
 		);
-		replayAll();
-		verifyAll();
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		resetAll();
-		orchestratorMock.submit( capture( work1FutureCapture ), eq( workMocks.get( 0 ) ) );
-		orchestratorMock.submit( capture( work2FutureCapture ), eq( workMocks.get( 1 ) ) );
-		orchestratorMock.submit( capture( work3FutureCapture ), eq( workMocks.get( 2 ) ) );
-		replayAll();
 		planExecutionFuture = execution.execute();
-		verifyAll();
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ) );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		resetAll();
-		replayAll();
-		work2FutureCapture.getValue().complete( work2Result );
-		work1FutureCapture.getValue().complete( work1Result );
-		verifyAll();
+		work2FutureCaptor.getValue().complete( work2Result );
+		work1FutureCaptor.getValue().complete( work1Result );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
 		// Fail upon commit
 		RuntimeException commitException = new RuntimeException( "Some message" );
-		resetAll();
-		orchestratorMock.forceCommitInCurrentThread();
-		expectLastCall().andThrow( commitException );
+		doThrow( commitException ).when( orchestratorMock ).forceCommitInCurrentThread();
+		work3FutureCaptor.getValue().complete( work3Result );
 		// ... no refresh expected, since the commit failed ...
-		expectWorkGetInfo( 0, 1, 2 );
-		replayAll();
-		work3FutureCapture.getValue().complete( work3Result );
-		verifyAll();
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
 		assertThatFuture( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
@@ -440,50 +405,40 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 		Long work3Result = 43L;
 
 		// Work futures: we will complete them
-		Capture<CompletableFuture<Long>> work1FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Long>> work2FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Long>> work3FutureCapture = Capture.newInstance();
+		ArgumentCaptor<CompletableFuture<Long>> work1FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Long>> work2FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Long>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
 		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> planExecutionFuture;
 
-		resetAll();
 		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
 				orchestratorMock,
 				entityReferenceFactoryMock,
 				commitStrategy, DocumentRefreshStrategy.FORCE,
-				createWorkMocks( 3 )
+				workMocks( 3 )
 		);
-		replayAll();
-		verifyAll();
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		resetAll();
-		orchestratorMock.submit( capture( work1FutureCapture ), eq( workMocks.get( 0 ) ) );
-		orchestratorMock.submit( capture( work2FutureCapture ), eq( workMocks.get( 1 ) ) );
-		orchestratorMock.submit( capture( work3FutureCapture ), eq( workMocks.get( 2 ) ) );
-		replayAll();
 		planExecutionFuture = execution.execute();
-		verifyAll();
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ) );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		resetAll();
-		replayAll();
-		work2FutureCapture.getValue().complete( work2Result );
-		work1FutureCapture.getValue().complete( work1Result );
-		verifyAll();
+		work2FutureCaptor.getValue().complete( work2Result );
+		work1FutureCaptor.getValue().complete( work1Result );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
 		// Fail upon refresh
 		RuntimeException refreshException = new RuntimeException( "Some message" );
-		resetAll();
+		doThrow( refreshException ).when( orchestratorMock ).forceRefreshInCurrentThread();
+		work3FutureCaptor.getValue().complete( work3Result );
 		if ( DocumentCommitStrategy.FORCE.equals( commitStrategy ) ) {
-			orchestratorMock.forceCommitInCurrentThread();
+			verify( orchestratorMock ).forceCommitInCurrentThread();
 		}
-		orchestratorMock.forceRefreshInCurrentThread();
-		expectLastCall().andThrow( refreshException );
-		expectWorkGetInfo( 0, 1, 2 );
-		replayAll();
-		work3FutureCapture.getValue().complete( work3Result );
-		verifyAll();
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
 		assertThatFuture( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
@@ -498,7 +453,6 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 		} );
 	}
 
-
 	@Test
 	public void failure_workAndCommit() {
 		assumeTrue(
@@ -511,48 +465,38 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 		Long work3Result = 43L;
 
 		// Work futures: we will complete them
-		Capture<CompletableFuture<Long>> work1FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Long>> work2FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Long>> work3FutureCapture = Capture.newInstance();
+		ArgumentCaptor<CompletableFuture<Long>> work1FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Long>> work2FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Long>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
 		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> planExecutionFuture;
 
-		resetAll();
 		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
 				orchestratorMock,
 				entityReferenceFactoryMock,
 				commitStrategy, refreshStrategy,
-				createWorkMocks( 3 )
+				workMocks( 3 )
 		);
-		replayAll();
-		verifyAll();
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		resetAll();
-		orchestratorMock.submit( capture( work1FutureCapture ), eq( workMocks.get( 0 ) ) );
-		orchestratorMock.submit( capture( work2FutureCapture ), eq( workMocks.get( 1 ) ) );
-		orchestratorMock.submit( capture( work3FutureCapture ), eq( workMocks.get( 2 ) ) );
-		replayAll();
 		planExecutionFuture = execution.execute();
-		verifyAll();
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ) );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		resetAll();
-		replayAll();
-		work2FutureCapture.getValue().complete( work2Result );
-		work1FutureCapture.getValue().completeExceptionally( work1Exception );
-		verifyAll();
+		work2FutureCaptor.getValue().complete( work2Result );
+		work1FutureCaptor.getValue().completeExceptionally( work1Exception );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
 		// Fail upon commit
 		RuntimeException commitException = new RuntimeException( "Some message" );
-		resetAll();
-		orchestratorMock.forceCommitInCurrentThread();
-		expectLastCall().andThrow( commitException );
+		doThrow( commitException ).when( orchestratorMock ).forceCommitInCurrentThread();
+		work3FutureCaptor.getValue().complete( work3Result );
 		// ... no refresh expected, since the commit failed ...
-		expectWorkGetInfo( 0, 1, 2 );
-		replayAll();
-		work3FutureCapture.getValue().complete( work3Result );
-		verifyAll();
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
 		assertThatFuture( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
@@ -580,50 +524,40 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 		Long work3Result = 43L;
 
 		// Work futures: we will complete them
-		Capture<CompletableFuture<Long>> work1FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Long>> work2FutureCapture = Capture.newInstance();
-		Capture<CompletableFuture<Long>> work3FutureCapture = Capture.newInstance();
+		ArgumentCaptor<CompletableFuture<Long>> work1FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Long>> work2FutureCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<Long>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
 		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> planExecutionFuture;
 
-		resetAll();
 		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
 				orchestratorMock,
 				entityReferenceFactoryMock,
 				commitStrategy, DocumentRefreshStrategy.FORCE,
-				createWorkMocks( 3 )
+				workMocks( 3 )
 		);
-		replayAll();
-		verifyAll();
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		resetAll();
-		orchestratorMock.submit( capture( work1FutureCapture ), eq( workMocks.get( 0 ) ) );
-		orchestratorMock.submit( capture( work2FutureCapture ), eq( workMocks.get( 1 ) ) );
-		orchestratorMock.submit( capture( work3FutureCapture ), eq( workMocks.get( 2 ) ) );
-		replayAll();
 		planExecutionFuture = execution.execute();
-		verifyAll();
+		verify( orchestratorMock ).submit( work1FutureCaptor.capture(), eq( workMocks.get( 0 ) ) );
+		verify( orchestratorMock ).submit( work2FutureCaptor.capture(), eq( workMocks.get( 1 ) ) );
+		verify( orchestratorMock ).submit( work3FutureCaptor.capture(), eq( workMocks.get( 2 ) ) );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
-		resetAll();
-		replayAll();
-		work2FutureCapture.getValue().complete( work2Result );
-		work1FutureCapture.getValue().completeExceptionally( work1Exception );
-		verifyAll();
+		work2FutureCaptor.getValue().complete( work2Result );
+		work1FutureCaptor.getValue().completeExceptionally( work1Exception );
+		verifyNoOtherOrchestratorInteractionsAndReset();
 		assertThatFuture( planExecutionFuture ).isPending();
 
 		// Fail upon refresh
 		RuntimeException refreshException = new RuntimeException( "Some message" );
-		resetAll();
+		doThrow( refreshException ).when( orchestratorMock ).forceRefreshInCurrentThread();
+		work3FutureCaptor.getValue().complete( work3Result );
 		if ( DocumentCommitStrategy.FORCE.equals( commitStrategy ) ) {
-			orchestratorMock.forceCommitInCurrentThread();
+			verify( orchestratorMock ).forceCommitInCurrentThread();
 		}
-		orchestratorMock.forceRefreshInCurrentThread();
-		expectLastCall().andThrow( refreshException );
-		expectWorkGetInfo( 0, 1, 2 );
-		replayAll();
-		work3FutureCapture.getValue().complete( work3Result );
-		verifyAll();
+		verifyNoOtherOrchestratorInteractionsAndReset();
 
 		assertThatFuture( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
@@ -639,37 +573,31 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 		} );
 	}
 
-	private void expectWorkGetInfo(int ... ids) {
-		for ( int id : ids ) {
-			SingleDocumentIndexingWork workMock = workMocks.get( id );
-			EasyMock.expect( workMock.getInfo() ).andStubReturn( workInfo( id ) );
-			EasyMock.expect( workMock.getEntityTypeName() ).andStubReturn( TYPE_NAME );
-			EasyMock.expect( workMock.getEntityIdentifier() ).andStubReturn( id );
-			EasyMock.expect( entityReferenceFactoryMock.createEntityReference( TYPE_NAME, id ) )
-					.andReturn( entityReference( id ) );
-		}
+	private void verifyNoOtherOrchestratorInteractionsAndReset() {
+		verifyNoMoreInteractions( orchestratorMock );
+		reset( orchestratorMock );
 	}
 
-	private void expectFailingWorkGetInfo(int id, Throwable thrown) {
-		SingleDocumentIndexingWork workMock = workMocks.get( id );
-		EasyMock.expect( workMock.getInfo() ).andStubReturn( workInfo( id ) );
-		EasyMock.expect( workMock.getEntityTypeName() ).andStubReturn( TYPE_NAME );
-		EasyMock.expect( workMock.getEntityIdentifier() ).andStubReturn( id );
-		EasyMock.expect( entityReferenceFactoryMock.createEntityReference( TYPE_NAME, id ) )
-				.andThrow( thrown );
-	}
-
-	private List<SingleDocumentIndexingWork> createWorkMocks(int count) {
+	private List<SingleDocumentIndexingWork> workMocks(int count) {
 		List<SingleDocumentIndexingWork> result = new ArrayList<>();
 		for ( int i = 0; i < count; i++ ) {
-			result.add( createWorkMock() );
+			result.add( workMock() );
 		}
 		return result;
 	}
 
-	private <T> SingleDocumentIndexingWork createWorkMock() {
-		String workName = workInfo( workMocks.size() );
-		SingleDocumentIndexingWork workMock = createStrictMock( workName, SingleDocumentIndexingWork.class );
+	private <T> ArgumentCaptor<CompletableFuture<T>> futureCaptor() {
+		return ArgumentCaptor.forClass( CompletableFuture.class );
+	}
+
+	private SingleDocumentIndexingWork workMock() {
+		int id = workMocks.size();
+		String workName = workInfo( id );
+		SingleDocumentIndexingWork workMock = mock( SingleDocumentIndexingWork.class,
+				withSettings().name( workName ).lenient() );
+		when( workMock.getInfo() ).thenReturn( workName );
+		when( workMock.getEntityTypeName() ).thenReturn( TYPE_NAME );
+		when( workMock.getEntityIdentifier() ).thenReturn( id );
 		workMocks.add( workMock );
 		return workMock;
 	}

@@ -8,9 +8,8 @@ package org.hibernate.search.backend.elasticsearch.client.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.reset;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
@@ -20,13 +19,17 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.util.common.SearchException;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import com.google.gson.JsonObject;
 import org.assertj.core.api.InstanceOfAssertFactories;
-import org.easymock.EasyMock;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 @RunWith(Parameterized.class)
 public class ElasticsearchClientUtilsGetElasticsearchVersionTest {
@@ -46,13 +49,17 @@ public class ElasticsearchClientUtilsGetElasticsearchVersionTest {
 		};
 	}
 
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+
 	private final String versionString;
 	private final int expectedMajor;
 	private final int expectedMinor;
 	private final int expectedMicro;
 	private final String expectedQualifier;
 
-	private ElasticsearchClient clientMock = EasyMock.createMock( ElasticsearchClient.class );
+	@Mock
+	private ElasticsearchClient clientMock;
 
 	public ElasticsearchClientUtilsGetElasticsearchVersionTest(String versionString, int expectedMajor,
 			int expectedMinor, int expectedMicro, String expectedQualifier) {
@@ -97,13 +104,11 @@ public class ElasticsearchClientUtilsGetElasticsearchVersionTest {
 	}
 
 	private void doMock(String theVersionString) {
-		reset( clientMock );
 		JsonObject versionObject = new JsonObject();
 		versionObject.addProperty( "number", theVersionString );
 		JsonObject responseBody = new JsonObject();
 		responseBody.add( "version", versionObject );
-		expect( clientMock.submit( EasyMock.anyObject() ) )
-				.andReturn( CompletableFuture.completedFuture( new ElasticsearchResponse( 200, "", responseBody ) ) );
-		replay( clientMock );
+		when( clientMock.submit( any() ) )
+				.thenReturn( CompletableFuture.completedFuture( new ElasticsearchResponse( 200, "", responseBody ) ) );
 	}
 }

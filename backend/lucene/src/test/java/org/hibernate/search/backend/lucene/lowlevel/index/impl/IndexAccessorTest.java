@@ -8,8 +8,10 @@ package org.hibernate.search.backend.lucene.lowlevel.index.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 
@@ -22,163 +24,156 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import org.apache.lucene.index.DirectoryReader;
-import org.easymock.EasyMockSupport;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
-public class IndexAccessorTest extends EasyMockSupport {
+public class IndexAccessorTest {
 
 	private static final String INDEX_NAME = "SomeIndexName";
 
-	private EventContext indexEventContext = EventContexts.fromIndexName( INDEX_NAME );
-	private DirectoryHolder directoryHolderMock = createStrictMock( DirectoryHolder.class );
-	private IndexReaderProvider indexReaderProviderMock = createStrictMock( IndexReaderProvider.class );
-	private IndexWriterProvider indexWriterProviderMock = createStrictMock( IndexWriterProvider.class );
-	private IndexWriterDelegatorImpl indexWriterDelegatorMock = createStrictMock( IndexWriterDelegatorImpl.class );
-	private DirectoryReader indexReaderMock = createStrictMock( DirectoryReader.class );
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
-	private IndexAccessorImpl accessor = new IndexAccessorImpl(
-			indexEventContext, directoryHolderMock,
-			indexWriterProviderMock, indexReaderProviderMock
-	);
+	private final EventContext indexEventContext = EventContexts.fromIndexName( INDEX_NAME );
+
+	@Mock
+	private DirectoryHolder directoryHolderMock;
+	@Mock
+	private IndexReaderProvider indexReaderProviderMock;
+	@Mock
+	private IndexWriterProvider indexWriterProviderMock;
+	@Mock
+	private IndexWriterDelegatorImpl indexWriterDelegatorMock;
+	@Mock
+	private DirectoryReader indexReaderMock;
+
+	private IndexAccessorImpl accessor;
 
 	@Before
 	public void start() throws IOException {
-		resetAll();
-		directoryHolderMock.start();
-		replayAll();
+		accessor = new IndexAccessorImpl( indexEventContext, directoryHolderMock,
+				indexWriterProviderMock, indexReaderProviderMock );
 		accessor.start();
-		verifyAll();
 	}
 
 	@After
 	public void close() throws IOException {
-		resetAll();
-		indexReaderProviderMock.clear();
-		indexWriterProviderMock.clear();
-		directoryHolderMock.close();
-		replayAll();
 		accessor.close();
-		verifyAll();
 	}
 
 	@Test
 	public void commit() {
-		resetAll();
-		expect( indexWriterProviderMock.getOrNull() ).andReturn( indexWriterDelegatorMock );
-		indexWriterDelegatorMock.commit();
-		replayAll();
+		when( indexWriterProviderMock.getOrNull() ).thenReturn( indexWriterDelegatorMock );
+
 		accessor.commit();
-		verifyAll();
+
+		verify( indexWriterDelegatorMock ).commit();
+		verifyNoOtherIndexInteractions();
 	}
 
 	@Test
 	public void commit_noWriter() {
-		resetAll();
-		// No writer => nothing to commit
-		expect( indexWriterProviderMock.getOrNull() ).andReturn( null );
-		replayAll();
+		when( indexWriterProviderMock.getOrNull() ).thenReturn( null );
+
 		accessor.commit();
-		verifyAll();
+
+		// No writer => nothing to commit
+		verifyNoOtherIndexInteractions();
 	}
 
 	@Test
 	public void commit_runtimeException() {
 		RuntimeException exception = new RuntimeException( "Some message" );
 
-		resetAll();
-		expect( indexWriterProviderMock.getOrNull() ).andReturn( indexWriterDelegatorMock );
-		indexWriterDelegatorMock.commit();
-		expectLastCall().andThrow( exception );
-		replayAll();
+		when( indexWriterProviderMock.getOrNull() ).thenReturn( indexWriterDelegatorMock );
+		doThrow( exception ).when( indexWriterDelegatorMock ).commit();
+
 		assertThatThrownBy( () -> accessor.commit() )
 				.isSameAs( exception );
-		verifyAll();
+		verifyNoOtherIndexInteractions();
 	}
 
 	@Test
 	public void commitOrDelay() {
-		resetAll();
-		expect( indexWriterProviderMock.getOrNull() ).andReturn( indexWriterDelegatorMock );
-		indexWriterDelegatorMock.commitOrDelay();
-		replayAll();
+		when( indexWriterProviderMock.getOrNull() ).thenReturn( indexWriterDelegatorMock );
+
 		accessor.commitOrDelay();
-		verifyAll();
+
+		verify( indexWriterDelegatorMock ).commitOrDelay();
+		verifyNoOtherIndexInteractions();
 	}
 
 	@Test
 	public void commitOrDelay_noWriter() {
-		resetAll();
-		// No writer => nothing to commit
-		expect( indexWriterProviderMock.getOrNull() ).andReturn( null );
-		replayAll();
+		when( indexWriterProviderMock.getOrNull() ).thenReturn( null );
+
 		accessor.commitOrDelay();
-		verifyAll();
+
+		// No writer => nothing to commit
+		verifyNoOtherIndexInteractions();
 	}
 
 	@Test
 	public void commitOrDelay_runtimeException() {
 		RuntimeException exception = new RuntimeException( "Some message" );
 
-		resetAll();
-		expect( indexWriterProviderMock.getOrNull() ).andReturn( indexWriterDelegatorMock );
-		indexWriterDelegatorMock.commitOrDelay();
-		expectLastCall().andThrow( exception );
-		replayAll();
+		when( indexWriterProviderMock.getOrNull() ).thenReturn( indexWriterDelegatorMock );
+		doThrow( exception ).when( indexWriterDelegatorMock ).commitOrDelay();
+
 		assertThatThrownBy( () -> accessor.commitOrDelay() )
 				.isSameAs( exception );
-		verifyAll();
+		verifyNoOtherIndexInteractions();
 	}
 
 	@Test
 	public void refresh() {
-		resetAll();
-		indexReaderProviderMock.refresh();
-		replayAll();
 		accessor.refresh();
-		verifyAll();
+
+		verify( indexReaderProviderMock ).refresh();
+		verifyNoOtherIndexInteractions();
 	}
 
 	@Test
 	public void refresh_runtimeException() {
 		RuntimeException exception = new RuntimeException( "Some message" );
 
-		resetAll();
-		indexReaderProviderMock.refresh();
-		expectLastCall().andThrow( exception );
-		replayAll();
+		doThrow( exception ).when( indexReaderProviderMock ).refresh();
+
 		assertThatThrownBy( () -> accessor.refresh() )
 				.isSameAs( exception );
-		verifyAll();
+		verifyNoOtherIndexInteractions();
 	}
 
 	@Test
 	public void mergeSegments() throws IOException {
-		resetAll();
-		expect( indexWriterProviderMock.getOrCreate() ).andReturn( indexWriterDelegatorMock );
-		indexWriterDelegatorMock.mergeSegments();
-		replayAll();
+		when( indexWriterProviderMock.getOrCreate() ).thenReturn( indexWriterDelegatorMock );
+
 		accessor.mergeSegments();
-		verifyAll();
+
+		verify( indexWriterDelegatorMock ).mergeSegments();
+		verifyNoOtherIndexInteractions();
 	}
 
 	@Test
 	public void getIndexWriterDelegator() throws IOException {
-		resetAll();
-		expect( indexWriterProviderMock.getOrCreate() ).andReturn( indexWriterDelegatorMock );
-		replayAll();
+		when( indexWriterProviderMock.getOrCreate() ).thenReturn( indexWriterDelegatorMock );
+
 		assertThat( accessor.getIndexWriterDelegator() ).isSameAs( indexWriterDelegatorMock );
-		verifyAll();
+		verifyNoOtherIndexInteractions();
 	}
 
 	@Test
 	public void getIndexReader() throws IOException {
-		resetAll();
-		expect( indexReaderProviderMock.getOrCreate() ).andReturn( indexReaderMock );
-		replayAll();
+		when( indexReaderProviderMock.getOrCreate() ).thenReturn( indexReaderMock );
+
 		assertThat( accessor.getIndexReader() ).isSameAs( indexReaderMock );
-		verifyAll();
+		verifyNoOtherIndexInteractions();
 	}
 
 	@Test
@@ -186,12 +181,11 @@ public class IndexAccessorTest extends EasyMockSupport {
 		Throwable exception = new RuntimeException( "Some message" );
 		Object failingOperation = "Some operation description";
 
-		resetAll();
-		indexWriterProviderMock.clearAfterFailure( exception, failingOperation );
-		indexReaderProviderMock.clear();
-		replayAll();
 		accessor.cleanUpAfterFailure( exception, failingOperation );
-		verifyAll();
+
+		verify( indexWriterProviderMock ).clearAfterFailure( exception, failingOperation );
+		verify( indexReaderProviderMock ).clear();
+		verifyNoOtherIndexInteractions();
 	}
 
 	@Test
@@ -200,14 +194,17 @@ public class IndexAccessorTest extends EasyMockSupport {
 		Object failingOperation = "Some operation description";
 		RuntimeException closeException = new RuntimeException( "Some other message" );
 
-		resetAll();
-		indexWriterProviderMock.clearAfterFailure( exception, failingOperation );
-		expectLastCall().andThrow( closeException );
-		replayAll();
+		doThrow( closeException ).when( indexWriterProviderMock ).clearAfterFailure( exception, failingOperation );
+
 		accessor.cleanUpAfterFailure( exception, failingOperation );
-		verifyAll();
 
 		assertThat( exception ).hasSuppressedException( closeException );
+		verifyNoOtherIndexInteractions();
+	}
+
+	private void verifyNoOtherIndexInteractions() {
+		verifyNoMoreInteractions( indexWriterProviderMock, indexWriterDelegatorMock,
+				indexReaderProviderMock, indexReaderMock );
 	}
 
 }

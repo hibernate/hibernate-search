@@ -6,10 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
-import static org.easymock.EasyMock.capture;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.newCapture;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,129 +23,119 @@ import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
-import org.easymock.Capture;
-import org.easymock.EasyMockSupport;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
-
-public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
+@SuppressWarnings("unchecked") // Raw types are the only way to mock parameterized types
+public class ElasticsearchDefaultWorkBulkerTest {
 
 	private static final int DEFAULT_MAX_BULK_SIZE = 10;
 
 	private static final DocumentRefreshStrategy DEFAULT_REFRESH = DocumentRefreshStrategy.NONE;
 
-	private ElasticsearchWorkSequenceBuilder sequenceBuilderMock;
-	private BiFunction<List<? extends BulkableWork<?>>, DocumentRefreshStrategy, NonBulkableWork<BulkResult>> bulkWorkFactoryMock;
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
-	@Before
-	public void initMocks() {
-		sequenceBuilderMock = createStrictMock( ElasticsearchWorkSequenceBuilder.class );
-		bulkWorkFactoryMock = createStrictMock( BiFunction.class );
-	}
+	@Mock
+	private ElasticsearchWorkSequenceBuilder sequenceBuilderMock;
+	@Mock
+	private BiFunction<List<? extends BulkableWork<?>>,
+			DocumentRefreshStrategy, NonBulkableWork<BulkResult>> bulkWorkFactoryMock;
 
 	@Test
 	public void simple() {
-		BulkableWork<Void> work1 = bulkableWork( 1 );
-		BulkableWork<Void> work2 = bulkableWork( 2 );
-		NonBulkableWork<BulkResult> bulkWork = work( 3 );
+		BulkableWork<Void> work1 = bulkableWorkMock( 1 );
+		BulkableWork<Void> work2 = bulkableWorkMock( 2 );
+		NonBulkableWork<BulkResult> bulkWork = workMock( 3 );
 
 		CompletableFuture<Void> work1Future;
 		CompletableFuture<Void> work1FutureFromSequenceBuilder = new CompletableFuture<>();
 		CompletableFuture<Void> work2Future;
 		CompletableFuture<Void> work2FutureFromSequenceBuilder = new CompletableFuture<>();
-		Capture<CompletableFuture<NonBulkableWork<BulkResult>>> bulkWorkFutureCapture = newCapture();
+		ArgumentCaptor<CompletableFuture<NonBulkableWork<BulkResult>>> bulkWorkFutureArgumentCaptor = futureCaptor();
 		CompletableFuture<BulkResult> bulkWorkResultFuture = new CompletableFuture<>();
 
-		replayAll();
 		ElasticsearchDefaultWorkBulker bulker =
 				new ElasticsearchDefaultWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock, DEFAULT_MAX_BULK_SIZE );
-		verifyAll();
+		verifyNoOtherSequenceInteractionsAndReset();
 
-		resetAll();
-		expect( work1.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
-		expect( sequenceBuilderMock.addBulkExecution( capture( bulkWorkFutureCapture ) ) ).andReturn( bulkWorkResultFuture );
-		expect( sequenceBuilderMock.addBulkResultExtraction( bulkWorkResultFuture, work1, 0 ) )
-				.andReturn( work1FutureFromSequenceBuilder );
-		replayAll();
+		when( work1.getRefreshStrategy() ).thenReturn( DEFAULT_REFRESH );
+		when( sequenceBuilderMock.addBulkExecution( bulkWorkFutureArgumentCaptor.capture() ) )
+				.thenReturn( bulkWorkResultFuture );
+		when( sequenceBuilderMock.addBulkResultExtraction( bulkWorkResultFuture, work1, 0 ) )
+				.thenReturn( work1FutureFromSequenceBuilder );
 		work1Future = bulker.add( work1 );
-		verifyAll();
+		verifyNoOtherSequenceInteractionsAndReset();
 		assertThatFuture( work1Future ).isPending();
-		assertThatFuture( bulkWorkFutureCapture.getValue() ).isPending();
+		assertThatFuture( bulkWorkFutureArgumentCaptor.getValue() ).isPending();
 
-		resetAll();
-		expect( work2.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
-		expect( sequenceBuilderMock.addBulkResultExtraction( bulkWorkResultFuture, work2, 1 ) )
-				.andReturn( work2FutureFromSequenceBuilder );
-		replayAll();
+		when( work2.getRefreshStrategy() ).thenReturn( DEFAULT_REFRESH );
+		when( sequenceBuilderMock.addBulkResultExtraction( bulkWorkResultFuture, work2, 1 ) )
+				.thenReturn( work2FutureFromSequenceBuilder );
 		work2Future = bulker.add( work2 );
-		verifyAll();
+		verifyNoOtherSequenceInteractionsAndReset();
 		assertThatFuture( work1Future ).isPending();
 		assertThatFuture( work2Future ).isPending();
-		assertThatFuture( bulkWorkFutureCapture.getValue() ).isPending();
+		assertThatFuture( bulkWorkFutureArgumentCaptor.getValue() ).isPending();
 
-		resetAll();
-		expect( bulkWorkFactoryMock.apply( Arrays.asList( work1, work2 ), DEFAULT_REFRESH ) ).andReturn( bulkWork );
-		replayAll();
+		when( bulkWorkFactoryMock.apply( Arrays.asList( work1, work2 ), DEFAULT_REFRESH ) ).thenReturn( bulkWork );
 		bulker.finalizeBulkWork();
-		verifyAll();
+		verifyNoOtherSequenceInteractionsAndReset();
 		assertThatFuture( work1Future ).isPending();
 		assertThatFuture( work2Future ).isPending();
-		assertThatFuture( bulkWorkFutureCapture.getValue() ).isSuccessful( bulkWork );
+		assertThatFuture( bulkWorkFutureArgumentCaptor.getValue() ).isSuccessful( bulkWork );
 
 		// Check that per-work futures are correctly bound to the futures returned by the sequence builder
-		resetAll();
-		replayAll();
 		work1FutureFromSequenceBuilder.complete( null );
 		assertThatFuture( work1Future ).isSuccessful( (Void) null );
 		work2FutureFromSequenceBuilder.completeExceptionally( new RuntimeException() );
 		assertThatFuture( work2Future ).isFailed();
-		verifyAll();
+		verifyNoOtherSequenceInteractionsAndReset();
 	}
 
 	@Test
 	public void alwaysBulk() {
-		BulkableWork<Void> work1 = bulkableWork( 1 );
-		NonBulkableWork<BulkResult> bulkWork = work( 2 );
+		BulkableWork<Void> work1 = bulkableWorkMock( 1 );
+		NonBulkableWork<BulkResult> bulkWork = workMock( 2 );
 
 		CompletableFuture<Void> work1FutureFromSequenceBuilder = new CompletableFuture<>();
-		Capture<CompletableFuture<NonBulkableWork<BulkResult>>> bulkWorkFutureCapture = newCapture();
+		ArgumentCaptor<CompletableFuture<NonBulkableWork<BulkResult>>> bulkWorkFutureArgumentCaptor = futureCaptor();
 		CompletableFuture<BulkResult> bulkWorkResultFuture = new CompletableFuture<>();
 
-		replayAll();
 		ElasticsearchDefaultWorkBulker bulker =
 				new ElasticsearchDefaultWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock, DEFAULT_MAX_BULK_SIZE );
-		verifyAll();
+		verifyNoOtherSequenceInteractionsAndReset();
 
-		resetAll();
-		expect( work1.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
-		expect( sequenceBuilderMock.addBulkExecution( capture( bulkWorkFutureCapture ) ) ).andReturn( bulkWorkResultFuture );
-		expect( sequenceBuilderMock.addBulkResultExtraction( bulkWorkResultFuture, work1, 0 ) )
-				.andReturn( work1FutureFromSequenceBuilder );
-		replayAll();
+		when( work1.getRefreshStrategy() ).thenReturn( DEFAULT_REFRESH );
+		when( sequenceBuilderMock.addBulkExecution( bulkWorkFutureArgumentCaptor.capture() ) ).thenReturn( bulkWorkResultFuture );
+		when( sequenceBuilderMock.addBulkResultExtraction( bulkWorkResultFuture, work1, 0 ) )
+				.thenReturn( work1FutureFromSequenceBuilder );
 		bulker.add( work1 );
-		verifyAll();
-		assertThatFuture( bulkWorkFutureCapture.getValue() ).isPending();
+		verifyNoOtherSequenceInteractionsAndReset();
+		assertThatFuture( bulkWorkFutureArgumentCaptor.getValue() ).isPending();
 
-		resetAll();
-		expect( bulkWorkFactoryMock.apply( Arrays.asList( work1 ), DEFAULT_REFRESH ) ).andReturn( bulkWork );
-		replayAll();
+		when( bulkWorkFactoryMock.apply( Arrays.asList( work1 ), DEFAULT_REFRESH ) ).thenReturn( bulkWork );
 		bulker.finalizeBulkWork();
-		verifyAll();
-		assertThatFuture( bulkWorkFutureCapture.getValue() ).isSuccessful( bulkWork );
+		verifyNoOtherSequenceInteractionsAndReset();
+		assertThatFuture( bulkWorkFutureArgumentCaptor.getValue() ).isSuccessful( bulkWork );
 	}
 
 	@Test
 	public void newBulkOnTooManyBulkedWorks() {
 		List<BulkableWork<Void>> firstBulkWorks = new ArrayList<>();
 		for ( int i = 0 ; i < DEFAULT_MAX_BULK_SIZE ; ++i ) {
-			firstBulkWorks.add( bulkableWork( i ) );
+			firstBulkWorks.add( bulkableWorkMock( i ) );
 		}
-		BulkableWork<Void> additionalWork1 = bulkableWork( DEFAULT_MAX_BULK_SIZE );
-		BulkableWork<Void> additionalWork2 = bulkableWork( DEFAULT_MAX_BULK_SIZE + 1 );
-		NonBulkableWork<BulkResult> bulkWork1 = work( DEFAULT_MAX_BULK_SIZE + 2 );
-		NonBulkableWork<BulkResult> bulkWork2 = work( DEFAULT_MAX_BULK_SIZE + 3 );
+		BulkableWork<Void> additionalWork1 = bulkableWorkMock( DEFAULT_MAX_BULK_SIZE );
+		BulkableWork<Void> additionalWork2 = bulkableWorkMock( DEFAULT_MAX_BULK_SIZE + 1 );
+		NonBulkableWork<BulkResult> bulkWork1 = workMock( DEFAULT_MAX_BULK_SIZE + 2 );
+		NonBulkableWork<BulkResult> bulkWork2 = workMock( DEFAULT_MAX_BULK_SIZE + 3 );
 
 		List<CompletableFuture<Void>> firstBulkWorksCompletableFuturesFromSequenceBuilder = new ArrayList<>();
 		for ( int i = 0 ; i < DEFAULT_MAX_BULK_SIZE ; ++i ) {
@@ -154,68 +145,59 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		CompletableFuture<Void> additionalWork2FutureFromSequenceBuilder = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkWork1ResultFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkWork2ResultFuture = new CompletableFuture<>();
-		Capture<CompletableFuture<NonBulkableWork<BulkResult>>> bulkWork1FutureCapture = newCapture();
-		Capture<CompletableFuture<NonBulkableWork<BulkResult>>> bulkWork2FutureCapture = newCapture();
+		ArgumentCaptor<CompletableFuture<NonBulkableWork<BulkResult>>> bulkWork1FutureArgumentCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<NonBulkableWork<BulkResult>>> bulkWork2FutureArgumentCaptor = futureCaptor();
 
-		replayAll();
 		ElasticsearchDefaultWorkBulker bulker =
 				new ElasticsearchDefaultWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock, DEFAULT_MAX_BULK_SIZE );
-		verifyAll();
+		verifyNoOtherSequenceInteractionsAndReset();
 
-		resetAll();
-		expect( sequenceBuilderMock.addBulkExecution( capture( bulkWork1FutureCapture ) ) ).andReturn( bulkWork1ResultFuture );
+		when( sequenceBuilderMock.addBulkExecution( bulkWork1FutureArgumentCaptor.capture() ) ).thenReturn( bulkWork1ResultFuture );
 		for ( int i = 0 ; i < DEFAULT_MAX_BULK_SIZE ; ++i ) {
 			BulkableWork<Void> work = firstBulkWorks.get( i );
-			expect( work.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
-			expect( sequenceBuilderMock.addBulkResultExtraction( bulkWork1ResultFuture, work, i ) )
-					.andReturn( firstBulkWorksCompletableFuturesFromSequenceBuilder.get( i ) );
+			when( work.getRefreshStrategy() ).thenReturn( DEFAULT_REFRESH );
+			when( sequenceBuilderMock.addBulkResultExtraction( bulkWork1ResultFuture, work, i ) )
+					.thenReturn( firstBulkWorksCompletableFuturesFromSequenceBuilder.get( i ) );
 		}
-		expect( bulkWorkFactoryMock.apply( firstBulkWorks, DEFAULT_REFRESH ) ).andReturn( bulkWork1 );
-		replayAll();
+		when( bulkWorkFactoryMock.apply( firstBulkWorks, DEFAULT_REFRESH ) ).thenReturn( bulkWork1 );
 		for ( BulkableWork<?> work : firstBulkWorks ) {
 			bulker.add( work );
 		}
-		verifyAll();
-		assertThatFuture( bulkWork1FutureCapture.getValue() ).isSuccessful( bulkWork1 );
+		verifyNoOtherSequenceInteractionsAndReset();
+		assertThatFuture( bulkWork1FutureArgumentCaptor.getValue() ).isSuccessful( bulkWork1 );
 
-		resetAll();
-		expect( additionalWork1.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
-		expect( sequenceBuilderMock.addBulkExecution( capture( bulkWork2FutureCapture ) ) ).andReturn( bulkWork2ResultFuture );
-		expect( sequenceBuilderMock.addBulkResultExtraction( bulkWork2ResultFuture, additionalWork1, 0 ) )
-				.andReturn( additionalWork1FutureFromSequenceBuilder );
-		replayAll();
+		when( additionalWork1.getRefreshStrategy() ).thenReturn( DEFAULT_REFRESH );
+		when( sequenceBuilderMock.addBulkExecution( bulkWork2FutureArgumentCaptor.capture() ) ).thenReturn( bulkWork2ResultFuture );
+		when( sequenceBuilderMock.addBulkResultExtraction( bulkWork2ResultFuture, additionalWork1, 0 ) )
+				.thenReturn( additionalWork1FutureFromSequenceBuilder );
 		bulker.add( additionalWork1 );
-		verifyAll();
-		assertThatFuture( bulkWork2FutureCapture.getValue() ).isPending();
+		verifyNoOtherSequenceInteractionsAndReset();
+		assertThatFuture( bulkWork2FutureArgumentCaptor.getValue() ).isPending();
 
-		resetAll();
-		expect( additionalWork2.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
-		expect( sequenceBuilderMock.addBulkResultExtraction( bulkWork2ResultFuture, additionalWork2, 1 ) )
-				.andReturn( additionalWork2FutureFromSequenceBuilder );
-		replayAll();
+		when( additionalWork2.getRefreshStrategy() ).thenReturn( DEFAULT_REFRESH );
+		when( sequenceBuilderMock.addBulkResultExtraction( bulkWork2ResultFuture, additionalWork2, 1 ) )
+				.thenReturn( additionalWork2FutureFromSequenceBuilder );
 		bulker.add( additionalWork2 );
-		verifyAll();
-		assertThatFuture( bulkWork2FutureCapture.getValue() ).isPending();
+		verifyNoOtherSequenceInteractionsAndReset();
+		assertThatFuture( bulkWork2FutureArgumentCaptor.getValue() ).isPending();
 
-		resetAll();
-		expect( bulkWorkFactoryMock.apply( Arrays.asList( additionalWork1, additionalWork2 ), DEFAULT_REFRESH ) ).andReturn(
+		when( bulkWorkFactoryMock.apply( Arrays.asList( additionalWork1, additionalWork2 ), DEFAULT_REFRESH ) ).thenReturn(
 				bulkWork2 );
-		replayAll();
 		bulker.finalizeBulkWork();
-		verifyAll();
-		assertThatFuture( bulkWork2FutureCapture.getValue() ).isSuccessful( bulkWork2 );
+		verifyNoOtherSequenceInteractionsAndReset();
+		assertThatFuture( bulkWork2FutureArgumentCaptor.getValue() ).isSuccessful( bulkWork2 );
 	}
 
 	@Test
 	public void newBulkOnDifferentRefresh() {
-		BulkableWork<Void> work1 = bulkableWork( 1 );
-		BulkableWork<Void> work2 = bulkableWork( 2 );
-		BulkableWork<Void> work3 = bulkableWork( 3 );
-		BulkableWork<Void> work4 = bulkableWork( 4 );
-		BulkableWork<Void> work5 = bulkableWork( 5 );
-		NonBulkableWork<BulkResult> bulkWork1 = work( 7 );
-		NonBulkableWork<BulkResult> bulkWork2 = work( 8 );
-		NonBulkableWork<BulkResult> bulkWork3 = work( 9 );
+		BulkableWork<Void> work1 = bulkableWorkMock( 1 );
+		BulkableWork<Void> work2 = bulkableWorkMock( 2 );
+		BulkableWork<Void> work3 = bulkableWorkMock( 3 );
+		BulkableWork<Void> work4 = bulkableWorkMock( 4 );
+		BulkableWork<Void> work5 = bulkableWorkMock( 5 );
+		NonBulkableWork<BulkResult> bulkWork1 = workMock( 7 );
+		NonBulkableWork<BulkResult> bulkWork2 = workMock( 8 );
+		NonBulkableWork<BulkResult> bulkWork3 = workMock( 9 );
 
 		CompletableFuture<Void> work1FutureFromSequenceBuilder = new CompletableFuture<>();
 		CompletableFuture<Void> work2FutureFromSequenceBuilder = new CompletableFuture<>();
@@ -225,79 +207,75 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		CompletableFuture<BulkResult> bulkWork1ResultFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkWork2ResultFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkWork3ResultFuture = new CompletableFuture<>();
-		Capture<CompletableFuture<NonBulkableWork<BulkResult>>> bulkWork1FutureCapture = newCapture();
-		Capture<CompletableFuture<NonBulkableWork<BulkResult>>> bulkWork2FutureCapture = newCapture();
-		Capture<CompletableFuture<NonBulkableWork<BulkResult>>> bulkWork3FutureCapture = newCapture();
+		ArgumentCaptor<CompletableFuture<NonBulkableWork<BulkResult>>> bulkWork1FutureArgumentCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<NonBulkableWork<BulkResult>>> bulkWork2FutureArgumentCaptor = futureCaptor();
+		ArgumentCaptor<CompletableFuture<NonBulkableWork<BulkResult>>> bulkWork3FutureArgumentCaptor = futureCaptor();
 
-		replayAll();
 		ElasticsearchDefaultWorkBulker bulker =
 				new ElasticsearchDefaultWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock, 10 );
-		verifyAll();
+		verifyNoOtherSequenceInteractionsAndReset();
 
-		resetAll();
-		expect( work1.getRefreshStrategy() ).andReturn( DocumentRefreshStrategy.NONE );
-		expect( sequenceBuilderMock.addBulkExecution( capture( bulkWork1FutureCapture ) ) ).andReturn( bulkWork1ResultFuture );
-		expect( sequenceBuilderMock.addBulkResultExtraction( bulkWork1ResultFuture, work1, 0 ) )
-				.andReturn( work1FutureFromSequenceBuilder );
-		replayAll();
+		when( work1.getRefreshStrategy() ).thenReturn( DocumentRefreshStrategy.NONE );
+		when( sequenceBuilderMock.addBulkExecution( bulkWork1FutureArgumentCaptor.capture() ) ).thenReturn( bulkWork1ResultFuture );
+		when( sequenceBuilderMock.addBulkResultExtraction( bulkWork1ResultFuture, work1, 0 ) )
+				.thenReturn( work1FutureFromSequenceBuilder );
 		bulker.add( work1 );
-		verifyAll();
+		verifyNoOtherSequenceInteractionsAndReset();
 
-		resetAll();
-		expect( work2.getRefreshStrategy() ).andReturn( DocumentRefreshStrategy.NONE );
-		expect( sequenceBuilderMock.addBulkResultExtraction( bulkWork1ResultFuture, work2, 1 ) )
-				.andReturn( work2FutureFromSequenceBuilder );
-		replayAll();
+		when( work2.getRefreshStrategy() ).thenReturn( DocumentRefreshStrategy.NONE );
+		when( sequenceBuilderMock.addBulkResultExtraction( bulkWork1ResultFuture, work2, 1 ) )
+				.thenReturn( work2FutureFromSequenceBuilder );
 		bulker.add( work2 );
-		verifyAll();
+		verifyNoOtherSequenceInteractionsAndReset();
 
 		// ForceRefresh from NONE to FORCE => new bulk
-		resetAll();
-		expect( work3.getRefreshStrategy() ).andReturn( DocumentRefreshStrategy.FORCE );
-		expect( bulkWorkFactoryMock.apply( Arrays.asList( work1, work2 ), DocumentRefreshStrategy.NONE ) ).andReturn(
+		when( work3.getRefreshStrategy() ).thenReturn( DocumentRefreshStrategy.FORCE );
+		when( bulkWorkFactoryMock.apply( Arrays.asList( work1, work2 ), DocumentRefreshStrategy.NONE ) ).thenReturn(
 				bulkWork1 );
-		expect( sequenceBuilderMock.addBulkExecution( capture( bulkWork2FutureCapture ) ) ).andReturn( bulkWork2ResultFuture );
-		expect( sequenceBuilderMock.addBulkResultExtraction( bulkWork2ResultFuture, work3, 0 ) )
-				.andReturn( work3FutureFromSequenceBuilder );
-		replayAll();
+		when( sequenceBuilderMock.addBulkExecution( bulkWork2FutureArgumentCaptor.capture() ) ).thenReturn( bulkWork2ResultFuture );
+		when( sequenceBuilderMock.addBulkResultExtraction( bulkWork2ResultFuture, work3, 0 ) )
+				.thenReturn( work3FutureFromSequenceBuilder );
 		bulker.add( work3 );
-		verifyAll();
-		assertThatFuture( bulkWork1FutureCapture.getValue() ).isSuccessful( bulkWork1 );
+		verifyNoOtherSequenceInteractionsAndReset();
+		assertThatFuture( bulkWork1FutureArgumentCaptor.getValue() ).isSuccessful( bulkWork1 );
 
-		resetAll();
-		expect( work4.getRefreshStrategy() ).andReturn( DocumentRefreshStrategy.FORCE );
-		expect( sequenceBuilderMock.addBulkResultExtraction( bulkWork2ResultFuture, work4, 1 ) )
-				.andReturn( work4FutureFromSequenceBuilder );
-		replayAll();
+		when( work4.getRefreshStrategy() ).thenReturn( DocumentRefreshStrategy.FORCE );
+		when( sequenceBuilderMock.addBulkResultExtraction( bulkWork2ResultFuture, work4, 1 ) )
+				.thenReturn( work4FutureFromSequenceBuilder );
 		bulker.add( work4 );
-		verifyAll();
+		verifyNoOtherSequenceInteractionsAndReset();
 
 		// ForceRefresh from FORCE to NONE => new bulk
-		resetAll();
-		expect( work5.getRefreshStrategy() ).andReturn( DocumentRefreshStrategy.NONE );
-		expect( bulkWorkFactoryMock.apply( Arrays.asList( work3, work4 ), DocumentRefreshStrategy.FORCE ) ).andReturn(
+		when( work5.getRefreshStrategy() ).thenReturn( DocumentRefreshStrategy.NONE );
+		when( bulkWorkFactoryMock.apply( Arrays.asList( work3, work4 ), DocumentRefreshStrategy.FORCE ) ).thenReturn(
 				bulkWork2 );
-		expect( sequenceBuilderMock.addBulkExecution( capture( bulkWork3FutureCapture ) ) ).andReturn( bulkWork3ResultFuture );
-		expect( sequenceBuilderMock.addBulkResultExtraction( bulkWork3ResultFuture, work5, 0 ) )
-				.andReturn( work5FutureFromSequenceBuilder );
-		replayAll();
+		when( sequenceBuilderMock.addBulkExecution( bulkWork3FutureArgumentCaptor.capture() ) ).thenReturn( bulkWork3ResultFuture );
+		when( sequenceBuilderMock.addBulkResultExtraction( bulkWork3ResultFuture, work5, 0 ) )
+				.thenReturn( work5FutureFromSequenceBuilder );
 		bulker.add( work5 );
-		verifyAll();
-		assertThatFuture( bulkWork2FutureCapture.getValue() ).isSuccessful( bulkWork2 );
+		verifyNoOtherSequenceInteractionsAndReset();
+		assertThatFuture( bulkWork2FutureArgumentCaptor.getValue() ).isSuccessful( bulkWork2 );
 
-		resetAll();
-		expect( bulkWorkFactoryMock.apply( Arrays.asList( work5 ), DocumentRefreshStrategy.NONE ) ).andReturn(
+		when( bulkWorkFactoryMock.apply( Arrays.asList( work5 ), DocumentRefreshStrategy.NONE ) ).thenReturn(
 				bulkWork3 );
-		replayAll();
 		bulker.finalizeBulkWork();
-		verifyAll();
+		verifyNoOtherSequenceInteractionsAndReset();
 	}
 
-	private <T> NonBulkableWork<T> work(int index) {
-		return createStrictMock( "work" + index, NonBulkableWork.class );
+	private void verifyNoOtherSequenceInteractionsAndReset() {
+		verifyNoMoreInteractions( sequenceBuilderMock, bulkWorkFactoryMock );
+		reset( sequenceBuilderMock, bulkWorkFactoryMock );
 	}
 
-	private <T> BulkableWork<T> bulkableWork(int index) {
-		return createStrictMock( "bulkableWork" + index, BulkableWork.class );
+	private <T> ArgumentCaptor<CompletableFuture<T>> futureCaptor() {
+		return ArgumentCaptor.forClass( CompletableFuture.class );
+	}
+
+	private <T> NonBulkableWork<T> workMock(int index) {
+		return mock( NonBulkableWork.class, "work" + index );
+	}
+
+	private <T> BulkableWork<T> bulkableWorkMock(int index) {
+		return mock( BulkableWork.class, "bulkableWork" + index );
 	}
 }
