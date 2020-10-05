@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.work.execution.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.eq;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
@@ -24,7 +25,6 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Test;
 
-import org.assertj.core.api.SoftAssertions;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
@@ -87,7 +87,7 @@ public class ElasticsearchIndexIndexingPlanExecutionTest extends EasyMockSupport
 
 		assertThatFuture( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
-			SoftAssertions.assertSoftly( softly -> {
+			assertSoftly( softly -> {
 				softly.assertThat( report.throwable() ).isEmpty();
 				softly.assertThat( report.failingEntityReferences() ).isEmpty();
 			} );
@@ -144,7 +144,7 @@ public class ElasticsearchIndexIndexingPlanExecutionTest extends EasyMockSupport
 
 		assertThatFuture( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
-			SoftAssertions.assertSoftly( softly -> {
+			assertSoftly( softly -> {
 				softly.assertThat( report.throwable() ).containsSame( work1Exception );
 				softly.assertThat( report.failingEntityReferences() )
 						.containsExactlyInAnyOrder( entityReference( 0 ) );
@@ -211,7 +211,7 @@ public class ElasticsearchIndexIndexingPlanExecutionTest extends EasyMockSupport
 
 		assertThatFuture( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
-			SoftAssertions.assertSoftly( softly -> {
+			assertSoftly( softly -> {
 				softly.assertThat( report.throwable() ).containsSame( work1Exception );
 				assertThat( work1Exception ).hasSuppressedException( work3Exception );
 				softly.assertThat( report.failingEntityReferences() )
@@ -282,7 +282,7 @@ public class ElasticsearchIndexIndexingPlanExecutionTest extends EasyMockSupport
 
 		assertThatFuture( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
-			SoftAssertions.assertSoftly( softly -> {
+			assertSoftly( softly -> {
 				softly.assertThat( report.throwable() ).containsSame( work1Exception );
 				softly.assertThat( work1Exception ).hasSuppressedException( entityReferenceFactoryException );
 				softly.assertThat( report.failingEntityReferences() )

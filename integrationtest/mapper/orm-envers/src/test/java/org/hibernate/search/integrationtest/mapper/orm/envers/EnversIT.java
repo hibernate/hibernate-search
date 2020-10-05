@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.envers;
 
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 
 import java.util.Arrays;
@@ -35,8 +36,6 @@ import org.hibernate.search.util.impl.test.rule.StaticCounters;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.SoftAssertions;
 
 @TestForIssue(jiraKey = { "HSEARCH-1293", "HSEARCH-3667" })
 @PortedFromSearch5(original = "org.hibernate.search.test.envers.SearchAndEnversIntegrationTest")
@@ -167,7 +166,7 @@ public class EnversIT {
 			int expectedAuditedObjectCountSoFar) {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			AuditReader auditReader = AuditReaderFactory.get( session );
-			SoftAssertions.assertSoftly( assertions -> {
+			assertSoftly( assertions -> {
 				assertions.assertThat( findLastRevisionForEntity( auditReader, type ) )
 						.as( "Last revision for entity type " + type )
 						.isEqualTo( expectedLastRevisionForType );
@@ -195,7 +194,7 @@ public class EnversIT {
 			Optional<IndexedEntity> loadedEntity = Search.session( session ).search( IndexedEntity.class )
 					.where( f -> f.matchAll() )
 					.fetchSingleHit();
-			SoftAssertions.assertSoftly( assertions -> {
+			assertSoftly( assertions -> {
 				assertions.assertThat( loadedEntity ).get()
 						.as( "getText()" )
 						.extracting( IndexedEntity::getText )

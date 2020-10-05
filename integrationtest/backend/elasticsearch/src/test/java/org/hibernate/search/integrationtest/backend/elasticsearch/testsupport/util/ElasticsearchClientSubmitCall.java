@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util;
 
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.util.List;
@@ -16,7 +17,6 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.Call;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import org.assertj.core.api.SoftAssertions;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class ElasticsearchClientSubmitCall extends Call<ElasticsearchClientSubmitCall> {
@@ -47,7 +47,7 @@ class ElasticsearchClientSubmitCall extends Call<ElasticsearchClientSubmitCall> 
 	}
 
 	void verify(ElasticsearchClientSubmitCall actualCall) {
-		SoftAssertions.assertSoftly( assertion -> {
+		assertSoftly( assertion -> {
 			assertion.assertThat( actualCall.request.path() ).isEqualTo( request.path() );
 			assertion.assertThat( actualCall.request.method() ).isEqualTo( request.method() );
 			switch ( assertionMode ) {
