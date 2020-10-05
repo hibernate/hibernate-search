@@ -6,13 +6,14 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.search;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,7 +37,7 @@ public class ElasticsearchMatchSearchPredicateIT {
 
 	@Test
 	public void match_skipAnalysis_normalizedStringField() {
-		Assertions.assertThatThrownBy( () -> index.createScope().query()
+		assertThatThrownBy( () -> index.createScope().query()
 				.where( f -> f.match().field( "normalizedStringField" ).matching( TEST_TERM ).skipAnalysis() )
 				.toQuery()
 		)

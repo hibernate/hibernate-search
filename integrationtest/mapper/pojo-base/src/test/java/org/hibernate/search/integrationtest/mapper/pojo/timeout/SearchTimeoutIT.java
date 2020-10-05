@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.timeout;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
@@ -25,8 +28,6 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWork
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 public class SearchTimeoutIT {
 
@@ -63,7 +64,7 @@ public class SearchTimeoutIT {
 					StubSearchWorkBehavior.of( 0L, Collections.emptyList() )
 			);
 
-			Assertions.assertThat( query.fetchAll().hits() ).isEmpty();
+			assertThat( query.fetchAll().hits() ).isEmpty();
 		}
 	}
 
@@ -86,7 +87,7 @@ public class SearchTimeoutIT {
 			);
 
 			// Just check that the exception is propagated
-			Assertions.assertThatThrownBy( () -> query.fetchAll() )
+			assertThatThrownBy( () -> query.fetchAll() )
 					.isSameAs( timeoutException );
 		}
 	}

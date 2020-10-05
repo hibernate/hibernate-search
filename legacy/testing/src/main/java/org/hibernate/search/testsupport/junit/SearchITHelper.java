@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.testsupport.junit;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,14 +20,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.MatchAllDocsQuery;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.TermQuery;
-import org.assertj.core.api.AbstractIntegerAssert;
-import org.assertj.core.api.Assertions;
-import org.assertj.core.api.ListAssert;
 import org.hibernate.search.backend.spi.Work;
 import org.hibernate.search.backend.spi.WorkType;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -36,7 +30,16 @@ import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
 import org.hibernate.search.testsupport.setup.TransactionContextForTest;
 import org.hibernate.search.util.StringHelper;
+
 import org.junit.Assert;
+
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.TermQuery;
+import org.assertj.core.api.AbstractIntegerAssert;
+import org.assertj.core.api.ListAssert;
 
 /**
  * A helper for Hibernate Search integration tests.
@@ -270,7 +273,7 @@ public class SearchITHelper {
 			List<Serializable> ids = results.stream()
 					.map( EntityInfo::getId )
 					.collect( Collectors.toList() );
-			return Assertions.assertThat( ids )
+			return assertThat( ids )
 					.as( "IDs of results of query " + toString( hsQuery ) );
 		}
 
@@ -281,21 +284,21 @@ public class SearchITHelper {
 					.map( EntityInfo::getProjection )
 					.map( Arrays::asList ) // Take advantage of List.equals when calling ListAssert.containsExactly, for instance
 					.collect( Collectors.toList() );
-			return Assertions.assertThat( projections )
+			return assertThat( projections )
 					.as( "Projections of results of query " + toString( hsQuery ) );
 		}
 
 		public ListAssert asResults() {
 			HSQuery hsQuery = getHSQuery();
 			List<EntityInfo> results = hsQuery.queryEntityInfos();
-			return Assertions.assertThat( results )
+			return assertThat( results )
 					.as( "Results of query " + toString( hsQuery ) );
 		}
 
 		public AbstractIntegerAssert<?> asResultSize() {
 			HSQuery hsQuery = getHSQuery();
 			int actualSize = hsQuery.queryResultSize();
-			return Assertions.assertThat( actualSize )
+			return assertThat( actualSize )
 					.as( "Number of results of query " + toString( hsQuery ) );
 		}
 
@@ -412,7 +415,7 @@ public class SearchITHelper {
 		}
 
 		public AssertFacetContext isEmpty() {
-			Assertions.assertThat( allFacets )
+			assertThat( allFacets )
 					.as( "Facets for faceting request '" + facetingRequestName + "' on query " + queryContext )
 					.isEmpty();
 			return this;
@@ -424,7 +427,7 @@ public class SearchITHelper {
 			while ( it.hasNext() && !found ) {
 				Facet facet = it.next();
 				if ( Objects.equals( value, facet.getValue() ) ) {
-					Assertions.assertThat( facet.getCount() )
+					assertThat( facet.getCount() )
 							.as( "Count for faceting request '" + facetingRequestName + "', facet '" + value + "' on query " + queryContext )
 							.isEqualTo( count );
 					it.remove();
@@ -442,7 +445,7 @@ public class SearchITHelper {
 		 * @return This object, for chained calls.
 		 */
 		public AssertFacetContext only() {
-			Assertions.assertThat( unmatchedFacets )
+			assertThat( unmatchedFacets )
 					.as( "Unexpected facets for faceting request '" + facetingRequestName + "' on query " + queryContext )
 					.isEmpty();
 			return this;

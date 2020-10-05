@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
 
 import javax.persistence.Entity;
@@ -20,8 +21,8 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
-import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
@@ -29,7 +30,6 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -259,7 +259,7 @@ public class MassIndexingBaseIT {
 		searchSession.massIndexer();
 		session.close();
 
-		Assertions.assertThatThrownBy( () -> {
+		assertThatThrownBy( () -> {
 			searchSession.massIndexer();
 		} )
 				.isInstanceOf( SearchException.class )
@@ -273,7 +273,7 @@ public class MassIndexingBaseIT {
 		SearchSession searchSession = Search.session( session );
 		session.close();
 
-		Assertions.assertThatThrownBy( () -> {
+		assertThatThrownBy( () -> {
 			searchSession.massIndexer();
 		} )
 				.isInstanceOf( SearchException.class )

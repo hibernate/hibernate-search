@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
@@ -15,7 +17,6 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Assume;
 import org.junit.Rule;
@@ -57,7 +58,7 @@ public class IndexNullAsErrorIT<V, F> {
 		// Null means "there's no value I can't parse". Useful for the String type.
 		Assume.assumeNotNull( unparsableNullAsValue );
 
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				setupHelper.start().withConfiguration( c -> {
 					c.addEntityType( expectations.getTypeWithValueBridge1() );
 					TypeMappingStep typeMapping = c.programmaticMapping().type( expectations.getTypeWithValueBridge1() );

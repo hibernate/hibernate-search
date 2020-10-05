@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.mapping;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultReadAlias;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultWriteAlias;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.mappingWithDiscriminatorProperty;
@@ -23,7 +24,6 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -138,7 +138,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 					);
 		}
 		else {
-			Assertions.assertThatThrownBy( () -> query.fetch( 20 ) )
+			assertThatThrownBy( () -> query.fetch( 20 ) )
 					.isInstanceOf( SearchException.class );
 		}
 	}
@@ -179,7 +179,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 					);
 		}
 		else {
-			Assertions.assertThatThrownBy( () -> query.fetch( 20 ) )
+			assertThatThrownBy( () -> query.fetch( 20 ) )
 					.isInstanceOf( SearchException.class );
 		}
 	}

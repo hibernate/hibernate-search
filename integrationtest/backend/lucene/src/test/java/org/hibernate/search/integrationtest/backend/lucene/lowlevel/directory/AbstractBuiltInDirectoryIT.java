@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.lucene.lowlevel.directory;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.IOException;
 import java.util.function.Function;
@@ -24,7 +25,6 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.Test;
 
 import org.apache.lucene.store.Lock;
-import org.assertj.core.api.Assertions;
 
 public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 
@@ -81,7 +81,7 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.CustomLockProviderTest.testFailOnNonExistentLockingFactory")
 	public void lockingStrategy_invalid() {
-		Assertions.assertThatThrownBy( () -> setup( c -> c.withBackendProperty(
+		assertThatThrownBy( () -> setup( c -> c.withBackendProperty(
 				LuceneIndexSettings.DIRECTORY_LOCKING_STRATEGY,
 				"some_invalid_name"
 		) ) )
@@ -128,7 +128,7 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 				.extracting( IndexAccessorImpl::getDirectoryForTests )
 				.allSatisfy( directory -> {
 					try ( Lock lock = directory.obtainLock( "my-lock" ) ) {
-						Assertions.assertThat( lock.getClass().getName() )
+						assertThat( lock.getClass().getName() )
 								.isEqualTo( expectedLockClassName );
 					}
 					catch (IOException e) {
@@ -138,7 +138,7 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 	}
 
 	private void testInvalidFSLockingStrategy(String strategyName) {
-		Assertions.assertThatThrownBy( () -> setup( c -> c.withBackendProperty(
+		assertThatThrownBy( () -> setup( c -> c.withBackendProperty(
 				LuceneIndexSettings.DIRECTORY_LOCKING_STRATEGY,
 				strategyName
 		) ) )

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueDistanceFromCenterValues.CENTER_POINT;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
@@ -42,8 +43,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import org.assertj.core.api.Assertions;
 
 /**
  * Tests basic behavior of sorts by distance.
@@ -178,7 +177,7 @@ public class DistanceSearchSortBaseIT {
 
 		String fieldPath = getFieldPath();
 
-		Assertions.assertThatThrownBy( () -> simpleQuery( dataSetForAsc, b -> b.distance( fieldPath, CENTER_POINT ) ) )
+		assertThatThrownBy( () -> simpleQuery( dataSetForAsc, b -> b.distance( fieldPath, CENTER_POINT ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot compute the median across nested documents",
@@ -196,7 +195,7 @@ public class DistanceSearchSortBaseIT {
 
 		String fieldPath = getFieldPath();
 
-		Assertions.assertThatThrownBy( () -> simpleQuery( dataSetForAsc, b -> b.distance( fieldPath, CENTER_POINT ) ) )
+		assertThatThrownBy( () -> simpleQuery( dataSetForAsc, b -> b.distance( fieldPath, CENTER_POINT ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot compute the sum for a distance sort",

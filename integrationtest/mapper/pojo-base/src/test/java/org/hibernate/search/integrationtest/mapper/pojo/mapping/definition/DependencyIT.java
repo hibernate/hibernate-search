@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
@@ -20,7 +22,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,7 +46,7 @@ public class DependencyIT {
 				throw new UnsupportedOperationException( "Should not be called" );
 			}
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -72,7 +73,7 @@ public class DependencyIT {
 				throw new UnsupportedOperationException( "Should not be called" );
 			}
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -99,7 +100,7 @@ public class DependencyIT {
 				throw new UnsupportedOperationException( "Should not be called" );
 			}
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -154,7 +155,7 @@ public class DependencyIT {
 				}
 			}
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start()
 						.withAnnotatedEntityTypes( DerivedFromCycle.A.class )
 						.withAnnotatedTypes( DerivedFromCycle.B.class, DerivedFromCycle.C.class )
@@ -194,7 +195,7 @@ public class DependencyIT {
 				String text;
 			}
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup(
 						CannotInvertAssociation.A.class, CannotInvertAssociation.B.class
 				)
@@ -238,7 +239,7 @@ public class DependencyIT {
 				String text;
 			}
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup(
 						CannotApplyInvertAssociationPath.A.class, CannotApplyInvertAssociationPath.B.class
 				)
@@ -280,7 +281,7 @@ public class DependencyIT {
 				String text;
 			}
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup(
 						CannotApplyInvertAssociationPath.A.class, CannotApplyInvertAssociationPath.B.class
 				)

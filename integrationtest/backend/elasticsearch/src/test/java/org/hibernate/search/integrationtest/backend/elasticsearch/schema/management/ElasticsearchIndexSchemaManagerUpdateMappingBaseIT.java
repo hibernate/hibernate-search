@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.defaultMetadataMappingAndCommaForInitialization;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForExpectations;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
-
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
@@ -25,8 +25,6 @@ import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 /**
  * Tests related to the mapping when updating indexes.
@@ -382,7 +380,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 
 	private void setupAndUpdateIndexIndexExpectingFailure(
 			StubMappedIndex index, String ... messageContent) {
-		Assertions.assertThatThrownBy( () -> setupAndUpdateIndex( index ) )
+		assertThatThrownBy( () -> setupAndUpdateIndex( index ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( messageContent );
 	}

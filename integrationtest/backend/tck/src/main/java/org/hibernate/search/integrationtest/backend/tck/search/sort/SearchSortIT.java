@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 
@@ -36,8 +39,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 /**
  * Generic tests for sorts. More specific tests can be found in other classes,
@@ -222,7 +223,7 @@ public class SearchSortIT {
 
 		// reuse the same sort instance on a different scope,
 		// targeting a different index
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				otherIndex.createScope().query()
 						.where( f -> f.matchAll() )
 						.sort( sort )
@@ -234,7 +235,7 @@ public class SearchSortIT {
 
 		// reuse the same sort instance on a different scope,
 		// targeting different indexes
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				mainIndex.createScope( otherIndex ).query()
 						.where( f -> f.matchAll() )
 						.sort( sort )
@@ -262,7 +263,7 @@ public class SearchSortIT {
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 
 		// Mandatory extension, unsupported
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> mainIndex.createScope().sort().extension( new UnSupportedExtension() )
 		)
 				.isInstanceOf( SearchException.class );
@@ -276,7 +277,7 @@ public class SearchSortIT {
 						)
 						.ifSupported(
 								new SupportedExtension(),
-								ignored -> Assertions.fail( "This should not be called" )
+								ignored -> fail( "This should not be called" )
 						)
 						.orElseFail()
 		);
@@ -290,7 +291,7 @@ public class SearchSortIT {
 						)
 						.ifSupported(
 								new SupportedExtension(),
-								ignored -> Assertions.fail( "This should not be called" )
+								ignored -> fail( "This should not be called" )
 						)
 						.orElseFail()
 		);
@@ -302,13 +303,13 @@ public class SearchSortIT {
 				.extension()
 						.ifSupported(
 								new UnSupportedExtension(),
-								ignored -> Assertions.fail( "This should not be called" )
+								ignored -> fail( "This should not be called" )
 						)
 						.ifSupported(
 								new SupportedExtension(),
 								c -> c.field( "string" ).missing().last()
 						)
-						.orElse( ignored -> Assertions.fail( "This should not be called" ) )
+						.orElse( ignored -> fail( "This should not be called" ) )
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
@@ -316,13 +317,13 @@ public class SearchSortIT {
 				.extension()
 						.ifSupported(
 								new UnSupportedExtension(),
-								ignored -> Assertions.fail( "This should not be called" )
+								ignored -> fail( "This should not be called" )
 						)
 						.ifSupported(
 								new SupportedExtension(),
 								c -> c.field( "string" ).desc().missing().last()
 						)
-						.orElse( ignored -> Assertions.fail( "This should not be called" ) )
+						.orElse( ignored -> fail( "This should not be called" ) )
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
@@ -332,11 +333,11 @@ public class SearchSortIT {
 				.extension()
 						.ifSupported(
 								new UnSupportedExtension(),
-								ignored -> Assertions.fail( "This should not be called" )
+								ignored -> fail( "This should not be called" )
 						)
 						.ifSupported(
 								new UnSupportedExtension(),
-								ignored -> Assertions.fail( "This should not be called" )
+								ignored -> fail( "This should not be called" )
 						)
 						.orElse(
 								c -> c.field( "string" ).missing().last()
@@ -348,11 +349,11 @@ public class SearchSortIT {
 				.extension()
 						.ifSupported(
 								new UnSupportedExtension(),
-								ignored -> Assertions.fail( "This should not be called" )
+								ignored -> fail( "This should not be called" )
 						)
 						.ifSupported(
 								new UnSupportedExtension(),
-								ignored -> Assertions.fail( "This should not be called" )
+								ignored -> fail( "This should not be called" )
 						)
 						.orElse(
 								c -> c.field( "string" ).desc().missing().last()
@@ -417,9 +418,9 @@ public class SearchSortIT {
 		@Override
 		public Optional<MyExtendedFactory> extendOptional(SearchSortFactory original,
 				SearchSortDslContext<?, ?> dslContext) {
-			Assertions.assertThat( original ).isNotNull();
-			Assertions.assertThat( dslContext ).isNotNull();
-			Assertions.assertThat( dslContext.builderFactory() ).isNotNull();
+			assertThat( original ).isNotNull();
+			assertThat( dslContext ).isNotNull();
+			assertThat( dslContext.builderFactory() ).isNotNull();
 			return Optional.of( new MyExtendedFactory( original, dslContext ) );
 		}
 	}
@@ -428,9 +429,9 @@ public class SearchSortIT {
 		@Override
 		public Optional<MyExtendedFactory> extendOptional(SearchSortFactory original,
 				SearchSortDslContext<?, ?> dslContext) {
-			Assertions.assertThat( original ).isNotNull();
-			Assertions.assertThat( dslContext ).isNotNull();
-			Assertions.assertThat( dslContext.builderFactory() ).isNotNull();
+			assertThat( original ).isNotNull();
+			assertThat( dslContext ).isNotNull();
+			assertThat( dslContext.builderFactory() ).isNotNull();
 			return Optional.empty();
 		}
 	}

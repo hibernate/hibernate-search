@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.test;
 
-import org.assertj.core.api.Assertions;
+import static org.assertj.core.api.Assertions.fail;
 
 /**
  * A util allowing to run blocks of code as "sub-tests".
@@ -35,7 +35,7 @@ public class SubTest {
 				}
 			}
 		}
-		Assertions.fail(
+		fail(
 				"Test failed after 3 attempts",
 				failure
 		);

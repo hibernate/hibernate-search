@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.cfg.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -15,8 +16,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-
-import org.assertj.core.api.Assertions;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -152,7 +151,7 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> extends EasyMockSuppo
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( Optional.empty() );
 		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
 		replayAll();
-		Assertions.assertThatThrownBy( () -> property.getOrThrow( sourceMock, SimulatedFailure::new ) )
+		assertThatThrownBy( () -> property.getOrThrow( sourceMock, SimulatedFailure::new ) )
 				.isInstanceOf( SimulatedFailure.class )
 				.hasMessage( resolvedKey );
 		verifyAll();

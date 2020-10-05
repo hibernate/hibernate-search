@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.query;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalize;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
@@ -31,8 +33,6 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 public class SearchQueryFetchIT {
 
@@ -253,22 +253,22 @@ public class SearchQueryFetchIT {
 
 	@Test
 	public void fetchTotalHitCount() {
-		Assertions.assertThat( matchAllQuerySortByField().fetchTotalHitCount() ).isEqualTo( DOCUMENT_COUNT );
+		assertThat( matchAllQuerySortByField().fetchTotalHitCount() ).isEqualTo( DOCUMENT_COUNT );
 
-		Assertions.assertThat( matchFirstHalfQuery().fetchTotalHitCount() ).isEqualTo( DOCUMENT_COUNT / 2 );
+		assertThat( matchFirstHalfQuery().fetchTotalHitCount() ).isEqualTo( DOCUMENT_COUNT / 2 );
 	}
 
 	@Test
 	public void fetchSingleHit() {
 		Optional<DocumentReference> result = matchOneQuery( 4 ).fetchSingleHit();
-		Assertions.assertThat( result ).isNotEmpty();
-		Assertions.assertThat( normalize( result.get() ) )
+		assertThat( result ).isNotEmpty();
+		assertThat( normalize( result.get() ) )
 				.isEqualTo( normalize( reference( index.typeName(), docId( 4 ) ) ) );
 
 		result = matchNoneQuery().fetchSingleHit();
-		Assertions.assertThat( result ).isEmpty();
+		assertThat( result ).isEmpty();
 
-		Assertions.assertThatThrownBy( () -> {
+		assertThatThrownBy( () -> {
 			matchAllQuerySortByField().fetchSingleHit();
 		} )
 				.isInstanceOf( SearchException.class );

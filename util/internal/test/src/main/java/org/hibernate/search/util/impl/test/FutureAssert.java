@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -15,7 +17,6 @@ import java.util.function.Consumer;
 
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.AbstractThrowableAssert;
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
 
 
@@ -69,7 +70,7 @@ public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Futur
 	}
 
 	public FutureAssert<T> isSuccessful(T expectedValue) {
-		return isSuccessful( value -> Assertions.assertThat( expectedValue ).isEqualTo( expectedValue ) );
+		return isSuccessful( value -> assertThat( expectedValue ).isEqualTo( expectedValue ) );
 	}
 
 	public FutureAssert<T> isSuccessful(Consumer<T> valueAssertion) {

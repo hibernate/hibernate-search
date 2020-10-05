@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.testsupport.junit;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +39,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
 import org.assertj.core.api.AbstractIntegerAssert;
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ListAssert;
 
 /**
@@ -325,7 +326,7 @@ public class SearchITHelper {
 			List<Object> ids = results.stream()
 					.map( array -> array[0] )
 					.collect( Collectors.toList() );
-			return Assertions.assertThat( ids )
+			return assertThat( ids )
 					.as( "IDs of results of query " + toString( hsQuery ) );
 		}
 
@@ -335,14 +336,14 @@ public class SearchITHelper {
 			List<List<Object>> projections = results.stream()
 					.map( Arrays::asList ) // Take advantage of List.equals when calling ListAssert.containsExactly, for instance
 					.collect( Collectors.toList() );
-			return Assertions.assertThat( projections )
+			return assertThat( projections )
 					.as( "Projections of results of query " + toString( hsQuery ) );
 		}
 
 		public AbstractIntegerAssert<?> asResultSize() {
 			HSQuery hsQuery = getHSQuery();
 			int actualSize = hsQuery.getResultSize();
-			return Assertions.assertThat( actualSize )
+			return assertThat( actualSize )
 					.as( "Number of results of query " + toString( hsQuery ) );
 		}
 
@@ -459,7 +460,7 @@ public class SearchITHelper {
 		}
 
 		public AssertFacetContext isEmpty() {
-			Assertions.assertThat( allFacets )
+			assertThat( allFacets )
 					.as( "Facets for faceting request '" + facetingRequestName + "' on query " + queryContext )
 					.isEmpty();
 			return this;
@@ -471,7 +472,7 @@ public class SearchITHelper {
 			while ( it.hasNext() && !found ) {
 				Facet facet = it.next();
 				if ( Objects.equals( value, facet.getValue() ) ) {
-					Assertions.assertThat( facet.getCount() )
+					assertThat( facet.getCount() )
 							.as( "Count for faceting request '" + facetingRequestName + "', facet '" + value + "' on query " + queryContext )
 							.isEqualTo( count );
 					it.remove();
@@ -489,7 +490,7 @@ public class SearchITHelper {
 		 * @return This object, for chained calls.
 		 */
 		public AssertFacetContext only() {
-			Assertions.assertThat( unmatchedFacets )
+			assertThat( unmatchedFacets )
 					.as( "Unexpected facets for faceting request '" + facetingRequestName + "' on query " + queryContext )
 					.isEmpty();
 			return this;

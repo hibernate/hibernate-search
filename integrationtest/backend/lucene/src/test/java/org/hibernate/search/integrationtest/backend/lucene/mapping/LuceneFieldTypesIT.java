@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.lucene.mapping;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.integrationtest.backend.lucene.testsupport.util.DocumentAssert.containsDocument;
 
 import java.util.List;
@@ -26,7 +27,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import org.apache.lucene.document.Document;
-import org.assertj.core.api.Assertions;
 
 public class LuceneFieldTypesIT {
 
@@ -58,7 +58,7 @@ public class LuceneFieldTypesIT {
 				.toQuery();
 
 		List<Document> result = query.fetchAll().hits();
-		Assertions.assertThat( result )
+		assertThat( result )
 				.hasSize( 2 )
 				.satisfies( containsDocument(
 						doc -> doc.hasField( "string", "keyword" )

@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
@@ -21,7 +22,6 @@ import org.hibernate.search.backend.lucene.work.impl.IndexingWork;
 import org.hibernate.search.backend.lucene.work.impl.IndexingWorkExecutionContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Test;
 
@@ -94,7 +94,7 @@ public class LuceneBatchedWorkProcessorTest extends EasyMockSupport {
 		expectWorkGetInfo( 50 );
 		indexAccessorMock.cleanUpAfterFailure( workException, workInfo( 50 ) );
 		replayAll();
-		Assertions.assertThatThrownBy( () -> processor.submit( failingWork ) )
+		assertThatThrownBy( () -> processor.submit( failingWork ) )
 				.isSameAs( workException );
 		verifyAll();
 
@@ -127,7 +127,7 @@ public class LuceneBatchedWorkProcessorTest extends EasyMockSupport {
 		expectLastCall().andThrow( commitException );
 		indexAccessorMock.cleanUpAfterFailure( commitException, "Commit after a set of index works" );
 		replayAll();
-		Assertions.assertThatThrownBy( () -> processor.forceCommit() )
+		assertThatThrownBy( () -> processor.forceCommit() )
 				.isSameAs( commitException );
 		verifyAll();
 
@@ -156,7 +156,7 @@ public class LuceneBatchedWorkProcessorTest extends EasyMockSupport {
 		indexAccessorMock.refresh();
 		expectLastCall().andThrow( refreshException );
 		replayAll();
-		Assertions.assertThatThrownBy( () -> processor.forceRefresh() )
+		assertThatThrownBy( () -> processor.forceRefresh() )
 				.isSameAs( refreshException );
 		verifyAll();
 	}

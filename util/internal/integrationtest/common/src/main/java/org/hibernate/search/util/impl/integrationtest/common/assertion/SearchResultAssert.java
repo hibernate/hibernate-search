@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.assertion;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collection;
 import java.util.function.Consumer;
 
@@ -15,7 +17,6 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryFinalStep;
 
 import org.assertj.core.api.AbstractLongAssert;
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ObjectAssert;
 
 public class SearchResultAssert<H> {
@@ -45,7 +46,7 @@ public class SearchResultAssert<H> {
 	}
 
 	public AbstractLongAssert<?> totalHitCount() {
-		return Assertions.assertThat( actual.total().hitCount() )
+		return assertThat( actual.total().hitCount() )
 				.as( "Total hit count of " + queryDescription );
 	}
 
@@ -54,7 +55,7 @@ public class SearchResultAssert<H> {
 	}
 
 	public <A> ObjectAssert<A> aggregation(AggregationKey<A> key) {
-		return Assertions.assertThat( actual.aggregation( key ) );
+		return assertThat( actual.aggregation( key ) );
 	}
 
 	public <A> SearchResultAssert<H> aggregation(AggregationKey<A> key, Consumer<A> assertion) {

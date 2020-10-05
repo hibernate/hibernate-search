@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.schema.management.manager;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.concurrent.CompletableFuture;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -22,7 +24,6 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.SchemaManagementWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -104,7 +105,7 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 		expectWork( IndexedEntity1.NAME, CompletableFuture.completedFuture( null ) );
 		expectWork( IndexedEntity2.NAME, exceptionFuture( exception ) );
 
-		Assertions.assertThatThrownBy( () -> execute( manager ) )
+		assertThatThrownBy( () -> execute( manager ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity2.class.getName() )
@@ -123,7 +124,7 @@ public abstract class AbstractSearchSchemaManagerSimpleOperationIT {
 		expectWork( IndexedEntity1.NAME, exceptionFuture( exception1 ) );
 		expectWork( IndexedEntity2.NAME, exceptionFuture( exception2 ) );
 
-		Assertions.assertThatThrownBy( () -> execute( manager ) )
+		assertThatThrownBy( () -> execute( manager ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity1.class.getName() )

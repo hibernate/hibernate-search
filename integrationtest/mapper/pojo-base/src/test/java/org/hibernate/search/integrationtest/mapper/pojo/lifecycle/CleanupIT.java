@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.lifecycle;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
@@ -38,7 +39,6 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubIndexManagerBuilder;
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.Rule;
@@ -341,7 +341,7 @@ public class CleanupIT {
 	}
 
 	private void failingStartup(Consumer<ProgrammaticMappingConfigurationContext> additionalMappingContributor) {
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> startup( additionalMappingContributor )
 		)
 				.isInstanceOf( SearchException.class )

@@ -44,7 +44,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import org.assertj.core.api.Assertions;
 import org.easymock.Capture;
 
 /**
@@ -162,8 +161,8 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 					)
 			);
 
-			Assertions.<Object>assertThat( query.fetchAll().hits() )
-					.containsExactly( getProjectionValues().toArray() );
+			assertThat( query.fetchAll().hits() )
+					.containsExactlyElementsOf( getProjectionValues() );
 		}
 	}
 
@@ -209,7 +208,7 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 		}
 
 		// convertUnknown must throw a runtime exception on invalid input
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> dslConverter.convertUnknown( new Object(), toDocumentConvertContext ),
 				"convertUnknown on invalid input"
 		)

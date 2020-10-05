@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.lucene.lowlevel.directory;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,9 +19,6 @@ import org.hibernate.search.backend.lucene.index.impl.Shard;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-
-import org.apache.log4j.Level;
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
@@ -28,6 +26,7 @@ import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.apache.log4j.Level;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.MMapDirectory;
@@ -108,7 +107,7 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testInvalidDirectoryType")
 	public void filesystemAccessStrategy_invalid() {
-		Assertions.assertThatThrownBy( () -> setup( c -> c.withBackendProperty(
+		assertThatThrownBy( () -> setup( c -> c.withBackendProperty(
 				LuceneIndexSettings.DIRECTORY_FILESYSTEM_ACCESS_STRATEGY,
 				"some_invalid_name"
 		) ) )

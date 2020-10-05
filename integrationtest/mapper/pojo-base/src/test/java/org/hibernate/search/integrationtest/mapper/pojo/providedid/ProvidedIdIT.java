@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.pojo.providedid;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
@@ -28,7 +29,6 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -105,7 +105,7 @@ public class ProvidedIdIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 
-			Assertions.assertThatThrownBy(
+			assertThatThrownBy(
 					() -> session.indexingPlan().add( entity1 )
 			)
 					.isInstanceOf( SearchException.class )

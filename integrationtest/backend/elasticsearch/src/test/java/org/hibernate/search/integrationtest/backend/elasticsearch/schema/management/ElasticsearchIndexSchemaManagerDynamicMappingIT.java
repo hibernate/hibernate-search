@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.EnumSet;
 import java.util.Map;
@@ -32,7 +33,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.google.gson.Gson;
-import org.assertj.core.api.Assertions;
 
 /**
  * Tests for the dynamic mapping attribute,
@@ -102,7 +102,7 @@ public class ElasticsearchIndexSchemaManagerDynamicMappingIT {
 
 	@Test
 	public void dynamicMapping_invalid() {
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupAndInspectIndex( "invalid" )
 		)
 				.isInstanceOf( SearchException.class )

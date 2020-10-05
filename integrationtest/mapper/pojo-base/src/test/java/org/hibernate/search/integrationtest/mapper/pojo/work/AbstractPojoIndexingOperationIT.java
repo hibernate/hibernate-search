@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.work;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 import static org.junit.Assume.assumeTrue;
 
@@ -41,8 +42,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import org.assertj.core.api.Assertions;
 
 /**
  * Abstract base for tests of individual operations in {@link org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan}
@@ -532,7 +531,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 	public void indexingPlan_runtimeException() {
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		RuntimeException exception = new RuntimeException();
-		Assertions.assertThatThrownBy( () -> {
+		assertThatThrownBy( () -> {
 			try ( SearchSession session = createSession() ) {
 				SearchIndexingPlan indexingPlan = session.indexingPlan();
 				expectOperation( futureFromBackend, 1, null, "1" );
@@ -549,7 +548,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 	public void indexingPlan_error() {
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		Error error = new Error();
-		Assertions.assertThatThrownBy( () -> {
+		assertThatThrownBy( () -> {
 			try ( SearchSession session = createSession() ) {
 				SearchIndexingPlan indexingPlan = session.indexingPlan();
 				expectOperation( futureFromBackend, 1, null, "1" );

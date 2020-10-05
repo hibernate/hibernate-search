@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.lucene.schema.management;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.IOException;
 
@@ -15,7 +16,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -42,7 +42,7 @@ public class LuceneIndexSchemaManagerValidationIT {
 
 		assertThat( indexExists() ).isFalse();
 
-		Assertions.assertThatThrownBy( this::validate )
+		assertThatThrownBy( this::validate )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Index does not exist for directory",

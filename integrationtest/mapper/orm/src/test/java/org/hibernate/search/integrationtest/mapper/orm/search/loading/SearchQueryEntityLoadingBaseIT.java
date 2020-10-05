@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -19,8 +21,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import org.assertj.core.api.Assertions;
 
 /**
  * Basic tests of entity loading when executing a search query
@@ -89,7 +89,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 
 		persistThatManyEntities( entityCount );
 
-		Assertions.assertThatThrownBy( () -> testLoadingThatManyEntities(
+		assertThatThrownBy( () -> testLoadingThatManyEntities(
 				session -> TimeoutLoadingListener.registerTimingOutLoadingListener( session ),
 				o -> { }, // No particular loading option
 				entityCount,

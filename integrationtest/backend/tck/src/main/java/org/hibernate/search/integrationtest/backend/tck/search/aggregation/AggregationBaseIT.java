@@ -6,15 +6,18 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.Map;
 import java.util.Optional;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Aggregable;
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
@@ -29,8 +32,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 public class AggregationBaseIT {
 
@@ -68,13 +69,13 @@ public class AggregationBaseIT {
 				.toQuery();
 		assertThatQuery( query )
 				.aggregation( aggregationKey )
-				.satisfies( map -> Assertions.assertThat( map ).containsExactly(
-						Assertions.entry( STRING_1, 2L ),
-						Assertions.entry( STRING_2, 1L )
+				.satisfies( map -> assertThat( map ).containsExactly(
+						entry( STRING_1, 2L ),
+						entry( STRING_2, 1L )
 				) );
 
 		// Mandatory extension, unsupported
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> scope.aggregation().extension( new UnSupportedExtension() )
 		)
 				.isInstanceOf( SearchException.class );
@@ -108,8 +109,8 @@ public class AggregationBaseIT {
 		@Override
 		public Optional<MyExtendedFactory> extendOptional(SearchAggregationFactory original,
 				SearchAggregationDslContext<?, ?> dslContext) {
-			Assertions.assertThat( original ).isNotNull();
-			Assertions.assertThat( dslContext ).isNotNull();
+			assertThat( original ).isNotNull();
+			assertThat( dslContext ).isNotNull();
 			return Optional.of( new MyExtendedFactory( original ) );
 		}
 	}
@@ -118,8 +119,8 @@ public class AggregationBaseIT {
 		@Override
 		public Optional<MyExtendedFactory> extendOptional(SearchAggregationFactory original,
 				SearchAggregationDslContext<?, ?> dslContext) {
-			Assertions.assertThat( original ).isNotNull();
-			Assertions.assertThat( dslContext ).isNotNull();
+			assertThat( original ).isNotNull();
+			assertThat( dslContext ).isNotNull();
 			return Optional.empty();
 		}
 	}

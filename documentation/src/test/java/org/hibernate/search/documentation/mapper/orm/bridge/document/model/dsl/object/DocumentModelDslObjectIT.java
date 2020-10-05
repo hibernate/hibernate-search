@@ -7,6 +7,8 @@
 package org.hibernate.search.documentation.mapper.orm.bridge.document.model.dsl.object;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.math.BigDecimal;
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -20,8 +22,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 public class DocumentModelDslObjectIT {
 	@Rule
@@ -67,7 +67,7 @@ public class DocumentModelDslObjectIT {
 					)
 					.fetchHits( 20 );
 
-			Assertions.assertThat( result ).hasSize( 1 );
+			assertThat( result ).hasSize( 1 );
 		} );
 	}
 

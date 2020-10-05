@@ -6,15 +6,16 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.indexnull;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -27,7 +28,6 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Assume;
 import org.junit.Rule;
@@ -80,7 +80,7 @@ public class IndexNullAsValueIT {
 
 	@Test
 	public void indexNullAsValue_fullText() {
-		Assertions.assertThatThrownBy( () -> setupHelper.start()
+		assertThatThrownBy( () -> setupHelper.start()
 				.withIndex( StubMappedIndex.ofNonRetrievable(
 						root -> root.field(
 								"fullTextField",

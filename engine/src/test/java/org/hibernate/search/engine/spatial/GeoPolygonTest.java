@@ -6,11 +6,10 @@
  */
 package org.hibernate.search.engine.spatial;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
-
-import org.assertj.core.api.Assertions;
 
 import org.junit.Test;
 
@@ -29,7 +28,7 @@ public class GeoPolygonTest {
 
 	@Test
 	public void invalidPolygon() {
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> GeoPolygon.of(
 						GeoPoint.of( 26, 23 ),
 						GeoPoint.of( 26, 26 ),
@@ -40,7 +39,7 @@ public class GeoPolygonTest {
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "HSEARCH000516" );
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> GeoPolygon.of( Arrays.asList(
 						GeoPoint.of( 26, 23 ),
 						GeoPoint.of( 26, 26 ),

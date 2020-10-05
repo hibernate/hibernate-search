@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.assertion;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
-
-import org.assertj.core.api.Assertions;
 
 public class SearchHitAssert<H> {
 
@@ -37,7 +37,7 @@ public class SearchHitAssert<H> {
 
 		DocumentReference actualReference = NormalizationUtils.normalize( (DocumentReference) actual );
 
-		Assertions.assertThat( references )
+		assertThat( references )
 				.as( description )
 				.contains( actualReference );
 	}

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.decimalscale;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
@@ -26,8 +27,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedInde
 
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 public class DecimalScaleIT {
 
@@ -190,7 +189,7 @@ public class DecimalScaleIT {
 		BigDecimal estimatedIndexedValue = bigDecimalWithOnes( INDEX_PRECISION, 0, schemaDecimalScale );
 		BigDecimal indexedValueLowerBound = estimatedIndexedValue.subtract( new BigDecimal( BigInteger.ONE, schemaDecimalScale ) );
 		BigDecimal indexedValueUpperBound = estimatedIndexedValue.add( new BigDecimal( BigInteger.ONE, schemaDecimalScale ) );
-		Assertions.assertThat( originalValue )
+		assertThat( originalValue )
 				.isBetween( indexedValueLowerBound, indexedValueUpperBound );
 
 		index.index( "1", doc -> doc.addValue( index.binding().scaled, originalValue ) );
@@ -227,7 +226,7 @@ public class DecimalScaleIT {
 		BigDecimal estimatedIndexedValue = bigDecimalWithOnes( INDEX_PRECISION, 0, schemaDecimalScale );
 		BigDecimal indexedValueLowerBound = estimatedIndexedValue.subtract( new BigDecimal( BigInteger.ONE, schemaDecimalScale ) );
 		BigDecimal indexedValueUpperBound = estimatedIndexedValue.add( new BigDecimal( BigInteger.ONE, schemaDecimalScale ) );
-		Assertions.assertThat( originalValue )
+		assertThat( originalValue )
 				.isBetween( indexedValueLowerBound, indexedValueUpperBound );
 
 		index.index( "1", doc -> doc.addValue( index.binding().scaled, originalValue ) );
@@ -264,7 +263,7 @@ public class DecimalScaleIT {
 		BigInteger estimatedIndexedValue = bigDecimalWithOnes( INDEX_PRECISION, 0, schemaDecimalScale ).toBigIntegerExact();
 		BigInteger indexedValueLowerBound = estimatedIndexedValue.subtract( new BigDecimal( BigInteger.ONE, schemaDecimalScale ).toBigIntegerExact() );
 		BigInteger indexedValueUpperBound = estimatedIndexedValue.add( new BigDecimal( BigInteger.ONE, schemaDecimalScale ).toBigIntegerExact() );
-		Assertions.assertThat( originalValue )
+		assertThat( originalValue )
 				.isBetween( indexedValueLowerBound, indexedValueUpperBound );
 
 		index.index( "1", doc -> doc.addValue( index.binding().scaled, originalValue ) );

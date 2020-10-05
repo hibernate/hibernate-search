@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.smoke;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 
 import java.time.LocalDate;
@@ -24,7 +25,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 
-import org.assertj.core.api.Assertions;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.CustomPropertyBinding;
 import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.CustomTypeBinding;
@@ -327,7 +327,7 @@ public class AnnotationMappingSmokeIT {
 
 			List<ParentIndexedEntity> result = query.fetchHits( 3, 2 );
 			backendMock.verifyExpectationsMet();
-			Assertions.assertThat( result )
+			assertThat( result )
 					.containsExactly(
 							session.getReference( IndexedEntity.class, 0 ),
 							session.getReference( YetAnotherIndexedEntity.class, 1 )
@@ -337,7 +337,7 @@ public class AnnotationMappingSmokeIT {
 
 			long resultSize = query.fetchTotalHitCount();
 			backendMock.verifyExpectationsMet();
-			Assertions.assertThat( resultSize ).isEqualTo( 6L );
+			assertThat( resultSize ).isEqualTo( 6L );
 		} );
 	}
 

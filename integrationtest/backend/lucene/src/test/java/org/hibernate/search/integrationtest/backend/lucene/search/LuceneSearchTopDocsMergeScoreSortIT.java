@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.search;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
@@ -27,7 +28,6 @@ import org.junit.Test;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopFieldDocs;
-import org.assertj.core.api.Assertions;
 
 /**
  * Test that one can use {@link org.apache.lucene.search.TopDocs#merge(int, TopDocs[])}
@@ -73,7 +73,7 @@ public class LuceneSearchTopDocsMergeScoreSortIT {
 				.hasDocRefHitsExactOrder( index.typeName(), SEGMENT_1_DOC_0, SEGMENT_1_DOC_1 );
 
 		TopFieldDocs[] allTopDocs = retrieveTopDocs( segment0Query, segment0Result, segment1Result );
-		Assertions.assertThat( TopDocs.merge( 10, allTopDocs ).scoreDocs )
+		assertThat( TopDocs.merge( 10, allTopDocs ).scoreDocs )
 				.containsExactly(
 						allTopDocs[1].scoreDocs[0], // SEGMENT_1_DOC_0
 						allTopDocs[0].scoreDocs[0], // SEGMENT_0_DOC_0
@@ -97,7 +97,7 @@ public class LuceneSearchTopDocsMergeScoreSortIT {
 				.hasDocRefHitsExactOrder( index.typeName(), SEGMENT_1_DOC_1, SEGMENT_1_DOC_0 );
 
 		TopFieldDocs[] allTopDocs = retrieveTopDocs( segment0Query, segment0Result, segment1Result );
-		Assertions.assertThat( TopDocs.merge( segment0Query.luceneSort(), 10, allTopDocs ).scoreDocs )
+		assertThat( TopDocs.merge( segment0Query.luceneSort(), 10, allTopDocs ).scoreDocs )
 				.containsExactly(
 						allTopDocs[0].scoreDocs[0], // SEGMENT_0_DOC_1
 						allTopDocs[1].scoreDocs[0], // SEGMENT_1_DOC_1

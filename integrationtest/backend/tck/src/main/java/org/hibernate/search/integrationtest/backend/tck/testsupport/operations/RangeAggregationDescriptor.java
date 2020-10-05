@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.operations;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
 import java.util.ArrayList;
@@ -30,8 +31,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.Expecta
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TypeAssertionHelper;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
-
-import org.assertj.core.api.Assertions;
 
 public class RangeAggregationDescriptor extends AggregationDescriptor {
 
@@ -177,7 +176,7 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 						Map.Entry<Range<T>, Long>[] actualEntries = NormalizationUtils.normalize( aggregationResult )
 								.entrySet().toArray( new Map.Entry[0] );
 						// Don't check the order, this is tested separately
-						Assertions.assertThat( actualEntries ).containsOnly( expectedEntries );
+						assertThat( actualEntries ).containsOnly( expectedEntries );
 					}
 				};
 			}

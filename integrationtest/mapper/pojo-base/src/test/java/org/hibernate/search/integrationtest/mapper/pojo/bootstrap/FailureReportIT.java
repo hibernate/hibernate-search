@@ -6,16 +6,17 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.bootstrap;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
@@ -86,7 +87,7 @@ public class FailureReportIT {
 						+ "JavaBean mapping, type '" + IndexedEntity.class.getName() + "', path '.myProperty'\n"
 		);
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -143,7 +144,7 @@ public class FailureReportIT {
 						+ "JavaBean mapping, type '" + IndexedEntity.class.getName() + "', path '.myProperty2'\n"
 		);
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -208,7 +209,7 @@ public class FailureReportIT {
 						+ "JavaBean mapping, type '" + IndexedEntity2.class.getName() + "', path '.myProperty2'\n"
 		);
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity1.class, IndexedEntity2.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -272,7 +273,7 @@ public class FailureReportIT {
 						+ " index '" + indexName + "', field 'failingField2'\n"
 		);
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )

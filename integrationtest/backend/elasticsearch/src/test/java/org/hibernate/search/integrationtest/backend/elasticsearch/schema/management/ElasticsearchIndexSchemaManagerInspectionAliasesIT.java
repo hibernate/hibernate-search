@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultPrimaryName;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultReadAlias;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultWriteAlias;
@@ -21,7 +22,6 @@ import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -66,7 +66,7 @@ public class ElasticsearchIndexSchemaManagerInspectionAliasesIT {
 				.deleteAndCreate()
 				.aliases().put( defaultWriteAlias( index.name() ).original );
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				this::setupAndInspectIndex
 		)
 				.isInstanceOf( SearchException.class )
@@ -88,7 +88,7 @@ public class ElasticsearchIndexSchemaManagerInspectionAliasesIT {
 				.deleteAndCreate()
 				.aliases().put( defaultReadAlias( index.name() ).original );
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				this::setupAndInspectIndex
 		)
 				.isInstanceOf( SearchException.class )

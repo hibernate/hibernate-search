@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.hibernate.search.integrationtest.backend.lucene.testsupport.util.DocumentAssert.containsDocument;
@@ -36,7 +37,6 @@ import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
 import org.apache.lucene.search.SortedSetSortField;
 import org.apache.lucene.search.TermQuery;
-import org.assertj.core.api.Assertions;
 
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
@@ -182,7 +182,7 @@ public class LuceneExtensionIT {
 				.where( f -> f.matchAll() )
 				.fetchAll();
 
-		Assertions.assertThat( result.topDocs() ).isNotNull();
+		assertThat( result.topDocs() ).isNotNull();
 	}
 
 	@Test
@@ -194,12 +194,12 @@ public class LuceneExtensionIT {
 				.toQuery();
 
 		// Matching document
-		Assertions.assertThat( query.explain( FIRST_ID ) )
+		assertThat( query.explain( FIRST_ID ) )
 				.extracting( Object::toString ).asString()
 				.contains( MetadataFields.idFieldName() );
 
 		// Non-matching document
-		Assertions.assertThat( query.explain( FIFTH_ID ) )
+		assertThat( query.explain( FIFTH_ID ) )
 				.extracting( Object::toString ).asString()
 				.contains( MetadataFields.idFieldName() );
 	}
@@ -231,12 +231,12 @@ public class LuceneExtensionIT {
 				.toQuery();
 
 		// Matching document
-		Assertions.assertThat( query.explain( mainIndex.typeName(), FIRST_ID ) )
+		assertThat( query.explain( mainIndex.typeName(), FIRST_ID ) )
 				.extracting( Object::toString ).asString()
 				.contains( MetadataFields.idFieldName() );
 
 		// Non-matching document
-		Assertions.assertThat( query.explain( mainIndex.typeName(), FIFTH_ID ) )
+		assertThat( query.explain( mainIndex.typeName(), FIFTH_ID ) )
 				.extracting( Object::toString ).asString()
 				.contains( MetadataFields.idFieldName() );
 	}
@@ -653,7 +653,7 @@ public class LuceneExtensionIT {
 				.toQuery();
 
 		List<Document> result = query.fetchAll().hits();
-		Assertions.assertThat( result )
+		assertThat( result )
 				.hasSize( 5 )
 				.satisfies( containsDocument(
 						doc -> doc.hasField( "string", "text 1" )
@@ -711,7 +711,7 @@ public class LuceneExtensionIT {
 		List<Document> result = query.fetchAll().hits().stream()
 				.map( list -> (Document) list.get( 0 ) )
 				.collect( Collectors.toList() );
-		Assertions.assertThat( result )
+		assertThat( result )
 				.hasSize( 1 )
 				.satisfies( containsDocument(
 						doc -> doc.hasField( "string", "text 1" )
@@ -732,8 +732,8 @@ public class LuceneExtensionIT {
 				.toQuery();
 
 		List<Explanation> result = query.fetchAll().hits();
-		Assertions.assertThat( result ).hasSize( 1 );
-		Assertions.assertThat( result.get( 0 ) )
+		assertThat( result ).hasSize( 1 );
+		assertThat( result.get( 0 ) )
 				.isInstanceOf( Explanation.class )
 				.extracting( Object::toString ).asString()
 				.contains( MetadataFields.idFieldName() );
@@ -757,7 +757,7 @@ public class LuceneExtensionIT {
 						) ) ) )
 				)
 				.toQuery();
-		assertThatQuery( query ).aggregation( aggregationKey, agg -> Assertions.assertThat( agg ).containsExactly(
+		assertThatQuery( query ).aggregation( aggregationKey, agg -> assertThat( agg ).containsExactly(
 				entry( "five", 1L ),
 				entry( "four", 1L ),
 				entry( "one", 1L ),
@@ -778,7 +778,7 @@ public class LuceneExtensionIT {
 	@Test
 	public void backend_unwrap() {
 		Backend backend = integration.backend();
-		Assertions.assertThat( backend.unwrap( LuceneBackend.class ) )
+		assertThat( backend.unwrap( LuceneBackend.class ) )
 				.isNotNull();
 	}
 
@@ -797,7 +797,7 @@ public class LuceneExtensionIT {
 	@Test
 	public void mainIndex_unwrap() {
 		IndexManager mainIndexFromIntegration = integration.indexManager( mainIndex.name() );
-		Assertions.assertThat( mainIndexFromIntegration.unwrap( LuceneIndexManager.class ) )
+		assertThat( mainIndexFromIntegration.unwrap( LuceneIndexManager.class ) )
 				.isNotNull();
 	}
 

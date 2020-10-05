@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.annotation.processing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
@@ -39,8 +40,6 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 /**
  * Test common use cases of (custom) property mapping annotations.
@@ -100,7 +99,7 @@ public class CustomPropertyMappingAnnotationBaseIT {
 			@AnnotationWithEmptyProcessorRef
 			Integer id;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -128,7 +127,7 @@ public class CustomPropertyMappingAnnotationBaseIT {
 			@AnnotationWithProcessorWithDifferentAnnotationType
 			Integer id;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )

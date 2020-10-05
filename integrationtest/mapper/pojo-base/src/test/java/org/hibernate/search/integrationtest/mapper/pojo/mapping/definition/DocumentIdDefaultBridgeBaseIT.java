@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
@@ -28,7 +29,6 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Assume;
 import org.junit.Before;
@@ -185,7 +185,7 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 		}
 
 		// convertUnknown must throw a runtime exception on invalid input
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> dslToIndexConverter.convertUnknown( new Object(), convertContext ),
 				"convertUnknown on invalid input"
 		)

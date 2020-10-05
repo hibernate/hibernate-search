@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.bootstrap;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
@@ -19,7 +20,6 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dial
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -70,7 +70,7 @@ public class ElasticsearchBootstrapIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3841")
 	public void explicitProtocolDialect_noVersionCheck() {
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start()
 						.withBackendProperty(
 								ElasticsearchBackendSettings.VERSION_CHECK_ENABLED, false
@@ -102,7 +102,7 @@ public class ElasticsearchBootstrapIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3841")
 	public void explicitProtocolDialect_noVersionCheck_incompleteVersion() {
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start()
 						.withBackendProperty(
 								ElasticsearchBackendSettings.VERSION_CHECK_ENABLED, false

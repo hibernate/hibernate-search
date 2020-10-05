@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultPrimaryName;
@@ -67,7 +68,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.apache.http.nio.client.HttpAsyncClient;
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
@@ -176,7 +176,7 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.matchAll() )
 				.fetchAll();
 
-		Assertions.assertThat( result.responseBody() )
+		assertThat( result.responseBody() )
 				.isNotNull()
 				.extracting( body -> body.get( "_shards" ) ).isInstanceOf( JsonObject.class );
 	}
@@ -190,13 +190,13 @@ public class ElasticsearchExtensionIT {
 				.toQuery();
 
 		// Matching document
-		Assertions.assertThat( query.explain( FIRST_ID ) )
+		assertThat( query.explain( FIRST_ID ) )
 				.asString()
 				.contains( "\"description\":" )
 				.contains( "\"details\":" );
 
 		// Non-matching document
-		Assertions.assertThat( query.explain( FIFTH_ID ) )
+		assertThat( query.explain( FIFTH_ID ) )
 				.asString()
 				.contains( "\"description\":" )
 				.contains( "\"details\":" );
@@ -213,13 +213,13 @@ public class ElasticsearchExtensionIT {
 				.toQuery();
 
 		// Matching document
-		Assertions.assertThat( query.explain( FIRST_ID ) )
+		assertThat( query.explain( FIRST_ID ) )
 				.asString()
 				.contains( "\"description\":" )
 				.contains( "\"details\":" );
 
 		// Non-matching document
-		Assertions.assertThat( query.explain( FIFTH_ID ) )
+		assertThat( query.explain( FIFTH_ID ) )
 				.asString()
 				.contains( "\"description\":" )
 				.contains( "\"details\":" );
@@ -251,13 +251,13 @@ public class ElasticsearchExtensionIT {
 				.toQuery();
 
 		// Matching document
-		Assertions.assertThat( query.explain( mainIndex.typeName(), FIRST_ID ) )
+		assertThat( query.explain( mainIndex.typeName(), FIRST_ID ) )
 				.asString()
 				.contains( "\"description\":" )
 				.contains( "\"details\":" );
 
 		// Non-matching document
-		Assertions.assertThat( query.explain( mainIndex.typeName(), FIFTH_ID ) )
+		assertThat( query.explain( mainIndex.typeName(), FIFTH_ID ) )
 				.asString()
 				.contains( "\"description\":" )
 				.contains( "\"details\":" );
@@ -847,7 +847,7 @@ public class ElasticsearchExtensionIT {
 				.toQuery();
 
 		List<JsonObject> result = query.fetchAll().hits();
-		Assertions.assertThat( result ).hasSize( 1 );
+		assertThat( result ).hasSize( 1 );
 		assertJsonEquals(
 				"{"
 						+ "'string': 'text 5',"
@@ -884,7 +884,7 @@ public class ElasticsearchExtensionIT {
 		List<JsonObject> result = query.fetchAll().hits().stream()
 				.map( list -> (JsonObject) list.get( 0 ) )
 				.collect( Collectors.toList() );
-		Assertions.assertThat( result ).hasSize( 1 );
+		assertThat( result ).hasSize( 1 );
 		assertJsonEquals(
 				"{"
 						+ "'string': 'text 5',"
@@ -910,8 +910,8 @@ public class ElasticsearchExtensionIT {
 				.toQuery();
 
 		List<JsonObject> result = query.fetchAll().hits();
-		Assertions.assertThat( result ).hasSize( 1 );
-		Assertions.assertThat( result.get( 0 ) )
+		assertThat( result ).hasSize( 1 );
+		assertThat( result.get( 0 ) )
 				.asString()
 				.contains( "\"description\":" )
 				.contains( "\"details\":" );
@@ -927,7 +927,7 @@ public class ElasticsearchExtensionIT {
 				.toQuery();
 
 		List<JsonObject> result = query.fetchAll().hits();
-		Assertions.assertThat( result ).hasSize( 1 );
+		assertThat( result ).hasSize( 1 );
 		assertJsonEquals(
 				"{"
 						+ "'_id': '" + FIRST_ID + "',"
@@ -952,8 +952,8 @@ public class ElasticsearchExtensionIT {
 				.asInstanceOf( InstanceOfAssertFactories.map( JsonElement.class, Long.class ) )
 				.containsExactly(
 						// There are extra quotes because it's a native field: these are JSON-formatted strings representing string values
-						Assertions.entry( new JsonPrimitive( "value-for-doc-1-and-2" ), 2L ),
-						Assertions.entry( new JsonPrimitive( "value-for-doc-3" ), 1L )
+						entry( new JsonPrimitive( "value-for-doc-1-and-2" ), 2L ),
+						entry( new JsonPrimitive( "value-for-doc-3" ), 1L )
 				);
 	}
 
@@ -1031,7 +1031,7 @@ public class ElasticsearchExtensionIT {
 						) )
 				)
 				.toQuery();
-		assertThatQuery( query ).aggregation( aggregationKey, agg -> Assertions.assertThat( agg ).containsExactly(
+		assertThatQuery( query ).aggregation( aggregationKey, agg -> assertThat( agg ).containsExactly(
 				entry( "five", 1L ),
 				entry( "four", 1L ),
 				entry( "one", 1L ),
@@ -1043,7 +1043,7 @@ public class ElasticsearchExtensionIT {
 	@Test
 	public void backend_unwrap() {
 		Backend backend = integration.backend();
-		Assertions.assertThat( backend.unwrap( ElasticsearchBackend.class ) )
+		assertThat( backend.unwrap( ElasticsearchBackend.class ) )
 				.isNotNull();
 	}
 
@@ -1067,7 +1067,7 @@ public class ElasticsearchExtensionIT {
 
 		// Test that the client actually works
 		Response response = restClient.performRequest( new Request( "GET", "/" ) );
-		Assertions.assertThat( response.getStatusLine().getStatusCode() ).isEqualTo( 200 );
+		assertThat( response.getStatusLine().getStatusCode() ).isEqualTo( 200 );
 	}
 
 	@Test
@@ -1087,7 +1087,7 @@ public class ElasticsearchExtensionIT {
 	@Test
 	public void mainIndex_unwrap() {
 		IndexManager mainIndexFromIntegration = integration.indexManager( mainIndex.name() );
-		Assertions.assertThat( mainIndexFromIntegration.unwrap( ElasticsearchIndexManager.class ) )
+		assertThat( mainIndexFromIntegration.unwrap( ElasticsearchIndexManager.class ) )
 				.isNotNull();
 	}
 

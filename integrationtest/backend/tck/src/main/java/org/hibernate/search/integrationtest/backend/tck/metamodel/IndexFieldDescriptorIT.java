@@ -38,8 +38,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import org.assertj.core.api.Assertions;
-
 /**
  * Tests for field descriptor features.
  * <p>
@@ -163,7 +161,7 @@ public class IndexFieldDescriptorIT {
 
 		// Static children
 		Collection<? extends IndexFieldDescriptor> children = fieldDescriptor.staticChildren();
-		Assertions.<IndexFieldDescriptor>assertThat( children ).contains( childFieldDescriptor );
+		assertThat( (Collection<IndexFieldDescriptor>) children ).contains( childFieldDescriptor );
 
 		switch ( fieldStructure.location ) {
 			case IN_FLATTENED:
