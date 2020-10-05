@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.entityindexmapping;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,8 +33,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import org.assertj.core.api.Assertions;
 
 @RunWith(Parameterized.class)
 public class HibernateOrmIndexedIT {
@@ -103,7 +102,7 @@ public class HibernateOrmIndexedIT {
 
 	@Test
 	public void search_singleQuery() {
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 					SearchSession searchSession = Search.session( entityManager );
 

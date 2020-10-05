@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +28,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -115,7 +116,7 @@ public class FieldContainerExtractorBaseIT {
 			@GenericField(extraction = @ContainerExtraction("some-undefined-name"))
 			Integer id;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -140,7 +141,7 @@ public class FieldContainerExtractorBaseIT {
 			@GenericField(extraction = @ContainerExtraction(RawContainerExtractor.NAME))
 			Integer id;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start()
 						.withConfiguration( builder -> {
 							builder.containerExtractors().define( RawContainerExtractor.NAME, RawContainerExtractor.class );
@@ -178,7 +179,7 @@ public class FieldContainerExtractorBaseIT {
 			@GenericField(extraction = @ContainerExtraction(BuiltinContainerExtractors.MAP_VALUE))
 			List<Integer> numbers;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
@@ -206,7 +207,7 @@ public class FieldContainerExtractorBaseIT {
 			))
 			List<Integer> numbers;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )

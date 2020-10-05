@@ -55,8 +55,6 @@ import org.hibernate.search.util.impl.test.rule.StaticCounters;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.assertj.core.api.Assertions;
-
 /**
  * Test common use cases of the {@code @IndexedEmbedded} annotation.
  * <p>
@@ -600,7 +598,7 @@ public class IndexedEmbeddedBaseIT {
 			}
 		}
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start()
 						.withAnnotatedEntityTypes( IndexedEntity.class )
 						.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
@@ -1414,7 +1412,7 @@ public class IndexedEmbeddedBaseIT {
 			String invalid;
 		}
 
-		Assertions.assertThatThrownBy( () -> setupHelper.start()
+		assertThatThrownBy( () -> setupHelper.start()
 				.withAnnotatedEntityTypes( IndexedEntity.class )
 				.setup() )
 				.isInstanceOf( SearchException.class )
@@ -1452,7 +1450,7 @@ public class IndexedEmbeddedBaseIT {
 			EmptyNested invalid;
 		}
 
-		Assertions.assertThatThrownBy( () -> setupHelper.start()
+		assertThatThrownBy( () -> setupHelper.start()
 				.withAnnotatedEntityTypes( IndexedEntity.class )
 				.setup() )
 				.isInstanceOf( SearchException.class )

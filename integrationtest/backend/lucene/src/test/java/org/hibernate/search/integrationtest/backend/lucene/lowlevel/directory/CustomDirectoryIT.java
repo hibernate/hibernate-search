@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.lucene.lowlevel.directory;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -16,7 +17,6 @@ import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolde
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
@@ -61,7 +61,7 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	public void invalid() {
 		String invalidDirectoryType = "someInvalidDirectoryType";
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				setup( "someInvalidDirectoryType", c -> c )
 		)
 				.isInstanceOf( SearchException.class )

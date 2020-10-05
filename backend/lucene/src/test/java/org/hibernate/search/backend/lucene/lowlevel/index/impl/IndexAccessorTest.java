@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.lowlevel.index.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
@@ -18,7 +19,6 @@ import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDeleg
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterProvider;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
-import org.assertj.core.api.Assertions;
 
 import org.junit.After;
 import org.junit.Before;
@@ -92,7 +92,7 @@ public class IndexAccessorTest extends EasyMockSupport {
 		indexWriterDelegatorMock.commit();
 		expectLastCall().andThrow( exception );
 		replayAll();
-		Assertions.assertThatThrownBy( () -> accessor.commit() )
+		assertThatThrownBy( () -> accessor.commit() )
 				.isSameAs( exception );
 		verifyAll();
 	}
@@ -126,7 +126,7 @@ public class IndexAccessorTest extends EasyMockSupport {
 		indexWriterDelegatorMock.commitOrDelay();
 		expectLastCall().andThrow( exception );
 		replayAll();
-		Assertions.assertThatThrownBy( () -> accessor.commitOrDelay() )
+		assertThatThrownBy( () -> accessor.commitOrDelay() )
 				.isSameAs( exception );
 		verifyAll();
 	}
@@ -148,7 +148,7 @@ public class IndexAccessorTest extends EasyMockSupport {
 		indexReaderProviderMock.refresh();
 		expectLastCall().andThrow( exception );
 		replayAll();
-		Assertions.assertThatThrownBy( () -> accessor.refresh() )
+		assertThatThrownBy( () -> accessor.refresh() )
 				.isSameAs( exception );
 		verifyAll();
 	}

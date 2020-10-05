@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub;
 
+import static org.assertj.core.api.Assertions.fail;
+
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.reporting.EventContextElement;
-
-import org.assertj.core.api.Assertions;
 
 public class StubUnusedContextualFailureCollector implements ContextualFailureCollector {
 	@Override
@@ -20,21 +20,21 @@ public class StubUnusedContextualFailureCollector implements ContextualFailureCo
 
 	@Override
 	public void add(Throwable t) {
-		Assertions.fail( "Unexpected call to add(" + t + ")" );
+		fail( "Unexpected call to add(" + t + ")" );
 	}
 
 	@Override
 	public void add(String failureMessage) {
-		Assertions.fail( "Unexpected call to add(" + failureMessage + ")" );
+		fail( "Unexpected call to add(" + failureMessage + ")" );
 	}
 
 	@Override
 	public ContextualFailureCollector withContext(EventContext context) {
-		return Assertions.fail( "Unexpected call to withContext(" + context + ")" );
+		return fail( "Unexpected call to withContext(" + context + ")" );
 	}
 
 	@Override
 	public ContextualFailureCollector withContext(EventContextElement contextElement) {
-		return Assertions.fail( "Unexpected call to withContext(" + contextElement + ")" );
+		return fail( "Unexpected call to withContext(" + contextElement + ")" );
 	}
 }

@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
 import java.lang.invoke.MethodHandles;
@@ -24,11 +27,11 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationConfigurationContext;
+import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationConfigurationContext;
-import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -44,7 +47,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import org.apache.log4j.Level;
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
@@ -214,7 +216,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		assertThatFuture( transactionThreadFuture ).isSuccessful();
 
 		// Upon timing out, the strategy should have set this reference
-		Assertions.assertThat( futureThatTookTooLong ).doesNotHaveValue( null );
+		assertThat( futureThatTookTooLong ).doesNotHaveValue( null );
 	}
 
 	@Test
@@ -234,7 +236,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		assertThatFuture( transactionThreadFuture ).isSuccessful();
 
 		// Upon timing out, the strategy should have set this reference
-		Assertions.assertThat( futureThatTookTooLong ).doesNotHaveValue( null );
+		assertThat( futureThatTookTooLong ).doesNotHaveValue( null );
 	}
 
 	@Test
@@ -414,7 +416,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		);
 
 		// There was no timeout, so the strategy should not have set this reference
-		Assertions.assertThat( futureThatTookTooLong ).hasValue( null );
+		assertThat( futureThatTookTooLong ).hasValue( null );
 	}
 
 	@Test
@@ -441,12 +443,12 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		);
 
 		// There was no timeout, so the strategy should not have set this reference
-		Assertions.assertThat( futureThatTookTooLong ).hasValue( null );
+		assertThat( futureThatTookTooLong ).hasValue( null );
 	}
 
 	@Test
 	public void invalidReference() {
-		Assertions.assertThatThrownBy( () -> setup( "invalidName" ) )
+		assertThatThrownBy( () -> setup( "invalidName" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Unable to convert configuration property '"
@@ -573,7 +575,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	private static Consumer<Throwable> transactionSynchronizationExceptionMatcher(Throwable indexingWorkException, String entityReferences) {
-		return throwable -> Assertions.assertThat( throwable ).isInstanceOf( HibernateException.class )
+		return throwable -> assertThat( throwable ).isInstanceOf( HibernateException.class )
 				.extracting( Throwable::getCause ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
 						.isInstanceOf( SearchException.class )
 						.hasMessageContainingAll(
@@ -652,7 +654,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 					futureThatTookTooLong.set( future );
 				}
 				catch (InterruptedException e) {
-					Assertions.fail( "Unexpected exception: " + e, e );
+					fail( "Unexpected exception: " + e, e );
 				}
 				catch (ExecutionException e) {
 					throw Throwables.toRuntimeException( e.getCause() );

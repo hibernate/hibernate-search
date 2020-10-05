@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.testsupport.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +20,6 @@ import java.util.function.Predicate;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.BytesRef;
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Condition;
 import org.assertj.core.api.ListAssert;
 
@@ -35,7 +36,7 @@ public class DocumentAssert {
 	 * @return A consumer to be passed to {@link ListAssert#satisfies(java.util.function.Consumer)}.
 	 */
 	public static Consumer<List<? extends Document>> containsDocument(Consumer<DocumentAssert> assertions) {
-		return allDocuments -> Assertions.assertThat( allDocuments ).anySatisfy(
+		return allDocuments -> assertThat( allDocuments ).anySatisfy(
 			document -> assertions.accept( new DocumentAssert( document ) )
 		);
 	}
@@ -49,7 +50,7 @@ public class DocumentAssert {
 	}
 
 	private ListAssert<IndexableField> asFields() {
-		return Assertions.assertThat( actual.getFields() );
+		return assertThat( actual.getFields() );
 	}
 
 	public DocumentAssert hasField(String absoluteFieldPath, String ... values) {

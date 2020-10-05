@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.mapper.orm.indexedembedded.includepathsanddepth;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -22,8 +23,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 public class IndexedEmbeddedIncludePathsAndDepthIT {
 
@@ -91,7 +90,7 @@ public class IndexedEmbeddedIncludePathsAndDepthIT {
 
 		SearchMapping searchMapping = Search.mapping( entityManagerFactory );
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> {
 					searchMapping.scope( Human.class ).predicate()
 							.match().field( "parents.parents.parents.nickname" );
@@ -99,7 +98,7 @@ public class IndexedEmbeddedIncludePathsAndDepthIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" );
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> {
 					searchMapping.scope( Human.class ).predicate()
 							.match().field( "parents.parents.parents.parents.name" );

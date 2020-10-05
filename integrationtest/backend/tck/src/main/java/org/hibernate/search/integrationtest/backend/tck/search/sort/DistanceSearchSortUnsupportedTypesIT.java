@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -20,7 +22,6 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.assertj.core.api.Assertions;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -70,7 +71,7 @@ public class DistanceSearchSortUnsupportedTypesIT<F> {
 		StubMappingScope scope = index.createScope();
 		String absoluteFieldPath = getFieldPath();
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> scope.sort().distance( absoluteFieldPath, GeoPoint.of( 42.0, 45.0 ) )
 		)
 				.isInstanceOf( SearchException.class )

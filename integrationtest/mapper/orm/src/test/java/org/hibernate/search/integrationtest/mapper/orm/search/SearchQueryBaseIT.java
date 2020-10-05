@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.search;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 
@@ -15,22 +17,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-
-import org.assertj.core.api.Assertions;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
@@ -115,7 +114,7 @@ public class SearchQueryBaseIT {
 					)
 			);
 
-			Assertions.assertThat( query.fetchAllHits() ).containsExactly(
+			assertThat( query.fetchAllHits() ).containsExactly(
 					session.load( Book.class, 1 ),
 					session.load( Book.class, 2 ),
 					session.load( Book.class, 3 )
@@ -147,7 +146,7 @@ public class SearchQueryBaseIT {
 						)
 				);
 
-				Assertions.assertThat( query.fetchAllHits() ).containsExactly(
+				assertThat( query.fetchAllHits() ).containsExactly(
 						session.load( Book.class, 1 ),
 						session.load( Book.class, 2 ),
 						session.load( Book.class, 3 )
@@ -175,7 +174,7 @@ public class SearchQueryBaseIT {
 					)
 			);
 
-			Assertions.assertThat( query.fetchAllHits() ).containsExactly(
+			assertThat( query.fetchAllHits() ).containsExactly(
 					session.load( Book.class, 1 ),
 					session.load( Author.class, 2 )
 			);
@@ -203,7 +202,7 @@ public class SearchQueryBaseIT {
 					)
 			);
 
-			Assertions.assertThatThrownBy( () -> query.fetchAllHits() )
+			assertThatThrownBy( () -> query.fetchAllHits() )
 					.isInstanceOf( SearchTimeoutException.class )
 					.hasMessageContaining(
 							"Search query loading exceeded the timeout of 1 milliseconds"
@@ -232,7 +231,7 @@ public class SearchQueryBaseIT {
 					)
 			);
 
-			Assertions.assertThatThrownBy( () -> query.fetchAllHits() )
+			assertThatThrownBy( () -> query.fetchAllHits() )
 					.isInstanceOf( SearchTimeoutException.class )
 					.hasMessageContaining(
 							"Search query loading exceeded the timeout of 1 milliseconds"
@@ -247,7 +246,7 @@ public class SearchQueryBaseIT {
 
 			Class<?> invalidClass = String.class;
 
-			Assertions.assertThatThrownBy( () -> searchSession.scope( invalidClass ) )
+			assertThatThrownBy( () -> searchSession.scope( invalidClass ) )
 					.hasMessageContainingAll(
 							"Some of the given types cannot be targeted",
 							"These types are not indexed, nor is any of their subtypes: [" + invalidClass.getName() + "]"
@@ -275,7 +274,7 @@ public class SearchQueryBaseIT {
 					)
 			);
 
-			Assertions.assertThat( query.fetchAllHits() ).containsExactly(
+			assertThat( query.fetchAllHits() ).containsExactly(
 					session.load( Book.class, 1 ),
 					session.load( Book.class, 2 ),
 					session.load( Book.class, 3 )
@@ -304,7 +303,7 @@ public class SearchQueryBaseIT {
 					)
 			);
 
-			Assertions.assertThat( query.fetchAllHits() ).containsExactly(
+			assertThat( query.fetchAllHits() ).containsExactly(
 					session.load( Book.class, 1 ),
 					session.load( Author.class, 2 )
 			);
@@ -318,7 +317,7 @@ public class SearchQueryBaseIT {
 
 			Class<?> invalidClass = String.class;
 
-			Assertions.assertThatThrownBy( () -> searchSession.scope(
+			assertThatThrownBy( () -> searchSession.scope(
 					invalidClass, Book.NAME
 			) )
 					.hasMessageContainingAll(
@@ -336,7 +335,7 @@ public class SearchQueryBaseIT {
 
 			String invalidName = "foo";
 
-			Assertions.assertThatThrownBy( () -> searchSession.scope(
+			assertThatThrownBy( () -> searchSession.scope(
 					Book.class, invalidName
 			) )
 					.hasMessageContainingAll(
@@ -374,7 +373,7 @@ public class SearchQueryBaseIT {
 					)
 			);
 
-			Assertions.assertThat( query.fetchAllHits() ).containsExactly(
+			assertThat( query.fetchAllHits() ).containsExactly(
 					session.load( Book.class, 1 ),
 					session.load( Book.class, 2 ),
 					session.load( Book.class, 3 )
@@ -407,7 +406,7 @@ public class SearchQueryBaseIT {
 					)
 			);
 
-			Assertions.assertThat( query.fetchAllHits() ).containsExactly(
+			assertThat( query.fetchAllHits() ).containsExactly(
 					TITLE_4_3_2_1,
 					TITLE_CIDER_HOUSE,
 					TITLE_AVENUE_OF_MYSTERIES
@@ -458,7 +457,7 @@ public class SearchQueryBaseIT {
 					)
 			);
 
-			Assertions.assertThat( query.fetchAllHits() ).containsExactly(
+			assertThat( query.fetchAllHits() ).containsExactly(
 					Arrays.asList(
 							TITLE_4_3_2_1,
 							EntityReferenceImpl.withName( Book.class, Book.NAME, 1 ),
@@ -521,7 +520,7 @@ public class SearchQueryBaseIT {
 					)
 			);
 
-			Assertions.assertThat( query.fetchAllHits() ).containsExactlyInAnyOrder(
+			assertThat( query.fetchAllHits() ).containsExactlyInAnyOrder(
 					new Book_Author_Score( new Book_Author( session.get( Book.class, 1 ), AUTHOR_4_3_2_1 ), 4.0F ),
 					new Book_Author_Score( new Book_Author( session.get( Book.class, 2 ), AUTHOR_CIDER_HOUSE ), 5.0F ),
 					new Book_Author_Score( new Book_Author( session.get( Book.class, 3 ), AUTHOR_AVENUE_OF_MYSTERIES ), 6.0F )
@@ -569,7 +568,7 @@ public class SearchQueryBaseIT {
 					)
 			);
 
-			Assertions.assertThat( query.fetchAllHits() ).containsExactlyInAnyOrder(
+			assertThat( query.fetchAllHits() ).containsExactlyInAnyOrder(
 					new Book_Author_Score( new Book_Author( session.load( Book.class, 1 ), AUTHOR_4_3_2_1 ), 4.0F ),
 					new Book_Author_Score( new Book_Author( session.load( Book.class, 2 ), AUTHOR_CIDER_HOUSE ), 5.0F ),
 					new Book_Author_Score( new Book_Author( session.load( Book.class, 3 ), AUTHOR_AVENUE_OF_MYSTERIES ), 6.0F )
@@ -629,7 +628,7 @@ public class SearchQueryBaseIT {
 					)
 			);
 
-			Assertions.assertThat( query.fetchAllHits() ).containsExactlyInAnyOrder(
+			assertThat( query.fetchAllHits() ).containsExactlyInAnyOrder(
 					EntityReferenceImpl.withName( Book.class, Book.NAME, 1 ),
 					EntityReferenceImpl.withName( Book.class, Book.NAME, 2 ),
 					EntityReferenceImpl.withName( Book.class, Book.NAME, 3 )

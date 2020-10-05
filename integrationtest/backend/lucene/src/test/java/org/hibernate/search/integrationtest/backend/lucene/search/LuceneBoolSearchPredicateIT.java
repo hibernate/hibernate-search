@@ -6,13 +6,14 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.search;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -36,7 +37,7 @@ public class LuceneBoolSearchPredicateIT {
 	public void minimumShouldMatch_outOfBounds() {
 		StubMappingScope scope = index.createScope();
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> scope.query()
 						.where( f -> f.bool()
 								.minimumShouldMatchNumber( 3 )

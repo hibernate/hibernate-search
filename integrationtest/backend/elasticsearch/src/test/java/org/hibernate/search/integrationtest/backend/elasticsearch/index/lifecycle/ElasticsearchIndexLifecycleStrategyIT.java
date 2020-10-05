@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.index.lifecycle;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.assertj.core.api.Assertions;
-
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -28,7 +28,7 @@ public class ElasticsearchIndexLifecycleStrategyIT {
 	@TestForIssue(jiraKey = "HSEARCH-3540")
 	public void noCall() {
 		StubMappedIndex index = StubMappedIndex.withoutFields();
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start()
 						.withBackendProperty(
 								"lifecycle.strategy",

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.assertion;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -16,7 +18,6 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
 
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ListAssert;
 import org.assertj.core.error.BasicErrorMessageFactory;
 import org.assertj.core.internal.Failures;
@@ -47,7 +48,7 @@ public class SearchHitsAssert<H> {
 		shouldHaveOnlyElementsOfTypeOrNull( asIs(), DocumentReference.class );
 		@SuppressWarnings( "unchecked" ) // We check that at runtime, that's what the assertion is for
 		List<DocumentReference> normalized = normalizeDocRefHits( ( (List<? extends DocumentReference>) actual ) );
-		return Assertions.assertThat( normalized ).as( description );
+		return assertThat( normalized ).as( description );
 	}
 
 	public ListAssert<List<?>> asNormalizedLists() {
@@ -56,16 +57,18 @@ public class SearchHitsAssert<H> {
 		List<List<?>> normalized = ( (List<? extends List<?>>) actual ).stream()
 				.map( NormalizationUtils::<List<?>>normalize )
 				.collect( Collectors.toList() );
-		return Assertions.assertThat( normalized ).as( description );
+		return assertThat( normalized ).as( description );
 	}
 
+	@SuppressWarnings("unchecked")
 	public ListAssert<H> asIs() {
-		return Assertions.<H>assertThat( actual )
+		return assertThat( (List<H>) actual )
 				.as( description );
 	}
 
+	@SuppressWarnings("unchecked")
 	public SearchHitsAssert<H> isEmpty() {
-		Assertions.<H>assertThat( actual )
+		assertThat( (List<H>) actual )
 				.as( description )
 				.isEmpty();
 		return this;
@@ -112,7 +115,7 @@ public class SearchHitsAssert<H> {
 	public SearchHitsAssert<H> ordinals(int... ordinals) {
 		List<H> newActuals = new ArrayList<>();
 		for ( int ordinal : ordinals ) {
-			Assertions.assertThat( ordinal ).isLessThan( actual.size() );
+			assertThat( ordinal ).isLessThan( actual.size() );
 			newActuals.add( actual.get( ordinal ) );
 		}
 

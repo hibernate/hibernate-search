@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
@@ -41,8 +42,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 public class SearchQueryBaseIT {
 
@@ -134,7 +133,7 @@ public class SearchQueryBaseIT {
 		assertThat( resultTotal.isHitCountLowerBound() ).isTrue();
 		assertThat( resultTotal.hitCountLowerBound() ).isLessThanOrEqualTo( 5000 );
 
-		Assertions.assertThatThrownBy( () -> resultTotal.hitCount() )
+		assertThatThrownBy( () -> resultTotal.hitCount() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Trying to get the exact total hit count, but it is a lower bound." );
 	}
@@ -173,7 +172,7 @@ public class SearchQueryBaseIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), "0", "1" );
 
 		// Mandatory extension, unsupported
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> query.extension( new UnSupportedQueryExtension<>() )
 		)
 				.isInstanceOf( SearchException.class );
@@ -194,7 +193,7 @@ public class SearchQueryBaseIT {
 				.hasDocRefHitsExactOrder( index.typeName(), "1", "2" );
 
 		// Mandatory extension, unsupported
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> scope.query()
 						.extension( new UnSupportedQueryDslExtension<>() )
 		)
@@ -235,8 +234,8 @@ public class SearchQueryBaseIT {
 		@Override
 		public Optional<QueryWrapper<H>> extendOptional(SearchQuery<H> original,
 				LoadingContext<?, ?> loadingContext) {
-			Assertions.assertThat( original ).isNotNull();
-			Assertions.assertThat( loadingContext ).isNotNull().isInstanceOf( StubLoadingContext.class );
+			assertThat( original ).isNotNull();
+			assertThat( loadingContext ).isNotNull().isInstanceOf( StubLoadingContext.class );
 			return Optional.of( new QueryWrapper<>( original ) );
 		}
 	}
@@ -245,8 +244,8 @@ public class SearchQueryBaseIT {
 		@Override
 		public Optional<QueryWrapper<H>> extendOptional(SearchQuery<H> original,
 				LoadingContext<?, ?> loadingContext) {
-			Assertions.assertThat( original ).isNotNull();
-			Assertions.assertThat( loadingContext ).isNotNull().isInstanceOf( StubLoadingContext.class );
+			assertThat( original ).isNotNull();
+			assertThat( loadingContext ).isNotNull().isInstanceOf( StubLoadingContext.class );
 			return Optional.empty();
 		}
 	}
@@ -257,10 +256,10 @@ public class SearchQueryBaseIT {
 		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
 				IndexScope<?> indexScope, BackendSessionContext sessionContext,
 				LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
-			Assertions.assertThat( original ).isNotNull();
-			Assertions.assertThat( indexScope ).isNotNull();
-			Assertions.assertThat( sessionContext ).isNotNull();
-			Assertions.assertThat( loadingContextBuilder ).isNotNull();
+			assertThat( original ).isNotNull();
+			assertThat( indexScope ).isNotNull();
+			assertThat( sessionContext ).isNotNull();
+			assertThat( loadingContextBuilder ).isNotNull();
 			return Optional.of( new MyExtendedDslContext<R>( original.selectEntityReference() ) );
 		}
 	}
@@ -271,10 +270,10 @@ public class SearchQueryBaseIT {
 		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
 				IndexScope<?> indexScope, BackendSessionContext sessionContext,
 				LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
-			Assertions.assertThat( original ).isNotNull();
-			Assertions.assertThat( indexScope ).isNotNull();
-			Assertions.assertThat( sessionContext ).isNotNull();
-			Assertions.assertThat( loadingContextBuilder ).isNotNull();
+			assertThat( original ).isNotNull();
+			assertThat( indexScope ).isNotNull();
+			assertThat( sessionContext ).isNotNull();
+			assertThat( loadingContextBuilder ).isNotNull();
 			return Optional.empty();
 		}
 	}

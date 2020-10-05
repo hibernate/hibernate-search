@@ -28,7 +28,6 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
@@ -441,7 +440,7 @@ public class IndexedBaseIT {
 			@GenericField
 			String text;
 		}
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setupHelper.start()
 						// Do not mention the type is an entity type here, on purpose, to trigger the failure
 						.withAnnotatedTypes( IndexedWithoutEntityMetadata.class )

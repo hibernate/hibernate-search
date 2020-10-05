@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.mapping;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
@@ -13,10 +15,10 @@ import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.TermVector;
+import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -29,7 +31,6 @@ import org.apache.lucene.analysis.ngram.NGramTokenizerFactory;
 import org.apache.lucene.analysis.payloads.TokenOffsetPayloadTokenFilterFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
-import org.assertj.core.api.Assertions;
 
 public class LuceneFieldAttributesIT {
 
@@ -64,12 +65,12 @@ public class LuceneFieldAttributesIT {
 		Document document = loadDocument();
 
 		// norms false => omit-norms true
-		Assertions.assertThat( document.getField( "keyword" ).fieldType().omitNorms() ).isTrue();
-		Assertions.assertThat( document.getField( "noNorms" ).fieldType().omitNorms() ).isTrue();
+		assertThat( document.getField( "keyword" ).fieldType().omitNorms() ).isTrue();
+		assertThat( document.getField( "noNorms" ).fieldType().omitNorms() ).isTrue();
 
 		// norms true => omit-norms false
-		Assertions.assertThat( document.getField( "text" ).fieldType().omitNorms() ).isFalse();
-		Assertions.assertThat( document.getField( "norms" ).fieldType().omitNorms() ).isFalse();
+		assertThat( document.getField( "text" ).fieldType().omitNorms() ).isFalse();
+		assertThat( document.getField( "norms" ).fieldType().omitNorms() ).isFalse();
 	}
 
 	@Test
@@ -78,23 +79,23 @@ public class LuceneFieldAttributesIT {
 
 		IndexableField field = document.getField( "text" );
 		// default no term vector stored
-		Assertions.assertThat( field.fieldType().storeTermVectors() ).isFalse();
-		Assertions.assertThat( field.fieldType().storeTermVectorPositions() ).isFalse();
-		Assertions.assertThat( field.fieldType().storeTermVectorOffsets() ).isFalse();
-		Assertions.assertThat( field.fieldType().storeTermVectorPayloads() ).isFalse();
+		assertThat( field.fieldType().storeTermVectors() ).isFalse();
+		assertThat( field.fieldType().storeTermVectorPositions() ).isFalse();
+		assertThat( field.fieldType().storeTermVectorOffsets() ).isFalse();
+		assertThat( field.fieldType().storeTermVectorPayloads() ).isFalse();
 
 		field = document.getField( "termVector" );
-		Assertions.assertThat( field.fieldType().storeTermVectors() ).isTrue();
-		Assertions.assertThat( field.fieldType().storeTermVectorPositions() ).isFalse();
-		Assertions.assertThat( field.fieldType().storeTermVectorOffsets() ).isFalse();
-		Assertions.assertThat( field.fieldType().storeTermVectorPayloads() ).isFalse();
+		assertThat( field.fieldType().storeTermVectors() ).isTrue();
+		assertThat( field.fieldType().storeTermVectorPositions() ).isFalse();
+		assertThat( field.fieldType().storeTermVectorOffsets() ).isFalse();
+		assertThat( field.fieldType().storeTermVectorPayloads() ).isFalse();
 
 		field = document.getField( "moreOptions" );
-		Assertions.assertThat( field.fieldType().storeTermVectors() ).isTrue();
+		assertThat( field.fieldType().storeTermVectors() ).isTrue();
 		// TODO these are not true:
-		// Assertions.assertThat( field.fieldType().storeTermVectorPositions() ).isTrue();
-		// Assertions.assertThat( field.fieldType().storeTermVectorOffsets() ).isTrue();
-		// Assertions.assertThat( field.fieldType().storeTermVectorPayloads() ).isTrue();
+		// assertThat( field.fieldType().storeTermVectorPositions() ).isTrue();
+		// assertThat( field.fieldType().storeTermVectorOffsets() ).isTrue();
+		// assertThat( field.fieldType().storeTermVectorPayloads() ).isTrue();
 	}
 
 	private Document loadDocument() {
@@ -107,7 +108,7 @@ public class LuceneFieldAttributesIT {
 
 		List<Document> result = query.fetchAll().hits();
 
-		Assertions.assertThat( result ).hasSize( 1 );
+		assertThat( result ).hasSize( 1 );
 		return result.get( 0 );
 	}
 

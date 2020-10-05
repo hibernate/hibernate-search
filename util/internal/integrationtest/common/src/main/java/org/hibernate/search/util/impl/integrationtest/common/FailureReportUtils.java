@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -14,8 +16,6 @@ import java.util.stream.Collectors;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.reporting.EventContextElement;
 import org.hibernate.search.util.common.SearchException;
-
-import org.assertj.core.api.Assertions;
 
 public final class FailureReportUtils {
 
@@ -41,15 +41,15 @@ public final class FailureReportUtils {
 	 */
 	public static <T extends Throwable> Consumer<T> hasContext(EventContextElement... contextElements) {
 		return throwable -> {
-			Assertions.assertThat( throwable )
+			assertThat( throwable )
 					.isInstanceOf( SearchException.class );
 			EventContext actualContext = ( (SearchException) throwable ).context();
-			Assertions.assertThat( actualContext ).as( "throwable.getContext()" ).isNotNull();
-			Assertions.assertThat( actualContext.elements() )
+			assertThat( actualContext ).as( "throwable.getContext()" ).isNotNull();
+			assertThat( actualContext.elements() )
 					.containsExactly( contextElements );
 			String renderedContextElements = Arrays.stream( contextElements ).map( EventContextElement::render )
 					.collect( Collectors.joining( ", " ) );
-			Assertions.assertThat( throwable.getMessage() )
+			assertThat( throwable.getMessage() )
 					.endsWith( "Context: " + renderedContextElements );
 		};
 	}

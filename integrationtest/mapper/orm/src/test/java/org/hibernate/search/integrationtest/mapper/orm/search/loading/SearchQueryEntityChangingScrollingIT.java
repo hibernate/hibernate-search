@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 
@@ -32,8 +33,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 public class SearchQueryEntityChangingScrollingIT {
 
@@ -98,7 +97,7 @@ public class SearchQueryEntityChangingScrollingIT {
 		// checking that changes above had an effect
 		try ( Session session = sessionFactory.openSession() ) {
 			Query<SimpleEntity> query = session.createQuery( "from SimpleEntity", SimpleEntity.class );
-			Assertions.assertThat( query.getResultList() ).extracting( "name" ).contains( NEW_NAME );
+			assertThat( query.getResultList() ).extracting( "name" ).contains( NEW_NAME );
 		}
 	}
 

@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.cfg.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -18,7 +19,6 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.testsupport.util.AbstractBeanResolverPartialMock;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Test;
 
@@ -260,7 +260,7 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( invalidTypeValue ) );
 		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
 		replayAll();
-		Assertions.assertThatThrownBy( () -> property.get( sourceMock ) )
+		assertThatThrownBy( () -> property.get( sourceMock ) )
 				.hasMessageContaining(
 						"Unable to convert configuration property '" + resolvedKey
 								+ "' with value '" + invalidTypeValue + "':"
@@ -289,7 +289,7 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		EasyMock.expect( beanResolverMock.resolve( StubBean.class, "name" ) )
 				.andThrow( simulatedFailure );
 		replayAll();
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> {
 					property.getAndMap( sourceMock, beanResolverMock::resolve );
 				}
@@ -325,7 +325,7 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 				.andThrow( simulatedFailure );
 		bean1Mock.close(); // Expect the first bean holder to be closed
 		replayAll();
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> {
 					property.getAndMap( sourceMock, beanResolverMock::resolve );
 				}

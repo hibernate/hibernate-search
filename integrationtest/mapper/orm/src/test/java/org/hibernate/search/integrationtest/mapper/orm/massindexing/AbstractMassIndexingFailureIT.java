@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
 
 import java.util.concurrent.CompletableFuture;
@@ -35,7 +36,6 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
-import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -501,7 +501,7 @@ public abstract class AbstractMassIndexingFailureIT {
 				runnable.run();
 			}
 			else {
-				Assertions.assertThatThrownBy( runnable::run )
+				assertThatThrownBy( runnable::run )
 						.asInstanceOf( InstanceOfAssertFactories.type( Throwable.class ) )
 						.satisfies( thrownExpectation );
 			}

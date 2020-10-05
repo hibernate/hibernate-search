@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.smoke;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 
 import java.time.LocalDate;
@@ -14,7 +15,6 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -24,17 +24,16 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 
-import org.assertj.core.api.Assertions;
 import org.hibernate.SessionFactory;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.CustomPropertyBridge;
 import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.CustomTypeBridge;
 import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.IntegerAsStringValueBridge;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
@@ -44,6 +43,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWork
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -326,7 +326,7 @@ public class ProgrammaticMappingSmokeIT {
 
 			List<ParentIndexedEntity> result = query.fetchHits( 3, 2 );
 			backendMock.verifyExpectationsMet();
-			Assertions.assertThat( result )
+			assertThat( result )
 					.containsExactly(
 							session.getReference( IndexedEntity.class, 0 ),
 							session.getReference( YetAnotherIndexedEntity.class, 1 )
@@ -336,7 +336,7 @@ public class ProgrammaticMappingSmokeIT {
 
 			long resultSize = query.fetchTotalHitCount();
 			backendMock.verifyExpectationsMet();
-			Assertions.assertThat( resultSize ).isEqualTo( 6L );
+			assertThat( resultSize ).isEqualTo( 6L );
 		} );
 	}
 

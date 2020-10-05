@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalize;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
@@ -39,7 +40,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -444,7 +444,7 @@ public class TermsAggregationSpecificsIT<F> {
 	public void minDocumentCount_negative() {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				index.createScope().aggregation().terms().field( fieldPath, fieldType.getJavaType() )
 						.minDocumentCount( -1 ) )
 				.isInstanceOf( IllegalArgumentException.class )
@@ -546,7 +546,7 @@ public class TermsAggregationSpecificsIT<F> {
 	public void maxTermCount_zero() {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				index.createScope().aggregation().terms().field( fieldPath, fieldType.getJavaType() )
 						.maxTermCount( 0 ) )
 				.isInstanceOf( IllegalArgumentException.class )
@@ -558,7 +558,7 @@ public class TermsAggregationSpecificsIT<F> {
 	public void maxTermCount_negative() {
 		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				index.createScope().aggregation().terms().field( fieldPath, fieldType.getJavaType() )
 						.maxTermCount( -1 ) )
 				.isInstanceOf( IllegalArgumentException.class )

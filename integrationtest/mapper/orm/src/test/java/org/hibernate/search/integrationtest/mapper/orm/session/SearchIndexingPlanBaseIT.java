@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.session;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.LinkedHashMap;
@@ -28,7 +29,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -167,7 +167,7 @@ public class SearchIndexingPlanBaseIT {
 
 		withinTransaction( sessionFactory, session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
-			Assertions.assertThatThrownBy(
+			assertThatThrownBy(
 					() -> indexingPlan.purge( invalidClass, 42, null )
 			)
 					.isInstanceOf( SearchException.class )
@@ -186,7 +186,7 @@ public class SearchIndexingPlanBaseIT {
 
 		withinTransaction( sessionFactory, session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
-			Assertions.assertThatThrownBy(
+			assertThatThrownBy(
 					() -> indexingPlan.purge( invalidClass, 42, null )
 			)
 					.isInstanceOf( SearchException.class )
@@ -220,7 +220,7 @@ public class SearchIndexingPlanBaseIT {
 
 		withinTransaction( sessionFactory, session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
-			Assertions.assertThatThrownBy(
+			assertThatThrownBy(
 					() -> indexingPlan.purge( invalidName, 42, null )
 			)
 					.isInstanceOf( SearchException.class )
@@ -399,25 +399,25 @@ public class SearchIndexingPlanBaseIT {
 			indexingPlan = Search.session( session ).indexingPlan();
 		}
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> indexingPlan.addOrUpdate( entity )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Underlying Hibernate ORM Session seems to be closed" );
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> indexingPlan.delete( entity )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Underlying Hibernate ORM Session seems to be closed" );
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> indexingPlan.process()
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Underlying Hibernate ORM Session seems to be closed" );
 
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> indexingPlan.execute()
 		)
 				.isInstanceOf( SearchException.class )

@@ -7,6 +7,8 @@
 package org.hibernate.search.documentation.mapper.orm.bridge.types.dsl.projectionconverter;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
 
@@ -20,8 +22,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 public class IndexFieldTypeDslProjectionConverterIT {
 	@Rule
@@ -52,7 +52,7 @@ public class IndexFieldTypeDslProjectionConverterIT {
 					.fetchHits( 20 );
 			//end::include[]
 
-			Assertions.assertThat( result ).hasSize( 1 );
+			assertThat( result ).hasSize( 1 );
 		} );
 	}
 

@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.dynamicmap;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 
 import java.time.LocalDate;
@@ -39,8 +42,6 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 /**
  * Test basic features when mapping a Hibernate ORM "dynamic-map" entity.
@@ -121,7 +122,7 @@ public class DynamicMapBaseIT {
 					)
 			);
 
-			Assertions.assertThat( query.fetchAllHits() ).containsExactly(
+			assertThat( query.fetchAllHits() ).containsExactly(
 					(Map) session.load( entityTypeName, 1 )
 			);
 		} );
@@ -182,7 +183,7 @@ public class DynamicMapBaseIT {
 					)
 			);
 
-			Assertions.assertThat( query.fetchAllHits() ).containsExactly(
+			assertThat( query.fetchAllHits() ).containsExactly(
 					session.load( entityTypeName, 1 )
 			);
 		} );
@@ -218,12 +219,12 @@ public class DynamicMapBaseIT {
 					.purge()
 					.mergeSegments();
 
-			Assertions.assertThatThrownBy( () -> {
+			assertThatThrownBy( () -> {
 				try {
 					scope.massIndexer().startAndWait();
 				}
 				catch (InterruptedException e) {
-					Assertions.fail( "Unexpected exception", e );
+					fail( "Unexpected exception", e );
 				}
 			} )
 					.hasMessageContainingAll(
@@ -290,7 +291,7 @@ public class DynamicMapBaseIT {
 					)
 			);
 
-			Assertions.assertThat( query.fetchAllHits() ).containsExactly(
+			assertThat( query.fetchAllHits() ).containsExactly(
 					session.load( entityTypeName, 1 )
 			);
 		} );
@@ -379,7 +380,7 @@ public class DynamicMapBaseIT {
 					)
 			);
 
-			Assertions.assertThat( query.fetchAllHits() ).containsExactly(
+			assertThat( query.fetchAllHits() ).containsExactly(
 					(Map) session.load( entityA_BTypeName, 1 ),
 					(Map) session.load( entityA_CTypeName, 2 )
 			);

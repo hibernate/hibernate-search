@@ -6,13 +6,14 @@
  */
 package org.hibernate.search.test.util.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ListAssert;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.util.impl.CollectionHelper;
@@ -90,11 +91,11 @@ public class IterableFlatteningTest {
 	private static <T> ListAssert assertIterable(Iterable<T> iterable) {
 		Iterator<T> iterator = iterable == null ? null : iterable.iterator();
 		if ( iterator == null ) {
-			return Assertions.assertThat( (List<T>) null );
+			return assertThat( (List<T>) null );
 		}
 		List<T> list = new ArrayList<>();
 		iterator.forEachRemaining( list::add );
-		return Assertions.assertThat( list );
+		return assertThat( list );
 	}
 
 }

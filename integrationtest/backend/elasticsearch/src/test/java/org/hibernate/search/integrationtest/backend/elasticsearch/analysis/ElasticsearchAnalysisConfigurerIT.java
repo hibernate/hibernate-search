@@ -6,18 +6,18 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.analysis;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.function.Consumer;
 
-import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
-
-import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	public void error_invalidReference() {
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setup( "foobar" )
 		)
 				.isInstanceOf( SearchException.class )
@@ -54,7 +54,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	public void error_failingConfigurer() {
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setup( FailingConfigurer.class.getName() )
 		)
 				.isInstanceOf( SearchException.class )
@@ -85,7 +85,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	public void error_tokenizer_namingConflict() {
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setup( TokenizerNamingConflictConfigurer.class.getName() )
 		)
 				.isInstanceOf( SearchException.class )
@@ -111,7 +111,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	public void error_tokenizer_missingType() {
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setup( TokenizerMissingTypeConfigurer.class.getName() )
 		)
 				.isInstanceOf( SearchException.class )
@@ -136,7 +136,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	public void error_charFilter_namingConflict() {
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setup( CharFilterNamingConflictConfigurer.class.getName() )
 		)
 				.isInstanceOf( SearchException.class )
@@ -162,7 +162,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	public void error_charFilter_missingType() {
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setup( CharFilterMissingTypeConfigurer.class.getName() )
 		)
 				.isInstanceOf( SearchException.class )
@@ -187,7 +187,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	public void error_tokenFilter_namingConflict() {
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setup( TokenFilterNamingConflictConfigurer.class.getName() )
 		)
 				.isInstanceOf( SearchException.class )
@@ -213,7 +213,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	public void error_tokenFilter_missingType() {
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setup( TokenFilterMissingTypeConfigurer.class.getName() )
 		)
 				.isInstanceOf( SearchException.class )
@@ -238,7 +238,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	@Test
 	public void error_parameter_namingConflict() {
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> setup( ParameterNamingConflictConfigurer.class.getName() )
 		)
 				.isInstanceOf( SearchException.class )

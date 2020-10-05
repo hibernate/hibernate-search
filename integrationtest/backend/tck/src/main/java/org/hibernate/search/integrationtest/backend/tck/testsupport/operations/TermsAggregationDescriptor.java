@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.operations;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
 import java.util.ArrayList;
@@ -16,10 +17,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationOptionsStep;
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationOptionsStep;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -32,8 +33,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.Expecta
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TypeAssertionHelper;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
-
-import org.assertj.core.api.Assertions;
 
 public class TermsAggregationDescriptor extends AggregationDescriptor {
 
@@ -171,7 +170,7 @@ public class TermsAggregationDescriptor extends AggregationDescriptor {
 						Map.Entry<Range<T>, Long>[] actualEntries = NormalizationUtils.normalize( aggregationResult )
 								.entrySet().toArray( new Map.Entry[0] );
 						// Don't check the order, this is tested separately
-						Assertions.assertThat( actualEntries ).containsOnly( expectedEntries );
+						assertThat( actualEntries ).containsOnly( expectedEntries );
 					}
 				};
 			}

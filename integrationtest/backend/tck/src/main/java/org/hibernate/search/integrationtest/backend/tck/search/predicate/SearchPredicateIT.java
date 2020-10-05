@@ -6,20 +6,22 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -28,8 +30,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 public class SearchPredicateIT {
 
@@ -158,7 +158,7 @@ public class SearchPredicateIT {
 
 		// reuse the same predicate instance on a different scope,
 		// targeting a different index
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				otherIndex.createScope().query()
 						.where( predicate )
 						.toQuery() )
@@ -169,7 +169,7 @@ public class SearchPredicateIT {
 
 		// reuse the same predicate instance on a different scope,
 		// targeting different indexes
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				mainIndex.createScope( otherIndex ).query()
 						.where( predicate )
 						.toQuery() )
@@ -235,7 +235,7 @@ public class SearchPredicateIT {
 
 		// reuse the same predicate instance on a different scope,
 		// targeting a different index
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				otherIndex.createScope().query()
 						.where( f -> f.bool().must( predicate ) )
 						.toQuery() )
@@ -246,7 +246,7 @@ public class SearchPredicateIT {
 
 		// reuse the same predicate instance on a different scope,
 		// targeting different indexes
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				mainIndex.createScope( otherIndex ).query()
 						.where( f -> f.bool().must( predicate ) )
 						.toQuery() )
@@ -271,7 +271,7 @@ public class SearchPredicateIT {
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 
 		// Mandatory extension, unsupported
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> scope.predicate().extension( new UnSupportedExtension() )
 		)
 				.isInstanceOf( SearchException.class );
@@ -362,8 +362,8 @@ public class SearchPredicateIT {
 		@Override
 		public Optional<MyExtendedFactory> extendOptional(SearchPredicateFactory original,
 				SearchPredicateDslContext<?> dslContext) {
-			Assertions.assertThat( original ).isNotNull();
-			Assertions.assertThat( dslContext ).isNotNull();
+			assertThat( original ).isNotNull();
+			assertThat( dslContext ).isNotNull();
 			return Optional.of( new MyExtendedFactory( original ) );
 		}
 	}
@@ -372,8 +372,8 @@ public class SearchPredicateIT {
 		@Override
 		public Optional<MyExtendedFactory> extendOptional(SearchPredicateFactory original,
 				SearchPredicateDslContext<?> dslContext) {
-			Assertions.assertThat( original ).isNotNull();
-			Assertions.assertThat( dslContext ).isNotNull();
+			assertThat( original ).isNotNull();
+			assertThat( dslContext ).isNotNull();
 			return Optional.empty();
 		}
 	}

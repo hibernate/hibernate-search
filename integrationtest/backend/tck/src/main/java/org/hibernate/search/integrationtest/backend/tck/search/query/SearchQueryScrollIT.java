@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.query;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 import static org.junit.Assert.assertFalse;
@@ -27,8 +28,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 public class SearchQueryScrollIT {
 
@@ -52,8 +51,8 @@ public class SearchQueryScrollIT {
 	public void none() {
 		try ( SearchScroll<DocumentReference> scroll = matchNoneQuery().scroll( CHUNK_SIZE ) ) {
 			SearchScrollResult<DocumentReference> scrollResult = scroll.next();
-			Assertions.assertThat( scrollResult.hasHits() ).isFalse();
-			Assertions.assertThat( scrollResult.hits() ).isEmpty();
+			assertThat( scrollResult.hasHits() ).isFalse();
+			assertThat( scrollResult.hits() ).isEmpty();
 		}
 	}
 
@@ -61,11 +60,11 @@ public class SearchQueryScrollIT {
 	public void one() {
 		try ( SearchScroll<DocumentReference> scroll = matchOneQuery( 4 ).scroll( CHUNK_SIZE ) ) {
 			SearchScrollResult<DocumentReference> scrollResult = scroll.next();
-			Assertions.assertThat( scrollResult.hasHits() ).isTrue();
+			assertThat( scrollResult.hasHits() ).isTrue();
 			assertThatHits( scrollResult.hits() ).hasDocRefHitsExactOrder( index.typeName(), docId( 4 ) );
 
 			scrollResult = scroll.next();
-			Assertions.assertThat( scrollResult.hasHits() ).isFalse();
+			assertThat( scrollResult.hasHits() ).isFalse();
 		}
 	}
 
@@ -121,13 +120,13 @@ public class SearchQueryScrollIT {
 
 		for ( int i = 0; i < quotient; i++ ) {
 			SearchScrollResult<DocumentReference> scrollResult = scroll.next();
-			Assertions.assertThat( scrollResult.hasHits() ).isTrue();
+			assertThat( scrollResult.hasHits() ).isTrue();
 
 			List<DocumentReference> hits = scrollResult.hits();
-			Assertions.assertThat( hits ).hasSize( chunkSize );
+			assertThat( hits ).hasSize( chunkSize );
 			for ( int j = 0; j < chunkSize; j++ ) {
-				Assertions.assertThat( hits.get( j ) ).extracting( DocumentReference::id ).isEqualTo( docId( docIndex++ ) );
-				Assertions.assertThat( hits.get( j ) ).extracting( DocumentReference::typeName ).isEqualTo( index.typeName() );
+				assertThat( hits.get( j ) ).extracting( DocumentReference::id ).isEqualTo( docId( docIndex++ ) );
+				assertThat( hits.get( j ) ).extracting( DocumentReference::typeName ).isEqualTo( index.typeName() );
 			}
 		}
 
@@ -136,18 +135,18 @@ public class SearchQueryScrollIT {
 
 		if ( remainder != 0 ) {
 			scrollResult = scroll.next();
-			Assertions.assertThat( scrollResult.hasHits() ).isTrue();
+			assertThat( scrollResult.hasHits() ).isTrue();
 
 			List<DocumentReference> hits = scrollResult.hits();
-			Assertions.assertThat( hits ).hasSize( remainder );
+			assertThat( hits ).hasSize( remainder );
 			for ( int j = 0; j < remainder; j++ ) {
-				Assertions.assertThat( hits.get( j ) ).extracting( DocumentReference::id ).isEqualTo( docId( docIndex++ ) );
-				Assertions.assertThat( hits.get( j ) ).extracting( DocumentReference::typeName ).isEqualTo( index.typeName() );
+				assertThat( hits.get( j ) ).extracting( DocumentReference::id ).isEqualTo( docId( docIndex++ ) );
+				assertThat( hits.get( j ) ).extracting( DocumentReference::typeName ).isEqualTo( index.typeName() );
 			}
 		}
 
 		scrollResult = scroll.next();
-		Assertions.assertThat( scrollResult.hasHits() ).isFalse();
+		assertThat( scrollResult.hasHits() ).isFalse();
 	}
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllQuery() {

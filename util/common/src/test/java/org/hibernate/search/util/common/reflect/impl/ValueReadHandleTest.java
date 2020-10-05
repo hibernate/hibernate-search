@@ -7,6 +7,8 @@
 package org.hibernate.search.util.common.reflect.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
@@ -27,7 +29,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.InstanceOfAssertFactories;
 
 @RunWith(Parameterized.class)
@@ -116,7 +117,7 @@ public class ValueReadHandleTest {
 		ValueReadHandle<?> valueReadHandle = factory.createForMethod( method );
 
 		EntityType entity = new EntityType();
-		Assertions.assertThatThrownBy( () -> valueReadHandle.get( entity ) )
+		assertThatThrownBy( () -> valueReadHandle.get( entity ) )
 				.isInstanceOf( SimulatedError.class )
 				.hasMessageContaining( "errorThrowingMethod" );
 	}
@@ -129,7 +130,7 @@ public class ValueReadHandleTest {
 		ValueReadHandle<?> valueReadHandle = factory.createForMethod( method );
 
 		EntityType entity = new EntityType( () -> "toStringResult" );
-		Assertions.assertThatThrownBy( () -> valueReadHandle.get( entity ) )
+		assertThatThrownBy( () -> valueReadHandle.get( entity ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Exception while invoking '" + method.toString() + "' on 'toStringResult'"
@@ -153,7 +154,7 @@ public class ValueReadHandleTest {
 		ValueReadHandle<?> valueReadHandle = factory.createForMethod( method );
 
 		EntityType entity = new EntityType( () -> "toStringResult" );
-		Assertions.assertThatThrownBy( () -> valueReadHandle.get( entity ) )
+		assertThatThrownBy( () -> valueReadHandle.get( entity ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Exception while invoking '" + method.toString() + "' on 'toStringResult'"
@@ -175,7 +176,7 @@ public class ValueReadHandleTest {
 		ValueReadHandle<?> valueReadHandle = factory.createForField( field );
 
 		EntityType entity = new EntityType( () -> "toStringResult" );
-		Assertions.assertThatThrownBy( () -> valueReadHandle.get( entity ) )
+		assertThatThrownBy( () -> valueReadHandle.get( entity ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Exception while invoking '" + field.toString() + "' on 'toStringResult'"
@@ -192,7 +193,7 @@ public class ValueReadHandleTest {
 
 		SimulatedRuntimeException toStringRuntimeException = new SimulatedRuntimeException( "toString" );
 		EntityType entity = new EntityType( () -> { throw toStringRuntimeException; } );
-		Assertions.assertThatThrownBy( () -> valueReadHandle.get( entity ) )
+		assertThatThrownBy( () -> valueReadHandle.get( entity ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Exception while invoking '" + method.toString() + "' on '<EntityType#toString() threw SimulatedRuntimeException>'"
@@ -267,7 +268,7 @@ public class ValueReadHandleTest {
 		private String illegalAccessExceptionThrowingField = "illegalAccessExceptionThrowingField";
 
 		private EntityType() {
-			this.toString = () -> Assertions.fail( "Unexpected call to 'toString()'" );
+			this.toString = () -> fail( "Unexpected call to 'toString()'" );
 		}
 
 		private EntityType(Supplier<String> toString) {
@@ -301,7 +302,7 @@ public class ValueReadHandleTest {
 			throw new SimulatedError( "errorThrowingMethod" );
 		}
 		private String illegalAccessExceptionThrowingMethod() {
-			return Assertions.fail( "This method is inaccessible and should not be called" );
+			return fail( "This method is inaccessible and should not be called" );
 		}
 	}
 

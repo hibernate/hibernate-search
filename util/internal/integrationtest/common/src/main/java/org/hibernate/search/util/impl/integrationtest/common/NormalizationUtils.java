@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common;
 
+import static org.assertj.core.api.Assertions.entry;
+
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -17,8 +19,6 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.impl.StreamHelper;
-
-import org.assertj.core.api.Assertions;
 
 /**
  * Utils allowing to normalize data coming from different backends.
@@ -91,7 +91,7 @@ public final class NormalizationUtils {
 	}
 
 	public static <K, V> Map.Entry<K, V> normalize(Map.Entry<K, V> original) {
-		return original == null ? null : Assertions.entry(
+		return original == null ? null : entry(
 				normalize( original.getKey() ),
 				normalize( original.getValue() )
 		);
@@ -105,7 +105,7 @@ public final class NormalizationUtils {
 
 	public static <K, V> Map<K, V> normalize(Map<K, V> original) {
 		return original == null ? null : original.entrySet().stream()
-				.map( e -> Assertions.entry(
+				.map( e -> entry(
 						normalize( e.getKey() ),
 						normalize( e.getValue() )
 				) )

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
@@ -14,27 +16,28 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
-import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
+import org.hibernate.search.engine.search.loading.spi.EntityLoader;
+import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
-import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
-import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.MapperEasyMockUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubDocumentReferenceConverter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntityLoader;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubLoadedObject;
@@ -42,7 +45,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTra
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.MapperEasyMockUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
@@ -52,7 +54,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.assertj.core.api.Assertions;
 import org.easymock.EasyMockSupport;
 
 /**
@@ -227,10 +228,10 @@ public class SearchProjectionIT extends EasyMockSupport {
 		Float score1 = result.hits().get( 0 );
 		Float score2 = result.hits().get( 1 );
 
-		Assertions.assertThat( score1 ).isNotNull().isNotNaN();
-		Assertions.assertThat( score2 ).isNotNull().isNotNaN();
+		assertThat( score1 ).isNotNull().isNotNaN();
+		assertThat( score2 ).isNotNull().isNotNaN();
 
-		Assertions.assertThat( score1 ).isGreaterThan( score2 );
+		assertThat( score1 ).isGreaterThan( score2 );
 	}
 
 	/**
@@ -252,8 +253,8 @@ public class SearchProjectionIT extends EasyMockSupport {
 		Float score1 = result.hits().get( 0 );
 		Float score2 = result.hits().get( 1 );
 
-		Assertions.assertThat( score1 ).isNotNull().isNotNaN();
-		Assertions.assertThat( score2 ).isNotNull().isNotNaN();
+		assertThat( score1 ).isNotNull().isNotNaN();
+		assertThat( score2 ).isNotNull().isNotNaN();
 	}
 
 	/**
@@ -409,7 +410,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 		// reuse the same projection instance on a different scope,
 		// targeting a different index
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				otherIndex.createScope().query()
 						.select( projection )
 						.where( f -> f.matchAll() )
@@ -421,7 +422,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 		// reuse the same projection instance on a different scope,
 		// targeting different indexes
-		Assertions.assertThatThrownBy( () ->
+		assertThatThrownBy( () ->
 				mainIndex.createScope( otherIndex ).query()
 						.select( projection )
 						.where( f -> f.matchAll() )
@@ -448,7 +449,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				.hasHitsAnyOrder( mainIndex.binding().string1Field.document1Value.indexedValue );
 
 		// Mandatory extension, unsupported
-		Assertions.assertThatThrownBy(
+		assertThatThrownBy(
 				() -> scope.projection().extension( new UnSupportedExtension<>() )
 		)
 				.isInstanceOf( SearchException.class );
@@ -670,8 +671,8 @@ public class SearchProjectionIT extends EasyMockSupport {
 		@Override
 		public Optional<MyExtendedFactory<R, E>> extendOptional(SearchProjectionFactory<R, E> original,
 				SearchProjectionDslContext<?> dslContext) {
-			Assertions.assertThat( original ).isNotNull();
-			Assertions.assertThat( dslContext ).isNotNull();
+			assertThat( original ).isNotNull();
+			assertThat( dslContext ).isNotNull();
 			return Optional.of( new MyExtendedFactory<>( original ) );
 		}
 	}
@@ -681,8 +682,8 @@ public class SearchProjectionIT extends EasyMockSupport {
 		@Override
 		public Optional<MyExtendedFactory<R, E>> extendOptional(SearchProjectionFactory<R, E> original,
 				SearchProjectionDslContext<?> dslContext) {
-			Assertions.assertThat( original ).isNotNull();
-			Assertions.assertThat( dslContext ).isNotNull();
+			assertThat( original ).isNotNull();
+			assertThat( dslContext ).isNotNull();
 			return Optional.empty();
 		}
 	}

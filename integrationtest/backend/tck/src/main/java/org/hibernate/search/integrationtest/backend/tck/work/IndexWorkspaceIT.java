@@ -6,14 +6,15 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.work;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
 import java.util.Collections;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -22,8 +23,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSes
 
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 /**
  * Verify that the work executor operations:
@@ -112,7 +111,7 @@ public class IndexWorkspaceIT {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		Assertions.assertThat( query.fetchTotalHitCount() ).isEqualTo( bookNumber );
+		assertThat( query.fetchTotalHitCount() ).isEqualTo( bookNumber );
 	}
 
 	private static class IndexBinding {
