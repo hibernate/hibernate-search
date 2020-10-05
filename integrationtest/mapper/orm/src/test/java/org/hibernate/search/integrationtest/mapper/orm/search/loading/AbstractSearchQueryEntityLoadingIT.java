@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSoftAssertions.assertWithinSession;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +68,7 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 			Consumer<EntityCollector<T>> expectedLoadedEntitiesContributor,
 			BiConsumer<OrmSoftAssertions, List<T>> assertionsContributor,
 			Integer timeout, TimeUnit timeUnit) {
-		OrmSoftAssertions.withinSession( sessionFactory(), (session, softAssertions) -> {
+		assertWithinSession( sessionFactory(), (session, softAssertions) -> {
 			sessionSetup.accept( session );
 
 			softAssertions.resetListenerData();

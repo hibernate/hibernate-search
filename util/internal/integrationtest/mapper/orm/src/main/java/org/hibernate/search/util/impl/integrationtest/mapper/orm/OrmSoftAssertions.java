@@ -24,7 +24,7 @@ import org.assertj.core.api.AutoCloseableSoftAssertions;
 
 public class OrmSoftAssertions extends AutoCloseableSoftAssertions {
 
-	public static void withinSession(SessionFactory sessionFactory,
+	public static void assertWithinSession(SessionFactory sessionFactory,
 			BiConsumer<Session, OrmSoftAssertions> action) {
 		try ( OrmSoftAssertions softAssertions = new OrmSoftAssertions( sessionFactory ) ) {
 			try ( Session session = sessionFactory.withOptions()
