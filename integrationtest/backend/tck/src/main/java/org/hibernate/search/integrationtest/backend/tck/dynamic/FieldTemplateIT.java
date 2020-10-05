@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.dynamic;
 
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -26,7 +28,6 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldLocation;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -102,7 +103,7 @@ public class FieldTemplateIT {
 				.join();
 
 		// Check that documents are indexed and the dynamic field can be searched
-		SearchResultAssert.assertThat( query(
+		assertThatQuery( query(
 				f -> f.match().field( getFieldPath( "foo" ) ).matching( "matchedValue" ) )
 		)
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
@@ -111,7 +112,7 @@ public class FieldTemplateIT {
 		integration.close();
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, templatesBinder );
 
-		SearchResultAssert.assertThat( query(
+		assertThatQuery( query(
 				f -> f.match().field( getFieldPath( "foo" ) ).matching( "matchedValue" ) )
 		)
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
@@ -148,11 +149,11 @@ public class FieldTemplateIT {
 				.join();
 
 		// Check that documents are indexed and the dynamic fields can be searched
-		SearchResultAssert.assertThat( query(
+		assertThatQuery( query(
 				f -> f.match().field( getFieldPath( "foo_str" ) ).matching( "matchedValue" ) )
 		)
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
-		SearchResultAssert.assertThat( query(
+		assertThatQuery( query(
 				f -> f.match().field( getFieldPath( "foo_int" ) ).matching( 42 ) )
 		)
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
@@ -161,11 +162,11 @@ public class FieldTemplateIT {
 		integration.close();
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, templatesBinder );
 
-		SearchResultAssert.assertThat( query(
+		assertThatQuery( query(
 				f -> f.match().field( getFieldPath( "foo_str" ) ).matching( "matchedValue" ) )
 		)
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
-		SearchResultAssert.assertThat( query(
+		assertThatQuery( query(
 				f -> f.match().field( getFieldPath( "foo_int" ) ).matching( 42 ) )
 		)
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
@@ -207,12 +208,12 @@ public class FieldTemplateIT {
 				.join();
 
 		// Check that dynamic fields have the correct type
-		SearchResultAssert.assertThat( query(
+		assertThatQuery( query(
 				f -> f.range().field( getFieldPath( "foo_str_int" ) )
 						.between( "3000", "5000" ) )
 		)
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
-		SearchResultAssert.assertThat( query(
+		assertThatQuery( query(
 				f -> f.range().field( getFieldPath( "foo_int" ) )
 						.between( 41, 43 ) )
 		)
@@ -222,12 +223,12 @@ public class FieldTemplateIT {
 		integration.close();
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, templatesBinder );
 
-		SearchResultAssert.assertThat( query(
+		assertThatQuery( query(
 				f -> f.range().field( getFieldPath( "foo_str_int" ) )
 						.between( "3000", "5000" ) )
 		)
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
-		SearchResultAssert.assertThat( query(
+		assertThatQuery( query(
 				f -> f.range().field( getFieldPath( "foo_int" ) )
 						.between( 41, 43 ) )
 		)

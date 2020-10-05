@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
 import java.util.ArrayList;
@@ -97,7 +97,7 @@ public class FieldSearchProjectionMultiValuedBaseIT<F> {
 
 		String fieldPath = getFieldPath();
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.select( f -> f.field( fieldPath, fieldType.getJavaType() ).multi() )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
@@ -116,7 +116,7 @@ public class FieldSearchProjectionMultiValuedBaseIT<F> {
 
 		String fieldPath = getFieldPath();
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.select( f -> f.field( fieldPath ).multi() )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
@@ -138,7 +138,7 @@ public class FieldSearchProjectionMultiValuedBaseIT<F> {
 
 		String fieldPath = getFieldPath();
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.select( f ->
 						f.composite(
 								f.field( fieldPath, fieldType.getJavaType() ).multi(),

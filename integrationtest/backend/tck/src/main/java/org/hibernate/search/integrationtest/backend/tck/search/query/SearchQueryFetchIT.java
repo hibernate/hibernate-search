@@ -7,7 +7,8 @@
 package org.hibernate.search.integrationtest.backend.tck.search.query;
 
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalize;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
@@ -51,7 +52,7 @@ public class SearchQueryFetchIT {
 
 	@Test
 	public void fetchAll() {
-		assertThat( matchAllQuerySortByField().fetchAll() )
+		assertThatResult( matchAllQuerySortByField().fetchAll() )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
@@ -59,7 +60,7 @@ public class SearchQueryFetchIT {
 					}
 				} );
 
-		assertThat( matchFirstHalfQuery().fetchAll() )
+		assertThatResult( matchFirstHalfQuery().fetchAll() )
 				.hasTotalHitCount( DOCUMENT_COUNT / 2 )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT / 2; i++ ) {
@@ -70,7 +71,7 @@ public class SearchQueryFetchIT {
 
 	@Test
 	public void fetch_limit() {
-		assertThat( matchAllQuerySortByField().fetch( null ) )
+		assertThatResult( matchAllQuerySortByField().fetch( null ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
@@ -78,18 +79,18 @@ public class SearchQueryFetchIT {
 					}
 				} );
 
-		assertThat( matchAllQuerySortByField().fetch( 1 ) )
+		assertThatResult( matchAllQuerySortByField().fetch( 1 ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( index.typeName(), docId( 0 ) );
 
-		assertThat( matchAllQuerySortByField().fetch( 2 ) )
+		assertThatResult( matchAllQuerySortByField().fetch( 2 ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( index.typeName(), docId( 0 ), docId( 1 ) );
 	}
 
 	@Test
 	public void fetch_offset_limit() {
-		assertThat( matchAllQuerySortByField().fetch( 1, null ) )
+		assertThatResult( matchAllQuerySortByField().fetch( 1, null ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 1; i < DOCUMENT_COUNT; i++ ) {
@@ -97,15 +98,15 @@ public class SearchQueryFetchIT {
 					}
 				} );
 
-		assertThat( matchAllQuerySortByField().fetch( 1, 1 ) )
+		assertThatResult( matchAllQuerySortByField().fetch( 1, 1 ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( index.typeName(), docId( 1 ) );
 
-		assertThat( matchAllQuerySortByField().fetch( null, 2 ) )
+		assertThatResult( matchAllQuerySortByField().fetch( null, 2 ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( index.typeName(), docId( 0 ), docId( 1 ) );
 
-		assertThat( matchAllQuerySortByField().fetch( null, null ) )
+		assertThatResult( matchAllQuerySortByField().fetch( null, null ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
@@ -114,7 +115,7 @@ public class SearchQueryFetchIT {
 				} );
 
 		// Fetch beyond the total hit count
-		assertThat( matchAllQuerySortByField().fetch( DOCUMENT_COUNT + 1, null ) )
+		assertThatResult( matchAllQuerySortByField().fetch( DOCUMENT_COUNT + 1, null ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasNoHits();
 	}
@@ -127,7 +128,7 @@ public class SearchQueryFetchIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4019")
 	public void fetch_offset_limit_defaultSort() {
-		assertThat( matchAllQuerySortByDefault().fetch( 1, null ) )
+		assertThatResult( matchAllQuerySortByDefault().fetch( 1, null ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsAnyOrder( builder -> {
 					for ( int i = 1; i < DOCUMENT_COUNT; i++ ) {
@@ -135,15 +136,15 @@ public class SearchQueryFetchIT {
 					}
 				} );
 
-		assertThat( matchAllQuerySortByDefault().fetch( 1, 1 ) )
+		assertThatResult( matchAllQuerySortByDefault().fetch( 1, 1 ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsAnyOrder( index.typeName(), docId( 1 ) );
 
-		assertThat( matchAllQuerySortByDefault().fetch( null, 2 ) )
+		assertThatResult( matchAllQuerySortByDefault().fetch( null, 2 ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsAnyOrder( index.typeName(), docId( 0 ), docId( 1 ) );
 
-		assertThat( matchAllQuerySortByDefault().fetch( null, null ) )
+		assertThatResult( matchAllQuerySortByDefault().fetch( null, null ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsAnyOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
@@ -152,21 +153,21 @@ public class SearchQueryFetchIT {
 				} );
 
 		// Fetch beyond the total hit count
-		assertThat( matchAllQuerySortByDefault().fetch( DOCUMENT_COUNT + 1, null ) )
+		assertThatResult( matchAllQuerySortByDefault().fetch( DOCUMENT_COUNT + 1, null ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasNoHits();
 	}
 
 	@Test
 	public void fetchAllHits() {
-		assertThat( matchAllQuerySortByField().fetchAllHits() )
+		assertThatHits( matchAllQuerySortByField().fetchAllHits() )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
 						builder.doc( index.typeName(), docId( i ) );
 					}
 				} );
 
-		assertThat( matchFirstHalfQuery().fetchAllHits() )
+		assertThatHits( matchFirstHalfQuery().fetchAllHits() )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT / 2; i++ ) {
 						builder.doc( index.typeName(), docId( i ) );
@@ -176,36 +177,36 @@ public class SearchQueryFetchIT {
 
 	@Test
 	public void fetchHits_limit() {
-		assertThat( matchAllQuerySortByField().fetchHits( null ) )
+		assertThatHits( matchAllQuerySortByField().fetchHits( null ) )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
 						builder.doc( index.typeName(), docId( i ) );
 					}
 				} );
 
-		assertThat( matchAllQuerySortByField().fetchHits( 1 ) )
+		assertThatHits( matchAllQuerySortByField().fetchHits( 1 ) )
 				.hasDocRefHitsExactOrder( index.typeName(), docId( 0 ) );
 
-		assertThat( matchAllQuerySortByField().fetchHits( 2 ) )
+		assertThatHits( matchAllQuerySortByField().fetchHits( 2 ) )
 				.hasDocRefHitsExactOrder( index.typeName(), docId( 0 ), docId( 1 ) );
 	}
 
 	@Test
 	public void fetchHits_offset_limit_fieldSort() {
-		assertThat( matchAllQuerySortByField().fetchHits( 1, null ) )
+		assertThatHits( matchAllQuerySortByField().fetchHits( 1, null ) )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 1; i < DOCUMENT_COUNT; i++ ) {
 						builder.doc( index.typeName(), docId( i ) );
 					}
 				} );
 
-		assertThat( matchAllQuerySortByField().fetchHits( 1, 1 ) )
+		assertThatHits( matchAllQuerySortByField().fetchHits( 1, 1 ) )
 				.hasDocRefHitsExactOrder( index.typeName(), docId( 1 ) );
 
-		assertThat( matchAllQuerySortByField().fetchHits( null, 2 ) )
+		assertThatHits( matchAllQuerySortByField().fetchHits( null, 2 ) )
 				.hasDocRefHitsExactOrder( index.typeName(), docId( 0 ), docId( 1 ) );
 
-		assertThat( matchAllQuerySortByField().fetchHits( null, null ) )
+		assertThatHits( matchAllQuerySortByField().fetchHits( null, null ) )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
 						builder.doc( index.typeName(), docId( i ) );
@@ -213,7 +214,7 @@ public class SearchQueryFetchIT {
 				} );
 
 		// Fetch beyond the total hit count
-		assertThat( matchAllQuerySortByField().fetchHits( DOCUMENT_COUNT + 1, null ) )
+		assertThatHits( matchAllQuerySortByField().fetchHits( DOCUMENT_COUNT + 1, null ) )
 				.isEmpty();
 	}
 
@@ -225,20 +226,20 @@ public class SearchQueryFetchIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4019")
 	public void fetchHits_offset_limit_defaultSort() {
-		assertThat( matchAllQuerySortByDefault().fetchHits( 1, null ) )
+		assertThatHits( matchAllQuerySortByDefault().fetchHits( 1, null ) )
 				.hasDocRefHitsAnyOrder( builder -> {
 					for ( int i = 1; i < DOCUMENT_COUNT; i++ ) {
 						builder.doc( index.typeName(), docId( i ) );
 					}
 				} );
 
-		assertThat( matchAllQuerySortByDefault().fetchHits( 1, 1 ) )
+		assertThatHits( matchAllQuerySortByDefault().fetchHits( 1, 1 ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), docId( 1 ) );
 
-		assertThat( matchAllQuerySortByDefault().fetchHits( null, 2 ) )
+		assertThatHits( matchAllQuerySortByDefault().fetchHits( null, 2 ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), docId( 0 ), docId( 1 ) );
 
-		assertThat( matchAllQuerySortByDefault().fetchHits( null, null ) )
+		assertThatHits( matchAllQuerySortByDefault().fetchHits( null, null ) )
 				.hasDocRefHitsAnyOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
 						builder.doc( index.typeName(), docId( i ) );
@@ -246,7 +247,7 @@ public class SearchQueryFetchIT {
 				} );
 
 		// Fetch beyond the total hit count
-		assertThat( matchAllQuerySortByDefault().fetchHits( DOCUMENT_COUNT + 1, null ) )
+		assertThatHits( matchAllQuerySortByDefault().fetchHits( DOCUMENT_COUNT + 1, null ) )
 				.isEmpty();
 	}
 
@@ -276,7 +277,7 @@ public class SearchQueryFetchIT {
 	@Test
 	public void fetch_limitAndOffset_reuseQuery() {
 		SearchQuery<DocumentReference> query = matchAllQuerySortByField().toQuery();
-		assertThat( query.fetch( 1, null ) ).fromQuery( query )
+		assertThatResult( query.fetch( 1, null ) ).fromQuery( query )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 1; i < DOCUMENT_COUNT; i++ ) {
@@ -284,15 +285,15 @@ public class SearchQueryFetchIT {
 					}
 				} );
 
-		assertThat( query.fetch( 1, 1 ) ).fromQuery( query )
+		assertThatResult( query.fetch( 1, 1 ) ).fromQuery( query )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( index.typeName(), docId( 1 ) );
 
-		assertThat( query.fetch( null, 2 ) ).fromQuery( query )
+		assertThatResult( query.fetch( null, 2 ) ).fromQuery( query )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( index.typeName(), docId( 0 ), docId( 1 ) );
 
-		assertThat( query.fetch( null, null ) ).fromQuery( query )
+		assertThatResult( query.fetch( null, null ) ).fromQuery( query )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
@@ -300,7 +301,7 @@ public class SearchQueryFetchIT {
 					}
 				} );
 
-		assertThat( query.fetchAll() ).fromQuery( query )
+		assertThatResult( query.fetchAll() ).fromQuery( query )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {
@@ -312,7 +313,7 @@ public class SearchQueryFetchIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3389")
 	public void maxResults_zero() {
-		assertThat( matchAllQuerySortByField().fetch( 0, 0 ) )
+		assertThatResult( matchAllQuerySortByField().fetch( 0, 0 ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasNoHits();
 	}

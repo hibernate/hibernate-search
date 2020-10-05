@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.query;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -62,7 +62,7 @@ public class SearchQueryScrollIT {
 		try ( SearchScroll<DocumentReference> scroll = matchOneQuery( 4 ).scroll( CHUNK_SIZE ) ) {
 			SearchScrollResult<DocumentReference> scrollResult = scroll.next();
 			Assertions.assertThat( scrollResult.hasHits() ).isTrue();
-			assertThat( scrollResult.hits() ).hasDocRefHitsExactOrder( index.typeName(), docId( 4 ) );
+			assertThatHits( scrollResult.hits() ).hasDocRefHitsExactOrder( index.typeName(), docId( 4 ) );
 
 			scrollResult = scroll.next();
 			Assertions.assertThat( scrollResult.hasHits() ).isFalse();

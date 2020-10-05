@@ -10,6 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultWriteAlias;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.mappingWithDiscriminatorProperty;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.mappingWithoutAnyProperty;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
@@ -19,7 +20,6 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
@@ -78,7 +78,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	@Test
 	public void singleIndexScope() {
 		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP );
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				index1.createScope().query().where( f -> f.matchAll() ).toQuery()
 		)
 				.hasDocRefHitsAnyOrder( c -> c
@@ -91,7 +91,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	public void multiIndexScope() {
 		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				index1.createScope( index2 ).query().where( f -> f.matchAll() ).toQuery()
 		)
 				.hasDocRefHitsAnyOrder( c -> c
@@ -112,7 +112,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 				.toQuery();
 
 		// Should work even if the index has an irregular name: the selected type-name mapping strategy is not actually used.
-		SearchResultAssert.assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( c -> c
 						.doc( index1.typeName(), ID_1 )
 						.doc( index1.typeName(), ID_2 )
@@ -129,7 +129,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 				.toQuery();
 
 		if ( IrregularIndexNameSupport.YES.equals( irregularIndexNameSupport ) ) {
-			SearchResultAssert.assertThat( query )
+			assertThatQuery( query )
 					.hasDocRefHitsAnyOrder( c -> c
 							.doc( index1.typeName(), ID_1 )
 							.doc( index1.typeName(), ID_2 )
@@ -153,7 +153,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 				.toQuery();
 
 		// Should work even if the index has an irregular name: the selected type-name mapping strategy is not actually used.
-		SearchResultAssert.assertThat( query )
+		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( c -> c
 						.doc( index1.typeName(), ID_1 )
 						.doc( index1.typeName(), ID_2 )
@@ -170,7 +170,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 				.toQuery();
 
 		if ( IrregularIndexNameSupport.YES.equals( irregularIndexNameSupport ) ) {
-			SearchResultAssert.assertThat( query )
+			assertThatQuery( query )
 					.hasDocRefHitsAnyOrder( c -> c
 							.doc( index1.typeName(), ID_1 )
 							.doc( index1.typeName(), ID_2 )

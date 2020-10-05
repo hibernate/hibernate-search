@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.dynamic;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -23,7 +24,6 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -412,7 +412,7 @@ public class ObjectFieldTemplateIT {
 				.join();
 
 		// Check that documents are indexed and the dynamic object field can be detected through an exists() predicate
-		SearchResultAssert.assertThat( query( f -> f.exists().field( "staticObject" ) ) )
+		assertThatQuery( query( f -> f.exists().field( "staticObject" ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), documentWhereObjectFieldExistsId );
 
 		// Try again with a clean Hibernate Search instance, where local schema caches are empty
@@ -420,7 +420,7 @@ public class ObjectFieldTemplateIT {
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY,
 				rootTemplatesBinder, staticObjectTemplatesBinder );
 
-		SearchResultAssert.assertThat( query( f -> f.exists().field( "staticObject" ) ) )
+		assertThatQuery( query( f -> f.exists().field( "staticObject" ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), documentWhereObjectFieldExistsId );
 	}
 
@@ -472,18 +472,18 @@ public class ObjectFieldTemplateIT {
 				.join();
 
 		// Check that documents are indexed and the dynamic object field can be detected through an exists() predicate
-		SearchResultAssert.assertThat( query( f -> f.exists().field( "foo_nested" ) ) )
+		assertThatQuery( query( f -> f.exists().field( "foo_nested" ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), documentWhereObjectFieldExistsId );
-		SearchResultAssert.assertThat( query( f -> f.exists().field( "foo_flattened" ) ) )
+		assertThatQuery( query( f -> f.exists().field( "foo_flattened" ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), documentWhereObjectFieldExistsId );
 
 		// Try again with a clean Hibernate Search instance, where local schema caches are empty
 		integration.close();
 		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY, templatesBinder );
 
-		SearchResultAssert.assertThat( query( f -> f.exists().field( "foo_nested" ) ) )
+		assertThatQuery( query( f -> f.exists().field( "foo_nested" ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), documentWhereObjectFieldExistsId );
-		SearchResultAssert.assertThat( query( f -> f.exists().field( "foo_flattened" ) ) )
+		assertThatQuery( query( f -> f.exists().field( "foo_flattened" ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), documentWhereObjectFieldExistsId );
 	}
 
@@ -502,7 +502,7 @@ public class ObjectFieldTemplateIT {
 	}
 
 	private void checkNested(String objectFieldPath) {
-		SearchResultAssert.assertThat( query(
+		assertThatQuery( query(
 				f -> f.nested().objectField( objectFieldPath )
 						.nest( f.bool()
 								.must( f.match().field( objectFieldPath + "." + FIRSTNAME_FIELD )
@@ -526,7 +526,7 @@ public class ObjectFieldTemplateIT {
 		) )
 				.hasMessageContainingAll( "is flattened",
 						"its structure was lost upon indexing and 'nested' features are not available" );
-		SearchResultAssert.assertThat( query(
+		assertThatQuery( query(
 				f -> f.bool()
 						.must( f.match().field( objectFieldPath + "." + FIRSTNAME_FIELD )
 								.matching( FIRSTNAME_1 ) )

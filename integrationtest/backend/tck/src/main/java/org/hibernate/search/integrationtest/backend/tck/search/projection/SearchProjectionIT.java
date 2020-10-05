@@ -7,7 +7,8 @@
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 
 import java.util.List;
 import java.util.Optional;
@@ -90,7 +91,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		assertThat( query ).hasTotalHitCount( 4 );
+		assertThatQuery( query ).hasTotalHitCount( 4 );
 	}
 
 	@Test
@@ -122,7 +123,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasListHitsAnyOrder( b -> {
+		assertThatQuery( query ).hasListHitsAnyOrder( b -> {
 			b.list( document1Reference, document1Reference, document1Reference );
 			b.list( document2Reference, document2Reference, document2Reference );
 			b.list( document3Reference, document3Reference, document3Reference );
@@ -201,7 +202,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
 		replayAll();
-		assertThat( query ).hasListHitsAnyOrder( b -> {
+		assertThatQuery( query ).hasListHitsAnyOrder( b -> {
 			b.list( document1Reference, document1TransformedReference, document1LoadedObject );
 			b.list( document2Reference, document2TransformedReference, document2LoadedObject );
 			b.list( document3Reference, document3TransformedReference, document3LoadedObject );
@@ -221,7 +222,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				.toQuery();
 
 		SearchResult<Float> result = query.fetchAll();
-		assertThat( result ).hasTotalHitCount( 2 );
+		assertThatResult( result ).hasTotalHitCount( 2 );
 
 		Float score1 = result.hits().get( 0 );
 		Float score2 = result.hits().get( 1 );
@@ -246,7 +247,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				.toQuery();
 
 		SearchResult<Float> result = query.fetchAll();
-		assertThat( result ).hasTotalHitCount( 2 );
+		assertThatResult( result ).hasTotalHitCount( 2 );
 
 		Float score1 = result.hits().get( 0 );
 		Float score2 = result.hits().get( 1 );
@@ -275,7 +276,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasListHitsAnyOrder( b -> {
+		assertThatQuery( query ).hasListHitsAnyOrder( b -> {
 			b.list(
 					mainIndex.binding().string1Field.document1Value.indexedValue,
 					reference( mainIndex.typeName(), DOCUMENT_1 ),
@@ -321,7 +322,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasListHitsAnyOrder( b -> {
+		assertThatQuery( query ).hasListHitsAnyOrder( b -> {
 			b.list(
 					mainIndex.binding().string1Field.document1Value.indexedValue,
 					reference( mainIndex.typeName(), DOCUMENT_1 ),
@@ -368,7 +369,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder( value1, value2, value3, null );
+		assertThatQuery( query ).hasHitsAnyOrder( value1, value2, value3, null );
 
 		// reuse the same projection instance on the same scope
 		query = scope.query()
@@ -376,7 +377,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder( value1, value2, value3, null );
+		assertThatQuery( query ).hasHitsAnyOrder( value1, value2, value3, null );
 
 		// reuse the same projection instance on a different scope,
 		// targeting the same index
@@ -385,7 +386,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder( value1, value2, value3, null );
+		assertThatQuery( query ).hasHitsAnyOrder( value1, value2, value3, null );
 
 		projection = mainIndex.createScope( otherIndex ).projection()
 				.field( mainIndex.binding().string1Field.relativeFieldName, String.class ).toProjection();
@@ -397,7 +398,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder( value1, value2, value3, null );
+		assertThatQuery( query ).hasHitsAnyOrder( value1, value2, value3, null );
 	}
 
 	@Test
@@ -443,7 +444,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				)
 				.where( f -> f.id().matching( DOCUMENT_1 ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasHitsAnyOrder( mainIndex.binding().string1Field.document1Value.indexedValue );
 
 		// Mandatory extension, unsupported
@@ -467,7 +468,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				)
 				.where( f -> f.id().matching( DOCUMENT_1 ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasHitsAnyOrder( mainIndex.binding().string1Field.document1Value.indexedValue );
 
 		// Conditional extensions with orElse - two, second supported
@@ -487,7 +488,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				)
 				.where( f -> f.id().matching( DOCUMENT_1 ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasHitsAnyOrder( mainIndex.binding().string1Field.document1Value.indexedValue );
 
 		// Conditional extensions with orElse - two, both unsupported
@@ -507,7 +508,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				)
 				.where( f -> f.id().matching( DOCUMENT_1 ) )
 				.toQuery();
-		assertThat( query )
+		assertThatQuery( query )
 				.hasHitsAnyOrder( mainIndex.binding().string1Field.document1Value.indexedValue );
 	}
 

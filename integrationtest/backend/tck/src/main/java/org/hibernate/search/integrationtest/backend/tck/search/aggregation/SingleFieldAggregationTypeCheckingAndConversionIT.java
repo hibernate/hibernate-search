@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -47,7 +48,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TypeAss
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
@@ -146,7 +146,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 		SearchAggregation<A> aggregation = scenario.setup( scope.aggregation(), fieldPath )
 				.toAggregation();
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				scope.query()
 						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, aggregation )
@@ -159,7 +159,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 				);
 
 		// reuse the aggregation instance on the same scope
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				scope.query()
 						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, aggregation )
@@ -173,7 +173,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 		// reuse the aggregation instance on a different scope targeting the same index
 		scope = mainIndex.createScope();
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				scope.query()
 						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, aggregation )
@@ -294,7 +294,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 		AggregationKey<A> key1 = AggregationKey.of( "aggregationName1" );
 		AggregationKey<A> key2 = AggregationKey.of( "aggregationName2" );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				mainIndex.createScope().query().where( f -> f.matchAll() )
 						.aggregation( key1, f -> scenario.setup( f, fieldPath ) )
 						.aggregation( key2, f -> scenario.setup( f, fieldPath ) )
@@ -502,7 +502,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 			Function<SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor,
 			BiFunction<SearchAggregationFactory, AggregationScenario<A>, AggregationFinalStep<A>> aggregationContributor) {
 		AggregationKey<A> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				scope.query()
 						.where( predicateContributor )
 						.aggregation( aggregationKey, f -> aggregationContributor.apply( f, scenario ) )

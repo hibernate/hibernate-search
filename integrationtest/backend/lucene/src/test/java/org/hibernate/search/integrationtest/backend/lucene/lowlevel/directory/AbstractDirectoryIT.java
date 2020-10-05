@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.lowlevel.directory;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.function.Function;
@@ -59,7 +59,7 @@ public abstract class AbstractDirectoryIT {
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder(
+		assertThatQuery( query ).hasDocRefHitsAnyOrder(
 				index.typeName(),
 				DOCUMENT_1, DOCUMENT_2, DOCUMENT_3
 		);

@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
 import java.util.ArrayList;
@@ -33,7 +34,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.e
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
@@ -147,7 +147,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		String fieldPath = getFieldPath( mainIndex.binding() );
 		AggregationKey<A> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				scope.query()
 						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, f -> scenario.setup( f, fieldPath, getFilterOrNull( mainIndex.binding() ) ) )
@@ -186,7 +186,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		SearchAggregation<A> aggregation = scenario.setup( scope.aggregation(), fieldPath, getFilterOrNull( mainIndex.binding() ) )
 				.toAggregation();
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				mainIndex.createScope().query()
 						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, aggregation )
@@ -261,7 +261,7 @@ public class SingleFieldAggregationBaseIT<F> {
 			Function<SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor,
 			BiFunction<SearchAggregationFactory, AggregationScenario<A>, AggregationFinalStep<A>> aggregationContributor) {
 		AggregationKey<A> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				scope.query()
 						.where( predicateContributor )
 						.aggregation( aggregationKey, f -> aggregationContributor.apply( f, scenario ) )

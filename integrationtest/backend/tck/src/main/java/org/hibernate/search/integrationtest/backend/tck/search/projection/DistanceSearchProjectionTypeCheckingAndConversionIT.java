@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableGeoPointWithDistanceFromCenterValues.CENTER_POINT_1;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -151,7 +151,7 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 
 		String fieldPath = getFieldWithConverterPath();
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.select( f -> f.distance( fieldPath, CENTER_POINT_1 ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
@@ -169,7 +169,7 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 	public void multiIndex_withCompatibleIndex() {
 		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.select( f -> f.distance( getFieldPath(), CENTER_POINT_1 ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )
@@ -188,7 +188,7 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 	public void multiIndex_withRawFieldCompatibleIndex() {
 		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.select( f -> f.distance( getFieldWithConverterPath(), CENTER_POINT_1 ) )
 				.where( f -> f.matchAll() )
 				.toQuery() )

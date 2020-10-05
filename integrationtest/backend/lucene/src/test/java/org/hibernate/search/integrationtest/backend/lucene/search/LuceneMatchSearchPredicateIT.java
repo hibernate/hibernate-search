@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.search;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -41,13 +41,13 @@ public class LuceneMatchSearchPredicateIT {
 				.where( f -> f.match().field( "normalizedStringField" ).matching( TEST_TERM ) )
 				.toQuery();
 
-		assertThat( query ).hasDocRefHitsAnyOrder( index.typeName(), "1" );
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( index.typeName(), "1" );
 
 		query = index.createScope().query()
 				.where( f -> f.match().field( "normalizedStringField" ).matching( TEST_TERM ).skipAnalysis() )
 				.toQuery();
 
-		assertThat( query ).hasNoHits();
+		assertThatQuery( query ).hasNoHits();
 	}
 
 	private void initData() {

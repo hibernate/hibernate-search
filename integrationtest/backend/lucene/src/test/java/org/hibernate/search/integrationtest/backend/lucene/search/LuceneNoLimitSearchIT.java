@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.search;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
 import java.util.List;
@@ -48,7 +49,7 @@ public class LuceneNoLimitSearchIT {
 
 		SearchResult<DocumentReference> documentReferences = query.fetchAll();
 
-		assertThat( documentReferences )
+		assertThatResult( documentReferences )
 				.hasDocRefHitsAnyOrder( index.typeName(), "739" )
 				.hasTotalHitCount( 1L );
 	}
@@ -61,7 +62,7 @@ public class LuceneNoLimitSearchIT {
 
 		SearchResult<DocumentReference> documentReferences = query.fetchAll();
 
-		assertThat( documentReferences ).hasTotalHitCount( 21L );
+		assertThatResult( documentReferences ).hasTotalHitCount( 21L );
 	}
 
 	@Test
@@ -72,7 +73,7 @@ public class LuceneNoLimitSearchIT {
 
 		SearchResult<DocumentReference> documentReferences = query.fetchAll();
 
-		assertThat( documentReferences ).hasTotalHitCount( 6067L );
+		assertThatResult( documentReferences ).hasTotalHitCount( 6067L );
 	}
 
 	@Test
@@ -83,7 +84,7 @@ public class LuceneNoLimitSearchIT {
 
 		SearchResult<DocumentReference> documentReferences = query.fetchAll();
 
-		assertThat( documentReferences ).hasTotalHitCount( 39961L );
+		assertThatResult( documentReferences ).hasTotalHitCount( 39961L );
 	}
 
 	@Test
@@ -95,7 +96,7 @@ public class LuceneNoLimitSearchIT {
 
 		SearchResult<DocumentReference> documentReferences = query.fetchAll();
 
-		assertThat( documentReferences )
+		assertThatResult( documentReferences )
 				.hasDocRefHitsAnyOrder( index.typeName(), "739" )
 				.hasTotalHitCount( 1L );
 	}
@@ -108,7 +109,7 @@ public class LuceneNoLimitSearchIT {
 
 		List<DocumentReference> documentReferences = query.fetchAllHits();
 
-		assertThat( documentReferences ).hasDocRefHitsAnyOrder( index.typeName(), "739" );
+		assertThatHits( documentReferences ).hasDocRefHitsAnyOrder( index.typeName(), "739" );
 	}
 
 	private static void initData() {

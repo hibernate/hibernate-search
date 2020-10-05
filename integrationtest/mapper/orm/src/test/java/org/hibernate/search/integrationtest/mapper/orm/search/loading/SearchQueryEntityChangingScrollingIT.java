@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 
 import java.util.ArrayList;
@@ -84,7 +84,7 @@ public class SearchQueryEntityChangingScrollingIT {
 
 			try ( SearchScroll<SimpleEntity> scroll = query.scroll( 3 ) ) {
 				for ( SearchScrollResult<SimpleEntity> next = scroll.next(); next.hasHits(); next = scroll.next() ) {
-					assertThat( next.hits() ).hasHitsAnyOrder( new SimpleEntity( index++ ), new SimpleEntity( index++ ), new SimpleEntity( index++ ) );
+					assertThatHits( next.hits() ).hasHitsAnyOrder( new SimpleEntity( index++ ), new SimpleEntity( index++ ), new SimpleEntity( index++ ) );
 					changeNames( next.hits() );
 
 					session.flush();

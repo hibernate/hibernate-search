@@ -11,7 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.encodeName;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.readAliasDefinition;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.writeAliasDefinition;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -76,8 +76,8 @@ public class ElasticsearchZeroDowntimeReindexingIT {
 
 		// Initial state: text == "text1"
 		// In a real-world scenario, we would index thousands of documents
-		assertThat( text1Query ).hasTotalHitCount( 1 );
-		assertThat( text2Query ).hasNoHits();
+		assertThatQuery( text1Query ).hasTotalHitCount( 1 );
+		assertThatQuery( text2Query ).hasNoHits();
 
 		// Create a new index without aliases
 		URLEncodedString newIndexPrimaryName = encodeName( index.name() + "-000002" );
@@ -88,8 +88,8 @@ public class ElasticsearchZeroDowntimeReindexingIT {
 				.move( defaultWriteAlias( index.name() ).original, newIndexPrimaryName.original, writeAliasDefinition() );
 
 		// Search queries are unaffected: text == "text1"
-		assertThat( text1Query ).hasTotalHitCount( 1 );
-		assertThat( text2Query ).hasNoHits();
+		assertThatQuery( text1Query ).hasTotalHitCount( 1 );
+		assertThatQuery( text2Query ).hasNoHits();
 
 		// Reindex the document: text == "text2"
 		// In a real-world scenario, we would reindex thousands of documents
@@ -102,23 +102,23 @@ public class ElasticsearchZeroDowntimeReindexingIT {
 		workspace.refresh().join();
 
 		// Search queries are unaffected: text == "text1"
-		assertThat( text1Query ).hasTotalHitCount( 1 );
-		assertThat( text2Query ).hasNoHits();
+		assertThatQuery( text1Query ).hasTotalHitCount( 1 );
+		assertThatQuery( text2Query ).hasNoHits();
 
 		// Switch the read alias from the old to the new index
 		elasticsearchClient.index( index.name() ).aliases()
 				.move( defaultReadAlias( index.name() ).original, newIndexPrimaryName.original, readAliasDefinition() );
 
 		// Search queries immediately show the new content: text == "text2"
-		assertThat( text1Query ).hasNoHits();
-		assertThat( text2Query ).hasTotalHitCount( 1 );
+		assertThatQuery( text1Query ).hasNoHits();
+		assertThatQuery( text2Query ).hasTotalHitCount( 1 );
 
 		// Remove the old index
 		elasticsearchClient.index( index.name() ).ensureDoesNotExist();
 
 		// Search queries still work and target the new index: text == "text2"
-		assertThat( text1Query ).hasNoHits();
-		assertThat( text2Query ).hasTotalHitCount( 1 );
+		assertThatQuery( text1Query ).hasNoHits();
+		assertThatQuery( text2Query ).hasTotalHitCount( 1 );
 	}
 
 	private static class IndexBinding {

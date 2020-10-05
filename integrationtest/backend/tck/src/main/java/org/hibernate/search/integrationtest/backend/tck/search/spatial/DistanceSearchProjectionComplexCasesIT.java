@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.Comparator;
 import java.util.List;
@@ -36,7 +36,7 @@ public class DistanceSearchProjectionComplexCasesIT extends AbstractSpatialWithi
 	public void several() {
 		StubMappingScope scope = mainIndex.createScope();
 
-		ListAssert<List<?>> hitsAssert = assertThat( scope.query()
+		ListAssert<List<?>> hitsAssert = assertThatQuery( scope.query()
 				.select( f -> f.composite(
 						f.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) ),
 						f.distance( "geoPoint", GeoPoint.of( 45.763363, 4.833527 ) ),
@@ -85,7 +85,7 @@ public class DistanceSearchProjectionComplexCasesIT extends AbstractSpatialWithi
 
 		GeoPoint center = GeoPoint.of( 45.749828, 4.854172 );
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.select( f -> f.distance( "geoPoint", center ) )
 				.where( f -> f.matchAll() )
 				.sort( f -> f
@@ -111,7 +111,7 @@ public class DistanceSearchProjectionComplexCasesIT extends AbstractSpatialWithi
 	public void longFieldName() {
 		StubMappingScope scope = mainIndex.createScope();
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.select( f ->
 						f.distance(
 								"geoPoint_with_a_veeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyy_long_name",

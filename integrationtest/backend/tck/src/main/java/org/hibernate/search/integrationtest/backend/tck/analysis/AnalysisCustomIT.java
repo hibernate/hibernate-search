@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.analysis;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -240,7 +240,7 @@ public class AnalysisCustomIT {
 				.where( f -> f.match().field( index.binding().field.relativeFieldName ).matching( valueToMatch ) )
 				.toQuery();
 
-		return assertThat( query );
+		return assertThatQuery( query );
 	}
 
 	private void setupWithAnalyzer(AnalysisDefinitions analysisDefinition) {

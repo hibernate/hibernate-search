@@ -9,6 +9,8 @@ package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalize;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
@@ -34,7 +36,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleF
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
@@ -112,7 +113,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<S, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, superClass ) )
 						.routing( dataSet.name )
@@ -138,7 +139,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 		Map.Entry<F, List<String>> firstTermEntry = dataSet.documentIdPerTerm.entrySet().iterator().next();
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				index.createScope().query()
 						.where( f -> f.id()
 								.matching( firstTermEntry.getValue().get( 0 ) )
@@ -166,7 +167,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatResult(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() ) )
 						.fetch( 3, 4 )
@@ -187,7 +188,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() ) )
 						.routing( dataSet.name )
@@ -211,7 +212,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								.orderByCountDescending()
@@ -239,7 +240,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								.orderByCountAscending()
@@ -266,7 +267,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								.orderByTermDescending()
@@ -294,7 +295,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								.orderByTermAscending()
@@ -320,7 +321,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								.minDocumentCount( 2 )
@@ -351,7 +352,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 		Map.Entry<F, List<String>> firstTermEntry = dataSet.documentIdPerTerm.entrySet().iterator().next();
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				index.createScope().query()
 						// Exclude documents containing the first term from matches
 						.where( f -> f.matchAll().except(
@@ -384,7 +385,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				index.createScope().query()
 						// Exclude all documents from the matches
 						.where( f -> f.id().matching( "none" ) )
@@ -415,7 +416,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				index.createScope().query()
 						// Exclude all documents from the matches
 						.where( f -> f.id().matching( "none" ) )
@@ -459,7 +460,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								.maxTermCount( 1 )
@@ -491,7 +492,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								.maxTermCount( 1 )
@@ -520,7 +521,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, fieldType.getJavaType() )
 								.maxTermCount( 1 )

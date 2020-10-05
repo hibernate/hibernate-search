@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableGeoPointWithDistanceFromCenterValues.CENTER_POINT_1;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.IndexableGeoPointWithDistanceFromCenterValues.CENTER_POINT_2;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators.APPROX_KM_COMPARATOR;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators.APPROX_MILES_COMPARATOR;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators.APPROX_M_COMPARATOR;
@@ -114,7 +114,7 @@ public class DistanceSearchProjectionSingleValuedBaseIT {
 
 		String fieldPath = getFieldPath();
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				// Do NOT add any additional projection here: this serves as a non-regression test for HSEARCH-3618
 				.select( f -> f.distance( fieldPath, CENTER_POINT_1 ) )
 				.where( f -> f.matchAll() )
@@ -140,7 +140,7 @@ public class DistanceSearchProjectionSingleValuedBaseIT {
 
 		String fieldPath = getFieldPath();
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.select( f -> f.distance( fieldPath, CENTER_POINT_1 ).multi() )
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
@@ -167,7 +167,7 @@ public class DistanceSearchProjectionSingleValuedBaseIT {
 
 		String fieldPath = getFieldPath();
 
-		ListAssert<Pair<Double, Double>> hitsAssert = assertThat( scope.query()
+		ListAssert<Pair<Double, Double>> hitsAssert = assertThatQuery( scope.query()
 				.select( f -> f.composite(
 						Pair::new,
 						f.distance( fieldPath, CENTER_POINT_1 ),
@@ -203,7 +203,7 @@ public class DistanceSearchProjectionSingleValuedBaseIT {
 
 		String fieldPath = sortableIndex.binding().getFieldPath( fieldStructure, fieldType );
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				// Do NOT add any additional projection here: this serves as a non-regression test for HSEARCH-3618
 				.select( f -> f.distance( fieldPath, AscendingUniqueDistanceFromCenterValues.CENTER_POINT ) )
 				.where( f -> f.matchAll() )
@@ -229,7 +229,7 @@ public class DistanceSearchProjectionSingleValuedBaseIT {
 
 		String fieldPath = sortableIndex.binding().getFieldPath( fieldStructure, fieldType );
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				// Do NOT add any additional projection here: this serves as a non-regression test for HSEARCH-3618
 				.select( f -> f.distance( fieldPath, AscendingUniqueDistanceFromCenterValues.CENTER_POINT ) )
 				.where( f -> f.matchAll() )
@@ -249,7 +249,7 @@ public class DistanceSearchProjectionSingleValuedBaseIT {
 	public void unit_km() {
 		StubMappingScope scope = mainIndex.createScope();
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.select( f -> f.distance( getFieldPath(), CENTER_POINT_1 )
 						.unit( DistanceUnit.KILOMETERS ) )
 				.where( f -> f.matchAll() )
@@ -269,7 +269,7 @@ public class DistanceSearchProjectionSingleValuedBaseIT {
 	public void unit_miles() {
 		StubMappingScope scope = mainIndex.createScope();
 
-		assertThat( scope.query()
+		assertThatQuery( scope.query()
 				.select( f -> f.distance( getFieldPath(), CENTER_POINT_1 )
 						.unit( DistanceUnit.MILES ) )
 				.where( f -> f.matchAll() )
@@ -289,7 +289,7 @@ public class DistanceSearchProjectionSingleValuedBaseIT {
 	public void several() {
 		StubMappingScope scope = mainIndex.createScope();
 
-		ListAssert<Triplet<Double, Double, Double>> hitsAssert = assertThat( scope.query()
+		ListAssert<Triplet<Double, Double, Double>> hitsAssert = assertThatQuery( scope.query()
 				.select( f -> f.composite(
 						Triplet::new,
 						f.distance( getFieldPath(), CENTER_POINT_1 ),

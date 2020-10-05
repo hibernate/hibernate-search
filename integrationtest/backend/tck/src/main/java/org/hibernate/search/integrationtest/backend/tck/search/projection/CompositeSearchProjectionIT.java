@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -73,7 +73,7 @@ public class CompositeSearchProjectionIT {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder(
+		assertThatQuery( query ).hasHitsAnyOrder(
 				Arrays.asList( index.binding().author.document1Value.indexedValue, index.binding().title.document1Value.indexedValue ),
 				Arrays.asList( index.binding().author.document2Value.indexedValue, index.binding().title.document2Value.indexedValue ),
 				Arrays.asList( index.binding().author.document3Value.indexedValue, index.binding().title.document3Value.indexedValue )
@@ -94,7 +94,7 @@ public class CompositeSearchProjectionIT {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder(
+		assertThatQuery( query ).hasHitsAnyOrder(
 				Arrays.asList( index.binding().author.document1Value.indexedValue, index.binding().title.document1Value.indexedValue ),
 				Arrays.asList( index.binding().author.document2Value.indexedValue, index.binding().title.document2Value.indexedValue ),
 				Arrays.asList( index.binding().author.document3Value.indexedValue, index.binding().title.document3Value.indexedValue )
@@ -116,7 +116,7 @@ public class CompositeSearchProjectionIT {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder(
+		assertThatQuery( query ).hasHitsAnyOrder(
 				new Book_Bi( index.binding().author.document1Value.indexedValue, index.binding().title.document1Value.indexedValue ),
 				new Book_Bi( index.binding().author.document2Value.indexedValue, index.binding().title.document2Value.indexedValue ),
 				new Book_Bi( index.binding().author.document3Value.indexedValue, index.binding().title.document3Value.indexedValue )
@@ -138,7 +138,7 @@ public class CompositeSearchProjectionIT {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder(
+		assertThatQuery( query ).hasHitsAnyOrder(
 				new Book_Bi( index.binding().author.document1Value.indexedValue, index.binding().title.document1Value.indexedValue ),
 				new Book_Bi( index.binding().author.document2Value.indexedValue, index.binding().title.document2Value.indexedValue ),
 				new Book_Bi( index.binding().author.document3Value.indexedValue, index.binding().title.document3Value.indexedValue )
@@ -159,7 +159,7 @@ public class CompositeSearchProjectionIT {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder(
+		assertThatQuery( query ).hasHitsAnyOrder(
 				new Book( index.binding().title.document1Value.indexedValue ),
 				new Book( index.binding().title.document2Value.indexedValue ),
 				new Book( index.binding().title.document3Value.indexedValue )
@@ -180,7 +180,7 @@ public class CompositeSearchProjectionIT {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder(
+		assertThatQuery( query ).hasHitsAnyOrder(
 				new Book( index.binding().title.document1Value.indexedValue ),
 				new Book( index.binding().title.document2Value.indexedValue ),
 				new Book( index.binding().title.document3Value.indexedValue )
@@ -202,7 +202,7 @@ public class CompositeSearchProjectionIT {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder(
+		assertThatQuery( query ).hasHitsAnyOrder(
 				new Book_Bi( index.binding().author.document1Value.indexedValue, index.binding().title.document1Value.indexedValue ),
 				new Book_Bi( index.binding().author.document2Value.indexedValue, index.binding().title.document2Value.indexedValue ),
 				new Book_Bi( index.binding().author.document3Value.indexedValue, index.binding().title.document3Value.indexedValue )
@@ -224,7 +224,7 @@ public class CompositeSearchProjectionIT {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder(
+		assertThatQuery( query ).hasHitsAnyOrder(
 				new Book_Bi( index.binding().author.document1Value.indexedValue, index.binding().title.document1Value.indexedValue ),
 				new Book_Bi( index.binding().author.document2Value.indexedValue, index.binding().title.document2Value.indexedValue ),
 				new Book_Bi( index.binding().author.document3Value.indexedValue, index.binding().title.document3Value.indexedValue )
@@ -247,7 +247,7 @@ public class CompositeSearchProjectionIT {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder(
+		assertThatQuery( query ).hasHitsAnyOrder(
 				new Book_Tri( index.binding().author.document1Value.indexedValue, index.binding().title.document1Value.indexedValue,
 						index.binding().releaseDate.document1Value.indexedValue ),
 				new Book_Tri( index.binding().author.document2Value.indexedValue, index.binding().title.document2Value.indexedValue,
@@ -273,7 +273,7 @@ public class CompositeSearchProjectionIT {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder(
+		assertThatQuery( query ).hasHitsAnyOrder(
 				new Book_Tri( index.binding().author.document1Value.indexedValue, index.binding().title.document1Value.indexedValue,
 						index.binding().releaseDate.document1Value.indexedValue ),
 				new Book_Tri( index.binding().author.document2Value.indexedValue, index.binding().title.document2Value.indexedValue,
@@ -302,7 +302,7 @@ public class CompositeSearchProjectionIT {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder(
+		assertThatQuery( query ).hasHitsAnyOrder(
 				new Book_Bi_Score( new Book_Bi( index.binding().author.document1Value.indexedValue, index.binding().title.document1Value.indexedValue ), 1.0F ),
 				new Book_Bi_Score( new Book_Bi( index.binding().author.document2Value.indexedValue, index.binding().title.document2Value.indexedValue ), 1.0F ),
 				new Book_Bi_Score( new Book_Bi( index.binding().author.document3Value.indexedValue, index.binding().title.document3Value.indexedValue ), 1.0F )

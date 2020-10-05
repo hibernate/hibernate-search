@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.sharding;
 
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -15,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -66,7 +67,7 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 	@TestForIssue(jiraKey = "HSEARCH-3314")
 	public void search() {
 		// No routing key => all documents should be returned
-		SearchResultAssert.assertThat( index.createScope().query()
+		assertThatQuery( index.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery()
 		)
@@ -79,7 +80,7 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 		String someOtherDocumentId = iterator.next();
 
 		// One or more explicit routing key => no document should be returned, since no documents was indexed with that routing key.
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				index.createScope().query()
 						.where( f -> f.matchAll() )
 						.routing( someDocumentId )
@@ -88,7 +89,7 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 				.hasNoHits();
 
 		// Multiple explicit routing keys => no result: documents were indexed without a routing key.
-		SearchResultAssert.assertThat(
+		assertThatQuery(
 				index.createScope().query()
 						.where( f -> f.matchAll() )
 						.routing( Arrays.asList( someDocumentId, someOtherDocumentId ) )
@@ -107,7 +108,7 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 
 		// One or more explicit routing key => no document should be purged, since no documents was indexed with that routing key.
 		index.createWorkspace().refresh().join();
-		SearchResultAssert.assertThat( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
+		assertThatQuery( index.createScope().query().where( f -> f.matchAll() ).toQuery() )
 				.hits().asNormalizedDocRefs()
 				.hasSize( TOTAL_DOCUMENT_COUNT )
 				.containsExactlyInAnyOrder( allDocRefs( docIdByRoutingKey ) );

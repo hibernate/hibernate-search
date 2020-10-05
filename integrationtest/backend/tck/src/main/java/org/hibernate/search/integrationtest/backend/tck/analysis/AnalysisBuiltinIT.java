@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.analysis;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import java.util.Arrays;
 import java.util.List;
@@ -101,7 +101,7 @@ public class AnalysisBuiltinIT {
 				.where( f -> f.match().field( fieldModel.relativeFieldName ).matching( valueToMatch ) )
 				.toQuery();
 
-		return assertThat( query );
+		return assertThatQuery( query );
 	}
 
 	private void initData(SimpleFieldModel<String> fieldModel, Consumer<SingleFieldDocumentBuilder<String>> valueContributor) {

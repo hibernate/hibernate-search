@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.work;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
@@ -27,7 +28,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubEntityReference;
@@ -93,7 +93,7 @@ public class IndexIndexingPlanIT {
 		// The operations should succeed.
 		assertThatFuture( future ).isSuccessful();
 
-		SearchResultAssert.assertThat( index.createScope().query( sessionContext )
+		assertThatQuery( index.createScope().query( sessionContext )
 				.where( f -> f.match().field( "title" ).matching( "Lord" ) )
 				.toQuery() )
 				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2", "3" );
@@ -105,7 +105,7 @@ public class IndexIndexingPlanIT {
 		// The operations should succeed.
 		assertThatFuture( future ).isSuccessful();
 
-		SearchResultAssert.assertThat( index.createScope().query( sessionContext )
+		assertThatQuery( index.createScope().query( sessionContext )
 				.where( f -> f.match().field( "title" ).matching( "Lord" ) )
 				.toQuery() )
 				.hasDocRefHitsAnyOrder( index.typeName(), "1", "3" );
@@ -117,7 +117,7 @@ public class IndexIndexingPlanIT {
 		// The operations should succeed.
 		assertThatFuture( future ).isSuccessful();
 
-		SearchResultAssert.assertThat( index.createScope().query( sessionContext )
+		assertThatQuery( index.createScope().query( sessionContext )
 				.where( f -> f.match().field( "title" ).matching( "Lord" ) )
 				.toQuery() )
 				.hasDocRefHitsAnyOrder( index.typeName(), "3" );
@@ -136,7 +136,7 @@ public class IndexIndexingPlanIT {
 		// The operations should succeed.
 		assertThatFuture( future ).isSuccessful();
 
-		SearchResultAssert.assertThat( index.createScope().query( sessionContext )
+		assertThatQuery( index.createScope().query( sessionContext )
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasDocRefHitsAnyOrder( index.typeName(), "2" );
