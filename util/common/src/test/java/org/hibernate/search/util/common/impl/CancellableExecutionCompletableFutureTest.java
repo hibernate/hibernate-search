@@ -7,6 +7,7 @@
 package org.hibernate.search.util.common.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -15,8 +16,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
-
-import org.hibernate.search.util.impl.test.FutureAssert;
 
 import org.junit.After;
 import org.junit.Before;
@@ -55,7 +54,7 @@ public class CancellableExecutionCompletableFutureTest {
 		);
 
 		Awaitility.await().until( future::isDone );
-		FutureAssert.assertThat( future ).isSuccessful();
+		assertThatFuture( future ).isSuccessful();
 		assertThat( finished ).isTrue();
 	}
 
@@ -76,7 +75,7 @@ public class CancellableExecutionCompletableFutureTest {
 		);
 
 		Awaitility.await().until( future::isDone );
-		FutureAssert.assertThat( future ).isFailed( exception );
+		assertThatFuture( future ).isFailed( exception );
 		assertThat( finished ).isTrue();
 	}
 
@@ -97,7 +96,7 @@ public class CancellableExecutionCompletableFutureTest {
 		);
 
 		Awaitility.await().until( future::isDone );
-		FutureAssert.assertThat( future ).isFailed( error );
+		assertThatFuture( future ).isFailed( error );
 		assertThat( finished ).isTrue();
 	}
 
@@ -132,7 +131,7 @@ public class CancellableExecutionCompletableFutureTest {
 		);
 
 		Awaitility.await().until( future::isDone );
-		FutureAssert.assertThat( future ).isCancelled();
+		assertThatFuture( future ).isCancelled();
 		Awaitility.await().untilTrue( finished );
 
 		// Also test that the failure triggered by the cancellation ultimately

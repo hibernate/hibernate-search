@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.workspace;
 
-import static org.hibernate.search.util.impl.test.FutureAssert.assertThat;
+import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -59,10 +59,10 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
 			CompletableFuture<?> futureFromWorkspace = executeAsync( workspace );
 			defaultBackendMock.verifyExpectationsMet();
-			assertThat( futureFromWorkspace ).isPending();
+			assertThatFuture( futureFromWorkspace ).isPending();
 
 			futureFromBackend.complete( new Object() );
-			assertThat( futureFromWorkspace ).isSuccessful();
+			assertThatFuture( futureFromWorkspace ).isSuccessful();
 		} );
 	}
 
@@ -78,11 +78,11 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
 			CompletableFuture<?> futureFromWorkspace = executeAsync( workspace );
 			defaultBackendMock.verifyExpectationsMet();
-			assertThat( futureFromWorkspace ).isPending();
+			assertThatFuture( futureFromWorkspace ).isPending();
 
 			RuntimeException exception = new RuntimeException();
 			futureFromBackend.completeExceptionally( exception );
-			assertThat( futureFromWorkspace ).isFailed( exception );
+			assertThatFuture( futureFromWorkspace ).isFailed( exception );
 		} );
 	}
 
@@ -137,13 +137,13 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 			CompletableFuture<?> futureFromWorkspace = executeAsync( workspace );
 			defaultBackendMock.verifyExpectationsMet();
 			backend2Mock.verifyExpectationsMet();
-			assertThat( futureFromWorkspace ).isPending();
+			assertThatFuture( futureFromWorkspace ).isPending();
 
 			future1FromBackend.complete( new Object() );
-			assertThat( futureFromWorkspace ).isPending();
+			assertThatFuture( futureFromWorkspace ).isPending();
 
 			future2FromBackend.complete( new Object() );
-			assertThat( futureFromWorkspace ).isSuccessful();
+			assertThatFuture( futureFromWorkspace ).isSuccessful();
 		} );
 	}
 
@@ -161,10 +161,10 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
 		CompletableFuture<?> futureFromWorkspace = executeAsync( workspace );
 		defaultBackendMock.verifyExpectationsMet();
-		assertThat( futureFromWorkspace ).isPending();
+		assertThatFuture( futureFromWorkspace ).isPending();
 
 		futureFromBackend.complete( new Object() );
-		assertThat( futureFromWorkspace ).isSuccessful();
+		assertThatFuture( futureFromWorkspace ).isSuccessful();
 	}
 
 	@Test
@@ -178,10 +178,10 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
 		CompletableFuture<?> futureFromWriter = executeAsync( workspace );
 		defaultBackendMock.verifyExpectationsMet();
-		assertThat( futureFromWriter ).isPending();
+		assertThatFuture( futureFromWriter ).isPending();
 
 		futureFromBackend.complete( new Object() );
-		assertThat( futureFromWriter ).isSuccessful();
+		assertThatFuture( futureFromWriter ).isSuccessful();
 	}
 
 	protected abstract void expectWork(BackendMock backendMock, String indexName, CompletableFuture<?> future);

@@ -11,6 +11,7 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.same;
+import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +23,6 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.test.FutureAssert;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Test;
@@ -59,7 +59,7 @@ public class BulkWorkTest extends EasyMockSupport {
 		replayAll();
 		CompletableFuture<BulkResult> returnedFuture = work.execute( contextMock );
 		verifyAll();
-		FutureAssert.assertThat( returnedFuture ).isPending();
+		assertThatFuture( returnedFuture ).isPending();
 
 		assertBulkRequest( requestCapture.getValue(), 0, 1 );
 
@@ -74,7 +74,7 @@ public class BulkWorkTest extends EasyMockSupport {
 		futureFromClient.complete( response );
 		verifyAll();
 
-		FutureAssert.assertThat( returnedFuture ).isSuccessful();
+		assertThatFuture( returnedFuture ).isSuccessful();
 		BulkResult result = returnedFuture.join();
 
 		Object bulkableResult = new Object();
@@ -116,7 +116,7 @@ public class BulkWorkTest extends EasyMockSupport {
 		replayAll();
 		CompletableFuture<BulkResult> returnedFuture = work.execute( contextMock );
 		verifyAll();
-		FutureAssert.assertThat( returnedFuture ).isPending();
+		assertThatFuture( returnedFuture ).isPending();
 
 		assertBulkRequest( requestCapture.getValue(), 0, 1 );
 
@@ -128,7 +128,7 @@ public class BulkWorkTest extends EasyMockSupport {
 		futureFromClient.complete( response );
 		verifyAll();
 
-		FutureAssert.assertThat( returnedFuture ).isFailed( throwable -> assertThat( throwable )
+		assertThatFuture( returnedFuture ).isFailed( throwable -> assertThat( throwable )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Elasticsearch response indicates a failure",

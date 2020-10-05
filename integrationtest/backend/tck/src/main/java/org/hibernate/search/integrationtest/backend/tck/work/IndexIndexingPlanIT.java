@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.work;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
+import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -29,7 +30,6 @@ import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchRes
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubEntityReference;
-import org.hibernate.search.util.impl.test.FutureAssert;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -91,7 +91,7 @@ public class IndexIndexingPlanIT {
 		CompletableFuture<?> future = plan.execute();
 		Awaitility.await().until( future::isDone );
 		// The operations should succeed.
-		FutureAssert.assertThat( future ).isSuccessful();
+		assertThatFuture( future ).isSuccessful();
 
 		SearchResultAssert.assertThat( index.createScope().query( sessionContext )
 				.where( f -> f.match().field( "title" ).matching( "Lord" ) )
@@ -103,7 +103,7 @@ public class IndexIndexingPlanIT {
 		future = plan.execute();
 		Awaitility.await().until( future::isDone );
 		// The operations should succeed.
-		FutureAssert.assertThat( future ).isSuccessful();
+		assertThatFuture( future ).isSuccessful();
 
 		SearchResultAssert.assertThat( index.createScope().query( sessionContext )
 				.where( f -> f.match().field( "title" ).matching( "Lord" ) )
@@ -115,7 +115,7 @@ public class IndexIndexingPlanIT {
 		future = plan.execute();
 		Awaitility.await().until( future::isDone );
 		// The operations should succeed.
-		FutureAssert.assertThat( future ).isSuccessful();
+		assertThatFuture( future ).isSuccessful();
 
 		SearchResultAssert.assertThat( index.createScope().query( sessionContext )
 				.where( f -> f.match().field( "title" ).matching( "Lord" ) )
@@ -134,7 +134,7 @@ public class IndexIndexingPlanIT {
 		CompletableFuture<?> future = plan.execute();
 		Awaitility.await().until( future::isDone );
 		// The operations should succeed.
-		FutureAssert.assertThat( future ).isSuccessful();
+		assertThatFuture( future ).isSuccessful();
 
 		SearchResultAssert.assertThat( index.createScope().query( sessionContext )
 				.where( f -> f.matchAll() )
@@ -156,7 +156,7 @@ public class IndexIndexingPlanIT {
 
 		// The operation should fail.
 		// Just check the failure is reported through the completable future.
-		FutureAssert.assertThat( future ).isFailed();
+		assertThatFuture( future ).isFailed();
 
 		try {
 			setupHelper.cleanUp();
@@ -182,7 +182,7 @@ public class IndexIndexingPlanIT {
 
 		// The operation should fail.
 		// Just check the failure is reported through the completable future.
-		FutureAssert.assertThat( future ).isFailed();
+		assertThatFuture( future ).isFailed();
 
 		try {
 			setupHelper.cleanUp();
@@ -208,7 +208,7 @@ public class IndexIndexingPlanIT {
 
 		// The operation should fail.
 		// Just check the failure is reported through the completable future.
-		FutureAssert.assertThat( future ).isFailed();
+		assertThatFuture( future ).isFailed();
 
 		try {
 			setupHelper.cleanUp();
@@ -234,7 +234,7 @@ public class IndexIndexingPlanIT {
 		Awaitility.await().until( future::isDone );
 
 		// The operation should succeed, but the report should indicate a failure.
-		FutureAssert.assertThat( future ).isSuccessful( report -> {
+		assertThatFuture( future ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
 			SoftAssertions.assertSoftly( softly -> {
 				softly.assertThat( report.throwable() ).containsInstanceOf( SearchException.class );

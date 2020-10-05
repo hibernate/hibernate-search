@@ -21,7 +21,7 @@ import org.assertj.core.api.ThrowableAssert;
 
 public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Future<T>> {
 
-	public static <T> FutureAssert<T> assertThat(Future<T> future) {
+	public static <T> FutureAssert<T> assertThatFuture(Future<T> future) {
 		return new FutureAssert<>( future );
 	}
 

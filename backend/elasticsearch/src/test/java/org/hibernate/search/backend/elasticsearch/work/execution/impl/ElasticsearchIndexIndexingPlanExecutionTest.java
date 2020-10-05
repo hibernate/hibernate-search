@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.work.execution.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.eq;
+import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,6 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentIndexingWork;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
-import org.hibernate.search.util.impl.test.FutureAssert;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Test;
@@ -66,26 +66,26 @@ public class ElasticsearchIndexIndexingPlanExecutionTest extends EasyMockSupport
 		replayAll();
 		planExecutionFuture = execution.execute();
 		verifyAll();
-		FutureAssert.assertThat( planExecutionFuture ).isPending();
+		assertThatFuture( planExecutionFuture ).isPending();
 
 		resetAll();
 		replayAll();
 		work2FutureCapture.getValue().complete( null );
 		verifyAll();
-		FutureAssert.assertThat( planExecutionFuture ).isPending();
+		assertThatFuture( planExecutionFuture ).isPending();
 
 		resetAll();
 		replayAll();
 		work1FutureCapture.getValue().complete( null );
 		verifyAll();
-		FutureAssert.assertThat( planExecutionFuture ).isPending();
+		assertThatFuture( planExecutionFuture ).isPending();
 
 		resetAll();
 		replayAll();
 		work3FutureCapture.getValue().complete( null );
 		verifyAll();
 
-		FutureAssert.assertThat( planExecutionFuture ).isSuccessful( report -> {
+		assertThatFuture( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
 			SoftAssertions.assertSoftly( softly -> {
 				softly.assertThat( report.throwable() ).isEmpty();
@@ -122,19 +122,19 @@ public class ElasticsearchIndexIndexingPlanExecutionTest extends EasyMockSupport
 		replayAll();
 		planExecutionFuture = execution.execute();
 		verifyAll();
-		FutureAssert.assertThat( planExecutionFuture ).isPending();
+		assertThatFuture( planExecutionFuture ).isPending();
 
 		resetAll();
 		replayAll();
 		work2FutureCapture.getValue().complete( null );
 		verifyAll();
-		FutureAssert.assertThat( planExecutionFuture ).isPending();
+		assertThatFuture( planExecutionFuture ).isPending();
 
 		resetAll();
 		replayAll();
 		work1FutureCapture.getValue().completeExceptionally( work1Exception );
 		verifyAll();
-		FutureAssert.assertThat( planExecutionFuture ).isPending();
+		assertThatFuture( planExecutionFuture ).isPending();
 
 		resetAll();
 		expectWorkGetInfo( 0 );
@@ -142,7 +142,7 @@ public class ElasticsearchIndexIndexingPlanExecutionTest extends EasyMockSupport
 		work3FutureCapture.getValue().complete( null );
 		verifyAll();
 
-		FutureAssert.assertThat( planExecutionFuture ).isSuccessful( report -> {
+		assertThatFuture( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
 			SoftAssertions.assertSoftly( softly -> {
 				softly.assertThat( report.throwable() ).containsSame( work1Exception );
@@ -183,25 +183,25 @@ public class ElasticsearchIndexIndexingPlanExecutionTest extends EasyMockSupport
 		replayAll();
 		planExecutionFuture = execution.execute();
 		verifyAll();
-		FutureAssert.assertThat( planExecutionFuture ).isPending();
+		assertThatFuture( planExecutionFuture ).isPending();
 
 		resetAll();
 		replayAll();
 		work2FutureCapture.getValue().complete( null );
 		verifyAll();
-		FutureAssert.assertThat( planExecutionFuture ).isPending();
+		assertThatFuture( planExecutionFuture ).isPending();
 
 		resetAll();
 		replayAll();
 		work1FutureCapture.getValue().completeExceptionally( work1Exception );
 		verifyAll();
-		FutureAssert.assertThat( planExecutionFuture ).isPending();
+		assertThatFuture( planExecutionFuture ).isPending();
 
 		resetAll();
 		replayAll();
 		work3FutureCapture.getValue().completeExceptionally( work3Exception );
 		verifyAll();
-		FutureAssert.assertThat( planExecutionFuture ).isPending();
+		assertThatFuture( planExecutionFuture ).isPending();
 
 		resetAll();
 		expectWorkGetInfo( 0, 2 );
@@ -209,7 +209,7 @@ public class ElasticsearchIndexIndexingPlanExecutionTest extends EasyMockSupport
 		work4FutureCapture.getValue().complete( null );
 		verifyAll();
 
-		FutureAssert.assertThat( planExecutionFuture ).isSuccessful( report -> {
+		assertThatFuture( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
 			SoftAssertions.assertSoftly( softly -> {
 				softly.assertThat( report.throwable() ).containsSame( work1Exception );
@@ -252,25 +252,25 @@ public class ElasticsearchIndexIndexingPlanExecutionTest extends EasyMockSupport
 		replayAll();
 		planExecutionFuture = execution.execute();
 		verifyAll();
-		FutureAssert.assertThat( planExecutionFuture ).isPending();
+		assertThatFuture( planExecutionFuture ).isPending();
 
 		resetAll();
 		replayAll();
 		work2FutureCapture.getValue().complete( null );
 		verifyAll();
-		FutureAssert.assertThat( planExecutionFuture ).isPending();
+		assertThatFuture( planExecutionFuture ).isPending();
 
 		resetAll();
 		replayAll();
 		work1FutureCapture.getValue().completeExceptionally( work1Exception );
 		verifyAll();
-		FutureAssert.assertThat( planExecutionFuture ).isPending();
+		assertThatFuture( planExecutionFuture ).isPending();
 
 		resetAll();
 		replayAll();
 		work3FutureCapture.getValue().completeExceptionally( work3Exception );
 		verifyAll();
-		FutureAssert.assertThat( planExecutionFuture ).isPending();
+		assertThatFuture( planExecutionFuture ).isPending();
 
 		RuntimeException entityReferenceFactoryException = new RuntimeException( "EntityReferenceFactory message" );
 		resetAll();
@@ -280,7 +280,7 @@ public class ElasticsearchIndexIndexingPlanExecutionTest extends EasyMockSupport
 		work4FutureCapture.getValue().complete( null );
 		verifyAll();
 
-		FutureAssert.assertThat( planExecutionFuture ).isSuccessful( report -> {
+		assertThatFuture( planExecutionFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
 			SoftAssertions.assertSoftly( softly -> {
 				softly.assertThat( report.throwable() ).containsSame( work1Exception );

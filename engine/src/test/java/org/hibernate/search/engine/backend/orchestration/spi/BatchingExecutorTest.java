@@ -11,6 +11,7 @@ import static org.awaitility.Awaitility.await;
 import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
+import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
@@ -21,7 +22,6 @@ import org.hibernate.search.engine.environment.thread.impl.DefaultThreadProvider
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.util.impl.test.FutureAssert;
 
 import org.junit.After;
 import org.junit.Test;
@@ -337,7 +337,7 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		replayAll();
 		CompletableFuture<?> completion = executor.completion();
 		verifyAll();
-		FutureAssert.assertThat( completion ).isSuccessful();
+		assertThatFuture( completion ).isSuccessful();
 	}
 
 	private StubCompletionListener addPendingCompletionListener() {
@@ -364,7 +364,7 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		replayAll();
 		CompletableFuture<?> completion = executor.completion();
 		verifyAll();
-		FutureAssert.assertThat( completion ).isSuccessful();
+		assertThatFuture( completion ).isSuccessful();
 
 		// The executor still accepts and processes new works.
 		StubWork workMock = createMock( StubWork.class );
