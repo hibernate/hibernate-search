@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.work;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
@@ -38,7 +39,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import org.assertj.core.api.SoftAssertions;
 import org.awaitility.Awaitility;
 
 @RunWith(Parameterized.class)
@@ -236,7 +236,7 @@ public class IndexIndexingPlanIT {
 		// The operation should succeed, but the report should indicate a failure.
 		assertThatFuture( future ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
-			SoftAssertions.assertSoftly( softly -> {
+			assertSoftly( softly -> {
 				softly.assertThat( report.throwable() ).containsInstanceOf( SearchException.class );
 				softly.assertThat( report.failingEntityReferences() )
 						.containsExactly(

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.search;
 
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 
 import java.util.ArrayList;
@@ -21,7 +22,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import org.assertj.core.api.Assertions;
-import org.assertj.core.api.SoftAssertions;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -595,7 +595,7 @@ public class SearchQueryBaseIT {
 		SearchSort sort = scope.sort().field( "title" ).toSort();
 		SearchAggregation<Map<String, Long>> aggregation = scope.aggregation().terms()
 				.field( "title", String.class ).toAggregation();
-		SoftAssertions.assertSoftly( a -> {
+		assertSoftly( a -> {
 			a.assertThat( projection ).isInstanceOf( StubSearchProjection.class );
 			a.assertThat( predicate ).isInstanceOf( StubSearchPredicate.class );
 			a.assertThat( sort ).isInstanceOf( StubSearchSort.class );

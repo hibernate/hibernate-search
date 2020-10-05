@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.lucene.lowlevel.writer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.assertj.core.data.Percentage.withPercentage;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
@@ -33,7 +34,6 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.apache.lucene.index.MergePolicy;
 import org.apache.lucene.util.InfoStream;
-import org.assertj.core.api.SoftAssertions;
 
 public class LuceneIndexWriterSettingsIT {
 
@@ -53,7 +53,7 @@ public class LuceneIndexWriterSettingsIT {
 				.extracting( IndexAccessorImpl::getWriterForTests )
 				.extracting( IndexWriter::getConfig )
 				.allSatisfy( config -> {
-					SoftAssertions.assertSoftly( softly -> {
+					assertSoftly( softly -> {
 						softly.assertThat( config.getMaxBufferedDocs() ).as( "getMaxBufferedDocs" )
 								.isEqualTo( IndexWriterConfig.DEFAULT_MAX_BUFFERED_DOCS );
 						softly.assertThat( config.getRAMBufferSizeMB() ).as( "getRAMBufferSizeMB" )
@@ -66,7 +66,7 @@ public class LuceneIndexWriterSettingsIT {
 					assertThat( abstractMergePolicy ).as( "getMergePolicy" ).isNotNull();
 					LogByteSizeMergePolicy mergePolicy = (LogByteSizeMergePolicy) abstractMergePolicy;
 
-					SoftAssertions.assertSoftly( softly -> {
+					assertSoftly( softly -> {
 						softly.assertThat( mergePolicy.getMaxMergeDocs() ).as( "getMaxMergeDocs()" )
 								.isEqualTo( LogByteSizeMergePolicy.DEFAULT_MAX_MERGE_DOCS );
 						softly.assertThat( mergePolicy.getMergeFactor() ).as( "getMergeFactor()" )
@@ -116,7 +116,7 @@ public class LuceneIndexWriterSettingsIT {
 				.extracting( IndexAccessorImpl::getWriterForTests )
 				.extracting( IndexWriter::getConfig )
 				.allSatisfy( config -> {
-					SoftAssertions.assertSoftly( softly -> {
+					assertSoftly( softly -> {
 						softly.assertThat( config.getMaxBufferedDocs() ).as( "getMaxBufferedDocs" )
 								.isEqualTo( 420 );
 						softly.assertThat( config.getRAMBufferSizeMB() ).as( "getRAMBufferSizeMB" )
@@ -129,7 +129,7 @@ public class LuceneIndexWriterSettingsIT {
 					assertThat( abstractMergePolicy ).as( "getMergePolicy" ).isNotNull();
 					LogByteSizeMergePolicy mergePolicy = (LogByteSizeMergePolicy) abstractMergePolicy;
 
-					SoftAssertions.assertSoftly( softly -> {
+					assertSoftly( softly -> {
 						softly.assertThat( mergePolicy.getMaxMergeDocs() ).as( "getMaxMergeDocs()" )
 								.isEqualTo( 42_000 );
 						softly.assertThat( mergePolicy.getMergeFactor() ).as( "getMergeFactor()" )

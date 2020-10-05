@@ -7,6 +7,7 @@
 package org.hibernate.search.util.common.pattern.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,8 +17,6 @@ import java.util.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import org.assertj.core.api.SoftAssertions;
 
 @RunWith(Parameterized.class)
 public class SimpleGlobPatternTest {
@@ -83,7 +82,7 @@ public class SimpleGlobPatternTest {
 
 	@Test
 	public void testEqualsAndHashCode() {
-		SoftAssertions.assertSoftly( softly -> {
+		assertSoftly( softly -> {
 			SimpleGlobPattern equalPattern = SimpleGlobPattern.compile( patternString );
 			softly.assertThat( pattern )
 					.isEqualTo( equalPattern )
@@ -99,7 +98,7 @@ public class SimpleGlobPatternTest {
 
 	@Test
 	public void matches() {
-		SoftAssertions.assertSoftly( softly -> {
+		assertSoftly( softly -> {
 			for ( String candidate : expectedMatching ) {
 				softly.assertThat( pattern.matches( candidate ) )
 						.as( "'" + patternString + "' matches '" + candidate + "'" )
