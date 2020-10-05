@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.work;
 
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
+import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -21,7 +22,6 @@ import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
-import org.hibernate.search.util.impl.test.FutureAssert;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,7 +58,7 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 		CompletableFuture<?> future = executeAsync( workspace );
 		Awaitility.await().until( future::isDone );
 
-		FutureAssert.assertThat( future ).isSuccessful();
+		assertThatFuture( future ).isSuccessful();
 
 		assertSuccess( index );
 	}
@@ -77,7 +77,7 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 
 		// The operation should fail.
 		// Just check the failure is reported through the completable future.
-		FutureAssert.assertThat( future ).isFailed();
+		assertThatFuture( future ).isFailed();
 
 		try {
 			setupHelper.cleanUp();

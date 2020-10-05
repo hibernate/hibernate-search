@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
-import static org.hibernate.search.util.impl.test.FutureAssert.assertThat;
+import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -62,7 +62,7 @@ public class ElasticsearchBatchedWorkProcessorTest extends EasyMockSupport {
 		replayAll();
 		CompletableFuture<Object> returnedWorkFuture = processor.submit( work );
 		verifyAll();
-		assertThat( returnedWorkFuture ).isSameAs( workFuture );
+		assertThatFuture( returnedWorkFuture ).isSameAs( workFuture );
 
 		resetAll();
 		expect( sequenceBuilderMock.build() ).andReturn( sequenceFuture );
@@ -70,12 +70,12 @@ public class ElasticsearchBatchedWorkProcessorTest extends EasyMockSupport {
 		replayAll();
 		CompletableFuture<Void> batchFuture = processor.endBatch();
 		verifyAll();
-		assertThat( batchFuture ).isPending();
+		assertThatFuture( batchFuture ).isPending();
 
 		resetAll();
 		sequenceFuture.complete( null );
 		replayAll();
-		assertThat( batchFuture ).isSuccessful();
+		assertThatFuture( batchFuture ).isSuccessful();
 		verifyAll();
 
 		checkComplete( processor );
@@ -109,8 +109,8 @@ public class ElasticsearchBatchedWorkProcessorTest extends EasyMockSupport {
 		CompletableFuture<Object> returnedWork1Future = processor.submit( work1 );
 		CompletableFuture<Object> returnedWork2Future = processor.submit( work2 );
 		verifyAll();
-		assertThat( returnedWork1Future ).isSameAs( work1Future );
-		assertThat( returnedWork2Future ).isSameAs( work2Future );
+		assertThatFuture( returnedWork1Future ).isSameAs( work1Future );
+		assertThatFuture( returnedWork2Future ).isSameAs( work2Future );
 
 		resetAll();
 		expect( sequenceBuilderMock.build() ).andReturn( sequenceFuture );
@@ -118,12 +118,12 @@ public class ElasticsearchBatchedWorkProcessorTest extends EasyMockSupport {
 		replayAll();
 		CompletableFuture<Void> batchFuture = processor.endBatch();
 		verifyAll();
-		assertThat( batchFuture ).isPending();
+		assertThatFuture( batchFuture ).isPending();
 
 		resetAll();
 		sequenceFuture.complete( null );
 		replayAll();
-		assertThat( batchFuture ).isSuccessful();
+		assertThatFuture( batchFuture ).isSuccessful();
 
 		checkComplete( processor );
 	}
@@ -161,12 +161,12 @@ public class ElasticsearchBatchedWorkProcessorTest extends EasyMockSupport {
 		replayAll();
 		CompletableFuture<Void> batch1Future = processor.endBatch();
 		verifyAll();
-		assertThat( batch1Future ).isPending();
+		assertThatFuture( batch1Future ).isPending();
 
 		resetAll();
 		sequence1Future.complete( null );
 		replayAll();
-		assertThat( batch1Future ).isSuccessful();
+		assertThatFuture( batch1Future ).isSuccessful();
 
 		resetAll();
 		bulkerMock.reset();
@@ -187,12 +187,12 @@ public class ElasticsearchBatchedWorkProcessorTest extends EasyMockSupport {
 		replayAll();
 		CompletableFuture<Void> batch2Future = processor.endBatch();
 		verifyAll();
-		assertThat( batch2Future ).isPending();
+		assertThatFuture( batch2Future ).isPending();
 
 		resetAll();
 		sequence2Future.complete( null );
 		replayAll();
-		assertThat( batch2Future ).isSuccessful();
+		assertThatFuture( batch2Future ).isSuccessful();
 
 		checkComplete( processor );
 	}

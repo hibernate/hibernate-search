@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
-import static org.hibernate.search.util.impl.test.FutureAssert.assertThat;
+import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
@@ -84,7 +84,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 		// The transaction thread should proceed successfully,
 		// regardless of the indexing work.
-		assertThat( transactionThreadFuture ).isSuccessful();
+		assertThatFuture( transactionThreadFuture ).isSuccessful();
 	}
 
 	@Test
@@ -98,7 +98,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		);
 
 		// The transaction thread should be blocked because the indexing work is not complete
-		assertThat( transactionThreadFuture ).isPending();
+		assertThatFuture( transactionThreadFuture ).isPending();
 
 		// Completing the work should allow the synchronization strategy to unblock the transaction thread
 		indexingWorkFuture.complete( null );
@@ -106,7 +106,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 				.until( transactionThreadFuture::isDone );
 		// The transaction thread should proceed successfully,
 		// because the indexing work was successful.
-		assertThat( transactionThreadFuture ).isSuccessful();
+		assertThatFuture( transactionThreadFuture ).isSuccessful();
 	}
 
 	@Test
@@ -120,7 +120,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		);
 
 		// The transaction thread should be blocked because the indexing work is not complete
-		assertThat( transactionThreadFuture ).isPending();
+		assertThatFuture( transactionThreadFuture ).isPending();
 
 		// Completing the work should allow the synchronization strategy to unblock the transaction thread
 		indexingWorkFuture.complete( null );
@@ -128,7 +128,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 				.until( transactionThreadFuture::isDone );
 		// The transaction thread should proceed successfully,
 		// because the indexing work was successful.
-		assertThat( transactionThreadFuture ).isSuccessful();
+		assertThatFuture( transactionThreadFuture ).isSuccessful();
 	}
 
 	@Test
@@ -142,7 +142,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		);
 
 		// The transaction thread should be blocked because the indexing work is not complete
-		assertThat( transactionThreadFuture ).isPending();
+		assertThatFuture( transactionThreadFuture ).isPending();
 
 		// Completing the work should allow the synchronization strategy to unblock the transaction thread
 		indexingWorkFuture.complete( null );
@@ -150,7 +150,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 				.until( transactionThreadFuture::isDone );
 		// The transaction thread should proceed successfully,
 		// because the indexing work was successful.
-		assertThat( transactionThreadFuture ).isSuccessful();
+		assertThatFuture( transactionThreadFuture ).isSuccessful();
 	}
 
 	@Test
@@ -164,7 +164,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		);
 
 		// The transaction thread should be blocked because the indexing work is not complete
-		assertThat( transactionThreadFuture ).isPending();
+		assertThatFuture( transactionThreadFuture ).isPending();
 
 		// Completing the work should allow the synchronization strategy to unblock the transaction thread
 		indexingWorkFuture.complete( null );
@@ -172,7 +172,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 				.until( transactionThreadFuture::isDone );
 		// The transaction thread should proceed successfully,
 		// because the indexing work was successful.
-		assertThat( transactionThreadFuture ).isSuccessful();
+		assertThatFuture( transactionThreadFuture ).isSuccessful();
 	}
 
 	@Test
@@ -186,7 +186,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		);
 
 		// The transaction thread should be blocked because the indexing work is not complete
-		assertThat( transactionThreadFuture ).isPending();
+		assertThatFuture( transactionThreadFuture ).isPending();
 
 		// Completing the work should allow the synchronization strategy to unblock the transaction thread
 		indexingWorkFuture.complete( null );
@@ -194,7 +194,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 				.until( transactionThreadFuture::isDone );
 		// The transaction thread should proceed successfully,
 		// because the indexing work was successful.
-		assertThat( transactionThreadFuture ).isSuccessful();
+		assertThatFuture( transactionThreadFuture ).isSuccessful();
 	}
 
 	@Test
@@ -211,7 +211,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 		// The transaction should be complete, because the indexing work took too long to execute
 		// (this is how the custom automatic indexing strategy is implemented)
-		assertThat( transactionThreadFuture ).isSuccessful();
+		assertThatFuture( transactionThreadFuture ).isSuccessful();
 
 		// Upon timing out, the strategy should have set this reference
 		Assertions.assertThat( futureThatTookTooLong ).doesNotHaveValue( null );
@@ -231,7 +231,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 		// The transaction should be complete, because the indexing work took too long to execute
 		// (this is how the custom automatic indexing strategy is implemented)
-		assertThat( transactionThreadFuture ).isSuccessful();
+		assertThatFuture( transactionThreadFuture ).isSuccessful();
 
 		// Upon timing out, the strategy should have set this reference
 		Assertions.assertThat( futureThatTookTooLong ).doesNotHaveValue( null );
@@ -262,7 +262,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 		// The transaction thread should proceed successfully,
 		// regardless of the indexing work.
-		assertThat( transactionThreadFuture ).isSuccessful();
+		assertThatFuture( transactionThreadFuture ).isSuccessful();
 	}
 
 	@Test
@@ -277,7 +277,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		);
 
 		// The transaction thread should be blocked because the indexing work is not complete
-		assertThat( transactionThreadFuture ).isPending();
+		assertThatFuture( transactionThreadFuture ).isPending();
 
 		// Completing the work should allow the synchronization strategy to unblock the transaction thread
 		indexingWorkFuture.completeExceptionally( indexingWorkException );
@@ -285,7 +285,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 				.until( transactionThreadFuture::isDone );
 		// The transaction thread should proceed but throw an exception,
 		// because the indexing work failed.
-		assertThat( transactionThreadFuture ).isFailed(
+		assertThatFuture( transactionThreadFuture ).isFailed(
 				transactionSynchronizationExceptionMatcher( indexingWorkException, ENTITY_1_ID, ENTITY_2_ID )
 		);
 	}
@@ -302,7 +302,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		);
 
 		// The transaction thread should be blocked because the indexing work is not complete
-		assertThat( transactionThreadFuture ).isPending();
+		assertThatFuture( transactionThreadFuture ).isPending();
 
 		// Completing the work should allow the synchronization strategy to unblock the thread
 		indexingWorkFuture.completeExceptionally( indexingWorkException );
@@ -310,7 +310,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 				.until( transactionThreadFuture::isDone );
 		// The transaction thread should proceed but throw an exception,
 		// because the indexing work failed.
-		assertThat( transactionThreadFuture ).isFailed(
+		assertThatFuture( transactionThreadFuture ).isFailed(
 				transactionSynchronizationExceptionMatcher( indexingWorkException, ENTITY_1_ID, ENTITY_2_ID )
 		);
 	}
@@ -327,7 +327,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		);
 
 		// The transaction thread should be blocked because the indexing work is not complete
-		assertThat( transactionThreadFuture ).isPending();
+		assertThatFuture( transactionThreadFuture ).isPending();
 
 		// Completing the work should allow the synchronization strategy to unblock the thread
 		indexingWorkFuture.completeExceptionally( indexingWorkException );
@@ -335,7 +335,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 				.until( transactionThreadFuture::isDone );
 		// The transaction thread should proceed but throw an exception,
 		// because the indexing work failed.
-		assertThat( transactionThreadFuture ).isFailed(
+		assertThatFuture( transactionThreadFuture ).isFailed(
 				transactionSynchronizationExceptionMatcher( indexingWorkException, ENTITY_1_ID, ENTITY_2_ID )
 		);
 	}
@@ -352,7 +352,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		);
 
 		// The transaction thread should be blocked because the indexing work is not complete
-		assertThat( transactionThreadFuture ).isPending();
+		assertThatFuture( transactionThreadFuture ).isPending();
 
 		// Completing the work should allow the synchronization strategy to unblock the thread
 		indexingWorkFuture.completeExceptionally( indexingWorkException );
@@ -360,7 +360,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 				.until( transactionThreadFuture::isDone );
 		// The transaction thread should proceed but throw an exception,
 		// because the indexing work failed.
-		assertThat( transactionThreadFuture ).isFailed(
+		assertThatFuture( transactionThreadFuture ).isFailed(
 				transactionSynchronizationExceptionMatcher( indexingWorkException, ENTITY_1_ID, ENTITY_2_ID )
 		);
 	}
@@ -377,7 +377,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		);
 
 		// The transaction thread should be blocked because the indexing work is not complete
-		assertThat( transactionThreadFuture ).isPending();
+		assertThatFuture( transactionThreadFuture ).isPending();
 
 		// Completing the work should allow the synchronization strategy to unblock the thread
 		indexingWorkFuture.completeExceptionally( indexingWorkException );
@@ -385,7 +385,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 				.until( transactionThreadFuture::isDone );
 		// The transaction thread should proceed but throw an exception,
 		// because the indexing work failed.
-		assertThat( transactionThreadFuture ).isFailed(
+		assertThatFuture( transactionThreadFuture ).isFailed(
 				transactionSynchronizationExceptionMatcher( indexingWorkException, ENTITY_1_ID, ENTITY_2_ID )
 		);
 	}
@@ -409,7 +409,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		// The transaction thread should proceed but throw an exception,
 		// because the indexing work failed before the timeout
 		// (this is how the custom automatic indexing strategy is implemented)
-		assertThat( transactionThreadFuture ).isFailed(
+		assertThatFuture( transactionThreadFuture ).isFailed(
 				transactionSynchronizationExceptionMatcher( indexingWorkException, ENTITY_1_ID, ENTITY_2_ID )
 		);
 
@@ -436,7 +436,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		// The transaction thread should proceed but throw an exception,
 		// because the indexing work failed before the timeout
 		// (this is how the custom automatic indexing strategy is implemented)
-		assertThat( transactionThreadFuture ).isFailed(
+		assertThatFuture( transactionThreadFuture ).isFailed(
 				transactionSynchronizationExceptionMatcher( indexingWorkException, ENTITY_1_ID, ENTITY_2_ID )
 		);
 
@@ -474,7 +474,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		ALMOST_FOREVER_UNIT.sleep( ALMOST_FOREVER_VALUE );
 
 		// We expect the transaction to block forever, because the work future isn't complete
-		assertThat( transactionThreadFuture ).isPending();
+		assertThatFuture( transactionThreadFuture ).isPending();
 
 		return transactionThreadFuture;
 	}

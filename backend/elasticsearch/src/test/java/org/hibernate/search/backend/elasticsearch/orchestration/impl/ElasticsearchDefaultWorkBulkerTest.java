@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.newCapture;
-import static org.hibernate.search.util.impl.test.FutureAssert.assertThat;
+import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,8 +70,8 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		replayAll();
 		work1Future = bulker.add( work1 );
 		verifyAll();
-		assertThat( work1Future ).isPending();
-		assertThat( bulkWorkFutureCapture.getValue() ).isPending();
+		assertThatFuture( work1Future ).isPending();
+		assertThatFuture( bulkWorkFutureCapture.getValue() ).isPending();
 
 		resetAll();
 		expect( work2.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
@@ -80,26 +80,26 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		replayAll();
 		work2Future = bulker.add( work2 );
 		verifyAll();
-		assertThat( work1Future ).isPending();
-		assertThat( work2Future ).isPending();
-		assertThat( bulkWorkFutureCapture.getValue() ).isPending();
+		assertThatFuture( work1Future ).isPending();
+		assertThatFuture( work2Future ).isPending();
+		assertThatFuture( bulkWorkFutureCapture.getValue() ).isPending();
 
 		resetAll();
 		expect( bulkWorkFactoryMock.apply( Arrays.asList( work1, work2 ), DEFAULT_REFRESH ) ).andReturn( bulkWork );
 		replayAll();
 		bulker.finalizeBulkWork();
 		verifyAll();
-		assertThat( work1Future ).isPending();
-		assertThat( work2Future ).isPending();
-		assertThat( bulkWorkFutureCapture.getValue() ).isSuccessful( bulkWork );
+		assertThatFuture( work1Future ).isPending();
+		assertThatFuture( work2Future ).isPending();
+		assertThatFuture( bulkWorkFutureCapture.getValue() ).isSuccessful( bulkWork );
 
 		// Check that per-work futures are correctly bound to the futures returned by the sequence builder
 		resetAll();
 		replayAll();
 		work1FutureFromSequenceBuilder.complete( null );
-		assertThat( work1Future ).isSuccessful( (Void) null );
+		assertThatFuture( work1Future ).isSuccessful( (Void) null );
 		work2FutureFromSequenceBuilder.completeExceptionally( new RuntimeException() );
-		assertThat( work2Future ).isFailed();
+		assertThatFuture( work2Future ).isFailed();
 		verifyAll();
 	}
 
@@ -125,14 +125,14 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		replayAll();
 		bulker.add( work1 );
 		verifyAll();
-		assertThat( bulkWorkFutureCapture.getValue() ).isPending();
+		assertThatFuture( bulkWorkFutureCapture.getValue() ).isPending();
 
 		resetAll();
 		expect( bulkWorkFactoryMock.apply( Arrays.asList( work1 ), DEFAULT_REFRESH ) ).andReturn( bulkWork );
 		replayAll();
 		bulker.finalizeBulkWork();
 		verifyAll();
-		assertThat( bulkWorkFutureCapture.getValue() ).isSuccessful( bulkWork );
+		assertThatFuture( bulkWorkFutureCapture.getValue() ).isSuccessful( bulkWork );
 	}
 
 	@Test
@@ -176,7 +176,7 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 			bulker.add( work );
 		}
 		verifyAll();
-		assertThat( bulkWork1FutureCapture.getValue() ).isSuccessful( bulkWork1 );
+		assertThatFuture( bulkWork1FutureCapture.getValue() ).isSuccessful( bulkWork1 );
 
 		resetAll();
 		expect( additionalWork1.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
@@ -186,7 +186,7 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		replayAll();
 		bulker.add( additionalWork1 );
 		verifyAll();
-		assertThat( bulkWork2FutureCapture.getValue() ).isPending();
+		assertThatFuture( bulkWork2FutureCapture.getValue() ).isPending();
 
 		resetAll();
 		expect( additionalWork2.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
@@ -195,7 +195,7 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		replayAll();
 		bulker.add( additionalWork2 );
 		verifyAll();
-		assertThat( bulkWork2FutureCapture.getValue() ).isPending();
+		assertThatFuture( bulkWork2FutureCapture.getValue() ).isPending();
 
 		resetAll();
 		expect( bulkWorkFactoryMock.apply( Arrays.asList( additionalWork1, additionalWork2 ), DEFAULT_REFRESH ) ).andReturn(
@@ -203,7 +203,7 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		replayAll();
 		bulker.finalizeBulkWork();
 		verifyAll();
-		assertThat( bulkWork2FutureCapture.getValue() ).isSuccessful( bulkWork2 );
+		assertThatFuture( bulkWork2FutureCapture.getValue() ).isSuccessful( bulkWork2 );
 	}
 
 	@Test
@@ -262,7 +262,7 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		replayAll();
 		bulker.add( work3 );
 		verifyAll();
-		assertThat( bulkWork1FutureCapture.getValue() ).isSuccessful( bulkWork1 );
+		assertThatFuture( bulkWork1FutureCapture.getValue() ).isSuccessful( bulkWork1 );
 
 		resetAll();
 		expect( work4.getRefreshStrategy() ).andReturn( DocumentRefreshStrategy.FORCE );
@@ -283,7 +283,7 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		replayAll();
 		bulker.add( work5 );
 		verifyAll();
-		assertThat( bulkWork2FutureCapture.getValue() ).isSuccessful( bulkWork2 );
+		assertThatFuture( bulkWork2FutureCapture.getValue() ).isSuccessful( bulkWork2 );
 
 		resetAll();
 		expect( bulkWorkFactoryMock.apply( Arrays.asList( work5 ), DocumentRefreshStrategy.NONE ) ).andReturn(
