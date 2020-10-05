@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,6 @@ import org.hibernate.search.util.impl.integrationtest.common.assertion.Normalize
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -309,7 +309,7 @@ public class RangePredicateSpecificsIT<F> {
 	}
 
 	private void assumeStrictGreaterThanSupported() {
-		Assume.assumeTrue(
+		assumeTrue(
 				"This backend doesn't support strict 'greater than' predicates on BigDecimal fields",
 				BigDecimalFieldTypeDescriptor.INSTANCE.equals( dataSet.fieldType )
 						&& !TckConfiguration.get().getBackendFeatures().worksFineWithStrictAboveRangedQueriesOnDecimalScaledField()

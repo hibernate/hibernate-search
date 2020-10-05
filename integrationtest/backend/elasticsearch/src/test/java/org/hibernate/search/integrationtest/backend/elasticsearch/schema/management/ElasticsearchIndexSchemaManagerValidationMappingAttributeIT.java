@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.buildValidationFailureReportPattern;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.defaultMetadataMappingAndCommaForInitialization;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
+import static org.junit.Assume.assumeFalse;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -29,7 +30,6 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
-import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -337,7 +337,7 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 		String firstFormat = elasticSearchClient.getDialect().getFirstLocalDateDefaultMappingFormat();
 		List<String> nextFormats = elasticSearchClient.getDialect().getAllLocalDateDefaultMappingFormats()
 				.stream().skip( 1 ).collect( Collectors.toList() );
-		Assume.assumeFalse(
+		assumeFalse(
 				"Skipping this test as we don't have a type with multiple default formats in " + elasticSearchClient.getDialect(),
 				nextFormats.isEmpty()
 		);

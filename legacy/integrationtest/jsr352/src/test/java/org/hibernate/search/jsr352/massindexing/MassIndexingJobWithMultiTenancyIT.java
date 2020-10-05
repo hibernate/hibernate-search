@@ -8,6 +8,7 @@ package org.hibernate.search.jsr352.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.jsr352.test.util.JobTestUtil.findIndexedResultsInTenant;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -39,7 +40,6 @@ import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 
 import org.junit.After;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -75,7 +75,7 @@ public class MassIndexingJobWithMultiTenancyIT {
 
 	@Before
 	public void setUp() throws Exception {
-		Assume.assumeTrue( "The connection provider for this test ignores configuration and requires H2",
+		assumeTrue( "The connection provider for this test ignores configuration and requires H2",
 				Dialect.getDialect() instanceof org.hibernate.dialect.H2Dialect );
 
 		sessionFactory = buildSessionFactory();

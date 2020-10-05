@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.Assume.assumeTrue;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -37,7 +38,6 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -74,7 +74,7 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 	private StubIndexSchemaNode index2FieldSchemaNode;
 
 	public FieldDefaultBridgeBaseIT(PropertyTypeDescriptor<V> typeDescriptor, Optional<DefaultValueBridgeExpectations<V, F>> expectations) {
-		Assume.assumeTrue(
+		assumeTrue(
 				"Type " + typeDescriptor + " does not have a default value bridge", expectations.isPresent()
 		);
 		this.typeDescriptor = typeDescriptor;

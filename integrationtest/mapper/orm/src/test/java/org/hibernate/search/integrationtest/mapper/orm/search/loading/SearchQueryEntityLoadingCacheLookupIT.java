@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +23,6 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -146,7 +146,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
 	public void overriddenStrategy_persistenceContext_fullCacheHits() {
-		Assume.assumeTrue(
+		assumeTrue(
 				"This test only makes sense if cache lookups are supported",
 				primitives.isCacheLookupSupported()
 		);
@@ -171,7 +171,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3349")
 	public void overriddenStrategy_2LC_fullCacheHits() {
-		Assume.assumeTrue(
+		assumeTrue(
 				"This test only makes sense if cache lookups are supported",
 				primitives.isCacheLookupSupported()
 		);

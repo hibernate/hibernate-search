@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.search.query;
 
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultReadAlias;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.encodeName;
+import static org.junit.Assume.assumeTrue;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
@@ -27,7 +28,6 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dial
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -147,7 +147,7 @@ public class ElasticsearchSearchQueryIT {
 
 	@Test
 	public void trackTotalHits_fetch() {
-		Assume.assumeTrue(
+		assumeTrue(
 				"Run only if the Elasticsearch version supports `track_total_hits` parameter",
 				ElasticsearchTestDialect.get().supportsSkipOrLimitingTotalHitCount()
 		);
@@ -173,7 +173,7 @@ public class ElasticsearchSearchQueryIT {
 
 	@Test
 	public void trackTotalHits_fetchHits() {
-		Assume.assumeTrue(
+		assumeTrue(
 				"Run only if the Elasticsearch version supports `track_total_hits` parameter",
 				ElasticsearchTestDialect.get().supportsSkipOrLimitingTotalHitCount()
 		);

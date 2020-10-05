@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.dynamic;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -28,7 +29,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -488,7 +488,7 @@ public class ObjectFieldTemplateIT {
 	}
 
 	private void assumeBackendSupportsDynamicChildFieldsInExistsPredicate() {
-		Assume.assumeTrue(
+		assumeTrue(
 				"This backend doesn't take dynamic child fields into account when creating exists predicates on object fields.",
 				TckConfiguration.get().getBackendFeatures().supportsDynamicChildFieldsInExistsPredicate()
 		);

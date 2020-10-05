@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assume.assumeTrue;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
@@ -30,7 +31,6 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWork
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -68,7 +68,7 @@ public class FieldDefaultBridgeOverridingIT<V, F> {
 	private StubIndexSchemaNode fieldSchemaNode;
 
 	public FieldDefaultBridgeOverridingIT(PropertyTypeDescriptor<V> typeDescriptor, Optional<DefaultValueBridgeExpectations<V, F>> expectations) {
-		Assume.assumeTrue(
+		assumeTrue(
 				"Type " + typeDescriptor + " does not have a default value bridge", expectations.isPresent()
 		);
 		this.typeDescriptor = typeDescriptor;

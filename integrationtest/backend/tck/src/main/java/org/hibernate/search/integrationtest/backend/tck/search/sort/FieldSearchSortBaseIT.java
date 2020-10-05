@@ -10,6 +10,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
+import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
 
 import java.time.MonthDay;
 import java.time.temporal.Temporal;
@@ -43,7 +45,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIn
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -161,7 +162,7 @@ public class FieldSearchSortBaseIT<F> {
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3103" })
 	public void medianWithNestedField() {
-		Assume.assumeTrue(
+		assumeTrue(
 				"This test is only relevant when using SortMode.MEDIAN in nested fields",
 				isMedianWithNestedField() && !isSumOrAvgOrMedianWithStringField()
 		);
@@ -179,7 +180,7 @@ public class FieldSearchSortBaseIT<F> {
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3103" })
 	public void sumOrAvgOrMedianWithStringField() {
-		Assume.assumeTrue(
+		assumeTrue(
 				"This test is only relevant when using SortMode.SUM/AVG/MEDIAN on String fields",
 				isSumOrAvgOrMedianWithStringField()
 		);
@@ -198,7 +199,7 @@ public class FieldSearchSortBaseIT<F> {
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3103" })
 	public void sumWithTemporalField() {
-		Assume.assumeTrue(
+		assumeTrue(
 				"This test is only relevant when using SortMode.SUM on Temporal fields",
 				isSumWithTemporalField()
 		);
@@ -463,11 +464,11 @@ public class FieldSearchSortBaseIT<F> {
 	}
 
 	private void assumeTestParametersWork() {
-		Assume.assumeFalse(
+		assumeFalse(
 				"This combination is not expected to work",
 				isMedianWithNestedField() || isSumOrAvgOrMedianWithStringField() || isSumWithTemporalField()
 		);
-		Assume.assumeTrue(
+		assumeTrue(
 				"This combination is buggy with this backend",
 				TckConfiguration.get().getBackendFeatures()
 						.sortByFieldValue( fieldStructure, fieldType.getJavaType(), sortMode )

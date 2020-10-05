@@ -9,6 +9,7 @@ package org.hibernate.search.util.common.reflect.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
+import static org.junit.Assume.assumeFalse;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
@@ -24,7 +25,6 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
 
-import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -142,7 +142,7 @@ public class ValueReadHandleTest {
 
 	@Test
 	public void failure_method_illegalAccessException() throws Exception {
-		Assume.assumeFalse(
+		assumeFalse(
 				"Cannot test IllegalAccessException with MethodHandles: "
 						+ " if we don't use setAccessible(true), we can't create the handle,"
 						+ " and if we do use setAccessible(true), the handle has full access to the field/method.",
@@ -164,7 +164,7 @@ public class ValueReadHandleTest {
 
 	@Test
 	public void failure_field_illegalAccessException() throws Exception {
-		Assume.assumeFalse(
+		assumeFalse(
 				"Cannot test IllegalAccessException with MethodHandles: "
 						+ " if we don't use setAccessible(true), we can't create the handle,"
 						+ " and if we do use setAccessible(true), the handle has full access to the field/method.",
