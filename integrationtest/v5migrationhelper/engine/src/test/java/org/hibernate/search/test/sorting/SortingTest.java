@@ -184,7 +184,7 @@ public class SortingTest {
 
 		Query rangeQuery = queryForRangeOnFieldSorted( 0, 2, "array" );
 		Sort sortAsInt = builder().sort().byField( "array" ).createSort();
-		helper.assertThat( rangeQuery )
+		helper.assertThatQuery( rangeQuery )
 				.from( Person.class )
 				.sort( sortAsInt )
 				.hasResultSize( 2 );
@@ -206,14 +206,14 @@ public class SortingTest {
 	}
 
 	private void assertSortedResults(Sort sort, int... expectedIds) {
-		helper.assertThat()
+		helper.assertThatQuery()
 				.from( Person.class )
 				.sort( sort )
 				.matchesExactlyIds( expectedIds );
 	}
 
 	private void assertStoredValueEquals(Query query, String fieldName, Object expectedValue) {
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.from( Person.class )
 				.projecting( fieldName )
 				.matchesExactlySingleProjections( expectedValue );

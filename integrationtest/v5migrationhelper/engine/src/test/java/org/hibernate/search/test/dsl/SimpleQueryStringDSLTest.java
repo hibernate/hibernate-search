@@ -49,7 +49,7 @@ public class SimpleQueryStringDSLTest {
 				.withAndAsDefaultOperator()
 				.matching( "balanced arabica" )
 				.createQuery();
-		helper.assertThat( query ).from( Coffee.class )
+		helper.assertThatQuery( query ).from( Coffee.class )
 				.sort( qb.sort().byField( Coffee.NAME_SORT ).createSort() )
 				.matchesExactlyIds( "Dulsão do Brasil", "Kazaar", "Livanto" );
 
@@ -58,7 +58,7 @@ public class SimpleQueryStringDSLTest {
 				.withAndAsDefaultOperator()
 				.matching( "-balanced arabica" )
 				.createQuery();
-		helper.assertThat( query ).from( Coffee.class )
+		helper.assertThatQuery( query ).from( Coffee.class )
 				.sort( qb.sort().byField( Coffee.NAME_SORT ).createSort() )
 				.matchesExactlyIds( "Bukeela ka Ethiopia", "Linizio Lungo", "Volluto" );
 
@@ -67,7 +67,7 @@ public class SimpleQueryStringDSLTest {
 				.withAndAsDefaultOperator()
 				.matching( "powerful \"fruity note\"" )
 				.createQuery();
-		helper.assertThat( query ).from( Coffee.class )
+		helper.assertThatQuery( query ).from( Coffee.class )
 				.sort( qb.sort().byField( Coffee.NAME_SORT ).createSort() )
 				.matchesExactlyIds( "Ristretto" );
 
@@ -75,7 +75,7 @@ public class SimpleQueryStringDSLTest {
 				.onFields( "name", "summary", "description" )
 				.matching( "sweet robust" )
 				.createQuery();
-		helper.assertThat( query ).from( Coffee.class )
+		helper.assertThatQuery( query ).from( Coffee.class )
 				.sort( qb.sort().byField( Coffee.NAME_SORT ).createSort() )
 				.matchesExactlyIds( "Caramelito", "Dulsão do Brasil", "Roma", "Volluto" );
 	}
@@ -92,7 +92,7 @@ public class SimpleQueryStringDSLTest {
 			.withAndAsDefaultOperator()
 			.matching( "fruity arabicas south american" )
 			.createQuery();
-		helper.assertThat( query ).from( Coffee.class )
+		helper.assertThatQuery( query ).from( Coffee.class )
 				.sort( new Sort( SortField.FIELD_SCORE ) )
 				.matchesExactlyIds( "Decaffeinato", "Ristretto" );
 
@@ -102,7 +102,7 @@ public class SimpleQueryStringDSLTest {
 				.withAndAsDefaultOperator()
 				.matching( "fruity arabicas south american" )
 				.createQuery();
-		helper.assertThat( query ).from( Coffee.class )
+		helper.assertThatQuery( query ).from( Coffee.class )
 				.sort( new Sort( SortField.FIELD_SCORE ) )
 				.matchesExactlyIds( "Ristretto", "Decaffeinato" );
 	}
@@ -119,7 +119,7 @@ public class SimpleQueryStringDSLTest {
 			.matching( "fruity arabica~2" )
 			.createQuery();
 
-		helper.assertThat( query ).from( Coffee.class )
+		helper.assertThatQuery( query ).from( Coffee.class )
 				.sort( qb.sort().byField( Coffee.NAME_SORT ).createSort() )
 				.matchesExactlyIds( "Decaffeinato", "Ristretto", "Rosabaya de Colombia", "Volluto" );
 	}
@@ -136,7 +136,7 @@ public class SimpleQueryStringDSLTest {
 				.matching( "Molière" )
 				.createQuery();
 
-		helper.assertThat( query ).from( Book.class )
+		helper.assertThatQuery( query ).from( Book.class )
 				.sort( qb.sort().byField( "title_sort" ).createSort() )
 				.matchesExactlyIds( "Le Grand Molière illustré", "Tartuffe" );
 
@@ -146,7 +146,7 @@ public class SimpleQueryStringDSLTest {
 				.matching( "deplacait" )
 				.createQuery();
 
-		helper.assertThat( query ).from( Book.class )
+		helper.assertThatQuery( query ).from( Book.class )
 				.sort( qb.sort().byField( "title_sort" ).createSort() )
 				.matchesExactlyIds( "Le chat qui déplaçait des montagnes" );
 
@@ -161,7 +161,7 @@ public class SimpleQueryStringDSLTest {
 				.matching( "Molière" )
 				.createQuery();
 
-		helper.assertThat( query ).from( Book.class )
+		helper.assertThatQuery( query ).from( Book.class )
 				.sort( qb.sort().byField( "title_sort" ).createSort() )
 				.matchesExactlyIds( "Dom Garcie de Navarre", "Le Grand Molière illustré" );
 	}
@@ -193,7 +193,7 @@ public class SimpleQueryStringDSLTest {
 				.matching( "" )
 				.createQuery();
 
-		helper.assertThat( query ).from( Coffee.class )
+		helper.assertThatQuery( query ).from( Coffee.class )
 				.sort( qb.sort().byField( Coffee.NAME_SORT ).createSort() )
 				.matchesNone();
 	}
@@ -210,7 +210,7 @@ public class SimpleQueryStringDSLTest {
 				.matching( "   " )
 				.createQuery();
 
-		helper.assertThat( query ).from( Coffee.class )
+		helper.assertThatQuery( query ).from( Coffee.class )
 				.sort( qb.sort().byField( Coffee.NAME_SORT ).createSort() )
 				.matchesNone();
 
@@ -220,7 +220,7 @@ public class SimpleQueryStringDSLTest {
 				.matching( "() (())" )
 				.createQuery();
 
-		helper.assertThat( query ).from( Coffee.class )
+		helper.assertThatQuery( query ).from( Coffee.class )
 				.sort( qb.sort().byField( Coffee.NAME_SORT ).createSort() )
 				.matchesNone();
 	}
@@ -235,7 +235,7 @@ public class SimpleQueryStringDSLTest {
 				.matching( "Stable" )
 				.createQuery();
 
-		helper.assertThat( query ).from( Coffee.class )
+		helper.assertThatQuery( query ).from( Coffee.class )
 				.matchesUnorderedIds( "Dharkan", "Arpeggio", "Decaffeinato" );
 	}
 

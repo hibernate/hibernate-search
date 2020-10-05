@@ -86,6 +86,6 @@ public class DslEmbeddedSearchTest {
 	}
 
 	private AssertBuildingHSQueryContext assertQuery(Query q) {
-		return helper.assertThat( q ).from( ContainerEntity.class );
+		return helper.assertThatQuery( q ).from( ContainerEntity.class );
 	}
 }

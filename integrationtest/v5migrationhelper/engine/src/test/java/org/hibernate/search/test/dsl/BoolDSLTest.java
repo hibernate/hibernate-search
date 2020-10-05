@@ -77,7 +77,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_1 );
 
 		query = helper.hsQuery(
@@ -87,7 +87,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query ).matchesNone();
+		helper.assertThatQuery( query ).matchesNone();
 
 		query = helper.hsQuery(
 				queryBuilder.bool()
@@ -96,7 +96,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_1 );
 	}
 
@@ -110,7 +110,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_1 );
 
 		query = helper.hsQuery(
@@ -120,7 +120,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_1, DOCUMENT_2 );
 	}
 
@@ -134,7 +134,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_2, DOCUMENT_3 );
 
 		query = helper.hsQuery(
@@ -144,7 +144,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_2 );
 	}
 
@@ -160,7 +160,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_3 );
 	}
 
@@ -175,7 +175,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query ).matchesNone();
+		helper.assertThatQuery( query ).matchesNone();
 
 		query = helper.hsQuery(
 				queryBuilder.bool()
@@ -184,7 +184,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_1 );
 	}
 
@@ -204,7 +204,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_1 );
 
 		// One matching and one non-matching "should" clause
@@ -216,7 +216,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_2 );
 	}
 
@@ -236,7 +236,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_1 );
 
 		// One matching and one non-matching "should" clause
@@ -248,7 +248,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_1 );
 	}
 
@@ -269,7 +269,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesNone();
 
 		// One matching and one non-matching "should" clause
@@ -282,7 +282,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_2 );
 	}
 
@@ -299,7 +299,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_1, DOCUMENT_3 );
 
 		// Expect to require 1 "should" clause to match even though there's a "must"
@@ -312,7 +312,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_2 );
 
 		// Expect to require 2 "should" clauses to match
@@ -325,7 +325,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_1 );
 
 		// Expect to require all "should" clauses to match
@@ -337,7 +337,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_1 );
 	}
 
@@ -354,7 +354,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_1, DOCUMENT_3 );
 
 		// Expect to require 1 "should" clause to match even though there's a "must"
@@ -367,7 +367,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_2 );
 
 		// Expect to require 2 "should" clauses to match
@@ -380,7 +380,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_1 );
 	}
 
@@ -397,7 +397,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_1, DOCUMENT_3 );
 
 		// Expect to require 1 "should" clause to match even though there's a "must"
@@ -410,7 +410,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_2 );
 
 		// Expect to require 2 "should" clauses to match
@@ -423,7 +423,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_1 );
 
 		// Expect to require all "should" clauses to match
@@ -435,7 +435,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_1 );
 	}
 
@@ -452,7 +452,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_1, DOCUMENT_3 );
 
 		// Expect to require 1 "should" clause to match even though there's a "must"
@@ -465,7 +465,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_2 );
 
 		// Expect to require 2 "should" clauses to match
@@ -478,7 +478,7 @@ public class BoolDSLTest {
 				.createQuery()
 		);
 
-		helper.assertThat( query )
+		helper.assertThatQuery( query )
 				.matchesUnorderedIds( DOCUMENT_1 );
 	}
 
@@ -521,7 +521,7 @@ public class BoolDSLTest {
 		);
 
 		// Check that all documents are searchable
-		helper.assertThat( helper.hsQuery( IndexedEntity.class ) )
+		helper.assertThatQuery( helper.hsQuery( IndexedEntity.class ) )
 				.matchesUnorderedIds( DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 

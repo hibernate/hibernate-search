@@ -122,19 +122,19 @@ public class SearchITHelper {
 		return integratorProvider.get().createHSQuery( query, classes );
 	}
 
-	public AssertBuildingHSQueryContext assertThat(String fieldName, String value) {
-		return assertThat( termQuery( fieldName, value ) );
+	public AssertBuildingHSQueryContext assertThatQuery(String fieldName, String value) {
+		return assertThatQuery( termQuery( fieldName, value ) );
 	}
 
-	public AssertBuildingHSQueryContext assertThat() {
-		return assertThat( new MatchAllDocsQuery() );
+	public AssertBuildingHSQueryContext assertThatQuery() {
+		return assertThatQuery( new MatchAllDocsQuery() );
 	}
 
-	public AssertBuildingHSQueryContext assertThat(Query luceneQuery) {
+	public AssertBuildingHSQueryContext assertThatQuery(Query luceneQuery) {
 		return new AssertBuildingHSQueryContext( luceneQuery );
 	}
 
-	public AssertHSQueryContext assertThat(HSQuery hsQuery) {
+	public AssertHSQueryContext assertThatQuery(HSQuery hsQuery) {
 		return new AssertHSQueryContext() {
 			@Override
 			protected HSQuery getHSQuery() {

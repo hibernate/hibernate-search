@@ -118,21 +118,21 @@ public class SortDSLTest {
 		Sort sort = builder().sort()
 				.byScore()
 				.createSort();
-		helper.assertThat( query ).from( IndexedEntry.class )
+		helper.assertThatQuery( query ).from( IndexedEntry.class )
 				.sort( sort ).matchesExactlyIds( 0, 3 );
 
 		sort = builder().sort()
 				.byScore()
 						.asc()
 				.createSort();
-		helper.assertThat( query ).from( IndexedEntry.class )
+		helper.assertThatQuery( query ).from( IndexedEntry.class )
 				.sort( sort ).matchesExactlyIds( 3, 0 );
 
 		sort = builder().sort()
 				.byScore()
 						.desc()
 				.createSort();
-		helper.assertThat( query ).from( IndexedEntry.class )
+		helper.assertThatQuery( query ).from( IndexedEntry.class )
 				.sort( sort ).matchesExactlyIds( 0, 3 );
 	}
 
@@ -425,13 +425,13 @@ public class SortDSLTest {
 	}
 
 	private AssertBuildingHSQueryContext assertQueryAll(Sort sort) {
-		return helper.assertThat()
+		return helper.assertThatQuery()
 				.from( IndexedEntry.class )
 				.sort( sort );
 	}
 
 	private AssertBuildingHSQueryContext assertQuery(Query query, Sort sort) {
-		return helper.assertThat( query )
+		return helper.assertThatQuery( query )
 				.from( IndexedEntry.class )
 				.sort( sort );
 	}

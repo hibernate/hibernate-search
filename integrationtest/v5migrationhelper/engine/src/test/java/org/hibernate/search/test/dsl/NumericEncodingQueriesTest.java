@@ -65,7 +65,7 @@ public class NumericEncodingQueriesTest {
 		Date nextEventDate = DateTools.round( NEXT_EVENT.getTime(), DateTools.Resolution.DAY );
 		Query query = queryBuilder().keyword().onField( "startDate" ).matching( nextEventDate ).createQuery();
 
-		helper.assertThat( query ).from( Fair.class ).matchesExactlyIds( LUCCA_ID );
+		helper.assertThatQuery( query ).from( Fair.class ).matchesExactlyIds( LUCCA_ID );
 	}
 
 	@Test
@@ -75,21 +75,21 @@ public class NumericEncodingQueriesTest {
 
 		Query query = queryBuilder().keyword().onField( "since" ).matching( year ).createQuery();
 
-		helper.assertThat( query ).from( Fair.class ).matchesExactlyIds( LUCCA_ID );
+		helper.assertThatQuery( query ).from( Fair.class ).matchesExactlyIds( LUCCA_ID );
 	}
 
 	@Test
 	public void testDslWithDefaultDateBridge() throws Exception {
 		Query query = queryBuilder().keyword().onField( "updated" ).matching( UPDATED ).createQuery();
 
-		helper.assertThat( query ).from( Fair.class ).matchesExactlyIds( LUCCA_ID );
+		helper.assertThatQuery( query ).from( Fair.class ).matchesExactlyIds( LUCCA_ID );
 	}
 
 	@Test
 	public void testDslWithDefaultCalendarBridge() throws Exception {
 		Query query = queryBuilder().keyword().onField( "announced" ).matching( ANNOUNCED ).createQuery();
 
-		helper.assertThat( query ).from( Fair.class ).matchesExactlyIds( LUCCA_ID );
+		helper.assertThatQuery( query ).from( Fair.class ).matchesExactlyIds( LUCCA_ID );
 	}
 
 	private QueryBuilder queryBuilder() {

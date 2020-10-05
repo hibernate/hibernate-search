@@ -45,35 +45,35 @@ public class HSQueryResultCacheClearingTest {
 	@Test
 	public void clear_firstResult() throws Exception {
 		HSQuery hsQuery = queryAll();
-		helper.assertThat( hsQuery ).matchesExactlyIds( 0, 1, 2 );
+		helper.assertThatQuery( hsQuery ).matchesExactlyIds( 0, 1, 2 );
 
 		hsQuery.firstResult( 1 );
-		helper.assertThat( hsQuery ).matchesExactlyIds( 1, 2 );
+		helper.assertThatQuery( hsQuery ).matchesExactlyIds( 1, 2 );
 
 		hsQuery.firstResult( 2 );
-		helper.assertThat( hsQuery ).matchesExactlyIds( 2 );
+		helper.assertThatQuery( hsQuery ).matchesExactlyIds( 2 );
 	}
 
 	@Test
 	public void clear_maxResult() throws Exception {
 		HSQuery hsQuery = queryAll();
-		helper.assertThat( hsQuery ).matchesExactlyIds( 0, 1, 2 );
+		helper.assertThatQuery( hsQuery ).matchesExactlyIds( 0, 1, 2 );
 
 		hsQuery.maxResults( 2 );
-		helper.assertThat( hsQuery ).matchesExactlyIds( 0, 1 );
+		helper.assertThatQuery( hsQuery ).matchesExactlyIds( 0, 1 );
 
 		hsQuery.maxResults( 1 );
-		helper.assertThat( hsQuery ).matchesExactlyIds( 0 );
+		helper.assertThatQuery( hsQuery ).matchesExactlyIds( 0 );
 	}
 
 	@Test
 	public void clear_projection() throws Exception {
 		HSQuery hsQuery = queryAll();
 		hsQuery.projection( ProjectionConstants.ID );
-		helper.assertThat( hsQuery ).matchesExactlySingleProjections( 0, 1, 2 );
+		helper.assertThatQuery( hsQuery ).matchesExactlySingleProjections( 0, 1, 2 );
 
 		hsQuery.projection( ProjectionConstants.ID, "field" );
-		helper.assertThat( hsQuery ).matchesExactlyProjections(
+		helper.assertThatQuery( hsQuery ).matchesExactlyProjections(
 				new Object[][]{
 						{ 0, "zero" },
 						{ 1, "one" },
@@ -85,17 +85,17 @@ public class HSQueryResultCacheClearingTest {
 	public void clear_sort() throws Exception {
 		QueryBuilder qb = helper.queryBuilder( IndexedEntity.class );
 		HSQuery hsQuery = queryAll();
-		helper.assertThat( hsQuery ).matchesExactlyIds( 0, 1, 2 );
+		helper.assertThatQuery( hsQuery ).matchesExactlyIds( 0, 1, 2 );
 
 		hsQuery.sort( qb.sort().byField( "idSort" ).desc().createSort() );
-		helper.assertThat( hsQuery ).matchesExactlyIds( 2, 1, 0 );
+		helper.assertThatQuery( hsQuery ).matchesExactlyIds( 2, 1, 0 );
 	}
 
 	@Test
 	public void clear_faceting() throws Exception {
 		QueryBuilder qb = helper.queryBuilder( IndexedEntity.class );
 		HSQuery hsQuery = queryAll();
-		helper.assertThat( hsQuery ).matchesExactlyIds( 0, 1, 2 );
+		helper.assertThatQuery( hsQuery ).matchesExactlyIds( 0, 1, 2 );
 
 		String facetingRequestName = "facet1";
 		FacetingRequest facetingRequest1 = qb.facet()
@@ -104,14 +104,14 @@ public class HSQueryResultCacheClearingTest {
 				.discrete()
 				.createFacetingRequest();
 		hsQuery.getFacetManager().enableFaceting( facetingRequest1 );
-		helper.assertThat( hsQuery ).facets( facetingRequestName )
+		helper.assertThatQuery( hsQuery ).facets( facetingRequestName )
 				.includes( "zero", 1 )
 				.includes( "one", 1 )
 				.includes( "two", 1 )
 				.only();
 
 		hsQuery.getFacetManager().disableFaceting( facetingRequestName );
-		helper.assertThat( hsQuery ).facets( facetingRequestName ).isEmpty();
+		helper.assertThatQuery( hsQuery ).facets( facetingRequestName ).isEmpty();
 	}
 
 	private HSQuery queryAll() {

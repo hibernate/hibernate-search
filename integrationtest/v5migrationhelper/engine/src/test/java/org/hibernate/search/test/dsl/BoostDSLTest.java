@@ -42,7 +42,7 @@ public class BoostDSLTest {
 				.should( qb.keyword().onField( "summary" ).boostedTo( 1f ).matching( "VELVETY" ).createQuery() )
 				.createQuery();
 
-		helper.assertThat( query ).from( Coffee.class )
+		helper.assertThatQuery( query ).from( Coffee.class )
 				.sort( new Sort( SortField.FIELD_SCORE ) )
 				.matchesExactlyIds( "Kazaar", "Dharkan" );
 
@@ -51,7 +51,7 @@ public class BoostDSLTest {
 				.should( qb.keyword().onField( "summary" ).boostedTo( 40f ).matching( "VELVETY" ).createQuery() )
 				.createQuery();
 
-		helper.assertThat( query ).from( Coffee.class )
+		helper.assertThatQuery( query ).from( Coffee.class )
 				.sort( new Sort( SortField.FIELD_SCORE ) )
 				.matchesExactlyIds( "Dharkan", "Kazaar" );
 	}
@@ -65,7 +65,7 @@ public class BoostDSLTest {
 				.should( qb.keyword().onField( "intensity" ).boostedTo( 1f ).matching( 11 ).createQuery() )
 				.createQuery();
 
-		helper.assertThat( query ).from( Coffee.class )
+		helper.assertThatQuery( query ).from( Coffee.class )
 				.sort( new Sort( SortField.FIELD_SCORE ) )
 				.matchesExactlyIds( "Kazaar", "Dharkan" );
 
@@ -74,7 +74,7 @@ public class BoostDSLTest {
 				.should( qb.keyword().onField( "intensity" ).boostedTo( 40f ).matching( 11 ).createQuery() )
 				.createQuery();
 
-		helper.assertThat( query ).from( Coffee.class )
+		helper.assertThatQuery( query ).from( Coffee.class )
 				.sort( new Sort( SortField.FIELD_SCORE ) )
 				.matchesExactlyIds( "Dharkan", "Kazaar" );
 	}

@@ -64,7 +64,7 @@ public class NumericTypeWithNullEncodingTest {
 	}
 
 	private AssertBuildingHSQueryContext assertProjection(Query query, String fieldName) {
-		return helper.assertThat( query )
+		return helper.assertThatQuery( query )
 				.from( SomeEntity.class )
 				.projecting( fieldName );
 	}
