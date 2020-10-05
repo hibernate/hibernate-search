@@ -76,6 +76,18 @@
             <property name="ignoreComments" value="true" />
         </module>
 
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="(?&lt;!^import static)\s[\w\.]*\b([A-Z]\w*)?Assert(ions?)?\.[a-z]\w*\(" />
+            <property name="message" value="Always use static imports for assertions" />
+            <property name="ignoreComments" value="true" />
+        </module>
+
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="(?&lt;!^import static)\s[\w\.]*\b([A-Z]\w*)?(Assume|Assumptions?)\.[a-z]\w*\(" />
+            <property name="message" value="Always use static imports for assumptions" />
+            <property name="ignoreComments" value="true" />
+        </module>
+
        <!-- Checks for imports -->
         <module name="AvoidStarImport" />
         <module name="RedundantImport" />
