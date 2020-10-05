@@ -16,7 +16,7 @@ import org.junit.Assert;
 
 public class StubIndexScaleWorkAssert {
 
-	public static StubIndexScaleWorkAssert assertThat(StubIndexScaleWork work) {
+	public static StubIndexScaleWorkAssert assertThatIndexScaleWork(StubIndexScaleWork work) {
 		return new StubIndexScaleWorkAssert( work );
 	}
 

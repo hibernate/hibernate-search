@@ -7,6 +7,7 @@
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.StubSearchWorkAssert.assertThatSearchWork;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -21,7 +22,6 @@ import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.StubSearchWorkAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
@@ -68,7 +68,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 		assertThat( actualCall.indexNames )
 				.as( "Search work did not target the expected indexes: " )
 				.isEqualTo( indexNames );
-		StubSearchWorkAssert.assertThat( actualCall.work )
+		assertThatSearchWork( actualCall.work )
 				.as( "Search work on indexes " + indexNames + " did not match: " )
 				.matches( work );
 

@@ -6,10 +6,11 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.StubTreeNodeAssert.assertThatTree;
+
 import java.util.Objects;
 
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.StubTreeNodeAssert;
 
 import org.easymock.Capture;
 
@@ -33,7 +34,7 @@ class SchemaDefinitionCall extends Call<SchemaDefinitionCall> {
 
 	public CallBehavior<Void> verify(SchemaDefinitionCall actualCall) {
 		if ( schemaNode != null ) {
-			StubTreeNodeAssert.assertThat( actualCall.schemaNode )
+			assertThatTree( actualCall.schemaNode )
 					.as( "Schema for index '" + indexName + "' did not match:\n" )
 					.matches( schemaNode );
 			return () -> {

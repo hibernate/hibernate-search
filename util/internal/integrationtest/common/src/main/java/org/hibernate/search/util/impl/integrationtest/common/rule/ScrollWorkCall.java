@@ -7,6 +7,7 @@
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.StubSearchWorkAssert.assertThatSearchWork;
 
 import java.util.Objects;
 import java.util.Set;
@@ -14,7 +15,6 @@ import java.util.Set;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchScroll;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.StubSearchWorkAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchScroll;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
@@ -65,7 +65,7 @@ public class ScrollWorkCall<T> extends Call<ScrollWorkCall<?>> {
 		assertThat( actualCall.indexNames )
 				.as( "Scroll work did not target the expected indexes: " )
 				.isEqualTo( indexNames );
-		StubSearchWorkAssert.assertThat( actualCall.work )
+		assertThatSearchWork( actualCall.work )
 				.as( "Scroll work on indexes " + indexNames + " did not match: " )
 				.matches( work );
 		assertThat( actualCall.chunkSize )

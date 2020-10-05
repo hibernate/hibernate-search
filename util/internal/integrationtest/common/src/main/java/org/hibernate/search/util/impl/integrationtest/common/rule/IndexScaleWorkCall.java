@@ -6,10 +6,11 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.StubIndexScaleWorkAssert.assertThatIndexScaleWork;
+
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.util.impl.integrationtest.common.assertion.StubIndexScaleWorkAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 
 class IndexScaleWorkCall extends Call<IndexScaleWorkCall> {
@@ -34,7 +35,7 @@ class IndexScaleWorkCall extends Call<IndexScaleWorkCall> {
 	public CallBehavior<CompletableFuture<?>> verify(IndexScaleWorkCall actualCall) {
 		String whenThisWorkWasExpected = "when an index-scale work on index '" + indexName
 				+ "' was expected";
-		StubIndexScaleWorkAssert.assertThat( actualCall.work )
+		assertThatIndexScaleWork( actualCall.work )
 				.as( "Incorrect work " + whenThisWorkWasExpected + ":\n" )
 				.matches( work );
 		return () -> completableFuture;

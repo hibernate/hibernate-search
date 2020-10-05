@@ -6,11 +6,12 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.StubSchemaManagementWorkAssert.assertThatSchemaManagementWork;
+
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.StubSchemaManagementWorkAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 
 class SchemaManagementWorkCall extends Call<SchemaManagementWorkCall> {
@@ -39,7 +40,7 @@ class SchemaManagementWorkCall extends Call<SchemaManagementWorkCall> {
 	public CallBehavior<CompletableFuture<?>> verify(SchemaManagementWorkCall actualCall) {
 		String whenThisWorkWasExpected = "when a schema management work on index '" + indexName
 				+ "' was expected";
-		StubSchemaManagementWorkAssert.assertThat( actualCall.work )
+		assertThatSchemaManagementWork( actualCall.work )
 				.as( "Incorrect work " + whenThisWorkWasExpected + ":\n" )
 				.matches( work );
 		return () -> behavior.execute( actualCall.failureCollector );

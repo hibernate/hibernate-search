@@ -16,7 +16,7 @@ import org.junit.Assert;
 
 public class StubSchemaManagementWorkAssert {
 
-	public static StubSchemaManagementWorkAssert assertThat(StubSchemaManagementWork work) {
+	public static StubSchemaManagementWorkAssert assertThatSchemaManagementWork(StubSchemaManagementWork work) {
 		return new StubSchemaManagementWorkAssert( work );
 	}
 

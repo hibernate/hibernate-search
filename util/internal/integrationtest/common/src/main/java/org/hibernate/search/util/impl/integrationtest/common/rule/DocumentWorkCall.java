@@ -6,11 +6,12 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.StubDocumentWorkAssert.assertThatDocumentWork;
+
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.StubDocumentWorkAssert;
 
 import org.junit.Assert;
 
@@ -63,7 +64,7 @@ class DocumentWorkCall extends Call<DocumentWorkCall> {
 					+ phase + ", actual: " + actualCall.phase
 					+ ".\n\tExpected work: " + work + "\n\tActual work: " + actualCall.work );
 		}
-		StubDocumentWorkAssert.assertThat( actualCall.work )
+		assertThatDocumentWork( actualCall.work )
 				.as( "Incorrect work " + whenThisWorkWasExpected + ":\n" )
 				.matches( work );
 		return () -> completableFuture;
