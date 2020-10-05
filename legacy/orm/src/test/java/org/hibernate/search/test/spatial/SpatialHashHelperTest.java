@@ -6,13 +6,15 @@
  */
 package org.hibernate.search.test.spatial;
 
-import org.hibernate.search.spatial.impl.SpatialHelper;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
 import org.hibernate.search.spatial.impl.Point;
+import org.hibernate.search.spatial.impl.SpatialHelper;
+
+import org.junit.Test;
 
 /**
  * Hibernate Search spatial: helper class to compute spatial hashes indexes, ids, and optimal level for search
@@ -24,14 +26,14 @@ public class SpatialHashHelperTest {
 	@Test
 	public void getCellIndexTest() {
 		int cellIndex = SpatialHelper.getCellIndex( 0.1, 0.3, 1 );
-		Assert.assertEquals( 0, cellIndex );
+		assertEquals( 0, cellIndex );
 		int cellIndex2 = SpatialHelper.getCellIndex( 0.2, 0.3, 1 );
-		Assert.assertEquals( 1, cellIndex2 );
+		assertEquals( 1, cellIndex2 );
 
 		int cellIndex3 = SpatialHelper.getCellIndex( 3, 10, 4 );
-		Assert.assertEquals( 4, cellIndex3 );
+		assertEquals( 4, cellIndex3 );
 		int cellIndex4 = SpatialHelper.getCellIndex( 6, 10, 4 );
-		Assert.assertEquals( 9, cellIndex4 );
+		assertEquals( 9, cellIndex4 );
 	}
 
 	@Test
@@ -39,62 +41,62 @@ public class SpatialHashHelperTest {
 		Point point = Point.fromDegrees( 45, 4 );
 
 		String cellId = SpatialHelper.getSpatialHashCellId( point, 5 );
-		Assert.assertEquals( "0|8", cellId );
+		assertEquals( "0|8", cellId );
 
 		String cellId2 = SpatialHelper.getSpatialHashCellId( point, 7 );
-		Assert.assertEquals( "1|32", cellId2 );
+		assertEquals( "1|32", cellId2 );
 
 		String cellId3 = SpatialHelper.getSpatialHashCellId( point, 14 );
-		Assert.assertEquals( "128|4096", cellId3 );
+		assertEquals( "128|4096", cellId3 );
 
 		Point point2 = Point.fromDegrees( -12, -179 );
 
 		String cellId4 = SpatialHelper.getSpatialHashCellId( point2, 5 );
-		Assert.assertEquals( "-16|-3", cellId4 );
+		assertEquals( "-16|-3", cellId4 );
 
 		String cellId5 = SpatialHelper.getSpatialHashCellId( point2, 7 );
-		Assert.assertEquals( "-63|-9", cellId5 );
+		assertEquals( "-63|-9", cellId5 );
 
 		String cellId6 = SpatialHelper.getSpatialHashCellId( point2, 14 );
-		Assert.assertEquals( "-7969|-1093", cellId6 );
+		assertEquals( "-7969|-1093", cellId6 );
 	}
 
 	@Test
 	public void findBestSpatialHashLevelForSearchRangeTest() {
 		int bestSpatialHashLevel = SpatialHelper.findBestSpatialHashLevelForSearchRange( 50 );
 
-		Assert.assertEquals( 9, bestSpatialHashLevel );
+		assertEquals( 9, bestSpatialHashLevel );
 
 		int bestSpatialHashLevel2 = SpatialHelper.findBestSpatialHashLevelForSearchRange( 1 );
 
-		Assert.assertEquals( 15, bestSpatialHashLevel2 );
+		assertEquals( 15, bestSpatialHashLevel2 );
 	}
 
 	@Test
 	public void projectedBoundingBoxCellsIdsInclusionTest() {
 		Point center = Point.fromDegrees( 45.0d, 32.0d );
 		Double radius = 50.0d;
-		Assert.assertTrue( projectedBoundingBoxCellsIdsInclusionTest( center, radius ) );
+		assertTrue( projectedBoundingBoxCellsIdsInclusionTest( center, radius ) );
 
 		center = Point.fromDegrees( 0.0d, 0.0d );
 		radius = 100.0d;
-		Assert.assertTrue( projectedBoundingBoxCellsIdsInclusionTest( center, radius ) );
+		assertTrue( projectedBoundingBoxCellsIdsInclusionTest( center, radius ) );
 
 		center = Point.fromDegrees( 180.0d, 0.0d );
 		radius = 250.0d;
-		Assert.assertTrue( projectedBoundingBoxCellsIdsInclusionTest( center, radius ) );
+		assertTrue( projectedBoundingBoxCellsIdsInclusionTest( center, radius ) );
 
 		center = Point.fromDegrees( 0.0d, 90.0d );
 		radius = 25.0d;
-		Assert.assertTrue( projectedBoundingBoxCellsIdsInclusionTest( center, radius ) );
+		assertTrue( projectedBoundingBoxCellsIdsInclusionTest( center, radius ) );
 
 		center = Point.fromDegrees( 45.0d, 360.0d );
 		radius = 100.0d;
-		Assert.assertTrue( projectedBoundingBoxCellsIdsInclusionTest( center, radius ) );
+		assertTrue( projectedBoundingBoxCellsIdsInclusionTest( center, radius ) );
 
 		center = Point.fromDegrees( -147.0d, -24.0d );
 		radius = 73.0d;
-		Assert.assertTrue( projectedBoundingBoxCellsIdsInclusionTest( center, radius ) );
+		assertTrue( projectedBoundingBoxCellsIdsInclusionTest( center, radius ) );
 	}
 
 	public boolean projectedBoundingBoxCellsIdsInclusionTest( Point center, Double radius) {

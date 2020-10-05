@@ -6,6 +6,11 @@
  */
 package org.hibernate.search.test.engine.typehandling;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
@@ -14,7 +19,7 @@ import org.hibernate.search.spi.IndexedTypeIdentifier;
 import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.impl.IndexedTypeSets;
 import org.hibernate.search.spi.impl.PojoIndexedTypeIdentifier;
-import org.junit.Assert;
+
 import org.junit.Test;
 
 public class BasicTypeCollectionsTest {
@@ -113,47 +118,47 @@ public class BasicTypeCollectionsTest {
 	}
 
 	private void assertIsDoubleSet(IndexedTypeSet typeSet) {
-		Assert.assertFalse( "Verify it's not a singleton", typeSet == IndexedTypeSets.empty() );
-		Assert.assertFalse( typeSet.isEmpty() );
-		Assert.assertEquals( 2, typeSet.size() );
+		assertFalse( "Verify it's not a singleton", typeSet == IndexedTypeSets.empty() );
+		assertFalse( typeSet.isEmpty() );
+		assertEquals( 2, typeSet.size() );
 		Iterator<IndexedTypeIdentifier> iterator = typeSet.iterator();
-		Assert.assertTrue( iterator.hasNext() );
+		assertTrue( iterator.hasNext() );
 		iterator.next(); // increment once
 		iterator.next(); // increment twice
-		Assert.assertFalse( iterator.hasNext() );
-		iterator.forEachRemaining( l -> Assert.fail( "should never happen" ) ); //no more elements
+		assertFalse( iterator.hasNext() );
+		iterator.forEachRemaining( l -> fail( "should never happen" ) ); //no more elements
 		Set<Class<?>> pojosSet = typeSet.toPojosSet();
-		Assert.assertTrue( pojosSet.contains( TYPE_A.getPojoType() ) );
-		Assert.assertTrue( pojosSet.contains( TYPE_B.getPojoType() ) );
-		Assert.assertEquals( 2, pojosSet.size() );
+		assertTrue( pojosSet.contains( TYPE_A.getPojoType() ) );
+		assertTrue( pojosSet.contains( TYPE_B.getPojoType() ) );
+		assertEquals( 2, pojosSet.size() );
 	}
 
 	private void assertIsEmpty(IndexedTypeSet typeSet) {
-		Assert.assertTrue( "Verify the singleton optimisation applies", typeSet == IndexedTypeSets.empty() );
-		Assert.assertTrue( typeSet.isEmpty() );
-		Assert.assertEquals( 0, typeSet.size() );
-		typeSet.iterator().forEachRemaining( l -> Assert.fail( "should never happen" ) );
-		Assert.assertEquals( 0, typeSet.toPojosSet().size() );
+		assertTrue( "Verify the singleton optimisation applies", typeSet == IndexedTypeSets.empty() );
+		assertTrue( typeSet.isEmpty() );
+		assertEquals( 0, typeSet.size() );
+		typeSet.iterator().forEachRemaining( l -> fail( "should never happen" ) );
+		assertEquals( 0, typeSet.toPojosSet().size() );
 	}
 
 	private void assertIsSingletonSet(IndexedTypeSet typeSet, Class<?> someType, boolean recursive) {
-		Assert.assertFalse( "Verify it's not a singleton", typeSet == IndexedTypeSets.empty() );
-		Assert.assertFalse( typeSet.isEmpty() );
-		Assert.assertEquals( 1, typeSet.size() );
+		assertFalse( "Verify it's not a singleton", typeSet == IndexedTypeSets.empty() );
+		assertFalse( typeSet.isEmpty() );
+		assertEquals( 1, typeSet.size() );
 		Iterator<IndexedTypeIdentifier> iterator = typeSet.iterator();
-		Assert.assertTrue( iterator.hasNext() );
+		assertTrue( iterator.hasNext() );
 		IndexedTypeIdentifier firstElement = iterator.next(); // increment once
-		Assert.assertFalse( iterator.hasNext() );
-		iterator.forEachRemaining( l -> Assert.fail( "should never happen" ) ); //no more elements
+		assertFalse( iterator.hasNext() );
+		iterator.forEachRemaining( l -> fail( "should never happen" ) ); //no more elements
 		Set<Class<?>> pojosSet = typeSet.toPojosSet();
-		Assert.assertTrue( pojosSet.contains( someType ) );
-		Assert.assertEquals( 1, pojosSet.size() );
+		assertTrue( pojosSet.contains( someType ) );
+		assertEquals( 1, pojosSet.size() );
 		IndexedTypeSet typeSet2 = firstElement.asTypeSet();
 		if ( recursive ) {
 			assertIsSingletonSet( typeSet2, someType, false );
 		}
-		Assert.assertEquals( typeSet2, typeSet2 );
-		Assert.assertEquals( firstElement.getPojoType(), someType );
+		assertEquals( typeSet2, typeSet2 );
+		assertEquals( firstElement.getPojoType(), someType );
 	}
 
 

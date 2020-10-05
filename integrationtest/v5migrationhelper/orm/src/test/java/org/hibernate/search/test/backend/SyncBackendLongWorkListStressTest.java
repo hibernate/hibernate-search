@@ -6,9 +6,10 @@
  */
 package org.hibernate.search.test.backend;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Map;
 
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.search.FullTextSession;
@@ -19,8 +20,10 @@ import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexi
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.test.SearchTestBase;
-import org.junit.Assert;
+
 import org.junit.Test;
+
+import org.apache.lucene.search.MatchAllDocsQuery;
 
 public class SyncBackendLongWorkListStressTest extends SearchTestBase {
 
@@ -44,7 +47,7 @@ public class SyncBackendLongWorkListStressTest extends SearchTestBase {
 		Number count = (Number) s.createCriteria( Clock.class )
 				.setProjection( Projections.rowCount() )
 				.uniqueResult();
-		Assert.assertEquals( NUM_SAVED_ENTITIES, count.intValue() );
+		assertEquals( NUM_SAVED_ENTITIES, count.intValue() );
 		tx.commit();
 		s.close();
 
@@ -56,7 +59,7 @@ public class SyncBackendLongWorkListStressTest extends SearchTestBase {
 		s = Search.getFullTextSession( openSession() );
 		tx = s.beginTransaction();
 		int fullTextCount = s.createFullTextQuery( new MatchAllDocsQuery(), Clock.class ).getResultSize();
-		Assert.assertEquals( NUM_SAVED_ENTITIES, fullTextCount );
+		assertEquals( NUM_SAVED_ENTITIES, fullTextCount );
 		s.purgeAll( Clock.class );
 		tx.commit();
 		s.close();

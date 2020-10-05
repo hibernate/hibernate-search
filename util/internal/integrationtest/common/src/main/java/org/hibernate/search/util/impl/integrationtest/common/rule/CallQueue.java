@@ -6,14 +6,14 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
-import org.junit.Assert;
 
 import org.assertj.core.api.Fail;
 
@@ -129,7 +129,7 @@ public class CallQueue<C extends Call<? super C>> {
 		remaining.addAll( callsExpectedInOrder );
 		remaining.addAll( callsExpectedOutOfOrder );
 		if ( !remaining.isEmpty() ) {
-			Assert.fail( "Expected " + remaining );
+			fail( "Expected " + remaining );
 		}
 	}
 

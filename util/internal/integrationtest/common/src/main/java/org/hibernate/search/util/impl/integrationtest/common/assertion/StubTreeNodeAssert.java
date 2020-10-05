@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.assertion;
 
+import static org.junit.Assert.fail;
+
 import java.util.Map;
 
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNode;
@@ -13,8 +15,6 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeCo
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeMismatch;
 import org.hibernate.search.util.common.impl.ToStringStyle;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
-
-import org.junit.Assert;
 
 public class StubTreeNodeAssert<T extends StubTreeNode<T>> {
 
@@ -42,7 +42,7 @@ public class StubTreeNodeAssert<T extends StubTreeNode<T>> {
 			builder.startObject();
 			StubTreeNodeCompare.appendTo( builder, mismatchesByPath );
 			builder.endObject();
-			Assert.fail( messageBase + builder.toString() );
+			fail( messageBase + builder.toString() );
 		}
 		return this;
 	}

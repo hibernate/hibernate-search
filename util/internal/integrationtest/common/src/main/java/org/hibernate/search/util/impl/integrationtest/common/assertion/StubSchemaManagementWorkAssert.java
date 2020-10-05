@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.assertion;
 
+import static org.junit.Assert.fail;
+
 import java.util.Objects;
 
 import org.hibernate.search.util.common.impl.ToStringStyle;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
-
-import org.junit.Assert;
 
 public class StubSchemaManagementWorkAssert {
 
@@ -43,7 +43,7 @@ public class StubSchemaManagementWorkAssert {
 		builder.endObject();
 
 		if ( hasAnyMismatch ) {
-			Assert.fail( messageBase + builder.toString() );
+			fail( messageBase + builder.toString() );
 		}
 
 		return this;

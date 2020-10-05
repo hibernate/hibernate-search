@@ -6,11 +6,15 @@
  */
 package org.hibernate.search.test.metadata.types;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Collections;
 
 import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.spi.impl.IndexedTypeSets;
-import org.junit.Assert;
+
 import org.junit.Test;
 
 /**
@@ -28,7 +32,7 @@ public class IndexedTypesSetsTest {
 		final IndexedTypeSet fromClasses = IndexedTypeSets.fromClasses( IndexedTypesSetsTest.class, Foo.class );
 		final String tostring = fromClasses.toString();
 		//being a set, the order is unspecified. The toString output is going to match A,B or B,A :
-		Assert.assertTrue(
+		assertTrue(
 				"[org.hibernate.search.test.metadata.types.Foo, org.hibernate.search.test.metadata.types.IndexedTypesSetsTest]".equals( tostring ) ||
 				"[org.hibernate.search.test.metadata.types.IndexedTypesSetsTest, org.hibernate.search.test.metadata.types.Foo]".equals( tostring ) );
 	}
@@ -39,7 +43,7 @@ public class IndexedTypesSetsTest {
 		final IndexedTypeSet fromClasses = IndexedTypeSets.fromClasses( IndexedTypesSetsTest.class, null, Foo.class );
 		final String tostring = fromClasses.toString();
 		//being a set, the order is unspecified. The toString output is going to match A,B or B,A :
-		Assert.assertTrue(
+		assertTrue(
 				"[org.hibernate.search.test.metadata.types.Foo, org.hibernate.search.test.metadata.types.IndexedTypesSetsTest]".equals( tostring ) ||
 				"[org.hibernate.search.test.metadata.types.IndexedTypesSetsTest, org.hibernate.search.test.metadata.types.Foo]".equals( tostring ) );
 	}
@@ -47,16 +51,16 @@ public class IndexedTypesSetsTest {
 	@Test
 	public void testCreationOfEmptySets() {
 		//This is more to test about creation from special parameters than to test the isEmpty() method
-		Assert.assertTrue( IndexedTypeSets.fromClasses().isEmpty() );
-		Assert.assertTrue( IndexedTypeSets.empty().isEmpty() );
-		Assert.assertTrue( IndexedTypeSets.fromIdentifiers( Collections.emptySet() ).isEmpty() );
+		assertTrue( IndexedTypeSets.fromClasses().isEmpty() );
+		assertTrue( IndexedTypeSets.empty().isEmpty() );
+		assertTrue( IndexedTypeSets.fromIdentifiers( Collections.emptySet() ).isEmpty() );
 	}
 
 	@Test
 	public void testSize() {
-		Assert.assertEquals( 2, IndexedTypeSets.fromClasses( IndexedTypesSetsTest.class, Foo.class ).size() );
-		Assert.assertEquals( 1, IndexedTypeSets.fromClasses( Foo.class, Foo.class ).size() );
-		Assert.assertEquals( 0, IndexedTypeSets.fromClasses( ).size() );
+		assertEquals( 2, IndexedTypeSets.fromClasses( IndexedTypesSetsTest.class, Foo.class ).size() );
+		assertEquals( 1, IndexedTypeSets.fromClasses( Foo.class, Foo.class ).size() );
+		assertEquals( 0, IndexedTypeSets.fromClasses( ).size() );
 	}
 
 	@Test
@@ -64,11 +68,11 @@ public class IndexedTypesSetsTest {
 		final IndexedTypeSet a = IndexedTypeSets.fromClasses( IndexedTypesSetsTest.class, Foo.class );
 		final IndexedTypeSet b = IndexedTypeSets.fromClasses( Foo.class, IndexedTypesSetsTest.class );
 		final IndexedTypeSet c = IndexedTypeSets.fromClasses( Foo.class );
-		Assert.assertEquals( a, b );
-		Assert.assertEquals( b, a );
-		Assert.assertEquals( a, a );
-		Assert.assertNotEquals( a, c );
-		Assert.assertNotEquals( b, c );
+		assertEquals( a, b );
+		assertEquals( b, a );
+		assertEquals( a, a );
+		assertNotEquals( a, c );
+		assertNotEquals( b, c );
 	}
 
 }

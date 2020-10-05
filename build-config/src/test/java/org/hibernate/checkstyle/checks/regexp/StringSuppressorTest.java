@@ -6,10 +6,12 @@
  */
 package org.hibernate.checkstyle.checks.regexp;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.Arrays;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.api.FileContents;
@@ -24,35 +26,35 @@ public class StringSuppressorTest {
 	public void testOutsideString() throws Exception {
 		StringSuppressor suppressor = new StringSuppressor();
 		suppressor.setCurrentContents( content( "  " ) );
-		Assert.assertFalse( suppressor.shouldSuppress( 1, 0, 0, 1 ) );
+		assertFalse( suppressor.shouldSuppress( 1, 0, 0, 1 ) );
 	}
 
 	@Test
 	public void testInsideString() throws Exception {
 		StringSuppressor suppressor = new StringSuppressor();
 		suppressor.setCurrentContents( content( "\"           \"" ) );
-		Assert.assertTrue( suppressor.shouldSuppress( 1, 4, 0, 6 ) );
+		assertTrue( suppressor.shouldSuppress( 1, 4, 0, 6 ) );
 	}
 
 	@Test
 	public void testInsideStringWithText() throws Exception {
 		StringSuppressor suppressor = new StringSuppressor();
 		suppressor.setCurrentContents( content( "\"text   text\"" ) );
-		Assert.assertTrue( suppressor.shouldSuppress( 1, 4, 0, 11 ) );
+		assertTrue( suppressor.shouldSuppress( 1, 4, 0, 11 ) );
 	}
 
 	@Test
 	public void testInsideStringWithCode() throws Exception {
 		StringSuppressor suppressor = new StringSuppressor();
 		suppressor.setCurrentContents( content( "System.out.println(\"text   text\");" ) );
-		Assert.assertTrue( suppressor.shouldSuppress( 1, 25, 0, 27 ) );
+		assertTrue( suppressor.shouldSuppress( 1, 25, 0, 27 ) );
 	}
 
 	@Test
 	public void testOutsideStringWithCode() throws Exception {
 		StringSuppressor suppressor = new StringSuppressor();
 		suppressor.setCurrentContents( content( "System.out.println   (\"text text\");" ) );
-		Assert.assertFalse( suppressor.shouldSuppress( 1, 18, 0, 20 ) );
+		assertFalse( suppressor.shouldSuppress( 1, 18, 0, 20 ) );
 	}
 
 	private FileContents content(String string) {

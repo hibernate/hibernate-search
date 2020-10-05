@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.test.session;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.lang.reflect.Proxy;
 import java.util.Map;
 
@@ -20,10 +23,8 @@ import org.hibernate.event.spi.EventSource;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
-import org.junit.Assert;
-import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import org.junit.Test;
 
 /**
  * @author Emmanuel Bernard
@@ -78,7 +79,7 @@ public class SessionTest extends SearchTestBase {
 		final Session session = getSessionFactory().getCurrentSession();
 		try {
 			FullTextSession fts = Search.getFullTextSession( session );
-			Assert.assertNotNull( fts );
+			assertNotNull( fts );
 			//success
 		}
 		finally {

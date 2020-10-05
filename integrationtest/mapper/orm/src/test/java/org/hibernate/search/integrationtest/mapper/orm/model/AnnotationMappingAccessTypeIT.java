@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.model;
 
+import static org.junit.Assert.fail;
+
 import java.io.Serializable;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -26,7 +28,6 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -130,7 +131,7 @@ public class AnnotationMappingAccessTypeIT {
 	}
 
 	private static <T> T methodShouldNotBeCalled() {
-		Assert.fail( "This method should not be called" );
+		fail( "This method should not be called" );
 		return null;
 	}
 

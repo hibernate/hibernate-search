@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.association;
 
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Basic;
@@ -25,7 +27,6 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -321,7 +322,7 @@ public class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 	public static class UnrelatedContainingEntity extends ContainingEntity {
 		@Transient
 		public IndexedEntity getParent() {
-			Assert.fail( "This method should never have been called" );
+			fail( "This method should never have been called" );
 			return null; // Dead code
 		}
 	}

@@ -7,9 +7,12 @@
 package org.hibernate.search.integrationtest.java.module.service;
 
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.hibernate.search.mapper.orm.Search;
+
+import org.junit.Test;
 
 public class JavaModulePathIT {
 
@@ -28,11 +31,11 @@ public class JavaModulePathIT {
 		service.add( "foo" );
 		service.add( "bar" );
 		service.add( "foo bar" );
-		Assert.assertEquals( 2, service.search( "foo" ).size() );
+		assertEquals( 2, service.search( "foo" ).size() );
 	}
 
 	private void checkIsInModulePath(Class<?> clazz) {
-		Assert.assertTrue(
+		assertTrue(
 				clazz + " should be part of a named module - there is a problem in test setup",
 				clazz.getModule().isNamed()
 		);

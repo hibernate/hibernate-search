@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.testsupport.junit;
 
+import static org.junit.Assert.assertNull;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,7 +29,6 @@ import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.spi.SearchIntegratorBuilder;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 
-import org.junit.Assert;
 import org.junit.rules.ExternalResource;
 
 /**
@@ -121,7 +122,7 @@ public class SearchFactoryHolder extends ExternalResource {
 	}
 
 	public SearchFactoryHolder withProperty(String key, Object value) {
-		Assert.assertNull( "SearchIntegrator already initialized", searchIntegrator );
+		assertNull( "SearchIntegrator already initialized", searchIntegrator );
 		configuration.put( key, value );
 		return this;
 	}

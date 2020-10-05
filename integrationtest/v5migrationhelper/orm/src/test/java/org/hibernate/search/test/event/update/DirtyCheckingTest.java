@@ -6,9 +6,10 @@
  */
 package org.hibernate.search.test.event.update;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
-import org.apache.lucene.search.Query;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
@@ -18,7 +19,8 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 
 import org.junit.Test;
-import org.junit.Assert;
+
+import org.apache.lucene.search.Query;
 
 /**
  * @author Davide D'Alto
@@ -62,8 +64,8 @@ public class DirtyCheckingTest extends SearchTestBase {
 
 		FullTextQuery fullTextQuery = s.createFullTextQuery( q, CheeseRollingCompetitor.class ).setProjection( "Nickname" );
 		List list = fullTextQuery.list();
-		Assert.assertEquals( 1, list.size() );
-		Assert.assertEquals( expectedProjection, ( (Object[]) list.get( 0 ) )[0] );
+		assertEquals( 1, list.size() );
+		assertEquals( expectedProjection, ( (Object[]) list.get( 0 ) )[0] );
 
 		s.clear();
 	}

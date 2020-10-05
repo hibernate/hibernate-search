@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.testsupport.junit;
 
+import static org.junit.Assert.assertNull;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,7 +15,6 @@ import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.testsupport.migration.V5MigrationJavaBeanSearchIntegratorAdapter;
 
-import org.junit.Assert;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -71,7 +72,7 @@ public class SearchFactoryHolder implements TestRule {
 	}
 
 	public SearchFactoryHolder withProperty(String key, Object value) {
-		Assert.assertNull( "Mapping already initialized", mapping );
+		assertNull( "Mapping already initialized", mapping );
 		configuration.put( key, value );
 		return this;
 	}

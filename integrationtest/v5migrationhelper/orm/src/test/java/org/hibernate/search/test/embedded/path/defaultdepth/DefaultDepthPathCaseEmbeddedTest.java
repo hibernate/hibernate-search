@@ -7,24 +7,24 @@
 
 package org.hibernate.search.test.embedded.path.defaultdepth;
 
-import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-import org.apache.lucene.search.Query;
+import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.util.common.SearchException;
+
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import org.apache.lucene.search.Query;
 
 /**
  * @author Davide D'Alto
@@ -62,8 +62,8 @@ public class DefaultDepthPathCaseEmbeddedTest extends SearchTestBase {
 	public void testFieldIsIndexedIfInPath() throws Exception {
 		List<EntityA> result = search( s, "b.indexed.field", "indexed" );
 
-		Assert.assertEquals( 1, result.size() );
-		Assert.assertEquals( entityA.id, result.get( 0 ).id );
+		assertEquals( 1, result.size() );
+		assertEquals( entityA.id, result.get( 0 ).id );
 	}
 
 	@Test

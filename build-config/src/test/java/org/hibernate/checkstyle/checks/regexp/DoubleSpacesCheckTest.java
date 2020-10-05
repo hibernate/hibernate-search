@@ -6,12 +6,14 @@
  */
 package org.hibernate.checkstyle.checks.regexp;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.api.FileContents;
@@ -28,7 +30,7 @@ public class DoubleSpacesCheckTest {
 		check.setIgnoreStrings( true );
 		check.processLines( Arrays.asList( "" ) );
 
-		Assert.assertTrue( check.violations.isEmpty() );
+		assertTrue( check.violations.isEmpty() );
 	}
 
 	@Test
@@ -37,7 +39,7 @@ public class DoubleSpacesCheckTest {
 		check.setIgnoreStrings( true );
 		check.processLines( Arrays.asList( "  " ) );
 
-		Assert.assertFalse( check.violations.isEmpty() );
+		assertFalse( check.violations.isEmpty() );
 	}
 
 	@Test
@@ -46,7 +48,7 @@ public class DoubleSpacesCheckTest {
 		check.setIgnoreStrings( false );
 		check.processLines( Arrays.asList( "\"  \"" ) );
 
-		Assert.assertFalse( check.violations.isEmpty() );
+		assertFalse( check.violations.isEmpty() );
 	}
 
 	@Test
@@ -55,7 +57,7 @@ public class DoubleSpacesCheckTest {
 		check.setIgnoreStrings( true );
 		check.processLines( Arrays.asList( "\"  \"" ) );
 
-		Assert.assertTrue( check.violations.isEmpty() );
+		assertTrue( check.violations.isEmpty() );
 	}
 
 	private static class DoubleSpacesCheckMock extends DoubleSpacesCheck {
