@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
+import static org.junit.Assert.fail;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,8 +39,6 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.timeout.impl.StubTimeoutManager;
-
-import org.junit.Assert;
 
 class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
@@ -322,7 +322,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	private static <C, T> Function<C, T> strictNoExpectationsBehavior() {
 		return call -> {
-			Assert.fail( "No call expected, but got: " + call );
+			fail( "No call expected, but got: " + call );
 			// Dead code, we throw an exception above
 			return null;
 		};

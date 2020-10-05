@@ -7,6 +7,7 @@
 package org.hibernate.search.test.spatial;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -15,23 +16,23 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.lucene.search.Sort;
-
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.annotations.Spatial;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
-import org.junit.Assert;
+import org.hibernate.search.util.common.SearchException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+
+import org.apache.lucene.search.Sort;
 
 /**
  * Hibernate Search spatial : unit tests on indexing POIs in with Grid and Grid+Distance
@@ -156,12 +157,12 @@ public class SpatialIndexingTest extends SearchTestBase {
 		Object[] fourthResult = (Object[]) results.get( 3 );
 		Object[] fifthResult = (Object[]) results.get( 4 );
 		Object[] sixthResult = (Object[]) results.get( 5 );
-		Assert.assertEquals( ( (Double) firstResult[1] ), 0.0, 0.0001 );
-		Assert.assertEquals( ( (Double) secondResult[1] ), 10.1582, 0.01 );
-		Assert.assertEquals( ( (Double) thirdResult[1] ), 11.1195, 0.01 );
-		Assert.assertEquals( ( (Double) fourthResult[1] ), 15.0636, 0.01 );
-		Assert.assertEquals( ( (Double) fifthResult[1] ), 22.239, 0.02 );
-		Assert.assertEquals( ( (Double) sixthResult[1] ), 24.446, 0.02 );
+		assertEquals( ( (Double) firstResult[1] ), 0.0, 0.0001 );
+		assertEquals( ( (Double) secondResult[1] ), 10.1582, 0.01 );
+		assertEquals( ( (Double) thirdResult[1] ), 11.1195, 0.01 );
+		assertEquals( ( (Double) fourthResult[1] ), 15.0636, 0.01 );
+		assertEquals( ( (Double) fifthResult[1] ), 22.239, 0.02 );
+		assertEquals( ( (Double) sixthResult[1] ), 24.446, 0.02 );
 	}
 
 	@Test
@@ -286,14 +287,14 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, Event.class );
 		List results = hibQuery.list();
-		Assert.assertEquals( 0, results.size() );
+		assertEquals( 0, results.size() );
 
 		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onField( "location" )
 				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.query.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, Event.class );
 		List results2 = hibQuery2.list();
-		Assert.assertEquals( 1, results2.size() );
+		assertEquals( 1, results2.size() );
 	}
 
 	@Test
@@ -310,14 +311,14 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, User.class );
 		List results = hibQuery.list();
-		Assert.assertEquals( 0, results.size() );
+		assertEquals( 0, results.size() );
 
 		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onField( "home" )
 				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.query.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, User.class );
 		List results2 = hibQuery2.list();
-		Assert.assertEquals( 1, results2.size() );
+		assertEquals( 1, results2.size() );
 	}
 
 	@Test
@@ -337,7 +338,7 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, UserRange.class );
 		List results = hibQuery.list();
-		Assert.assertEquals( 0, results.size() );
+		assertEquals( 0, results.size() );
 
 		org.apache.lucene.search.Query luceneQuery2 = builder.spatial()
 				.within( 51, Unit.KM )
@@ -347,7 +348,7 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 		org.hibernate.query.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, UserRange.class );
 		List results2 = hibQuery2.list();
-		Assert.assertEquals( 1, results2.size() );
+		assertEquals( 1, results2.size() );
 	}
 
 	@Test
@@ -363,14 +364,14 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, UserEx.class );
 		List results = hibQuery.list();
-		Assert.assertEquals( 1, results.size() );
+		assertEquals( 1, results.size() );
 
 		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onField( "work" )
 				.within( 100.0d, Unit.KM ).ofLatitude( 12.0d ).andLongitude( 27.5d ).createQuery();
 
 		org.hibernate.query.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, UserEx.class );
 		List results2 = hibQuery2.list();
-		Assert.assertEquals( 1, results2.size() );
+		assertEquals( 1, results2.size() );
 	}
 
 	@Test
@@ -388,14 +389,14 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 
 		List results = hibQuery.list();
-		Assert.assertEquals( 0, results.size() );
+		assertEquals( 0, results.size() );
 
 		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onField( "location" )
 				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.query.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, RangeEvent.class );
 		List results2 = hibQuery2.list();
-		Assert.assertEquals( 1, results2.size() );
+		assertEquals( 1, results2.size() );
 	}
 
 	@Test
@@ -412,14 +413,14 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, Hotel.class );
 		List results = hibQuery.list();
-		Assert.assertEquals( 0, results.size() );
+		assertEquals( 0, results.size() );
 
 		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onField( "hotel_location" )
 				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.query.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, Hotel.class );
 		List results2 = hibQuery2.list();
-		Assert.assertEquals( 1, results2.size() );
+		assertEquals( 1, results2.size() );
 	}
 
 	@Test
@@ -441,7 +442,7 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, RangeHotel.class );
 		List results = hibQuery.list();
-		Assert.assertEquals( 0, results.size() );
+		assertEquals( 0, results.size() );
 
 		org.apache.lucene.search.Query luceneQuery2 = builder
 				.spatial()
@@ -452,7 +453,7 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 		org.hibernate.query.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, RangeHotel.class );
 		List results2 = hibQuery2.list();
-		Assert.assertEquals( 1, results2.size() );
+		assertEquals( 1, results2.size() );
 
 		double endOfTheWorldLatitude = 0.0d;
 		double endOfTheWorldLongitude = 180.0d;
@@ -466,7 +467,7 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 		org.hibernate.query.Query hibQuery3 = fullTextSession.createFullTextQuery( luceneQuery3, RangeHotel.class );
 		List results3 = hibQuery3.list();
-		Assert.assertEquals( 2, results3.size() );
+		assertEquals( 2, results3.size() );
 
 		org.apache.lucene.search.Query luceneQuery4 = builder
 				.spatial()
@@ -477,7 +478,7 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 		org.hibernate.query.Query hibQuery4 = fullTextSession.createFullTextQuery( luceneQuery4, RangeHotel.class );
 		List results4 = hibQuery4.list();
-		Assert.assertEquals( 3, results4.size() );
+		assertEquals( 3, results4.size() );
 	}
 
 	@Test
@@ -493,14 +494,14 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, Restaurant.class );
 		List results = hibQuery.list();
-		Assert.assertEquals( 0, results.size() );
+		assertEquals( 0, results.size() );
 
 		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onField( "position.location" )
 				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.query.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, Restaurant.class );
 		List results2 = hibQuery2.list();
-		Assert.assertEquals( 1, results2.size() );
+		assertEquals( 1, results2.size() );
 	}
 
 	@Test
@@ -517,14 +518,14 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, GetterUser.class );
 		List results = hibQuery.list();
-		Assert.assertEquals( 0, results.size() );
+		assertEquals( 0, results.size() );
 
 		org.apache.lucene.search.Query luceneQuery2 = builder.spatial().onField( "home" )
 				.within( 51, Unit.KM ).ofLatitude( centerLatitude ).andLongitude( centerLongitude ).createQuery();
 
 		org.hibernate.query.Query hibQuery2 = fullTextSession.createFullTextQuery( luceneQuery2, GetterUser.class );
 		List results2 = hibQuery2.list();
-		Assert.assertEquals( 1, results2.size() );
+		assertEquals( 1, results2.size() );
 	}
 
 	@Test
@@ -544,11 +545,11 @@ public class SpatialIndexingTest extends SearchTestBase {
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, "location" );
 		hibQuery.setSort( builder.sort().byDistance().onField( "location" ).fromLatitude( centerLatitude ).andLongitude( centerLongitude ).createSort() );
 		List results = hibQuery.list();
-		Assert.assertEquals( 2, results.size() );
+		assertEquals( 2, results.size() );
 		Object[] firstResult = (Object[]) results.get( 0 );
 		Object[] secondResult = (Object[]) results.get( 1 );
-		Assert.assertEquals( 6.0492d, (Double) firstResult[1], 0.001 );
-		Assert.assertEquals( 4132.8166d, (Double) secondResult[1], 1 );
+		assertEquals( 6.0492d, (Double) firstResult[1], 0.001 );
+		assertEquals( 4132.8166d, (Double) secondResult[1], 1 );
 
 		//Tests with @Longitude+@Latitude
 		luceneQuery = builder.spatial()
@@ -559,11 +560,11 @@ public class SpatialIndexingTest extends SearchTestBase {
 		hibQuery.setSpatialParameters( centerLatitude, centerLongitude, Spatial.COORDINATES_DEFAULT_FIELD );
 		hibQuery.setSort( builder.sort().byDistance().onField( "location" ).fromLatitude( centerLatitude ).andLongitude( centerLongitude ).createSort() );
 		results = hibQuery.list();
-		Assert.assertEquals( 2, results.size() );
+		assertEquals( 2, results.size() );
 		firstResult = (Object[]) results.get( 0 );
 		secondResult = (Object[]) results.get( 1 );
-		Assert.assertEquals( 6.0492d, (Double) firstResult[1], 0.001 );
-		Assert.assertEquals( 4132.8166d, (Double) secondResult[1], 1 );
+		assertEquals( 6.0492d, (Double) firstResult[1], 0.001 );
+		assertEquals( 4132.8166d, (Double) secondResult[1], 1 );
 	}
 
 	@Override
@@ -597,6 +598,6 @@ public class SpatialIndexingTest extends SearchTestBase {
 
 		org.hibernate.query.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 		List results = hibQuery.list();
-		Assert.assertEquals( "Unexpected number of POIs within radius", expectedPoiCount, results.size() );
+		assertEquals( "Unexpected number of POIs within radius", expectedPoiCount, results.size() );
 	}
 }

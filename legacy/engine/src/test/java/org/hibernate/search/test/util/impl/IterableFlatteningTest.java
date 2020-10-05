@@ -7,6 +7,7 @@
 package org.hibernate.search.test.util.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +18,6 @@ import java.util.NoSuchElementException;
 import org.assertj.core.api.ListAssert;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.util.impl.CollectionHelper;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -43,7 +43,7 @@ public class IterableFlatteningTest {
 		Iterator<Integer> iterator = flattened.iterator();
 		try {
 			iterator.next();
-			Assert.fail( "Should have thrown the exception" );
+			fail( "Should have thrown the exception" );
 		}
 		catch (NoSuchElementException e) {
 			//All good
@@ -64,7 +64,7 @@ public class IterableFlatteningTest {
 		Iterator<Integer> iterator = flattened.iterator();
 		try {
 			iterator.next();
-			Assert.fail( "Should have thrown the exception" );
+			fail( "Should have thrown the exception" );
 		}
 		catch (NoSuchElementException e) {
 			//All good

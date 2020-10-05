@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
+import static org.junit.Assert.fail;
+
 import org.hibernate.BaseSessionEventListener;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
-
-import org.junit.Assert;
 
 public class SlowerLoadingListener extends BaseSessionEventListener {
 
@@ -30,7 +30,7 @@ public class SlowerLoadingListener extends BaseSessionEventListener {
 			Thread.sleep( delay );
 		}
 		catch (InterruptedException e) {
-			Assert.fail( "Unexpected interruption " + e.getMessage() );
+			fail( "Unexpected interruption " + e.getMessage() );
 		}
 	}
 }

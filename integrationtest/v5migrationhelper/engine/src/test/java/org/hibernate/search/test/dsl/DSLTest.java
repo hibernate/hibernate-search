@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.test.dsl;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -16,11 +18,6 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Query;
-import org.hamcrest.CoreMatchers;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.AnalysisNames;
@@ -29,12 +26,18 @@ import org.hibernate.search.testsupport.junit.PortedToSearch6;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
-import org.junit.Assert;
+import org.hibernate.search.util.common.SearchException;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
+
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Query;
+import org.hamcrest.CoreMatchers;
 
 /**
  * @author Emmanuel Bernard
@@ -336,7 +339,7 @@ public class DSLTest {
 		BooleanJunction<?> booleanJunction = monthQb.bool();
 		assertTrue( booleanJunction.isEmpty() );
 		booleanJunction.createQuery();
-		Assert.fail( "should not reach this point" );
+		fail( "should not reach this point" );
 	}
 
 	@Test
@@ -352,8 +355,8 @@ public class DSLTest {
 				.should( null )
 				.createQuery();
 
-		Assert.assertThat( query, CoreMatchers.instanceOf( BooleanQuery.class ) );
-		Assert.assertEquals( 1, ( (BooleanQuery) query ).clauses().size() );
+		assertThat( query, CoreMatchers.instanceOf( BooleanQuery.class ) );
+		assertEquals( 1, ( (BooleanQuery) query ).clauses().size() );
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesExactlyIds( 1 );
 
@@ -365,8 +368,8 @@ public class DSLTest {
 					.must( monthQb.keyword().onField( "mythology" ).matching( "colder" ).createQuery() )
 					.createQuery();
 
-		Assert.assertThat( query, CoreMatchers.instanceOf( BooleanQuery.class ) );
-		Assert.assertEquals( 1, ( (BooleanQuery) query ).clauses().size() );
+		assertThat( query, CoreMatchers.instanceOf( BooleanQuery.class ) );
+		assertEquals( 1, ( (BooleanQuery) query ).clauses().size() );
 
 		helper.assertThatQuery( query ).from( Month.class ).matchesExactlyIds( 1 );
 	}

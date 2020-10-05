@@ -7,17 +7,18 @@
 
 package org.hibernate.search.test.batchindexing;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 
-import org.apache.lucene.search.MatchAllDocsQuery;
-
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
-import org.junit.Assert;
+
 import org.junit.Test;
+
+import org.apache.lucene.search.MatchAllDocsQuery;
 
 /**
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
@@ -30,10 +31,10 @@ public class CollectionInitializeTest extends SearchTestBase {
 		initializeData( fullTextSession );
 		try {
 			List list = fullTextSession.createCriteria( LegacyCarPlant.class ).list();
-			Assert.assertEquals( 1, list.size() );
+			assertEquals( 1, list.size() );
 			fullTextSession.createIndexer( LegacyCarPlant.class ).startAndWait();
 			int resultSize = fullTextSession.createFullTextQuery( new MatchAllDocsQuery(), LegacyCarPlant.class ).getResultSize();
-			Assert.assertEquals( 1, resultSize );
+			assertEquals( 1, resultSize );
 		}
 		finally {
 			clearData( fullTextSession );

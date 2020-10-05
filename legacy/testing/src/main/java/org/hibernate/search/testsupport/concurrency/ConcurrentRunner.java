@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.testsupport.concurrency;
 
+import static org.junit.Assert.fail;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -13,9 +15,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import org.junit.Assert;
-
 
 /**
  * Helper to create tests which need to execute multiple tasks at "approximately same time",
@@ -121,7 +120,7 @@ public class ConcurrentRunner {
 		catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 			e.printStackTrace();
-			Assert.fail( "Interrupted while waiting for end of execution" );
+			fail( "Interrupted while waiting for end of execution" );
 		}
 
 		AssertionError reportedError = null;

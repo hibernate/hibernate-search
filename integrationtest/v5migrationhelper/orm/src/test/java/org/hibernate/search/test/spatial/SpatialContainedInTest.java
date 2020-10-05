@@ -6,8 +6,9 @@
  */
 package org.hibernate.search.test.spatial;
 
-import java.util.List;
+import static org.junit.Assert.assertEquals;
 
+import java.util.List;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -27,7 +28,7 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.hibernate.search.test.SearchInitializationTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.junit.Assert;
+
 import org.junit.Test;
 
 /**
@@ -81,7 +82,7 @@ public class SpatialContainedInTest extends SearchInitializationTestBase {
 
 			FullTextQuery query = ftSession.createFullTextQuery( luceneQuery, Actor.class );
 			List<?> results = query.list();
-			Assert.assertEquals( 1, results.size() );
+			assertEquals( 1, results.size() );
 		}
 
 		// Change the location so that it doesn't match the query anymore
@@ -111,7 +112,7 @@ public class SpatialContainedInTest extends SearchInitializationTestBase {
 
 			FullTextQuery query = ftSession.createFullTextQuery( luceneQuery, Actor.class );
 			List<?> results = query.list();
-			Assert.assertEquals( 0, results.size() );
+			assertEquals( 0, results.size() );
 		}
 	}
 

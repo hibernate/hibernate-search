@@ -7,24 +7,24 @@
 
 package org.hibernate.search.test.embedded.path;
 
-import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-import org.apache.lucene.search.Query;
+import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.util.common.SearchException;
+
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import org.apache.lucene.search.Query;
 
 /**
  * John of England Genealogy
@@ -54,8 +54,8 @@ public class PathEmbeddedDepthTest extends SearchTestBase {
 	public void testShouldIndexFieldInPath() throws Exception {
 		List<Human> result = search( session, "parents.parents.parents.name", "Philippa" );
 
-		Assert.assertEquals( 1, result.size() );
-		Assert.assertEquals(
+		assertEquals( 1, result.size() );
+		assertEquals(
 				"Should be able to index a field in path regarding the depth",
 				"John of England", result.get( 0 ).getFullname() );
 	}
@@ -64,8 +64,8 @@ public class PathEmbeddedDepthTest extends SearchTestBase {
 	public void testIndexFieldIfInsideDepth() throws Exception {
 		List<Human> result = search( session, "parents.parents.name", "Empress" );
 
-		Assert.assertEquals( 1, result.size() );
-		Assert.assertEquals(
+		assertEquals( 1, result.size() );
+		assertEquals(
 				"Should be able to index field inside depth and in path",
 				"John of England", result.get( 0 ).getFullname() );
 	}
@@ -84,8 +84,8 @@ public class PathEmbeddedDepthTest extends SearchTestBase {
 	public void testShouldIndexFieldNotInPathButInsideDepthThreshold() throws Exception {
 		List<Human> result = search( session, "parents.parents.surname", "de Châtellerault" );
 
-		Assert.assertEquals( 1, result.size() );
-		Assert.assertEquals( "Should be able to index a field if is inside the depth threshold even if not in path",
+		assertEquals( 1, result.size() );
+		assertEquals( "Should be able to index a field if is inside the depth threshold even if not in path",
 				"John of England", result.get( 0 ).getFullname() );
 	}
 

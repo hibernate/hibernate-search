@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.assertion;
 
+import static org.junit.Assert.fail;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -14,8 +16,6 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNodeMi
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.common.impl.ToStringStyle;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
-
-import org.junit.Assert;
 
 public class StubDocumentWorkAssert {
 
@@ -69,7 +69,7 @@ public class StubDocumentWorkAssert {
 		builder.endObject();
 
 		if ( hasAnyMismatch ) {
-			Assert.fail( messageBase + builder.toString() );
+			fail( messageBase + builder.toString() );
 		}
 
 		return this;

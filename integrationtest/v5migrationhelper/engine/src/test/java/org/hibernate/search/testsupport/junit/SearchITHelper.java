@@ -7,6 +7,7 @@
 package org.hibernate.search.testsupport.junit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,8 +31,6 @@ import org.hibernate.search.query.facet.Facet;
 import org.hibernate.search.testsupport.migration.V5MigrationJavaBeanSearchSessionAdapter;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.common.AssertionFailure;
-
-import org.junit.Assert;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.MatchAllDocsQuery;
@@ -480,7 +479,7 @@ public class SearchITHelper {
 				}
 			}
 			if ( !found ) {
-				Assert.fail( "Could not find facet '" + value + "' for faceting request '" + facetingRequestName + "' on query " + queryContext );
+				fail( "Could not find facet '" + value + "' for faceting request '" + facetingRequestName + "' on query " + queryContext );
 			}
 			return this;
 		}

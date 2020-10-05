@@ -6,14 +6,16 @@
  */
 package org.hibernate.search.test.batchindexing;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.lucene.search.MatchAllDocsQuery;
-import org.apache.lucene.search.Query;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
@@ -23,10 +25,12 @@ import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.concurrency.Poller;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
+
 import org.hibernate.testing.TestForIssue;
-import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.Query;
 
 @TestForIssue(jiraKey = "HSEARCH-655")
 public class MassIndexerCancellingTest extends SearchTestBase {
@@ -61,16 +65,16 @@ public class MassIndexerCancellingTest extends SearchTestBase {
 		fullTextSession.close();
 
 		// check 2 indexing thread enlisted
-		Assert.assertTrue( monitor.getThreadNumber() == threadsToLoadObjects );
+		assertTrue( monitor.getThreadNumber() == threadsToLoadObjects );
 
 		// verify index is now containing 2 docs
 		Poller.milliseconds( 10_000, 10 ).pollAssertion( () -> {
-				Assert.assertEquals( "Expected index size still not reached after 10 seconds!",
+				assertEquals( "Expected index size still not reached after 10 seconds!",
 						2, getIndexSize() );
 		} );
 
 		// check all indexing thread are interrupted
-		Assert.assertTrue( monitor.massIndexerThreadsAreInterruptedOrDied() );
+		assertTrue( monitor.massIndexerThreadsAreInterruptedOrDied() );
 
 	}
 

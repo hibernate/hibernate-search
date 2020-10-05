@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.model.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,6 @@ import javax.persistence.Transient;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 public class HibernateOrmBootstrapIntrospectorAccessTypeTest
@@ -229,7 +229,7 @@ public class HibernateOrmBootstrapIntrospectorAccessTypeTest
 	}
 
 	private static <T> T methodShouldNotBeCalled() {
-		Assert.fail( "This method should not be called" );
+		fail( "This method should not be called" );
 		return null;
 	}
 

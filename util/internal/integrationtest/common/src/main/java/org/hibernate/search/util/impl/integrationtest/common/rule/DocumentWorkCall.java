@@ -7,13 +7,12 @@
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.StubDocumentWorkAssert.assertThatDocumentWork;
+import static org.junit.Assert.fail;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
-
-import org.junit.Assert;
 
 class DocumentWorkCall extends Call<DocumentWorkCall> {
 
@@ -60,7 +59,7 @@ class DocumentWorkCall extends Call<DocumentWorkCall> {
 		String whenThisWorkWasExpected = "when a " + phase + " call for a document work on index '" + indexName
 				+ "', identifier '" + work.getIdentifier() + "' was expected";
 		if ( !Objects.equals( phase, actualCall.phase ) ) {
-			Assert.fail( "Incorrect work phase " + whenThisWorkWasExpected + ".\n\tExpected: "
+			fail( "Incorrect work phase " + whenThisWorkWasExpected + ".\n\tExpected: "
 					+ phase + ", actual: " + actualCall.phase
 					+ ".\n\tExpected work: " + work + "\n\tActual work: " + actualCall.work );
 		}

@@ -6,12 +6,10 @@
  */
 package org.hibernate.search.test.engine.worker;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Level;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -20,11 +18,16 @@ import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
 import org.hibernate.search.testsupport.concurrency.ConcurrentRunner;
-import org.junit.Assert;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import org.apache.log4j.Level;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 
 /**
  * @author Emmanuel Bernard
@@ -109,7 +112,7 @@ public abstract class WorkerTestCase extends SearchTestBase {
 				// don't test because in case of async, it query happens before
 				// actual saving
 				if ( isWorkerSync ) {
-					Assert.assertTrue( results );
+					assertTrue( results );
 				}
 				tx.commit();
 				s.close();

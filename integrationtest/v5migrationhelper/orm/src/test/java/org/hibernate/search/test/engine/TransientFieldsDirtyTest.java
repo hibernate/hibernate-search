@@ -6,17 +6,16 @@
  */
 package org.hibernate.search.test.engine;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.apache.lucene.search.Query;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -29,8 +28,10 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.junit.Assert;
+
 import org.junit.Test;
+
+import org.apache.lucene.search.Query;
 
 /**
  * Verify we don't rely on dirtyness values from Hibernate ORM on fields
@@ -81,9 +82,9 @@ public class TransientFieldsDirtyTest extends SearchTestBase {
 		FullTextQuery query = fullTextSession.createFullTextQuery( luceneQuery, FormulaAdd.class );
 		List resultsList = query.list();
 		transaction.commit();
-		Assert.assertEquals( 1, resultsList.size() );
+		assertEquals( 1, resultsList.size() );
 		FormulaAdd result = (FormulaAdd) resultsList.get( 0 );
-		Assert.assertEquals( value, result.getAplusB() );
+		assertEquals( value, result.getAplusB() );
 	}
 
 	@Override

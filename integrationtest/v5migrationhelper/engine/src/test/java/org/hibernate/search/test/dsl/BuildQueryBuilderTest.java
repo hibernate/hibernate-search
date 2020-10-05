@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.test.dsl;
 
-import org.apache.lucene.search.MatchAllDocsQuery;
+import static org.junit.Assert.assertEquals;
+
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
@@ -17,10 +18,12 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
-import org.junit.Assert;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import org.apache.lucene.search.MatchAllDocsQuery;
 
 /**
  * @author Yoann Rodiere
@@ -38,7 +41,7 @@ public class BuildQueryBuilderTest {
 	@Test
 	public void forEntity_configured_indexed() {
 		QueryBuilder builder = sfHolder.getSearchFactory().buildQueryBuilder().forEntity( ConfiguredIndexed.class ).get();
-		Assert.assertEquals( new MatchAllDocsQuery(), builder.all().createQuery() );
+		assertEquals( new MatchAllDocsQuery(), builder.all().createQuery() );
 	}
 
 	@Test

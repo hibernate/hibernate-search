@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.assertion;
 
+import static org.junit.Assert.fail;
+
 import java.util.Objects;
 
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
-
-import org.junit.Assert;
 
 public class StubSearchWorkAssert {
 
@@ -62,7 +62,7 @@ public class StubSearchWorkAssert {
 		hasAnyMismatch = hasAnyMismatch || mismatch;
 
 		if ( hasAnyMismatch ) {
-			Assert.fail( builder.toString() );
+			fail( builder.toString() );
 		}
 
 		return this;

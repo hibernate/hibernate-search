@@ -7,14 +7,15 @@
 package org.hibernate.search.test.batchindexing;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.concurrent.atomic.LongAdder;
 
-import org.apache.lucene.search.MatchAllDocsQuery;
-import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
@@ -28,11 +29,13 @@ import org.hibernate.search.test.util.FullTextSessionBuilder;
 import org.hibernate.search.testsupport.textbuilder.SentenceInventor;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
-import org.junit.Assert;
+
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.Query;
 
 /**
  * Tests the fullTextSession.createIndexer() API for basic functionality.
@@ -138,7 +141,7 @@ public class IndexingGeneratedCorpusTest {
 	private void reindexAll() throws InterruptedException {
 		FullTextSession fullTextSession = builder.openFullTextSession();
 		SilentProgressMonitor progressMonitor = new SilentProgressMonitor();
-		Assert.assertFalse( progressMonitor.finished );
+		assertFalse( progressMonitor.finished );
 		try {
 			fullTextSession.createIndexer( Object.class )
 					.threadsForSubsequentFetching( 8 )
@@ -150,7 +153,7 @@ public class IndexingGeneratedCorpusTest {
 		finally {
 			fullTextSession.close();
 		}
-		Assert.assertTrue( progressMonitor.finished );
+		assertTrue( progressMonitor.finished );
 	}
 
 	private void purgeAll() {
