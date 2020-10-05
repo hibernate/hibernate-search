@@ -19,7 +19,7 @@ import org.junit.Assert;
 
 public class StubDocumentWorkAssert {
 
-	public static StubDocumentWorkAssert assertThat(StubDocumentWork work) {
+	public static StubDocumentWorkAssert assertThatDocumentWork(StubDocumentWork work) {
 		return new StubDocumentWorkAssert( work );
 	}
 

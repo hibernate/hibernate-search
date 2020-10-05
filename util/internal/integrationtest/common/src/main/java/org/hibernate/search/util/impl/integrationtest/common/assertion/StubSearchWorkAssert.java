@@ -16,7 +16,7 @@ public class StubSearchWorkAssert {
 
 	private static final String NEWLINE = "\n\t";
 
-	public static StubSearchWorkAssert assertThat(StubSearchWork work) {
+	public static StubSearchWorkAssert assertThatSearchWork(StubSearchWork work) {
 		return new StubSearchWorkAssert( work );
 	}
 

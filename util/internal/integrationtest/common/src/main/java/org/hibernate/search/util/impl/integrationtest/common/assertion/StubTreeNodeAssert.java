@@ -18,7 +18,7 @@ import org.junit.Assert;
 
 public class StubTreeNodeAssert<T extends StubTreeNode<T>> {
 
-	public static <T extends StubTreeNode<T>> StubTreeNodeAssert<T> assertThat(T node) {
+	public static <T extends StubTreeNode<T>> StubTreeNodeAssert<T> assertThatTree(T node) {
 		return new StubTreeNodeAssert<>( node );
 	}
 
