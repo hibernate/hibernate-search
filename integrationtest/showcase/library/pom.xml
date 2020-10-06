@@ -85,13 +85,6 @@
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <!-- Spring Boot uses Mockito -->
-                <exclusion>
-                    <groupId>org.easymock</groupId>
-                    <artifactId>easymock</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!--
