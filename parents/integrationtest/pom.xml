@@ -47,6 +47,14 @@
          -->
         <sonar.sources>${rootProject.emptySubdirectory}</sonar.sources>
         <sonar.tests>${project.basedir}/src</sonar.tests>
+
+        <!-- For some reason, the failsafe plugin uses the modulepath
+             even when we didn't define a module-info.java,
+             and many things fail because of the modulepath.
+             In particular, the backend TCK fails to retrieve TckBackendHelper,
+             and Spring Boot ITs fail to detect configuration defined in the main (non-test) code.
+             So, disable the modulepath explicitly. -->
+        <failsafe.useModulePath>false</failsafe.useModulePath>
     </properties>
 
     <dependencyManagement>
