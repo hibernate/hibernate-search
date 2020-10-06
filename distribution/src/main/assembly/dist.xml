@@ -9,7 +9,7 @@
 <!--
   When updating this file, make sure we don't include duplicate jars in different subdirectories.
   Generate the distribution preview to see how it looks like:
-   mvn clean package assembly:assembly -DskipTests=true
+   mvn clean package assembly:assembly -DskipTests -DskipITs
   To inspect which jars are being distributed and look for duplicates this might be handy:
    tar -ztvf target/*-dist.tar.gz  | grep .jar | sed -e "s/.*\/dist//" -e "s/\(\/lib\/[^\/]*\)\/\(.*\)/\2 \t\t\t\1/" | sort
  -->

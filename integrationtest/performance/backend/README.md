@@ -10,9 +10,9 @@ and find regressions in isolation from the various mappers.
 To build the performance tests:
 
 ```
-mvn clean install -pl integrationtest/performance/backend/elasticsearch -am -DskipTests
+mvn clean install -pl integrationtest/performance/backend/elasticsearch -am -DskipTests -DskipITs
 # OR
-mvn clean install -pl integrationtest/performance/backend/lucene -am -DskipTests
+mvn clean install -pl integrationtest/performance/backend/lucene -am -DskipTests -DskipITs
 ```
 
 ## Run it from command line
