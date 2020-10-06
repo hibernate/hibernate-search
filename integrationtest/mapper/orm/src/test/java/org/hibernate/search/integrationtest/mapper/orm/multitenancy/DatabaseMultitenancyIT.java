@@ -101,9 +101,9 @@ public class DatabaseMultitenancyIT {
 	}
 
 	private void persist(String tenantId, Clock[] models) {
-		BackendMock.DocumentWorkCallListContext expectWorks = backendMock.expectWorks( Clock.INDEX );
+		BackendMock.DocumentWorkCallListContext expectWorks = backendMock.expectWorks( Clock.INDEX, tenantId );
 		for ( Clock clock : models ) {
-			expectWorks.add( clock.getId() + "", tenantId, b -> b.field( "brand", clock.getBrand() ) );
+			expectWorks.add( clock.getId() + "", b -> b.field( "brand", clock.getBrand() ) );
 		}
 		expectWorks.processedThenExecuted();
 

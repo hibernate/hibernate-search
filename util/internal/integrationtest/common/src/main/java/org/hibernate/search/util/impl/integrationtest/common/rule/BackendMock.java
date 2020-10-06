@@ -136,16 +136,24 @@ public class BackendMock implements TestRule {
 	}
 
 	public DocumentWorkCallListContext expectWorks(String indexName) {
+		return expectWorks( indexName, null );
+	}
+
+	public DocumentWorkCallListContext expectWorks(String indexName, String tenantId) {
 		// Default to force commit and no refresh, which is what the mapper should use by default
-		return expectWorks( indexName, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
+		return expectWorks( indexName, tenantId, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
 	}
 
 	public DocumentWorkCallListContext expectWorks(String indexName,
-			DocumentCommitStrategy commitStrategy,
-			DocumentRefreshStrategy refreshStrategy) {
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		return expectWorks( indexName, null, commitStrategy, refreshStrategy );
+	}
+
+	public DocumentWorkCallListContext expectWorks(String indexName, String tenantId,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		CallQueue<DocumentWorkCall> callQueue = backendBehavior().getDocumentWorkCalls( indexName );
 		return new DocumentWorkCallListContext(
-				indexName,
+				indexName, tenantId,
 				commitStrategy, refreshStrategy,
 				callQueue::expectInOrder
 		);
@@ -156,7 +164,7 @@ public class BackendMock implements TestRule {
 			DocumentRefreshStrategy refreshStrategy) {
 		CallQueue<DocumentWorkCall> callQueue = backendBehavior().getDocumentWorkCalls( indexName );
 		return new DocumentWorkCallListContext(
-				indexName,
+				indexName, null,
 				commitStrategy, refreshStrategy,
 				callQueue::expectOutOfOrder
 		);
@@ -289,16 +297,18 @@ public class BackendMock implements TestRule {
 
 	public class DocumentWorkCallListContext {
 		private final String indexName;
+		private final String tenantId;
 		private final DocumentCommitStrategy commitStrategyForDocumentWorks;
 		private final DocumentRefreshStrategy refreshStrategyForDocumentWorks;
 		private final Consumer<DocumentWorkCall> expectationConsumer;
 		private final List<StubDocumentWork> works = new ArrayList<>();
 
-		private DocumentWorkCallListContext(String indexName,
+		private DocumentWorkCallListContext(String indexName, String tenantId,
 				DocumentCommitStrategy commitStrategyForDocumentWorks,
 				DocumentRefreshStrategy refreshStrategyForDocumentWorks,
 				Consumer<DocumentWorkCall> expectationConsumer) {
 			this.indexName = indexName;
+			this.tenantId = tenantId;
 			this.commitStrategyForDocumentWorks = commitStrategyForDocumentWorks;
 			this.refreshStrategyForDocumentWorks = refreshStrategyForDocumentWorks;
 			this.expectationConsumer = expectationConsumer;
@@ -310,11 +320,6 @@ public class BackendMock implements TestRule {
 
 		public DocumentWorkCallListContext add(String id, Consumer<StubDocumentNode.Builder> documentContributor) {
 			return documentWork( StubDocumentWork.Type.ADD, id, documentContributor );
-		}
-
-		public DocumentWorkCallListContext add(String id, String tenantId,
-				Consumer<StubDocumentNode.Builder> documentContributor) {
-			return documentWork( StubDocumentWork.Type.ADD, id, tenantId, documentContributor );
 		}
 
 		public DocumentWorkCallListContext update(Consumer<StubDocumentWork.Builder> contributor) {
@@ -336,6 +341,7 @@ public class BackendMock implements TestRule {
 		DocumentWorkCallListContext documentWork(StubDocumentWork.Type type,
 				Consumer<StubDocumentWork.Builder> contributor) {
 			StubDocumentWork.Builder builder = StubDocumentWork.builder( type );
+			builder.tenantIdentifier( tenantId );
 			contributor.accept( builder );
 			builder.commit( commitStrategyForDocumentWorks );
 			builder.refresh( refreshStrategyForDocumentWorks );
@@ -346,17 +352,6 @@ public class BackendMock implements TestRule {
 				Consumer<StubDocumentNode.Builder> documentContributor) {
 			return documentWork( type, b -> {
 				b.identifier( id );
-				StubDocumentNode.Builder documentBuilder = StubDocumentNode.document();
-				documentContributor.accept( documentBuilder );
-				b.document( documentBuilder.build() );
-			} );
-		}
-
-		DocumentWorkCallListContext documentWork(StubDocumentWork.Type type, String id, String tenantId,
-				Consumer<StubDocumentNode.Builder> documentContributor) {
-			return documentWork( type, b -> {
-				b.identifier( id );
-				b.tenantIdentifier( tenantId );
 				StubDocumentNode.Builder documentBuilder = StubDocumentNode.document();
 				documentContributor.accept( documentBuilder );
 				b.document( documentBuilder.build() );
