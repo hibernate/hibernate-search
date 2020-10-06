@@ -68,23 +68,4 @@
             <property name="hibernate.search.backend.directory.type" value="local-heap" />
         </properties>
     </persistence-unit>
-    <persistence-unit name="lucene_multiTenancy_pu" transaction-type="RESOURCE_LOCAL">
-        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <properties>
-            <property name="hibernate.dialect" value="${db.dialect}" />
-            <property name="hibernate.connection.driver_class" value="${jdbc.driver}" />
-            <property name="hibernate.connection.url" value="${jdbc.url}" />
-            <property name="hibernate.connection.user" value="${jdbc.user}" />
-            <property name="hibernate.connection.password" value="${jdbc.pass}" />
-            <property name="hibernate.hbm2ddl.auto" value="create-drop" />
-            <property name="hibernate.session_factory_name" value="primary_session_factory" />
-            <property name="hibernate.session_factory_name_is_jndi" value="false" />
-            <property name="hibernate.multiTenancy" value="DATABASE" />
-
-            <property name="hibernate.search.automatic_indexing.strategy" value="none" />
-            <property name="hibernate.search.backend.type" value="lucene" />
-            <property name="hibernate.search.backend.directory.type" value="local-heap" />
-            <property name="hibernate.search.backend.multi_tenancy.strategy" value="discriminator" />
-        </properties>
-    </persistence-unit>
 </persistence>

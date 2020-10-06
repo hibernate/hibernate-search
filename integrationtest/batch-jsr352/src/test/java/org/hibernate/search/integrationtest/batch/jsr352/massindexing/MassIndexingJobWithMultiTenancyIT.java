@@ -16,29 +16,31 @@ import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
+import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
 import org.hibernate.search.batch.jsr352.core.massindexing.test.util.JobTestUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneBackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.hibernate.testing.RequiresDialect;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Mincong Huang
  */
-@RequiresDialect(
-		comment = "The connection provider for this test ignores configuration and requires H2",
-		strictMatching = true,
-		value = org.hibernate.dialect.H2Dialect.class
-)
 public class MassIndexingJobWithMultiTenancyIT {
+
+	@Rule
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withSingleBackend( new LuceneBackendConfiguration() );
 
 	private static final String TARGET_TENANT_ID = "targetTenant";
 
@@ -46,7 +48,7 @@ public class MassIndexingJobWithMultiTenancyIT {
 
 	private static final int JOB_TIMEOUT_MS = 10_000;
 
-	protected EntityManagerFactory emf;
+	private SessionFactory sessionFactory;
 
 	private JobOperator jobOperator = BatchRuntime.getJobOperator();
 
@@ -58,15 +60,17 @@ public class MassIndexingJobWithMultiTenancyIT {
 
 	@Before
 	public void setUp() throws Exception {
-		emf = Persistence.createEntityManagerFactory( "lucene_multiTenancy_pu" );
+		sessionFactory = ormSetupHelper
+				.start()
+				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
+						AutomaticIndexingStrategyName.NONE )
+				.withBackendProperty( LuceneBackendSettings.MULTI_TENANCY_STRATEGY,
+						MultiTenancyStrategyName.DISCRIMINATOR.name() )
+				.tenants( TARGET_TENANT_ID, UNUSED_TENANT_ID )
+				.setup( Company.class );
+
 		persist( TARGET_TENANT_ID, companies );
 		purgeAll( TARGET_TENANT_ID, Company.class );
-	}
-
-	public void tearDown() {
-		if ( emf != null ) {
-			emf.close();
-		}
 	}
 
 	@Test
@@ -83,13 +87,13 @@ public class MassIndexingJobWithMultiTenancyIT {
 		JobTestUtil.waitForTermination( jobOperator, jobExecution, JOB_TIMEOUT_MS );
 		assertThat( jobExecution.getBatchStatus() ).isEqualTo( BatchStatus.COMPLETED );
 
-		assertThat( findIndexedResultsInTenant( emf, Company.class, "name", "Google", TARGET_TENANT_ID ) ).hasSize( 1 );
-		assertThat( findIndexedResultsInTenant( emf, Company.class, "name", "Red Hat", TARGET_TENANT_ID ) ).hasSize( 1 );
-		assertThat( findIndexedResultsInTenant( emf, Company.class, "name", "Microsoft", TARGET_TENANT_ID ) ).hasSize( 1 );
+		assertThat( findIndexedResultsInTenant( sessionFactory, Company.class, "name", "Google", TARGET_TENANT_ID ) ).hasSize( 1 );
+		assertThat( findIndexedResultsInTenant( sessionFactory, Company.class, "name", "Red Hat", TARGET_TENANT_ID ) ).hasSize( 1 );
+		assertThat( findIndexedResultsInTenant( sessionFactory, Company.class, "name", "Microsoft", TARGET_TENANT_ID ) ).hasSize( 1 );
 
-		assertThat( findIndexedResultsInTenant( emf, Company.class, "name", "Google", UNUSED_TENANT_ID ) ).isEmpty();
-		assertThat( findIndexedResultsInTenant( emf, Company.class, "name", "Red Hat", UNUSED_TENANT_ID ) ).isEmpty();
-		assertThat( findIndexedResultsInTenant( emf, Company.class, "name", "Microsoft", UNUSED_TENANT_ID ) ).isEmpty();
+		assertThat( findIndexedResultsInTenant( sessionFactory, Company.class, "name", "Google", UNUSED_TENANT_ID ) ).isEmpty();
+		assertThat( findIndexedResultsInTenant( sessionFactory, Company.class, "name", "Red Hat", UNUSED_TENANT_ID ) ).isEmpty();
+		assertThat( findIndexedResultsInTenant( sessionFactory, Company.class, "name", "Microsoft", UNUSED_TENANT_ID ) ).isEmpty();
 	}
 
 	private <T> void persist(String tenantId, List<T> entities) {
@@ -107,6 +111,6 @@ public class MassIndexingJobWithMultiTenancyIT {
 	}
 
 	private Session openSessionWithTenantId(String tenantId) {
-		return emf.unwrap( SessionFactory.class ).withOptions().tenantIdentifier( tenantId ).openSession();
+		return sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession();
 	}
 }
