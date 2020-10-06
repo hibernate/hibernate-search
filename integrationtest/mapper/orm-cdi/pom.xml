@@ -12,6 +12,11 @@
     <name>Hibernate Search Integration Tests - ORM - CDI</name>
     <description>Hibernate Search integration tests for the Hibernate ORM integration with CDI</description>
 
+    <properties>
+        <!-- Weld performs illegal accesses to java.base to generate proxies, so we can't use strict access validation -->
+        <surefire.jvm.args.java-version>${surefire.jvm.args.java-version.lenient}</surefire.jvm.args.java-version>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
