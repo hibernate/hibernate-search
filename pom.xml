@@ -1296,7 +1296,6 @@
                         <execution>
                             <id>verify-forbidden-apis</id>
                             <configuration>
-                                <targetVersion>15</targetVersion>
                                 <!-- if the used Java version is too new, don't fail, just do nothing: -->
                                 <failOnUnsupportedJava>false</failOnUnsupportedJava>
                                 <excludes>
@@ -1382,7 +1381,6 @@
                         <execution>
                             <id>verify-forbidden-test-apis</id>
                             <configuration>
-                                <targetVersion>${maven.compiler.testRelease}</targetVersion>
                                 <!-- if the used Java version is too new, don't fail, just do nothing: -->
                                 <failOnUnsupportedJava>false</failOnUnsupportedJava>
                                 <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
