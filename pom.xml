@@ -1296,7 +1296,7 @@
                         <execution>
                             <id>verify-forbidden-apis</id>
                             <configuration>
-                                <targetVersion>13</targetVersion>
+                                <targetVersion>15</targetVersion>
                                 <!-- if the used Java version is too new, don't fail, just do nothing: -->
                                 <failOnUnsupportedJava>false</failOnUnsupportedJava>
                                 <excludes>
@@ -1341,6 +1341,8 @@
                                     <bundledSignature>jdk-unsafe-11</bundledSignature>
                                     <bundledSignature>jdk-unsafe-12</bundledSignature>
                                     <bundledSignature>jdk-unsafe-13</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-14</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-15</bundledSignature>
 
                                     <bundledSignature>jdk-deprecated-1.8</bundledSignature>
                                     <bundledSignature>jdk-deprecated-9</bundledSignature>
@@ -1348,6 +1350,8 @@
                                     <bundledSignature>jdk-deprecated-11</bundledSignature>
                                     <bundledSignature>jdk-deprecated-12</bundledSignature>
                                     <bundledSignature>jdk-deprecated-13</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-14</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-15</bundledSignature>
 
                                     <bundledSignature>jdk-internal-1.8</bundledSignature>
                                     <bundledSignature>jdk-internal-9</bundledSignature>
@@ -1355,6 +1359,8 @@
                                     <bundledSignature>jdk-internal-11</bundledSignature>
                                     <bundledSignature>jdk-internal-12</bundledSignature>
                                     <bundledSignature>jdk-internal-13</bundledSignature>
+                                    <bundledSignature>jdk-internal-14</bundledSignature>
+                                    <bundledSignature>jdk-internal-15</bundledSignature>
                                 </bundledSignatures>
                                 <failOnMissingClasses>false</failOnMissingClasses>
                                 <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
@@ -1775,8 +1781,6 @@
                 <jdk>[14,)</jdk>
             </activation>
             <properties>
-                <!-- ForbiddenAPIs doesn't provide bundled signatures for JDK14... yet. -->
-                <forbiddenapis.skip>true</forbiddenapis.skip>
                 <!-- Spring isn't ready for JDK14 yet: https://github.com/spring-projects/spring-framework/issues/23678 -->
                 <failsafe.spring.skip>true</failsafe.spring.skip>
             </properties>
@@ -1788,6 +1792,8 @@
                 <jdk>[16,)</jdk>
             </activation>
             <properties>
+                <!-- ForbiddenAPIs doesn't provide bundled signatures for JDK16... yet. -->
+                <forbiddenapis.skip>true</forbiddenapis.skip>
                 <!--
                     We need net.bytebuddy.experimental=true
                     to make BytecodeEnhancementIT pass
