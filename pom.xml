@@ -276,7 +276,7 @@
         <version.deploy.plugin>2.8.2</version.deploy.plugin>
         <version.org.eclipse.m2e.lifecycle-mapping>1.0.0</version.org.eclipse.m2e.lifecycle-mapping>
         <version.enforcer.plugin>3.0.0-M3</version.enforcer.plugin>
-        <version.forbiddenapis.plugin>2.7</version.forbiddenapis.plugin>
+        <version.forbiddenapis.plugin>3.1</version.forbiddenapis.plugin>
         <version.help.plugin>2.2</version.help.plugin>
         <version.install.plugin>2.5.2</version.install.plugin>
         <version.io.takari.maven>0.7.6</version.io.takari.maven>
@@ -1973,7 +1973,7 @@
                                             <pluginExecutionFilter>
                                                 <groupId>de.thetaphi</groupId>
                                                 <artifactId>forbiddenapis</artifactId>
-                                                <versionRange>[1.8,)</versionRange>
+                                                <versionRange>[3.1,)</versionRange>
                                                 <goals>
                                                     <goal>check</goal>
                                                     <goal>testCheck</goal>
