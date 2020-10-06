@@ -19,11 +19,12 @@
 # Xms represents the initial size of total heap space
 # Xmx represents the maximum size of total heap space
 
-# For Hibernate Search, we don't need as much as the default 1g
-# Let's keep it low, so that we'll be able to run tests
-# on memory-constrained CI slaves
--Xms512m
--Xmx512m
+# For Hibernate Search, a few tests require slightly more than 512MB of memory
+# because they index a lot of data.
+# Let's stay on the safe side and keep the default of 1GB,
+# since it's not 2010 anymore and CI instances have more than enough memory.
+-Xms1g
+-Xmx1g
 
 ################################################################
 ## Expert settings
