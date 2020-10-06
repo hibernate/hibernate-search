@@ -61,7 +61,7 @@ node (PERFORMANCE_NODE_PATTERN) {
 			sh """ \
 					mvn clean install \
 					-U -am -pl :hibernate-search-integrationtest-performance-backend-lucene \
-					-DskipTests \
+					-DskipTests -DskipITs \
 			"""
 			dir ('integrationtest/performance/backend/lucene/target') {
 				stash name:'jar', includes:'benchmarks.jar'

@@ -77,7 +77,7 @@ lock(label: esAwsBuildEnv.lockedResourcesLabel) {
 				sh """ \
 						mvn clean install \
 						-U -am -pl :hibernate-search-integrationtest-performance-backend-elasticsearch \
-						-DskipTests \
+						-DskipTests -DskipITs \
 				"""
 				dir ('integrationtest/performance/backend/elasticsearch/target') {
 					stash name:'jar', includes:'benchmarks.jar'

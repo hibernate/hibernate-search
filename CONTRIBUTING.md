@@ -282,7 +282,7 @@ You can request static analysis and sanity checks with the `jqassistant` profile
 Tests do not need to be run for these checks.
 
 ```bash
-mvn clean install -Pjqassistant -DskipTests
+mvn clean install -Pjqassistant -DskipTests -DskipITs
 ```
 
 To also check cyclic dependencies between packages, use `-Djqassistant.groups=default,cycles`.
@@ -290,7 +290,7 @@ Cyclic dependency analysis is costly and may add significant overhead to the bui
 at least 10 seconds, maybe one minute or more depending on your setup.
 
 ```bash
-mvn clean install -Pjqassistant -DskipTests -Djqassistant.groups=default,cycles
+mvn clean install -Pjqassistant -DskipTests -DskipITs -Djqassistant.groups=default,cycles
 ```
 
 You can also inspect the created Neo4j datastore after a build,

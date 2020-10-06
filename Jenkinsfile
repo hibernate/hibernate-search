@@ -540,7 +540,7 @@ stage('Non-default environments') {
 				helper.withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install \
-							-DskipTests \
+							-DskipTests -DskipITs \
 							-P${buildEnv.mavenProfile},!javaModuleITs \
 					"""
 				}
