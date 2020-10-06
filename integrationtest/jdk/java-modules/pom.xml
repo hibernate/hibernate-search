@@ -18,6 +18,8 @@
 
     <properties>
         <maven.compiler.release>11</maven.compiler.release>
+        <!-- Override the default from the parent POM: here we really do want to use the modulepath -->
+        <failsafe.useModulePath>true</failsafe.useModulePath>
     </properties>
 
     <dependencies>
@@ -55,26 +57,14 @@
         </resources>
         <plugins>
             <plugin>
-                <!--
-                     Workaround for https://jira.apache.org/jira/browse/SUREFIRE-1570.
-                     Strangely enough, the surefire plugin supports running tests in the modulepath,
-                     but not the failsafe plugin.
-                     So we have to run our integration tests using the surefire plugin...
-                 -->
-                <artifactId>maven-surefire-plugin</artifactId>
+                <artifactId>maven-failsafe-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>verify</id>
+                        <id>it</id>
                         <goals>
-                            <goal>test</goal>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
                         </goals>
-                        <phase>integration-test</phase>
-                        <configuration>
-                            <skip>${skipITs}</skip>
-                            <includes>
-                                <include>**/*IT.java</include>
-                            </includes>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
