@@ -8,6 +8,9 @@ package org.hibernate.search.engine.cfg.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -17,16 +20,19 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import org.easymock.EasyMock;
-import org.easymock.EasyMockSupport;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 @RunWith(Parameterized.class)
-@SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types with EasyMock
-public class ConfigurationPropertyValidSimpleValuesTest<T> extends EasyMockSupport {
+@SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types
+public class ConfigurationPropertyValidSimpleValuesTest<T> {
 
 	@Parameterized.Parameters(name = "{2}")
 	public static Object[][] data() {
@@ -48,11 +54,15 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> extends EasyMockSuppo
 		return new Object[] { testedMethod, stringValue, expectedValue };
 	}
 
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+
+	@Mock
+	private ConfigurationPropertySource sourceMock;
+
 	private final Function<KeyContext, OptionalPropertyContext<T>> testedMethod;
 	private final String stringValue;
 	private final T expectedValue;
-
-	private final ConfigurationPropertySource sourceMock = createMock( ConfigurationPropertySource.class );
 
 	public ConfigurationPropertyValidSimpleValuesTest(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
 			String stringValue, T expectedValue) {
@@ -74,27 +84,21 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> extends EasyMockSuppo
 		T result;
 
 		// No value
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( Optional.empty() );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( Optional.empty() );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isEqualTo( expectedValue );
 
 		// String value
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( stringValue ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( stringValue ) );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isEqualTo( expectedValue );
 
 		// Typed value
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( expectedValue ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( expectedValue ) );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isEqualTo( expectedValue );
 	}
 
@@ -110,28 +114,22 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> extends EasyMockSuppo
 		Optional<T> result;
 
 		// No value
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( Optional.empty() );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( Optional.empty() );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isEmpty();
 
 		// String value
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( stringValue ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( stringValue ) );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get() ).isEqualTo( expectedValue );
 
 		// Typed value
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( expectedValue ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( expectedValue ) );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get() ).isEqualTo( expectedValue );
 	}
@@ -147,21 +145,17 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> extends EasyMockSuppo
 						.build();
 
 		// No value -> exception
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( Optional.empty() );
-		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( Optional.empty() );
+		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
 		assertThatThrownBy( () -> property.getOrThrow( sourceMock, SimulatedFailure::new ) )
 				.isInstanceOf( SimulatedFailure.class )
 				.hasMessage( resolvedKey );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 
 		// Valid value -> no exception
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( expectedValue ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( expectedValue ) );
 		T result = property.getOrThrow( sourceMock, SimulatedFailure::new );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isEqualTo( expectedValue );
 	}
 
@@ -178,40 +172,37 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> extends EasyMockSuppo
 		Optional<List<T>> result;
 
 		// String value - one
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( stringValue ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( stringValue ) );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get() ).containsExactly( expectedValue );
 
 		// String value - multiple
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( stringValue + "," + stringValue ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( stringValue + "," + stringValue ) );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get() ).containsExactly( expectedValue, expectedValue );
 
 		// Typed value - one
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( createCollection( expectedValue ) ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( createCollection( expectedValue ) ) );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get() ).containsExactly( expectedValue );
 
 		// Typed value - multiple
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( createCollection( expectedValue, expectedValue ) ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( createCollection( expectedValue, expectedValue ) ) );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get() ).containsExactly( expectedValue );
+	}
+
+	private void verifyNoOtherSourceInteractionsAndReset() {
+		verifyNoMoreInteractions( sourceMock );
+		reset( sourceMock );
 	}
 
 	@SafeVarargs
