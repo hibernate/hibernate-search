@@ -27,8 +27,8 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
-import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
+import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.util.common.SearchException;
@@ -61,6 +61,7 @@ public class EntityWriter extends AbstractItemWriter {
 	private SearchMapping searchMapping;
 	private BatchMappingContext mappingContext;
 	private PojoRawTypeIdentifier<?> typeIdentifier;
+	private SearchWorkspace workspace;
 
 	private WriteMode writeMode;
 
@@ -82,6 +83,7 @@ public class EntityWriter extends AbstractItemWriter {
 		searchMapping = Search.mapping( emf );
 		mappingContext = (BatchMappingContext) searchMapping;
 		typeIdentifier = mappingContext.typeContextProvider().typeIdentifierForEntityName( entityName );
+		workspace = searchMapping.scope( typeIdentifier.javaClass(), entityName ).workspace( tenantId );
 
 		/*
 		 * Always execute works as updates on the first checkpoint interval,
@@ -106,15 +108,15 @@ public class EntityWriter extends AbstractItemWriter {
 			for ( Object entity : entities ) {
 				writeItem( indexer, entity );
 			}
-		}
 
-		/*
-		 * Flush after each write operation
-		 * This ensures the writes have actually been persisted,
-		 * which is necessary because the runtime will perform a checkpoint
-		 * just after we return from this method.
-		 */
-		getScope().workspace().flush();
+			/*
+			 * Flush after each write operation
+			 * This ensures the writes have actually been persisted,
+			 * which is necessary because the runtime will perform a checkpoint
+			 * just after we return from this method.
+			 */
+			workspace.flush();
+		}
 
 		// update work count
 		PartitionContextData partitionData = (PartitionContextData) stepContext.getTransientUserData();
@@ -146,10 +148,6 @@ public class EntityWriter extends AbstractItemWriter {
 				);
 				break;
 		}
-	}
-
-	private SearchScope<?> getScope() {
-		return searchMapping.scope( typeIdentifier.javaClass(), entityName );
 	}
 
 	private enum WriteMode {
