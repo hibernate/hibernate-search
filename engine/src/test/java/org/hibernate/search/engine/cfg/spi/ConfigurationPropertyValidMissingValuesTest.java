@@ -8,6 +8,9 @@ package org.hibernate.search.engine.cfg.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -19,16 +22,19 @@ import java.util.function.Function;
 
 import org.hibernate.search.util.common.SearchException;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import org.easymock.EasyMock;
-import org.easymock.EasyMockSupport;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 @RunWith(Parameterized.class)
-@SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types with EasyMock
-public class ConfigurationPropertyValidMissingValuesTest<T> extends EasyMockSupport {
+@SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types
+public class ConfigurationPropertyValidMissingValuesTest<T> {
 
 	@Parameterized.Parameters(name = "{2}")
 	public static Object[][] data() {
@@ -50,11 +56,17 @@ public class ConfigurationPropertyValidMissingValuesTest<T> extends EasyMockSupp
 		return new Object[] { testedMethod, stringValue, expectedValue };
 	}
 
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+
+	@Mock
+	private ConfigurationPropertySource sourceMock;
+	@Mock
+	private Function<T, Object> mappingFunction;
+
 	private final Function<KeyContext, OptionalPropertyContext<T>> testedMethod;
 	private final String stringValue;
 	private final T expectedValue;
-
-	private final ConfigurationPropertySource sourceMock = createMock( ConfigurationPropertySource.class );
 
 	public ConfigurationPropertyValidMissingValuesTest(Function<KeyContext, OptionalPropertyContext<T>> testedMethod,
 			String stringValue, T expectedValue) {
@@ -76,27 +88,21 @@ public class ConfigurationPropertyValidMissingValuesTest<T> extends EasyMockSupp
 		T result;
 
 		// No value
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( Optional.empty() );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( Optional.empty() );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isEqualTo( expectedValue );
 
 		// String value
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( stringValue ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( stringValue ) );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isEqualTo( expectedValue );
 
 		// Typed value
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( expectedValue ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( expectedValue ) );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isEqualTo( expectedValue );
 	}
 
@@ -112,28 +118,22 @@ public class ConfigurationPropertyValidMissingValuesTest<T> extends EasyMockSupp
 		Optional<T> result;
 
 		// No value
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( Optional.empty() );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( Optional.empty() );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isEmpty();
 
 		// String value
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( stringValue ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( stringValue ) );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get() ).isEqualTo( expectedValue );
 
 		// Typed value
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( expectedValue ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( expectedValue ) );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get() ).isEqualTo( expectedValue );
 	}
@@ -148,34 +148,27 @@ public class ConfigurationPropertyValidMissingValuesTest<T> extends EasyMockSupp
 				)
 						.build();
 
-		Function<T, Object> mappingFunction = createMock( Function.class );
 		Optional<Object> result;
 		Object expectedMappedValue = new Object();
 
 		// No value -> empty
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( Optional.empty() );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( Optional.empty() );
 		result = property.getAndMap( sourceMock, mappingFunction );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isEmpty();
 
 		// Valid value -> no exception, mapping function applied
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( expectedValue ) );
-		EasyMock.expect( mappingFunction.apply( expectedValue ) ).andReturn( expectedMappedValue );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( expectedValue ) );
+		when( mappingFunction.apply( expectedValue ) ).thenReturn( expectedMappedValue );
 		result = property.getAndMap( sourceMock, mappingFunction );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).contains( expectedMappedValue );
 
 		// Valid value and mapping function fails
 		SimulatedFailure simulatedFailure = new SimulatedFailure( "SIMULATED" );
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( expectedValue ) );
-		EasyMock.expect( mappingFunction.apply( expectedValue ) ).andThrow( simulatedFailure );
-		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( expectedValue ) );
+		when( mappingFunction.apply( expectedValue ) ).thenThrow( simulatedFailure );
+		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
 		assertThatThrownBy( () -> property.getAndMap( sourceMock, mappingFunction ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
@@ -184,7 +177,7 @@ public class ConfigurationPropertyValidMissingValuesTest<T> extends EasyMockSupp
 				)
 				.hasMessageContaining( simulatedFailure.getMessage() )
 				.hasCause( simulatedFailure );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 	}
 
 	@Test
@@ -198,21 +191,17 @@ public class ConfigurationPropertyValidMissingValuesTest<T> extends EasyMockSupp
 						.build();
 
 		// No value -> exception
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( Optional.empty() );
-		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( Optional.empty() );
+		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
 		assertThatThrownBy( () -> property.getOrThrow( sourceMock, SimulatedFailure::new ) )
 				.isInstanceOf( SimulatedFailure.class )
 				.hasMessage( resolvedKey );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 
 		// Valid value -> no exception
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( expectedValue ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( expectedValue ) );
 		T result = property.getOrThrow( sourceMock, SimulatedFailure::new );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isEqualTo( expectedValue );
 	}
 
@@ -226,36 +215,29 @@ public class ConfigurationPropertyValidMissingValuesTest<T> extends EasyMockSupp
 				)
 						.build();
 
-		Function<T, Object> mappingFunction = createMock( Function.class );
 		Object result;
 
 		// No value -> exception
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( Optional.empty() );
-		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( Optional.empty() );
+		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
 		assertThatThrownBy( () -> property.getAndMapOrThrow( sourceMock, mappingFunction, SimulatedFailure::new ) )
 				.isInstanceOf( SimulatedFailure.class )
 				.hasMessage( resolvedKey );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 
 		// Valid value -> no exception, mapping function applied
 		Object expectedMappedValue = new Object();
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( expectedValue ) );
-		EasyMock.expect( mappingFunction.apply( expectedValue ) ).andReturn( expectedMappedValue );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( expectedValue ) );
+		when( mappingFunction.apply( expectedValue ) ).thenReturn( expectedMappedValue );
 		result = property.getAndMapOrThrow( sourceMock, mappingFunction, SimulatedFailure::new );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isEqualTo( expectedMappedValue );
 
 		// Valid value and mapping function fails
 		SimulatedFailure simulatedFailure = new SimulatedFailure( "SIMULATED" );
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( expectedValue ) );
-		EasyMock.expect( mappingFunction.apply( expectedValue ) ).andThrow( simulatedFailure );
-		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( expectedValue ) );
+		when( mappingFunction.apply( expectedValue ) ).thenThrow( simulatedFailure );
+		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
 		assertThatThrownBy( () -> property.getAndMap( sourceMock, mappingFunction ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
@@ -264,7 +246,7 @@ public class ConfigurationPropertyValidMissingValuesTest<T> extends EasyMockSupp
 				)
 				.hasMessageContaining( simulatedFailure.getMessage() )
 				.hasCause( simulatedFailure );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 	}
 
 	@Test
@@ -280,27 +262,21 @@ public class ConfigurationPropertyValidMissingValuesTest<T> extends EasyMockSupp
 		T result;
 
 		// Empty string value
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( "" ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( "" ) );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isEqualTo( expectedValue );
 
 		// Blank string value
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( "    " ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( "    " ) );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isEqualTo( expectedValue );
 
 		// String value with extra blank characters
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( "   " + stringValue + "   " ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( "   " + stringValue + "   " ) );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isEqualTo( expectedValue );
 	}
 
@@ -317,40 +293,37 @@ public class ConfigurationPropertyValidMissingValuesTest<T> extends EasyMockSupp
 		Optional<List<T>> result;
 
 		// String value - one
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( stringValue ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( stringValue ) );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get() ).containsExactly( expectedValue );
 
 		// String value - multiple
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( stringValue + "," + stringValue ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( stringValue + "," + stringValue ) );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get() ).containsExactly( expectedValue, expectedValue );
 
 		// Typed value - one
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( createCollection( expectedValue ) ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( createCollection( expectedValue ) ) );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get() ).containsExactly( expectedValue );
 
 		// Typed value - multiple
-		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( createCollection( expectedValue, expectedValue ) ) );
-		replayAll();
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( createCollection( expectedValue, expectedValue ) ) );
 		result = property.get( sourceMock );
-		verifyAll();
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get() ).containsExactly( expectedValue );
+	}
+
+	private void verifyNoOtherSourceInteractionsAndReset() {
+		verifyNoMoreInteractions( sourceMock, mappingFunction );
+		reset( sourceMock, mappingFunction );
 	}
 
 	@SafeVarargs

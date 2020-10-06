@@ -8,9 +8,13 @@ package org.hibernate.search.engine.environment.bean.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -21,38 +25,47 @@ import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
-import org.hibernate.search.engine.testsupport.util.AbstractConfigurationPropertySourcePartialMock;
 import org.hibernate.search.util.common.SearchException;
 
+import org.junit.Rule;
 import org.junit.Test;
 
-import org.easymock.EasyMock;
-import org.easymock.EasyMockSupport;
+import org.mockito.Answers;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
-@SuppressWarnings({ "unchecked", "rawtypes" }) // Raw types are the only way to mock parameterized types with EasyMock
-public class ConfiguredBeanResolverTest extends EasyMockSupport {
+@SuppressWarnings({ "unchecked", "rawtypes" }) // Raw types are the only way to mock parameterized types
+public class ConfiguredBeanResolverTest {
 
-	private final ServiceResolver serviceResolverMock = createMock( ServiceResolver.class );
-	private final BeanProvider beanProviderMock = createMock( BeanProvider.class );
-	private final ConfigurationPropertySource configurationSourceMock =
-			partialMockBuilder( AbstractConfigurationPropertySourcePartialMock.class ).mock();
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+
+	@Mock
+	private ServiceResolver serviceResolverMock;
+
+	@Mock(answer = Answers.CALLS_REAL_METHODS)
+	private BeanProvider beanProviderMock;
+
+	@Mock(answer = Answers.CALLS_REAL_METHODS)
+	private ConfigurationPropertySource configurationSourceMock;
+
+	private final List<BeanReference<?>> beanReferenceMocks = new ArrayList<>();
 
 	@Test
 	public void resolve_withoutBeanConfigurer() {
 		// Setup
-		resetAll();
-		expect( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
-				.andStubReturn( Collections.emptyList() );
-		expect( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
-				.andStubReturn( Optional.empty() );
-		replayAll();
+		when( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
+				.thenReturn( Collections.emptyList() );
+		when( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
+				.thenReturn( Optional.empty() );
 		BeanResolver beanResolver =
 				new ConfiguredBeanResolver( serviceResolverMock, beanProviderMock, configurationSourceMock );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
 		BeanHolder<Type1> type1BeanHolder = BeanHolder.of( new Type1() );
 		BeanHolder<Type2> type2BeanHolder = BeanHolder.of( new Type2() );
@@ -60,42 +73,32 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 		BeanHolder<Type3> type3BeanHolder2 = BeanHolder.of( new Type3() );
 
 		// resolve(Class)
-		resetAll();
-		expect( beanProviderMock.forType( Type1.class ) ).andReturn( type1BeanHolder );
-		replayAll();
+		when( beanProviderMock.forType( Type1.class ) ).thenReturn( type1BeanHolder );
 		assertThat( beanResolver.resolve( Type1.class ) ).isSameAs( type1BeanHolder );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class) through BeanReference
-		resetAll();
-		expect( beanProviderMock.forType( Type1.class ) ).andReturn( type1BeanHolder );
-		replayAll();
+		when( beanProviderMock.forType( Type1.class ) ).thenReturn( type1BeanHolder );
 		assertThat( beanResolver.resolve( BeanReference.of( Type1.class ) ) ).isSameAs( type1BeanHolder );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class, String)
-		resetAll();
-		expect( beanProviderMock.forTypeAndName( Type2.class, "someName" ) ).andReturn( type2BeanHolder );
-		replayAll();
+		when( beanProviderMock.forTypeAndName( Type2.class, "someName" ) ).thenReturn( type2BeanHolder );
 		assertThat( beanResolver.resolve( Type2.class, "someName" ) ).isSameAs( type2BeanHolder );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class, String) through BeanReference
-		resetAll();
-		expect( beanProviderMock.forTypeAndName( Type2.class, "someName" ) ).andReturn( type2BeanHolder );
-		replayAll();
+		when( beanProviderMock.forTypeAndName( Type2.class, "someName" ) ).thenReturn( type2BeanHolder );
 		assertThat( beanResolver.resolve( BeanReference.of( Type2.class, "someName" ) ) ).isSameAs( type2BeanHolder );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
 		// resolve(List<BeanReference>)
-		resetAll();
-		expect( beanProviderMock.forType( Type3.class ) ).andReturn( type3BeanHolder1 );
-		expect( beanProviderMock.forTypeAndName( Type3.class, "someOtherName" ) ).andReturn( type3BeanHolder2 );
-		replayAll();
+		when( beanProviderMock.forType( Type3.class ) ).thenReturn( type3BeanHolder1 );
+		when( beanProviderMock.forTypeAndName( Type3.class, "someOtherName" ) ).thenReturn( type3BeanHolder2 );
 		BeanHolder<List<Type3>> beans = beanResolver.resolve(
 				Arrays.asList( BeanReference.of( Type3.class ), BeanReference.of( Type3.class, "someOtherName" ) )
 		);
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 		assertThat( beans.get() )
 				.containsExactly( type3BeanHolder1.get(), type3BeanHolder2.get() );
 	}
@@ -103,37 +106,27 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 	@Test
 	public void resolve_withBeanConfigurer() {
 		// Setup
-		BeanConfigurer beanConfigurer1Mock = createMock( BeanConfigurer.class );
-		BeanConfigurer beanConfigurer2Mock = createMock( BeanConfigurer.class );
+		BeanReference<Type1> beanReference1Mock = beanReferenceMock();
+		BeanReference<Type2> beanReference2Mock = beanReferenceMock();
+		BeanReference<Type3> beanReference3Mock = beanReferenceMock();
+		BeanReference<Type3> beanReference4Mock = beanReferenceMock();
 
-		BeanReference<Type1> beanReference1Mock = createMock( BeanReference.class );
-		BeanReference<Type2> beanReference2Mock = createMock( BeanReference.class );
-		BeanReference<Type3> beanReference3Mock = createMock( BeanReference.class );
-		BeanReference<Type3> beanReference4Mock = createMock( BeanReference.class );
-
-		resetAll();
-		expect( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
-				.andReturn( Collections.singletonList( beanConfigurer1Mock ) );
-		expect( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
-				.andReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2Mock ) ) );
-		beanConfigurer1Mock.configure( EasyMock.anyObject() );
-		expectLastCall().andAnswer( () -> {
-			BeanConfigurationContext context = (BeanConfigurationContext) EasyMock.getCurrentArguments()[0];
+		BeanConfigurer beanConfigurer1 = context -> {
 			context.define( Type1.class, beanReference1Mock );
 			context.define( Type2.class, "someName", beanReference2Mock );
 			context.define( Type3.class, "someOtherName1", beanReference3Mock );
-			return null;
-		} );
-		beanConfigurer2Mock.configure( EasyMock.anyObject() );
-		expectLastCall().andAnswer( () -> {
-			BeanConfigurationContext context = (BeanConfigurationContext) EasyMock.getCurrentArguments()[0];
+		};
+		BeanConfigurer beanConfigurer2 = context -> {
 			context.define( Type3.class, "someOtherName2", beanReference4Mock );
-			return null;
-		} );
-		replayAll();
+		};
+
+		when( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
+				.thenReturn( Collections.singletonList( beanConfigurer1 ) );
+		when( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
+				.thenReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2 ) ) );
 		BeanResolver beanResolver =
 				new ConfiguredBeanResolver( serviceResolverMock, beanProviderMock, configurationSourceMock );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
 		BeanHolder<Type1> type1BeanHolder = BeanHolder.of( new Type1() );
 		BeanHolder<Type2> type2BeanHolder = BeanHolder.of( new Type2() );
@@ -141,36 +134,30 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 		BeanHolder<Type3> type3BeanHolder2 = BeanHolder.of( new Type3() );
 
 		// resolve(Class)
-		resetAll();
-		expect( beanProviderMock.forType( Type1.class ) )
-				.andThrow( new SearchException( "cannot find Type1" ) );
-		expect( beanReference1Mock.resolve( EasyMock.anyObject() ) ).andReturn( type1BeanHolder );
-		replayAll();
+		when( beanProviderMock.forType( Type1.class ) )
+				.thenThrow( new SearchException( "cannot find Type1" ) );
+		when( beanReference1Mock.resolve( any() ) ).thenReturn( type1BeanHolder );
 		assertThat( beanResolver.resolve( Type1.class ) ).isSameAs( type1BeanHolder );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class, String)
-		resetAll();
-		expect( beanProviderMock.forTypeAndName( Type2.class, "someName" ) )
-				.andThrow( new SearchException( "cannot find Type2#someName" ) );
-		expect( beanReference2Mock.resolve( EasyMock.anyObject() ) ).andReturn( type2BeanHolder );
-		replayAll();
+		when( beanProviderMock.forTypeAndName( Type2.class, "someName" ) )
+				.thenThrow( new SearchException( "cannot find Type2#someName" ) );
+		when( beanReference2Mock.resolve( any() ) ).thenReturn( type2BeanHolder );
 		assertThat( beanResolver.resolve( Type2.class, "someName" ) ).isSameAs( type2BeanHolder );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
 		// resolve(List<BeanReference>)
-		resetAll();
-		expect( beanProviderMock.forTypeAndName( Type3.class, "someOtherName1" ) )
-				.andThrow( new SearchException( "cannot find Type3#someOtherName" ) );
-		expect( beanProviderMock.forTypeAndName( Type3.class, "someOtherName2" ) )
-				.andThrow( new SearchException( "cannot find Type3#someOtherName2" ) );
-		expect( beanReference3Mock.resolve( EasyMock.anyObject() ) ).andReturn( type3BeanHolder1 );
-		expect( beanReference4Mock.resolve( EasyMock.anyObject() ) ).andReturn( type3BeanHolder2 );
-		replayAll();
+		when( beanProviderMock.forTypeAndName( Type3.class, "someOtherName1" ) )
+				.thenThrow( new SearchException( "cannot find Type3#someOtherName" ) );
+		when( beanProviderMock.forTypeAndName( Type3.class, "someOtherName2" ) )
+				.thenThrow( new SearchException( "cannot find Type3#someOtherName2" ) );
+		when( beanReference3Mock.resolve( any() ) ).thenReturn( type3BeanHolder1 );
+		when( beanReference4Mock.resolve( any() ) ).thenReturn( type3BeanHolder2 );
 		BeanHolder<List<Type3>> beans = beanResolver.resolve(
 				Arrays.asList( BeanReference.of( Type3.class, "someOtherName1" ), BeanReference.of( Type3.class, "someOtherName2" ) )
 		);
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 		assertThat( beans.get() )
 				.containsExactly( type3BeanHolder1.get(), type3BeanHolder2.get() );
 	}
@@ -178,144 +165,110 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 	@Test
 	public void resolve_noBean() {
 		// Setup
-		resetAll();
-		expect( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
-				.andReturn( Collections.emptyList() );
-		expect( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
-				.andReturn( (Optional) Optional.empty() );
-		replayAll();
+		when( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
+				.thenReturn( Collections.emptyList() );
+		when( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
+				.thenReturn( (Optional) Optional.empty() );
 		BeanResolver beanResolver =
 				new ConfiguredBeanResolver( serviceResolverMock, beanProviderMock, configurationSourceMock );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class)
 		SearchException providerType1NotFound = new SearchException( "cannot find Type1" );
-		resetAll();
-		expect( beanProviderMock.forType( Type1.class ) ).andThrow( providerType1NotFound );
-		replayAll();
+		when( beanProviderMock.forType( Type1.class ) ).thenThrow( providerType1NotFound );
 		assertThatThrownBy( () -> beanResolver.resolve( Type1.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Cannot resolve bean reference to type '" + Type1.class.getName() + "'",
 						" cannot find Type1" )
 				.hasCauseReference( providerType1NotFound );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class, String)
 		SearchException providerType2NotFound = new SearchException( "cannot find Type2#someName" );
-		resetAll();
-		expect( beanProviderMock.forTypeAndName( Type2.class, "someName" ) )
-				.andThrow( providerType2NotFound );
-		replayAll();
+		when( beanProviderMock.forTypeAndName( Type2.class, "someName" ) )
+				.thenThrow( providerType2NotFound );
 		assertThatThrownBy( () -> beanResolver.resolve( Type2.class, "someName" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Cannot resolve bean reference to type '" + Type2.class.getName() + "' and name 'someName'",
 						"cannot find Type2#someName" )
 				.hasCauseReference( providerType2NotFound );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 	}
 
 	@Test
 	public void resolve_withBeanConfigurer_providerFailure() {
 		// Setup
-		BeanConfigurer beanConfigurer1Mock = createMock( BeanConfigurer.class );
-		BeanConfigurer beanConfigurer2Mock = createMock( BeanConfigurer.class );
+		BeanReference<Type1> beanReference1Mock = beanReferenceMock();
+		BeanReference<Type1> beanReference2Mock = beanReferenceMock();
 
-		BeanReference<Type1> beanReference1Mock = createMock( BeanReference.class );
-		BeanReference<Type1> beanReference2Mock = createMock( BeanReference.class );
-
-		resetAll();
-		expect( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
-				.andReturn( Collections.singletonList( beanConfigurer1Mock ) );
-		expect( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
-				.andReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2Mock ) ) );
-		beanConfigurer1Mock.configure( EasyMock.anyObject() );
-		expectLastCall().andAnswer( () -> {
-			BeanConfigurationContext context = (BeanConfigurationContext) EasyMock.getCurrentArguments()[0];
+		BeanConfigurer beanConfigurer1 = context -> {
 			context.define( Type1.class, beanReference1Mock );
-			return null;
-		} );
-		beanConfigurer2Mock.configure( EasyMock.anyObject() );
-		expectLastCall().andAnswer( () -> {
-			BeanConfigurationContext context = (BeanConfigurationContext) EasyMock.getCurrentArguments()[0];
+		};
+		BeanConfigurer beanConfigurer2 = context -> {
 			context.define( Type1.class, "someName", beanReference2Mock );
-			return null;
-		} );
-		replayAll();
+		};
+
+		when( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
+				.thenReturn( Collections.singletonList( beanConfigurer1 ) );
+		when( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
+				.thenReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2 ) ) );
 		BeanResolver beanResolver =
 				new ConfiguredBeanResolver( serviceResolverMock, beanProviderMock, configurationSourceMock );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class)
 		RuntimeException providerFailure = new RuntimeException( "internal failure in provider" );
-		resetAll();
-		expect( beanProviderMock.forType( Type1.class ) ).andThrow( providerFailure );
-		replayAll();
+		when( beanProviderMock.forType( Type1.class ) ).thenThrow( providerFailure );
 		assertThatThrownBy( () -> beanResolver.resolve( Type1.class ) ).isSameAs( providerFailure );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class, String)
-		resetAll();
-		expect( beanProviderMock.forTypeAndName( Type2.class, "someName" ) ).andThrow( providerFailure );
-		replayAll();
+		when( beanProviderMock.forTypeAndName( Type2.class, "someName" ) ).thenThrow( providerFailure );
 		assertThatThrownBy( () -> beanResolver.resolve( Type2.class, "someName" ) )
 				.isSameAs( providerFailure );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 	}
 
 	@Test
 	public void resolve_withBeanConfigurer_noProviderBean_configuredBeanFailure() {
 		// Setup
-		BeanConfigurer beanConfigurer1Mock = createMock( BeanConfigurer.class );
-		BeanConfigurer beanConfigurer2Mock = createMock( BeanConfigurer.class );
+		BeanReference<Type1> beanReference1Mock = beanReferenceMock();
+		BeanReference<Type2> beanReference2Mock = beanReferenceMock();
 
-		BeanReference<Type1> beanReference1Mock = createMock( BeanReference.class );
-		BeanReference<Type2> beanReference2Mock = createMock( BeanReference.class );
-
-		resetAll();
-		expect( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
-				.andReturn( Collections.singletonList( beanConfigurer1Mock ) );
-		expect( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
-				.andReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2Mock ) ) );
-		beanConfigurer1Mock.configure( EasyMock.anyObject() );
-		expectLastCall().andAnswer( () -> {
-			BeanConfigurationContext context = (BeanConfigurationContext) EasyMock.getCurrentArguments()[0];
+		BeanConfigurer beanConfigurer1 = context -> {
 			context.define( Type1.class, beanReference1Mock );
-			return null;
-		} );
-		beanConfigurer2Mock.configure( EasyMock.anyObject() );
-		expectLastCall().andAnswer( () -> {
-			BeanConfigurationContext context = (BeanConfigurationContext) EasyMock.getCurrentArguments()[0];
+		};
+		BeanConfigurer beanConfigurer2 = context -> {
 			context.define( Type2.class, "someName", beanReference2Mock );
-			return null;
-		} );
-		replayAll();
+		};
+
+		when( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
+				.thenReturn( Collections.singletonList( beanConfigurer1 ) );
+		when( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
+				.thenReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2 ) ) );
 		BeanResolver beanResolver =
 				new ConfiguredBeanResolver( serviceResolverMock, beanProviderMock, configurationSourceMock );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class)
 		SearchException providerType1NotFound = new SearchException( "cannot find Type1" );
 		RuntimeException configuredBeanType1Failed = new RuntimeException( "configured bean failed for Type1" );
-		resetAll();
-		expect( beanProviderMock.forType( Type1.class ) ).andThrow( providerType1NotFound );
-		expect( beanReference1Mock.resolve( EasyMock.anyObject() ) ).andThrow( configuredBeanType1Failed );
-		replayAll();
+		when( beanProviderMock.forType( Type1.class ) ).thenThrow( providerType1NotFound );
+		when( beanReference1Mock.resolve( any() ) ).thenThrow( configuredBeanType1Failed );
 		assertThatThrownBy( () -> beanResolver.resolve( Type1.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Cannot resolve bean reference to type '" + Type1.class.getName() + "'",
 						"cannot find Type1", "configured bean failed for Type1" )
 				.hasCauseReference( providerType1NotFound )
 				.hasSuppressedException( configuredBeanType1Failed );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class, String)
 		SearchException providerType2NotFound = new SearchException( "provider cannot find Type2#someName" );
 		RuntimeException configuredBeanType2Failed = new RuntimeException( "configured bean failed for Type2#someName" );
-		resetAll();
-		expect( beanProviderMock.forTypeAndName( Type2.class, "someName" ) )
-				.andThrow( providerType2NotFound );
-		expect( beanReference2Mock.resolve( EasyMock.anyObject() ) ).andThrow( configuredBeanType2Failed );
-		replayAll();
+		when( beanProviderMock.forTypeAndName( Type2.class, "someName" ) )
+				.thenThrow( providerType2NotFound );
+		when( beanReference2Mock.resolve( any() ) ).thenThrow( configuredBeanType2Failed );
 		assertThatThrownBy( () -> beanResolver.resolve( Type2.class, "someName" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Cannot resolve bean reference to type '" + Type2.class.getName() + "' and name 'someName'",
@@ -323,86 +276,64 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 						"configured bean failed for Type2#someName" )
 				.hasCauseReference( providerType2NotFound )
 				.hasSuppressedException( configuredBeanType2Failed );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 	}
 
 	@Test
 	public void resolve_withBeanConfigurer_multipleBeans() {
 		// Setup
-		BeanConfigurer beanConfigurer1Mock = createMock( BeanConfigurer.class );
-		BeanConfigurer beanConfigurer2Mock = createMock( BeanConfigurer.class );
+		BeanReference<Type1> beanReference1Mock = beanReferenceMock();
+		BeanReference<Type1> beanReference2Mock = beanReferenceMock();
 
-		BeanReference<Type1> beanReference1Mock = createMock( BeanReference.class );
-		BeanReference<Type1> beanReference2Mock = createMock( BeanReference.class );
-
-		resetAll();
-		expect( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
-				.andReturn( Collections.singletonList( beanConfigurer1Mock ) );
-		expect( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
-				.andReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2Mock ) ) );
-		beanConfigurer1Mock.configure( EasyMock.anyObject() );
-		expectLastCall().andAnswer( () -> {
-			BeanConfigurationContext context = (BeanConfigurationContext) EasyMock.getCurrentArguments()[0];
+		BeanConfigurer beanConfigurer1 = context -> {
 			context.define( Type1.class, beanReference1Mock );
-			return null;
-		} );
-		beanConfigurer2Mock.configure( EasyMock.anyObject() );
-		expectLastCall().andAnswer( () -> {
-			BeanConfigurationContext context = (BeanConfigurationContext) EasyMock.getCurrentArguments()[0];
+		};
+		BeanConfigurer beanConfigurer2 = context -> {
 			context.define( Type1.class, "someName", beanReference2Mock );
-			return null;
-		} );
-		replayAll();
+		};
+
+		when( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
+				.thenReturn( Collections.singletonList( beanConfigurer1 ) );
+		when( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
+				.thenReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2 ) ) );
 		BeanResolver beanResolver =
 				new ConfiguredBeanResolver( serviceResolverMock, beanProviderMock, configurationSourceMock );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class)
-		resetAll();
-		expect( beanProviderMock.forType( Type1.class ) )
-				.andThrow( new SearchException( "cannot find Type1" ) );
-		replayAll();
+		when( beanProviderMock.forType( Type1.class ) )
+				.thenThrow( new SearchException( "cannot find Type1" ) );
 		assertThatThrownBy( () -> beanResolver.resolve( Type1.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Cannot resolve bean reference to type '" + Type1.class.getName() + "'",
 						"cannot find Type1",
 						"Multiple beans registered for type '" + Type1.class.getName() + "'" );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 	}
 
 	@Test
 	public void resolveRole() {
-		BeanConfigurer beanConfigurer1Mock = createMock( BeanConfigurer.class );
-		BeanConfigurer beanConfigurer2Mock = createMock( BeanConfigurer.class );
+		BeanReference<RoleType> beanReference1Mock = beanReferenceMock();
+		BeanReference<RoleType> beanReference2Mock = beanReferenceMock();
+		BeanReference<RoleType> beanReference3Mock = beanReferenceMock();
+		BeanReference<RoleType> beanReference4Mock = beanReferenceMock();
 
-		BeanReference<RoleType> beanReference1Mock = createMock( BeanReference.class );
-		BeanReference<RoleType> beanReference2Mock = createMock( BeanReference.class );
-		BeanReference<RoleType> beanReference3Mock = createMock( BeanReference.class );
-		BeanReference<RoleType> beanReference4Mock = createMock( BeanReference.class );
-
-		resetAll();
-		expect( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
-				.andReturn( Collections.singletonList( beanConfigurer1Mock ) );
-		expect( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
-				.andReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2Mock ) ) );
-		beanConfigurer1Mock.configure( EasyMock.anyObject() );
-		expectLastCall().andAnswer( () -> {
-			BeanConfigurationContext context = (BeanConfigurationContext) EasyMock.getCurrentArguments()[0];
+		BeanConfigurer beanConfigurer1 = context -> {
 			context.define( RoleType.class, beanReference1Mock );
-			return null;
-		} );
-		beanConfigurer2Mock.configure( EasyMock.anyObject() );
-		expectLastCall().andAnswer( () -> {
-			BeanConfigurationContext context = (BeanConfigurationContext) EasyMock.getCurrentArguments()[0];
+		};
+		BeanConfigurer beanConfigurer2 = context -> {
 			context.define( RoleType.class, "someName", beanReference2Mock );
 			context.define( RoleType.class, "someOtherName", beanReference3Mock );
 			context.define( RoleType.class, beanReference4Mock );
-			return null;
-		} );
-		replayAll();
+		};
+
+		when( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
+				.thenReturn( Collections.singletonList( beanConfigurer1 ) );
+		when( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
+				.thenReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2 ) ) );
 		BeanResolver beanResolver =
 				new ConfiguredBeanResolver( serviceResolverMock, beanProviderMock, configurationSourceMock );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
 		BeanHolder<RoleType> beanHolder1 = BeanHolder.of( new Type3() );
 		BeanHolder<RoleType> beanHolder2 = BeanHolder.of( new Type3() );
@@ -410,33 +341,44 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 		BeanHolder<RoleType> beanHolder4 = BeanHolder.of( new Type3() );
 
 		// resolveRole
-		resetAll();
-		expect( beanReference1Mock.resolve( EasyMock.anyObject() ) ).andReturn( beanHolder1 );
-		expect( beanReference2Mock.resolve( EasyMock.anyObject() ) ).andReturn( beanHolder2 );
-		expect( beanReference3Mock.resolve( EasyMock.anyObject() ) ).andReturn( beanHolder3 );
-		expect( beanReference4Mock.resolve( EasyMock.anyObject() ) ).andReturn( beanHolder4 );
-		replayAll();
+		when( beanReference1Mock.resolve( any() ) ).thenReturn( beanHolder1 );
+		when( beanReference2Mock.resolve( any() ) ).thenReturn( beanHolder2 );
+		when( beanReference3Mock.resolve( any() ) ).thenReturn( beanHolder3 );
+		when( beanReference4Mock.resolve( any() ) ).thenReturn( beanHolder4 );
 		List<BeanReference<RoleType>> beanReferencesWithRole = beanResolver.allConfiguredForRole( RoleType.class );
 		BeanHolder<List<RoleType>> beansWithRole = beanResolver.resolve( beanReferencesWithRole );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 		assertThat( beansWithRole.get() )
 				.containsExactlyInAnyOrder( beanHolder1.get(), beanHolder2.get(), beanHolder3.get(), beanHolder4.get() );
 
 		// Roles should ignore inheritance
-		resetAll();
-		replayAll();
 		List<BeanReference<Object>> beanReferencesWithObjectRole = beanResolver.allConfiguredForRole( Object.class );
 		BeanHolder<List<Object>> beansWithObjectRole = beanResolver.resolve( beanReferencesWithObjectRole );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 		assertThat( beansWithObjectRole.get() ).isEmpty();
 
 		// Unassigned roles should result in an empty list
-		resetAll();
-		replayAll();
 		List<BeanReference<NonRoleType>> beanReferencesWithNonRole = beanResolver.allConfiguredForRole( NonRoleType.class );
 		BeanHolder<List<NonRoleType>> beansWithNonRole = beanResolver.resolve( beanReferencesWithNonRole );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 		assertThat( beansWithNonRole.get() ).isEmpty();
+	}
+
+	private void verifyNoOtherInteractionsAndReset() {
+		verifyNoMoreInteractions( serviceResolverMock, beanProviderMock, configurationSourceMock );
+		if ( !beanReferenceMocks.isEmpty() ) {
+			verifyNoMoreInteractions( beanReferenceMocks.toArray() );
+		}
+		reset( serviceResolverMock, beanProviderMock, configurationSourceMock );
+		if ( !beanReferenceMocks.isEmpty() ) {
+			reset( beanReferenceMocks.toArray() );
+		}
+	}
+
+	private <T> BeanReference<T> beanReferenceMock() {
+		BeanReference<T> mock = mock( BeanReference.class );
+		beanReferenceMocks.add( mock );
+		return mock;
 	}
 
 	private static class Type1 {

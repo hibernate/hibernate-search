@@ -8,6 +8,9 @@ package org.hibernate.search.engine.common.dsl.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -16,14 +19,21 @@ import java.util.function.Function;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.util.common.SearchException;
 
+import org.junit.Rule;
 import org.junit.Test;
 
-import org.easymock.EasyMock;
-import org.easymock.EasyMockSupport;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
-public class DslExtensionStateTest extends EasyMockSupport {
+public class DslExtensionStateTest {
 
-	private final Function<Object, MyResultType> contextFunction = createMock( Function.class );
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+
+	@Mock
+	private Function<Object, MyResultType> contextFunction;
 
 	private final DslExtensionState<MyResultType> state = new DslExtensionState<>();
 
@@ -32,32 +42,26 @@ public class DslExtensionStateTest extends EasyMockSupport {
 	@Test
 	public void ifSupported_noSupported() {
 		String extensionToString = "EXTENSION_TO_STRING";
-		resetAll();
-		replayAll();
 		state.ifSupported( new MyExtension( extensionToString ), Optional.empty(), contextFunction );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 	}
 
 	@Test
 	public void ifSupported_supported() {
 		Object extendedContext = new Object();
 
-		resetAll();
-		EasyMock.expect( contextFunction.apply( extendedContext ) ).andReturn( expectedResult );
-		replayAll();
+		when( contextFunction.apply( extendedContext ) ).thenReturn( expectedResult );
 		state.ifSupported( new MyExtension(), Optional.of( extendedContext ), contextFunction );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 	}
 
 	@Test
 	public void orElse() {
 		Object defaultContext = new Object();
 
-		resetAll();
-		EasyMock.expect( contextFunction.apply( defaultContext ) ).andReturn( expectedResult );
-		replayAll();
+		when( contextFunction.apply( defaultContext ) ).thenReturn( expectedResult );
 		assertThat( state.orElse( defaultContext, contextFunction ) ).isSameAs( expectedResult );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 	}
 
 	@Test
@@ -73,8 +77,6 @@ public class DslExtensionStateTest extends EasyMockSupport {
 	@Test
 	public void ifSupportedThenOrElseFail_noSupported() {
 		String extensionToString = "EXTENSION_TO_STRING";
-		resetAll();
-		replayAll();
 		state.ifSupported( new MyExtension( extensionToString ), Optional.empty(), contextFunction );
 		assertThatThrownBy( state::orElseFail )
 				.isInstanceOf( SearchException.class )
@@ -82,39 +84,31 @@ public class DslExtensionStateTest extends EasyMockSupport {
 						"None of the provided extensions can be applied to the current context",
 						extensionToString
 				);
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 	}
 
 	@Test
 	public void ifSupportedThenOrElseFail_supported() {
 		Object extendedContext = new Object();
 
-		resetAll();
-		EasyMock.expect( contextFunction.apply( extendedContext ) ).andReturn( expectedResult );
-		replayAll();
+		when( contextFunction.apply( extendedContext ) ).thenReturn( expectedResult );
 		state.ifSupported( new MyExtension(), Optional.of( extendedContext ), contextFunction );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		replayAll();
 		state.orElseFail();
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 	}
 
 	@Test
 	public void ifSupportedThenOrElse_noSupported() {
 		Object defaultContext = new Object();
 
-		resetAll();
-		replayAll();
 		state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		EasyMock.expect( contextFunction.apply( defaultContext ) ).andReturn( expectedResult );
-		replayAll();
+		when( contextFunction.apply( defaultContext ) ).thenReturn( expectedResult );
 		assertThat( state.orElse( defaultContext, contextFunction ) ).isSameAs( expectedResult );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 	}
 
 	@Test
@@ -122,16 +116,12 @@ public class DslExtensionStateTest extends EasyMockSupport {
 		Object extendedContext = new Object();
 		Object defaultContext = new Object();
 
-		resetAll();
-		EasyMock.expect( contextFunction.apply( extendedContext ) ).andReturn( expectedResult );
-		replayAll();
+		when( contextFunction.apply( extendedContext ) ).thenReturn( expectedResult );
 		state.ifSupported( new MyExtension(), Optional.of( extendedContext ), contextFunction );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		replayAll();
 		assertThat( state.orElse( defaultContext, contextFunction ) ).isSameAs( expectedResult );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 	}
 
 	@Test
@@ -140,8 +130,6 @@ public class DslExtensionStateTest extends EasyMockSupport {
 		String extension2ToString = "EXTENSION2_TO_STRING";
 		String extension3ToString = "EXTENSION3_TO_STRING";
 
-		resetAll();
-		replayAll();
 		state.ifSupported( new MyExtension( extension1ToString ), Optional.empty(), contextFunction );
 		state.ifSupported( new MyExtension( extension2ToString ), Optional.empty(), contextFunction );
 		state.ifSupported( new MyExtension( extension3ToString ), Optional.empty(), contextFunction );
@@ -153,33 +141,25 @@ public class DslExtensionStateTest extends EasyMockSupport {
 						extension2ToString,
 						extension3ToString
 				);
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 	}
 
 	@Test
 	public void multipleIfSupported_singleSupported() {
 		Object extendedContext1 = new Object();
 
-		resetAll();
-		EasyMock.expect( contextFunction.apply( extendedContext1 ) ).andReturn( expectedResult );
-		replayAll();
+		when( contextFunction.apply( extendedContext1 ) ).thenReturn( expectedResult );
 		state.ifSupported( new MyExtension(), Optional.of( extendedContext1 ), contextFunction );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		replayAll();
 		state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		replayAll();
 		state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		replayAll();
 		state.orElseFail();
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 	}
 
 	@Test
@@ -187,53 +167,37 @@ public class DslExtensionStateTest extends EasyMockSupport {
 		Object extendedContext2 = new Object();
 		Object extendedContext3 = new Object();
 
-		resetAll();
-		replayAll();
 		state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		EasyMock.expect( contextFunction.apply( extendedContext2 ) ).andReturn( expectedResult );
-		replayAll();
+		when( contextFunction.apply( extendedContext2 ) ).thenReturn( expectedResult );
 		state.ifSupported( new MyExtension(), Optional.of( extendedContext2 ), contextFunction );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
 		// Only the first supported extension should be applied
-		resetAll();
-		replayAll();
 		state.ifSupported( new MyExtension(), Optional.of( extendedContext3 ), contextFunction );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		replayAll();
 		state.orElseFail();
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 	}
 
 	@Test
 	public void multipleIfSupportedThenOrElse_noSupported() {
 		Object defaultContext = new Object();
 
-		resetAll();
-		replayAll();
 		state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		replayAll();
 		state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		replayAll();
 		state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		EasyMock.expect( contextFunction.apply( defaultContext ) ).andReturn( expectedResult );
-		replayAll();
+		when( contextFunction.apply( defaultContext ) ).thenReturn( expectedResult );
 		assertThat( state.orElse( defaultContext, contextFunction ) ).isSameAs( expectedResult );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 	}
 
 	@Test
@@ -241,26 +205,18 @@ public class DslExtensionStateTest extends EasyMockSupport {
 		Object extendedContext1 = new Object();
 		Object defaultContext = new Object();
 
-		resetAll();
-		EasyMock.expect( contextFunction.apply( extendedContext1 ) ).andReturn( expectedResult );
-		replayAll();
+		when( contextFunction.apply( extendedContext1 ) ).thenReturn( expectedResult );
 		state.ifSupported( new MyExtension(), Optional.of( extendedContext1 ), contextFunction );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		replayAll();
 		state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		replayAll();
 		state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		replayAll();
 		assertThat( state.orElse( defaultContext, contextFunction ) ).isSameAs( expectedResult );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 	}
 
 	@Test
@@ -269,47 +225,40 @@ public class DslExtensionStateTest extends EasyMockSupport {
 		Object extendedContext3 = new Object();
 		Object defaultContext = new Object();
 
-		resetAll();
-		replayAll();
 		state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		EasyMock.expect( contextFunction.apply( extendedContext2 ) ).andReturn( expectedResult );
-		replayAll();
+		when( contextFunction.apply( extendedContext2 ) ).thenReturn( expectedResult );
 		state.ifSupported( new MyExtension(), Optional.of( extendedContext2 ), contextFunction );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
 		// Only the first supported extension should be applied
-		resetAll();
-		replayAll();
 		state.ifSupported( new MyExtension(), Optional.of( extendedContext3 ), contextFunction );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		replayAll();
 		assertThat( state.orElse( defaultContext, contextFunction ) ).isSameAs( expectedResult );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 	}
 
 	@Test
 	public void orElseThenIfSupported() {
 		Object defaultContext = new Object();
 
-		resetAll();
-		EasyMock.expect( contextFunction.apply( defaultContext ) ).andReturn( expectedResult );
-		replayAll();
+		when( contextFunction.apply( defaultContext ) ).thenReturn( expectedResult );
 		assertThat( state.orElse( defaultContext, contextFunction ) ).isSameAs( expectedResult );
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
 
-		resetAll();
-		replayAll();
 		assertThatThrownBy( () -> state.ifSupported( new MyExtension(), Optional.empty(), contextFunction ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot call ifSupported(...) after orElse(...)"
 				);
-		verifyAll();
+		verifyNoOtherInteractionsAndReset();
+	}
+
+	private void verifyNoOtherInteractionsAndReset() {
+		verifyNoMoreInteractions( contextFunction );
+		reset( contextFunction );
 	}
 
 	private static class MyExtension {
