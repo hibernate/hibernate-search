@@ -13,10 +13,12 @@ import java.util.Map;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
+import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl.MultitenancyTestHelper;
 
 public final class OrmSetupHelper
 		extends MappingSetupHelper<OrmSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SessionFactory> {
@@ -57,6 +59,8 @@ public final class OrmSetupHelper
 
 	private final SchemaManagementStrategyName schemaManagementStrategyName;
 
+	private MultitenancyTestHelper multitenancyTestHelper;
+
 	private OrmSetupHelper(BackendSetupStrategy backendSetupStrategy,
 			SchemaManagementStrategyName schemaManagementStrategyName) {
 		super( backendSetupStrategy );
@@ -70,7 +74,10 @@ public final class OrmSetupHelper
 
 	@Override
 	protected void close(SessionFactory toClose) {
-		toClose.close();
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( SessionFactory::close, toClose );
+			closer.push( MultitenancyTestHelper::close, multitenancyTestHelper );
+		}
 	}
 
 	public final class SetupContext
@@ -94,6 +101,14 @@ public final class OrmSetupHelper
 		@Override
 		public SetupContext withProperty(String key, Object value) {
 			overriddenProperties.put( key, value );
+			return thisAsC();
+		}
+
+		public SetupContext tenants(String ... tenants) {
+			multitenancyTestHelper = new MultitenancyTestHelper( tenants );
+			multitenancyTestHelper.forceConfigurationSettings( overriddenProperties );
+			withConfiguration( b -> b.onServiceRegistryBuilder( multitenancyTestHelper::enable ) );
+			withConfiguration( b -> b.onMetadata( multitenancyTestHelper::exportSchema ) );
 			return thisAsC();
 		}
 

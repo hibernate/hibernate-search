@@ -10,7 +10,6 @@ import java.io.Closeable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.MultiTenancyStrategy;
@@ -39,26 +38,16 @@ import org.hibernate.testing.env.ConnectionProviderBuilder;
  */
 public class MultitenancyTestHelper implements Closeable {
 
-	private final Set<String> tenantIds;
-	private final boolean multitenancyEnabled;
+	private final String[] tenantIds;
 	private final AbstractMultiTenantConnectionProvider multiTenantConnectionProvider;
 	private final Map<String,DriverManagerConnectionProviderImpl> tenantSpecificConnectionProviders = new HashMap<>();
 
-	public MultitenancyTestHelper(Set<String> tenantIds) {
+	public MultitenancyTestHelper(String[] tenantIds) {
 		this.tenantIds = tenantIds;
-		this.multitenancyEnabled = tenantIds != null && tenantIds.size() != 0;
-		if ( multitenancyEnabled ) {
-			multiTenantConnectionProvider = buildMultiTenantConnectionProvider();
-		}
-		else {
-			multiTenantConnectionProvider = null;
-		}
+		this.multiTenantConnectionProvider = buildMultiTenantConnectionProvider();
 	}
 
-	public void enableIfNeeded(StandardServiceRegistryBuilder registryBuilder) {
-		if ( !multitenancyEnabled ) {
-			return;
-		}
+	public void enable(StandardServiceRegistryBuilder registryBuilder) {
 		registryBuilder.addService( MultiTenantConnectionProvider.class, multiTenantConnectionProvider );
 	}
 
@@ -93,9 +82,6 @@ public class MultitenancyTestHelper implements Closeable {
 	}
 
 	public void exportSchema(MetadataImplementor metadata) {
-		if ( !multitenancyEnabled ) {
-			return;
-		}
 		ServiceRegistryImplementor serviceRegistry = (ServiceRegistryImplementor) metadata.getMetadataBuildingOptions()
 				.getServiceRegistry();
 		HibernateSchemaManagementTool tool = new HibernateSchemaManagementTool();
@@ -127,10 +113,7 @@ public class MultitenancyTestHelper implements Closeable {
 	}
 
 	public void forceConfigurationSettings(Map<String, Object> settings) {
-		if ( !multitenancyEnabled ) {
-			return;
-		}
-		settings.remove( org.hibernate.cfg.Environment.HBM2DDL_AUTO );
+		settings.put( org.hibernate.cfg.Environment.HBM2DDL_AUTO, org.hibernate.tool.schema.Action.NONE );
 		settings.put( AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.DATABASE.name() );
 		// any required backend-multi-tenancy property (e.g.:*.backend.multi_tenancy.strategy = discriminator)
 		// should be set by the client test
