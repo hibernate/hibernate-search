@@ -312,6 +312,11 @@ public class BackendMock implements TestRule {
 			return documentWork( StubDocumentWork.Type.ADD, id, documentContributor );
 		}
 
+		public DocumentWorkCallListContext add(String id, String tenantId,
+				Consumer<StubDocumentNode.Builder> documentContributor) {
+			return documentWork( StubDocumentWork.Type.ADD, id, tenantId, documentContributor );
+		}
+
 		public DocumentWorkCallListContext update(Consumer<StubDocumentWork.Builder> contributor) {
 			return documentWork( StubDocumentWork.Type.UPDATE, contributor );
 		}
@@ -341,6 +346,17 @@ public class BackendMock implements TestRule {
 				Consumer<StubDocumentNode.Builder> documentContributor) {
 			return documentWork( type, b -> {
 				b.identifier( id );
+				StubDocumentNode.Builder documentBuilder = StubDocumentNode.document();
+				documentContributor.accept( documentBuilder );
+				b.document( documentBuilder.build() );
+			} );
+		}
+
+		DocumentWorkCallListContext documentWork(StubDocumentWork.Type type, String id, String tenantId,
+				Consumer<StubDocumentNode.Builder> documentContributor) {
+			return documentWork( type, b -> {
+				b.identifier( id );
+				b.tenantIdentifier( tenantId );
 				StubDocumentNode.Builder documentBuilder = StubDocumentNode.document();
 				documentContributor.accept( documentBuilder );
 				b.document( documentBuilder.build() );
