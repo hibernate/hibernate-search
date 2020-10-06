@@ -600,23 +600,15 @@ stage('Non-default environments') {
 						// By default, rely on credentials provided by the EC2 infrastructure
 
 						helper.withMavenWorkspace {
-							// Tests may fail because of hourly AWS snapshots,
-							// which prevent deleting indexes while they are being executed.
-							// So if this fails, we re-try twice.
-							// Note that because we expect frequent failure and retries,
-							// we use --fail-fast here, to make sure we don't waste time.
-							retry(count: 3) {
-								mavenNonDefaultBuild buildEnv, """ \
-										clean install \
-										--fail-fast \
-										-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
-										${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
-										-Dtest.elasticsearch.connection.hosts=$buildEnv.endpointHostAndPort \
-										-Dtest.elasticsearch.connection.protocol=$buildEnv.endpointProtocol \
-										-Dtest.elasticsearch.connection.aws.signing.enabled=true \
-										-Dtest.elasticsearch.connection.aws.region=$buildEnv.awsRegion \
-									"""
-							}
+							mavenNonDefaultBuild buildEnv, """ \
+									clean install \
+									-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
+									${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
+									-Dtest.elasticsearch.connection.hosts=$buildEnv.endpointHostAndPort \
+									-Dtest.elasticsearch.connection.protocol=$buildEnv.endpointProtocol \
+									-Dtest.elasticsearch.connection.aws.signing.enabled=true \
+									-Dtest.elasticsearch.connection.aws.region=$buildEnv.awsRegion \
+								"""
 						}
 					}
 					else {
@@ -629,26 +621,18 @@ stage('Non-default environments') {
 											  usernameVariable: 'AWS_ACCESS_KEY_ID',
 											  passwordVariable: 'AWS_SECRET_ACCESS_KEY'
 											 ]]) {
-								// Tests may fail because of hourly AWS snapshots,
-								// which prevent deleting indexes while they are being executed.
-								// So if this fails, we re-try twice.
-								// Note that because we expect frequent failure and retries,
-								// we use --fail-fast here, to make sure we don't waste time.
-								retry(count: 3) {
-									mavenNonDefaultBuild buildEnv, """ \
-										clean install \
-										--fail-fast \
-										-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
-										${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
-										-Dtest.elasticsearch.connection.hosts=$buildEnv.endpointHostAndPort \
-										-Dtest.elasticsearch.connection.protocol=$buildEnv.endpointProtocol \
-										-Dtest.elasticsearch.connection.aws.signing.enabled=true \
-										-Dtest.elasticsearch.connection.aws.region=$buildEnv.awsRegion \
-										-Dtest.elasticsearch.connection.aws.credentials.type=static \
-										-Dtest.elasticsearch.connection.aws.credentials.access_key_id=$AWS_ACCESS_KEY_ID \
-										-Dtest.elasticsearch.connection.aws.credentials.secret_access_key=$AWS_SECRET_ACCESS_KEY \
-									"""
-								}
+								mavenNonDefaultBuild buildEnv, """ \
+									clean install \
+									-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
+									${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
+									-Dtest.elasticsearch.connection.hosts=$buildEnv.endpointHostAndPort \
+									-Dtest.elasticsearch.connection.protocol=$buildEnv.endpointProtocol \
+									-Dtest.elasticsearch.connection.aws.signing.enabled=true \
+									-Dtest.elasticsearch.connection.aws.region=$buildEnv.awsRegion \
+									-Dtest.elasticsearch.connection.aws.credentials.type=static \
+									-Dtest.elasticsearch.connection.aws.credentials.access_key_id=$AWS_ACCESS_KEY_ID \
+									-Dtest.elasticsearch.connection.aws.credentials.secret_access_key=$AWS_SECRET_ACCESS_KEY \
+								"""
 							}
 						}
 					}
