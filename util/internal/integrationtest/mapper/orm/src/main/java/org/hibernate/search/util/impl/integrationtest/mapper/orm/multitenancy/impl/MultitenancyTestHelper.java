@@ -6,9 +6,13 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl;
 
+import static org.junit.Assume.assumeTrue;
+
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.dialect.H2Dialect;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
@@ -42,6 +46,12 @@ public class MultitenancyTestHelper {
 				new H2LazyMultiTenantConnectionProvider( tenantIds ) );
 		// any required backend-multi-tenancy property (e.g.:*.backend.multi_tenancy.strategy = discriminator)
 		// should be set by the client test
+
+		builder.onMetadata( metadataImplementor -> {
+			Dialect dialect = metadataImplementor.getDatabase().getDialect();
+			assumeTrue( "This test relies on multi-tenancy, which can currently only be set up with H2",
+					dialect instanceof H2Dialect );
+		} );
 
 		builder.onMetadata( this::exportSchema );
 	}
