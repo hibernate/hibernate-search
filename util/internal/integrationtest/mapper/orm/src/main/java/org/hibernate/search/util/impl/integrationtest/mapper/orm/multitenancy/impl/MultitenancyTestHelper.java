@@ -6,17 +6,9 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl;
 
-import java.io.Closeable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.hibernate.HibernateException;
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.cfg.AvailableSettings;
-import org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl;
-import org.hibernate.engine.jdbc.connections.spi.AbstractMultiTenantConnectionProvider;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
@@ -27,7 +19,6 @@ import org.hibernate.tool.schema.internal.SchemaDropperImpl;
 import org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase;
 
 import org.hibernate.testing.boot.JdbcConnectionAccessImpl;
-import org.hibernate.testing.env.ConnectionProviderBuilder;
 
 /**
  * Utility to help setting up a test SessionFactory which uses multi-tenancy based
@@ -36,56 +27,23 @@ import org.hibernate.testing.env.ConnectionProviderBuilder;
  * @author Sanne Grinovero
  * @since 5.4
  */
-public class MultitenancyTestHelper implements Closeable {
+public class MultitenancyTestHelper {
 
 	private final String[] tenantIds;
-	private final AbstractMultiTenantConnectionProvider multiTenantConnectionProvider;
-	private final Map<String,DriverManagerConnectionProviderImpl> tenantSpecificConnectionProviders = new HashMap<>();
 
 	public MultitenancyTestHelper(String[] tenantIds) {
 		this.tenantIds = tenantIds;
-		this.multiTenantConnectionProvider = buildMultiTenantConnectionProvider();
 	}
 
 	public void enable(SimpleSessionFactoryBuilder builder) {
 		builder.setProperty( org.hibernate.cfg.Environment.HBM2DDL_AUTO, org.hibernate.tool.schema.Action.NONE );
 		builder.setProperty( AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.DATABASE.name() );
+		builder.setProperty( AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER,
+				new H2LazyMultiTenantConnectionProvider( tenantIds ) );
 		// any required backend-multi-tenancy property (e.g.:*.backend.multi_tenancy.strategy = discriminator)
 		// should be set by the client test
 
-		builder.onServiceRegistryBuilder( registryBuilder ->
-				registryBuilder.addService( MultiTenantConnectionProvider.class, multiTenantConnectionProvider ) );
 		builder.onMetadata( this::exportSchema );
-	}
-
-	private AbstractMultiTenantConnectionProvider buildMultiTenantConnectionProvider() {
-		for ( String tenantId : tenantIds ) {
-			DriverManagerConnectionProviderImpl connectionProvider = ConnectionProviderBuilder.buildConnectionProvider( tenantId );
-			tenantSpecificConnectionProviders.put( tenantId, connectionProvider );
-		}
-		return new AbstractMultiTenantConnectionProvider() {
-			@Override
-			protected ConnectionProvider getAnyConnectionProvider() {
-				//blatantly assuming there's at least one entry:
-				return tenantSpecificConnectionProviders.entrySet().iterator().next().getValue();
-			}
-
-			@Override
-			protected ConnectionProvider selectConnectionProvider(String tenantIdentifier) {
-				DriverManagerConnectionProviderImpl connectionProviderImpl = tenantSpecificConnectionProviders.get( tenantIdentifier );
-				if ( connectionProviderImpl == null ) {
-					throw new HibernateException( "Unknown tenant identifier" );
-				}
-				return connectionProviderImpl;
-			}
-		};
-	}
-
-	@Override
-	public void close() {
-		for ( DriverManagerConnectionProviderImpl connectionProvider : tenantSpecificConnectionProviders.values() ) {
-			connectionProvider.stop();
-		}
 	}
 
 	private void exportSchema(MetadataImplementor metadata) {
@@ -107,10 +65,12 @@ public class MultitenancyTestHelper implements Closeable {
 	}
 
 	private GenerationTargetToDatabase[] createSchemaTargets(ServiceRegistryImplementor serviceRegistry) {
-		GenerationTargetToDatabase[] targets = new GenerationTargetToDatabase[tenantSpecificConnectionProviders.size()];
+		H2LazyMultiTenantConnectionProvider multiTenantConnectionProvider = (H2LazyMultiTenantConnectionProvider)
+				serviceRegistry.getService( MultiTenantConnectionProvider.class );
+		GenerationTargetToDatabase[] targets = new GenerationTargetToDatabase[tenantIds.length];
 		int index = 0;
-		for ( Entry<String, DriverManagerConnectionProviderImpl> e : tenantSpecificConnectionProviders.entrySet() ) {
-			ConnectionProvider connectionProvider = e.getValue();
+		for ( String tenantId : tenantIds ) {
+			ConnectionProvider connectionProvider = multiTenantConnectionProvider.selectConnectionProvider( tenantId );
 			targets[index] = new GenerationTargetToDatabase(
 						new DdlTransactionIsolatorTestingImpl( serviceRegistry,
 								new JdbcConnectionAccessImpl( connectionProvider ) ) );
