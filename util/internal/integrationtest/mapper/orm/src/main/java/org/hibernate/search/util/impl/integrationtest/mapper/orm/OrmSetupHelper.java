@@ -102,7 +102,7 @@ public final class OrmSetupHelper
 		}
 
 		public SetupContext tenants(String ... tenants) {
-			withConfiguration( new MultitenancyTestHelper( tenants )::enable );
+			withConfiguration( b -> MultitenancyTestHelper.enable( b, tenants ) );
 			return thisAsC();
 		}
 
