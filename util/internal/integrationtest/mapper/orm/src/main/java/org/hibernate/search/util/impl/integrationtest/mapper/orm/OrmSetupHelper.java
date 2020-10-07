@@ -106,9 +106,7 @@ public final class OrmSetupHelper
 
 		public SetupContext tenants(String ... tenants) {
 			multitenancyTestHelper = new MultitenancyTestHelper( tenants );
-			multitenancyTestHelper.forceConfigurationSettings( overriddenProperties );
-			withConfiguration( b -> b.onServiceRegistryBuilder( multitenancyTestHelper::enable ) );
-			withConfiguration( b -> b.onMetadata( multitenancyTestHelper::exportSchema ) );
+			withConfiguration( multitenancyTestHelper::enable );
 			return thisAsC();
 		}
 
