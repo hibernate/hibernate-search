@@ -107,7 +107,7 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 	/**
 	 * Constructor for unit test.
 	 */
-	PartitionMapper(
+	public PartitionMapper(
 				String serializedIdFetchSize,
 				String customQueryHql,
 				String serializedMaxThreads,

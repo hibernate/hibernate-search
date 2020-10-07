@@ -15,7 +15,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
-import org.hibernate.search.batch.jsr352.core.massindexing.test.util.JobTestUtil;
+import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.EntityWithEmbeddedId;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.EntityWithIdClass;
 import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;
