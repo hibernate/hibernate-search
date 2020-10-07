@@ -59,6 +59,12 @@
          -->
         <version.javax.xml.bind.jaxb-api>2.3.0</version.javax.xml.bind.jaxb-api>
         <version.org.glassfish.jaxb>2.3.0.1</version.org.glassfish.jaxb>
+        <!--
+            The version of bytebuddy used on ORM 5.3.6.Final has bugs when used with JDK11,
+            especially when used with Mockito,
+            so we need to override it.
+         -->
+        <version.net.bytebuddy>1.10.16</version.net.bytebuddy>
 
         <!-- >>> JSR 352 -->
         <version.javax.batch>1.0</version.javax.batch>
@@ -573,6 +579,11 @@
                 <groupId>org.jboss</groupId>
                 <artifactId>jboss-transaction-spi</artifactId>
                 <version>${version.org.jboss.jboss-transaction-spi}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${version.net.bytebuddy}</version>
             </dependency>
 
             <!-- Manage version of xml-apis to have dom4j and Tika requirements converge -->
