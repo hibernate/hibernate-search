@@ -26,12 +26,15 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
+import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName;
+import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.test.testsupport.V5MigrationHelperOrmSetupHelper;
-import org.hibernate.search.test.util.MultitenancyTestHelper;
 import org.hibernate.search.test.util.TestConfiguration;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
+import java.util.Set;
 
 /**
  * Manages bootstrap and teardown of an Hibernate SessionFactory for purposes of
@@ -54,7 +57,6 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	/* Each of the following fields needs to be cleaned up on close */
 	private SessionFactoryImplementor sessionFactory;
 	private Path baseIndexDir;
-	private MultitenancyTestHelper multitenancyHelper;
 	private Session session;
 	private SearchFactory searchFactory;
 	private Map<String,Object> configurationSettings;
@@ -79,21 +81,22 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 	private SessionFactoryImplementor buildSessionFactory() {
 		V5MigrationHelperOrmSetupHelper.SetupContext setupContext = setupHelper.start();
 
-		multitenancyHelper = new MultitenancyTestHelper( test.multiTenantIds() );
 		Map<String, Object> settings = getConfigurationSettings();
-		multitenancyHelper.forceConfigurationSettings( settings );
-
 		setupContext = setupContext.withProperties( settings );
 
-		setupContext = setupContext.withConfiguration( b -> b.onServiceRegistryBuilder( multitenancyHelper::enableIfNeeded ) );
+		Set<String> tenantIds = test.multiTenantIds();
+		if ( !tenantIds.isEmpty() ) {
+			setupContext = setupContext.tenants( tenantIds.toArray( new String[0] ) );
+			setupContext = setupContext.withProperty(
+					BackendSettings.backendKey( LuceneBackendSettings.MULTI_TENANCY_STRATEGY ),
+					MultiTenancyStrategyName.DISCRIMINATOR );
+		}
 
 		Class<?>[] annotatedClasses = test.getAnnotatedClasses();
 		if ( annotatedClasses != null ) {
 			setupContext = setupContext.withConfiguration( builder ->
 					builder.addAnnotatedClasses( Arrays.asList( annotatedClasses ) ) );
 		}
-
-		setupContext = setupContext.withConfiguration( b -> b.onMetadata( multitenancyHelper::exportSchema ) );
 
 		return setupContext.setup().unwrap( SessionFactoryImplementor.class );
 	}
@@ -111,10 +114,6 @@ public final class DefaultTestResourceManager implements TestResourceManager {
 		if ( sessionFactory != null ) {
 			sessionFactory.close();
 			sessionFactory = null;
-		}
-		if ( multitenancyHelper != null ) {
-			multitenancyHelper.close();
-			multitenancyHelper = null;
 		}
 		//Make sure we don't reuse the settings across SessionFactories
 		configurationSettings = null;
