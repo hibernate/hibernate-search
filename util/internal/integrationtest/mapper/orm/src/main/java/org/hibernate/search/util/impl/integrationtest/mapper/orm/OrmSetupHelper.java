@@ -59,8 +59,6 @@ public final class OrmSetupHelper
 
 	private final SchemaManagementStrategyName schemaManagementStrategyName;
 
-	private MultitenancyTestHelper multitenancyTestHelper;
-
 	private OrmSetupHelper(BackendSetupStrategy backendSetupStrategy,
 			SchemaManagementStrategyName schemaManagementStrategyName) {
 		super( backendSetupStrategy );
@@ -76,7 +74,6 @@ public final class OrmSetupHelper
 	protected void close(SessionFactory toClose) {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( SessionFactory::close, toClose );
-			closer.push( MultitenancyTestHelper::close, multitenancyTestHelper );
 		}
 	}
 
@@ -105,8 +102,7 @@ public final class OrmSetupHelper
 		}
 
 		public SetupContext tenants(String ... tenants) {
-			multitenancyTestHelper = new MultitenancyTestHelper( tenants );
-			withConfiguration( multitenancyTestHelper::enable );
+			withConfiguration( new MultitenancyTestHelper( tenants )::enable );
 			return thisAsC();
 		}
 
