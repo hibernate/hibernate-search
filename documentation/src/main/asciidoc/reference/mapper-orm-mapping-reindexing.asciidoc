@@ -133,9 +133,9 @@ to a particular property (and, in the case of `@IndexedEmbedded`, anything beyon
 Several options are available to control exactly how updates to a given property affect reindexing.
 See the sections below for an explanation of each option.
 
-=== `ReindexingOnUpdate.SHALLOW`: limiting automatic reindexing to same-entity updates only
+=== `ReindexOnUpdate.SHALLOW`: limiting automatic reindexing to same-entity updates only
 
-`ReindexingOnUpdate.SHALLOW` is most useful when an association is highly asymmetric and therefore unidirectional.
+`ReindexOnUpdate.SHALLOW` is most useful when an association is highly asymmetric and therefore unidirectional.
 Think associations to "reference" data such as categories, types, cities, countries, ...
 
 It essentially tells Hibernate Search that changing an association
@@ -205,9 +205,9 @@ The index will become slightly out-of-sync,
 but this can be solved by <<mapper-orm-indexing-massindexer,reindexing>> `Book` entities,
 for example every night.
 
-=== `ReindexingOnUpdate.NO`: disabling automatic reindexing for updates of a particular property
+=== `ReindexOnUpdate.NO`: disabling automatic reindexing for updates of a particular property
 
-`ReindexingOnUpdate.NO` is most useful for properties that change very frequently
+`ReindexOnUpdate.NO` is most useful for properties that change very frequently
 and don't need to be up-to-date in the index.
 
 It essentially tells Hibernate Search that changes to that property should not trigger automatic reindexing,
