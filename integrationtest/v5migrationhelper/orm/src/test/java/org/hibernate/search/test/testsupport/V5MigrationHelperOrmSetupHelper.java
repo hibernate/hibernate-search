@@ -21,6 +21,7 @@ import org.hibernate.search.testsupport.configuration.V5MigrationHelperTestLucen
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl.MultitenancyTestHelper;
 
 public final class V5MigrationHelperOrmSetupHelper
 		extends MappingSetupHelper<V5MigrationHelperOrmSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SessionFactory> {
@@ -68,6 +69,11 @@ public final class V5MigrationHelperOrmSetupHelper
 		@Override
 		public SetupContext withProperty(String key, Object value) {
 			overriddenProperties.put( key, value );
+			return thisAsC();
+		}
+
+		public SetupContext tenants(String ... tenants) {
+			withConfiguration( b -> MultitenancyTestHelper.enable( b, tenants ) );
 			return thisAsC();
 		}
 
