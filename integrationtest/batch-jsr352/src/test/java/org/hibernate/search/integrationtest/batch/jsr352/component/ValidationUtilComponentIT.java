@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.batch.jsr352.core.massindexing.util.impl;
+package org.hibernate.search.integrationtest.batch.jsr352.component;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -13,8 +13,9 @@ import java.util.stream.Stream;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.hibernate.search.batch.jsr352.core.massindexing.test.entity.Company;
-import org.hibernate.search.batch.jsr352.core.massindexing.test.entity.Person;
+import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.ValidationUtil;
+import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
+import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Person;
 import org.hibernate.search.util.common.SearchException;
 
 import org.junit.After;
@@ -24,9 +25,9 @@ import org.junit.Test;
 /**
  * @author Mincong Huang
  */
-public class ValidationUtilTest {
+public class ValidationUtilComponentIT {
 
-	private static final String PERSISTENCE_UNIT_NAME = "primary_pu";
+	private static final String PERSISTENCE_UNIT_NAME = "lucene_pu";
 
 	private static final String EMF_SCOPE = "persistence-unit-name";
 
@@ -123,5 +124,4 @@ public class ValidationUtilTest {
 			// Private constructor, do not use it.
 		}
 	}
-
 }

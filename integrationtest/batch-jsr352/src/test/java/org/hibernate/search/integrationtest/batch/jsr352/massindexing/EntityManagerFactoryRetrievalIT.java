@@ -12,7 +12,7 @@ import java.util.List;
 import javax.batch.runtime.JobExecution;
 
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
-import org.hibernate.search.batch.jsr352.core.massindexing.test.util.JobTestUtil;
+import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 
 import org.junit.Test;

@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.batch.jsr352.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.batch.jsr352.core.massindexing.test.util.JobTestUtil.findIndexedResultsInTenant;
+import static org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil.findIndexedResultsInTenant;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -22,7 +22,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
-import org.hibernate.search.batch.jsr352.core.massindexing.test.util.JobTestUtil;
+import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;

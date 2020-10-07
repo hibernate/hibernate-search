@@ -4,13 +4,12 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.spi;
+package org.hibernate.search.integrationtest.batch.jsr352.component;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -24,8 +23,9 @@ import javax.persistence.Persistence;
 import org.hibernate.CacheMode;
 import org.hibernate.search.batch.jsr352.core.massindexing.impl.JobContextData;
 import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.IndexScope;
-import org.hibernate.search.batch.jsr352.core.massindexing.test.entity.Company;
-import org.hibernate.search.batch.jsr352.core.massindexing.test.util.JobTestUtil;
+import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.spi.EntityReader;
+import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
+import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 
 import org.junit.After;
 import org.junit.Before;
@@ -37,13 +37,13 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
 /**
- * Unit test for item reader validation.
+ * Single-component test for item reader validation.
  *
  * @author Mincong Huang
  */
-public class EntityReaderTest {
+public class EntityReaderComponentIT {
 
-	private static final String PERSISTENCE_UNIT_NAME = "primary_pu";
+	private static final String PERSISTENCE_UNIT_NAME = "lucene_pu";
 
 	private static final List<Company> COMPANIES = Arrays.asList(
 			new Company( "Red Hat" ),
@@ -119,7 +119,7 @@ public class EntityReaderTest {
 		jobData.setEntityTypeDescriptors( Arrays.asList( JobTestUtil.createSimpleEntityTypeDescriptor( emf, Company.class ) ) );
 
 		when( mockedJobContext.getTransientUserData() ).thenReturn( jobData );
-		verify( mockedStepContext ).setTransientUserData( any() );
+		mockedStepContext.setTransientUserData( any() );
 
 		try {
 			entityReader.open( null );
