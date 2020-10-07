@@ -33,13 +33,18 @@ import org.hibernate.testing.boot.JdbcConnectionAccessImpl;
  */
 public class MultitenancyTestHelper {
 
+	public static void enable(SimpleSessionFactoryBuilder builder, String ... tenantIds) {
+		MultitenancyTestHelper helper = new MultitenancyTestHelper( tenantIds );
+		helper.attachTo( builder );
+	}
+
 	private final String[] tenantIds;
 
-	public MultitenancyTestHelper(String[] tenantIds) {
+	private MultitenancyTestHelper(String[] tenantIds) {
 		this.tenantIds = tenantIds;
 	}
 
-	public void enable(SimpleSessionFactoryBuilder builder) {
+	private void attachTo(SimpleSessionFactoryBuilder builder) {
 		builder.setProperty( org.hibernate.cfg.Environment.HBM2DDL_AUTO, org.hibernate.tool.schema.Action.NONE );
 		builder.setProperty( AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.DATABASE.name() );
 		builder.setProperty( AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER,
