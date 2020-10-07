@@ -123,6 +123,11 @@
         <version.com.ibm.jbatch>1.0</version.com.ibm.jbatch>
         <!-- Derby driver used by JBatch -->
         <version.org.apache.derby>10.13.1.1</version.org.apache.derby>
+
+        <!-- Test settings -->
+        <surefire.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${surefire.jvm.args.jacoco} -Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize=true</surefire.jvm.args>
+        <failsafe.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${failsafe.jvm.args.jacoco} ${failsafe.jvm.args.hibernate-orm} -Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize=true</failsafe.jvm.args>
+
     </properties>
 
     <dependencyManagement>
