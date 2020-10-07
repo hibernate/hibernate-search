@@ -15,8 +15,6 @@ import java.util.Set;
 import org.apache.lucene.search.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.dialect.Dialect;
-import org.hibernate.dialect.H2Dialect;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -48,8 +46,6 @@ import org.junit.Test;
 	value = org.hibernate.dialect.H2Dialect.class
 )
 public class DatabaseMultitenancyTest extends SearchTestBase {
-
-	public static final Dialect DIALECT = new H2Dialect();
 
 	/**
 	 * Metamec tenant identifier
