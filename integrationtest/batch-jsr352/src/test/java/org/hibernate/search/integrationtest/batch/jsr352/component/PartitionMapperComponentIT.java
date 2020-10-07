@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl;
+package org.hibernate.search.integrationtest.batch.jsr352.component;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -20,23 +20,24 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.hibernate.search.batch.jsr352.core.massindexing.impl.JobContextData;
-import org.hibernate.search.batch.jsr352.core.massindexing.test.entity.Company;
-import org.hibernate.search.batch.jsr352.core.massindexing.test.entity.Person;
-import org.hibernate.search.batch.jsr352.core.massindexing.test.util.JobTestUtil;
+import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.PartitionMapper;
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.MassIndexingPartitionProperties;
+import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
+import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Person;
+import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Unit test for partition plan validation.
+ * Single-component test for partition plan validation.
  *
  * @author Mincong Huang
  */
-public class PartitionMapperTest {
+public class PartitionMapperComponentIT {
 
-	private static final String PERSISTENCE_UNIT_NAME = "primary_pu";
+	private static final String PERSISTENCE_UNIT_NAME = "lucene_pu";
 	private static final int COMP_ROWS = 3;
 	private static final int PERS_ROWS = 8;
 

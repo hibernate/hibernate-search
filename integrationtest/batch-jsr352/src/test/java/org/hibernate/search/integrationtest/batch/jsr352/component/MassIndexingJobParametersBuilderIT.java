@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.batch.jsr352.core.massindexing;
+package org.hibernate.search.integrationtest.batch.jsr352.component;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
@@ -18,6 +18,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.hibernate.CacheMode;
+import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
+import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.util.common.SearchException;
 
 import org.junit.After;
@@ -27,7 +29,7 @@ import org.junit.Test;
 /**
  * @author Mincong Huang
  */
-public class MassIndexingJobParametersBuilderTest {
+public class MassIndexingJobParametersBuilderIT {
 
 	private static final String SESSION_FACTORY_NAME = "someUniqueString";
 
@@ -44,7 +46,7 @@ public class MassIndexingJobParametersBuilderTest {
 	private static final int CHECKPOINT_INTERVAL = 200;
 	private static final CacheMode CACHE_MODE = CacheMode.GET;
 
-	private static final String PERSISTENCE_UNIT_NAME = "primary_pu";
+	private static final String PERSISTENCE_UNIT_NAME = "lucene_pu";
 	private EntityManagerFactory emf;
 
 	@Before

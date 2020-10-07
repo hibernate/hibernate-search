@@ -149,10 +149,7 @@ public class EntityReader extends AbstractItemReader {
 	public EntityReader() {
 	}
 
-	/**
-	 * Constructor for unit test
-	 */
-	EntityReader(String serializedCacheMode,
+	public EntityReader(String serializedCacheMode,
 			String entityName,
 			String serializedEntityFetchSize,
 			String serializedCheckpointInterval,
