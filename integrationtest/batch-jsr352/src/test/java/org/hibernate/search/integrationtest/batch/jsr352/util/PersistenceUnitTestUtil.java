@@ -28,4 +28,8 @@ public final class PersistenceUnitTestUtil {
 		String result = System.getProperty( PERSISTENCE_UNIT_NAME_PROPERTY );
 		return result == null ? DEFAULT_PERSISTENCE_UNIT_NAME : result;
 	}
+
+	public static boolean isDefaultPersistenceUnit() {
+		return DEFAULT_PERSISTENCE_UNIT_NAME.equals( getPersistenceUnitName() );
+	}
 }

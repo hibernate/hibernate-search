@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.batch.jsr352.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil.findIndexedResultsInTenant;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -24,6 +25,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
 import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
+import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
@@ -70,6 +72,10 @@ public class MassIndexingJobWithMultiTenancyIT {
 
 	@Before
 	public void setUp() throws Exception {
+		assumeTrue( "Run this test only when the default persistence unit is in use",
+				PersistenceUnitTestUtil.isDefaultPersistenceUnit()
+		);
+
 		sessionFactory = ormSetupHelper
 				.start()
 				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
