@@ -40,6 +40,7 @@ import org.jboss.byteman.contrib.bmunit.BMRules;
 /**
  * @author Mincong Huang
  */
+// TODO HSEARCH-4043 Remove Byteman from RestartChunkIT
 @RunWith(org.jboss.byteman.contrib.bmunit.BMUnitRunner.class)
 public class RestartChunkIT {
 

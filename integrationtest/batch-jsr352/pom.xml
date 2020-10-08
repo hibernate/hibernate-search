@@ -11,6 +11,12 @@
     <name>Hibernate Search Integration Tests - Batch JSR-352</name>
     <description>Hibernate Search integration tests for the Batch JSR-352 integration</description>
 
+    <properties>
+        <!-- TODO HSEARCH-4043 Test settings for JDK 8 && RestartChunkIT (which uses Byteman) -->
+        <surefire.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${surefire.jvm.args.jacoco} -Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize=true</surefire.jvm.args>
+        <failsafe.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${failsafe.jvm.args.jacoco} ${failsafe.jvm.args.hibernate-orm} -Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize=true</failsafe.jvm.args>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
