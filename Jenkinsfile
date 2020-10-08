@@ -964,7 +964,7 @@ String toTestJdkArg(BuildEnvironment buildEnv) {
 	String testJdkTool = buildEnv.testJdkTool
 	if ( testJdkTool ) {
 		def testJdkToolPath = tool(name: testJdkTool, type: 'jdk')
-		args += " -Dsurefire.jvm.java_executable=$testJdkToolPath/bin/java"
+		args += " -Dsurefire.jvm.java_home=$testJdkToolPath"
 	}
 	String testJdkRelease = buildEnv.testJdkRelease
 	if ( testJdkRelease ) {
