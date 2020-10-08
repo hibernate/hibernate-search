@@ -20,6 +20,7 @@ import javax.persistence.Persistence;
 import org.hibernate.CacheMode;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters;
+import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;
 import org.hibernate.search.util.common.SearchException;
 
 import org.junit.After;
@@ -46,7 +47,7 @@ public class MassIndexingJobParametersBuilderIT {
 	private static final int CHECKPOINT_INTERVAL = 200;
 	private static final CacheMode CACHE_MODE = CacheMode.GET;
 
-	private static final String PERSISTENCE_UNIT_NAME = "lucene_pu";
+	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();
 	private EntityManagerFactory emf;
 
 	@Before

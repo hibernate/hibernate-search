@@ -25,6 +25,7 @@ import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.MassIndexin
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Person;
 import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
+import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;
 
 import org.junit.After;
 import org.junit.Before;
@@ -37,7 +38,7 @@ import org.junit.Test;
  */
 public class PartitionMapperComponentIT {
 
-	private static final String PERSISTENCE_UNIT_NAME = "lucene_pu";
+	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();
 	private static final int COMP_ROWS = 3;
 	private static final int PERS_ROWS = 8;
 
