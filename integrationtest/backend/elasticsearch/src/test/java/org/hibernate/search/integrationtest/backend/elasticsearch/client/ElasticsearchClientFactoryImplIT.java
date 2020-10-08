@@ -101,11 +101,11 @@ public class ElasticsearchClientFactoryImplIT {
 	@Rule
 	public TestConfigurationProvider testConfigurationProvider = new TestConfigurationProvider();
 
-	private ThreadPoolProviderImpl threadPoolProvider = new ThreadPoolProviderImpl(
+	private final ThreadPoolProviderImpl threadPoolProvider = new ThreadPoolProviderImpl(
 			BeanHolder.of( new DefaultThreadProvider( ElasticsearchClientFactoryImplIT.class.getName() + ": " ) )
 	);
 
-	private ScheduledExecutorService timeoutExecutorService =
+	private final ScheduledExecutorService timeoutExecutorService =
 			threadPoolProvider.newScheduledExecutor( 1, "Timeout - " );
 
 	@After
