@@ -192,7 +192,7 @@
         <!-- When updating the following versions you will likely need to update the
              matching test profile as well, e.g. elasticsearch-6.0 for the 6.0+ series -->
         <!-- The main version of Elasticsearch targeted by Hibernate Search, tested in the default profile -->
-        <version.org.elasticsearch.main>7.9.0</version.org.elasticsearch.main>
+        <version.org.elasticsearch.main>7.9.2</version.org.elasticsearch.main>
         <!-- The versions of Elasticsearch advertised as compatible with Hibernate Search -->
         <version.org.elasticsearch.compatible.text>5.6, 6.8 or 7.9</version.org.elasticsearch.compatible.text>
         <!-- The versions of Elasticsearch that may work, but are not given priority for bugfixes and new features -->
