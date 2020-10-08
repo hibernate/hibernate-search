@@ -1,6 +1,67 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Beta11 (08-10-2020)
+-------------------------
+
+** Bug
+    * HSEARCH-4028 Elasticsearch's SearchResultTotal incorrectly reports an exact count after a timeout
+    * HSEARCH-4027 ScrollResult.timedOut() sometimes returns false even though a timeout occurred with Lucene
+    * HSEARCH-4011 Hibernate Search ScrollableResults should throw a JPA QueryTimeoutException instead of SearchTimeoutException
+    * HSEARCH-4009 PropertyBridge on property marked with @IndexingDependency(derivedFrom = ...) leads to bootstrap failure
+    * HSEARCH-4008 Hibernate Search ScrollableResults.getRowNumber() returns Integer.MAX_VALUE instead of -1 when after the last element
+    * HSEARCH-3999 Deletion of contained entity whose elementCollection is indexed-embedded in the containing entity leads to LazyInitializationException
+    * HSEARCH-3998 Mass indexing a (non-abstract) parent class in a type hierarchy with a subclass annotated with @Indexed(enabled = false) still indexes that subclass
+    * HSEARCH-3997 Mapping arrays of primitive types (int[]/float[]/etc.) leads to ClassCastException upon indexing
+    * HSEARCH-3864 java.lang.Error thrown during mass indexing are swallowed and not reported to the user
+    * HSEARCH-3655 AWS signing fails when using multiple routing keys
+
+** Improvement
+    * HSEARCH-4030 Upgrade to Hibernate ORM 5.4.22.Final
+    * HSEARCH-4020 Add the entity reference to the message of exceptions occurring during automatic indexing
+    * HSEARCH-4019 Avoid adding a TotalHitCountCollector to Lucene queries unless absolutely necessary
+    * HSEARCH-4018 Avoid filtering out nested documents in Lucene queries when we know there are none
+    * HSEARCH-4016 Avoid call to loader.loadBlocking(<empty list>) when there are no entities to load
+    * HSEARCH-4007 Throw an exception when the document ID turns out to be non-unique when loading entities during a search query
+    * HSEARCH-4005 Test Hibernate Search against Elasticsearch 7.7 on AWS
+    * HSEARCH-4004 Expose an eventContext from MappingAnnotationProcessorContext
+    * HSEARCH-4003 Automatically expand repeatable annotations in MappingAnnotatedElement
+    * HSEARCH-3947 Avoid creating huge arrays for collectors when a query does not have an upper bound limit
+    * HSEARCH-3917 Use TopScoreDocCollector when a descending score sort is requested explicitly
+
+** New Feature
+    * HSEARCH-4002 Expose the type of a property for a given ContainerExtractorPath in MappingAnnotatedProperty
+    * HSEARCH-4001 Trigger reindexing when a property is modified, but not when the targeted entity is modified
+    * HSEARCH-3994 Expose metadata about the targeted types from SearchScope
+    * HSEARCH-3992 Add support for a default analyzer configured at the analysis configurer level
+    * HSEARCH-3560 Elasticsearch AWS should support AWS Credential Providers for authentication
+
+** Task
+    * HSEARCH-4042 Restore the retry() steps in the Jenkinsfile
+    * HSEARCH-4039 Upgrade to maven-surefire-plugin/maven-failsafe-plugin 3.0.0-M5
+    * HSEARCH-4038 Assign more memory to the JVM used to run Elasticsearch locally in tests
+    * HSEARCH-4037 Stop adding -Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize=true to JVM system properties when testing
+    * HSEARCH-4036 Upgrade to ForbiddenApis 3.1
+    * HSEARCH-4035 Use static imports for all assertions
+    * HSEARCH-4034 Add a multi-tenancy test to mapper ORM integration tests
+    * HSEARCH-4032 Use "surefire.rerunFailingTestsCount"/"failsafe.rerunFailingTestsCount" to re-run failing tests when testing on AWS Elasticsearch
+    * HSEARCH-4031 Move from Easymock to Mockito
+    * HSEARCH-4026 Raise timeout for reaching yellow status when testing on AWS Elasticsearch Service
+    * HSEARCH-4025 Support indexing entities with @IdClass if they have an explicit @DocumentId
+    * HSEARCH-4017 Don't scan index leaves that don't contain topdocs when applying projections
+    * HSEARCH-4015 Remove some legacy dependencies from the parent pom
+    * HSEARCH-4014 Document support for Character, Byte, Boolean, Float, Double as document identifiers
+    * HSEARCH-4013 Add framework-specific bits to the getting started guide
+    * HSEARCH-4012 Run tests in more environments for pull requests
+    * HSEARCH-3995 Add Lucene/Elasticsearch versions to the "Compatibility" section of the documentation
+    * HSEARCH-3991 Upgrade to Lucene 8.6.2
+    * HSEARCH-3986 Test that Hibernate Search releases all file handles on close
+    * HSEARCH-3985 Test Hibernate Search 6 indexing when hibernate.use_identifier_rollback=true
+    * HSEARCH-3785 Test soft timeout ( limiting fetching ) on Elasticsearch
+    * HSEARCH-3419 Remove --add-opens java.base/java.lang=ALL-UNNAMED from the JVM arguments used in our JDK11 integration tests
+    * HSEARCH-3282 Provide a "compatibility layer" module to help users migrate from Search 5 to Search 6
+    * HSEARCH-3243 Search 6 groundwork - Implement safer type checking for bridge type parameters
+
 6.0.0.Beta10 (04-09-2020)
 -------------------------
 
