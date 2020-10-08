@@ -16,6 +16,7 @@ import javax.persistence.Persistence;
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.ValidationUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Person;
+import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;
 import org.hibernate.search.util.common.SearchException;
 
 import org.junit.After;
@@ -27,7 +28,7 @@ import org.junit.Test;
  */
 public class ValidationUtilComponentIT {
 
-	private static final String PERSISTENCE_UNIT_NAME = "lucene_pu";
+	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();
 
 	private static final String EMF_SCOPE = "persistence-unit-name";
 

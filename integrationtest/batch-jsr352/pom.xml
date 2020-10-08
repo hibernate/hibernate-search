@@ -115,13 +115,41 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>it</id>
+                        <id>batch-jsr352-lucene-it</id>
                         <goals>
                             <goal>integration-test</goal>
+                        </goals>
+                        <configuration>
+                            <reportsDirectory>target/failsafe-reports/lucene</reportsDirectory>
+                            <systemPropertyVariables>
+                                <org.hibernate.search.jsr352.persistence_unit>lucene_pu</org.hibernate.search.jsr352.persistence_unit>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>batch-jsr352-elasticsearch-it</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                        <configuration>
+                            <reportsDirectory>target/failsafe-reports/elasticsearch</reportsDirectory>
+                            <systemPropertyVariables>
+                                <org.hibernate.search.jsr352.persistence_unit>elasticsearch_pu</org.hibernate.search.jsr352.persistence_unit>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>batch-jsr352-it-verify</id>
+                        <goals>
                             <goal>verify</goal>
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.alexcojocaru</groupId>
+                <artifactId>elasticsearch-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

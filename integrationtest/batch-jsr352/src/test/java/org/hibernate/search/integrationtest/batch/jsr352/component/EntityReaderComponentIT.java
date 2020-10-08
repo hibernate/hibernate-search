@@ -26,6 +26,7 @@ import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.Inde
 import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.spi.EntityReader;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
+import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;
 
 import org.junit.After;
 import org.junit.Before;
@@ -38,7 +39,7 @@ import org.junit.Test;
  */
 public class EntityReaderComponentIT {
 
-	private static final String PERSISTENCE_UNIT_NAME = "lucene_pu";
+	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();
 
 	private static final List<Company> COMPANIES = Arrays.asList(
 			new Company( "Red Hat" ),
