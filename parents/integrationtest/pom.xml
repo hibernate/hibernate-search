@@ -290,9 +290,10 @@
             </activation>
             <properties>
                 <!-- Tests may fail unexpectedly with AWS Elasticsearch.
-                     In particular, AWS may decide to snapshot an index, in which case deleting indexes will fail.
-                     Sometimes we also get timeouts, seemingly for no particular reason.
+                     In particular, we sometimes get timeouts, seemingly for no particular reason.
                      Thus we need to retry tests when they fail, to be sure it's not just a transient failure.
+                     Note that this will not re-run tests when they fail in @BeforeClass/@AfterClass in particular,
+                     so we also have retry steps in the Jenkinsfile.
                  -->
                 <failsafe.rerunFailingTestsCount>4</failsafe.rerunFailingTestsCount>
             </properties>
