@@ -73,6 +73,7 @@ public final class JobTestUtil {
 	public static <T> int nbDocumentsInIndex(EntityManagerFactory emf, Class<T> clazz) {
 		try ( Session session = emf.unwrap( SessionFactory.class ).openSession() ) {
 			SearchSession searchSession = Search.session( session );
+			searchSession.workspace().refresh();
 			long totalHitCount = searchSession.search( clazz ).where( f -> f.matchAll() ).fetchTotalHitCount();
 			return Math.toIntExact( totalHitCount );
 		}
@@ -94,6 +95,7 @@ public final class JobTestUtil {
 
 	private static <T> List<T> find(Session session, Class<T> clazz, String key, String value) {
 		SearchSession searchSession = Search.session( session );
+		searchSession.workspace().refresh();
 		return searchSession.search( clazz )
 				.where( f -> f.match().field( key ).matching( value ) )
 				.fetchHits( 1000 );
