@@ -411,8 +411,10 @@
         <!-- Test settings -->
         <!-- Set empty default values to avoid Maven leaving property references (${...}) when it doesn't find a value -->
 
+        <!-- IMPORTANT: For Java 8, this must be the path to the JDK, not to the JRE -->
         <surefire.jvm.java_home>${java.home}</surefire.jvm.java_home>
         <surefire.jvm.java_executable>${surefire.jvm.java_home}/bin/java</surefire.jvm.java_executable>
+        <surefire.jvm.toolsjar>${surefire.jvm.java_home}/lib/tools.jar</surefire.jvm.toolsjar>
         <surefire.jvm.args.memory>-Xmx512m -Xms128m</surefire.jvm.args.memory>
         <!--
             Provide two sets of settings for settings specific to a java version.
@@ -1504,10 +1506,6 @@
                         <jvm>${surefire.jvm.java_executable}</jvm>
                         <argLine>${surefire.jvm.args}</argLine>
                         <reportNameSuffix>${surefire.environment}-${surefire.executing-module}</reportNameSuffix>
-                        <additionalClasspathElements>
-                            <!-- Needed by Byteman to load the agent on demand -->
-                            <additionalClasspathElement>${jdk-toolsjar}</additionalClasspathElement>
-                        </additionalClasspathElements>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -1529,10 +1527,6 @@
                         <jvm>${surefire.jvm.java_executable}</jvm>
                         <argLine>${failsafe.jvm.args}</argLine>
                         <reportNameSuffix>${surefire.environment}-${surefire.executing-module}</reportNameSuffix>
-                        <additionalClasspathElements>
-                            <!-- Needed by Byteman to load the agent on demand -->
-                            <additionalClasspathElement>${jdk-toolsjar}</additionalClasspathElement>
-                        </additionalClasspathElements>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -1707,6 +1701,42 @@
                             <artifactId>maven-compiler-plugin</artifactId>
                             <configuration>
                                 <failOnWarning>false</failOnWarning>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
+        <profile>
+            <id>testWithJdk8</id>
+            <activation>
+                <property>
+                    <name>maven.compiler.testRelease</name>
+                    <value>8</value>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <configuration>
+                                <additionalClasspathElements>
+                                    <!-- Needed by Byteman to load the agent on demand -->
+                                    <additionalClasspathElement>${surefire.jvm.toolsjar}</additionalClasspathElement>
+                                </additionalClasspathElements>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-failsafe-plugin</artifactId>
+                            <configuration>
+                                <additionalClasspathElements>
+                                    <!-- Needed by Byteman to load the agent on demand -->
+                                    <additionalClasspathElement>${surefire.jvm.toolsjar}</additionalClasspathElement>
+                                </additionalClasspathElements>
                             </configuration>
                         </plugin>
                     </plugins>
@@ -2034,27 +2064,16 @@
         <!-- ====================================== -->
         <!-- Detection of tools classes for Byteman -->
         <!-- ====================================== -->
-        <!-- See the configuration of the surefire and failsafe plugins -->
+        <!-- These profiles are useful and will only be active when testing against JDK8 -->
         <profile>
-            <id>default-toolsjar-profile</id>
+            <id>jdk8-mac-toolsjar</id>
             <activation>
-                <file>
-                    <exists>${java.home}/../lib/tools.jar</exists>
-                </file>
+                <os>
+                    <family>mac</family>
+                </os>
             </activation>
             <properties>
-                <jdk-toolsjar>${java.home}/../lib/tools.jar</jdk-toolsjar>
-            </properties>
-        </profile>
-        <profile>
-            <id>mac-toolsjar-profile</id>
-            <activation>
-                <file>
-                    <exists>${java.home}/../Classes/classes.jar</exists>
-                </file>
-            </activation>
-            <properties>
-                <jdk-toolsjar>${java.home}/../Classes/classes.jar</jdk-toolsjar>
+                <surefire.jvm.toolsjar>${surefire.jvm.java_home}/Classes/classes.jar</surefire.jvm.toolsjar>
             </properties>
         </profile>
 
