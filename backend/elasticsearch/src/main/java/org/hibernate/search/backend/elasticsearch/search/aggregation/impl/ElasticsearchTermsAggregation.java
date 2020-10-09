@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
@@ -80,7 +80,7 @@ public class ElasticsearchTermsAggregation<F, K>
 	}
 
 	public static class Factory<F>
-			extends AbstractElasticsearchCodecAwareSearchFieldQueryElementFactory<TypeSelector<?>, F> {
+			extends AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory<TypeSelector<?>, F> {
 		public Factory(ElasticsearchFieldCodec<F> codec) {
 			super( codec );
 		}

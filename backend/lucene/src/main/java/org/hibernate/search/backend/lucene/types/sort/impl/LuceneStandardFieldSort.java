@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
@@ -39,7 +39,7 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 	}
 
 	abstract static class AbstractFactory<F, E, C extends LuceneStandardFieldCodec<F, E>>
-			extends AbstractLuceneCodecAwareSearchFieldQueryElementFactory<FieldSortBuilder, F, C> {
+			extends AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<FieldSortBuilder, F, C> {
 		protected AbstractFactory(C codec) {
 			super( codec );
 		}

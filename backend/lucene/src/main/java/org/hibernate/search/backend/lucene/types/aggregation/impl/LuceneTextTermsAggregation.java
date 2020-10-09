@@ -14,7 +14,7 @@ import java.util.TreeSet;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningTextMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.TextMultiValueFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
@@ -96,7 +96,7 @@ public class LuceneTextTermsAggregation<K>
 	}
 
 	public static class Factory
-			extends AbstractLuceneSearchFieldQueryElementFactory<AbstractTypeSelector<?>, String> {
+			extends AbstractLuceneSearchValueFieldQueryElementFactory<AbstractTypeSelector<?>, String> {
 		@Override
 		public TypeSelector create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<String> field) {
 			return new TypeSelector( searchContext, field );

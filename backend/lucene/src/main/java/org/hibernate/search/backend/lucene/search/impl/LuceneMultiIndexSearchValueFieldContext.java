@@ -83,7 +83,7 @@ public class LuceneMultiIndexSearchValueFieldContext<F>
 
 	@Override
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchContext searchContext) {
-		LuceneSearchFieldQueryElementFactory<T, F> factory = type().queryElementFactory( key );
+		LuceneSearchValueFieldQueryElementFactory<T, F> factory = type().queryElementFactory( key );
 		if ( factory == null ) {
 			throw log.cannotUseQueryElementForField( absolutePath(), key.toString(), eventContext() );
 		}
@@ -127,11 +127,11 @@ public class LuceneMultiIndexSearchValueFieldContext<F>
 	}
 
 	@Override
-	public <T> LuceneSearchFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key) {
-		LuceneSearchFieldQueryElementFactory<T, F> factory = null;
+	public <T> LuceneSearchValueFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key) {
+		LuceneSearchValueFieldQueryElementFactory<T, F> factory = null;
 		for ( LuceneSearchValueFieldContext<F> fieldContext : fieldForEachIndex ) {
 			LuceneSearchValueFieldTypeContext<F> fieldType = fieldContext.type();
-			LuceneSearchFieldQueryElementFactory<T, F> factoryForFieldContext =
+			LuceneSearchValueFieldQueryElementFactory<T, F> factoryForFieldContext =
 					fieldType.queryElementFactory( key );
 			if ( factory == null ) {
 				factory = factoryForFieldContext;
@@ -175,7 +175,7 @@ public class LuceneMultiIndexSearchValueFieldContext<F>
 	}
 
 	private <T> void checkFactoryCompatibility(SearchQueryElementTypeKey<T> key,
-			LuceneSearchFieldQueryElementFactory<T, F> factory1, LuceneSearchFieldQueryElementFactory<T, F> factory2) {
+			LuceneSearchValueFieldQueryElementFactory<T, F> factory1, LuceneSearchValueFieldQueryElementFactory<T, F> factory2) {
 		if ( factory1 == null && factory2 == null ) {
 			return;
 		}

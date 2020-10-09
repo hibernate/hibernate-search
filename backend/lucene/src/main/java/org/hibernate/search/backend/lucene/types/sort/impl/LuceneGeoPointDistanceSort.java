@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
@@ -29,7 +29,7 @@ public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort 
 	}
 
 	public static class Factory
-			extends AbstractLuceneSearchFieldQueryElementFactory<DistanceSortBuilder, GeoPoint> {
+			extends AbstractLuceneSearchValueFieldQueryElementFactory<DistanceSortBuilder, GeoPoint> {
 		@Override
 		public DistanceSortBuilder create(LuceneSearchContext searchContext,
 				LuceneSearchValueFieldContext<GeoPoint> field) {

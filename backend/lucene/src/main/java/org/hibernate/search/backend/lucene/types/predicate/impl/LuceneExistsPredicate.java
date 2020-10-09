@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
@@ -46,7 +46,7 @@ public class LuceneExistsPredicate extends AbstractLuceneLeafSingleFieldPredicat
 	}
 
 	public static class NormsBasedFactory
-			extends AbstractLuceneSearchFieldQueryElementFactory<ExistsPredicateBuilder, String> {
+			extends AbstractLuceneSearchValueFieldQueryElementFactory<ExistsPredicateBuilder, String> {
 		@Override
 		public NormsBasedBuilder create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<String> field) {
 			return new NormsBasedBuilder( searchContext, field );
@@ -65,7 +65,7 @@ public class LuceneExistsPredicate extends AbstractLuceneLeafSingleFieldPredicat
 	}
 
 	public static class DocValuesBasedFactory<F>
-			extends AbstractLuceneSearchFieldQueryElementFactory<ExistsPredicateBuilder, F> {
+			extends AbstractLuceneSearchValueFieldQueryElementFactory<ExistsPredicateBuilder, F> {
 		@Override
 		public DocValuesBasedBuilder<F> create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
 			return new DocValuesBasedBuilder<>( searchContext, field );
@@ -84,7 +84,7 @@ public class LuceneExistsPredicate extends AbstractLuceneLeafSingleFieldPredicat
 	}
 
 	public static class DefaultFactory<F>
-			extends AbstractLuceneSearchFieldQueryElementFactory<ExistsPredicateBuilder, F> {
+			extends AbstractLuceneSearchValueFieldQueryElementFactory<ExistsPredicateBuilder, F> {
 		@Override
 		public DefaultBuilder<F> create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
 			return new DefaultBuilder<>( searchContext, field );

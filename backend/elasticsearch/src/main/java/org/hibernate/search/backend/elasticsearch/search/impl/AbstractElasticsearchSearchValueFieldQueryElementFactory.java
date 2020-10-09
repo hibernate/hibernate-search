@@ -11,13 +11,13 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public abstract class AbstractElasticsearchSearchFieldQueryElementFactory<T, F>
-		implements ElasticsearchSearchFieldQueryElementFactory<T, F> {
+public abstract class AbstractElasticsearchSearchValueFieldQueryElementFactory<T, F>
+		implements ElasticsearchSearchValueFieldQueryElementFactory<T, F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
-	public void checkCompatibleWith(ElasticsearchSearchFieldQueryElementFactory<?, ?> other) {
+	public void checkCompatibleWith(ElasticsearchSearchValueFieldQueryElementFactory<?, ?> other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			throw log.differentImplementationClassForQueryElement( getClass(), other.getClass() );
 		}

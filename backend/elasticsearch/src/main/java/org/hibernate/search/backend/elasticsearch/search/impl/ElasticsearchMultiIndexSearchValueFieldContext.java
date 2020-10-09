@@ -81,7 +81,7 @@ public class ElasticsearchMultiIndexSearchValueFieldContext<F>
 
 	@Override
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchContext searchContext) {
-		ElasticsearchSearchFieldQueryElementFactory<T, F> factory = type().queryElementFactory( key );
+		ElasticsearchSearchValueFieldQueryElementFactory<T, F> factory = type().queryElementFactory( key );
 		if ( factory == null ) {
 			throw log.cannotUseQueryElementForField( absolutePath(), key.toString(), eventContext() );
 		}
@@ -135,11 +135,11 @@ public class ElasticsearchMultiIndexSearchValueFieldContext<F>
 	}
 
 	@Override
-	public <T> ElasticsearchSearchFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key) {
-		ElasticsearchSearchFieldQueryElementFactory<T, F> factory = null;
+	public <T> ElasticsearchSearchValueFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key) {
+		ElasticsearchSearchValueFieldQueryElementFactory<T, F> factory = null;
 		for ( ElasticsearchSearchValueFieldContext<F> fieldContext : fieldForEachIndex ) {
 			ElasticsearchSearchValueFieldTypeContext<F> fieldType = fieldContext.type();
-			ElasticsearchSearchFieldQueryElementFactory<T, F> factoryForFieldContext =
+			ElasticsearchSearchValueFieldQueryElementFactory<T, F> factoryForFieldContext =
 					fieldType.queryElementFactory( key );
 			if ( factory == null ) {
 				factory = factoryForFieldContext;
@@ -183,8 +183,8 @@ public class ElasticsearchMultiIndexSearchValueFieldContext<F>
 	}
 
 	private <T> void checkFactoryCompatibility(SearchQueryElementTypeKey<T> key,
-			ElasticsearchSearchFieldQueryElementFactory<T, F> factory1,
-			ElasticsearchSearchFieldQueryElementFactory<T, F> factory2) {
+			ElasticsearchSearchValueFieldQueryElementFactory<T, F> factory1,
+			ElasticsearchSearchValueFieldQueryElementFactory<T, F> factory2) {
 		if ( factory1 == null && factory2 == null ) {
 			return;
 		}

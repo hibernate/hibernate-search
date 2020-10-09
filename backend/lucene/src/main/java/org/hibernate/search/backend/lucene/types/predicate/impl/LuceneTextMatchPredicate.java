@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDef
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.FuzzyQueryBuilder;
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
@@ -39,7 +39,8 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 	}
 
 	public static class Factory<F>
-			extends AbstractLuceneCodecAwareSearchFieldQueryElementFactory<MatchPredicateBuilder, F, LuceneStandardFieldCodec<F, String>> {
+			extends
+			AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<MatchPredicateBuilder, F, LuceneStandardFieldCodec<F, String>> {
 		public Factory(LuceneStandardFieldCodec<F, String> codec) {
 			super( codec );
 		}

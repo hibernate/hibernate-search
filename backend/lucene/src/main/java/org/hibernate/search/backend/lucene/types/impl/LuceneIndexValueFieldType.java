@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldTypeContext;
 import org.hibernate.search.backend.lucene.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
@@ -40,7 +40,7 @@ public class LuceneIndexValueFieldType<F>
 	private final boolean projectable;
 	private final boolean aggregable;
 
-	private final Map<SearchQueryElementTypeKey<?>, LuceneSearchFieldQueryElementFactory<?, F>> queryElementFactories;
+	private final Map<SearchQueryElementTypeKey<?>, LuceneSearchValueFieldQueryElementFactory<?, F>> queryElementFactories;
 
 	private final Analyzer indexingAnalyzerOrNormalizer;
 	private final Analyzer searchAnalyzerOrNormalizer;
@@ -157,8 +157,8 @@ public class LuceneIndexValueFieldType<F>
 
 	@SuppressWarnings("unchecked") // The cast is safe by construction; see the builder.
 	@Override
-	public <T> LuceneSearchFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key) {
-		return (LuceneSearchFieldQueryElementFactory<T, F>) queryElementFactories.get( key );
+	public <T> LuceneSearchValueFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key) {
+		return (LuceneSearchValueFieldQueryElementFactory<T, F>) queryElementFactories.get( key );
 	}
 
 	public Analyzer indexingAnalyzerOrNormalizer() {
@@ -185,7 +185,7 @@ public class LuceneIndexValueFieldType<F>
 		private boolean projectable;
 		private boolean aggregable;
 
-		private final Map<SearchQueryElementTypeKey<?>, LuceneSearchFieldQueryElementFactory<?, F>>
+		private final Map<SearchQueryElementTypeKey<?>, LuceneSearchValueFieldQueryElementFactory<?, F>>
 				queryElementFactories = new HashMap<>();
 
 		private Analyzer analyzer;
@@ -232,7 +232,7 @@ public class LuceneIndexValueFieldType<F>
 		}
 
 		public <T> void queryElementFactory(SearchQueryElementTypeKey<T> key,
-				LuceneSearchFieldQueryElementFactory<T, F> factory) {
+				LuceneSearchValueFieldQueryElementFactory<T, F> factory) {
 			queryElementFactories.put( key, factory );
 		}
 

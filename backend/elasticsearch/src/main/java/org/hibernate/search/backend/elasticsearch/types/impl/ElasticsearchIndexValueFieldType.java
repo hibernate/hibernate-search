@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldTypeContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
@@ -39,7 +39,7 @@ public class ElasticsearchIndexValueFieldType<F>
 	private final boolean projectable;
 	private final boolean aggregable;
 
-	private final Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchFieldQueryElementFactory<?, F>> queryElementFactories;
+	private final Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchValueFieldQueryElementFactory<?, F>> queryElementFactories;
 
 	private final String analyzerName;
 	private final String searchAnalyzerName;
@@ -154,8 +154,8 @@ public class ElasticsearchIndexValueFieldType<F>
 
 	@SuppressWarnings("unchecked") // The cast is safe by construction; see the builder.
 	@Override
-	public <T> ElasticsearchSearchFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key) {
-		return (ElasticsearchSearchFieldQueryElementFactory<T, F>) queryElementFactories.get( key );
+	public <T> ElasticsearchSearchValueFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key) {
+		return (ElasticsearchSearchValueFieldQueryElementFactory<T, F>) queryElementFactories.get( key );
 	}
 
 	public PropertyMapping mapping() {
@@ -177,7 +177,7 @@ public class ElasticsearchIndexValueFieldType<F>
 		private boolean projectable;
 		private boolean aggregable;
 
-		private final Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchFieldQueryElementFactory<?, F>>
+		private final Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchValueFieldQueryElementFactory<?, F>>
 				queryElementFactories = new HashMap<>();
 
 		private String analyzerName;
@@ -230,7 +230,7 @@ public class ElasticsearchIndexValueFieldType<F>
 		}
 
 		public <T> void queryElementFactory(SearchQueryElementTypeKey<T> key,
-				ElasticsearchSearchFieldQueryElementFactory<T, F> factory) {
+				ElasticsearchSearchValueFieldQueryElementFactory<T, F> factory) {
 			queryElementFactories.put( key, factory );
 		}
 
