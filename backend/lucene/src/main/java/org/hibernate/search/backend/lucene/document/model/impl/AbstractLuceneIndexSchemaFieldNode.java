@@ -25,15 +25,17 @@ public abstract class AbstractLuceneIndexSchemaFieldNode implements IndexFieldDe
 	protected final IndexFieldInclusion inclusion;
 	protected final boolean multiValued;
 	protected final boolean multiValuedInRoot;
+	protected final boolean dynamic;
 
 	public AbstractLuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String relativeName,
-			IndexFieldInclusion inclusion, boolean multiValued) {
+			IndexFieldInclusion inclusion, boolean multiValued, boolean dynamic) {
 		this.parent = parent;
 		this.absolutePath = parent.absolutePath( relativeName );
 		this.relativeName = relativeName;
 		this.inclusion = parent.inclusion().compose( inclusion );
 		this.multiValued = multiValued;
 		this.multiValuedInRoot = multiValued || parent.multiValuedInRoot();
+		this.dynamic = dynamic;
 	}
 
 	@Override
@@ -74,5 +76,9 @@ public abstract class AbstractLuceneIndexSchemaFieldNode implements IndexFieldDe
 	@Override
 	public EventContext eventContext() {
 		return EventContexts.fromIndexFieldAbsolutePath( absolutePath );
+	}
+
+	public boolean dynamic() {
+		return dynamic;
 	}
 }

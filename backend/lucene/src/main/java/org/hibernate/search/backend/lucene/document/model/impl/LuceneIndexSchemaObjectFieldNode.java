@@ -36,9 +36,9 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 	private final Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByName;
 
 	public LuceneIndexSchemaObjectFieldNode(LuceneIndexSchemaObjectNode parent, String relativeName,
-			IndexFieldInclusion inclusion, ObjectStructure structure, boolean multiValued,
+			IndexFieldInclusion inclusion, ObjectStructure structure, boolean multiValued, boolean dynamic,
 			Map<String, AbstractLuceneIndexSchemaFieldNode> notYetInitializedStaticChildren) {
-		super( parent, relativeName, inclusion, multiValued );
+		super( parent, relativeName, inclusion, multiValued, dynamic );
 		List<String> theNestedPathHierarchy = parent.nestedPathHierarchy();
 		if ( ObjectStructure.NESTED.equals( structure ) ) {
 			// if we found a nested object, we add it to the nestedPathHierarchy

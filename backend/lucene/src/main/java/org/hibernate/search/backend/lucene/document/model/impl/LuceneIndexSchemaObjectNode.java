@@ -34,4 +34,6 @@ public interface LuceneIndexSchemaObjectNode extends IndexCompositeElementDescri
 
 	boolean multiValuedInRoot();
 
+	boolean dynamic();
+
 }

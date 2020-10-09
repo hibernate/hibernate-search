@@ -77,7 +77,7 @@ class LuceneIndexSchemaValueFieldNodeBuilder<F>
 			throw log.incompleteFieldDefinition( eventContext() );
 		}
 		LuceneIndexSchemaValueFieldNode<F> fieldNode = new LuceneIndexSchemaValueFieldNode<>(
-				parentNode, relativeFieldName, inclusion, multiValued, type
+				parentNode, relativeFieldName, inclusion, multiValued, false, type
 		);
 
 		staticChildrenByNameForParent.put( relativeFieldName, fieldNode );

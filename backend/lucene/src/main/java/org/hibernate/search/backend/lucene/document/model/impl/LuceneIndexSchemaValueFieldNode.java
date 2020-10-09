@@ -32,8 +32,8 @@ public class LuceneIndexSchemaValueFieldNode<F> extends AbstractLuceneIndexSchem
 	private final LuceneIndexValueFieldType<F> type;
 
 	public LuceneIndexSchemaValueFieldNode(LuceneIndexSchemaObjectNode parent, String relativeName,
-			IndexFieldInclusion inclusion, boolean multiValued, LuceneIndexValueFieldType<F> type) {
-		super( parent, relativeName, inclusion, multiValued );
+			IndexFieldInclusion inclusion, boolean multiValued, boolean dynamic, LuceneIndexValueFieldType<F> type) {
+		super( parent, relativeName, inclusion, multiValued, dynamic );
 		this.nestedPathHierarchy = parent.nestedPathHierarchy();
 		this.type = type;
 	}

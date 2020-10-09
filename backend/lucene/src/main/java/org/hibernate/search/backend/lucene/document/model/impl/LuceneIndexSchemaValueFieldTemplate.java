@@ -26,6 +26,6 @@ public class LuceneIndexSchemaValueFieldTemplate
 	@Override
 	protected LuceneIndexSchemaValueFieldNode<?> createNode(LuceneIndexSchemaObjectNode parent,
 			String relativePath, IndexFieldInclusion inclusion, boolean multiValued) {
-		return new LuceneIndexSchemaValueFieldNode<>( parent, relativePath, inclusion, multiValued, type );
+		return new LuceneIndexSchemaValueFieldNode<>( parent, relativePath, inclusion, multiValued, true, type );
 	}
 }

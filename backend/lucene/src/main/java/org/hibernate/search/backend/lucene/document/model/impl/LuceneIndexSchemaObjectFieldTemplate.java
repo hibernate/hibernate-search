@@ -29,7 +29,7 @@ public class LuceneIndexSchemaObjectFieldTemplate
 	protected LuceneIndexSchemaObjectFieldNode createNode(LuceneIndexSchemaObjectNode parent,
 			String relativePath, IndexFieldInclusion inclusion, boolean multiValued) {
 		return new LuceneIndexSchemaObjectFieldNode(
-				parent, relativePath, inclusion, structure, multiValued,
+				parent, relativePath, inclusion, structure, multiValued, true,
 				// TODO HSEARCH-3905 we don't know the children, so we should find another way to implement the exists predicate
 				Collections.emptyMap()
 		);
