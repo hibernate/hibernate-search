@@ -158,6 +158,16 @@ abstract class AbstractLuceneDocumentElementBuilder implements DocumentElement {
 		}
 	}
 
+	/**
+	 * When executing an exists() predicate on an object field that contains dynamic value field,
+	 * we don't necessarily know all the possible child value fields,
+	 * so we cannot just execute {@code exists(childField1) OR exists(childField2) OR ... OR exists(childFieldN)}.
+	 * That's why we keep track of the fact that
+	 * "for this document, this object field exists because it contains at least one dynamic value".
+	 * This is done by adding the path of the object field to the "fieldNames" field.
+	 */
+	abstract void ensureDynamicValueDetectedByExistsPredicateOnObjectField();
+
 	private <F> void addValue(LuceneIndexSchemaValueFieldNode<F> node, F value) {
 		LuceneIndexSchemaObjectNode expectedParentNode = node.parent();
 		checkTreeConsistency( expectedParentNode );
@@ -170,6 +180,9 @@ abstract class AbstractLuceneDocumentElementBuilder implements DocumentElement {
 		}
 
 		type.codec().addToDocument( documentContent, absolutePath, value );
+		if ( value != null && node.dynamic() ) {
+			ensureDynamicValueDetectedByExistsPredicateOnObjectField();
+		}
 	}
 
 	private DocumentElement addObject(LuceneIndexSchemaObjectFieldNode node, boolean nullObject) {
@@ -189,12 +202,12 @@ abstract class AbstractLuceneDocumentElementBuilder implements DocumentElement {
 		switch ( node.structure() ) {
 			case NESTED:
 				LuceneNestedObjectFieldBuilder nestedDocumentBuilder =
-						new LuceneNestedObjectFieldBuilder( model, node );
+						new LuceneNestedObjectFieldBuilder( model, node, this );
 				addNestedObjectDocumentBuilder( nestedDocumentBuilder );
 				return nestedDocumentBuilder;
 			default:
 				LuceneFlattenedObjectFieldBuilder flattenedDocumentBuilder =
-						new LuceneFlattenedObjectFieldBuilder( model, node, documentContent );
+						new LuceneFlattenedObjectFieldBuilder( model, node, this, documentContent );
 				addFlattenedObjectDocumentBuilder( flattenedDocumentBuilder );
 				return flattenedDocumentBuilder;
 		}

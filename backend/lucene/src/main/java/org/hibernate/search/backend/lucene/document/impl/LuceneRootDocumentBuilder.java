@@ -32,6 +32,11 @@ public class LuceneRootDocumentBuilder extends AbstractLuceneDocumentElementBuil
 		);
 	}
 
+	@Override
+	void ensureDynamicValueDetectedByExistsPredicateOnObjectField() {
+		// This is not an object field: nothing to do.
+	}
+
 	private List<Document> assembleDocuments(MultiTenancyStrategy multiTenancyStrategy,
 			String tenantId, String id, String routingKey) {
 		// We own the document content, so we finalize it ourselves.

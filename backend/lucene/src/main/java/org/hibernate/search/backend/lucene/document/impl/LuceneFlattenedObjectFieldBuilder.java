@@ -15,16 +15,16 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class LuceneFlattenedObjectFieldBuilder extends AbstractLuceneDocumentElementBuilder {
+class LuceneFlattenedObjectFieldBuilder extends AbstractLuceneObjectFieldBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Set<String> encounteredFields = new HashSet<>();
 
 	LuceneFlattenedObjectFieldBuilder(LuceneIndexModel model, LuceneIndexSchemaObjectFieldNode schemaNode,
-			LuceneDocumentContentImpl documentContent) {
+			AbstractLuceneDocumentElementBuilder parent, LuceneDocumentContentImpl documentContent) {
 		// The document content is not ours: it's the parent's.
-		super( model, schemaNode, documentContent );
+		super( model, schemaNode, parent, documentContent );
 	}
 
 	@Override

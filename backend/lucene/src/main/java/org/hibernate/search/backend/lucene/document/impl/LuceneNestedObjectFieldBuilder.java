@@ -16,10 +16,11 @@ import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.apache.lucene.document.Document;
 
 
-class LuceneNestedObjectFieldBuilder extends AbstractLuceneDocumentElementBuilder {
+class LuceneNestedObjectFieldBuilder extends AbstractLuceneObjectFieldBuilder {
 
-	LuceneNestedObjectFieldBuilder(LuceneIndexModel model, LuceneIndexSchemaObjectFieldNode schemaNode) {
-		super( model, schemaNode, new LuceneDocumentContentImpl() );
+	LuceneNestedObjectFieldBuilder(LuceneIndexModel model, LuceneIndexSchemaObjectFieldNode schemaNode,
+			AbstractLuceneDocumentElementBuilder parent) {
+		super( model, schemaNode, parent, new LuceneDocumentContentImpl() );
 	}
 
 	@Override
