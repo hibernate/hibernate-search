@@ -51,7 +51,7 @@ public class Book {
     private Integer id;
 
     // This property is mapped to a document field
-    @FullTextField(analyzer = "english")
+    @FullTextField
     private String title;
 
     @ManyToMany
@@ -71,7 +71,7 @@ public class Author {
     private Integer id;
 
     // This property is mapped to a document field
-    @FullTextField(analyzer = "name")
+    @FullTextField
     private String name;
 
     @ManyToMany(mappedBy = "authors")
