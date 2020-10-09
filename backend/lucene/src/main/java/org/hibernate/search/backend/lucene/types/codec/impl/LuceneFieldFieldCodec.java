@@ -11,7 +11,6 @@ import java.util.Objects;
 
 import org.apache.lucene.index.IndexableField;
 
-import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
 import org.hibernate.search.backend.lucene.logging.impl.Log;

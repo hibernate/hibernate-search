@@ -18,6 +18,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -29,7 +30,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.apache.lucene.document.Document;
 
 
-abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
+abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder, DocumentElement {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

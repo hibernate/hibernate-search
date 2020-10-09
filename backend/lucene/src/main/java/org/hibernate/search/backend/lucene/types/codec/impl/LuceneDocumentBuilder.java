@@ -4,14 +4,12 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.document.impl;
-
-import org.hibernate.search.engine.backend.document.DocumentElement;
+package org.hibernate.search.backend.lucene.types.codec.impl;
 
 import org.apache.lucene.index.IndexableField;
 
 
-public interface LuceneDocumentBuilder extends DocumentElement {
+public interface LuceneDocumentBuilder {
 
 	/**
 	 * Add a field to this document.
