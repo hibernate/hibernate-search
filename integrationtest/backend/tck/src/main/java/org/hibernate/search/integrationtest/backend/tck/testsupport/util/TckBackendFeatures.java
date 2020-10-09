@@ -51,10 +51,6 @@ public class TckBackendFeatures {
 		return true;
 	}
 
-	public boolean supportsDynamicChildFieldsInExistsPredicate() {
-		return true;
-	}
-
 	public boolean supportsValuesForDynamicField(Class<?> javaType) {
 		return true;
 	}

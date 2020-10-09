@@ -17,12 +17,6 @@ class LuceneTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
-	public boolean supportsDynamicChildFieldsInExistsPredicate() {
-		// See https://hibernate.atlassian.net/browse/HSEARCH-3905
-		return false;
-	}
-
-	@Override
 	public boolean projectionPreservesNulls() {
 		return false;
 	}

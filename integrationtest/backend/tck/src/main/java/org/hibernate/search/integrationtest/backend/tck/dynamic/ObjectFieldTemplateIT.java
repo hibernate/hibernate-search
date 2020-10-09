@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.backend.tck.dynamic;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -23,7 +22,6 @@ import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
@@ -363,10 +361,8 @@ public class ObjectFieldTemplateIT {
 	 * The {@code exists} predicate should detect static object fields even if all their sub-fields are dynamic.
 	 */
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3273")
+	@TestForIssue(jiraKey = { "HSEARCH-3273", "HSEARCH-3905" })
 	public void exists_staticObjectField() {
-		assumeBackendSupportsDynamicChildFieldsInExistsPredicate();
-
 		Consumer<IndexSchemaElement> rootTemplatesBinder = root -> { };
 		Consumer<IndexSchemaElement> staticObjectTemplatesBinder = staticObject -> {
 			staticObject.fieldTemplate( "fieldTemplate", f -> f.asString() )
@@ -428,10 +424,8 @@ public class ObjectFieldTemplateIT {
 	 * The {@code exists} predicate should detect dynamic object fields even if all their sub-fields are dynamic.
 	 */
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3273")
+	@TestForIssue(jiraKey = { "HSEARCH-3273", "HSEARCH-3905" })
 	public void exists_dynamicObjectField() {
-		assumeBackendSupportsDynamicChildFieldsInExistsPredicate();
-
 		Consumer<IndexSchemaElement> templatesBinder = root -> {
 			root.fieldTemplate( "fieldTemplate", f -> f.asString() )
 					.matchingPathGlob( VALUE_FIELD_PATH_GLOB );
@@ -485,13 +479,6 @@ public class ObjectFieldTemplateIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), documentWhereObjectFieldExistsId );
 		assertThatQuery( query( f -> f.exists().field( "foo_flattened" ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), documentWhereObjectFieldExistsId );
-	}
-
-	private void assumeBackendSupportsDynamicChildFieldsInExistsPredicate() {
-		assumeTrue(
-				"This backend doesn't take dynamic child fields into account when creating exists predicates on object fields.",
-				TckConfiguration.get().getBackendFeatures().supportsDynamicChildFieldsInExistsPredicate()
-		);
 	}
 
 	private SearchQuery<DocumentReference> query(
