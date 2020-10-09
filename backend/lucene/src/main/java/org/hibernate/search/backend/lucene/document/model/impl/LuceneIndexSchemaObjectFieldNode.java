@@ -7,9 +7,9 @@
 package org.hibernate.search.backend.lucene.document.model.impl;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
@@ -26,11 +26,11 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 
 	private final ObjectStructure structure;
 
-	private final List<AbstractLuceneIndexSchemaFieldNode> staticChildren;
+	private final Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByName;
 
 	public LuceneIndexSchemaObjectFieldNode(LuceneIndexSchemaObjectNode parent, String relativeName,
 			IndexFieldInclusion inclusion, ObjectStructure structure, boolean multiValued,
-			List<AbstractLuceneIndexSchemaFieldNode> notYetInitializedStaticChildren) {
+			Map<String, AbstractLuceneIndexSchemaFieldNode> notYetInitializedStaticChildren) {
 		super( parent, relativeName, inclusion, multiValued );
 		List<String> theNestedPathHierarchy = parent.nestedPathHierarchy();
 		if ( ObjectStructure.NESTED.equals( structure ) ) {
@@ -41,7 +41,7 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 		this.nestedPathHierarchy = Collections.unmodifiableList( theNestedPathHierarchy );
 		this.structure = structure;
 		// We expect the children to be added to the list externally, just after the constructor call.
-		this.staticChildren = Collections.unmodifiableList( notYetInitializedStaticChildren );
+		this.staticChildrenByName = Collections.unmodifiableMap( notYetInitializedStaticChildren );
 	}
 
 	@Override
@@ -91,8 +91,8 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 	}
 
 	@Override
-	public Collection<? extends AbstractLuceneIndexSchemaFieldNode> staticChildren() {
-		return staticChildren;
+	public Map<String, ? extends AbstractLuceneIndexSchemaFieldNode> staticChildrenByName() {
+		return staticChildrenByName;
 	}
 
 	@Override

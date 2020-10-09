@@ -7,9 +7,9 @@
 package org.hibernate.search.backend.lucene.document.model.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
@@ -21,11 +21,11 @@ public class LuceneIndexSchemaRootNode implements LuceneIndexSchemaObjectNode {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final List<AbstractLuceneIndexSchemaFieldNode> staticChildren;
+	private final Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByName;
 
-	public LuceneIndexSchemaRootNode(List<AbstractLuceneIndexSchemaFieldNode> notYetInitializedStaticChildren) {
+	public LuceneIndexSchemaRootNode(Map<String, AbstractLuceneIndexSchemaFieldNode> notYetInitializedStaticChildren) {
 		// We expect the children to be added to the list externally, just after the constructor call.
-		this.staticChildren = Collections.unmodifiableList( notYetInitializedStaticChildren );
+		this.staticChildrenByName = Collections.unmodifiableMap( notYetInitializedStaticChildren );
 	}
 
 	@Override
@@ -69,8 +69,8 @@ public class LuceneIndexSchemaRootNode implements LuceneIndexSchemaObjectNode {
 	}
 
 	@Override
-	public Collection<? extends AbstractLuceneIndexSchemaFieldNode> staticChildren() {
-		return staticChildren;
+	public Map<String, ? extends AbstractLuceneIndexSchemaFieldNode> staticChildrenByName() {
+		return staticChildrenByName;
 	}
 
 	@Override

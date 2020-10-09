@@ -8,15 +8,16 @@ package org.hibernate.search.integrationtest.backend.tck.metamodel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.metamodel.IndexCompositeElementDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
@@ -24,6 +25,7 @@ import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldTypeDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldLocation;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -127,7 +129,15 @@ public class IndexFieldDescriptorIT {
 			assertThat( elementDescriptor ).isSameAs( indexDescriptor.root() );
 			assertThat( elementDescriptor.staticChildren() )
 					.extracting( IndexFieldDescriptor::absolutePath )
-					.containsExactlyInAnyOrder( "myField", "myMultiValuedField", "nestedObject", "flattenedObject" );
+					.containsExactly( "flattenedObject", "myField", "myMultiValuedField", "nestedObject" );
+			assertThat( elementDescriptor.staticChildrenByName() )
+					.extractingFromEntries( e -> entry( e.getKey(), e.getValue().absolutePath() ) )
+					.containsExactly(
+							entry( "flattenedObject", "flattenedObject" ),
+							entry( "myField", "myField" ),
+							entry( "myMultiValuedField", "myMultiValuedField" ),
+							entry( "nestedObject", "nestedObject" )
+					);
 			return;
 		}
 
@@ -161,32 +171,54 @@ public class IndexFieldDescriptorIT {
 
 		// Static children
 		Collection<? extends IndexFieldDescriptor> children = fieldDescriptor.staticChildren();
+		Map<String, ? extends IndexFieldDescriptor> childrenByName = fieldDescriptor.staticChildrenByName();
 		assertThat( (Collection<IndexFieldDescriptor>) children ).contains( childFieldDescriptor );
+		assertThat( (Map<String, IndexFieldDescriptor>) childrenByName )
+				.contains( entry( getRelativeFieldName(), childFieldDescriptor ) );
 
 		switch ( fieldStructure.location ) {
 			case IN_FLATTENED:
 				assertThat( children )
 						.extracting( IndexFieldDescriptor::absolutePath )
-						.containsExactlyInAnyOrder(
+						.containsExactly(
 								"flattenedObject.myField",
 								"flattenedObject.myMultiValuedField"
+						);
+				assertThat( childrenByName )
+						.extractingFromEntries( e -> entry( e.getKey(), e.getValue().absolutePath() ) )
+						.containsExactly(
+								entry( "myField", "flattenedObject.myField" ),
+								entry( "myMultiValuedField", "flattenedObject.myMultiValuedField" )
 						);
 				break;
 			case IN_NESTED:
 				assertThat( children )
 						.extracting( IndexFieldDescriptor::absolutePath )
-						.containsExactlyInAnyOrder(
+						.containsExactly(
 								"nestedObject.myField",
 								"nestedObject.myMultiValuedField",
 								"nestedObject.nestedObject"
+						);
+				assertThat( childrenByName )
+						.extractingFromEntries( e -> entry( e.getKey(), e.getValue().absolutePath() ) )
+						.containsExactly(
+								entry( "myField", "nestedObject.myField" ),
+								entry( "myMultiValuedField", "nestedObject.myMultiValuedField" ),
+								entry( "nestedObject", "nestedObject.nestedObject" )
 						);
 				break;
 			case IN_NESTED_TWICE:
 				assertThat( children )
 						.extracting( IndexFieldDescriptor::absolutePath )
-						.containsExactlyInAnyOrder(
+						.containsExactly(
 								"nestedObject.nestedObject.myField",
 								"nestedObject.nestedObject.myMultiValuedField"
+						);
+				assertThat( childrenByName )
+						.extractingFromEntries( e -> entry( e.getKey(), e.getValue().absolutePath() ) )
+						.containsExactly(
+								entry( "myField", "nestedObject.nestedObject.myField" ),
+								entry( "myMultiValuedField", "nestedObject.nestedObject.myMultiValuedField" )
 						);
 				break;
 		}

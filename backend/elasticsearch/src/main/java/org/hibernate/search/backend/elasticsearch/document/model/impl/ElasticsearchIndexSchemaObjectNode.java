@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexCompositeElementDescriptor;
@@ -24,7 +25,12 @@ public interface ElasticsearchIndexSchemaObjectNode extends IndexCompositeElemen
 	List<String> nestedPathHierarchy();
 
 	@Override
-	Collection<? extends AbstractElasticsearchIndexSchemaFieldNode> staticChildren();
+	default Collection<? extends AbstractElasticsearchIndexSchemaFieldNode> staticChildren() {
+		return staticChildrenByName().values();
+	}
+
+	@Override
+	Map<String, ? extends AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByName();
 
 	boolean multiValuedInRoot();
 

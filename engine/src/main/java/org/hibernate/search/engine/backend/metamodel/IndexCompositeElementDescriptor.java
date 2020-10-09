@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.backend.metamodel;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -44,8 +45,20 @@ public interface IndexCompositeElementDescriptor {
 	 * fields created dynamically through {@link IndexSchemaElement#fieldTemplate(String, Function) templates}
 	 * are not included in the collection.
 	 *
-	 * @return A collection containing all fields.
+	 * @return A collection containing all static child fields.
 	 */
 	Collection<? extends IndexFieldDescriptor> staticChildren();
+
+	/**
+	 * Get all statically-defined, direct child fields for this element,
+	 * mapped by their {@link IndexFieldDescriptor#relativeName() relative name}.
+	 * <p>
+	 * Only statically-defined fields are returned;
+	 * fields created dynamically through {@link IndexSchemaElement#fieldTemplate(String, Function) templates}
+	 * are not included in the map.
+	 *
+	 * @return A map containing all static child fields.
+	 */
+	Map<String, ? extends IndexFieldDescriptor> staticChildrenByName();
 
 }

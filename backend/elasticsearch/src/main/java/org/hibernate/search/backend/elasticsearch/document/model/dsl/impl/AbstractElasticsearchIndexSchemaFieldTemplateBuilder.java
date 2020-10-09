@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
-import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldTemplate;
@@ -67,7 +67,7 @@ abstract class AbstractElasticsearchIndexSchemaFieldTemplateBuilder<
 	@Override
 	public void contribute(ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode,
-			List<AbstractElasticsearchIndexSchemaFieldNode> staticChildrenForParent,
+			Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByNameForParent,
 			AbstractTypeMapping parentMapping) {
 		SimpleGlobPattern absolutePathGlob = FieldPaths.absolutize(
 				parent.getAbsolutePath(),

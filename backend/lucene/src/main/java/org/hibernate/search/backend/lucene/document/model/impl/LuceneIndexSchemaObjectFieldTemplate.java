@@ -31,7 +31,7 @@ public class LuceneIndexSchemaObjectFieldTemplate
 		return new LuceneIndexSchemaObjectFieldNode(
 				parent, relativePath, inclusion, structure, multiValued,
 				// TODO HSEARCH-3905 we don't know the children, so we should find another way to implement the exists predicate
-				Collections.emptyList()
+				Collections.emptyMap()
 		);
 	}
 

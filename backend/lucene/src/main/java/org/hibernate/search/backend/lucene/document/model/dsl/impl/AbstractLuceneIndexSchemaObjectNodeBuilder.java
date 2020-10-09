@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
@@ -95,15 +94,15 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 	abstract String getAbsolutePath();
 
 	final void contributeChildren(LuceneIndexSchemaObjectNode node, LuceneIndexSchemaNodeCollector collector,
-			List<AbstractLuceneIndexSchemaFieldNode> staticChildrenForParent) {
+			Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByNameForParent) {
 		for ( LuceneIndexSchemaNodeContributor contributor : fields.values() ) {
-			contributor.contribute( collector, node, staticChildrenForParent );
+			contributor.contribute( collector, node, staticChildrenByNameForParent );
 		}
 		// Contribute templates depth-first, so do ours after the children's.
 		// The reason is templates defined in children have more precise path globs and thus
 		// should be appear first in the list.
 		for ( LuceneIndexSchemaNodeContributor template : templates.values() ) {
-			template.contribute( collector, node, staticChildrenForParent );
+			template.contribute( collector, node, staticChildrenByNameForParent );
 		}
 	}
 

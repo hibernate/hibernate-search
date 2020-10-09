@@ -7,9 +7,9 @@
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
@@ -21,12 +21,12 @@ public class ElasticsearchIndexSchemaRootNode implements ElasticsearchIndexSchem
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final List<AbstractElasticsearchIndexSchemaFieldNode> staticChildren;
+	private final Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByName;
 
 	public ElasticsearchIndexSchemaRootNode(
-			List<AbstractElasticsearchIndexSchemaFieldNode> notYetInitializedStaticChildren) {
+			Map<String, AbstractElasticsearchIndexSchemaFieldNode> notYetInitializedStaticChildren) {
 		// We expect the children to be added to the list externally, just after the constructor call.
-		this.staticChildren = Collections.unmodifiableList( notYetInitializedStaticChildren );
+		this.staticChildrenByName = Collections.unmodifiableMap( notYetInitializedStaticChildren );
 	}
 
 	@Override
@@ -70,8 +70,8 @@ public class ElasticsearchIndexSchemaRootNode implements ElasticsearchIndexSchem
 	}
 
 	@Override
-	public Collection<? extends AbstractElasticsearchIndexSchemaFieldNode> staticChildren() {
-		return staticChildren;
+	public Map<String, ? extends AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByName() {
+		return staticChildrenByName;
 	}
 
 	@Override
