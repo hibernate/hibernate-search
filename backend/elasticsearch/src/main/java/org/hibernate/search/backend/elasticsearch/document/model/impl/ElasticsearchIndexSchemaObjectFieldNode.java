@@ -8,9 +8,9 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
@@ -30,11 +30,11 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 
 	private final ObjectStructure structure;
 
-	private final List<AbstractElasticsearchIndexSchemaFieldNode> staticChildren;
+	private final Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByName;
 
 	public ElasticsearchIndexSchemaObjectFieldNode(ElasticsearchIndexSchemaObjectNode parent, String relativeFieldName,
 			IndexFieldInclusion inclusion, ObjectStructure structure, boolean multiValued,
-			List<AbstractElasticsearchIndexSchemaFieldNode> notYetInitializedStaticChildren) {
+			Map<String, AbstractElasticsearchIndexSchemaFieldNode> notYetInitializedStaticChildren) {
 		super( parent, relativeFieldName, inclusion, multiValued );
 		// at the root object level the nestedPathHierarchy is empty
 		List<String> theNestedPathHierarchy = parent.nestedPathHierarchy();
@@ -46,7 +46,7 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 		this.nestedPathHierarchy = Collections.unmodifiableList( theNestedPathHierarchy );
 		this.structure = ObjectStructure.DEFAULT.equals( structure ) ? ObjectStructure.FLATTENED : structure;
 		// We expect the children to be added to the list externally, just after the constructor call.
-		this.staticChildren = Collections.unmodifiableList( notYetInitializedStaticChildren );
+		this.staticChildrenByName = Collections.unmodifiableMap( notYetInitializedStaticChildren );
 	}
 
 	@Override
@@ -96,8 +96,8 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 	}
 
 	@Override
-	public Collection<? extends AbstractElasticsearchIndexSchemaFieldNode> staticChildren() {
-		return staticChildren;
+	public Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByName() {
+		return staticChildrenByName;
 	}
 
 	@Override

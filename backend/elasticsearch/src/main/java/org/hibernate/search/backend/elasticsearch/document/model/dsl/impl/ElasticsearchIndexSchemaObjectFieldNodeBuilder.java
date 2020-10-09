@@ -7,8 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexObjectFieldReference;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
@@ -78,18 +78,18 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 	@Override
 	public void contribute(ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode,
-			List<AbstractElasticsearchIndexSchemaFieldNode> staticChildrenForParent,
+			Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByNameForParent,
 			AbstractTypeMapping parentMapping) {
 		if ( reference == null ) {
 			throw log.incompleteFieldDefinition( eventContext() );
 		}
 
-		List<AbstractElasticsearchIndexSchemaFieldNode> staticChildren = new ArrayList<>();
+		Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByName = new TreeMap<>();
 		ElasticsearchIndexSchemaObjectFieldNode fieldNode = new ElasticsearchIndexSchemaObjectFieldNode(
-				parentNode, relativeFieldName, inclusion, structure, multiValued, staticChildren
+				parentNode, relativeFieldName, inclusion, structure, multiValued, staticChildrenByName
 		);
 
-		staticChildrenForParent.add( fieldNode );
+		staticChildrenByNameForParent.put( relativeFieldName, fieldNode );
 		collector.collect( absoluteFieldPath, fieldNode );
 
 		reference.setSchemaNode( fieldNode );
@@ -102,7 +102,7 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 			parentMapping.addProperty( relativeFieldName, mapping );
 		}
 
-		contributeChildren( mapping, fieldNode, collector, staticChildren );
+		contributeChildren( mapping, fieldNode, collector, staticChildrenByName );
 	}
 
 	@Override

@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldReference;
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
@@ -72,7 +72,7 @@ class LuceneIndexSchemaValueFieldNodeBuilder<F>
 
 	@Override
 	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode,
-			List<AbstractLuceneIndexSchemaFieldNode> staticChildrenForParent) {
+			Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByNameForParent) {
 		if ( reference == null ) {
 			throw log.incompleteFieldDefinition( eventContext() );
 		}
@@ -80,7 +80,7 @@ class LuceneIndexSchemaValueFieldNodeBuilder<F>
 				parentNode, relativeFieldName, inclusion, multiValued, type
 		);
 
-		staticChildrenForParent.add( fieldNode );
+		staticChildrenByNameForParent.put( relativeFieldName, fieldNode );
 		collector.collect( fieldNode.absolutePath(), fieldNode );
 
 		reference.setSchemaNode( fieldNode );

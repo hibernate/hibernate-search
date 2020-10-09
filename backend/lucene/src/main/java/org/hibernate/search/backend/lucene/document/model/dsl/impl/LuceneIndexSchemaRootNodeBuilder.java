@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
@@ -100,9 +101,9 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 			}
 		};
 
-		List<AbstractLuceneIndexSchemaFieldNode> staticChildren = new ArrayList<>();
-		LuceneIndexSchemaObjectNode rootNode = new LuceneIndexSchemaRootNode( staticChildren );
-		contributeChildren( rootNode, collector, staticChildren );
+		Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByName = new TreeMap<>();
+		LuceneIndexSchemaObjectNode rootNode = new LuceneIndexSchemaRootNode( staticChildrenByName );
+		contributeChildren( rootNode, collector, staticChildrenByName );
 
 		return new LuceneIndexModel(
 				indexName,

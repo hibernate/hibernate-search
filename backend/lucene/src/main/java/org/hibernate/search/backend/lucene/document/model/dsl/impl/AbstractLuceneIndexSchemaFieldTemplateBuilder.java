@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
-import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldTemplate;
@@ -65,7 +65,7 @@ abstract class AbstractLuceneIndexSchemaFieldTemplateBuilder<
 
 	@Override
 	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode,
-			List<AbstractLuceneIndexSchemaFieldNode> staticChildrenForParent) {
+			Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByNameForParent) {
 		SimpleGlobPattern absolutePathGlob = FieldPaths.absolutize(
 				parent.getAbsolutePath(),
 				prefix,
