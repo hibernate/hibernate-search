@@ -18,14 +18,16 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchObjectFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchValueFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactoryImpl;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
@@ -148,31 +150,49 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 
 	@Override
 	@SuppressWarnings("unchecked") // We check types using reflection (see calls to type().valueType())
-	public LuceneSearchValueFieldContext<?> field(String absoluteFieldPath) {
-		LuceneSearchValueFieldContext<?> resultOrNull = null;
+	public LuceneSearchFieldContext field(String absoluteFieldPath) {
+		LuceneSearchFieldContext resultOrNull = null;
 		if ( elements().size() == 1 ) {
 			// Single-index search
-			resultOrNull = elements().iterator().next().model()
-					.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
+			resultOrNull = elements().iterator().next().model().fieldOrNull( absoluteFieldPath );
 		}
 		else {
 			// Multi-index search
-			List<LuceneSearchValueFieldContext<?>> fieldForEachIndex = new ArrayList<>();
+			List<LuceneSearchFieldContext> fieldForEachIndex = new ArrayList<>();
+			LuceneScopeIndexManagerContext indexOfFirstField = null;
+			AbstractLuceneIndexSchemaFieldNode firstField = null;
 
 			for ( LuceneScopeIndexManagerContext index : elements() ) {
 				LuceneIndexModel indexModel = index.model();
-				LuceneIndexSchemaValueFieldNode<?> fieldForCurrentIndex =
-						indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
+				AbstractLuceneIndexSchemaFieldNode fieldForCurrentIndex = indexModel.fieldOrNull( absoluteFieldPath );
 				if ( fieldForCurrentIndex == null ) {
 					continue;
+				}
+				if ( firstField == null ) {
+					indexOfFirstField = index;
+					firstField = fieldForCurrentIndex;
+				}
+				else {
+					if ( firstField.isObjectField() != fieldForCurrentIndex.isObjectField() ) {
+						throw log.conflictingFieldModel( absoluteFieldPath, firstField, fieldForCurrentIndex,
+								EventContexts.fromIndexNames( indexOfFirstField.model().hibernateSearchName(),
+										index.model().hibernateSearchName() ) );
+					}
 				}
 				fieldForEachIndex.add( fieldForCurrentIndex );
 			}
 
 			if ( !fieldForEachIndex.isEmpty() ) {
-				resultOrNull = new LuceneMultiIndexSearchValueFieldContext<>(
-						indexNames, absoluteFieldPath, (List) fieldForEachIndex
-				);
+				if ( firstField.isObjectField() ) {
+					resultOrNull = new LuceneMultiIndexSearchObjectFieldContext(
+							this, absoluteFieldPath, (List) fieldForEachIndex
+					);
+				}
+				else {
+					resultOrNull = new LuceneMultiIndexSearchValueFieldContext<>(
+							indexNames, absoluteFieldPath, (List) fieldForEachIndex
+					);
+				}
 			}
 		}
 		if ( resultOrNull == null ) {

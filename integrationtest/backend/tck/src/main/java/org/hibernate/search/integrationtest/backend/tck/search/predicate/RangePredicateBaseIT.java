@@ -326,6 +326,11 @@ public class RangePredicateBaseIT {
 		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
 			f.range().field( fieldPath );
 		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:range";
+		}
 	}
 
 	@RunWith(Parameterized.class)

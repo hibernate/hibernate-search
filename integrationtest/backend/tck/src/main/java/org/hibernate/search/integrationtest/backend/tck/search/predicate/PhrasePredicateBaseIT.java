@@ -342,6 +342,11 @@ public class PhrasePredicateBaseIT {
 		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
 			f.phrase().field( fieldPath );
 		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:phrase";
+		}
 	}
 
 	@RunWith(Parameterized.class)

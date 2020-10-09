@@ -40,6 +40,16 @@ public class LuceneMultiIndexSearchValueFieldContext<F>
 	}
 
 	@Override
+	public boolean isObjectField() {
+		return false;
+	}
+
+	@Override
+	public LuceneSearchObjectFieldContext toObjectField() {
+		throw log.invalidIndexElementTypeValueFieldIsNotObjectField( absolutePath );
+	}
+
+	@Override
 	public String absolutePath() {
 		return absolutePath;
 	}

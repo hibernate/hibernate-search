@@ -44,8 +44,9 @@ public abstract class AbstractPredicateInvalidFieldIT {
 
 		assertThatThrownBy( () -> tryPredicate( f, fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unknown field" )
-				.hasMessageContaining( "'" + fieldPath + "'" );
+				.hasMessageContainingAll(
+						"Cannot use '" + predicateNameInErrorMessage() + "' on field '" + fieldPath + "'",
+						"'" + predicateNameInErrorMessage() + "' is not available for object fields" );
 	}
 
 	@Test
@@ -56,11 +57,14 @@ public abstract class AbstractPredicateInvalidFieldIT {
 
 		assertThatThrownBy( () -> tryPredicate( f, fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unknown field" )
-				.hasMessageContaining( "'" + fieldPath + "'" );
+				.hasMessageContainingAll(
+						"Cannot use '" + predicateNameInErrorMessage() + "' on field '" + fieldPath + "'",
+						"'" + predicateNameInErrorMessage() + "' is not available for object fields" );
 	}
 
 	protected abstract void tryPredicate(SearchPredicateFactory f, String fieldPath);
+
+	protected abstract String predicateNameInErrorMessage();
 
 	public static final class IndexBinding {
 		private final ObjectBinding nested;

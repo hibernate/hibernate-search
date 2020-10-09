@@ -10,14 +10,18 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.JsonElement;
 
-public abstract class AbstractElasticsearchIndexSchemaFieldNode implements IndexFieldDescriptor {
+public abstract class AbstractElasticsearchIndexSchemaFieldNode
+		implements IndexFieldDescriptor, ElasticsearchSearchFieldContext {
 	protected static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final ElasticsearchIndexSchemaObjectNode parent;
@@ -85,4 +89,10 @@ public abstract class AbstractElasticsearchIndexSchemaFieldNode implements Index
 	public boolean multiValuedInRoot() {
 		return multiValuedInRoot;
 	}
+
+	@Override
+	public EventContext eventContext() {
+		return EventContexts.fromIndexFieldAbsolutePath( absolutePath );
+	}
+
 }

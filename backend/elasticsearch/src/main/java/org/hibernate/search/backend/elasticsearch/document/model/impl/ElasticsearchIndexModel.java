@@ -105,11 +105,16 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 
 	@Override
 	public Optional<IndexFieldDescriptor> field(String absolutePath) {
-		IndexFieldDescriptor fieldDescriptor = getFieldNode( absolutePath, IndexFieldFilter.INCLUDED_ONLY );
+		return Optional.ofNullable( fieldOrNull( absolutePath ) );
+	}
+
+	public AbstractElasticsearchIndexSchemaFieldNode fieldOrNull(String absolutePath) {
+		AbstractElasticsearchIndexSchemaFieldNode fieldDescriptor =
+				getFieldNode( absolutePath, IndexFieldFilter.INCLUDED_ONLY );
 		if ( fieldDescriptor == null ) {
 			fieldDescriptor = getObjectFieldNode( absolutePath, IndexFieldFilter.INCLUDED_ONLY );
 		}
-		return Optional.ofNullable( fieldDescriptor );
+		return fieldDescriptor;
 	}
 
 	@Override

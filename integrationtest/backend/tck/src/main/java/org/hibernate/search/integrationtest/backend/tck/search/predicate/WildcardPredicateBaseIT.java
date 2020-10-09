@@ -285,6 +285,11 @@ public class WildcardPredicateBaseIT {
 		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
 			f.wildcard().field( fieldPath );
 		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:wildcard";
+		}
 	}
 
 	@RunWith(Parameterized.class)

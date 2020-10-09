@@ -96,11 +96,15 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 
 	@Override
 	public Optional<IndexFieldDescriptor> field(String absolutePath) {
-		IndexFieldDescriptor fieldDescriptor = getFieldNode( absolutePath, IndexFieldFilter.INCLUDED_ONLY );
+		return Optional.ofNullable( fieldOrNull( absolutePath ) );
+	}
+
+	public AbstractLuceneIndexSchemaFieldNode fieldOrNull(String absolutePath) {
+		AbstractLuceneIndexSchemaFieldNode fieldDescriptor = getFieldNode( absolutePath, IndexFieldFilter.INCLUDED_ONLY );
 		if ( fieldDescriptor == null ) {
 			fieldDescriptor = getObjectFieldNode( absolutePath, IndexFieldFilter.INCLUDED_ONLY );
 		}
-		return Optional.ofNullable( fieldDescriptor );
+		return fieldDescriptor;
 	}
 
 	@Override

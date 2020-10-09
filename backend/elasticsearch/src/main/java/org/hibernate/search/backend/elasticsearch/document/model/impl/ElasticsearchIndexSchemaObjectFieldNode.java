@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchObjectFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchObjectFieldQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
@@ -22,7 +26,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
 public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsearchIndexSchemaFieldNode
-		implements IndexObjectFieldDescriptor, ElasticsearchIndexSchemaObjectNode, IndexObjectFieldTypeDescriptor {
+		implements IndexObjectFieldDescriptor, ElasticsearchIndexSchemaObjectNode,
+				IndexObjectFieldTypeDescriptor, ElasticsearchSearchObjectFieldContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -103,6 +108,21 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 	@Override
 	public boolean nested() {
 		return ObjectStructure.NESTED.equals( structure );
+	}
+
+	@Override
+	public <T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchContext searchContext) {
+		ElasticsearchSearchObjectFieldQueryElementFactory<T> factory = queryElementFactory( key );
+		if ( factory == null ) {
+			throw log.cannotUseQueryElementForObjectField( absolutePath(), key.toString(), eventContext() );
+		}
+		return factory.create( searchContext, this );
+	}
+
+	@Override
+	public <T> ElasticsearchSearchObjectFieldQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
+		// FIXME implement this for exists()
+		return null;
 	}
 
 	public ObjectStructure structure() {

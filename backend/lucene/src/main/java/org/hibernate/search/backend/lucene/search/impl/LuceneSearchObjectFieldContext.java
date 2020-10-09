@@ -6,18 +6,16 @@
  */
 package org.hibernate.search.backend.lucene.search.impl;
 
+import java.util.Map;
+
 /**
- * Information about a value (non-object) field targeted by search,
+ * Information about an object field targeted by search,
  * be it in a projection, a predicate, a sort, ...
- *
- * @param <F> The indexed field value type.
  */
-public interface LuceneSearchValueFieldContext<F> extends LuceneSearchFieldContext {
+public interface LuceneSearchObjectFieldContext extends LuceneSearchFieldContext {
 
-	String nestedDocumentPath();
+	Map<String, ? extends LuceneSearchFieldContext> staticChildrenByName();
 
-	boolean multiValuedInRoot();
-
-	LuceneSearchValueFieldTypeContext<F> type();
+	<T> LuceneSearchObjectFieldQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key);
 
 }

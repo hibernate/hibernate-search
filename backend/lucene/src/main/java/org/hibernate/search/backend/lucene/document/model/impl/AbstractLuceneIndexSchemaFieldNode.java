@@ -9,11 +9,14 @@ package org.hibernate.search.backend.lucene.document.model.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
-public abstract class AbstractLuceneIndexSchemaFieldNode implements IndexFieldDescriptor {
+public abstract class AbstractLuceneIndexSchemaFieldNode implements IndexFieldDescriptor, LuceneSearchFieldContext {
 	protected static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final LuceneIndexSchemaObjectNode parent;
@@ -66,5 +69,10 @@ public abstract class AbstractLuceneIndexSchemaFieldNode implements IndexFieldDe
 	@Override
 	public boolean multiValuedInRoot() {
 		return multiValuedInRoot;
+	}
+
+	@Override
+	public EventContext eventContext() {
+		return EventContexts.fromIndexFieldAbsolutePath( absolutePath );
 	}
 }

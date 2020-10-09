@@ -81,11 +81,6 @@ public class LuceneIndexSchemaValueFieldNode<F> extends AbstractLuceneIndexSchem
 	}
 
 	@Override
-	public EventContext eventContext() {
-		return EventContexts.fromIndexFieldAbsolutePath( absolutePath );
-	}
-
-	@Override
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchContext searchContext) {
 		LuceneSearchValueFieldQueryElementFactory<T, F> factory = type().queryElementFactory( key );
 		if ( factory == null ) {

@@ -38,6 +38,16 @@ public class ElasticsearchMultiIndexSearchValueFieldContext<F>
 	}
 
 	@Override
+	public boolean isObjectField() {
+		return false;
+	}
+
+	@Override
+	public ElasticsearchSearchObjectFieldContext toObjectField() {
+		throw log.invalidIndexElementTypeValueFieldIsNotObjectField( absolutePath );
+	}
+
+	@Override
 	public String absolutePath() {
 		return absolutePath;
 	}
