@@ -255,6 +255,11 @@ public class SpatialWithinCirclePredicateBaseIT {
 					// We need this because the backend is not involved before the call to circle()
 					.circle( GeoPoint.of( 0, 0 ), 1 );
 		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:spatial:within-circle";
+		}
 	}
 
 	@RunWith(Parameterized.class)

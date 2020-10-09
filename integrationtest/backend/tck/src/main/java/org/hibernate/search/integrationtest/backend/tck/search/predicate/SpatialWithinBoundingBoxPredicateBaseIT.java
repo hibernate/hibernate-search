@@ -235,6 +235,11 @@ public class SpatialWithinBoundingBoxPredicateBaseIT {
 					// We need this because the backend is not involved before the call to boundingBox()
 					.boundingBox( 0.0, 0.0, 0.1, 0.1 );
 		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:spatial:within-bounding-box";
+		}
 	}
 
 	@RunWith(Parameterized.class)

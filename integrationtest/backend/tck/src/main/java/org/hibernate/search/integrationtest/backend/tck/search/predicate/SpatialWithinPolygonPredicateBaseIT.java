@@ -240,6 +240,11 @@ public class SpatialWithinPolygonPredicateBaseIT {
 					// We need this because the backend is not involved before the call to polygon()
 					.polygon( unsusedPolygon() );
 		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:spatial:within-polygon";
+		}
 	}
 
 	@RunWith(Parameterized.class)

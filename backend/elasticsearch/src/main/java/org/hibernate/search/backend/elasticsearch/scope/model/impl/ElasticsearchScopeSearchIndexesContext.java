@@ -18,14 +18,16 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMultiIndexSearchObjectFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMultiIndexSearchValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
@@ -92,29 +94,49 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 
 	@Override
 	@SuppressWarnings("unchecked") // We check types using reflection (see calls to type().valueType())
-	public ElasticsearchSearchValueFieldContext<?> field(String absoluteFieldPath) {
-		ElasticsearchSearchValueFieldContext<?> resultOrNull = null;
-		if ( indexModels.size() == 1 ) {
+	public ElasticsearchSearchFieldContext field(String absoluteFieldPath) {
+		ElasticsearchSearchFieldContext resultOrNull = null;
+		if ( elements().size() == 1 ) {
 			// Single-index search
-			resultOrNull = indexModels.iterator().next().getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
+			resultOrNull = indexModels.iterator().next().fieldOrNull( absoluteFieldPath );
 		}
 		else {
 			// Multi-index search
-			List<ElasticsearchSearchValueFieldContext<?>> fieldForEachIndex = new ArrayList<>();
+			List<ElasticsearchSearchFieldContext> fieldForEachIndex = new ArrayList<>();
+			ElasticsearchSearchIndexContext indexModelOfFirstField = null;
+			AbstractElasticsearchIndexSchemaFieldNode firstField = null;
 
 			for ( ElasticsearchIndexModel indexModel : indexModels ) {
-				ElasticsearchIndexSchemaValueFieldNode<?> fieldForCurrentIndex =
-						indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
+				AbstractElasticsearchIndexSchemaFieldNode fieldForCurrentIndex =
+						indexModel.fieldOrNull( absoluteFieldPath );
 				if ( fieldForCurrentIndex == null ) {
 					continue;
+				}
+				if ( firstField == null ) {
+					indexModelOfFirstField = indexModel;
+					firstField = fieldForCurrentIndex;
+				}
+				else {
+					if ( firstField.isObjectField() != fieldForCurrentIndex.isObjectField() ) {
+						throw log.conflictingFieldModel( absoluteFieldPath, firstField, fieldForCurrentIndex,
+								EventContexts.fromIndexNames( indexModelOfFirstField.names().getHibernateSearch(),
+										indexModel.names().getHibernateSearch() ) );
+					}
 				}
 				fieldForEachIndex.add( fieldForCurrentIndex );
 			}
 
 			if ( !fieldForEachIndex.isEmpty() ) {
-				resultOrNull = new ElasticsearchMultiIndexSearchValueFieldContext<>(
-						hibernateSearchIndexNames(), absoluteFieldPath, (List) fieldForEachIndex
-				);
+				if ( firstField.isObjectField() ) {
+					resultOrNull = new ElasticsearchMultiIndexSearchObjectFieldContext(
+							hibernateSearchIndexNames, absoluteFieldPath, (List) fieldForEachIndex
+					);
+				}
+				else {
+					resultOrNull = new ElasticsearchMultiIndexSearchValueFieldContext<>(
+							hibernateSearchIndexNames, absoluteFieldPath, (List) fieldForEachIndex
+					);
+				}
 			}
 		}
 		if ( resultOrNull == null ) {

@@ -93,30 +93,28 @@ public class DistanceSearchProjectionTypeIndependentIT {
 
 	@Test
 	public void objectField_nested() {
+		String fieldPath = index.binding().nestedObject.relativeFieldName;
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.projection()
-				.distance( index.binding().nestedObject.relativeFieldName, SOME_POINT ) )
+				.distance( fieldPath, SOME_POINT ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Unknown field",
-						"nestedObject",
-						index.name()
-				);
+						"Cannot use 'projection:distance' on field '" + fieldPath + "'",
+						"'projection:distance' is not available for object fields" );
 	}
 
 	@Test
 	public void objectField_flattened() {
+		String fieldPath = index.binding().flattenedObject.relativeFieldName;
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.projection()
-				.distance( index.binding().flattenedObject.relativeFieldName, SOME_POINT ) )
+				.distance( fieldPath, SOME_POINT ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Unknown field",
-						"flattenedObject",
-						index.name()
-				);
+						"Cannot use 'projection:distance' on field '" + fieldPath + "'",
+						"'projection:distance' is not available for object fields" );
 	}
 
 	private static class IndexBinding {

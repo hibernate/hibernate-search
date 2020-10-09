@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
@@ -92,7 +92,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 			return new ElasticsearchExistsPredicate.Builder( searchContext, absoluteFieldPath, nestedPathHierarchy );
 		}
 		else {
-			ElasticsearchSearchValueFieldContext<?> field = indexes.field( absoluteFieldPath );
+			ElasticsearchSearchFieldContext field = indexes.field( absoluteFieldPath );
 			// Make sure to fail for fields with different type
 			// We may be able to relax this constraint, but that would require more extensive testing
 			return field.queryElement( PredicateTypeKeys.EXISTS, searchContext );

@@ -74,32 +74,30 @@ public class FieldSearchProjectionTypeIndependentIT {
 
 	@Test
 	public void objectField_nested() {
+		String fieldPath = index.binding().nestedObject.relativeFieldName;
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.projection()
-				.field( index.binding().nestedObject.relativeFieldName, Object.class )
+				.field( fieldPath, Object.class )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Unknown field",
-						"nestedObject",
-						index.name()
-				);
+						"Cannot use 'projection:field' on field '" + fieldPath + "'",
+						"'projection:field' is not available for object fields" );
 	}
 
 	@Test
 	public void objectField_flattened() {
+		String fieldPath = index.binding().flattenedObject.relativeFieldName;
 		StubMappingScope scope = index.createScope();
 
 		assertThatThrownBy( () -> scope.projection()
-				.field( index.binding().flattenedObject.relativeFieldName, Object.class )
+				.field( fieldPath, Object.class )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Unknown field",
-						"flattenedObject",
-						index.name()
-				);
+						"Cannot use 'projection:field' on field '" + fieldPath + "'",
+						"'projection:field' is not available for object fields" );
 	}
 
 	private static class IndexBinding {

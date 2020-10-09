@@ -335,6 +335,11 @@ public class MatchPredicateBaseIT {
 		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
 			f.match().field( fieldPath );
 		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:match";
+		}
 	}
 
 	@RunWith(Parameterized.class)

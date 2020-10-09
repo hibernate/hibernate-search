@@ -7,17 +7,11 @@
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
 /**
- * Information about a value (non-object) field targeted by search,
+ * Information about an object field targeted by search,
  * be it in a projection, a predicate, a sort, ...
- *
- * @param <F> The indexed field value type.
  */
-public interface ElasticsearchSearchValueFieldContext<F> extends ElasticsearchSearchFieldContext {
+public interface ElasticsearchSearchObjectFieldContext extends ElasticsearchSearchFieldContext {
 
-	String[] absolutePathComponents();
-
-	boolean multiValuedInRoot();
-
-	ElasticsearchSearchValueFieldTypeContext<F> type();
+	<T> ElasticsearchSearchObjectFieldQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key);
 
 }

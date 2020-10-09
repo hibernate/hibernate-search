@@ -64,11 +64,6 @@ public class ElasticsearchIndexSchemaValueFieldNode<F> extends AbstractElasticse
 	}
 
 	@Override
-	public EventContext eventContext() {
-		return EventContexts.fromIndexFieldAbsolutePath( absolutePath );
-	}
-
-	@Override
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchContext searchContext) {
 		ElasticsearchSearchValueFieldQueryElementFactory<T, F> factory = type().queryElementFactory( key );
 		if ( factory == null ) {

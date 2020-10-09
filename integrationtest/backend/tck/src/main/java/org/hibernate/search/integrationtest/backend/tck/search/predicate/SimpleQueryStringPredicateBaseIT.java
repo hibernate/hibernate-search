@@ -334,6 +334,11 @@ public class SimpleQueryStringPredicateBaseIT {
 		protected void tryPredicate(SearchPredicateFactory f, String fieldPath) {
 			f.simpleQueryString().field( fieldPath );
 		}
+
+		@Override
+		protected String predicateNameInErrorMessage() {
+			return "predicate:simple-query-string";
+		}
 	}
 
 	@RunWith(Parameterized.class)
