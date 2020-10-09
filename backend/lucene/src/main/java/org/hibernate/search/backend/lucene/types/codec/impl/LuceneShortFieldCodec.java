@@ -20,7 +20,7 @@ public final class LuceneShortFieldCodec extends AbstractLuceneNumericFieldCodec
 	}
 
 	@Override
-	void addStoredToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, Short value,
+	void addStoredToDocument(LuceneDocumentContent documentBuilder, String absoluteFieldPath, Short value,
 			Integer encodedValue) {
 		documentBuilder.addField( new StoredField( absoluteFieldPath, encodedValue ) );
 	}

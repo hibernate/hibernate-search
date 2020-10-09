@@ -15,35 +15,22 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import org.apache.lucene.index.IndexableField;
-
-
-class LuceneFlattenedObjectDocumentBuilder extends AbstractLuceneDocumentBuilder {
+class LuceneFlattenedObjectFieldBuilder extends AbstractLuceneDocumentElementBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final AbstractLuceneDocumentBuilder parent;
-
 	private final Set<String> encounteredFields = new HashSet<>();
 
-	LuceneFlattenedObjectDocumentBuilder(LuceneIndexModel model, LuceneIndexSchemaObjectFieldNode schemaNode,
-			AbstractLuceneDocumentBuilder parent) {
-		super( model, schemaNode );
-		this.parent = parent;
-	}
-
-	@Override
-	public void addField(IndexableField field) {
-		parent.addField( field );
-	}
-
-	@Override
-	public void addFieldName(String absoluteFieldPath) {
-		parent.addFieldName( absoluteFieldPath );
+	LuceneFlattenedObjectFieldBuilder(LuceneIndexModel model, LuceneIndexSchemaObjectFieldNode schemaNode,
+			LuceneDocumentContentImpl documentContent) {
+		// The document content is not ours: it's the parent's.
+		super( model, schemaNode, documentContent );
 	}
 
 	@Override
 	void checkNoValueYetForSingleValued(String absoluteFieldPath) {
+		// We cannot rely on the document content which is shared between all flattened objects,
+		// because the single-valued field may have one value for each flattened object.
 		boolean firstEncounter = encounteredFields.add( absoluteFieldPath );
 		if ( !firstEncounter ) {
 			throw log.multipleValuesForSingleValuedField( absoluteFieldPath );

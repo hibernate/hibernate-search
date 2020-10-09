@@ -44,7 +44,7 @@ public final class LuceneBigIntegerFieldCodec extends AbstractLuceneNumericField
 	}
 
 	@Override
-	void addStoredToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, BigInteger value,
+	void addStoredToDocument(LuceneDocumentContent documentBuilder, String absoluteFieldPath, BigInteger value,
 			Long encodedValue) {
 		documentBuilder.addField( new StoredField( absoluteFieldPath, value.toString() ) );
 	}

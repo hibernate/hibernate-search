@@ -20,7 +20,7 @@ public final class LuceneLongFieldCodec extends AbstractLuceneNumericFieldCodec<
 	}
 
 	@Override
-	void addStoredToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, Long value,
+	void addStoredToDocument(LuceneDocumentContent documentBuilder, String absoluteFieldPath, Long value,
 			Long encodedValue) {
 		documentBuilder.addField( new StoredField( absoluteFieldPath, encodedValue ) );
 	}

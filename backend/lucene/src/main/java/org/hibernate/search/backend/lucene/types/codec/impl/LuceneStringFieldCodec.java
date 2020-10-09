@@ -31,7 +31,7 @@ public final class LuceneStringFieldCodec implements LuceneStandardFieldCodec<St
 	}
 
 	@Override
-	public void addToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, String value) {
+	public void addToDocument(LuceneDocumentContent documentBuilder, String absoluteFieldPath, String value) {
 		if ( value == null && indexNullAsValue != null ) {
 			value = indexNullAsValue;
 		}

@@ -8,32 +8,23 @@ package org.hibernate.search.backend.lucene.document.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneDocumentBuilder;
+import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneDocumentContent;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 
-
-abstract class AbstractLuceneNonFlattenedDocumentBuilder extends AbstractLuceneDocumentBuilder
-		implements LuceneDocumentBuilder {
+public class LuceneDocumentContentImpl implements LuceneDocumentContent {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	final Document document = new Document();
+	private final Document document = new Document();
 	private final Map<String, EncounteredFieldStatus> fieldStatus = new HashMap<>();
-
-	AbstractLuceneNonFlattenedDocumentBuilder(LuceneIndexModel model, LuceneIndexSchemaObjectNode schemaNode) {
-		super( model, schemaNode );
-	}
 
 	@Override
 	public void addField(IndexableField field) {
@@ -46,7 +37,6 @@ abstract class AbstractLuceneNonFlattenedDocumentBuilder extends AbstractLuceneD
 		fieldStatus.put( absoluteFieldPath, EncounteredFieldStatus.ENCOUNTERED_AND_NAME_INDEXED );
 	}
 
-	@Override
 	void checkNoValueYetForSingleValued(String absoluteFieldPath) {
 		EncounteredFieldStatus previousValue = fieldStatus.putIfAbsent( absoluteFieldPath, EncounteredFieldStatus.ENCOUNTERED );
 		if ( previousValue != null ) {
@@ -54,9 +44,7 @@ abstract class AbstractLuceneNonFlattenedDocumentBuilder extends AbstractLuceneD
 		}
 	}
 
-	@Override
-	void contribute(MultiTenancyStrategy multiTenancyStrategy, String tenantId, String routingKey,
-			String rootId, List<Document> nestedDocuments) {
+	Document finalizeDocument(MultiTenancyStrategy multiTenancyStrategy, String tenantId, String routingKey) {
 		for ( Map.Entry<String, EncounteredFieldStatus> entry : fieldStatus.entrySet() ) {
 			EncounteredFieldStatus status = entry.getValue();
 			if ( EncounteredFieldStatus.ENCOUNTERED_AND_NAME_INDEXED.equals( status ) ) {
@@ -76,11 +64,12 @@ abstract class AbstractLuceneNonFlattenedDocumentBuilder extends AbstractLuceneD
 
 		multiTenancyStrategy.contributeToIndexedDocument( document, tenantId );
 
-		super.contribute( multiTenancyStrategy, tenantId, routingKey, rootId, nestedDocuments );
+		return document;
 	}
 
 	private enum EncounteredFieldStatus {
 		ENCOUNTERED,
 		ENCOUNTERED_AND_NAME_INDEXED;
 	}
+
 }

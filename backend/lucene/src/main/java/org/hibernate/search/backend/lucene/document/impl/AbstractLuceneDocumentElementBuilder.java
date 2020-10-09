@@ -18,7 +18,6 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -30,19 +29,22 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.apache.lucene.document.Document;
 
 
-abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder, DocumentElement {
+abstract class AbstractLuceneDocumentElementBuilder implements DocumentElement {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final LuceneIndexModel model;
 	protected final LuceneIndexSchemaObjectNode schemaNode;
+	protected final LuceneDocumentContentImpl documentContent;
 
-	private List<LuceneFlattenedObjectDocumentBuilder> flattenedObjectDocumentBuilders;
-	private List<LuceneNestedObjectDocumentBuilder> nestedObjectDocumentBuilders;
+	private List<LuceneFlattenedObjectFieldBuilder> flattenedObjectDocumentBuilders;
+	private List<LuceneNestedObjectFieldBuilder> nestedObjectDocumentBuilders;
 
-	AbstractLuceneDocumentBuilder(LuceneIndexModel model, LuceneIndexSchemaObjectNode schemaNode) {
+	AbstractLuceneDocumentElementBuilder(LuceneIndexModel model, LuceneIndexSchemaObjectNode schemaNode,
+			LuceneDocumentContentImpl documentContent) {
 		this.model = model;
 		this.schemaNode = schemaNode;
+		this.documentContent = documentContent;
 	}
 
 	@Override
@@ -108,9 +110,11 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder, D
 		addObject( fieldSchemaNode.toObjectField(), true );
 	}
 
-	abstract void checkNoValueYetForSingleValued(String absoluteFieldPath);
+	void checkNoValueYetForSingleValued(String absoluteFieldPath) {
+		documentContent.checkNoValueYetForSingleValued( absoluteFieldPath );
+	}
 
-	private void addNestedObjectDocumentBuilder(LuceneNestedObjectDocumentBuilder nestedObjectDocumentBuilder) {
+	private void addNestedObjectDocumentBuilder(LuceneNestedObjectFieldBuilder nestedObjectDocumentBuilder) {
 		if ( nestedObjectDocumentBuilders == null ) {
 			nestedObjectDocumentBuilders = new ArrayList<>();
 		}
@@ -119,7 +123,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder, D
 	}
 
 	private void addFlattenedObjectDocumentBuilder(
-			LuceneFlattenedObjectDocumentBuilder flattenedObjectDocumentBuilder) {
+			LuceneFlattenedObjectFieldBuilder flattenedObjectDocumentBuilder) {
 		if ( flattenedObjectDocumentBuilders == null ) {
 			flattenedObjectDocumentBuilders = new ArrayList<>();
 		}
@@ -136,7 +140,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder, D
 	void contribute(MultiTenancyStrategy multiTenancyStrategy, String tenantId, String routingKey,
 			String rootId, List<Document> nestedDocuments) {
 		if ( flattenedObjectDocumentBuilders != null ) {
-			for ( LuceneFlattenedObjectDocumentBuilder flattenedObjectDocumentBuilder : flattenedObjectDocumentBuilders ) {
+			for ( LuceneFlattenedObjectFieldBuilder flattenedObjectDocumentBuilder : flattenedObjectDocumentBuilders ) {
 				flattenedObjectDocumentBuilder.contribute(
 						multiTenancyStrategy, tenantId, routingKey,
 						rootId, nestedDocuments
@@ -145,7 +149,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder, D
 		}
 
 		if ( nestedObjectDocumentBuilders != null ) {
-			for ( LuceneNestedObjectDocumentBuilder nestedObjectDocumentBuilder : nestedObjectDocumentBuilders ) {
+			for ( LuceneNestedObjectFieldBuilder nestedObjectDocumentBuilder : nestedObjectDocumentBuilders ) {
 				nestedObjectDocumentBuilder.contribute(
 						multiTenancyStrategy, tenantId, routingKey,
 						rootId, nestedDocuments
@@ -165,7 +169,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder, D
 			checkNoValueYetForSingleValued( absolutePath );
 		}
 
-		type.codec().addToDocument( this, absolutePath, value );
+		type.codec().addToDocument( documentContent, absolutePath, value );
 	}
 
 	private DocumentElement addObject(LuceneIndexSchemaObjectFieldNode node, boolean nullObject) {
@@ -184,13 +188,13 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder, D
 
 		switch ( node.structure() ) {
 			case NESTED:
-				LuceneNestedObjectDocumentBuilder nestedDocumentBuilder =
-						new LuceneNestedObjectDocumentBuilder( model, node );
+				LuceneNestedObjectFieldBuilder nestedDocumentBuilder =
+						new LuceneNestedObjectFieldBuilder( model, node );
 				addNestedObjectDocumentBuilder( nestedDocumentBuilder );
 				return nestedDocumentBuilder;
 			default:
-				LuceneFlattenedObjectDocumentBuilder flattenedDocumentBuilder =
-						new LuceneFlattenedObjectDocumentBuilder( model, node, this );
+				LuceneFlattenedObjectFieldBuilder flattenedDocumentBuilder =
+						new LuceneFlattenedObjectFieldBuilder( model, node, documentContent );
 				addFlattenedObjectDocumentBuilder( flattenedDocumentBuilder );
 				return flattenedDocumentBuilder;
 		}

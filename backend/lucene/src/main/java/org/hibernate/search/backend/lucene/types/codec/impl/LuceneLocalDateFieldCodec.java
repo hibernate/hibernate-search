@@ -35,7 +35,7 @@ public final class LuceneLocalDateFieldCodec extends AbstractLuceneNumericFieldC
 	}
 
 	@Override
-	void addStoredToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, LocalDate value,
+	void addStoredToDocument(LuceneDocumentContent documentBuilder, String absoluteFieldPath, LocalDate value,
 			Long encodedValue) {
 		documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
 	}

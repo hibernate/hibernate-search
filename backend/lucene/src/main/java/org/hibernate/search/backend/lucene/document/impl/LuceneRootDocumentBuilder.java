@@ -16,12 +16,12 @@ import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 
 
-public class LuceneRootDocumentBuilder extends AbstractLuceneNonFlattenedDocumentBuilder {
+public class LuceneRootDocumentBuilder extends AbstractLuceneDocumentElementBuilder {
 
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	LuceneRootDocumentBuilder(LuceneIndexModel model, MultiTenancyStrategy multiTenancyStrategy) {
-		super( model, model.root() );
+		super( model, model.root(), new LuceneDocumentContentImpl() );
 		this.multiTenancyStrategy = multiTenancyStrategy;
 	}
 
@@ -34,13 +34,15 @@ public class LuceneRootDocumentBuilder extends AbstractLuceneNonFlattenedDocumen
 
 	private List<Document> assembleDocuments(MultiTenancyStrategy multiTenancyStrategy,
 			String tenantId, String id, String routingKey) {
+		// We own the document content, so we finalize it ourselves.
+		Document document = documentContent.finalizeDocument( multiTenancyStrategy, tenantId, routingKey );
 		document.add( MetadataFields.searchableMetadataField( MetadataFields.typeFieldName(), MetadataFields.TYPE_MAIN_DOCUMENT ) );
 		document.add( MetadataFields.searchableRetrievableMetadataField( MetadataFields.idFieldName(), id ) );
 
-		// all the ancestors of a subdocument must be added after it
+		// In the list of documents, a child must appear before its parent,
+		// so we let children contribute their document first.
 		List<Document> documents = new ArrayList<>();
 		contribute( multiTenancyStrategy, tenantId, routingKey, id, documents );
-
 		documents.add( document );
 
 		return documents;

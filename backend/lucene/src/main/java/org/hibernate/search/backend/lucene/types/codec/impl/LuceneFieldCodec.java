@@ -26,7 +26,7 @@ public interface LuceneFieldCodec<F> {
 	 * @param absoluteFieldPath The absolute path of the field.
 	 * @param value The value to encode.
 	 */
-	void addToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, F value);
+	void addToDocument(LuceneDocumentContent documentBuilder, String absoluteFieldPath, F value);
 
 	/**
 	 * Extract the value from the given stored field.
@@ -43,9 +43,9 @@ public interface LuceneFieldCodec<F> {
 	 * i.e. whether its {@link #decode(IndexableField)}
 	 * and {@link LuceneStandardFieldCodec#encode(Object)} methods behave the same way.
 	 * <p>
-	 * NOTE: {@link #addToDocument(LuceneDocumentBuilder, String, Object)} may behave differently,
+	 * NOTE: {@link #addToDocument(LuceneDocumentContent, String, Object)} may behave differently,
 	 * e.g. it may add docvalues while this codec does not.
-	 * The behavior of {@link #addToDocument(LuceneDocumentBuilder, String, Object)}
+	 * The behavior of {@link #addToDocument(LuceneDocumentContent, String, Object)}
 	 * is considered irrelevant when checking the equivalence of encoding,
 	 * because such differences should be accounted for through other ways
 	 * (fields being assigned incompatible predicate factories, etc.).

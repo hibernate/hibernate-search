@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 import org.apache.lucene.index.IndexableField;
 
 
-public interface LuceneDocumentBuilder {
+public interface LuceneDocumentContent {
 
 	/**
 	 * Add a field to this document.

@@ -41,7 +41,7 @@ public final class LuceneZonedDateTimeFieldCodec extends AbstractLuceneNumericFi
 	}
 
 	@Override
-	void addStoredToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, ZonedDateTime value,
+	void addStoredToDocument(LuceneDocumentContent documentBuilder, String absoluteFieldPath, ZonedDateTime value,
 			Long encodedValue) {
 		documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
 	}

@@ -31,7 +31,7 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 	}
 
 	@Override
-	public void addToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, GeoPoint value) {
+	public void addToDocument(LuceneDocumentContent documentBuilder, String absoluteFieldPath, GeoPoint value) {
 		if ( value == null && indexNullAsValue != null ) {
 			value = indexNullAsValue;
 		}

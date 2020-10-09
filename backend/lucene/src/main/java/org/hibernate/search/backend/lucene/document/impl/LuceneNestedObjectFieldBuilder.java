@@ -16,21 +16,24 @@ import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.apache.lucene.document.Document;
 
 
-class LuceneNestedObjectDocumentBuilder extends AbstractLuceneNonFlattenedDocumentBuilder {
+class LuceneNestedObjectFieldBuilder extends AbstractLuceneDocumentElementBuilder {
 
-	LuceneNestedObjectDocumentBuilder(LuceneIndexModel model, LuceneIndexSchemaObjectFieldNode schemaNode) {
-		super( model, schemaNode );
+	LuceneNestedObjectFieldBuilder(LuceneIndexModel model, LuceneIndexSchemaObjectFieldNode schemaNode) {
+		super( model, schemaNode, new LuceneDocumentContentImpl() );
 	}
 
 	@Override
 	void contribute(MultiTenancyStrategy multiTenancyStrategy, String tenantId, String routingKey,
 			String rootId, List<Document> nestedDocuments) {
+
+		// We own the document content, so we finalize it ourselves.
+		Document document = documentContent.finalizeDocument( multiTenancyStrategy, tenantId, routingKey );
 		document.add( MetadataFields.searchableMetadataField( MetadataFields.typeFieldName(), MetadataFields.TYPE_CHILD_DOCUMENT ) );
 		document.add( MetadataFields.searchableMetadataField( MetadataFields.idFieldName(), rootId ) );
-
 		document.add( MetadataFields.searchableMetadataField( MetadataFields.nestedDocumentPathFieldName(), schemaNode.absolutePath() ) );
 
-		// all the ancestors of a subdocument must be added after it
+		// In the list of documents, a child must appear before its parent,
+		// so we let children contribute their document first.
 		super.contribute( multiTenancyStrategy, tenantId, routingKey, rootId, nestedDocuments );
 		nestedDocuments.add( document );
 	}

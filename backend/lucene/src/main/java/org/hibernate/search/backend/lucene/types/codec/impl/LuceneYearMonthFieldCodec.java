@@ -43,7 +43,7 @@ public final class LuceneYearMonthFieldCodec extends AbstractLuceneNumericFieldC
 	}
 
 	@Override
-	void addStoredToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, YearMonth value,
+	void addStoredToDocument(LuceneDocumentContent documentBuilder, String absoluteFieldPath, YearMonth value,
 			Long encodedValue) {
 		documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
 	}

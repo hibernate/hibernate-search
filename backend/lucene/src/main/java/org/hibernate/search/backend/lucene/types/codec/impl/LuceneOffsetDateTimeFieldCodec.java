@@ -35,7 +35,7 @@ public final class LuceneOffsetDateTimeFieldCodec extends AbstractLuceneNumericF
 	}
 
 	@Override
-	void addStoredToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, OffsetDateTime value,
+	void addStoredToDocument(LuceneDocumentContent documentBuilder, String absoluteFieldPath, OffsetDateTime value,
 			Long encodedValue) {
 		documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
 	}

@@ -25,7 +25,7 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number>
 	}
 
 	@Override
-	public final void addToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, F value) {
+	public final void addToDocument(LuceneDocumentContent documentBuilder, String absoluteFieldPath, F value) {
 		if ( value == null && indexNullAsValue != null ) {
 			value = indexNullAsValue;
 		}
@@ -67,7 +67,7 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number>
 
 	public abstract LuceneNumericDomain<E> getDomain();
 
-	abstract void addStoredToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath,
+	abstract void addStoredToDocument(LuceneDocumentContent documentBuilder, String absoluteFieldPath,
 			F value, E encodedValue);
 
 }

@@ -37,7 +37,7 @@ public final class LuceneMonthDayFieldCodec extends AbstractLuceneNumericFieldCo
 	}
 
 	@Override
-	void addStoredToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, MonthDay value,
+	void addStoredToDocument(LuceneDocumentContent documentBuilder, String absoluteFieldPath, MonthDay value,
 			Integer encodedValue) {
 		documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
 	}

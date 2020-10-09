@@ -22,7 +22,7 @@ public final class LuceneYearFieldCodec extends AbstractLuceneNumericFieldCodec<
 	}
 
 	@Override
-	void addStoredToDocument(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, Year value,
+	void addStoredToDocument(LuceneDocumentContent documentBuilder, String absoluteFieldPath, Year value,
 			Integer encodedValue) {
 		documentBuilder.addField( new StoredField( absoluteFieldPath, encodedValue ) );
 	}
