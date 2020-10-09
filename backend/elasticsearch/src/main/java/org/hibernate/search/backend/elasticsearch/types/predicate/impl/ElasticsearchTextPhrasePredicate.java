@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
@@ -59,7 +59,7 @@ public class ElasticsearchTextPhrasePredicate extends AbstractElasticsearchSingl
 	}
 
 	public static class Factory
-			extends AbstractElasticsearchSearchFieldQueryElementFactory<PhrasePredicateBuilder, String> {
+			extends AbstractElasticsearchSearchValueFieldQueryElementFactory<PhrasePredicateBuilder, String> {
 		@Override
 		public PhrasePredicateBuilder create(ElasticsearchSearchContext searchContext,
 				ElasticsearchSearchValueFieldContext<String> field) {

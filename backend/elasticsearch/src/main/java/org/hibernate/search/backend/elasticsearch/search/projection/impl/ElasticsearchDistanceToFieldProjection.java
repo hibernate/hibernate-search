@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.util.impl.SloppyMath;
@@ -220,7 +220,8 @@ public class ElasticsearchDistanceToFieldProjection<E, P> extends AbstractElasti
 	}
 
 	public static class Factory
-			extends AbstractElasticsearchSearchFieldQueryElementFactory<DistanceToFieldProjectionBuilder, GeoPoint> {
+			extends
+			AbstractElasticsearchSearchValueFieldQueryElementFactory<DistanceToFieldProjectionBuilder, GeoPoint> {
 		@Override
 		public Builder create(ElasticsearchSearchContext searchContext,
 				ElasticsearchSearchValueFieldContext<GeoPoint> field) {

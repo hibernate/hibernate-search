@@ -11,7 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
@@ -58,7 +58,7 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 	}
 
 	public static class Factory
-			extends AbstractElasticsearchCodecAwareSearchFieldQueryElementFactory<MatchPredicateBuilder, String> {
+			extends AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory<MatchPredicateBuilder, String> {
 		public Factory(ElasticsearchFieldCodec<String> codec) {
 			super( codec );
 		}

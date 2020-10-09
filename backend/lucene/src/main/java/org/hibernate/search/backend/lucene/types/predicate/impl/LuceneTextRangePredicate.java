@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
@@ -29,7 +29,8 @@ public class LuceneTextRangePredicate extends AbstractLuceneLeafSingleFieldPredi
 	}
 
 	public static class Factory<F>
-			extends AbstractLuceneCodecAwareSearchFieldQueryElementFactory<RangePredicateBuilder, F, LuceneStandardFieldCodec<F, String>> {
+			extends
+			AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<RangePredicateBuilder, F, LuceneStandardFieldCodec<F, String>> {
 		public Factory(LuceneStandardFieldCodec<F, String> codec) {
 			super( codec );
 		}

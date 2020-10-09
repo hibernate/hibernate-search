@@ -50,7 +50,7 @@ public interface LuceneSearchValueFieldTypeContext<F> {
 		}
 	}
 
-	<T> LuceneSearchFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key);
+	<T> LuceneSearchValueFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key);
 
 	Optional<String> searchAnalyzerName();
 

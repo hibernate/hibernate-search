@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
@@ -55,7 +55,8 @@ public class ElasticsearchGeoPointSpatialWithinPolygonPredicate extends Abstract
 	}
 
 	public static class Factory
-			extends AbstractElasticsearchSearchFieldQueryElementFactory<SpatialWithinPolygonPredicateBuilder, GeoPoint> {
+			extends
+			AbstractElasticsearchSearchValueFieldQueryElementFactory<SpatialWithinPolygonPredicateBuilder, GeoPoint> {
 		@Override
 		public Builder create(ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<GeoPoint> field) {
 			return new Builder( searchContext, field );

@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import java.util.List;
 
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
@@ -28,7 +28,7 @@ public class LuceneGeoPointSpatialWithinPolygonPredicate extends AbstractLuceneL
 	}
 
 	public static class Factory
-			extends AbstractLuceneSearchFieldQueryElementFactory<SpatialWithinPolygonPredicateBuilder, GeoPoint> {
+			extends AbstractLuceneSearchValueFieldQueryElementFactory<SpatialWithinPolygonPredicateBuilder, GeoPoint> {
 		@Override
 		public Builder create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<GeoPoint> field) {
 			return new Builder( searchContext, field );

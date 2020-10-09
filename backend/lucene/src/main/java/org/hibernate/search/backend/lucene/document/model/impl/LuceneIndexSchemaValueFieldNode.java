@@ -12,7 +12,7 @@ import java.util.List;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
@@ -87,7 +87,7 @@ public class LuceneIndexSchemaValueFieldNode<F> extends AbstractLuceneIndexSchem
 
 	@Override
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchContext searchContext) {
-		LuceneSearchFieldQueryElementFactory<T, F> factory = type().queryElementFactory( key );
+		LuceneSearchValueFieldQueryElementFactory<T, F> factory = type().queryElementFactory( key );
 		if ( factory == null ) {
 			throw log.cannotUseQueryElementForField( absolutePath(), key.toString(), eventContext() );
 		}

@@ -12,7 +12,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
@@ -98,7 +98,8 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 	}
 
 	public static class Factory<F>
-			extends AbstractLuceneCodecAwareSearchFieldQueryElementFactory<AbstractTypeSelector<?>, F, AbstractLuceneNumericFieldCodec<F, ?>> {
+			extends
+			AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<AbstractTypeSelector<?>, F, AbstractLuceneNumericFieldCodec<F, ?>> {
 		public Factory(AbstractLuceneNumericFieldCodec<F, ?> codec) {
 			super( codec );
 		}

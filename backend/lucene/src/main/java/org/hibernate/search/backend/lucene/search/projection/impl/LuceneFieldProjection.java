@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchFieldQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
@@ -86,7 +86,8 @@ public class LuceneFieldProjection<E, P, F, V> extends AbstractLuceneProjection<
 	}
 
 	public static class Factory<F>
-			extends AbstractLuceneCodecAwareSearchFieldQueryElementFactory<TypeSelector<?>, F, LuceneFieldCodec<F>> {
+			extends
+			AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<TypeSelector<?>, F, LuceneFieldCodec<F>> {
 		public Factory(LuceneFieldCodec<F> codec) {
 			super( codec );
 		}
