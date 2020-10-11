@@ -21,8 +21,6 @@ include::mapping.asciidoc[]
 
 include::query.asciidoc[]
 
-include::manual-index.asciidoc[]
-
 include::index-optimization.asciidoc[]
 
 include::monitoring.asciidoc[]
