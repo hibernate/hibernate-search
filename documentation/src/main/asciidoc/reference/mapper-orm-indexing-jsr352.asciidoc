@@ -33,7 +33,7 @@ long executionId = BatchRuntime
 ----
 ====
 
-==== Job Parameters
+== Job Parameters
 
 .Job Parameters in JSR 352 Integration
 |===
@@ -73,7 +73,7 @@ place after indexing.
 |Specify the Hibernate `CacheMode` when loading entities.
 The default is `IGNORE`, and it will be the most efficient choice in most cases,
 but using another mode such as `GET` may be more efficient if many of the entities being indexed
-refer to a small set of other entities. 
+refer to a small set of other entities.
 
 |`idFetchSize`
 |`idFetchSize(int)`
@@ -154,11 +154,11 @@ than 0, and equal to or less than the value of `checkpointInterval`.
 |`entityManagerFactoryNamespace(String)`
 |-
 |-
-|See <<jsr-352-emf,Selecting the persistence unit (EntityManagerFactory)>> 
+|See <<jsr-352-emf,Selecting the persistence unit (EntityManagerFactory)>>
 |===
 
 [[jsr-352-indexing-mode]]
-==== Indexing mode
+== Indexing mode
 
 The mass indexing job allows you to define your own entities to be indexed -- you can start a full
 indexing or a partial indexing through 3 different methods: selecting the desired entity types,
@@ -228,7 +228,7 @@ Because of those limitations, we suggest you use this approach only for indexing
 and only if you know that no entities matching the query will be created during indexing.
 ====
 
-==== Parallel indexing
+== Parallel indexing
 
 For better performance, indexing is performed in parallel using multiple threads. The set of
 entities to index is split into multiple partitions. Each thread processes one partition at a time.
@@ -243,7 +243,7 @@ is highly dependent on your overall architecture, database design and even data 
 You should experiment with these settings to find out what's best in your particular case.
 ====
 
-===== Threads
+=== Threads
 
 The maximum number of threads used by the job execution is defined through method `maxThreads()`.
 Within the N threads given, there’s 1 thread reserved for the core, so only N - 1 threads are
@@ -267,7 +267,7 @@ use as many as possible up to the requested maximum (JSR352 v1.0 Final Release, 
 batch jobs share the same thread pool, so it's not always a good idea to execute jobs concurrently.
 ====
 
-===== Rows per partition
+=== Rows per partition
 
 Each partition consists of a fixed number of elements to index. You may tune exactly how many elements
 a partition will hold with `rowsPerPartition`.
@@ -313,7 +313,7 @@ the same partition.
 ====
 
 [[jsr-352-chunking]]
-==== Chunking and session clearing
+== Chunking and session clearing
 
 The mass indexing job supports restart a suspended or failed job more or less from where it stopped.
 
@@ -364,7 +364,7 @@ Thus having a 1-element checkpoint interval is definitely not a good idea.
 ====
 
 [[jsr-352-emf]]
-==== Selecting the persistence unit (EntityManagerFactory)
+== Selecting the persistence unit (EntityManagerFactory)
 
 [CAUTION]
 ====
@@ -374,7 +374,7 @@ will stay open during the whole mass indexing process.
 ====
 
 [[jsr-352-emf-jberet]]
-===== JBeret
+=== JBeret
 
 If your JSR-352 runtime is JBeret (used in WildFly in particular),
 you can use CDI to retrieve the `EntityManagerFactory`.
@@ -428,7 +428,7 @@ an entity manager factory by its persistence unit name when using the mass index
 ====
 
 [[jsr-352-emf-other-implementation]]
-===== Other DI-enabled JSR-352 implementations
+=== Other DI-enabled JSR-352 implementations
 
 If you want to use a different JSR-352 implementation that happens to allow dependency injection,
 you can use `hibernate-search-jsr352-core` under the following conditions:
@@ -444,7 +444,7 @@ For instance this can be achieved in Spring DI using the `@ComponentScan` annota
 3. You must register a single bean in the dependency injection context
 that will implement the `EntityManagerFactoryRegistry` interface.
 
-===== Plain Java environment (no dependency injection at all)
+=== Plain Java environment (no dependency injection at all)
 
 The following will work only if your JSR-352 runtime does not support dependency injection at all,
 i.e. it ignores `@Inject` annotations in batch artifacts.
