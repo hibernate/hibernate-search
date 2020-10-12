@@ -191,7 +191,7 @@ public class ElasticsearchMultiIndexSearchValueFieldContext<F>
 		try {
 			try {
 				if ( factory1 == null || factory2 == null ) {
-					throw log.inconsistentSupportForQueryElement( key.toString() );
+					throw log.partialSupportForQueryElement( key.toString() );
 				}
 
 				factory1.checkCompatibleWith( factory2 );
