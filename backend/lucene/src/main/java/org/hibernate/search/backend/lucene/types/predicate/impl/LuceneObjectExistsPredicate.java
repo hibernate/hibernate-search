@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchObjectFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
@@ -20,9 +21,11 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateTypeKe
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 
 public class LuceneObjectExistsPredicate extends AbstractLuceneSingleFieldPredicate {
 
@@ -39,9 +42,22 @@ public class LuceneObjectExistsPredicate extends AbstractLuceneSingleFieldPredic
 	protected Query doToQuery(PredicateRequestContext context) {
 		// if exists at least one not-null field, exists on object field should match
 		BooleanQuery.Builder builder = new BooleanQuery.Builder();
+
 		for ( LuceneSearchPredicate child : children ) {
 			builder.add( child.toQuery( context ), BooleanClause.Occur.SHOULD );
 		}
+
+		/*
+		 * When executing an exists() predicate on an object field that contains dynamic value field,
+		 * we don't necessarily know all the possible (dynamic) child value fields,
+		 * so we cannot just execute {@code exists(childField1) OR exists(childField2) OR ... OR exists(childFieldN)}.
+		 * That's why we keep track of the fact that
+		 * "for this document, this object field exists because it contains at least one dynamic value"
+		 * by adding the path of the object field to the "fieldNames" field.
+		 */
+		builder.add( new TermQuery( new Term( MetadataFields.fieldNamesFieldName(), absoluteFieldPath ) ),
+				BooleanClause.Occur.SHOULD );
+
 		return builder.build();
 	}
 
