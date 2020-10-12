@@ -56,13 +56,12 @@ public class HibernateOrmBatchJsr352IT {
 	@Test
 	public void simple() throws Exception {
 		// tag::simple[]
-		Properties jobProps = MassIndexingJob
-				.parameters()
-				.forEntities( Book.class, Author.class )
+		Properties jobProps = MassIndexingJob.parameters() // <1>
+				.forEntities( Book.class, Author.class ) // <2>
 				.build();
 
-		JobOperator jobOperator = BatchRuntime.getJobOperator();
-		long executionId = jobOperator.start( MassIndexingJob.NAME, jobProps );
+		JobOperator jobOperator = BatchRuntime.getJobOperator(); // <3>
+		long executionId = jobOperator.start( MassIndexingJob.NAME, jobProps ); // <4>
 		// end::simple[]
 
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );
@@ -80,14 +79,13 @@ public class HibernateOrmBatchJsr352IT {
 	@Test
 	public void hql() throws Exception {
 		// tag::hql[]
-		Properties jobProps = MassIndexingJob
-				.parameters()
-				.forEntities( Author.class )
-				.restrictedBy( "from Author a where a.lastName = 'Smith1'" )
+		Properties jobProps = MassIndexingJob.parameters() // <1>
+				.forEntities( Author.class ) // <2>
+				.restrictedBy( "from Author a where a.lastName = 'Smith1'" ) // <3>
 				.build();
 
-		JobOperator jobOperator = BatchRuntime.getJobOperator();
-		long executionId = jobOperator.start( MassIndexingJob.NAME, jobProps );
+		JobOperator jobOperator = BatchRuntime.getJobOperator(); // <4>
+		long executionId = jobOperator.start( MassIndexingJob.NAME, jobProps ); // <5>
 		// end::hql[]
 
 		JobExecution jobExecution = jobOperator.getJobExecution( executionId );

@@ -19,18 +19,16 @@ implementation (see <<jsr-352-emf-jberet,how to configure it here>>).
 As for other implementations, they can also be used, but will require
 <<jsr-352-emf-other-implementation,a bit more configuration on your side>>.
 
-.How to use the JSR-352 mass-indexing job?
+.Reindexing everything using a `JSR-352` mass-indexing job
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-Properties jobProps = MassIndexingJob
-        .parameters()
-        .forEntity( MyEntity.class )
-        .build();
-long executionId = BatchRuntime
-        .getJobOperator()
-        .start( MassIndexingJob.NAME, jobProps );
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmBatchJsr352IT.java[tags=simple]
 ----
+<1> Start building parameters for a mass-indexing job.
+<2> Define some parameters. In this case, the list of the entity types to be indexed.
+<3> Get the `JobOperator` from the framework.
+<4> Start the job.
 ====
 
 == Job Parameters
@@ -155,23 +153,17 @@ The mass indexing job allows you to define your own entities to be indexed -- yo
 indexing or a partial indexing through 2 different methods: selecting the desired entity types,
 or using HQL.
 
-.How to define the indexing mode?
+.Partial reindexing using a `restrictedBy` HQL parameter
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-// full indexing
-Properties jobProps1 = MassIndexingJob
-        .parameters()
-        .forEntity( MyClass.class )
-        .build();
-
-// partial indexing using HQL
-Properties jobProps2 = MassIndexingJob
-        .parameters()
-        .forEntity( MyClass.class )
-        .restrictedBy( "select c from MyClass c where c.name in ( 'Foo', 'Bar' )" )
-        .build();
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmBatchJsr352IT.java[tags=hql]
 ----
+<1> Start building parameters for a mass-indexing job.
+<2> Define the entity type to be indexed.
+<3> Restrict the scope of the job using a HQL restriction.
+<4> Get `JobOperator` form the framework.
+<5> Start the job.
 ====
 
 While the full indexing is useful when you perform the very first indexing, or
