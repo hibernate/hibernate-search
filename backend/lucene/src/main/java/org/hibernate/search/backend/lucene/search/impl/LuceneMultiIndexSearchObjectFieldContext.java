@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -73,13 +74,30 @@ public class LuceneMultiIndexSearchObjectFieldContext implements LuceneSearchObj
 		if ( factory == null ) {
 			throw log.cannotUseQueryElementForObjectField( absolutePath(), key.toString(), eventContext() );
 		}
-		return factory.create( searchContext, this );
+		try {
+			return factory.create( searchContext, this );
+		}
+		catch (SearchException e) {
+			throw log.cannotUseQueryElementForObjectFieldBecauseCreationException( absolutePath, key.toString(),
+					e.getMessage(), e, indexesEventContext() );
+		}
 	}
 
 	@Override
 	public Map<String, ? extends LuceneSearchFieldContext> staticChildrenByName() {
 		if ( staticChildrenByName != null ) {
 			return staticChildrenByName;
+		}
+		// TODO HSEARCH-4050 remove this unnecessary restriction?
+		Set<String> childrenNames = null;
+		for ( LuceneSearchObjectFieldContext fieldContext : fieldForEachIndex ) {
+			if ( childrenNames == null ) {
+				childrenNames = fieldContext.staticChildrenByName().keySet();
+			}
+			else if ( !childrenNames.equals( fieldContext.staticChildrenByName().keySet() ) ) {
+				throw log.conflictingObjectFieldModel( absolutePath, fieldForEachIndex.get( 0 ),
+						fieldContext, eventContext() );
+			}
 		}
 		Map<String, LuceneSearchFieldContext> result = new TreeMap<>();
 		Function<String, LuceneSearchFieldContext> createChildFieldContext = indexesContext::field;

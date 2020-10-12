@@ -141,10 +141,14 @@ public class ExistsPredicateObjectsSpecificsIT {
 		assumeFullMultiIndexCompatibilityCheck();
 		SearchPredicateFactory f = mainIndex.createScope( invertedIndex ).predicate();
 
-		assertThatThrownBy( () -> f.exists().field( "nested" ) )
+		String fieldPath = "nested";
+
+		assertThatThrownBy( () -> f.exists().field( fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting models for object field" )
-				.hasMessageContaining( "'nested'" )
+				.hasMessageContainingAll(
+						"Cannot use 'predicate:exists' on field '" + fieldPath + "'",
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Field attribute 'nestedPathHierarchy' differs:", " vs. " )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), invertedIndex.name() )
 				) );
@@ -219,10 +223,14 @@ public class ExistsPredicateObjectsSpecificsIT {
 		assumeFullMultiIndexCompatibilityCheck();
 		SearchPredicateFactory f = invertedIndex.createScope( mainIndex ).predicate();
 
-		assertThatThrownBy( () -> f.exists().field( "flattened" ) )
+		String fieldPath = "flattened";
+
+		assertThatThrownBy( () -> f.exists().field( fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting models for object field" )
-				.hasMessageContaining( "'flattened'" )
+				.hasMessageContainingAll(
+						"Cannot use 'predicate:exists' on field '" + fieldPath + "'",
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Field attribute 'nestedPathHierarchy' differs:", " vs. " )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( invertedIndex.name(), mainIndex.name() )
 				) );

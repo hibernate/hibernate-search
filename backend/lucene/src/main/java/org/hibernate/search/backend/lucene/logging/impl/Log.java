@@ -22,8 +22,8 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.Version;
 
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchObjectFieldContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.logging.spi.AggregationKeyFormatter;
@@ -458,7 +458,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 105,
 			value = "Multiple conflicting models for object field '%1$s': '%2$s' vs. '%3$s'.")
 	SearchException conflictingObjectFieldModel(String absoluteFieldPath,
-			LuceneIndexSchemaObjectFieldNode index1Model, LuceneIndexSchemaObjectFieldNode index2Model, @Param EventContext context);
+			LuceneSearchObjectFieldContext index1Model, LuceneSearchObjectFieldContext index2Model, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 106,
 			value = "Multiple conflicting models for field '%1$s': '%2$s' vs. '%3$s'.")
@@ -612,4 +612,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 139, value = "Cannot use '%2$s' on field '%1$s'."
 			+ " '%2$s' is not available for object fields.")
 	SearchException cannotUseQueryElementForObjectField(String absoluteFieldPath, String queryElementName, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 140, value = "Cannot use '%2$s' on field '%1$s': %3$s")
+	SearchException cannotUseQueryElementForObjectFieldBecauseCreationException(String absoluteFieldPath,
+			String queryElementName, String causeMessage, @Cause SearchException cause, @Param EventContext context);
 }
