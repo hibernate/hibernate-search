@@ -193,10 +193,6 @@ public interface Log extends BasicLogger {
 			+ " Given predicate was: '%1$s'")
 	SearchException cannotMixLuceneSearchQueryWithOtherPredicates(SearchPredicate predicate);
 
-	@Message(id = ID_OFFSET_2 + 12,
-			value = "Field '%1$s' is not an object field.")
-	SearchException nonObjectFieldForNestedQuery(String absoluteFieldPath, @Param EventContext context);
-
 	@Message(id = ID_OFFSET_2 + 13,
 			value = "Object field '%1$s' is flattened: its structure was lost upon indexing and 'nested' features are not available.")
 	SearchException nonNestedFieldForNestedQuery(String absoluteFieldPath, @Param EventContext context);
@@ -490,10 +486,6 @@ public interface Log extends BasicLogger {
 			value = "Unable to drop index directory: %1$s")
 	SearchException unableToDropIndexDirectory(String causeMessage,
 			@Param EventContext context, @Cause Exception cause);
-
-	@Message(id = ID_OFFSET_2 + 112, value = "Multiple index conflicting models on nested document paths targeting '%1$s'. '%2$s' vs. '%3$s'.")
-	SearchException conflictingNestedDocumentPathHierarchy(String absoluteFieldPath, List<String> nestedDocumentPathHierarchy1, List<String> nestedDocumentPathHierarchy2,
-			@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 113, value = "Simple query string targets fields [%1$s, %3$s] spanning multiple nested paths: %2$s, %4$s.")
 	SearchException simpleQueryStringSpanningMultipleNestedPaths(String fieldPath1, String nestedPath1, String fieldPath2, String nestedPath2);

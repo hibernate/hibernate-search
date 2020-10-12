@@ -9,13 +9,10 @@ package org.hibernate.search.backend.lucene.scope.model.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
@@ -30,7 +27,6 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactoryImpl;
-import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -208,52 +204,6 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 			}
 		}
 		return false;
-	}
-
-	@Override
-	public void checkNestedField(String absoluteFieldPath) {
-		boolean found = false;
-
-		for ( LuceneScopeIndexManagerContext index : elements() ) {
-			LuceneIndexModel indexModel = index.model();
-			AbstractLuceneIndexSchemaFieldNode schemaNode = indexModel.fieldOrNull( absoluteFieldPath );
-			if ( schemaNode == null ) {
-				continue;
-			}
-			found = true;
-			if ( !schemaNode.isObjectField() ) {
-				throw log.nonObjectFieldForNestedQuery(
-						absoluteFieldPath, indexModel.getEventContext()
-				);
-			}
-			if ( !ObjectStructure.NESTED.equals( schemaNode.toObjectField().structure() ) ) {
-				throw log.nonNestedFieldForNestedQuery(
-						absoluteFieldPath, indexModel.getEventContext()
-				);
-			}
-		}
-		if ( !found ) {
-			throw log.unknownFieldForSearch( absoluteFieldPath, indexesEventContext() );
-		}
-	}
-
-	@Override
-	public List<String> nestedPathHierarchyForObject(String absoluteFieldPath) {
-		Optional<List<String>> nestedDocumentPath = elements().stream()
-				.map( index -> index.model().fieldOrNull( absoluteFieldPath ) )
-				.filter( Objects::nonNull )
-				.map( node -> Optional.ofNullable( node.nestedPathHierarchy() ) )
-				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
-					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
-						return nestedDocumentPath1;
-					}
-
-					throw log.conflictingNestedDocumentPathHierarchy(
-							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), indexesEventContext() );
-				} )
-				.orElse( Optional.empty() );
-
-		return nestedDocumentPath.orElse( Collections.emptyList() );
 	}
 
 	private EventContext indexesEventContext() {

@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import java.util.List;
+import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchObjectFieldContext;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
@@ -25,11 +28,14 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBox
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Query;
 
 
 public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPredicateBuilderFactory {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneSearchContext searchContext;
 	private final LuceneSearchIndexesContext indexes;
@@ -118,9 +124,13 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public NestedPredicateBuilder nested(String absoluteFieldPath) {
-		indexes.checkNestedField( absoluteFieldPath );
-		List<String> nestedPathHierarchy = indexes.nestedPathHierarchyForObject( absoluteFieldPath );
-		return new LuceneNestedPredicate.Builder( searchContext, absoluteFieldPath, nestedPathHierarchy );
+		LuceneSearchObjectFieldContext field = indexes.field( absoluteFieldPath ).toObjectField();
+		if ( !field.nested() ) {
+			throw log.nonNestedFieldForNestedQuery( absoluteFieldPath,
+					EventContexts.fromIndexNames( indexes.indexNames() ) );
+		}
+		return new LuceneNestedPredicate.Builder( searchContext, absoluteFieldPath,
+				field.nestedPathHierarchy() );
 	}
 
 	@Override

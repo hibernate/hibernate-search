@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.search.impl;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,9 +29,5 @@ public interface LuceneSearchIndexesContext {
 	LuceneSearchFieldContext field(String absoluteFieldPath);
 
 	boolean hasNestedDocuments();
-
-	void checkNestedField(String absoluteFieldPath);
-
-	List<String> nestedPathHierarchyForObject(String absoluteFieldPath);
 
 }

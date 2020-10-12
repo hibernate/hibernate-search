@@ -74,6 +74,11 @@ public class ElasticsearchMultiIndexSearchObjectFieldContext implements Elastics
 	}
 
 	@Override
+	public boolean nested() {
+		return getFromFieldIfCompatible( ElasticsearchSearchObjectFieldContext::nested, Object::equals, "nested" );
+	}
+
+	@Override
 	public <T> ElasticsearchSearchObjectFieldQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
 		ElasticsearchSearchObjectFieldQueryElementFactory<T> factory = null;
 		for ( ElasticsearchSearchObjectFieldContext fieldContext : fieldForEachIndex ) {

@@ -12,6 +12,8 @@ package org.hibernate.search.backend.elasticsearch.search.impl;
  */
 public interface ElasticsearchSearchObjectFieldContext extends ElasticsearchSearchFieldContext {
 
+	boolean nested();
+
 	<T> ElasticsearchSearchObjectFieldQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key);
 
 }

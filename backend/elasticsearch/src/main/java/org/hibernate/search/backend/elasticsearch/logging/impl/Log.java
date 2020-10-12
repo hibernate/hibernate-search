@@ -257,10 +257,6 @@ public interface Log extends BasicLogger {
 					+ " Given predicate was: '%1$s'")
 	SearchException cannotMixElasticsearchSearchQueryWithOtherPredicates(SearchPredicate predicate);
 
-	@Message(id = ID_OFFSET_3 + 9,
-			value = "Field '%1$s' is not an object field.")
-	SearchException nonObjectFieldForNestedQuery(String absoluteFieldPath, @Param EventContext context);
-
 	@Message(id = ID_OFFSET_3 + 10,
 			value = "Object field '%1$s' is flattened: its structure was lost upon indexing and 'nested' features are not available.")
 	SearchException nonNestedFieldForNestedQuery(String absoluteFieldPath, @Param EventContext context);
@@ -485,10 +481,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 85,
 			value = "Multiple aggregations with the same key: '%1$s'")
 	SearchException duplicateAggregationKey(@FormatWith(AggregationKeyFormatter.class) AggregationKey key);
-
-	@Message(id = ID_OFFSET_3 + 86, value = "Multiple index conflicting models on nested document paths targeting '%1$s'. '%2$s' vs. '%3$s'.")
-	SearchException conflictingNestedDocumentPathHierarchy(String absoluteFieldPath,
-			List<String> nestedDocumentPathHierarchy1, List<String> nestedDocumentPathHierarchy2, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 87, value = "Cannot apply a search analyzer if an analyzer has not been defined on the same field." +
 			" Search analyzer: '%1$s'.")

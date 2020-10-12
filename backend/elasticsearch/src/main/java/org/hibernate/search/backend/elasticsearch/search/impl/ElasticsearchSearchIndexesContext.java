@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,7 +31,4 @@ public interface ElasticsearchSearchIndexesContext {
 
 	boolean hasSchemaObjectNodeComponent(String absoluteFieldPath);
 
-	void checkNestedField(String absoluteFieldPath);
-
-	List<String> nestedPathHierarchyForObject(String absoluteObjectPath);
 }
