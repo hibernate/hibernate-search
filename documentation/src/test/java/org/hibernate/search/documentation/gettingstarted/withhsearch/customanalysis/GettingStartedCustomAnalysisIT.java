@@ -33,11 +33,6 @@ public class GettingStartedCustomAnalysisIT {
 
 	@Before
 	public void setup() {
-		entityManagerFactory = Persistence.createEntityManagerFactory( persistenceUnitName );
-	}
-
-	@After
-	public void cleanup() {
 		if ( IS_IDE ) {
 			Map<String, String> properties = new HashMap<>();
 			// More than one backend type in the classpath, we have to set it explicitly.
@@ -46,6 +41,13 @@ public class GettingStartedCustomAnalysisIT {
 		}
 		else {
 			entityManagerFactory = Persistence.createEntityManagerFactory( persistenceUnitName );
+		}
+	}
+
+	@After
+	public void cleanup() {
+		if ( entityManagerFactory != null ) {
+			entityManagerFactory.close();
 		}
 	}
 
