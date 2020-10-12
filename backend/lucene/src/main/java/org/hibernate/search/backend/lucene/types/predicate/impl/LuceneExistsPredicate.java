@@ -26,7 +26,7 @@ public class LuceneExistsPredicate extends AbstractLuceneLeafSingleFieldPredicat
 		super( builder );
 	}
 
-	private static class AbstractBuilder<F> extends AbstractLuceneLeafSingleFieldPredicate.AbstractBuilder<F>
+	private abstract static class AbstractBuilder<F> extends AbstractLuceneLeafSingleFieldPredicate.AbstractBuilder<F>
 			implements ExistsPredicateBuilder {
 		private AbstractBuilder(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
 			super( searchContext, field );
@@ -40,9 +40,7 @@ public class LuceneExistsPredicate extends AbstractLuceneLeafSingleFieldPredicat
 		}
 
 		@Override
-		protected Query buildQuery() {
-			return new NormsFieldExistsQuery( absoluteFieldPath );
-		}
+		protected abstract Query buildQuery();
 	}
 
 	public static class NormsBasedFactory
