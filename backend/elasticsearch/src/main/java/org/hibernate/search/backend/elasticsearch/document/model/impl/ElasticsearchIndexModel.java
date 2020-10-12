@@ -6,17 +6,17 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
-import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.LowLevelIndexMetadataBuilder;
+import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexContext;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
@@ -40,23 +40,18 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 
 	private final ToDocumentIdentifierValueConverter<?> idDslConverter;
 	private final ElasticsearchIndexSchemaObjectNode rootNode;
-	private final Map<String, ElasticsearchIndexSchemaObjectFieldNode> objectFieldNodes;
-	private final Map<String, ElasticsearchIndexSchemaValueFieldNode<?>> valueFieldNodes;
-	private final List<IndexFieldDescriptor> staticFields;
-	private final List<ElasticsearchIndexSchemaObjectFieldTemplate> objectFieldTemplates;
-	private final List<ElasticsearchIndexSchemaValueFieldTemplate> valueFieldTemplates;
-	private final ConcurrentMap<String, ElasticsearchIndexSchemaObjectFieldNode> dynamicObjectFieldNodesCache = new ConcurrentHashMap<>();
-	private final ConcurrentMap<String, ElasticsearchIndexSchemaValueFieldNode<?>> dynamicValueFieldNodesCache = new ConcurrentHashMap<>();
+	private final Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticFields;
+	private final List<IndexFieldDescriptor> includedStaticFields;
+	private final List<AbstractElasticsearchIndexSchemaFieldTemplate<?>> fieldTemplates;
+	private final ConcurrentMap<String, AbstractElasticsearchIndexSchemaFieldNode> dynamicFieldsCache = new ConcurrentHashMap<>();
 
 	public ElasticsearchIndexModel(IndexNames names,
 			String mappedTypeName,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			RootTypeMapping mapping, ToDocumentIdentifierValueConverter<?> idDslConverter,
 			ElasticsearchIndexSchemaObjectNode rootNode,
-			Map<String, ElasticsearchIndexSchemaObjectFieldNode> objectFieldNodes,
-			Map<String, ElasticsearchIndexSchemaValueFieldNode<?>> valueFieldNodes,
-			List<ElasticsearchIndexSchemaObjectFieldTemplate> objectFieldTemplates,
-			List<ElasticsearchIndexSchemaValueFieldTemplate> valueFieldTemplates) {
+			Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticFields,
+			List<AbstractElasticsearchIndexSchemaFieldTemplate<?>> fieldTemplates) {
 		this.names = names;
 		this.mappedTypeName = mappedTypeName;
 		this.eventContext = EventContexts.fromIndexName( hibernateSearchName() );
@@ -64,18 +59,11 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 		this.mapping = mapping;
 		this.idDslConverter = idDslConverter;
 		this.rootNode = rootNode;
-		this.objectFieldNodes = objectFieldNodes;
-		this.valueFieldNodes = valueFieldNodes;
-		List<IndexFieldDescriptor> theStaticFields = new ArrayList<>();
-		objectFieldNodes.values().stream()
+		this.staticFields = staticFields;
+		this.includedStaticFields = CollectionHelper.toImmutableList( staticFields.values().stream()
 				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.inclusion() ) )
-				.forEach( theStaticFields::add );
-		valueFieldNodes.values().stream()
-				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.inclusion() ) )
-				.forEach( theStaticFields::add );
-		this.staticFields = CollectionHelper.toImmutableList( theStaticFields );
-		this.objectFieldTemplates = objectFieldTemplates;
-		this.valueFieldTemplates = valueFieldTemplates;
+				.collect( Collectors.toList() ) );
+		this.fieldTemplates = fieldTemplates;
 	}
 
 	@Override
@@ -109,33 +97,21 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 	}
 
 	public AbstractElasticsearchIndexSchemaFieldNode fieldOrNull(String absolutePath) {
-		AbstractElasticsearchIndexSchemaFieldNode fieldDescriptor =
-				getFieldNode( absolutePath, IndexFieldFilter.INCLUDED_ONLY );
-		if ( fieldDescriptor == null ) {
-			fieldDescriptor = getObjectFieldNode( absolutePath, IndexFieldFilter.INCLUDED_ONLY );
-		}
-		return fieldDescriptor;
+		return fieldOrNull( absolutePath, IndexFieldFilter.INCLUDED_ONLY );
+	}
+
+	public AbstractElasticsearchIndexSchemaFieldNode fieldOrNull(String absolutePath, IndexFieldFilter filter) {
+		AbstractElasticsearchIndexSchemaFieldNode node = fieldOrNullIgnoringInclusion( absolutePath );
+		return node == null ? null : filter.filter( node, node.inclusion() );
 	}
 
 	@Override
 	public Collection<IndexFieldDescriptor> staticFields() {
-		return staticFields;
+		return includedStaticFields;
 	}
 
 	public EventContext getEventContext() {
 		return eventContext;
-	}
-
-	public ElasticsearchIndexSchemaObjectFieldNode getObjectFieldNode(String absolutePath, IndexFieldFilter filter) {
-		ElasticsearchIndexSchemaObjectFieldNode node =
-				getNode( objectFieldNodes, objectFieldTemplates, dynamicObjectFieldNodesCache, absolutePath );
-		return node == null ? null : filter.filter( node, node.inclusion() );
-	}
-
-	public ElasticsearchIndexSchemaValueFieldNode<?> getFieldNode(String absolutePath, IndexFieldFilter filter) {
-		ElasticsearchIndexSchemaValueFieldNode<?> node =
-				getNode( valueFieldNodes, valueFieldTemplates, dynamicValueFieldNodesCache, absolutePath );
-		return node == null ? null : filter.filter( node, node.inclusion() );
 	}
 
 	public void contributeLowLevelMetadata(LowLevelIndexMetadataBuilder builder) {
@@ -153,30 +129,27 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 				.toString();
 	}
 
-	private <N> N getNode(Map<String, N> staticNodes,
-			List<? extends AbstractElasticsearchIndexSchemaFieldTemplate<N>> templates,
-			ConcurrentMap<String, N> dynamicNodesCache,
-			String absolutePath) {
-		N node = staticNodes.get( absolutePath );
-		if ( node != null ) {
-			return node;
+	private AbstractElasticsearchIndexSchemaFieldNode fieldOrNullIgnoringInclusion(String absolutePath) {
+		AbstractElasticsearchIndexSchemaFieldNode field = staticFields.get( absolutePath );
+		if ( field != null ) {
+			return field;
 		}
-		node = dynamicNodesCache.get( absolutePath );
-		if ( node != null ) {
-			return node;
+		field = dynamicFieldsCache.get( absolutePath );
+		if ( field != null ) {
+			return field;
 		}
-		for ( AbstractElasticsearchIndexSchemaFieldTemplate<N> template : templates ) {
-			node = template.createNodeIfMatching( this, absolutePath );
-			if ( node != null ) {
-				N previous = dynamicNodesCache.putIfAbsent( absolutePath, node );
+		for ( AbstractElasticsearchIndexSchemaFieldTemplate<?> template : fieldTemplates ) {
+			field = template.createNodeIfMatching( this, absolutePath );
+			if ( field != null ) {
+				AbstractElasticsearchIndexSchemaFieldNode previous = dynamicFieldsCache.putIfAbsent( absolutePath, field );
 				if ( previous != null ) {
 					// Some other thread created the node before us.
 					// Keep the first created node, discard ours: they are identical.
-					node = previous;
+					field = previous;
 				}
 				break;
 			}
 		}
-		return node;
+		return field;
 	}
 }

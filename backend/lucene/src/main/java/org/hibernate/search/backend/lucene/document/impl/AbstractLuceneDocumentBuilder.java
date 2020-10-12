@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
@@ -73,37 +74,37 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 	@Override
 	public void addValue(String relativeFieldName, Object value) {
 		String absoluteFieldPath = schemaNode.absolutePath( relativeFieldName );
-		LuceneIndexSchemaValueFieldNode<?> node = model.getFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
+		AbstractLuceneIndexSchemaFieldNode node = model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( node == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
 		}
 
-		addValueUnknownType( node, value );
+		addValueUnknownType( node.toValueField(), value );
 	}
 
 	@Override
 	public DocumentElement addObject(String relativeFieldName) {
 		String absoluteFieldPath = schemaNode.absolutePath( relativeFieldName );
-		LuceneIndexSchemaObjectFieldNode fieldSchemaNode = model.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
+		AbstractLuceneIndexSchemaFieldNode fieldSchemaNode = model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
 		}
 
-		return addObject( fieldSchemaNode, false );
+		return addObject( fieldSchemaNode.toObjectField(), false );
 	}
 
 	@Override
 	public void addNullObject(String relativeFieldName) {
 		String absoluteFieldPath = schemaNode.absolutePath( relativeFieldName );
-		LuceneIndexSchemaObjectFieldNode fieldSchemaNode = model.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
+		AbstractLuceneIndexSchemaFieldNode fieldSchemaNode = model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
 		}
 
-		addObject( fieldSchemaNode, true );
+		addObject( fieldSchemaNode.toObjectField(), true );
 	}
 
 	abstract void checkNoValueYetForSingleValued(String absoluteFieldPath);

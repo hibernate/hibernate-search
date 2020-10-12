@@ -219,7 +219,7 @@ public class ObjectFieldTemplateIT {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3273")
+	@TestForIssue(jiraKey = { "HSEARCH-3273", "HSEARCH-4048" })
 	public void matchingPathGlob_precedence_firstDeclared() {
 		Consumer<IndexSchemaElement> templatesBinder = root -> {
 			root.fieldTemplate( "fieldTemplate", f -> f.asString() )

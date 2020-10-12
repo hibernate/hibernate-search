@@ -6,24 +6,23 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
-import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
-import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.CollectionHelper;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.DelegatingAnalyzerWrapper;
@@ -38,14 +37,11 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 	private final ToDocumentIdentifierValueConverter<?> idDslConverter;
 
 	private final LuceneIndexSchemaObjectNode rootNode;
-	private final Map<String, LuceneIndexSchemaObjectFieldNode> objectFieldNodes;
-	private final Map<String, LuceneIndexSchemaValueFieldNode<?>> valueFieldNodes;
-	private final List<IndexFieldDescriptor> staticFields;
-	private final List<LuceneIndexSchemaObjectFieldTemplate> objectFieldTemplates;
-	private final List<LuceneIndexSchemaValueFieldTemplate> valueFieldTemplates;
+	private final Map<String, AbstractLuceneIndexSchemaFieldNode> staticFields;
+	private final List<IndexFieldDescriptor> includedStaticFields;
+	private final List<AbstractLuceneIndexSchemaFieldTemplate<?>> fieldTemplates;
 	private final boolean hasNestedDocuments;
-	private final ConcurrentMap<String, LuceneIndexSchemaObjectFieldNode> dynamicObjectFieldNodesCache = new ConcurrentHashMap<>();
-	private final ConcurrentMap<String, LuceneIndexSchemaValueFieldNode<?>> dynamicValueFieldNodesCache = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, AbstractLuceneIndexSchemaFieldNode> dynamicFieldsCache = new ConcurrentHashMap<>();
 
 	private final IndexingScopedAnalyzer indexingAnalyzer;
 	private final SearchScopedAnalyzer searchAnalyzer;
@@ -54,29 +50,21 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 			String mappedTypeName,
 			ToDocumentIdentifierValueConverter<?> idDslConverter,
 			LuceneIndexSchemaObjectNode rootNode,
-			Map<String, LuceneIndexSchemaObjectFieldNode> objectFieldNodes,
-			Map<String, LuceneIndexSchemaValueFieldNode<?>> valueFieldNodes,
-			List<LuceneIndexSchemaObjectFieldTemplate> objectFieldTemplates,
-			List<LuceneIndexSchemaValueFieldTemplate> valueFieldTemplates) {
+			Map<String, AbstractLuceneIndexSchemaFieldNode> staticFields,
+			List<AbstractLuceneIndexSchemaFieldTemplate<?>> fieldTemplates,
+			boolean hasNestedDocuments) {
 		this.indexName = indexName;
 		this.mappedTypeName = mappedTypeName;
 		this.idDslConverter = idDslConverter;
 		this.rootNode = rootNode;
-		this.objectFieldNodes = CollectionHelper.toImmutableMap( objectFieldNodes );
-		this.valueFieldNodes = CollectionHelper.toImmutableMap( valueFieldNodes );
-		List<IndexFieldDescriptor> theStaticFields = new ArrayList<>();
-		objectFieldNodes.values().stream()
+		this.staticFields = CollectionHelper.toImmutableMap( staticFields );
+		this.includedStaticFields = CollectionHelper.toImmutableList( staticFields.values().stream()
 				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.inclusion() ) )
-				.forEach( theStaticFields::add );
-		valueFieldNodes.values().stream()
-				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.inclusion() ) )
-				.forEach( theStaticFields::add );
-		this.staticFields = CollectionHelper.toImmutableList( theStaticFields );
+				.collect( Collectors.toList() ) );
 		this.indexingAnalyzer = new IndexingScopedAnalyzer();
 		this.searchAnalyzer = new SearchScopedAnalyzer();
-		this.objectFieldTemplates = objectFieldTemplates;
-		this.valueFieldTemplates = valueFieldTemplates;
-		this.hasNestedDocuments = initHasNestedDocuments();
+		this.fieldTemplates = fieldTemplates;
+		this.hasNestedDocuments = hasNestedDocuments;
 	}
 
 	@Override
@@ -100,16 +88,17 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 	}
 
 	public AbstractLuceneIndexSchemaFieldNode fieldOrNull(String absolutePath) {
-		AbstractLuceneIndexSchemaFieldNode fieldDescriptor = getFieldNode( absolutePath, IndexFieldFilter.INCLUDED_ONLY );
-		if ( fieldDescriptor == null ) {
-			fieldDescriptor = getObjectFieldNode( absolutePath, IndexFieldFilter.INCLUDED_ONLY );
-		}
-		return fieldDescriptor;
+		return fieldOrNull( absolutePath, IndexFieldFilter.INCLUDED_ONLY );
+	}
+
+	public AbstractLuceneIndexSchemaFieldNode fieldOrNull(String absolutePath, IndexFieldFilter filter) {
+		AbstractLuceneIndexSchemaFieldNode field = fieldOrNullIgnoringInclusion( absolutePath );
+		return field == null ? null : filter.filter( field, field.inclusion() );
 	}
 
 	@Override
 	public Collection<IndexFieldDescriptor> staticFields() {
-		return staticFields;
+		return includedStaticFields;
 	}
 
 	public String mappedTypeName() {
@@ -122,18 +111,6 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 
 	public ToDocumentIdentifierValueConverter<?> idDslConverter() {
 		return idDslConverter;
-	}
-
-	public LuceneIndexSchemaObjectFieldNode getObjectFieldNode(String absolutePath, IndexFieldFilter filter) {
-		LuceneIndexSchemaObjectFieldNode node =
-				getNode( objectFieldNodes, objectFieldTemplates, dynamicObjectFieldNodesCache, absolutePath );
-		return node == null ? null : filter.filter( node, node.inclusion() );
-	}
-
-	public LuceneIndexSchemaValueFieldNode<?> getFieldNode(String absolutePath, IndexFieldFilter filter) {
-		LuceneIndexSchemaValueFieldNode<?> node =
-				getNode( valueFieldNodes, valueFieldTemplates, dynamicValueFieldNodesCache, absolutePath );
-		return node == null ? null : filter.filter( node, node.inclusion() );
 	}
 
 	public boolean hasNestedDocuments() {
@@ -157,31 +134,28 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 				.toString();
 	}
 
-	private <N> N getNode(Map<String, N> staticNodes,
-			List<? extends AbstractLuceneIndexSchemaFieldTemplate<N>> templates,
-			ConcurrentMap<String, N> dynamicNodesCache,
-			String absolutePath) {
-		N node = staticNodes.get( absolutePath );
-		if ( node != null ) {
-			return node;
+	private AbstractLuceneIndexSchemaFieldNode fieldOrNullIgnoringInclusion(String absolutePath) {
+		AbstractLuceneIndexSchemaFieldNode field = staticFields.get( absolutePath );
+		if ( field != null ) {
+			return field;
 		}
-		node = dynamicNodesCache.get( absolutePath );
-		if ( node != null ) {
-			return node;
+		field = dynamicFieldsCache.get( absolutePath );
+		if ( field != null ) {
+			return field;
 		}
-		for ( AbstractLuceneIndexSchemaFieldTemplate<N> template : templates ) {
-			node = template.createNodeIfMatching( this, absolutePath );
-			if ( node != null ) {
-				N previous = dynamicNodesCache.putIfAbsent( absolutePath, node );
+		for ( AbstractLuceneIndexSchemaFieldTemplate<?> template : fieldTemplates ) {
+			field = template.createNodeIfMatching( this, absolutePath );
+			if ( field != null ) {
+				AbstractLuceneIndexSchemaFieldNode previous = dynamicFieldsCache.putIfAbsent( absolutePath, field );
 				if ( previous != null ) {
 					// Some other thread created the node before us.
 					// Keep the first created node, discard ours: they are identical.
-					node = previous;
+					field = previous;
 				}
 				break;
 			}
 		}
-		return node;
+		return field;
 	}
 
 	/**
@@ -197,12 +171,12 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 
 		@Override
 		protected Analyzer getWrappedAnalyzer(String fieldName) {
-			LuceneIndexSchemaValueFieldNode<?> field = getFieldNode( fieldName, IndexFieldFilter.ALL );
+			AbstractLuceneIndexSchemaFieldNode field = fieldOrNull( fieldName, IndexFieldFilter.ALL );
 			if ( field == null ) {
 				return AnalyzerConstants.KEYWORD_ANALYZER;
 			}
 
-			Analyzer analyzer = field.type().indexingAnalyzerOrNormalizer();
+			Analyzer analyzer = field.toValueField().type().indexingAnalyzerOrNormalizer();
 			if ( analyzer == null ) {
 				return AnalyzerConstants.KEYWORD_ANALYZER;
 			}
@@ -223,42 +197,17 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 
 		@Override
 		protected Analyzer getWrappedAnalyzer(String fieldName) {
-			LuceneIndexSchemaValueFieldNode<?> field = getFieldNode( fieldName, IndexFieldFilter.ALL );
+			AbstractLuceneIndexSchemaFieldNode field = fieldOrNull( fieldName, IndexFieldFilter.ALL );
 			if ( field == null ) {
 				return AnalyzerConstants.KEYWORD_ANALYZER;
 			}
 
-			Analyzer analyzer = field.type().searchAnalyzerOrNormalizer();
+			Analyzer analyzer = field.toValueField().type().searchAnalyzerOrNormalizer();
 			if ( analyzer == null ) {
 				return AnalyzerConstants.KEYWORD_ANALYZER;
 			}
 
 			return analyzer;
-		}
-	}
-
-	private boolean initHasNestedDocuments() {
-		for ( LuceneIndexSchemaObjectFieldNode node : objectFieldNodes.values() ) {
-			if ( isNested( node.structure() ) ) {
-				return true;
-			}
-		}
-		for ( LuceneIndexSchemaObjectFieldTemplate template : objectFieldTemplates ) {
-			if ( isNested( template.structure() ) ) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean isNested(ObjectStructure structure) {
-		switch ( structure ) {
-			case NESTED:
-				return true;
-			case FLATTENED:
-			case DEFAULT:
-			default:
-				return false;
 		}
 	}
 }

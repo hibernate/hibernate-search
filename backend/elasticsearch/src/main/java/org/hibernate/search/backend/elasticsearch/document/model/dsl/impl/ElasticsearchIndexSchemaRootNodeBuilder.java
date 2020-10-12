@@ -14,6 +14,7 @@ import java.util.TreeMap;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldTemplate;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldTemplate;
@@ -101,30 +102,28 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 
 		mapping.setDynamic( resolveSelfDynamicType( defaultDynamicType ) );
 
-		final Map<String, ElasticsearchIndexSchemaObjectFieldNode> objectFieldNodes = new HashMap<>();
-		final Map<String, ElasticsearchIndexSchemaValueFieldNode<?>> valueFieldNodes = new HashMap<>();
-		final List<ElasticsearchIndexSchemaObjectFieldTemplate> objectFieldTemplates = new ArrayList<>();
-		final List<ElasticsearchIndexSchemaValueFieldTemplate> valueFieldTemplates = new ArrayList<>();
+		Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticFields = new HashMap<>();
+		List<AbstractElasticsearchIndexSchemaFieldTemplate<?>> fieldTemplates = new ArrayList<>();
 
 		ElasticsearchIndexSchemaNodeCollector collector = new ElasticsearchIndexSchemaNodeCollector() {
 			@Override
 			public void collect(String absolutePath, ElasticsearchIndexSchemaObjectFieldNode node) {
-				objectFieldNodes.put( absolutePath, node );
+				staticFields.put( absolutePath, node );
 			}
 
 			@Override
 			public void collect(String absoluteFieldPath, ElasticsearchIndexSchemaValueFieldNode<?> node) {
-				valueFieldNodes.put( absoluteFieldPath, node );
+				staticFields.put( absoluteFieldPath, node );
 			}
 
 			@Override
 			public void collect(ElasticsearchIndexSchemaObjectFieldTemplate template) {
-				objectFieldTemplates.add( template );
+				fieldTemplates.add( template );
 			}
 
 			@Override
 			public void collect(ElasticsearchIndexSchemaValueFieldTemplate template) {
-				valueFieldTemplates.add( template );
+				fieldTemplates.add( template );
 			}
 
 			@Override
@@ -143,8 +142,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 				analysisDefinitionRegistry,
 				mapping,
 				idDslConverter == null ? new StringToDocumentIdentifierValueConverter() : idDslConverter,
-				rootNode, objectFieldNodes, valueFieldNodes,
-				objectFieldTemplates, valueFieldTemplates
+				rootNode, staticFields, fieldTemplates
 		);
 	}
 
