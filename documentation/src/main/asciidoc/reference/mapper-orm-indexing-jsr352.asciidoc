@@ -99,15 +99,6 @@ will attempt to preload everything in memory.
 type. Mixing this approach with the criteria restriction is not allowed. Please notice that there's
 no query validation for your input. See <<jsr-352-indexing-mode>> for more detail and limitations.
 
-|`customQueryCriteria` (Not available, query builder only)
-|`restrictedBy(Criterion)`
-|Optional
-|-
-|Add criterion to construct a customized selection of mass-indexing under the criteria approach. You
-can call this method multiple times to add multiple criteria: only entities matching every criterion
-will be indexed. However, mixing this approach with the HQL restriction is not allowed.
-See <<jsr-352-indexing-mode>> for more detail and limitations.
-
 |`maxResultsPerEntity`
 |`maxResultsPerEntity(int)`
 |Optional
@@ -161,8 +152,8 @@ than 0, and equal to or less than the value of `checkpointInterval`.
 == Indexing mode
 
 The mass indexing job allows you to define your own entities to be indexed -- you can start a full
-indexing or a partial indexing through 3 different methods: selecting the desired entity types,
-using HQL, or using Hibernate criteria.
+indexing or a partial indexing through 2 different methods: selecting the desired entity types,
+or using HQL.
 
 .How to define the indexing mode?
 ====
@@ -180,19 +171,12 @@ Properties jobProps2 = MassIndexingJob
         .forEntity( MyClass.class )
         .restrictedBy( "select c from MyClass c where c.name in ( 'Foo', 'Bar' )" )
         .build();
-
-// partial indexing using Criteria
-Properties jobProps3 = MassIndexingJob
-        .parameters()
-        .forEntity( MyClass.class )
-        .restrictedBy( Restrictions.in( "name", "Foo", "Bar" ) )
-        .build();
 ----
 ====
 
 While the full indexing is useful when you perform the very first indexing, or
 after extensive changes to your whole database, it may also be time consuming.
-If your want to reindex only part of your data, you need to add restrictions using HQL or criteria:
+If your want to reindex only part of your data, you need to add restrictions using HQL:
 they help you to define a customized selection, and only the entities inside that selection will be indexed. A typical
 use-case is to index the new entities appeared since yesterday.
 
@@ -204,10 +188,6 @@ Note that, as detailed below, some features may not be supported depending on th
 
 | Full Indexation
 | All entities
-| Supported
-
-| Criteria
-| Some entities
 | Supported
 
 | HQL
@@ -378,8 +358,8 @@ will stay open during the whole mass indexing process.
 
 If your JSR-352 runtime is JBeret (used in WildFly in particular),
 you can use CDI to retrieve the `EntityManagerFactory`.
-Unless you use an already packaged `hibernate-search-jsr352` module for your application container,
-this will require you to add the `hibernate-search-jsr352-jberet` jar to your classpath.
+Unless you use an already packaged `hibernate-search-batch-jsr352-*` module for your application container,
+this will require you to add the `hibernate-search-batch-jsr352-jberet` jar to your classpath.
 
 If you use only one persistence unit, the mass indexer will be able to access your database
 automatically without any special configuration.
@@ -431,15 +411,15 @@ an entity manager factory by its persistence unit name when using the mass index
 === Other DI-enabled JSR-352 implementations
 
 If you want to use a different JSR-352 implementation that happens to allow dependency injection,
-you can use `hibernate-search-jsr352-core` under the following conditions:
+you can use `hibernate-search-batch-jsr352-core` under the following conditions:
 
 1. You must map the following two scope annotations
 to the relevant scope in the dependency injection mechanism:
- * `org.hibernate.search.jsr352.inject.scope.spi.HibernateSearchJobScoped`
- * `org.hibernate.search.jsr352.inject.scope.spi.HibernateSearchPartitionScoped`
+ * `org.hibernate.search.batch.jsr352.core.inject.scope.spi.HibernateSearchJobScoped`
+ * `org.hibernate.search.batch.jsr352.core.inject.scope.spi.HibernateSearchPartitionScoped`
 2. You must make sure that the dependency injection mechanism will register
 all injection-annotated classes (`@Named`, ...) from the
-`hibernate-search-jsr352-core` module in the dependency injection context.
+`hibernate-search-batch-jsr352-core` module in the dependency injection context.
 For instance this can be achieved in Spring DI using the `@ComponentScan` annotation.
 3. You must register a single bean in the dependency injection context
 that will implement the `EntityManagerFactoryRegistry` interface.
