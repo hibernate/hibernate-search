@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
 
@@ -23,8 +22,6 @@ public interface LuceneSearchIndexesContext {
 	Set<String> indexNames();
 
 	ToDocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
-
-	LuceneObjectPredicateBuilderFactory objectPredicateBuilderFactory(String absoluteFieldPath);
 
 	LuceneSearchFieldContext field(String absoluteFieldPath);
 

@@ -15,11 +15,14 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchObjectFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchObjectFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.SearchQueryElementTypeKey;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateTypeKeys;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectExistsPredicate;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldTypeDescriptor;
+import org.hibernate.search.util.common.SearchException;
 
 
 public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaFieldNode
@@ -110,12 +113,23 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 		if ( factory == null ) {
 			throw log.cannotUseQueryElementForObjectField( absolutePath(), key.toString(), eventContext() );
 		}
-		return factory.create( searchContext, this );
+		try {
+			return factory.create( searchContext, this );
+		}
+		catch (SearchException e) {
+			throw log.cannotUseQueryElementForObjectFieldBecauseCreationException( absolutePath, key.toString(),
+					e.getMessage(), e, null );
+		}
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // The "equals" condition tells us what T is exactly, so we can cast safely.
 	public <T> LuceneSearchObjectFieldQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
-		// FIXME implement this for exists()
+		if ( PredicateTypeKeys.EXISTS.equals( key ) ) {
+			return (LuceneSearchObjectFieldQueryElementFactory<T>)
+					LuceneObjectExistsPredicate.Factory.INSTANCE;
+		}
+		// Otherwise: not supported for object fields.
 		return null;
 	}
 

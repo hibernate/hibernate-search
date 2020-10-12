@@ -12,7 +12,6 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchObjectFieldContext;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
@@ -93,13 +92,6 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public ExistsPredicateBuilder exists(String absoluteFieldPath) {
-		// trying object node first
-		LuceneObjectPredicateBuilderFactory objectPredicateBuilderFactory =
-				indexes.objectPredicateBuilderFactory( absoluteFieldPath );
-		if ( objectPredicateBuilderFactory != null ) {
-			return objectPredicateBuilderFactory.createExistsPredicateBuilder( searchContext );
-		}
-
 		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.EXISTS, searchContext );
 	}
 

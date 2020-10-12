@@ -10,8 +10,10 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchObjectFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchObjectFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
@@ -41,6 +43,20 @@ public class ElasticsearchExistsPredicate extends AbstractElasticsearchSingleFie
 		@Override
 		public ExistsPredicateBuilder create(ElasticsearchSearchContext searchContext,
 				ElasticsearchSearchValueFieldContext<F> field) {
+			return new Builder( searchContext, field.absolutePath(), field.nestedPathHierarchy() );
+		}
+	}
+
+	public static class ObjectFieldFactory
+			extends AbstractElasticsearchSearchObjectFieldQueryElementFactory<ExistsPredicateBuilder> {
+		public static final ObjectFieldFactory INSTANCE = new ObjectFieldFactory();
+
+		private ObjectFieldFactory() {
+		}
+
+		@Override
+		public ExistsPredicateBuilder create(ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchObjectFieldContext field) {
 			return new Builder( searchContext, field.absolutePath(), field.nestedPathHierarchy() );
 		}
 	}

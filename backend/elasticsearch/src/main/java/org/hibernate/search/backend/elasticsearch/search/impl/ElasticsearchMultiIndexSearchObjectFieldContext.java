@@ -70,7 +70,13 @@ public class ElasticsearchMultiIndexSearchObjectFieldContext implements Elastics
 		if ( factory == null ) {
 			throw log.cannotUseQueryElementForObjectField( absolutePath(), key.toString(), eventContext() );
 		}
-		return factory.create( searchContext, this );
+		try {
+			return factory.create( searchContext, this );
+		}
+		catch (SearchException e) {
+			throw log.cannotUseQueryElementForObjectFieldBecauseCreationException( absolutePath, key.toString(),
+					e.getMessage(), e, indexesEventContext() );
+		}
 	}
 
 	@Override

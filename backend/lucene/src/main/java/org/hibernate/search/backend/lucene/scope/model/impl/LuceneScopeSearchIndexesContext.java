@@ -17,16 +17,12 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchObjectFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactoryImpl;
 import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -85,62 +81,6 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 			}
 		}
 		return converter;
-	}
-
-	@Override
-	public LuceneObjectPredicateBuilderFactory objectPredicateBuilderFactory(String absoluteFieldPath) {
-		LuceneObjectPredicateBuilderFactory result = null;
-
-		LuceneIndexSchemaObjectFieldNode objectNode = null;
-		String objectNodeIndexName = null;
-		LuceneIndexSchemaValueFieldNode<?> fieldNode = null;
-		String fieldNodeIndexName = null;
-
-		for ( LuceneScopeIndexManagerContext index : elements() ) {
-			LuceneIndexModel indexModel = index.model();
-			String indexName = indexModel.hibernateSearchName();
-
-			AbstractLuceneIndexSchemaFieldNode currentFieldNode =
-					indexModel.fieldOrNull( absoluteFieldPath );
-			if ( currentFieldNode == null ) {
-				continue;
-			}
-
-			if ( currentFieldNode.isValueField() ) {
-				fieldNode = currentFieldNode.toValueField();
-				fieldNodeIndexName = indexName;
-				if ( objectNode != null ) {
-					throw log.conflictingFieldModel( absoluteFieldPath, objectNode, fieldNode,
-							EventContexts.fromIndexNames( objectNodeIndexName, indexName )
-					);
-				}
-				continue;
-			}
-
-			LuceneIndexSchemaObjectFieldNode currentObjectFieldNode = currentFieldNode.toObjectField();
-
-			if ( fieldNode != null ) {
-				throw log.conflictingFieldModel( absoluteFieldPath, currentObjectFieldNode, fieldNode,
-						EventContexts.fromIndexNames( fieldNodeIndexName, indexName )
-				);
-			}
-
-			LuceneObjectPredicateBuilderFactoryImpl predicateBuilderFactory =
-					new LuceneObjectPredicateBuilderFactoryImpl( currentObjectFieldNode );
-			if ( result == null ) {
-				result = predicateBuilderFactory;
-				objectNode = currentObjectFieldNode;
-				objectNodeIndexName = indexName;
-				continue;
-			}
-
-			if ( !result.isCompatibleWith( predicateBuilderFactory ) ) {
-				throw log.conflictingObjectFieldModel( absoluteFieldPath, objectNode, currentObjectFieldNode,
-						EventContexts.fromIndexNames( objectNodeIndexName, indexName )
-				);
-			}
-		}
-		return result;
 	}
 
 	@Override

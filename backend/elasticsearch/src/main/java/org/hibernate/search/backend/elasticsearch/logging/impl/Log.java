@@ -651,4 +651,8 @@ public interface Log extends BasicLogger {
 			+ " '%2$s' is not available for object fields.")
 	SearchException cannotUseQueryElementForObjectField(String absoluteFieldPath, String queryElementName, @Param EventContext context);
 
+	@Message(id = ID_OFFSET_3 + 124, value = "Cannot use '%2$s' on field '%1$s': %3$s")
+	SearchException cannotUseQueryElementForObjectFieldBecauseCreationException(String absoluteFieldPath,
+			String queryElementName, String causeMessage, @Cause SearchException cause, @Param EventContext context);
+
 }

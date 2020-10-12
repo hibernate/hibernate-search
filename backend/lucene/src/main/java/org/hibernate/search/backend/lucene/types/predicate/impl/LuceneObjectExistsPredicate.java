@@ -9,10 +9,14 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchObjectFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchObjectFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateTypeKeys;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 
@@ -41,6 +45,22 @@ public class LuceneObjectExistsPredicate extends AbstractLuceneSingleFieldPredic
 		return builder.build();
 	}
 
+	public static class Factory extends AbstractLuceneSearchObjectFieldQueryElementFactory<ExistsPredicateBuilder> {
+		public static final Factory INSTANCE = new Factory();
+
+		private Factory() {
+		}
+
+		@Override
+		public ExistsPredicateBuilder create(LuceneSearchContext searchContext, LuceneSearchObjectFieldContext field) {
+			Builder builder = new Builder( searchContext, field.absolutePath(), field.nestedPathHierarchy() );
+			for ( LuceneSearchFieldContext child : field.staticChildrenByName().values() ) {
+				builder.addChild( child );
+			}
+			return builder;
+		}
+	}
+
 	public static class Builder extends AbstractBuilder implements ExistsPredicateBuilder {
 		private List<LuceneSearchPredicate> children = new ArrayList<>();
 
@@ -49,8 +69,14 @@ public class LuceneObjectExistsPredicate extends AbstractLuceneSingleFieldPredic
 			super( searchContext, absoluteFieldPath, nestedPathHierarchy );
 		}
 
-		public void addChild(SearchPredicate child) {
-			children.add( LuceneSearchPredicate.from( searchContext, child ) );
+		public void addChild(LuceneSearchFieldContext child) {
+			if ( child.isObjectField() && child.toObjectField().nested() ) {
+				// TODO HSEARCH-3904 Elasticsearch ignores children that are nested object fields.
+				//  We align on that behavior... for now.
+				return;
+			}
+			children.add( LuceneSearchPredicate.from( searchContext,
+					child.queryElement( PredicateTypeKeys.EXISTS, searchContext ).build() ) );
 		}
 
 		@Override
