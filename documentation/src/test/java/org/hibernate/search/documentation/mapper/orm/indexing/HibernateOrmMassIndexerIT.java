@@ -9,6 +9,7 @@ package org.hibernate.search.documentation.mapper.orm.indexing;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
@@ -26,8 +27,8 @@ import org.junit.Test;
 
 public class HibernateOrmMassIndexerIT {
 
-	private static final int NUMBER_OF_BOOKS = 1000;
-	private static final int INIT_DATA_TRANSACTION_SIZE = 500;
+	static final int NUMBER_OF_BOOKS = 1000;
+	static final int INIT_DATA_TRANSACTION_SIZE = 500;
 
 	@Rule
 	public DocumentationSetupHelper setupHelper = DocumentationSetupHelper.withSingleBackend( BackendConfigurations.simple() );
@@ -42,7 +43,7 @@ public class HibernateOrmMassIndexerIT {
 						AutomaticIndexingStrategyName.NONE
 				)
 				.setup( Book.class, Author.class );
-		initData();
+		initData( entityManagerFactory, HibernateOrmMassIndexerIT::newAuthor );
 	}
 
 	@Test
@@ -116,7 +117,7 @@ public class HibernateOrmMassIndexerIT {
 		} );
 	}
 
-	private void assertBookCount(EntityManager entityManager, int expectedCount) {
+	static void assertBookCount(EntityManager entityManager, int expectedCount) {
 		SearchSession searchSession = Search.session( entityManager );
 		assertThat(
 				searchSession.search( Book.class )
@@ -126,7 +127,7 @@ public class HibernateOrmMassIndexerIT {
 				.isEqualTo( expectedCount );
 	}
 
-	private void assertAuthorCount(EntityManager entityManager, int expectedCount) {
+	static void assertAuthorCount(EntityManager entityManager, int expectedCount) {
 		SearchSession searchSession = Search.session( entityManager );
 		assertThat(
 				searchSession.search( Author.class )
@@ -136,22 +137,7 @@ public class HibernateOrmMassIndexerIT {
 				.isEqualTo( expectedCount );
 	}
 
-	private Book newBook(int id) {
-		Book book = new Book();
-		book.setId( id );
-		book.setTitle( "This is the title of book #" + id );
-		return book;
-	}
-
-	private Author newAuthor(int id) {
-		Author author = new Author();
-		author.setId( id );
-		author.setFirstName( "John" + id );
-		author.setLastName( "Smith" + id );
-		return author;
-	}
-
-	private void initData() {
+	static void initData( EntityManagerFactory entityManagerFactory, Function<Integer, Author> authorInit ) {
 		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
 			try {
 				int i = 0;
@@ -159,7 +145,7 @@ public class HibernateOrmMassIndexerIT {
 					entityManager.getTransaction().begin();
 					int end = Math.min( i + INIT_DATA_TRANSACTION_SIZE, NUMBER_OF_BOOKS );
 					for ( ; i < end; ++i ) {
-						Author author = newAuthor( i );
+						Author author = authorInit.apply( i );
 
 						Book book = newBook( i );
 						book.setAuthor( author );
@@ -178,4 +164,18 @@ public class HibernateOrmMassIndexerIT {
 		} );
 	}
 
+	private static Book newBook(int id) {
+		Book book = new Book();
+		book.setId( id );
+		book.setTitle( "This is the title of book #" + id );
+		return book;
+	}
+
+	private static Author newAuthor(int id) {
+		Author author = new Author();
+		author.setId( id );
+		author.setFirstName( "John" + id );
+		author.setLastName( "Smith" + id );
+		return author;
+	}
 }
