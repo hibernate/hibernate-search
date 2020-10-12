@@ -16,6 +16,8 @@ public interface LuceneSearchObjectFieldContext extends LuceneSearchFieldContext
 
 	Map<String, ? extends LuceneSearchFieldContext> staticChildrenByName();
 
+	boolean nested();
+
 	<T> LuceneSearchObjectFieldQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key);
 
 }

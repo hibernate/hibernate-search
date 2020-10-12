@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
-import java.util.List;
+import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchObjectFieldContext;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
@@ -25,10 +28,13 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBox
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
 public class ElasticsearchSearchPredicateBuilderFactoryImpl implements ElasticsearchSearchPredicateBuilderFactory {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchSearchContext searchContext;
 	private final ElasticsearchSearchIndexesContext indexes;
@@ -86,13 +92,12 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public ExistsPredicateBuilder exists(String absoluteFieldPath) {
-		List<String> nestedPathHierarchy;
-		if ( indexes.hasSchemaObjectNodeComponent( absoluteFieldPath ) ) {
-			nestedPathHierarchy = indexes.nestedPathHierarchyForObject( absoluteFieldPath );
-			return new ElasticsearchExistsPredicate.Builder( searchContext, absoluteFieldPath, nestedPathHierarchy );
+		ElasticsearchSearchFieldContext field = indexes.field( absoluteFieldPath );
+		if ( field.isObjectField() ) {
+			return new ElasticsearchExistsPredicate.Builder( searchContext, absoluteFieldPath,
+					field.nestedPathHierarchy() );
 		}
 		else {
-			ElasticsearchSearchFieldContext field = indexes.field( absoluteFieldPath );
 			// Make sure to fail for fields with different type
 			// We may be able to relax this constraint, but that would require more extensive testing
 			return field.queryElement( PredicateTypeKeys.EXISTS, searchContext );
@@ -119,9 +124,13 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public NestedPredicateBuilder nested(String absoluteFieldPath) {
-		indexes.checkNestedField( absoluteFieldPath );
-		List<String> nestedPathHierarchy = indexes.nestedPathHierarchyForObject( absoluteFieldPath );
-		return new ElasticsearchNestedPredicate.Builder( searchContext, absoluteFieldPath, nestedPathHierarchy );
+		ElasticsearchSearchObjectFieldContext field = indexes.field( absoluteFieldPath ).toObjectField();
+		if ( !field.nested() ) {
+			throw log.nonNestedFieldForNestedQuery( absoluteFieldPath,
+					EventContexts.fromIndexNames( indexes.hibernateSearchIndexNames() ) );
+		}
+		return new ElasticsearchNestedPredicate.Builder( searchContext, absoluteFieldPath,
+				field.nestedPathHierarchy() );
 	}
 
 	@Override

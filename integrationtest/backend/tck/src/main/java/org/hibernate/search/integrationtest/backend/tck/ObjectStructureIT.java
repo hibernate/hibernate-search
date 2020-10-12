@@ -185,7 +185,7 @@ public class ObjectStructureIT {
 				scope.predicate().nested().objectField( "flattenedObject.string" )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "'flattenedObject.string'", "is not an object field" );
+				.hasMessageContaining( "'flattenedObject.string' is a value field, not an object field" );
 	}
 
 	@Test

@@ -102,6 +102,11 @@ public class LuceneMultiIndexSearchObjectFieldContext implements LuceneSearchObj
 	}
 
 	@Override
+	public boolean nested() {
+		return getFromFieldIfCompatible( LuceneSearchObjectFieldContext::nested, Object::equals, "nested" );
+	}
+
+	@Override
 	public <T> LuceneSearchObjectFieldQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
 		LuceneSearchObjectFieldQueryElementFactory<T> factory = null;
 		for ( LuceneSearchObjectFieldContext fieldContext : fieldForEachIndex ) {
