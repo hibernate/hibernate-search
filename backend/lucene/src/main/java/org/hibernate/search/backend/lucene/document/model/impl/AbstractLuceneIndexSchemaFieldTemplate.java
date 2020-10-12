@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusio
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 
-public abstract class AbstractLuceneIndexSchemaFieldTemplate<N> {
+public abstract class AbstractLuceneIndexSchemaFieldTemplate<N extends AbstractLuceneIndexSchemaFieldNode> {
 
 	private final IndexFieldInclusion inclusion;
 
@@ -39,7 +39,7 @@ public abstract class AbstractLuceneIndexSchemaFieldTemplate<N> {
 		RelativizedPath relativizedPath = FieldPaths.relativize( absolutePath );
 		LuceneIndexSchemaObjectNode parent =
 				relativizedPath.parentPath
-						.<LuceneIndexSchemaObjectNode>map( path -> model.getObjectFieldNode( path, IndexFieldFilter.ALL ) )
+						.<LuceneIndexSchemaObjectNode>map( path -> model.fieldOrNull( path, IndexFieldFilter.ALL ).toObjectField() )
 						.orElseGet( model::root );
 
 		return createNode( parent, relativizedPath.relativePath, inclusion, multiValued );

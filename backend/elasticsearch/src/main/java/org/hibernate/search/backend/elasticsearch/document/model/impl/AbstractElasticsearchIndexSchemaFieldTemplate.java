@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusio
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 
-public abstract class AbstractElasticsearchIndexSchemaFieldTemplate<N> {
+public abstract class AbstractElasticsearchIndexSchemaFieldTemplate<N extends AbstractElasticsearchIndexSchemaFieldNode> {
 
 	private final SimpleGlobPattern absolutePathGlob;
 	private final IndexFieldInclusion inclusion;
@@ -39,7 +39,8 @@ public abstract class AbstractElasticsearchIndexSchemaFieldTemplate<N> {
 		RelativizedPath relativizedPath = FieldPaths.relativize( absolutePath );
 		ElasticsearchIndexSchemaObjectNode parent =
 				relativizedPath.parentPath
-						.<ElasticsearchIndexSchemaObjectNode>map( path -> model.getObjectFieldNode( path, IndexFieldFilter.ALL ) )
+						.<ElasticsearchIndexSchemaObjectNode>map( path ->
+								model.fieldOrNull( path, IndexFieldFilter.ALL ).toObjectField() )
 						.orElseGet( model::root );
 
 		return createNode( parent, relativizedPath.relativePath, inclusion, multiValued );

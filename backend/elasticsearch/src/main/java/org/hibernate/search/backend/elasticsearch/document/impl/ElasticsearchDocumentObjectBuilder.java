@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.document.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
+import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldNode;
@@ -78,42 +79,46 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 	@Override
 	public void addValue(String relativeFieldName, Object value) {
 		String absoluteFieldPath = FieldPaths.compose( schemaNode.absolutePath(), relativeFieldName );
-		ElasticsearchIndexSchemaValueFieldNode<?> node = model.getFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
+		AbstractElasticsearchIndexSchemaFieldNode node = model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( node == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
 		}
 
-		addValueUnknownType( node, value );
+		addValueUnknownType( node.toValueField(), value );
 	}
 
 	@Override
 	public DocumentElement addObject(String relativeFieldName) {
 		String absoluteFieldPath = schemaNode.absolutePath( relativeFieldName );
-		ElasticsearchIndexSchemaObjectFieldNode fieldSchemaNode =
-				model.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
+		AbstractElasticsearchIndexSchemaFieldNode fieldSchemaNode =
+				model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
 		}
 
-		JsonObject jsonObject = new JsonObject();
-		addObject( fieldSchemaNode, jsonObject );
+		ElasticsearchIndexSchemaObjectFieldNode objectFieldSchemaNode = fieldSchemaNode.toObjectField();
 
-		return new ElasticsearchDocumentObjectBuilder( model, fieldSchemaNode, jsonObject );
+		JsonObject jsonObject = new JsonObject();
+		addObject( objectFieldSchemaNode, jsonObject );
+
+		return new ElasticsearchDocumentObjectBuilder( model, objectFieldSchemaNode, jsonObject );
 	}
 
 	@Override
 	public void addNullObject(String relativeFieldName) {
 		String absoluteFieldPath = schemaNode.absolutePath( relativeFieldName );
-		ElasticsearchIndexSchemaObjectFieldNode fieldSchemaNode =
-				model.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.ALL );
+		AbstractElasticsearchIndexSchemaFieldNode fieldSchemaNode =
+				model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
 		}
 
-		addObject( fieldSchemaNode, null );
+		ElasticsearchIndexSchemaObjectFieldNode objectFieldSchemaNode = fieldSchemaNode.toObjectField();
+
+		addObject( objectFieldSchemaNode, null );
 	}
 
 	public JsonObject build() {

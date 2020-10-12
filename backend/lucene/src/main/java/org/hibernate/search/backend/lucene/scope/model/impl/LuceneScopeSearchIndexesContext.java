@@ -30,7 +30,6 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactoryImpl;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
@@ -105,10 +104,14 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 			LuceneIndexModel indexModel = index.model();
 			String indexName = indexModel.hibernateSearchName();
 
-			LuceneIndexSchemaValueFieldNode<?> currentFieldNode =
-					indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
-			if ( currentFieldNode != null ) {
-				fieldNode = currentFieldNode;
+			AbstractLuceneIndexSchemaFieldNode currentFieldNode =
+					indexModel.fieldOrNull( absoluteFieldPath );
+			if ( currentFieldNode == null ) {
+				continue;
+			}
+
+			if ( currentFieldNode.isValueField() ) {
+				fieldNode = currentFieldNode.toValueField();
 				fieldNodeIndexName = indexName;
 				if ( objectNode != null ) {
 					throw log.conflictingFieldModel( absoluteFieldPath, objectNode, fieldNode,
@@ -118,29 +121,25 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 				continue;
 			}
 
-			LuceneIndexSchemaObjectFieldNode currentObjectNode =
-					indexModel.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
-			if ( currentObjectNode == null ) {
-				continue;
-			}
+			LuceneIndexSchemaObjectFieldNode currentObjectFieldNode = currentFieldNode.toObjectField();
 
 			if ( fieldNode != null ) {
-				throw log.conflictingFieldModel( absoluteFieldPath, currentObjectNode, fieldNode,
+				throw log.conflictingFieldModel( absoluteFieldPath, currentObjectFieldNode, fieldNode,
 						EventContexts.fromIndexNames( fieldNodeIndexName, indexName )
 				);
 			}
 
 			LuceneObjectPredicateBuilderFactoryImpl predicateBuilderFactory =
-					new LuceneObjectPredicateBuilderFactoryImpl( currentObjectNode );
+					new LuceneObjectPredicateBuilderFactoryImpl( currentObjectFieldNode );
 			if ( result == null ) {
 				result = predicateBuilderFactory;
-				objectNode = currentObjectNode;
+				objectNode = currentObjectFieldNode;
 				objectNodeIndexName = indexName;
 				continue;
 			}
 
 			if ( !result.isCompatibleWith( predicateBuilderFactory ) ) {
-				throw log.conflictingObjectFieldModel( absoluteFieldPath, objectNode, currentObjectNode,
+				throw log.conflictingObjectFieldModel( absoluteFieldPath, objectNode, currentObjectFieldNode,
 						EventContexts.fromIndexNames( objectNodeIndexName, indexName )
 				);
 			}
@@ -217,28 +216,23 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 
 		for ( LuceneScopeIndexManagerContext index : elements() ) {
 			LuceneIndexModel indexModel = index.model();
-			LuceneIndexSchemaObjectFieldNode schemaNode =
-					indexModel.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
-			if ( schemaNode != null ) {
-				found = true;
-				if ( !ObjectStructure.NESTED.equals( schemaNode.structure() ) ) {
-					throw log.nonNestedFieldForNestedQuery(
-							absoluteFieldPath, indexModel.getEventContext()
-					);
-				}
+			AbstractLuceneIndexSchemaFieldNode schemaNode = indexModel.fieldOrNull( absoluteFieldPath );
+			if ( schemaNode == null ) {
+				continue;
+			}
+			found = true;
+			if ( !schemaNode.isObjectField() ) {
+				throw log.nonObjectFieldForNestedQuery(
+						absoluteFieldPath, indexModel.getEventContext()
+				);
+			}
+			if ( !ObjectStructure.NESTED.equals( schemaNode.toObjectField().structure() ) ) {
+				throw log.nonNestedFieldForNestedQuery(
+						absoluteFieldPath, indexModel.getEventContext()
+				);
 			}
 		}
 		if ( !found ) {
-			for ( LuceneScopeIndexManagerContext index : elements() ) {
-				LuceneIndexModel indexModel = index.model();
-				LuceneIndexSchemaValueFieldNode<?> schemaNode =
-						indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
-				if ( schemaNode != null ) {
-					throw log.nonObjectFieldForNestedQuery(
-							absoluteFieldPath, indexModel.getEventContext()
-					);
-				}
-			}
 			throw log.unknownFieldForSearch( absoluteFieldPath, indexesEventContext() );
 		}
 	}
@@ -246,7 +240,7 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 	@Override
 	public List<String> nestedPathHierarchyForObject(String absoluteFieldPath) {
 		Optional<List<String>> nestedDocumentPath = elements().stream()
-				.map( index -> index.model().getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY ) )
+				.map( index -> index.model().fieldOrNull( absoluteFieldPath ) )
 				.filter( Objects::nonNull )
 				.map( node -> Optional.ofNullable( node.nestedPathHierarchy() ) )
 				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {

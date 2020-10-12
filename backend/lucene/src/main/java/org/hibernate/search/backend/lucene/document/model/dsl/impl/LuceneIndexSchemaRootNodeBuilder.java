@@ -14,6 +14,7 @@ import java.util.TreeMap;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldTemplate;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldTemplate;
@@ -25,6 +26,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactory;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIndexFieldTypeFactoryImpl;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
@@ -74,25 +76,32 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	public LuceneIndexModel build(String indexName) {
-		Map<String, LuceneIndexSchemaObjectFieldNode> objectFieldNodes = new HashMap<>();
-		Map<String, LuceneIndexSchemaValueFieldNode<?>> fieldNodes = new HashMap<>();
-		List<LuceneIndexSchemaObjectFieldTemplate> objectFieldTemplates = new ArrayList<>();
-		List<LuceneIndexSchemaValueFieldTemplate> fieldTemplates = new ArrayList<>();
+		Map<String, AbstractLuceneIndexSchemaFieldNode> staticFields = new HashMap<>();
+		List<AbstractLuceneIndexSchemaFieldTemplate<?>> fieldTemplates = new ArrayList<>();
+		// Initializing a one-element array so that we can mutate the boolean below.
+		// Alternatively we could use AtomicBoolean, but we don't need concurrent access here.
+		boolean[] hasNestedDocument = new boolean[1];
 
 		LuceneIndexSchemaNodeCollector collector = new LuceneIndexSchemaNodeCollector() {
 			@Override
 			public void collect(String absoluteFieldPath, LuceneIndexSchemaValueFieldNode<?> node) {
-				fieldNodes.put( absoluteFieldPath, node );
+				staticFields.put( absoluteFieldPath, node );
 			}
 
 			@Override
 			public void collect(String absolutePath, LuceneIndexSchemaObjectFieldNode node) {
-				objectFieldNodes.put( absolutePath, node );
+				staticFields.put( absolutePath, node );
+				if ( isNested( node.structure() ) ) {
+					hasNestedDocument[0] = true;
+				}
 			}
 
 			@Override
 			public void collect(LuceneIndexSchemaObjectFieldTemplate template) {
-				objectFieldTemplates.add( template );
+				fieldTemplates.add( template );
+				if ( isNested( template.structure() ) ) {
+					hasNestedDocument[0] = true;
+				}
 			}
 
 			@Override
@@ -109,8 +118,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 				indexName,
 				mappedTypeName,
 				idDslConverter == null ? new StringToDocumentIdentifierValueConverter() : idDslConverter,
-				rootNode, objectFieldNodes, fieldNodes,
-				objectFieldTemplates, fieldTemplates
+				rootNode, staticFields, fieldTemplates, hasNestedDocument[0]
 		);
 	}
 
@@ -121,5 +129,16 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 
 	EventContext getIndexEventContext() {
 		return indexEventContext;
+	}
+
+	private boolean isNested(ObjectStructure structure) {
+		switch ( structure ) {
+			case NESTED:
+				return true;
+			case FLATTENED:
+			case DEFAULT:
+			default:
+				return false;
+		}
 	}
 }

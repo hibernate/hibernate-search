@@ -20,15 +20,12 @@ import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldNode;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMultiIndexSearchObjectFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMultiIndexSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
@@ -148,12 +145,11 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 	@Override
 	public boolean hasSchemaObjectNodeComponent(String absoluteFieldPath) {
 		for ( ElasticsearchIndexModel indexModel : indexModels ) {
-			ElasticsearchIndexSchemaObjectFieldNode objectNode =
-					indexModel.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
+			AbstractElasticsearchIndexSchemaFieldNode field = indexModel.fieldOrNull( absoluteFieldPath );
 			// Even if we have an inconsistency with the Lucene backend,
 			// we decide to be very lenient here,
 			// allowing ALL the model incompatibilities Elasticsearch allows.
-			if ( objectNode != null ) {
+			if ( field != null && field.isObjectField() ) {
 				return true;
 			}
 		}
@@ -166,27 +162,23 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 		boolean found = false;
 
 		for ( ElasticsearchIndexModel indexModel : indexModels ) {
-			ElasticsearchIndexSchemaObjectFieldNode schemaNode =
-					indexModel.getObjectFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
-			if ( schemaNode != null ) {
-				found = true;
-				if ( !ObjectStructure.NESTED.equals( schemaNode.structure() ) ) {
-					throw log.nonNestedFieldForNestedQuery(
-							absoluteFieldPath, indexModel.getEventContext()
-					);
-				}
+			AbstractElasticsearchIndexSchemaFieldNode schemaNode = indexModel.fieldOrNull( absoluteFieldPath );
+			if ( schemaNode == null ) {
+				continue;
+			}
+			found = true;
+			if ( !schemaNode.isObjectField() ) {
+				throw log.nonObjectFieldForNestedQuery(
+						absoluteFieldPath, indexModel.getEventContext()
+				);
+			}
+			if ( !ObjectStructure.NESTED.equals( schemaNode.toObjectField().structure() ) ) {
+				throw log.nonNestedFieldForNestedQuery(
+						absoluteFieldPath, indexModel.getEventContext()
+				);
 			}
 		}
 		if ( !found ) {
-			for ( ElasticsearchIndexModel indexModel : indexModels ) {
-				ElasticsearchIndexSchemaValueFieldNode<?> schemaNode =
-						indexModel.getFieldNode( absoluteFieldPath, IndexFieldFilter.INCLUDED_ONLY );
-				if ( schemaNode != null ) {
-					throw log.nonObjectFieldForNestedQuery(
-							absoluteFieldPath, indexModel.getEventContext()
-					);
-				}
-			}
 			throw log.unknownFieldForSearch( absoluteFieldPath, indexesEventContext() );
 		}
 	}
@@ -194,7 +186,7 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 	@Override
 	public List<String> nestedPathHierarchyForObject(String absoluteObjectPath) {
 		Optional<List<String>> nestedDocumentPath = indexModels.stream()
-				.map( indexModel -> indexModel.getObjectFieldNode( absoluteObjectPath, IndexFieldFilter.INCLUDED_ONLY ) )
+				.map( indexModel -> indexModel.fieldOrNull( absoluteObjectPath ) )
 				.filter( Objects::nonNull )
 				.map( node -> Optional.ofNullable( node.nestedPathHierarchy() ) )
 				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
