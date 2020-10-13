@@ -3,9 +3,6 @@
 // Search 5 anchors backward compatibility
 [[jsr352-integration]]
 
-The integration with JSR-352, Batch Applications for the Java Platform, is in development. We do
-think we have the basics covered and we are looking for feedback.
-
 Hibernate Search provides a JSR-352 job to perform mass indexing. It covers not only the existing
 functionality of the mass indexer described above, but also benefits from some powerful standard
 features of the Java Batch Platform (JSR-352), such as failure recovery using checkpoints, chunk
