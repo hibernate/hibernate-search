@@ -191,7 +191,7 @@ class IndexManagerBuildingStateHolder {
 				);
 				IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.schemaRootNodeBuilder();
 
-				state = new IndexManagerInitialBuildState( indexName, indexPropertySourceExtractor,
+				state = new IndexManagerInitialBuildState( indexName, mappedTypeName, indexPropertySourceExtractor,
 						builder, schemaRootNodeBuilder );
 				indexManagerBuildStateByName.put( indexName, state );
 			}
@@ -211,17 +211,19 @@ class IndexManagerBuildingStateHolder {
 	private static class IndexManagerInitialBuildState implements IndexManagerBuildingState {
 
 		private final String indexName;
+		private final String mappedTypeName;
 		private final ConfigurationPropertySourceExtractor propertySourceExtractor;
 		private final IndexManagerBuilder builder;
 		private final IndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 
 		private IndexManagerImplementor indexManager;
 
-		IndexManagerInitialBuildState(String indexName,
+		IndexManagerInitialBuildState(String indexName, String mappedTypeName,
 				ConfigurationPropertySourceExtractor propertySourceExtractor,
 				IndexManagerBuilder builder,
 				IndexSchemaRootNodeBuilder schemaRootNodeBuilder) {
 			this.indexName = indexName;
+			this.mappedTypeName = mappedTypeName;
 			this.propertySourceExtractor = propertySourceExtractor;
 			this.builder = builder;
 			this.schemaRootNodeBuilder = schemaRootNodeBuilder;
