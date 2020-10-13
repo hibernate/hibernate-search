@@ -95,7 +95,7 @@ class IndexManagerBuildingStateHolder {
 	IndexManagerBuildingState getIndexManagerBuildingState(Optional<String> backendName, String indexName,
 			String mappedTypeName, boolean multiTenancyEnabled) {
 		return getBackend( backendName.orElse( defaultBackendName ) )
-				.getIndexManagerBuildingState( indexName, mappedTypeName, multiTenancyEnabled );
+				.createIndexManagerBuildingState( indexName, mappedTypeName, multiTenancyEnabled );
 	}
 
 	private BackendInitialBuildState getBackend(String backendName) {
@@ -178,7 +178,7 @@ class IndexManagerBuildingStateHolder {
 			this.backend = backend;
 		}
 
-		IndexManagerInitialBuildState getIndexManagerBuildingState(
+		IndexManagerInitialBuildState createIndexManagerBuildingState(
 				String indexName, String mappedTypeName, boolean multiTenancyEnabled) {
 			IndexManagerInitialBuildState state = indexManagerBuildStateByName.get( indexName );
 			if ( state != null ) {
