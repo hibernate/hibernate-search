@@ -7,7 +7,8 @@
 package org.hibernate.search.batch.jsr352.core.massindexing.util.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManagerFactory;
@@ -15,6 +16,8 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.search.batch.jsr352.core.context.jpa.spi.EntityManagerFactoryRegistry;
 import org.hibernate.search.batch.jsr352.core.logging.impl.Log;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -59,16 +62,22 @@ public final class ValidationUtil {
 				entityManagerFactoryReference
 		);
 
-		Set<String> indexedTypes = Search.mapping( emf ).allIndexedEntities().stream()
-				.map( ie -> ie.javaClass().getName() )
+		SearchMapping mapping = Search.mapping( emf );
+
+		Set<String> failingTypes = Arrays.stream( serializedEntityTypes.split( "," ) )
+				.map( (String serializedEntityType) -> {
+					try {
+						mapping.indexedEntity( serializedEntityType );
+						return null;
+					}
+					// if the type is not indexed, a SearchException is thrown
+					catch (SearchException ex) {
+						return serializedEntityType;
+					}
+				} )
+				.filter( Objects::nonNull )
 				.collect( Collectors.toSet() );
 
-		Set<String> failingTypes = new HashSet<>();
-		for ( String type : serializedEntityTypes.split( "," ) ) {
-			if ( !indexedTypes.contains( type ) ) {
-				failingTypes.add( type );
-			}
-		}
 		if ( failingTypes.size() > 0 ) {
 			throw log.failingEntityTypes( String.join( ", ", failingTypes ) );
 		}
