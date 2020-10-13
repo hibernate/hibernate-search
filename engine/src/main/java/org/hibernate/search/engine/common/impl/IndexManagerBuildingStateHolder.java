@@ -181,20 +181,22 @@ class IndexManagerBuildingStateHolder {
 		IndexManagerInitialBuildState getIndexManagerBuildingState(
 				String indexName, String mappedTypeName, boolean multiTenancyEnabled) {
 			IndexManagerInitialBuildState state = indexManagerBuildStateByName.get( indexName );
-			if ( state == null ) {
-				ConfigurationPropertySourceExtractor indexPropertySourceExtractor =
-						EngineConfigurationUtils.extractorForIndex( propertySourceExtractor, indexName );
-				ConfigurationPropertySource indexPropertySource = indexPropertySourceExtractor.extract( propertySource );
-
-				IndexManagerBuilder builder = backend.createIndexManagerBuilder(
-						indexName, mappedTypeName, multiTenancyEnabled, backendBuildContext, indexPropertySource
-				);
-				IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.schemaRootNodeBuilder();
-
-				state = new IndexManagerInitialBuildState( indexName, mappedTypeName, indexPropertySourceExtractor,
-						builder, schemaRootNodeBuilder );
-				indexManagerBuildStateByName.put( indexName, state );
+			if ( state != null ) {
+				throw log.twoTypesTargetSameIndex( indexName, state.mappedTypeName, mappedTypeName );
 			}
+
+			ConfigurationPropertySourceExtractor indexPropertySourceExtractor =
+					EngineConfigurationUtils.extractorForIndex( propertySourceExtractor, indexName );
+			ConfigurationPropertySource indexPropertySource = indexPropertySourceExtractor.extract( propertySource );
+
+			IndexManagerBuilder builder = backend.createIndexManagerBuilder(
+					indexName, mappedTypeName, multiTenancyEnabled, backendBuildContext, indexPropertySource
+			);
+			IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.schemaRootNodeBuilder();
+
+			state = new IndexManagerInitialBuildState( indexName, mappedTypeName, indexPropertySourceExtractor,
+					builder, schemaRootNodeBuilder );
+			indexManagerBuildStateByName.put( indexName, state );
 			return state;
 
 		}

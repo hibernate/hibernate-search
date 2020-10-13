@@ -367,4 +367,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 87, value = "Trying to get the exact total hit count, but it is a lower bound.")
 	SearchException notExactTotalHitCount();
+
+	@Message(id = ID_OFFSET_2 + 88, value = "Trying to target the same index '%1$s' from different types: '%2$s', '%3$s'. ")
+	SearchException twoTypesTargetSameIndex(String indexName, String mappedTypeName, String anotherMappedTypeName);
 }
