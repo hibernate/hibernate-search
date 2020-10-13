@@ -1,5 +1,7 @@
+[[mapper-orm-indexing-jsr352]]
+= Reindexing large volumes of data with the JSR-352 integration
+// Search 5 anchors backward compatibility
 [[jsr352-integration]]
-=== Integration with JSR-352
 
 The integration with JSR-352, Batch Applications for the Java Platform, is in development. We do
 think we have the basics covered and we are looking for feedback.
