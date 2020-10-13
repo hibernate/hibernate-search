@@ -491,6 +491,30 @@ public class IndexedBaseIT {
 						.build() );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4006")
+	public void moreTypesTargetSameIndex() {
+		@Indexed(index = "indexName")
+		class IndexedEntityA {
+			@DocumentId
+			Integer id;
+			@GenericField
+			String text;
+		}
+		@Indexed(index = "indexName")
+		class IndexedEntityB {
+			@DocumentId
+			Integer id;
+			@GenericField
+			String text;
+		}
+
+		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntityA.class, IndexedEntityB.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Trying to target the same index 'indexName' from different types",
+						"IndexedEntityA", "IndexedEntityB" );
+	}
+
 	public static class StaticCounterRoutingBinder implements RoutingBinder {
 		private static final StaticCounters.Key KEY = StaticCounters.createKey();
 
