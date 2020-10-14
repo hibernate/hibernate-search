@@ -6,15 +6,15 @@
  */
 package org.hibernate.search.integrationtest.batch.jsr352.util;
 
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
+
 /**
  * @author Yoann Rodiere
  */
 public final class PersistenceUnitTestUtil {
 
-	private static final String PERSISTENCE_UNIT_NAME_PROPERTY = "org.hibernate.search.jsr352.persistence_unit";
-
-	// Mainly for convenience, to run tests in the IDE
-	private static final String DEFAULT_PERSISTENCE_UNIT_NAME = "lucene_pu";
+	private static final String LUCENE_PERSISTENCE_UNIT_NAME = "lucene_pu";
+	private static final String ELASTICSEARCH_PERSISTENCE_UNIT_NAME = "elasticsearch_pu";
 
 	private PersistenceUnitTestUtil() {
 		// Private constructor
@@ -25,7 +25,7 @@ public final class PersistenceUnitTestUtil {
 	 * using different settings.
 	 */
 	public static String getPersistenceUnitName() {
-		String result = System.getProperty( PERSISTENCE_UNIT_NAME_PROPERTY );
-		return result == null ? DEFAULT_PERSISTENCE_UNIT_NAME : result;
+		return ( BackendConfiguration.isElasticsearch() ) ? ELASTICSEARCH_PERSISTENCE_UNIT_NAME
+				: LUCENE_PERSISTENCE_UNIT_NAME;
 	}
 }
