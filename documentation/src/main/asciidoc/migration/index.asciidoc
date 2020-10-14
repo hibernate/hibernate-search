@@ -135,10 +135,355 @@ This excludes in particular:
 [[configuration]]
 == Configuration changes
 
+=== Basics
+
+Most configuration properties changed in Hibernate Search 6.
+In most cases it's only a matter of changing the prefix of a configuration property
+(due to the different structure of Hibernate Search 6),
+but in a few cases the relevant feature changed so much that a new approach was necessary for configuration.
+
+For a quick introduction to the basics of configuration in Hibernate Search 6,
+refer to the link:{hibernateSearchDocUrl}#getting-started-configuration[getting started guide, section "configuration"].
+
+For more details,
+see the link:{hibernateSearchDocUrl}#configuration[main "configuration" section of the reference documentation].
+
+For a complete list of Hibernate Search 5 properties and their equivalent in Hibernate Search 6,
+refer to the section below.
+
+=== Constants for property keys
+
+In Hibernate Search 5, constants for configuration property keys used to be provided through
+`org.hibernate.search.cfg.Environment` and `org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment`.
+
+In Hibernate Search 6, constants are provided through classes whose name ends with `Settings`:
+
+* `org.hibernate.search.engine.cfg.EngineSettings`
+* `org.hibernate.search.engine.cfg.BackendSettings`
+* `org.hibernate.search.engine.cfg.IndexSettings`
+* `org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings`
+* `org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings`
+* `org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings`
+* `org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings`
+* `org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings`
+
+=== Configuration property reference
+
+Below is a list of Hibernate Search 5 properties in alphabetical order,
+along with their equivalent in Hibernate Search 6.
+
+[WARNING]
+====
+Index defaults are no longer specified using the prefix `hibernate.search.default.`,
+and `hibernate.search.indexes.default.` will not work either.
+
+To specify configuration to be applied by default to all indexes,
+just set the configuration at the backend level using the prefix `hibernate.search.backend.`.
+====
+
+`hibernate.search.analyzer`::
+No direct equivalent in Hibernate Search 6.
++
+To override the default analyzer, define a custom analyzer named `default`.
+See <<analysis-definition-provider>>.
+`hibernate.search.autoregister_listeners`::
+Hibernate Search 6 equivalent: `hibernate.search.enabled`.
+`hibernate.search.batch_size`::
+No direct equivalent in Hibernate Search 6.
++
+This property was not documented in Hibernate Search 5.
+For the specific use case of batch processes,
+know that upon Hibernate ORM session flushes,
+Hibernate Search 6 will automatically turn entities to documents
+and hold documents in memory until the transaction commit.
++
+See also link:{hibernateSearchDocUrl}#mapper-orm-indexing-manual[this section of the documentation].
+`hibernate.search.default.elasticsearch.connection_timeout`::
+Hibernate Search 6 equivalent: `hibernate.search.backend.connection_timeout`.
++
+NOTE: Defaults to 1000 (1 second) in Hibernate Search 6 instead of 3 seconds in Hibernate Search 5.
+More information https://in.relation.to/2020/09/07/hibernate-search-6-0-0-Beta10/#improved-timeouts[here].
+`hibernate.search.default.elasticsearch.discovery.default_scheme`::
+Hibernate Search 6 equivalent: `hibernate.search.backend.protocol`.
+`hibernate.search.default.elasticsearch.discovery.enabled`::
+Hibernate Search 6 equivalent: `hibernate.search.backend.discovery.enabled`.
+`hibernate.search.default.elasticsearch.discovery.refresh_interval`::
+Hibernate Search 6 equivalent: `hibernate.search.backend.discovery.refresh_interval`.
+`hibernate.search.default.elasticsearch.dynamic_mapping`, `hibernate.search.<index-name>.elasticsearch.dynamic_mapping`::
+Hibernate Search 6 equivalent (global defaults): `hibernate.search.backend.dynamic_mapping`.
++
+Hibernate Search 6 equivalent (per-index): `hibernate.search.backend.indexes.<index-name>.dynamic_mapping`.
+`hibernate.search.default.elasticsearch.host`::
+Hibernate Search 6 equivalent: `hibernate.search.backend.hosts`.
++
+IMPORTANT: In Hibernate Search 6, the URL scheme (`http://` or `https://`) must *not* be included here.
+Instead, set the property `hibernate.search.backend.protocol` to either `http` (the default) or `https`.
+`hibernate.search.default.elasticsearch.index_management_wait_timeout`, `hibernate.search.<index-name>.elasticsearch.index_management_wait_timeout`::
+Hibernate Search 6 equivalent (global defaults): `hibernate.search.backend.schema_management.minimal_required_status_wait_timeout`.
++
+Hibernate Search 6 equivalent (per-index): `hibernate.search.backend.indexes.<index-name>.schema_management.minimal_required_status_wait_timeout`.
+`hibernate.search.default.elasticsearch.index_schema_management_strategy`, `hibernate.search.<index-name>.elasticsearch.index_schema_management_strategy`::
+Hibernate Search 6 equivalent (global defaults): `hibernate.search.schema_management.strategy`.
++
+Hibernate Search 6 equivalent (per-index): none.
++
+Defaults to `create-or-validate` in Hibernate Search 6.
+See link:{hibernateSearchDocUrl}#mapper-orm-schema-management-strategy[schema management].
++
+There is no direct equivalent for the per-index variant in Hibernate Search 6:
+automatic schema management is configured globally for all indexes, not on a per-index basis.
+However, you can achieve more control by setting `hibernate.search.schema_management.strategy` to `none`
+and link:{hibernateSearchDocUrl}#mapper-orm-schema-management-manager[managing the schema manually after startup].
+`hibernate.search.default.elasticsearch.max_total_connection_per_route`::
+Hibernate Search 6 equivalent: `hibernate.search.backend.max_connections_per_route`.
+`hibernate.search.default.elasticsearch.max_total_connection`::
+Hibernate Search 6 equivalent: `hibernate.search.backend.max_connections`.
+`hibernate.search.default.elasticsearch.password`::
+Hibernate Search 6 equivalent: `hibernate.search.backend.password`.
+`hibernate.search.default.elasticsearch.path_prefix`::
+No equivalent in Hibernate Search 6 link:{hibernateSearchJiraUrl}/HSEARCH-4051[yet].
+`hibernate.search.default.elasticsearch.read_timeout`::
+Hibernate Search 6 equivalent: `hibernate.search.backend.read_timeout`.
++
+NOTE: Defaults to 30000 (30 seconds) in Hibernate Search 6 instead of 60 seconds in Hibernate Search 5.
+More information https://in.relation.to/2020/09/07/hibernate-search-6-0-0-Beta10/#improved-timeouts[here].
+`hibernate.search.default.elasticsearch.refresh_after_write`, `hibernate.search.<index-name>.elasticsearch.refresh_after_write`::
+Hibernate Search 6 equivalent (global defaults): `hibernate.search.automatic_indexing.synchronization.strategy`.
++
+Hibernate Search 6 equivalent (per-index): none.
++
+Setting `hibernate.search.automatic_indexing.synchronization.strategy` to `read-sync` or `sync` will produce results
+similar to setting `hibernate.search.default.elasticsearch.refresh_after_write` to `true`.
+See link:{hibernateSearchDocUrl}#mapper-orm-indexing-automatic-synchronization[automatic indexing synchronization]
+for more information.
++
+There is no equivalent for the per-index variant in Hibernate Search 6:
+the synchronization strategy can only be set globally, not on a per-index basis.
+`hibernate.search.default.elasticsearch.request_timeout`::
+Hibernate Search 6 equivalent: `hibernate.search.backend.request_timeout`.
++
+NOTE: Defaults to no timeout in Hibernate Search 6.
+More information https://in.relation.to/2020/09/07/hibernate-search-6-0-0-Beta10/#improved-timeouts[here].
+`hibernate.search.default.elasticsearch.required_index_status`, `hibernate.search.<index-name>.elasticsearch.required_index_status`::
+Hibernate Search 6 equivalent (global defaults): `hibernate.search.backend.schema_management.minimal_required_status`.
++
+Hibernate Search 6 equivalent (per-index): `hibernate.search.backend.indexes.<index-name>.schema_management.minimal_required_status`.
+`hibernate.search.default.elasticsearch.username`::
+Hibernate Search 6 equivalent: `hibernate.search.backend.username`.
+`hibernate.search.default.exclusive_index_use`, `hibernate.search.<index-name>.exclusive_index_use`::
+No equivalent in Hibernate Search 6.
+`hibernate.search.default.indexBase`, `hibernate.search.<index-name>.indexBase`::
+Hibernate Search 6 equivalent (global defaults): `hibernate.search.backend.directory.root`.
++
+Hibernate Search 6 equivalent (per-index): `hibernate.search.backend.indexes.<index-name>.directory.root`.
+`hibernate.search.default.indexName`, `hibernate.search.<index-name>.indexName`::
+No equivalent in Hibernate Search 6.
++
+The name of an index can still be customized in the mapping, using `@Indexed(name = ...)`,
+or with the <<mapping-programmatic,programmatic>> equivalent.
+`hibernate.search.default.index_flush_interval`, `hibernate.search.<index-name>.index_flush_interval`::
+Hibernate Search 6 equivalent (global defaults): `hibernate.search.backend.io.commit_interval`.
++
+Hibernate Search 6 equivalent (per-index): `hibernate.search.backend.indexes.<index name>.io.commit_interval`.
+`hibernate.search.default.index_metadata_complete`, `hibernate.search.<index-name>.index_metadata_complete`::
+No equivalent in Hibernate Search 6.
++
+This property was not documented in Hibernate Search 5.
+`hibernate.search.default.indexmanager`, `hibernate.search.<index-name>.indexmanager`::
+Hibernate Search 6 equivalent (global defaults): `hibernate.search.backend.type`.
++
+Hibernate Search 6 equivalent (per-index): none.
++
+Setting the backend type (`elasticsearch` or `lucene`) should no longer be necessary:
+it will be picked automatically if there is only one backend type available in the classpath.
++
+If you have multiple backend types available in the classpath for some reason,
+but only want to use one, set `hibernate.search.backend.type` to either `lucene` or `elasticsearch`.
++
+If you need both a Lucene backend and an Elasticsearch backend, proceed as follows:
+
+* Annotate entities that must be indexed in the Elasticsearch backend with `@Indexed(backend = "elasticsearch")`.
+* Annotate entities that must be indexed in the Lucene backend with `@Indexed(backend = "lucene")`.
+* Configure two separate backends in your configuration properties:
+** prefix properties of the Elasticsearch backend with
+`hibernate.search.backends.elasticsearch.` instead of `hibernate.search.backend.`.
+** prefix properties of the Lucene backend with
+`hibernate.search.backends.lucene.` instead of `hibernate.search.backend.`.
+** same goes for indexes,
+e.g. `hibernate.search.backends.elasticsearch.indexes.<index-name>.someProperty`
+for indexes of the Elasticsearch backend
+or `hibernate.search.backends.lucene.indexes.<index-name>.someProperty`
+for indexes of the Lucene backend.
+`hibernate.search.default.indexwriter.*`, `hibernate.search.<index-name>.indexwriter.*`::
+Hibernate Search 6 equivalent (global defaults): `hibernate.search.backend.io.writer.*` or `hibernate.search.backend.io.merge.*`.
++
+Hibernate Search 6 equivalent (per-index): `hibernate.search.backend.indexes.<index-name>.io.writer.*` or `hibernate.search.backend.indexes.<index-name>.io.merge.*`.
++
+The writer settings and merge settings are now split.
+See link:{hibernateSearchDocUrl}#backend-lucene-io-writer[here for available writer settings]
+and link:{hibernateSearchDocUrl}#backend-lucene-io-merge[here for available merge settings].
+`hibernate.search.default.locking_strategy`, `hibernate.search.<index-name>.locking_strategy`::
+Hibernate Search 6 equivalent (global defaults): `hibernate.search.backend.directory.locking.strategy`.
++
+Hibernate Search 6 equivalent (per-index): `hibernate.search.backend.indexes.<index-name>.directory.locking.strategy`.
++
+See link:{hibernateSearchDocUrl}#backend-lucene-configuration-directory-locking-strategy[here for available locking strategies].
+`hibernate.search.default.max_queue_length`, `hibernate.search.<index-name>.max_queue_length`::
+Hibernate Search 6 equivalent (global defaults): `hibernate.search.backend.indexing.queue_size`.
++
+Hibernate Search 6 equivalent (per-index): `hibernate.search.backend.indexes.<index-name>.indexing.queue_size`.
++
+IMPORTANT: In Hibernate Search 6, there are multiple queues per index, enabling parallel indexing of documents.
+See link:{hibernateSearchDocUrl}#backend-lucene-indexing-queues[here for Lucene]
+or link:{hibernateSearchDocUrl}#backend-elasticsearch-indexing-queues[here for Elasticsearch].
+`hibernate.search.default_null_token`::
+No equivalent in Hibernate Search 6.
++
+In most cases, you <<field-indexnullas,won't need to use `indexNullAs` anymore>>.
+Where `indexNullAs` is still needed, define the token explicitly for each index field.
+`hibernate.search.default.reader.*`, `hibernate.search.<index-name>.reader.*`::
+No direct equivalent in Hibernate Search 6.
++
+To enable async reader refresh, set `hibernate.search.backend.io.refresh_interval` or
+`hibernate.search.backend.indexes.<index-name>.io.refresh_interval`
+to a strictly positive value (in milliseconds).
+See link:{hibernateSearchDocUrl}#backend-lucene-io-refresh[here for more information].
++
+Custom reader strategies are no longer supported.
+`hibernate.search.default.retry_marker_lookup`, `hibernate.search.<index-name>.retry_marker_lookup`::
+No equivalent in Hibernate Search 6: <<search-5-backends,the `filesystem-slave` backend is no longer supported>>.
+`hibernate.search.default.similarity`, `hibernate.search.<index-name>.similarity`::
+No direct equivalent in Hibernate Search 6: the similarity is configured through the <<analysis-definition-provider,analysis configurer>>.
+`hibernate.search.default.worker.backend`, `hibernate.search.<index-name>.worker.backend`::
+No equivalent in Hibernate Search 6: <<search-5-backends,the JMS/JGroups/`filesystem-slave`/`filesystem-master`/`infinispan` backends are no longer supported>>.
+`hibernate.search.default.worker.execution`, `hibernate.search.<index-name>.worker.execution`::
+No direct equivalent in Hibernate Search 6.
++
+Setting `hibernate.search.automatic_indexing.synchronization.strategy` to `async` or `sync` will produce results
+similar to setting `hibernate.search.<index-name>.worker.execution` to the same value.
+See link:{hibernateSearchDocUrl}#mapper-orm-indexing-automatic-synchronization[automatic indexing synchronization]
+for more information.
+`hibernate.search.default.worker.*`, `hibernate.search.<index-name>.worker.*`::
+No equivalent in Hibernate Search 6: <<search-5-backends,the JMS/JGroups/`filesystem-slave`/`filesystem-master`/`infinispan` backends are no longer supported>>.
+`hibernate.search.elasticsearch.analysis_definition_provider`::
+Hibernate Search 6 equivalent: `hibernate.search.backend.analysis.configurer`.
++
+IMPORTANT: A different interface should be implemented: see <<analysis-definition-provider>>.
+`hibernate.search.elasticsearch.log.json_pretty_printing`::
+Hibernate Search 6 equivalent: `hibernate.search.backend.log.json_pretty_printing`.
+`hibernate.search.elasticsearch.scroll_backtracking_window_size`::
+No equivalent in Hibernate Search 6: scrolling is forward-only.
+`hibernate.search.elasticsearch.scroll_fetch_size`::
+No direct equivalent in Hibernate Search 6.
++
+When using Hibernate Search APIs, the "chunk size" is an argument to the
+link:{hibernateSearchDocUrl}#search-dsl-query-fetching-results-scrolling[`scroll` method].
+When using the link:{hibernateSearchDocUrl}#search-dsl-query-object[Hibernate ORM or JPA adapters],
+the "chunk size" is set to the same value as the link:{hibernateSearchDocUrl}#search-dsl-query-fetch-size[fetch size].
+`hibernate.search.elasticsearch.scroll_timeout`::
+Hibernate Search 6 equivalent: `hibernate.search.backend.scroll_timeout`.
+`hibernate.search.enable_dirty_check`::
+Hibernate Search 6 equivalent: `hibernate.search.automatic_indexing.enable_dirty_check`.
+`hibernate.search.error_handler`::
+Hibernate Search 6 equivalent: `hibernate.search.background_failure_handler`.
++
+IMPORTANT: A different interface should be implemented: see <<error-handler>>.
+`hibernate.search.filter.cache_docidresults.size`::
+No equivalent in Hibernate Search 6. See <<full-text-filter>>.
+`hibernate.search.filter.cache_strategy`::
+No equivalent in Hibernate Search 6. See <<full-text-filter>>.
+`hibernate.search.generate_statistics`::
+No equivalent in Hibernate Search 6. See <<statistics>>.
+`hibernate.search.index_uninverting_allowed`::
+Index uninverting was deprecated in Hibernate Search 5 due to poor performance and is no longer allowed.
+All index fields that you want to sort on must be <<sortablefield,marked as sortable>>.
+`hibernate.search.indexing_strategy`::
+Hibernate Search 6 equivalent: `hibernate.search.automatic_indexing.strategy`.
++
+Set to `none` to get the equivalent of `hibernate.search.indexing_strategy = manual` in Hibernate Search 5.
+`hibernate.search.jmx_bean_suffix`::
+No equivalent in Hibernate Search 6. See <<jmx>>.
+`hibernate.search.jmx_enabled`::
+No equivalent in Hibernate Search 6. See <<jmx>>.
+`hibernate.search.lucene.analysis_definition_provider`::
+Hibernate Search 6 equivalent: `hibernate.search.backend.analysis.configurer`.
++
+IMPORTANT: A different interface should be implemented: see <<analysis-definition-provider>>.
+`hibernate.search.lucene_version`::
+Hibernate Search 6 equivalent: `hibernate.search.backend.lucene_version`.
+`hibernate.search.model_mapping`::
+Hibernate Search 6 equivalent: `hibernate.search.mapping.configurer`.
++
+IMPORTANT: A different interface should be implemented: see <<mapping-programmatic>>.
+`hibernate.search.query.database_retrieval_method`::
+No equivalent in Hibernate Search 6: entities are always loaded with a query.
+`hibernate.search.query.object_lookup_method`::
+Hibernate Search 6 equivalent: `hibernate.search.query.loading.cache_lookup.strategy`.
++
+See link:{hibernateSearchDocUrl}#search-dsl-query-cache-lookup-strategy[this section of the documentation].
+`hibernate.search.similarity`::
+No direct equivalent in Hibernate Search 6: the similarity is configured through the <<analysis-definition-provider,analysis configurer>>.
+`hibernate.search.worker.*`::
+No equivalent to the concept of "worker" in Hibernate Search 6:
+* automatic indexing is link:{hibernateSearchDocUrl}#mapper-orm-indexing-automatic-concepts[always performed on transaction commit or,
+when there is no transaction, on session flush].
+* <<search-5-backends,transactional backends, for example the JMS backend, are no longer supported>>.
+
+[[jmx]]
+=== JMX
+
+TODO
+
+[[search-5-backends]]
+=== Backends
+
 TODO
 
 [[api]]
 == API changes
+
+[[mapping-annotation]]
+=== Mapping annotations
+
+TODO
+
+[[field]]
+==== `@Field`
+
+TODO
+
+[[field-indexnullas]]
+===== `@Field.indexNullAs`
+
+TODO
+
+[[sortablefield]]
+==== `@SortableField`
+
+TODO
+
+[[mapping-programmatic]]
+=== Programmatic mapping
+
+TODO
+
+[[error-handler]]
+=== Error handler
+
+TODO
+
+[[full-text-filter]]
+=== Full text filter
+
+TODO
+
+[[statistics]]
+=== Statistics
+
+TODO
+
+[[analysis-definition-provider]]
+=== Analysis definition provider
 
 TODO
 
