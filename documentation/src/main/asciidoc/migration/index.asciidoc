@@ -1495,7 +1495,29 @@ See link:{hibernateSearchDocUrl}#backend-lucene-analysis-similarity[here for mor
 [[bridges]]
 === Bridges
 
-TODO
+The bridge API was completely reworked in Hibernate Search 6 to offer a more powerful, Lucene-independent solution.
+New features include:
+
+* the ability to link:{hibernateSearchDocUrl}#mapper-orm-bridge-index-field-type-dsl[define field types precisely],
+allowing in particular to pick an analyzer or to enable aggregation (faceting) on a bridge-declared field;
+* the ability to link:{hibernateSearchDocUrl}#mapper-orm-bridge-bridgedelement-dependencies[declare the properties the bridge relies on],
+allowing Hibernate Search to reindex less often;
+* the ability to link:{hibernateSearchDocUrl}#mapper-orm-bridge-index-field-dsl-dynamic[declare dynamic fields with a precise type]
+which the Search DSL will be aware of;
+* the ability to link:{hibernateSearchDocUrl}#mapper-orm-custom-annotations[define custom field annotations];
+* and link:{hibernateSearchDocUrl}#mapper-orm-bridge[more].
+
+If your application relied on custom bridges with Hibernate Search 5,
+and you need to re-implement them with Hibernate Search 6,
+see link:{hibernateSearchDocUrl}#mapper-orm-directfieldmapping-custom-types[mapping custom property types].
+
+The new bridge API is quite different from Hibernate Search 5,
+but most changes should be addressed rather easily, especially
+for the simpler bridges which will be implemented through `ValueBridge`.
+
+Perhaps the only change to note is that bridges must declare the index fields they will create at bootstrap.
+To set the value of new fields with random names dynamically at runtime,
+you will have to rely on link:{hibernateSearchDocUrl}#mapper-orm-bridge-index-field-dsl-dynamic[field templates].
 
 [[entity-indexing-interceptors]]
 === Entity indexing interceptors
