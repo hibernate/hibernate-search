@@ -34,7 +34,7 @@ public final class MassIndexingJobParameters {
 
 	public static final String CACHE_MODE = "cacheMode";
 
-	public static final String OPTIMIZE_ON_FINISH = "optimizeOnFinish";
+	public static final String MERGE_SEGMENTS_ON_FINISH = "mergeSegmentsOnFinish";
 
 	public static final String MERGE_SEGMENTS_AFTER_PURGE = "mergeSegmentsAfterPurge";
 
@@ -58,7 +58,7 @@ public final class MassIndexingJobParameters {
 
 		public static final int ID_FETCH_SIZE = 1_000;
 		public static final CacheMode CACHE_MODE = CacheMode.IGNORE;
-		public static final boolean OPTIMIZE_ON_FINISH = true;
+		public static final boolean MERGE_SEGMENTS_ON_FINISH = true;
 		public static final boolean MERGE_SEGMENTS_AFTER_PURGE = true;
 		public static final boolean PURGE_ALL_ON_START = true;
 
