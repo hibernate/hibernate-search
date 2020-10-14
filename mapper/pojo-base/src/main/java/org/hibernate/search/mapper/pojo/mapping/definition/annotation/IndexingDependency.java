@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -40,10 +41,17 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  *     which can be configured using {@link #derivedFrom()}.
  *     </li>
  * </ul>
+ * <p>
+ * This annotation may be applied multiple times to the same property with different {@link #extraction() extractions},
+ * to configure differently the dependency to different container elements.
+ * For example with a property of type {@code Map<Entity1, Entity2>},
+ * one can have a dependency to {@code Entity1} (map keys) or {@code Entity2} (map values),
+ * and each may require a different configuration.
  */
 @Documented
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
+@Repeatable(IndexingDependency.List.class)
 @PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = IndexingDependencyProcessor.class))
 public @interface IndexingDependency {
 
@@ -76,5 +84,12 @@ public @interface IndexingDependency {
 	 * @see ContainerExtraction
 	 */
 	ContainerExtraction extraction() default @ContainerExtraction;
+
+	@Documented
+	@Target({ ElementType.METHOD, ElementType.FIELD })
+	@Retention(RetentionPolicy.RUNTIME)
+	@interface List {
+		IndexingDependency[] value();
+	}
 
 }
