@@ -66,6 +66,14 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-batch-jsr352-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-batch-jsr352-jberet</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-integrationtest-backend-elasticsearch</artifactId>
             <scope>test</scope>
         </dependency>
@@ -112,6 +120,11 @@
         <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-integrationtest-v5migrationhelper-orm</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-integrationtest-batch-jsr352</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
