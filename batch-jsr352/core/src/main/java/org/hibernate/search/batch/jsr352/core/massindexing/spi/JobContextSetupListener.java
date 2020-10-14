@@ -15,7 +15,7 @@ import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJo
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.ID_FETCH_SIZE;
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY;
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.MAX_THREADS;
-import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE;
+import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.MERGE_SEGMENTS_AFTER_PURGE;
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.OPTIMIZE_ON_FINISH;
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.PURGE_ALL_ON_START;
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.ROWS_PER_PARTITION;
@@ -92,8 +92,8 @@ public class JobContextSetupListener extends AbstractJobListener {
 	private String serializedOptimizedOnFinish;
 
 	@Inject
-	@BatchProperty(name = OPTIMIZE_AFTER_PURGE)
-	private String serializedOptimizedAfterPurge;
+	@BatchProperty(name = MERGE_SEGMENTS_AFTER_PURGE)
+	private String serializedMergeSegmentsAfterPurge;
 
 	@Inject
 	@BatchProperty(name = PURGE_ALL_ON_START)
@@ -171,7 +171,7 @@ public class JobContextSetupListener extends AbstractJobListener {
 
 		// A boolean parameter is validated if its deserialization is successful.
 		SerializationUtil.parseBooleanParameterOptional( OPTIMIZE_ON_FINISH , serializedOptimizedOnFinish, Defaults.OPTIMIZE_ON_FINISH );
-		SerializationUtil.parseBooleanParameterOptional( OPTIMIZE_AFTER_PURGE, serializedOptimizedAfterPurge, Defaults.OPTIMIZE_AFTER_PURGE );
+		SerializationUtil.parseBooleanParameterOptional( MERGE_SEGMENTS_AFTER_PURGE, serializedMergeSegmentsAfterPurge, Defaults.MERGE_SEGMENTS_AFTER_PURGE );
 		SerializationUtil.parseBooleanParameterOptional( PURGE_ALL_ON_START, serializedPurgeAllOnStart, Defaults.PURGE_ALL_ON_START );
 	}
 

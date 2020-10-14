@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.batch.jsr352.core.massindexing.step.beforechunk.impl;
 
-import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE;
+import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.MERGE_SEGMENTS_AFTER_PURGE;
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.PURGE_ALL_ON_START;
 
 import java.lang.invoke.MethodHandles;
@@ -42,8 +42,8 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 	private String serializedPurgeAllOnStart;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE)
-	private String serializedOptimizeAfterPurge;
+	@BatchProperty(name = MassIndexingJobParameters.MERGE_SEGMENTS_AFTER_PURGE)
+	private String serializedMergeSegmentsAfterPurge;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.TENANT_ID)
@@ -54,8 +54,8 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 		boolean purgeAllOnStart = SerializationUtil.parseBooleanParameterOptional(
 				PURGE_ALL_ON_START, serializedPurgeAllOnStart, Defaults.PURGE_ALL_ON_START
 		);
-		boolean optimizeAfterPurge = SerializationUtil.parseBooleanParameterOptional(
-				OPTIMIZE_AFTER_PURGE, serializedOptimizeAfterPurge, Defaults.OPTIMIZE_AFTER_PURGE
+		boolean mergeSegmentsAfterPurge = SerializationUtil.parseBooleanParameterOptional(
+				MERGE_SEGMENTS_AFTER_PURGE, serializedMergeSegmentsAfterPurge, Defaults.MERGE_SEGMENTS_AFTER_PURGE
 		);
 
 		if ( purgeAllOnStart ) {
@@ -67,7 +67,7 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 			// This is necessary because the batchlet is not executed inside a transaction
 			workspace.flush();
 
-			if ( optimizeAfterPurge ) {
+			if ( mergeSegmentsAfterPurge ) {
 				log.startOptimization();
 				workspace.mergeSegments();
 			}

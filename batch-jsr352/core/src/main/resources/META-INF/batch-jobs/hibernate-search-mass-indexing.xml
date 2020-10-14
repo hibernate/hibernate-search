@@ -21,7 +21,7 @@
                 <property name="entityFetchSize" value="#{jobParameters['entityFetchSize']}" />
                 <property name="cacheMode" value="#{jobParameters['cacheMode']}" />
                 <property name="optimizeOnFinish" value="#{jobParameters['optimizeOnFinish']}" />
-                <property name="optimizeAfterPurge" value="#{jobParameters['optimizeAfterPurge']}" />
+                <property name="mergeSegmentsAfterPurge" value="#{jobParameters['mergeSegmentsAfterPurge']}" />
                 <property name="purgeAllOnStart" value="#{jobParameters['purgeAllOnStart']}" />
                 <property name="sessionClearInterval" value="#{jobParameters['sessionClearInterval']}" />
                 <property name="checkpointInterval" value="#{jobParameters['checkpointInterval']}" />
