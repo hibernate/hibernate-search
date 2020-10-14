@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -25,10 +26,16 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  * This annotation is generally not needed, as inverse sides of associations should generally be inferred by the mapper.
  * For example, Hibernate ORM defines inverse sides using {@code @OneToMany#mappedBy}, {@code @OneToOne#mappedBy}, etc.,
  * and the Hibernate ORM mapper will register these inverse sides automatically.
+ * <p>
+ * This annotation may be applied multiple times to the same property with different {@link #extraction() extractions},
+ * to configure a different association for different container elements.
+ * For example with a property of type {@code Map<Entity1, Entity2>},
+ * one can have an association to {@code Entity1} (map keys) or {@code Entity2} (map values).
  */
 @Documented
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
+@Repeatable(AssociationInverseSide.List.class)
 @PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = AssociationInverseSideProcessor.class))
 public @interface AssociationInverseSide {
 
@@ -48,5 +55,12 @@ public @interface AssociationInverseSide {
 	 * @return The path to the targeted entity on the inverse side of the association.
 	 */
 	ObjectPath inversePath();
+
+	@Documented
+	@Target({ ElementType.METHOD, ElementType.FIELD })
+	@Retention(RetentionPolicy.RUNTIME)
+	@interface List {
+		AssociationInverseSide[] value();
+	}
 
 }
