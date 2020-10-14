@@ -1590,7 +1590,10 @@ Whatever code was implemented in your factory can be moved to the configurer.
 [[spi]]
 == SPI changes
 
-TODO
+Due to the extensive rewrites involved in Hibernate Search 6,
+existing integrations relying on Hibernate Search 5 are likely to require a full rewrite.
+
+We will be glad to help, so feel free to link:https://hibernate.org/community[contact us].
 
 [[behavior]]
 == Behavior changes
