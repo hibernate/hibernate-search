@@ -1480,7 +1480,17 @@ and refer to the javadoc for details.
 [[analysis-definition-provider]]
 === Analysis definition provider
 
-TODO
+Analysis definition providers are now called analysis configurers.
+The interfaces are slightly different but follow the same general principle.
+
+See link:{hibernateSearchDocUrl}#backend-lucene-analysis-analyzers[here for Lucene],
+or link:{hibernateSearchDocUrl}#backend-elasticsearch-analysis-analyzers[here for Elasticsearch].
+
+NOTE: Analysis configurers can be used to override the default analyzer.
+To do so, just define a custom analyzer named `default`.
+
+NOTE: With the Lucene backend, analysis configurers can be used to override the default similarity.
+See link:{hibernateSearchDocUrl}#backend-lucene-analysis-similarity[here for more information]
 
 [[bridges]]
 === Bridges
@@ -1531,16 +1541,6 @@ WARNING: This section is still incomplete. To be completed upon the CR or releas
 
 [[document-id-is-not-a-field]]
 === The document ID is not an index field
-
-TODO
-
-[[indexed-is-inherited]]
-=== `@Indexed` is inherited
-
-TODO
-
-[[index-name-defaults-to-entity-name]]
-=== The index name defaults to the entity name
 
 TODO
 
