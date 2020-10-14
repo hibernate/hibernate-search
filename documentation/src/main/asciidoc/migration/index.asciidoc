@@ -442,28 +442,1065 @@ TODO
 [[api]]
 == API changes
 
-[[mapping-annotation]]
-=== Mapping annotations
+A lot of APIs changed. We recommend having a look at
+link:{hibernateSearchDocUrl}#getting-started[the getting started guide] before migrating.
 
-TODO
+[[mapping-annotation]]
+=== Annotation mapping
+
+[[analyzer]]
+==== `@Analyzer`
+
+In Hibernate Search 5, it was possible to apply an `@Analyzer` annotation to a class or property,
+so that the corresponding analyzer would be used by default for any index field declared in this scope.
+
+There is no equivalent to that feature in Hibernate Search 6:
+all fields must specify their analyzer explicitly using `@FullTextField(analyzer = "myAnalyzer")`,
+or rely on the (global) default analyzer.
+
+Also, still in Hibernate Search 5, `@Analyzer` could point directly to a class extending `org.apache.lucene.analysis.Analyzer`,
+for example with `@Analyzer(impl = StandardAnalyzer.class)`.
+
+This is no longer possible: analyzers are now always referenced by their name.
+However, you can assign a name to a given analyzer instance using
+the link:{hibernateSearchDocUrl}#backend-lucene-analysis-analyzers[Lucene analysis configurer].
+
+[[analyzerdef]]
+==== `@AnalyzerDef`, `@AnalyzerDefs`
+
+Annotation-based analyzer definitions are no longer supported.
+
+Instead, implement an analysis configurer:
+see link:{hibernateSearchDocUrl}#backend-lucene-analysis-analyzers[here for Lucene],
+or link:{hibernateSearchDocUrl}#backend-elasticsearch-analysis-analyzers[here for Elasticsearch].
+
+[[analyzerdiscriminator]]
+==== `@AnalyzerDiscriminator`
+
+`@AnalyzerDiscriminator` has no direct equivalent in Hibernate Search 6:
+the analyzer assigned to each field is static and cannot change at runtime,
+because that results in unreliable matches and in scoring issues.
+
+Instead, Hibernate Search 6 allows declaring multiple index fields for a single property,
+and putting the content of that property in a different field depending on a discriminator.
+Then, when searching, you can target all fields at once.
+
+See link:{hibernateSearchDocUrl}#mapper-orm-alternatives[Mapping multiple alternatives].
+
+[[boost]]
+==== `@Boost`
+
+Index-time boosting was deprecated in Hibernate Search 5.
+It is no longer available in Hibernate Search 6.
+
+Instead, rely on link:{hibernateSearchDocUrl}#search-dsl-predicate-common-boost[query-time boosting].
+
+[[cachefromindex]]
+==== `@CacheFromIndex`
+
+This annotation was deprecated and non-functional in Hibernate Search 5.
+It is no longer available in Hibernate Search 6.
+
+[[calendarbridge]]
+==== `@CalendarBridge`
+
+`@CalendarBridge` is not necessary to index `Calendar` values:
+you can simply apply `@GenericField` to a property of type `Calendar`,
+and an appropriate default bridge will be used.
+
+The main purpose of `@CalendarBridge` in Hibernate Search 5 was to provide the ability
+to "truncate" calendars upon indexing, e.g. zeroing out all data more precise than the day
+with `@CalendarBridge(resolution = Resolution.DAY)`.
+
+For such use case, the recommended approach in Hibernate Search 6 is to index values with full resolution
+(not using `@CalendarBridge`) and to control resolution when searching,
+with a link:{hibernateSearchDocUrl}#search-dsl-predicate-range[`range` predicate].
+Note that you can pass `ZonedDateTime` values to the predicate, which are much easier to truncate manually.
+For example, to match only documents whose calendar is within a given day:
+
+[source, JAVA]
+----
+Calendar toMatch = /* ... */;
+ZonedDateTime toMatchZonedDateTime = ( (GregorianCalendar) toMatch ).toZonedDateTime();
+ZonedDateTime dayStart = toMatchZonedDateTime.truncatedTo( ChronoUnit.DAYS );
+ZonedDateTime nextDayStart = dayStart.plus( 1, ChronoUnit.DAYS );
+
+List<MyEntity> hits = searchSession.search( MyEntity.class )
+        .where( f -> f.range().field( "calendar" )
+                .range( Range.canonical( dayStart, nextDayStart ), ValueConvert.NO )
+        .fetchHits( 20 );
+----
+
+If that approach doesn't work for you, link:https://hibernate.org/community[let us know] and we'll try to come up with a solution together.
+
+[[charfilterdef]]
+==== `@CharFilterDef`
+
+See <<analyzerdef>> or <<normalizerdef>>.
+
+[[classbridge]]
+==== `@ClassBridge`, `@ClassBridges`
+
+See <<bridges>>.
+
+[[containedin]]
+==== `@ContainedIn`
+
+`@ContainedIn` is no longer necessary in Hibernate Search 6.
+
+Hibernate Search 6 infers indexing dependencies from the mapping,
+and raises errors at bootstrap when the equivalent of `@ContainedIn` cannot be applied automatically
+(for example an `@IndexedEmbedded` association with no inverse side).
+
+The error message includes potential solutions. It looks like this:
+
+> Cannot find the inverse side of the association on type 'MyIndexedType' at path '.myIndexedEmbedded<no value extractors>'
+> Hibernate Search needs this information in order to reindex 'MyIndexedType' when 'MyIndexedEmbeddedType' is modified.
+> You can solve this error by defining the inverse side of this association,
+> either with annotations specific to your integration (`@OneToMany(mappedBy = ...)` in Hibernate ORM)
+> or with the Hibernate Search `@AssociationInverseSide` annotation.
+> Alternatively, if you do not need to reindex 'MyIndexedType' when 'MyIndexedEmbeddedType' is modified,
+> you can disable automatic reindexing with `@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)`.
+
+Thus, the recommended approach when migrating is to simply remove all `@ContainedIn` annotations,
+then deal with the bootstrap errors, if any.
+
+TIP: Hibernate Search 6 is able to raise multiple mapping errors during a single startup,
+so you don't have to restart the application 20 times to address 20 different problems.
+
+[[datebridge]]
+==== `@DateBridge`
+
+`@DateBridge` is not necessary to index `Date` values:
+you can simply apply `@GenericField` to a property of type `java.util.Date`, `java.sql.Date`, `java.sql.Time` or `java.sql.Timestamp`,
+and an appropriate default bridge will be used.
+
+The main purpose of `@DateBridge` in Hibernate Search 5 was to provide the ability
+to "truncate" dates upon indexing, e.g. zeroing out all data more precise than the day
+with `@DateBridge(resolution = Resolution.DAY)`.
+
+For such use case, the recommended approach in Hibernate Search 6 is to index values with full resolution
+(not using `@DateBridge`) and to control resolution when searching,
+with a link:{hibernateSearchDocUrl}#search-dsl-predicate-range[`range` predicate].
+Note that you can pass `Instant` values to the predicate, which are much easier to truncate manually.
+For example, to match only documents whose date is within a given day:
+
+[source, JAVA]
+----
+Date toMatch = /* ... */;
+ZoneId userZoneId = /* ... */;
+ZonedDateTime toMatchZonedDateTime = Instant.ofEpochMilli( toMatch.getTime() ).atZone( userZoneId );
+ZonedDateTime dayStart = toMatchZonedDateTime.truncatedTo( ChronoUnit.DAYS );
+ZonedDateTime nextDayStart = dayStart.plus( 1, ChronoUnit.DAYS );
+
+List<MyEntity> hits = searchSession.search( MyEntity.class )
+        .where( f -> f.range().field( "date" )
+                .range( Range.canonical( dayStart.toInstant(), nextDayStart.toInstant() ),
+                        ValueConvert.NO )
+        .fetchHits( 20 );
+----
+
+If that approach doesn't work for you, link:https://hibernate.org/community[let us know] and we'll try to come up with a solution together.
+
+[[documentid]]
+==== `@DocumentId`
+
+`@DocumentId` is still available in Hibernate Search 6, but moved to a different package:
+`org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId`.
+
+However, it no longer exposes a `name` attribute,
+because <<document-id-is-not-a-field,the document ID is no longer an index field>>,
+and thus it does not need a name.
+
+[[dynamicboost]]
+==== `@DynamicBoost`
+
+Index-time boosting was deprecated in Hibernate Search 5.
+It is no longer available in Hibernate Search 6.
+
+Instead, rely on link:{hibernateSearchDocUrl}#search-dsl-predicate-common-boost[query-time boosting].
+
+[[facet]]
+==== `@Facet`, `@Facets`
+
+===== Basics
+
+Facets are now called aggregations, which are a generalization of the concept of faceting.
+
+To make a field aggregable, just set the `@*Field.aggregable` attribute to `Aggregable.YES`:
+
+[source, JAVA]
+----
+@KeywordField(aggregable = Aggregable.YES)
+private String myKeyword;
+@GenericField(aggregable = Aggregable.YES)
+private Integer myInteger;
+@GenericField(aggregable = Aggregable.YES)
+private LocalDate myLocalDate;
+----
+
+[NOTE]
+====
+An aggregable `@KeywordField` with a normalizer will return normalized values in aggregations,
+whereas Hibernate Search 5 used to return raw (non-normalized) values.
+
+See <<faceting-strings-are-normalized>>.
+====
+
+[NOTE]
+====
+`aggregable` is not available on `@FullTextField`,
+because aggregation on a tokenized field would aggregate tokens instead of field values,
+which is rarely the intent.
+
+If you need both an analyzer and aggregations on the same property, create two separate fields:
+
+[source, JAVA]
+----
+@FullTextField
+@KeywordField(name = "category_aggregation", aggregable = Aggregable.YES)
+private String category;
+----
+
+For instructions on how to execute aggregations, see <<searching-facet>>.
+
+This will lead to two separate fields being created in the index, for the same property.
+Just make sure to use the correct field name when searching:
+`category` when creating link:{hibernateSearchDocUrl}#search-dsl-predicate-match[predicates],
+but `category_aggregation` when creating link:{hibernateSearchDocUrl}#search-dsl-aggregation-terms[aggregations].
+====
+
+===== `@Facet.encoding`
+
+The facet encoding options no longer exists:
+strings will be indexed as strings and numbers will be indexed as numbers.
+
+For the few cases where encoding a number as a string is necessary,
+you can define a separate field exclusively for aggregations,
+and apply a link:{hibernateSearchDocUrl}#mapper-orm-bridge-valuebridge[custom value bridge]
+to convert the number to a string (and back).
 
 [[field]]
-==== `@Field`
+==== `@Field`, `@Fields`
 
-TODO
+[[field-basics]]
+===== Basics
+
+The `@Field` annotation was split into multiple annotations, specific to each field type:
+
+* `org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField`
+* `org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField`
+* `org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField`
+
+Here is a quick reference of how to convert a `@Field` annotation to Hibernate Search 6:
+
+[cols="a,2a,2a",options="header"]
+|====
+|Property type|Hibernate Search 5|Hibernate Search 6
+.5+|`String`, `Character`, `char`, enum|
+[source, JAVA]
+----
+@Field
+----
+|[source, JAVA]
+----
+@FullTextField
+----
+|[source, JAVA]
+----
+@Field(analyzer = @Analyzer(definition = "myAnalyzer"))
+----
+.2+|[source, JAVA]
+----
+@FullTextField(analyzer = "myAnalyzer")
+----
+|[source, JAVA]
+----
+@Field
+@Analyzer(definition = "myAnalyzer")
+----
+|[source, JAVA]
+----
+@Field(normalizer = @Normalizer(definition = "myNormalizer"))
+----
+|[source, JAVA]
+----
+@KeywordField(normalizer = "myNormalizer")
+----
+|[source, JAVA]
+----
+@Field(analyze = analyze.NO)
+----
+|[source, JAVA]
+----
+@KeywordField
+// OR
+@GenericField
+----
+.2+|Other
+|[source, JAVA]
+----
+@Field
+@NumericField
+----
+|[source, JAVA]
+----
+@GenericField
+----
+|[source, JAVA]
+----
+@Field
+----
+|[source, JAVA]
+----
+@GenericField
+----
+|====
+
+[[field-analyze]]
+===== `@Field.analyze`
+
+`@Field.analyze` has no direct equivalent in Hibernate Search 6.
+Instead of enabling/disabling analysis explicitly,
+<<field-basics,pick the right `@*Field` annotation according to your needs>>.
+
+[[field-analyzer]]
+===== `@Field.analyzer`
+
+See <<field-basics>>.
+
+[[field-boost]]
+===== `@Field.boost`
+
+Index-time boosting was deprecated in Hibernate Search 5.
+It is no longer available in Hibernate Search 6.
+
+Instead, rely on link:{hibernateSearchDocUrl}#search-dsl-predicate-common-boost[query-time boosting].
+
+[[field-bridge]]
+===== `@Field.bridge`
+
+See <<bridges>>.
+
+[[field-index]]
+===== `@Field.index`
+
+`@Field.index` is now `@*Field.searchable`:
+
+[cols="a,a",options="header"]
+|====
+|Hibernate Search 5|Hibernate Search 6
+|[source, JAVA]
+----
+@Field(index = Index.YES)
+----
+|[source, JAVA]
+----
+@GenericField(searchable = Searchable.YES)
+// OR
+@FullTextField(searchable = Searchable.YES)
+// OR
+@KeywordField(searchable = Searchable.YES)
+----
+|[source, JAVA]
+----
+@Field(index = Index.NO)
+----
+|[source, JAVA]
+----
+@GenericField(searchable = Searchable.NO)
+// OR
+@FullTextField(searchable = Searchable.NO)
+// OR
+@KeywordField(searchable = Searchable.NO)
+----
+|====
 
 [[field-indexnullas]]
 ===== `@Field.indexNullAs`
 
-TODO
+`@Field.indexNullAs` is still available for most Hibernate Search 6's `@*Field` annotations:
+
+[cols="a,a",options="header"]
+|====
+|Hibernate Search 5|Hibernate Search 6
+|[source, JAVA]
+----
+@Field(indexNullAs = "_null_")
+----
+|[source, JAVA]
+----
+@GenericField(indexNullAs = "_null_")
+// OR
+@KeywordField(indexNullAs = "_null_")
+----
+|====
+
+However:
+
+* You should consider whether it is really necessary,
+as the new link:{hibernateSearchDocUrl}#search-dsl-predicate-exists[`exists` predicate]
+introduced in Hibernate Search 6 allows finding documents where a field is present or not
+*without* relying on `indexNullAs`.
+* `indexNullAs` is not available on `@FullTextField`.
+* The default null token is no longer supported, i.e. `Field.DEFAULT_NULL_TOKEN` has no equivalent in Hibernate search 6.
+Each field that requires `indexNullAs` must have its value set explicitly.
+* The (text) value passed to `indexNullAs` must be link:{hibernateSearchDocUrl}#mapper-orm-directfieldmapping-supported-types[formatted according to the type of the field].
+
+[[field-name]]
+===== `@Field.name`
+
+`@Field.name` stays the same in Hibernate Search 6's `@*Field` annotations:
+
+[cols="a,a",options="header"]
+|====
+|Hibernate Search 5|Hibernate Search 6
+|[source, JAVA]
+----
+@Field(name = "myField")
+----
+|[source, JAVA]
+----
+@GenericField(name = "myField")
+// OR
+@FullTextField(name = "myField")
+// OR
+@KeywordField(name = "myField")
+----
+|====
+
+[[field-normalizer]]
+===== `@Field.normalizer`
+
+See <<field-basics>>.
+
+[[field-norms]]
+===== `@Field.norms`
+
+`@Field.norms` only has an equivalent in Hibernate Search 6's `@FullTextField` and `@KeywordField`.
+The `Norms` enum has moved to `org.hibernate.search.engine.backend.types.Norms`.
+
+[[field-store]]
+===== `@Field.store`
+
+`@Field.store` is now `@*Field.projectable`:
+
+[cols="a,a",options="header"]
+|====
+|Hibernate Search 5|Hibernate Search 6
+|[source, JAVA]
+----
+@Field(store = Store.YES)
+----
+|[source, JAVA]
+----
+@GenericField(projectable = Projectable.YES)
+// OR
+@FullTextField(projectable = Projectable.YES)
+// OR
+@KeywordField(projectable = Projectable.YES)
+----
+|[source, JAVA]
+----
+@Field(store = Store.NO)
+----
+|[source, JAVA]
+----
+@GenericField(projectable = Projectable.NO)
+// OR
+@FullTextField(projectable = Projectable.NO)
+// OR
+@KeywordField(projectable = Projectable.NO)
+----
+|[source, JAVA]
+----
+@Field(store = Store.COMPRESS)
+----
+|No direct equivalent; use `Projectable.YES`.
+
+See also link:{hibernateSearchJiraUrl}/HSEARCH-3081[HSEARCH-3081].
+|====
+
+[[field-termVector]]
+===== `@Field.termVector`
+
+`@Field.termVector` only has an equivalent in Hibernate Search 6's `@FullTextField`.
+The `TermVector` enum has moved to `org.hibernate.search.engine.backend.types.TermVector`.
+
+[[fieldbridge]]
+==== `@FieldBridge`
+
+See <<bridges>>.
+
+[[fulltextfilterdef]]
+==== `@FullTextFilterDef`, `@FullTextFilterDefs`
+
+Full-text filters have no direct equivalent in Hibernate Search 6.
+
+See <<full-text-filter>>.
+
+[[indexed]]
+==== `@Indexed`
+
+===== Basics
+
+`@Indexed` is still available in Hibernate Search 6, but moved to a different package:
+`org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed`.
+
+NOTE: In Hibernate Search 6, <<index-name-defaults-to-entity-name,index names default to the entity name, not the class name>>.
+
+NOTE: In Hibernate Search 6, <<indexed-is-inherited,`@Indexed` is inherited>>.
+
+===== `@Indexed.index`
+
+`@Indexed.index` stays the same in Hibernate Search 6.
+
+===== `@Indexed.interceptor`
+
+Entity indexing interceptors have no direct equivalent in Hibernate Search 6,
+but conditional indexing can be implemented through routing bridges.
+
+See <<entity-indexing-interceptors>>.
+
+[[indexedembeded]]
+==== `@IndexedEmbedded`
+
+===== Basics
+
+`@IndexedEmbedded` is still available in Hibernate Search 6, but moved to a different package:
+`org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded`.
+
+===== `@IndexedEmbedded.depth`
+
+`@IndexedEmbedded.depth` was renamed to `includeDepth` in Hibernate Search 6:
+
+[cols="a,a",options="header"]
+|====
+|Hibernate Search 5|Hibernate Search 6
+|[source, JAVA]
+----
+@IndexedEmbedded(depth = 2)
+----
+|[source, JAVA]
+----
+@IndexedEmbedded(includeDepth = 2)
+----
+|[source, JAVA]
+----
+@IndexedEmbedded(depth = 1, includePaths = {"foo.bar", "foo.bar2"})
+----
+|[source, JAVA]
+----
+@IndexedEmbedded(includeDepth = 1, includePaths = {"foo.bar", "foo.bar2"})
+----
+|====
+
+===== `@IndexedEmbedded.includePaths`
+
+`@IndexedEmbedded.includePaths` stays the same in Hibernate Search 6.
+
+However, the document id of other entities is no longer a field by default,
+so you can no longer use `@IndexedEmbedded(includePaths = "id")` (for example)
+to embed another entity's ID, unless you explicitly add a `@GenericField` annotation on the id property.
+See <<document-id-is-not-a-field>> for more information.
+
+===== `@IndexedEmbedded.prefix`
+
+`@IndexedEmbedded.prefix` is still available in Hibernate Search 6, but is deprecated for removal in the next major version.
+
+You should use `@IndexedEmbedded.name` instead,
+which doesn't prepend a prefix to the embedded fields, but instead creates an object field with the given name:
+
+[cols="a,a",options="header"]
+|====
+|Hibernate Search 5|Hibernate Search 6
+|[source, JAVA]
+----
+@IndexedEmbedded(prefix = "foo.")
+----
+|[source, JAVA]
+----
+@IndexedEmbedded(name = "foo")
+----
+|[source, JAVA]
+----
+@IndexedEmbedded(prefix = "foo.bar.")
+----
+|WARNING: No equivalent: `name` only allows one object field.
+|[source, JAVA]
+----
+@IndexedEmbedded(prefix = "foo_")
+----
+.2+|WARNING: No equivalent: `name` does not allow prefixes to be prepended to embedded field names.
+|[source, JAVA]
+----
+@IndexedEmbedded(prefix = "foo.bar_")
+----
+|====
+
+===== `@IndexedEmbedded.targetElement`
+
+`@IndexedEmbedded.targetElement` was renamed to `targetType` in Hibernate Search 6:
+
+[cols="a,a",options="header"]
+|====
+|Hibernate Search 5|Hibernate Search 6
+|[source, JAVA]
+----
+@IndexedEmbedded(targetElement = MyConcreteEntity.class)
+----
+|[source, JAVA]
+----
+@IndexedEmbedded(targetType = MyConcreteEntity.class)
+----
+|====
+
+===== `@IndexedEmbedded.indexNullAs`
+
+`@IndexedEmbedded.indexNullAs` has no equivalent in Hibernate Search 6.
+
+To search for documents where an object field is present (or absent),
+use the link:{hibernateSearchDocUrl}#search-dsl-predicate-exists[`exists` predicate].
+
+===== `@IndexedEmbedded.includeEmbeddedObjectId`
+
+`@IndexedEmbedded.includeEmbeddedObjectId` stays the same in Hibernate Search 6.
+
+However, embedded IDs of numeric or date/time types (`Integer`, `Long`, `Date`, ...)
+used to be indexed as string values by default in Hibernate Search 5,
+but are indexed as numeric values by default in Hibernate Search 6.
+See <<more-numeric-by-default>>.
+
+===== Using `@IndexedEmbedded` to request container extraction
+
+A little-known and undocumented feature of `@IndexedEmbedded` was to combine it with `@Field`
+on a property of a container type (`Collection`, `List`, `Map`, ...) to instruct Hibernate Search to apply `@Field` to the container elements
+instead of the container.
+
+For example, the code below would lead to a bootstrap failure, because there is no default bridge for the `List` type:
+
+[source, JAVA]
+----
+@Field
+@ElementCollection
+private List<String> notes;
+----
+
+However, the code below would work just fine,
+and would instruct Hibernate Search to index each element of the `List` in the `notes` index field:
+
+[source, JAVA]
+----
+@Field
+@IndexedEmbedded
+@ElementCollection
+private List<String> notes;
+----
+
+In Hibernate Search 6, `@IndexedEmbedded` should no longer be used this way,
+as the container extraction is now implied:
+
+[source, JAVA]
+----
+@FullTextField
+@ElementCollection
+private List<String> notes;
+----
+
+See also <<implicit-container-extraction>>.
+
+[[key]]
+==== `@Key`
+
+`@Key` has no equivalent in Hibernate Search 6.
+
+See also <<full-text-filter>>.
+
+[[latitude]]
+==== `@Latitude`
+
+`@Latitude` is still available in Hibernate Search 6, but moved to a different package:
+`org.hibernate.search.annotations.Latitude`.
+
+See also <<spatial>>.
+
+[[longitude]]
+==== `@Longitude`
+
+`@Longitude` is still available in Hibernate Search 6, but moved to a different package:
+`org.hibernate.search.annotations.Longitude`.
+
+See also <<spatial>>.
+
+[[normalizer]]
+==== `@Normalizer`
+
+In Hibernate Search 5, `@Normalizer` could point directly to a class extending `org.apache.lucene.analysis.Analyzer`,
+for example with `@Normalizer(impl = MyNormalizer.class)`.
+
+This is no longer possible: normalizers are now always referenced by their name.
+However, you can assign a name to a given normalizer instance using
+the link:{hibernateSearchDocUrl}#backend-lucene-analysis-analyzers[Lucene analysis configurer].
+
+[[normalizerdef]]
+==== `@NormalizerDef`, `@NormalizerDefs`
+
+Annotation-based normalizer definitions are no longer supported.
+
+Instead, implement an analysis configurer:
+see link:{hibernateSearchDocUrl}#backend-lucene-analysis-analyzers[here for Lucene],
+or link:{hibernateSearchDocUrl}#backend-elasticsearch-analysis-analyzers[here for Elasticsearch].
+
+==== `@NumericField`, `@NumericFields`
+
+`@NumericField` no longer exists in Hibernate Search 6.
+
+Numeric types are indexed as numeric values by default, so this annotation can simply be removed.
+
+See also <<more-numeric-by-default>>.
+
+==== `@ProvidedId`
+
+`@ProvidedId` was deprecated in Hibernate Search 5.
+It no longer exists in Hibernate Search 6.
 
 [[sortablefield]]
-==== `@SortableField`
+==== `@SortableField`, `@SortableFields`
 
-TODO
+`@SortableField` no longer exists in Hibernate Search 6. Instead, use `@*Field.sortable`:
+
+[cols="a,a",options="header"]
+|====
+|Hibernate Search 5|Hibernate Search 6
+|[source, JAVA]
+----
+@Field
+@SortableField
+----
+|[source, JAVA]
+----
+@GenericField(sortable = Sortable.YES)
+// OR
+@KeywordField(sortable = Sortable.YES)
+----
+|[source, JAVA]
+----
+@Field
+@Field(name = "myField_sort", analyze = Analyze.NO)
+@SortableField(forField = "myField_sort")
+----
+|[source, JAVA]
+----
+@FullTextField
+@KeywordField(name = "myField_sort", sortable = Sortable.YES)
+----
+|====
+
+[NOTE]
+====
+`sortable` is not available on `@FullTextField`,
+because link:{hibernateSearchDocUrl}#mapper-orm-directfieldmapping-annotations-fulltextfield[tokenized data cannot be reliably sorted on].
+
+If you need both an analyzer and sorts on the same property, create two separate fields:
+
+[source, JAVA]
+----
+@FullTextField
+@KeywordField(name = "title_sort", normalizer = "myNormalizer", sortable = Sortable.YES)
+private String title;
+----
+
+This will lead to two separate fields being created in the index, for the same property.
+Just make sure to use the correct field name when searching:
+`title` when creating link:{hibernateSearchDocUrl}#search-dsl-predicate-match[predicates],
+but `title_sort` when creating link:{hibernateSearchDocUrl}#search-dsl-sort-field[sorts].
+====
+
+[[spatial]]
+==== `@Spatial`, `@Spatials`
+
+===== Basics
+
+`@Spatial` has no direct equivalent in Hibernate Search 6.
+
+Here is a quick reference of how to convert a `@Spatial` annotation to Hibernate Search 6:
+
+[cols="2a,a,2a",options="header"]
+|====
+|Hibernate Search 5|Latitude/longitude are mutable?|Hibernate Search 6
+.2+|[source, JAVA]
+----
+@Indexed
+@Entity
+public class MyEntity {
+    @Spatial
+	private MyCoordinates location;
+}
+public class MyCoordinates implements Coordinates {
+	private Double latitude;
+	private Double longitude;
+	public Double getLatitude() {
+		return latitude;
+	}
+	public Double getLongitude() {
+		return longitude;
+	}
+}
+----
+|Yes
+|[source, JAVA]
+----
+@Indexed
+@Entity
+public class MyEntity {
+    @GeoPointBinding(projectable = Projectable.YES)
+	private MyCoordinates location;
+}
+public class MyCoordinates implements Coordinates {
+	private Double latitude;
+	private Double longitude;
+	@Latitude
+	public Double getLatitude() {
+		return latitude;
+	}
+	@Longitude
+	public Double getLongitude() {
+		return longitude;
+	}
+}
+----
+|No
+|[source, JAVA]
+----
+@Indexed
+@Entity
+public class MyEntity {
+    @GenericField(projectable = Projectable.YES)
+	private MyCoordinates location;
+}
+public class MyCoordinates implements GeoPoint {
+	private final double latitude;
+	private final double longitude;
+	public double latitude() {
+		return latitude;
+	}
+	public double longitude() {
+		return longitude;
+	}
+}
+----
+|[source, JAVA]
+----
+@Indexed
+@Entity
+@Spatial
+public class MyEntity {
+	@Latitude
+	private Double latitude;
+
+	@Longitude
+    private Double longitude;
+}
+----
+|Yes
+|[source, JAVA]
+----
+@Indexed
+@Entity
+@GeoPointBinding(projectable = Projectable.YES)
+public class MyEntity {
+	@Latitude
+	private Double latitude;
+
+	@Longitude
+    private Double longitude;
+}
+----
+|[source, JAVA]
+----
+@Indexed
+@Entity
+@Spatial(name = "home_coordinates")
+@Spatial(name = "work_coordinates")
+public MyEntity {
+	@Latitude(of = "home_coordinates")
+	private Double homeLatitude;
+
+	@Longitude(of = "home_coordinates")
+    private Double homeLongitude;
+
+	@Latitude(of = "work_coordinates")
+	private Double workLatitude;
+
+	@Longitude(of = "home_coordinates")
+    private Double workLongitude;
+}
+----
+|Yes
+|[source, JAVA]
+----
+@Indexed
+@Entity
+@GeoPointBinding(name = "home_coordinates", markerSet = "home", projectable = Projectable.YES)
+@GeoPointBinding(name = "work_coordinates", markerSet = "work", projectable = Projectable.YES)
+public MyEntity {
+	@Latitude(markerSet = "home")
+	private Double homeLatitude;
+
+	@Longitude(markerSet = "home")
+    private Double homeLongitude;
+
+	@Latitude(markerSet = "work")
+	private Double workLatitude;
+
+	@Longitude(markerSet = "home")
+    private Double workLongitude;
+}
+----
+|====
+
+[[spatial-boost]]
+===== `@Spatial.boost`
+
+Index-time boosting was deprecated in Hibernate Search 5.
+It is no longer available in Hibernate Search 6.
+
+Instead, rely on link:{hibernateSearchDocUrl}#search-dsl-predicate-common-boost[query-time boosting].
+
+[[spatial-name]]
+===== `@Spatial.name`
+
+`@Field.name` stays the same in Hibernate Search 6's `@GeoPointBinding` and `@GenericField` annotations,
+with one exception: the field name is mandatory when `@GeoPointBinding` is applied to a class.
+
+[cols="a,a",options="header"]
+|====
+|Hibernate Search 5|Hibernate Search 6
+|[source, JAVA]
+----
+@Spatial(name = "myField")
+----
+|[source, JAVA]
+----
+@GeoPointBinding(name = "myField")
+// OR
+@GenericField(name = "myField")
+----
+|[source, JAVA]
+----
+// No field name, will use an internal default
+@Spatial
+public class MyEntity {
+	// ...
+}
+----
+|[source, JAVA]
+----
+// Must provide a field name
+@GeoPointBinding(name = "location")
+public class MyEntity {
+	// ...
+}
+----
+|====
+
+[[spatial-spatialmode]]
+===== `@Spatial.spatialMode`, `@Spatial.topSpatialHashLevel`, `@Spatial.bottomSpatialHashLevel`
+
+`@Spatial.spatialMode`, `@Spatial.topSpatialHashLevel`, `@Spatial.bottomSpatialHashLevel`
+have no equivalent in Hibernate Search 6:
+geohash-based geo-point fields are no longer supported.
+
+For Lucene, this is because Hibernate Search now uses Lucene's built-in spatial support,
+which is range-based.
+
+For Elasticsearch, hash-based geo-point fields have never been available in the first place.
+
+[[spatial-store]]
+===== `@Spatial.store`
+
+`@Spatial.store` is now `@GeoPointBinding.projectable`/`@GenericField.projectable`:
+
+[cols="a,a",options="header"]
+|====
+|Hibernate Search 5|Hibernate Search 6
+|[source, JAVA]
+----
+@Spatial(store = Store.YES)
+----
+|[source, JAVA]
+----
+@GeoPointBinding(projectable = Projectable.YES)
+// OR
+@GenericField(projectable = Projectable.YES)
+----
+|[source, JAVA]
+----
+@Spatial(store = Store.NO)
+----
+|[source, JAVA]
+----
+@GeoPointBinding(projectable = Projectable.YES)
+// OR
+@GenericField(projectable = Projectable.YES)
+----
+|====
+
+NOTE: In Hibernate Search 6, `projectable` must be set to `Projectable.YES`
+to enable distance projections on a geo-point field.
+
+[[tikabridge]]
+==== `@TikaBridge`
+
+`@TikaBridge` has no equivalent in Hibernate Search 6 yet.
+
+If you need this feature, vote for it to be re-implemented using the new bridge API in 6.1:
+link:{hibernateSearchJiraUrl}/HSEARCH-3350[HSEARCH-3350].
+We'll also gladly help anyone interested in contributing a patch:
+feel free to link:https://hibernate.org/community[contact us].
+
+[[tokenfilterdef]]
+==== `@TokenFilterDef`
+
+See <<analyzerdef>> or <<normalizerdef>>.
+
+[[tokenizerdef]]
+==== `@TokenizerDef`
+
+See <<analyzerdef>>.
 
 [[mapping-programmatic]]
 === Programmatic mapping
+
+Programmatic mapping was overhauled to match the new mapping annotations.
+
+See link:{hibernateSearchDocUrl}#mapper-orm-programmatic-mapping[here] for the entry point,
+and refer to the javadoc for details.
+
+[[analysis-definition-provider]]
+=== Analysis definition provider
+
+TODO
+
+[[bridges]]
+=== Bridges
+
+TODO
+
+[[entity-indexing-interceptors]]
+=== Entity indexing interceptors
+
+TODO
+
+See link:{hibernateSearchDocUrl}#mapper-orm-entityindexmapping-conditional-and-routing[this section of the documentation].
+
+[[searching]]
+=== Searching
+
+TODO
+
+[[searching-facet]]
+==== Facets
 
 TODO
 
@@ -482,11 +1519,6 @@ TODO
 
 TODO
 
-[[analysis-definition-provider]]
-=== Analysis definition provider
-
-TODO
-
 [[spi]]
 == SPI changes
 
@@ -495,4 +1527,36 @@ TODO
 [[behavior]]
 == Behavior changes
 
+WARNING: This section is still incomplete. To be completed upon the CR or release.
+
+[[document-id-is-not-a-field]]
+=== The document ID is not an index field
+
 TODO
+
+[[indexed-is-inherited]]
+=== `@Indexed` is inherited
+
+TODO
+
+[[index-name-defaults-to-entity-name]]
+=== The index name defaults to the entity name
+
+TODO
+
+[[faceting-strings-are-normalized]]
+=== Faceting returns normalized strings
+
+TODO
+
+[[implicit-container-extraction]]
+=== Container extraction for `@*Field` is implied
+
+TODO
+
+[[more-numeric-by-default]]
+=== More fields are numeric by default
+
+TODO @IndexedEmbedded.includeEmbeddedObjectId: previously string except if @NumericField, now numeric except if custom bridge
+
+TODO short/byte: previously string except if @NumericField, now numeric except if custom bridge
