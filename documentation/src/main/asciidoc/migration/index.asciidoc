@@ -1551,6 +1551,42 @@ TODO
 
 TODO
 
+[[factory]]
+=== `@Factory`
+
+The `@Factory` annotation does not exist in Hibernate Search 6 anymore.
+
+You are encouraged to rely on a proper dependency injection framework if you need such a feature:
+just reference the bean name instead of referencing the bean class in your Hibernate Search mapping/configuration.
+See link:{hibernateSearchDocUrl}#configuration-bean[the section of the documentation about beans in Hibernate Search]
+for details and supported DI frameworks.
+
+If you don't use a dependency injection framework,
+here are details on how to migrate:
+
+String bridges, field bridges, class bridges::
+Use their `*Binder` equivalent in Hibernate Search 6,
+which can act as a factory:
+link:{hibernateSearchDocUrl}#mapper-orm-bridge-valuebridge-valuebinder[`ValueBinder`],
+link:{hibernateSearchDocUrl}#mapper-orm-bridge-propertybridge[`PropertyBinder`],
+link:{hibernateSearchDocUrl}#mapper-orm-bridge-typebridge[`TypeBinder`].
+
+Full-text filters::
+These no longer exist in Hibernate Search 6.
+See link:{hibernateSearchJiraUrl}/HSEARCH-3325[HSEARCH-3325].
+
+Programmatic mapping::
+`@Factory` is no longer needed for the programmatic mapping,
+since you will pass a callback (link:{hibernateSearchDocUrl}#mapper-orm-programmatic-mapping[`HibernateOrmSearchMappingConfigurer`])
+instead of passing the mapping directly.
+Whatever code was implemented in your factory can be moved to the configurer.
+
+Analysis definition providers::
+Analysis definition providers <<analysis-definition-provider,are now called analysis configurers>>,
+and as they are just callbacks that are used only once,
+the `@Factory` annotation should not be necessary.
+Whatever code was implemented in your factory can be moved to the configurer.
+
 [[spi]]
 == SPI changes
 
