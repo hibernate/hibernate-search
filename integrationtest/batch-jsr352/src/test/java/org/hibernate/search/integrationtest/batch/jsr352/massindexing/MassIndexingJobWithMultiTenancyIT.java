@@ -19,15 +19,15 @@ import javax.batch.runtime.JobExecution;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
-import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
 import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchBackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneBackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
 import org.junit.Before;
@@ -40,7 +40,7 @@ import org.junit.Test;
 public class MassIndexingJobWithMultiTenancyIT {
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withSingleBackend( new LuceneBackendConfiguration() );
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withSingleBackend( backendConfiguration() );
 
 	private static final String TARGET_TENANT_ID = "targetTenant";
 
@@ -64,8 +64,7 @@ public class MassIndexingJobWithMultiTenancyIT {
 				.start()
 				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
 						AutomaticIndexingStrategyName.NONE )
-				.withBackendProperty( LuceneBackendSettings.MULTI_TENANCY_STRATEGY,
-						MultiTenancyStrategyName.DISCRIMINATOR.name() )
+				.withBackendProperty( "multi_tenancy.strategy", "discriminator" )
 				.tenants( TARGET_TENANT_ID, UNUSED_TENANT_ID )
 				.setup( Company.class );
 
@@ -112,5 +111,10 @@ public class MassIndexingJobWithMultiTenancyIT {
 
 	private Session openSessionWithTenantId(String tenantId) {
 		return sessionFactory.withOptions().tenantIdentifier( tenantId ).openSession();
+	}
+
+	private static BackendConfiguration backendConfiguration() {
+		return ( BackendConfiguration.isElasticsearch() ) ? new ElasticsearchBackendConfiguration() :
+				new LuceneBackendConfiguration();
 	}
 }
