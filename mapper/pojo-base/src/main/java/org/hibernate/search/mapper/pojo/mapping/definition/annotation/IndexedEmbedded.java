@@ -228,6 +228,4 @@ public @interface IndexedEmbedded {
 		IndexedEmbedded[] value();
 	}
 
-	// TODO HSEARCH-3071 includeEmbeddedObjectId
-
 }
