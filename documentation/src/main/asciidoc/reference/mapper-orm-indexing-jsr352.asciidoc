@@ -47,11 +47,11 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 |Specify whether the existing index should be purged at the beginning of the job. This operation
 takes place before indexing.
 
-|`optimizeAfterPurge`
-|`optimizeAfterPurge(boolean)`
+|`mergeSegmentsAfterPurge`
+|`mergeSegmentsAfterPurge(boolean)`
 |Optional
 |True
-|Specify whether the mass indexer should be optimized at the beginning of the job. This operation
+|Specify whether the mass indexer should merge segments at the beginning of the job. This operation
 takes place after the purge operation and before indexing.
 
 |`optimizeOnFinish`

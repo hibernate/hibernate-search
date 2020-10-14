@@ -95,7 +95,7 @@ public final class MassIndexingJob {
 		private String entityManagerFactoryNamespace;
 		private String entityManagerFactoryReference;
 		private CacheMode cacheMode;
-		private Boolean optimizeAfterPurge;
+		private Boolean mergeSegmentsAfterPurge;
 		private Boolean optimizeOnFinish;
 		private Boolean purgeAllOnStart;
 		private Integer idFetchSize;
@@ -278,18 +278,18 @@ public final class MassIndexingJob {
 		}
 
 		/**
-		 * Specify whether the mass indexer should be optimized at the beginning of the job. This operation takes place
+		 * Specify whether the mass indexer should merge segments at the beginning of the job. This operation takes place
 		 * after the purge operation and before indexing.
 		 * <p>
 		 * This is an optional parameter, its default value is
-		 * {@link MassIndexingJobParameters.Defaults#OPTIMIZE_AFTER_PURGE}.
+		 * {@link MassIndexingJobParameters.Defaults#MERGE_SEGMENTS_AFTER_PURGE}.
 		 *
-		 * @param optimizeAfterPurge optimize after purge.
+		 * @param mergeSegmentsAfterPurge merge segments after purge.
 		 *
 		 * @return itself
 		 */
-		public ParametersBuilder optimizeAfterPurge(boolean optimizeAfterPurge) {
-			this.optimizeAfterPurge = optimizeAfterPurge;
+		public ParametersBuilder mergeSegmentsAfterPurge(boolean mergeSegmentsAfterPurge) {
+			this.mergeSegmentsAfterPurge = mergeSegmentsAfterPurge;
 			return this;
 		}
 
@@ -407,7 +407,7 @@ public final class MassIndexingJob {
 			addIfNotNull( jobParams, MassIndexingJobParameters.SESSION_CLEAR_INTERVAL, sessionClearInterval );
 			addIfNotNull( jobParams, MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY, maxResultsPerEntity );
 			addIfNotNull( jobParams, MassIndexingJobParameters.MAX_THREADS, maxThreads );
-			addIfNotNull( jobParams, MassIndexingJobParameters.OPTIMIZE_AFTER_PURGE, optimizeAfterPurge );
+			addIfNotNull( jobParams, MassIndexingJobParameters.MERGE_SEGMENTS_AFTER_PURGE, mergeSegmentsAfterPurge );
 			addIfNotNull( jobParams, MassIndexingJobParameters.OPTIMIZE_ON_FINISH, optimizeOnFinish );
 			addIfNotNull( jobParams, MassIndexingJobParameters.PURGE_ALL_ON_START, purgeAllOnStart );
 			addIfNotNull( jobParams, MassIndexingJobParameters.ENTITY_TYPES, getEntityTypesAsString() );
