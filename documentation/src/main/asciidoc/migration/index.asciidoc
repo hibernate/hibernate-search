@@ -20,3 +20,61 @@ NOTE: If you think something is missing or something does not work, please link:
 If you're looking to migrate from an earlier version,
 you should migrate step-by-step, from one minor version to the next,
 following the migration guide of link:https://hibernate.org/search/documentation/[each version].
+
+[[recommended-procedure]]
+== Recommended procedure
+
+Search 6 introduces new APIs, so migrating older projects will be more work than usual.
+
+To facilitate the process of migrating, Hibernate Search 6 includes a "migration helper" module
+that allows you to use the Hibernate Search 5 APIs with Hibernate Search 6 and a Lucene backend under the hood.
+However, this module does not offer full backward compatibility: for some features that changed dramatically,
+it may not be possible to use the Search 5 APIs anymore.
+See <<migration-helper>> for more information.
+
+[NOTE]
+====
+For those who cannot afford to, or do not want to, spend the time required to migrate,
+we intend to continue maintenance releases (= bugfixes) of Hibernate Search 5.x:
+no end-of-life date has been set at the moment.
+====
+
+[[requirements]]
+== Requirements
+
+TODO
+
+[[maven-coordinates]]
+== Maven coordinates changes
+
+TODO
+
+[[data-format]]
+== Data format changes
+
+TODO
+
+[[migration-helper]]
+== Migration helper
+
+TODO
+
+[[configuration]]
+== Configuration changes
+
+TODO
+
+[[api]]
+== API changes
+
+TODO
+
+[[spi]]
+== SPI changes
+
+TODO
+
+[[behavior]]
+== Behavior changes
+
+TODO
