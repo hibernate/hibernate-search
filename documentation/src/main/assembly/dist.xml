@@ -58,5 +58,27 @@
                 <include>*/*.pdf</include>
             </includes>
         </fileSet>
+
+        <!-- Migration guide -->
+        <fileSet>
+            <directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
+            <outputDirectory>migration/html_single/css/</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${asciidoctor.aggregated-resources-dir}/script/</directory>
+            <outputDirectory>migration/html_single/script/</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${asciidoctor.aggregated-resources-dir}/images/</directory>
+            <outputDirectory>migration/html_single/images/</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${asciidoctor.base-output-dir}/migration/</directory>
+            <outputDirectory>migration/</outputDirectory>
+            <includes>
+                <include>*/*.html</include>
+                <include>*/*.pdf</include>
+            </includes>
+        </fileSet>
     </fileSets>
 </assembly>
