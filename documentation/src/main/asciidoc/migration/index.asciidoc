@@ -84,7 +84,53 @@ so that Hibernate Search will automatically pick the right predicate/sort depend
 [[migration-helper]]
 == Migration helper
 
-TODO
+=== Purpose
+
+Hibernate Search 6 includes a temporary additional "migration helper" module
+that provides partial compatibility with Hibernate Search 5 APIs backed by the Hibernate Search 6 implementations.
+
+This module should make migration easier by making sure that code relying on the most-frequently-used APIs
+(mapping annotations, search DSL, ...)
+continues to compile and run.
+The idea is to use the migration helper temporarily to make most of the application code (search queries, ...) work,
+making it easier to focus on migrating configuration and to assess the effort required to migrate the remaining code.
+
+[IMPORTANT]
+====
+The migration helper should not be used in production environments.
+
+It has limitations preventing full compatibility with Hibernate Search 5,
+and these limitations will never be addressed.
+
+All APIs defined in the migration helper are deprecated and will be removed in the next major version
+of Hibernate Search.
+====
+
+=== How to use the migration helper
+
+To use the migration helper, add the following dependency to your project:
+
+[source, XML, subs="+attributes"]
+----
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-v5migrationhelper-orm</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+----
+
+Then, try to recompile your application.
+Compilation errors should point you to the most significant API changes that require your immediate attention;
+most of the code that still compiles should work as it used to in Hibernate Search 5.
+
+[NOTE]
+====
+The migration helper only addresses Java API compatibility.
+This excludes in particular:
+
+* Configuration properties: they must still be <<configuration,replaced with Search 6 properties>>.
+* Data format: data must still be <<data-format,reindexed>>.
+====
 
 [[configuration]]
 == Configuration changes
