@@ -42,17 +42,44 @@ no end-of-life date has been set at the moment.
 [[requirements]]
 == Requirements
 
-TODO
+Hibernate Search 6 is still compatible with both JDK8 and JDK11.
+
+The required versions of dependencies changed:
+
+* The Hibernate ORM mapper now requires Hibernate ORM 5.4.4.Final or later
+(5.4.3.Final and earlier won't work correctly).
+* The Elasticsearch backend now requires Elasticsearch 5.6, 6.8 or 7.9.
+* The Lucene backend now requires Lucene 8.6.
 
 [[maven-coordinates]]
 == Maven coordinates changes
 
-TODO
+If you pull Hibernate Search artifacts from a Maven repository and you come from Hibernate Search 5,
+be aware that just bumping the version number will not be enough:
+
+* the group IDs changed from `org.hibernate` to `org.hibernate.search`
+* most of the artifact IDs changed to reflect the new mapper/backend design
+* the Lucene integration now requires an explicit dependency instead of being pulled by the engine by default.
+
+Read the link:{hibernateSearchDocUrl}#getting-started-dependencies[getting started guide, section "dependencies"]
+for more information.
 
 [[data-format]]
-== Data format changes
+== Data format and schema changes
 
-TODO
+Indexes created with Hibernate Search 5 or earlier are not compatible with Hibernate Search 6.
+This goes for embedded-Lucene indexes as well as Elasticsearch indexes.
+
+In order to upgrade an application to Hibernate Search 6, all data must be reindexed.
+See link:{hibernateSearchDocUrl}#mapper-orm-indexing-massindexer[the documentation of the `MassIndexer`]
+for instructions.
+
+Similarly, native queries/predicates/sorts targeting Hibernate Search 5 indexes
+(e.g. manual instantiation of Lucene `Query` types, Elasticsearch JSON) may not work correctly
+with Hibernate Search 6, because the underlying type of some fields may have changed.
+To avoid that sort of problem in future major upgrades, we recommend you use the <<searching,Hibernate Search DSL>>
+to create predicates and sorts,
+so that Hibernate Search will automatically pick the right predicate/sort depending on the field type.
 
 [[migration-helper]]
 == Migration helper
