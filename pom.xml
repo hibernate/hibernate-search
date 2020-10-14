@@ -173,6 +173,12 @@
     </modules>
 
     <properties>
+        <!--
+             Version to be used as baseline for API/SPI change reports,
+             and for the migration guide
+          -->
+        <version.org.hibernate.search.previous-stable>5.11.5.Final</version.org.hibernate.search.previous-stable>
+
         <!-- Main dependencies -->
 
         <!-- >>> Common -->
@@ -399,9 +405,6 @@
             such as when fooling Sonar into thinking there is no "main" source in a project.
          -->
         <rootProject.emptySubdirectory>${rootProject.directory}/.empty</rootProject.emptySubdirectory>
-
-        <!-- Version to be used as baseline for API/SPI change reports -->
-        <previous.stable>5.10.3.Final</previous.stable>
 
         <!-- JDK version required for the build; we target 8 but require at least 11 for the build -->
         <jdk.min.version>11</jdk.min.version>
@@ -973,8 +976,6 @@
                             <rootLocationProperty>rootProject.directory</rootLocationProperty>
                         </configuration>
                     </execution>
-                    <!-- The following defines the properties 'parsedVersion.majorVersion'
-                        and 'parsedVersion.minorVersion' to be in synch with the current project version -->
                     <execution>
                         <id>parse-project-version</id>
                         <goals>
@@ -983,6 +984,16 @@
                         <configuration>
                             <propertyPrefix>parsed-version.org.hibernate.search</propertyPrefix>
                             <versionString>${project.version}</versionString>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>parse-project-previous-stable-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>parsed-version.org.hibernate.search.previous-stable</propertyPrefix>
+                            <versionString>${version.org.hibernate.search.previous-stable}</versionString>
                         </configuration>
                     </execution>
                     <execution>
@@ -1642,7 +1653,7 @@
                         <dependency>
                             <groupId>org.hibernate.search</groupId>
                             <artifactId>${project.artifactId}</artifactId>
-                            <version>${previous.stable}</version>
+                            <version>${version.org.hibernate.search.previous-stable}</version>
                             <type>${project.packaging}</type>
                         </dependency>
                     </oldVersion>
