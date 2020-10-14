@@ -372,7 +372,7 @@ IMPORTANT: A different interface should be implemented: see <<analysis-definitio
 `hibernate.search.elasticsearch.log.json_pretty_printing`::
 Hibernate Search 6 equivalent: `hibernate.search.backend.log.json_pretty_printing`.
 `hibernate.search.elasticsearch.scroll_backtracking_window_size`::
-No equivalent in Hibernate Search 6: scrolling is forward-only.
+No equivalent in Hibernate Search 6: <<scrolling-forward-only,scrolling is forward-only>>.
 `hibernate.search.elasticsearch.scroll_fetch_size`::
 No direct equivalent in Hibernate Search 6.
 +
@@ -568,21 +568,13 @@ Hibernate Search 6 infers indexing dependencies from the mapping,
 and raises errors at bootstrap when the equivalent of `@ContainedIn` cannot be applied automatically
 (for example an `@IndexedEmbedded` association with no inverse side).
 
-The error message includes potential solutions. It looks like this:
-
-> Cannot find the inverse side of the association on type 'MyIndexedType' at path '.myIndexedEmbedded<no value extractors>'
-> Hibernate Search needs this information in order to reindex 'MyIndexedType' when 'MyIndexedEmbeddedType' is modified.
-> You can solve this error by defining the inverse side of this association,
-> either with annotations specific to your integration (`@OneToMany(mappedBy = ...)` in Hibernate ORM)
-> or with the Hibernate Search `@AssociationInverseSide` annotation.
-> Alternatively, if you do not need to reindex 'MyIndexedType' when 'MyIndexedEmbeddedType' is modified,
-> you can disable automatic reindexing with `@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)`.
-
 Thus, the recommended approach when migrating is to simply remove all `@ContainedIn` annotations,
 then deal with the bootstrap errors, if any.
 
 TIP: Hibernate Search 6 is able to raise multiple mapping errors during a single startup,
 so you don't have to restart the application 20 times to address 20 different problems.
+
+See <<automatic-indexing-across-associations-by-default,this section>> for guidance on how to address these errors.
 
 [[datebridge]]
 ==== `@DateBridge`
@@ -862,6 +854,7 @@ introduced in Hibernate Search 6 allows finding documents where a field is prese
 * The default null token is no longer supported, i.e. `Field.DEFAULT_NULL_TOKEN` has no equivalent in Hibernate search 6.
 Each field that requires `indexNullAs` must have its value set explicitly.
 * The (text) value passed to `indexNullAs` must be link:{hibernateSearchDocUrl}#mapper-orm-directfieldmapping-supported-types[formatted according to the type of the field].
+* <<indexnullas-is-for-indexing,`indexNullAs` is irrelevant when building predicates and when projecting>>.
 
 [[field-name]]
 ===== `@Field.name`
@@ -963,9 +956,11 @@ See <<full-text-filter>>.
 `@Indexed` is still available in Hibernate Search 6, but moved to a different package:
 `org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed`.
 
-NOTE: In Hibernate Search 6, <<index-name-defaults-to-entity-name,index names default to the entity name, not the class name>>.
+However, in Hibernate Search 6:
 
-NOTE: In Hibernate Search 6, <<indexed-is-inherited,`@Indexed` is inherited>>.
+* <<index-name-defaults-to-entity-name,index names default to the entity name, not the class name>>.
+* <<indexed-is-inherited,`@Indexed` is inherited>>.
+* <<index-exclusive,each indexed type has its own index>>.
 
 ===== `@Indexed.index`
 
@@ -1828,7 +1823,7 @@ The code below makes some assumptions:
 For matches on the identifier (which is <<document-id-is-not-a-field,no longer a field by default>>),
 use the `id` predicate instead (see below).
 
-`matching(...)` no longer accepts `null`;
+`matching(...)` <<indexnullas-is-for-indexing,no longer accepts `null`>>;
 use a (negated) `exists` predicate instead (see below).
 |qb.keyword().onField("field")
         .matching("value")
@@ -2101,6 +2096,9 @@ The code below makes some assumptions:
         .createSort()
 |f.field("field")
 .6+|link:{hibernateSearchDocUrl}#search-dsl-sort-field[`field`]
+
+Missing values are sorted differently by default.
+See <<sort-missing-values-last-by-default>>.
 |qb.sort().byField("field")
         .asc()
         .createSort()
@@ -2144,6 +2142,9 @@ There is no equivalent in Hibernate Search 6.
 |f.distance("field",
         GeoPoint.of(latitude, longitude))
 |link:{hibernateSearchDocUrl}#search-dsl-sort-distance[`distance`]
+
+Missing values are sorted differently by default.
+See <<sort-missing-values-last-by-default>>.
 
 |qb.sort().byNative(sortField)
 |f.extension(LuceneExtension.get())
@@ -2648,26 +2649,328 @@ We will be glad to help, so feel free to link:https://hibernate.org/community[co
 [[behavior]]
 == Behavior changes
 
-WARNING: This section is still incomplete. To be completed upon the CR or release.
+=== No default bridge for `java.util.Class`
+
+There is no longer a builtin, default bridge for `java.util.Class`.
+
+If you need to index a `Class<?>`, you will need to implement a
+link:{hibernateSearchDocUrl}#mapper-orm-bridge-valuebridge[custom bridge]
+(probably from `Class` to `String`).
+
+Optionally, you can also register your custom bridge as a
+link:{hibernateSearchDocUrl}#mapper-orm-bridge-resolver[default bridge]
+so that it is applied automatically and transparently to all fields defined on properties of type `Class`.
 
 [[document-id-is-not-a-field]]
 === The document ID is not an index field
 
-TODO
+Hibernate Search 5 used to create an index field for document IDs,
+which could then be queried using the query DSL in particular:
+
+[source, JAVA]
+----
+@Indexed
+@Entity
+public class MyEntity {
+
+    @Id // Implicitly creates a String field named "id"
+    public Integer id;
+
+}
+----
+
+In Hibernate Search 6, this is no longer the case.
+The identifier "field" is internal, and is not named after the entity property it originates from.
+
+If you want to use the identifier as a field:
+
+* For exact matches, consider the new link:{hibernateSearchDocUrl}#search-dsl-predicate-id[`id` predicate]
+* For any other reason (sorts, aggregations, non-exact matches, ...),
+declare a field explicitly by annotating the identifier property with
+link:{hibernateSearchDocUrl}#mapper-orm-directfieldmapping[`@GenericField` or a similar annotation].
+
+[[indexed-is-inherited]]
+=== `@Indexed` is inherited
+
+In Hibernate Search 5, `@Indexed` was not inherited by subclasses;
+the following configuration would result in instances of `MyEntity` being indexed,
+but not instances of `MySubClassEntity`:
+
+[source, JAVA]
+----
+@Indexed
+@Entity
+public class MyEntity {
+	// ...
+}
+
+@Entity
+public class MySubClassEntity extends MyEntity {
+	// ...
+}
+----
+
+In Hibernate Search 6, `@Indexed` *is* inherited by subclasses;
+the configuration above would result in instances of both `MyEntity` and `MySubClassEntity` being indexed,
+though in different indexes.
+A search query on type `MyEntity` will return instances of both `MyEntity` and `MySubClassEntity`,
+in accordance with the https://en.wikipedia.org/wiki/Liskov_substitution_principle[Liskov substitution principle].
+
+To prevent `MySubClassEntity` from being indexed, annotate it with `@Indexed(enabled = false)`;
+this will restore the Hibernate Search 5 behavior:
+
+[source, JAVA]
+----
+@Indexed
+@Entity
+public class MyEntity {
+	// ...
+}
+
+@Indexed(enabled = false)
+@Entity
+public class MySubClassEntity extends MyEntity {
+	// ...
+}
+----
+
+[[index-exclusive]]
+=== One index => one type
+
+In Hibernate Search 5, it used to be possible to store multiple entity types in the same index.
+
+In Hibernate Search 6, each type must have its own dedicated index.
+Annotating two distinct types with `@Indexed(index = "my-index")` (the same index name)
+will lead to a bootstrap failure.
+
+[[index-name-defaults-to-entity-name]]
+=== The index name defaults to the entity name
+
+In Hibernate Search 5, the default name of the index for a given entity when `@Indexed.index` was not set
+was the fully-qualified class name, so the following mapping resulted in an index named `com.mycompany.MyEntity1`
+and another named `com.mycompany.MyEntity2`:
+
+[source, JAVA]
+----
+package com.mycompany;
+
+@Indexed
+@Entity
+public class MyEntity1 {
+	// ...
+}
+
+@Indexed
+@Entity(name = "MyEntityTwo")
+public class MyEntity2 {
+	// ...
+}
+----
+
+In Hibernate Search 6, the default name of the index in that case is the JPA entity name,
+so the mapping above results in an index named simply `MyEntity1` and another named `MyEntityTwo`.
+
+[[indexnullas-is-for-indexing]]
+=== `indexNullAs` is irrelevant when building predicates and when projecting
+
+In Hibernate Search 5, when a field was configured with <<field-indexnullas,`indexNullAs`>>:
+
+* passing `null` as the value to match for a query created through the Search DSL
+would automatically translate to the null token.
+* projecting on a field whose value is equal to the configured null token would return `null`.
+
+In Hibernate Search 6, this is no longer the case:
+
+* passing `null` as the value to match for a predicate created through the Search DSL
+will throw an exception (since `null` is not indexed, only the corresponding null token is).
+* projecting on a field whose value is equal to the configured null token
+will return that null token
+(since Hibernate Search can't tell whether the indexed value was `null` or just happened to be equal to the null token).
+
+If this behavior is not acceptable, consider dropping the `indexNullAs` option
+and relying on the link:{hibernateSearchDocUrl}#search-dsl-predicate-exists[`exists` predicate]
+to search for documents that have or don't have a value for a given field.
 
 [[faceting-strings-are-normalized]]
 === Faceting returns normalized strings
 
-TODO
+In Hibernate Search 5, a terms aggregation on a field with a normalizer used to return raw (non-normalized) values.
+
+In Hibernate Search 6, the same aggregation on this normalized field will return normalized values.
+
+[[automatic-indexing-across-associations-by-default]]
+=== `@IndexedEmbedded` on an association enables reindexing when the target entity changes by default
+
+In Hibernate Search 5, automatic reindexing was only triggered by changes to the indexed entity by default:
+if you were to add `@IndexedEmbedded(includePaths = "name")` to an association from entity `A` to another entity `B`,
+then calling `a.setB(...)` would lead to reindexing of `a`,
+but calling `a.getB().setName("a new name")` would not.
+In order to make sure that changes to `B.name` automatically trigger reindexing of the associated `A`,
+you had to mark the inverse side of the association, `B.a`, with the `@ContainedIn` annotation.
+
+This behavior changed in Hibernate Search 6:
+in the example above, Hibernate Search 6 would automatically trigger reindexing of `B.a` when `B.name` is modified,
+*without* the need of applying a <<containedin,`@ContainedIn`>> annotation.
+
+This means that automatic indexing is "safe" by default: whenever you apply `@IndexedEmbedded` to an association,
+Hibernate Search will automatically resolve the inverse side of that association
+and will make sure that any change in "indexed-embedded" entities lead to reindexing of affected indexed entities.
+
+This also means that Hibernate Search 6 needs to know the inverse side of associations annotated with `@IndexedEmbedded`.
+If it can't resolve it (for example when an `@IndexedEmbedded` association has no inverse side),
+Hibernate Search 6 will raise errors at bootstrap, looking like this:
+
+----
+Cannot find the inverse side of the association on type 'A' at path '.b<no value extractors>'
+Hibernate Search needs this information in order to reindex 'A' when 'B' is modified.
+You can solve this error by defining the inverse side of this association,
+either with annotations specific to your integration
+(@OneToMany(mappedBy = ...) in Hibernate ORM)
+or with the Hibernate Search @AssociationInverseSide annotation.
+Alternatively, if you do not need to reindex 'A' when 'B' is modified,
+you can disable automatic reindexing with
+@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW).
+----
+
+The error message already explains the potential solutions,
+but here is a perhaps clearer explanation of each solution
+in the context of migrating Hibernate Search 5 applications:
+
+1. Add an inverse side to the assocation in `B`: `@OneToMany(mappedBy = ...) List<A> a`
+or `@OneToOne(mappedBy = ...) A a` or `@ManyToMany(mappedBy = ...) List<A> a`.
+This is obviously only practical if `B.a` has a reasonably low cardinality
+(a few dozens instances of `A` for a given `B`).
++
+IMPORTANT: Make sure to
+link:{hibernateSearchDocUrl}#mapper-orm-indexing-automatic-concepts-session-consistency[always update both sides of the association when you change it]!
++
+In some rare situations, the inverse side of the association cannot be expressed with `mappedBy`;
+in this case, you can use link:{hibernateSearchDocUrl}#mapper-orm-reindexing-associationinverseside[`@AssociationInverseSide`],
+an annotation specific to Hibernate Search.
+2. Annotate the `@IndexedEmbedded` association with `@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)`,
+which will restore the behavior of Hibernate Search 5 when `@ContainedIn` was not used.
+This is particularly useful when the association is massive and highly asymmetric
+(e.g. hundreds or more instances of `A` for just a dozen instances of `B`)
+and `B` is not expected to change (reference data, e.g. a `Country` entity).
+
+For more information, refer to link:{hibernateSearchDocUrl}#mapper-orm-reindexing[Tuning automatic reindexing],
+in particular link:{hibernateSearchDocUrl}#mapper-orm-reindexing-reindexonupdate[this section for shallow reindexing]
+and link:{hibernateSearchDocUrl}#mapper-orm-reindexing-associationinverseside[this section for specifying the inverse side of an association].
+
+[[indexed-transient-requires-configuration]]
+=== Indexed, `@Transient` properties require additional configuration
+
+In Hibernate Search 5, when a `@Transient` property was mapped to an index field,
+Hibernate Search would switch to a "non-optimized" mode where reindexing was triggered for any change in the same entity,
+assuming that the transient property value was computed from other properties of the same entity.
+This would work fine in some cases, but could lead to unnecessary reindexing when unrelated properties were modified
+and to out-of-sync indexes when the transient property was computed from data extracted from associated entities.
+
+This behavior changed in Hibernate Search 6:
+if a `@Transient` property is mapped to an index field,
+Hibernate Search will trigger a bootstrap failure asking for additionnal configuration.
+
+The "right" solution in that case is to put an annotation on the transient property,
+to explain which properties are used to derive the value of the transient property:
+`@IndexingDependency(derivedFrom = ...)`.
+You can find more information in
+link:{hibernateSearchDocUrl}#mapper-orm-reindexing-derivedfrom[this section of the documentation].
+
+Alternatively, if you do not care about automatic reindexing when the transient property changes,
+then you can just disable automatic reindexing for this property with `@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)`.
+See link:{hibernateSearchDocUrl}#mapper-orm-reindexing-reindexonupdate-no[this section of the documentation].
 
 [[implicit-container-extraction]]
 === Container extraction for `@*Field` is implied
 
-TODO
+In Hibernate Search 6, when a `+@*Field+` annotation is applied on a property of a container type,
+the field will work on container *elements* by default, not on the container itself.
+
+For example, the following mapping will create a `String` field,
+and Hibernate Search will index each element of the `List` in the `notes` index field:
+
+[source, JAVA]
+----
+@FullTextField
+@ElementCollection
+private List<String> notes;
+----
+
+This should be kept in mind when migrating custom bridges that work on container types.
+For example, the following mapping likely won't work, because `MyListBridge` expects values of type `List`, not `String`:
+
+[source, JAVA]
+----
+@GenericField(valueBridge = @ValueBridgeRef(type = MyListBridge.class)) // Will not work
+@ElementCollection
+private List<String> notes;
+----
+
+To disable the automatic extraction of container element (and get back to the Hibernate Search 5 behavior),
+use `extraction = @ContainerExtraction(extract = ContainerExtract.NO)`:
+
+[source, JAVA]
+----
+@GenericField(valueBridge = @ValueBridgeRef(type = MyListBridge.class),
+        extraction = @ContainerExtraction(extract = ContainerExtract.NO)) // Will work
+@ElementCollection
+private List<String> notes;
+----
+
+See link:{hibernateSearchDocUrl}#mapper-orm-containerextractor[this section of the documentation]
+for more information.
 
 [[more-numeric-by-default]]
 === More fields are numeric by default
 
-TODO @IndexedEmbedded.includeEmbeddedObjectId: previously string except if @NumericField, now numeric except if custom bridge
+Fields of type `Boolean`, `boolean`, `Short`, `short`, `Byte` and `byte`
+used to be indexed as string values by default in Hibernate Search 5,
+but are indexed as numeric values by default in Hibernate Search 6.
 
-TODO short/byte: previously string except if @NumericField, now numeric except if custom bridge
+Similarly, fields created to represent the embedded identifier when using `@IndexedEmbedded.includeEmbeddedObjectId`
+used to be string fields, unless annotated with `@NumericField`.
+The behavior changed in Hibernate Search 6:
+
+* If the embedded entity's document identifier has a custom identifier bridge (`@DocumentId(identifierBridge = ...)`),
+then the field representing the embedded identifier will be a string field.
+* Otherwise, the field representing the embedded identifier will be assigned a type by the default value bridge
+for its type.
+This means in particular that a `Long` embedded identifier will be represented by a `Long` embedded field,
+an `Instant` embedded identifier will be represented by an `Instant` embedded field,
+etc.
+
+[[scrolling-forward-only]]
+=== Scrolling is forward-only
+
+When using a `Query` that is an link:{hibernateSearchDocUrl}#search-dsl-query-object[adapter to a Hibernate Search query],
+the `ScrollableResults` returned by `Query.scroll()`/`Query.scroll(ScrollMode)`
+is now always forward-only;
+trying to move the cursor backward will lead to an exception being thrown.
+
+[[scrolling-iterate-batch-loading]]
+=== Scrolling/`Query.iterate()` load entities eagerly in batches
+
+When using a `Query` that is an link:{hibernateSearchDocUrl}#search-dsl-query-object[adapter to a Hibernate Search query],
+the `ScrollableResults` returned by `Query.scroll()`/`Query.scroll(ScrollMode)`,
+as well as the `iterate()` method,
+no longer load entities lazily as late as possible:
+instead, entities are loaded in batches under the hood.
+
+This is important in particular if you clear the session,
+as you might clear an entity that was already loaded as part of the current batch,
+which could result in a `LazyInitializationException` being thrown upon accessing that entity.
+
+You can control the size of batches by
+link:{hibernateSearchDocUrl}#search-dsl-query-fetch-size[configuring the loading fetch size]
+or link:{hibernateSearchDocUrl}#search-dsl-query-fetching-results-scrolling[scrolling through Hibernate Search's own APIs].
+
+[[sort-missing-values-last-by-default]]
+=== When sorting by field value or distance, missing values are last by default
+
+In Hibernate Search 5, sorts involving missing values used to assume a default value depending on the field type,
+e.g. `0` for numeric types.
+As a result, a document whose field does not have a value could end up first,
+or right in the middle of other documents after a sort.
+
+In Hibernate Search 6, a document whose field does not have a value always ends up at the very end by default.
+This behavior link:{hibernateSearchDocUrl}#search-dsl-sort-common-missing[can be customized when defining the sort].

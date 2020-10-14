@@ -133,6 +133,7 @@ to a particular property (and, in the case of `@IndexedEmbedded`, anything beyon
 Several options are available to control exactly how updates to a given property affect reindexing.
 See the sections below for an explanation of each option.
 
+[[mapper-orm-reindexing-reindexonupdate-shallow]]
 === `ReindexOnUpdate.SHALLOW`: limiting automatic reindexing to same-entity updates only
 
 `ReindexOnUpdate.SHALLOW` is most useful when an association is highly asymmetric and therefore unidirectional.
@@ -205,6 +206,7 @@ The index will become slightly out-of-sync,
 but this can be solved by <<mapper-orm-indexing-massindexer,reindexing>> `Book` entities,
 for example every night.
 
+[[mapper-orm-reindexing-reindexonupdate-no]]
 === `ReindexOnUpdate.NO`: disabling automatic reindexing for updates of a particular property
 
 `ReindexOnUpdate.NO` is most useful for properties that change very frequently
