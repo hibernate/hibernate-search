@@ -96,7 +96,7 @@ public final class MassIndexingJob {
 		private String entityManagerFactoryReference;
 		private CacheMode cacheMode;
 		private Boolean mergeSegmentsAfterPurge;
-		private Boolean optimizeOnFinish;
+		private Boolean mergeSegmentsOnFinish;
 		private Boolean purgeAllOnStart;
 		private Integer idFetchSize;
 		private Integer entityFetchSize;
@@ -294,18 +294,18 @@ public final class MassIndexingJob {
 		}
 
 		/**
-		 * Specify whether the mass indexer should be optimized at the end of the job. This operation takes place after
+		 * Specify whether the mass indexer should merge segments at the end of the job. This operation takes place after
 		 * indexing.
 		 * <p>
 		 * This is an optional parameter, its default value is
-		 * {@link MassIndexingJobParameters.Defaults#OPTIMIZE_ON_FINISH}.
+		 * {@link MassIndexingJobParameters.Defaults#MERGE_SEGMENTS_ON_FINISH}.
 		 *
-		 * @param optimizeOnFinish optimize on finish.
+		 * @param mergeSegmentsOnFinish merge segments on finish.
 		 *
 		 * @return itself
 		 */
-		public ParametersBuilder optimizeOnFinish(boolean optimizeOnFinish) {
-			this.optimizeOnFinish = optimizeOnFinish;
+		public ParametersBuilder mergeSegmentsOnFinish(boolean mergeSegmentsOnFinish) {
+			this.mergeSegmentsOnFinish = mergeSegmentsOnFinish;
 			return this;
 		}
 
@@ -408,7 +408,7 @@ public final class MassIndexingJob {
 			addIfNotNull( jobParams, MassIndexingJobParameters.MAX_RESULTS_PER_ENTITY, maxResultsPerEntity );
 			addIfNotNull( jobParams, MassIndexingJobParameters.MAX_THREADS, maxThreads );
 			addIfNotNull( jobParams, MassIndexingJobParameters.MERGE_SEGMENTS_AFTER_PURGE, mergeSegmentsAfterPurge );
-			addIfNotNull( jobParams, MassIndexingJobParameters.OPTIMIZE_ON_FINISH, optimizeOnFinish );
+			addIfNotNull( jobParams, MassIndexingJobParameters.MERGE_SEGMENTS_ON_FINISH, mergeSegmentsOnFinish );
 			addIfNotNull( jobParams, MassIndexingJobParameters.PURGE_ALL_ON_START, purgeAllOnStart );
 			addIfNotNull( jobParams, MassIndexingJobParameters.ENTITY_TYPES, getEntityTypesAsString() );
 			addIfNotNull( jobParams, MassIndexingJobParameters.ROWS_PER_PARTITION, rowsPerPartition );

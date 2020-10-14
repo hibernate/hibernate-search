@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.batch.jsr352.core.massindexing.step.afterchunk.impl;
 
-import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.OPTIMIZE_ON_FINISH;
+import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.MERGE_SEGMENTS_ON_FINISH;
 
 import java.lang.invoke.MethodHandles;
 import javax.batch.api.AbstractBatchlet;
@@ -36,8 +36,8 @@ public class AfterChunkBatchlet extends AbstractBatchlet {
 	private JobContext jobContext;
 
 	@Inject
-	@BatchProperty(name = MassIndexingJobParameters.OPTIMIZE_ON_FINISH)
-	private String serializedOptimizeOnFinish;
+	@BatchProperty(name = MassIndexingJobParameters.MERGE_SEGMENTS_ON_FINISH)
+	private String serializedMergeSegmentsOnFinish;
 
 	@Inject
 	@BatchProperty(name = MassIndexingJobParameters.TENANT_ID)
@@ -45,11 +45,11 @@ public class AfterChunkBatchlet extends AbstractBatchlet {
 
 	@Override
 	public String process() throws Exception {
-		boolean optimizeOnFinish = SerializationUtil.parseBooleanParameterOptional(
-				OPTIMIZE_ON_FINISH, serializedOptimizeOnFinish, Defaults.OPTIMIZE_ON_FINISH
+		boolean mergeSegmentsOnFinish = SerializationUtil.parseBooleanParameterOptional(
+				MERGE_SEGMENTS_ON_FINISH, serializedMergeSegmentsOnFinish, Defaults.MERGE_SEGMENTS_ON_FINISH
 		);
 
-		if ( optimizeOnFinish ) {
+		if ( mergeSegmentsOnFinish ) {
 			log.startOptimization();
 
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();

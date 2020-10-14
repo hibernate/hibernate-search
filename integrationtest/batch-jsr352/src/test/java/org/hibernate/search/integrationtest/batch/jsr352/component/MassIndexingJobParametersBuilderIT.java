@@ -37,7 +37,7 @@ public class MassIndexingJobParametersBuilderIT {
 	private static final String TENANT_ID = "myTenantId";
 
 	private static final boolean MERGE_SEGMENTS_AFTER_PURGE = true;
-	private static final boolean OPTIMIZE_ON_FINISH = true;
+	private static final boolean MERGE_SEGMENTS_ON_FINISH = true;
 	private static final boolean PURGE_ALL_ON_START = true;
 	private static final int ID_FETCH_SIZE = Integer.MIN_VALUE;
 	private static final int ENTITY_FETCH_SIZE = Integer.MIN_VALUE + 1;
@@ -73,7 +73,7 @@ public class MassIndexingJobParametersBuilderIT {
 				.maxResultsPerEntity( MAX_RESULTS_PER_ENTITY )
 				.maxThreads( MAX_THREADS )
 				.mergeSegmentsAfterPurge( MERGE_SEGMENTS_AFTER_PURGE )
-				.optimizeOnFinish( OPTIMIZE_ON_FINISH )
+				.mergeSegmentsOnFinish( MERGE_SEGMENTS_ON_FINISH )
 				.rowsPerPartition( ROWS_PER_PARTITION )
 				.checkpointInterval( CHECKPOINT_INTERVAL )
 				.purgeAllOnStart( PURGE_ALL_ON_START )
@@ -97,8 +97,8 @@ public class MassIndexingJobParametersBuilderIT {
 				Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.MERGE_SEGMENTS_AFTER_PURGE ) )
 		);
 		assertEquals(
-				OPTIMIZE_ON_FINISH,
-				Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.OPTIMIZE_ON_FINISH ) )
+				MERGE_SEGMENTS_ON_FINISH,
+				Boolean.parseBoolean( props.getProperty( MassIndexingJobParameters.MERGE_SEGMENTS_ON_FINISH ) )
 		);
 		assertEquals(
 				ROWS_PER_PARTITION,
