@@ -111,7 +111,7 @@ https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-upgrade.ht
 are still required on your cluster: Hibernate Search will not take care of those.
 
 On top of that, there are some fundamental differences between some versions of Elasticsearch,
-and for that reason, some upgrades will require you to delete your indexes manually and <<search-batchindex,reindex your data>>.
+and for that reason, some upgrades will require you to delete your indexes manually and reindex your data.
 
 The upgrades that require such changes are the following:
 
@@ -163,7 +163,7 @@ Hibernate Search can work with an Elasticsearch server without altering its conf
 
 However some features offered by Hibernate Search require specific configuration:
 
-* on Elasticsearch 2.x only (not necessary on 5.x): if you want to be able to use the Hibernate Search <<search-batchindex-massindexer,MassIndexer>>
+* on Elasticsearch 2.x only (not necessary on 5.x): if you want to be able to use the Hibernate Search MassIndexer
 with `purgeAllOnStart` enabled - it is enabled by default -, or to use `FullTextSession.purge()` or `FullTextSession.purgeAll()`,
 install the link:https://www.elastic.co/guide/en/elasticsearch/plugins/2.2/plugins-delete-by-query.html[`delete-by-query` plugin]
 * on Elasticsearch 2.x only (not necessary on 5.x): if you want to retrieve the distance in a geolocation query, enable the `lang-groovy` plugin,

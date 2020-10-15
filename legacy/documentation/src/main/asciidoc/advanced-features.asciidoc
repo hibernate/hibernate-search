@@ -505,6 +505,6 @@ The use of a tenant identifier will have the following effects:
 1. Every document saved or updated in the index will have an additional field `__HSearch_TenantId`
    containing the tenant identifier.
 2. Every search will be filtered using the tenant identifier.
-3. The MassIndexer (see <<search-batchindex-massindexer>>) will only affect the currently selected tenant.
+3. The MassIndexer will only affect the currently selected tenant.
 
 Note that not using a tenant will return all the matching results for all the tenants in the index.
