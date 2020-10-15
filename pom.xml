@@ -247,6 +247,14 @@
         <!-- >>> Common -->
         <version.log4j>1.2.17</version.log4j>
         <version.junit>4.13.1</version.junit>
+
+        <!--
+            junit-vintage-engine 5.5.2 version does not support junit 4.13.1.
+            If we try to use it, a parsing error is thrown.
+            So we downgrade JUnit, so that junit-vintage-engine will handle it.
+        -->
+        <version.legacy.junit>4.13</version.legacy.junit>
+
         <version.org.hamcrest>2.2</version.org.hamcrest>
         <version.org.mockito>3.5.13</version.org.mockito>
         <version.org.assertj.assertj-core>3.15.0</version.org.assertj.assertj-core>
