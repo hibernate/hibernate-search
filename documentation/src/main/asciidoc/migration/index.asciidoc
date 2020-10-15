@@ -1538,9 +1538,16 @@ you will have to rely on link:{hibernateSearchDocUrl}#mapper-orm-bridge-index-fi
 [[entity-indexing-interceptors]]
 === Entity indexing interceptors
 
-TODO
+Entity indexing interceptors were used in Hibernate Search 5 to implement conditional indexing.
 
-See link:{hibernateSearchDocUrl}#mapper-orm-entityindexmapping-conditional-and-routing[this section of the documentation].
+Conditional indexing can be implemented in Hibernate Search 6 with a different,
+but equivalent solution: the `RoutingBridge`.
+
+The idea is for the `RoutingBridge` to decide, based on the state of an entity,
+whether its document should be routed to the index (indexed) or not (not indexed).
+
+See link:{hibernateSearchDocUrl}#mapper-orm-entityindexmapping-conditional-and-routing[this section of the documentation]
+for more information.
 
 [[searching]]
 === Searching
