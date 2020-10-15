@@ -19,7 +19,7 @@ when the listeners are enabled but no entities are annotated as indexed.
 
 By default, every time an object is inserted, updated or deleted through Hibernate, Hibernate Search
 updates the according Lucene index. It is sometimes desirable to disable that features if either
-your index is read-only or if index updates are done in a batch way (see <<search-batchindex>>).
+your index is read-only or if index updates are done in a batch way.
 
 To disable event based indexing, set
 ====
@@ -635,7 +635,7 @@ the database transaction fail in case there are issues with indexing.
 
 It is possible to apply compensating operations to the index by implementing a custom
 `ErrorHandler` (see <<exception-handling>>), or simply re-synchronize the whole index
-state by starting the MassIndexer (see <<search-batchindex-massindexer>>.
+state by starting the MassIndexer (see MassIndexer.
 
 
 [TIP]

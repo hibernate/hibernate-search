@@ -30,7 +30,7 @@ This MBean gives you access to Statistics object as described in the previous se
 ==== IndexControlMBean
 
 This MBean allows to build, optimize and purge the index for a given entity. Indexing occurs via the
-mass indexing API (see <<search-batchindex-massindexer>>). A requirement for this bean to be
+mass indexing API. A requirement for this bean to be
 registered in JMX is, that the Hibernate SessionFactory is bound to JNDI via the
 `hibernate.session_factory_name` property. Refer to the Hibernate Core manual for more
 information on how to configure JNDI.

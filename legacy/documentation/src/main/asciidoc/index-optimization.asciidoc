@@ -37,7 +37,7 @@ should run it:
 * on an idle system or when the searches are less frequent
 * after a lot of index modifications
 
-When using a MassIndexer (see <<search-batchindex-massindexer>>) it will optimize involved indexes
+When using a MassIndexer it will optimize involved indexes
 by default at the start and at the end of processing; you can change this behavior by using
 MassIndexer.optimizeAfterPurge and MassIndexer.optimizeOnFinish respectively. The initial
 optimization is actually very cheap as it is performed on an empty index: its purpose is to release

@@ -284,8 +284,7 @@ public class Author {
 Hibernate Search will transparently index every entity persisted, updated or removed through
 Hibernate ORM. However, you have to create an initial Lucene index for the data already present in
 your database. Once you have added the above properties and annotations it is time to trigger an
-initial batch index of your books. You can achieve this by using one of the following code snippets
-(see also <<search-batchindex>>):
+initial batch index of your books. You can achieve this by using one of the following code snippets:
 
 .Using Hibernate Session to index data
 ====
