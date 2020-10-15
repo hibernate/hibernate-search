@@ -149,6 +149,7 @@
                                 ${basedir}/../backend/elasticsearch/src/main/java;
                                 ${basedir}/../backend/elasticsearch-aws/src/main/java;
                                 ${basedir}/../backend/lucene/src/main/java;
+                                ${basedir}/../batch-jsr352/core/src/main/java;
                             </sourcepath>
                             <docfilessubdirs>true</docfilessubdirs>
                             <packagesheader>Hibernate Search Packages</packagesheader>
