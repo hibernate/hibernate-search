@@ -484,6 +484,7 @@ two queries if there are more hits than the fetch size but less than twice the f
 etc.
 ====
 
+[[search-dsl-query-entity-graph]]
 === Entity graph
 // Search 5 anchors backward compatibility
 [[_fetching_strategy]]
@@ -766,7 +767,8 @@ but also by the name of its type.
 you can instead use the Elasticsearch extension on the `SearchQuery` to convert it after its creation.
 ====
 
-=== Query metadata in SearchResult: `took` and `timed_out`
+[[search-dsl-query-debugging-took-timedout]]
+=== Query metadata in SearchResult: `took` and `timedOut`
 
 .Returning query execution time and whether a timeout occurred
 ====
