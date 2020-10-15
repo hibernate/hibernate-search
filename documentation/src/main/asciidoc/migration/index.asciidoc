@@ -2493,9 +2493,101 @@ to handle failures during mass indexing differently (e.g. report to the web cons
 More information link:{hibernateSearchDocUrl}#configuration-background-failure-handling#mapper-orm-indexing-massindexer-parameters[here].
 
 [[full-text-filter]]
-=== Full text filter
+=== Full-text filter
 
-TODO
+Hibernate Search 6 does not support named full-text filters at the moment.
+In most cases, you can replace them with static methods.
+
+For example, let's take this filter from a Hibernate Search 5 application:
+
+[source, JAVA]
+----
+public class SecurityFilterFactory {
+    private Integer level;
+
+    /**
+     * injected parameter
+     */
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
+
+    @Factory
+    public Query getFilter() {
+        return new TermQuery( new Term( "level", level.toString() ) );
+    }
+}
+----
+
+[source, JAVA]
+----
+@Entity
+@Indexed
+@FullTextFilterDef(name = "security", impl = SecurityFilterFactory.class)
+public class Driver {
+   // ...
+}
+----
+
+The filter could be used this way:
+
+[source, JAVA]
+----
+FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( em );
+QueryBuilder qb = fullTextEntityManager.getSearchFactory()
+        .buildQueryBuilder().forEntity( Driver.class ).get();
+
+BooleanJunction junction = qb.bool();
+junction.must( qb.all().createQuery() );
+
+// Not shown: add user predicates to the junction (search terms, etc.).
+// ...
+
+org.apache.lucene.search.Query luceneQuery = junction.createQuery();
+
+FullTextQuery fullTextQuery = fullTextEntityManager.createFullTextQuery( luceneQuery, Driver.class );
+fullTextQuery.setMaxResults( 20 );
+
+// HERE: Enable the filter
+fullTextQuery.enableFullTextFilter("security").setParameter("level", 5);
+
+List hits = fullTextQuery.getResultList();
+----
+
+In Hibernate Search 6, you can define the filter as a static method:
+
+[source, JAVA]
+----
+public final class SecurityFilterFactory {
+	private SecurityFilterFactory() {
+	}
+
+    public static SearchPredicate create(SearchPredicateFactory factory, int level) {
+        return factory.match().field( "level" ).matching( level.toString() );
+    }
+}
+----
+
+And then simply add it to the root boolean predicate when searching:
+
+[source, JAVA]
+----
+SearchSession session = Search.session( entityManager );
+List<Book> hits = searchSession.search( Driver.class )
+        .where( f -> f.bool( b -> {
+            b.must( f.matchAll() );
+            // HERE: Enable the filter
+            b.filter( SecurityFilterFactory.create( f, 5 ) );
+
+            // Not shown: add user predicates to the junction (search terms, etc.).
+            // ...
+        } ) )
+        .fetchHits( 20 );
+----
+
+NOTE: If you have needs that can be addressed only with named full-text filters,
+and cannot be solved with the solution above,
+feel free to drop a comment to explain your use case on link:{hibernateSearchJiraUrl}/HSEARCH-3325[HSEARCH-3325].
 
 [[statistics]]
 === Statistics
@@ -2531,7 +2623,7 @@ link:{hibernateSearchDocUrl}#mapper-orm-bridge-typebridge[`TypeBinder`].
 
 Full-text filters::
 These no longer exist in Hibernate Search 6.
-See link:{hibernateSearchJiraUrl}/HSEARCH-3325[HSEARCH-3325].
+See <<full-text-filter>>.
 
 Programmatic mapping::
 `@Factory` is no longer needed for the programmatic mapping,
