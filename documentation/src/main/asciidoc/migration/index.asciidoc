@@ -2500,7 +2500,14 @@ TODO
 [[statistics]]
 === Statistics
 
-TODO
+Hibernate Search 6 does not provide statistics at the moment.
+
+The current plans are to implement support for tracing in a future release
+(link:{hibernateSearchJiraUrl}/HSEARCH-4057[HSEARCH-4057]).
+This would provide a more powerful solution to users looking for insight into the behavior of their application.
+
+If you need this feature urgently, we'll gladly help anyone interested in contributing a patch:
+feel free to link:https://hibernate.org/community[contact us].
 
 [[factory]]
 === `@Factory`
