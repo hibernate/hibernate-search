@@ -2482,7 +2482,15 @@ to restrict the hits to the selected facet(s):
 [[error-handler]]
 === Error handler
 
-TODO
+The `ErrorHandler` interface was replaced with the `FailureHandler` interface,
+and the related configuration properties changed.
+
+See link:{hibernateSearchDocUrl}#configuration-background-failure-handling[this section of the documentation]
+for more information about background failure handling.
+
+Also, be aware that the `MassIndexer` now exposes a `failureHandler` parameter,
+to handle failures during mass indexing differently (e.g. report to the web console from which mass indexing was initiated).
+More information link:{hibernateSearchDocUrl}#configuration-background-failure-handling#mapper-orm-indexing-massindexer-parameters[here].
 
 [[full-text-filter]]
 === Full text filter
