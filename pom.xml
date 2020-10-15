@@ -262,7 +262,7 @@
         <version.org.openjdk.jmh>1.23</version.org.openjdk.jmh>
 
         <!-- >>> Spring integration tests -->
-        <version.org.springframework.boot>2.2.0.RELEASE</version.org.springframework.boot>
+        <version.org.springframework.boot>2.3.4.RELEASE</version.org.springframework.boot>
 
         <!-- Maven plugins versions -->
 
