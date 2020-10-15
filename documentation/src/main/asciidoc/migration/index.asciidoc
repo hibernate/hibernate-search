@@ -432,12 +432,28 @@ when there is no transaction, on session flush].
 [[jmx]]
 === JMX
 
-TODO
+Hibernate Search 6 does not provide JMX support at the moment.
+
+The current plans are to implement support for tracing in a future release
+(link:{hibernateSearchJiraUrl}/HSEARCH-4057[HSEARCH-4057]).
+This would provide a more powerful solution to users looking for insight into the behavior of their application.
+
+If you need this feature urgently, we'll gladly help anyone interested in contributing a patch:
+feel free to link:https://hibernate.org/community[contact us].
 
 [[search-5-backends]]
 === Backends
 
-TODO
+Hibernate Search 6 does not provide support for the JGroups, JMS, Infinispan
+or filesystem-master/filesystem-slave backends at the moment.
+
+If you need to scale your application to multiple nodes,
+consider switching to the link:{hibernateSearchDocUrl}#architecture-examples-elasticsearch[Elasticsearch backend].
+
+The roadmap for Hibernate Search 6.1 will focus on restoring support for clustered application
+(link:{hibernateSearchJiraUrl}/HSEARCH-3281[HSEARCH-3281])
+probably by offering out-of-session, fully-asynchronous indexing (re-loading entities in a separate background thread).
+This should improve the scalability and robustness of clustered applications relying on an Elasticsearch backend.
 
 [[api]]
 == API changes
