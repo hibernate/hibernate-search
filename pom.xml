@@ -1843,10 +1843,6 @@
             <activation>
                 <jdk>[14,)</jdk>
             </activation>
-            <properties>
-                <!-- Spring isn't ready for JDK14 yet: https://github.com/spring-projects/spring-framework/issues/23678 -->
-                <failsafe.spring.skip>true</failsafe.spring.skip>
-            </properties>
         </profile>
 
         <profile>
@@ -1869,6 +1865,8 @@
                     ${surefire.jvm.args.java-version.lenient}
                     --illegal-access=deny
                 </surefire.jvm.args.java-version.strict>
+                <!-- Spring isn't ready for JDK16 yet -->
+                <failsafe.spring.skip>true</failsafe.spring.skip>
             </properties>
         </profile>
 
