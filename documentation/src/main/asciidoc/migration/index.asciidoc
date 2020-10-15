@@ -1529,12 +1529,932 @@ See link:{hibernateSearchDocUrl}#mapper-orm-entityindexmapping-conditional-and-r
 [[searching]]
 === Searching
 
-TODO
+[[searching-fulltextquery]]
+==== `FullTextQuery` => DSL
+
+===== Basics
+
+Search APIs have changed significantly, in order to implement several improvements, in particular:
+
+* to get rid of Lucene types leaking through Hibernate Search APIs;
+* to avoid returning raw types in search results;
+* to expose a more adapted, native interface for Hibernate Search queries,
+instead of trying to make do with JPA's `Query` type;
+* to offer a less verbose, lambda-based syntax as an alternative to the "traditional", object-based syntax.
+
+The recommended way to build search queries in Hibernate Search 6 is through the Hibernate Search DSL.
+You can find an explanation of entry points and all available features of this DSL
+in link:{hibernateSearchDocUrl}#search-dsl-query[the dedicated section of the documentation].
+
+As to migrating existing queries, let's take the following query in Hibernate Search 5 as an example:
+
+[source, JAVA]
+----
+int pageIndex = ...;
+int pageSize = ...;
+FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( em );
+QueryBuilder qb = fullTextEntityManager.getSearchFactory()
+        .buildQueryBuilder().forEntity( Book.class ).get();
+
+org.apache.lucene.search.Query luceneQuery = qb.keyword()
+        .onField( "title" ).boostedTo( 3 )
+        .matching( "robot" )
+        .createQuery();
+
+FullTextQuery fullTextQuery = fullTextEntityManager.createFullTextQuery( luceneQuery, Book.class );
+fullTextQuery.setFirstResult( pageIndex * pageSize );
+fullTextQuery.setMaxResults( pageSize );
+
+List hits = fullTextQuery.getResultList();
+int totalHitCount = fullTextQuery.getResultSize();
+----
+
+With the recommended lambda-based syntax, the equivalent code in Hibernate Search 6 will be:
+
+[source, JAVA]
+----
+int pageIndex = ...;
+int pageSize = ...;
+SearchSession session = Search.session( entityManager );
+
+SearchResult<Book> result = session.search( Book.class )
+        .where( f -> f.match().field( "title" ).matching( "robot" ).boost( 3 ) )
+        .fetch( pageIndex * pageSize, pageSize );
+
+List<Book> hits = result.hits();
+long totalHitCount = result.total().hitCount();
+----
+
+Alternatively, if the total hit count is not desired, you can use `fetchHits()`:
+
+[source, JAVA]
+----
+int pageIndex = ...;
+int pageSize = ...;
+SearchSession session = Search.session( entityManager );
+
+List<Book> hits = session.search( Book.class )
+        .where( f -> f.match().field( "title" ).matching( "robot" ).boost( 3 ) )
+        .fetchHits( pageIndex * pageSize, pageSize );
+----
+
+[[searching-fulltextquery-jpa-orm]]
+===== Adapter from search query to JPA/ORM query
+
+If you really need a `Query` object implementing JPA or Hibernate ORM interfaces,
+for example to integrate with external code designed for JPA/Hibernate ORM,
+know that the Hibernate Search query can still be converted.
+
+See link:{hibernateSearchDocUrl}#search-dsl-query-object[this section of the documentation] for more information.
+
+[[searching-fulltextquery-initializeObjectsWith]]
+===== `FullTextQuery.initializeObjectsWith`
+
+Hibernate Search 6 does not allow setting a `DatabaseRetrievalMethod` on a search query:
+entities are always loaded with a Hibernate ORM query.
+
+In Hibernate Search 6,
+the equivalent to setting the `ObjectLookupMethod` with `FullTextQuery.initializeObjectsWith`
+is to link:{hibernateSearchDocUrl}#search-dsl-query-cache-lookup-strategy[set the cache lookup strategy].
+
+[[searching-fulltextquery-setCriteriaQuery]]
+===== `FullTextQuery.setCriteriaQuery(...)`
+
+Hibernate Search 6 does not allow adding a `Criteria` object to a search query.
+
+If your goal is to control loading of associations precisely,
+link:{hibernateSearchDocUrl}#search-dsl-query-entity-graph[set an entity graph in loading options] instead.
+
+If your goal is to apply a filter expressed by an SQL "where" clause executed in-database,
+rework your query to <<projections,project on the entity ID>>,
+and execute a JPA/Hibernate ORM query after the search query to filter the entities and load them.
+
+[[searching-fulltextquery-explain]]
+===== `FullTextQuery.explain(...)`
+
+Hibernate Search 6 still offers a way to explain the score of hits through an `explain` method,
+but that method expects the entity ID, not the internal Lucene document ID
+(which can change from one query execution to the next).
+
+[source, JAVA]
+----
+LuceneSearchQuery<Book> query = searchSession.search( Book.class )
+        .extension( LuceneExtension.get() )
+        .where( f -> f.match()
+                .field( "title" )
+                .matching( "robot" ) )
+        .toQuery();
+
+Explanation explanation = query.explain( 1 );
+----
+
+See link:{hibernateSearchDocUrl}#search-dsl-query-debugging-scores[this section of the documentation].
+
+[[searching-fulltextquery-setfilter]]
+===== `FullTextQuery.setFilter(...)`
+
+`FullTextQuery.setFilter(...)` was deprecated in Hibernate Search 5.
+It is no longer available in Hibernate Search 6.
+
+To filter a query, just wrap your predicate in a boolean predicate
+and add a link:{hibernateSearchDocUrl}#search-dsl-predicate-boolean-filter[`filter` clause].
+
+[[searching-fulltextquery-fulltextfilter]]
+===== `FullTextQuery.enableFullTextFilter(...)` / `FullTextQuery.disableFullTextFilter(...)`
+
+See <<full-text-filter>>.
+
+[[queries]]
+==== `org.apache.lucene.search.Query` => `SearchPredicate`
+
+[[queries-basics]]
+===== Basics
+
+Lucene queries are replaced with Lucene-independent "search predicates" in Hibernate Search 6.
+
+Most of the time, code that builds queries does not need to manipulate search predicates directly,
+thanks to the lambda syntax.
+However, it's still possible to manipulate `SearchPredicate` objects if you need to pass them around from a method to another.
+
+You can find more information about building predicates and details about all available predicates
+in link:{hibernateSearchDocUrl}#search-dsl-predicate[the dedicated section of the documentation],
+and instructions to migrate from the Hibernate Search 5 Query DSL in <<queries-reference>>.
+
+As to migrating existing complex queries, let's consider the query below:
+
+[source, JAVA]
+----
+MySearchParameters params = ...;
+FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( em );
+QueryBuilder qb = fullTextEntityManager.getSearchFactory()
+        .buildQueryBuilder().forEntity( Book.class ).get();
+
+BooleanJunction junction = qb.bool();
+junction.must(qb.all().createQuery());
+
+if ( searchParameters.getSearchTerms() != null ) {
+    junction.must( qb.simpleQueryString().onFields( "title", "description" )
+            .withAndAsDefaultOperator()
+            .matching( searchParameters.getSearchTerms() )
+            .createQuery() );
+}
+if ( searchParameters.getGenre() != null ) {
+    junction.must( qb.keyword().onField( "genre" )
+            .matching( searchParameters.getGenre() ) );
+}
+if ( searchParameters.getMaxBookLength() != null ) {
+    junction.must( qb.range().onField( "pageCount" )
+            .below( searchParameters.getMaxBookLength() ) );
+}
+
+org.apache.lucene.search.Query luceneQuery = junction.createQuery();
+
+FullTextQuery fullTextQuery = fullTextEntityManager.createFullTextQuery( luceneQuery, Book.class );
+fullTextQuery.setFirstResult( params.getPageIndex() * params.getPageSize() );
+fullTextQuery.setMaxResults( params.getPageSize() );
+
+List hits = fullTextQuery.getResultList();
+----
+
+It would look like this in Hibernate Search 6:
+
+[source, JAVA]
+----
+MySearchParameters params = ...;
+SearchSession session = Search.session( entityManager );
+List<Book> hits = searchSession.search( Book.class )
+        .where( f -> f.bool( b -> {
+            b.must( f.matchAll() );
+            if ( searchParameters.getSearchTerms() != null ) {
+                b.must( f.simpleQueryString().fields( "title", "description" )
+                        .matching( searchParameters.getSearchTerms() )
+                        .defaultOperator( BooleanOperator.AND ) );
+            }
+            if ( searchParameters.getGenre() != null ) {
+                b.must( f.match().field( "genre" )
+                        .matching( searchParameters.getGenre() ) );
+            }
+            if ( searchParameters.getMaxBookLength() != null ) {
+                b.must( f.range().field( "pageCount" )
+                        .atMost( searchParameters.getMaxBookLength() ) );
+            }
+        } ) )
+        .fetchHits( params.getPageIndex() * params.getPageSize(), params.getPageSize() );
+----
+
+Alternatively, if for some reasons predicate objects are necessary:
+
+[source, JAVA]
+----
+MySearchParameters params = ...;
+SearchSession session = Search.session( entityManager );
+SearchPredicateFactory pf = session.scope( Book.class ).predicate();
+List<SearchPredicate> predicates = new ArrayList<>();
+
+if ( searchParameters.getSearchTerms() != null ) {
+    predicates.add( pf.simpleQueryString().fields( "title", "description" )
+            .matching( searchParameters.getSearchTerms() )
+            .defaultOperator( BooleanOperator.AND )
+            .toPredicate() );
+}
+if ( searchParameters.getGenre() != null ) {
+    predicates.add( pf.match().field( "genre" )
+            .matching( searchParameters.getGenre() )
+            .toPredicate() );
+}
+if ( searchParameters.getMaxBookLength() != null ) {
+    predicates.add( pf.range().field( "pageCount" )
+            .atMost( searchParameters.getMaxBookLength() )
+            .toPredicate() );
+}
+
+List<Book> hits = searchSession.search( Book.class )
+        .where( f -> f.bool( b -> {
+            b.must( f.matchAll() );
+            for ( SearchPredicate predicate : predicates ) {
+            	b.must( predicate );
+            }
+        } )
+        .fetchHits( params.getPageIndex() * params.getPageSize(), params.getPageSize() );
+----
+
+[[queries-reference]]
+===== `Query` DSL migration reference
+
+The code below makes some assumptions:
+
+* For Hibernate Search 5, a `QueryBuilder` was retrieved from the `SearchFactory` and put in variable `qb`.
+* For Hibernate Search 6, the predicate is being built in a lambda expression:
+`Search.session( entityManager ).search( Book.class ).where( f -> ... )`.
+
+[cols="l,l,a",options="header"]
+|====
+|Hibernate Search 5|Hibernate Search 6|Documentation
+
+|qb.all().createQuery()
+|f.matchAll()
+|link:{hibernateSearchDocUrl}#search-dsl-predicate-match-all[`matchAll`]
+
+|qb.keyword().onField("field")
+        .matching("value")
+        .createQuery()
+|f.match().field("field")
+        .matching("value")
+.6+a|link:{hibernateSearchDocUrl}#search-dsl-predicate-match[`match`]
+
+For matches on the identifier (which is <<document-id-is-not-a-field,no longer a field by default>>),
+use the `id` predicate instead (see below).
+
+`matching(...)` no longer accepts `null`;
+use a (negated) `exists` predicate instead (see below).
+|qb.keyword().onField("field")
+        .matching("value")
+        .ignoreFieldBridge()
+        .createQuery()
+|f.match().field("field")
+        .matching("value",
+                ValueConvert.NO)
+|qb.keyword().onField("field")
+        .matching("value")
+        .ignoreAnalyzer()
+        .createQuery()
+|f.match().field("field")
+        .matching("value")
+        .skipAnalysis()
+|qb.keyword().onField("field")
+        .fuzzy()
+        .matching("value")
+        .createQuery()
+|f.match().field("field")
+        .matching("value")
+        .fuzzy()
+|qb.keyword().onField("field")
+        .fuzzy()
+        .withEditDistanceUpTo(2)
+        .matching("value")
+        .createQuery()
+|f.match().field("field")
+        .matching("value")
+        .fuzzy(2)
+|qb.keyword().onField("field")
+        .fuzzy()
+        .withEditDistanceUpTo(2)
+        .withPrefixLength(1)
+        .matching("value")
+        .createQuery()
+|f.match().field("field")
+        .matching("value")
+        .fuzzy(2,1)
+
+|qb.keyword().onField("field")
+        .matching(null)
+        .createQuery()
+|f.bool().mustNot(f.exists()
+        .field("field"))
+|link:{hibernateSearchDocUrl}#search-dsl-predicate-exists[`exists`]
+
+|qb.keyword().onField("id")
+        .matching(123L)
+        .createQuery()
+|f.id().matching(123L)
+|link:{hibernateSearchDocUrl}#search-dsl-predicate-id[`id`]
+
+|qb.keyword().wildcard()
+        .onField("field")
+        .matching("pattern*")
+        .createQuery()
+|f.wildcard().field("field")
+        .matching("pattern*")
+|link:{hibernateSearchDocUrl}#search-dsl-predicate-wildcard[`wildcard`]
+
+|qb.range().onField("field")
+        .from(0).to(3)
+        .createQuery()
+|f.range().field("field")
+        .between(0,3)
+.6+|link:{hibernateSearchDocUrl}#search-dsl-predicate-range[`range`]
+|qb.range().onField("field")
+        .from(0).to(3).excludeLimit()
+        .createQuery()
+|f.range().field("field")
+        .range(Range.canonical(0,3))
+|qb.range().onField("field")
+        .below(3)
+        .createQuery()
+|f.range().field("field")
+        .atMost(3)
+|qb.range().onField("field")
+        .below(3).excludeLimit()
+        .createQuery()
+|f.range().field("field")
+        .lessThan(3)
+|qb.range().onField("field")
+        .above(0)
+        .createQuery()
+|f.range().field("field")
+        .atLeast(0)
+|qb.range().onField("field")
+        .above(0).excludeLimit()
+        .createQuery()
+|f.range().field("field")
+        .greaterThan(0)
+
+|qb.phrase().onField("field")
+        .sentence("a few words")
+        .createQuery()
+|f.phrase().field("field")
+        .matching("a few words")
+|link:{hibernateSearchDocUrl}#search-dsl-predicate-phrase[`phrase`]
+
+|qb.bool()
+.must(qb.keyword().onField("field1")
+        .matching("value1")
+        .createQuery())
+.should(qb.keyword().onField("field2")
+        .matching("value2")
+        .createQuery())
+.filter(qb.keyword().onField("field3")
+        .matching("value3")
+        .createQuery())
+.must(qb.keyword().onField("field4")
+        .matching("value4")
+        .createQuery())
+        .not()
+.createQuery()
+|f.bool()
+.must(f.match().field("field1")
+        .matching("value1"))
+.should(f.match().field("field2")
+        .matching("value2"))
+.filter(f.match().field("field3")
+        .matching("value3"))
+.mustNot(f.match().field("field4")
+        .matching("value4"))
+.2+|link:{hibernateSearchDocUrl}#search-dsl-predicate-boolean[`bool`]
+|qb.bool()
+.minimumShouldMatchNumber(2)
+.should(qb.keyword().onField("field1")
+        .matching("value1")
+        .createQuery())
+.should(qb.keyword().onField("field2")
+        .matching("value2")
+        .createQuery())
+.createQuery()
+|f.bool()
+.minimumShouldMatchNumber(2)
+.should(f.match().field("field1")
+        .matching("value1"))
+.should(f.match().field("field2")
+        .matching("value2"))
+
+|qb.simpleQueryString().onField("field")
+        .matching("querystring")
+|f.simpleQueryString().field("field")
+        .matching("querystring")
+.2+|link:{hibernateSearchDocUrl}#search-dsl-predicate-simple-query-string[`simpleQueryString`]
+|qb.simpleQueryString()
+        .onField("field")
+        .withAndAsDefaultOperator()
+        .matching("querystring")
+|f.simpleQueryString().field("field")
+        .defaultOperator(BooleanOperator.AND)
+        .matching("querystring")
+
+|qb.spatial().onField("field")
+        .within(51,Unit.KM)
+        .ofLatitude(centerLatitude)
+        .andLongitude(centerLongitude)
+        .createQuery()
+|f.spatial().within()
+        .field("field")
+        .circle(centerLatitude,
+                centerLongitude,
+                51,
+                DistanceUnit.KILOMETERS)
+.2+|link:{hibernateSearchDocUrl}#search-dsl-predicate-spatial-within[`within`]
+|Coordinates center = ...;
+qb.spatial().onField("field")
+        .within(51,Unit.KM)
+        .ofCoordinates(center)
+        .createQuery()
+|GeoPoint center = ...;
+f.spatial().within()
+        .field("field")
+        .circle(center,
+                51,
+                DistanceUnit.KILOMETERS)
+
+|qb.moreLikeThis()
+|No equivalent in Hibernate Search 6.
+
+If you need more-like-this predicates,
+feel free to drop a comment to explain your use case on link:{hibernateSearchJiraUrl}/HSEARCH-3272[HSEARCH-3272].
+|====
+
+[[queries-native]]
+===== Native query
+
+It is still possible to rely on native Lucene queries (e.g. `new RegexpQuery(...)`)
+or Elasticsearch queries (e.g. `{'match': {...}}`)
+in Hibernate Search 6:
+you will just need to rely on the link:{hibernateSearchDocUrl}#search-dsl-predicate-extensions[backend-specific extension].
+
+[WARNING]
+====
+Be aware that internal field types may have changed since Hibernate Search 5;
+see <<data-format>>.
+====
+
+[[sorts]]
+==== `org.apache.lucene.search.Sort` / `SortField` => `SearchSort`
+
+Lucene sort fields are replaced with Lucene-independent "search sorts" in Hibernate Search 6.
+
+Most of the time, code that builds queries does not need to manipulate search sorts directly,
+thanks to the lambda syntax.
+However, it's still possible to manipulate `SearchSort` objects if you need to pass them around from a method to another.
+
+You can find more information about building sorts and details about all available sorts
+in link:{hibernateSearchDocUrl}#search-dsl-sort[the dedicated section of the documentation],
+and instructions to migrate from the Hibernate Search 5 Query DSL in <<sorts-reference>>.
+
+As to adding sorts to search queries, let's consider the query below:
+
+[source, JAVA]
+----
+MySearchParameters params = ...;
+FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( em );
+QueryBuilder qb = fullTextEntityManager.getSearchFactory()
+        .buildQueryBuilder().forEntity( Book.class ).get();
+
+FullTextQuery fullTextQuery = fullTextEntityManager.createFullTextQuery( qb.all().createQuery(), Book.class );
+fullTextQuery.setFirstResult( params.getPageIndex() * params.getPageSize() );
+fullTextQuery.setMaxResults( params.getPageSize() );
+
+fullTextQuery.sort( qb.sort().byField( "pageCount" ).desc()
+        .andByField( "title_sort" )
+        .createSort() );
+
+List hits = fullTextQuery.getResultList();
+----
+
+It would look like this in Hibernate Search 6:
+
+[source, JAVA]
+----
+MySearchParameters params = ...;
+SearchSession session = Search.session( entityManager );
+List<Book> hits = searchSession.search( Book.class )
+        .where( f -> f.matchAll() )
+        .sort( f -> f.field( "pageCount" ).desc()
+                .then().field( "title_sort" ) )
+        .fetchHits( params.getPageIndex() * params.getPageSize(), params.getPageSize() );
+----
+
+[[sorts-reference]]
+===== `Sort` DSL migration reference
+
+The code below makes some assumptions:
+
+* For Hibernate Search 5, a `QueryBuilder` was retrieved from the `SearchFactory` and put in variable `qb`.
+* For Hibernate Search 6, the sort is being built in a lambda expression:
+`Search.session( entityManager ).search( Book.class ).where( f -> f.matchAll() ).sort( f -> ... )`.
+
+[cols="l,l,a",options="header"]
+|====
+|Hibernate Search 5|Hibernate Search 6|Documentation
+
+|qb.sort().byScore()
+        .createSort()
+|f.score()
+|link:{hibernateSearchDocUrl}#search-dsl-sort-score[`score`]
+
+|qb.sort().byIndexOrder()
+        .createSort()
+|f.indexOrder()
+|link:{hibernateSearchDocUrl}#search-dsl-sort-index-order[`indexOrder`]
+
+|qb.sort().byField("field")
+        .createSort()
+|f.field("field")
+.6+|link:{hibernateSearchDocUrl}#search-dsl-sort-field[`field`]
+|qb.sort().byField("field")
+        .asc()
+        .createSort()
+|f.field("field").asc()
+|qb.sort().byField("field")
+        .desc()
+        .createSort()
+|f.field("field").desc()
+|qb.sort().byField("field")
+        .onMissingValue()
+        .sortFirst()
+        .createSort()
+|f.field("field")
+        .missing().first()
+|qb.sort().byField("field")
+        .onMissingValue()
+        .sortLast()
+        .createSort()
+|f.field("field")
+        .missing().last()
+|qb.sort().byField("field")
+        .onMissingValue()
+        .use("value")
+        .createSort()
+|f.field("field")
+        .missing().use("value")
+
+|qb.sort()
+        .byField("field",
+                SortField.Type.STRING)
+        .createSort()
+|-
+|This method was deprecated in Hibernate Search 5.
+
+There is no equivalent in Hibernate Search 6.
+
+|qb.sort().byDistance().onField("field")
+        .fromLatitude(latitude)
+        .andLongitude(longitude)
+        .createSort()
+|f.distance("field",
+        GeoPoint.of(latitude, longitude))
+|link:{hibernateSearchDocUrl}#search-dsl-sort-distance[`distance`]
+
+|qb.sort().byNative(sortField)
+|f.extension(LuceneExtension.get())
+        .fromLuceneSortField(sortField)
+|link:{hibernateSearchDocUrl}#search-dsl-sort-extensions-lucene-from-lucene-sort-field[`fromLuceneSortField`]
+
+Be aware that internal field types may have changed since Hibernate Search 5;
+see <<data-format>>.
+
+In particular, Hibernate Search 6 relies on `SORTED_SET` docvalues for most field types,
+so the classic `SortField.TYPE.STRING` and similar just won't work:
+you need to go through the DSL to create the appropriate sorts.
+
+|qb.sort().byNative("authors.name", "{'order':'asc', 'mode': 'min'}")
+|f.extension(ElasticsearchExtension.get())
+        .fromJson("{'authors.name': {'order':'asc', 'mode': 'min'} }")
+|link:{hibernateSearchDocUrl}#search-dsl-sort-extensions-elasticsearch-from-json[`fromJson`]
+
+Be aware that internal field types may have changed since Hibernate Search 5;
+see <<data-format>>.
+|====
+
+[[sorts-native]]
+===== Native sorts
+
+It is still possible to rely on native Lucene sort fields (e.g. `new SortField(...)`)
+or Elasticsearch sorts (e.g. `{'title_sort': {...}}`)
+in Hibernate Search 6:
+you will just need to rely on the link:{hibernateSearchDocUrl}#search-dsl-sort-extensions[backend-specific extension].
+
+[[projections]]
+==== Projections
+
+===== Basics
+
+Projections gain a full-blown DSL in Hibernate Search 6, allowing more complex projections,
+as explained in link:{hibernateSearchDocUrl}#search-dsl-sort[the dedicated section of the documentation].
+
+The `ProjectionConstants` are gone, and the projection DSL must be used instead to build `SearchProjection` objects.
+You will find instructions to migrate from `ProjectionConstants` to the Hibernate Search 6 projection DSL in <<projections-reference>>.
+
+As to adding projections to search queries, let's consider the query below:
+
+[source, JAVA]
+----
+FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( em );
+QueryBuilder qb = fullTextEntityManager.getSearchFactory()
+        .buildQueryBuilder().forEntity( Book.class ).get();
+
+FullTextQuery fullTextQuery = fullTextEntityManager.createFullTextQuery( qb.all().createQuery(), Book.class );
+fullTextQuery.setMaxResults( 20 );
+
+fullTextQuery.setProjection( "isbn", "title" );
+
+List hits = fullTextQuery.getResultList();
+----
+
+It would look like this in Hibernate Search 6:
+
+[source, JAVA]
+----
+SearchSession session = Search.session( entityManager );
+List<List<?>> hits = searchSession.search( Book.class )
+        .select( f -> f.composite(
+        		f.field( "isbn" ),
+        		f.field( "title" )
+        ) )
+        .where( f -> f.matchAll() )
+        .fetchHits( 20 );
+----
+
+Alternatively, the composite projection can be made more type-safe:
+
+[source, JAVA]
+----
+SearchSession session = Search.session( entityManager );
+List<Map.Entry<ISBN, String>> hits = searchSession.search( Book.class )
+        .select( f -> f.composite(
+        		Map::entry,
+        		f.field( "isbn", ISBN.class ),
+        		f.field( "title", String.class )
+        ) )
+        .where( f -> f.matchAll() )
+        .fetchHits( 20 );
+----
+
+[[projections-reference]]
+===== `ProjectionConstants`/`ElasticsearchProjectionConstants` migration reference
+
+The code below makes some assumptions for Hibernate Search 6: the projection is being built in a lambda expression,
+e.g. `Search.session( entityManager ).search( Book.class ).select( f -> ... )`.
+
+[cols="l,l,a",options="header"]
+|====
+|Hibernate Search 5 `ProjectionConstants` or `ElasticsearchProjectionConstants`|Hibernate Search 6|Documentation
+|THIS
+|f.entity()
+|link:{hibernateSearchDocUrl}#search-dsl-projection-entity[`entity`]
+
+|DOCUMENT
+|f.extension(LuceneExtension.get())
+        .document()
+|link:{hibernateSearchDocUrl}#search-dsl-projection-extensions-lucene-document[`document`]
+
+|SCORE
+|f.score()
+|link:{hibernateSearchDocUrl}#search-dsl-projection-score[`score`]
+
+|ID
+|f.composite(EntityReference::id,
+        f.entityReference())
+|link:{hibernateSearchDocUrl}#search-dsl-projection-reference[`entityReference`],
+link:{hibernateSearchDocUrl}#search-dsl-projection-composite[`composite`]
+
+Alternatively, `f.entityReference()` (without the wrapping in the "composite" projection)
+will return an instance of `EntityReference`,
+which includes both the type and ID of the entity.
+
+|DOCUMENT_ID
+|f.composite(DocumentReference::id,
+        f.documentReference())
+|link:{hibernateSearchDocUrl}#search-dsl-projection-documentReference[`documentReference`],
+link:{hibernateSearchDocUrl}#search-dsl-projection-composite[`composite`]
+
+This no longer returns the internal Lucene document ID
+(which can change from one query execution to the next),
+but instead returns the Hibernate Search document ID,
+i.e. the String version of the property annotated with `@Id` or `@DocumentId`.
+Note that you no longer need the internal Lucene document ID
+to get an <<searching-fulltextquery-explain,explanation of the score>>.
+
+Alternatively, `f.documentReference()` (without the wrapping in the "composite" projection)
+will return an instance of `DocumentReference`,
+which includes both the type and ID of the document.
+
+|EXPLANATION
+|f.extension(LuceneExtension.get())
+        .explanation()
+
+OR
+
+f.extension(ElasticsearchExtension.get())
+        .explanation()
+|link:{hibernateSearchDocUrl}#search-dsl-projection-extensions-lucene-explanation[`explanation` (Lucene)]
+
+link:{hibernateSearchDocUrl}#search-dsl-projection-extensions-elasticsearch-explanation[`explanation` (Elasticsearch)]
+
+This projection returns a `JsonObject` for Elasticsearch.
+
+|OBJECT_CLASS
+|f.composite(EntityReference::type,
+        f.entityReference())
+|link:{hibernateSearchDocUrl}#search-dsl-projection-reference[`entityReference`],
+link:{hibernateSearchDocUrl}#search-dsl-projection-composite[`composite`]
+
+Alternatively, `f.entityReference()` (without the wrapping in the "composite" projection)
+will return an instance of `EntityReference`,
+which includes both the type and ID of the entity.
+
+.2+|SPATIAL_DISTANCE
+|f.distance("field",
+        GeoPoint.of(latitude, longitude))
+.2+|link:{hibernateSearchDocUrl}#search-dsl-projection-distance[`distance`]
+|f.distance("field",
+        GeoPoint.of(latitude, longitude))
+        .unit( DistanceUnit.KILOMETERS )
+
+|SOURCE
+|f.extension(ElasticsearchExtension.get())
+        .source()
+|link:{hibernateSearchDocUrl}#search-dsl-projection-extensions-elasticsearch-source[`source`]
+
+This projection used to return a `String` in Hibernate Search 5,
+but returns a `JsonObject` in Hibernate Search 6.
+
+|TOOK
+|-
+|See link:{hibernateSearchDocUrl}#search-dsl-query-debugging-took-timedout[`took` and `timedOut`]
+
+|TIMED_OUT
+|-
+|See link:{hibernateSearchDocUrl}#search-dsl-query-debugging-took-timedout[`took` and `timedOut`]
+|====
 
 [[searching-facet]]
-==== Facets
+==== Facets => Aggregations
 
-TODO
+Facets are now called aggregations, which are a generalization of the concept of faceting.
+
+Like other concepts (predicates, sorts, ...) aggregations have a dedicated DSL in Hibernate Search 6,
+as explained in link:{hibernateSearchDocUrl}#search-dsl-aggregation[the dedicated section of the documentation].
+
+See the following sections for the equivalent aggregation for each type of facet.
+
+NOTE: One difference with Hibernate Search 5 is that Hibernate Search 6 aggregations
+no longer allow drill-down (`.selectFacets(...)`).
+See <<searching-facets-selectfacets>>.
+
+===== Discrete faceting
+
+Let's consider the query below:
+
+[source, JAVA]
+----
+FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( em );
+QueryBuilder qb = fullTextEntityManager.getSearchFactory()
+        .buildQueryBuilder().forEntity( Book.class ).get();
+
+FacetingRequest genreFacetingRequest = qb.facet()
+        .name( "genreFaceting" )
+        .onField( "genre" )
+        .discrete()
+        .orderedBy( FacetSortOrder.COUNT_DESC )
+        .includeZeroCounts( false )
+        .maxFacetCount( 3 )
+        .createFacetingRequest();
+
+FullTextQuery fullTextQuery = fullTextEntityManager.createFullTextQuery( qb.all().createQuery(), Book.class );
+fullTextQuery.setMaxResults( 20 );
+
+FacetManager facetManager = fullTextQuery.getFacetManager();
+facetManager.enableFaceting( genreFacetingRequest );
+
+List hits = fullTextQuery.getResultList();
+
+List<Facet> facets = facetManager.getFacets( "genreFaceting" );
+----
+
+It would look like this in Hibernate Search 6:
+
+[source, JAVA]
+----
+SearchSession session = Search.session( entityManager );
+
+AggregationKey<Map<Genre, Long>> countByGenreKey = AggregationKey.of( "countByGenre" );
+
+SearchResult<Book> result = searchSession.search( Book.class )
+        .where( f -> f.matchAll() )
+        .aggregation( countByGenreKey, f -> f.terms()
+                .field( "genre", Genre.class )
+                .orderByCountDescending()
+                .minDocumentCount( 1 )
+                .maxTermCount( 3 ) )
+        .fetch( 20 );
+
+List<Book> hits = result.hits();
+
+Map<Genre, Long> countByGenre = result.aggregation( countByGenreKey );
+----
+
+See link:{hibernateSearchDocUrl}#search-dsl-aggregation-terms[this section of the documentation] for more information.
+
+===== Range faceting
+
+Let's consider the query below:
+
+[source, JAVA]
+----
+FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( em );
+QueryBuilder qb = fullTextEntityManager.getSearchFactory()
+        .buildQueryBuilder().forEntity( Book.class ).get();
+
+FacetingRequest priceFacetingRequest = qb.facet()
+        .name( "priceFaceting" )
+        .onField( "price" )
+        .range()
+        .below( 1000 ).excludeLimit()
+        .from( 1001 ).to( 1500 ).excludeLimit()
+        .above( 1500 )
+        .orderedBy( FacetSortOrder.COUNT_DESC )
+        .includeZeroCounts( false )
+        .maxFacetCount( 3 )
+        .createFacetingRequest();
+
+FullTextQuery fullTextQuery = fullTextEntityManager.createFullTextQuery( qb.all().createQuery(), Book.class );
+fullTextQuery.setMaxResults( 20 );
+
+FacetManager facetManager = fullTextQuery.getFacetManager();
+facetManager.enableFaceting( priceFacetingRequest );
+
+List hits = fullTextQuery.getResultList();
+
+List<Facet> facets = facetManager.getFacets( "priceFaceting" );
+----
+
+It would look like this in Hibernate Search 6:
+
+[source, JAVA]
+----
+SearchSession session = Search.session( entityManager );
+
+AggregationKey<Map<Range<Double>, Long>> countByPriceRangeKey = AggregationKey.of( "countByPriceRange" );
+
+SearchResult<Book> result = searchSession.search( Book.class )
+        .where( f -> f.matchAll() )
+        .aggregation( countByPriceRangeKey, f -> f.range()
+                .field( "price", Double.class )
+                .range( Range.lessThan( 1000.0 ) )
+                .range( Range.canonical( 1000.0, 1500.0 ) )
+                .range( Range.atLeast( 1500.0 ) )
+                // Not equivalent to 'orderedBy'
+                // Not equivalent to 'includeZeroCounts'
+                // Not equivalent to 'maxFacetCount'
+        .fetch( 20 );
+
+List<Book> hits = result.hits();
+
+Map<Range<Double>, Long> countByPriceRange = result.aggregation( countByPriceRangeKey );
+----
+
+See link:{hibernateSearchDocUrl}#search-dsl-aggregation-range[this section of the documentation] for more information.
+
+[NOTE]
+====
+`orderedBy`, `includeZeroCounts` and `maxFacetCount` have no equivalent Hibernate Search 6 range aggregations:
+all given ranges will always be included in the resulting `Map`.
+
+The behavior of these methods can be implemented by post-processing the `Map` in user code.
+====
+
+[[searching-facets-selectfacets]]
+===== Drill-down with `.selectFacets`
+
+In Hibernate Search 5, the `.selectFacets` method used to allow "drill-down",
+i.e. adding a filter to the query to only consider documents in a given facet.
+
+Hibernate Search 6 no longer supports this feature directly.
+
+To perform a drill-down, create a new query with the original predicate wrapped in a boolean predicate
+and add a link:{hibernateSearchDocUrl}#search-dsl-predicate-boolean-filter[`filter` clause]
+to restrict the hits to the selected facet(s):
+
+* For discrete faceting, use a link:{hibernateSearchDocUrl}#search-dsl-predicate-match[`match` predicate].
+* For range faceting, use a link:{hibernateSearchDocUrl}#search-dsl-predicate-range[`range` predicate].
 
 [[error-handler]]
 === Error handler
