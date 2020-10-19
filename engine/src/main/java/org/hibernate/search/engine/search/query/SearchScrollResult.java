@@ -15,6 +15,12 @@ import java.util.List;
 public interface SearchScrollResult<H> {
 
 	/**
+	 * @return The total for a search result, pertaining to all matched documents,
+	 * independently from the current chunk of {@link #hits()}. Includes in particular the total hit count.
+	 */
+	SearchResultTotal total();
+
+	/**
 	 * Returns true if this scrolling result contains some index hits.
 	 * <p>
 	 * Notice that it is possible for this method to return {@code true} while {@link #hits()} returns an empty list,
