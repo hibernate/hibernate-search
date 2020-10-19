@@ -15,17 +15,19 @@ public interface StubNextScrollWorkBehavior<H> {
 	/**
 	 * @return The total hit count, which may be larger than the number of {@link #getRawHits()}
 	 */
-	default long getTotalHitCount() {
-		// TODO HSEARCH-4023 provide total hit count
-		return 0;
-	}
+	long getTotalHitCount();
 
 	boolean hasHits();
 
 	List<H> getRawHits();
 
-	static <H> StubNextScrollWorkBehavior<H> of(List<H> rawHits) {
+	static <H> StubNextScrollWorkBehavior<H> of(long totalHitCount, List<H> rawHits) {
 		return new StubNextScrollWorkBehavior<H>() {
+			@Override
+			public long getTotalHitCount() {
+				return totalHitCount;
+			}
+
 			@Override
 			public boolean hasHits() {
 				return true;
@@ -41,6 +43,11 @@ public interface StubNextScrollWorkBehavior<H> {
 	static <H> StubNextScrollWorkBehavior<H> afterLast() {
 		return new StubNextScrollWorkBehavior<H>() {
 			@Override
+			public long getTotalHitCount() {
+				return 0;
+			}
+
+			@Override
 			public boolean hasHits() {
 				return false;
 			}
@@ -54,6 +61,11 @@ public interface StubNextScrollWorkBehavior<H> {
 
 	static <H> StubNextScrollWorkBehavior<H> failing(Supplier<RuntimeException> exceptionSupplier) {
 		return new StubNextScrollWorkBehavior<H>() {
+			@Override
+			public long getTotalHitCount() {
+				return 0;
+			}
+
 			@Override
 			public boolean hasHits() {
 				return fail();

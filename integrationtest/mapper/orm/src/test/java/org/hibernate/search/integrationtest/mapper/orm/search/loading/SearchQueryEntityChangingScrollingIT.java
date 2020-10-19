@@ -74,7 +74,7 @@ public class SearchQueryEntityChangingScrollingIT {
 			} );
 			for ( int base = 0; base < 12; base += 3 ) {
 				backendMock.expectNextScroll( targetIndexes,
-						StubNextScrollWorkBehavior.of( documentReferences( base, base + 1, base + 2 ) ) );
+						StubNextScrollWorkBehavior.of( 12, documentReferences( base, base + 1, base + 2 ) ) );
 			}
 			backendMock.expectNextScroll( targetIndexes, StubNextScrollWorkBehavior.afterLast() );
 			backendMock.expectCloseScroll( targetIndexes );

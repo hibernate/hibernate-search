@@ -34,7 +34,8 @@ public class SearchQueryEntityLoadingScrollingIT extends SearchQueryEntityLoadin
 				}
 		);
 
-		backendMock.expectNextScroll( targetIndexes, StubNextScrollWorkBehavior.of( hitDocumentReferences ) );
+		backendMock.expectNextScroll( targetIndexes, StubNextScrollWorkBehavior
+				.of( hitDocumentReferences.size(), hitDocumentReferences ) );
 
 		backendMock.expectCloseScroll( targetIndexes );
 
