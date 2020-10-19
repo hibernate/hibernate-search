@@ -86,6 +86,8 @@ public class SearchQueryEntityChangingScrollingIT {
 					assertThatHits( next.hits() ).hasHitsAnyOrder( new SimpleEntity( index++ ), new SimpleEntity( index++ ), new SimpleEntity( index++ ) );
 					changeNames( next.hits() );
 
+					assertThat( next.total().hitCount() ).isEqualTo( 12 );
+
 					session.flush();
 					session.clear();
 				}
