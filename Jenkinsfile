@@ -162,7 +162,6 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
 
 @Field boolean enableDefaultBuild = false
 @Field boolean enableDefaultBuildIT = false
-@Field boolean enableDefaultBuildLegacyIT = false
 @Field boolean performRelease = false
 @Field boolean deploySnapshot = false
 
@@ -320,11 +319,6 @@ If this parameter is non-empty, ENVIRONMENT_SET will be ignored and environments
 Some useful filters: 'default', 'jdk', 'jdk-10', 'eclipse', 'postgresql', 'elasticsearch-local-[5.6'.
 """
 					),
-					booleanParam(
-							name: 'LEGACY_IT',
-							defaultValue: false,
-							description: 'If true, also enable tests of the legacy code (Search 5) in the default environment.'
-					),
 					string(
 							name: 'RELEASE_VERSION',
 							defaultValue: '',
@@ -386,11 +380,6 @@ Some useful filters: 'default', 'jdk', 'jdk-10', 'eclipse', 'postgresql', 'elast
 		envSet.enabled.remove(envSet.default)
 	}
 
-	if ( enableDefaultBuildIT && params.LEGACY_IT ) {
-		echo "Enabling legacy integration tests in default environment due to explicit request"
-		enableDefaultBuildLegacyIT = true
-	}
-
 	enableDefaultBuild =
 			enableDefaultBuildIT ||
 			environments.content.any { key, envSet -> envSet.enabled.any { buildEnv -> buildEnv.requiresDefaultBuildArtifacts() } } ||
@@ -404,7 +393,6 @@ params.ENVIRONMENT_FILTER: ${params.ENVIRONMENT_FILTER}
 Resulting execution plan:
     enableDefaultBuild=$enableDefaultBuild
     enableDefaultBuildIT=$enableDefaultBuildIT
-    enableDefaultBuildLegacyIT=$enableDefaultBuildLegacyIT
     environments=${environments.enabledAsString}
     performRelease=$performRelease
     deploySnapshot=$deploySnapshot
@@ -452,7 +440,6 @@ stage('Default build') {
 					"} \
 					-Pdist -Pcoverage -Pjqassistant \
 					${enableDefaultBuildIT ? '' : '-DskipITs'} \
-					${enableDefaultBuildLegacyIT ? '-Dlegacy.skip=false' : ''} \
 					${toTestJdkArg(environments.content.jdk.default)} \
 					${toElasticsearchJdkArg(environments.content.jdk.default)} \
 			"""
@@ -879,8 +866,6 @@ void keepOnlyEnvironmentsFromSet(String environmentSetName) {
 				enableDefaultEnv = true
 				enableBeforeMergeEnvs = true
 				enableAfterMergeEnvs = true
-				echo "Legacy integration tests are enabled for the default build environment."
-				enableDefaultBuildLegacyIT = true
 			} else {
 				echo "Building feature branch '$helper.scmSource.branch.name'"
 				enableDefaultEnv = true
