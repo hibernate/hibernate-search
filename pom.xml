@@ -589,11 +589,6 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-stub</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-v5migrationhelper-engine</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -609,14 +604,14 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-batch-jsr352-core</artifactId>
+                <artifactId>hibernate-search-batch-jsr352-jberet</artifactId>
                 <version>${project.version}</version>
-                <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-batch-jsr352-jberet</artifactId>
+                <artifactId>hibernate-search-documentation</artifactId>
                 <version>${project.version}</version>
+                <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
@@ -632,12 +627,6 @@
                 <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-integrationtest-mapper-pojo-base</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-documentation</artifactId>
-                <version>${project.version}</version>
-                <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
