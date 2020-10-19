@@ -35,6 +35,7 @@ import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubDocumentReferenceConverter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntityLoader;
@@ -709,7 +710,9 @@ public class SearchQueryResultLoadingOrTransformingIT {
 	}
 
 	private static <H> List<H> hitsUsingScroll(SearchQuery<H> query) {
-		return query.scroll( 10 ).next().hits();
+		try ( SearchScroll<H> scroll = query.scroll( 10 ) ) {
+			return scroll.next().hits();
+		}
 	}
 
 	private void initData() {
