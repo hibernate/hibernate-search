@@ -1759,14 +1759,14 @@
         </profile>
 
         <profile>
-            <id>jdk13+</id>
+            <id>jdk15+</id>
             <activation>
-                <jdk>[13,)</jdk>
+                <jdk>[15,)</jdk>
             </activation>
             <build>
                 <!--
                      maven-surefire-plugin and maven-failsafe-plugin use an older version of ASM
-                     that cannot handle Java 13/14 bytecode.
+                     that cannot handle Java 15+ bytecode.
                      Let's upgrade that dependency and hope for the best;
                      if it doesn't work, the build is very likely to fail and we'll know about it.
                  -->
