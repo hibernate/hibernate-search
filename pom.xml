@@ -1800,13 +1800,6 @@
         </profile>
 
         <profile>
-            <id>jdk14+</id>
-            <activation>
-                <jdk>[14,)</jdk>
-            </activation>
-        </profile>
-
-        <profile>
             <id>jdk16+</id>
             <activation>
                 <jdk>[16,)</jdk>
