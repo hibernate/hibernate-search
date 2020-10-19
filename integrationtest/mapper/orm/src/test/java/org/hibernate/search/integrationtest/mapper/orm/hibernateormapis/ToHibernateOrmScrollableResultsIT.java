@@ -155,7 +155,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.get() ).isNull();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 0, DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( 100, references( 0, DEFAULT_FETCH_SIZE ) ) );
 				assertThat( scroll.next() ).isTrue();
 				backendMock.verifyExpectationsMet();
 
@@ -328,7 +328,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.get() ).isNull();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 0, DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT, references( 0, DEFAULT_FETCH_SIZE ) ) );
 				assertThat( scroll.scroll( 10 ) ).isTrue();
 				backendMock.verifyExpectationsMet();
 
@@ -368,9 +368,11 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, 59 ) );
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( DEFAULT_FETCH_SIZE, 2 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( DEFAULT_FETCH_SIZE, 2 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 2 * DEFAULT_FETCH_SIZE, 3 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 2 * DEFAULT_FETCH_SIZE, 3 * DEFAULT_FETCH_SIZE ) ) );
 				assertThat( scroll.scroll( 200 ) ).isTrue();
 				backendMock.verifyExpectationsMet();
 
@@ -384,19 +386,26 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, 259 ) );
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 3 * DEFAULT_FETCH_SIZE, 4 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 3 * DEFAULT_FETCH_SIZE, 4 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 4 * DEFAULT_FETCH_SIZE, 5 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 4 * DEFAULT_FETCH_SIZE, 5 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 5 * DEFAULT_FETCH_SIZE, 6 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 5 * DEFAULT_FETCH_SIZE, 6 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 6 * DEFAULT_FETCH_SIZE, 7 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 6 * DEFAULT_FETCH_SIZE, 7 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 7 * DEFAULT_FETCH_SIZE, 8 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 7 * DEFAULT_FETCH_SIZE, 8 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 8 * DEFAULT_FETCH_SIZE, 9 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 8 * DEFAULT_FETCH_SIZE, 9 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 9 * DEFAULT_FETCH_SIZE, 10 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 9 * DEFAULT_FETCH_SIZE, 10 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
 						StubNextScrollWorkBehavior.afterLast() );
 				assertThat( scroll.scroll( 10000 ) ).isFalse();
@@ -458,7 +467,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.get() ).isNull();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 0, DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT, references( 0, DEFAULT_FETCH_SIZE ) ) );
 				assertThat( scroll.scroll( 10 ) ).isTrue();
 				backendMock.verifyExpectationsMet();
 
@@ -501,7 +510,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.get() ).isNull();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 0, DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT, references( 0, DEFAULT_FETCH_SIZE ) ) );
 				assertThat( scroll.setRowNumber( 10 ) ).isTrue();
 				backendMock.verifyExpectationsMet();
 
@@ -528,9 +537,11 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, 50 ) );
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( DEFAULT_FETCH_SIZE, 2 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( DEFAULT_FETCH_SIZE, 2 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 2 * DEFAULT_FETCH_SIZE, 3 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 2 * DEFAULT_FETCH_SIZE, 3 * DEFAULT_FETCH_SIZE ) ) );
 				assertThat( scroll.setRowNumber( 220 ) ).isTrue();
 				backendMock.verifyExpectationsMet();
 
@@ -544,19 +555,26 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( row[0] ).isEqualTo( session.getReference( IndexedEntity.class, 220 ) );
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 3 * DEFAULT_FETCH_SIZE, 4 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 3 * DEFAULT_FETCH_SIZE, 4 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 4 * DEFAULT_FETCH_SIZE, 5 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 4 * DEFAULT_FETCH_SIZE, 5 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 5 * DEFAULT_FETCH_SIZE, 6 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 5 * DEFAULT_FETCH_SIZE, 6 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 6 * DEFAULT_FETCH_SIZE, 7 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 6 * DEFAULT_FETCH_SIZE, 7 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 7 * DEFAULT_FETCH_SIZE, 8 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 7 * DEFAULT_FETCH_SIZE, 8 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 8 * DEFAULT_FETCH_SIZE, 9 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 8 * DEFAULT_FETCH_SIZE, 9 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 9 * DEFAULT_FETCH_SIZE, 10 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 9 * DEFAULT_FETCH_SIZE, 10 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
 						StubNextScrollWorkBehavior.afterLast() );
 				assertThat( scroll.setRowNumber( 10000 ) ).isFalse();
@@ -587,7 +605,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.get() ).isNull();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 0, DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT, references( 0, DEFAULT_FETCH_SIZE ) ) );
 				assertThat( scroll.setRowNumber( 10 ) ).isTrue();
 				backendMock.verifyExpectationsMet();
 
@@ -630,7 +648,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.get() ).isNull();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 0, DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT, references( 0, DEFAULT_FETCH_SIZE ) ) );
 				assertThat( scroll.setRowNumber( 10 ) ).isTrue();
 				backendMock.verifyExpectationsMet();
 
@@ -683,7 +701,7 @@ public class ToHibernateOrmScrollableResultsIT {
 
 				// next() still works after a call to beforeFirst()
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 0, DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT, references( 0, DEFAULT_FETCH_SIZE ) ) );
 				assertThat( scroll.next() ).isTrue();
 				backendMock.verifyExpectationsMet();
 
@@ -712,7 +730,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.get() ).isNull();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 0, DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT, references( 0, DEFAULT_FETCH_SIZE ) ) );
 				assertThat( scroll.next() ).isTrue();
 				backendMock.verifyExpectationsMet();
 
@@ -749,7 +767,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( scroll.get() ).isNull();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 0, DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT, references( 0, DEFAULT_FETCH_SIZE ) ) );
 				scroll.first();
 				backendMock.verifyExpectationsMet();
 
@@ -798,7 +816,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				backendMock.verifyExpectationsMet();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 0, DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT, references( 0, DEFAULT_FETCH_SIZE ) ) );
 				assertThat( scroll.next() ).isTrue();
 				assertThat( scroll.next() ).isTrue();
 				backendMock.verifyExpectationsMet();
@@ -829,25 +847,34 @@ public class ToHibernateOrmScrollableResultsIT {
 				backendMock.verifyExpectationsMet();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 0, DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT, references( 0, DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( DEFAULT_FETCH_SIZE, 2 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( DEFAULT_FETCH_SIZE, 2 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 2 * DEFAULT_FETCH_SIZE, 3 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 2 * DEFAULT_FETCH_SIZE, 3 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 3 * DEFAULT_FETCH_SIZE, 4 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 3 * DEFAULT_FETCH_SIZE, 4 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 4 * DEFAULT_FETCH_SIZE, 5 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 4 * DEFAULT_FETCH_SIZE, 5 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 5 * DEFAULT_FETCH_SIZE, 6 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 5 * DEFAULT_FETCH_SIZE, 6 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 6 * DEFAULT_FETCH_SIZE, 7 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 6 * DEFAULT_FETCH_SIZE, 7 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 7 * DEFAULT_FETCH_SIZE, 8 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 7 * DEFAULT_FETCH_SIZE, 8 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 8 * DEFAULT_FETCH_SIZE, 9 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 8 * DEFAULT_FETCH_SIZE, 9 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 9 * DEFAULT_FETCH_SIZE, 10 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 9 * DEFAULT_FETCH_SIZE, 10 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
 						StubNextScrollWorkBehavior.afterLast() );
 				assertThat( scroll.last() ).isTrue();
@@ -898,7 +925,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				backendMock.verifyExpectationsMet();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 0, DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT, references( 0, DEFAULT_FETCH_SIZE ) ) );
 				assertThat( scroll.scroll( 10 ) ).isTrue();
 				backendMock.verifyExpectationsMet();
 
@@ -929,25 +956,34 @@ public class ToHibernateOrmScrollableResultsIT {
 				backendMock.verifyExpectationsMet();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 0, DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT, references( 0, DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( DEFAULT_FETCH_SIZE, 2 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( DEFAULT_FETCH_SIZE, 2 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 2 * DEFAULT_FETCH_SIZE, 3 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 2 * DEFAULT_FETCH_SIZE, 3 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 3 * DEFAULT_FETCH_SIZE, 4 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 3 * DEFAULT_FETCH_SIZE, 4 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 4 * DEFAULT_FETCH_SIZE, 5 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 4 * DEFAULT_FETCH_SIZE, 5 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 5 * DEFAULT_FETCH_SIZE, 6 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 5 * DEFAULT_FETCH_SIZE, 6 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 6 * DEFAULT_FETCH_SIZE, 7 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 6 * DEFAULT_FETCH_SIZE, 7 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 7 * DEFAULT_FETCH_SIZE, 8 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 7 * DEFAULT_FETCH_SIZE, 8 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 8 * DEFAULT_FETCH_SIZE, 9 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 8 * DEFAULT_FETCH_SIZE, 9 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 9 * DEFAULT_FETCH_SIZE, 10 * DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( 9 * DEFAULT_FETCH_SIZE, 10 * DEFAULT_FETCH_SIZE ) ) );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
 						StubNextScrollWorkBehavior.afterLast() );
 				assertThat( scroll.scroll( ENTITY_COUNT + 1 ) ).isFalse();
@@ -986,7 +1022,7 @@ public class ToHibernateOrmScrollableResultsIT {
 				assertThat( implementor.isClosed() ).isFalse();
 
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( 0, DEFAULT_FETCH_SIZE ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT, references( 0, DEFAULT_FETCH_SIZE ) ) );
 				scroll.next();
 
 				assertThat( implementor.isClosed() ).isFalse();
@@ -1061,7 +1097,8 @@ public class ToHibernateOrmScrollableResultsIT {
 			if ( scrollNextFirstId < totalHitCount ) {
 				int lastIdExclusive = Math.min( scrollNextFirstId + fetchSize, totalHitCount );
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
-						StubNextScrollWorkBehavior.of( references( scrollNextFirstId, lastIdExclusive ) ) );
+						StubNextScrollWorkBehavior.of( ENTITY_COUNT,
+								references( scrollNextFirstId, lastIdExclusive ) ) );
 			}
 			else {
 				backendMock.expectNextScroll( Collections.singletonList( IndexedEntity.NAME ),
