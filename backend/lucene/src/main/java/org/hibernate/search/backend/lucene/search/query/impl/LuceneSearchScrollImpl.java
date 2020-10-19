@@ -93,7 +93,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 
 		// no more results check
 		if ( scrollIndex >= search.hitSize() ) {
-			return new LuceneSearchScrollResultImpl<>( false, Collections.emptyList(),
+			return new LuceneSearchScrollResultImpl<>( search.total(), false, Collections.emptyList(),
 					timeoutManager.tookTime(), timeoutManager.isTimedOut() );
 		}
 
@@ -119,7 +119,8 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 
 		// increasing the index for further next(s)
 		scrollIndex += chunkSize;
-		return new LuceneSearchScrollResultImpl<>( true, result.hits(), result.took(), result.timedOut() );
+		return new LuceneSearchScrollResultImpl<>( search.total(), true, result.hits(),
+				result.took(), result.timedOut() );
 	}
 
 	private <T> T doSubmitWithIndexReader(ReadWork<T> work, HibernateSearchMultiReader indexReader) {

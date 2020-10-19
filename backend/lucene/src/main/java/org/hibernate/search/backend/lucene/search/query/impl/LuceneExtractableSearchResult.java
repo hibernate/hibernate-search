@@ -25,6 +25,7 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentF
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.query.SearchResultTotal;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.IndexSearcher;
@@ -92,6 +93,10 @@ public class LuceneExtractableSearchResult<H> {
 	public int hitSize() {
 		TopDocs topDocs = luceneCollectors.getTopDocs();
 		return ( topDocs == null ) ? 0 : topDocs.scoreDocs.length;
+	}
+
+	SearchResultTotal total() {
+		return luceneCollectors.getResultTotal();
 	}
 
 	private List<Object> extractHits(ProjectionHitMapper<?, ?> projectionHitMapper, int startInclusive,
