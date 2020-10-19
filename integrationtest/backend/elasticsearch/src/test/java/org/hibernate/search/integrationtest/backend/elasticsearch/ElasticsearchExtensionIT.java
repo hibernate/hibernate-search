@@ -310,6 +310,7 @@ public class ElasticsearchExtensionIT {
 			for ( ElasticsearchSearchScrollResult<DocumentReference> chunk = scroll.next(); chunk.hasHits();
 					chunk = scroll.next() ) {
 				hits.addAll( chunk.hits() );
+				assertThat( chunk.total().hitCount() ).isEqualTo( 6 );
 			}
 			assertThatHits( hits )
 					.hasDocRefHitsAnyOrder( mainIndex.typeName(),
@@ -331,6 +332,7 @@ public class ElasticsearchExtensionIT {
 			for ( ElasticsearchSearchScrollResult<DocumentReference> chunk = scroll.next(); chunk.hasHits();
 					chunk = scroll.next() ) {
 				hits.addAll( chunk.hits() );
+				assertThat( chunk.total().hitCount() ).isEqualTo( 6 );
 			}
 			assertThatHits( hits )
 					.hasDocRefHitsAnyOrder( mainIndex.typeName(),

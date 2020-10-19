@@ -290,6 +290,7 @@ public class LuceneExtensionIT {
 			for ( LuceneSearchScrollResult<DocumentReference> chunk = scroll.next(); chunk.hasHits();
 					chunk = scroll.next() ) {
 				hits.addAll( chunk.hits() );
+				assertThat( chunk.total().hitCount() ).isEqualTo( 5 );
 			}
 			assertThatHits( hits )
 					.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID );
@@ -310,6 +311,7 @@ public class LuceneExtensionIT {
 			for ( LuceneSearchScrollResult<DocumentReference> chunk = scroll.next(); chunk.hasHits();
 					chunk = scroll.next() ) {
 				hits.addAll( chunk.hits() );
+				assertThat( chunk.total().hitCount() ).isEqualTo( 5 );
 			}
 			assertThatHits( hits )
 					.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID );

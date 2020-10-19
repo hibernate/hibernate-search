@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.query;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.integrationtest.backend.tck.testsupport.stub.MapperMockUtils.expectHitMapping;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
@@ -23,6 +24,7 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
+import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubDocumentReferenceConverter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntityLoader;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubLoadedObject;
@@ -126,7 +128,8 @@ public class SearchQueryScrollResultLoadingIT {
 						}
 					}
 			);
-			assertThatHits( scroll.next().hits() ).hasHitsAnyOrder(
+			SearchScrollResult<StubLoadedObject> chunk = scroll.next();
+			assertThatHits( chunk.hits() ).hasHitsAnyOrder(
 					references[base + 0].loadedObject, references[base + 1].loadedObject, references[base + 2].loadedObject,
 					references[base + 3].loadedObject, references[base + 4].loadedObject
 			);
@@ -134,6 +137,7 @@ public class SearchQueryScrollResultLoadingIT {
 			// which must happen every time we load entities,
 			// so that the mapper can run state checks (session is still open, ...).
 			verify( loadingContextMock ).createProjectionHitMapper();
+			assertThat( chunk.total().hitCount() ).isEqualTo( 37 );
 		}
 
 		// page with the few remaining items
@@ -145,10 +149,12 @@ public class SearchQueryScrollResultLoadingIT {
 					}
 				}
 		);
-		assertThatHits( scroll.next().hits() ).hasHitsAnyOrder(
+		SearchScrollResult<StubLoadedObject> chunk = scroll.next();
+		assertThatHits( chunk.hits() ).hasHitsAnyOrder(
 				references[35].loadedObject, references[36].loadedObject
 		);
 		verify( loadingContextMock ).createProjectionHitMapper();
+		assertThat( chunk.total().hitCount() ).isEqualTo( 37 );
 	}
 
 	private void initData() {
