@@ -134,12 +134,6 @@ as well as any other technology Hibernate Search integrates with.
 Here are some notable sub-directories:
   *  `performance`: performance tests.
   *  `showcase/library`: a sample application using Hibernate Search in a Spring Boot environment.
-* `legacy`: Legacy code from Search 5. This code is not part of the distributed JARs.
-Parts of it will progressively be re-integrated into the main (Search 6+) code base.
-Note that compilation and tests in this directory are disabled by default
-(they are only enabled when the property `legacy.skip` is set to `false`).
-When enabled, Elasticsearch integration test in this directory 
-are executed against Elasticsearch 5.6 by default.
 * `mapper`: The mappers, i.e. the modules that expose APIs to index and search user entities,
 and do the work of converting between user entities and documents to be indexed.
   * `javabean`: An experimental (not published) mapper for Java Beans without Hibernate ORM.

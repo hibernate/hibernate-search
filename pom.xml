@@ -2267,19 +2267,6 @@
             </build>
         </profile>
 
-        <profile>
-            <id>legacy</id>
-            <activation>
-                <property>
-                    <name>legacy.skip</name>
-                    <value>false</value>
-                </property>
-            </activation>
-            <modules>
-                <module>legacy</module>
-            </modules>
-        </profile>
-
         <!--
              WARNING: this MUST be the very last profile,
              so that the "report" module is the very last module,

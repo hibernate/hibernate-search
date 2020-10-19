@@ -1,2 +1,0 @@
-org.hibernate.search.hcore.impl.SearchFactoryServiceContributor
-org.hibernate.search.hcore.impl.ExtendedBeanManagerSynchronizerContributor
