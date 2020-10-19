@@ -67,7 +67,7 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 
 		timeoutManager.stop();
 
-		return new ElasticsearchSearchScrollResultImpl<>( loadableSearchResult.hasHits(), searchResult.hits(),
-				searchResult.took(), searchResult.timedOut() );
+		return new ElasticsearchSearchScrollResultImpl<>( searchResult.total(), loadableSearchResult.hasHits(),
+				searchResult.hits(), searchResult.took(), searchResult.timedOut() );
 	}
 }
