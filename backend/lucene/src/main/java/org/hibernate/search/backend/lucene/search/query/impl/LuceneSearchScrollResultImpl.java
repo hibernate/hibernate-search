@@ -16,7 +16,8 @@ public class LuceneSearchScrollResultImpl<H> extends SimpleSearchScrollResult<H>
 		implements LuceneSearchScrollResult<H> {
 
 	public LuceneSearchScrollResultImpl(boolean hasHits, List<H> hits, Duration took, Boolean timedOut) {
-		super( hasHits, hits, took, timedOut );
+		// TODO HSEARCH-4023 provide total hit count
+		super( null, hasHits, hits, took, timedOut );
 	}
 
 }

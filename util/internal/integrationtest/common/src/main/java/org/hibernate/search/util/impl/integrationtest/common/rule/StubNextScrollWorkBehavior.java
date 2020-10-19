@@ -12,6 +12,14 @@ import java.util.function.Supplier;
 
 public interface StubNextScrollWorkBehavior<H> {
 
+	/**
+	 * @return The total hit count, which may be larger than the number of {@link #getRawHits()}
+	 */
+	default long getTotalHitCount() {
+		// TODO HSEARCH-4023 provide total hit count
+		return 0;
+	}
+
 	boolean hasHits();
 
 	List<H> getRawHits();

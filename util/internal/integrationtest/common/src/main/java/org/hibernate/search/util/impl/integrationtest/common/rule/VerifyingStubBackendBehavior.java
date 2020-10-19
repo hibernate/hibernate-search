@@ -28,6 +28,7 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
+import org.hibernate.search.engine.search.query.spi.SimpleSearchResultTotal;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchScrollResult;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
@@ -307,7 +308,8 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 						timeoutManager ),
 				(call1, call2) -> call1.verify( call2 ),
 				noExpectationsBehavior( () ->
-						new SimpleSearchScrollResult<>( false, Collections.emptyList(), Duration.ZERO, false ) )
+						new SimpleSearchScrollResult<>( SimpleSearchResultTotal.exact( 0L ),
+								false, Collections.emptyList(), Duration.ZERO, false ) )
 		);
 	}
 

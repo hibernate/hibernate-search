@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
+import org.hibernate.search.engine.search.query.spi.SimpleSearchResultTotal;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchScrollResult;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
@@ -68,7 +69,8 @@ public class NextScrollWorkCall<T> extends Call<NextScrollWorkCall<?>> {
 		// work is expected to be filled only on from the actualCall
 		assertThat( work ).isNull();
 
-		return () -> new SimpleSearchScrollResult<>( behavior.hasHits(), SearchWorkCall.getResults(
+		return () -> new SimpleSearchScrollResult<>( SimpleSearchResultTotal.exact( behavior.getTotalHitCount() ),
+				behavior.hasHits(), SearchWorkCall.getResults(
 				actualCall.projectionContext,
 				actualCall.loadingContext.createProjectionHitMapper(),
 				actualCall.rootProjection,
