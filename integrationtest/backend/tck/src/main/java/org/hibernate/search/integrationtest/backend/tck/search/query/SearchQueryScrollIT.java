@@ -53,6 +53,7 @@ public class SearchQueryScrollIT {
 			SearchScrollResult<DocumentReference> scrollResult = scroll.next();
 			assertThat( scrollResult.hasHits() ).isFalse();
 			assertThat( scrollResult.hits() ).isEmpty();
+			assertThat( scrollResult.total().hitCount() ).isEqualTo( 0L );
 		}
 	}
 
@@ -62,9 +63,11 @@ public class SearchQueryScrollIT {
 			SearchScrollResult<DocumentReference> scrollResult = scroll.next();
 			assertThat( scrollResult.hasHits() ).isTrue();
 			assertThatHits( scrollResult.hits() ).hasDocRefHitsExactOrder( index.typeName(), docId( 4 ) );
+			assertThat( scrollResult.total().hitCount() ).isEqualTo( 1L );
 
 			scrollResult = scroll.next();
 			assertThat( scrollResult.hasHits() ).isFalse();
+			assertThat( scrollResult.total().hitCount() ).isEqualTo( 1L );
 		}
 	}
 
@@ -128,6 +131,8 @@ public class SearchQueryScrollIT {
 				assertThat( hits.get( j ) ).extracting( DocumentReference::id ).isEqualTo( docId( docIndex++ ) );
 				assertThat( hits.get( j ) ).extracting( DocumentReference::typeName ).isEqualTo( index.typeName() );
 			}
+
+			assertThat( scrollResult.total().hitCount() ).isEqualTo( documentCount );
 		}
 
 		int remainder = documentCount % chunkSize;
@@ -143,6 +148,8 @@ public class SearchQueryScrollIT {
 				assertThat( hits.get( j ) ).extracting( DocumentReference::id ).isEqualTo( docId( docIndex++ ) );
 				assertThat( hits.get( j ) ).extracting( DocumentReference::typeName ).isEqualTo( index.typeName() );
 			}
+
+			assertThat( scrollResult.total().hitCount() ).isEqualTo( documentCount );
 		}
 
 		scrollResult = scroll.next();

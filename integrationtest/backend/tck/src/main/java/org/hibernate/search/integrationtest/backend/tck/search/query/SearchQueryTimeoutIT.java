@@ -153,6 +153,8 @@ public class SearchQueryTimeoutIT {
 			assertThat( result.timedOut() ).isTrue();
 
 			assertThat( result.hits() ).hasSizeLessThan( 5 );
+			assertThat( result.total().isHitCountLowerBound() ).isTrue();
+			assertThat( result.total().hitCountLowerBound() ).isLessThanOrEqualTo( 5 );
 		}
 	}
 
@@ -189,6 +191,8 @@ public class SearchQueryTimeoutIT {
 			assertThat( result.timedOut() ).isFalse();
 
 			assertThat( result.hits() ).hasSize( 0 );
+			assertThat( result.total().isHitCountExact() ).isTrue();
+			assertThat( result.total().hitCount() ).isEqualTo( 0 );
 		}
 	}
 
@@ -214,6 +218,8 @@ public class SearchQueryTimeoutIT {
 			assertThat( result.timedOut() ).isFalse();
 
 			assertThat( result.hits() ).hasSize( 0 );
+			assertThat( result.total().isHitCountExact() ).isTrue();
+			assertThat( result.total().hitCount() ).isEqualTo( 0 );
 		}
 	}
 
