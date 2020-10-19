@@ -700,18 +700,6 @@
                 <version>${version.org.hibernate}</version>
             </dependency>
             <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-orm-jbossmodules</artifactId>
-                <version>${version.org.hibernate}</version>
-                <type>zip</type>
-                <exclusions>
-                    <exclusion>
-                        <groupId>*</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
                 <groupId>org.hibernate.common</groupId>
                 <artifactId>hibernate-commons-annotations</artifactId>
                 <version>${version.org.hibernate.commons.annotations}</version>
