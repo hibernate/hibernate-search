@@ -44,10 +44,16 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <!--
+                junit-vintage-engine 5.5.2 version does not support junit 4.13.1.
+                If we try to use it, a parsing error is thrown.
+                So we downgrade JUnit, so that junit-vintage-engine will handle it.
+                See https://stackoverflow.com/a/64371503/1812965
+            -->
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>${version.legacy.junit}</version>
+                <version>${version.junit.junit-platform-workaround}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
