@@ -347,7 +347,8 @@ Each chunk will include at most 20 hits, since that was the selected chunk size.
 <3> Detect the end of the scroll by calling `hasHits()` on the last retrieved chunk,
 and retrieve the next chunk by calling `next()` again on the scroll.
 <4> Retrieve the hits of a chunk.
-<5> Optionally, if using Hibernate ORM and retrieving entities,
+<5> Optionally, retrieve the total number of matching entities.
+<6> Optionally, if using Hibernate ORM and retrieving entities,
 you might want to use the link:{hibernateDocUrl}#batch-session-batch-insert[periodic "flush-clear" pattern]
 to ensure entities don't stay in the session taking more and more memory.
 ====

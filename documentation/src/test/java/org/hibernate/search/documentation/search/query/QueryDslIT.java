@@ -256,6 +256,8 @@ public class QueryDslIT {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			List<Integer> collectedIds = new ArrayList<>();
+			long totalHitCount = 0;
+
 			// tag::fetching-scrolling[]
 			try ( SearchScroll<Book> scroll = searchSession.search( Book.class )
 					.where( f -> f.matchAll() )
@@ -268,12 +270,17 @@ public class QueryDslIT {
 						collectedIds.add( hit.getId() );
 						// tag::fetching-scrolling[]
 					}
-					entityManager.flush(); // <5>
-					entityManager.clear(); // <5>
+
+					totalHitCount = chunk.total().hitCount(); // <5>
+
+					entityManager.flush(); // <6>
+					entityManager.clear(); // <6>
 				}
 			}
 			// end::fetching-scrolling[]
+
 			assertThat( collectedIds ).hasSize( 4 );
+			assertThat( totalHitCount ).isEqualTo( 4 );
 		} );
 	}
 
