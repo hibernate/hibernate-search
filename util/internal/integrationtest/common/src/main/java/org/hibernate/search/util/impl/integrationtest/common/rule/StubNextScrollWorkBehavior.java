@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
@@ -16,11 +15,6 @@ public interface StubNextScrollWorkBehavior<H> {
 	boolean hasHits();
 
 	List<H> getRawHits();
-
-	@SafeVarargs
-	static <H> StubNextScrollWorkBehavior<H> of(H... rawHits) {
-		return of( Arrays.asList( rawHits ) );
-	}
 
 	static <H> StubNextScrollWorkBehavior<H> of(List<H> rawHits) {
 		return new StubNextScrollWorkBehavior<H>() {
