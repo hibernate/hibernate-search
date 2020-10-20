@@ -48,8 +48,35 @@ public class AnalysisBuiltinOverrideIT {
 
 	@Test
 	public void analyzer_default() {
-		SimpleFieldModel<String> field = index.binding().defaultAnalyzer;
+		verifyOverride( index.binding().defaultAnalyzer );
+	}
 
+	@Test
+	public void analyzer_standard() {
+		verifyOverride( index.binding().standardAnalyzer );
+	}
+
+	@Test
+	public void analyzer_simple() {
+		verifyOverride( index.binding().simpleAnalyzer );
+	}
+
+	@Test
+	public void analyzer_whitespace() {
+		verifyOverride( index.binding().whitespaceAnalyzer );
+	}
+
+	@Test
+	public void analyzer_stop() {
+		verifyOverride( index.binding().stopAnalyzer );
+	}
+
+	@Test
+	public void analyzer_keyword() {
+		verifyOverride( index.binding().keywordAnalyzer );
+	}
+
+	private void verifyOverride(SimpleFieldModel<String> field) {
 		initData( field, b -> {
 			b.emptyDocument( "empty" );
 			b.document( "nonempty", "somewords" );
@@ -82,12 +109,31 @@ public class AnalysisBuiltinOverrideIT {
 
 	private static class IndexBinding {
 		final SimpleFieldModel<String> defaultAnalyzer;
+		final SimpleFieldModel<String> standardAnalyzer;
+		final SimpleFieldModel<String> simpleAnalyzer;
+		final SimpleFieldModel<String> whitespaceAnalyzer;
+		final SimpleFieldModel<String> stopAnalyzer;
+		final SimpleFieldModel<String> keywordAnalyzer;
 
 		IndexBinding(IndexSchemaElement root) {
 			this.defaultAnalyzer = SimpleFieldModel.mapperWithOverride( KeywordStringFieldTypeDescriptor.INSTANCE,
 					f -> f.asString().analyzer( AnalyzerNames.DEFAULT ) )
 					.map( root, "default" );
+			this.standardAnalyzer = SimpleFieldModel.mapperWithOverride( KeywordStringFieldTypeDescriptor.INSTANCE,
+					f -> f.asString().analyzer( AnalyzerNames.STANDARD ) )
+					.map( root, "standard" );
+			this.simpleAnalyzer = SimpleFieldModel.mapperWithOverride( KeywordStringFieldTypeDescriptor.INSTANCE,
+					f -> f.asString().analyzer( AnalyzerNames.SIMPLE ) )
+					.map( root, "simple" );
+			this.whitespaceAnalyzer = SimpleFieldModel.mapperWithOverride( KeywordStringFieldTypeDescriptor.INSTANCE,
+					f -> f.asString().analyzer( AnalyzerNames.WHITESPACE ) )
+					.map( root, "whitespace" );
+			this.stopAnalyzer = SimpleFieldModel.mapperWithOverride( KeywordStringFieldTypeDescriptor.INSTANCE,
+					f -> f.asString().analyzer( AnalyzerNames.STOP ) )
+					.map( root, "stop" );
+			this.keywordAnalyzer = SimpleFieldModel.mapperWithOverride( KeywordStringFieldTypeDescriptor.INSTANCE,
+					f -> f.asString().analyzer( AnalyzerNames.KEYWORD ) )
+					.map( root, "keyword" );
 		}
 	}
-
 }
