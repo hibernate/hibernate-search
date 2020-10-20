@@ -17,6 +17,11 @@ public class AnalysisBuiltinOverrideITAnalysisConfigurer implements LuceneAnalys
 	@Override
 	public void configure(LuceneAnalysisConfigurationContext context) {
 		overrideAnalyzer( context, AnalyzerNames.DEFAULT );
+		overrideAnalyzer( context, AnalyzerNames.STANDARD );
+		overrideAnalyzer( context, AnalyzerNames.SIMPLE );
+		overrideAnalyzer( context, AnalyzerNames.WHITESPACE );
+		overrideAnalyzer( context, AnalyzerNames.STOP );
+		overrideAnalyzer( context, AnalyzerNames.KEYWORD );
 	}
 
 	private void overrideAnalyzer(LuceneAnalysisConfigurationContext context, String name) {
