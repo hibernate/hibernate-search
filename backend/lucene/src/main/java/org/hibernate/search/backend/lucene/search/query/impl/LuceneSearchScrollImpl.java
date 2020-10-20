@@ -88,7 +88,8 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 			if ( search != null ) {
 				queryFetchSize *= 2;
 			}
-			search = doSubmitWithIndexReader( workFactory.scroll( searcher, queryFetchSize ), indexReader );
+			// TODO HSEARCH-3990 Pass an offset
+			search = doSubmitWithIndexReader( workFactory.scroll( searcher, 0, queryFetchSize ), indexReader );
 		}
 
 		// no more results check
