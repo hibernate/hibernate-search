@@ -171,6 +171,12 @@ stage('Configure') {
 							elasticsearchTool: 'OpenJDK 11 Latest'),
 					new JdkBuildEnvironment(version: '14', tool: 'OpenJDK 14 Latest', status: BuildEnvironmentStatus.SUPPORTED,
 							// Elasticsearch won't run on JDK13+
+							elasticsearchTool: 'OpenJDK 11 Latest'),
+					new JdkBuildEnvironment(version: '15', tool: 'OpenJDK 15 Latest', status: BuildEnvironmentStatus.SUPPORTED,
+							// Elasticsearch won't run on JDK13+
+							elasticsearchTool: 'OpenJDK 11 Latest'),
+					new JdkBuildEnvironment(version: '16', tool: 'OpenJDK 16 Latest', status: BuildEnvironmentStatus.SUPPORTED,
+							// Elasticsearch won't run on JDK13+
 							elasticsearchTool: 'OpenJDK 11 Latest')
 			],
 			compiler: [
