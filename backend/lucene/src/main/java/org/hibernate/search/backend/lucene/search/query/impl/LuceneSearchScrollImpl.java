@@ -41,10 +41,10 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 	private final HibernateSearchMultiReader indexReader;
 	private final int chunkSize;
 
-	private int scrollIndex = 0;
-	private int queryFetchSize;
-	private LuceneExtractableSearchResult<H> search;
-	private int offset = 0;
+	private int nextChunkOffset = 0;
+	private int currentPageLimit;
+	private LuceneExtractableSearchResult<H> currentPage;
+	private int currentPageOffset = 0;
 
 	public LuceneSearchScrollImpl(LuceneSyncWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, LuceneSearchContext searchContext,
@@ -60,7 +60,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 		this.searcher = searcher;
 		this.indexReader = indexReader;
 		this.chunkSize = chunkSize;
-		this.queryFetchSize = chunkSize * 4; // Will fetch the topdocs for the first 4 pages initially
+		this.currentPageLimit = chunkSize * 4; // Will fetch the topdocs for the first 4 pages initially
 	}
 
 	@Override
@@ -85,28 +85,27 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 	}
 
 	private LuceneSearchScrollResult<H> doNext() {
-		if ( search == null || scrollIndex + chunkSize > queryFetchSize + offset ) {
-			if ( search != null ) {
-				queryFetchSize *= 2;
+		if ( currentPage == null || nextChunkOffset + chunkSize > currentPageLimit + currentPageOffset ) {
+			if ( currentPage != null ) {
+				currentPageLimit *= 2;
 			}
-			offset = scrollIndex;
-			search = doSubmitWithIndexReader( workFactory.scroll( searcher, offset, queryFetchSize ), indexReader );
+			currentPageOffset = nextChunkOffset;
+			currentPage = doSubmitWithIndexReader( workFactory.scroll( searcher, currentPageOffset, currentPageLimit ), indexReader );
 		}
 
-		// index relative to current search
-		int index = scrollIndex - offset;
+		int nextChunkStartIndexInPage = nextChunkOffset - currentPageOffset;
 
 		// no more results check
-		if ( index >= search.hitSize() ) {
-			return new LuceneSearchScrollResultImpl<>( search.total(), false, Collections.emptyList(),
+		if ( nextChunkStartIndexInPage >= currentPage.hitSize() ) {
+			return new LuceneSearchScrollResultImpl<>( currentPage.total(), false, Collections.emptyList(),
 					timeoutManager.tookTime(), timeoutManager.isTimedOut() );
 		}
 
-		int endIndexExclusive = index + chunkSize;
+		int nextChunkEndIndexInPage = nextChunkStartIndexInPage + chunkSize;
 
 		LuceneLoadableSearchResult<H> loadableSearchResult;
 		try {
-			loadableSearchResult = search.extract( index, endIndexExclusive );
+			loadableSearchResult = currentPage.extract( nextChunkStartIndexInPage, nextChunkEndIndexInPage );
 		}
 		catch (IOException e) {
 			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(),
@@ -123,8 +122,8 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 		LuceneSearchResult<H> result = loadableSearchResult.loadBlocking();
 
 		// increasing the index for further next(s)
-		scrollIndex += chunkSize;
-		return new LuceneSearchScrollResultImpl<>( search.total(), true, result.hits(),
+		nextChunkOffset += chunkSize;
+		return new LuceneSearchScrollResultImpl<>( currentPage.total(), true, result.hits(),
 				result.took(), result.timedOut() );
 	}
 
