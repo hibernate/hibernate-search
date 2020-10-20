@@ -87,12 +87,10 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 	@Override
 	public LuceneExtractableSearchResult<H> scroll(IndexSearcher indexSearcher,
-			IndexReaderMetadataResolver metadataResolver, int limit) throws IOException {
+			IndexReaderMetadataResolver metadataResolver, int offset, int limit) throws IOException {
 		queryLog.executingLuceneQuery( requestContext.getLuceneQuery() );
 
-		int offset = 0;
 		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
-
 		LuceneCollectors luceneCollectors = collectMatchingDocs(
 				indexSearcher, metadataResolver, offset, limit, maxDocs, Integer.MAX_VALUE );
 
