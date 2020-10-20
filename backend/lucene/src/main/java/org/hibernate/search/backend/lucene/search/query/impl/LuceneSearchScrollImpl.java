@@ -44,6 +44,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 	private int scrollIndex = 0;
 	private int queryFetchSize;
 	private LuceneExtractableSearchResult<H> search;
+	private int offset = 0;
 
 	public LuceneSearchScrollImpl(LuceneSyncWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, LuceneSearchContext searchContext,
@@ -84,25 +85,28 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 	}
 
 	private LuceneSearchScrollResult<H> doNext() {
-		if ( search == null || scrollIndex + chunkSize > queryFetchSize ) {
+		if ( search == null || scrollIndex + chunkSize > queryFetchSize + offset ) {
 			if ( search != null ) {
 				queryFetchSize *= 2;
 			}
-			// TODO HSEARCH-3990 Pass an offset
-			search = doSubmitWithIndexReader( workFactory.scroll( searcher, 0, queryFetchSize ), indexReader );
+			offset = scrollIndex;
+			search = doSubmitWithIndexReader( workFactory.scroll( searcher, offset, queryFetchSize ), indexReader );
 		}
 
+		// index relative to current search
+		int index = scrollIndex - offset;
+
 		// no more results check
-		if ( scrollIndex >= search.hitSize() ) {
+		if ( index >= search.hitSize() ) {
 			return new LuceneSearchScrollResultImpl<>( search.total(), false, Collections.emptyList(),
 					timeoutManager.tookTime(), timeoutManager.isTimedOut() );
 		}
 
-		int endIndexExclusive = scrollIndex + chunkSize;
+		int endIndexExclusive = index + chunkSize;
 
 		LuceneLoadableSearchResult<H> loadableSearchResult;
 		try {
-			loadableSearchResult = search.extract( scrollIndex, endIndexExclusive );
+			loadableSearchResult = search.extract( index, endIndexExclusive );
 		}
 		catch (IOException e) {
 			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(),
