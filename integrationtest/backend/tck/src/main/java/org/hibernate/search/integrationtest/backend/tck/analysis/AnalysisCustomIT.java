@@ -11,6 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
@@ -33,6 +34,8 @@ import org.junit.Test;
  * <p>
  * Backend testing modules are expected to add the definitions
  * listed in {@link AnalysisDefinitions}.
+ * <p>
+ * Built-in {@link AnalyzerNames} should never be used as names of {@link AnalysisDefinitions}.
  */
 public class AnalysisCustomIT {
 
