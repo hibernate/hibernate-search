@@ -592,9 +592,25 @@ See below for examples.
 Built-in analyzers and normalizers are available out-of-the-box and don't require explicit configuration.
 If necessary, they can be overridden by defining your own analyzer/normalizer with the same name.
 
-The Lucene backend comes with a single built-in analyzer, named `default`.
-It is used by default with <<mapper-orm-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>.
-Unless overridden explicitly, this analyzer uses a `standard` tokenizer and a `lowercase` filter.
+The Lucene backend comes with a series of built-in analyzer:
+
+[cols="l,1",options="header"]
+.Built-in analyzers provided out-of-the box by the Lucene backend
+|====
+|Analyzer name|Description
+|default|It is used by default with <<mapper-orm-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>.
+Uses a `standard` tokenizer and a `lowercase` filter.
+|standard|Uses a `standard` tokenizer and a `lowercase` filter.
+|simple|Tokenize the text into tokens whenever it encounters a character which is not a letter,
+then lowercase each token.
+|whitespace|Tokenize the text into tokens whenever it encounters a character which is not a white space,
+without changing the tokens.
+|stop|Tokenize the text into tokens whenever it encounters a character which is not a letter,
+then it removes english stop words and finally lowercase each token.
+|keyword|Do not change in any way the text.
+With this analyzer a full text field would behave exactly as it was a keyword field.
+Maybe you should consider using a <<mapper-orm-directfieldmapping-annotations-keywordfield,`@KeywordField`>> instead.
+|====
 
 The Lucene backend does not provide any built-in normalizer.
 
