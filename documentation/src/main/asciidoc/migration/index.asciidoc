@@ -2638,6 +2638,11 @@ and as they are just callbacks that are used only once,
 the `@Factory` annotation should not be necessary.
 Whatever code was implemented in your factory can be moved to the configurer.
 
+[[searchexception]]
+=== `SearchException`
+
+`org.hibernate.search.exception.SearchException` has moved to `org.hibernate.search.util.common.SearchException`.
+
 [[spi]]
 == SPI changes
 
