@@ -399,7 +399,7 @@ No equivalent in Hibernate Search 6. See <<full-text-filter>>.
 `hibernate.search.filter.cache_strategy`::
 No equivalent in Hibernate Search 6. See <<full-text-filter>>.
 `hibernate.search.generate_statistics`::
-No equivalent in Hibernate Search 6. See <<statistics>>.
+No equivalent in Hibernate Search 6. See <<searchfactory-getstatistics>>.
 `hibernate.search.index_uninverting_allowed`::
 Index uninverting was deprecated in Hibernate Search 5 due to poor performance and is no longer allowed.
 All index fields that you want to sort on must be <<sortablefield,marked as sortable>>.
@@ -2596,18 +2596,6 @@ NOTE: If you have needs that can be addressed only with named full-text filters,
 and cannot be solved with the solution above,
 feel free to drop a comment to explain your use case on link:{hibernateSearchJiraUrl}/HSEARCH-3325[HSEARCH-3325].
 
-[[statistics]]
-=== Statistics
-
-Hibernate Search 6 does not provide statistics at the moment.
-
-The current plans are to implement support for tracing in a future release
-(link:{hibernateSearchJiraUrl}/HSEARCH-4057[HSEARCH-4057]).
-This would provide a more powerful solution to users looking for insight into the behavior of their application.
-
-If you need this feature urgently, we'll gladly help anyone interested in contributing a patch:
-feel free to link:https://hibernate.org/community[contact us].
-
 [[factory]]
 === `@Factory`
 
@@ -2649,14 +2637,6 @@ Whatever code was implemented in your factory can be moved to the configurer.
 
 `org.hibernate.search.exception.SearchException` has moved to `org.hibernate.search.util.common.SearchException`.
 
-[[indexreaderaccessor]]
-=== `IndexReaderAccessor`
-
-Hibernate Search 6 does not provide direct access to the index reader.
-
-If you were using this feature and still need it in Hibernate Search 6,
-let us know by dropping a comment link:{hibernateSearchJiraUrl}/HSEARCH-4065[here].
-
 [[sharding]]
 === Sharding: `IndexShardingStrategy`/`ShardIdentifierProvider`/`ShardIdentifierProviderTemplate`
 
@@ -2669,6 +2649,154 @@ Dynamic sharding is no longer available in Hibernate Search 6.
 If your application absolutely requires it,
 link:https://hibernate.org/community[contact us] so we can discuss how to best address your needs,
 or drop a comment link:{hibernateSearchJiraUrl}/HSEARCH-3313[here].
+
+=== `SearchFactory`
+
+==== Basics
+
+The equivalent to Hibernate Search 5's `SearchFactory` is Hibernate Search 6's `SearchMapping`,
+but some operations are more conveniently accessible directly from `SearchSession`.
+
+Here is how to retrieve the `SessionFactory` in Hibernate Search 5:
+
+[source, JAVA]
+----
+SearchFactory searchFactory = Search.getFullTextEntityManager( entityManager ).getSearchFactory();
+// Alternatively
+searchFactory = Search.getFullTextSession( session ).getSearchFactory();
+----
+
+The main entry point to Hibernate Search APIs is still named `Search`, but it moved to another package:
+`org.hibernate.search.mapper.orm.Search`.
+Here is how to retrieve the `SearchMapping` in Hibernate Search 6:
+
+[source, JAVA]
+----
+SearchMapping mapping = Search.mapping( entityManagerFactory );
+// Alternatively
+mapping = Search.mapping( sessionFactory );
+mapping = Search.mapping( entityManager.getEntityManagerFactory() );
+mapping = Search.mapping( session.getSessionFactory() );
+----
+
+See the following sections for the exact equivalent of each operation of `SearchFactory`.
+
+[[searchfactory-optimize]]
+==== Merging segments: `SearchFactory.optimize()`/`SearchFactory.optimize(...)`
+
+In Hibernate Search 5:
+
+[source, JAVA]
+----
+SearchFactory searchFactory = Search.getFullTextSession( session ).getSearchFactory();
+
+searchFactory.optimize( Book.class );
+// or
+searchFactory.optimize();
+----
+
+Equivalent in Hibernate Search 6:
+
+[source, JAVA]
+----
+SearchSession searchSession = Search.session( session );
+
+searchSession.workspace( Book.class ).mergeSegments();
+// or
+searchSession.workspace().mergeSegments();
+----
+
+See link:{hibernateSearchDocUrl}#mapper-orm-indexing-manual-largescale[this section of the documentation]
+for more information.
+
+[[searchfactory-getanalyzer]]
+==== Getting Lucene analyzers: `SearchFactory.getAnalyzer(...)`
+
+In Hibernate Search 5:
+
+[source, JAVA]
+----
+SearchFactory searchFactory = Search.getFullTextSession( session ).getSearchFactory();
+
+// Get a named analyzer
+Analyzer analyzer = searchFactory.getAnalyzer( "customanalyzer" );
+
+// Get the search analyzer for a given indexed type
+Analyzer searchAnalyzer = searchFactory.getAnalyzer( Book.class );
+----
+
+Equivalent in Hibernate Search 6:
+
+[source, JAVA]
+----
+SearchMapping mapping = Search.mapping( entityManagerFactory );
+// Alternatively
+mapping = Search.mapping( entityManager.getEntityManagerFactory() );
+
+// Get a named analyzer
+Optional<? extends Analyzer> analyzer = mapping.backend().unwrap( LuceneBackend.class )
+        .analyzer( "customanalyzer" );
+
+// Get the search analyzer for a given indexed type
+Analyzer searchAnalyzer = mapping.indexedEntity( Book.class ).indexManager()
+        .unwrap( LuceneIndexManager.class ).searchAnalyzer();
+
+// Get the search analyzer for a given index
+Analyzer searchAnalyzer = mapping.indexexManager( "Book" ).indexManager()
+        .unwrap( LuceneIndexManager.class ).searchAnalyzer();
+----
+
+See link:{hibernateSearchDocUrl}#backend-lucene-access-analyzers[this section of the documentation]
+for more information.
+
+[[searchfactory-buildquerybuilder]]
+==== Building queries: `SearchFactory.buildQueryBuilder()`
+
+See <<queries>>.
+
+[[searchfactory-getstatistics]]
+==== Statistics: `SearchFactory.getStatistics()`
+
+Hibernate Search 6 does not provide statistics at the moment.
+
+The current plans are to implement support for tracing in a future release
+(link:{hibernateSearchJiraUrl}/HSEARCH-4057[HSEARCH-4057]).
+This would provide a more powerful solution to users looking for insight into the behavior of their application.
+
+If you need this feature urgently, we'll gladly help anyone interested in contributing a patch:
+feel free to link:https://hibernate.org/community[contact us].
+
+[[searchfactory-getindexreaderaccessor]]
+==== Accessing Lucene index readers: `SearchFactory.getIndexReaderAccessor`
+
+Hibernate Search 6 does not provide direct access to the index reader.
+
+If you were using this feature and still need it in Hibernate Search 6,
+let us know by dropping a comment link:{hibernateSearchJiraUrl}/HSEARCH-4065[here].
+
+[[metamodel]]
+==== Metamodel: `SearchFactory.getIndexedTypeDescriptor`, `SearchFactory.getIndexedTypes`
+
+The metamodel is still available in Hibernate Search 6,
+but through different API calls.
+See link:{hibernateSearchDocUrl}#mapper-orm-mapping-inspect[this section of the documentation] for more information.
+
+In Hibernate Search 6, the metamodel includes:
+
+* General information about indexed types (entity type, JPA entity name)
+* Detailed information about the indexes and all their declared fields.
+
+Compared to Hibernate Search 5, it *no longer* includes:
+
+* Detailed information about indexed types and their annotated properties.
+
+[[searchfactory-getindexfamily]]
+==== Accessing the Elasticsearch client: `SearchFactory.getIndexFamily`
+
+The main purpose of `getIndexFamily` in Hibernate Search 5 was to access the Elasticsearch REST client.
+
+See link:{hibernateSearchDocUrl}#backend-elasticsearch-access-client[this section of the documentation]
+for an equivalent solution in Hibernate Search 6.
 
 [[spi]]
 == SPI changes
