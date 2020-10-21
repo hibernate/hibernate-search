@@ -1573,6 +1573,117 @@ whether its document should be routed to the index (indexed) or not (not indexed
 See link:{hibernateSearchDocUrl}#mapper-orm-entityindexmapping-conditional-and-routing[this section of the documentation]
 for more information.
 
+[[fulltextsession]]
+=== `FullTextEntityManager`/`FullTextSession`
+
+==== Basics
+
+The equivalent to Hibernate Search 5's `FullTextEntityManager`/`FullTextSession` is Hibernate Search 6's `SearchSession`.
+
+Here is how to retrieve the `FullTextEntityManager`/`FullTextSession` in Hibernate Search 5:
+
+[source, JAVA]
+----
+FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( entityManager );
+FullTextSession fullTextSession = Search.getFullTextSession( session );
+----
+
+The main entry point to Hibernate Search APIs is still named `Search`, but it moved to another package:
+`org.hibernate.search.mapper.orm.Search`.
+Here is how to retrieve the `SearchSession` in Hibernate Search 6:
+
+[source, JAVA]
+----
+SearchSession searchSession = Search.session( entityManager );
+SearchSession searchSession = Search.session( session );
+----
+
+Tha main difference between Hibernate Search 5 and 6 is that `SearchSession` does not extend `EntityManager` or `Session`:
+the interface stands on its own.
+
+[TIP]
+====
+To retrieve the `EntityManager`/`Session` for a given `SearchSession`,
+you can simply call `searchSession.toEntityManager()`/`searchSession.toOrmSession()`.
+====
+
+See the following sections for the exact equivalent of each operation.
+
+[[fulltextsession-createfulltextquery]]
+==== `FullTextSession.createFullTextQuery`
+
+See <<searching>>.
+
+[[fulltextsession-indexing]]
+==== `FullTextSession.index(...)`, `FullTextSession.purge(...)`
+
+In Hibernate Search 6, indexing operations are handled through the indexing plan:
+
+* `fullTextSession.index(entity)` is equivalent to `searchSession.indexingPlan().addOrUpdate(entity)`;
+* `fullTextSession.purge(entity)` is equivalent to `searchSession.indexingPlan().delete(entity)`;
+* `fullTextSession.purge(entityType, id)` is equivalent to `searchSession.indexingPlan().purge(entityType, id)`;
+
+However:
+
+* In Hibernate Search 5, these operations used to bypass the custom <<entity-indexing-interceptors>>.
+In Hibernate Search 6, the `addOrUppdate` and `delete` operations do not bypass the equivalent `RoutingBridge`,
+but the `purge` operation still does.
+* In Hibernate Search 5, `index` only triggered indexing of the entity passed as an argument.
+In Hibernate Search 6, `addOrUpdate` will also trigger reindexing of other entities that embed it
+(through `@IndexedEmbedded` for example).
+* In Hibernate Search 5, passing `null` to `purge` used to trigger removal of all entities from the index.
+In Hibernate Search 6, passing `null` to `delete`/`purge` will result in an exception being thrown.
+To remove all entities from the index, see <<fulltextsession-purgeall>>.
+
+See link:{hibernateSearchDocUrl}#mapper-orm-indexing-manual[this section of the documentation] for more information.
+
+[[fulltextsession-flushtoindexes]]
+==== `FullTextSession.flushToIndexes()`
+
+The equivalent of `fullTextSession.flushToIndexes()` is `searchSession.indexingPlan().execute()`.
+
+However, keep in mind that Hibernate Search 6 (on contrary to 5)
+turns entities into documents upon Hibernate ORM session flushes,
+so you generally don't need to write to indexes until the write happens automatically on transaction commit,
+*even if you manually flush/clear the Hibernate ORM session*.
+
+The only valid reason to use this method is to preserve memory
+when you're processing a very large number of entities.
+
+See link:{hibernateSearchDocUrl}#mapper-orm-indexing-manual-indexingplan-process-execute[this section of the documentation]
+for more information.
+
+[[fulltextsession-purgeall]]
+==== `FullTextSession.purgeAll(...)`
+
+In Hibernate Search 5:
+
+[source, JAVA]
+----
+FullTextSession ftSession = Search.getFullTextSession( session );
+
+ftSession.purgeAll( Book.class );
+----
+
+Equivalent in Hibernate Search 6:
+
+[source, JAVA]
+----
+SearchSession searchSession = Search.session( session );
+
+searchSession.workspace( Book.class ).purge();
+----
+
+However, the purge is no longer performed on transaction commit: it's executed immediately.
+
+See link:{hibernateSearchDocUrl}#mapper-orm-indexing-manual-largescale[this section of the documentation]
+for more information.
+
+[[fulltextsession-createindexer]]
+==== `FullTextSession.createIndexer(...)`
+
+See <<massindexer>>.
+
 [[searching]]
 === Searching
 
@@ -2820,6 +2931,11 @@ The main purpose of `getIndexFamily` in Hibernate Search 5 was to access the Ela
 
 See link:{hibernateSearchDocUrl}#backend-elasticsearch-access-client[this section of the documentation]
 for an equivalent solution in Hibernate Search 6.
+
+[[massindexer]]
+=== `MassIndexer`
+
+TODO
 
 [[spi]]
 == SPI changes
