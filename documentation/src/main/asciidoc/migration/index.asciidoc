@@ -123,14 +123,37 @@ Then, try to recompile your application.
 Compilation errors should point you to the most significant API changes that require your immediate attention;
 most of the code that still compiles should work as it used to in Hibernate Search 5.
 
-[NOTE]
-====
-The migration helper only addresses Java API compatibility.
+[[migration-helper-limitations]]
+=== Limitations of the migration helper
+
+The migration helper does not solve everything.
+
+First, the migration helper only addresses Java API compatibility.
 This excludes in particular:
 
 * Configuration properties: they must still be <<configuration,replaced with Search 6 properties>>.
 * Data format: data must still be <<data-format,reindexed>>.
-====
+* Behavior: most of the <<behavior,behavior changes>> in Hibernate Search 6 also affect the migration helper.
+In particular, <<index-exclusive>>, <<indexed-is-inherited>> and <<document-id-is-not-a-field>>.
+
+Second, even for Java APIs, not *all* APIs from Hibernate Search 5 are present in the migration helper.
+You should get compilation errors when APIs are missing, but here are the main pitfalls:
+
+* APIs that have no equivalent in Hibernate Search 6
+are not available in the migration helper.
++
+This includes in particular <<full-text-filter,full-text filters>>, <<boost,index-time boost>>,
+<<searchfactory-getstatistics,statistics>>, <<searchfactory-getindexreaderaccessor,`IndexReaderAccessor`>>,
+<<analyzer,referring to analyzers by class>>,
+annotation-based analyzer definitions (<<analyzerdef>>/<<normalizerdef>>),
+<<analyzerdiscriminator>>, ...
+* Hibernate Search 5 bridges cannot be used in the migration helper.
+You can however mix Hibernate Search 5 annotations with Hibernate Search 6 annotations,
+so feel free to migrate only annotations where a custom bridge is used (see <<field>>), as a first step.
+* Hibernate Search 5 programmatic mapping cannot be used in the migration helper.
+You should move to the Hibernate Search 6 programmatic mapping, as explained <<mapping-programmatic,here>>.
+* Hibernate Search 5 metamodel APIs cannot be used in the migration helper.
+You should move to the Hibernate Search 6 metamodel APIs, as explained in <<metamodel>>.
 
 [[configuration]]
 == Configuration changes
