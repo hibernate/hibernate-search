@@ -18,7 +18,7 @@ import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.hamcrest.CoreMatchers;
 
