@@ -253,7 +253,37 @@ This includes, for example, purging the index to remove all of its content.
 
 The operations are performed *outside* of the context of an ORM session,
 using the `SearchWorkspace` interface.
-This interface exposes various large-scale operations
+
+The `SearchWorkspace` can be retrieved from the `SearchMapping`,
+and can target one, several or all indexes:
+
+.Retrieving a `SearchWorkspace` from the `SearchMapping`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=workspace-retrieval-mapping]
+----
+<1> Get a `SearchMapping`.
+<2> Get a workspace targeting all indexes.
+<3> Get a workspace targeting the index mapped to the `Book` entity type.
+<4> Get a workspace targeting the indexes mapped to the `Book` and `Author` entity types.
+====
+
+Alternatively, for convenience, the `SearchWorkspace` can be retrieved from the `SearchSession`:
+
+.Retrieving a `SearchWorkspace` from the `SearchSession`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=workspace-retrieval-mapping]
+----
+<1> Get a `SearchSession`.
+<2> Get a workspace targeting all indexes.
+<3> Get a workspace targeting the index mapped to the `Book` entity type.
+<4> Get a workspace targeting the indexes mapped to the `Book` and `Author` entity types.
+====
+
+The `SearchWorkspace` exposes various large-scale operations
 that can be applied to an index or a set of indexes.
 These operations are triggered as soon as they are requested,
 without waiting for the transaction commit.
@@ -336,18 +366,4 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 <3> Trigger a purge.
 This method is synchronous and will only return after the purge is complete,
 but an asynchronous method, `purgeAsync`, is also available.
-====
-
-There are multiple ways to retrieve a `SearchWorkspace` to target one, several or all indexes:
-
-.Retrieving a `SearchWorkspace`
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmManualIndexingIT.java[tags=workspace-retrieval]
-----
-<1> Get a `SearchSession`.
-<2> Get a workspace targeting all indexes.
-<3> Get a workspace targeting the index mapped to the `Book` entity type.
-<4> Get a workspace targeting the indexes mapped to the `Book` and `Author` entity types.
 ====
