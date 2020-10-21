@@ -22,8 +22,8 @@ import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.LogEvent;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -76,22 +76,21 @@ public class BootstrapLogsIT {
 				.setup( IndexedEntity.class, ContainedEntity.class );
 	}
 
-	private static Matcher<? extends LoggingEvent> suspiciousLogEventMatcher() {
-		return new TypeSafeMatcher<LoggingEvent>() {
+	private static Matcher<? extends LogEvent> suspiciousLogEventMatcher() {
+		return new TypeSafeMatcher<>() {
 			private final Level level = Level.WARN;
 			@Override
 			public void describeTo(Description description) {
-				description.appendText( "a LoggingEvent with " ).appendValue( level ).appendText( " level or higher" )
+				description.appendText( "a LogEvent with " ).appendValue( level ).appendText( " level or higher" )
 						.appendText( " (ignoring known test-only warnings)" );
 			}
 			@Override
-			protected boolean matchesSafely(LoggingEvent item) {
-				return item.getLevel().isGreaterOrEqual( level )
+			protected boolean matchesSafely(LogEvent item) {
+				return item.getLevel().isMoreSpecificThan( level )
 						// Ignore these, they are warning but are expected (just related to the testing infrastructure)
-						&& !(
-								CONNECTION_POOL_WARNING_PATTERN.matcher( item.getRenderedMessage() ).find()
-								|| HBM2DDL_WARNING_PATTERN.matcher( item.getRenderedMessage() ).find()
-						);
+						&& !( CONNECTION_POOL_WARNING_PATTERN.matcher( item.getMessage().getFormattedMessage() ).find()
+						|| HBM2DDL_WARNING_PATTERN.matcher( item.getMessage().getFormattedMessage() ).find()
+				);
 			}
 		};
 	}
