@@ -2643,6 +2643,14 @@ Whatever code was implemented in your factory can be moved to the configurer.
 
 `org.hibernate.search.exception.SearchException` has moved to `org.hibernate.search.util.common.SearchException`.
 
+[[indexreaderaccessor]]
+=== `IndexReaderAccessor`
+
+Hibernate Search 6 does not provide direct access to the index reader.
+
+If you were using this feature and still need it in Hibernate Search 6,
+let us know by dropping a comment link:{hibernateSearchJiraUrl}/HSEARCH-4065[here].
+
 [[spi]]
 == SPI changes
 
