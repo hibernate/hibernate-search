@@ -352,6 +352,12 @@ See link:{hibernateSearchDocUrl}#backend-lucene-io-refresh[here for more informa
 Custom reader strategies are no longer supported.
 `hibernate.search.default.retry_marker_lookup`, `hibernate.search.<index-name>.retry_marker_lookup`::
 No equivalent in Hibernate Search 6: <<search-5-backends,the `filesystem-slave` backend is no longer supported>>.
+`hibernate.search.default.sharding_strategy`, `hibernate.search.<index-name>.sharding_strategy`::
+No direct equivalent in Hibernate Search 6: sharding is configured differently.
+See <<sharding>>.
+`hibernate.search.default.sharding_strategy.nbr_of_shards`, `hibernate.search.<index-name>.sharding_strategy.nbr_of_shards`::
+No direct equivalent in Hibernate Search 6: sharding is configured differently.
+See <<sharding>>.
 `hibernate.search.default.similarity`, `hibernate.search.<index-name>.similarity`::
 No direct equivalent in Hibernate Search 6: the similarity is configured through the <<analysis-definition-provider,analysis configurer>>.
 `hibernate.search.default.worker.backend`, `hibernate.search.<index-name>.worker.backend`::
@@ -2650,6 +2656,19 @@ Hibernate Search 6 does not provide direct access to the index reader.
 
 If you were using this feature and still need it in Hibernate Search 6,
 let us know by dropping a comment link:{hibernateSearchJiraUrl}/HSEARCH-4065[here].
+
+[[sharding]]
+=== Sharding: `IndexShardingStrategy`/`ShardIdentifierProvider`/`ShardIdentifierProviderTemplate`
+
+Static sharding is still available in Hibernate Search 6,
+but it works differently, so the Hibernate Search 5 APIs are no longer available.
+To implement static sharding in Hibernate Search 6,
+refer to link:{hibernateSearchDocUrl}#concepts-sharding-routing[this section of the documentation].
+
+Dynamic sharding is no longer available in Hibernate Search 6.
+If your application absolutely requires it,
+link:https://hibernate.org/community[contact us] so we can discuss how to best address your needs,
+or drop a comment link:{hibernateSearchJiraUrl}/HSEARCH-3313[here].
 
 [[spi]]
 == SPI changes
