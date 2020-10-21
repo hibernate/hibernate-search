@@ -19,7 +19,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 import org.hamcrest.CoreMatchers;
 
 @TestForIssue(jiraKey = "HSEARCH-4336")

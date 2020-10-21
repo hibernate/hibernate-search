@@ -17,7 +17,7 @@ import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 import org.hamcrest.CoreMatchers;
 
 @TestForIssue(jiraKey = "HSEARCH-4336")
