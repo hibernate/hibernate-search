@@ -42,7 +42,7 @@ public class HibernateSearchResourceLoaderTest {
 	@Test
 	public void testOpenKnownResource() throws Exception {
 		// using a known resource for testing
-		String resource = "log4j.properties";
+		String resource = "log4j2.properties";
 		InputStream in = resourceLoader.openResource( resource );
 		String resourceContent = StreamHelper.readInputStream( in );
 		assertNotNull( resourceContent );
