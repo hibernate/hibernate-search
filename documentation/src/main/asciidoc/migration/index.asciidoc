@@ -2991,6 +2991,38 @@ This method was deprecated in Hibernate Search 5 and didn't do anything.
 
 It is no longer available in Hibernate Search 6.
 
+[[jsr352]]
+=== Batch (JSR-352) integration
+
+The mass indexing Batch (JSR-352) job mostly stays the same in Hibernate Search 6,
+but `MassIndexingJob` moved to a different package:
+`org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob`.
+
+See link:{hibernateSearchDocUrl}#mapper-orm-indexing-jsr352[this section of the documentation]
+for more information about the JSR-352 integration.
+
+See the table below for the exact equivalent of parameters that changed.
+
+.Job Parameters in JSR 352 Integration that changed in Hibernate Search 6
+|===
+|Hibernate Search 5 |Hibernate Search 6 |Comment
+
+|`optimizeAfterPurge`, `optimizeAfterPurge(boolean)`
+|`mergeSegmentsAfterPurge`, `mergeSegmentsAfterPurge(boolean)`
+|
+
+|`optimizeOnFinish`, `optimizeOnFinish(boolean)`
+|`mergeSegmentsOnFinish`, `mergeSegmentsOnFinish(boolean)`
+|
+
+|`restrictedBy(Criterion)` (`MassIndexingJob` parameter builder only)
+|`customQueryHQL`, `restrictedBy(String)`
+|Using Hibernate ORM criteria is no longer supported.
+Use HQL / JPQL instead.
+
+See link:{hibernateSearchDocUrl}#jsr-352-indexing-mode[this section of the documentation] for more details and limitations.
+|===
+
 [[spi]]
 == SPI changes
 
