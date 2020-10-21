@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.indexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
@@ -16,6 +17,7 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
@@ -197,13 +199,23 @@ public class HibernateOrmManualIndexingIT {
 		EntityManagerFactory entityManagerFactory = setup( AutomaticIndexingStrategyName.SESSION );
 		initBooksAndAuthors( entityManagerFactory, numberOfBooks );
 
+		{
+			// tag::workspace-retrieval-mapping[]
+			SearchMapping searchMapping = Search.mapping( entityManagerFactory ); // <1>
+			SearchWorkspace allEntitiesWorkspace = searchMapping.scope( Object.class ).workspace(); // <2>
+			SearchWorkspace bookWorkspace = searchMapping.scope( Book.class ).workspace(); // <3>
+			SearchWorkspace bookAndAuthorWorkspace = searchMapping.scope( Arrays.asList( Book.class, Author.class ) )
+					.workspace(); // <4>
+			// end::workspace-retrieval-mapping[]
+		}
+
 		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
-			// tag::workspace-retrieval[]
+			// tag::workspace-retrieval-session[]
 			SearchSession searchSession = Search.session( entityManager ); // <1>
-			SearchWorkspace workspace1 = searchSession.workspace(); // <2>
-			SearchWorkspace workspace2 = searchSession.workspace( Book.class ); // <3>
-			SearchWorkspace workspace3 = searchSession.workspace( Book.class, Author.class ); // <4>
-			// end::workspace-retrieval[]
+			SearchWorkspace allEntitiesWorkspace = searchSession.workspace(); // <2>
+			SearchWorkspace bookWorkspace = searchSession.workspace( Book.class ); // <3>
+			SearchWorkspace bookAndAuthorWorkspace = searchSession.workspace( Book.class, Author.class ); // <4>
+			// end::workspace-retrieval-session[]
 		} );
 
 		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
