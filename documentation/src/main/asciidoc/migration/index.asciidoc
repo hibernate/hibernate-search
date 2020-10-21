@@ -2935,7 +2935,61 @@ for an equivalent solution in Hibernate Search 6.
 [[massindexer]]
 === `MassIndexer`
 
-TODO
+==== Basics
+
+The `MassIndexer` mostly stays the same in Hibernate Search 6, but it moved to a different package:
+`org.hibernate.search.mapper.orm.massindexing.MassIndexer`.
+
+Here is how to retrieve and use a `MassIndexer` in Hibernate Search 5:
+
+[source, JAVA]
+----
+FullTextSession fullTextSession = Search.getFullTextSession( session );
+fullTextSession.createIndexer().startAndWait();
+// or
+fullTextSession.createIndexer( Book.class, Author.class ).startAndWait();
+----
+
+Here is how to retrieve and use a `MassIndexer` in Hibernate Search 6:
+
+[source, JAVA]
+----
+SearchSession searchSession = Search.session( entityManager );
+searchSession.massIndexer().startAndWait();
+// or
+searchSession.massIndexer( Book.class, Author.class ).startAndWait();
+----
+
+Most mass indexing parameters stayed the same;
+see the following sections for the exact equivalent of parameters that changed.
+
+See link:{hibernateSearchDocUrl}#mapper-orm-indexing-massindexer[this section of the documentation]
+for more information about the mass indexer.
+
+[[massindexer-optimizeonfinish]]
+==== `MassIndexer.optimizeOnFinish(...)`
+
+The equivalent method in Hibernate Search 6 is `MassIndexer.mergeSegmentsOnFinish(...)`.
+
+[[massindexer-optimizeafterpurge]]
+==== `MassIndexer.optimizeAfterPurge(...)`
+
+The equivalent method in Hibernate Search 6 is `MassIndexer.mergeSegmentsAfterPurge(...)`.
+
+[[massindexer-progressmonitor]]
+==== `MassIndexer.progressMonitor(...)`
+
+The equivalent method in Hibernate Search 6 is `MassIndexer.monitor(...)`.
+Instead of expecting an instance of `MassIndexerProgressMonitor`,
+it expects an instance of `MassIndexingMonitor`,
+which is largely the same except that all methods take `long` arguments instead of `int`.
+
+[[massindexer-threadsforsubsequentfetching]]
+==== `MassIndexer.threadsForSubsequentFetching(...)`
+
+This method was deprecated in Hibernate Search 5 and didn't do anything.
+
+It is no longer available in Hibernate Search 6.
 
 [[spi]]
 == SPI changes
