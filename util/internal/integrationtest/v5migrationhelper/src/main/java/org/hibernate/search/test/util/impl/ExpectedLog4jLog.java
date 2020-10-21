@@ -10,21 +10,21 @@ import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
+import org.hibernate.search.util.impl.test.rule.log4j.Log4j2ConfigurationAccessor;
+
+import org.junit.rules.TestRule;
+import org.junit.runners.model.Statement;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.LogEvent;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.StringDescription;
 import org.hamcrest.TypeSafeMatcher;
-import org.junit.rules.TestRule;
-import org.junit.runners.model.Statement;
 
 /**
  * @author Yoann Rodiere
@@ -39,9 +39,9 @@ public class ExpectedLog4jLog implements TestRule {
 		return new ExpectedLog4jLog();
 	}
 
-	private List<Matcher<?>> expectations = new ArrayList<>();
+	protected List<Matcher<?>> expectations = new ArrayList<>();
 
-	private List<Matcher<?>> absenceExpectations = new ArrayList<>();
+	protected List<Matcher<?>> absenceExpectations = new ArrayList<>();
 
 	private ExpectedLog4jLog() {
 	}
@@ -54,14 +54,14 @@ public class ExpectedLog4jLog implements TestRule {
 	/**
 	 * Verify that your code produces a log event matching the given matcher.
 	 */
-	public void expectEvent(Matcher<? extends LoggingEvent> matcher) {
+	public void expectEvent(Matcher<? extends LogEvent> matcher) {
 		expectations.add( matcher );
 	}
 
 	/**
 	 * Verify that your code <strong>doesn't</strong> produce a log event matching the given matcher.
 	 */
-	public void expectEventMissing(Matcher<? extends LoggingEvent> matcher) {
+	public void expectEventMissing(Matcher<? extends LogEvent> matcher) {
 		absenceExpectations.add( matcher );
 	}
 
@@ -69,14 +69,14 @@ public class ExpectedLog4jLog implements TestRule {
 	 * Verify that your code <strong>doesn't</strong> produce a log event matching the given level or higher.
 	 */
 	public void expectLevelMissing(Level level) {
-		expectEventMissing( new TypeSafeMatcher<LoggingEvent>() {
+		expectEventMissing( new TypeSafeMatcher<LogEvent>() {
 			@Override
 			public void describeTo(Description description) {
 				description.appendText( "a LoggingEvent with " ).appendValue( level ).appendText( " level or higher" );
 			}
 			@Override
-			protected boolean matchesSafely(LoggingEvent item) {
-				return item.getLevel().isGreaterOrEqual( level );
+			protected boolean matchesSafely(LogEvent item) {
+				return item.getLevel().isMoreSpecificThan( level );
 			}
 		} );
 	}
@@ -132,8 +132,8 @@ public class ExpectedLog4jLog implements TestRule {
 		return CoreMatchers.<String>allOf( matchers );
 	}
 
-	private Matcher<LoggingEvent> eventMessageMatcher(final Matcher<String> messageMatcher) {
-		return new TypeSafeMatcher<LoggingEvent>() {
+	private Matcher<LogEvent> eventMessageMatcher(final Matcher<String> messageMatcher) {
+		return new TypeSafeMatcher<LogEvent>() {
 
 			@Override
 			public void describeTo(Description description) {
@@ -142,50 +142,10 @@ public class ExpectedLog4jLog implements TestRule {
 			}
 
 			@Override
-			protected boolean matchesSafely(LoggingEvent item) {
+			protected boolean matchesSafely(LogEvent item) {
 				return messageMatcher.matches( item.getMessage() );
 			}
 		};
-	}
-
-	private class TestAppender extends AppenderSkeleton {
-		private final Set<Matcher<?>> expectationsMet = new HashSet<>();
-		private final Set<LoggingEvent> unexpectedEvents = new HashSet<>();
-
-		@Override
-		public void close() {
-		}
-
-		@Override
-		public boolean requiresLayout() {
-			return false;
-		}
-
-		@Override
-		protected void append(LoggingEvent event) {
-			for ( Matcher<?> expectation : ExpectedLog4jLog.this.expectations ) {
-				if ( !expectationsMet.contains( expectation ) && expectation.matches( event ) ) {
-					expectationsMet.add( expectation );
-				}
-			}
-			for ( Matcher<?> absenceExpectation : ExpectedLog4jLog.this.absenceExpectations ) {
-				if ( absenceExpectation.matches( event ) ) {
-					unexpectedEvents.add( event );
-				}
-			}
-		}
-
-		public Set<Matcher<?>> getExpectationsNotMet() {
-			Set<Matcher<?>> expectationsNotMet = new HashSet<>();
-			expectationsNotMet.addAll( expectations );
-			expectationsNotMet.removeAll( expectationsMet );
-			return expectationsNotMet;
-		}
-
-		public Set<LoggingEvent> getUnexpectedEvents() {
-			return unexpectedEvents;
-		}
-
 	}
 
 	private class ExpectedLogStatement extends Statement {
@@ -198,24 +158,24 @@ public class ExpectedLog4jLog implements TestRule {
 
 		@Override
 		public void evaluate() throws Throwable {
-			final Logger logger = Logger.getRootLogger();
-			TestAppender appender = new TestAppender();
-			logger.addAppender( appender );
+			Log4j2ConfigurationAccessor programmaticConfig = new Log4j2ConfigurationAccessor();
+			TestAppender appender = new TestAppender( "TestAppender", ExpectedLog4jLog.this );
+			programmaticConfig.addAppender( appender );
 			try {
 				next.evaluate();
 			}
 			finally {
-				logger.removeAppender( appender );
+				programmaticConfig.removeAppender();
 			}
 			Set<Matcher<?>> expectationsNotMet = appender.getExpectationsNotMet();
-			Set<LoggingEvent> unexpectedEvents = appender.getUnexpectedEvents();
+			Set<LogEvent> unexpectedEvents = appender.getUnexpectedEvents();
 			if ( !expectationsNotMet.isEmpty() || !unexpectedEvents.isEmpty() ) {
 				fail( buildFailureMessage( expectationsNotMet, unexpectedEvents ) );
 			}
 		}
 	}
 
-	private static String buildFailureMessage(Set<Matcher<?>> missingSet, Set<LoggingEvent> unexpectedEvents) {
+	private static String buildFailureMessage(Set<Matcher<?>> missingSet, Set<LogEvent> unexpectedEvents) {
 		Description description = new StringDescription();
 		description.appendText( "Produced logs did not meet the expectations." );
 		if ( !missingSet.isEmpty() ) {
@@ -227,9 +187,9 @@ public class ExpectedLog4jLog implements TestRule {
 		}
 		if ( !unexpectedEvents.isEmpty() ) {
 			description.appendText( "\nUnexpected logs:" );
-			for ( LoggingEvent unexpected : unexpectedEvents ) {
+			for ( LogEvent unexpected : unexpectedEvents ) {
 				description.appendText( "\n\t" );
-				description.appendText( unexpected.getRenderedMessage() );
+				description.appendText( unexpected.getMessage().getFormattedMessage() );
 			}
 		}
 		return description.toString();

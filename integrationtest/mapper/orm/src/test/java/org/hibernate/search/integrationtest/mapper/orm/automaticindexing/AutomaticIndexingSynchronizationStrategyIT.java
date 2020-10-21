@@ -46,7 +46,7 @@ import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;

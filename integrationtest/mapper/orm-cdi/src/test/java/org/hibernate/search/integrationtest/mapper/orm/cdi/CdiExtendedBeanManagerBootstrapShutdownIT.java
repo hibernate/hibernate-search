@@ -37,7 +37,7 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 
 /**
  * Check that Hibernate Search will be able to boot and shut down

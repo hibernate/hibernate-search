@@ -18,7 +18,7 @@ import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 
 public class SchemaManagementStrategyDropAndCreateAndDropIT extends AbstractSchemaManagementStrategyIT {
 

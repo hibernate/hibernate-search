@@ -80,7 +80,7 @@ import com.google.gson.JsonSyntaxException;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.ssl.SSLContexts;
-import org.apache.log4j.Level;
+import org.apache.logging.log4j.Level;
 import org.assertj.core.api.InstanceOfAssertFactories;
 
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.DefaultElasticsearchClientFactoryTest")

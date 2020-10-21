@@ -12,31 +12,37 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.WriterAppender;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Property;
 
-public class TestAppender extends WriterAppender {
 
-	private final Map<String, List<LoggingEvent>> eventsByLogger = new LinkedHashMap<>();
+public class TestAppender extends AbstractAppender {
+
+	private final Map<String, List<String>> eventMessagesByLogger = new LinkedHashMap<>();
+
+	public TestAppender(String name) {
+		super( name, null, null, true, Property.EMPTY_ARRAY );
+	}
 
 	@Override
-	public void append(LoggingEvent event) {
+	public void append(LogEvent event) {
 		synchronized (this) {
-			eventsByLogger.computeIfAbsent( event.getLoggerName(), ignored -> new ArrayList<>() )
-					.add( event );
+			eventMessagesByLogger.computeIfAbsent( event.getLoggerName(), ignored -> new ArrayList<>() )
+					.add( event.getMessage().getFormattedMessage() );
 		}
 	}
 
-	public List<LoggingEvent> searchByLoggerAndMessage(String logger, String contents) {
-		ArrayList<LoggingEvent> results = new ArrayList<>();
+	public List<String> searchByLoggerAndMessage(String logger, String contents) {
+		ArrayList<String> results = new ArrayList<>();
 		synchronized (this) {
-			Collection<LoggingEvent> collection = eventsByLogger.get( logger );
+			Collection<String> collection = eventMessagesByLogger.get( logger );
 			if ( collection == null ) {
 				return results;
 			}
-			for ( LoggingEvent loggingEvent : collection ) {
-				if ( loggingEvent.getRenderedMessage().contains( contents ) ) {
-					results.add( loggingEvent );
+			for ( String eventMessage : collection ) {
+				if ( eventMessage.contains( contents ) ) {
+					results.add( eventMessage );
 				}
 			}
 		}

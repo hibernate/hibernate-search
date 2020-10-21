@@ -11,14 +11,12 @@ import static org.junit.Assert.assertFalse;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.logging.impl.LuceneLogCategories;
+import org.hibernate.search.util.impl.test.rule.log4j.Log4j2ConfigurationAccessor;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -29,23 +27,22 @@ import org.apache.lucene.store.ByteBuffersDirectory;
 
 public class LoggerInfoStreamTest {
 
-	private Level hsearchLevel;
-	private final Logger hsearchLogger = Logger.getLogger( "org.hibernate.search" );
-	private final Logger rootLogger = Logger.getRootLogger();
+	private final Log4j2ConfigurationAccessor programmaticConfig;
 	private TestAppender testAppender;
+
+	public LoggerInfoStreamTest() {
+		programmaticConfig = new Log4j2ConfigurationAccessor();
+	}
 
 	@Before
 	public void setUp() throws Exception {
-		testAppender = new TestAppender();
-		rootLogger.addAppender( testAppender );
-		hsearchLevel = hsearchLogger.getLevel();
-		hsearchLogger.setLevel( Level.TRACE );
+		testAppender = new TestAppender( "LuceneTestAppender" );
+		programmaticConfig.addAppender( testAppender );
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		rootLogger.removeAppender( testAppender );
-		hsearchLogger.setLevel( hsearchLevel );
+		programmaticConfig.removeAppender();
 	}
 
 	@Test
@@ -64,8 +61,10 @@ public class LoggerInfoStreamTest {
 		indexWriter.commit();
 		indexWriter.close();
 
-		List<LoggingEvent> loggingEvents = testAppender.searchByLoggerAndMessage( LuceneLogCategories.INFOSTREAM_LOGGER_CATEGORY.getName(), "IW:" );
+		List<String> logEvents = testAppender.searchByLoggerAndMessage(
+				LuceneLogCategories.INFOSTREAM_LOGGER_CATEGORY.getName(), "IW:"
+		);
 
-		assertFalse( loggingEvents.isEmpty() );
+		assertFalse( logEvents.isEmpty() );
 	}
 }
