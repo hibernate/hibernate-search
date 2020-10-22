@@ -17,10 +17,11 @@ import org.jboss.logging.annotations.ValidIdRanges;
 
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 @ValidIdRanges({
-		// Search 5 :
-		@ValidIdRange(min = MessageConstants.BATCH_JSR352_CORE_ID_RANGE_MIN, max = MessageConstants.BATCH_JSR352_CORE_ID_RANGE_MIN + 5),
-		// Search 6 :
-		@ValidIdRange(min = MessageConstants.BATCH_JSR352_JBERET_ID_RANGE_MIN, max = MessageConstants.BATCH_JSR352_JBERET_ID_RANGE_MAX)
+		@ValidIdRange(min = MessageConstants.BATCH_JSR352_JBERET_ID_RANGE_MIN,
+				max = MessageConstants.BATCH_JSR352_JBERET_ID_RANGE_MAX),
+		// Exceptions for legacy messages from Search 5 (JSR-352 Core module)
+		@ValidIdRange(min = MessageConstants.BATCH_JSR352_CORE_ID_RANGE_MIN,
+				max = MessageConstants.BATCH_JSR352_CORE_ID_RANGE_MIN + 5),
 })
 public interface Log extends BasicLogger {
 
@@ -28,26 +29,26 @@ public interface Log extends BasicLogger {
 	// Pre-existing messages from Search 5 (JSR-352 Core module)
 	// DO NOT ADD ANY NEW MESSAGES HERE
 	// -----------------------------------
-	int ID_OFFSET_1 = MessageConstants.BATCH_JSR352_CORE_ID_RANGE_MIN;
+	int ID_OFFSET_LEGACY = MessageConstants.BATCH_JSR352_CORE_ID_RANGE_MIN;
 
-	@Message(id = ID_OFFSET_1 + 2,
+	@Message(id = ID_OFFSET_LEGACY + 2,
 			value = "No entity manager factory available in the CDI context with this bean name: '%1$s'."
 					+ " Make sure your entity manager factory is a named bean."
 	)
 	SearchException noAvailableEntityManagerFactoryInCDI(String reference);
 
-	@Message(id = ID_OFFSET_1 + 3,
+	@Message(id = ID_OFFSET_LEGACY + 3,
 			value = "Unknown entity manager factory namespace: '%1$s'. Please use a supported namespace.")
 	SearchException unknownEntityManagerFactoryNamespace(String namespace);
 
-	@Message(id = ID_OFFSET_1 + 4,
+	@Message(id = ID_OFFSET_LEGACY + 4,
 			value = "Exception while retrieving the EntityManagerFactory using @PersistenceUnit."
 					+ " This generally happens either because the persistence wasn't configured properly"
 					+ " or because there are multiple persistence units."
 	)
 	SearchException cannotRetrieveEntityManagerFactoryInJsr352();
 
-	@Message(id = ID_OFFSET_1 + 5,
+	@Message(id = ID_OFFSET_LEGACY + 5,
 			value = "Multiple entity manager factories have been registered in the CDI context."
 					+ " Please provide the bean name for the selected entity manager factory to the batch indexing job through"
 					+ " the 'entityManagerFactoryReference' parameter."
@@ -57,6 +58,6 @@ public interface Log extends BasicLogger {
 	// -----------------------------------
 	// New messages from Search 6 onwards
 	// -----------------------------------
-	int ID_OFFSET_2 = MessageConstants.BATCH_JSR352_JBERET_ID_RANGE_MIN;
+	int ID_OFFSET = MessageConstants.BATCH_JSR352_JBERET_ID_RANGE_MIN;
 
 }

@@ -42,7 +42,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 @ValidIdRanges({
 		@ValidIdRange(min = MessageConstants.ORM_ID_RANGE_MIN, max = MessageConstants.ORM_ID_RANGE_MAX),
-		// Exceptions for legacy messages from Search 5
+		// Exceptions for legacy messages from Search 5 (engine module)
 		@ValidIdRange(min = 27, max = 28),
 		@ValidIdRange(min = 30, max = 30),
 		@ValidIdRange(min = 31, max = 31),
@@ -57,7 +57,6 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = 235, max = 235),
 		@ValidIdRange(min = 276, max = 276),
 		@ValidIdRange(min = 348, max = 349)
-		// TODO HSEARCH-3308 add exceptions here for legacy messages from Search 5. See the Lucene logger for examples.
 })
 public interface Log extends BasicLogger {
 
@@ -65,42 +64,42 @@ public interface Log extends BasicLogger {
 	// Pre-existing messages from Search 5
 	// DO NOT ADD ANY NEW MESSAGES HERE
 	// -----------------------------------
-	int ID_OFFSET_1 = MessageConstants.ENGINE_ID_RANGE_MIN;
+	int ID_OFFSET_LEGACY_ENGINE = MessageConstants.ENGINE_ID_RANGE_MIN;
 
 	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_1 + 27, value = "Going to reindex %d entities")
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 27, value = "Going to reindex %d entities")
 	void indexingEntities(long count);
 
 	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_1 + 28, value = "Reindexed %1$d entities")
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 28, value = "Reindexed %1$d entities")
 	void indexingEntitiesCompleted(long nbrOfEntities);
 
 	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_1 + 30, value = "%1$d documents indexed in %2$d ms")
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 30, value = "%1$d documents indexed in %2$d ms")
 	void indexingDocumentsCompleted(long doneCount, long elapsedMs);
 
 	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_1 + 31, value = "Indexing speed: %1$f documents/second; progress: %2$.2f%%")
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 31, value = "Indexing speed: %1$f documents/second; progress: %2$.2f%%")
 	void indexingSpeed(float estimateSpeed, float estimatePercentileComplete);
 
 	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_1 + 34, value = "Hibernate Search version %1$s")
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 34, value = "Hibernate Search version %1$s")
 	void version(String versionString);
 
 	@LogMessage(level = WARN)
-	@Message(id = ID_OFFSET_1 + 36, value = "Cannot guess the Transaction Status: not starting a JTA transaction")
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 36, value = "Cannot guess the Transaction Status: not starting a JTA transaction")
 	void cannotGuessTransactionStatus(@Cause Exception e);
 
 	@LogMessage(level = WARN)
-	@Message(id = ID_OFFSET_1 + 39, value = "Unable to properly close scroll in ScrollableResults")
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 39, value = "Unable to properly close scroll in ScrollableResults")
 	void unableToCloseSearcherInScrollableResult(@Cause Exception e);
 
 	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET_1 + 62, value = "Mass indexing was interrupted")
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 62, value = "Mass indexing was interrupted")
 	void interruptedBatchIndexing();
 
 	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET_1 + 65, value = "Error while rolling back transaction after %1$s")
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 65, value = "Error while rolling back transaction after %1$s")
 	void errorRollingBackTransaction(String message, @Cause Exception e1);
 
 	/*
@@ -122,74 +121,72 @@ public interface Log extends BasicLogger {
 	String massIndexingLoadingAndExtractingEntityData(String entityName);
 
 	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET_1 + 235, value = "Default automatic indexing synchronization strategy set to '%s'." )
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 235, value = "Default automatic indexing synchronization strategy set to '%s'." )
 	void defaultAutomaticIndexingSynchronizationStrategy(Object strategy);
 
-	@Message(id = ID_OFFSET_1 + 276, value = "No transaction is active while indexing entity '%1$s'; Consider increasing the connection time-out")
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 276, value = "No transaction is active while indexing entity '%1$s'; Consider increasing the connection time-out")
 	SearchException transactionNotActiveWhileProducingIdsForBatchIndexing(String entityName);
-
-	// TODO HSEARCH-3308 migrate relevant messages from Search 5 here
 
 	// -----------------------------------
 	// New messages from Search 6 onwards
 	// -----------------------------------
-	int ID_OFFSET_2 = MessageConstants.ORM_ID_RANGE_MIN;
+	int ID_OFFSET = MessageConstants.ORM_ID_RANGE_MIN;
 
-	@Message(id = ID_OFFSET_2 + 1,
+	@Message(id = ID_OFFSET + 1,
 			value = "Hibernate Search was not initialized.")
 	SearchException hibernateSearchNotInitialized();
 
-	@Message(id = ID_OFFSET_2 + 2,
+	@Message(id = ID_OFFSET + 2,
 			value = "Unexpected entity name for a query hit: '%1$s'. Expected one of %2$s.")
 	SearchException unexpectedSearchHitEntityName(String entityName, Collection<String> expectedNames);
 
-	@Message(id = ID_OFFSET_2 + 3,
+	@Message(id = ID_OFFSET + 3,
 			value = "Invalid automatic indexing strategy name: '%1$s'. Valid names are: %2$s.")
 	SearchException invalidAutomaticIndexingStrategyName(String invalidRepresentation, List<String> validRepresentations);
 
-	@Message(id = ID_OFFSET_2 + 7,
+	@Message(id = ID_OFFSET + 7,
 			value = "Path '%1$s' cannot be resolved to a persisted value in Hibernate ORM metadata."
 					+ " If this path points to a transient value, use @IndexingDependency(derivedFrom = ...)"
 					+ " to specify which persisted values it is derived from."
 					+ " See the reference documentation for more information.")
 	SearchException unknownPathForDirtyChecking(@FormatWith(PojoModelPathFormatter.class) PojoModelPath path, @Cause Exception e);
 
-	@Message(id = ID_OFFSET_2 + 8,
+	@Message(id = ID_OFFSET + 8,
 			value = "Path '%1$s' can be resolved using Hibernate ORM metadata,"
 					+ " but points to value '%2$s' that will never be reported as dirty by Hibernate ORM."
 					+ " Check that you didn't declare an invalid indexing dependency.")
 	SearchException unreportedPathForDirtyChecking(@FormatWith(PojoModelPathFormatter.class) PojoModelPath path, Value value);
 
-	@Message(id = ID_OFFSET_2 + 9,
+	@Message(id = ID_OFFSET + 9,
 			value = "Container value extractor with name '%2$s' cannot be applied to"
 					+ " Hibernate ORM metadata node of type '%1$s'.")
 	SearchException invalidContainerExtractorForDirtyChecking(Class<?> ormMappingClass, String extractorName);
 
-	@Message(id = ID_OFFSET_2 + 11, value = "Mapping service cannot create a SearchSession using a different session factory. Expected: '%1$s'. In use: '%2$s'.")
+	@Message(id = ID_OFFSET + 11, value = "Mapping service cannot create a SearchSession using a different session factory. Expected: '%1$s'. In use: '%2$s'.")
 	SearchException usingDifferentSessionFactories(SessionFactory expectedSessionFactory, SessionFactory usedSessionFactory);
 
-	@Message(id = ID_OFFSET_2 + 12, value = "Exception while retrieving property type model for '%1$s' on '%2$s'.")
+	@Message(id = ID_OFFSET + 12, value = "Exception while retrieving property type model for '%1$s' on '%2$s'.")
 	SearchException errorRetrievingPropertyTypeModel(String propertyModelName, @FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> parentTypeModel, @Cause Exception cause);
 
-	@Message(id = ID_OFFSET_2 + 13, value = "Mass indexing was interrupted; index will be left in unknown state!")
+	@Message(id = ID_OFFSET + 13, value = "Mass indexing was interrupted; index will be left in unknown state!")
 	SearchException massIndexingThreadInterrupted(@Cause InterruptedException e);
 
-	@Message(id = ID_OFFSET_2 + 15,
+	@Message(id = ID_OFFSET + 15,
 			value = "Invalid reflection strategy name: '%1$s'. Valid names are: %2$s.")
 	SearchException invalidReflectionStrategyName(String invalidRepresentation, List<String> validRepresentations);
 
-	@Message(id = ID_OFFSET_2 + 16, value = "Error trying to access Hibernate ORM session." )
+	@Message(id = ID_OFFSET + 16, value = "Error trying to access Hibernate ORM session." )
 	SearchException hibernateSessionAccessError(@Cause IllegalStateException cause);
 
-	@Message(id = ID_OFFSET_2 + 17, value = "Underlying Hibernate ORM Session seems to be closed." )
+	@Message(id = ID_OFFSET + 17, value = "Underlying Hibernate ORM Session seems to be closed." )
 	SearchException hibernateSessionIsClosed(@Cause IllegalStateException cause);
 
-	@Message(id = ID_OFFSET_2 + 18,
+	@Message(id = ID_OFFSET + 18,
 			value = "Invalid automatic indexing synchronization strategy name: '%1$s'. Valid names are: %2$s.")
 	SearchException invalidAutomaticIndexingSynchronizationStrategyName(String invalidRepresentation, List<String> validRepresentations);
 
 	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET_2 + 19,
+	@Message(id = ID_OFFSET + 19,
 			value = "The entity loader for '%1$s' will ignore the cache lookup strategy '%2$s',"
 					+ " because document IDs are distinct from entity IDs "
 					+ "and thus cannot be used for persistence context or second level cache lookups.")
@@ -197,37 +194,37 @@ public interface Log extends BasicLogger {
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy);
 
 	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET_2 + 20,
+	@Message(id = ID_OFFSET + 20,
 			value = "The entity loader for '%1$s' will ignore the second-level cache "
 					+ " even though it was instructed to use it,"
 					+ " because caching is not enabled for this entity type.")
 	void skippingSecondLevelCacheLookupsForNonCachedEntityTypeEntityLoader(String entityName);
 
-	@Message(id = ID_OFFSET_2 + 21, value = "Error trying to access Hibernate ORM session factory." )
+	@Message(id = ID_OFFSET + 21, value = "Error trying to access Hibernate ORM session factory." )
 	SearchException hibernateSessionFactoryAccessError(@Cause IllegalStateException cause);
 
-	@Message(id = ID_OFFSET_2 + 22, value = "Indexing failure: %1$s.\nThe following entities may not have been updated correctly in the index: %2$s." )
+	@Message(id = ID_OFFSET + 22, value = "Indexing failure: %1$s.\nThe following entities may not have been updated correctly in the index: %2$s." )
 	SearchException indexingFailure(String causeMessage, List<EntityReference> failingEntities, @Cause Throwable cause);
 
 	@Message(value = "Automatic indexing of Hibernate ORM entities")
 	String automaticIndexing();
 
-	@Message(id = ID_OFFSET_2 + 23, value = "Automatic indexing failed before transaction completion: %1$s" )
+	@Message(id = ID_OFFSET + 23, value = "Automatic indexing failed before transaction completion: %1$s" )
 	SearchException synchronizationBeforeTransactionFailure(String causeMessage, @Cause Throwable cause);
 
-	@Message(id = ID_OFFSET_2 + 24, value = "Automatic indexing failed after transaction completion: %1$s" )
+	@Message(id = ID_OFFSET + 24, value = "Automatic indexing failed after transaction completion: %1$s" )
 	SearchException synchronizationAfterTransactionFailure(String causeMessage, @Cause Throwable cause);
 
-	@Message(id = ID_OFFSET_2 + 25, value = "Exception while handling transactions: %1$s")
+	@Message(id = ID_OFFSET + 25, value = "Exception while handling transactions: %1$s")
 	SearchException massIndexingTransactionHandlingException(String causeMessage, @Cause Throwable cause);
 
-	@Message(id = ID_OFFSET_2 + 26, value = "%1$s entities could not be indexed. See the logs for details."
+	@Message(id = ID_OFFSET + 26, value = "%1$s entities could not be indexed. See the logs for details."
 			+ " First failure on entity '%2$s': %3$s")
 	SearchException massIndexingEntityFailures(long finalFailureCount,
 			EntityReference firstFailureEntity, String firstFailureMessage,
 			@Cause Throwable firstFailure);
 
-	@Message(id = ID_OFFSET_2 + 27,
+	@Message(id = ID_OFFSET + 27,
 			value = "Unknown type: '%1$s'. Available named types: %2$s."
 					+ " For entity types, the correct type name is the entity name."
 					+ " For component types (embeddeds, ...) in dynamic-map entities,"
@@ -237,12 +234,12 @@ public interface Log extends BasicLogger {
 	)
 	SearchException unknownNamedType(String typeName, Collection<String> availableNamedTypes);
 
-	@Message(id = ID_OFFSET_2 + 28,
+	@Message(id = ID_OFFSET + 28,
 			value = "Unknown entity name: '%1$s'. Available entity names: %2$s."
 	)
 	SearchException invalidEntityName(String entityName, Collection<String> availableEntityNames);
 
-	@Message(id = ID_OFFSET_2 + 29,
+	@Message(id = ID_OFFSET + 29,
 			value = "Invalid type for '%1$s': expected the entity to extend '%2$s'," +
 					" but entity type '%3$s' does not."
 	)
@@ -250,7 +247,7 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassFormatter.class) Class<?> expectedSuperType,
 			@FormatWith(ClassFormatter.class) Class<?> actualJavaType);
 
-	@Message(id = ID_OFFSET_2 + 30,
+	@Message(id = ID_OFFSET + 30,
 			value = "Type '%1$s' doesn't have any representation in the JPA metamodel."
 					+ " As a result, Hibernate Search cannot use the Criteria API to automatically build queries targeting this type."
 					+ " This means in particular that this type cannot:"
@@ -259,41 +256,41 @@ public interface Log extends BasicLogger {
 	SearchException nonJpaEntityType(PojoRawTypeIdentifier<?> typeIdentifier);
 
 	@LogMessage(level = Logger.Level.ERROR)
-	@Message(id = ID_OFFSET_2 + 31,
+	@Message(id = ID_OFFSET + 31,
 			value = "The mass indexing failure handler threw an exception while handling a previous failure."
 					+ " The failure may not have been reported.")
 	void failureInMassIndexingFailureHandler(@Cause Throwable t);
 
-	@Message(id = ID_OFFSET_2 + 32, value = "Invalid schema management strategy name: '%1$s'."
+	@Message(id = ID_OFFSET + 32, value = "Invalid schema management strategy name: '%1$s'."
 			+ " Valid names are: %2$s.")
 	SearchException invalidSchemaManagementStrategyName(String invalidRepresentation, List<String> validRepresentations);
 
-	@Message(id = ID_OFFSET_2 + 33, value = "Type '%1$s' is not an entity type, or the entity is not indexed.")
+	@Message(id = ID_OFFSET + 33, value = "Type '%1$s' is not an entity type, or the entity is not indexed.")
 	SearchException notIndexedEntityType(@FormatWith(ClassFormatter.class) Class<?> type);
 
-	@Message(id = ID_OFFSET_2 + 34, value = "Entity '%1$s' is not indexed.")
+	@Message(id = ID_OFFSET + 34, value = "Entity '%1$s' is not indexed.")
 	SearchException notIndexedEntityName(String name);
 
 	@LogMessage(level = Logger.Level.ERROR)
-	@Message(id = ID_OFFSET_2 + 35, value = "Hibernate Search shutdown failed: %1$s")
+	@Message(id = ID_OFFSET + 35, value = "Hibernate Search shutdown failed: %1$s")
 	void shutdownFailed(String causeMessage, @Cause Throwable cause);
 
-	@Message(id = ID_OFFSET_2 + 36, value = "Cannot use scroll() with scroll mode '%1$s' with Hibernate Search queries:"
+	@Message(id = ID_OFFSET + 36, value = "Cannot use scroll() with scroll mode '%1$s' with Hibernate Search queries:"
 			+ " only ScrollMode.FORWARDS_ONLY is supported.")
 	SearchException canOnlyUseScrollWithScrollModeForwardsOnly(ScrollMode scrollMode);
 
-	@Message(id = ID_OFFSET_2 + 37, value = "Cannot scroll backwards with Hibernate Search scrolls: they are forwards-only."
+	@Message(id = ID_OFFSET + 37, value = "Cannot scroll backwards with Hibernate Search scrolls: they are forwards-only."
 			+ " Ensure you always increment the scroll position, and never decrement it.")
 	SearchException cannotScrollBackwards();
 
-	@Message(id = ID_OFFSET_2 + 38, value = "Cannot set the scroll position relative to the end with Hibernate Search scrolls."
+	@Message(id = ID_OFFSET + 38, value = "Cannot set the scroll position relative to the end with Hibernate Search scrolls."
 			+ " Ensure you always pass a positive number to setRowNumber().")
 	SearchException cannotSetScrollPositionRelativeToEnd();
 
-	@Message(id = ID_OFFSET_2 + 39, value = "Cannot use this ScrollableResults instance: it is closed.")
+	@Message(id = ID_OFFSET + 39, value = "Cannot use this ScrollableResults instance: it is closed.")
 	SearchException cannotUseClosedScrollableResults();
 
-	@Message(id = ID_OFFSET_2 + 40, value = "Found multiple entities of type '%1$s' with '%2$s' set to '%3$s'."
+	@Message(id = ID_OFFSET + 40, value = "Found multiple entities of type '%1$s' with '%2$s' set to '%3$s'."
 				+ " '%2$s' is the document ID and must be assigned unique values.")
 	SearchException foundMultipleEntitiesForDocumentId(String entityName, String documentIdSourcePropertyName,
 			Object id);

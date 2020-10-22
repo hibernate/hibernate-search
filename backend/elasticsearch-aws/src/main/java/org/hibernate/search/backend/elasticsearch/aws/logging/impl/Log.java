@@ -18,7 +18,8 @@ import org.jboss.logging.annotations.ValidIdRanges;
 
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 @ValidIdRanges({
-		@ValidIdRange(min = MessageConstants.BACKEND_ES_AWS_ID_RANGE_MIN, max = MessageConstants.BACKEND_ES_AWS_ID_RANGE_MAX)
+		@ValidIdRange(min = MessageConstants.BACKEND_ES_AWS_ID_RANGE_MIN,
+				max = MessageConstants.BACKEND_ES_AWS_ID_RANGE_MAX)
 })
 public interface Log extends BasicLogger {
 

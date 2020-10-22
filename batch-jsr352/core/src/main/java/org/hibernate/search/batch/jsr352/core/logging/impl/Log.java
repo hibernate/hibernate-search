@@ -29,27 +29,14 @@ import org.jboss.logging.annotations.ValidIdRanges;
  */
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 @ValidIdRanges({
-		@ValidIdRange(min = MessageConstants.BATCH_JSR352_CORE_ID_RANGE_MIN, max = MessageConstants.BATCH_JSR352_CORE_ID_RANGE_MAX),
-		// Exceptions for legacy messages from Search 5 (engine module)
-		// TODO HSEARCH-3308 add exceptions here for legacy messages from Search 5 (engine module).
+		@ValidIdRange(min = MessageConstants.BATCH_JSR352_CORE_ID_RANGE_MIN,
+				max = MessageConstants.BATCH_JSR352_CORE_ID_RANGE_MAX),
 })
 public interface Log extends BasicLogger {
 
-	// -----------------------------------
-	// Pre-existing messages from Search 5 (engine module)
-	// DO NOT ADD ANY NEW MESSAGES HERE
-	// -----------------------------------
-	int ID_OFFSET_1 = MessageConstants.ENGINE_ID_RANGE_MIN;
+	int ID_OFFSET = MessageConstants.BATCH_JSR352_CORE_ID_RANGE_MIN;
 
-	// TODO HSEARCH-3308 migrate relevant messages from Search 5 (engine module) here
-
-	// -----------------------------------
-	// Pre-existing messages from Search 5 (ES module)
-	// DO NOT ADD ANY NEW MESSAGES HERE
-	// -----------------------------------
-	int ID_OFFSET_2 = MessageConstants.BATCH_JSR352_CORE_ID_RANGE_MIN;
-
-	@Message(id = ID_OFFSET_2 + 1,
+	@Message(id = ID_OFFSET + 1,
 			value = "An '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_NAMESPACE + "' parameter was defined,"
 					+ " but the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE + "' parameter is empty."
 					+ " Please also set the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE + "' parameter"
@@ -58,11 +45,11 @@ public interface Log extends BasicLogger {
 	)
 	SearchException entityManagerFactoryReferenceIsEmpty();
 
-	@Message(id = ID_OFFSET_2 + 3,
+	@Message(id = ID_OFFSET + 3,
 			value = "Unknown entity manager factory namespace: '%1$s'. Please use a supported namespace.")
 	SearchException unknownEntityManagerFactoryNamespace(String namespace);
 
-	@Message(id = ID_OFFSET_2 + 6,
+	@Message(id = ID_OFFSET + 6,
 			value = "No entity manager factory has been created with this persistence unit name yet: '%1$s'."
 					+ " Make sure you use the JPA API to create your entity manager factory (use a 'persistence.xml' file)"
 					+ " and that the entity manager factory has already been created and wasn't closed before"
@@ -70,7 +57,7 @@ public interface Log extends BasicLogger {
 	)
 	SearchException cannotFindEntityManagerFactoryByPUName(String persistentUnitName);
 
-	@Message(id = ID_OFFSET_2 + 7,
+	@Message(id = ID_OFFSET + 7,
 			value = "No entity manager factory has been created with this name yet: '%1$s'."
 					+ " Make sure your entity manager factory is named (for instance by setting the '"
 					+ AvailableSettings.SESSION_FACTORY_NAME + "' option) and that the entity manager factory has"
@@ -78,14 +65,14 @@ public interface Log extends BasicLogger {
 	)
 	SearchException cannotFindEntityManagerFactoryByName(String entityManagerFactoryName);
 
-	@Message(id = ID_OFFSET_2 + 8,
+	@Message(id = ID_OFFSET + 8,
 			value = "No entity manager factory has been created yet."
 					+ " Make sure that the entity manager factory has already been created and wasn't closed before"
 					+ " you launched the job."
 	)
 	SearchException noEntityManagerFactoryCreated();
 
-	@Message(id = ID_OFFSET_2 + 9,
+	@Message(id = ID_OFFSET + 9,
 			value = "Multiple entity manager factories are currently active."
 					+ " Please provide the name of the selected persistence unit to the batch indexing job through"
 					+ " the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE
@@ -95,116 +82,111 @@ public interface Log extends BasicLogger {
 	SearchException tooManyActiveEntityManagerFactories();
 
 	@LogMessage(level = Level.INFO)
-	@Message(id = ID_OFFSET_2 + 10,
+	@Message(id = ID_OFFSET + 10,
 			value = "%1$s"
 	)
 	void analyzeIndexProgress(String progress);
 
 	@LogMessage(level = Level.INFO)
-	@Message(id = ID_OFFSET_2 + 15,
+	@Message(id = ID_OFFSET + 15,
 			value = "Optimizing all entities ..."
 	)
 	void startOptimization();
 
 	@LogMessage(level = Level.DEBUG)
-	@Message(id = ID_OFFSET_2 + 16,
+	@Message(id = ID_OFFSET + 16,
 			value = "%1$d criteria found."
 	)
 	void criteriaSize(int size);
 
 	@LogMessage(level = Level.DEBUG)
-	@Message(id = ID_OFFSET_2 + 17,
+	@Message(id = ID_OFFSET + 17,
 			value = "Checkpoint reached. Sending checkpoint ID to batch runtime... (entity='%1$s', checkpointInfo='%2$s')"
 	)
 	void checkpointReached(String entityName, Object checkpointInfo);
 
 	@LogMessage(level = Level.DEBUG)
-	@Message(id = ID_OFFSET_2 + 18,
+	@Message(id = ID_OFFSET + 18,
 			value = "Opening EntityReader of partitionId='%1$s', entity='%2$s'."
 	)
 	void openingReader(String partitionId, String entityName);
 
 	@LogMessage(level = Level.DEBUG)
-	@Message(id = ID_OFFSET_2 + 19,
+	@Message(id = ID_OFFSET + 19,
 			value = "Closing EntityReader of partitionId='%1$s', entity='%2$s'."
 	)
 	void closingReader(String partitionId, String entityName);
 
 	@LogMessage(level = Level.TRACE)
-	@Message(id = ID_OFFSET_2 + 21,
+	@Message(id = ID_OFFSET + 21,
 			value = "Reading entity..."
 	)
 	void readingEntity();
 
 	@LogMessage(level = Level.INFO)
-	@Message(id = ID_OFFSET_2 + 22,
+	@Message(id = ID_OFFSET + 22,
 			value = "No more results, read ends."
 	)
 	void noMoreResults();
 
 	@LogMessage(level = Level.TRACE)
-	@Message(id = ID_OFFSET_2 + 23,
+	@Message(id = ID_OFFSET + 23,
 			value = "Processing entity with id: '%1$s'"
 	)
 	void processEntity(Object entityId);
 
 	@LogMessage(level = Level.INFO)
-	@Message(id = ID_OFFSET_2 + 26,
+	@Message(id = ID_OFFSET + 26,
 			value = "%1$d partitions, %2$d threads."
 	)
 	void partitionsPlan(int partitionSize, int threadSize);
 
 	@LogMessage(level = Level.INFO)
-	@Message(id = ID_OFFSET_2 + 27,
+	@Message(id = ID_OFFSET + 27,
 			value = "entityName: '%1$s', rowsToIndex: %2$d")
 	void rowsToIndex(String entityName, Long rowsToIndex);
 
-	@Message(id = ID_OFFSET_2 + 28,
+	@Message(id = ID_OFFSET + 28,
 			value = "Failed to serialize job parameter of type %1$s")
 	SearchException failedToSerializeJobParameter(@FormatWith(ClassFormatter.class) Class<?> type, @Cause Throwable e);
 
-	@Message(id = ID_OFFSET_2 + 29,
+	@Message(id = ID_OFFSET + 29,
 			value = "Unable to parse value '%2$s' for job parameter '%1$s'."
 	)
 	SearchException unableToParseJobParameter(String parameterName, Object parameterValue, @Cause Exception e);
 
-	@Message(id = ID_OFFSET_2 + 30,
+	@Message(id = ID_OFFSET + 30,
 			value = "The value of parameter '" + MassIndexingJobParameters.CHECKPOINT_INTERVAL
 					+ "' (value=%1$d) should be equal to or less than the value of parameter '"
 					+ MassIndexingJobParameters.ROWS_PER_PARTITION + "' (value=%2$d)."
 	)
 	SearchException illegalCheckpointInterval(int checkpointInterval, int rowsPerPartition);
 
-	@Message(id = ID_OFFSET_2 + 31,
+	@Message(id = ID_OFFSET + 31,
 			value = "The value of parameter '%1$s' (value=%2$d) should be greater than 0."
 	)
 	SearchException negativeValueOrZero(String parameterName, Number parameterValue);
 
-	@Message(id = ID_OFFSET_2 + 32,
+	@Message(id = ID_OFFSET + 32,
 			value = "The following selected entity types aren't indexable: %1$s. Please check if the annotation"
 					+ " '@Indexed' has been added to each of them."
 	)
 	SearchException failingEntityTypes(String failingEntityNames);
 
-	@Message(id = ID_OFFSET_2 + 33,
+	@Message(id = ID_OFFSET + 33,
 			value = "The value of parameter '" + MassIndexingJobParameters.SESSION_CLEAR_INTERVAL
 					+ "' (value=%1$d) should be equal to or less than the value of parameter '"
 					+ MassIndexingJobParameters.CHECKPOINT_INTERVAL + "' (value=%2$d)."
 	)
 	SearchException illegalSessionClearInterval(int sessionClearInterval, int checkpointInterval);
 
-	// -----------------------------------
-	// New messages from Search 6 onwards
-	// -----------------------------------
-	int ID_OFFSET_3 = MessageConstants.BATCH_JSR352_CORE_ID_RANGE_MIN + 500;
-
 	@LogMessage(level = Level.DEBUG)
-	@Message(id = ID_OFFSET_3 + 1,
+	@Message(id = ID_OFFSET + 34,
 			value = "Opening EntityWriter of partitionId='%1$s', entity='%2$s'.")
 	void openingEntityWriter(String partitionId, String entityName);
 
 	@LogMessage(level = Level.DEBUG)
-	@Message(id = ID_OFFSET_3 + 2,
+	@Message(id = ID_OFFSET + 35,
 			value = "Closing EntityWriter of partitionId='%1$s', entity='%2$s'.")
 	void closingEntityWriter(String partitionId, String entityName);
 
