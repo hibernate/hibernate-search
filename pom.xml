@@ -232,7 +232,7 @@
         <version.javax.persistence>2.2</version.javax.persistence>
 
         <!-- >>> JSR 352 -->
-        <version.javax.batch>1.0</version.javax.batch>
+        <version.javax.batch>1.0.1</version.javax.batch>
         <version.org.jberet>1.3.7.Final</version.org.jberet>
 
         <!-- >>> JSR 352 test -->
