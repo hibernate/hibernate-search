@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.schema.management.impl;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BinaryOperator;
 
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneParallelWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
@@ -58,6 +59,18 @@ public class LuceneIndexSchemaManager implements IndexSchemaManager {
 	public CompletableFuture<?> validate(ContextualFailureCollector failureCollector) {
 		// We only check that the index exists, and we throw an exception if it doesn't.
 		return doSubmit( luceneWorkFactory.validateIndexExists() );
+	}
+
+	public CompletableFuture<Long> computeSizeInBytes() {
+		IndexManagementWork<Long> computeSizeWork = luceneWorkFactory.computeSizeInBytes();
+		BinaryOperator<Long> add = (left, right) -> left + right;
+
+		CompletableFuture<Long> totalSizeFuture = CompletableFuture.completedFuture( 0L );
+		for ( LuceneParallelWorkOrchestrator orchestrator : indexManagerContext.allManagementOrchestrators() ) {
+			CompletableFuture<Long> shardSizeFuture = orchestrator.submit( computeSizeWork );
+			totalSizeFuture = totalSizeFuture.thenCombine( shardSizeFuture, add );
+		}
+		return totalSizeFuture;
 	}
 
 	private CompletableFuture<?> doSubmit(IndexManagementWork<?> work) {

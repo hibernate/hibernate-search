@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.index.impl;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
@@ -177,6 +178,28 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 		catch (RuntimeException | IOException e) {
 			throwable.addSuppressed( e );
 		}
+	}
+
+	@Override
+	public long computeSizeInBytes() {
+		long totalSize = 0L;
+
+		Directory directory = directoryHolder.get();
+		try {
+			for ( String fileName : directory.listAll() ) {
+				try {
+					totalSize += directory.fileLength( fileName );
+				}
+				catch (FileNotFoundException ignored) {
+					// Ignore: the file was probably removed since the call to listAll
+				}
+			}
+		}
+		catch (IOException e) {
+			throw log.unableToComputeIndexSize( eventContext, e );
+		}
+
+		return totalSize;
 	}
 
 	public Directory getDirectoryForTests() {

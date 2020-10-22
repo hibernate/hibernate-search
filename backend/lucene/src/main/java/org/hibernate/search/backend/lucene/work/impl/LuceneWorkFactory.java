@@ -28,6 +28,8 @@ public interface LuceneWorkFactory {
 
 	IndexManagementWork<?> mergeSegments();
 
+	IndexManagementWork<Long> computeSizeInBytes();
+
 	SingleDocumentIndexingWork add(String tenantId, String entityTypeName, Object entityIdentifier,
 			String documentIdentifier, LuceneIndexEntry indexEntry);
 
