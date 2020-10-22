@@ -25,8 +25,8 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 public class SearchQueryScrollIT {
@@ -35,13 +35,13 @@ public class SearchQueryScrollIT {
 	private static final int CHUNK_SIZE = 30;
 	private static final int EXACT_DIVISOR_CHUNK_SIZE = 25;
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@ClassRule
+	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	@Before
-	public void setup() {
+	@BeforeClass
+	public static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
 		initData();
@@ -178,7 +178,7 @@ public class SearchQueryScrollIT {
 				.where( f -> f.match().field( "integer" ).matching( DOCUMENT_COUNT + 2 ) );
 	}
 
-	private void initData() {
+	private static void initData() {
 		index.bulkIndexer()
 				.add( DOCUMENT_COUNT, i -> documentProvider(
 						docId( i ),
