@@ -1109,3 +1109,23 @@ It ignores the <<mapper-orm-directfieldmapping-search-analyzer,search analyzer>>
 This is the analyzer used when building search queries through the <<search-dsl,Search DSL>>.
 On contrary to the indexing analyzer, it takes into account the <<mapper-orm-directfieldmapping-search-analyzer,search analyzer>>.
 ====
+
+
+[[backend-lucene-access-size]]
+== Retrieving the index size
+
+The size of a Lucene index can be retrieved from the `LuceneIndexManager`.
+
+.Retrieving the index size from a Lucene index manager
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/indexmanager/LuceneGetIndexSizeIT.java[tags=computeIndexSize]
+----
+<1> Retrieve the `SearchMapping`.
+<2> Retrieve the `IndexManager`.
+<3> Narrow down the index manager to the `LuceneIndexManager` type.
+<4> Request computation of the index size.
+The size is computed in a background thread, so this call is non-blocking and returns a `CompletableFuture`.
+<5> Wait until the index size is computed, then get the index size.
+====
