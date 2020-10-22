@@ -111,7 +111,7 @@ public class LuceneCollectors {
 		}
 
 		if ( requireFieldDocRescoring ) {
-			handleRescoring( indexSearcher, luceneQuery );
+			handleRescoring();
 		}
 	}
 
@@ -179,7 +179,7 @@ public class LuceneCollectors {
 		}
 	}
 
-	private void handleRescoring(IndexSearcher indexSearcher, Query luceneQuery) throws IOException {
+	private void handleRescoring() throws IOException {
 		if ( scoreSortFieldIndexForRescoring != null ) {
 			// If there's a SCORE sort field, just get the score value from the sort field
 			for ( ScoreDoc scoreDoc : topDocs.scoreDocs ) {
