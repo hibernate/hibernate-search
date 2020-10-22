@@ -7,16 +7,20 @@
 package org.hibernate.search.integrationtest.backend.lucene.index;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -33,7 +37,7 @@ public class LuceneIndexManagerIT {
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static final StubMappedIndex index = StubMappedIndex.ofNonRetrievable( IndexBinding::new );
+	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	private static LuceneIndexManager indexApi;
 
@@ -79,6 +83,31 @@ public class LuceneIndexManagerIT {
 				.containsExactly( "Foo Bar" );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3589")
+	public void computeSizeInBytes() {
+		CompletableFuture<Long> initialSizeFuture = indexApi.computeSizeInBytes();
+		await().untilAsserted( () -> assertThat( initialSizeFuture ).isCompleted() );
+		long initialSize = initialSizeFuture.join();
+		assertThat( initialSize ).isGreaterThanOrEqualTo( 0L );
+
+		IndexBinding binding = index.binding();
+		index.bulkIndexer()
+				.add( 100, i -> documentProvider(
+						String.valueOf( i ),
+						document -> document.addValue( binding.normalized, "value" + i )
+				) )
+				.join();
+
+		index.createWorkspace().flush().join();
+
+		CompletableFuture<Long> finalSizeFuture = indexApi.computeSizeInBytes();
+		await().untilAsserted( () -> assertThat( finalSizeFuture ).isCompleted() );
+		long finalSize = finalSizeFuture.join();
+		assertThat( finalSize ).isGreaterThan( 0L );
+		assertThat( finalSize ).isGreaterThan( initialSize );
+	}
+
 	private List<String> analyze(Analyzer analyzer, String absoluteFieldPath, String inputString) throws IOException {
 		final List<String> tokenList = new ArrayList<>();
 		try ( TokenStream stream = analyzer.tokenStream( absoluteFieldPath, inputString ) ) {
@@ -94,6 +123,8 @@ public class LuceneIndexManagerIT {
 	}
 
 	private static class IndexBinding {
+		private final IndexFieldReference<String> normalized;
+
 		public IndexBinding(IndexSchemaElement root) {
 			root.field( "whitespace_lowercase", f -> f.asString()
 					.analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
@@ -102,7 +133,7 @@ public class LuceneIndexManagerIT {
 					.analyzer( DefaultAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
 					.searchAnalyzer( DefaultAnalysisDefinitions.ANALYZER_NGRAM.name ) )
 					.toReference();
-			root.field( "normalized", f -> f.asString()
+			normalized = root.field( "normalized", f -> f.asString()
 					.normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name ) )
 					.toReference();
 		}
