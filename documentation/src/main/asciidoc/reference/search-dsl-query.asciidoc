@@ -247,7 +247,13 @@ To enable this performance optimization, call `totalHitCountThreshold(...)` when
 
 [NOTE]
 ====
-This optimization has no effect on calls to `fetchHits(...)` (which is already optimized by default) or to `fetchTotalHitCount()` (which always returns an exact hit count).
+This optimization has no effect in the following cases:
+
+* when calling `fetchHits(...)`: it is already optimized by default.
+* when calling `fetchTotalHitCount()`: it always returns an exact hit count.
+* when calling `scroll(...)` with the Elasticsearch backend:
+Elasticsearch does not support this optimization when scrolling.
+The optimization is enabled for `scroll(...)` calls with the Lucene backend, however.
 ====
 
 .Defining a total hit count threshold
