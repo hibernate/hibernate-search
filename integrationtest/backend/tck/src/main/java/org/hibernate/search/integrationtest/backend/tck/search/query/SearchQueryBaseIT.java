@@ -116,7 +116,7 @@ public class SearchQueryBaseIT {
 	public void resultTotal_totalHitCountThreshold() {
 		assumeTrue(
 				"This backend doesn't take totalHitsThreshold() into account.",
-				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThreshold()
+				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForSearch()
 		);
 
 		initData( 5000 );

@@ -106,8 +106,15 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
-	public boolean supportsTotalHitsThreshold() {
+	public boolean supportsTotalHitsThresholdForSearch() {
 		return dialect.supportsSkipOrLimitingTotalHitCount();
+	}
+
+	@Override
+	public boolean supportsTotalHitsThresholdForScroll() {
+		// If we try to customize track_total_hits for a scroll, we get an error:
+		// "disabling [track_total_hits] is not allowed in a scroll context"
+		return false;
 	}
 
 	@Override
