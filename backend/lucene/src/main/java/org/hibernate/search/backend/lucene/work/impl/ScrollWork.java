@@ -23,11 +23,13 @@ public class ScrollWork<ER> implements ReadWork<ER> {
 
 	private final int offset;
 	private final int limit;
+	private final int totalHitCountThreshold;
 
-	ScrollWork(LuceneSearcher<?, ER> searcher, int offset, int limit) {
+	ScrollWork(LuceneSearcher<?, ER> searcher, int offset, int limit, int totalHitCountThreshold) {
 		this.offset = offset;
 		this.limit = limit;
 		this.searcher = searcher;
+		this.totalHitCountThreshold = totalHitCountThreshold;
 	}
 
 	@Override
@@ -35,7 +37,8 @@ public class ScrollWork<ER> implements ReadWork<ER> {
 		try {
 			IndexSearcher indexSearcher = context.createSearcher();
 
-			return searcher.scroll( indexSearcher, context.getIndexReaderMetadataResolver(), offset, limit );
+			return searcher.scroll( indexSearcher, context.getIndexReaderMetadataResolver(), offset, limit,
+					totalHitCountThreshold );
 		}
 		catch (IOException e) {
 			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(), context.getEventContext(), e );

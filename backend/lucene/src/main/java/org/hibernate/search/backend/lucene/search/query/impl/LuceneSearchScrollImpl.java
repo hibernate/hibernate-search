@@ -36,6 +36,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 	private final Set<String> routingKeys;
 	private final LuceneTimeoutManager timeoutManager;
 	private final LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher;
+	private final int totalHitCountThreshold;
 
 	// specific to this scroll instance:
 	private final HibernateSearchMultiReader indexReader;
@@ -51,6 +52,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 			Set<String> routingKeys,
 			LuceneTimeoutManager timeoutManager,
 			LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher,
+			int totalHitCountThreshold,
 			HibernateSearchMultiReader indexReader, int chunkSize) {
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
@@ -58,6 +60,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 		this.routingKeys = routingKeys;
 		this.timeoutManager = timeoutManager;
 		this.searcher = searcher;
+		this.totalHitCountThreshold = totalHitCountThreshold;
 		this.indexReader = indexReader;
 		this.chunkSize = chunkSize;
 		this.currentPageLimit = chunkSize * 4; // Will fetch the topdocs for the first 4 pages initially
@@ -90,7 +93,9 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 				currentPageLimit *= 2;
 			}
 			currentPageOffset = nextChunkOffset;
-			currentPage = doSubmitWithIndexReader( workFactory.scroll( searcher, currentPageOffset, currentPageLimit ), indexReader );
+			currentPage = doSubmitWithIndexReader(
+					workFactory.scroll( searcher, currentPageOffset, currentPageLimit, totalHitCountThreshold ),
+					indexReader );
 		}
 
 		int nextChunkStartIndexInPage = nextChunkOffset - currentPageOffset;

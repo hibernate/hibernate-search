@@ -99,8 +99,8 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	}
 
 	@Override
-	public <ER> ReadWork<ER> scroll(LuceneSearcher<?, ER> searcher, int offset, int limit) {
-		return new ScrollWork<>( searcher, offset, limit );
+	public <ER> ReadWork<ER> scroll(LuceneSearcher<?, ER> searcher, int offset, int limit, int totalHitCountThreshold) {
+		return new ScrollWork<>( searcher, offset, limit, totalHitCountThreshold );
 	}
 
 	@Override
