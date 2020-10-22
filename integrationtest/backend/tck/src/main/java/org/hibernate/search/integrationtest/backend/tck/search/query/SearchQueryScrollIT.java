@@ -7,10 +7,12 @@
 package org.hibernate.search.integrationtest.backend.tck.search.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThatHits;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.List;
 import java.util.Locale;
@@ -19,10 +21,13 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.search.query.SearchResultTotal;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
 import org.junit.BeforeClass;
@@ -31,7 +36,7 @@ import org.junit.Test;
 
 public class SearchQueryScrollIT {
 
-	private static final int DOCUMENT_COUNT = 200;
+	private static final int DOCUMENT_COUNT = 2000;
 	private static final int CHUNK_SIZE = 30;
 	private static final int EXACT_DIVISOR_CHUNK_SIZE = 25;
 
@@ -117,6 +122,100 @@ public class SearchQueryScrollIT {
 		}
 	}
 
+	@Test
+	public void resultTotal() {
+		try ( SearchScroll<DocumentReference> scroll = matchAllSortedByScoreQuery()
+				.scroll( CHUNK_SIZE ) ) {
+			for ( SearchScrollResult<DocumentReference> chunk = scroll.next(); chunk.hasHits();
+					chunk = scroll.next() ) {
+				SearchResultTotal total = scroll.next().total();
+
+				assertThat( total.isHitCountExact() ).isTrue();
+				assertThat( total.isHitCountLowerBound() ).isFalse();
+				assertThat( total.hitCount() ).isEqualTo( DOCUMENT_COUNT );
+				assertThat( total.hitCountLowerBound() ).isEqualTo( DOCUMENT_COUNT );
+			}
+		}
+	}
+
+	@Test
+	public void resultTotal_totalHitCountThreshold() {
+		assumeTrue(
+				"This backend doesn't take totalHitsThreshold() into account for scrolls.",
+				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForScroll()
+		);
+
+		try ( SearchScroll<DocumentReference> scroll = matchAllSortedByScoreQuery()
+				.totalHitCountThreshold( 100 )
+				.scroll( CHUNK_SIZE ) ) {
+			int chunkCountSoFar = 0;
+			for ( SearchScrollResult<DocumentReference> chunk = scroll.next(); chunk.hasHits();
+					chunk = scroll.next() ) {
+				SearchResultTotal total = scroll.next().total();
+
+				++chunkCountSoFar;
+
+				// Even when approximate, the total hit count should be greater than or equal to
+				// the number of hits processed so far.
+				assertThat( total.hitCountLowerBound() ).isGreaterThanOrEqualTo( CHUNK_SIZE * chunkCountSoFar );
+
+				if ( chunkCountSoFar == 1 ) {
+					// The first chunk definitely cannot have an exact count,
+					// considering the high number of hits.
+					assertThat( total.isHitCountExact() ).isFalse();
+					assertThat( total.isHitCountLowerBound() ).isTrue();
+					assertThat( total.hitCountLowerBound() ).isLessThanOrEqualTo( DOCUMENT_COUNT );
+
+					assertThatThrownBy( () -> total.hitCount() )
+							.isInstanceOf( SearchException.class )
+							.hasMessageContaining(
+									"Trying to get the exact total hit count, but it is a lower bound." );
+				}
+				else {
+					// The next chunks *may* have an exact count,
+					// depending on the internal implementation (depending on how many hits are retrieved).
+
+					if ( total.isHitCountExact() ) {
+						assertThat( total.isHitCountLowerBound() ).isFalse();
+						assertThat( total.hitCount() ).isEqualTo( DOCUMENT_COUNT );
+						assertThat( total.hitCountLowerBound() ).isEqualTo( DOCUMENT_COUNT );
+					}
+					else {
+						assertThat( total.isHitCountLowerBound() ).isTrue();
+						assertThat( total.hitCountLowerBound() ).isLessThanOrEqualTo( DOCUMENT_COUNT );
+
+						assertThatThrownBy( () -> total.hitCount() )
+								.isInstanceOf( SearchException.class )
+								.hasMessageContaining(
+										"Trying to get the exact total hit count, but it is a lower bound." );
+					}
+				}
+			}
+		}
+	}
+
+	@Test
+	public void resultTotal_totalHitCountThreshold_veryHigh() {
+		assumeTrue(
+				"This backend doesn't take totalHitsThreshold() into account for scrolls.",
+				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForScroll()
+		);
+
+		try ( SearchScroll<DocumentReference> scroll = matchAllSortedByScoreQuery()
+				.totalHitCountThreshold( DOCUMENT_COUNT * 2 )
+				.scroll( CHUNK_SIZE ) ) {
+			for ( SearchScrollResult<DocumentReference> chunk = scroll.next(); chunk.hasHits();
+					chunk = scroll.next() ) {
+				SearchResultTotal total = scroll.next().total();
+
+				assertThat( total.isHitCountExact() ).isTrue();
+				assertThat( total.isHitCountLowerBound() ).isFalse();
+				assertThat( total.hitCount() ).isEqualTo( DOCUMENT_COUNT );
+				assertThat( total.hitCountLowerBound() ).isEqualTo( DOCUMENT_COUNT );
+			}
+		}
+	}
+
 	private void checkScrolling(SearchScroll<DocumentReference> scroll, int documentCount, int chunkSize) {
 		int docIndex = 0;
 		int quotient = documentCount / chunkSize;
@@ -160,6 +259,11 @@ public class SearchQueryScrollIT {
 		return index.query()
 				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "integer" ).asc() );
+	}
+
+	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllSortedByScoreQuery() {
+		return index.query()
+				.where( f -> f.matchAll() );
 	}
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchFirstHalfQuery() {

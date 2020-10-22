@@ -59,7 +59,11 @@ public class TckBackendFeatures {
 		return true;
 	}
 
-	public boolean supportsTotalHitsThreshold() {
+	public boolean supportsTotalHitsThresholdForSearch() {
+		return true;
+	}
+
+	public boolean supportsTotalHitsThresholdForScroll() {
 		return true;
 	}
 
