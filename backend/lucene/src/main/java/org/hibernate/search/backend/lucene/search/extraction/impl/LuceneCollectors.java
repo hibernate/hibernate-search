@@ -83,7 +83,6 @@ public class LuceneCollectors {
 			return;
 		}
 
-		// Phase 1: collect top docs and aggregations
 		try {
 			Collector composed = collectorsForAllMatchingDocs.getComposed();
 			if ( composed != null ) {
