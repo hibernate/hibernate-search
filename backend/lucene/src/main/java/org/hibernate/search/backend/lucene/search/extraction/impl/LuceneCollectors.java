@@ -119,6 +119,12 @@ public class LuceneCollectors {
 					SimpleSearchResultTotal.exact( topDocs.totalHits.value ) :
 					SimpleSearchResultTotal.lowerBound( topDocs.totalHits.value );
 		}
+		else if ( resultTotal.isHitCountExact() ) {
+			// Update the total hit count of the topDocs, which might not be precise enough,
+			// and might be consumed by callers of LuceneSearchResult.topDocs()
+			// (Useful for Infinispan in particular)
+			topDocs.totalHits = new TotalHits( resultTotal.hitCount(), TotalHits.Relation.EQUAL_TO );
+		}
 
 		if ( requireFieldDocRescoring ) {
 			handleRescoring();
