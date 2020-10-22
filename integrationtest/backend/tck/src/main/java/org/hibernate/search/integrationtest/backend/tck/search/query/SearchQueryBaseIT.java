@@ -30,6 +30,7 @@ import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.SearchResultTotal;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -68,10 +69,7 @@ public class SearchQueryBaseIT {
 
 	@Test
 	public void tookAndTimedOut() {
-		StubMappingScope scope = index.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
+		SearchQuery<DocumentReference> query = matchAllSortedByScoreQuery()
 				.toQuery();
 
 		SearchResult<DocumentReference> result = query.fetchAll();
@@ -84,11 +82,8 @@ public class SearchQueryBaseIT {
 	@Test
 	public void resultTotal() {
 		initData( 5000 );
-		StubMappingScope scope = index.createScope();
 
-		SearchResult<DocumentReference> fetch = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery()
+		SearchResult<DocumentReference> fetch = matchAllSortedByScoreQuery()
 				.fetch( 10 );
 
 		SearchResultTotal resultTotal = fetch.total();
@@ -102,11 +97,8 @@ public class SearchQueryBaseIT {
 	@SuppressWarnings("deprecation") // we can remove the test when the deprecated API is removed
 	public void totalHitCount_deprecated() {
 		initData( 5000 );
-		StubMappingScope scope = index.createScope();
 
-		SearchResult<DocumentReference> fetch = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery()
+		SearchResult<DocumentReference> fetch = matchAllSortedByScoreQuery()
 				.fetch( 10 );
 
 		assertThat( fetch.totalHitCount() ).isEqualTo( 5000 );
@@ -120,10 +112,8 @@ public class SearchQueryBaseIT {
 		);
 
 		initData( 5000 );
-		StubMappingScope scope = index.createScope();
 
-		SearchResult<DocumentReference> fetch = scope.query()
-				.where( f -> f.matchAll() )
+		SearchResult<DocumentReference> fetch = matchAllWithConditionSortedByScoreQuery()
 				.totalHitCountThreshold( 100 )
 				.toQuery()
 				.fetch( 10 );
@@ -141,10 +131,8 @@ public class SearchQueryBaseIT {
 	@Test
 	public void resultTotal_totalHitCountThreshold_veryHigh() {
 		initData( 5000 );
-		StubMappingScope scope = index.createScope();
 
-		SearchResult<DocumentReference> fetch = scope.query()
-				.where( f -> f.matchAll() )
+		SearchResult<DocumentReference> fetch = matchAllWithConditionSortedByScoreQuery()
 				.totalHitCountThreshold( 5000 )
 				.toQuery()
 				.fetch( 10 );
@@ -160,11 +148,7 @@ public class SearchQueryBaseIT {
 	public void extension() {
 		initData( 2 );
 
-		StubMappingScope scope = index.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.matchAll() )
-				.toQuery();
+		SearchQuery<DocumentReference> query = matchAllSortedByScoreQuery().toQuery();
 
 		// Mandatory extension, supported
 		QueryWrapper<DocumentReference> extendedQuery = query.extension( new SupportedQueryExtension<>() );
@@ -198,6 +182,22 @@ public class SearchQueryBaseIT {
 						.extension( new UnSupportedQueryDslExtension<>() )
 		)
 				.isInstanceOf( SearchException.class );
+	}
+
+	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllSortedByScoreQuery() {
+		return index.query()
+				.where( f -> f.matchAll() );
+	}
+
+	/**
+	 * @return A query that matches all documents, but still has a condition (not a MatchAllDocsQuery).
+	 * Necessary when we want to test the total hit count with a total hit count threshold,
+	 * because optimizations are possible with MatchAllDocsQuery that would allow Hibernate Search
+	 * to return an exact total hit count in constant time, ignoring the total hit count threshold.
+	 */
+	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllWithConditionSortedByScoreQuery() {
+		return index.query()
+				.where( f -> f.exists().field( "string" ) );
 	}
 
 	private void initData(int documentCount) {
