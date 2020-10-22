@@ -59,6 +59,10 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_LEGACY + 231, value = "Stopping executor '%1$s'")
 	void stoppingExecutor(String indexName);
 
+	@Message(id = ID_OFFSET_LEGACY + 237,
+			value = "Invalid value: at least one bound in range predicates must be non-null.")
+	SearchException rangePredicateCannotMatchNullValue(@Param EventContext context);
+
 	@Message(id = ID_OFFSET_LEGACY + 242,
 			value = "Hibernate Search failed to initialize component '%1$s' as class '%2$s' doesn't have a public no-arguments constructor")
 	SearchException noPublicNoArgConstructor(String componentName, @FormatWith(ClassFormatter.class) Class<?> clazz);
@@ -91,10 +95,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 6,
 			value = "Invalid multi value: expected either a Collection or a String.")
 	SearchException invalidMultiPropertyValue();
-
-	@Message(id = ID_OFFSET + 12,
-			value = "Invalid value: at least one bound in range predicates must be non-null.")
-	SearchException rangePredicateCannotMatchNullValue(@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 14,
 			value = "Field name '%1$s' is invalid: field names cannot be null or empty.")

@@ -46,7 +46,13 @@ import org.jboss.logging.annotations.ValidIdRanges;
 @ValidIdRanges({
 		@ValidIdRange(min = MessageConstants.MAPPER_POJO_ID_RANGE_MIN, max = MessageConstants.MAPPER_POJO_ID_RANGE_MAX),
 		// Exceptions for legacy messages from Search 5 (engine module)
+		@ValidIdRange(min = 135, max = 135),
+		@ValidIdRange(min = 159, max = 159),
+		@ValidIdRange(min = 160, max = 160),
+		@ValidIdRange(min = 177, max = 177),
 		@ValidIdRange(min = 216, max = 216),
+		@ValidIdRange(min = 221, max = 221),
+		@ValidIdRange(min = 234, max = 234),
 		@ValidIdRange(min = 295, max = 295),
 		@ValidIdRange(min = 297, max = 297)
 })
@@ -58,6 +64,23 @@ public interface Log extends BasicLogger {
 	// -----------------------------------
 	int ID_OFFSET_LEGACY_ENGINE = MessageConstants.ENGINE_ID_RANGE_MIN;
 
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 135,
+			value = "Unable to find a default value bridge implementation for type '%1$s'")
+	SearchException unableToResolveDefaultValueBridgeFromSourceType(
+			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> sourceType);
+
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 159, value = "Could not find a property with the '%1$s' marker for field '%2$s' (marker set: '%3$s').")
+	SearchException propertyMarkerNotFound(String markerName, String fieldName, String markerSet);
+
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 160, value = "Found multiple properties with the '%1$s' marker for field '%2$s' (marker set: '%3$s').")
+	SearchException multiplePropertiesForMarker(String markerName, String fieldName, String markerSet);
+
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 177,
+			value = "There isn't any explicit document ID mapping for indexed type '%1$s',"
+					+ " and the entity ID cannot be used as a default because"
+					+ " the property representing the entity ID cannot be found.")
+	SearchException missingIdentifierMapping(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel);
+
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 216,
 			value = "An IndexedEmbedded defines includePaths filters that do not match anything."
 					+ " Non-matching includePaths filters: %1$s."
@@ -66,6 +89,21 @@ public interface Log extends BasicLogger {
 	)
 	SearchException uselessIncludePathFilters(Set<String> nonMatchingIncludePaths, Set<String> encounteredFieldPaths,
 			@Param EventContext eventContext);
+
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 221,
+			value = "Found an infinite embedded recursion involving path '%2$s' on type '%1$s'")
+	SearchException infiniteRecursionForAssociationEmbeddeds(
+			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
+			@FormatWith(PojoModelPathFormatter.class) PojoModelPathValueNode path);
+
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 234,
+			value = "Some of the given types cannot be targeted."
+					+ " These types are not indexed, nor is any of their subtypes: %1$s."
+					+ " Note that some of them are indexed-embedded in an indexed entity, but this is not enough to be targeted"
+					+ " (only indexed types can be targeted): %2$s."
+	)
+	SearchException invalidScopeTarget(Collection<PojoRawTypeIdentifier<?>> nonIndexedTypes,
+			Collection<PojoRawTypeIdentifier<?>> containedTypes);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 295, value = "String '$1%s' cannot be parsed into a '$2%s'")
 	SearchException parseException(String text, @FormatWith(ClassFormatter.class) Class<?> readerClass, @Cause Exception e);
@@ -81,11 +119,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 1,
 			value = "Unable to find a default identifier bridge implementation for type '%1$s'")
 	SearchException unableToResolveDefaultIdentifierBridgeFromSourceType(
-			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> sourceType);
-
-	@Message(id = ID_OFFSET + 2,
-			value = "Unable to find a default value bridge implementation for type '%1$s'")
-	SearchException unableToResolveDefaultValueBridgeFromSourceType(
 			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> sourceType);
 
 	@Message(id = ID_OFFSET + 3,
@@ -198,22 +231,10 @@ public interface Log extends BasicLogger {
 			value = "@AssociationInverseSide.inversePath is empty.")
 	SearchException missingInversePathInAssociationInverseSideMapping();
 
-	@Message(id = ID_OFFSET + 24,
-			value = "Found an infinite embedded recursion involving path '%2$s' on type '%1$s'")
-	SearchException infiniteRecursionForAssociationEmbeddeds(
-			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
-			@FormatWith(PojoModelPathFormatter.class) PojoModelPathValueNode path);
-
 	@Message(id = ID_OFFSET + 27,
 			value = "Type '%1$s' is not marked as an entity type and is not abstract, yet it is indexed or targeted"
 			+ " by an association from an indexed type. Please check your configuration.")
 	SearchException missingEntityTypeMetadata(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel);
-
-	@Message(id = ID_OFFSET + 28,
-			value = "There isn't any explicit document ID mapping for indexed type '%1$s',"
-					+ " and the entity ID cannot be used as a default because"
-					+ " the property representing the entity ID cannot be found.")
-	SearchException missingIdentifierMapping(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel);
 
 	@Message(id = ID_OFFSET + 29,
 			value = "@IndexingDependency.derivedFrom contains an empty path.")
@@ -240,21 +261,6 @@ public interface Log extends BasicLogger {
 	)
 	SearchException invalidFieldEncodingForStringFieldMapping(IndexFieldTypeOptionsStep<?, ?> step,
 			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
-
-	@Message(id = ID_OFFSET + 34, value = "Could not find a property with the '%1$s' marker for field '%2$s' (marker set: '%3$s').")
-	SearchException propertyMarkerNotFound(String markerName, String fieldName, String markerSet);
-
-	@Message(id = ID_OFFSET + 35, value = "Found multiple properties with the '%1$s' marker for field '%2$s' (marker set: '%3$s').")
-	SearchException multiplePropertiesForMarker(String markerName, String fieldName, String markerSet);
-
-	@Message(id = ID_OFFSET + 36,
-			value = "Some of the given types cannot be targeted."
-					+ " These types are not indexed, nor is any of their subtypes: %1$s."
-					+ " Note that some of them are indexed-embedded in an indexed entity, but this is not enough to be targeted"
-					+ " (only indexed types can be targeted): %2$s."
-	)
-	SearchException invalidScopeTarget(Collection<PojoRawTypeIdentifier<?>> nonIndexedTypes,
-			Collection<PojoRawTypeIdentifier<?>> containedTypes);
 
 	@Message(id = ID_OFFSET + 37, value = "Cannot work on type '%1$s', because it is not indexed, neither directly nor as a contained entity in another type.")
 	SearchException notIndexedTypeNorAsDelegate(PojoRawTypeIdentifier<?> targetedType);
