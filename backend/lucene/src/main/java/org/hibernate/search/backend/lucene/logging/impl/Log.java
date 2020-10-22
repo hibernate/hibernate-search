@@ -616,4 +616,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 140, value = "Cannot use '%2$s' on field '%1$s': %3$s")
 	SearchException cannotUseQueryElementForObjectFieldBecauseCreationException(String absoluteFieldPath,
 			String queryElementName, String causeMessage, @Cause SearchException cause, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 141,
+			value = "Unable to compute size of index.")
+	SearchException unableToComputeIndexSize(@Param EventContext context, @Cause Exception e);
 }

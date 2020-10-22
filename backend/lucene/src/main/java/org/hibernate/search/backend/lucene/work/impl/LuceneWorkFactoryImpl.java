@@ -58,6 +58,11 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	}
 
 	@Override
+	public IndexManagementWork<Long> computeSizeInBytes() {
+		return new ComputeSizeInBytesWork();
+	}
+
+	@Override
 	public SingleDocumentIndexingWork add(String tenantId, String entityTypeName, Object entityIdentifier,
 			String documentIdentifier, LuceneIndexEntry indexEntry) {
 		return new AddEntryWork( tenantId, entityTypeName, entityIdentifier,

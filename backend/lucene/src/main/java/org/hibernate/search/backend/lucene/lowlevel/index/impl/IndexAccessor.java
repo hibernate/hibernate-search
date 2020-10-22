@@ -76,4 +76,9 @@ public interface IndexAccessor {
 	 * @param failingOperation The operation that failed.
 	 */
 	void cleanUpAfterFailure(Throwable throwable, Object failingOperation);
+
+	/**
+	 * @return The size of the index on its storage support, in bytes.
+	 */
+	long computeSizeInBytes();
 }

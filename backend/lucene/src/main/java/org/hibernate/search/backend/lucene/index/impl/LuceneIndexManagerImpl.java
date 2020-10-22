@@ -190,6 +190,11 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
+	public CompletableFuture<Long> computeSizeInBytes() {
+		return schemaManager.computeSizeInBytes();
+	}
+
+	@Override
 	@SuppressWarnings("unchecked") // Checked using reflection
 	public <T> T unwrap(Class<T> clazz) {
 		if ( clazz.isAssignableFrom( LuceneIndexManager.class ) ) {
