@@ -21,6 +21,7 @@ import org.hibernate.search.engine.search.query.spi.SimpleSearchResultTotal;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldDoc;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TimeLimitingCollector;
@@ -39,7 +40,7 @@ public class LuceneCollectors {
 	private final IndexReaderMetadataResolver metadataResolver;
 
 	private final IndexSearcher indexSearcher;
-	private final Query luceneQuery;
+	private final Query rewrittenLuceneQuery;
 
 	private final boolean requireFieldDocRescoring;
 	private final Integer scoreSortFieldIndexForRescoring;
@@ -53,14 +54,14 @@ public class LuceneCollectors {
 	private SearchResultTotal resultTotal;
 	private TopDocs topDocs = null;
 
-	LuceneCollectors(IndexReaderMetadataResolver metadataResolver, IndexSearcher indexSearcher, Query luceneQuery,
+	LuceneCollectors(IndexReaderMetadataResolver metadataResolver, IndexSearcher indexSearcher, Query rewrittenLuceneQuery,
 			boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring,
 			CollectorSet collectorsForAllMatchingDocs,
 			Set<CollectorFactory<?>> collectorsForTopDocsFactories,
 			LuceneTimeoutManager timeoutManager) {
 		this.metadataResolver = metadataResolver;
 		this.indexSearcher = indexSearcher;
-		this.luceneQuery = luceneQuery;
+		this.rewrittenLuceneQuery = rewrittenLuceneQuery;
 		this.requireFieldDocRescoring = requireFieldDocRescoring;
 		this.scoreSortFieldIndexForRescoring = scoreSortFieldIndexForRescoring;
 		this.collectorsForAllMatchingDocs = collectorsForAllMatchingDocs;
@@ -86,20 +87,29 @@ public class LuceneCollectors {
 		try {
 			Collector composed = collectorsForAllMatchingDocs.getComposed();
 			if ( composed != null ) {
-				indexSearcher.search( luceneQuery, composed );
+				indexSearcher.search( rewrittenLuceneQuery, composed );
 			}
 		}
 		catch (TimeLimitingCollector.TimeExceededException e) {
 			timeoutManager.forceTimedOut();
 		}
 
-		TotalHitCountCollector totalHitCountCollector = collectorsForAllMatchingDocs.get( TOTAL_HIT_COUNT_KEY );
-		if ( totalHitCountCollector != null ) {
-			resultTotal = SimpleSearchResultTotal.exact( totalHitCountCollector.getTotalHits() );
+		if ( rewrittenLuceneQuery instanceof MatchAllDocsQuery ) {
+			// We can compute the total hit count in constant time.
+			resultTotal = SimpleSearchResultTotal.exact( indexSearcher.getIndexReader().numDocs() );
+		}
+		else {
+			TotalHitCountCollector totalHitCountCollector = collectorsForAllMatchingDocs.get( TOTAL_HIT_COUNT_KEY );
+			if ( totalHitCountCollector != null ) {
+				resultTotal = SimpleSearchResultTotal.exact( totalHitCountCollector.getTotalHits() );
+			}
 		}
 
 		TopDocsCollector<?> topDocsCollector = collectorsForAllMatchingDocs.get( TOP_DOCS_KEY );
 		if ( topDocsCollector == null ) {
+			if ( resultTotal == null ) {
+				resultTotal = SimpleSearchResultTotal.lowerBound( 0 );
+			}
 			return;
 		}
 
@@ -190,7 +200,7 @@ public class LuceneCollectors {
 		else {
 			// Failing that, we need to re-score the top documents after the query was executed.
 			// This feels wrong, but apparently that's the recommended practice...
-			TopFieldCollector.populateScores( topDocs.scoreDocs, indexSearcher, luceneQuery );
+			TopFieldCollector.populateScores( topDocs.scoreDocs, indexSearcher, rewrittenLuceneQuery );
 		}
 	}
 
