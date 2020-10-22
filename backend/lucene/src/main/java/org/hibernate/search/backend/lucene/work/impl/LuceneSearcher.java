@@ -21,7 +21,7 @@ public interface LuceneSearcher<R, ER> {
 			int offset, Integer limit, int totalHitCountThreshold) throws IOException;
 
 	ER scroll(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver,
-			int offset, int limit) throws IOException;
+			int offset, int limit, int totalHitCountThreshold) throws IOException;
 
 	int count(IndexSearcher indexSearcher) throws IOException;
 

@@ -40,7 +40,7 @@ public interface LuceneWorkFactory {
 
 	<R> ReadWork<R> search(LuceneSearcher<R, ?> searcher, Integer offset, Integer limit, int totalHitCountThreshold);
 
-	<ER> ReadWork<ER> scroll(LuceneSearcher<?, ER> searcher, int offset, int limit);
+	<ER> ReadWork<ER> scroll(LuceneSearcher<?, ER> searcher, int offset, int limit, int totalHitCountThreshold);
 
 	ReadWork<Integer> count(LuceneSearcher<?, ?> searcher);
 

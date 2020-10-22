@@ -74,8 +74,9 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 	@Override
 	public LuceneExtractableSearchResult<H> scroll(IndexSearcher indexSearcher,
-			IndexReaderMetadataResolver metadataResolver, int offset, int limit) throws IOException {
-		return doSearch( indexSearcher, metadataResolver, offset, limit, Integer.MAX_VALUE );
+			IndexReaderMetadataResolver metadataResolver,
+			int offset, int limit, int totalHitCountThreshold) throws IOException {
+		return doSearch( indexSearcher, metadataResolver, offset, limit, totalHitCountThreshold );
 	}
 
 	private LuceneExtractableSearchResult<H> doSearch(IndexSearcher indexSearcher,
