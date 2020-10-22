@@ -62,7 +62,7 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 		LuceneIndexEntry indexEntry = indexEntryFactory.create( tenantId, id, routingKey, documentContributor );
 
 		collect( id, routingKey, factory.add(
-				tenantId, indexManagerContext.getMappedTypeName(), referenceProvider.entityIdentifier(),
+				tenantId, indexManagerContext.mappedTypeName(), referenceProvider.entityIdentifier(),
 				id, indexEntry
 		) );
 	}
@@ -76,7 +76,7 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 		LuceneIndexEntry indexEntry = indexEntryFactory.create( tenantId, id, routingKey, documentContributor );
 
 		collect( id, routingKey, factory.update(
-				tenantId, indexManagerContext.getMappedTypeName(), referenceProvider.entityIdentifier(),
+				tenantId, indexManagerContext.mappedTypeName(), referenceProvider.entityIdentifier(),
 				id, indexEntry
 		) );
 	}
@@ -87,7 +87,7 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 		String routingKey = referenceProvider.routingKey();
 
 		collect( id, routingKey, factory.delete(
-				tenantId, indexManagerContext.getMappedTypeName(), referenceProvider.entityIdentifier(),
+				tenantId, indexManagerContext.mappedTypeName(), referenceProvider.entityIdentifier(),
 				id
 		) );
 	}
@@ -125,7 +125,7 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 
 	private void collect(String documentId, String routingKey, SingleDocumentIndexingWork work) {
 		// Route the work to the appropriate shard
-		LuceneSerialWorkOrchestrator orchestrator = indexManagerContext.getIndexingOrchestrator( documentId, routingKey );
+		LuceneSerialWorkOrchestrator orchestrator = indexManagerContext.indexingOrchestrator( documentId, routingKey );
 
 		List<SingleDocumentIndexingWork> works = worksByOrchestrator.get( orchestrator );
 		if ( works == null ) {
