@@ -62,7 +62,7 @@ public class LuceneIndexSchemaManager implements IndexSchemaManager {
 
 	private CompletableFuture<?> doSubmit(IndexManagementWork<?> work) {
 		Collection<LuceneParallelWorkOrchestrator> orchestrators =
-				indexManagerContext.getAllManagementOrchestrators();
+				indexManagerContext.allManagementOrchestrators();
 		CompletableFuture<?>[] futures = new CompletableFuture[orchestrators.size()];
 		int i = 0;
 		for ( LuceneParallelWorkOrchestrator orchestrator : orchestrators ) {

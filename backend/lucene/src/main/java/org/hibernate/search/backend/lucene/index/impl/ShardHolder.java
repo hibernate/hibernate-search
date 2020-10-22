@@ -65,7 +65,7 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 
 			for ( Shard shard : shards.values() ) {
 				shard.start( propertySource );
-				managementOrchestrators.add( shard.getManagementOrchestrator() );
+				managementOrchestrators.add( shard.managementOrchestrator() );
 			}
 		}
 		catch (RuntimeException e) {
@@ -105,36 +105,36 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 	}
 
 	@Override
-	public String getIndexName() {
+	public String indexName() {
 		return model.hibernateSearchName();
 	}
 
 	@Override
-	public String getMappedTypeName() {
+	public String mappedTypeName() {
 		return model.mappedTypeName();
 	}
 
 	@Override
-	public LuceneSerialWorkOrchestrator getIndexingOrchestrator(String documentId, String routingKey) {
-		return toShard( documentId, routingKey ).getIndexingOrchestrator();
+	public LuceneSerialWorkOrchestrator indexingOrchestrator(String documentId, String routingKey) {
+		return toShard( documentId, routingKey ).indexingOrchestrator();
 	}
 
 	@Override
-	public List<LuceneParallelWorkOrchestrator> getManagementOrchestrators(Set<String> routingKeys) {
+	public List<LuceneParallelWorkOrchestrator> managementOrchestrators(Set<String> routingKeys) {
 		Collection<Shard> enabledShards = toShards( routingKeys );
 		List<LuceneParallelWorkOrchestrator> orchestrators = new ArrayList<>();
 		for ( Shard shard : enabledShards ) {
-			orchestrators.add( shard.getManagementOrchestrator() );
+			orchestrators.add( shard.managementOrchestrator() );
 		}
 		return orchestrators;
 	}
 
 	@Override
-	public List<LuceneParallelWorkOrchestrator> getAllManagementOrchestrators() {
+	public List<LuceneParallelWorkOrchestrator> allManagementOrchestrators() {
 		return managementOrchestrators;
 	}
 
-	public List<Shard> getShardsForTests() {
+	public List<Shard> shardsForTests() {
 		return new ArrayList<>( shards.values() );
 	}
 

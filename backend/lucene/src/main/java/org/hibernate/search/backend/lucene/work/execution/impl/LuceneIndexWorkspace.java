@@ -32,13 +32,13 @@ public class LuceneIndexWorkspace implements IndexWorkspace {
 
 	@Override
 	public CompletableFuture<?> mergeSegments() {
-		return doSubmit( indexManagerContext.getAllManagementOrchestrators(), factory.mergeSegments(), false );
+		return doSubmit( indexManagerContext.allManagementOrchestrators(), factory.mergeSegments(), false );
 	}
 
 	@Override
 	public CompletableFuture<?> purge(Set<String> routingKeys) {
 		return doSubmit(
-				indexManagerContext.getManagementOrchestrators( routingKeys ),
+				indexManagerContext.managementOrchestrators( routingKeys ),
 				factory.deleteAll( sessionContext.tenantIdentifier(), routingKeys ),
 				true
 		);
@@ -46,12 +46,12 @@ public class LuceneIndexWorkspace implements IndexWorkspace {
 
 	@Override
 	public CompletableFuture<?> flush() {
-		return doSubmit( indexManagerContext.getAllManagementOrchestrators(), factory.flush(), false );
+		return doSubmit( indexManagerContext.allManagementOrchestrators(), factory.flush(), false );
 	}
 
 	@Override
 	public CompletableFuture<?> refresh() {
-		return doSubmit( indexManagerContext.getAllManagementOrchestrators(), factory.refresh(), false );
+		return doSubmit( indexManagerContext.allManagementOrchestrators(), factory.refresh(), false );
 	}
 
 	private <T> CompletableFuture<?> doSubmit(List<LuceneParallelWorkOrchestrator> orchestrators,

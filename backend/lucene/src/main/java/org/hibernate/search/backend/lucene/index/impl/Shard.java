@@ -78,15 +78,15 @@ public final class Shard {
 		return indexAccessor.getIndexReader();
 	}
 
-	LuceneSerialWorkOrchestrator getIndexingOrchestrator() {
+	LuceneSerialWorkOrchestrator indexingOrchestrator() {
 		return indexingOrchestrator;
 	}
 
-	LuceneParallelWorkOrchestrator getManagementOrchestrator() {
+	LuceneParallelWorkOrchestrator managementOrchestrator() {
 		return managementOrchestrator;
 	}
 
-	public IndexAccessorImpl getIndexAccessorForTests() {
+	public IndexAccessorImpl indexAccessorForTests() {
 		return indexAccessor;
 	}
 }

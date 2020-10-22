@@ -42,7 +42,7 @@ public class LuceneSimilarityIT {
 
 		LuceneIndexManagerImpl luceneIndexManager = index.unwrapForTests( LuceneIndexManagerImpl.class );
 		assertThat( luceneIndexManager.getShardsForTests() )
-				.extracting( Shard::getIndexAccessorForTests )
+				.extracting( Shard::indexAccessorForTests )
 				.extracting( IndexAccessorImpl::getWriterForTests )
 				.extracting( IndexWriter::getConfig )
 				.allSatisfy( config -> {
@@ -66,7 +66,7 @@ public class LuceneSimilarityIT {
 
 		LuceneIndexManagerImpl luceneIndexManager = index.unwrapForTests( LuceneIndexManagerImpl.class );
 		assertThat( luceneIndexManager.getShardsForTests() )
-				.extracting( Shard::getIndexAccessorForTests )
+				.extracting( Shard::indexAccessorForTests )
 				.extracting( IndexAccessorImpl::getWriterForTests )
 				.extracting( IndexWriter::getConfig )
 				.allSatisfy( config -> {

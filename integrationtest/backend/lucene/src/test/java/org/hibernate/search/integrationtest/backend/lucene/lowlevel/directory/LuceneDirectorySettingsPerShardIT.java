@@ -56,22 +56,22 @@ public class LuceneDirectorySettingsPerShardIT extends AbstractSettingsPerShardI
 		LuceneIndexManagerImpl luceneIndexManager = index.unwrapForTests( LuceneIndexManagerImpl.class );
 		assertThat( luceneIndexManager.getShardsForTests() )
 				.element( 0 )
-				.extracting( Shard::getIndexAccessorForTests )
+				.extracting( Shard::indexAccessorForTests )
 				.extracting( IndexAccessorImpl::getDirectoryForTests )
 				.isInstanceOf( FSDirectory.class );
 		assertThat( luceneIndexManager.getShardsForTests() )
 				.element( 1 )
-				.extracting( Shard::getIndexAccessorForTests )
+				.extracting( Shard::indexAccessorForTests )
 				.extracting( IndexAccessorImpl::getDirectoryForTests )
 				.isInstanceOf( FSDirectory.class );
 		assertThat( luceneIndexManager.getShardsForTests() )
 				.element( 2 )
-				.extracting( Shard::getIndexAccessorForTests )
+				.extracting( Shard::indexAccessorForTests )
 				.extracting( IndexAccessorImpl::getDirectoryForTests )
 				.isInstanceOf( FSDirectory.class );
 		assertThat( luceneIndexManager.getShardsForTests() )
 				.element( 3 )
-				.extracting( Shard::getIndexAccessorForTests )
+				.extracting( Shard::indexAccessorForTests )
 				.extracting( IndexAccessorImpl::getDirectoryForTests )
 				.isInstanceOf( ByteBuffersDirectory.class );
 	}

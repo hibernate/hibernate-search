@@ -49,7 +49,7 @@ public class LuceneIndexIndexer implements IndexIndexer {
 		return submit(
 				id, routingKey,
 				factory.add(
-						tenantId, indexManagerContext.getMappedTypeName(),
+						tenantId, indexManagerContext.mappedTypeName(),
 						referenceProvider.entityIdentifier(), id,
 						indexEntry
 				),
@@ -70,7 +70,7 @@ public class LuceneIndexIndexer implements IndexIndexer {
 		return submit(
 				id, routingKey,
 				factory.update(
-						tenantId, indexManagerContext.getMappedTypeName(),
+						tenantId, indexManagerContext.mappedTypeName(),
 						referenceProvider.entityIdentifier(), id,
 						indexEntry
 				),
@@ -86,7 +86,7 @@ public class LuceneIndexIndexer implements IndexIndexer {
 		return submit(
 				id, routingKey,
 				factory.delete(
-						tenantId, indexManagerContext.getMappedTypeName(),
+						tenantId, indexManagerContext.mappedTypeName(),
 						referenceProvider.entityIdentifier(), id
 				),
 				commitStrategy, refreshStrategy
@@ -96,7 +96,7 @@ public class LuceneIndexIndexer implements IndexIndexer {
 	private <T> CompletableFuture<T> submit(String documentId, String routingKey, IndexingWork<T> work,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		// Route the work to the appropriate shard
-		LuceneSerialWorkOrchestrator orchestrator = indexManagerContext.getIndexingOrchestrator( documentId, routingKey );
+		LuceneSerialWorkOrchestrator orchestrator = indexManagerContext.indexingOrchestrator( documentId, routingKey );
 
 		CompletableFuture<T> futureForOrchestrator = new CompletableFuture<>();
 		CompletableFuture<T> futureForCaller;

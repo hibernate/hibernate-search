@@ -12,6 +12,6 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneParallelWork
 
 public interface SchemaManagementIndexManagerContext {
 
-	Collection<LuceneParallelWorkOrchestrator> getAllManagementOrchestrators();
+	Collection<LuceneParallelWorkOrchestrator> allManagementOrchestrators();
 
 }

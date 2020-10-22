@@ -201,7 +201,7 @@ public class LuceneIndexManagerImpl
 	}
 
 	public final List<Shard> getShardsForTests() {
-		return shardHolder.getShardsForTests();
+		return shardHolder.shardsForTests();
 	}
 
 	private EventContext getBackendAndIndexEventContext() {

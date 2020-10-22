@@ -80,7 +80,7 @@ public class MultiDirectoryIT {
 
 		LuceneIndexManagerImpl luceneIndexManager = index4.unwrapForTests( LuceneIndexManagerImpl.class );
 		assertThat( luceneIndexManager.getShardsForTests() )
-				.extracting( Shard::getIndexAccessorForTests )
+				.extracting( Shard::indexAccessorForTests )
 				.extracting( IndexAccessorImpl::getDirectoryForTests )
 				.allSatisfy( directory -> assertThat( directory ).isInstanceOf( ByteBuffersDirectory.class ) );
 

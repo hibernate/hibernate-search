@@ -43,25 +43,25 @@ public class LuceneIndexWriterSettingsPerShardIT extends AbstractSettingsPerShar
 		LuceneIndexManagerImpl luceneIndexManager = index.unwrapForTests( LuceneIndexManagerImpl.class );
 		assertThat( luceneIndexManager.getShardsForTests() )
 				.element( 0 )
-				.extracting( Shard::getIndexAccessorForTests )
+				.extracting( Shard::indexAccessorForTests )
 				.extracting( this::getWriterForTests )
 				.extracting( IndexWriter::getConfig )
 				.returns( 420, LiveIndexWriterConfig::getMaxBufferedDocs );
 		assertThat( luceneIndexManager.getShardsForTests() )
 				.element( 1 )
-				.extracting( Shard::getIndexAccessorForTests )
+				.extracting( Shard::indexAccessorForTests )
 				.extracting( this::getWriterForTests )
 				.extracting( IndexWriter::getConfig )
 				.returns( 420, LiveIndexWriterConfig::getMaxBufferedDocs );
 		assertThat( luceneIndexManager.getShardsForTests() )
 				.element( 2 )
-				.extracting( Shard::getIndexAccessorForTests )
+				.extracting( Shard::indexAccessorForTests )
 				.extracting( this::getWriterForTests )
 				.extracting( IndexWriter::getConfig )
 				.returns( 42, LiveIndexWriterConfig::getMaxBufferedDocs );
 		assertThat( luceneIndexManager.getShardsForTests() )
 				.element( 3 )
-				.extracting( Shard::getIndexAccessorForTests )
+				.extracting( Shard::indexAccessorForTests )
 				.extracting( this::getWriterForTests )
 				.extracting( IndexWriter::getConfig )
 				.returns( 4200, LiveIndexWriterConfig::getMaxBufferedDocs );
