@@ -19,6 +19,7 @@ import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutMana
 
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
@@ -43,16 +44,31 @@ public final class ExtractionRequirements {
 		requiredCollectorForTopDocsFactories = builder.requiredCollectorForTopDocsFactories;
 	}
 
-	public LuceneCollectors createCollectors(IndexSearcher indexSearcher, Query luceneQuery, Sort sort,
+	public LuceneCollectors createCollectors(IndexSearcher indexSearcher, Query originalLuceneQuery, Sort sort,
 			IndexReaderMetadataResolver metadataResolver, int maxDocs, LuceneTimeoutManager timeoutManager,
-			int totalHitCountThreshold)
+			int requestedTotalHitCountThreshold)
 			throws IOException {
+		// Necessary to unwrap boolean queries with a single clause, in particular:
+		// we have optimizations in place when there is a single query and this query is a MatchAllDocsQuery.
+		Query rewrittenLuceneQuery = indexSearcher.rewrite( originalLuceneQuery );
+
+		int totalHitCountThreshold;
+		if ( rewrittenLuceneQuery instanceof MatchAllDocsQuery ) {
+			// No need to keep track of the total hit count: we're matching everything,
+			// so we can easily compute the total hit count in constant time.
+			// See LuceneCollectors.collectMatchingDocs
+			totalHitCountThreshold = 0;
+		}
+		else {
+			totalHitCountThreshold = requestedTotalHitCountThreshold;
+		}
+
 		TopDocsCollector<?> topDocsCollector = null;
 		Integer scoreSortFieldIndexForRescoring = null;
 		boolean requireFieldDocRescoring = false;
 
 		CollectorExecutionContext executionContext =
-				new CollectorExecutionContext( metadataResolver, indexSearcher, luceneQuery, maxDocs );
+				new CollectorExecutionContext( metadataResolver, indexSearcher, rewrittenLuceneQuery, maxDocs );
 
 		CollectorSet.Builder collectorsForAllMatchingDocsBuilder =
 				new CollectorSet.Builder( executionContext, timeoutManager );
@@ -70,16 +86,14 @@ public final class ExtractionRequirements {
 					// If there's a SCORE sort field, make sure we remember that, so that later we can optimize rescoring
 					scoreSortFieldIndexForRescoring = getScoreSortFieldIndexOrNull( sort );
 				}
-				topDocsCollector = TopFieldCollector.create(
-						sort, maxDocs, totalHitCountThreshold
-				);
+				topDocsCollector = TopFieldCollector.create( sort, maxDocs, totalHitCountThreshold );
 			}
 			collectorsForAllMatchingDocsBuilder.add( LuceneCollectors.TOP_DOCS_KEY, topDocsCollector );
 		}
 
-		if ( topDocsCollector == null ) {
+		if ( topDocsCollector == null && totalHitCountThreshold > 0 ) {
 			// Normally the topDocsCollector collects the total hit count,
-			// but if it's not there, we need a separate collector.
+			// but if it's not there and not all docs are matched, we need a separate collector.
 			// Note that adding this collector can have a significant cost in some situations
 			// (e.g. for queries matching many hits), so we only add it if it's really necessary.
 			TotalHitCountCollector totalHitCountCollector = new TotalHitCountCollector();
@@ -91,7 +105,7 @@ public final class ExtractionRequirements {
 		return new LuceneCollectors(
 				metadataResolver,
 				indexSearcher,
-				luceneQuery,
+				rewrittenLuceneQuery,
 				requireFieldDocRescoring, scoreSortFieldIndexForRescoring,
 				collectorsForAllMatchingDocs,
 				requiredCollectorForTopDocsFactories,
