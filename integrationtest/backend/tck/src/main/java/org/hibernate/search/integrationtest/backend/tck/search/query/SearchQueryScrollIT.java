@@ -124,7 +124,7 @@ public class SearchQueryScrollIT {
 
 	@Test
 	public void resultTotal() {
-		try ( SearchScroll<DocumentReference> scroll = matchAllSortedByScoreQuery()
+		try ( SearchScroll<DocumentReference> scroll = matchAllWithConditionSortedByScoreQuery()
 				.scroll( CHUNK_SIZE ) ) {
 			for ( SearchScrollResult<DocumentReference> chunk = scroll.next(); chunk.hasHits();
 					chunk = scroll.next() ) {
@@ -145,7 +145,7 @@ public class SearchQueryScrollIT {
 				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForScroll()
 		);
 
-		try ( SearchScroll<DocumentReference> scroll = matchAllSortedByScoreQuery()
+		try ( SearchScroll<DocumentReference> scroll = matchAllWithConditionSortedByScoreQuery()
 				.totalHitCountThreshold( 100 )
 				.scroll( CHUNK_SIZE ) ) {
 			int chunkCountSoFar = 0;
@@ -201,7 +201,7 @@ public class SearchQueryScrollIT {
 				TckConfiguration.get().getBackendFeatures().supportsTotalHitsThresholdForScroll()
 		);
 
-		try ( SearchScroll<DocumentReference> scroll = matchAllSortedByScoreQuery()
+		try ( SearchScroll<DocumentReference> scroll = matchAllWithConditionSortedByScoreQuery()
 				.totalHitCountThreshold( DOCUMENT_COUNT * 2 )
 				.scroll( CHUNK_SIZE ) ) {
 			for ( SearchScrollResult<DocumentReference> chunk = scroll.next(); chunk.hasHits();
@@ -261,9 +261,15 @@ public class SearchQueryScrollIT {
 				.sort( f -> f.field( "integer" ).asc() );
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllSortedByScoreQuery() {
+	/**
+	 * @return A query that matches all documents, but still has a condition (not a MatchAllDocsQuery).
+	 * Necessary when we want to test the total hit count with a total hit count threshold,
+	 * because optimizations are possible with MatchAllDocsQuery that would allow Hibernate Search
+	 * to return an exact total hit count in constant time, ignoring the total hit count threshold.
+	 */
+	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllWithConditionSortedByScoreQuery() {
 		return index.query()
-				.where( f -> f.matchAll() );
+				.where( f -> f.exists().field( "integer" ) );
 	}
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchFirstHalfQuery() {
