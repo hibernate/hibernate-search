@@ -98,12 +98,12 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	@Override
 	public LuceneSearchResult<H> fetch(Integer offset, Integer limit) {
-		return doFetch( offset, limit, false );
+		return doFetch( offset, limit, true );
 	}
 
 	@Override
 	public List<H> fetchHits(Integer offset, Integer limit) {
-		return doFetch( offset, limit, true ).hits();
+		return doFetch( offset, limit, false ).hits();
 	}
 
 	@Override
@@ -173,11 +173,10 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		searcher.setTimeoutManager( timeoutManager );
 	}
 
-	private LuceneSearchResult<H> doFetch(Integer offset, Integer limit, boolean skipTotalHitCount) {
+	private LuceneSearchResult<H> doFetch(Integer offset, Integer limit, boolean trackTotalHitCount) {
 		timeoutManager.start();
 		ReadWork<LuceneLoadableSearchResult<H>> work = workFactory.search( searcher, offset, limit,
-				totalHitCountThreshold( skipTotalHitCount )
-		);
+				totalHitCountThreshold( trackTotalHitCount ) );
 		LuceneSearchResult<H> result = doSubmit( work )
 				/*
 				 * WARNING: the following call must run in the user thread.
@@ -211,8 +210,8 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		);
 	}
 
-	private int totalHitCountThreshold(boolean skipTotalHitCount) {
-		if ( skipTotalHitCount ) {
+	private int totalHitCountThreshold(boolean trackTotalHitCount) {
+		if ( !trackTotalHitCount ) {
 			return 0;
 		}
 		if ( totalHitCountThreshold == null || totalHitCountThreshold >= (long) Integer.MAX_VALUE ) {
