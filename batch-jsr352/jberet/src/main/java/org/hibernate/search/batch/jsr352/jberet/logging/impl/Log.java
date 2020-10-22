@@ -57,6 +57,6 @@ public interface Log extends BasicLogger {
 	// -----------------------------------
 	// New messages from Search 6 onwards
 	// -----------------------------------
-	int ID_OFFSET_3 = MessageConstants.BATCH_JSR352_JBERET_ID_RANGE_MIN;
+	int ID_OFFSET_2 = MessageConstants.BATCH_JSR352_JBERET_ID_RANGE_MIN;
 
 }

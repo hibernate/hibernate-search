@@ -609,25 +609,25 @@ public interface Log extends BasicLogger {
 			+ " If it already is, then '%2$s' is not available for fields of this type.")
 	SearchException cannotUseQueryElementForField(String absoluteFieldPath, String queryElementName, @Param EventContext context);
 
-	@Message(id = ID_OFFSET_2 + 115,
+	@Message(id = ID_OFFSET_3 + 115,
 			value = "Inconsistent support for '%1$s': %2$s")
 	SearchException inconsistentSupportForQueryElement(String queryElementName,
 			String causeMessage, @Cause SearchException cause);
 
-	@Message(id = ID_OFFSET_2 + 116,
+	@Message(id = ID_OFFSET_3 + 116,
 			value = "Field attribute '%1$s' differs: '%2$s' vs. '%3$s'.")
 	SearchException differentFieldAttribute(String attributeName, Object component1, Object component2);
 
-	@Message(id = ID_OFFSET_2 + 117,
+	@Message(id = ID_OFFSET_3 + 117,
 			value = "Implementation class differs: '%1$s' vs. '%2$s'.")
 	SearchException differentImplementationClassForQueryElement(@FormatWith(ClassFormatter.class) Class<?> class1,
 			@FormatWith(ClassFormatter.class) Class<?> class2);
 
-	@Message(id = ID_OFFSET_2 + 118,
+	@Message(id = ID_OFFSET_3 + 118,
 			value = "Field codec differs: '%1$s' vs. '%2$s'.")
 	SearchException differentFieldCodecForQueryElement(Object codec1, Object codec2);
 
-	@Message(id = ID_OFFSET_2 + 119,
+	@Message(id = ID_OFFSET_3 + 119,
 			value = "'%1$s' can be used in some of the targeted indexes, but not all of them."
 					+ " Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant) in all indexes,"
 					+ " and that the field has the same type in all indexes.")
