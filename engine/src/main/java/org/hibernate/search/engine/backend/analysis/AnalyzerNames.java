@@ -31,6 +31,8 @@ public final class AnalyzerNames {
 
 	/**
 	 * The standard analyzer.
+	 * <p>
+	 * Unless overridden by explicit analysis configuration, this analyzer behaves as follows:
 	 * <ul>
 	 *     <li>First, tokenize using the standard tokenizer, which follows Word Break rules from the
 	 *     Unicode Text Segmentation algorithm, as specified in
@@ -42,8 +44,10 @@ public final class AnalyzerNames {
 
 	/**
 	 * The simple analyzer.
+	 * <p>
+	 * Unless overridden by explicit analysis configuration, this analyzer behaves as follows:
 	 * <ul>
-	 *     <li>First, tokenize the text into tokens whenever it encounters a character which is not a letter.</li>
+	 *     <li>First, tokenize by assuming non-letter characters are separators.</li>
 	 *     <li>Then, lowercase each token.</li>
 	 * </ul>
 	 */
@@ -51,8 +55,10 @@ public final class AnalyzerNames {
 
 	/**
 	 * The whitespace analyzer.
+	 * <p>
+	 * Unless overridden by explicit analysis configuration, this analyzer behaves as follows:
 	 * <ul>
-	 *     <li>Tokenize the text into tokens whenever it encounters a character which is a white space.</li>
+	 *     <li>First, tokenize by assuming whitespace characters are separators.</li>
 	 *     <li>Do not change the tokens.</li>
 	 * </ul>
 	 */
@@ -60,8 +66,10 @@ public final class AnalyzerNames {
 
 	/**
 	 * The stop analyzer.
+	 * <p>
+	 * Unless overridden by explicit analysis configuration, this analyzer behaves as follows:
 	 * <ul>
-	 *     <li>First, tokenize the text into tokens whenever it encounters a character which is not a letter.</li>
+	 *     <li>First, tokenize by assuming non-letter characters are separators.</li>
 	 *     <li>Then, lowercase each token.</li>
 	 *     <li>finally, remove english stop words.</li>
 	 * </ul>
@@ -71,11 +79,12 @@ public final class AnalyzerNames {
 	/**
 	 * The keyword analyzer.
 	 * <p>
-	 * Do not change in any way the text.
-	 * With this analyzer a full text field would behave similarly to a keyword field,
+	 * Unless overridden by explicit analysis configuration, this analyzer does not change the text in any way.
+	 * <p>
+	 * With this analyzer, a full text field would behave similarly to a keyword field,
 	 * but with fewer features: no terms aggregations, for example.
 	 * <p>
-	 * Maybe you should consider using a keyword field instead.
+	 * Consider using a keyword field instead.
 	 */
 	public static final String KEYWORD = "keyword";
 
