@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.time.Duration;
 import java.time.Period;
 import java.util.Locale;
 
@@ -49,7 +48,7 @@ public final class DefaultPeriodValueBridge implements ValueBridge<Period, Strin
 			return Period.of( years, months, days );
 		}
 		catch (NumberFormatException e) {
-			throw log.parseException( value, Duration.class, e );
+			throw log.parseException( value, Period.class, e );
 		}
 	}
 
