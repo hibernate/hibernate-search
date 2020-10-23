@@ -449,11 +449,12 @@ public class IndexedBaseIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedWithoutEntityMetadata.class.getName() )
-						.failure(
-								"Type '" + IndexedWithoutEntityMetadata.class.getName()
-										+ "' is not marked as an entity type and is not abstract, yet it is indexed or targeted"
-										+ " by an association from an indexed type. Please check your configuration."
-						)
+						.failure( "Unable to index type '" + IndexedWithoutEntityMetadata.class.getName()
+								+ "': this type is not an entity type."
+								+ " If you only expect subtypes to be instantiated, make this type abstract."
+								+ " If you expect this exact type to be instantiated and want it to be indexed, make it an entity type."
+								+ " Otherwise, ensure this type and its subtypes are never indexed by removing the @Indexed annotation"
+								+ " or by annotating the type with @Indexed(enabled = false)." )
 						.build()
 				);
 	}
