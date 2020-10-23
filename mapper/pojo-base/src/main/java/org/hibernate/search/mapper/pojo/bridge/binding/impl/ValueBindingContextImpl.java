@@ -92,7 +92,7 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 		try {
 			PojoRawTypeModel<V2> expectedValueTypeModel = introspector.typeModel( expectedValueType );
 			if ( !valueTypeModel.rawType().isSubTypeOf( expectedValueTypeModel ) ) {
-				throw log.invalidInputTypeForBridge( bridgeHolder.get(), valueTypeModel );
+				throw log.invalidInputTypeForBridge( bridgeHolder.get(), valueTypeModel, expectedValueTypeModel );
 			}
 
 			IndexFieldReference<F> indexFieldReference = createFieldReference(

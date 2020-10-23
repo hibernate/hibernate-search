@@ -59,7 +59,7 @@ public class DefaultIdentifierBindingContext<I> extends AbstractBindingContext
 		try {
 			PojoRawTypeModel<I2> expectedValueTypeModel = introspector.typeModel( expectedValueType );
 			if ( !identifierTypeModel.rawType().equals( expectedValueTypeModel ) ) {
-				throw log.invalidInputTypeForBridge( bridgeHolder.get(), identifierTypeModel );
+				throw log.invalidInputTypeForBridge( bridgeHolder.get(), identifierTypeModel, expectedValueTypeModel );
 			}
 
 			@SuppressWarnings("unchecked") // We check that I2 equals I explicitly using reflection (see above)
