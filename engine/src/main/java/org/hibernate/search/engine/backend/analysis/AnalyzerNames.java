@@ -19,8 +19,13 @@ public final class AnalyzerNames {
 	 * <p>
 	 * This analyzer will generally be used for full-text field that don't require specific analysis.
 	 * <p>
-	 * Unless overridden by explicit analysis configuration,
-	 * the default analyzer will be the {@link #STANDARD} analyzer.
+	 * Unless overridden by explicit analysis configuration, the default analyzer will be the standard analyzer:
+	 * <ul>
+	 *     <li>First, tokenize using the standard tokenizer, which follows Word Break rules from the
+	 *     Unicode Text Segmentation algorithm, as specified in
+	 *     <a href="http://unicode.org/reports/tr29/">Unicode Standard Annex #29</a>.</li>
+	 *     <li>Then, lowercase each token.</li>
+	 * </ul>
 	 */
 	public static final String DEFAULT = "default";
 
@@ -48,7 +53,7 @@ public final class AnalyzerNames {
 	/**
 	 * The whitespace analyzer.
 	 * <ul>
-	 *     <li>Tokenize the text into tokens whenever it encounters a character which is not a white space.</li>
+	 *     <li>Tokenize the text into tokens whenever it encounters a character which is a white space.</li>
 	 *     <li>Do not change the tokens.</li>
 	 * </ul>
 	 */
@@ -68,7 +73,8 @@ public final class AnalyzerNames {
 	 * The keyword analyzer.
 	 * <p>
 	 * Do not change in any way the text.
-	 * With this analyzer a full text field would behave exactly as it was a keyword field.
+	 * With this analyzer a full text field would behave similarly to a keyword field,
+	 * but with fewer features: no terms aggregations, for example.
 	 * <p>
 	 * Maybe you should consider using a keyword field instead.
 	 */
