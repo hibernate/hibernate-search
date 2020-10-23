@@ -143,10 +143,11 @@ public class NonStandardFieldIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".myProperty" )
 						.failure(
-								"This property's mapping expects a non-standard type for the index field",
-								"but the assigned value bridge or value binder declares a standard type",
+								"Unable to apply property mapping: this property mapping must target an index field of non-standard type",
+								"the resolved field type is standard",
+								"Switch to a standard field annotation such as @GenericField",
 								"encountered type DSL step '",
-								"does extend the '" + StandardIndexFieldTypeOptionsStep.class.getName() + "' interface"
+								"does extend the interface '" + StandardIndexFieldTypeOptionsStep.class.getName() + "'"
 						)
 						.build()
 				);
@@ -170,10 +171,11 @@ public class NonStandardFieldIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".wrap" )
 						.failure(
-								"This property's mapping expects a non-standard type for the index field",
-								"but the assigned value bridge or value binder declares a standard type",
+								"Unable to apply property mapping: this property mapping must target an index field of non-standard type",
+								"the resolved field type is standard",
+								"Switch to a standard field annotation such as @GenericField",
 								"encountered type DSL step '",
-								"does extend the '" + StandardIndexFieldTypeOptionsStep.class.getName() + "' interface"
+								"does extend the interface '" + StandardIndexFieldTypeOptionsStep.class.getName() + "'"
 						)
 						.build()
 				);

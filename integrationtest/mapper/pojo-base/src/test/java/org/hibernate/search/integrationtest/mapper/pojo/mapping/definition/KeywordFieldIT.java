@@ -272,10 +272,13 @@ public class KeywordFieldIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".notString" )
 						.failure(
-								"This property's mapping expects a standard String type for the index field",
-								"but the assigned value bridge or value binder declares a non-standard or non-String type",
+								"Unable to apply property mapping: this property mapping must target an index field of standard String type",
+								"the resolved field type is non-standard or non-String",
+								"This generally means you need to use a different field annotation"
+										+ " or to convert property values using a custom ValueBridge or ValueBinder",
+								"If you are already using a custom ValueBridge or ValueBinder, check its field type",
 								"encountered type DSL step '",
-								"expected '" + StringIndexFieldTypeOptionsStep.class.getName() + "'"
+								"expected interface '" + StringIndexFieldTypeOptionsStep.class.getName() + "'"
 						)
 						.build()
 				);
@@ -300,10 +303,13 @@ public class KeywordFieldIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".wrap" )
 						.failure(
-								"This property's mapping expects a standard String type for the index field",
-								"but the assigned value bridge or value binder declares a non-standard or non-String type",
+								"Unable to apply property mapping: this property mapping must target an index field of standard String type",
+								"the resolved field type is non-standard or non-String",
+								"This generally means you need to use a different field annotation"
+										+ " or to convert property values using a custom ValueBridge or ValueBinder",
+								"If you are already using a custom ValueBridge or ValueBinder, check its field type",
 								"encountered type DSL step '",
-								"expected '" + StringIndexFieldTypeOptionsStep.class.getName() + "'"
+								"expected interface '" + StringIndexFieldTypeOptionsStep.class.getName() + "'"
 						)
 						.build()
 				);
@@ -328,10 +334,13 @@ public class KeywordFieldIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".wrap" )
 						.failure(
-								"This property's mapping expects a standard String type for the index field",
-								"but the assigned value bridge or value binder declares a non-standard or non-String type",
+								"Unable to apply property mapping: this property mapping must target an index field of standard String type",
+								"the resolved field type is non-standard or non-String",
+								"This generally means you need to use a different field annotation"
+										+ " or to convert property values using a custom ValueBridge or ValueBinder",
+								"If you are already using a custom ValueBridge or ValueBinder, check its field type",
 								"encountered type DSL step '",
-								"expected '" + StringIndexFieldTypeOptionsStep.class.getName() + "'"
+								"expected interface '" + StringIndexFieldTypeOptionsStep.class.getName() + "'"
 						)
 						.build()
 				);

@@ -168,10 +168,14 @@ public class ScaledNumberFieldIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".notScalable" )
 						.failure(
-								"This property's mapping expects a scaled number type (BigDecimal or BigInteger) for the index field",
-								"but the assigned value bridge or value binder declares a non-scaled type",
+								"Unable to apply property mapping: this property mapping must target"
+										+ " an index field of standard, scaled-number type (BigDecimal or BigInteger)",
+								"but the resolved field type is non-standard or non-scaled",
+								"This generally means you need to use a different field annotation"
+										+ " or to convert property values using a custom ValueBridge or ValueBinder.",
+								"If you are already using a custom ValueBridge or ValueBinder, check its field type.",
 								"encountered type DSL step '",
-								"expected '" + ScaledNumberIndexFieldTypeOptionsStep.class.getName() + "'"
+								"expected interface '" + ScaledNumberIndexFieldTypeOptionsStep.class.getName() + "'"
 						)
 						.build()
 				);
@@ -282,10 +286,14 @@ public class ScaledNumberFieldIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".wrap" )
 						.failure(
-								"This property's mapping expects a scaled number type (BigDecimal or BigInteger) for the index field",
-								"but the assigned value bridge or value binder declares a non-scaled type",
+								"Unable to apply property mapping: this property mapping must target"
+										+ " an index field of standard, scaled-number type (BigDecimal or BigInteger)",
+								"but the resolved field type is non-standard or non-scaled",
+								"This generally means you need to use a different field annotation"
+										+ " or to convert property values using a custom ValueBridge or ValueBinder.",
+								"If you are already using a custom ValueBridge or ValueBinder, check its field type.",
 								"encountered type DSL step '",
-								"expected '" + ScaledNumberIndexFieldTypeOptionsStep.class.getName() + "'"
+								"expected interface '" + ScaledNumberIndexFieldTypeOptionsStep.class.getName() + "'"
 						)
 						.build()
 				);
@@ -309,10 +317,14 @@ public class ScaledNumberFieldIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".wrap" )
 						.failure(
-								"This property's mapping expects a scaled number type (BigDecimal or BigInteger) for the index field",
-								"but the assigned value bridge or value binder declares a non-scaled type",
+								"Unable to apply property mapping: this property mapping must target"
+										+ " an index field of standard, scaled-number type (BigDecimal or BigInteger)",
+								"but the resolved field type is non-standard or non-scaled",
+								"This generally means you need to use a different field annotation"
+										+ " or to convert property values using a custom ValueBridge or ValueBinder.",
+								"If you are already using a custom ValueBridge or ValueBinder, check its field type.",
 								"encountered type DSL step '",
-								"expected '" + ScaledNumberIndexFieldTypeOptionsStep.class.getName() + "'"
+								"expected interface '" + ScaledNumberIndexFieldTypeOptionsStep.class.getName() + "'"
 						)
 						.build()
 				);
