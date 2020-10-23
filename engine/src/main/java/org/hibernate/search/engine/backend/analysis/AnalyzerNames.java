@@ -35,8 +35,7 @@ public final class AnalyzerNames {
 	 *     <li>First, tokenize using the standard tokenizer, which follows Word Break rules from the
 	 *     Unicode Text Segmentation algorithm, as specified in
 	 *     <a href="http://unicode.org/reports/tr29/">Unicode Standard Annex #29</a>.</li>
-	 *     <li>Then, it removes most punctuation.</li>
-	 *     <li>Finally, lowercase each token.</li>
+	 *     <li>Then, lowercase each token.</li>
 	 * </ul>
 	 */
 	public static final String STANDARD = "standard";
@@ -63,8 +62,8 @@ public final class AnalyzerNames {
 	 * The stop analyzer.
 	 * <ul>
 	 *     <li>First, tokenize the text into tokens whenever it encounters a character which is not a letter.</li>
-	 *     <li>Then, it removes english stop words.</li>
-	 *     <li>Finally, lowercase each token.</li>
+	 *     <li>Then, lowercase each token.</li>
+	 *     <li>finally, remove english stop words.</li>
 	 * </ul>
 	 */
 	public static final String STOP = "stop";
