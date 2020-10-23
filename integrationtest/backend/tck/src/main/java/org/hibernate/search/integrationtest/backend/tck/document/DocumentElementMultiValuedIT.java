@@ -304,8 +304,11 @@ public class DocumentElementMultiValuedIT<F> {
 				"Multiple values written to field '" + absoluteFieldPath + "'"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple values were added to single-valued field '" + absoluteFieldPath + "'." )
-				.hasMessageContaining( "Declare the field as multi-valued in order to allow this." );
+				.hasMessageContainingAll(
+						"Multiple values assigned to field '" + absoluteFieldPath + "'",
+						"this field is single-valued",
+						"Declare the field as multi-valued in order to allow this."
+				);
 	}
 
 	private void executeAdd(String id, Consumer<DocumentElement> documentContributor) {

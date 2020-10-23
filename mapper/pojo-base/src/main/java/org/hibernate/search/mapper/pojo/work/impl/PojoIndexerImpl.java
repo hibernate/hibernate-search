@@ -75,7 +75,7 @@ public class PojoIndexerImpl implements PojoIndexer {
 		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> typeContext =
 				indexedTypeContextProvider.getByExactType( typeIdentifier );
 		if ( !typeContext.isPresent() ) {
-			throw log.notDirectlyIndexedType( typeIdentifier );
+			throw log.nonIndexedTypeInIndexer( typeIdentifier );
 		}
 
 		return typeContext.get().createIndexer( sessionContext );

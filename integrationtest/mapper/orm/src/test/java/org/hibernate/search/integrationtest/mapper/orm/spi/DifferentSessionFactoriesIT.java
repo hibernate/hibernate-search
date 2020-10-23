@@ -62,7 +62,7 @@ public class DifferentSessionFactoriesIT {
 		} ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Mapping service cannot create a SearchSession using a different session factory."
+						"Unable to create a SearchSession for sessions created using a different session factory."
 				);
 	}
 

@@ -113,7 +113,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 			loadableSearchResult = currentPage.extract( nextChunkStartIndexInPage, nextChunkEndIndexInPage );
 		}
 		catch (IOException e) {
-			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(),
+			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(), e.getMessage(),
 					EventContexts.fromIndexNames( searchContext.indexes().indexNames() ), e );
 		}
 

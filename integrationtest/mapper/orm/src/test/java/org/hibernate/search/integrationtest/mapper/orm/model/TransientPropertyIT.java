@@ -55,9 +55,9 @@ public class TransientPropertyIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( EntityWithoutDerivedFrom.class.getName() )
 						.failure(
-								"Path '.APlusB' cannot be resolved to a persisted value in Hibernate ORM metadata.",
-								"If this path points to a transient value, use @IndexingDependency(derivedFrom = ...)"
-										+ " to specify which persisted values it is derived from.",
+								"Unable to resolve path '.APlusB' to a persisted attribute in Hibernate ORM metadata.",
+								"If this path points to a transient attribute, use @IndexingDependency(derivedFrom = ...)"
+										+ " to specify which persisted attributes it is derived from.",
 								"See the reference documentation for more information"
 						)
 						.build()

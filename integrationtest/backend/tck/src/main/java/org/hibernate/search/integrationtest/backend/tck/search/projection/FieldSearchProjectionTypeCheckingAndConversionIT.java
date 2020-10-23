@@ -179,8 +179,8 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 				.field( fieldPath, fieldType.getJavaType() ).toProjection() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Projection on field '" + fieldPath + "' cannot be single-valued",
-						"this field is multi-valued",
+						"Invalid cardinality for projection on field '" + fieldPath + "'",
+						"the projection is single-valued, but this field is multi-valued",
 						"Make sure to call '.multi()' when you create the projection"
 				);
 	}
@@ -197,8 +197,8 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 				.field( fieldPath, fieldType.getJavaType() ).toProjection() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Projection on field '" + fieldPath + "' cannot be single-valued",
-						"this field is multi-valued",
+						"Invalid cardinality for projection on field '" + fieldPath + "'",
+						"the projection is single-valued, but this field is multi-valued",
 						"Make sure to call '.multi()' when you create the projection"
 				);
 	}
@@ -215,8 +215,8 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 				.field( fieldPath, fieldType.getJavaType() ).toProjection() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Projection on field '" + fieldPath + "' cannot be single-valued",
-						"this field is multi-valued",
+						"Invalid cardinality for projection on field '" + fieldPath + "'",
+						"the projection is single-valued, but this field is multi-valued",
 						"Make sure to call '.multi()' when you create the projection"
 				);
 	}

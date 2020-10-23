@@ -154,7 +154,7 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 			indexWriterProvider.getOrCreate().mergeSegments();
 		}
 		catch (IOException e) {
-			throw log.unableToMergeSegments( eventContext, e );
+			throw log.unableToMergeSegments( e.getMessage(), eventContext, e );
 		}
 	}
 
@@ -199,7 +199,7 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 			}
 		}
 		catch (IOException e) {
-			throw log.unableToComputeIndexSize( eventContext, e );
+			throw log.unableToComputeIndexSize( e.getMessage(), eventContext, e );
 		}
 
 		return totalSize;
@@ -224,7 +224,7 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 			iw.close();
 		}
 		catch (LockObtainFailedException lofe) {
-			log.lockingFailureDuringInitialization( directory.toString(), eventContext );
+			log.lockingFailureDuringInitialization( directory.toString(), eventContext, lofe );
 		}
 	}
 }

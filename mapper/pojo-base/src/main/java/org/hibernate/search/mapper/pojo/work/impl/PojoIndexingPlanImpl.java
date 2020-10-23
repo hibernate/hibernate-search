@@ -178,7 +178,7 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 				return delegate;
 			}
 		}
-		throw log.notIndexedTypeNorAsDelegate( typeIdentifier );
+		throw log.nonIndexedNorContainedTypeInIndexingPlan( typeIdentifier );
 	}
 
 	private PojoIndexedTypeIndexingPlan<?, ?, ?> getOrCreateIndexedDelegateForContainedUpdate(PojoRawTypeIdentifier<?> typeIdentifier) {

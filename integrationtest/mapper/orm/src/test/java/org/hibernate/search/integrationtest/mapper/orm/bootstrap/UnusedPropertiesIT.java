@@ -39,7 +39,7 @@ public class UnusedPropertiesIT {
 	@Test
 	public void checkDisabled_unusedProperty() {
 		String unusedPropertyKey = "hibernate.search.indexes.myIndex.foo";
-		logged.expectMessage( "Some properties in the Hibernate Search configuration were not used" )
+		logged.expectMessage( "some properties in the given configuration are not used" )
 				.never();
 		logged.expectEvent( Level.INFO, "Configuration property tracking is disabled" )
 				.once();
@@ -53,7 +53,8 @@ public class UnusedPropertiesIT {
 	public void checkEnabledByDefault_unusedProperty() {
 		String unusedPropertyKey = "hibernate.search.indexes.myIndex.foo";
 		logged.expectEvent( Level.WARN,
-				"Some properties in the Hibernate Search configuration were not used",
+				"Invalid configuration passed to Hibernate Search",
+				"some properties in the given configuration are not used",
 				"[" + unusedPropertyKey + "]",
 				"To disable this warning, set the property '"
 						+ EngineSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY + "' to 'ignore'" )
@@ -77,7 +78,7 @@ public class UnusedPropertiesIT {
 		 * This is a corner case worth testing, since the property may legitimately be accessed before
 		 * we start tracking property usage.
  		 */
-		logged.expectMessage( "Some properties in the Hibernate Search configuration were not used" )
+		logged.expectMessage( "some properties in the given configuration are not used" )
 				.never();
 		logged.expectMessage( "Configuration property tracking is disabled" )
 				.never();

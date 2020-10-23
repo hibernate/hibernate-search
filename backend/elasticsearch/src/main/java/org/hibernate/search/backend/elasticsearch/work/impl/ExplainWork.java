@@ -28,10 +28,12 @@ public class ExplainWork extends AbstractNonBulkableWork<ExplainResult> {
 	private static final ElasticsearchRequestSuccessAssessor SUCCESS_ASSESSOR =
 			DefaultElasticsearchRequestSuccessAssessor.builder().ignoreErrorStatuses( 404 ).build();
 
+	private final URLEncodedString indexName;
 	private final URLEncodedString id;
 
 	private ExplainWork(Builder builder) {
 		super( builder );
+		this.indexName = builder.indexName;
 		this.id = builder.id;
 	}
 
@@ -39,7 +41,7 @@ public class ExplainWork extends AbstractNonBulkableWork<ExplainResult> {
 	protected ExplainResult generateResult(ElasticsearchWorkExecutionContext context,
 			ElasticsearchResponse response) {
 		if ( response.statusCode() == 404 ) {
-			throw log.explainUnknownDocument( id );
+			throw log.explainUnknownDocument( indexName, id );
 		}
 		JsonObject body = response.body();
 		return new ExplainResultImpl( body );

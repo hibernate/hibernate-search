@@ -107,9 +107,7 @@ public class SearchMappingIT {
 	public void indexedEntity_byName_notIndexed() {
 		assertThatThrownBy( () -> mapping.indexedEntity( Toy.JPA_ENTITY_NAME ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining(
-						"Entity '" + Toy.JPA_ENTITY_NAME + "' is not indexed"
-				);
+				.hasMessageContaining( "Entity type '" + Toy.JPA_ENTITY_NAME + "' is not indexed" );
 	}
 
 	@Test
@@ -129,7 +127,7 @@ public class SearchMappingIT {
 		assertThatThrownBy( () -> mapping.indexedEntity( String.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Type '" + String.class.getName() + "' is not an entity type, or the entity is not indexed"
+						"Type '" + String.class.getName() + "' is not an entity type, or this entity type is not indexed"
 				);
 	}
 
@@ -139,7 +137,7 @@ public class SearchMappingIT {
 		assertThatThrownBy( () -> mapping.indexedEntity( Toy.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Type '" + Toy.class.getName() + "' is not an entity type, or the entity is not indexed"
+						"Type '" + Toy.class.getName() + "' is not an entity type, or this entity type is not indexed"
 				);
 	}
 

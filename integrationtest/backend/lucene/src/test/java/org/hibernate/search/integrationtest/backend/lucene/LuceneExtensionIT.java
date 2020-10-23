@@ -253,10 +253,8 @@ public class LuceneExtensionIT {
 				() -> query.explain( FIRST_ID )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "explain(Object id) cannot be used when the query targets multiple types" )
-				.hasMessageContaining(
-						"pass one of [" + mainIndex.typeName() + ", " + otherIndex.typeName() + "]"
-				);
+				.hasMessageContainingAll( "Invalid use of explain(Object id) on a query targeting multiple types",
+						"pass one of [" + mainIndex.typeName() + ", " + otherIndex.typeName() + "]" );
 	}
 
 	@Test
@@ -268,13 +266,12 @@ public class LuceneExtensionIT {
 				.toQuery();
 
 		assertThatThrownBy(
-				() -> query.explain( "NotAnIndexName", FIRST_ID )
+				() -> query.explain( "NotAMappedName", FIRST_ID )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining(
-						"mapped type name 'NotAnIndexName' is not among the mapped types targeted by this query: ["
-								+ mainIndex.typeName() + ", " + otherIndex.typeName() + "]"
-				);
+				.hasMessageContainingAll( "Invalid mapped type name: 'NotAMappedName'",
+						"This type is not among the mapped types targeted by this query: ["
+								+ mainIndex.typeName() + ", " + otherIndex.typeName() + "]" );
 	}
 
 	@Test
@@ -791,8 +788,8 @@ public class LuceneExtensionIT {
 		assertThatThrownBy( () -> backend.unwrap( String.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Attempt to unwrap a Lucene backend to '" + String.class.getName() + "'",
-						"this backend can only be unwrapped to '" + LuceneBackend.class.getName() + "'"
+						"Invalid requested type for this backend: '" + String.class.getName() + "'",
+						"Lucene backends can only be unwrapped to '" + LuceneBackend.class.getName() + "'"
 				);
 	}
 
@@ -810,8 +807,9 @@ public class LuceneExtensionIT {
 		assertThatThrownBy( () -> mainIndexFromIntegration.unwrap( String.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Attempt to unwrap a Lucene index manager to '" + String.class.getName() + "'",
-						"this index manager can only be unwrapped to '" + LuceneIndexManager.class.getName() + "'"
+						"Invalid requested type for this index manager: '" + String.class.getName() + "'",
+						"Lucene index managers can only be unwrapped to '"
+								+ LuceneIndexManager.class.getName() + "'"
 				);
 	}
 

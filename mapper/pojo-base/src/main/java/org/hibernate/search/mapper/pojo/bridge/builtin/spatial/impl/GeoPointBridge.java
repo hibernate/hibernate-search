@@ -146,12 +146,12 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 			PojoElementAccessor<Double> latitudeAccessor = bridgedPojoModelElement.properties()
 					.filter( model -> model.markers( LatitudeMarker.class )
 							.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
-					.collect( singleMarkedProperty( "latitude", defaultedFieldName, markerSet ) )
+					.collect( singleMarkedProperty( "@Latitude", defaultedFieldName, markerSet ) )
 					.createAccessor( Double.class );
 			PojoElementAccessor<Double> longitudeAccessor = bridgedPojoModelElement.properties()
 					.filter( model -> model.markers( LongitudeMarker.class )
 							.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
-					.collect( singleMarkedProperty( "longitude", defaultedFieldName, markerSet ) )
+					.collect( singleMarkedProperty( "@Longitude", defaultedFieldName, markerSet ) )
 					.createAccessor( Double.class );
 
 			coordinatesExtractor = bridgedElement -> {
@@ -174,8 +174,8 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 		private static Collector<PojoModelCompositeElement, ?, PojoModelCompositeElement> singleMarkedProperty(
 				String markerName, String fieldName, String markerSet) {
 			return StreamHelper.singleElement(
-					() -> log.propertyMarkerNotFound( markerName, fieldName, markerSet ),
-					() -> log.multiplePropertiesForMarker( markerName, fieldName, markerSet )
+					() -> log.unableToFindLongitudeOrLatitudeProperty( markerName, fieldName, markerSet ),
+					() -> log.multipleLatitudeOrLongitudeProperties( markerName, fieldName, markerSet )
 			);
 		}
 	}

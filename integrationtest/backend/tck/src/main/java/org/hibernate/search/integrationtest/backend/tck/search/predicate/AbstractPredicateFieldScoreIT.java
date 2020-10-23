@@ -87,7 +87,8 @@ public abstract class AbstractPredicateFieldScoreIT<V extends AbstractPredicateT
 				0 )
 				.toPredicate() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "per-field boosts together with withConstantScore option" );
+				.hasMessageContainingAll( "Invalid use of per-field boost: the predicate score is constant.",
+						"Cannot assign a different boost to each field when the predicate score is constant." );
 	}
 
 	@Test

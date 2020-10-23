@@ -130,8 +130,9 @@ public class ObsoletePropertiesIT {
 		} ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Some properties in the given Hibernate Search configuration were only valid in Hibernate Search 5 and are now obsolete",
-						"configuration properties changed in Hibernate Search 6",
+						"Invalid configuration passed to Hibernate Search",
+						"some properties in the given configuration are obsolete",
+						"Configuration properties changed between Hibernate Search 5 and Hibernate Search 6",
 						"Check out the reference documentation and upgrade your configuration",
 						"Obsolete properties: "
 				)

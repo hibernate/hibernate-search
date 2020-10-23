@@ -3206,7 +3206,7 @@ If it can't resolve it (for example when an `@IndexedEmbedded` association has n
 Hibernate Search 6 will raise errors at bootstrap, looking like this:
 
 ----
-Cannot find the inverse side of the association on type 'A' at path '.b<no value extractors>'
+Unable to find the inverse side of the association on type 'A' at path '.b<no value extractors>'
 Hibernate Search needs this information in order to reindex 'A' when 'B' is modified.
 You can solve this error by defining the inverse side of this association,
 either with annotations specific to your integration

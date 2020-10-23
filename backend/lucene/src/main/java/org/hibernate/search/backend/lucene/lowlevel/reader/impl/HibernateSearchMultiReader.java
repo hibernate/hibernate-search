@@ -55,8 +55,8 @@ public class HibernateSearchMultiReader extends MultiReader {
 			catch (IOException | RuntimeException e) {
 				new SuppressingCloser( e )
 						.pushAll( builder.directoryReaders );
-				throw log.failureOnMultiReaderRefresh(
-						EventContexts.fromIndexNames( indexNames ), e
+				throw log.unableToOpenIndexReaders(
+						e.getMessage(), EventContexts.fromIndexNames( indexNames ), e
 				);
 			}
 		}

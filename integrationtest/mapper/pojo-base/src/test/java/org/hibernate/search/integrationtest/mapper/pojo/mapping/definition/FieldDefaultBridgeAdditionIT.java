@@ -137,7 +137,8 @@ public class FieldDefaultBridgeAdditionIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( indexedType.getName() )
 						.pathContext( ".property" )
-						.failure( "Unable to find a default value bridge implementation" )
+						.failure( "No default value bridge implementation for type",
+								"Use a custom bridge" )
 						.build() );
 	}
 

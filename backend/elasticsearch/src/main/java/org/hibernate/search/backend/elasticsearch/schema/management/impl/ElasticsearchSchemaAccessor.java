@@ -89,9 +89,8 @@ public class ElasticsearchSchemaAccessor {
 				.build();
 		return execute( work )
 				.exceptionally( Futures.handler( e -> {
-					throw log.elasticsearchIndexMetadataRetrievalFailed(
-							Throwables.expectException( e )
-					);
+					throw log.elasticsearchIndexMetadataRetrievalFailed( e.getMessage(),
+							Throwables.expectException( e ) );
 				} ) )
 				.thenApply( list -> {
 					if ( list.isEmpty() ) {
@@ -126,9 +125,8 @@ public class ElasticsearchSchemaAccessor {
 		NonBulkableWork<?> work = getWorkFactory().putIndexSettings( indexName, settings ).build();
 		return execute( work )
 				.exceptionally( Futures.handler( e -> {
-					throw log.elasticsearchSettingsUpdateFailed(
-							indexName.original, Throwables.expectException( e )
-					);
+					throw log.elasticsearchSettingsUpdateFailed( indexName.original, e.getMessage(),
+							Throwables.expectException( e ) );
 				} ) );
 	}
 

@@ -44,7 +44,8 @@ public class SearchWork<R> implements ReadWork<R> {
 			);
 		}
 		catch (IOException e) {
-			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(), context.getEventContext(), e );
+			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(), e.getMessage(),
+					context.getEventContext(), e );
 		}
 	}
 

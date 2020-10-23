@@ -41,7 +41,7 @@ public class DeleteEntriesByQueryWork implements IndexManagementWork<Long> {
 			return indexWriterDelegator.deleteDocuments( query );
 		}
 		catch (IOException e) {
-			throw log.unableToDeleteAllEntriesFromIndex( query, context.getEventContext(), e );
+			throw log.unableToDeleteAllEntriesFromIndex( query, e.getMessage(), context.getEventContext(), e );
 		}
 	}
 

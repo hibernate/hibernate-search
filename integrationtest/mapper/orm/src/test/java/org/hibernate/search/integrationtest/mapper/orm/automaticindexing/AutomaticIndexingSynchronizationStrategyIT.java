@@ -451,9 +451,9 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		assertThatThrownBy( () -> setup( "invalidName" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Unable to convert configuration property '"
-								+ HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY + "'",
-						"with value 'invalidName'",
+						"Invalid value for configuration property '"
+								+ HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY
+								+ "': 'invalidName'",
 						"Unable to find " + AutomaticIndexingSynchronizationStrategy.class.getName()
 								+ " implementation class: invalidName"
 				);
@@ -579,7 +579,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 				.extracting( Throwable::getCause ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
 						.isInstanceOf( SearchException.class )
 						.hasMessageContainingAll(
-								"Automatic indexing failed after transaction completion: ",
+								"Unable to index documents for automatic indexing after transaction completion: ",
 								"Indexing failure: " + indexingWorkException.getMessage(),
 								"The following entities may not have been updated correctly in the index: [" + entityReferences + "]"
 						)

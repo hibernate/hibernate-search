@@ -138,7 +138,7 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 					break;
 				case SUM:
 				default:
-					throw log.cannotComputeSumForTemporalField( field.eventContext() );
+					throw log.invalidSortModeForTemporalField( mode, field.eventContext() );
 			}
 		}
 	}
@@ -172,7 +172,7 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 				case AVG:
 				case MEDIAN:
 				default:
-					throw log.cannotComputeSumOrAvgOrMedianForStringField( field.eventContext() );
+					throw log.invalidSortModeForStringField( mode, field.eventContext() );
 			}
 		}
 	}

@@ -24,6 +24,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentif
 import org.hibernate.search.engine.logging.spi.AggregationKeyFormatter;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
+import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.sort.SearchSort;
@@ -99,17 +100,15 @@ public interface Log extends BasicLogger {
 			@Cause Exception cause);
 
 	@Message(id = ID_OFFSET_LEGACY_ES + 34,
-			value = "Could not retrieve the index metadata from Elasticsearch"
-	)
-	SearchException elasticsearchIndexMetadataRetrievalFailed(@Cause Throwable cause);
+			value = "Unable to retrieve index metadata from Elasticsearch: %1$s")
+	SearchException elasticsearchIndexMetadataRetrievalFailed(String causeMessage, @Cause Throwable cause);
 
 	@Message(id = ID_OFFSET_LEGACY_ES + 35,
-			value = "Could not update mappings in index '%1$s': %2$s"
-	)
+			value = "Unable to update schema for index '%1$s': %2$s")
 	SearchException schemaUpdateFailed(URLEncodedString indexName, String causeMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_LEGACY_ES + 50,
-			value = "Index aliases [%1$s, %2$s] do not point to any index in the Elasticsearch cluster." )
+			value = "Missing index: index aliases [%1$s, %2$s] do not point to any index in the Elasticsearch cluster." )
 	SearchException indexMissing(URLEncodedString write, URLEncodedString read);
 
 	@LogMessage(level = Level.DEBUG)
@@ -119,43 +118,39 @@ public interface Log extends BasicLogger {
 			String bodyParts);
 
 	@Message(id = ID_OFFSET_LEGACY_ES + 55,
-			value = "Multiple tokenizer definitions with the same name: '%1$s'. The tokenizer names must be unique.")
+			value = "Duplicate tokenizer definitions: '%1$s'. Tokenizer names must be unique.")
 	SearchException tokenizerNamingConflict(String remoteName);
 
 	@Message(id = ID_OFFSET_LEGACY_ES + 56,
-			value = "Multiple char filter definitions with the same name: '%1$s'. The char filter names must be unique.")
+			value = "Duplicate char filter definitions: '%1$s'. Char filter names must be unique.")
 	SearchException charFilterNamingConflict(String remoteName);
 
 	@Message(id = ID_OFFSET_LEGACY_ES + 57,
-			value = "Multiple token filter definitions with the same name: '%1$s'. The token filter names must be unique.")
+			value = "Duplicate token filter definitions: '%1$s'. Token filter names must be unique.")
 	SearchException tokenFilterNamingConflict(String remoteName);
 
 	@Message(id = ID_OFFSET_LEGACY_ES + 67,
-			value = "Could not update settings for index '%1$s'"
-	)
-	SearchException elasticsearchSettingsUpdateFailed(Object indexName, @Cause Exception e);
+			value = "Unable to update settings for index '%1$s': %2$s")
+	SearchException elasticsearchSettingsUpdateFailed(Object indexName, String causeMessage, @Cause Exception cause);
 
 	@LogMessage(level = Level.INFO)
 	@Message(id = ID_OFFSET_LEGACY_ES + 69,
-			value = "Closed Elasticsearch index '%1$s' automatically."
-	)
+			value = "Closed Elasticsearch index '%1$s' automatically.")
 	void closedIndex(Object indexName);
 
 	@LogMessage(level = Level.INFO)
 	@Message(id = ID_OFFSET_LEGACY_ES + 70,
-			value = "Opened Elasticsearch index '%1$s' automatically."
-	)
+			value = "Opened Elasticsearch index '%1$s' automatically.")
 	void openedIndex(Object indexName);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET_LEGACY_ES + 73,
 			value = "Hibernate Search will connect to Elasticsearch with authentication over plain HTTP (not HTTPS)."
-					+ " The password will be sent in clear text over the network."
-	)
+					+ " The password will be sent in clear text over the network.")
 	void usingPasswordOverHttp();
 
 	@Message(id = ID_OFFSET_LEGACY_ES + 75,
-			value = "Error while applying analysis configuration: %1$s")
+			value = "Unable to apply analysis configuration: %1$s")
 	SearchException unableToApplyAnalysisConfiguration(String errorMessage, @Cause Exception e,
 			@Param EventContext eventContext);
 
@@ -176,40 +171,43 @@ public interface Log extends BasicLogger {
 	SearchException invalidElasticsearchTokenFilterDefinition(String name);
 
 	@Message(id = ID_OFFSET_LEGACY_ES + 80,
-			value = "Failed to detect the Elasticsearch version running on the cluster: %s" )
+			value = "Unable to detect the Elasticsearch version running on the cluster: %s")
 	SearchException failedToDetectElasticsearchVersion(String causeMessage, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_LEGACY_ES + 81,
-			value = "An unsupported Elasticsearch version runs on the Elasticsearch cluster: '%s'."
-					+ " Please refer to the documentation to know which versions are supported." )
+			value = "Incompatible Elasticsearch version running on the cluster: '%s'."
+					+ " Refer to the documentation to know which versions of Elasticsearch"
+					+ " are compatible with Hibernate Search.")
 	SearchException unsupportedElasticsearchVersion(ElasticsearchVersion version);
 
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ID_OFFSET_LEGACY_ES + 82,
 			value = "Executed Elasticsearch HTTP %s request to path '%s' with query parameters %s and %d objects in payload in %dms."
-					+ " Response had status %d '%s'."
-	)
+					+ " Response had status %d '%s'.")
 	void executedRequest(String method, String path, Map<String, String> getParameters, int bodyParts, long timeInMs,
 			int responseStatusCode, String responseStatusMessage);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET_LEGACY_ES + 85,
-			value = "Hibernate Search may not work correctly, because an unknown Elasticsearch version runs on the Elasticsearch cluster: '%s'." )
+			value = "Unknown Elasticsearch version running on the cluster: '%s'."
+					+ " Hibernate Search may not work correctly."
+					+ " Consider updating to a newer version of Hibernate Search, if any.")
 	void unknownElasticsearchVersion(ElasticsearchVersion version);
 
 	@Message(id = ID_OFFSET_LEGACY_ES + 89,
-			value = "Failed to parse Elasticsearch response. Status code was '%1$d', status phrase was '%2$s'.")
-	SearchException failedToParseElasticsearchResponse(int statusCode, String statusPhrase, @Cause Exception cause);
+			value = "Unable to parse Elasticsearch response. Status code was '%1$d', status phrase was '%2$s'."
+					+ " Nested exception: %3$s")
+	SearchException failedToParseElasticsearchResponse(int statusCode, String statusPhrase,
+			String causeMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_LEGACY_ES + 90,
-			value = "Elasticsearch response indicates a failure." )
+			value = "Elasticsearch response indicates a failure.")
 	SearchException elasticsearchResponseIndicatesFailure();
 
 	@LogMessage(level = Level.TRACE)
 	@Message(id = ID_OFFSET_LEGACY_ES + 93,
 			value = "Executed Elasticsearch HTTP %s request to path '%s' with query parameters %s and %d objects in payload in %dms."
-					+ " Response had status %d '%s'. Request body: <%s>. Response body: <%s>"
-	)
+					+ " Response had status %d '%s'. Request body: <%s>. Response body: <%s>")
 	void executedRequest(String method, String path, Map<String, String> getParameters, int bodyParts, long timeInMs,
 			int responseStatusCode, String responseStatusMessage,
 			String requestBodyParts, String responseBody);
@@ -220,14 +218,14 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET = MessageConstants.BACKEND_ES_ID_RANGE_MIN + 500;
 
 	@Message(id = ID_OFFSET + 2,
-			value = "A multi-index scope cannot include both an Elasticsearch index and another type of index."
-					+ " Base scope was: '%1$s', Elasticsearch index was: '%2$s'")
+			value = "Invalid multi-index scope: a scope cannot span both a Elasticsearch index and another type of index."
+					+ " Base scope: '%1$s', incompatible (Elasticsearch) index: '%2$s'.")
 	SearchException cannotMixElasticsearchScopeWithOtherType(IndexScopeBuilder baseScope,
 			ElasticsearchIndexManager elasticsearchIndex, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 3,
-			value = "A multi-index scope cannot span multiple Elasticsearch backends."
-					+ " Base scope was: '%1$s', index from another backend was: '%2$s'")
+			value = "Invalid multi-index scope: a scope cannot span multiple Elasticsearch backends."
+					+ " Base scope: '%1$s', incompatible index (from another backend): '%2$s'.")
 	SearchException cannotMixElasticsearchScopeWithOtherBackend(IndexScopeBuilder baseScope,
 			ElasticsearchIndexManager indexFromOtherBackend, @Param EventContext context);
 
@@ -236,26 +234,27 @@ public interface Log extends BasicLogger {
 	SearchException unknownFieldForSearch(String absoluteFieldPath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 6,
-			value = "The Elasticsearch extension can only be applied to objects"
-			+ " derived from the Elasticsearch backend. Was applied to '%1$s' instead.")
+			value = "Invalid target for Elasticsearch extension: '%1$s'."
+					+ " This extension can only be applied to components created by an Elasticsearch backend.")
 	SearchException elasticsearchExtensionOnUnknownType(Object context);
 
 	@Message(id = ID_OFFSET + 8,
-			value = "An Elasticsearch query cannot include search predicates built using a non-Elasticsearch search scope."
-					+ " Given predicate was: '%1$s'")
+			value = "Invalid search predicate: '%1$s'. You must build the predicate from an Elasticsearch search scope.")
 	SearchException cannotMixElasticsearchSearchQueryWithOtherPredicates(SearchPredicate predicate);
 
 	@Message(id = ID_OFFSET + 10,
-			value = "Object field '%1$s' is flattened: its structure was lost upon indexing and 'nested' features are not available.")
+			value = "Invalid target field: object field '%1$s' is flattened."
+					+ " If you want to use a 'nested' predicate on this field, set its structure to 'NESTED'."
+					+ " Do not forget to reindex all your data after changing the structure.")
 	SearchException nonNestedFieldForNestedQuery(String absoluteFieldPath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 11,
-			value = "An Elasticsearch query cannot include search sorts built using a non-Elasticsearch search scope."
-					+ " Given sort was: '%1$s'")
+			value = "Invalid search sort: '%1$s'. You must build the sort from an Elasticsearch search scope.")
 	SearchException cannotMixElasticsearchSearchSortWithOtherSorts(SearchSort sort);
 
 	@Message(id = ID_OFFSET + 14,
-			value = "Index '%1$s' requires multi-tenancy but the backend does not support it in its current configuration.")
+			value = "Invalid backend configuration: index '%1$s' requires multi-tenancy"
+					+ " but no multi-tenancy strategy is set.")
 	SearchException multiTenancyRequiredButNotSupportedByBackend(String indexName, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 15, value = "Invalid multi-tenancy strategy name: '%1$s'."
@@ -263,40 +262,44 @@ public interface Log extends BasicLogger {
 	SearchException invalidMultiTenancyStrategyName(String invalidRepresentation, List<String> validRepresentations);
 
 	@Message(id = ID_OFFSET + 16,
-			value = "Tenant identifier '%1$s' is provided, but multi-tenancy is disabled for this backend.")
+			value = "Invalid tenant identifier: '%1$s'."
+					+ " The tenant identifier must be null, because multi-tenancy is disabled for this backend.")
 	SearchException tenantIdProvidedButMultiTenancyDisabled(String tenantId, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 17,
-			value = "Backend has multi-tenancy enabled, but no tenant identifier is provided.")
+			value = "Missing tenant identifier."
+					+ " The tenant identifier must be non-null, because multi-tenancy is enabled for this backend.")
 	SearchException multiTenancyEnabledButNoTenantIdProvided(@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 18,
-			value = "Attempt to unwrap the Elasticsearch low-level client to %1$s,"
-					+ " but the client can only be unwrapped to %2$s.")
-	SearchException clientUnwrappingWithUnkownType(Class<?> requestedClass, Class<?> actualClass);
+			value = "Invalid requested type for client: '%1$s'."
+					+ " The Elasticsearch low-level client can only be unwrapped to '%2$s'.")
+	SearchException clientUnwrappingWithUnkownType(@FormatWith(ClassFormatter.class) Class<?> requestedClass,
+			@FormatWith(ClassFormatter.class) Class<?> actualClass);
 
 	@Message(id = ID_OFFSET + 19,
-			value = "Attempt to unwrap an Elasticsearch backend to '%1$s',"
-					+ " but this backend can only be unwrapped to '%2$s'.")
+			value = "Invalid requested type for this backend: '%1$s'."
+					+ " Elasticsearch backends can only be unwrapped to '%2$s'.")
 	SearchException backendUnwrappingWithUnknownType(@FormatWith(ClassFormatter.class) Class<?> requestedClass,
 			@FormatWith(ClassFormatter.class) Class<?> actualClass,
 			@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 20,
-			value = "The index schema node '%1$s' was added twice."
-					+ " Multiple bridges may be trying to access the same index field, "
-					+ " or two indexed-embeddeds may have prefixes that lead to conflicting field names,"
-					+ " or you may have declared multiple conflicting mappings."
-					+ " In any case, there is something wrong with your mapping and you should fix it.")
+			value = "Duplicate index field definition: '%1$s'."
+					+ " Index field names must be unique."
+					+ " Look for two property mappings with the same field name,"
+					+ " or two indexed-embeddeds with prefixes that lead to conflicting index field names,"
+					+ " or two custom bridges declaring index fields with the same name.")
 	SearchException indexSchemaNodeNameConflict(String name,
 			@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 25,
-			value = "Invalid field reference for this document element: this document element has path '%1$s', but the referenced field has a parent with path '%2$s'.")
+			value = "Invalid field reference for this document element:"
+					+ " this document element has path '%1$s', but the referenced field has a parent with path '%2$s'.")
 	SearchException invalidFieldForDocumentElement(String expectedPath, String actualPath);
 
 	@Message(id = ID_OFFSET + 26,
-			value = "Expected data was missing in the Elasticsearch response.")
+			value = "Missing data in the Elasticsearch response.")
 	AssertionFailure elasticsearchResponseMissingData();
 
 	@Message(id = ID_OFFSET + 29,
@@ -304,21 +307,23 @@ public interface Log extends BasicLogger {
 	SearchException minimumShouldMatchConflictingConstraints(int ceiling);
 
 	@Message(id = ID_OFFSET + 30,
-			value = "Conflicting index names: Hibernate Search indexes '%1$s' and '%2$s' both target the name or alias '%3$s'")
+			value = "Conflicting index names: Hibernate Search indexes '%1$s' and '%2$s'"
+					+ " both target the Elasticsearch index name or alias '%3$s'")
 	SearchException conflictingIndexNames(String firstHibernateSearchIndexName,
 			String secondHibernateSearchIndexName, String nameOrAlias);
 
 	@Message(id = ID_OFFSET + 31,
-			value = "Could not resolve index name '%1$s' to an entity type: %2$s")
-	SearchException elasticsearchResponseUnknownIndexName(String elasticsearchIndexName, String causeMessage, @Cause Exception e);
+			value = "Unable to resolve index name '%1$s' to an entity type: %2$s")
+	SearchException elasticsearchResponseUnknownIndexName(String elasticsearchIndexName, String causeMessage,
+			@Cause Exception e);
 
 	@Message(id = ID_OFFSET + 32,
-			value = "Unable to convert DSL parameter: %1$s")
+			value = "Unable to convert DSL argument: %1$s")
 	SearchException cannotConvertDslParameter(String errorMessage, @Cause Exception cause, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 33,
-			value = "Attempt to unwrap an Elasticsearch index manager to '%1$s',"
-					+ " but this index manager can only be unwrapped to '%2$s'.")
+			value = "Invalid requested type for this index manager: '%1$s'."
+					+ " Elasticsearch index managers can only be unwrapped to '%2$s'.")
 	SearchException indexManagerUnwrappingWithUnknownType(@FormatWith(ClassFormatter.class) Class<?> requestedClass,
 			@FormatWith(ClassFormatter.class) Class<?> actualClass,
 			@Param EventContext context);
@@ -328,22 +333,25 @@ public interface Log extends BasicLogger {
 	SearchException invalidElasticsearchTypedAnalyzerDefinition(String name);
 
 	@Message(id = ID_OFFSET + 35,
-			value = "Cannot apply both an analyzer and a normalizer. Analyzer: '%1$s', normalizer: '%2$s'.")
+			value = "Invalid index field type: both analyzer '%1$s' and normalizer '%2$s' are assigned to this type."
+					+ " Either an analyzer or a normalizer can be assigned, but not both.")
 	SearchException cannotApplyAnalyzerAndNormalizer(String analyzerName, String normalizerName, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 36,
-			value = "Cannot apply an analyzer on a sortable field. Use a normalizer instead. Analyzer: '%1$s'."
-					+ " If an actual analyzer (with tokenization) is necessary, define two separate fields:"
+			value = "Invalid index field type: both analyzer '%1$s' and sorts are enabled."
+					+ " Sorts are not supported on analyzed fields."
+					+ " If you need an analyzer simply to transform the text (lowercasing, ...)"
+					+ " without splitting it into tokens, use a normalizer instead."
+					+ " If you need an actual analyzer (with tokenization), define two separate fields:"
 					+ " one with an analyzer that is not sortable, and one with a normalizer that is sortable.")
 	SearchException cannotUseAnalyzerOnSortableField(String analyzerName, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 37,
-			value = "Multiple parameters with the same name: '%1$s'. Can't assign both value '%2$s' and '%3$s'" )
+			value = "Ambiguous value for parameter '%1$s': this parameter is set to two different values '%2$s' and '%3$s'.")
 	SearchException analysisComponentParameterConflict(String name, JsonElement value1, JsonElement value2);
 
 	@Message(id = ID_OFFSET + 38,
-			value = "An Elasticsearch query cannot include search projections built using a non-Elasticsearch search scope."
-			+ " Given projection was: '%1$s'")
+			value = "Invalid search projection: '%1$s'. You must build the projection from an Elasticsearch search scope.")
 	SearchException cannotMixElasticsearchSearchQueryWithOtherProjections(SearchProjection<?> projection);
 
 	@Message(id = ID_OFFSET + 41,
@@ -354,7 +362,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 44, value = "Unable to shut down the Elasticsearch client: %1$s")
 	SearchException unableToShutdownClient(String causeMessage, @Cause Exception cause);
 
-	@Message(id = ID_OFFSET + 45, value = "Cannot guess field type for input type %1$s.")
+	@Message(id = ID_OFFSET + 45, value = "No built-in index field type for class: '%1$s'.")
 	SearchException cannotGuessFieldType(@FormatWith(ClassFormatter.class) Class<?> inputType, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 49,
@@ -397,82 +405,95 @@ public interface Log extends BasicLogger {
 					+ " Please use a more precise version to remove the ambiguity." )
 	SearchException ambiguousElasticsearchVersion(ElasticsearchVersion version);
 
-	@Message(id = ID_OFFSET + 62, value = "Index-null-as option is not supported on analyzed field. Trying to define the analyzer: '%1$s' together with index null as: '%2$s'.")
+	@Message(id = ID_OFFSET + 62,
+			value = "Invalid index field type: both null token '%2$s' ('indexNullAs')"
+					+ " and analyzer '%1$s' are assigned to this type."
+					+ " 'indexNullAs' is not supported on analyzed fields.")
 	SearchException cannotUseIndexNullAsAndAnalyzer(String analyzerName, String indexNullAs, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 63,
-			value = "Multiple values were added to single-valued field '%1$s'."
-					+ " Declare the field as multi-valued in order to allow this."
-	)
+			value = "Multiple values assigned to field '%1$s': this field is single-valued."
+					+ " Declare the field as multi-valued in order to allow this.")
 	SearchException multipleValuesForSingleValuedField(String absolutePath);
 
 	@Message(id = ID_OFFSET + 64,
-			value = "explain(Object id) cannot be used when the query targets multiple types."
+			value = "Invalid use of explain(Object id) on a query targeting multiple types."
 					+ " Use explain(String typeName, Object id) and pass one of %1$s as the type name." )
 	SearchException explainRequiresTypeName(Set<String> targetedTypeNames);
 
 	@Message(id = ID_OFFSET + 65,
-			value = "The given mapped type name '%2$s' is not among the mapped type targeted by this query: %1$s." )
+			value = "Invalid mapped type name: '%2$s'."
+					+ " This type is not among the mapped types targeted by this query: %1$s.")
 	SearchException explainRequiresTypeTargetedByQuery(Set<String> targetedTypeNames, String typeName);
 
 	@Message(id = ID_OFFSET + 66,
-			value = "Document with id '%1$s' does not exist in the targeted index and thus its match cannot be explained." )
-	SearchException explainUnknownDocument(URLEncodedString id);
+			value = "Invalid document identifier: '%2$s'. No such document in index '%1$s'.")
+	SearchException explainUnknownDocument(URLEncodedString indexName, URLEncodedString id);
 
-	@Message(id = ID_OFFSET + 68, value = "Impossible to detect a decimal scale to use for this field."
-			+ " If the value is bridged, set '.asBigDecimal().decimalScale( int )' in the bind, else verify your mapping.")
+	@Message(id = ID_OFFSET + 67, value = "Invalid index field type: missing decimal scale."
+			+ " Define the decimal scale explicitly.")
 	SearchException nullDecimalScale(@Param EventContext eventContext);
 
 	@Message(id = ID_OFFSET + 69, value = "The value '%1$s' cannot be indexed because its absolute value is too large.")
 	SearchException scaledNumberTooLarge(Number value);
 
-	@Message(id = ID_OFFSET + 70, value = "Positive decimal scale ['%1$s'] is not allowed for BigInteger fields, since a BigInteger value cannot have any decimal digits.")
+	@Message(id = ID_OFFSET + 70,
+			value = "Invalid index field type: decimal scale '%1$s' is positive."
+						+ " The decimal scale of BigInteger fields must be zero or negative.")
 	SearchException invalidDecimalScale(Integer decimalScale, @Param EventContext eventContext);
 
-	@Message(id = ID_OFFSET + 72, value = "The predicate '%1$s' is defined on a scope targeting different indexes."
-			+ " Predicate is targeting: '%2$s'. Current scope is targeting: '%3$s'.")
+	@Message(id = ID_OFFSET + 72,
+			value = "Invalid search predicate: '%1$s'. You must build the predicate from a scope targeting indexes %3$s,"
+					+ " but the given predicate was built from a scope targeting indexes %2$s.")
 	SearchException predicateDefinedOnDifferentIndexes(SearchPredicate predicate, Set<String> predicateIndexes, Set<String> scopeIndexes);
 
-	@Message(id = ID_OFFSET + 73, value = "The sort '%1$s' is defined on a scope targeting different indexes."
-			+ " Sort is targeting: '%2$s'. Current scope is targeting: '%3$s'.")
+	@Message(id = ID_OFFSET + 73,
+			value = "Invalid search sort: '%1$s'. You must build the sort from a scope targeting indexes %3$s,"
+					+ " but the given sort was built from a scope targeting indexes %2$s.")
 	SearchException sortDefinedOnDifferentIndexes(SearchSort sort, Set<String> sortIndexes, Set<String> scopeIndexes);
 
-	@Message(id = ID_OFFSET + 74, value = "The projection '%1$s' is defined on a scope targeting different indexes."
-			+ " Projection is targeting: '%2$s'. Current scope is targeting: '%3$s'.")
+	@Message(id = ID_OFFSET + 74,
+			value = "Invalid search projection: '%1$s'. You must build the projection from a scope targeting indexes %3$s,"
+					+ " but the given projection was built from a scope targeting indexes %2$s.")
 	SearchException projectionDefinedOnDifferentIndexes(SearchProjection<?> projection, Set<String> projectionIndexes, Set<String> scopeIndexes);
 
 	@Message(id = ID_OFFSET + 76,
-			value = "Cannot apply an analyzer on an aggregable field. Use a normalizer instead. Analyzer: '%1$s'."
-					+ " If an actual analyzer (with tokenization) is necessary, define two separate fields:"
+			value = "Invalid index field type: both analyzer '%1$s' and aggregations are enabled."
+					+ " Aggregations are not supported on analyzed fields."
+					+ " If you need an analyzer simply to transform the text (lowercasing, ...)"
+					+ " without splitting it into tokens, use a normalizer instead."
+					+ " If you need an actual analyzer (with tokenization), define two separate fields:"
 					+ " one with an analyzer that is not aggregable, and one with a normalizer that is aggregable.")
 	SearchException cannotUseAnalyzerOnAggregableField(String analyzerName, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 80,
-			value = "Elasticsearch range aggregations only accept ranges in the canonical form:"
+			value = "Invalid range: '%1$s'. Elasticsearch range aggregations only accept ranges in the canonical form:"
 					+ " (-Infinity, <value>) or [<value1>, <value2>) or [<value>, +Infinity)."
-					+ " The given range is not in canonical form: '%1$s'.")
+					+ " Call Range.canonical(...) to be sure to create such a range.")
 	SearchException elasticsearchRangeAggregationRequiresCanonicalFormForRanges(Range<?> range);
 
 	@Message(id = ID_OFFSET + 81,
-			value = "An Elasticsearch query cannot include search aggregations built using a non-Elasticsearch search scope."
-					+ " Given aggregation was: '%1$s'")
+			value = "Invalid search aggregation: '%1$s'. You must build the aggregation from an Elasticsearch search scope.")
 	SearchException cannotMixElasticsearchSearchQueryWithOtherAggregations(SearchAggregation<?> aggregation);
 
-	@Message(id = ID_OFFSET + 82, value = "The aggregation '%1$s' is defined on a scope targeting different indexes."
-			+ " Aggregation is targeting: '%2$s'. Current scope is targeting: '%3$s'.")
+	@Message(id = ID_OFFSET + 82,
+			value = "Invalid search aggregation: '%1$s'. You must build the aggregation from a scope targeting indexes %3$s,"
+					+ " but the given aggregation was built from a scope targeting indexes %2$s.")
 	SearchException aggregationDefinedOnDifferentIndexes(SearchAggregation<?> aggregation,
 			Set<String> aggregationIndexes, Set<String> scopeIndexes);
 
 	@Message(id = ID_OFFSET + 85,
-			value = "Multiple aggregations with the same key: '%1$s'")
-	SearchException duplicateAggregationKey(@FormatWith(AggregationKeyFormatter.class) AggregationKey key);
+			value = "Duplicate aggregation definitions for key: '%1$s'")
+	SearchException duplicateAggregationKey(@FormatWith(AggregationKeyFormatter.class) AggregationKey<?> key);
 
-	@Message(id = ID_OFFSET + 87, value = "Cannot apply a search analyzer if an analyzer has not been defined on the same field." +
-			" Search analyzer: '%1$s'.")
+	@Message(id = ID_OFFSET + 87,
+			value = "Invalid index field type: search analyzer '%1$s' is assigned to this type,"
+				+ " but the indexing analyzer is missing."
+				+ " Assign an indexing analyzer and a search analyzer, or remove the search analyzer.")
 	SearchException searchAnalyzerWithoutAnalyzer(String searchAnalyzer, @Param EventContext context);
 
-	@Message(id = ID_OFFSET + 88, value = "The operation failed due to the failure of the call to the bulk REST API.")
-	SearchException elasticsearchFailedBecauseOfBulkFailure(@Cause Throwable bulkFailure);
+	@Message(id = ID_OFFSET + 88, value = "Call to the bulk REST API failed: %1$s")
+	SearchException elasticsearchFailedBecauseOfBulkFailure(String causeMessage, @Cause Throwable cause);
 
 	@Message(id = ID_OFFSET + 89, value = "Invalid host/port: '%1$s'."
 			+ " The host/port string must use the format 'host:port', for example 'mycompany.com:9200'"
@@ -493,21 +514,27 @@ public interface Log extends BasicLogger {
 	SearchException missingTypeFieldInDocument(String fieldName);
 
 	@Message(id = ID_OFFSET + 93,
-			value = "Index aliases [%1$s, %2$s] are assigned to a single Hibernate Search index, "
-					+ " but they are already defined in Elasticsearch and point to multiple distinct indexes: %3$s.")
+			value = "Invalid Elasticsearch index layout:"
+					+ " index aliases [%1$s, %2$s] resolve to multiple distinct indexes %3$s."
+					+ " These aliases must resolve to a single index.")
 	SearchException elasticsearchIndexNameAndAliasesMatchMultipleIndexes(URLEncodedString write, URLEncodedString read,
 			Set<String> matchingIndexes);
 
 	@Message(id = ID_OFFSET + 94,
-			value = "Index primary name  '%1$s' does not match the expected pattern '%2$s'.")
+			value = "Invalid Elasticsearch index layout:"
+					+ " primary (non-alias) name for existing Elasticsearch index '%1$s'"
+					+ " does not match the expected pattern '%2$s'.")
 	SearchException invalidIndexPrimaryName(String elasticsearchIndexName, Pattern pattern);
 
 	@Message(id = ID_OFFSET + 95,
-			value = "Unique key '%1$s' extracted from the index name does not match any of %2$s")
+			value = "Invalid Elasticsearch index layout:"
+					+ " unique key '%1$s' extracted from the index name does not match any of %2$s.")
 	SearchException invalidIndexUniqueKey(String uniqueKey, Set<String> knownKeys);
 
 	@Message(id = ID_OFFSET + 96,
-			value = "Write alias and read alias must be different, but were set to the same value: '%1$s'.")
+			value = "Invalid Elasticsearch index layout:"
+					+ " the write alias and read alias are set to the same value: '%1$s'."
+					+ " The write alias and read alias must be different." )
 	SearchException sameWriteAndReadAliases(URLEncodedString writeAndReadAlias, @Param EventContext eventContext);
 
 	@Message(id = ID_OFFSET + 97, value = "Invalid Elasticsearch version: '%1$s'."
@@ -519,43 +546,50 @@ public interface Log extends BasicLogger {
 			+ " Set the schema management strategy via the property 'hibernate.search.schema_management.strategy' instead.")
 	SearchException lifecycleStrategyMovedToMapper();
 
-	@Message(id = ID_OFFSET + 99, value = "Simple query string targets fields [%1$s, %3$s] spanning multiple nested paths: %2$s, %4$s.")
-	SearchException simpleQueryStringSpanningMultipleNestedPaths(String fieldPath1, String nestedPath1, String fieldPath2, String nestedPath2);
+	@Message(id = ID_OFFSET + 99,
+			value = "Invalid target fields for simple-query-string predicate:"
+					+ " fields [%1$s, %3$s] are in different nested documents [%2$s, %4$s]."
+					+ " All fields targeted by a simple-query-string predicate must be in the same document.")
+	SearchException simpleQueryStringSpanningMultipleNestedPaths(String fieldPath1, String nestedPath1,
+			String fieldPath2, String nestedPath2);
 
 	@Message(id = ID_OFFSET + 100,
-			value = "Cannot compute the median across nested documents.")
-	SearchException cannotComputeMedianAcrossNested(@Param EventContext context);
+			value = "Invalid sort mode: %1$s. This sort mode is not supported for fields in nested documents.")
+	SearchException invalidSortModeAcrossNested(SortMode mode, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 101,
-			value = "Cannot compute the sum, average or median of a text field. Only min and max are supported.")
-	SearchException cannotComputeSumOrAvgOrMedianForStringField(@Param EventContext context);
+			value = "Invalid sort mode: %1$s. This sort mode is not supported for String fields."
+					+ " Only MIN and MAX are supported.")
+	SearchException invalidSortModeForStringField(SortMode mode, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 102,
-			value = "Cannot compute the sum of a temporal field. Only min, max, avg and median are supported.")
-	SearchException cannotComputeSumForTemporalField(@Param EventContext context);
+			value = "Invalid sort mode: %1$s. This sort mode is not supported for temporal fields."
+					+ " Only MIN, MAX, AVG and MEDIAN are supported.")
+	SearchException invalidSortModeForTemporalField(SortMode mode, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 103,
-			value = "Cannot compute the sum for a distance sort. Only min, max, avg and median are supported.")
-	SearchException cannotComputeSumForDistanceSort(@Param EventContext context);
+			value = "Invalid sort mode: %1$s. This sort mode is not supported for a distance sort."
+					+ " Only MIN, MAX, AVG and MEDIAN are supported.")
+	SearchException invalidSortModeForDistanceSort(SortMode mode, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 104,
-			value = "Field '%1$s' is not contained in a nested object."
+			value = "Invalid sort filter: field '%1$s' is not contained in a nested object."
 					+ " Sort filters are only available if the field to sort on is contained in a nested object.")
 	SearchException cannotFilterSortOnRootDocumentField(String absoluteFieldPath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 105,
-			value = "Predicate targets unexpected fields %2$s."
-					+ " Only fields that are contained in the nested object with path '%1$s'"
-					+ " are allowed here.")
-	SearchException invalidNestedObjectPathForPredicate(String nestedObjectPath, List<String> fieldPaths);
+			value = "Invalid search predicate: %1$s. This predicate targets fields %3$s,"
+					+ " but only fields that are contained in the nested object with path '%2$s' are allowed here.")
+	SearchException invalidNestedObjectPathForPredicate(SearchPredicate predicate, String nestedObjectPath,
+			List<String> fieldPaths);
 
 	@Message(id = ID_OFFSET + 106,
-			value = "Field '%1$s' is not contained in a nested object."
+			value = "Invalid aggregation filter: field '%1$s' is not contained in a nested object."
 					+ " Aggregation filters are only available if the field to aggregate on is contained in a nested object.")
 	SearchException cannotFilterAggregationOnRootDocumentField(String absoluteFieldPath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 107,
-			value = "The index field template '%1$s' was added twice."
+			value = "Duplicate index field template definition: '%1$s'."
 					+ " Multiple bridges may be trying to access the same index field template, "
 					+ " or two indexed-embeddeds may have prefixes that lead to conflicting field names,"
 					+ " or you may have declared multiple conflicting mappings."
@@ -585,7 +619,8 @@ public interface Log extends BasicLogger {
 	SearchException invalidIndexElementTypeObjectFieldIsNotValueField(String absolutePath);
 
 	@Message(id = ID_OFFSET + 113,
-			value = "Projection on field '%1$s' cannot be single-valued, because this field is multi-valued."
+			value = "Invalid cardinality for projection on field '%1$s': the projection is single-valued,"
+					+ " but this field is multi-valued."
 					+ " Make sure to call '.multi()' when you create the projection.")
 	SearchException invalidSingleValuedProjectionOnMultiValuedField(String absolutePath, @Param EventContext context);
 

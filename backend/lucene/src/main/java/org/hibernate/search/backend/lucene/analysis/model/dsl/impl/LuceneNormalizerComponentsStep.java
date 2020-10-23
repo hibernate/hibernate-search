@@ -62,7 +62,7 @@ class LuceneNormalizerComponentsStep
 			);
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.unableToCreateNormalizer( name, e );
+			throw log.unableToCreateNormalizer( name, e.getMessage(), e );
 		}
 	}
 

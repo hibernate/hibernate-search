@@ -39,7 +39,7 @@ public class SearchProjectionExtractContext {
 			return indexSearcher.explain( luceneQuery, docId );
 		}
 		catch (IOException e) {
-			throw log.ioExceptionOnExplain( e );
+			throw log.ioExceptionOnExplain( e.getMessage(), e );
 		}
 	}
 

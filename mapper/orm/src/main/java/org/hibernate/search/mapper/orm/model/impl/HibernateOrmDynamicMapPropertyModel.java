@@ -57,7 +57,7 @@ class HibernateOrmDynamicMapPropertyModel<T> implements PojoPropertyModel<T> {
 				typeModel = ormPropertyMetadata.getTypeModelFactory().create( introspector );
 			}
 			catch (RuntimeException e) {
-				throw log.errorRetrievingPropertyTypeModel( name(), holderTypeModel, e );
+				throw log.errorRetrievingPropertyTypeModel( name(), holderTypeModel, e.getMessage(), e );
 			}
 		}
 		return typeModel;
@@ -73,7 +73,7 @@ class HibernateOrmDynamicMapPropertyModel<T> implements PojoPropertyModel<T> {
 				);
 			}
 			catch (RuntimeException e) {
-				throw log.errorRetrievingPropertyTypeModel( name(), holderTypeModel, e );
+				throw log.errorRetrievingPropertyTypeModel( name(), holderTypeModel, e.getMessage(), e );
 			}
 		}
 		return handle;

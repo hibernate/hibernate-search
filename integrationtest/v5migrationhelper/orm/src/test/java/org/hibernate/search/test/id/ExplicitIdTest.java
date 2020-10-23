@@ -119,7 +119,7 @@ public class ExplicitIdTest extends SearchTestBase {
 		catch (SearchException e) {
 			assertThat( e )
 					.hasMessageContainingAll(
-							"Found multiple entities of type 'Article' with 'documentId' set to '1'.",
+							"Multiple instances of entity type 'Article' have their property 'documentId' set to '1'.",
 							"'documentId' is the document ID and must be assigned unique values"
 					);
 		}

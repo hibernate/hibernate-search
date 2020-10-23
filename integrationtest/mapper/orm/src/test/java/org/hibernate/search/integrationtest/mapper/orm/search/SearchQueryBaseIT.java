@@ -320,7 +320,7 @@ public class SearchQueryBaseIT {
 			) )
 					.hasMessageContainingAll(
 							"Invalid type for '" + Book.NAME + "'",
-							"expected the entity to extend '" + invalidClass.getName()
+							"the entity type must extend '" + invalidClass.getName()
 									+ "', but entity type '" + Book.class.getName() + "' does not"
 					);
 		} );

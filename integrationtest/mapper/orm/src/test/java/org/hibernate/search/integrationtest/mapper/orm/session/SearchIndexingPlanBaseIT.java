@@ -171,10 +171,9 @@ public class SearchIndexingPlanBaseIT {
 					() -> indexingPlan.purge( invalidClass, 42, null )
 			)
 					.isInstanceOf( SearchException.class )
-					.hasMessageContainingAll(
-							"Cannot work on type '" + invalidClass.getName() + "', because it is not indexed,"
-									+ " neither directly nor as a contained entity in another type"
-					);
+					.hasMessageContainingAll( "Invalid type '" + invalidClass.getName()
+							+ "' in an indexing plan: this type is not indexed,"
+							+ " neither directly nor as a contained entity in another indexed type" );
 		} );
 	}
 
@@ -191,8 +190,9 @@ public class SearchIndexingPlanBaseIT {
 			)
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
-							"Type '" + ContainedEntity.class.getName() + "' is contained in an indexed type but is not itself indexed",
-							"thus entity with identifier '42' cannot be purged"
+							"Unable to purge entity of type '" + ContainedEntity.class.getName()
+									+ "' with identifier '42': "
+									+ " this type is contained in an indexed type but is not itself indexed."
 					);
 		} );
 	}
@@ -403,25 +403,25 @@ public class SearchIndexingPlanBaseIT {
 				() -> indexingPlan.addOrUpdate( entity )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Underlying Hibernate ORM Session seems to be closed" );
+				.hasMessageContaining( "Underlying Hibernate ORM Session is closed" );
 
 		assertThatThrownBy(
 				() -> indexingPlan.delete( entity )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Underlying Hibernate ORM Session seems to be closed" );
+				.hasMessageContaining( "Underlying Hibernate ORM Session is closed" );
 
 		assertThatThrownBy(
 				() -> indexingPlan.process()
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Underlying Hibernate ORM Session seems to be closed" );
+				.hasMessageContaining( "Underlying Hibernate ORM Session is closed" );
 
 		assertThatThrownBy(
 				() -> indexingPlan.execute()
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Underlying Hibernate ORM Session seems to be closed" );
+				.hasMessageContaining( "Underlying Hibernate ORM Session is closed" );
 	}
 
 	private SessionFactory setup(AutomaticIndexingStrategyName automaticIndexingStrategy) {

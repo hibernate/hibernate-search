@@ -131,7 +131,7 @@ public class DocumentIdDefaultBridgeAdditionIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( indexedType.getName() )
 						.pathContext( ".id" )
-						.failure( "Unable to find a default identifier bridge implementation" )
+						.failure( "No default identifier bridge implementation for type", "Use a custom bridge" )
 						.build() );
 	}
 

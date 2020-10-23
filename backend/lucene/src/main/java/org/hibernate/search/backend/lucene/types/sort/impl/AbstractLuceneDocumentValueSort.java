@@ -67,7 +67,7 @@ public abstract class AbstractLuceneDocumentValueSort extends AbstractLuceneReve
 
 		public void mode(SortMode mode) {
 			if ( nestedDocumentPath != null && SortMode.MEDIAN.equals( mode ) ) {
-				throw log.cannotComputeMedianAcrossNested( getEventContext() );
+				throw log.invalidSortModeAcrossNested( mode, getEventContext() );
 			}
 			this.mode = mode;
 		}

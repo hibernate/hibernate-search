@@ -24,7 +24,7 @@ import org.junit.Test;
 
 public class ElasticsearchAnalysisConfigurerIT {
 
-	private static final String ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX = "Error while applying analysis configuration";
+	private static final String ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX = "Unable to apply analysis configuration";
 
 	private static final String TYPE_NAME = "mainType";
 	private static final String INDEX_NAME = "mainIndex";
@@ -43,9 +43,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 						.indexContext( INDEX_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
-								"Unable to convert configuration property 'hibernate.search.backend."
-										+ ElasticsearchIndexSettings.ANALYSIS_CONFIGURER + "'",
-								"'foobar'",
+								"Invalid value for configuration property 'hibernate.search.backend."
+										+ ElasticsearchIndexSettings.ANALYSIS_CONFIGURER + "': 'foobar'",
 								"Unable to find " + ElasticsearchAnalysisConfigurer.class.getName() + " implementation class: foobar"
 						)
 						.build()
@@ -94,8 +93,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 						.indexContext( INDEX_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
-								"Multiple tokenizer definitions with the same name",
-								"'tokenizerName'"
+								"Duplicate tokenizer definitions: 'tokenizerName'",
+								"Tokenizer names must be unique"
 						)
 						.build()
 				);
@@ -145,8 +144,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 						.indexContext( INDEX_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
-								"Multiple char filter definitions with the same name",
-								"'charFilterName'"
+								"Duplicate char filter definitions: 'charFilterName'",
+								"Char filter names must be unique"
 						)
 						.build()
 				);
@@ -196,8 +195,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 						.indexContext( INDEX_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
-								"Multiple token filter definitions with the same name",
-								"'tokenFilterName'"
+								"Duplicate token filter definitions: 'tokenFilterName'",
+								"Token filter names must be unique"
 						)
 						.build()
 				);
@@ -247,8 +246,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 						.indexContext( INDEX_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
-								"Multiple parameters with the same name",
-								"'parameterName'",
+								"Ambiguous value for parameter 'parameterName'",
 								"'\"value1\"'",
 								"'\"value2\"'"
 						)

@@ -28,10 +28,8 @@ abstract class AbstractLuceneNestablePredicate extends AbstractLuceneSearchPredi
 		List<String> nestedPathHierarchy = getNestedPathHierarchy();
 
 		if ( expectedParentNestedPath != null && !nestedPathHierarchy.contains( expectedParentNestedPath ) ) {
-			throw log.invalidNestedObjectPathForPredicate(
-					expectedParentNestedPath,
-					getFieldPathsForErrorMessage()
-			);
+			throw log.invalidNestedObjectPathForPredicate( this, expectedParentNestedPath,
+					getFieldPathsForErrorMessage() );
 		}
 	}
 

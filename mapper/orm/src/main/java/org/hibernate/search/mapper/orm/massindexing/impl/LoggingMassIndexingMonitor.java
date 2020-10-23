@@ -94,9 +94,9 @@ public class LoggingMassIndexingMonitor implements MassIndexingMonitor {
 
 	protected void printStatusMessage(long startTime, long totalTodoCount, long doneCount) {
 		long elapsedMs = TimeUnit.NANOSECONDS.toMillis( System.nanoTime() - startTime );
-		log.indexingDocumentsCompleted( doneCount, elapsedMs );
+		log.indexingProgressRaw( doneCount, elapsedMs );
 		float estimateSpeed = doneCount * 1000f / elapsedMs;
 		float estimatePercentileComplete = doneCount * 100f / totalTodoCount;
-		log.indexingSpeed( estimateSpeed, estimatePercentileComplete );
+		log.indexingProgressStats( estimateSpeed, estimatePercentileComplete );
 	}
 }

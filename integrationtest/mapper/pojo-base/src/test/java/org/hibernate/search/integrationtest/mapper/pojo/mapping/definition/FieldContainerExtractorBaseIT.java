@@ -124,7 +124,7 @@ public class FieldContainerExtractorBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure(
-								"Cannot resolve container extractor name 'some-undefined-name'."
+								"No container extractor with name 'some-undefined-name'."
 								+ " Check that this name matches a container extractor,"
 								+ " either a builtin one whose name is a constant in '" + BuiltinContainerExtractors.class.getName() + "'"
 								+ " or a custom one that was properly registered."
@@ -153,7 +153,7 @@ public class FieldContainerExtractorBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure(
-								"Cannot interpret the type arguments to the ContainerExtractor interface in "
+								"Unable to interpret the type arguments to the ContainerExtractor interface in "
 										+ " implementation '" + RawContainerExtractor.class.getName()
 										+ "'. Only the following implementations of ContainerExtractor are valid"
 						)
@@ -186,11 +186,10 @@ public class FieldContainerExtractorBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".numbers" )
-						.failure(
-								"Cannot apply the requested container value extractor '" + BuiltinContainerExtractors.MAP_VALUE
-								+ "' (implementation class: '" + MapValueExtractor.class.getName()
-								+ "') to type '" + List.class.getName() + "<" + Integer.class.getName() + ">'"
-						)
+						.failure( "Invalid container extractor for type '"
+								+ List.class.getName() + "<" + Integer.class.getName() + ">': '"
+								+ BuiltinContainerExtractors.MAP_VALUE
+								+ "' (implementation class: '" + MapValueExtractor.class.getName() + "')" )
 						.build()
 				);
 	}
@@ -216,7 +215,8 @@ public class FieldContainerExtractorBaseIT {
 						.pathContext( ".numbers" )
 						.annotationContextAnyParameters( GenericField.class )
 						.failure(
-								"Extractors cannot be defined explicitly when extract = ContainerExtract.NO.",
+								"Unexpected extractor references",
+								"extractors cannot be defined explicitly when extract = ContainerExtract.NO.",
 								"Either leave 'extract' to its default value to define extractors explicitly",
 								"or leave the 'extractor' list to its default, empty value to disable extraction"
 						)

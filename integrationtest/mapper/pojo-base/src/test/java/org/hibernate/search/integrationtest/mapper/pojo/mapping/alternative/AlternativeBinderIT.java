@@ -116,9 +116,9 @@ public class AlternativeBinderIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.failure( "Could not find any property marked with @Alternative(id = null).",
+						.failure( "No property annotated with @Alternative(id = null).",
 								"There must be exactly one such property in order to map property 'text' to multi-alternative fields." )
-						.failure( "Could not find any property marked with @Alternative(id = null).",
+						.failure( "No property annotated with @Alternative(id = null).",
 								"There must be exactly one such property in order to map property 'title' to multi-alternative fields." )
 						.build()
 				);
@@ -144,9 +144,9 @@ public class AlternativeBinderIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.failure( "Found multiple properties marked with @Alternative(id = null).",
+						.failure( "Multiple properties annotated with @Alternative(id = null).",
 								"There must be exactly one such property in order to map property 'text' to multi-alternative fields." )
-						.failure( "Found multiple properties marked with @Alternative(id = null).",
+						.failure( "Multiple properties annotated with @Alternative(id = null).",
 								"There must be exactly one such property in order to map property 'title' to multi-alternative fields." )
 						.build()
 				);

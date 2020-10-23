@@ -83,7 +83,7 @@ public class IndexWriterProvider {
 	 * Should be used to clean up upon error.
 	 */
 	public void clearAfterFailure(Throwable throwable, Object failingOperation) {
-		log.indexWriterReset( eventContext );
+		log.indexWriterResetAfterFailure( eventContext );
 
 		/*
 		 * Acquire the lock so that we're sure no writer will be created for the directory before we close the current one.

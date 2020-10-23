@@ -47,7 +47,7 @@ public class DeleteEntryWork extends AbstractSingleDocumentIndexingWork {
 		}
 		catch (IOException e) {
 			throw log.unableToDeleteEntryFromIndex(
-					tenantId, entityTypeName, entityIdentifier, context.getEventContext(), e
+					tenantId, entityTypeName, entityIdentifier, e.getMessage(), context.getEventContext(), e
 			);
 		}
 	}

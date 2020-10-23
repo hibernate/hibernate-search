@@ -8,7 +8,6 @@ package org.hibernate.search.batch.jsr352.core.massindexing.util.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.fail;
 
 import org.hibernate.search.util.common.SearchException;
 
@@ -36,21 +35,21 @@ public class SerializationUtilTest {
 	public void deserializeInt_fromDouble() throws Exception {
 		assertThatThrownBy( () -> SerializationUtil.parseIntegerParameter( "My parameter", "1.0" ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessage( "HSEARCH500029: Unable to parse value '1.0' for job parameter 'My parameter'." );
+				.hasMessageContaining( "Invalid value for job parameter 'My parameter': '1.0'." );
 	}
 
 	@Test
 	public void deserializeInt_fromOther() throws Exception {
 		assertThatThrownBy( () -> SerializationUtil.parseIntegerParameter( "My parameter", "foo" ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessage( "HSEARCH500029: Unable to parse value 'foo' for job parameter 'My parameter'." );
+				.hasMessageContaining( "Invalid value for job parameter 'My parameter': 'foo'." );
 	}
 
 	@Test
 	public void deserializeInt_missing() throws Exception {
 		assertThatThrownBy( () -> SerializationUtil.parseIntegerParameter( "My parameter", null ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessage( "HSEARCH500029: Unable to parse value 'null' for job parameter 'My parameter'." );
+				.hasMessageContaining( "Invalid value for job parameter 'My parameter': 'null'." );
 	}
 
 	@Test
@@ -94,14 +93,10 @@ public class SerializationUtilTest {
 	@Test
 	public void deserializeBoolean_fromOthers() throws Exception {
 		for ( String value : new String[] { "", "0", "1", "t", "f" } ) {
-			try {
-				SerializationUtil.parseBooleanParameterOptional( "My parameter", value, true );
-				fail();
-			}
-			catch (SearchException e) {
-				String expectedMsg = "HSEARCH500029: Unable to parse value '" + value + "' for job parameter 'My parameter'.";
-				assertThat( e.getMessage() ).isEqualTo( expectedMsg );
-			}
+			assertThatThrownBy( () ->
+					SerializationUtil.parseBooleanParameterOptional( "My parameter", value, true ) )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Invalid value for job parameter 'My parameter': '" + value + "'." );
 		}
 	}
 }

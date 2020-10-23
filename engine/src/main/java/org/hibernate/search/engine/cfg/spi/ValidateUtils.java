@@ -24,7 +24,7 @@ public final class ValidateUtils {
 
 	public static void validateCharacter(String value) {
 		if ( value != null && value.length() != 1 ) {
-			throw log.invalidStringForType( value, Character.class, null );
+			throw log.invalidStringForType( value, Character.class, "", null );
 		}
 	}
 
@@ -50,7 +50,7 @@ public final class ValidateUtils {
 			UUID.fromString( value );
 		}
 		catch (IllegalArgumentException ex) {
-			throw log.invalidStringForType( value, UUID.class, ex );
+			throw log.invalidStringForType( value, UUID.class, ex.getMessage(), ex );
 		}
 	}
 
@@ -63,7 +63,7 @@ public final class ValidateUtils {
 			ZoneId.of( value );
 		}
 		catch (DateTimeException ex) {
-			throw log.invalidStringForType( value, ZoneId.class, ex );
+			throw log.invalidStringForType( value, ZoneId.class, ex.getMessage(), ex );
 		}
 	}
 

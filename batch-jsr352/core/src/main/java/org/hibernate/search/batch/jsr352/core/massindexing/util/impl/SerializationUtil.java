@@ -72,7 +72,7 @@ public final class SerializationUtil {
 		if ( "false".equalsIgnoreCase( value ) ) {
 			return false;
 		}
-		throw log.unableToParseJobParameter( key, value, null );
+		throw log.unableToParseJobParameter( key, value, "", null );
 	}
 
 	public static int parseIntegerParameter(String key, String value) {
@@ -80,7 +80,7 @@ public final class SerializationUtil {
 			return Integer.parseInt( value );
 		}
 		catch (NumberFormatException e) {
-			throw log.unableToParseJobParameter( key, value, e );
+			throw log.unableToParseJobParameter( key, value, e.getMessage(), e );
 		}
 	}
 
@@ -99,7 +99,7 @@ public final class SerializationUtil {
 			return (T) SerializationUtil.deserialize( value );
 		}
 		catch (IOException | ClassNotFoundException e) {
-			throw log.unableToParseJobParameter( key, value, e );
+			throw log.unableToParseJobParameter( key, value, e.getMessage(), e );
 		}
 	}
 
@@ -115,7 +115,7 @@ public final class SerializationUtil {
 			return Enum.valueOf( clazz, value );
 		}
 		catch (IllegalArgumentException e) {
-			throw log.unableToParseJobParameter( key, value, e );
+			throw log.unableToParseJobParameter( key, value, e.getMessage(), e );
 		}
 	}
 

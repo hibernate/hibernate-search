@@ -124,7 +124,7 @@ abstract class AbstractElasticsearchDocumentValueSort extends AbstractElasticsea
 
 		public void mode(SortMode mode) {
 			if ( !nestedPathHierarchy.isEmpty() && SortMode.MEDIAN.equals( mode ) ) {
-				throw log.cannotComputeMedianAcrossNested( field.eventContext() );
+				throw log.invalidSortModeAcrossNested( mode, field.eventContext() );
 			}
 			if ( mode != null ) {
 				switch ( mode ) {

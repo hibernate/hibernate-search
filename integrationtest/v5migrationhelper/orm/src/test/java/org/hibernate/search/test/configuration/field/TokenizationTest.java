@@ -34,7 +34,7 @@ public class TokenizationTest extends SearchInitializationTestBase {
 
 	@Test
 	public void testWarningLoggedForInconsistentFieldConfiguration() throws Exception {
-		thrown.expectMessage( "The index schema node '" + DEFAULT_FIELD_NAME + "' was added twice" );
+		thrown.expectMessage( "Duplicate index field definition: '" + DEFAULT_FIELD_NAME + "'" );
 		thrown.expectMessage( Product.class.getName() );
 
 		init( Product.class );

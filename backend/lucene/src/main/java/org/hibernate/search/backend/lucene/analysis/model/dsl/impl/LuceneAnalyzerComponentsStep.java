@@ -80,7 +80,7 @@ class LuceneAnalyzerComponentsStep
 			);
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.unableToCreateAnalyzer( name, e );
+			throw log.unableToCreateAnalyzer( name, e.getMessage(), e );
 		}
 	}
 

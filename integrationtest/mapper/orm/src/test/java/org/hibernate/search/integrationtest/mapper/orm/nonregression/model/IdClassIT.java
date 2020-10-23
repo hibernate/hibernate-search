@@ -44,10 +44,11 @@ public class IdClassIT {
 		assertThatThrownBy( () -> ormSetupHelper.start().setup( IdClassIndexed.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"There isn't any explicit document ID mapping for indexed type '"
+						"Unable to define a document identifier for indexed type '"
 								+ IdClassIndexed.class.getName() + "'",
-						"the entity ID cannot be used as a default because"
-								+ " the property representing the entity ID cannot be found"
+						"The property representing the entity identifier is unknown",
+						"Define the document identifier explicitly by annotating"
+								+ " a property whose values are unique with @DocumentId"
 				);
 	}
 

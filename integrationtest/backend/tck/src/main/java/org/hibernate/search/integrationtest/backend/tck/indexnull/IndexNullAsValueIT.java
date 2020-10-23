@@ -92,9 +92,13 @@ public class IndexNullAsValueIT {
 				.setup()
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Index-null-as option is not supported on analyzed field." )
-				.hasMessageContaining( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
-				.hasMessageContaining( "bla bla bla" );
+				.hasMessageContainingAll(
+						"Invalid index field type",
+						"both null token 'bla bla bla' ('indexNullAs') and analyzer '"
+								+ DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name
+								+ "' are assigned to this type",
+						"'indexNullAs' is not supported on analyzed fields"
+				);
 	}
 
 	private void setUp() {

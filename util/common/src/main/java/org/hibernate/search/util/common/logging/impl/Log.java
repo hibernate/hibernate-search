@@ -78,26 +78,26 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 6,
 			value = "Requested type argument %3$s to type %2$s"
-					+ " in implementing type %1$s, but %2$s doesn't declare any type parameter")
+					+ " in implementing type %1$s, but %2$s doesn't declare any type parameter.")
 	IllegalArgumentException cannotRequestTypeParameterOfUnparameterizedType(@FormatWith(TypeFormatter.class) Type type,
 			@FormatWith(ClassFormatter.class) Class<?> rawSuperType, int typeArgumentIndex);
 
 	@Message(id = ID_OFFSET + 7,
 			value = "Requested type argument %3$s to type %2$s"
-					+ " in implementing type %1$s, but %2$s only declares %4$s type parameter(s)")
+					+ " in implementing type %1$s, but %2$s only declares %4$s type parameter(s).")
 	IllegalArgumentException typeParameterIndexOutOfBound(@FormatWith(TypeFormatter.class) Type type,
 			@FormatWith(ClassFormatter.class) Class<?> rawSuperType,
 			int typeArgumentIndex, int typeParametersLength);
 
 	@Message(id = ID_OFFSET + 8,
 			value = "Requested type argument index %3$s to type %2$s"
-					+ " in implementing type %1$s should be 0 or greater")
+					+ " in implementing type %1$s should be 0 or greater.")
 	IllegalArgumentException invalidTypeParameterIndex(@FormatWith(TypeFormatter.class) Type type,
 			@FormatWith(ClassFormatter.class) Class<?> rawSuperType, int typeArgumentIndex);
 
 	@LogMessage(level = Logger.Level.INFO)
 	@Message(id = ID_OFFSET + 9,
-			value = "Cannot access the value of containing annotation '%1$s'."
+			value = "Unable to access the value of containing annotation '%1$s'."
 					+ " Ignoring annotation.")
 	void cannotAccessRepeateableContainingAnnotationValue(
 			@FormatWith(ClassFormatter.class) Class<?> containingAnnotationType, @Cause Throwable e);

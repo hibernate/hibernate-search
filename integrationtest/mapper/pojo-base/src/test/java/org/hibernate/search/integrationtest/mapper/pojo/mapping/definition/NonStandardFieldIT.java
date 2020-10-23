@@ -102,9 +102,7 @@ public class NonStandardFieldIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".value" )
 						.annotationContextAnyParameters( NonStandardField.class )
-						.failure(
-								"Index field name 'invalid.withdot' is invalid: field names cannot contain a dot ('.')"
-						)
+						.failure( "Invalid index field name 'invalid.withdot': field names cannot contain a dot ('.')" )
 						.build()
 				);
 	}
@@ -197,11 +195,13 @@ public class NonStandardFieldIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".property" )
-						.failure( "Bridge '" + GenericTypeBridge.TOSTRING + "' implements ValueBridge<V, F>,"
+						.failure( "Unable to infer index field type for value bridge '"
+								+ GenericTypeBridge.TOSTRING + "':"
+								+ " this bridge implements ValueBridge<V, F>,"
 								+ " but sets the generic type parameter F to 'T'."
-								+ " The field type can only be inferred automatically"
+								+ " The index field type can only be inferred automatically"
 								+ " when this type parameter is set to a raw class."
-								+ " Use a ValueBinder to set the field type explicitly,"
+								+ " Use a ValueBinder to set the index field type explicitly,"
 								+ " or set the type parameter F to a definite, raw type." )
 						.build() );
 	}

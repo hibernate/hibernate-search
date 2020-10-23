@@ -511,8 +511,8 @@ public class ObjectFieldTemplateIT {
 										.matching( LASTNAME_1 ) )
 						)
 		) )
-				.hasMessageContainingAll( "is flattened",
-						"its structure was lost upon indexing and 'nested' features are not available" );
+				.hasMessageContainingAll( "Invalid target field", "'" + objectFieldPath + "' is flattened",
+						"If you want to use a 'nested' predicate on this field, set its structure to 'NESTED'" );
 		assertThatQuery( query(
 				f -> f.bool()
 						.must( f.match().field( objectFieldPath + "." + FIRSTNAME_FIELD )

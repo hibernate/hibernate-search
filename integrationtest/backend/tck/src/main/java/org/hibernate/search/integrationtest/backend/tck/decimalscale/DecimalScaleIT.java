@@ -57,7 +57,8 @@ public class DecimalScaleIT {
 						.setup()
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Impossible to detect a decimal scale to use for this field." );
+				.hasMessageContainingAll( "Invalid index field type: missing decimal scale",
+						"Define the decimal scale explicitly" );
 	}
 
 	@Test
@@ -70,7 +71,8 @@ public class DecimalScaleIT {
 						.setup()
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Impossible to detect a decimal scale to use for this field." );
+				.hasMessageContainingAll( "Invalid index field type: missing decimal scale",
+						"Define the decimal scale explicitly" );
 	}
 
 	@Test
@@ -83,7 +85,8 @@ public class DecimalScaleIT {
 						.setup()
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Positive decimal scale ['3'] is not allowed for BigInteger fields" );
+				.hasMessageContainingAll( "Invalid index field type: decimal scale '3' is positive",
+						"The decimal scale of BigInteger fields must be zero or negative" );
 	}
 
 	@Test

@@ -99,7 +99,7 @@ public class PropertyBindingBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".text" )
 						.annotationContextAnyParameters( PropertyBinding.class )
-						.failure( "The binder reference is empty." )
+						.failure( "Empty binder reference." )
 						.build()
 				);
 	}

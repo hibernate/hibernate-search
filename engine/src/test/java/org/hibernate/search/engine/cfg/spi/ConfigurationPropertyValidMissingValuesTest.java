@@ -172,8 +172,8 @@ public class ConfigurationPropertyValidMissingValuesTest<T> {
 		assertThatThrownBy( () -> property.getAndMap( sourceMock, mappingFunction ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Unable to convert configuration property '" + resolvedKey
-								+ "' with value '" + expectedValue + "':"
+						"Invalid value for configuration property '" + resolvedKey
+								+ "': '" + expectedValue + "'."
 				)
 				.hasMessageContaining( simulatedFailure.getMessage() )
 				.hasCause( simulatedFailure );
@@ -241,8 +241,8 @@ public class ConfigurationPropertyValidMissingValuesTest<T> {
 		assertThatThrownBy( () -> property.getAndMap( sourceMock, mappingFunction ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Unable to convert configuration property '" + resolvedKey
-								+ "' with value '" + expectedValue + "':"
+						"Invalid value for configuration property '" + resolvedKey
+								+ "': '" + expectedValue + "'."
 				)
 				.hasMessageContaining( simulatedFailure.getMessage() )
 				.hasCause( simulatedFailure );

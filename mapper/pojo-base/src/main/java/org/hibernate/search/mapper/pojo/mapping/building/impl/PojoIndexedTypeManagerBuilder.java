@@ -148,7 +148,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 				indexManager,
 				reindexingResolver
 		);
-		log.createdPojoIndexedTypeManager( typeManager );
+		log.indexedTypeManager( typeModel, typeManager );
 
 		typeManagersBuilder.add( typeModel, typeManager );
 

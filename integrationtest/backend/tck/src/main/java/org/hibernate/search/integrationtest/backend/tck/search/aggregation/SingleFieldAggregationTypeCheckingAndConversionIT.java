@@ -209,9 +209,9 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 						.toQuery()
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "scope targeting different indexes" )
-				.hasMessageContaining( mainIndex.name() )
-				.hasMessageContaining( compatibleIndex.name() );
+				.hasMessageContainingAll( "Invalid search aggregation",
+						"You must build the aggregation from a scope targeting indexes ", compatibleIndex.name(),
+						"the given aggregation was built from a scope targeting indexes ", mainIndex.name() );
 
 		// reuse the aggregation instance on a different scope targeting a superset of the original indexes
 		assertThatThrownBy( () ->
@@ -222,9 +222,10 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 						.toQuery()
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "scope targeting different indexes" )
-				.hasMessageContaining( mainIndex.name() )
-				.hasMessageContaining( compatibleIndex.name() );
+				.hasMessageContainingAll( "Invalid search aggregation",
+						"You must build the aggregation from a scope targeting indexes ",
+						mainIndex.name(), compatibleIndex.name(),
+						"the given aggregation was built from a scope targeting indexes ", mainIndex.name() );
 	}
 
 	@Test
@@ -333,8 +334,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 						.aggregation( key1, f -> scenario.setup( f, fieldPath ) )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple aggregations with the same key: " )
-				.hasMessageContaining( "'aggregationName1'" );
+				.hasMessageContaining( "Duplicate aggregation definitions for key: 'aggregationName1'" );
 	}
 
 	@Test

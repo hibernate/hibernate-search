@@ -167,7 +167,7 @@ public class DefaultReindexOnUpdateIT {
 						.typeContext( ParentEntity.class.getName() )
 						.pathContext( ".child<no value extractors>.value<no value extractors>" )
 						.failure(
-								"Cannot find the inverse side of the association on type '" + ParentEntity.class.getName() + "'"
+								"Unable to find the inverse side of the association on type '" + ParentEntity.class.getName() + "'"
 										+ " at path '.child<no value extractors>'",
 								"Hibernate Search needs this information in order to reindex '"
 										+ ParentEntity.class.getName() + "' when '"

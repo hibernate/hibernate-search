@@ -155,7 +155,8 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 			close();
 		}
 		catch (RuntimeException | IOException e) {
-			exceptionToReport.addSuppressed( log.unableToCloseIndexWriterAfterFailures( eventContext, e ) );
+			exceptionToReport.addSuppressed(
+					log.unableToCloseIndexWriterAfterFailures( e.getMessage(), eventContext, e ) );
 		}
 
 		/*
@@ -179,7 +180,7 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 			}
 		}
 		catch (RuntimeException | IOException e) {
-			throw log.unableToCommitIndex( eventContext, e );
+			throw log.unableToCommitIndex( e.getMessage(), eventContext, e );
 		}
 	}
 

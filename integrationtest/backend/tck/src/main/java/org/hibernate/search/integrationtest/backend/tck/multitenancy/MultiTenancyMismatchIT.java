@@ -45,8 +45,9 @@ public class MultiTenancyMismatchIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Index", "requires multi-tenancy but the backend",
-						"does not support it in its current configuration."
+						"Invalid backend configuration",
+						"index '" + index.name() + "'", "requires multi-tenancy",
+						"no multi-tenancy strategy is set"
 				);
 	}
 
@@ -62,8 +63,8 @@ public class MultiTenancyMismatchIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Tenant identifier",
-						"is provided, but multi-tenancy is disabled for this backend."
+						"Invalid tenant identifier: '" + tenant1SessionContext.tenantIdentifier() + "'",
+						"The tenant identifier must be null, because multi-tenancy is disabled for this backend."
 				);
 	}
 
@@ -78,8 +79,8 @@ public class MultiTenancyMismatchIT {
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Tenant identifier",
-						"is provided, but multi-tenancy is disabled for this backend."
+						"Invalid tenant identifier: '" + tenant1SessionContext.tenantIdentifier() + "'",
+						"The tenant identifier must be null, because multi-tenancy is disabled for this backend."
 				);
 	}
 
@@ -94,8 +95,8 @@ public class MultiTenancyMismatchIT {
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Tenant identifier",
-						"is provided, but multi-tenancy is disabled for this backend."
+						"Invalid tenant identifier: '" + tenant1SessionContext.tenantIdentifier() + "'",
+						"The tenant identifier must be null, because multi-tenancy is disabled for this backend."
 				);
 	}
 
@@ -110,8 +111,8 @@ public class MultiTenancyMismatchIT {
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Tenant identifier",
-						"is provided, but multi-tenancy is disabled for this backend."
+						"Invalid tenant identifier: '" + tenant1SessionContext.tenantIdentifier() + "'",
+						"The tenant identifier must be null, because multi-tenancy is disabled for this backend."
 				);
 	}
 

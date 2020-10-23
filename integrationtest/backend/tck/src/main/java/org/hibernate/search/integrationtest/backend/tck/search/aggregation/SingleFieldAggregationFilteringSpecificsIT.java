@@ -95,7 +95,7 @@ public class SingleFieldAggregationFilteringSpecificsIT<F> {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Field '" + fieldPath + "' is not contained in a nested object.",
+						"Invalid aggregation filter: field '" + fieldPath + "' is not contained in a nested object.",
 						"Aggregation filters are only available if the field to aggregate on is contained in a nested object."
 				);
 	}
@@ -113,11 +113,11 @@ public class SingleFieldAggregationFilteringSpecificsIT<F> {
 				() -> scenario.setup( scope.aggregation(), fieldPath, pf -> pf.exists().field( fieldInParentPath ) )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Predicate targets unexpected fields [" + fieldInParentPath + "]",
-						"Only fields that are contained in the nested object with path '" + mainIndex.binding().nestedObject1.relativeFieldName + "'"
-								+ " are allowed here."
-				);
+				.hasMessageContainingAll( "Invalid search predicate",
+						"This predicate targets fields [" + fieldInParentPath + "]",
+						"only fields that are contained in the nested object with path '"
+								+ mainIndex.binding().nestedObject1.relativeFieldName + "'"
+								+ " are allowed here." );
 	}
 
 	@Test
@@ -134,11 +134,11 @@ public class SingleFieldAggregationFilteringSpecificsIT<F> {
 				() -> scenario.setup( scope.aggregation(), fieldPath, pf -> pf.exists().field( fieldInSiblingPath ) )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Predicate targets unexpected fields [" + fieldInSiblingPath + "]",
-						"Only fields that are contained in the nested object with path '" + mainIndex.binding().nestedObject1.relativeFieldName + "'"
-								+ " are allowed here."
-				);
+				.hasMessageContainingAll( "Invalid search predicate",
+						"This predicate targets fields [" + fieldInSiblingPath + "]",
+						"only fields that are contained in the nested object with path '"
+								+ mainIndex.binding().nestedObject1.relativeFieldName + "'"
+								+ " are allowed here." );
 	}
 
 	private static class AbstractObjectBinding {

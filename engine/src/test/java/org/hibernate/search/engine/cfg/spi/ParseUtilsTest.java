@@ -27,9 +27,11 @@ public class ParseUtilsTest {
 		assertThat( geoPoint ).isEqualTo( GeoPoint.of( 12.123, -24.234 ) );
 
 		assertThatThrownBy( () -> ParseUtils.parseGeoPoint( "12.123#-24.234" ) )
-				.hasMessage( "HSEARCH000564: Unable to parse the provided geo-point value: '12.123#-24.234'. The expected format is latitude, longitude." );
+				.hasMessageContainingAll( "Invalid geo-point value: '12.123#-24.234'.",
+						"The expected format is '<latitude as double>, <longitude as double>'." );
 
 		assertThatThrownBy( () -> ParseUtils.parseGeoPoint( "12.123" ) )
-				.hasMessage( "HSEARCH000564: Unable to parse the provided geo-point value: '12.123'. The expected format is latitude, longitude." );
+				.hasMessageContainingAll( "Invalid geo-point value: '12.123'.",
+						"The expected format is '<latitude as double>, <longitude as double>'." );
 	}
 }

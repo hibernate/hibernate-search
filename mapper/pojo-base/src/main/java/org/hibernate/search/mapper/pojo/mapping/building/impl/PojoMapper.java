@@ -380,7 +380,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 					entityName, entityType.typeIdentifier(), entityType.caster(),
 					reindexingResolverOptional.get()
 			);
-			log.createdPojoContainedTypeManager( typeManager );
+			log.containedTypeManager( entityType, typeManager );
 			containedTypeManagerContainerBuilder.add( entityType, typeManager );
 		}
 	}

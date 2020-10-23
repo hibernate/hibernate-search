@@ -57,7 +57,7 @@ public class DistanceSearchSortFilteringSpecificsIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Field '" + fieldPath + "' is not contained in a nested object.",
+						"Invalid sort filter: field '" + fieldPath + "' is not contained in a nested object.",
 						"Sort filters are only available if the field to sort on is contained in a nested object."
 				);
 	}
@@ -72,11 +72,11 @@ public class DistanceSearchSortFilteringSpecificsIT {
 						.filter( pf -> pf.exists().field( fieldInParentPath ) ) )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Predicate targets unexpected fields [" + fieldInParentPath + "]",
-						"Only fields that are contained in the nested object with path '" + index.binding().nestedObject1.relativeFieldName + "'"
-								+ " are allowed here."
-				);
+				.hasMessageContainingAll( "Invalid search predicate",
+						"This predicate targets fields [" + fieldInParentPath + "]",
+						"only fields that are contained in the nested object with path '"
+								+ index.binding().nestedObject1.relativeFieldName + "'"
+								+ " are allowed here." );
 	}
 
 	@Test
@@ -89,11 +89,11 @@ public class DistanceSearchSortFilteringSpecificsIT {
 						.filter( pf -> pf.exists().field( fieldInSiblingPath ) ) )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Predicate targets unexpected fields [" + fieldInSiblingPath + "]",
-						"Only fields that are contained in the nested object with path '" + index.binding().nestedObject1.relativeFieldName + "'"
-								+ " are allowed here."
-				);
+				.hasMessageContainingAll( "Invalid search predicate",
+						"This predicate targets fields [" + fieldInSiblingPath + "]",
+						"only fields that are contained in the nested object with path '"
+								+ index.binding().nestedObject1.relativeFieldName + "'"
+								+ " are allowed here." );
 	}
 
 	private SearchQuery<DocumentReference> matchAllQuery(

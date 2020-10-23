@@ -238,8 +238,8 @@ public class ElasticsearchExtensionIT {
 				.isInstanceOf( SearchException.class )
 				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Document with id 'InvalidId' does not exist in the targeted index",
-						"its match cannot be explained" );
+				.hasMessageContainingAll( "Invalid document identifier: 'InvalidId'",
+						"No such document in index 'main-read'" );
 	}
 
 	@Test
@@ -275,8 +275,8 @@ public class ElasticsearchExtensionIT {
 				() -> query.explain( FIRST_ID )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "explain(Object id) cannot be used when the query targets multiple types" )
-				.hasMessageContaining( "pass one of [" + mainIndex.typeName() + ", " + otherIndex.typeName() + "]" );
+				.hasMessageContainingAll( "Invalid use of explain(Object id) on a query targeting multiple types",
+						"pass one of [" + mainIndex.typeName() + ", " + otherIndex.typeName() + "]" );
 	}
 
 	@Test
@@ -291,10 +291,9 @@ public class ElasticsearchExtensionIT {
 				() -> query.explain( "NotAMappedName", FIRST_ID )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining(
-						"type name 'NotAMappedName' is not among the mapped type targeted by this query: ["
-						+ mainIndex.typeName() + ", " + otherIndex.typeName() + "]"
-				);
+				.hasMessageContainingAll( "Invalid mapped type name: 'NotAMappedName'",
+						"This type is not among the mapped types targeted by this query: ["
+								+ mainIndex.typeName() + ", " + otherIndex.typeName() + "]" );
 	}
 
 	@Test
@@ -1056,8 +1055,8 @@ public class ElasticsearchExtensionIT {
 		assertThatThrownBy( () -> backend.unwrap( String.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Attempt to unwrap an Elasticsearch backend to '" + String.class.getName() + "'",
-						"this backend can only be unwrapped to '" + ElasticsearchBackend.class.getName() + "'"
+						"Invalid requested type for this backend: '" + String.class.getName() + "'",
+						"Elasticsearch backends can only be unwrapped to '" + ElasticsearchBackend.class.getName() + "'"
 				);
 	}
 
@@ -1080,8 +1079,9 @@ public class ElasticsearchExtensionIT {
 		assertThatThrownBy( () -> elasticsearchBackend.client( HttpAsyncClient.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
+						"Invalid requested type for client",
 						HttpAsyncClient.class.getName(),
-						"the client can only be unwrapped to",
+						"The Elasticsearch low-level client can only be unwrapped to",
 						RestClient.class.getName()
 				);
 	}
@@ -1100,8 +1100,9 @@ public class ElasticsearchExtensionIT {
 		assertThatThrownBy( () -> mainIndexFromIntegration.unwrap( String.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Attempt to unwrap an Elasticsearch index manager to '" + String.class.getName() + "'",
-						"this index manager can only be unwrapped to '" + ElasticsearchIndexManager.class.getName() + "'"
+						"Invalid requested type for this index manager: '" + String.class.getName() + "'",
+						"Elasticsearch index managers can only be unwrapped to '"
+								+ ElasticsearchIndexManager.class.getName() + "'"
 				);
 	}
 

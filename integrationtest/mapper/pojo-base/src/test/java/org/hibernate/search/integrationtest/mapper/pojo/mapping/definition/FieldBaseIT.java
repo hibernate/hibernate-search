@@ -66,10 +66,9 @@ public class FieldBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".myProperty" )
-						.failure(
-								"Unable to find a default value bridge implementation for type '"
-										+ Object.class.getName() + "'"
-						)
+						.failure( "No default value bridge implementation for type '"
+										+ Object.class.getName() + "'",
+								"Use a custom bridge" )
 						.build()
 				);
 	}
@@ -91,9 +90,8 @@ public class FieldBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".myProperty" )
-						.failure(
-								"Unable to find a default value bridge implementation for type 'java.lang.Enum'"
-						)
+						.failure( "No default value bridge implementation for type 'java.lang.Enum'",
+								"Use a custom bridge" )
 						.build()
 				);
 	}
@@ -114,9 +112,8 @@ public class FieldBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".myProperty" )
-						.failure(
-								"Unable to find a default value bridge implementation for type 'java.lang.Enum<?>'"
-						)
+						.failure( "No default value bridge implementation for type 'java.lang.Enum<?>'",
+								"Use a custom bridge" )
 						.build()
 				);
 	}
@@ -137,10 +134,9 @@ public class FieldBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".myProperty" )
-						.failure(
-								"Unable to find a default value bridge implementation for type 'java.lang.Enum<"
-										+ EnumForEnumSuperClassTest.class.getName() + ">'"
-						)
+						.failure( "No default value bridge implementation for type 'java.lang.Enum<"
+										+ EnumForEnumSuperClassTest.class.getName() + ">'",
+								"Use a custom bridge" )
 						.build()
 				);
 	}
@@ -228,8 +224,8 @@ public class FieldBaseIT {
 						.pathContext( ".id" )
 						.annotationContextAnyParameters( GenericField.class )
 						.failure(
-								"The field annotation defines both valueBridge and valueBinder."
-										+ " Only one of those can be defined, not both."
+								"Ambiguous value bridge reference: both 'valueBridge' and 'valueBinder' are set."
+										+ " Only one can be set."
 						)
 						.build()
 				);
@@ -249,7 +245,9 @@ public class FieldBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
-						.failure( "Bridge '" + GenericTypeBridge.TOSTRING + "' implements ValueBridge<V, F>,"
+						.failure( "Unable to infer expected value type for value bridge '"
+								+ GenericTypeBridge.TOSTRING + "':"
+								+ " this bridge implements ValueBridge<V, F>,"
 								+ " but sets the generic type parameter V to 'T'."
 								+ " The expected value type can only be inferred automatically"
 								+ " when this type parameter is set to a raw class."

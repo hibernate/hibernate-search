@@ -78,7 +78,7 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 					break;
 				case SUM:
 				default:
-					throw log.cannotComputeSumForDistanceSort( field.eventContext() );
+					throw log.invalidSortModeForDistanceSort( mode, field.eventContext() );
 			}
 		}
 

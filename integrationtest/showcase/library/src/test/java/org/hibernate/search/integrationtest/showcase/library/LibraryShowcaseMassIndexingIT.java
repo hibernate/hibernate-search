@@ -110,8 +110,8 @@ public class LibraryShowcaseMassIndexingIT {
 			int batchSize = 49;
 			indexer.batchSizeToLoadObjects( batchSize );
 			int expectedNumberOfLogs = NUMBER_OF_BOOKS / MASS_INDEXING_MONITOR_LOG_PERIOD;
-			logged.expectEvent( Level.INFO, "documents indexed in" ).times( expectedNumberOfLogs );
-			logged.expectEvent( Level.INFO, "Indexing speed: " ).times( expectedNumberOfLogs );
+			logged.expectEvent( Level.INFO, "Mass indexing progress: indexed", "entities in", "ms" ).times( expectedNumberOfLogs );
+			logged.expectEvent( Level.INFO, "Mass indexing progress:", "%", "documents/second" ).times( expectedNumberOfLogs );
 
 			indexer.startAndWait();
 		}

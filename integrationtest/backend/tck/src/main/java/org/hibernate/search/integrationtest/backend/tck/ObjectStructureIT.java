@@ -173,8 +173,8 @@ public class ObjectStructureIT {
 			scope.predicate().nested().objectField( "flattenedObject" )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "'flattenedObject'", "is flattened",
-						"its structure was lost upon indexing and 'nested' features are not available" );
+				.hasMessageContainingAll( "Invalid target field", "'flattenedObject' is flattened",
+						"If you want to use a 'nested' predicate on this field, set its structure to 'NESTED'" );
 	}
 
 	@Test

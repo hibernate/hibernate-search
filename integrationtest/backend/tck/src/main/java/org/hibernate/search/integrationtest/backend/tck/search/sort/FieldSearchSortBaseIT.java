@@ -172,7 +172,8 @@ public class FieldSearchSortBaseIT<F> {
 		assertThatThrownBy( () -> matchNonEmptyQuery( dataSetForAsc, b -> b.field( fieldPath ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Cannot compute the median across nested documents",
+						"Invalid sort mode: MEDIAN",
+						"This sort mode is not supported for fields in nested documents",
 						fieldPath
 				);
 	}
@@ -190,8 +191,8 @@ public class FieldSearchSortBaseIT<F> {
 		assertThatThrownBy( () -> matchNonEmptyQuery( dataSetForAsc, b -> b.field( fieldPath ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Cannot compute the sum, average or median of a text field",
-						"Only min and max are supported",
+						"Invalid sort mode: " + sortMode.name() + ". This sort mode is not supported for String fields",
+						"Only MIN and MAX are supported",
 						fieldPath
 				);
 	}
@@ -209,8 +210,8 @@ public class FieldSearchSortBaseIT<F> {
 		assertThatThrownBy( () -> matchNonEmptyQuery( dataSetForAsc, b -> b.field( fieldPath ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Cannot compute the sum of a temporal field",
-						"Only min, max, avg and median are supported",
+						"Invalid sort mode: SUM. This sort mode is not supported for temporal fields",
+						"Only MIN, MAX, AVG and MEDIAN are supported",
 						fieldPath
 				);
 	}

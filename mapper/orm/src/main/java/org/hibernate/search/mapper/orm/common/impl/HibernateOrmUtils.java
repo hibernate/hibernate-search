@@ -38,7 +38,7 @@ public final class HibernateOrmUtils {
 			return entityManagerFactory.unwrap( SessionFactoryImplementor.class );
 		}
 		catch (IllegalStateException e) {
-			throw log.hibernateSessionFactoryAccessError( e );
+			throw log.hibernateSessionFactoryAccessError( e.getMessage(), e );
 		}
 	}
 
@@ -47,7 +47,7 @@ public final class HibernateOrmUtils {
 			return entityManager.unwrap( SessionImplementor.class );
 		}
 		catch (IllegalStateException e) {
-			throw log.hibernateSessionAccessError( e );
+			throw log.hibernateSessionAccessError( e.getMessage(), e );
 		}
 	}
 
