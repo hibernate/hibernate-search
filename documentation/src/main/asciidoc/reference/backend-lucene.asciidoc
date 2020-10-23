@@ -594,41 +594,45 @@ If necessary, they can be overridden by defining your own analyzer/normalizer wi
 
 The Lucene backend comes with a series of built-in analyzer:
 
-[cols="l,2,1",options="header"]
-.Built-in analyzers provided out-of-the-box by the Lucene backend
-|====
-|Analyzer name|Description|Is an instance of
-|default|
-It is used by default with <<mapper-orm-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>.
-First, tokenize using the standard tokenizer, which follows Word Break rules from the
+`default`::
+The analyzer used by default with <<mapper-orm-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>.
++
+Default implementation: `org.apache.lucene.analysis.standard.StandardAnalyzer`.
++
+Default behavior: first, tokenize using the standard tokenizer, which follows Word Break rules from the
 Unicode Text Segmentation algorithm, as specified in http://unicode.org/reports/tr29/[Unicode Standard Annex #29].
 Then, lowercase each token.
-|`org.apache.lucene.analysis.standard.StandardAnalyzer`
-|standard|
-First, tokenize using the standard tokenizer, which follows Word Break rules from the
+`standard`::
+Default implementation: `org.apache.lucene.analysis.standard.StandardAnalyzer`.
++
+Default behavior: first, tokenize using the standard tokenizer, which follows Word Break rules from the
 Unicode Text Segmentation algorithm, as specified in http://unicode.org/reports/tr29/[Unicode Standard Annex #29].
 Then, lowercase each token.
-|`org.apache.lucene.analysis.standard.StandardAnalyzer`
-|simple|
-First, tokenize the text into tokens whenever it encounters a character which is not a letter.
+`simple`::
+Default implementation: `org.apache.lucene.analysis.core.SimpleAnalyzer`.
++
+Default behavior: first, tokenize the text into tokens whenever it encounters a character which is not a letter.
 Then, lowercase each token.
-|`org.apache.lucene.analysis.core.SimpleAnalyzer`
-|whitespace|
-Tokenize the text into tokens whenever it encounters a character which is a white space.
+`whitespace`::
+Default implementation: `org.apache.lucene.analysis.core.WhitespaceAnalyzer`.
++
+Default behavior: tokenize the text into tokens whenever it encounters a character which is a white space.
 Do not change the tokens.
-|`org.apache.lucene.analysis.core.WhitespaceAnalyzer`
-|stop|
-First, tokenize the text into tokens whenever it encounters a character which is not a letter.
+`stop`::
+Default implementation: `org.apache.lucene.analysis.core.StopAnalyzer`.
++
+Default behavior: first, tokenize the text into tokens whenever it encounters a character which is not a letter.
 Then, it removes english stop words.
 Finally, lowercase each token.
-|`org.apache.lucene.analysis.core.StopAnalyzer`
-|keyword|
-Do not change in any way the text.
+`keyword`::
+Default implementation: `org.apache.lucene.analysis.core.KeywordAnalyzer`.
++
+Default behavior: do not change in any way the text.
++
 With this analyzer a full text field would behave similarly to a keyword field,
 but with fewer features: no terms aggregations, for example.
++
 Maybe you should consider using a <<mapper-orm-directfieldmapping-annotations-keywordfield,`@KeywordField`>> instead.
-|`org.apache.lucene.analysis.core.KeywordAnalyzer`
-|====
 
 The Lucene backend does not provide any built-in normalizer.
 
