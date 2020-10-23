@@ -752,7 +752,7 @@ only definitions from the specific configurer will be taken into account.
 [[backend-elasticsearch-analysis-builtin]]
 === Built-in analyzers and normalizers
 
-Built-in analyzers and normalizers are available out-of-the box and don't require explicit configuration.
+Built-in analyzers and normalizers are available out-of-the-box and don't require explicit configuration.
 If necessary, they can be overridden by defining your own analyzer/normalizer with the same name.
 
 The Elasticsearch backend comes with several built-in analyzers.
