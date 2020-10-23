@@ -572,7 +572,7 @@ both when indexing (document processing)
 and when searching (query processing).
 
 The Lucene backend comes with some <<backend-lucene-analysis-builtin,default analyzers>>,
-but analysis also be configured explicitly.
+but analysis can also be configured explicitly.
 
 To configure analysis in a Lucene backend, you will need to:
 
