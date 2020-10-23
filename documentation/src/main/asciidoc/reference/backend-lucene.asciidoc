@@ -571,7 +571,7 @@ to only return search hits for the current tenant.
 both when indexing (document processing)
 and when searching (query processing).
 
-The Lucene backend comes with some <<backend-lucene-analysis-builtin,defaults>>,
+The Lucene backend comes with some <<backend-lucene-analysis-builtin,default analyzers>>,
 but analysis also be configured explicitly.
 
 To configure analysis in a Lucene backend, you will need to:
@@ -587,10 +587,10 @@ and the configurer will be able to take advantage of a DSL to define
 See below for examples.
 
 [[backend-lucene-analysis-builtin]]
-=== Built-in analyzers and normalizers
+=== Built-in analyzers
 
-Built-in analyzers and normalizers are available out-of-the-box and don't require explicit configuration.
-If necessary, they can be overridden by defining your own analyzer/normalizer with the same name.
+Built-in analyzers are available out-of-the-box and don't require explicit configuration.
+If necessary, they can be overridden by defining your own analyzer with the same name.
 
 The Lucene backend comes with a series of built-in analyzer:
 
@@ -633,6 +633,9 @@ With this analyzer a full text field would behave similarly to a keyword field,
 but with fewer features: no terms aggregations, for example.
 +
 Consider using a <<mapper-orm-directfieldmapping-annotations-keywordfield,`@KeywordField`>> instead.
+
+[[backend-lucene-analysis-builtin-normalizer]]
+=== Built-in normalizers
 
 The Lucene backend does not provide any built-in normalizer.
 
