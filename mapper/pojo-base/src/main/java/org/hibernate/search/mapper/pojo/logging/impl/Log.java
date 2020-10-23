@@ -254,11 +254,14 @@ public interface Log extends BasicLogger {
 			@FormatWith(PojoModelPathFormatter.class) PojoModelPathValueNode path);
 
 	@Message(id = ID_OFFSET + 31,
-			value = "This property's mapping expects a standard String type for the index field,"
-					+ " but the assigned value bridge or value binder declares a non-standard or non-String type."
-					+ " Make sure to use a compatible bridge or binder."
+			value = "Unable to apply property mapping:"
+					+ " this property mapping must target an index field of standard String type,"
+					+ " but the resolved field type is non-standard or non-String."
+					+ " This generally means you need to use a different field annotation"
+					+ " or to convert property values using a custom ValueBridge or ValueBinder."
+					+ " If you are already using a custom ValueBridge or ValueBinder, check its field type."
 					+ " Details: encountered type DSL step '%1$s',"
-					+ " which does not extend the expected '%2$s' interface."
+					+ " which does not extend the expected interface '%2$s'."
 	)
 	SearchException invalidFieldEncodingForStringFieldMapping(IndexFieldTypeOptionsStep<?, ?> step,
 			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
@@ -330,11 +333,15 @@ public interface Log extends BasicLogger {
 	SearchException inconsistentBridgeDependencyDeclaration();
 
 	@Message(id = ID_OFFSET + 51,
-			value = "This property's mapping expects a scaled number type (BigDecimal or BigInteger) for the index field,"
-					+ " but the assigned value bridge or value binder declares a non-scaled type."
-					+ " Make sure to use a compatible bridge or binder."
+			value = "Unable to apply property mapping:"
+					+ " this property mapping must target an index field"
+					+ " of standard, scaled-number type (BigDecimal or BigInteger),"
+					+ " but the resolved field type is non-standard or non-scaled."
+					+ " This generally means you need to use a different field annotation"
+					+ " or to convert property values using a custom ValueBridge or ValueBinder."
+					+ " If you are already using a custom ValueBridge or ValueBinder, check its field type."
 					+ " Details: encountered type DSL step '%1$s',"
-					+ " which does not extend the expected '%2$s' interface."
+					+ " which does not extend the expected interface '%2$s'."
 	)
 	SearchException invalidFieldEncodingForScaledNumberFieldMapping(IndexFieldTypeOptionsStep<?, ?> step,
 			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
@@ -386,22 +393,23 @@ public interface Log extends BasicLogger {
 	SearchException multipleEntityNames(String entityName, String otherEntityName);
 
 	@Message(id = ID_OFFSET + 65,
-			value = "This property's mapping expects a standard type for the index field,"
-					+ " but the assigned value bridge or value binder declares a non-standard type."
-					+ " Make sure to use a compatible bridge or binder."
+			value = "Unable to apply property mapping:"
+					+ " this property mapping must target an index field of standard type,"
+					+ " but the resolved field type is non-standard."
+					+ " This generally means you need to use a different field annotation"
+					+ " or to convert property values using a custom ValueBridge or ValueBinder."
+					+ " If you are already using a custom ValueBridge or ValueBinder, check its field type."
 					+ " Details: encountered type DSL step '%1$s',"
-					+ " which does not extend the expected '%2$s' interface."
-	)
+					+ " which does not extend the expected interface '%2$s'.")
 	SearchException invalidFieldEncodingForStandardFieldMapping(IndexFieldTypeOptionsStep<?, ?> step,
 			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
 
 	@Message(id = ID_OFFSET + 66,
-			value = "This property's mapping expects a non-standard type for the index field,"
-					+ " but the assigned value bridge or value binder declares a standard type."
+			value = "Unable to apply property mapping: this property mapping must target an index field of non-standard type,"
+					+ " but the resolved field type is standard."
 					+ " Switch to a standard field annotation such as @GenericField."
 					+ " Details: encountered type DSL step '%1$s',"
-					+ " which does extend the '%2$s' interface."
-	)
+					+ " which does extend the interface '%2$s'.")
 	SearchException invalidFieldEncodingForNonStandardFieldMapping(IndexFieldTypeOptionsStep<?, ?> step,
 			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
 
