@@ -58,9 +58,8 @@ public class QueryValidationTest extends SearchTestBase {
 		TermQuery query = new TermQuery( new Term( "foo", "bar" ) );
 		assertThatThrownBy( () -> fullTextSession.createFullTextQuery( query, C.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Some of the given types cannot be targeted.",
-					"These types are not indexed, nor is any of their subtypes: ["
-							+ C.class.getName() + "]" );
+				.hasMessageContainingAll( "Invalid target types: [" + C.class.getName() + "]",
+						"These types are not indexed, nor is any of their subtypes" );
 	}
 
 	@Test
@@ -68,9 +67,8 @@ public class QueryValidationTest extends SearchTestBase {
 		TermQuery query = new TermQuery( new Term( "foo", "bar" ) );
 		assertThatThrownBy( () -> fullTextSession.createFullTextQuery( query, D.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Some of the given types cannot be targeted.",
-					"These types are not indexed, nor is any of their subtypes: ["
-							+ D.class.getName() + "]" );
+				.hasMessageContainingAll( "Invalid target types: [" + D.class.getName() + "]",
+						"These types are not indexed, nor is any of their subtypes" );
 	}
 
 	@Override

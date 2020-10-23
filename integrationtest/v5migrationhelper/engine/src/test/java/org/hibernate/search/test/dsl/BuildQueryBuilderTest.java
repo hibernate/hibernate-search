@@ -46,32 +46,22 @@ public class BuildQueryBuilderTest {
 
 	@Test
 	public void forEntity_configured_notIndexed() {
-		thrown.expectMessage( "Some of the given types cannot be targeted" );
-		thrown.expectMessage( "These types are not indexed, nor is any of their subtypes: ["
-				+ ConfiguredNotIndexed.class.getName() + "]" );
-		thrown.expectMessage( "some of them are indexed-embedded in an indexed entity, "
-				+ "but this is not enough to be targeted (only indexed types can be targeted): ["
-				+ ConfiguredNotIndexed.class.getName() + "]" );
+		thrown.expectMessage( "Invalid target types: [" + ConfiguredNotIndexed.class.getName() + "]" );
+		thrown.expectMessage( "These types are not indexed, nor is any of their subtypes" );
 		sfHolder.getSearchFactory().buildQueryBuilder().forEntity( ConfiguredNotIndexed.class ).get();
 	}
 
 	@Test
 	public void forEntity_notConfigured_indexed() {
-		thrown.expectMessage( "Some of the given types cannot be targeted" );
-		thrown.expectMessage( "These types are not indexed, nor is any of their subtypes: ["
-				+ NotConfiguredIndexed.class.getName() + "]" );
-		thrown.expectMessage( "some of them are indexed-embedded in an indexed entity, "
-				+ "but this is not enough to be targeted (only indexed types can be targeted): []" );
+		thrown.expectMessage( "Invalid target types: [" + NotConfiguredIndexed.class.getName() + "]" );
+		thrown.expectMessage( "These types are not indexed, nor is any of their subtypes" );
 		sfHolder.getSearchFactory().buildQueryBuilder().forEntity( NotConfiguredIndexed.class ).get();
 	}
 
 	@Test
 	public void forEntity_notConfigured_notIndexed() {
-		thrown.expectMessage( "Some of the given types cannot be targeted" );
-		thrown.expectMessage( "These types are not indexed, nor is any of their subtypes: ["
-				+ NotConfiguredNotIndexed.class.getName() + "]" );
-		thrown.expectMessage( "some of them are indexed-embedded in an indexed entity, "
-				+ "but this is not enough to be targeted (only indexed types can be targeted): []" );
+		thrown.expectMessage( "Invalid target types: [" + NotConfiguredNotIndexed.class.getName() + "]" );
+		thrown.expectMessage( "These types are not indexed, nor is any of their subtypes" );
 		thrown.expectMessage( NotConfiguredNotIndexed.class.getSimpleName() );
 		sfHolder.getSearchFactory().buildQueryBuilder().forEntity( NotConfiguredNotIndexed.class ).get();
 	}

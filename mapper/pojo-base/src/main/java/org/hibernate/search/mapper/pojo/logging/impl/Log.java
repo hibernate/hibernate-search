@@ -97,13 +97,10 @@ public interface Log extends BasicLogger {
 			@FormatWith(PojoModelPathFormatter.class) PojoModelPathValueNode path);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 234,
-			value = "Some of the given types cannot be targeted."
-					+ " These types are not indexed, nor is any of their subtypes: %1$s."
-					+ " Note that some of them are indexed-embedded in an indexed entity, but this is not enough to be targeted"
-					+ " (only indexed types can be targeted): %2$s."
+			value = "Invalid target types: %1$s"
+					+ " These types are not indexed, nor is any of their subtypes."
 	)
-	SearchException invalidScopeTarget(Collection<PojoRawTypeIdentifier<?>> nonIndexedTypes,
-			Collection<PojoRawTypeIdentifier<?>> containedTypes);
+	SearchException invalidScopeTarget(Collection<PojoRawTypeIdentifier<?>> nonIndexedTypes);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 295, value = "String '$1%s' cannot be parsed into a '$2%s'")
 	SearchException parseException(String text, @FormatWith(ClassFormatter.class) Class<?> readerClass, @Cause Exception e);

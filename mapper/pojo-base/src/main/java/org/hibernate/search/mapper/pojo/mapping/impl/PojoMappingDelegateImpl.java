@@ -72,7 +72,6 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 		return PojoScopeDelegateImpl.create(
 				mappingContext,
 				indexedTypeManagers,
-				containedTypeManagers,
 				targetedTypes,
 				indexedTypeExtendedContextProvider
 		);
@@ -91,7 +90,6 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 		return Optional.of( PojoScopeDelegateImpl.create(
 				mappingContext,
 				indexedTypeManagers,
-				containedTypeManagers,
 				typeIdentifiers,
 				indexedTypeExtendedContextProvider
 		) );

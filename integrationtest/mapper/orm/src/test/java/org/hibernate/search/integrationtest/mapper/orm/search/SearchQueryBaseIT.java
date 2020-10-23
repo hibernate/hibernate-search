@@ -247,10 +247,8 @@ public class SearchQueryBaseIT {
 			Class<?> invalidClass = String.class;
 
 			assertThatThrownBy( () -> searchSession.scope( invalidClass ) )
-					.hasMessageContainingAll(
-							"Some of the given types cannot be targeted",
-							"These types are not indexed, nor is any of their subtypes: [" + invalidClass.getName() + "]"
-					);
+					.hasMessageContainingAll( "Invalid target types: [" + invalidClass.getName() + "]",
+							"These types are not indexed, nor is any of their subtypes" );
 		} );
 	}
 

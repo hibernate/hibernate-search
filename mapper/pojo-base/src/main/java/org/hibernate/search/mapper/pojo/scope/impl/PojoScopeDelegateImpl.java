@@ -43,7 +43,6 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 	public static <R, E, E2, C> PojoScopeDelegate<R, E2, C> create(
 			PojoScopeMappingContext mappingContext,
 			PojoScopeIndexedTypeContextProvider indexedTypeContextProvider,
-			PojoScopeContainedTypeContextProvider containedTypeContextProvider,
 			Collection<? extends PojoRawTypeIdentifier<? extends E>> targetedTypes,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
 		if ( targetedTypes.isEmpty() ) {
@@ -52,7 +51,6 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 
 		Set<PojoScopeIndexedTypeContext<?, ? extends E>> targetedTypeContexts = new LinkedHashSet<>();
 		Set<PojoRawTypeIdentifier<?>> nonIndexedTypes = new LinkedHashSet<>();
-		Set<PojoRawTypeIdentifier<?>> nonIndexedButContainedTypes = new LinkedHashSet<>();
 		for ( PojoRawTypeIdentifier<? extends E> targetedType : targetedTypes ) {
 			Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>>> targetedTypeManagersForType =
 					indexedTypeContextProvider.getAllBySuperType( targetedType );
@@ -62,14 +60,11 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 			else {
 				// Remember this to produce a clear error message
 				nonIndexedTypes.add( targetedType );
-				if ( containedTypeContextProvider.getByExactType( targetedType ).isPresent() ) {
-					nonIndexedButContainedTypes.add( targetedType );
-				}
 			}
 		}
 
-		if ( !nonIndexedTypes.isEmpty() || !nonIndexedButContainedTypes.isEmpty() ) {
-			throw log.invalidScopeTarget( nonIndexedTypes, nonIndexedButContainedTypes );
+		if ( !nonIndexedTypes.isEmpty() ) {
+			throw log.invalidScopeTarget( nonIndexedTypes );
 		}
 
 		Set<C> targetedTypeExtendedContexts =

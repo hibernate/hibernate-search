@@ -47,10 +47,8 @@ public class QueryUnindexedEntityTest extends SearchTestBase {
 			fail();
 		}
 		catch (SearchException e) {
-			assertThat( e ).hasMessageContainingAll(
-					"Some of the given types cannot be targeted.",
-					"These types are not indexed, nor is any of their subtypes: [java.lang.Object]"
-			);
+			assertThat( e ).hasMessageContainingAll( "Invalid target types: [java.lang.Object]",
+					"These types are not indexed, nor is any of their subtypes" );
 		}
 
 		tx.rollback();
