@@ -750,10 +750,10 @@ only definitions from the specific configurer will be taken into account.
 ====
 
 [[backend-elasticsearch-analysis-builtin]]
-=== Built-in analyzers and normalizers
+=== Built-in analyzers
 
-Built-in analyzers and normalizers are available out-of-the-box and don't require explicit configuration.
-If necessary, they can be overridden by defining your own analyzer/normalizer with the same name.
+Built-in analyzers are available out-of-the-box and don't require explicit configuration.
+If necessary, they can be overridden by defining your own analyzer with the same name.
 
 The Elasticsearch backend comes with several built-in analyzers.
 The exact list depends on the version of Elasticsearch and can be found
@@ -762,6 +762,9 @@ link:{elasticsearchDocUrl}/analysis-analyzers.html[here].
 One important built-in analyzer is the one named `default`:
 it is used by default with <<mapper-orm-directfieldmapping-annotations-fulltextfield,`@FullTextField`>>.
 Unless overridden explicitly, this analyzer uses a `standard` tokenizer and a `lowercase` filter.
+
+[[backend-elasticsearch-analysis-builtin-normalizer]]
+=== Built-in normalizers
 
 The Elasticsearch backend does not provide any built-in normalizer.
 
