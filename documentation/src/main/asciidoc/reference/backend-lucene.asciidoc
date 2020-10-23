@@ -611,28 +611,28 @@ Then, lowercase each token.
 `simple`::
 Default implementation: `org.apache.lucene.analysis.core.SimpleAnalyzer`.
 +
-Default behavior: first, tokenize the text into tokens whenever it encounters a character which is not a letter.
+Default behavior: first, split the text at non-letter characters.
 Then, lowercase each token.
 `whitespace`::
 Default implementation: `org.apache.lucene.analysis.core.WhitespaceAnalyzer`.
 +
-Default behavior: tokenize the text into tokens whenever it encounters a character which is a white space.
+Default behavior: split the text at whitespace characters.
 Do not change the tokens.
 `stop`::
 Default implementation: `org.apache.lucene.analysis.core.StopAnalyzer`.
 +
-Default behavior: first, tokenize the text into tokens whenever it encounters a character which is not a letter.
+Default behavior: first, split the text at non-letter characters.
 Then, lowercase each token.
-Finally, remove english stop words.
+Finally, remove English stop words.
 `keyword`::
 Default implementation: `org.apache.lucene.analysis.core.KeywordAnalyzer`.
 +
-Default behavior: do not change in any way the text.
+Default behavior: do not change the text in any way.
 +
 With this analyzer a full text field would behave similarly to a keyword field,
 but with fewer features: no terms aggregations, for example.
 +
-Maybe you should consider using a <<mapper-orm-directfieldmapping-annotations-keywordfield,`@KeywordField`>> instead.
+Consider using a <<mapper-orm-directfieldmapping-annotations-keywordfield,`@KeywordField`>> instead.
 
 The Lucene backend does not provide any built-in normalizer.
 
