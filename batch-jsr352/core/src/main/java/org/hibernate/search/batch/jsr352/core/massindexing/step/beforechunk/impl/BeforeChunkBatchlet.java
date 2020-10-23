@@ -68,7 +68,7 @@ public class BeforeChunkBatchlet extends AbstractBatchlet {
 			workspace.flush();
 
 			if ( mergeSegmentsAfterPurge ) {
-				log.startOptimization();
+				log.startMergeSegments();
 				workspace.mergeSegments();
 			}
 		}

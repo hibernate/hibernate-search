@@ -169,7 +169,7 @@ public class PojoAssociationPathInverterTest {
 		assertThatThrownBy( () -> inverter.invertPath( inverseSideEntityTypeMock, boundPathToInvert ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Found an infinite embedded recursion involving path '"
+						"Infinite embedded recursion involving path '"
 								+ PojoModelPath.builder()
 										.property( inverseSideProperty1Name ).value( ContainerExtractorPath.noExtractors() )
 										.property( inverseSideProperty2Name ).value( ContainerExtractorPath.noExtractors() )

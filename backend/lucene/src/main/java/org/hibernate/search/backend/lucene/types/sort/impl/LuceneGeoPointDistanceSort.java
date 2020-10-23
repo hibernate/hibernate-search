@@ -60,7 +60,7 @@ public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort 
 					break;
 				case SUM:
 				default:
-					throw log.cannotComputeSumForDistanceSort( getEventContext() );
+					throw log.invalidSortModeForDistanceSort( mode, getEventContext() );
 			}
 		}
 

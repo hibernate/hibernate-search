@@ -416,9 +416,9 @@ public class SearchProjectionIT {
 						.where( f -> f.matchAll() )
 						.toQuery() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "scope targeting different indexes" )
-				.hasMessageContaining( mainIndex.name() )
-				.hasMessageContaining( otherIndex.name() );
+				.hasMessageContainingAll( "Invalid search projection",
+						"You must build the projection from a scope targeting indexes ", otherIndex.name(),
+						"the given projection was built from a scope targeting ", mainIndex.name() );
 
 		// reuse the same projection instance on a different scope,
 		// targeting different indexes
@@ -428,9 +428,10 @@ public class SearchProjectionIT {
 						.where( f -> f.matchAll() )
 						.toQuery() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "scope targeting different indexes" )
-				.hasMessageContaining( mainIndex.name() )
-				.hasMessageContaining( otherIndex.name() );
+				.hasMessageContainingAll( "Invalid search projection",
+						"You must build the projection from a scope targeting indexes ",
+						mainIndex.name(), otherIndex.name(),
+						"the given projection was built from a scope targeting ", mainIndex.name() );
 	}
 
 	@Test

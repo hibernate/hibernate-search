@@ -45,10 +45,9 @@ public class ElasticsearchIndexNamingBaseIT {
 				.hasMessageMatching(
 						FailureReportUtils.buildFailureReportPattern()
 								.indexContext( index1.name() )
-								.failure(
-										"Write alias and read alias must be different,"
-												+ " but were set to the same value: 'alias-conflicting'."
-								)
+								.failure( "Invalid Elasticsearch index layout",
+										"write alias and read alias are set to the same value: 'alias-conflicting'",
+										"The write alias and read alias must be different" )
 								.build()
 				);
 	}
@@ -109,7 +108,8 @@ public class ElasticsearchIndexNamingBaseIT {
 						FailureReportUtils.buildFailureReportPattern()
 								.failure(
 										"Conflicting index names: Hibernate Search indexes '" + index1.name()
-												+ "' and '" + index2.name() + "' both target the name or alias '"
+												+ "' and '" + index2.name()
+												+ "' both target the Elasticsearch index name or alias '"
 												+ conflictingName + "'"
 								)
 								.build()

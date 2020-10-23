@@ -179,7 +179,7 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 				case AVG:
 				case MEDIAN:
 				default:
-					throw log.cannotComputeSumOrAvgOrMedianForStringField( getEventContext() );
+					throw log.invalidSortModeForStringField( mode, getEventContext() );
 			}
 		}
 
@@ -227,7 +227,7 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 					super.mode( mode );
 					break;
 				case SUM:
-					throw log.cannotComputeSumForTemporalField( getEventContext() );
+					throw log.invalidSortModeForTemporalField( mode, getEventContext() );
 			}
 		}
 	}

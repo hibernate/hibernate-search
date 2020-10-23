@@ -181,7 +181,8 @@ public class DistanceSearchSortBaseIT {
 		assertThatThrownBy( () -> simpleQuery( dataSetForAsc, b -> b.distance( fieldPath, CENTER_POINT ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Cannot compute the median across nested documents",
+						"Invalid sort mode: MEDIAN",
+						"This sort mode is not supported for fields in nested documents",
 						fieldPath
 				);
 	}
@@ -199,8 +200,8 @@ public class DistanceSearchSortBaseIT {
 		assertThatThrownBy( () -> simpleQuery( dataSetForAsc, b -> b.distance( fieldPath, CENTER_POINT ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Cannot compute the sum for a distance sort",
-						"Only min, max, avg and median are supported",
+						"Invalid sort mode: SUM. This sort mode is not supported for a distance sort",
+						"Only MIN, MAX, AVG and MEDIAN are supported",
 						fieldPath
 				);
 	}

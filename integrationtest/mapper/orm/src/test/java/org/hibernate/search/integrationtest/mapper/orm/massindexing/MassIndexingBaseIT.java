@@ -263,7 +263,7 @@ public class MassIndexingBaseIT {
 			searchSession.massIndexer();
 		} )
 				.isInstanceOf( SearchException.class )
-				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
+				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session is closed." );
 	}
 
 	@Test
@@ -277,7 +277,7 @@ public class MassIndexingBaseIT {
 			searchSession.massIndexer();
 		} )
 				.isInstanceOf( SearchException.class )
-				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
+				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session is closed." );
 	}
 
 	private void initData() {

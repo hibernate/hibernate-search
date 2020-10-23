@@ -84,7 +84,7 @@ public class ToHibernateOrmSessionIT {
 			Search.session( closedSession );
 		} )
 				.isInstanceOf( SearchException.class )
-				.hasMessage( "HSEARCH800016: Error trying to access Hibernate ORM session." );
+				.hasMessageContaining( "Unable to access Hibernate ORM session" );
 	}
 
 	@Test
@@ -99,7 +99,7 @@ public class ToHibernateOrmSessionIT {
 
 		assertThatThrownBy( () -> createSimpleQuery( searchSession ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
+				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session is closed." );
 	}
 
 	@Test
@@ -111,7 +111,7 @@ public class ToHibernateOrmSessionIT {
 
 		assertThatThrownBy( () -> createSimpleQuery( searchSession ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
+				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session is closed." );
 	}
 
 	@Test
@@ -131,7 +131,7 @@ public class ToHibernateOrmSessionIT {
 
 		assertThatThrownBy( () -> query.fetchAllHits() )
 				.isInstanceOf( SearchException.class )
-				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
+				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session is closed." );
 	}
 
 	private SearchQuery<IndexedEntity> createSimpleQuery(SearchSession searchSession) {

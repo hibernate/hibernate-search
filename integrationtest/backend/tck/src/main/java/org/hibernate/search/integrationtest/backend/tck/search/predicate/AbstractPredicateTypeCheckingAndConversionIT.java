@@ -68,7 +68,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		SearchPredicateFactory f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path(), invalidTypeParam() ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unable to convert DSL parameter: " )
+				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
 				.hasCauseInstanceOf( ClassCastException.class )
 				.satisfies( FailureReportUtils.hasContext(
@@ -89,7 +89,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		SearchPredicateFactory f = index.createScope().predicate();
 		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path(), invalidTypeParam() ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unable to convert DSL parameter: " )
+				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
 				.hasCauseInstanceOf( ClassCastException.class )
 				.satisfies( FailureReportUtils.hasContext(
@@ -112,7 +112,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path(),invalidTypeParam(),
 				ValueConvert.YES ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unable to convert DSL parameter: " )
+				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
 				.hasCauseInstanceOf( ClassCastException.class )
 				.satisfies( FailureReportUtils.hasContext(
@@ -135,7 +135,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path(), invalidTypeParam(),
 				ValueConvert.YES ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unable to convert DSL parameter: " )
+				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
 				.hasCauseInstanceOf( ClassCastException.class )
 				.satisfies( FailureReportUtils.hasContext(
@@ -158,7 +158,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		assertThatThrownBy( () -> predicate( f, defaultDslConverterField0Path(), invalidTypeParam(),
 				ValueConvert.NO ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unable to convert DSL parameter: " )
+				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
 				.hasCauseInstanceOf( ClassCastException.class )
 				.satisfies( FailureReportUtils.hasContext(
@@ -181,7 +181,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		assertThatThrownBy( () -> predicate( f, customDslConverterField0Path(), invalidTypeParam(),
 				ValueConvert.NO ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unable to convert DSL parameter: " )
+				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
 				.hasCauseInstanceOf( ClassCastException.class )
 				.satisfies( FailureReportUtils.hasContext(

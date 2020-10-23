@@ -54,10 +54,8 @@ public class DocumentIdBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
-						.failure(
-								"Unable to find a default identifier bridge implementation for type '"
-										+ Object.class.getName() + "'"
-						)
+						.failure( "No default identifier bridge implementation for type '" + Object.class.getName() + "'",
+								"Use a custom bridge" )
 						.build()
 				);
 	}
@@ -77,9 +75,8 @@ public class DocumentIdBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
-						.failure(
-								"Unable to find a default identifier bridge implementation for type 'java.lang.Enum'"
-						)
+						.failure( "No default identifier bridge implementation for type 'java.lang.Enum'",
+								"Use a custom bridge" )
 						.build()
 				);
 	}
@@ -98,9 +95,8 @@ public class DocumentIdBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
-						.failure(
-								"Unable to find a default identifier bridge implementation for type 'java.lang.Enum<?>'"
-						)
+						.failure( "No default identifier bridge implementation for type 'java.lang.Enum<?>'",
+								"Use a custom bridge" )
 						.build()
 				);
 	}
@@ -119,10 +115,9 @@ public class DocumentIdBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
-						.failure(
-								"Unable to find a default identifier bridge implementation for type 'java.lang.Enum<"
-										+ EnumForEnumSuperClassTest.class.getName() + ">'"
-						)
+						.failure( "No default identifier bridge implementation for type 'java.lang.Enum<"
+										+ EnumForEnumSuperClassTest.class.getName() + ">'",
+								"Use a custom bridge" )
 						.build()
 				);
 	}
@@ -244,8 +239,8 @@ public class DocumentIdBaseIT {
 						.pathContext( ".id" )
 						.annotationContextAnyParameters( DocumentId.class )
 						.failure(
-								"@DocumentId defines both identifierBridge and identifierBinder."
-										+ " Only one of those can be defined, not both."
+								"Ambiguous identifier bridge reference: both 'identifierBridge' and 'identifierBinder' are set."
+										+ " Only one can be set."
 						)
 						.build()
 				);
@@ -264,7 +259,9 @@ public class DocumentIdBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
-						.failure( "Bridge '" + GenericTypeBridge.TOSTRING + "' implements IdentifierBridge<I>,"
+						.failure( "Unable to infer expected identifier type for identifier bridge '"
+								+ GenericTypeBridge.TOSTRING + "':"
+								+ " this bridge implements IdentifierBridge<I>,"
 								+ " but sets the generic type parameter I to 'T'."
 								+ " The expected identifier type can only be inferred automatically"
 								+ " when this type parameter is set to a raw class."
@@ -307,10 +304,11 @@ public class DocumentIdBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
-								"There isn't any explicit document ID mapping for indexed type '"
+								"Unable to define a document identifier for indexed type '"
 										+ IndexedEntity.class.getName() + "'",
-								"the entity ID cannot be used as a default because"
-										+ " the property representing the entity ID cannot be found"
+								"The property representing the entity identifier is unknown",
+								"Define the document identifier explicitly by annotating"
+										+ " a property whose values are unique with @DocumentId"
 						)
 						.build()
 				);

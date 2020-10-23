@@ -236,7 +236,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		void onBulkWorkComplete(Object ignored, Throwable throwable) {
 			if ( throwable != null ) {
 				// The bulk work failed; mark the bulked work as failed too
-				fail( log.elasticsearchFailedBecauseOfBulkFailure( throwable ) );
+				fail( log.elasticsearchFailedBecauseOfBulkFailure( throwable.getMessage(), throwable ) );
 			}
 		}
 

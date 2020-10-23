@@ -199,9 +199,7 @@ public class IndexedEmbeddedBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".level1" )
 						.annotationContextAnyParameters( IndexedEmbedded.class )
-						.failure(
-								"Index field name 'invalid.withdot' is invalid: field names cannot contain a dot ('.')"
-						)
+						.failure( "Invalid index field name 'invalid.withdot': field names cannot contain a dot ('.')" )
 						.build()
 				);
 	}
@@ -233,10 +231,9 @@ public class IndexedEmbeddedBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".level1" )
 						.annotationContextAnyParameters( IndexedEmbedded.class )
-						.failure(
-								"Cannot set both the name and prefix in @IndexedEmbedded",
-								"Name was 'somename', prefix was 'someprefix.'."
-						)
+						.failure( "Ambiguous @IndexedEmbedded name: both 'name' and 'prefix' are set.",
+								"Only one can be set.",
+								"Name is 'somename', prefix is 'someprefix.'" )
 						.build()
 				);
 	}
@@ -608,7 +605,7 @@ public class IndexedEmbeddedBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
-								"IndexedEmbedded defines includePaths filters that do not match anything",
+								"An @IndexedEmbedded defines includePaths filters that do not match anything",
 								"Non-matching includePaths filters:",
 								CollectionHelper.asLinkedHashSet( "nonMatchingPath" ).toString(),
 								"Encountered field paths:",
@@ -1313,8 +1310,8 @@ public class IndexedEmbeddedBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".invalid" )
-						.failure( "Type '" + String.class.getName() +
-								"' cannot be indexed-embedded, because no index mapping (@GenericField, @FullTextField, ...) is defined for that type." )
+						.failure( "Unable to index-embed type '" + String.class.getName() + "': no index mapping"
+								+ " (@GenericField, @FullTextField, custom bridges, ...) is defined for that type." )
 						.build()
 				);
 	}
@@ -1351,8 +1348,8 @@ public class IndexedEmbeddedBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".invalid" )
-						.failure( "Type '" + EmptyNested.class.getName() +
-								"' cannot be indexed-embedded, because no index mapping (@GenericField, @FullTextField, ...) is defined for that type." )
+						.failure( "Unable to index-embed type '" + EmptyNested.class.getName() + "': no index mapping"
+								+ " (@GenericField, @FullTextField, custom bridges, ...) is defined for that type." )
 						.build()
 				);
 	}

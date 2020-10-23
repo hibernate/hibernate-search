@@ -433,7 +433,7 @@ public class RangePredicateBaseIT {
 					.range( Range.between( null, null ) ) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
-							"Invalid value",
+							"Invalid range",
 							"at least one bound in range predicates must be non-null",
 							fieldPath()
 					);

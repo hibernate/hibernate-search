@@ -35,7 +35,7 @@ public class AddEntryWork extends AbstractSingleDocumentIndexingWork {
 		}
 		catch (IOException e) {
 			throw log.unableToIndexEntry(
-					tenantId, entityTypeName, entityIdentifier, context.getEventContext(), e
+					tenantId, entityTypeName, entityIdentifier, e.getMessage(), context.getEventContext(), e
 			);
 		}
 	}

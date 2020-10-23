@@ -57,9 +57,15 @@ public class IndexSchemaElementTypeIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.failure(
-								"Cannot apply an analyzer on a sortable field",
-								"Use a normalizer instead",
-								"'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name + "'"
+								"Invalid index field type",
+								"both analyzer '" + DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name
+										+ "' and sorts are enabled",
+								"Sorts are not supported on analyzed fields",
+								"If you need an analyzer simply to transform the text (lowercasing, ...)"
+										+ " without splitting it into tokens, use a normalizer instead",
+								"If you need an actual analyzer (with tokenization), define two separate fields:"
+										+ " one with an analyzer that is not sortable,"
+										+ " and one with a normalizer that is sortable"
 						)
 						.build() );
 	}
@@ -84,9 +90,16 @@ public class IndexSchemaElementTypeIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.failure(
-								"Cannot apply an analyzer on an aggregable field",
-								"Use a normalizer instead",
-								"'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name + "'"
+								"Invalid index field type",
+								"both analyzer '"
+										+ DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name
+										+ "' and aggregations are enabled",
+								"Aggregations are not supported on analyzed fields",
+								"If you need an analyzer simply to transform the text (lowercasing, ...)"
+										+ " without splitting it into tokens, use a normalizer instead.",
+								"If you need an actual analyzer (with tokenization), define two separate fields:"
+										+ " one with an analyzer that is not aggregable,"
+										+ " and one with a normalizer that is aggregable."
 						)
 						.build() );
 	}
@@ -111,9 +124,10 @@ public class IndexSchemaElementTypeIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.failure(
-								"Cannot apply both an analyzer and a normalizer",
+								"Invalid index field type",
 								"'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name + "'",
-								"'" + DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name + "'"
+								"'" + DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name + "'",
+								"Either an analyzer or a normalizer can be assigned, but not both"
 						)
 						.build() );
 	}
@@ -137,8 +151,10 @@ public class IndexSchemaElementTypeIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.failure(
-								"Cannot apply a search analyzer if an analyzer has not been defined on the same field",
-								"'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name + "'"
+								"Invalid index field type: search analyzer '"
+										+ DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name + "'"
+										+ " is assigned to this type, but the indexing analyzer is missing.",
+								"Assign an indexing analyzer and a search analyzer, or remove the search analyzer"
 						)
 						.build() );
 	}

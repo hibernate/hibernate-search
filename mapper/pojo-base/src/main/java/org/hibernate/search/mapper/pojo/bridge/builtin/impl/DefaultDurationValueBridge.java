@@ -53,7 +53,7 @@ public final class DefaultDurationValueBridge implements ValueBridge<Duration, L
 			return value.toNanos();
 		}
 		catch (ArithmeticException ae) {
-			throw log.valueTooLargeForConversionException( Duration.class, value, ae );
+			throw log.valueTooLargeForConversionException( Long.class, value, ae );
 		}
 	}
 }

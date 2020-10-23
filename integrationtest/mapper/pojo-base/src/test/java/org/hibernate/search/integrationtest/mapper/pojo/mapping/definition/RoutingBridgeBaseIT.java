@@ -122,9 +122,13 @@ public class RoutingBridgeBaseIT {
 
 			assertThatThrownBy( session::close )
 					.isInstanceOf( SearchException.class )
-					.hasMessageContainingAll( "Routing bridge 'NoCurrentRouteRoutingBridge' did not define any current route",
-							"Exactly one current route must be defined",
-							"or you can call notIndexed() to explicitly indicate no route is necessary" );
+					.hasMessageContainingAll(
+							"Incorrect routing bridge implementation:"
+									+ " routing bridge 'NoCurrentRouteRoutingBridge' did not define any current route.",
+							"In the implementation of RoutingBridge.route(...)",
+							"define exactly one current route by calling 'routes.addRoute()',"
+									+ " or explicitly indicate indexing is not required by calling 'routes.notIndexed()'."
+					);
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -178,9 +182,13 @@ public class RoutingBridgeBaseIT {
 
 			assertThatThrownBy( session::close )
 					.isInstanceOf( SearchException.class )
-					.hasMessageContainingAll( "Routing bridge 'NoPreviousRouteRoutingBridge' did not define any previous route",
-							"At least one previous route must be defined",
-							"or you can call notIndexed() to explicitly indicate no route was necessary" );
+					.hasMessageContainingAll(
+							"Incorrect routing bridge implementation:"
+									+ " routing bridge 'NoPreviousRouteRoutingBridge' did not define any previous route.",
+							"In the implementation of RoutingBridge.previousRoutes(...)",
+							"define at least one previous route by calling 'routes.addRoute()' at least once,"
+									+ " or explicitly indicate no prior indexing was performed by calling 'routes.notIndexed()'"
+					);
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -189,9 +197,13 @@ public class RoutingBridgeBaseIT {
 
 			assertThatThrownBy( session::close )
 					.isInstanceOf( SearchException.class )
-					.hasMessageContainingAll( "Routing bridge 'NoPreviousRouteRoutingBridge' did not define any previous route",
-							"At least one previous route must be defined",
-							"or you can call notIndexed() to explicitly indicate no route was necessary" );
+					.hasMessageContainingAll(
+							"Incorrect routing bridge implementation:"
+									+ " routing bridge 'NoPreviousRouteRoutingBridge' did not define any previous route.",
+							"In the implementation of RoutingBridge.previousRoutes(...)",
+							"define at least one previous route by calling 'routes.addRoute()' at least once,"
+									+ " or explicitly indicate no prior indexing was performed by calling 'routes.notIndexed()'"
+					);
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -246,8 +258,12 @@ public class RoutingBridgeBaseIT {
 
 			assertThatThrownBy( session::close )
 					.isInstanceOf( SearchException.class )
-					.hasMessageContainingAll( "Routing bridge 'TwoCurrentRoutesRoutingBridge' defined multiple current routes",
-							"At most one current route must be defined" );
+					.hasMessageContainingAll(
+							"Incorrect routing bridge implementation:"
+									+ " routing bridge 'TwoCurrentRoutesRoutingBridge' defined multiple current routes.",
+							"In the implementation of RoutingBridge.route(...)",
+							"define at most one current route by calling 'routes.addRoute()' at most once."
+					);
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -355,10 +371,8 @@ public class RoutingBridgeBaseIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.failure(
-								"Requested incompatible type for '.stringProperty<no value extractors>'",
-								"'" + Integer.class.getName() + "'"
-						)
+						.failure( "'.stringProperty<no value extractors>' cannot be assigned to '"
+								+ Integer.class.getName() + "'" )
 						.build()
 				);
 	}
@@ -471,8 +485,8 @@ public class RoutingBridgeBaseIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.failure( "Unable to find a readable property 'doesNotExist' on type '" + IndexedEntity.class.getName()
-								+ "'" )
+						.failure( "No readable property named 'doesNotExist' on type '"
+								+ IndexedEntity.class.getName() + "'" )
 						.build() );
 	}
 
@@ -497,9 +511,10 @@ public class RoutingBridgeBaseIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.failure( "The binder did not declare any dependency to the entity model during binding."
-								+ " Declare dependencies using context.dependencies().use(...) or,"
-								+ " if the bridge really does not depend on the entity model, context.dependencies().useRootOnly()" )
+						.failure( "Incorrect binder implementation",
+								"the binder did not declare any dependency to the entity model during binding.",
+								" Declare dependencies using context.dependencies().use(...) or,"
+										+ " if the bridge really does not depend on the entity model, context.dependencies().useRootOnly()" )
 						.build() );
 	}
 
@@ -527,8 +542,9 @@ public class RoutingBridgeBaseIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.failure( "The binder called context.dependencies().useRootOnly() during binding,"
-								+ " but also declared extra dependencies to the entity model." )
+						.failure( "Incorrect binder implementation",
+								"the binder called context.dependencies().useRootOnly() during binding,"
+										+ " but also declared extra dependencies to the entity model." )
 						.build() );
 	}
 

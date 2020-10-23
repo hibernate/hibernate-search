@@ -243,8 +243,8 @@ public class ConfigurationPropertyBeanReferenceTest {
 		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
 		assertThatThrownBy( () -> property.get( sourceMock ) )
 				.hasMessageContaining(
-						"Unable to convert configuration property '" + resolvedKey
-								+ "' with value '" + invalidTypeValue + "':"
+						"Invalid value for configuration property '" + resolvedKey
+								+ "': '" + invalidTypeValue + "'."
 				)
 				.hasMessageContaining(
 						"Invalid BeanReference value: expected an instance of '" + StubBean.class.getName()
@@ -275,8 +275,8 @@ public class ConfigurationPropertyBeanReferenceTest {
 		)
 				.hasCause( simulatedFailure )
 				.hasMessageContaining(
-						"Unable to convert configuration property '" + resolvedKey
-								+ "' with value '" + propertyValue + "':"
+						"Invalid value for configuration property '" + resolvedKey
+								+ "': '" + propertyValue + "'."
 				);
 		verifyNoOtherSourceInteractionsAndReset();
 	}
@@ -308,8 +308,8 @@ public class ConfigurationPropertyBeanReferenceTest {
 		)
 				.hasCause( simulatedFailure )
 				.hasMessageContaining(
-						"Unable to convert configuration property '" + resolvedKey
-								+ "' with value '" + propertyValue + "':"
+						"Invalid value for configuration property '" + resolvedKey
+								+ "': '" + propertyValue + "'."
 				);
 		verify( bean1Mock ).close(); // Expect the first bean holder to be closed
 		verifyNoMoreInteractions( bean1Mock );

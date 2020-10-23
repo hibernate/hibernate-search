@@ -181,7 +181,7 @@ public final class ParseUtils {
 			return ZoneOffset.of( value );
 		}
 		catch (DateTimeException e) {
-			throw log.invalidStringForType( value, ZoneOffset.class, e );
+			throw log.invalidStringForType( value, ZoneOffset.class, e.getMessage(), e );
 		}
 	}
 
@@ -190,7 +190,7 @@ public final class ParseUtils {
 			return Period.parse( value );
 		}
 		catch (DateTimeParseException e) {
-			throw log.invalidStringForType( value, Period.class, e );
+			throw log.invalidStringForType( value, Period.class, e.getMessage(), e );
 		}
 	}
 
@@ -199,7 +199,7 @@ public final class ParseUtils {
 			return Duration.parse( value );
 		}
 		catch (DateTimeParseException e) {
-			throw log.invalidStringForType( value, Duration.class, e );
+			throw log.invalidStringForType( value, Duration.class, e.getMessage(), e );
 		}
 	}
 

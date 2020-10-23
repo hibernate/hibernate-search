@@ -211,10 +211,8 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 					body );
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.failedToParseElasticsearchResponse(
-					response.getStatusLine().getStatusCode(),
-					response.getStatusLine().getReasonPhrase(),
-					e );
+			throw log.failedToParseElasticsearchResponse( response.getStatusLine().getStatusCode(),
+					response.getStatusLine().getReasonPhrase(), e.getMessage(), e );
 		}
 	}
 

@@ -178,7 +178,7 @@ public class ConfiguredBeanResolverTest {
 		when( beanProviderMock.forType( Type1.class ) ).thenThrow( providerType1NotFound );
 		assertThatThrownBy( () -> beanResolver.resolve( Type1.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Cannot resolve bean reference to type '" + Type1.class.getName() + "'",
+				.hasMessageContainingAll( "Unable to resolve bean reference to type '" + Type1.class.getName() + "'",
 						" cannot find Type1" )
 				.hasCauseReference( providerType1NotFound );
 		verifyNoOtherInteractionsAndReset();
@@ -189,7 +189,7 @@ public class ConfiguredBeanResolverTest {
 				.thenThrow( providerType2NotFound );
 		assertThatThrownBy( () -> beanResolver.resolve( Type2.class, "someName" ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Cannot resolve bean reference to type '" + Type2.class.getName() + "' and name 'someName'",
+				.hasMessageContainingAll( "Unable to resolve bean reference to type '" + Type2.class.getName() + "' and name 'someName'",
 						"cannot find Type2#someName" )
 				.hasCauseReference( providerType2NotFound );
 		verifyNoOtherInteractionsAndReset();
@@ -257,7 +257,7 @@ public class ConfiguredBeanResolverTest {
 		when( beanReference1Mock.resolve( any() ) ).thenThrow( configuredBeanType1Failed );
 		assertThatThrownBy( () -> beanResolver.resolve( Type1.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Cannot resolve bean reference to type '" + Type1.class.getName() + "'",
+				.hasMessageContainingAll( "Unable to resolve bean reference to type '" + Type1.class.getName() + "'",
 						"cannot find Type1", "configured bean failed for Type1" )
 				.hasCauseReference( providerType1NotFound )
 				.hasSuppressedException( configuredBeanType1Failed );
@@ -271,7 +271,7 @@ public class ConfiguredBeanResolverTest {
 		when( beanReference2Mock.resolve( any() ) ).thenThrow( configuredBeanType2Failed );
 		assertThatThrownBy( () -> beanResolver.resolve( Type2.class, "someName" ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Cannot resolve bean reference to type '" + Type2.class.getName() + "' and name 'someName'",
+				.hasMessageContainingAll( "Unable to resolve bean reference to type '" + Type2.class.getName() + "' and name 'someName'",
 						"provider cannot find Type2#someName",
 						"configured bean failed for Type2#someName" )
 				.hasCauseReference( providerType2NotFound )
@@ -305,9 +305,10 @@ public class ConfiguredBeanResolverTest {
 				.thenThrow( new SearchException( "cannot find Type1" ) );
 		assertThatThrownBy( () -> beanResolver.resolve( Type1.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Cannot resolve bean reference to type '" + Type1.class.getName() + "'",
+				.hasMessageContainingAll( "Unable to resolve bean reference to type '" + Type1.class.getName() + "'",
 						"cannot find Type1",
-						"Multiple beans registered for type '" + Type1.class.getName() + "'" );
+						"Ambiguous bean reference to type '" + Type1.class.getName() + "'",
+						"multiple beans are explicitly defined for this type" );
 		verifyNoOtherInteractionsAndReset();
 	}
 

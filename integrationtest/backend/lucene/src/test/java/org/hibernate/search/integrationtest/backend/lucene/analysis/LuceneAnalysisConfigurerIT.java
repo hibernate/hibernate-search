@@ -26,7 +26,7 @@ import org.apache.lucene.analysis.core.WhitespaceTokenizerFactory;
 
 public class LuceneAnalysisConfigurerIT {
 
-	private static final String ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX = "Error while applying analysis configuration";
+	private static final String ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX = "Unable to apply analysis configuration";
 
 	@Rule
 	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -41,9 +41,8 @@ public class LuceneAnalysisConfigurerIT {
 						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
-								"Unable to convert configuration property 'hibernate.search.backend."
-										+ LuceneBackendSettings.ANALYSIS_CONFIGURER + "'",
-								"'foobar'",
+								"Invalid value for configuration property 'hibernate.search.backend."
+										+ LuceneBackendSettings.ANALYSIS_CONFIGURER + "': 'foobar'",
 								"Unable to find " + LuceneAnalysisConfigurer.class.getName() + " implementation class: foobar"
 						)
 						.build()
@@ -90,8 +89,7 @@ public class LuceneAnalysisConfigurerIT {
 						.defaultBackendContext()
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
-								"Multiple parameters with the same name",
-								"'parameterName'",
+								"Ambiguous value for parameter 'parameterName'",
 								"'value1'",
 								"'value2'"
 						)

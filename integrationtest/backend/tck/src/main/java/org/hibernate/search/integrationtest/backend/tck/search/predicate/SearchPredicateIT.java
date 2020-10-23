@@ -135,9 +135,9 @@ public class SearchPredicateIT {
 						.where( predicate )
 						.toQuery() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "scope targeting different indexes" )
-				.hasMessageContaining( mainIndex.name() )
-				.hasMessageContaining( otherIndex.name() );
+				.hasMessageContainingAll( "Invalid search predicate",
+						"You must build the predicate from a scope targeting indexes ", otherIndex.name(),
+						"the given predicate was built from a scope targeting ", mainIndex.name() );
 
 		// reuse the same predicate instance on a different scope,
 		// targeting different indexes
@@ -146,9 +146,10 @@ public class SearchPredicateIT {
 						.where( predicate )
 						.toQuery() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "scope targeting different indexes" )
-				.hasMessageContaining( mainIndex.name() )
-				.hasMessageContaining( otherIndex.name() );
+				.hasMessageContainingAll( "Invalid search predicate",
+						"You must build the predicate from a scope targeting indexes ",
+						mainIndex.name(), otherIndex.name(),
+						"the given predicate was built from a scope targeting ", mainIndex.name() );
 	}
 
 	@Test
@@ -212,9 +213,9 @@ public class SearchPredicateIT {
 						.where( f -> f.bool().must( predicate ) )
 						.toQuery() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "scope targeting different indexes" )
-				.hasMessageContaining( mainIndex.name() )
-				.hasMessageContaining( otherIndex.name() );
+				.hasMessageContainingAll( "Invalid search predicate",
+						"You must build the predicate from a scope targeting indexes ", otherIndex.name(),
+						"the given predicate was built from a scope targeting ", mainIndex.name() );
 
 		// reuse the same predicate instance on a different scope,
 		// targeting different indexes
@@ -223,9 +224,10 @@ public class SearchPredicateIT {
 						.where( f -> f.bool().must( predicate ) )
 						.toQuery() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "scope targeting different indexes" )
-				.hasMessageContaining( mainIndex.name() )
-				.hasMessageContaining( otherIndex.name() );
+				.hasMessageContainingAll( "Invalid search predicate",
+						"You must build the predicate from a scope targeting indexes ",
+						mainIndex.name(), otherIndex.name(),
+						"the given predicate was built from a scope targeting ", mainIndex.name() );
 	}
 
 	@Test

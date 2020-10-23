@@ -210,9 +210,8 @@ public class TypeBridgeBaseIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.failure(
-								"Unable to find a readable property 'doesNotExist' on type '" + IndexedEntity.class.getName() + "'"
-						)
+						.failure( "No readable property named 'doesNotExist' on type '"
+								+ IndexedEntity.class.getName() + "'" )
 						.build()
 				);
 	}
@@ -331,9 +330,8 @@ public class TypeBridgeBaseIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.failure(
-								"Unable to find a readable property 'doesNotExist' on type '" + ContainedEntity.class.getName() + "'"
-						)
+						.failure( "No readable property named 'doesNotExist' on type '"
+								+ ContainedEntity.class.getName() + "'" )
 						.build()
 				);
 	}
@@ -368,9 +366,8 @@ public class TypeBridgeBaseIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.failure(
-								"Unable to find a readable property 'doesNotExist' on type '" + ContainedEntity.class.getName() + "'"
-						)
+						.failure( "No readable property named 'doesNotExist' on type '"
+								+ ContainedEntity.class.getName() + "'" )
 						.build()
 				);
 	}
@@ -412,7 +409,7 @@ public class TypeBridgeBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".notEntity<no value extractors>" )
 						.failure(
-								"'fromOtherEntity' can only be used when the bridged element has an entity type,"
+								"Invalid use of 'fromOtherEntity': this method can only be used when the bridged element has an entity type,"
 								+ " but the bridged element has type '" + NotEntity.class.getName() + "',"
 								+ " which is not an entity type."
 						)
@@ -450,8 +447,8 @@ public class TypeBridgeBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
-								"'fromOtherEntity' expects an entity type; "
-								+ "type '" + NotEntity.class.getName() + "' is not an entity type."
+								"Invalid type passed to 'fromOtherEntity': the type must be an entity type",
+								"Type '" + NotEntity.class.getName() + "' is not an entity type."
 						)
 						.build()
 				);
@@ -522,7 +519,8 @@ public class TypeBridgeBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
-								"The binder did not declare any dependency to the entity model during binding."
+								"Incorrect binder implementation",
+								"the binder did not declare any dependency to the entity model during binding."
 								+ " Declare dependencies using context.dependencies().use(...) or,"
 								+ " if the bridge really does not depend on the entity model, context.dependencies().useRootOnly()"
 						)
@@ -557,7 +555,8 @@ public class TypeBridgeBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
-								"The binder called context.dependencies().useRootOnly() during binding,"
+								"Incorrect binder implementation",
+								"the binder called context.dependencies().useRootOnly() during binding,"
 										+ " but also declared extra dependencies to the entity model."
 						)
 						.build()
@@ -869,10 +868,8 @@ public class TypeBridgeBaseIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.failure(
-								"Requested incompatible type for '.stringProperty<no value extractors>'",
-								"'" + Integer.class.getName() + "'"
-						)
+						.failure( "'.stringProperty<no value extractors>' cannot be assigned to '"
+								+ Integer.class.getName() + "'" )
 						.build()
 				);
 	}

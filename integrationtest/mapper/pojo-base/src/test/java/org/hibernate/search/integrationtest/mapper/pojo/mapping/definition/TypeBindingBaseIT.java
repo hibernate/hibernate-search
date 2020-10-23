@@ -97,7 +97,7 @@ public class TypeBindingBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.annotationContextAnyParameters( TypeBinding.class )
-						.failure( "The binder reference is empty." )
+						.failure( "Empty binder reference." )
 						.build()
 				);
 	}

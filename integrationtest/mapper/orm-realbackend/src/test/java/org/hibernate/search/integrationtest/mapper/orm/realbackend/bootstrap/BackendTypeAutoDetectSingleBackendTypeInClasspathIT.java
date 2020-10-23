@@ -35,7 +35,8 @@ public class BackendTypeAutoDetectSingleBackendTypeInClasspathIT {
 	public void backendType_autoDetect() {
 		if ( IS_IDE ) {
 			throw new IllegalStateException( "Tests seem to be running from an IDE."
-					+ " This test cannot run from the IDE as it requires a very specific classpath (with a single backend type)." );
+					+ " This test cannot run from the IDE"
+					+ " as it requires a very specific classpath (with a single backend type)." );
 		}
 
 		SessionFactory sessionFactory = ormSetupHelper.start()

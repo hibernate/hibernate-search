@@ -214,11 +214,11 @@ public class NestedPredicateSpecificsIT {
 						)
 				) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Predicate targets unexpected fields [" + fieldInParentPath + "]",
-						"Only fields that are contained in the nested object with path '" + objectFieldPath + "'"
-								+ " are allowed here."
-				);
+				.hasMessageContainingAll( "Invalid search predicate",
+						"This predicate targets fields [" + fieldInParentPath + "]",
+						"only fields that are contained in the nested object with path '"
+								+ objectFieldPath + "'"
+								+ " are allowed here." );
 	}
 
 	@Test
@@ -240,11 +240,11 @@ public class NestedPredicateSpecificsIT {
 						)
 				) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Predicate targets unexpected fields [" + fieldInSiblingPath + "]",
-						"Only fields that are contained in the nested object with path '" + objectFieldPath + "'"
-								+ " are allowed here."
-				);
+				.hasMessageContainingAll( "Invalid search predicate",
+						"This predicate targets fields [" + fieldInSiblingPath + "]",
+						"only fields that are contained in the nested object with path '"
+								+ objectFieldPath + "'"
+								+ " are allowed here." );
 	}
 
 	private static void initData() {

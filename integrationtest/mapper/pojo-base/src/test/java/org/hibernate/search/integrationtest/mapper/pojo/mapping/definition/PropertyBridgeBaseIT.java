@@ -226,9 +226,8 @@ public class PropertyBridgeBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".contained" )
-						.failure(
-								"Unable to find a readable property 'doesNotExist' on type '" + Contained.class.getName() + "'"
-						)
+						.failure( "No readable property named 'doesNotExist' on type '"
+								+ Contained.class.getName() + "'" )
 						.build()
 				);
 	}
@@ -265,12 +264,9 @@ public class PropertyBridgeBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".contained" )
-						.failure(
-								"Cannot apply the requested container value extractor '"
+						.failure( "Invalid container extractor for type '" + Contained.class.getName() + "': '"
 								+ BuiltinContainerExtractors.COLLECTION
-								+ "' (implementation class: '" + CollectionElementExtractor.class.getName()
-								+ "') to type '" + Contained.class.getName() + "'"
-						)
+								+ "' (implementation class: '" + CollectionElementExtractor.class.getName() + "')" )
 						.build()
 				);
 	}
@@ -405,10 +401,8 @@ public class PropertyBridgeBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class.getName() )
 						.pathContext( ".child" )
-						.failure(
-								"Unable to find a readable property 'doesNotExist' on type '"
-								+ PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class.getName() + "'"
-						)
+						.failure( "No readable property named 'doesNotExist' on type '"
+								+ PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class.getName() + "'" )
 						.build()
 				);
 	}
@@ -439,9 +433,8 @@ public class PropertyBridgeBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class.getName() )
 						.pathContext( ".child" )
-						.failure(
-								"Unable to find a readable property 'doesNotExist' on type '" + PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class.getName() + "'"
-						)
+						.failure( "No readable property named 'doesNotExist' on type '"
+								+ PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class.getName() + "'" )
 						.build()
 				);
 	}
@@ -473,12 +466,10 @@ public class PropertyBridgeBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class.getName() )
 						.pathContext( ".child" )
-						.failure(
-								"Cannot apply the requested container value extractor '"
+						.failure( "Invalid container extractor for type '"
+								+ PropertyBridgeExplicitIndexingClasses.ContainedLevel1Entity.class.getName() + "': '"
 								+ BuiltinContainerExtractors.COLLECTION
-								+ "' (implementation class: '" + CollectionElementExtractor.class.getName()
-								+ "') to type '" + PropertyBridgeExplicitIndexingClasses.ContainedLevel1Entity.class.getName() + "'"
-						)
+								+ "' (implementation class: '" + CollectionElementExtractor.class.getName() + "')" )
 						.build()
 				);
 	}
@@ -511,7 +502,7 @@ public class PropertyBridgeBaseIT {
 						.typeContext( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class.getName() )
 						.pathContext( ".notEntity" )
 						.failure(
-								"'fromOtherEntity' can only be used when the bridged element has an entity type,"
+								"Invalid use of 'fromOtherEntity': this method can only be used when the bridged element has an entity type,"
 								+ " but the bridged element has type '" + PropertyBridgeExplicitIndexingClasses.NotEntity.class.getName() + "',"
 								+ " which is not an entity type."
 						)
@@ -547,9 +538,9 @@ public class PropertyBridgeBaseIT {
 						.typeContext( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class.getName() )
 						.pathContext( ".child" )
 						.failure(
-								"'fromOtherEntity' expects an entity type; "
-								+ "type '" + PropertyBridgeExplicitIndexingClasses.NotEntity.class.getName()
-								+ "' is not an entity type."
+								"Invalid type passed to 'fromOtherEntity': the type must be an entity type",
+								"Type '" + PropertyBridgeExplicitIndexingClasses.NotEntity.class.getName()
+										+ "' is not an entity type."
 						)
 						.build()
 				);
@@ -619,7 +610,8 @@ public class PropertyBridgeBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".contained" )
 						.failure(
-								"The binder did not declare any dependency to the entity model during binding."
+								"Incorrect binder implementation",
+								"the binder did not declare any dependency to the entity model during binding."
 										+ " Declare dependencies using context.dependencies().use(...) or,"
 										+ " if the bridge really does not depend on the entity model, context.dependencies().useRootOnly()"
 						)
@@ -659,7 +651,8 @@ public class PropertyBridgeBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".contained" )
 						.failure(
-								"The binder called context.dependencies().useRootOnly() during binding,"
+								"Incorrect binder implementation",
+								"the binder called context.dependencies().useRootOnly() during binding,"
 										+ " but also declared extra dependencies to the entity model."
 						)
 						.build()
@@ -942,10 +935,8 @@ public class PropertyBridgeBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".stringProperty" )
-						.failure(
-								"Requested incompatible type for '.stringProperty<no value extractors>'",
-								"'" + Integer.class.getName() + "'"
-						)
+						.failure( "'.stringProperty<no value extractors>' cannot be assigned to '"
+								+ Integer.class.getName() + "'" )
 						.build()
 				);
 	}

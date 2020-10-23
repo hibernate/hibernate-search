@@ -512,8 +512,9 @@ public class IndexedBaseIT {
 
 		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntityA.class, IndexedEntityB.class ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Trying to target the same index 'indexName' from different types",
-						"IndexedEntityA", "IndexedEntityB" );
+				.hasMessageContaining( "Multiple entity types mapped to index 'indexName'",
+						"IndexedEntityA", "IndexedEntityB",
+						"Each indexed type must be mapped to its own, dedicated index" );
 	}
 
 	public static class StaticCounterRoutingBinder implements RoutingBinder {

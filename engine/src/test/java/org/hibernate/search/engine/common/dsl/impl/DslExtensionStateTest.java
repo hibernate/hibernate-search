@@ -251,7 +251,7 @@ public class DslExtensionStateTest {
 		assertThatThrownBy( () -> state.ifSupported( new MyExtension(), Optional.empty(), contextFunction ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Cannot call ifSupported(...) after orElse(...)"
+						"Invalid call of ifSupported(...) after orElse(...)"
 				);
 		verifyNoOtherInteractionsAndReset();
 	}

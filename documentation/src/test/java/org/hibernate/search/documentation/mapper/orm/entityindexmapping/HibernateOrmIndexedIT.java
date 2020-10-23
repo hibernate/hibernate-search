@@ -115,7 +115,8 @@ public class HibernateOrmIndexedIT {
 				} )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "A multi-index scope cannot span multiple " );
+				.hasMessageContaining( "Invalid multi-index scope",
+						"a scope cannot span multiple " );
 	}
 
 	private void initData() {

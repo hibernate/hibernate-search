@@ -109,7 +109,7 @@ public class ProvidedIdIT {
 					() -> session.indexingPlan().add( entity1 )
 			)
 					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "the provided identifier was null" );
+					.hasMessageContaining( "The entity identifier must not be null" );
 		}
 	}
 

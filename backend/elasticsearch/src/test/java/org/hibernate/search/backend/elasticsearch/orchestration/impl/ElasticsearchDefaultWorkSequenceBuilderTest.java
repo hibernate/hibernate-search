@@ -365,15 +365,15 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest {
 		assertThatFuture( sequenceBuilderBulkResultFuture ).isFailed( exception );
 		assertThatFuture( work1FutureFromSequenceBuilder ).getFailure()
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "operation failed due to the failure of the call to the bulk REST API" )
+				.hasMessageContaining( "Call to the bulk REST API failed" )
 				.hasCauseReference( exception );
 		assertThatFuture( work2FutureFromSequenceBuilder ).getFailure()
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "operation failed due to the failure of the call to the bulk REST API" )
+				.hasMessageContaining( "Call to the bulk REST API failed" )
 				.hasCauseReference( exception );
 		assertThatFuture( work3FutureFromSequenceBuilder ).getFailure()
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "operation failed due to the failure of the call to the bulk REST API" )
+				.hasMessageContaining( "Call to the bulk REST API failed" )
 				.hasCauseReference( exception );
 		assertThatFuture( work4FutureFromSequenceBuilder ).isPending();
 		assertThatFuture( sequenceFuture ).isPending();
@@ -447,15 +447,15 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest {
 		assertThatFuture( sequenceBuilderBulkResultFuture ).isFailed( exception );
 		assertThatFuture( work1FutureFromSequenceBuilder ).getFailure()
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "operation failed due to the failure of the call to the bulk REST API" )
+				.hasMessageContaining( "Call to the bulk REST API failed" )
 				.hasCauseReference( exception );
 		assertThatFuture( work2FutureFromSequenceBuilder ).getFailure()
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "operation failed due to the failure of the call to the bulk REST API" )
+				.hasMessageContaining( "Call to the bulk REST API failed" )
 				.hasCauseReference( exception );
 		assertThatFuture( work3FutureFromSequenceBuilder ).getFailure()
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "operation failed due to the failure of the call to the bulk REST API" )
+				.hasMessageContaining( "Call to the bulk REST API failed" )
 				.hasCauseReference( exception );
 		assertThatFuture( work4FutureFromSequenceBuilder ).isPending();
 		assertThatFuture( sequenceFuture ).isPending();

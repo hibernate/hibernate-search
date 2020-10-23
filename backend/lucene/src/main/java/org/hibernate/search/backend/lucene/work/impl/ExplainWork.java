@@ -51,7 +51,8 @@ class ExplainWork implements ReadWork<Explanation> {
 			return searcher.explain( indexSearcher, luceneDocId );
 		}
 		catch (IOException e) {
-			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(), context.getEventContext(), e );
+			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(), e.getMessage(),
+					context.getEventContext(), e );
 		}
 	}
 

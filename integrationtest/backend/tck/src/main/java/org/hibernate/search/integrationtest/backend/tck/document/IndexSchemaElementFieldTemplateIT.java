@@ -50,7 +50,7 @@ public class IndexSchemaElementFieldTemplateIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "Field template name 'null' is invalid: field template names cannot be null or empty" )
+						.failure( "Invalid index field template name 'null': field template names cannot be null or empty" )
 						.build() );
 
 		assertThatThrownBy(
@@ -65,7 +65,7 @@ public class IndexSchemaElementFieldTemplateIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
-						.failure( "Field template name 'null' is invalid: field template names cannot be null or empty" )
+						.failure( "Invalid index field template name 'null': field template names cannot be null or empty" )
 						.build() );
 
 		assertThatThrownBy(
@@ -79,7 +79,7 @@ public class IndexSchemaElementFieldTemplateIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "Field template name 'null' is invalid: field template names cannot be null or empty" )
+						.failure( "Invalid index field template name 'null': field template names cannot be null or empty" )
 						.build() );
 
 		assertThatThrownBy(
@@ -93,7 +93,7 @@ public class IndexSchemaElementFieldTemplateIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
-						.failure( "Field template name 'null' is invalid: field template names cannot be null or empty" )
+						.failure( "Invalid index field template name 'null': field template names cannot be null or empty" )
 						.build() );
 	}
 
@@ -110,7 +110,7 @@ public class IndexSchemaElementFieldTemplateIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "Field template name '' is invalid: field template names cannot be null or empty" )
+						.failure( "Invalid index field template name '': field template names cannot be null or empty" )
 						.build() );
 
 		assertThatThrownBy(
@@ -124,7 +124,7 @@ public class IndexSchemaElementFieldTemplateIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
-						.failure( "Field template name '' is invalid: field template names cannot be null or empty" )
+						.failure( "Invalid index field template name '': field template names cannot be null or empty" )
 						.build() );
 
 		assertThatThrownBy(
@@ -138,7 +138,7 @@ public class IndexSchemaElementFieldTemplateIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "Field template name '' is invalid: field template names cannot be null or empty" )
+						.failure( "Invalid index field template name '': field template names cannot be null or empty" )
 						.build() );
 
 		assertThatThrownBy(
@@ -152,7 +152,7 @@ public class IndexSchemaElementFieldTemplateIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
-						.failure( "Field template name '' is invalid: field template names cannot be null or empty" )
+						.failure( "Invalid index field template name '': field template names cannot be null or empty" )
 						.build() );
 	}
 
@@ -170,7 +170,7 @@ public class IndexSchemaElementFieldTemplateIT {
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure(
-								"Field template name 'foo.bar' is invalid: field template names cannot contain a dot ('.')."
+								"Invalid index field template name 'foo.bar': field template names cannot contain a dot ('.')."
 						)
 						.build() );
 
@@ -186,7 +186,7 @@ public class IndexSchemaElementFieldTemplateIT {
 						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
 						.failure(
-								"Field template name 'foo.bar' is invalid: field template names cannot contain a dot ('.')."
+								"Invalid index field template name 'foo.bar': field template names cannot contain a dot ('.')."
 						)
 						.build() );
 
@@ -202,7 +202,7 @@ public class IndexSchemaElementFieldTemplateIT {
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure(
-								"Field template name 'foo.bar' is invalid: field template names cannot contain a dot ('.')."
+								"Invalid index field template name 'foo.bar': field template names cannot contain a dot ('.')."
 						)
 						.build() );
 
@@ -218,7 +218,7 @@ public class IndexSchemaElementFieldTemplateIT {
 						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
 						.failure(
-								"Field template name 'foo.bar' is invalid: field template names cannot contain a dot ('.')."
+								"Invalid index field template name 'foo.bar': field template names cannot contain a dot ('.')."
 						)
 						.build() );
 	}
@@ -237,7 +237,7 @@ public class IndexSchemaElementFieldTemplateIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "field template 'field1' was added twice" )
+						.failure( "Duplicate index field template definition: 'field1'" )
 						.build() );
 
 		assertThatThrownBy(
@@ -254,7 +254,7 @@ public class IndexSchemaElementFieldTemplateIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "object1.object2" )
-						.failure( "field template 'field1' was added twice" )
+						.failure( "Duplicate index field template definition: 'field1'" )
 						.build() );
 	}
 
@@ -272,7 +272,7 @@ public class IndexSchemaElementFieldTemplateIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "field template 'field1' was added twice" )
+						.failure( "Duplicate index field template definition: 'field1'" )
 						.build() );
 
 		assertThatThrownBy(
@@ -289,7 +289,7 @@ public class IndexSchemaElementFieldTemplateIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "object1.object2" )
-						.failure( "field template 'field1' was added twice" )
+						.failure( "Duplicate index field template definition: 'field1'" )
 						.build() );
 	}
 
@@ -307,7 +307,7 @@ public class IndexSchemaElementFieldTemplateIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "field template 'field1' was added twice" )
+						.failure( "Duplicate index field template definition: 'field1'" )
 						.build() );
 
 		assertThatThrownBy(
@@ -324,7 +324,7 @@ public class IndexSchemaElementFieldTemplateIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "object1.object2" )
-						.failure( "field template 'field1' was added twice" )
+						.failure( "Duplicate index field template definition: 'field1'" )
 						.build() );
 	}
 

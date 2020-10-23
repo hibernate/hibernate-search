@@ -70,13 +70,12 @@ public class ElasticsearchIndexSchemaManagerInspectionAliasesIT {
 				this::setupAndInspectIndex
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining(
-						"Index aliases [" + defaultWriteAlias( index.name() ) + ", " + defaultReadAlias( index.name() )
-								+ "] are assigned to a single Hibernate Search index, "
-								+ " but they are already defined in Elasticsearch and point to multiple distinct indexes: "
-								+ "[" + defaultPrimaryName( index.name() ) + ", "
-								+ defaultPrimaryName( "otherIndex" ) + "]"
-				);
+				.hasMessageContainingAll( "Invalid Elasticsearch index layout",
+						"index aliases [" + defaultWriteAlias( index.name() ) + ", " + defaultReadAlias( index.name() )
+								+ "] resolve to multiple distinct indexes ["
+								+ defaultPrimaryName( index.name() ) + ", "
+								+ defaultPrimaryName( "otherIndex" ) + "]",
+						"These aliases must resolve to a single index" );
 	}
 
 	@Test
@@ -92,13 +91,12 @@ public class ElasticsearchIndexSchemaManagerInspectionAliasesIT {
 				this::setupAndInspectIndex
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining(
-							"Index aliases [" + defaultWriteAlias( index.name() ) + ", " + defaultReadAlias( index.name() )
-									+ "] are assigned to a single Hibernate Search index, "
-									+ " but they are already defined in Elasticsearch and point to multiple distinct indexes: "
-									+ "[" + defaultPrimaryName( index.name() ) + ", "
-									+ defaultPrimaryName( "otherIndex" ) + "]"
-				);
+				.hasMessageContainingAll( "Invalid Elasticsearch index layout",
+						"index aliases [" + defaultWriteAlias( index.name() ) + ", " + defaultReadAlias( index.name() )
+								+ "] resolve to multiple distinct indexes ["
+								+ defaultPrimaryName( index.name() ) + ", "
+								+ defaultPrimaryName( "otherIndex" ) + "]",
+						"These aliases must resolve to a single index" );
 	}
 
 	private void setupAndInspectIndex() {

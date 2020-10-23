@@ -169,7 +169,10 @@ public class SearchQueryScrollIT {
 					assertThatThrownBy( () -> total.hitCount() )
 							.isInstanceOf( SearchException.class )
 							.hasMessageContaining(
-									"Trying to get the exact total hit count, but it is a lower bound." );
+									"Unable to provide the exact total hit count: only a lower-bound approximation is available.",
+									"This is generally the result of setting query options such as a timeout or the total hit count threshold",
+									"unset these options, or retrieve the lower-bound hit count approximation"
+							);
 				}
 				else {
 					// The next chunks *may* have an exact count,
@@ -187,7 +190,10 @@ public class SearchQueryScrollIT {
 						assertThatThrownBy( () -> total.hitCount() )
 								.isInstanceOf( SearchException.class )
 								.hasMessageContaining(
-										"Trying to get the exact total hit count, but it is a lower bound." );
+										"Unable to provide the exact total hit count: only a lower-bound approximation is available.",
+										"This is generally the result of setting query options such as a timeout or the total hit count threshold",
+										"unset these options, or retrieve the lower-bound hit count approximation"
+								);
 					}
 				}
 			}

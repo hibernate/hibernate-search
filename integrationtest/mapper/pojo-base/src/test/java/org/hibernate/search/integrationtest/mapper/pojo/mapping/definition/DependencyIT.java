@@ -107,10 +107,8 @@ public class DependencyIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".derived<no value extractors>" )
-						.failure(
-								"Unable to find a readable property 'invalidPath' on type '"
-										+ IndexedEntity.class.getName() + "'"
-						)
+						.failure( "No readable property named 'invalidPath' on type '"
+								+ IndexedEntity.class.getName() + "'" )
 						.build()
 				);
 	}
@@ -165,10 +163,10 @@ public class DependencyIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( DerivedFromCycle.A.class.getName() )
 						.pathContext( ".derivedA<no value extractors>" )
-						.failure(
-								"Found a cyclic dependency between derived properties"
-										+ " involving path '.derivedA<no value extractors>'"
-										+ " on type '" + DerivedFromCycle.A.class.getName() + "'",
+						.failure( "Unable to resolve dependencies of a derived property:"
+								+ " there is a cyclic dependency involving path '.derivedA<no value extractors>'"
+								+ " on type '" + DerivedFromCycle.A.class.getName() + "'",
+								"A derived properties cannot be marked as derived from itself",
 								"you should consider disabling automatic reindexing"
 						)
 						.build()
@@ -205,7 +203,7 @@ public class DependencyIT {
 						.typeContext( CannotInvertAssociation.A.class.getName() )
 						.pathContext( ".embedded<no value extractors>.b<no value extractors>.text<no value extractors>" )
 						.failure(
-								"Cannot find the inverse side of the association on type '" + CannotInvertAssociation.A.class.getName() + "'"
+								"Unable to find the inverse side of the association on type '" + CannotInvertAssociation.A.class.getName() + "'"
 										+ " at path '.embedded<no value extractors>.b<no value extractors>'",
 								" Hibernate Search needs this information in order to reindex '"
 										+ CannotInvertAssociation.A.class.getName() + "' when '"
@@ -246,7 +244,7 @@ public class DependencyIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Cannot apply the path '.invalidPath<default value extractors>'"
+						"Unable to apply path '.invalidPath<default value extractors>'"
 						+ " to type '" + CannotApplyInvertAssociationPath.B.class.getName() + "'"
 				)
 				.hasMessageContaining(
@@ -258,10 +256,8 @@ public class DependencyIT {
 								+ CannotApplyInvertAssociationPath.A.class.getName() + "' when '"
 								+ CannotApplyInvertAssociationPath.B.class.getName() + "' is modified."
 				)
-				.hasMessageContaining(
-						"Unable to find a readable property 'invalidPath' on type '"
-						+ CannotApplyInvertAssociationPath.B.class.getName() + "'"
-				);
+				.hasMessageContaining( "No readable property named 'invalidPath' on type '"
+						+ CannotApplyInvertAssociationPath.B.class.getName() + "'" );
 	}
 
 	@Test
@@ -288,7 +284,7 @@ public class DependencyIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Cannot apply the path '.a<default value extractors>'"
+						"Unable to apply path '.a<default value extractors>'"
 						+ " to type '" + CannotApplyInvertAssociationPath.B.class.getName() + "'"
 				)
 				.hasMessageContaining(

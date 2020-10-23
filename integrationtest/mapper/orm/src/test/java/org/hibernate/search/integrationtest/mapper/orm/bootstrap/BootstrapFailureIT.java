@@ -42,7 +42,8 @@ public class BootstrapFailureIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Unable to find a default value bridge implementation",
+						"No default value bridge implementation",
+						"Use a custom bridge",
 						ContainedEntity.class.getName()
 				);
 	}

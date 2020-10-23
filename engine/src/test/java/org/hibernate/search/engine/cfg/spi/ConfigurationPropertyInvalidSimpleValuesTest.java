@@ -57,7 +57,7 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 						c -> c.as( MyPropertyType.class, MyPropertyType::new ),
 						MyPropertyType.INVALID_VALUE, new MyPropertyType( "foobar" ),
 						"Invalid value: expected either an instance of '" + MyPropertyType.class.getName()
-								+ "' or a String that can be parsed.",
+								+ "' or a String that can be parsed into that type.",
 						MyPropertyType.INVALID_VALUE_ERROR_MESSAGE
 				)
 		};
@@ -112,8 +112,8 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
 		assertThatThrownBy( () -> property.get( sourceMock ) )
 				.hasMessageContaining(
-						"Unable to convert configuration property '" + resolvedKey
-								+ "' with value '" + invalidStringValue + "':"
+						"Invalid value for configuration property '" + resolvedKey
+								+ "': '" + invalidStringValue + "'."
 				)
 				.hasMessageContaining( expectedInvalidValueCommonMessagePrefix )
 				.hasMessageContaining( expectedInvalidStringMessage );
@@ -124,8 +124,8 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
 		assertThatThrownBy( () -> property.get( sourceMock ) )
 				.hasMessageContaining(
-						"Unable to convert configuration property '" + resolvedKey
-								+ "' with value '" + invalidTypeValue + "':"
+						"Invalid value for configuration property '" + resolvedKey
+								+ "': '" + invalidTypeValue + "'."
 				)
 				.hasMessageContaining( expectedInvalidValueCommonMessagePrefix );
 		verifyNoOtherSourceInteractionsAndReset();
@@ -145,8 +145,8 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
 		assertThatThrownBy( () -> property.get( sourceMock ) )
 				.hasMessageContaining(
-						"Unable to convert configuration property '" + resolvedKey
-								+ "' with value '" + invalidStringValue + "':"
+						"Invalid value for configuration property '" + resolvedKey
+								+ "': '" + invalidStringValue + "'."
 				)
 				.hasMessageContaining( expectedInvalidValueCommonMessagePrefix )
 				.hasMessageContaining( expectedInvalidStringMessage );
@@ -157,8 +157,8 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
 		assertThatThrownBy( () -> property.get( sourceMock ) )
 				.hasMessageContaining(
-						"Unable to convert configuration property '" + resolvedKey
-								+ "' with value '" + invalidTypeValue + "':"
+						"Invalid value for configuration property '" + resolvedKey
+								+ "': '" + invalidTypeValue + "'."
 				)
 				.hasMessageContaining( expectedInvalidValueCommonMessagePrefix );
 		verifyNoOtherSourceInteractionsAndReset();
@@ -180,8 +180,8 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
 		assertThatThrownBy( () -> property.get( sourceMock ) )
 				.hasMessageContaining(
-						"Unable to convert configuration property '" + resolvedKey
-								+ "' with value '" + invalidStringValue + "':"
+						"Invalid value for configuration property '" + resolvedKey
+								+ "': '" + invalidStringValue + "'."
 				)
 				.hasMessageContaining( expectedInvalidValueCommonMessagePrefix )
 				.hasMessageContaining( expectedInvalidStringMessage );
@@ -193,8 +193,8 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
 		assertThatThrownBy( () -> property.get( sourceMock ) )
 				.hasMessageContaining(
-						"Unable to convert configuration property '" + resolvedKey
-								+ "' with value '" + commaSeparatedStringValue + "':"
+						"Invalid value for configuration property '" + resolvedKey
+								+ "': '" + commaSeparatedStringValue + "'."
 				)
 				.hasMessageContaining( expectedInvalidValueCommonMessagePrefix )
 				.hasMessageContaining( expectedInvalidStringMessage );
@@ -206,8 +206,8 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
 		assertThatThrownBy( () -> property.get( sourceMock ) )
 				.hasMessageContaining(
-						"Unable to convert configuration property '" + resolvedKey
-								+ "' with value '" + invalidTypeValueCollection + "':"
+						"Invalid value for configuration property '" + resolvedKey
+								+ "': '" + invalidTypeValueCollection + "'."
 				)
 				.hasMessageContaining( expectedInvalidValueCommonMessagePrefix );
 		verifyNoOtherSourceInteractionsAndReset();
@@ -218,8 +218,8 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> {
 		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
 		assertThatThrownBy( () -> property.get( sourceMock ) )
 				.hasMessageContaining(
-						"Unable to convert configuration property '" + resolvedKey
-								+ "' with value '" + invalidTypeValue + "':"
+						"Invalid value for configuration property '" + resolvedKey
+								+ "': '" + invalidTypeValue + "'."
 				)
 				.hasMessageContaining( "Invalid multi value: expected either a Collection or a String" )
 				.hasCauseInstanceOf( SearchException.class );

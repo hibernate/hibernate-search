@@ -229,9 +229,9 @@ public class SearchSortIT {
 						.sort( sort )
 						.toQuery() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "scope targeting different indexes" )
-				.hasMessageContaining( mainIndex.name() )
-				.hasMessageContaining( otherIndex.name() );
+				.hasMessageContainingAll( "Invalid search sort",
+						"You must build the sort from a scope targeting indexes ", otherIndex.name(),
+						"the given sort was built from a scope targeting ", mainIndex.name() );
 
 		// reuse the same sort instance on a different scope,
 		// targeting different indexes
@@ -241,9 +241,10 @@ public class SearchSortIT {
 						.sort( sort )
 						.toQuery() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "scope targeting different indexes" )
-				.hasMessageContaining( mainIndex.name() )
-				.hasMessageContaining( otherIndex.name() );
+				.hasMessageContainingAll( "Invalid search sort",
+						"You must build the sort from a scope targeting indexes ",
+						mainIndex.name(), otherIndex.name(),
+						"the given sort was built from a scope targeting ", mainIndex.name() );
 	}
 
 	@Test

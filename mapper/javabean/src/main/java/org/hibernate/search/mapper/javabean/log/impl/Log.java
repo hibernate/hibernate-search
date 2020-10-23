@@ -25,12 +25,12 @@ public interface Log extends BasicLogger {
 
 	int ID_OFFSET = MessageConstants.MAPPER_JAVABEAN_ID_RANGE_MIN;
 
-	@Message(id = ID_OFFSET + 3, value = "Exception while retrieving the type model for '%1$s'.")
+	@Message(id = ID_OFFSET + 3, value = "Unable to retrieve type model for class '%1$s'.")
 	SearchException errorRetrievingTypeModel(@FormatWith(ClassFormatter.class) Class<?> clazz, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 5,
-			value = "The JavaBean mapper cannot load entities,"
-					+ " but there was an attempt to load the entity corresponding to document '%1$s'."
+			value = "Unable to load the entity instance corresponding to document '%1$s':"
+					+ " the JavaBean mapper does not support entity loading."
 					+ " There is probably an entity projection in the query definition: it should be removed."
 	)
 	SearchException cannotLoadEntity(DocumentReference reference);
@@ -39,19 +39,19 @@ public interface Log extends BasicLogger {
 	SearchException multipleEntityTypesWithSameName(String entityName, Class<?> previousType, Class<?> type);
 
 	@Message(id = ID_OFFSET + 7,
-			value = "The JavaBean mapper does not support named types. The type with name '%1$s' does not exist."
+			value = "Type with name '%1$s' does not exist: the JavaBean mapper does not support named types."
 	)
 	SearchException namedTypesNotSupported(String name);
 
 	@Message(id = ID_OFFSET + 8,
-			value = "The JavaBean mapper cannot load entities,"
-					+ " but there was an attempt to configure entity loading."
+			value = "Unable to configure entity loading:"
+					+ " the JavaBean mapper does not support entity loading."
 	)
 	SearchException entityLoadingConfigurationNotSupported();
 
-	@Message(id = ID_OFFSET + 9, value = "Type '%1$s' is not an entity type, or the entity is not indexed.")
+	@Message(id = ID_OFFSET + 9, value = "Type '%1$s' is not an entity type, or this entity type is not indexed.")
 	SearchException notIndexedEntityType(@FormatWith(ClassFormatter.class) Class<?> type);
 
-	@Message(id = ID_OFFSET + 10, value = "Entity '%1$s' does not exist or is not indexed.")
+	@Message(id = ID_OFFSET + 10, value = "Entity type '%1$s' does not exist or is not indexed.")
 	SearchException notIndexedEntityName(String name);
 }

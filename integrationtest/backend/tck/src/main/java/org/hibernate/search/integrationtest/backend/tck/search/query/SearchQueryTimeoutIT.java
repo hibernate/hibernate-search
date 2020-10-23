@@ -133,7 +133,11 @@ public class SearchQueryTimeoutIT {
 		assertThat( result.total().hitCountLowerBound() ).isLessThan( DOCUMENT_COUNT );
 		assertThatThrownBy( () -> result.total().hitCount() )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Trying to get the exact total hit count, but it is a lower bound" );
+				.hasMessageContaining(
+						"Unable to provide the exact total hit count: only a lower-bound approximation is available.",
+						"This is generally the result of setting query options such as a timeout or the total hit count threshold",
+						"unset these options, or retrieve the lower-bound hit count approximation"
+				);
 	}
 
 	@Test

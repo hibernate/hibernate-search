@@ -27,6 +27,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchObjectFieldCo
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.logging.spi.AggregationKeyFormatter;
+import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.util.common.logging.impl.DurationInSecondsAndFractionsFormatter;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -87,13 +88,13 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET_LEGACY_ENGINE = MessageConstants.ENGINE_ID_RANGE_MIN;
 
 	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 41, value = "Index directory not found, creating: '%1$s'")
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 41, value = "Index directory does not exist, creating: '%1$s'")
 	void indexDirectoryNotFoundCreatingNewOne(Path absolutePath);
 
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 52,
-			value = "Going to reset the index writer and force release of the IndexWriter lock. %1$s")
-	void indexWriterReset(@FormatWith(EventContextFormatter.class) EventContext context);
+			value = "An index writer operation failed. Resetting the index writer and forcing release of locks. %1$s")
+	void indexWriterResetAfterFailure(@FormatWith(EventContextFormatter.class) EventContext context);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 55,
@@ -102,65 +103,70 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 75,
-			value = "Configuration setting '%1$s' was not specified: using LATEST (currently '%2$s'). %3$s")
+			value = "Missing value for configuration property '%1$s': using LATEST (currently '%2$s'). %3$s")
 	void recommendConfiguringLuceneVersion(String key, Version latest, @FormatWith(EventContextFormatter.class) EventContext context);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 114,
-			value = "Could not load resource: '%1$s'")
+			value = "Resource does not exist in classpath: '%1$s'")
 	SearchException unableToLoadResource(String fileName);
 
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 118,
-			value = "Index Merge operation on index '%1$s'")
+	@Message(value = "Index Merge operation on index '%1$s'")
 	String indexMergeOperation(String indexName);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 225,
-			value = "An index locking error occurred during initialization of Directory '%s'."
-					+ " This might indicate a concurrent initialization;"
-					+ " If you experience errors on this index you might need to remove the lock, or rebuild the index."
-	)
-	void lockingFailureDuringInitialization(String directoryDescription, @Param EventContext context);
+			value = "Unable to acquire lock on the index while initializing directory '%s'."
+					+ " Either the directory wasn't properly closed last time it was used due to a critical failure,"
+					+ " or another instance of Hibernate Search is using it concurrently"
+					+ " (which is not supported)."
+					+ " If you experience indexing failures on this index"
+					+ " you will need to remove the lock, and might need to rebuild the index.")
+	void lockingFailureDuringInitialization(String directoryDescription, @Param EventContext context, @Cause Exception e);
 
 	@LogMessage(level = TRACE)
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 226, value = "%s: %s" )
 	void logInfoStreamMessage(String componentName, String message);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 228,
-			value = "Value '%1$ss' is not in a valid format to express a Lucene version: %2$s" )
+			value = "Unable to parse '%1$ss' into a Lucene version: %2$s" )
 	SearchException illegalLuceneVersionFormat(String property, String luceneErrorMessage, @Cause Exception e);
 
 	@LogMessage(level = Level.DEBUG)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 274, value = "Executing Lucene query '%s'" )
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 274, value = "Executing Lucene query: %s" )
 	void executingLuceneQuery(Query luceneQuery);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 284,
-			value = "An exception occurred while opening multiple indexes." )
-	SearchException failureOnMultiReaderRefresh(@Param EventContext context, @Cause Exception e);
+			value = "Unable to open index readers: %1$s" )
+	SearchException unableToOpenIndexReaders(String causeMessage, @Param EventContext context, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 329,
-			value = "Error while applying analysis configuration: %1$s")
+			value = "Unable to apply analysis configuration: %1$s")
 	SearchException unableToApplyAnalysisConfiguration(String errorMessage, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 337,
-			value = "Multiple parameters with the same name: '%1$s'. Can't assign both value '%2$s' and '%3$s'" )
+			value = "Ambiguous value for parameter '%1$s': this parameter is set to two different values '%2$s' and '%3$s'.")
 	SearchException analysisComponentParameterConflict(String name, String value1, String value2);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 342,
-			value = "Cannot apply both an analyzer and a normalizer. Analyzer: '%1$s', normalizer: '%2$s'.")
+			value = "Invalid index field type: both analyzer '%1$s' and normalizer '%2$s' are assigned to this type."
+					+ " Either an analyzer or a normalizer can be assigned, but not both.")
 	SearchException cannotApplyAnalyzerAndNormalizer(String analyzerName, String normalizerName, @Param EventContext context);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 344,
-			value = "The normalizer for definition '%s' produced %d tokens."
-			+ " Normalizers should never produce more than one token."
-			+ " The tokens have been concatenated by Hibernate Search,"
-			+ " but you should fix your normalizer definition." )
+			value = "Invalid normalizer implementation: the normalizer for definition '%s' produced %d tokens."
+					+ " Normalizers should never produce more than one token."
+					+ " The tokens have been concatenated by Hibernate Search,"
+					+ " but you should fix your normalizer definition.")
 	void normalizerProducedMultipleTokens(String normalizerName, int token);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 345,
-			value = "Cannot apply an analyzer on a sortable field. Use a normalizer instead. Analyzer: '%1$s'."
-			+ " If an actual analyzer (with tokenization) is necessary, define two separate fields:"
-			+ " one with an analyzer that is not sortable, and one with a normalizer that is sortable.")
+			value = "Invalid index field type: both analyzer '%1$s' and sorts are enabled."
+					+ " Sorts are not supported on analyzed fields."
+					+ " If you need an analyzer simply to transform the text (lowercasing, ...)"
+					+ " without splitting it into tokens, use a normalizer instead."
+					+ " If you need an actual analyzer (with tokenization), define two separate fields:"
+					+ " one with an analyzer that is not sortable, and one with a normalizer that is sortable.")
 	SearchException cannotUseAnalyzerOnSortableField(String analyzerName, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 353,
@@ -181,22 +187,22 @@ public interface Log extends BasicLogger {
 	SearchException pathIsNotWriteableDirectory(Path rootDirectory);
 
 	@Message(id = ID_OFFSET + 5,
-			value = "The Lucene extension can only be applied to objects"
-			+ " derived from the Lucene backend. Was applied to '%1$s' instead.")
+			value = "Invalid target for Lucene extension: '%1$s'."
+					+ " This extension can only be applied to components created by a Lucene backend.")
 	SearchException luceneExtensionOnUnknownType(Object context);
 
 	@Message(id = ID_OFFSET + 10,
-			value = "A Lucene query cannot include search predicates built using a non-Lucene search scope."
-			+ " Given predicate was: '%1$s'")
+			value = "Invalid search predicate: '%1$s'. You must build the predicate from a Lucene search scope.")
 	SearchException cannotMixLuceneSearchQueryWithOtherPredicates(SearchPredicate predicate);
 
 	@Message(id = ID_OFFSET + 13,
-			value = "Object field '%1$s' is flattened: its structure was lost upon indexing and 'nested' features are not available.")
+			value = "Invalid target field: object field '%1$s' is flattened."
+					+ " If you want to use a 'nested' predicate on this field, set its structure to 'NESTED'."
+					+ " Do not forget to reindex all your data after changing the structure.")
 	SearchException nonNestedFieldForNestedQuery(String absoluteFieldPath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 14,
-			value = "A Lucene query cannot include search sorts built using a non-Lucene search scope."
-			+ " Given sort was: '%1$s'")
+			value = "Invalid search sort: '%1$s'. You must build the sort from a Lucene search scope.")
 	SearchException cannotMixLuceneSearchSortWithOtherSorts(SearchSort sort);
 
 	@Message(id = ID_OFFSET + 15,
@@ -204,37 +210,39 @@ public interface Log extends BasicLogger {
 	SearchException unableToInitializeIndexDirectory(String causeMessage,
 			@Param EventContext context, @Cause Exception cause);
 
-	@Message(id = ID_OFFSET + 16, value = "Unable to index entity of type '%2$s' with identifier '%3$s' and tenant identifier '%1$s'.")
+	@Message(id = ID_OFFSET + 16, value = "Unable to index entity of type '%2$s' with identifier '%3$s' and tenant identifier '%1$s': %4$s")
 	SearchException unableToIndexEntry(String tenantId, String entityTypeName, Object entityIdentifier,
-			@Param EventContext context, @Cause Exception e);
+			String causeMessage, @Param EventContext context, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 17,
-			value = "Unable to delete entity of type '%2$s' with identifier '%3$s' and tenant identifier '%1$s'.")
+			value = "Unable to delete entity of type '%2$s' with identifier '%3$s' and tenant identifier '%1$s': %4$s")
 	SearchException unableToDeleteEntryFromIndex(String tenantId, String entityTypeName, Object entityIdentifier,
-			@Param EventContext context, @Cause Exception e);
+			String causeMessage, @Param EventContext context, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 19,
-			value = "Unable to commit.")
-	SearchException unableToCommitIndex(@Param EventContext context, @Cause Exception e);
+			value = "Unable to commit: %1$s")
+	SearchException unableToCommitIndex(String causeMessage, @Param EventContext context, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 24,
-			value = "A multi-index scope cannot include both a Lucene index and another type of index."
-					+ " Base scope was: '%1$s', Lucene index was: '%2$s'")
+			value = "Invalid multi-index scope: a scope cannot span both a Lucene index and another type of index."
+					+ " Base scope: '%1$s', incompatible (Lucene) index: '%2$s'.")
 	SearchException cannotMixLuceneScopeWithOtherType(IndexScopeBuilder baseScope,
 			LuceneIndexManager luceneIndex, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 25,
-			value = "A multi-index scope cannot span multiple Lucene backends."
-					+ " Base scope was: '%1$s', index from another backend was: '%2$s'")
+			value = "Invalid multi-index scope: a scope cannot span multiple Lucene backends."
+					+ " Base scope: '%1$s', incompatible index (from another backend): '%2$s'.")
 	SearchException cannotMixLuceneScopeWithOtherBackend(IndexScopeBuilder baseScope,
 			LuceneIndexManager indexFromOtherBackend, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 27,
-			value = "An IOException happened while executing the query '%1$s'.")
-	SearchException ioExceptionOnQueryExecution(Query luceneQuery, @Param EventContext context, @Cause IOException e);
+			value = "Unable to execute search query '%1$s': %2$s")
+	SearchException ioExceptionOnQueryExecution(Query luceneQuery, String causeMessage,
+			@Param EventContext context, @Cause IOException cause);
 
 	@Message(id = ID_OFFSET + 29,
-			value = "Index '%1$s' requires multi-tenancy but the backend does not support it in its current configuration.")
+			value = "Invalid backend configuration: index '%1$s' requires multi-tenancy"
+					+ " but no multi-tenancy strategy is set.")
 	SearchException multiTenancyRequiredButNotSupportedByBackend(String indexName, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 30,
@@ -242,31 +250,34 @@ public interface Log extends BasicLogger {
 	SearchException invalidMultiTenancyStrategyName(String invalidRepresentation, List<String> validRepresentations);
 
 	@Message(id = ID_OFFSET + 31,
-			value = "Tenant identifier '%1$s' is provided, but multi-tenancy is disabled for this backend.")
+			value = "Invalid tenant identifier: '%1$s'."
+					+ " The tenant identifier must be null, because multi-tenancy is disabled for this backend.")
 	SearchException tenantIdProvidedButMultiTenancyDisabled(String tenantId, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 32,
-			value = "Backend has multi-tenancy enabled, but no tenant identifier is provided.")
+			value = "Missing tenant identifier."
+					+ " The tenant identifier must be non-null, because multi-tenancy is enabled for this backend.")
 	SearchException multiTenancyEnabledButNoTenantIdProvided(@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 33,
-			value = "Attempt to unwrap a Lucene backend to '%1$s',"
-					+ " but this backend can only be unwrapped to '%2$s'.")
+			value = "Invalid requested type for this backend: '%1$s'."
+					+ " Lucene backends can only be unwrapped to '%2$s'.")
 	SearchException backendUnwrappingWithUnknownType(@FormatWith(ClassFormatter.class) Class<?> requestedClass,
 			@FormatWith(ClassFormatter.class) Class<?> actualClass,
 			@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 34,
-			value = "The index schema node '%1$s' was added twice."
-					+ " Multiple bridges may be trying to access the same index field, "
-					+ " or two indexed-embeddeds may have prefixes that lead to conflicting field names,"
-					+ " or you may have declared multiple conflicting mappings."
-					+ " In any case, there is something wrong with your mapping and you should fix it.")
+			value = "Duplicate index field definition: '%1$s'."
+					+ " Index field names must be unique."
+					+ " Look for two property mappings with the same field name,"
+					+ " or two indexed-embeddeds with prefixes that lead to conflicting index field names,"
+					+ " or two custom bridges declaring index fields with the same name.")
 	SearchException indexSchemaNodeNameConflict(String relativeFieldName,
 			@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 39,
-			value = "Invalid field reference for this document element: this document element has path '%1$s', but the referenced field has a parent with path '%2$s'.")
+			value = "Invalid field reference for this document element:"
+					+ " this document element has path '%1$s', but the referenced field has a parent with path '%2$s'.")
 	SearchException invalidFieldForDocumentElement(String expectedPath, String actualPath);
 
 	@Message(id = ID_OFFSET + 44,
@@ -287,31 +298,29 @@ public interface Log extends BasicLogger {
 	SearchException invalidFieldPath(String expectedPath, String actualPath);
 
 	@Message(id = ID_OFFSET + 50,
-			value = "Unable to convert DSL parameter: %1$s")
+			value = "Unable to convert DSL argument: %1$s")
 	SearchException cannotConvertDslParameter(String errorMessage, @Cause Exception cause, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 51,
-			value = "Attempt to unwrap a Lucene index manager to '%1$s',"
-					+ " but this index manager can only be unwrapped to '%2$s'.")
+			value = "Invalid requested type for this index manager: '%1$s'."
+					+ " Lucene index managers can only be unwrapped to '%2$s'.")
 	SearchException indexManagerUnwrappingWithUnknownType(@FormatWith(ClassFormatter.class) Class<?> requestedClass,
-			@FormatWith(ClassFormatter.class) Class<?> actualClass,
-			@Param EventContext context);
+			@FormatWith(ClassFormatter.class) Class<?> actualClass, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 52,
-			value = "Unable to create analyzer for name '%1$s'.")
-	SearchException unableToCreateAnalyzer(String name, @Cause Exception e);
+			value = "Unable to create analyzer for name '%1$s': %2$s")
+	SearchException unableToCreateAnalyzer(String name, String causeMessage, @Cause Exception e);
 
 	@Message(id = ID_OFFSET + 53,
-			value = "Unable to create normalizer for name '%1$s'.")
-	SearchException unableToCreateNormalizer(String name, @Cause Exception e);
+			value = "Unable to create normalizer for name '%1$s': %2$s")
+	SearchException unableToCreateNormalizer(String name, String causeMessage, @Cause Exception e);
 
 	@Message(id = ID_OFFSET + 54,
 			value = "Unknown normalizer: '%1$s'. Make sure you defined this normalizer.")
 	SearchException unknownNormalizer(String normalizerName, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 55,
-			value = "A Lucene query cannot include search projections built using a non-Lucene search scope."
-			+ " Given projection was: '%1$s'")
+			value = "Invalid search projection: '%1$s'. You must build the projection from a Lucene search scope.")
 	SearchException cannotMixLuceneSearchQueryWithOtherProjections(SearchProjection<?> projection);
 
 	@Message(id = ID_OFFSET + 58,
@@ -322,14 +331,15 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 61, value = "Unable to shut down index accessor: %1$s")
 	SearchException unableToShutdownIndexAccessor(String causeMessage, @Cause Exception cause);
 
-	@Message(id = ID_OFFSET + 62, value = "Cannot guess field type for input type: '%1$s'.")
+	@Message(id = ID_OFFSET + 62, value = "No built-in index field type for class: '%1$s'.")
 	SearchException cannotGuessFieldType(@FormatWith(ClassFormatter.class) Class<?> inputType, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 64, value = "Unexpected index: documentId '%1$s' was not collected." )
 	SearchException documentIdNotCollected(Integer documentId);
 
-	@Message(id = ID_OFFSET + 67, value = "Unable to delete all entries matching query '%1$s'.")
-	SearchException unableToDeleteAllEntriesFromIndex(Query query, @Param EventContext context, @Cause Exception e);
+	@Message(id = ID_OFFSET + 67, value = "Unable to delete all entries matching query '%1$s': %2$s")
+	SearchException unableToDeleteAllEntriesFromIndex(Query query, String causeMessage, @Param EventContext context,
+			@Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 68,
 			value = "Inconsistent configuration for the identifier in a search query across multiple indexes: converter differs: '%1$s' vs. '%2$s'.")
@@ -337,8 +347,8 @@ public interface Log extends BasicLogger {
 			ToDocumentIdentifierValueConverter<?> component2, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 69,
-			value = "An IOException occurred while generating an Explanation.")
-	SearchException ioExceptionOnExplain(@Cause IOException e);
+			value = "Unable to explain search query: %1$s")
+	SearchException ioExceptionOnExplain(String causeMessage, @Cause IOException cause);
 
 	@Message(id = ID_OFFSET + 70,
 			value = "Full-text features (analysis, fuzziness) are not supported for fields of this type.")
@@ -354,56 +364,65 @@ public interface Log extends BasicLogger {
 					+ " You must call toReference() exactly once.")
 	SearchException cannotCreateReferenceMultipleTimes(@Param EventContext context);
 
-	@Message(id = ID_OFFSET + 73, value = "Index-null-as option is not supported on analyzed field. Trying to define the analyzer: '%1$s' together with index null as: '%2$s'.")
+	@Message(id = ID_OFFSET + 73,
+			value = "Invalid index field type: both null token '%2$s' ('indexNullAs')"
+					+ " and analyzer '%1$s' are assigned to this type."
+					+ " 'indexNullAs' is not supported on analyzed fields.")
 	SearchException cannotUseIndexNullAsAndAnalyzer(String analyzerName, String indexNullAs, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 74,
-			value = "Multiple values were added to single-valued field '%1$s'."
-					+ " Declare the field as multi-valued in order to allow this."
-	)
+			value = "Multiple values assigned to field '%1$s': this field is single-valued."
+					+ " Declare the field as multi-valued in order to allow this.")
 	SearchException multipleValuesForSingleValuedField(String absoluteFieldPath);
 
 	@Message(id = ID_OFFSET + 75,
-			value = "explain(Object id) cannot be used when the query targets multiple types."
+			value = "Invalid use of explain(Object id) on a query targeting multiple types."
 					+ " Use explain(String typeName, Object id) and pass one of %1$s as the type name." )
 	SearchException explainRequiresTypeName(Set<String> targetedTypeNames);
 
 	@Message(id = ID_OFFSET + 76,
-			value = "The given mapped type name '%2$s' is not among the mapped types targeted by this query: %1$s." )
+			value = "Invalid mapped type name: '%2$s'."
+					+ " This type is not among the mapped types targeted by this query: %1$s.")
 	SearchException explainRequiresTypeTargetedByQuery(Set<String> targetedTypeNames, String typeName);
 
 	@Message(id = ID_OFFSET + 77,
-			value = "Document with id '%2$s' does not exist for the mapped type '%1$s' and thus its match cannot be explained." )
+			value = "Invalid document identifier: '%2$s'. No such document for type '%1$s'.")
 	SearchException explainUnknownDocument(String typeName, String id);
 
 	@Message(id = ID_OFFSET + 78,
-			value = "Unable to merge index segments.")
-	SearchException unableToMergeSegments(@Param EventContext context, @Cause Exception e);
+			value = "Unable to merge index segments: %1$s")
+	SearchException unableToMergeSegments(String causeMessage, @Param EventContext context, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 79,
-			value = "Unable to close the index writer after write failures.")
-	SearchException unableToCloseIndexWriterAfterFailures(@Param EventContext context, @Cause Exception e);
+			value = "Unable to close the index writer after write failures: %1$s")
+	SearchException unableToCloseIndexWriterAfterFailures(String causeMessage, @Param EventContext context,
+			@Cause Exception cause);
 
-	@Message(id = ID_OFFSET + 80, value = "Impossible to detect a decimal scale to use for this field."
-			+ " If the value is bridged, set '.asBigDecimal().decimalScale( int )' in the bind, else verify your mapping.")
+	@Message(id = ID_OFFSET + 80, value = "Invalid index field type: missing decimal scale."
+			+ " Define the decimal scale explicitly.")
 	SearchException nullDecimalScale(@Param EventContext eventContext);
 
 	@Message(id = ID_OFFSET + 81, value = "The value '%1$s' cannot be indexed because its absolute value is too large.")
 	SearchException scaledNumberTooLarge(Number value);
 
-	@Message(id = ID_OFFSET + 82, value = "Positive decimal scale ['%1$s'] is not allowed for BigInteger fields, since a BigInteger value cannot have any decimal digits.")
+	@Message(id = ID_OFFSET + 82,
+			value = "Invalid index field type: decimal scale '%1$s' is positive."
+						+ " The decimal scale of BigInteger fields must be zero or negative.")
 	SearchException invalidDecimalScale(Integer decimalScale, @Param EventContext eventContext);
 
-	@Message(id = ID_OFFSET + 84, value = "The predicate '%1$s' is defined on a scope targeting different indexes."
-			+ " Predicate is targeting: '%2$s'. Current scope is targeting: '%3$s'.")
+	@Message(id = ID_OFFSET + 84,
+			value = "Invalid search predicate: '%1$s'. You must build the predicate from a scope targeting indexes %3$s,"
+					+ " but the given predicate was built from a scope targeting indexes %2$s.")
 	SearchException predicateDefinedOnDifferentIndexes(SearchPredicate predicate, Set<String> predicateIndexes, Set<String> scopeIndexes);
 
-	@Message(id = ID_OFFSET + 85, value = "The sort '%1$s' is defined on a scope targeting different indexes."
-			+ " Sort is targeting: '%2$s'. Current scope is targeting: '%3$s'.")
+	@Message(id = ID_OFFSET + 85,
+			value = "Invalid search sort: '%1$s'. You must build the sort from a scope targeting indexes %3$s,"
+					+ " but the given sort was built from a scope targeting indexes %2$s.")
 	SearchException sortDefinedOnDifferentIndexes(SearchSort predicate, Set<String> predicateIndexes, Set<String> scopeIndexes);
 
-	@Message(id = ID_OFFSET + 86, value = "The projection '%1$s' is defined on a scope targeting different indexes."
-			+ " Projection is targeting: '%2$s'. Current scope is targeting: '%3$s'.")
+	@Message(id = ID_OFFSET + 86,
+			value = "Invalid search projection: '%1$s'. You must build the projection from a scope targeting indexes %3$s,"
+					+ " but the given projection was built from a scope targeting indexes %2$s.")
 	SearchException projectionDefinedOnDifferentIndexes(SearchProjection<?> predicate, Set<String> predicateIndexes, Set<String> scopeIndexes);
 
 	@Message(id = ID_OFFSET + 87,
@@ -415,13 +434,14 @@ public interface Log extends BasicLogger {
 	SearchException invalidLockingStrategyName(String invalidRepresentation, List<String> validRepresentations);
 
 	@Message(id = ID_OFFSET + 89,
-			value = "The sharding strategy '%1$s' is not implemented properly:"
-					+ " it must call either context.setShardIdentifiers() or context.setShardingDisabled()"
-					+ " in its initialize() method, but it did not." )
+			value = "Incorrect sharding strategy implementation:"
+					+ " strategy '%1$s' did not declare any shard identifiers during initialization."
+					+ " Declare shard identifiers using context.shardIdentifiers(...) or,"
+					+ " if sharding is disabled, call context.disableSharding().")
 	SearchException missingShardIdentifiersAfterShardingStrategyInitialization(Object strategy);
 
 	@Message(id = ID_OFFSET + 90,
-			value = "Missing value for property '%2$s'. The sharding strategy '%1$s' requires this property to be set.")
+			value = "Invalid configuration for sharding strategy '%1$s': configuration property '%2$s' must be set.")
 	SearchException missingPropertyValueForShardingStrategy(String strategyName, String propertyKey);
 
 	@Message(id = ID_OFFSET + 91,
@@ -429,27 +449,32 @@ public interface Log extends BasicLogger {
 	SearchException invalidRoutingKeyForExplicitShardingStrategy(String invalidKey, Collection<String> validKeys);
 
 	@Message(id = ID_OFFSET + 94,
-			value = "Cannot apply an analyzer on an aggregable field. Use a normalizer instead. Analyzer: '%1$s'."
-					+ " If an actual analyzer (with tokenization) is necessary, define two separate fields:"
+			value = "Invalid index field type: both analyzer '%1$s' and aggregations are enabled."
+					+ " Aggregations are not supported on analyzed fields."
+					+ " If you need an analyzer simply to transform the text (lowercasing, ...)"
+					+ " without splitting it into tokens, use a normalizer instead."
+					+ " If you need an actual analyzer (with tokenization), define two separate fields:"
 					+ " one with an analyzer that is not aggregable, and one with a normalizer that is aggregable.")
 	SearchException cannotUseAnalyzerOnAggregableField(String analyzerName, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 98,
-			value = "An Lucene query cannot include search aggregations built using a non-Lucene search scope."
-					+ " Given aggregation was: '%1$s'")
+			value = "Invalid search aggregation: '%1$s'. You must build the aggregation from a Lucene search scope.")
 	SearchException cannotMixLuceneSearchQueryWithOtherAggregations(SearchAggregation<?> aggregation);
 
-	@Message(id = ID_OFFSET + 99, value = "The aggregation '%1$s' is defined on a scope targeting different indexes."
-			+ " Aggregation is targeting: '%2$s'. Current scope is targeting: '%3$s'.")
+	@Message(id = ID_OFFSET + 99,
+			value = "Invalid search aggregation: '%1$s'. You must build the aggregation from a scope targeting indexes %3$s,"
+					+ " but the given aggregation was built from a scope targeting indexes %2$s.")
 	SearchException aggregationDefinedOnDifferentIndexes(SearchAggregation<?> aggregation,
 			Set<String> aggregationIndexes, Set<String> scopeIndexes);
 
 	@Message(id = ID_OFFSET + 102,
-			value = "Multiple aggregations with the same key: '%1$s'")
-	SearchException duplicateAggregationKey(@FormatWith(AggregationKeyFormatter.class) AggregationKey key);
+			value = "Duplicate aggregation definitions for key: '%1$s'")
+	SearchException duplicateAggregationKey(@FormatWith(AggregationKeyFormatter.class) AggregationKey<?> key);
 
-	@Message(id = ID_OFFSET + 104, value = "Cannot apply a search analyzer if an analyzer has not been defined on the same field." +
-			" Search analyzer: '%1$s'.")
+	@Message(id = ID_OFFSET + 104,
+			value = "Invalid index field type: search analyzer '%1$s' is assigned to this type,"
+				+ " but the indexing analyzer is missing."
+				+ " Assign an indexing analyzer and a search analyzer, or remove the search analyzer.")
 	SearchException searchAnalyzerWithoutAnalyzer(String searchAnalyzer, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 105,
@@ -484,24 +509,31 @@ public interface Log extends BasicLogger {
 	SearchException unableToDropIndexDirectory(String causeMessage,
 			@Param EventContext context, @Cause Exception cause);
 
-	@Message(id = ID_OFFSET + 113, value = "Simple query string targets fields [%1$s, %3$s] spanning multiple nested paths: %2$s, %4$s.")
-	SearchException simpleQueryStringSpanningMultipleNestedPaths(String fieldPath1, String nestedPath1, String fieldPath2, String nestedPath2);
+	@Message(id = ID_OFFSET + 113,
+			value = "Invalid target fields for simple-query-string predicate:"
+					+ " fields [%1$s, %3$s] are in different nested documents [%2$s, %4$s]."
+					+ " All fields targeted by a simple-query-string predicate must be in the same document.")
+	SearchException simpleQueryStringSpanningMultipleNestedPaths(String fieldPath1, String nestedPath1,
+			String fieldPath2, String nestedPath2);
 
 	@Message(id = ID_OFFSET + 114,
-			value = "Cannot compute the median across nested documents.")
-	SearchException cannotComputeMedianAcrossNested(@Param EventContext context);
+			value = "Invalid sort mode: %1$s. This sort mode is not supported for fields in nested documents.")
+	SearchException invalidSortModeAcrossNested(SortMode mode, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 115,
-			value = "Cannot compute the sum, average or median of a text field. Only min and max are supported.")
-	SearchException cannotComputeSumOrAvgOrMedianForStringField(@Param EventContext context);
+			value = "Invalid sort mode: %1$s. This sort mode is not supported for String fields."
+					+ " Only MIN and MAX are supported.")
+	SearchException invalidSortModeForStringField(SortMode mode, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 116,
-			value = "Cannot compute the sum of a temporal field. Only min, max, avg and median are supported.")
-	SearchException cannotComputeSumForTemporalField(@Param EventContext context);
+			value = "Invalid sort mode: %1$s. This sort mode is not supported for temporal fields."
+					+ " Only MIN, MAX, AVG and MEDIAN are supported.")
+	SearchException invalidSortModeForTemporalField(SortMode mode, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 117,
-			value = "Cannot compute the sum for a distance sort. Only min, max, avg and median are supported.")
-	SearchException cannotComputeSumForDistanceSort(@Param EventContext context);
+			value = "Invalid sort mode: %1$s. This sort mode is not supported for a distance sort."
+					+ " Only MIN, MAX, AVG and MEDIAN are supported.")
+	SearchException invalidSortModeForDistanceSort(SortMode mode, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 118,
 			value = "A failure occurred during a low-level write operation"
@@ -512,31 +544,31 @@ public interface Log extends BasicLogger {
 			@Param EventContext context, @Cause Throwable cause);
 
 	@Message(id = ID_OFFSET + 120,
-			value = "Field '%1$s' is not contained in a nested object."
+			value = "Invalid sort filter: field '%1$s' is not contained in a nested object."
 					+ " Sort filters are only available if the field to sort on is contained in a nested object.")
 	SearchException cannotFilterSortOnRootDocumentField(String absoluteFieldPath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 121,
-			value = "Predicate targets unexpected fields %2$s."
-					+ " Only fields that are contained in the nested object with path '%1$s'"
-					+ " are allowed here.")
-	SearchException invalidNestedObjectPathForPredicate(String nestedObjectPath, List<String> fieldPaths);
+			value = "Invalid search predicate: %1$s. This predicate targets fields %3$s,"
+					+ " but only fields that are contained in the nested object with path '%2$s' are allowed here.")
+	SearchException invalidNestedObjectPathForPredicate(SearchPredicate predicate, String nestedObjectPath,
+			List<String> fieldPaths);
 
 	@Message(id = ID_OFFSET + 122,
-			value = "Field '%1$s' is not contained in a nested object."
+			value = "Invalid aggregation filter: field '%1$s' is not contained in a nested object."
 					+ " Aggregation filters are only available if the field to aggregate on is contained in a nested object.")
 	SearchException cannotFilterAggregationOnRootDocumentField(String absoluteFieldPath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 123,
-			value = "IndexWriter setting '%1$s' cannot be set to '%2$s': %3$s")
+			value = "Invalid value for IndexWriter setting '%1$s': '%2$s'. %3$s")
 	SearchException illegalIndexWriterSetting(String settingName, Object settingValue, String message, @Cause Exception e);
 
 	@Message(id = ID_OFFSET + 124,
-			value = "Merge policy setting '%1$s' cannot be set to '%2$s': %3$s")
+			value = "Invalid value for merge policy setting '%1$s': '%2$s'. %3$s")
 	SearchException illegalMergePolicySetting(String settingName, Object settingValue, String message, @Cause Exception e);
 
 	@Message(id = ID_OFFSET + 125,
-			value = "The index field template '%1$s' was added twice."
+			value = "Duplicate index field template definition: '%1$s'."
 					+ " Multiple bridges may be trying to access the same index field template, "
 					+ " or two indexed-embeddeds may have prefixes that lead to conflicting field names,"
 					+ " or you may have declared multiple conflicting mappings."
@@ -566,7 +598,8 @@ public interface Log extends BasicLogger {
 	SearchException invalidIndexElementTypeObjectFieldIsNotValueField(String absolutePath);
 
 	@Message(id = ID_OFFSET + 131,
-			value = "Projection on field '%1$s' cannot be single-valued, because this field is multi-valued."
+			value = "Invalid cardinality for projection on field '%1$s': the projection is single-valued,"
+					+ " but this field is multi-valued."
 					+ " Make sure to call '.multi()' when you create the projection.")
 	SearchException invalidSingleValuedProjectionOnMultiValuedField(String absolutePath, @Param EventContext context);
 
@@ -615,6 +648,6 @@ public interface Log extends BasicLogger {
 			String queryElementName, String causeMessage, @Cause SearchException cause, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 141,
-			value = "Unable to compute size of index.")
-	SearchException unableToComputeIndexSize(@Param EventContext context, @Cause Exception e);
+			value = "Unable to compute size of index: %1$s")
+	SearchException unableToComputeIndexSize(String causeMessage, @Param EventContext context, @Cause Exception cause);
 }

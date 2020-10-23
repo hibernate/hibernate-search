@@ -278,8 +278,7 @@ public class SearchMultiIndexIT {
 				"search across multiple backends"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "A multi-index scope cannot span multiple" )
-				.hasMessageContaining( "backends" );
+				.hasMessageContainingAll( "Invalid multi-index scope", "a scope cannot span multiple", "backends" );
 	}
 
 	private void initData() {

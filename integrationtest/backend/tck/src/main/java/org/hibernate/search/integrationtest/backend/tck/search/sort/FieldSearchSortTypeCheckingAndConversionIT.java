@@ -187,7 +187,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 				"field() sort with invalid parameter type for missing().use() on field " + absoluteFieldPath
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unable to convert DSL parameter: " )
+				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
 				.hasCauseInstanceOf( ClassCastException.class )
 				.satisfies( FailureReportUtils.hasContext(
@@ -208,7 +208,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 				"field() sort with invalid parameter type for missing().use() on field " + absoluteFieldPath
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unable to convert DSL parameter: " )
+				.hasMessageContaining( "Unable to convert DSL argument: " )
 				.hasMessageContaining( InvalidType.class.getName() )
 				.hasCauseInstanceOf( ClassCastException.class )
 				.satisfies( FailureReportUtils.hasContext(

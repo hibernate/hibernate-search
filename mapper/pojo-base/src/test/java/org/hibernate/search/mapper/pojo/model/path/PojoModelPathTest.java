@@ -238,7 +238,8 @@ public class PojoModelPathTest {
 						"foo", ContainerExtractorPath.defaultExtractors()
 				) );
 
-		String errorMessage = "chain of multiple container extractors cannot include the default extractors";
+		String errorMessage = "Invalid reference to default extractors:"
+				+ " a chain of multiple container extractors must not include the default extractors";
 
 		assertThatThrownBy(
 				() -> PojoModelPath.builder().property( "foo" )

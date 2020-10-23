@@ -48,7 +48,7 @@ public final class DefaultPeriodValueBridge implements ValueBridge<Period, Strin
 			return Period.of( years, months, days );
 		}
 		catch (NumberFormatException e) {
-			throw log.parseException( value, Period.class, e );
+			throw log.parseException( value, Period.class, e.getMessage(), e );
 		}
 	}
 

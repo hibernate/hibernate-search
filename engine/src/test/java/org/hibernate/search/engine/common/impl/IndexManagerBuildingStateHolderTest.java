@@ -255,8 +255,10 @@ public class IndexManagerBuildingStateHolderTest {
 		assertThat( throwableCaptor.getValue() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Configuration property 'somePrefix.backend.type' is not set, and no backend was found in the classpath",
-						"Did you forget to add the desired backend to your project's dependencies?" );
+						"Unable to resolve backend type",
+						"configuration property 'somePrefix.backend.type' is not set,"
+								+ " and there isn't any backend in the classpath",
+						"Check that you added the desired backend to your project's dependencies" );
 	}
 
 	@Test
@@ -286,8 +288,10 @@ public class IndexManagerBuildingStateHolderTest {
 		assertThat( throwableCaptor.getValue() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Configuration property 'somePrefix.backend.type' is not set, and no backend was found in the classpath",
-						"Did you forget to add the desired backend to your project's dependencies?" );
+						"Unable to resolve backend type",
+						"configuration property 'somePrefix.backend.type' is not set,"
+								+ " and there isn't any backend in the classpath",
+						"Check that you added the desired backend to your project's dependencies" );
 	}
 
 	private void verifyNoOtherBackendInteractionsAndReset() {

@@ -140,7 +140,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Found an infinite IndexedEmbedded recursion",
+						"Infinite @IndexedEmbedded recursion",
 						"path 'level1.prefix1_level1.prefix1_'",
 						"type '" + typeModel1Mock.toString() + "'"
 				);
@@ -173,7 +173,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Found an infinite IndexedEmbedded recursion",
+						"Infinite @IndexedEmbedded recursion",
 						"path 'level1.prefix1_level2.prefix2_level1.prefix1_'",
 						"type '" + typeModel1Mock.toString() + "'"
 				);

@@ -33,7 +33,8 @@ public class CountWork implements ReadWork<Integer> {
 			return searcher.count( indexSearcher );
 		}
 		catch (IOException e) {
-			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(), context.getEventContext(), e );
+			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(), e.getMessage(),
+					context.getEventContext(), e );
 		}
 	}
 

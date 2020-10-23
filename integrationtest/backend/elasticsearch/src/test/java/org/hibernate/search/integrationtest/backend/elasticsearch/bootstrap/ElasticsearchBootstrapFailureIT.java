@@ -48,7 +48,7 @@ public class ElasticsearchBootstrapFailureIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.defaultBackendContext()
 						.failure(
-								"Failed to detect the Elasticsearch version running on the cluster",
+								"Unable to detect the Elasticsearch version running on the cluster",
 								"Elasticsearch request failed",
 								"Connection refused"
 						)

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.batch.jsr352.jberet.logging.impl;
 
+import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
@@ -38,20 +39,20 @@ public interface Log extends BasicLogger {
 	SearchException noAvailableEntityManagerFactoryInCDI(String reference);
 
 	@Message(id = ID_OFFSET_LEGACY + 3,
-			value = "Unknown entity manager factory namespace: '%1$s'. Please use a supported namespace.")
+			value = "Unknown entity manager factory namespace: '%1$s'. Use a supported namespace.")
 	SearchException unknownEntityManagerFactoryNamespace(String namespace);
 
 	@Message(id = ID_OFFSET_LEGACY + 4,
 			value = "Exception while retrieving the EntityManagerFactory using @PersistenceUnit."
-					+ " This generally happens either because the persistence wasn't configured properly"
+					+ " This generally happens either because persistence wasn't configured properly"
 					+ " or because there are multiple persistence units."
 	)
 	SearchException cannotRetrieveEntityManagerFactoryInJsr352();
 
 	@Message(id = ID_OFFSET_LEGACY + 5,
 			value = "Multiple entity manager factories have been registered in the CDI context."
-					+ " Please provide the bean name for the selected entity manager factory to the batch indexing job through"
-					+ " the 'entityManagerFactoryReference' parameter."
+					+ " Use the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE + "' parameter"
+					+ " to provide the bean name for the selected entity manager factory to the mass indexing job."
 	)
 	SearchException ambiguousEntityManagerFactoryInJsr352();
 

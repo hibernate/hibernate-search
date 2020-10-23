@@ -50,7 +50,7 @@ public class AfterChunkBatchlet extends AbstractBatchlet {
 		);
 
 		if ( mergeSegmentsOnFinish ) {
-			log.startOptimization();
+			log.startMergeSegments();
 
 			JobContextData jobData = (JobContextData) jobContext.getTransientUserData();
 			EntityManagerFactory emf = jobData.getEntityManagerFactory();

@@ -105,10 +105,8 @@ public class CustomPropertyMappingAnnotationBaseIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.annotationTypeContext( AnnotationWithEmptyProcessorRef.class )
-						.failure(
-								"The processor reference in meta-annotation '" + PropertyMapping.class.getName() + "'"
-										+ " is empty."
-						)
+						.failure( "Empty annotation processor reference in meta-annotation '"
+								+ PropertyMapping.class.getName() + "'" )
 						.build()
 				);
 	}
@@ -133,12 +131,9 @@ public class CustomPropertyMappingAnnotationBaseIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.annotationTypeContext( AnnotationWithProcessorWithDifferentAnnotationType.class )
-						.failure(
-								"Annotation processor '"
-										+ DifferentAnnotationType.Processor.TO_STRING + "'"
-										+ " expects annotations of incompatible type '"
-										+ DifferentAnnotationType.class.getName() + "'."
-						)
+						.failure( "Invalid annotation processor: '" + DifferentAnnotationType.Processor.TO_STRING + "'",
+								"This processor expects annotations of a different type: '"
+										+ DifferentAnnotationType.class.getName() + "'" )
 						.build()
 				);
 	}

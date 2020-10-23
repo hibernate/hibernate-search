@@ -9,13 +9,11 @@ package org.hibernate.search.batch.jsr352.core.logging.impl;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;
-import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
@@ -37,47 +35,48 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET = MessageConstants.BATCH_JSR352_CORE_ID_RANGE_MIN;
 
 	@Message(id = ID_OFFSET + 1,
-			value = "An '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_NAMESPACE + "' parameter was defined,"
+			value = "The '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_NAMESPACE + "' parameter was defined,"
 					+ " but the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE + "' parameter is empty."
-					+ " Please also set the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE + "' parameter"
+					+ " Set the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE + "' parameter"
 					+ " to select an entity manager factory, or do not set the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_NAMESPACE
 					+ "' parameter to try to use a default entity manager factory."
 	)
 	SearchException entityManagerFactoryReferenceIsEmpty();
 
 	@Message(id = ID_OFFSET + 3,
-			value = "Unknown entity manager factory namespace: '%1$s'. Please use a supported namespace.")
+			value = "Unknown entity manager factory namespace: '%1$s'. Use a supported namespace.")
 	SearchException unknownEntityManagerFactoryNamespace(String namespace);
 
 	@Message(id = ID_OFFSET + 6,
 			value = "No entity manager factory has been created with this persistence unit name yet: '%1$s'."
-					+ " Make sure you use the JPA API to create your entity manager factory (use a 'persistence.xml' file)"
-					+ " and that the entity manager factory has already been created and wasn't closed before"
-					+ " you launch the job."
+					+ " Make sure that you use the JPA API to create your entity manager factory (use a 'persistence.xml' file),"
+					+ " that it has already been created,"
+					+ " and that it hasn't been closed yet."
 	)
 	SearchException cannotFindEntityManagerFactoryByPUName(String persistentUnitName);
 
 	@Message(id = ID_OFFSET + 7,
 			value = "No entity manager factory has been created with this name yet: '%1$s'."
-					+ " Make sure your entity manager factory is named (for instance by setting the '"
-					+ AvailableSettings.SESSION_FACTORY_NAME + "' option) and that the entity manager factory has"
-					+ " already been created and wasn't closed before you launch the job."
+					+ " Make sure that your entity manager factory is named (for instance by setting the '"
+					+ AvailableSettings.SESSION_FACTORY_NAME + "' option),"
+					+ " that it has already been created,"
+					+ " and that it hasn't been closed yet."
 	)
 	SearchException cannotFindEntityManagerFactoryByName(String entityManagerFactoryName);
 
 	@Message(id = ID_OFFSET + 8,
 			value = "No entity manager factory has been created yet."
-					+ " Make sure that the entity manager factory has already been created and wasn't closed before"
-					+ " you launched the job."
+					+ " Make sure that the entity manager factory has already been created"
+					+ " and that the entity manager factory hasn't been closed."
 	)
 	SearchException noEntityManagerFactoryCreated();
 
 	@Message(id = ID_OFFSET + 9,
 			value = "Multiple entity manager factories are currently active."
-					+ " Please provide the name of the selected persistence unit to the batch indexing job through"
-					+ " the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE
-					+ "' parameter (you may also use the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_NAMESPACE
-					+ "' parameter for more referencing options)."
+					+ " Set the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_REFERENCE
+					+ " parameter to select a persistence unit."
+					+ " You may also set the '" + MassIndexingJobParameters.ENTITY_MANAGER_FACTORY_NAMESPACE
+					+ "' parameter for more referencing options."
 	)
 	SearchException tooManyActiveEntityManagerFactories();
 
@@ -89,15 +88,9 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = Level.INFO)
 	@Message(id = ID_OFFSET + 15,
-			value = "Optimizing all entities ..."
+			value = "Merging index segments for all entities ..."
 	)
-	void startOptimization();
-
-	@LogMessage(level = Level.DEBUG)
-	@Message(id = ID_OFFSET + 16,
-			value = "%1$d criteria found."
-	)
-	void criteriaSize(int size);
+	void startMergeSegments();
 
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ID_OFFSET + 17,
@@ -146,14 +139,11 @@ public interface Log extends BasicLogger {
 			value = "entityName: '%1$s', rowsToIndex: %2$d")
 	void rowsToIndex(String entityName, Long rowsToIndex);
 
-	@Message(id = ID_OFFSET + 28,
-			value = "Failed to serialize job parameter of type %1$s")
-	SearchException failedToSerializeJobParameter(@FormatWith(ClassFormatter.class) Class<?> type, @Cause Throwable e);
-
 	@Message(id = ID_OFFSET + 29,
-			value = "Unable to parse value '%2$s' for job parameter '%1$s'."
+			value = "Invalid value for job parameter '%1$s': '%2$s'. %3$s"
 	)
-	SearchException unableToParseJobParameter(String parameterName, Object parameterValue, @Cause Exception e);
+	SearchException unableToParseJobParameter(String parameterName, Object parameterValue,
+			String causeMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 30,
 			value = "The value of parameter '" + MassIndexingJobParameters.CHECKPOINT_INTERVAL
@@ -168,8 +158,8 @@ public interface Log extends BasicLogger {
 	SearchException negativeValueOrZero(String parameterName, Number parameterValue);
 
 	@Message(id = ID_OFFSET + 32,
-			value = "The following selected entity types aren't indexable: %1$s. Please check if the annotation"
-					+ " '@Indexed' has been added to each of them."
+			value = "The following selected entity types aren't indexable: %1$s."
+					+ " Check whether they are annotated with '@Indexed'."
 	)
 	SearchException failingEntityTypes(String failingEntityNames);
 

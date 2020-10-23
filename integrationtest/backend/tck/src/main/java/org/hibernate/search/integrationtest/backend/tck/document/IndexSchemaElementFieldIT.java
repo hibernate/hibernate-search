@@ -52,7 +52,7 @@ public class IndexSchemaElementFieldIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "Field name 'null' is invalid: field names cannot be null or empty" )
+						.failure( "Invalid index field name 'null': field names cannot be null or empty" )
 						.build() );
 
 		assertThatThrownBy(
@@ -68,7 +68,7 @@ public class IndexSchemaElementFieldIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
-						.failure( "Field name 'null' is invalid: field names cannot be null or empty" )
+						.failure( "Invalid index field name 'null': field names cannot be null or empty" )
 						.build() );
 
 		assertThatThrownBy(
@@ -83,7 +83,7 @@ public class IndexSchemaElementFieldIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "Field name 'null' is invalid: field names cannot be null or empty" )
+						.failure( "Invalid index field name 'null': field names cannot be null or empty" )
 						.build() );
 
 		assertThatThrownBy(
@@ -94,12 +94,12 @@ public class IndexSchemaElementFieldIT {
 				"Null object field name on non-root"
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Field name 'null' is invalid: field names cannot be null or empty" )
+				.hasMessageContaining( "Invalid index field name 'null': field names cannot be null or empty" )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
-						.failure( "Field name 'null' is invalid: field names cannot be null or empty" )
+						.failure( "Invalid index field name 'null': field names cannot be null or empty" )
 						.build() );
 	}
 
@@ -117,7 +117,7 @@ public class IndexSchemaElementFieldIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "Field name '' is invalid: field names cannot be null or empty" )
+						.failure( "Invalid index field name '': field names cannot be null or empty" )
 						.build() );
 
 		assertThatThrownBy(
@@ -132,7 +132,7 @@ public class IndexSchemaElementFieldIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
-						.failure( "Field name '' is invalid: field names cannot be null or empty" )
+						.failure( "Invalid index field name '': field names cannot be null or empty" )
 						.build() );
 
 		assertThatThrownBy(
@@ -147,7 +147,7 @@ public class IndexSchemaElementFieldIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "Field name '' is invalid: field names cannot be null or empty" )
+						.failure( "Invalid index field name '': field names cannot be null or empty" )
 						.build() );
 
 		assertThatThrownBy(
@@ -162,7 +162,7 @@ public class IndexSchemaElementFieldIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
-						.failure( "Field name '' is invalid: field names cannot be null or empty" )
+						.failure( "Invalid index field name '': field names cannot be null or empty" )
 						.build() );
 	}
 
@@ -181,7 +181,7 @@ public class IndexSchemaElementFieldIT {
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure(
-								"Field name 'foo.bar' is invalid: field names cannot contain a dot ('.').",
+								"Invalid index field name 'foo.bar': field names cannot contain a dot ('.').",
 								" Remove the dot from your field name",
 								"if you are declaring the field in a bridge and want a tree of fields,",
 								" declare an object field using the objectField() method."
@@ -201,7 +201,7 @@ public class IndexSchemaElementFieldIT {
 						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
 						.failure(
-								"Field name 'foo.bar' is invalid: field names cannot contain a dot ('.').",
+								"Invalid index field name 'foo.bar': field names cannot contain a dot ('.').",
 								" Remove the dot from your field name",
 								"if you are declaring the field in a bridge and want a tree of fields,",
 								" declare an object field using the objectField() method."
@@ -221,7 +221,7 @@ public class IndexSchemaElementFieldIT {
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
 						.failure(
-								"Field name 'foo.bar' is invalid: field names cannot contain a dot ('.').",
+								"Invalid index field name 'foo.bar': field names cannot contain a dot ('.').",
 								" Remove the dot from your field name",
 								"if you are declaring the field in a bridge and want a tree of fields,",
 								" declare an object field using the objectField() method."
@@ -241,7 +241,7 @@ public class IndexSchemaElementFieldIT {
 						.indexContext( index.name() )
 						.indexFieldContext( "nonRoot" )
 						.failure(
-								"Field name 'foo.bar' is invalid: field names cannot contain a dot ('.').",
+								"Invalid index field name 'foo.bar': field names cannot contain a dot ('.').",
 								" Remove the dot from your field name",
 								"if you are declaring the field in a bridge and want a tree of fields,",
 								" declare an object field using the objectField() method."
@@ -264,7 +264,7 @@ public class IndexSchemaElementFieldIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "schema node 'field1' was added twice" )
+						.failure( "Duplicate index field definition: 'field1'" )
 						.build() );
 
 		assertThatThrownBy(
@@ -282,7 +282,7 @@ public class IndexSchemaElementFieldIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "object1.object2" )
-						.failure( "schema node 'field1' was added twice" )
+						.failure( "Duplicate index field definition: 'field1'" )
 						.build() );
 	}
 
@@ -301,7 +301,7 @@ public class IndexSchemaElementFieldIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "schema node 'field1' was added twice" )
+						.failure( "Duplicate index field definition: 'field1'" )
 						.build() );
 
 		assertThatThrownBy(
@@ -319,7 +319,7 @@ public class IndexSchemaElementFieldIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "object1.object2" )
-						.failure( "schema node 'field1' was added twice" )
+						.failure( "Duplicate index field definition: 'field1'" )
 						.build() );
 	}
 
@@ -338,7 +338,7 @@ public class IndexSchemaElementFieldIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexSchemaRootContext()
-						.failure( "schema node 'field1' was added twice" )
+						.failure( "Duplicate index field definition: 'field1'" )
 						.build() );
 
 		assertThatThrownBy(
@@ -356,7 +356,7 @@ public class IndexSchemaElementFieldIT {
 						.typeContext( index.typeName() )
 						.indexContext( index.name() )
 						.indexFieldContext( "object1.object2" )
-						.failure( "schema node 'field1' was added twice" )
+						.failure( "Duplicate index field definition: 'field1'" )
 						.build() );
 	}
 
