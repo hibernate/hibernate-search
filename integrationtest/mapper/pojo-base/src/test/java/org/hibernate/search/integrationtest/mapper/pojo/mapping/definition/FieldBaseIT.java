@@ -165,10 +165,9 @@ public class FieldBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
-						.failure(
-								"Bridge '" + MyStringBridge.TOSTRING + "' cannot be applied to input type '"
-										+ Integer.class.getName() + "'"
-						)
+						.failure( "Invalid bridge for input type '" + Integer.class.getName()
+										+ "': '" + MyStringBridge.TOSTRING + "'",
+								"This bridge expects an input of type '" + String.class.getName() + "'" )
 						.build()
 				);
 	}
@@ -189,10 +188,9 @@ public class FieldBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".numbers" )
-						.failure(
-								"Bridge '" + MyStringBridge.TOSTRING + "' cannot be applied to input type '"
-										+ Integer.class.getName() + "'"
-						)
+						.failure( "Invalid bridge for input type '" + Integer.class.getName()
+										+ "': '" + MyStringBridge.TOSTRING + "'",
+								"This bridge expects an input of type '" + String.class.getName() + "'" )
 						.build()
 				);
 	}

@@ -141,9 +141,10 @@ public interface Log extends BasicLogger {
 	SearchException invalidEmptyTargetForScope();
 
 	@Message(id = ID_OFFSET + 10,
-			value = "Bridge '%1$s' cannot be applied to input type '%2$s'.")
+			value = "Invalid bridge for input type '%2$s': '%1$s'. This bridge expects an input of type '%3$s'.")
 	SearchException invalidInputTypeForBridge(Object bridge,
-			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> typeModel);
+			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> typeModel,
+			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> expectedTypeModel);
 
 	@Message(id = ID_OFFSET + 11,
 			value = "Missing field name for GeoPointBinding on type %1$s."
@@ -428,9 +429,11 @@ public interface Log extends BasicLogger {
 	SearchException conflictingAlternativeDiscriminators(String alternativeId, String fieldValueSourcePropertyName);
 
 	@Message(id = ID_OFFSET + 73,
-			value = "Routing bridge '%1$s' cannot be applied to entity type '%2$s'.")
+			value = "Invalid routing bridge for entity type '%2$s': '%1$s'"
+					+ " This bridge expects an entity type extending '%3$s'.")
 	SearchException invalidInputTypeForRoutingBridge(Object routingBridge,
-			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> typeModel);
+			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> typeModel,
+			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> expectedTypeModel);
 
 	@Message(id = ID_OFFSET + 75,
 			value = "Routing bridge '%1$s' did not define any current route. Exactly one current route must be defined," +

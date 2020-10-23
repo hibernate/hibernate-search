@@ -66,8 +66,9 @@ public class RoutingBridgeBaseIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.failure( "Routing bridge '" + UnusedRoutingBridge.TOSTRING
-								+ "' cannot be applied to entity type '" + IndexedEntity.class.getName() + "'" )
+						.failure( "Invalid routing bridge for entity type '" + IndexedEntity.class.getName()
+										+ "': '" + UnusedRoutingBridge.TOSTRING + "'",
+								"This bridge expects an entity type extending '" + Integer.class.getName() )
 						.build()
 				);
 	}

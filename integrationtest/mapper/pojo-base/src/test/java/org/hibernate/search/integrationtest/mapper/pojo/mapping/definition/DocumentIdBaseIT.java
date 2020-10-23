@@ -146,10 +146,9 @@ public class DocumentIdBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
-						.failure(
-								"Bridge '" + MyStringBridge.TOSTRING + "' cannot be applied to input type '"
-										+ Integer.class.getName() + "'"
-						)
+						.failure( "Invalid bridge for input type '" + Integer.class.getName()
+										+ "': '" + MyStringBridge.TOSTRING + "'",
+								"This bridge expects an input of type '" + String.class.getName() + "'." )
 						.build()
 				);
 	}
@@ -184,8 +183,9 @@ public class DocumentIdBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
-						.failure( "Bridge '" + MyNumberBridge.TOSTRING + "' cannot be applied to input type '"
-								+ Object.class.getName() + "'" )
+						.failure( "Invalid bridge for input type '" + Object.class.getName()
+										+ "': '" + MyNumberBridge.TOSTRING + "'",
+								"This bridge expects an input of type '" + Number.class.getName() + "'" )
 						.build() );
 	}
 
@@ -202,8 +202,9 @@ public class DocumentIdBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
-						.failure( "Bridge '" + MyNumberBridge.TOSTRING + "' cannot be applied to input type '"
-								+ Integer.class.getName() + "'" )
+						.failure( "Invalid bridge for input type '" + Integer.class.getName()
+										+ "': '" + MyNumberBridge.TOSTRING + "'",
+								"This bridge expects an input of type '" + Number.class.getName() + "'." )
 						.build() );
 	}
 
