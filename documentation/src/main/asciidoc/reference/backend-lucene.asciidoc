@@ -622,8 +622,8 @@ Do not change the tokens.
 Default implementation: `org.apache.lucene.analysis.core.StopAnalyzer`.
 +
 Default behavior: first, tokenize the text into tokens whenever it encounters a character which is not a letter.
-Then, it removes english stop words.
-Finally, lowercase each token.
+Then, lowercase each token.
+Finally, remove english stop words.
 `keyword`::
 Default implementation: `org.apache.lucene.analysis.core.KeywordAnalyzer`.
 +
