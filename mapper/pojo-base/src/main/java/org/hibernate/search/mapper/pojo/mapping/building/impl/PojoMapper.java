@@ -362,7 +362,10 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		 * Note this will require to allow them to define their own indexing plan APIs.
 		 */
 		PojoEntityTypeAdditionalMetadata entityTypeMetadata = typeAdditionalMetadataProvider.get( entityType )
-				.getEntityTypeMetadata().orElseThrow( () -> log.missingEntityTypeMetadata( entityType ) );
+				.getEntityTypeMetadata()
+				// This should not be possible since this method is only called for entity types (see caller)
+				.orElseThrow( () -> new AssertionFailure( "Missing metadata for entity type '" + entityType
+						+ "'. There is a bug in Hibernate Search, please report it." ) );
 		PojoPathFilterFactory<Set<String>> pathFilterFactory = entityTypeMetadata.getPathFilterFactory();
 		Optional<? extends PojoImplicitReindexingResolver<T, Set<String>>> reindexingResolverOptional =
 				reindexingResolverBuildingHelper.buildOptional( entityType, pathFilterFactory );

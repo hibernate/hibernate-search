@@ -230,8 +230,11 @@ public interface Log extends BasicLogger {
 	SearchException missingInversePathInAssociationInverseSideMapping();
 
 	@Message(id = ID_OFFSET + 27,
-			value = "Type '%1$s' is not marked as an entity type and is not abstract, yet it is indexed or targeted"
-			+ " by an association from an indexed type. Please check your configuration.")
+			value = "Unable to index type '%1$s': this type is not an entity type."
+					+ " If you only expect subtypes to be instantiated, make this type abstract."
+					+ " If you expect this exact type to be instantiated and want it to be indexed, make it an entity type."
+					+ " Otherwise, ensure this type and its subtypes are never indexed by removing the @Indexed annotation"
+					+ " or by annotating the type with @Indexed(enabled = false).")
 	SearchException missingEntityTypeMetadata(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel);
 
 	@Message(id = ID_OFFSET + 29,
