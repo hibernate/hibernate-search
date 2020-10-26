@@ -14,14 +14,14 @@ import java.util.Map;
 import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.hibernate.search.engine.reporting.impl.EngineEventContextMessages;
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.common.reporting.EventContext;
-import org.hibernate.search.util.common.reporting.EventContextElement;
+import org.hibernate.search.engine.reporting.impl.EngineEventContextMessages;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.ToStringStyle;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.util.common.reporting.EventContextElement;
 import org.hibernate.search.util.common.reporting.impl.CommonEventContextMessages;
 
 public final class RootFailureCollector implements FailureCollector {
@@ -99,18 +99,18 @@ public final class RootFailureCollector implements FailureCollector {
 		@Override
 		public synchronized ContextualFailureCollectorImpl withContext(EventContext context) {
 			List<EventContextElement> elements = context.elements();
-			// This should not happen, but we want to be extra-cautious to avoid failures while handling failures
-			if ( elements.isEmpty() ) {
-				// Just log the problem and degrade gracefully.
-				log.unexpectedEmptyEventContext( new IllegalStateException( "Exception for stack trace" ) );
-				return withDefaultContext();
-			}
-			else {
+			try {
 				NonRootFailureCollector failureCollector = this;
 				for ( EventContextElement contextElement : elements ) {
 					failureCollector = failureCollector.withContext( contextElement );
 				}
 				return (ContextualFailureCollectorImpl) failureCollector;
+			}
+			// This should not happen, but we want to be extra-cautious to avoid failures while handling failures
+			catch (RuntimeException e) {
+				// Just log the problem and degrade gracefully.
+				log.exceptionWhileCollectingFailure( e.getMessage(), e );
+				return withDefaultContext();
 			}
 		}
 
