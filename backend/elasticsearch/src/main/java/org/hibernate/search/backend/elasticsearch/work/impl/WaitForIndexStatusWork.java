@@ -50,7 +50,7 @@ public class WaitForIndexStatusWork extends AbstractNonBulkableWork<Void> {
 					.param( "wait_for_status", requiredStatus.externalRepresentation() )
 					.param( "timeout", requiredStatusTimeoutInMs + "ms" );
 
-			builder.requestDeadline( Deadline.ofMilliseconds( requiredStatusTimeoutInMs ) );
+			builder.deadline( Deadline.ofMilliseconds( requiredStatusTimeoutInMs ) );
 
 			return builder.build();
 		}

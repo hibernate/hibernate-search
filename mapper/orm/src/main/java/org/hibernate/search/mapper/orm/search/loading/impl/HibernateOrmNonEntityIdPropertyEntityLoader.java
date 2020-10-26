@@ -23,12 +23,12 @@ import org.hibernate.exception.LockTimeoutException;
 import org.hibernate.jpa.QueryHints;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
-import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.util.common.SearchTimeoutException;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
@@ -70,14 +70,14 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 
 	@Override
 	public void loadBlocking(List<EntityReference> references,
-			Map<? super EntityReference, ? super E> entitiesByReference, TimeoutManager timeoutManager) {
+			Map<? super EntityReference, ? super E> entitiesByReference, Deadline deadline) {
 		Map<Object, EntityReference> documentIdSourceValueToReference = new HashMap<>();
 		for ( EntityReference reference : references ) {
 			documentIdSourceValueToReference.put( reference.id(), reference );
 		}
 
 		List<? extends E> loadedEntities;
-		Long timeout = timeoutManager.remainingTimeToHardTimeout();
+		Long timeout = deadline == null ? null : deadline.remainingTimeMillis();
 		try {
 			loadedEntities = loadEntities( documentIdSourceValueToReference.keySet(), timeout );
 		}

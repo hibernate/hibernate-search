@@ -64,7 +64,7 @@ final class StubSearchQuery<H> extends AbstractSearchQuery<H, SearchResult<H>>
 		timeoutManager.start();
 
 		SearchResult<H> result = backend.getBehavior().executeSearchWork(
-				indexNames, work, projectionContext, loadingContext, rootProjection, timeoutManager
+				indexNames, work, projectionContext, loadingContext, rootProjection, timeoutManager.hardDeadlineOrNull()
 		);
 
 		timeoutManager.stop();

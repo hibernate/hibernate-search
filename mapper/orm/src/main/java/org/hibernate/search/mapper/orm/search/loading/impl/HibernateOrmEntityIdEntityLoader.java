@@ -22,11 +22,11 @@ import org.hibernate.jpa.QueryHints;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
-import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.util.common.SearchTimeoutException;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 
 /**
  * An entity loader for indexed entities whose document ID is the entity ID.
@@ -62,9 +62,9 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 	}
 
 	@Override
-	public List<E> loadBlocking(List<EntityReference> references, TimeoutManager timeoutManager) {
+	public List<E> loadBlocking(List<EntityReference> references, Deadline deadline) {
 		if ( cacheLookupStrategyImplementor == null ) {
-			Long timeout = timeoutManager.remainingTimeToHardTimeout();
+			Long timeout = deadline == null ? null : deadline.remainingTimeMillis();
 			// Optimization: if we don't need to look up the cache, we don't need a map to store intermediary results.
 			try {
 				return doLoadEntities( references, timeout );
@@ -76,16 +76,15 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 			}
 		}
 		else {
-			return HibernateOrmComposableEntityLoader.super.loadBlocking( references, timeoutManager );
+			return HibernateOrmComposableEntityLoader.super.loadBlocking( references, deadline );
 		}
 	}
 
 	@Override
 	public void loadBlocking(List<EntityReference> references,
-			Map<? super EntityReference, ? super E> entitiesByReference, TimeoutManager timeoutManager) {
-
+			Map<? super EntityReference, ? super E> entitiesByReference, Deadline deadline) {
 		List<? extends E> loadedEntities;
-		Long timeout = timeoutManager.remainingTimeToHardTimeout();
+		Long timeout = deadline == null ? null : deadline.remainingTimeMillis();
 		try {
 			loadedEntities = doLoadEntities( references, timeout );
 		}

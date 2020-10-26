@@ -14,9 +14,9 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.util.common.logging.impl.DefaultLogCategories;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -28,12 +28,14 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 	private static final Log queryLog = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY );
 
 	private final ElasticsearchSearchResultExtractor<R> resultExtractor;
-	private final ElasticsearchTimeoutManager timeoutManager;
+	private final Deadline deadline;
+	private final boolean failOnDeadline;
 
 	protected SearchWork(Builder<R> builder) {
 		super( builder );
 		this.resultExtractor = builder.resultExtractor;
-		this.timeoutManager = builder.timeoutManager;
+		this.deadline = builder.deadline;
+		this.failOnDeadline = builder.failOnDeadline;
 	}
 
 	@Override
@@ -49,7 +51,7 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 	@Override
 	protected R generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
 		JsonObject body = response.body();
-		return resultExtractor.extract( body, timeoutManager );
+		return resultExtractor.extract( body, failOnDeadline ? deadline : null );
 	}
 
 	public static class Builder<R>
@@ -84,7 +86,8 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 		private Integer scrollSize;
 		private String scrollTimeout;
 		private Set<String> routingKeys;
-		private ElasticsearchTimeoutManager timeoutManager;
+		private Deadline deadline;
+		private boolean failOnDeadline;
 
 		private Builder(JsonObject payload, ElasticsearchSearchResultExtractor<R> resultExtractor, Boolean trackTotalHits,
 				boolean allowPartialSearchResultsSupported) {
@@ -122,8 +125,9 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 		}
 
 		@Override
-		public SearchWorkBuilder<R> timeout(ElasticsearchTimeoutManager timeoutManager) {
-			this.timeoutManager = timeoutManager;
+		public SearchWorkBuilder<R> deadline(Deadline deadline, boolean failOnDeadline) {
+			this.deadline = deadline;
+			this.failOnDeadline = failOnDeadline;
 			return this;
 		}
 
@@ -182,9 +186,9 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 				}
 			}
 
-			if ( timeoutManager.defined() ) {
+			if ( deadline != null ) {
 				// Server-side timeout: the search will truncate results or fail on timeout.
-				builder.param( "timeout", timeoutManager.timeoutString() );
+				builder.param( "timeout", deadline.remainingTimeMillis() + "ms" );
 				if ( allowPartialSearchResultsSupported ) {
 					// If ( timeoutManager.exceptionOnTimeout() ):
 					// Ask the server to fail on timeout.
@@ -196,13 +200,13 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 					// Ask the server to truncate results on timeout.
 					// This is normally the default behavior, but can be overridden with server-side settings,
 					// so we set it just to be safe.
-					builder.param( "allow_partial_search_results", !timeoutManager.hasHardTimeout() );
+					builder.param( "allow_partial_search_results", !failOnDeadline );
 				}
 
 				// Client-side timeout: the search will fail on timeout.
 				// This is necessary to address network problems: the server-side timeout would not detect that.
-				if ( timeoutManager.hasHardTimeout() ) {
-					builder.requestDeadline( timeoutManager );
+				if ( failOnDeadline ) {
+					builder.deadline( deadline );
 				}
 			}
 

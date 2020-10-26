@@ -11,6 +11,7 @@ import java.time.Duration;
 
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -29,14 +30,15 @@ public class TimeoutManager {
 	protected final TimingSource timingSource;
 	protected final Long timeoutMs;
 	protected final Type type;
+	private final DynamicDeadline deadline;
 
 	private Long start;
-	boolean timedOut = false;
 
 	public TimeoutManager(TimingSource timingSource, Long timeoutMs, Type type) {
 		this.timingSource = timingSource;
 		this.timeoutMs = timeoutMs;
 		this.type = type;
+		this.deadline = timeoutMs == null ? null : new DynamicDeadline();
 
 		timingSource.ensureInitialized();
 	}
@@ -53,18 +55,23 @@ public class TimeoutManager {
 	}
 
 	/**
-	 * If no hard timeout is defined, returns {@code null}.
-	 *
-	 * @return the remaining time to hard timeout in milliseconds
-	 * @throws org.hibernate.search.util.common.SearchTimeoutException If the timeout was reached and
-	 * a hard timeout was requested.
+	 * @return The deadline for the timeout defined by this timeout manager,
+	 * {@code null} if no timeout is set.
 	 */
-	public Long remainingTimeToHardTimeout() {
-		if ( !Type.EXCEPTION.equals( type ) ) {
+	public Deadline deadlineOrNull() {
+		return this.deadline;
+	}
+
+	/**
+	 * @return The hard deadline defined by this timeout manager,
+	 * i.e. the deadline beyond which an exception should be thrown.
+	 * {@code null} if no hard timeout is set.
+	 */
+	public Deadline hardDeadlineOrNull() {
+		if ( !hasHardTimeout() ) {
 			return null;
 		}
-
-		return checkTimeLeftInMilliseconds();
+		return this.deadline;
 	}
 
 	public long timeoutBaseline() {
@@ -72,34 +79,11 @@ public class TimeoutManager {
 	}
 
 	/**
-	 * @return {@code true} if the timeout was reached, {@code false} otherwise.
-	 * @throws org.hibernate.search.util.common.SearchTimeoutException If the timeout was reached and
-	 * a hard timeout was requested.
-	 */
-	public Long checkTimeLeftInMilliseconds() {
-		if ( timeoutMs == null ) {
-			return null;
-		}
-		else {
-			final long elapsedTime = elapsedTimeInMilliseconds();
-			long timeLeft = timeoutMs - elapsedTime;
-			if ( timeLeft <= 0 ) {
-				forceTimedOut();
-				// Timed out: don't return a negative number.
-				return 0L;
-			}
-			else {
-				return timeLeft;
-			}
-		}
-	}
-
-	/**
 	 * @return {@code true} if the timeout was reached in a previous call to {@link #checkTimedOut()},
 	 * {@code false} otherwise.
 	 */
 	public boolean isTimedOut() {
-		return timedOut;
+		return deadline != null && deadline.timedOut;
 	}
 
 	/**
@@ -108,13 +92,17 @@ public class TimeoutManager {
 	 * a hard timeout was requested.
 	 */
 	public boolean checkTimedOut() {
-		Long timeLeft = checkTimeLeftInMilliseconds();
-		return timeLeft != null && timeLeft <= 0;
+		if ( deadline == null ) {
+			return false;
+		}
+		return deadline.remainingTimeMillis() <= 0;
 	}
 
 	public void forceTimedOut() {
-		this.timedOut = Boolean.TRUE;
-		onTimedOut();
+		if ( deadline == null ) {
+			return;
+		}
+		this.deadline.forceTimeout();
 	}
 
 	public boolean hasHardTimeout() {
@@ -131,6 +119,29 @@ public class TimeoutManager {
 
 	protected long elapsedTimeInMilliseconds() {
 		return timingSource.monotonicTimeEstimate() - start;
+	}
+
+	final class DynamicDeadline implements Deadline {
+		boolean timedOut = false;
+
+		@Override
+		public long remainingTimeMillis() {
+			final long elapsedTime = elapsedTimeInMilliseconds();
+			long timeLeft = timeoutMs - elapsedTime;
+			if ( timeLeft <= 0 ) {
+				forceTimeout();
+				// Timed out: don't return a negative number.
+				return 0L;
+			}
+			else {
+				return timeLeft;
+			}
+		}
+
+		void forceTimeout() {
+			this.timedOut = true;
+			onTimedOut();
+		}
 	}
 }
 

@@ -10,9 +10,9 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 
 
 public interface SearchWorkBuilder<R> extends ElasticsearchWorkBuilder<NonBulkableWork<R>> {
@@ -27,7 +27,7 @@ public interface SearchWorkBuilder<R> extends ElasticsearchWorkBuilder<NonBulkab
 
 	SearchWorkBuilder<R> requestTransformer(Function<ElasticsearchRequest, ElasticsearchRequest> requestTransformer);
 
-	SearchWorkBuilder<R> timeout(ElasticsearchTimeoutManager timeoutManager);
+	SearchWorkBuilder<R> deadline(Deadline deadline, boolean allowPartialResults);
 
 	SearchWorkBuilder<R> disableTrackTotalHits();
 

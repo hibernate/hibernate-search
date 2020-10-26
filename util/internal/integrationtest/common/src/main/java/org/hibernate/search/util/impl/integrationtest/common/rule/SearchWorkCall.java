@@ -21,11 +21,10 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
-import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.timeout.impl.StubTimeoutManager;
 
 class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 
@@ -35,21 +34,21 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 	private final LoadingContext<?, ?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
 	private final StubSearchWorkBehavior<?> behavior;
-	private final StubTimeoutManager timeoutManager;
+	private final Deadline deadline;
 
 	SearchWorkCall(Set<String> indexNames,
 			StubSearchWork work,
 			StubSearchProjectionContext projectionContext,
 			LoadingContext<?, ?> loadingContext,
 			StubSearchProjection<T> rootProjection,
-			StubTimeoutManager timeoutManager) {
+			Deadline deadline) {
 		this.indexNames = indexNames;
 		this.work = work;
 		this.projectionContext = projectionContext;
 		this.loadingContext = loadingContext;
 		this.rootProjection = rootProjection;
 		this.behavior = null;
-		this.timeoutManager = timeoutManager;
+		this.deadline = deadline;
 	}
 
 	SearchWorkCall(Set<String> indexNames,
@@ -61,7 +60,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 		this.loadingContext = null;
 		this.rootProjection = null;
 		this.behavior = behavior;
-		this.timeoutManager = null;
+		this.deadline = null;
 	}
 
 	public <U> CallBehavior<SearchResult<U>> verify(SearchWorkCall<U> actualCall) {
@@ -79,7 +78,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 						actualCall.projectionContext,
 						actualCall.loadingContext.createProjectionHitMapper(),
 						actualCall.rootProjection,
-						behavior.getRawHits(), actualCall.timeoutManager
+						behavior.getRawHits(), actualCall.deadline
 				),
 				Collections.emptyMap(),
 				Duration.ZERO, false
@@ -94,7 +93,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 	static <H> List<H> getResults(StubSearchProjectionContext actualProjectionContext,
 			ProjectionHitMapper<?, ?> actualProjectionHitMapper,
 			StubSearchProjection<H> actualRootProjection,
-			List<?> rawHits, TimeoutManager timeoutManager) {
+			List<?> rawHits, Deadline deadline) {
 		List<Object> extractedElements = new ArrayList<>( rawHits.size() );
 
 		for ( Object rawHit : rawHits ) {
@@ -104,7 +103,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 			);
 		}
 
-		LoadingResult<?, ?> loadingResult = actualProjectionHitMapper.loadBlocking( timeoutManager );
+		LoadingResult<?, ?> loadingResult = actualProjectionHitMapper.loadBlocking( deadline );
 
 		List<H> hits = new ArrayList<>( rawHits.size() );
 

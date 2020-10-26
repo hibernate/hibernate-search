@@ -30,6 +30,7 @@ import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResultTotal;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchScrollResult;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
@@ -39,7 +40,6 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.timeout.impl.StubTimeoutManager;
 
 class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
@@ -246,10 +246,10 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	@Override
 	public <T> SearchResult<T> executeSearchWork(Set<String> indexNames, StubSearchWork work,
 			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext,
-			StubSearchProjection<T> rootProjection, StubTimeoutManager timeoutManager) {
+			StubSearchProjection<T> rootProjection, Deadline deadline) {
 		return searchCalls.verify(
 				new SearchWorkCall<>( indexNames, work, projectionContext, loadingContext, rootProjection,
-						timeoutManager ),
+						deadline ),
 				(call1, call2) -> call1.verify( call2 ),
 				noExpectationsBehavior( () -> new SimpleSearchResult<>(
 						true, 0L, Collections.emptyList(), Collections.emptyMap(), Duration.ZERO, false
@@ -302,10 +302,10 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	@Override
 	public <T> SearchScrollResult<T> executeNextScrollWork(Set<String> indexNames, StubSearchWork work,
 			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext,
-			StubSearchProjection<T> rootProjection, StubTimeoutManager timeoutManager) {
+			StubSearchProjection<T> rootProjection, Deadline deadline) {
 		return nextScrollCalls.verify(
 				new NextScrollWorkCall<>( indexNames, work, projectionContext, loadingContext, rootProjection,
-						timeoutManager ),
+						deadline ),
 				(call1, call2) -> call1.verify( call2 ),
 				noExpectationsBehavior( () ->
 						new SimpleSearchScrollResult<>( SimpleSearchResultTotal.exact( 0L ),

@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.loading.spi;
 
 import java.util.List;
 
-import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 
 @SuppressWarnings({ "unchecked", "rawtypes" }) // This implementation works for any E
 class IdentityEntityLoader<E> implements EntityLoader<E, E> {
@@ -20,7 +20,7 @@ class IdentityEntityLoader<E> implements EntityLoader<E, E> {
 	}
 
 	@Override
-	public List<E> loadBlocking(List<E> references, TimeoutManager timeoutManager) {
+	public List<E> loadBlocking(List<E> references, Deadline timeoutManager) {
 		return references;
 	}
 }

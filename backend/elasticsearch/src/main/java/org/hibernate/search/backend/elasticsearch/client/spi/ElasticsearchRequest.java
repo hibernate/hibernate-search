@@ -160,7 +160,7 @@ public final class ElasticsearchRequest {
 			return this;
 		}
 
-		public Builder requestDeadline(Deadline deadline) {
+		public Builder deadline(Deadline deadline) {
 			this.deadline = deadline;
 			return this;
 		}

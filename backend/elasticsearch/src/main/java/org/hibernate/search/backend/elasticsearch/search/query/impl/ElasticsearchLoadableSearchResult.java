@@ -14,10 +14,10 @@ import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionTransformContext;
-import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.SearchResultTotal;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 
 /**
  * A search result from the backend that offers a method to load data from the mapper.
@@ -41,7 +41,7 @@ public class ElasticsearchLoadableSearchResult<H> {
 	private final Boolean timedOut;
 	private final boolean hasHits;
 	private final String scrollId;
-	private final ElasticsearchTimeoutManager timeoutManager;
+	private final Deadline deadline;
 
 	ElasticsearchLoadableSearchResult(ElasticsearchSearchQueryExtractContext extractContext,
 			ElasticsearchSearchProjection<?, H> rootProjection,
@@ -49,7 +49,7 @@ public class ElasticsearchLoadableSearchResult<H> {
 			List<Object> extractedHits,
 			Map<AggregationKey<?>, ?> extractedAggregations,
 			Integer took, Boolean timedOut, String scrollId,
-			ElasticsearchTimeoutManager timeoutManager) {
+			Deadline deadline) {
 		this.extractContext = extractContext;
 		this.rootProjection = rootProjection;
 		this.resultTotal = resultTotal;
@@ -59,14 +59,14 @@ public class ElasticsearchLoadableSearchResult<H> {
 		this.timedOut = timedOut;
 		this.hasHits = !extractedHits.isEmpty();
 		this.scrollId = scrollId;
-		this.timeoutManager = timeoutManager;
+		this.deadline = deadline;
 	}
 
 	ElasticsearchSearchResultImpl<H> loadBlocking() {
 		SearchProjectionTransformContext transformContext = extractContext.createProjectionTransformContext();
 
 		LoadingResult<?, ?> loadingResult = extractContext.getProjectionHitMapper()
-				.loadBlocking( timeoutManager );
+				.loadBlocking( deadline );
 
 		int readIndex = 0;
 		int writeIndex = 0;

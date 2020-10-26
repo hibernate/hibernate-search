@@ -9,8 +9,8 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
-import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ScrollWorkBuilder;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 
 import com.google.gson.JsonObject;
 
@@ -18,18 +18,20 @@ import com.google.gson.JsonObject;
 public class ScrollWork<R> extends AbstractNonBulkableWork<R> {
 
 	private final ElasticsearchSearchResultExtractor<R> resultExtractor;
-	private final ElasticsearchTimeoutManager timeoutManager;
+	private final Deadline deadline;
+	private final boolean failOnDeadline;
 
 	protected ScrollWork(Builder<R> builder) {
 		super( builder );
 		this.resultExtractor = builder.resultExtractor;
-		this.timeoutManager = builder.timeoutManager;
+		this.deadline = builder.deadline;
+		this.failOnDeadline = builder.failOnDeadline;
 	}
 
 	@Override
 	protected R generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
 		JsonObject body = response.body();
-		return resultExtractor.extract( body, timeoutManager );
+		return resultExtractor.extract( body, failOnDeadline ? deadline : null );
 	}
 
 	public static class Builder<R>
@@ -38,15 +40,21 @@ public class ScrollWork<R> extends AbstractNonBulkableWork<R> {
 		private final String scrollId;
 		private final String scrollTimeout;
 		private final ElasticsearchSearchResultExtractor<R> resultExtractor;
-		private final ElasticsearchTimeoutManager timeoutManager;
+		private Deadline deadline;
+		private boolean failOnDeadline;
 
-		public Builder(String scrollId, String scrollTimeout, ElasticsearchSearchResultExtractor<R> resultExtractor,
-				ElasticsearchTimeoutManager timeoutManager) {
+		public Builder(String scrollId, String scrollTimeout, ElasticsearchSearchResultExtractor<R> resultExtractor) {
 			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.scrollId = scrollId;
 			this.scrollTimeout = scrollTimeout;
 			this.resultExtractor = resultExtractor;
-			this.timeoutManager = timeoutManager;
+		}
+
+		@Override
+		public Builder<R> deadline(Deadline deadline, boolean failOnDeadline) {
+			this.deadline = deadline;
+			this.failOnDeadline = failOnDeadline;
+			return this;
 		}
 
 		@Override

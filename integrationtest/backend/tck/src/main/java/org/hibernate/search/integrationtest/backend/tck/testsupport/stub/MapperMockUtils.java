@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.stub;
 
 import static org.hibernate.search.util.impl.integrationtest.common.MockUtils.referenceMatcher;
-import static org.mockito.ArgumentMatchers.notNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
@@ -70,7 +70,7 @@ public final class MapperMockUtils {
 		Set<R> keysToLoad = context.loadingMap.keySet();
 		if ( !keysToLoad.isEmpty() ) {
 			when( objectLoaderMock.loadBlocking(
-					MockUtils.collectionAnyOrderMatcher( new ArrayList<>( keysToLoad ) ), notNull() ) )
+					MockUtils.collectionAnyOrderMatcher( new ArrayList<>( keysToLoad ) ), any() ) )
 					.thenAnswer( invocationOnMock -> invocationOnMock.<List<R>>getArgument( 0 ).stream()
 							.map( context.loadingMap::get )
 							.collect( Collectors.toList() ) );

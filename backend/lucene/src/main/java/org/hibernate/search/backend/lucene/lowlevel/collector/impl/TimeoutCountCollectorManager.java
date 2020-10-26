@@ -8,21 +8,21 @@ package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 
 import java.util.Collection;
 
-import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 
 import org.apache.lucene.search.CollectorManager;
 
 public class TimeoutCountCollectorManager implements CollectorManager<TimeoutCountCollector, Integer> {
 
-	private final LuceneTimeoutManager timeoutManager;
+	private final Deadline deadline;
 
-	public TimeoutCountCollectorManager(LuceneTimeoutManager timeoutManager) {
-		this.timeoutManager = timeoutManager;
+	public TimeoutCountCollectorManager(Deadline deadline) {
+		this.deadline = deadline;
 	}
 
 	@Override
 	public TimeoutCountCollector newCollector() {
-		return new TimeoutCountCollector( timeoutManager );
+		return new TimeoutCountCollector( deadline );
 	}
 
 	@Override

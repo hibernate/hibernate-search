@@ -15,6 +15,7 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExec
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.MultiCollector;
@@ -79,9 +80,10 @@ public class CollectorSet {
 		}
 
 		private Collector wrapTimeLimitingCollectorIfNecessary(Collector collector, LuceneTimeoutManager timeoutManager) {
-			final Long timeoutLeft = timeoutManager.checkTimeLeftInMilliseconds();
-			if ( timeoutLeft != null ) {
-				TimeLimitingCollector wrapped = new TimeLimitingCollector( collector, timeoutManager.createCounter(), timeoutLeft );
+			final Deadline deadline = timeoutManager.deadlineOrNull();
+			if ( deadline != null ) {
+				TimeLimitingCollector wrapped = new TimeLimitingCollector( collector, timeoutManager.createCounter(),
+						deadline.remainingTimeMillis() );
 				// The timeout starts from the given baseline, not from when the collector is first used.
 				// This is important because some collectors are applied during a second search.
 				wrapped.setBaseline( timeoutManager.timeoutBaseline() );

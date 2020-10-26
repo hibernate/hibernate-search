@@ -140,8 +140,8 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 			return completableFuture;
 		}
 
-		Long currentTimeoutValue = ( deadline == null ) ?
-				Long.valueOf( requestTimeoutMs.get() ) : deadline.remainingTimeToHardTimeout();
+		long currentTimeoutValue = deadline == null ?
+				Long.valueOf( requestTimeoutMs.get() ) : deadline.remainingTimeMillis();
 
 		/*
 		 * TODO HSEARCH-3590 maybe the callback should also cancel the request?
@@ -183,10 +183,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 			return;
 		}
 
-		Long timeToHardTimeout = deadline.remainingTimeToHardTimeout();
-		if ( timeToHardTimeout == null ) {
-			return;
-		}
+		long timeToHardTimeout = deadline.remainingTimeMillis();
 
 		// set a per-request socket timeout
 		int socketTimeoutMs = ( timeToHardTimeout <= Integer.MAX_VALUE ) ? Math.toIntExact( timeToHardTimeout ) : -1;

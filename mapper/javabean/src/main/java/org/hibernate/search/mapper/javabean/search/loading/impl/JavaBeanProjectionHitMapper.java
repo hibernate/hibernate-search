@@ -12,10 +12,10 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class JavaBeanProjectionHitMapper implements ProjectionHitMapper<EntityReference, Void> {
@@ -34,7 +34,7 @@ public class JavaBeanProjectionHitMapper implements ProjectionHitMapper<EntityRe
 	}
 
 	@Override
-	public LoadingResult<EntityReference, Void> loadBlocking(TimeoutManager timeoutManager) {
+	public LoadingResult<EntityReference, Void> loadBlocking(Deadline deadline) {
 		return new JavaBeanUnusuableGetLoadingResult( documentReferenceConverter );
 	}
 
