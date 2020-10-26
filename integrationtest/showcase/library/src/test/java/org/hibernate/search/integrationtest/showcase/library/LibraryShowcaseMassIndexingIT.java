@@ -15,6 +15,7 @@ import org.hibernate.search.integrationtest.showcase.library.service.TestDataSer
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,7 +24,6 @@ import org.junit.runner.RunWith;
 import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -34,7 +34,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 		"spring.jpa.properties.hibernate.search.automatic_indexing.strategy=none"
 })
 @ActiveProfiles(resolver = TestActiveProfilesResolver.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class LibraryShowcaseMassIndexingIT {
 
 	private static final int NUMBER_OF_BOOKS = 200;
@@ -68,6 +67,14 @@ public class LibraryShowcaseMassIndexingIT {
 	@Before
 	public void initData() {
 		testDataService.initBooksDataSet( NUMBER_OF_BOOKS );
+	}
+
+	@After
+	public void cleanUpData() {
+		// we're cleaning the data manually,
+		// in order to have a class level application context,
+		// to support the job of ExpectedLog4jLog
+		documentService.purge();
 	}
 
 	@Test
@@ -113,4 +120,5 @@ public class LibraryShowcaseMassIndexingIT {
 		}
 		assertThat( documentService.countIndexed() ).isEqualTo( NUMBER_OF_BOOKS );
 	}
+
 }

@@ -32,4 +32,7 @@ public interface IndexSearchDocumentRepository {
 			int offset, int limit);
 
 	List<String> getAuthorsOfBooksHavingTerms(String terms, SortOrder order);
+
+	void purge();
+
 }
