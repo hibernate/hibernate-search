@@ -148,7 +148,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				if ( !( mappableTypeModel instanceof PojoRawTypeModel ) ) {
 					throw new AssertionFailure(
 							"Expected the mappable type model to be an instance of " + PojoRawTypeModel.class
-									+ ", got " + mappableTypeModel + " instead. There is probably a bug in the mapper implementation"
+									+ ", got " + mappableTypeModel + " instead."
 					);
 				}
 
@@ -364,8 +364,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		PojoEntityTypeAdditionalMetadata entityTypeMetadata = typeAdditionalMetadataProvider.get( entityType )
 				.getEntityTypeMetadata()
 				// This should not be possible since this method is only called for entity types (see caller)
-				.orElseThrow( () -> new AssertionFailure( "Missing metadata for entity type '" + entityType
-						+ "'. There is a bug in Hibernate Search, please report it." ) );
+				.orElseThrow( () -> new AssertionFailure( "Missing metadata for entity type '" + entityType ) );
 		PojoPathFilterFactory<Set<String>> pathFilterFactory = entityTypeMetadata.getPathFilterFactory();
 		Optional<? extends PojoImplicitReindexingResolver<T, Set<String>>> reindexingResolverOptional =
 				reindexingResolverBuildingHelper.buildOptional( entityType, pathFilterFactory );

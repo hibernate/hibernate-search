@@ -173,7 +173,6 @@ public class AnnotationProcessorProvider {
 					.orElseThrow( () -> new AssertionFailure(
 							"Could not auto-detect the annotation type accepted by processor '"
 									+ processor + "'."
-									+ " There is a bug in Hibernate Search, please report it."
 					) );
 			if ( !processorAnnotationType.isAssignableFrom( encounteredAnnotationType ) ) {
 				throw log.invalidAnnotationTypeForAnnotationProcessor( processor, processorAnnotationType );

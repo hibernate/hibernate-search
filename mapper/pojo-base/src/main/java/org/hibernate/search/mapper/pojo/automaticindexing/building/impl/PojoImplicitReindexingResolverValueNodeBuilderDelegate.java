@@ -73,7 +73,6 @@ class PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> {
 					+ ": attempt to convert a reindexing resolver builder to an incorrect type; "
 					+ " got " + targetTypeModel + ", but a subtype of " + valueRawTypeModel
 					+ " was expected."
-					+ " This is very probably a bug in Hibernate Search, please report it."
 			);
 		}
 	}
@@ -131,7 +130,6 @@ class PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> {
 		if ( frozen ) {
 			throw new AssertionFailure(
 					"A mutating method was called on " + this + " after it was frozen."
-					+ " There is a bug in Hibernate Search, please report it."
 			);
 		}
 	}
@@ -140,7 +138,6 @@ class PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> {
 		if ( !frozen ) {
 			throw new AssertionFailure(
 					"A method was called on " + this + " before it was frozen, but a preliminary freeze is required."
-							+ " There is a bug in Hibernate Search, please report it."
 			);
 		}
 	}

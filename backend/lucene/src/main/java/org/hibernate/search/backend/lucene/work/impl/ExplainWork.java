@@ -70,8 +70,7 @@ class ExplainWork implements ReadWork<Explanation> {
 		}
 		if ( topDocs.scoreDocs.length > 1 ) {
 			throw new AssertionFailure(
-					"Multiple documents match query " + explainedDocumentQuery + "." +
-							" There is a bug in Hibernate Search, please report it."
+					"Multiple documents match query " + explainedDocumentQuery + "."
 			);
 		}
 		return topDocs.scoreDocs[0].doc;

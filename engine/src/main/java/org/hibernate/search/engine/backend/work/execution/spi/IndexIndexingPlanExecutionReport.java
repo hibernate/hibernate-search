@@ -51,7 +51,6 @@ public final class IndexIndexingPlanExecutionReport<R> {
 		if ( builder.throwable == null && !failingEntityReferences.isEmpty() ) {
 			this.throwable = new AssertionFailure(
 					"Unknown throwable: missing throwable when reporting the failure."
-							+ " There is probably a bug in Hibernate Search, please report it."
 			);
 		}
 		else {

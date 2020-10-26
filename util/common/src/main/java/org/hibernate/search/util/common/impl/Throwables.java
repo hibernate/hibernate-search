@@ -27,7 +27,7 @@ public final class Throwables {
 			throw (Error) throwable;
 		}
 		else if ( throwable == null ) {
-			throw new AssertionFailure( "Null throwable - there is probably a bug" );
+			throw new AssertionFailure( "Null throwable" );
 		}
 		else {
 			return new SearchException( throwable.getMessage(), throwable );
@@ -43,10 +43,10 @@ public final class Throwables {
 			throw (Error) throwable;
 		}
 		else if ( throwable == null ) {
-			throw new AssertionFailure( "Null throwable - there is probably a bug" );
+			throw new AssertionFailure( "Null throwable" );
 		}
 		else {
-			throw new AssertionFailure( "Unexpected throwable type - there is probably a bug", throwable );
+			throw new AssertionFailure( "Unexpected throwable type", throwable );
 		}
 	}
 

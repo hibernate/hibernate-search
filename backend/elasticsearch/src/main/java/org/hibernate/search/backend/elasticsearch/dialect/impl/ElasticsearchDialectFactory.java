@@ -64,7 +64,6 @@ public class ElasticsearchDialectFactory {
 			// The version is supposed to be fetched from the cluster itself, so it should be complete
 			throw new AssertionFailure(
 					"The Elasticsearch version is incomplete when creating the protocol dialect."
-					+ " There is probably a bug in Hibernate Search, please report it."
 			);
 		}
 		int minor = minorOptional.getAsInt();

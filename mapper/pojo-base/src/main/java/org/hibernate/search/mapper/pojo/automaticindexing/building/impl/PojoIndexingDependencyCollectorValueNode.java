@@ -214,7 +214,6 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 							+ ": the dependency collector was passed a resolver builder with incorrect type; "
 							+ " got " + inverseSideRawEntityType + ", but a subtype of " + expectedInverseSideEntityRawType
 							+ " was expected."
-							+ " This is very probably a bug in Hibernate Search, please report it."
 			);
 		}
 

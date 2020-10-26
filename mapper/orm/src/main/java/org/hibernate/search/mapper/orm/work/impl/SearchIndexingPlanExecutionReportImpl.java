@@ -21,10 +21,7 @@ public class SearchIndexingPlanExecutionReportImpl implements SearchIndexingPlan
 		Throwable throwable = indexReport.throwable().orElse( null );
 		List<EntityReference> failingEntities = indexReport.failingEntityReferences();
 		if ( throwable == null && !failingEntities.isEmpty() ) {
-			throwable = new AssertionFailure(
-					"Unknown throwable: missing throwable when reporting the failure."
-							+ " There is probably a bug in Hibernate Search, please report it."
-			);
+			throwable = new AssertionFailure( "Unknown throwable: missing throwable when reporting the failure." );
 		}
 		return new SearchIndexingPlanExecutionReportImpl( throwable, failingEntities );
 	}

@@ -163,7 +163,6 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 		if ( clientImplementor == null ) {
 			throw new AssertionFailure(
 					"Attempt to retrieve Elasticsearch client or related information before the backend was started."
-							+ "There is probably a bug in Hibernate Search, please report it."
 			);
 		}
 	}
