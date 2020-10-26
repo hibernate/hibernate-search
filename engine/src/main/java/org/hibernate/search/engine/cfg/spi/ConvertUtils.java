@@ -284,13 +284,9 @@ public final class ConvertUtils {
 				return ( (BeanReference<?>) value ).asSubTypeOf( expectedType );
 			}
 			if ( value instanceof Class ) {
-				Class<?> castedValue = (Class<?>) value;
-				if ( !expectedType.isAssignableFrom( castedValue ) ) {
-					throw log.invalidBeanType( expectedType, castedValue );
-				}
-				@SuppressWarnings("unchecked") // Checked using reflection just above
-				Class<? extends T> castedValueAsChildType = (Class<? extends T>) value;
-				return BeanReference.of( castedValueAsChildType );
+				// Don't check the given class is assignable to the expected type now:
+				// the bean provider may return an instance of a subtype of the given class.
+				return BeanReference.of( (Class<?>) value ).asSubTypeOf( expectedType );
 			}
 			if ( value instanceof String ) {
 				return BeanReference.of( expectedType, (String) value );
