@@ -21,7 +21,6 @@ import org.hibernate.search.batch.jsr352.core.logging.impl.Log;
 import org.hibernate.search.batch.jsr352.core.massindexing.impl.JobContextData;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
-import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.StringHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -52,15 +51,6 @@ public final class JobContextUtil {
 			EntityManagerFactory emf = getEntityManagerFactory( emfRegistry, entityManagerFactoryNamespace, entityManagerFactoryReference );
 			data = createData( emf, entityTypes );
 			jobContext.setTransientUserData( data );
-		}
-		return data;
-	}
-
-	public static JobContextData getExistingData(JobContext jobContext) {
-		JobContextData data = (JobContextData) jobContext.getTransientUserData();
-		if ( data == null ) {
-			throw new AssertionFailure( "The job context data was unexpectedly missing;"
-					+ " there probably is something wrong with how Hibernate Search set up the job context data." );
 		}
 		return data;
 	}
