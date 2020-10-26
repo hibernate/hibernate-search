@@ -191,12 +191,6 @@ public interface Log extends BasicLogger {
 	SearchException invalidBeanReferencePropertyValue(@FormatWith(ClassFormatter.class) Class<?> expectedType,
 			String nestedErrorMessage, @Cause Exception cause);
 
-	@Message(id = ID_OFFSET + 48,
-			value = "Invalid bean type: type '%2$s' cannot be assigned to '%1$s'.")
-	SearchException invalidBeanType(
-			@FormatWith(ClassFormatter.class) Class<?> expectedSuperType,
-			@FormatWith(ClassFormatter.class) Class<?> actualType);
-
 	@Message(id = ID_OFFSET + 51,
 			value = "Invalid use of per-field boost: the predicate score is constant."
 					+ " Cannot assign a different boost to each field when the predicate score is constant.")
