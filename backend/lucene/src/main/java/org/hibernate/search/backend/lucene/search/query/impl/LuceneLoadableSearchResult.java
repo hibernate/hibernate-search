@@ -70,7 +70,7 @@ public class LuceneLoadableSearchResult<H> {
 
 	LuceneSearchResult<H> loadBlocking() {
 		SearchProjectionTransformContext transformContext = new SearchProjectionTransformContext( convertContext );
-		LoadingResult<?, ?> loadingResult = projectionHitMapper.loadBlocking( timeoutManager );
+		LoadingResult<?, ?> loadingResult = projectionHitMapper.loadBlocking( timeoutManager.hardDeadlineOrNull() );
 
 		int readIndex = 0;
 		int writeIndex = 0;

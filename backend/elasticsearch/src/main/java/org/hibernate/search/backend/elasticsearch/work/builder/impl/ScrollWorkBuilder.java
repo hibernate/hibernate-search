@@ -7,8 +7,11 @@
 package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 
 
 public interface ScrollWorkBuilder<R> extends ElasticsearchWorkBuilder<NonBulkableWork<R>> {
+
+	ScrollWorkBuilder<R> deadline(Deadline deadline, boolean allowPartialResults);
 
 }

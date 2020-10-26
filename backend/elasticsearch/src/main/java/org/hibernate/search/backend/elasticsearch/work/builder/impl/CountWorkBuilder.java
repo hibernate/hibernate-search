@@ -10,9 +10,9 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 
 import com.google.gson.JsonObject;
 
@@ -26,6 +26,6 @@ public interface CountWorkBuilder extends ElasticsearchWorkBuilder<NonBulkableWo
 
 	CountWorkBuilder requestTransformer(Function<ElasticsearchRequest, ElasticsearchRequest> requestTransformer);
 
-	CountWorkBuilder timeout(ElasticsearchTimeoutManager timeoutManager);
+	CountWorkBuilder deadline(Deadline deadline);
 
 }

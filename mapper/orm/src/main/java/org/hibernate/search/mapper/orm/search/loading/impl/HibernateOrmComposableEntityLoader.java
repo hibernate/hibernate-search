@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
-import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 
 /**
  * An {@link EntityLoader} that can be easily composed with others entity loaders.
@@ -25,10 +25,10 @@ import org.hibernate.search.mapper.orm.common.EntityReference;
 public interface HibernateOrmComposableEntityLoader<E> extends EntityLoader<EntityReference, E> {
 
 	@Override
-	default List<E> loadBlocking(List<EntityReference> references, TimeoutManager timeoutManager) {
+	default List<E> loadBlocking(List<EntityReference> references, Deadline deadline) {
 		// Load all references
 		Map<EntityReference, E> objectsByReference = new HashMap<>();
-		loadBlocking( references, objectsByReference, timeoutManager );
+		loadBlocking( references, objectsByReference, deadline );
 
 		// Re-create the list of objects in the same order
 		List<E> result = new ArrayList<>( references.size() );
@@ -48,9 +48,9 @@ public interface HibernateOrmComposableEntityLoader<E> extends EntityLoader<Enti
 	 * @param references A list of references to the objects to load.
 	 * @param entitiesByReference A map with references as keys and loaded entities as values.
 	 * Initial values are undefined and the loader must not rely on them.
-	 * @param timeoutManager The timeout manager to apply to the loading in milliseconds.
+	 * @param deadline The timeout manager to apply to the loading in milliseconds.
 	 */
 	void loadBlocking(List<EntityReference> references, Map<? super EntityReference, ? super E> entitiesByReference,
-			TimeoutManager timeoutManager);
+			Deadline deadline);
 
 }

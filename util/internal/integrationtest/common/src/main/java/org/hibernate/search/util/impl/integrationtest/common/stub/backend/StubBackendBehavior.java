@@ -16,6 +16,7 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
@@ -23,7 +24,6 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.timeout.impl.StubTimeoutManager;
 
 public abstract class StubBackendBehavior {
 
@@ -51,7 +51,7 @@ public abstract class StubBackendBehavior {
 
 	public abstract <T> SearchResult<T> executeSearchWork(Set<String> indexNames, StubSearchWork work,
 			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext,
-			StubSearchProjection<T> rootProjection, StubTimeoutManager timeoutManager);
+			StubSearchProjection<T> rootProjection, Deadline deadline);
 
 	public abstract CompletableFuture<?> executeIndexScaleWork(String indexName, StubIndexScaleWork work);
 
@@ -65,6 +65,6 @@ public abstract class StubBackendBehavior {
 
 	public abstract <T> SearchScrollResult<T> executeNextScrollWork(Set<String> indexNames, StubSearchWork work,
 			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext,
-			StubSearchProjection<T> rootProjection, StubTimeoutManager timeoutManager);
+			StubSearchProjection<T> rootProjection, Deadline deadline);
 
 }

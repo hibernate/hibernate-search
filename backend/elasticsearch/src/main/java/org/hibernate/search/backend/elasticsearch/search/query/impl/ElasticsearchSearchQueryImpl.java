@@ -170,7 +170,8 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		}
 		builder.query( filteredPayload )
 				.routingKeys( routingKeys )
-				.timeout( timeoutManager )
+				// soft timeout has no meaning for a count work
+				.deadline( timeoutManager.hardDeadlineOrNull() )
 				.requestTransformer(
 						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
 				);
@@ -227,7 +228,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		}
 		builder
 				.routingKeys( routingKeys )
-				.timeout( timeoutManager )
+				.deadline( timeoutManager.deadlineOrNull(), timeoutManager.hasHardTimeout() )
 				.requestTransformer(
 						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
 				);

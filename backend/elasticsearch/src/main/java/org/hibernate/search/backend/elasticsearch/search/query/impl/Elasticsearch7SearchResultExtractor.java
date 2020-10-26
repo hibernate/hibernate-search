@@ -18,12 +18,12 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregation;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
-import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.SearchResultTotal;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResultTotal;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -73,7 +73,7 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 
 	@Override
 	public ElasticsearchLoadableSearchResult<H> extract(JsonObject responseBody,
-			ElasticsearchTimeoutManager timeoutManager) {
+			Deadline deadline) {
 		ElasticsearchSearchQueryExtractContext extractContext = requestContext.createExtractContext(
 				responseBody
 		);
@@ -103,7 +103,7 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 				extractedHits,
 				extractedAggregations,
 				took, timedOut, scrollId,
-				timeoutManager
+				deadline
 		);
 	}
 

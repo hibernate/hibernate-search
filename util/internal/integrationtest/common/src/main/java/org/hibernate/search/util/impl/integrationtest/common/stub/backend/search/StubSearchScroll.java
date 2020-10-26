@@ -50,7 +50,7 @@ public class StubSearchScroll<T> implements SearchScroll<T> {
 		timeoutManager.start();
 
 		SearchScrollResult<T> result = behavior.executeNextScrollWork( indexNames, work, projectionContext,
-				loadingContext, rootProjection, timeoutManager
+				loadingContext, rootProjection, timeoutManager.hardDeadlineOrNull()
 		);
 
 		timeoutManager.stop();

@@ -7,23 +7,22 @@
 package org.hibernate.search.engine.common.timing.spi;
 
 /**
- * Common interface providing a deadline through the method {@link #remainingTimeToHardTimeout}.
+ * Common interface providing a deadline through the method {@link #remainingTimeMillis}.
  */
 public interface Deadline {
 
 	/**
-	 * If no hard timeout is defined, returns {@code null}.
-	 *
-	 * @return the remaining time to hard timeout in milliseconds
-	 * @throws org.hibernate.search.util.common.SearchTimeoutException If the timeout was reached and
-	 * a hard timeout was requested.
+	 * @return The remaining time to the deadline in milliseconds.
+	 * @throws org.hibernate.search.util.common.SearchTimeoutException If the deadline was reached
+	 * and it's a hard deadline requiring immediate failure.
 	 */
-	Long remainingTimeToHardTimeout();
+	long remainingTimeMillis();
 
 	/**
 	 * @param milliseconds The number of milliseconds until the deadline.
 	 * @return An immutable {@link Deadline} which does not track the passing time.
-	 * {@link #remainingTimeToHardTimeout()} will always return the same value.
+	 * {@link #remainingTimeMillis()} will always return the same value
+	 * and will never throw an exception.
 	 */
 	static Deadline ofMilliseconds(long milliseconds) {
 		return new StaticDeadline( milliseconds );

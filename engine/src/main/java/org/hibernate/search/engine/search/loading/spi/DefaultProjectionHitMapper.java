@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
-import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 public final class DefaultProjectionHitMapper<R, E> implements ProjectionHitMapper<R, E> {
@@ -36,7 +36,7 @@ public final class DefaultProjectionHitMapper<R, E> implements ProjectionHitMapp
 	}
 
 	@Override
-	public LoadingResult<R, E> loadBlocking(TimeoutManager timeoutManager) {
+	public LoadingResult<R, E> loadBlocking(Deadline deadline) {
 		List<? extends E> loadedObjects;
 		if ( referencesToLoad.isEmpty() ) {
 			// Avoid the call to the objectLoader:
@@ -46,7 +46,7 @@ public final class DefaultProjectionHitMapper<R, E> implements ProjectionHitMapp
 		else {
 			List<R> converted = referencesToLoad.stream().map( documentReferenceConverter::fromDocumentReference )
 					.collect( Collectors.toList() );
-			loadedObjects = objectLoader.loadBlocking( converted, timeoutManager );
+			loadedObjects = objectLoader.loadBlocking( converted, deadline );
 		}
 
 		return new DefaultLoadingResult<>( loadedObjects, documentReferenceConverter );

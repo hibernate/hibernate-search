@@ -8,14 +8,14 @@ package org.hibernate.search.engine.common.timing.spi;
 
 final class StaticDeadline implements Deadline {
 
-	private final long remainingTimeToHardTimeout;
+	private final long remainingTimeMillis;
 
-	StaticDeadline(long remainingTimeToHardTimeout) {
-		this.remainingTimeToHardTimeout = remainingTimeToHardTimeout;
+	StaticDeadline(long remainingTimeMillis) {
+		this.remainingTimeMillis = remainingTimeMillis;
 	}
 
 	@Override
-	public Long remainingTimeToHardTimeout() {
-		return remainingTimeToHardTimeout;
+	public long remainingTimeMillis() {
+		return remainingTimeMillis;
 	}
 }

@@ -102,7 +102,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		// since there is no possible to have partial result.
 		if ( timeoutManager.hasHardTimeout() ) {
 			return indexSearcher.search(
-					requestContext.getLuceneQuery(), new TimeoutCountCollectorManager( timeoutManager ) );
+					requestContext.getLuceneQuery(), new TimeoutCountCollectorManager( timeoutManager.deadlineOrNull() ) );
 		}
 
 		return indexSearcher.count( requestContext.getLuceneQuery() );

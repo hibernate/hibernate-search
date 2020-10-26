@@ -13,10 +13,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class HibernateOrmByTypeEntityLoader<T> implements EntityLoader<EntityReference, T> {
@@ -30,7 +30,7 @@ public class HibernateOrmByTypeEntityLoader<T> implements EntityLoader<EntityRef
 	}
 
 	@Override
-	public List<T> loadBlocking(List<EntityReference> references, TimeoutManager timeoutManager) {
+	public List<T> loadBlocking(List<EntityReference> references, Deadline timeoutManager) {
 		LinkedHashMap<EntityReference, T> objectsByReference = new LinkedHashMap<>( references.size() );
 		Map<HibernateOrmComposableEntityLoader<? extends T>, List<EntityReference>> referencesByDelegate = new HashMap<>();
 

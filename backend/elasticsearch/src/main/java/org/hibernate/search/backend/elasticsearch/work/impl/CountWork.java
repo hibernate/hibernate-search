@@ -14,9 +14,9 @@ import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.CountWorkBuilder;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 
 import com.google.gson.JsonObject;
 
@@ -39,7 +39,7 @@ public class CountWork extends AbstractNonBulkableWork<Long> {
 		private final List<URLEncodedString> indexNames = new ArrayList<>();
 		private JsonObject query;
 		private Set<String> routingKeys;
-		private ElasticsearchTimeoutManager timeoutManager;
+		private Deadline deadline;
 
 		public Builder() {
 			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
@@ -64,8 +64,8 @@ public class CountWork extends AbstractNonBulkableWork<Long> {
 		}
 
 		@Override
-		public CountWorkBuilder timeout(ElasticsearchTimeoutManager timeoutManager) {
-			this.timeoutManager = timeoutManager;
+		public CountWorkBuilder deadline(Deadline deadline) {
+			this.deadline = deadline;
 			return this;
 		}
 
@@ -85,9 +85,8 @@ public class CountWork extends AbstractNonBulkableWork<Long> {
 				builder.multiValuedParam( "routing", routingKeys );
 			}
 
-			if ( timeoutManager.hasHardTimeout() ) {
-				// soft timeout has no meaning for a count work
-				builder.requestDeadline( timeoutManager );
+			if ( deadline != null ) {
+				builder.deadline( deadline );
 			}
 
 			return builder.build();
