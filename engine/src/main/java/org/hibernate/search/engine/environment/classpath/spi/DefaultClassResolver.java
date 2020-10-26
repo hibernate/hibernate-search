@@ -37,7 +37,7 @@ public final class DefaultClassResolver implements ClassResolver {
 			return (Class<T>) Class.forName( className, true, aggregatedClassLoader );
 		}
 		catch (Exception | LinkageError e) {
-			throw log.unableToLoadTheClass( className, e );
+			throw log.unableToLoadTheClass( className, e.getMessage(), e );
 		}
 	}
 

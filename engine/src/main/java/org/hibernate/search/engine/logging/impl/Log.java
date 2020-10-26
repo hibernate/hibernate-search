@@ -64,8 +64,8 @@ public interface Log extends BasicLogger {
 	SearchException rangePredicateCannotMatchNullValue(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_LEGACY + 242,
-			value = "Unable to initialize component '%1$s': class '%2$s' doesn't have a public no-arguments constructor")
-	SearchException noPublicNoArgConstructor(String componentName, @FormatWith(ClassFormatter.class) Class<?> clazz);
+			value = "Invalid type '%1$s': missing constructor. The type must expose a public, no-arguments constructor.")
+	SearchException noPublicNoArgConstructor(@FormatWith(ClassFormatter.class) Class<?> clazz);
 
 	// -----------------------------------
 	// New messages from Search 6 onwards
@@ -153,17 +153,12 @@ public interface Log extends BasicLogger {
 	)
 	SearchException dslExtensionNoMatch(List<?> attemptedExtensions);
 
-	@Message(id = ID_OFFSET + 27, value = "Unable to instantiate %1$s, class '%2$s': %3$s")
-	SearchException unableToInstantiateComponent(String componentDescription, @FormatWith(ClassFormatter.class) Class<?> classToLoad, String causeMessage, @Cause Exception cause);
+	@Message(id = ID_OFFSET + 28, value = "Security manager does not allow access to the constructor of type '%1$s': %2$s")
+	SearchException securityManagerLoadingError(@FormatWith(ClassFormatter.class) Class<?> classToLoad,
+			String causeMessage, @Cause Exception cause);
 
-	@Message(id = ID_OFFSET + 28, value = "%2$s defined for component %1$s could not be instantiated because of a security manager error")
-	SearchException securityManagerLoadingError(String componentDescription, @FormatWith(ClassFormatter.class) Class<?> classToLoad, @Cause Exception cause);
-
-	@Message(id = ID_OFFSET + 29, value = "Unable to find %1$s implementation class: %2$s")
-	SearchException unableToFindComponentImplementation(String componentDescription, String classNameToLoad, @Cause Exception cause);
-
-	@Message(id = ID_OFFSET + 30, value = "Unable to load class '%1$s'")
-	ClassLoadingException unableToLoadTheClass(String className, @Cause Throwable cause);
+	@Message(id = ID_OFFSET + 30, value = "Unable to load class '%1$s': %2$s")
+	ClassLoadingException unableToLoadTheClass(String className, String causeMessage, @Cause Throwable cause);
 
 	@Message(id = ID_OFFSET + 33,
 			value = "No backend with name '%1$s'."
@@ -175,23 +170,17 @@ public interface Log extends BasicLogger {
 					+ " Check that at least one entity is configured to target that index.")
 	SearchException noIndexManagerRegistered(String indexManagerName);
 
-	@Message(id = ID_OFFSET + 40, value = "Unable to instantiate class '%1$s': %2$s.")
-	SearchException unableToInstantiateClass(@FormatWith(ClassFormatter.class) Class<?> classToLoad, String causeMessage, @Cause Exception cause);
+	@Message(id = ID_OFFSET + 40, value = "Unable to instantiate class '%1$s': %2$s")
+	SearchException unableToInstantiateClass(String className, String causeMessage, @Cause Exception cause);
 
-	@Message(id = ID_OFFSET + 41, value = "Wrong configuration of %1$s: class %2$s does not implement interface %3$s.")
-	SearchException interfaceImplementedExpected(String component, @FormatWith(ClassFormatter.class) Class<?> classToLoad, @FormatWith(ClassFormatter.class) Class<?> superType);
+	@Message(id = ID_OFFSET + 42, value = "Invalid type '%1$s': this type cannot be assigned to type '%2$s'.")
+	SearchException subtypeExpected(@FormatWith(ClassFormatter.class) Class<?> classToLoad, @FormatWith(ClassFormatter.class) Class<?> superType);
 
-	@Message(id = ID_OFFSET + 42, value = "Wrong configuration of %1$s: class %2$s is not a subtype of %3$s.")
-	SearchException subtypeExpected(String component, @FormatWith(ClassFormatter.class) Class<?> classToLoad, @FormatWith(ClassFormatter.class) Class<?> superType);
+	@Message(id = ID_OFFSET + 43, value = "Invalid type '%1$s': this type is an interface. An implementation class is required.")
+	SearchException implementationRequired(@FormatWith(ClassFormatter.class) Class<?> classToLoad);
 
-	@Message(id = ID_OFFSET + 43, value = "%2$s defined for component %1$s is an interface: implementation required.")
-	SearchException implementationRequired(String component, @FormatWith(ClassFormatter.class) Class<?> classToLoad);
-
-	@Message(id = ID_OFFSET + 44, value = "%2$s defined for component %1$s is missing an appropriate constructor: expected a public constructor with a single parameter of type Map.")
-	SearchException missingConstructor(String component, @FormatWith(ClassFormatter.class) Class<?> classToLoad);
-
-	@Message(id = ID_OFFSET + 45, value = "Unable to load class for %1$s. Configured implementation %2$s  is not assignable to type %3$s.")
-	SearchException notAssignableImplementation(String component, String classToLoad, @FormatWith(ClassFormatter.class) Class<?> superType);
+	@Message(id = ID_OFFSET + 44, value = "Invalid type '%1$s': missing constructor. The type must expose a public constructor with a single parameter of type Map.")
+	SearchException noPublicMapArgConstructor(@FormatWith(ClassFormatter.class) Class<?> classToLoad);
 
 	@Message(id = ID_OFFSET + 46, value = "Infinite @IndexedEmbedded recursion involving path '%1$s' on type '%2$s'.")
 	SearchException indexedEmbeddedCyclicRecursion(String cyclicRecursionPath,
@@ -379,4 +368,7 @@ public interface Log extends BasicLogger {
 			value = "Multiple entity types mapped to index '%1$s': '%2$s', '%3$s'."
 					+ " Each indexed type must be mapped to its own, dedicated index.")
 	SearchException twoTypesTargetSameIndex(String indexName, String mappedTypeName, String anotherMappedTypeName);
+
+	@Message(id = ID_OFFSET + 89, value = "Unable to create bean using reflection: %1$s")
+	SearchException unableToCreateBeanUsingReflection(String causeMessage, @Cause Exception e);
 }

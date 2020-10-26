@@ -43,7 +43,7 @@ public class LuceneAnalysisConfigurerIT {
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Invalid value for configuration property 'hibernate.search.backend."
 										+ LuceneBackendSettings.ANALYSIS_CONFIGURER + "': 'foobar'",
-								"Unable to find " + LuceneAnalysisConfigurer.class.getName() + " implementation class: foobar"
+								"Unable to load class 'foobar'"
 						)
 						.build()
 				);

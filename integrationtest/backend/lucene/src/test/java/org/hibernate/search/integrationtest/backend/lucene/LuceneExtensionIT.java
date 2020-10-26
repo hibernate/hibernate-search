@@ -217,9 +217,8 @@ public class LuceneExtensionIT {
 				() -> query.explain( "InvalidId" )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining(
-						"Document with id 'InvalidId' does not exist for the mapped type '" + mainIndex.typeName() + "'"
-				);
+				.hasMessageContaining( "Invalid document identifier: 'InvalidId'",
+						"No such document for type '" + mainIndex.typeName() + "'" );
 	}
 
 	@Test

@@ -650,4 +650,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 141,
 			value = "Unable to compute size of index: %1$s")
 	SearchException unableToComputeIndexSize(String causeMessage, @Param EventContext context, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET + 142,
+			value = "Unable to create instance of analysis component '%1$s': %2$s")
+	SearchException unableToCreateAnalysisComponent(@FormatWith(ClassFormatter.class) Class<?> type, String causeMessage,
+			@Cause Exception cause);
 }
