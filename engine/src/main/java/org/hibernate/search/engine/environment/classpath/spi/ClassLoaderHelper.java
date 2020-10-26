@@ -15,7 +15,6 @@ import java.util.Map;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.impl.StringHelper;
 import org.hibernate.search.util.common.impl.Throwables;
 
 /**
@@ -43,8 +42,6 @@ public class ClassLoaderHelper {
 	 * @param targetSuperType the return type of the function, the classNameToLoad will be checked
 	 * to be assignable to this type.
 	 * @param classNameToLoad a fully qualified class name, whose type is assignable to targetSuperType
-	 * @param componentDescription a meaningful description of the role the instance will have,
-	 * used to enrich error messages to describe the context of the error
 	 * @param classResolver the {@link ClassResolver} to use to load classes
 	 *
 	 * @return a new instance of the type given by {@code classNameToLoad}
@@ -54,10 +51,17 @@ public class ClassLoaderHelper {
 	 */
 	public static <T> T instanceFromName(Class<T> targetSuperType,
 			String classNameToLoad,
-			String componentDescription,
 			ClassResolver classResolver) {
-		final Class<?> clazzDef = classForName( classNameToLoad, componentDescription, classResolver );
-		return instanceFromClass( targetSuperType, clazzDef, componentDescription );
+		final Class<?> classToLoad;
+		final Object instance;
+		try {
+			classToLoad = classResolver.classForName( classNameToLoad );
+			instance = callNoArgConstructor( classToLoad );
+		}
+		catch (IllegalAccessException | InvocationTargetException | InstantiationException | RuntimeException e) {
+			throw log.unableToInstantiateClass( classNameToLoad, Throwables.getFirstNonNullMessage( e ), e );
+		}
+		return verifySuperTypeCompatibility( targetSuperType, instance, classToLoad );
 	}
 
 	/**
@@ -66,48 +70,42 @@ public class ClassLoaderHelper {
 	 * @param <T> the type of targetSuperType: defines the return type
 	 * @param targetSuperType the created instance will be checked to be assignable to this type
 	 * @param classToLoad the class to be instantiated
-	 * @param componentDescription a role name/description to contextualize error messages
 	 *
 	 * @return a new instance of classToLoad
 	 *
 	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
 	 * missing proper constructor, wrong type, securitymanager errors.
 	 */
-	public static <T> T instanceFromClass(Class<T> targetSuperType, Class<?> classToLoad, String componentDescription) {
-		checkClassType( classToLoad, componentDescription );
-		final Object instance = untypedInstanceFromClass( classToLoad, componentDescription );
-		return verifySuperTypeCompatibility( targetSuperType, instance, classToLoad, componentDescription );
+	public static <T> T instanceFromClass(Class<T> targetSuperType, Class<?> classToLoad) {
+		final Object instance;
+		try {
+			instance = callNoArgConstructor( classToLoad );
+		}
+		catch (IllegalAccessException | InvocationTargetException | InstantiationException | RuntimeException e) {
+			throw log.unableToInstantiateClass( classToLoad.getName(), Throwables.getFirstNonNullMessage( e ), e );
+		}
+		return verifySuperTypeCompatibility( targetSuperType, instance, classToLoad );
 	}
 
 	/**
-	 * Creates an instance of target class. Similar to {@link #instanceFromClass(Class, Class, String)} but not checking
-	 * the created instance will be of any specific type: using {@link #instanceFromClass(Class, Class, String)} should
+	 * Creates an instance of target class. Similar to {@link #instanceFromClass(Class, Class)} but not checking
+	 * the created instance will be of any specific type: using {@link #instanceFromClass(Class, Class)} should
 	 * be preferred whenever possible.
 	 *
 	 * @param <T> the type of targetSuperType: defines the return type
 	 * @param classToLoad the class to be instantiated
-	 * @param componentDescription a role name/description to contextualize error messages. Ideally should be provided, but it can handle null.
 	 *
 	 * @return a new instance of classToLoad
 	 *
 	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
 	 * missing proper constructor, securitymanager errors.
 	 */
-	public static <T> T untypedInstanceFromClass(final Class<T> classToLoad, final String componentDescription) {
-		checkClassType( classToLoad, componentDescription );
-		Constructor<T> constructor = noArgConstructor( classToLoad, componentDescription );
+	public static <T> T untypedInstanceFromClass(final Class<T> classToLoad) {
 		try {
-			return constructor.newInstance();
+			return callNoArgConstructor( classToLoad );
 		}
-		catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
-			if ( StringHelper.isEmpty( componentDescription ) ) {
-				throw log.unableToInstantiateClass( classToLoad, Throwables.getFirstNonNullMessage( e ), e );
-			}
-			else {
-				throw log.unableToInstantiateComponent(
-						componentDescription, classToLoad, Throwables.getFirstNonNullMessage( e ), e
-				);
-			}
+		catch (IllegalAccessException | InvocationTargetException | InstantiationException | RuntimeException e) {
+			throw log.unableToInstantiateClass( classToLoad.getName(), Throwables.getFirstNonNullMessage( e ), e );
 		}
 	}
 
@@ -117,20 +115,13 @@ public class ClassLoaderHelper {
 	 * @param targetSuperType the type to extend, or the interface it should implement
 	 * @param instance the object instance to be verified
 	 * @param classToLoad the Class of the instance
-	 * @param componentDescription a user friendly description of the component represented by the verified instance
 	 *
 	 * @return the same instance
 	 */
 	@SuppressWarnings("unchecked")
-	private static <T> T verifySuperTypeCompatibility(Class<T> targetSuperType, Object instance, Class<?> classToLoad, String componentDescription) {
+	private static <T> T verifySuperTypeCompatibility(Class<T> targetSuperType, Object instance, Class<?> classToLoad) {
 		if ( !targetSuperType.isInstance( instance ) ) {
-			// have a proper error message according to interface implementation or subclassing
-			if ( targetSuperType.isInterface() ) {
-				throw log.interfaceImplementedExpected( componentDescription, classToLoad, targetSuperType );
-			}
-			else {
-				throw log.subtypeExpected( componentDescription, classToLoad, targetSuperType );
-			}
+			throw log.subtypeExpected( classToLoad, targetSuperType );
 		}
 		else {
 			return (T) instance;
@@ -144,7 +135,6 @@ public class ClassLoaderHelper {
 	 * @param <T> the type of targetSuperType: defines the return type
 	 * @param targetSuperType the created instance will be checked to be assignable to this type
 	 * @param classToLoad the class to be instantiated
-	 * @param componentDescription a role name/description to contextualize error messages
 	 * @param constructorParameter a Map to be passed to the constructor. The loaded type must have such a constructor.
 	 *
 	 * @return a new instance of classToLoad
@@ -152,100 +142,66 @@ public class ClassLoaderHelper {
 	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
 	 * missing proper constructor, wrong type, security errors.
 	 */
-	public static <T> T instanceFromClass(Class<T> targetSuperType, Class<?> classToLoad, String componentDescription,
+	public static <T> T instanceFromClass(Class<T> targetSuperType, Class<?> classToLoad,
 			Map<String, String> constructorParameter) {
-		checkClassType( classToLoad, componentDescription );
-		Constructor<?> singleMapConstructor = singleMapConstructor( classToLoad, componentDescription );
+		final Object instance;
+		try {
+			instance = callMapArgConstructor( classToLoad, constructorParameter );
+		}
+		catch (Exception e) {
+			throw log.unableToInstantiateClass( classToLoad.getName(), Throwables.getFirstNonNullMessage( e ), e );
+		}
+		return verifySuperTypeCompatibility( targetSuperType, instance, classToLoad );
+	}
+
+	private static void checkInstantiable(Class<?> classToLoad) {
+		if ( classToLoad.isInterface() ) {
+			throw log.implementationRequired( classToLoad );
+		}
+	}
+
+	private static <T> T callNoArgConstructor(Class<T> classToLoad)
+			throws IllegalAccessException, InvocationTargetException, InstantiationException {
+		checkInstantiable( classToLoad );
+		try {
+			Constructor<T> constructor = classToLoad.getConstructor();
+			return constructor.newInstance();
+		}
+		catch (SecurityException e) {
+			throw log.securityManagerLoadingError( classToLoad, e.getMessage(), e );
+		}
+		catch (NoSuchMethodException e) {
+			throw log.noPublicNoArgConstructor( classToLoad );
+		}
+	}
+
+	private static <T> T callMapArgConstructor(Class<T> classToLoad, Map<String, String> constructorParameter)
+			throws IllegalAccessException, InvocationTargetException, InstantiationException {
 		if ( constructorParameter == null ) {
 			constructorParameter = new HashMap<>( 0 );//can't use the emptyMap singleton as it needs to be mutable
 		}
-		final Object instance;
+		checkInstantiable( classToLoad );
 		try {
-			instance = singleMapConstructor.newInstance( constructorParameter );
-		}
-		catch (Exception e) {
-			throw log.unableToInstantiateComponent(
-					componentDescription, classToLoad, Throwables.getFirstNonNullMessage( e ), e
-			);
-		}
-		return verifySuperTypeCompatibility( targetSuperType, instance, classToLoad, componentDescription );
-	}
-
-	private static void checkClassType(Class<?> classToLoad, String componentDescription) {
-		if ( classToLoad.isInterface() ) {
-			throw log.implementationRequired( componentDescription, classToLoad );
-		}
-	}
-
-	/**
-	 * Verifies if target class has a no-args constructor, and that it is
-	 * accessible in current security manager.
-	 * If checks are succesfull, return the constructor; otherwise appropriate exceptions are thrown.
-	 * @param classToLoad the class type to check
-	 * @param componentDescription adds a meaningful description to the type to describe in the error messsage
-	 */
-	private static <T> Constructor<T> noArgConstructor(Class<T> classToLoad, String componentDescription) {
-		try {
-			return classToLoad.getConstructor();
+			Constructor<T> singleMapConstructor = classToLoad.getConstructor( Map.class );
+			return singleMapConstructor.newInstance( constructorParameter );
 		}
 		catch (SecurityException e) {
-			throw log.securityManagerLoadingError( componentDescription, classToLoad, e );
+			throw log.securityManagerLoadingError( classToLoad, e.getMessage(), e );
 		}
 		catch (NoSuchMethodException e) {
-			throw log.noPublicNoArgConstructor( componentDescription, classToLoad );
+			throw log.noPublicMapArgConstructor( classToLoad );
 		}
-	}
-
-	private static Constructor<?> singleMapConstructor(Class<?> classToLoad, String componentDescription) {
-		try {
-			return classToLoad.getConstructor( Map.class );
-		}
-		catch (SecurityException e) {
-			throw log.securityManagerLoadingError( componentDescription, classToLoad, e );
-		}
-		catch (NoSuchMethodException e) {
-			throw log.missingConstructor( componentDescription, classToLoad );
-		}
-	}
-
-	public static Class<?> classForName(String classNameToLoad, String componentDescription, ClassResolver classResolver) {
-		Class<?> clazz;
-		try {
-			clazz = classResolver.classForName( classNameToLoad );
-		}
-		catch (ClassLoadingException e) {
-			throw log.unableToFindComponentImplementation( componentDescription, classNameToLoad, e );
-		}
-		return clazz;
 	}
 
 	public static <T> Class<? extends T> classForName(Class<T> targetSuperType,
 			String classNameToLoad,
-			String componentDescription,
 			ClassResolver classResolver) {
-		final Class<?> clazzDef = classForName( classNameToLoad, componentDescription, classResolver );
+		final Class<?> clazzDef = classResolver.classForName( classNameToLoad );
 		try {
 			return clazzDef.asSubclass( targetSuperType );
 		}
 		catch (ClassCastException cce) {
-			throw log.notAssignableImplementation( componentDescription, classNameToLoad, targetSuperType );
+			throw log.subtypeExpected( clazzDef, targetSuperType );
 		}
-	}
-
-	/**
-	 * Perform resolution of a class name.
-	 * <p>
-	 * Here we first check the context classloader, if one, before delegating to
-	 * {@link Class#forName(String, boolean, ClassLoader)} using the caller's classloader
-	 *
-	 * @param classNameToLoad The class name
-	 * @param classResolver The {@link ClassResolver} to use to load classes
-	 *
-	 * @return The class reference.
-	 *
-	 * @throws ClassLoadingException From {@link Class#forName(String, boolean, ClassLoader)}.
-	 */
-	public static Class<?> classForName(String classNameToLoad, ClassResolver classResolver) {
-		return classResolver.classForName( classNameToLoad );
 	}
 }

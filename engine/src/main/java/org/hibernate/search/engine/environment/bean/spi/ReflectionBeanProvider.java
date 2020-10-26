@@ -7,13 +7,18 @@
 package org.hibernate.search.engine.environment.bean.spi;
 
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoaderHelper;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
-
+import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
 public final class ReflectionBeanProvider implements BeanProvider {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ClassResolver classResolver;
 
@@ -36,7 +41,12 @@ public final class ReflectionBeanProvider implements BeanProvider {
 	}
 
 	public <T> T forTypeNoClosingNecessary(Class<T> typeReference) {
-		return ClassLoaderHelper.untypedInstanceFromClass( typeReference, typeReference.getName() );
+		try {
+			return ClassLoaderHelper.untypedInstanceFromClass( typeReference );
+		}
+		catch (RuntimeException e) {
+			throw log.unableToCreateBeanUsingReflection( e.getMessage(), e );
+		}
 	}
 
 	@Override
@@ -45,10 +55,12 @@ public final class ReflectionBeanProvider implements BeanProvider {
 	}
 
 	public <T> T forTypeAndNameNoClosingNecessary(Class<T> typeReference, String implementationFullyQualifiedClassName) {
-		Class<? extends T> implementationClass = ClassLoaderHelper.classForName(
-				typeReference, implementationFullyQualifiedClassName, typeReference.getName(), classResolver
-		);
-		return ClassLoaderHelper.untypedInstanceFromClass( implementationClass, implementationFullyQualifiedClassName );
+		try {
+			return ClassLoaderHelper.instanceFromName( typeReference, implementationFullyQualifiedClassName, classResolver );
+		}
+		catch (RuntimeException e) {
+			throw log.unableToCreateBeanUsingReflection( e.getMessage(), e );
+		}
 	}
 
 }

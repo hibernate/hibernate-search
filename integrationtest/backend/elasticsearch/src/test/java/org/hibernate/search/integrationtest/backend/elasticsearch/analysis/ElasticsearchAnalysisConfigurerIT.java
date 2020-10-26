@@ -45,7 +45,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Invalid value for configuration property 'hibernate.search.backend."
 										+ ElasticsearchIndexSettings.ANALYSIS_CONFIGURER + "': 'foobar'",
-								"Unable to find " + ElasticsearchAnalysisConfigurer.class.getName() + " implementation class: foobar"
+								"Unable to load class 'foobar'"
 						)
 						.build()
 				);

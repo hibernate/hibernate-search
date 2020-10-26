@@ -52,7 +52,6 @@ final class HibernateSearchResourceLoader implements ResourceLoader {
 		return ClassLoaderHelper.classForName(
 				expectedType,
 				className,
-				describeComponent( className ),
 				classResolver
 		);
 	}
@@ -62,13 +61,8 @@ final class HibernateSearchResourceLoader implements ResourceLoader {
 		return ClassLoaderHelper.instanceFromName(
 				expectedType,
 				className,
-				describeComponent( className ),
 				classResolver
 		);
-	}
-
-	private static String describeComponent(final String className) {
-		return "Lucene Analyzer component " + className;
 	}
 
 }

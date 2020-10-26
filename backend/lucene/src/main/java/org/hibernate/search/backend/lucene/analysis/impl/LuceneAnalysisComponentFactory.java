@@ -7,13 +7,16 @@
 package org.hibernate.search.backend.lucene.analysis.impl;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoaderHelper;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordTokenizerFactory;
@@ -31,6 +34,7 @@ import org.apache.lucene.util.Version;
  * @author Hardy Ferentschik
  */
 public final class LuceneAnalysisComponentFactory {
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String LUCENE_VERSION_PARAM = "luceneMatchVersion";
 
@@ -80,15 +84,19 @@ public final class LuceneAnalysisComponentFactory {
 
 	private <T> T createAnalysisComponent(Class<T> expectedFactoryClass,
 			Class<? extends T> factoryClass, Map<String, String> parameters) throws IOException {
-		final Map<String, String> tokenMapsOfParameters = getMapOfParameters( parameters, luceneMatchVersion );
-		T tokenizerFactory = ClassLoaderHelper.instanceFromClass(
-				expectedFactoryClass,
-				factoryClass,
-				expectedFactoryClass.getName(),
-				tokenMapsOfParameters
-		);
-		injectResourceLoader( tokenizerFactory );
-		return tokenizerFactory;
+		try {
+			final Map<String, String> tokenMapsOfParameters = getMapOfParameters( parameters, luceneMatchVersion );
+			T tokenizerFactory = ClassLoaderHelper.instanceFromClass(
+					expectedFactoryClass,
+					factoryClass,
+					tokenMapsOfParameters
+			);
+			injectResourceLoader( tokenizerFactory );
+			return tokenizerFactory;
+		}
+		catch (RuntimeException e) {
+			throw log.unableToCreateAnalysisComponent( factoryClass, e.getMessage(), e );
+		}
 	}
 
 	private void injectResourceLoader(Object processor) throws IOException {
