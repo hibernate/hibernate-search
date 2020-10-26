@@ -65,4 +65,9 @@ public class DocumentService {
 	public List<String> getAuthorsOfBooksHavingTerms(String terms, SortOrder order) {
 		return documentRepo.getAuthorsOfBooksHavingTerms( terms, order );
 	}
+
+	public void purge() {
+		documentRepo.deleteAll();
+		documentRepo.purge();
+	}
 }

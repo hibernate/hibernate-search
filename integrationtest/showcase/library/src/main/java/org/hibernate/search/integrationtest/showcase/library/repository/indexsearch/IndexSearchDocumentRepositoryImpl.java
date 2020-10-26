@@ -149,4 +149,9 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 				.sort( b -> b.field( "author" ).order( order ) )
 				.fetchAllHits();
 	}
+
+	@Override
+	public void purge() {
+		Search.session( entityManager ).workspace( Document.class ).purge();
+	}
 }
