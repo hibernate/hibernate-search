@@ -196,7 +196,6 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 				.orElseThrow( () -> new AssertionFailure(
 						"Could not auto-detect the return type for value bridge '"
 								+ bridge + "'."
-								+ " There is a bug in Hibernate Search, please report it."
 				) );
 		return indexFieldTypeFactory.as( returnType );
 	}

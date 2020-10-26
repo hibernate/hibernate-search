@@ -199,7 +199,6 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 		throw new AssertionFailure(
 				"Attempt to reindex an entity of type " + typeIdentifier + " because a contained entity was modified,"
 				+ " but this entity type is not indexed directly."
-				+ " There is a bug in Hibernate Search, please report it."
 		);
 	}
 
@@ -210,7 +209,6 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 			throw new AssertionFailure(
 					"Attempt to reindex entity " + containingEntity + " because a contained entity was modified,"
 							+ " but this entity type is not indexed directly."
-							+ " There is a bug in Hibernate Search, please report it."
 			);
 		}
 		PojoIndexedTypeIndexingPlan<?, ?, ?> delegate = getOrCreateIndexedDelegateForContainedUpdate( typeIdentifier );

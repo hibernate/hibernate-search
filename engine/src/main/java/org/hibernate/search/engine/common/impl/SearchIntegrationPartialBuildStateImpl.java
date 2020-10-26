@@ -124,8 +124,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			PBM partiallyBuiltMapping = (PBM) partiallyBuiltMappings.get( mappingKey );
 			if ( partiallyBuiltMapping == null ) {
 				throw new AssertionFailure(
-						"Some partially built mapping could not be found during bootstrap; there is probably a bug in Hibernate Search."
-								+ " Key: " + mappingKey
+						"Some partially built mapping could not be found during bootstrap. Key: " + mappingKey
 				);
 			}
 
@@ -143,8 +142,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 		public SearchIntegration finalizeIntegration() {
 			if ( !partiallyBuiltMappings.isEmpty() ) {
 				throw new AssertionFailure(
-						"Some mappings were not fully built; there is probably a bug in Hibernate Search."
-								+ " Partially built mappings: " + partiallyBuiltMappings
+						"Some mappings were not fully built. Partially built mappings: " + partiallyBuiltMappings
 				);
 			}
 

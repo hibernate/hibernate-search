@@ -88,7 +88,6 @@ public final class BeanBinder
 				.orElseThrow( () -> new AssertionFailure(
 						"Could not auto-detect the input type for identifier bridge '"
 						+ bridge + "'."
-						+ " There is a bug in Hibernate Search, please report it."
 				) );
 		context.bridge( bridgeParameterType, bridge );
 	}
@@ -109,7 +108,6 @@ public final class BeanBinder
 				.orElseThrow( () -> new AssertionFailure(
 						"Could not auto-detect the input type for value bridge '"
 						+ bridge + "'."
-						+ " There is a bug in Hibernate Search, please report it."
 				) );
 		context.bridge( bridgeParameterType, bridge );
 	}

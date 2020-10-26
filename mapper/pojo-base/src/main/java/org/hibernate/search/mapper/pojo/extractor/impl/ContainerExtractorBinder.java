@@ -153,7 +153,6 @@ public class ContainerExtractorBinder {
 		if ( boundPath.getExtractorPath().isEmpty() ) {
 			throw new AssertionFailure(
 					"Received a request to create extractors, but the extractor path was empty."
-							+ " There is probably a bug in Hibernate Search."
 			);
 		}
 		ContainerExtractor<? super C, ?> extractor = null;

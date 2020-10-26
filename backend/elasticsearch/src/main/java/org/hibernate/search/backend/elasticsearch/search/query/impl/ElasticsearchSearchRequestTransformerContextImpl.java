@@ -43,7 +43,6 @@ final class ElasticsearchSearchRequestTransformerContextImpl
 		if ( originalBodyParts.size() != 1 ) {
 			throw new AssertionFailure(
 					"Request transformation was applied to a request with no body part or more than one body parts."
-							+ " There is a bug in Hibernate Search, please report it."
 			);
 		}
 		this.originalBody = originalBodyParts.get( 0 );

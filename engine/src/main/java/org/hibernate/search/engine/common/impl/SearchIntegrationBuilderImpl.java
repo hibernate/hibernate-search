@@ -132,7 +132,6 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			throw new AssertionFailure(
 					"Attempt to add a mapping initiator"
 					+ " after Hibernate Search has started to build the mappings."
-					+ " There is a bug in the Hibernate Search integration."
 			);
 		}
 
@@ -142,7 +141,6 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			throw new AssertionFailure(
 					"Mapping key '" + mappingKey + "' has multiple initiators: '"
 							+ existing + "', '" + initiator + "'."
-							+ " There is a bug in the mapper, please report it."
 			);
 		}
 		return this;
@@ -408,8 +406,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			if ( !failureCollector.hasFailure() ) {
 				throw new AssertionFailure(
 						"Caught " + MappingAbortedException.class.getSimpleName()
-								+ ", but the mapper did not collect any failure."
-								+ " There is a bug in the mapper, please report it.",
+								+ ", but the mapper did not collect any failure.",
 						e
 				);
 			}

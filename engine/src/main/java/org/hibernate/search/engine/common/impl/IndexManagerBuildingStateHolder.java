@@ -87,7 +87,6 @@ class IndexManagerBuildingStateHolder {
 		if ( backendBuildState == null ) {
 			throw new AssertionFailure(
 					"Mapper asking for a reference to backend '" + backendName + "', which was not declared in advance."
-					+ " There is a bug in Hibernate Search, please report it."
 			);
 		}
 		return backendBuildState;
@@ -239,7 +238,6 @@ class IndexManagerBuildingStateHolder {
 			if ( indexManager != null ) {
 				throw new AssertionFailure(
 						"Trying to build index manager " + indexName + " twice."
-						+ " There is probably a bug in the mapper implementation."
 				);
 			}
 			indexManager = builder.build();
@@ -250,7 +248,6 @@ class IndexManagerBuildingStateHolder {
 			if ( indexManager == null ) {
 				throw new AssertionFailure(
 						"Index manager " + indexName + " was not built by the mapper as expected."
-						+ " There is probably a bug in the mapper implementation."
 				);
 			}
 			return new IndexManagerNonStartedState( EventContexts.fromIndexName( indexName ),

@@ -110,8 +110,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	public void submit(BatchedWork<? super P> work) throws InterruptedException {
 		if ( processingTask == null ) {
 			throw new AssertionFailure(
-					"Attempt to submit a work to executor '" + name + "', which is stopped"
-					+ " There is probably a bug in Hibernate Search, please report it."
+					"Attempt to submit a work to executor '" + name + "', which is stopped."
 			);
 		}
 		workQueue.put( work );

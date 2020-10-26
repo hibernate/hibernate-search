@@ -325,10 +325,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	private <T extends Service> T getOrmServiceOrFail(Class<T> serviceClass) {
 		T service = serviceRegistry.getService( serviceClass );
 		if ( service == null ) {
-			throw new AssertionFailure(
-					"A required service was missing; there is probably a bug in Hibernate ORM or Hibernate Search."
-					+ " Missing service: " + serviceClass
-			);
+			throw new AssertionFailure( "A required service was missing. Missing service: " + serviceClass );
 		}
 		return service;
 	}

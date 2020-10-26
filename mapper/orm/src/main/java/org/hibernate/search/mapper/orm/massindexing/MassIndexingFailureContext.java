@@ -31,14 +31,10 @@ public class MassIndexingFailureContext {
 		 * (they would throw an NPE which may produce disastrous results such as killing background threads).
 		 */
 		this.throwable = builder.throwable == null
-				? new AssertionFailure(
-				"Unknown throwable: missing throwable when reporting the failure."
-						+ " There is probably a bug in Hibernate Search, please report it."
-		)
+				? new AssertionFailure( "Unknown throwable: missing throwable when reporting the failure." )
 				: builder.throwable;
 		this.failingOperation = builder.failingOperation == null
 				? "Unknown operation: missing operation when reporting the failure."
-				+ " There is probably a bug in Hibernate Search, please report it."
 				: builder.failingOperation;
 	}
 

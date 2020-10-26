@@ -109,7 +109,6 @@ class PojoImplicitReindexingResolverBuilder<T> {
 		if ( frozen ) {
 			throw new AssertionFailure(
 					"A mutating method was called on " + this + " after it was frozen."
-							+ " There is a bug in Hibernate Search, please report it."
 			);
 		}
 	}
