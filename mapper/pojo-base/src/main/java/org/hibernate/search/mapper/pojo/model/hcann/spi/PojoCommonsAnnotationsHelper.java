@@ -6,16 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.model.hcann.spi;
 
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.reflection.java.JavaXMember;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Allows to access to the {@link XProperty} private field {@link Member}.
@@ -24,8 +21,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * of <a href="https://github.com/hibernate/hibernate-orm">Hibernate ORM project</a>.
  */
 public class PojoCommonsAnnotationsHelper {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private PojoCommonsAnnotationsHelper() {
 	}
@@ -41,14 +36,11 @@ public class PojoCommonsAnnotationsHelper {
 			// NOTE : no need to check accessibility here - we know it is protected
 			getMemberMethod.setAccessible( true );
 		}
-		catch (NoSuchMethodException e) {
+		catch (Exception e) {
 			throw new AssertionFailure(
-					"Could not resolve JavaXMember#getMember method in order to access XProperty member signature",
+					"Could not resolve JavaXMember#getMember method in order to extract Java Member from XProperty",
 					e
 			);
-		}
-		catch (Exception e) {
-			throw log.cannotAccessPropertyMember( e );
 		}
 	}
 
@@ -68,14 +60,5 @@ public class PojoCommonsAnnotationsHelper {
 					e.getCause()
 			);
 		}
-	}
-
-	public static Method extractUnderlyingMethod(XProperty xProperty) {
-		Member member = extractUnderlyingMember( xProperty );
-		if ( !( member instanceof Method ) ) {
-			throw log.cannotAccessPropertyMethod( xProperty.getName() );
-		}
-
-		return (Method) member;
 	}
 }

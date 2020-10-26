@@ -361,12 +361,6 @@ public interface Log extends BasicLogger {
 	)
 	SearchException cannotPurgeNonIndexedContainedType(PojoRawTypeIdentifier<?> type, Object providedId);
 
-	@Message(id = ID_OFFSET + 56, value = "Could not access to the org.hibernate.annotations.common.reflection.java.JavaXMember#getMember method")
-	SearchException cannotAccessPropertyMember(@Cause Exception cause);
-
-	@Message(id = ID_OFFSET + 57, value = "The underlying member of property '%1$s' is supposed to be a method")
-	SearchException cannotAccessPropertyMethod(String propertyName);
-
 	@Message(id = ID_OFFSET + 58,
 			value = "The bind() method of binder '%1$s' is not implemented correctly:"
 					+ " it did not call context.bridge().")
