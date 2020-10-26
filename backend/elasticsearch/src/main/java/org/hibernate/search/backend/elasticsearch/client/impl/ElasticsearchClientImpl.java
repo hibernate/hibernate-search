@@ -27,7 +27,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRespon
 import org.hibernate.search.backend.elasticsearch.gson.spi.JsonLogHelper;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchLogCategories;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.timeout.spi.RequestDeadline;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -134,14 +134,14 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 				}
 				);
 
-		RequestDeadline requestDeadline = elasticsearchRequest.deadline();
-		if ( requestDeadline == null && !requestTimeoutMs.isPresent() ) {
+		Deadline deadline = elasticsearchRequest.deadline();
+		if ( deadline == null && !requestTimeoutMs.isPresent() ) {
 			// no need to schedule a client side timeout
 			return completableFuture;
 		}
 
-		Long currentTimeoutValue = ( requestDeadline == null ) ?
-				Long.valueOf( requestTimeoutMs.get() ) : requestDeadline.remainingTimeToHardTimeout();
+		Long currentTimeoutValue = ( deadline == null ) ?
+				Long.valueOf( requestTimeoutMs.get() ) : deadline.remainingTimeToHardTimeout();
 
 		/*
 		 * TODO HSEARCH-3590 maybe the callback should also cancel the request?
@@ -178,12 +178,12 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	}
 
 	private void setPerRequestSocketTimeout(ElasticsearchRequest elasticsearchRequest, Request request) {
-		RequestDeadline requestDeadline = elasticsearchRequest.deadline();
-		if ( requestDeadline == null ) {
+		Deadline deadline = elasticsearchRequest.deadline();
+		if ( deadline == null ) {
 			return;
 		}
 
-		Long timeToHardTimeout = requestDeadline.remainingTimeToHardTimeout();
+		Long timeToHardTimeout = deadline.remainingTimeToHardTimeout();
 		if ( timeToHardTimeout == null ) {
 			return;
 		}

@@ -4,12 +4,12 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.search.timeout.spi;
+package org.hibernate.search.engine.common.timing.spi;
 
 /**
  * Common interface providing a deadline through the method {@link #remainingTimeToHardTimeout}.
  */
-public interface RequestDeadline {
+public interface Deadline {
 
 	/**
 	 * If no hard timeout is defined, returns {@code null}.
@@ -21,20 +21,12 @@ public interface RequestDeadline {
 	Long remainingTimeToHardTimeout();
 
 	/**
-	 * Simple implementation of {@link RequestDeadline} which does not need to track the passed time.
-	 * The {@code remainingTimeToHardTimeout} is immutable here.
+	 * @param milliseconds The number of milliseconds until the deadline.
+	 * @return An immutable {@link Deadline} which does not track the passing time.
+	 * {@link #remainingTimeToHardTimeout()} will always return the same value.
 	 */
-	final class ImmutableRequestDeadline implements RequestDeadline {
-
-		private final long remainingTimeToHardTimeout;
-
-		public ImmutableRequestDeadline(long remainingTimeToHardTimeout) {
-			this.remainingTimeToHardTimeout = remainingTimeToHardTimeout;
-		}
-
-		@Override
-		public Long remainingTimeToHardTimeout() {
-			return remainingTimeToHardTimeout;
-		}
+	static Deadline ofMilliseconds(long milliseconds) {
+		return new StaticDeadline( milliseconds );
 	}
+
 }
