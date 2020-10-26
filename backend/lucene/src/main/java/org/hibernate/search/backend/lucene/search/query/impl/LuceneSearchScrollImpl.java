@@ -18,11 +18,11 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchScroll;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchScrollResult;
-import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.backend.lucene.work.impl.ReadWork;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
@@ -34,7 +34,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 	private final LuceneWorkFactory workFactory;
 	private final LuceneSearchContext searchContext;
 	private final Set<String> routingKeys;
-	private final LuceneTimeoutManager timeoutManager;
+	private final TimeoutManager timeoutManager;
 	private final LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher;
 	private final int totalHitCountThreshold;
 
@@ -50,7 +50,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 	public LuceneSearchScrollImpl(LuceneSyncWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, LuceneSearchContext searchContext,
 			Set<String> routingKeys,
-			LuceneTimeoutManager timeoutManager,
+			TimeoutManager timeoutManager,
 			LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher,
 			int totalHitCountThreshold,
 			HibernateSearchMultiReader indexReader, int chunkSize) {

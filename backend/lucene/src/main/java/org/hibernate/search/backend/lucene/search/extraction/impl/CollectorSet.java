@@ -14,7 +14,8 @@ import java.util.Set;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExecutionContext;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
-import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
+import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneCounterAdapter;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.engine.common.timing.spi.Deadline;
 
 import org.apache.lucene.search.Collector;
@@ -43,11 +44,11 @@ public class CollectorSet {
 	public static class Builder {
 
 		private final CollectorExecutionContext executionContext;
-		private final LuceneTimeoutManager timeoutManager;
+		private final TimeoutManager timeoutManager;
 
 		private final Map<CollectorKey<?>, Collector> components = new LinkedHashMap<>();
 
-		public Builder(CollectorExecutionContext executionContext, LuceneTimeoutManager timeoutManager) {
+		public Builder(CollectorExecutionContext executionContext, TimeoutManager timeoutManager) {
 			this.executionContext = executionContext;
 			this.timeoutManager = timeoutManager;
 		}
@@ -79,10 +80,11 @@ public class CollectorSet {
 			return new CollectorSet( composed, components );
 		}
 
-		private Collector wrapTimeLimitingCollectorIfNecessary(Collector collector, LuceneTimeoutManager timeoutManager) {
+		private Collector wrapTimeLimitingCollectorIfNecessary(Collector collector, TimeoutManager timeoutManager) {
 			final Deadline deadline = timeoutManager.deadlineOrNull();
 			if ( deadline != null ) {
-				TimeLimitingCollector wrapped = new TimeLimitingCollector( collector, timeoutManager.createCounter(),
+				TimeLimitingCollector wrapped = new TimeLimitingCollector( collector,
+						new LuceneCounterAdapter( timeoutManager.timingSource() ),
 						deadline.remainingTimeMillis() );
 				// The timeout starts from the given baseline, not from when the collector is first used.
 				// This is important because some collectors are applied during a second search.

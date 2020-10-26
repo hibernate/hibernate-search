@@ -14,10 +14,10 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFact
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.ExplicitDocIdsQuery;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
-import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
 import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.engine.search.query.SearchResultTotal;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResultTotal;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.AssertionFailure;
 
 import org.apache.lucene.search.Collector;
@@ -51,7 +51,7 @@ public class LuceneCollectors {
 	private final Set<CollectorFactory<?>> collectorsForTopDocsFactories;
 	private CollectorSet collectorsForTopDocs;
 
-	private final LuceneTimeoutManager timeoutManager;
+	private final TimeoutManager timeoutManager;
 
 	private SearchResultTotal resultTotal;
 	private TopDocs topDocs = null;
@@ -60,7 +60,7 @@ public class LuceneCollectors {
 			boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring,
 			CollectorSet collectorsForAllMatchingDocs,
 			Set<CollectorFactory<?>> collectorsForTopDocsFactories,
-			LuceneTimeoutManager timeoutManager) {
+			TimeoutManager timeoutManager) {
 		this.metadataResolver = metadataResolver;
 		this.indexSearcher = indexSearcher;
 		this.rewrittenLuceneQuery = rewrittenLuceneQuery;

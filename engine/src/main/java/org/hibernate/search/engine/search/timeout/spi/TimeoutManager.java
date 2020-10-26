@@ -23,6 +23,31 @@ public class TimeoutManager {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	public static TimeoutManager of(TimingSource timingSource, Long timeout, TimeUnit timeUnit,
+			boolean exceptionOnTimeout) {
+		if ( timeout != null && timeUnit != null ) {
+			if ( exceptionOnTimeout ) {
+				return TimeoutManager.hardTimeout( timingSource, timeout, timeUnit );
+			}
+			else {
+				return TimeoutManager.softTimeout( timingSource, timeout, timeUnit );
+			}
+		}
+		return TimeoutManager.noTimeout( timingSource );
+	}
+
+	public static TimeoutManager noTimeout(TimingSource timingSource) {
+		return new TimeoutManager( timingSource, null, null, Type.NONE );
+	}
+
+	public static TimeoutManager softTimeout(TimingSource timingSource, long timeout, TimeUnit timeUnit) {
+		return new TimeoutManager( timingSource, timeout, timeUnit, Type.LIMIT );
+	}
+
+	public static TimeoutManager hardTimeout(TimingSource timingSource, long timeout, TimeUnit timeUnit) {
+		return new TimeoutManager( timingSource, timeout, timeUnit, Type.EXCEPTION );
+	}
+
 	public enum Type {
 		NONE,
 		EXCEPTION,
@@ -58,6 +83,10 @@ public class TimeoutManager {
 
 	public void stop() {
 		this.start = null;
+	}
+
+	public TimingSource timingSource() {
+		return timingSource;
 	}
 
 	/**

@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExec
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.StoredFieldsCollector;
-import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.IndexSearcher;
@@ -45,7 +45,7 @@ public final class ExtractionRequirements {
 	}
 
 	public LuceneCollectors createCollectors(IndexSearcher indexSearcher, Query originalLuceneQuery, Sort sort,
-			IndexReaderMetadataResolver metadataResolver, int maxDocs, LuceneTimeoutManager timeoutManager,
+			IndexReaderMetadataResolver metadataResolver, int maxDocs, TimeoutManager timeoutManager,
 			int requestedTotalHitCountThreshold)
 			throws IOException {
 		// Necessary to unwrap boolean queries with a single clause, in particular:

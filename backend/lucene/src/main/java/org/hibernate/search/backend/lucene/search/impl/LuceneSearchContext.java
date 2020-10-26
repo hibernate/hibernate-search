@@ -10,13 +10,13 @@ import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 import org.apache.lucene.search.Query;
 
@@ -69,16 +69,8 @@ public final class LuceneSearchContext {
 		return multiTenancyStrategy.filterOrNull( tenantId );
 	}
 
-	public LuceneTimeoutManager createTimeoutManager(Long timeout, TimeUnit timeUnit, boolean exceptionOnTimeout) {
-		if ( timeout != null && timeUnit != null ) {
-			if ( exceptionOnTimeout ) {
-				return LuceneTimeoutManager.hardTimeout( timingSource, timeout, timeUnit );
-			}
-			else {
-				return LuceneTimeoutManager.softTimeout( timingSource, timeout, timeUnit );
-			}
-		}
-		return LuceneTimeoutManager.noTimeout( timingSource );
+	public TimeoutManager createTimeoutManager(Long timeout, TimeUnit timeUnit, boolean exceptionOnTimeout) {
+		return TimeoutManager.of( timingSource, timeout, timeUnit, exceptionOnTimeout );
 	}
 
 }

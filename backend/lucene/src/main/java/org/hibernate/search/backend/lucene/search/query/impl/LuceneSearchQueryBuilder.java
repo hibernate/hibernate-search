@@ -28,7 +28,6 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementC
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionRequestContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
-import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
@@ -36,6 +35,7 @@ import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.BooleanClause;
@@ -218,7 +218,7 @@ public class LuceneSearchQueryBuilder<H>
 		}
 		ExtractionRequirements extractionRequirements = extractionRequirementsBuilder.build();
 
-		LuceneTimeoutManager timeoutManager = searchContext.createTimeoutManager( timeout, timeUnit, exceptionOnTimeout );
+		TimeoutManager timeoutManager = searchContext.createTimeoutManager( timeout, timeUnit, exceptionOnTimeout );
 
 		LuceneSearcherImpl<H> searcher = new LuceneSearcherImpl<>(
 				requestContext,
