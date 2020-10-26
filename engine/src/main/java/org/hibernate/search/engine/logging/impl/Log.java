@@ -133,10 +133,12 @@ public interface Log extends BasicLogger {
 	)
 	void newCollectedFailure(String process, String context, @Cause Throwable failure);
 
-	@LogMessage(level = Logger.Level.DEBUG)
-	@Message(id = ID_OFFSET + 22,
-			value = "Unexpected empty event context; there is a bug in Hibernate Search, please report it")
-	void unexpectedEmptyEventContext(@Cause Throwable exceptionForStackTrace);
+	@LogMessage(level = Logger.Level.WARN)
+	@Message(id = ID_OFFSET + 22, value = "Exception while collecting a failure"
+			+ " -- this may indicate a bug or a missing test in Hibernate Search."
+			+ " Please report it: https://hibernate.org/community/"
+			+ " Nested exception: %1$s")
+	void exceptionWhileCollectingFailure(String causeMessage, @Cause Throwable cause);
 
 	@Message(id = ID_OFFSET + 25,
 			value = "Invalid call of ifSupported(...) after orElse(...)."
