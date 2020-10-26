@@ -25,7 +25,7 @@ public class PojoCommonsAnnotationsHelper {
 	private PojoCommonsAnnotationsHelper() {
 	}
 
-	private static Method getMemberMethod;
+	private static final Method getMemberMethod;
 
 	static {
 		// The following is in a static block to avoid problems lazy-initializing
