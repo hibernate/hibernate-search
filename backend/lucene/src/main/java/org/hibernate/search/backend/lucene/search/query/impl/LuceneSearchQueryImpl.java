@@ -20,7 +20,6 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchScroll;
-import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
@@ -31,6 +30,7 @@ import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -55,14 +55,14 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private final LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher;
 	private final Long totalHitCountThreshold;
 
-	private LuceneTimeoutManager timeoutManager;
+	private TimeoutManager timeoutManager;
 
 	LuceneSearchQueryImpl(LuceneSyncWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, LuceneSearchContext searchContext,
 			BackendSessionContext sessionContext,
 			LoadingContext<?, ?> loadingContext,
 			Set<String> routingKeys,
-			LuceneTimeoutManager timeoutManager,
+			TimeoutManager timeoutManager,
 			Query luceneQuery, Sort luceneSort,
 			LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher,
 			Long totalHitCountThreshold) {

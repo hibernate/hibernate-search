@@ -20,12 +20,12 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollecto
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
-import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.SearchResultTotal;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.IndexSearcher;
@@ -40,13 +40,13 @@ public class LuceneExtractableSearchResult<H> {
 	private final LuceneCollectors luceneCollectors;
 	private final LuceneSearchProjection<?, H> rootProjection;
 	private final Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
-	private final LuceneTimeoutManager timeoutManager;
+	private final TimeoutManager timeoutManager;
 
 	public LuceneExtractableSearchResult(LuceneSearchQueryRequestContext requestContext,
 			IndexSearcher indexSearcher,
 			LuceneCollectors luceneCollectors,
 			LuceneSearchProjection<?, H> rootProjection,
-			Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations, LuceneTimeoutManager timeoutManager) {
+			Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations, TimeoutManager timeoutManager) {
 		this.requestContext = requestContext;
 		this.convertContext = new FromDocumentFieldValueConvertContextImpl( requestContext.getSessionContext() );
 		this.indexSearcher = indexSearcher;

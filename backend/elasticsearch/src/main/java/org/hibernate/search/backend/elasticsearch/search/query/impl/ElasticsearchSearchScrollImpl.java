@@ -9,11 +9,11 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchScroll;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchScrollResult;
-import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
 
@@ -24,7 +24,7 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 	private final ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor;
 	private final String scrollTimeoutString;
 	private final SearchWorkBuilder<ElasticsearchLoadableSearchResult<H>> firstScroll;
-	private final ElasticsearchTimeoutManager timeoutManager;
+	private final TimeoutManager timeoutManager;
 
 	private String scrollId;
 
@@ -33,7 +33,7 @@ public class ElasticsearchSearchScrollImpl<H> implements ElasticsearchSearchScro
 			ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor,
 			String scrollTimeoutString,
 			SearchWorkBuilder<ElasticsearchLoadableSearchResult<H>> firstScroll,
-			ElasticsearchTimeoutManager timeoutManager) {
+			TimeoutManager timeoutManager) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.searchResultExtractor = searchResultExtractor;

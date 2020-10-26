@@ -11,13 +11,13 @@ import java.util.concurrent.TimeUnit;
 import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -80,16 +80,16 @@ public final class ElasticsearchSearchContext {
 		return multiTenancyStrategy.filterOrNull( tenantId );
 	}
 
-	public ElasticsearchTimeoutManager createTimeoutManager(Long timeout,
+	public TimeoutManager createTimeoutManager(Long timeout,
 			TimeUnit timeUnit, boolean exceptionOnTimeout) {
 		if ( timeout != null && timeUnit != null ) {
 			if ( exceptionOnTimeout ) {
-				return ElasticsearchTimeoutManager.hardTimeout( timingSource, timeout, timeUnit );
+				return TimeoutManager.hardTimeout( timingSource, timeout, timeUnit );
 			}
 			else {
-				return ElasticsearchTimeoutManager.softTimeout( timingSource, timeout, timeUnit );
+				return TimeoutManager.softTimeout( timingSource, timeout, timeUnit );
 			}
 		}
-		return ElasticsearchTimeoutManager.noTimeout( timingSource );
+		return TimeoutManager.noTimeout( timingSource );
 	}
 }

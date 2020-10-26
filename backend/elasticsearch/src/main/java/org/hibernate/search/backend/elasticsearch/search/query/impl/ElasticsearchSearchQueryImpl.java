@@ -22,7 +22,6 @@ import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSear
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchScroll;
-import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.CountWorkBuilder;
@@ -37,6 +36,7 @@ import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -67,7 +67,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private final Integer scrollTimeout;
 	private final Long totalHitCountThreshold;
 
-	private ElasticsearchTimeoutManager timeoutManager;
+	private TimeoutManager timeoutManager;
 
 	ElasticsearchSearchQueryImpl(ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchParallelWorkOrchestrator queryOrchestrator,
@@ -78,7 +78,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			JsonObject payload,
 			ElasticsearchSearchRequestTransformer requestTransformer,
 			ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor,
-			ElasticsearchTimeoutManager timeoutManager, Integer scrollTimeout, Long totalHitCountThreshold) {
+			TimeoutManager timeoutManager, Integer scrollTimeout, Long totalHitCountThreshold) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.searchContext = searchContext;

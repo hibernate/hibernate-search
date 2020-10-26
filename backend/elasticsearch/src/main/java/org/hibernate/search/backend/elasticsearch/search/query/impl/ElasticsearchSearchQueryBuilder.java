@@ -26,7 +26,6 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Predicat
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DistanceSortKey;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
-import org.hibernate.search.backend.elasticsearch.search.timeout.impl.ElasticsearchTimeoutManager;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
@@ -34,6 +33,7 @@ import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.impl.Contracts;
@@ -219,7 +219,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 			REQUEST_SOURCE_ACCESSOR.set( payload, new JsonPrimitive( Boolean.FALSE ) );
 		}
 
-		ElasticsearchTimeoutManager timeoutManager = searchContext.createTimeoutManager(
+		TimeoutManager timeoutManager = searchContext.createTimeoutManager(
 				timeoutValue, timeoutUnit, exceptionOnTimeout );
 
 		ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor =
