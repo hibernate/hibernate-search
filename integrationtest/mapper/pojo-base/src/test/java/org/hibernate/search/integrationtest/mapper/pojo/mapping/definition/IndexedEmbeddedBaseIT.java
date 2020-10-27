@@ -788,52 +788,6 @@ public class IndexedEmbeddedBaseIT {
 	}
 
 	/**
-	 * Check that the deprecated "storage" parameter is taken into account.
-	 */
-	@Test
-	@SuppressWarnings("deprecation")
-	public void storage() {
-		class IndexedEmbeddedLevel1 {
-			String level1Property;
-			@GenericField
-			public String getLevel1Property() {
-				return level1Property;
-			}
-		}
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
-			@DocumentId
-			Integer id;
-			@IndexedEmbedded(storage = org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage.NESTED)
-			IndexedEmbeddedLevel1 level1;
-			public IndexedEntity(int id, String level1Value) {
-				this.id = id;
-				this.level1 = new IndexedEmbeddedLevel1();
-				this.level1.level1Property = level1Value;
-			}
-		}
-
-		backendMock.expectSchema( INDEX_NAME, b -> b
-				.objectField( "level1", ObjectStructure.NESTED, b2 -> b2
-						.field( "level1Property", String.class )
-				)
-		);
-		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( IndexedEntity.class )
-				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
-				.setup();
-		backendMock.verifyExpectationsMet();
-
-		doTestEmbeddedRuntime(
-				mapping,
-				id -> new IndexedEntity( id, "level1Value" ),
-				document -> document.objectField( "level1", b2 -> b2
-						.field( "level1Property", "level1Value" )
-				)
-		);
-	}
-
-	/**
 	 * Check that bridges whose contributed fields are all filtered out are never applied.
 	 */
 	@Test
