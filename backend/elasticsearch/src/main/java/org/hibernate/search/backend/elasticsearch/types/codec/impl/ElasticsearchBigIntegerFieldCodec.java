@@ -27,10 +27,14 @@ public class ElasticsearchBigIntegerFieldCodec implements ElasticsearchFieldCode
 
 	private final int decimalScale;
 	private final BigDecimal scalingFactor;
+	private final BigDecimal minScaledValue;
+	private final BigDecimal maxScaledValue;
 
 	public ElasticsearchBigIntegerFieldCodec(int decimalScale) {
 		this.decimalScale = decimalScale;
 		scalingFactor = BigDecimal.TEN.pow( decimalScale, new MathContext( 10, RoundingMode.HALF_UP ) );
+		minScaledValue = new BigDecimal( NumberScaleConstants.MIN_LONG_AS_BIGINTEGER, decimalScale );
+		maxScaledValue = new BigDecimal( NumberScaleConstants.MAX_LONG_AS_BIGINTEGER, decimalScale );
 	}
 
 	@Override
@@ -46,8 +50,9 @@ public class ElasticsearchBigIntegerFieldCodec implements ElasticsearchFieldCode
 			return JsonNull.INSTANCE;
 		}
 
-		if ( isTooLarge( value ) ) {
-			throw log.scaledNumberTooLarge( value );
+		BigDecimal decimal = new BigDecimal( value );
+		if ( decimal.compareTo( minScaledValue ) < 0 || decimal.compareTo( maxScaledValue ) > 0 ) {
+			throw log.scaledNumberTooLarge( value, minScaledValue, maxScaledValue );
 		}
 
 		return new JsonPrimitive( value );
@@ -89,11 +94,4 @@ public class ElasticsearchBigIntegerFieldCodec implements ElasticsearchFieldCode
 		return scalingFactor;
 	}
 
-	public boolean isTooLarge(BigInteger value) {
-		BigDecimal scaled = new BigDecimal( value ).multiply( scalingFactor );
-		return (
-			scaled.compareTo( NumberScaleConstants.MIN_LONG_AS_BIGDECIMAL ) < 0 ||
-			scaled.compareTo( NumberScaleConstants.MAX_LONG_AS_BIGDECIMAL ) > 0
-		);
-	}
 }

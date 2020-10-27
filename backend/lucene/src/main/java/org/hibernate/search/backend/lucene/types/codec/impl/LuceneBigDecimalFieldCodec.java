@@ -56,8 +56,8 @@ public final class LuceneBigDecimalFieldCodec extends AbstractLuceneNumericField
 
 	@Override
 	public Long encode(BigDecimal value) {
-		if ( isTooLarge( value ) ) {
-			throw log.scaledNumberTooLarge( value );
+		if ( value.compareTo( minScaledValue ) < 0 || value.compareTo( maxScaledValue ) > 0 ) {
+			throw log.scaledNumberTooLarge( value, minScaledValue, maxScaledValue );
 		}
 
 		return unscale( value );
@@ -95,7 +95,4 @@ public final class LuceneBigDecimalFieldCodec extends AbstractLuceneNumericField
 		return new BigDecimal( BigInteger.valueOf( value ), decimalScale );
 	}
 
-	private boolean isTooLarge(BigDecimal value) {
-		return ( value.compareTo( minScaledValue ) < 0 || value.compareTo( maxScaledValue ) > 0 );
-	}
 }
