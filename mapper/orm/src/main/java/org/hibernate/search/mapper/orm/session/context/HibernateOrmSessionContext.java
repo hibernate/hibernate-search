@@ -15,13 +15,4 @@ public interface HibernateOrmSessionContext {
 	 */
 	Session session();
 
-	/**
-	 * @return The Hibernate ORM {@link Session}.
-	 * @deprecated Use {@link #session()} instead.
-	 */
-	@Deprecated
-	default Session getSession() {
-		return session();
-	}
-
 }

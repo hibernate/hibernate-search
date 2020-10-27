@@ -47,7 +47,6 @@ public final class HibernateOrmExtension
 		implements IdentifierBridgeToDocumentIdentifierContextExtension<HibernateOrmMappingContext>,
 				IdentifierBridgeFromDocumentIdentifierContextExtension<HibernateOrmSessionContext>,
 				RoutingBridgeRouteContextExtension<HibernateOrmSessionContext>,
-				org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContextExtension<HibernateOrmSessionContext>,
 				TypeBridgeWriteContextExtension<HibernateOrmSessionContext>,
 				PropertyBridgeWriteContextExtension<HibernateOrmSessionContext>,
 				ValueBridgeToIndexedValueContextExtension<HibernateOrmMappingContext>,
@@ -88,16 +87,6 @@ public final class HibernateOrmExtension
 	 */
 	@Override
 	public Optional<HibernateOrmSessionContext> extendOptional(RoutingBridgeRouteContext original,
-			BridgeSessionContext sessionContext) {
-		return extendToOrmSessionContext( sessionContext );
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Optional<HibernateOrmSessionContext> extendOptional(
-			org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext original,
 			BridgeSessionContext sessionContext) {
 		return extendToOrmSessionContext( sessionContext );
 	}

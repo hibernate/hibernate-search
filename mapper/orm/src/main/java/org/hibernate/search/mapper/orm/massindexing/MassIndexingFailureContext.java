@@ -51,33 +51,12 @@ public class MassIndexingFailureContext {
 	}
 
 	/**
-	 * @return The {@link Exception} or {@link Error} thrown when the operation failed.
-	 * Never {@code null}.
-	 * @deprecated Use {@link #throwable()} instead.
-	 */
-	@Deprecated
-	public Throwable getThrowable() {
-		return throwable();
-	}
-
-	/**
 	 * @return The operation that triggered the failure.
 	 * Never {@code null}.
 	 * Use {@link Object#toString()} to get a textual representation.
 	 */
 	public Object failingOperation() {
 		return failingOperation;
-	}
-
-	/**
-	 * @return The operation that triggered the failure.
-	 * Never {@code null}.
-	 * Use {@link Object#toString()} to get a textual representation.
-	 * @deprecated Use {@link #failingOperation()} instead.
-	 */
-	@Deprecated
-	public Object getFailingOperation() {
-		return failingOperation();
 	}
 
 	public static class Builder {
@@ -100,5 +79,4 @@ public class MassIndexingFailureContext {
 			return new MassIndexingFailureContext( this );
 		}
 	}
-
 }
