@@ -21,10 +21,12 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.Startup
 import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.RoutingBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
@@ -121,7 +123,7 @@ public class CleanupIT {
 	}
 
 	@Test
-	public void failingRoutingKeyBinding() {
+	public void failingRoutingBinding() {
 		failingStartup( mappingDefinition -> {
 			TypeMappingStep otherIndexedEntityMapping = mappingDefinition.type( OtherIndexedEntity.class );
 			otherIndexedEntityMapping.indexed().index( OtherIndexedEntity.INDEX );
@@ -135,7 +137,7 @@ public class CleanupIT {
 							// The extractor returns type Object, not String
 							.valueBinder( StartupStubBridge.binder( Object.class, VALUE_BRIDGE_COUNTER_KEYS ) )
 							.extractor( StartupStubContainerExtractor.NAME );
-			otherIndexedEntityMapping.routingKeyBinder( new FailingBinder() );
+			otherIndexedEntityMapping.indexed().routingBinder( new FailingBinder() );
 		} );
 
 		// We must have instantiated objects...
@@ -477,9 +479,8 @@ public class CleanupIT {
 		}
 	}
 
-	private static class FailingBinder implements TypeBinder,
-			PropertyBinder, org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder,
-			IdentifierBinder, ValueBinder {
+	private static class FailingBinder implements TypeBinder, PropertyBinder,
+			IdentifierBinder, ValueBinder, RoutingBinder {
 		@Override
 		public void bind(TypeBindingContext context) {
 			throw new SimulatedFailure();
@@ -496,12 +497,12 @@ public class CleanupIT {
 		}
 
 		@Override
-		public void bind(org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext context) {
+		public void bind(ValueBindingContext<?> context) {
 			throw new SimulatedFailure();
 		}
 
 		@Override
-		public void bind(ValueBindingContext<?> context) {
+		public void bind(RoutingBindingContext context) {
 			throw new SimulatedFailure();
 		}
 	}
@@ -518,5 +519,4 @@ public class CleanupIT {
 			throw new UnsupportedOperationException( "Unexpected runtime use" );
 		}
 	}
-
 }
