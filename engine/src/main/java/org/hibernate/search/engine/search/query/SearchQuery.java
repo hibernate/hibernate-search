@@ -21,15 +21,6 @@ public interface SearchQuery<H> extends SearchFetchable<H> {
 	String queryString();
 
 	/**
-	 * @return A textual representation of the query.
-	 * @deprecated Use {@link #queryString()} instead.
-	 */
-	@Deprecated
-	default String getQueryString() {
-		return queryString();
-	}
-
-	/**
 	 * Extend the current query with the given extension,
 	 * resulting in an extended query offering more options or a more detailed result type.
 	 *

@@ -60,15 +60,6 @@ public interface IndexFieldDescriptor {
 	boolean multiValued();
 
 	/**
-	 * @return {@code true} if this field can have multiple values in the same parent document.
-	 * @deprecated Use {@link #multiValued()} instead.
-	 */
-	@Deprecated
-	default boolean isMultiValued() {
-		return multiValued();
-	}
-
-	/**
 	 * @return {@code true} if this field can have multiple values in the same root document
 	 * or if it is contained, directly or indirectly, in an object field that can have multiple values.
 	 */

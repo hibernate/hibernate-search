@@ -25,16 +25,6 @@ public interface GeoPolygon {
 	List<GeoPoint> points();
 
 	/**
-	 * @return The points of this polygon.
-	 * The first and last points are always identical.
-	 * @deprecated Use {@link #points()} instead.
-	 */
-	@Deprecated
-	default List<GeoPoint> getPoints() {
-		return points();
-	}
-
-	/**
 	 * Create a {@link GeoPolygon} from a list of points.
 	 * <p>
 	 * The first and last points must be identical.

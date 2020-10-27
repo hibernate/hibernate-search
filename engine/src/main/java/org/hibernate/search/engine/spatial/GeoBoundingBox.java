@@ -17,27 +17,9 @@ public interface GeoBoundingBox {
 	GeoPoint topLeft();
 
 	/**
-	 * @return The top-left coordinates of this bounding-box.
-	 * @deprecated Use {@link #topLeft()} instead.
-	 */
-	@Deprecated
-	default GeoPoint getTopLeft() {
-		return topLeft();
-	}
-
-	/**
 	 * @return The bottom-right coordinates of this bounding-box.
 	 */
 	GeoPoint bottomRight();
-
-	/**
-	 * @return The bottom-right coordinates of this bounding-box.
-	 * @deprecated Use {@link #bottomRight()} instead.
-	 */
-	@Deprecated
-	default GeoPoint getBottomRight() {
-		return bottomRight();
-	}
 
 	/**
 	 * Create a {@link GeoBoundingBox} from the top-left and bottom-right corners.

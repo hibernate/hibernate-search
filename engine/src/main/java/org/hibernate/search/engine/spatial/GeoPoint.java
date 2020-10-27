@@ -18,27 +18,9 @@ public interface GeoPoint {
 	double latitude();
 
 	/**
-	 * @return the latitude, in degrees
-	 * @deprecated Use {@link #latitude()} instead.
-	 */
-	@Deprecated
-	default double getLatitude() {
-		return latitude();
-	}
-
-	/**
 	 * @return the longitude, in degrees
 	 */
 	double longitude();
-
-	/**
-	 * @return the longitude, in degrees
-	 * @deprecated Use {@link #longitude()} instead.
-	 */
-	@Deprecated
-	default double getLongitude() {
-		return longitude();
-	}
 
 	/**
 	 * Create a {@link GeoPoint} from a latitude and a longitude.

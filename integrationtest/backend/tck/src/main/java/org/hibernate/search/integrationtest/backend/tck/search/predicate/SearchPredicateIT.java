@@ -84,34 +84,6 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	@SuppressWarnings("deprecation")
-	public void predicate_searchPredicate() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		SearchPredicate predicate = scope.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
-
-		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( predicate )
-				.toQuery();
-
-		assertThatQuery( query )
-				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
-	}
-
-	@Test
-	@SuppressWarnings("deprecation")
-	public void predicate_lambda() {
-		StubMappingScope scope = mainIndex.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.match().field( "string" ).matching( STRING_1 ) )
-				.toQuery();
-
-		assertThatQuery( query )
-				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
-	}
-
-	@Test
 	public void reuseRootPredicateInstance_onScopeTargetingSameIndexes() {
 		StubMappingScope scope = mainIndex.createScope();
 		SearchPredicate predicate = scope
