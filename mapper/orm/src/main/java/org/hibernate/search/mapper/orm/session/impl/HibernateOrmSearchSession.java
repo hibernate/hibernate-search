@@ -24,6 +24,10 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
@@ -36,6 +40,7 @@ import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
 import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.context.HibernateOrmSessionContext;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
@@ -132,20 +137,39 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 
 	@Override
 	@SuppressWarnings("deprecation")
-	public <T> org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep<T> search(
+	public <T> SearchQuerySelectStep<
+			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>,
+			EntityReference,
+			T,
+			SearchLoadingOptionsStep,
+			SearchProjectionFactory<EntityReference, T>,
+			SearchPredicateFactory
+			> search(
 			Collection<? extends Class<? extends T>> types) {
 		return search( scope( types ) );
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
-	public <T> org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep<T> search(
+	public <T> SearchQuerySelectStep<
+			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>,
+			EntityReference,
+			T,
+			SearchLoadingOptionsStep,
+			SearchProjectionFactory<EntityReference, T>,
+			SearchPredicateFactory
+			> search(
 			SearchScope<T> scope) {
 		return search( (SearchScopeImpl<T>) scope );
 	}
 
-	@SuppressWarnings("deprecation")
-	private <T> org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep<T> search(
+	private <T> SearchQuerySelectStep<
+			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>,
+			EntityReference,
+			T,
+			SearchLoadingOptionsStep,
+			SearchProjectionFactory<EntityReference, T>,
+			SearchPredicateFactory
+			> search(
 			SearchScopeImpl<T> scope) {
 		return scope.search( this );
 	}

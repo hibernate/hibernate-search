@@ -12,6 +12,8 @@ import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionCon
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
@@ -19,7 +21,8 @@ import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexerImpl;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.schema.management.impl.SearchSchemaManagerImpl;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
-import org.hibernate.search.mapper.orm.search.query.dsl.impl.HibernateOrmSearchQuerySelectStepImpl;
+import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
+import org.hibernate.search.mapper.orm.search.query.dsl.impl.HibernateOrmSearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmLoadingContext;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.work.impl.SearchWorkspaceImpl;
@@ -38,14 +41,19 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 		this.delegate = delegate;
 	}
 
-	@SuppressWarnings("deprecation")
-	public org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep<E> search(HibernateOrmScopeSessionContext sessionContext) {
+	public SearchQuerySelectStep<
+			SearchQueryOptionsStep<?, E, SearchLoadingOptionsStep, ?, ?>,
+			EntityReference,
+			E,
+			SearchLoadingOptionsStep,
+			SearchProjectionFactory<EntityReference, E>,
+			SearchPredicateFactory
+			> search(HibernateOrmScopeSessionContext sessionContext) {
 		HibernateOrmLoadingContext.Builder<E> loadingContextBuilder = new HibernateOrmLoadingContext.Builder<>(
 				mappingContext, sessionContext, delegate.includedIndexedTypes()
 		);
-		return new HibernateOrmSearchQuerySelectStepImpl<>(
-				delegate.search( sessionContext.backendSessionContext(), loadingContextBuilder ),
-				loadingContextBuilder
+		return new HibernateOrmSearchQuerySelectStep<>(
+				delegate.search( sessionContext.backendSessionContext(), loadingContextBuilder )
 		);
 	}
 
