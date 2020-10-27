@@ -218,7 +218,7 @@ public class LuceneSearchQueryBuilder<H>
 		}
 		ExtractionRequirements extractionRequirements = extractionRequirementsBuilder.build();
 
-		LuceneTimeoutManager timeoutManager = searchContext.createTimeoutManager( definitiveLuceneQuery, timeout, timeUnit, exceptionOnTimeout );
+		LuceneTimeoutManager timeoutManager = searchContext.createTimeoutManager( timeout, timeUnit, exceptionOnTimeout );
 
 		LuceneSearcherImpl<H> searcher = new LuceneSearcherImpl<>(
 				requestContext,

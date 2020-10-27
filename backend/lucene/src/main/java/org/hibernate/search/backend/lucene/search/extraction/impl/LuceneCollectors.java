@@ -15,8 +15,10 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.ExplicitDocIdsQuery;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneTimeoutManager;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.engine.search.query.SearchResultTotal;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResultTotal;
+import org.hibernate.search.util.common.AssertionFailure;
 
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldDoc;
@@ -91,7 +93,11 @@ public class LuceneCollectors {
 			}
 		}
 		catch (TimeLimitingCollector.TimeExceededException e) {
-			timeoutManager.forceTimedOut();
+			Deadline deadline = timeoutManager.deadlineOrNull();
+			if ( deadline == null ) {
+				throw new AssertionFailure( "Timeout reached, but no timeout was defined", e );
+			}
+			deadline.forceTimeout( e );
 		}
 
 		if ( rewrittenLuceneQuery instanceof MatchAllDocsQuery ) {
@@ -155,7 +161,11 @@ public class LuceneCollectors {
 			indexSearcher.search( topDocsQuery, collectorsForTopDocs.getComposed() );
 		}
 		catch (TimeLimitingCollector.TimeExceededException e) {
-			timeoutManager.forceTimedOut();
+			Deadline deadline = timeoutManager.deadlineOrNull();
+			if ( deadline == null ) {
+				throw new AssertionFailure( "Timeout reached, but no timeout was defined", e );
+			}
+			deadline.forceTimeout( e );
 		}
 	}
 

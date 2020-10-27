@@ -93,7 +93,7 @@ public class SearchQueryTimeoutIT {
 
 		assertThatThrownBy( () -> query.fetch( 20 ) )
 				.isInstanceOf( SearchTimeoutException.class )
-				.hasMessageContaining( " exceeded the timeout of 0s, 0ms and 1ns: " );
+				.hasMessageContaining( "Operation exceeded the timeout of 0s, 0ms and 1ns" );
 	}
 
 	@Test
@@ -104,7 +104,7 @@ public class SearchQueryTimeoutIT {
 
 		assertThatThrownBy( () -> query.fetchTotalHitCount() )
 				.isInstanceOf( SearchTimeoutException.class )
-				.hasMessageContaining( " exceeded the timeout of 0s, 0ms and 1ns: " );
+				.hasMessageContaining( "Operation exceeded the timeout of 0s, 0ms and 1ns" );
 	}
 
 	@Test
@@ -116,7 +116,7 @@ public class SearchQueryTimeoutIT {
 		try ( SearchScroll<DocumentReference> scroll = query.scroll( 5 ) ) {
 			assertThatThrownBy( () -> scroll.next() )
 					.isInstanceOf( SearchTimeoutException.class )
-					.hasMessageContaining( " exceeded the timeout of 0s, 0ms and 1ns: " );
+					.hasMessageContaining( "Operation exceeded the timeout of 0s, 0ms and 1ns" );
 		}
 	}
 

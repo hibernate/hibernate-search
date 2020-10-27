@@ -168,7 +168,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	@Override
 	public void failAfter(long timeout, TimeUnit timeUnit) {
 		// replace the timeout manager on already created query instance
-		timeoutManager = searchContext.createTimeoutManager( luceneQuery, timeout, timeUnit, true );
+		timeoutManager = searchContext.createTimeoutManager( timeout, timeUnit, true );
 		searcher.setTimeoutManager( timeoutManager );
 	}
 

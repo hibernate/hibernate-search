@@ -80,16 +80,16 @@ public final class ElasticsearchSearchContext {
 		return multiTenancyStrategy.filterOrNull( tenantId );
 	}
 
-	public ElasticsearchTimeoutManager createTimeoutManager(JsonObject definitiveQuery, Long timeout,
+	public ElasticsearchTimeoutManager createTimeoutManager(Long timeout,
 			TimeUnit timeUnit, boolean exceptionOnTimeout) {
 		if ( timeout != null && timeUnit != null ) {
 			if ( exceptionOnTimeout ) {
-				return ElasticsearchTimeoutManager.hardTimeout( timingSource, definitiveQuery, timeout, timeUnit );
+				return ElasticsearchTimeoutManager.hardTimeout( timingSource, timeout, timeUnit );
 			}
 			else {
-				return ElasticsearchTimeoutManager.softTimeout( timingSource, definitiveQuery, timeout, timeUnit );
+				return ElasticsearchTimeoutManager.softTimeout( timingSource, timeout, timeUnit );
 			}
 		}
-		return ElasticsearchTimeoutManager.noTimeout( timingSource, definitiveQuery );
+		return ElasticsearchTimeoutManager.noTimeout( timingSource );
 	}
 }

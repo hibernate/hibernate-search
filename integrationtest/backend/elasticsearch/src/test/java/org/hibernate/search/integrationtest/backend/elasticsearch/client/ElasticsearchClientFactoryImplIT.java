@@ -268,7 +268,8 @@ public class ElasticsearchClientFactoryImplIT {
 				.isInstanceOf( CompletionException.class )
 				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Request exceeded the timeout of 1s, 0ms and 0ns: 'POST /myIndex/myType with parameters {}'." );
+				.hasMessageContainingAll( "Request execution exceeded the timeout of 1s, 0ms and 0ns",
+						"Request was POST /myIndex/myType with parameters {}" );
 	}
 
 	/**
@@ -371,7 +372,8 @@ public class ElasticsearchClientFactoryImplIT {
 					.isInstanceOf( CompletionException.class )
 					.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
 					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Request exceeded the timeout of 1s, 0ms and 0ns: 'POST /myIndex/myType with parameters {}'." );
+					.hasMessageContainingAll( "Request execution exceeded the timeout of 1s, 0ms and 0ns",
+							"Request was POST /myIndex/myType with parameters {}" );
 		}
 	}
 

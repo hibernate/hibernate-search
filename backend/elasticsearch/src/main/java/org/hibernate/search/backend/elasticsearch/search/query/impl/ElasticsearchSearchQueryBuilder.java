@@ -220,7 +220,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 		}
 
 		ElasticsearchTimeoutManager timeoutManager = searchContext.createTimeoutManager(
-				payload, timeoutValue, timeoutUnit, exceptionOnTimeout );
+				timeoutValue, timeoutUnit, exceptionOnTimeout );
 
 		ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor =
 				searchResultExtractorFactory.createResultExtractor(

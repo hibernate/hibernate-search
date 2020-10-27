@@ -98,9 +98,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 				1, TimeUnit.MICROSECONDS
 		) )
 				.isInstanceOf( SearchTimeoutException.class )
-				.hasMessageContaining(
-						"Search query loading exceeded the timeout of 1 milliseconds"
-				);
+				.hasMessageContaining( "Operation exceeded the timeout of 0s, 1ms and 0ns" );
 	}
 
 	/**

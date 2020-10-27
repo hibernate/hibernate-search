@@ -69,17 +69,16 @@ public final class LuceneSearchContext {
 		return multiTenancyStrategy.filterOrNull( tenantId );
 	}
 
-	public LuceneTimeoutManager createTimeoutManager(Query definitiveLuceneQuery,
-			Long timeout, TimeUnit timeUnit, boolean exceptionOnTimeout) {
+	public LuceneTimeoutManager createTimeoutManager(Long timeout, TimeUnit timeUnit, boolean exceptionOnTimeout) {
 		if ( timeout != null && timeUnit != null ) {
 			if ( exceptionOnTimeout ) {
-				return LuceneTimeoutManager.hardTimeout( timingSource, definitiveLuceneQuery, timeout, timeUnit );
+				return LuceneTimeoutManager.hardTimeout( timingSource, timeout, timeUnit );
 			}
 			else {
-				return LuceneTimeoutManager.softTimeout( timingSource, definitiveLuceneQuery, timeout, timeUnit );
+				return LuceneTimeoutManager.softTimeout( timingSource, timeout, timeUnit );
 			}
 		}
-		return LuceneTimeoutManager.noTimeout( timingSource, definitiveLuceneQuery );
+		return LuceneTimeoutManager.noTimeout( timingSource );
 	}
 
 }

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.common.timing.spi;
 
+import org.hibernate.search.util.common.SearchTimeoutException;
+
 /**
  * Common interface providing a deadline through the method {@link #remainingTimeMillis}.
  */
@@ -17,6 +19,19 @@ public interface Deadline {
 	 * and it's a hard deadline requiring immediate failure.
 	 */
 	long remainingTimeMillis();
+
+	/**
+	 * @param cause The cause of the timeout, or {@code null}.
+	 * @throws org.hibernate.search.util.common.SearchTimeoutException If the deadline is
+	 * a hard deadline requiring immediate failure.
+	 */
+	void forceTimeout(Exception cause);
+
+	/**
+	 * @param cause The cause of the timeout, or {@code null}.
+	 * @return An exception to be thrown on timeout.
+	 */
+	SearchTimeoutException forceTimeoutAndCreateException(Exception cause);
 
 	/**
 	 * @param milliseconds The number of milliseconds until the deadline.

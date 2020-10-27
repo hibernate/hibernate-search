@@ -286,6 +286,6 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	@Override
 	public void failAfter(long timeout, TimeUnit timeUnit) {
 		// replace the timeout manager on already created query instance
-		timeoutManager = searchContext.createTimeoutManager( payload, timeout, timeUnit, true );
+		timeoutManager = searchContext.createTimeoutManager( timeout, timeUnit, true );
 	}
 }

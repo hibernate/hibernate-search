@@ -204,9 +204,7 @@ public class SearchQueryBaseIT {
 
 			assertThatThrownBy( () -> query.fetchAllHits() )
 					.isInstanceOf( SearchTimeoutException.class )
-					.hasMessageContaining(
-							"Search query loading exceeded the timeout of 1 milliseconds"
-					);
+					.hasMessageContaining( "Operation exceeded the timeout of 0s, 1ms and 0ns" );
 		} );
 	}
 
@@ -233,9 +231,7 @@ public class SearchQueryBaseIT {
 
 			assertThatThrownBy( () -> query.fetchAllHits() )
 					.isInstanceOf( SearchTimeoutException.class )
-					.hasMessageContaining(
-							"Search query loading exceeded the timeout of 1 milliseconds"
-					);
+					.hasMessageContaining( "Operation exceeded the timeout of 0s, 1ms and 0ns" );
 		} );
 	}
 

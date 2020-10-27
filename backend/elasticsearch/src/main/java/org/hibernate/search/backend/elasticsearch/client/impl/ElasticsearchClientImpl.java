@@ -151,10 +151,12 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 		ScheduledFuture<?> timeout = timeoutExecutorService.schedule(
 				() -> {
 					if ( !completableFuture.isDone() ) {
-						completableFuture.completeExceptionally( log.timedOut(
+						RuntimeException cause = log.requestTimedOut(
 								Duration.ofNanos( TimeUnit.MILLISECONDS.toNanos( currentTimeoutValue ) ),
-								elasticsearchRequest
-						) );
+								elasticsearchRequest );
+						completableFuture.completeExceptionally(
+								deadline != null ? deadline.forceTimeoutAndCreateException( cause ) : cause
+						);
 					}
 				},
 				currentTimeoutValue, TimeUnit.MILLISECONDS

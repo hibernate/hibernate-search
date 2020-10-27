@@ -12,7 +12,6 @@ import static org.jboss.logging.Logger.Level.WARN;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -28,13 +27,11 @@ import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.logging.spi.AggregationKeyFormatter;
 import org.hibernate.search.engine.search.common.SortMode;
-import org.hibernate.search.util.common.logging.impl.DurationInSecondsAndFractionsFormatter;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
-import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
@@ -487,9 +484,6 @@ public interface Log extends BasicLogger {
 	SearchException conflictingFieldModel(String absoluteFieldPath,
 			AbstractLuceneIndexSchemaFieldNode fieldNode1, AbstractLuceneIndexSchemaFieldNode fieldNode2,
 			@Param EventContext context);
-
-	@Message(id = ID_OFFSET + 107, value = "Search query exceeded the timeout of %1$s: '%2$s'.")
-	SearchTimeoutException timedOut(@FormatWith(DurationInSecondsAndFractionsFormatter.class) Duration timeout, String queryDescription);
 
 	@Message(id = ID_OFFSET + 108,
 			value = "Invalid I/O strategy name: '%1$s'. Valid names are: %2$s.")

@@ -8,10 +8,12 @@ package org.hibernate.search.engine.search.timeout.spi;
 
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.common.timing.spi.Deadline;
+import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -28,15 +30,19 @@ public class TimeoutManager {
 	}
 
 	protected final TimingSource timingSource;
+	protected final Long timeoutValue;
+	protected final TimeUnit timeoutUnit;
 	protected final Long timeoutMs;
 	protected final Type type;
 	private final DynamicDeadline deadline;
 
 	private Long start;
 
-	public TimeoutManager(TimingSource timingSource, Long timeoutMs, Type type) {
+	public TimeoutManager(TimingSource timingSource, Long timeoutValue, TimeUnit timeoutUnit, Type type) {
 		this.timingSource = timingSource;
-		this.timeoutMs = timeoutMs;
+		this.timeoutValue = timeoutValue;
+		this.timeoutUnit = timeoutUnit;
+		this.timeoutMs = timeoutUnit == null ? null : timeoutUnit.toMillis( timeoutValue );
 		this.type = type;
 		this.deadline = timeoutMs == null ? null : new DynamicDeadline();
 
@@ -98,23 +104,12 @@ public class TimeoutManager {
 		return deadline.remainingTimeMillis() <= 0;
 	}
 
-	public void forceTimedOut() {
-		if ( deadline == null ) {
-			return;
-		}
-		this.deadline.forceTimeout();
-	}
-
 	public boolean hasHardTimeout() {
 		return this.type == Type.EXCEPTION;
 	}
 
 	public Duration tookTime() {
 		return Duration.ofMillis( elapsedTimeInMilliseconds() );
-	}
-
-	protected void onTimedOut() {
-		throw log.timedOut( timeoutMs );
 	}
 
 	protected long elapsedTimeInMilliseconds() {
@@ -129,7 +124,7 @@ public class TimeoutManager {
 			final long elapsedTime = elapsedTimeInMilliseconds();
 			long timeLeft = timeoutMs - elapsedTime;
 			if ( timeLeft <= 0 ) {
-				forceTimeout();
+				forceTimeout( null );
 				// Timed out: don't return a negative number.
 				return 0L;
 			}
@@ -138,9 +133,20 @@ public class TimeoutManager {
 			}
 		}
 
-		void forceTimeout() {
+		@Override
+		public void forceTimeout(Exception cause) {
+			if ( hasHardTimeout() ) {
+				throw forceTimeoutAndCreateException( cause );
+			}
+			else {
+				this.timedOut = true;
+			}
+		}
+
+		@Override
+		public SearchTimeoutException forceTimeoutAndCreateException(Exception cause) {
 			this.timedOut = true;
-			onTimedOut();
+			return log.timedOut( Duration.ofNanos( timeoutUnit.toNanos( timeoutValue ) ), cause );
 		}
 	}
 }

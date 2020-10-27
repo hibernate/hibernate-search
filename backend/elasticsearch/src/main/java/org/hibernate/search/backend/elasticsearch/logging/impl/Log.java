@@ -500,8 +500,8 @@ public interface Log extends BasicLogger {
 			+ " The URI scheme ('http://', 'https://') must not be included.")
 	SearchException invalidHostAndPort(String hostAndPort, @Cause Exception e);
 
-	@Message(id = ID_OFFSET + 90, value = "Request exceeded the timeout of %1$s: '%2$s'.")
-	SearchTimeoutException timedOut(@FormatWith(DurationInSecondsAndFractionsFormatter.class) Duration timeout,
+	@Message(id = ID_OFFSET + 90, value = "Request execution exceeded the timeout of %1$s. Request was %2$s")
+	SearchTimeoutException requestTimedOut(@FormatWith(DurationInSecondsAndFractionsFormatter.class) Duration timeout,
 			@FormatWith(ElasticsearchRequestFormatter.class) ElasticsearchRequest request);
 
 	@Message(id = ID_OFFSET + 91, value = "Invalid name for the type-name mapping strategy: '%1$s'."
@@ -652,10 +652,6 @@ public interface Log extends BasicLogger {
 					+ " Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant) in all indexes,"
 					+ " and that the field has the same type in all indexes.")
 	SearchException partialSupportForQueryElement(String queryElementName);
-
-	@Message(id = ID_OFFSET + 120, value = "Request exceeded the timeout of %1$s: '%2$s'.")
-	SearchTimeoutException clientSideTimedOut(@FormatWith(DurationInSecondsAndFractionsFormatter.class) Duration timeout,
-			String query);
 
 	@Message(id = ID_OFFSET + 121, value = "Invalid dynamic type: '%1$s'."
 			+ " Valid values are: %2$s.")
