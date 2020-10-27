@@ -18,6 +18,7 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerEx
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.IndexedEmbeddedProcessor;
+import org.hibernate.search.util.common.annotation.Search5DeprecatedAPI;
 
 /**
  * Maps a property to an object field whose fields are the same as those defined in the property type.
@@ -109,6 +110,7 @@ public @interface IndexedEmbedded {
 	 * @deprecated Use {@link #name()} instead. Note that {@link #name()} does not allow dots.
 	 */
 	@Deprecated
+	@Search5DeprecatedAPI
 	String prefix() default "";
 
 	/**
