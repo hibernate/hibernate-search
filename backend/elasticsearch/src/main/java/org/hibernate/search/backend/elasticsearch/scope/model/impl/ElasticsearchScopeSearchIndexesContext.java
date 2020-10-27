@@ -27,6 +27,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentI
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -111,9 +112,11 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 				}
 				else {
 					if ( firstField.isObjectField() != fieldForCurrentIndex.isObjectField() ) {
-						throw log.conflictingFieldModel( absoluteFieldPath, firstField, fieldForCurrentIndex,
+						SearchException cause = log.conflictingFieldModel();
+						throw log.inconsistentConfigurationForFieldForSearch( absoluteFieldPath, cause.getMessage(),
 								EventContexts.fromIndexNames( indexModelOfFirstField.names().getHibernateSearch(),
-										indexModel.names().getHibernateSearch() ) );
+										indexModel.names().getHibernateSearch() ),
+								cause );
 					}
 				}
 				fieldForEachIndex.add( fieldForCurrentIndex );

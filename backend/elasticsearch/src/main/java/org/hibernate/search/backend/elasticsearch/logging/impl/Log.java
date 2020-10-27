@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
@@ -661,10 +660,8 @@ public interface Log extends BasicLogger {
 	SearchException invalidDynamicType(String invalidRepresentation, List<String> validRepresentations);
 
 	@Message(id = ID_OFFSET + 122,
-			value = "Multiple conflicting models for field '%1$s': '%2$s' vs. '%3$s'.")
-	SearchException conflictingFieldModel(String absoluteFieldPath,
-			AbstractElasticsearchIndexSchemaFieldNode fieldNode1, AbstractElasticsearchIndexSchemaFieldNode fieldNode2,
-			@Param EventContext context);
+			value = "This field is a value field in some indexes, but an object field in other indexes.")
+	SearchException conflictingFieldModel();
 
 	@Message(id = ID_OFFSET + 123, value = "Cannot use '%2$s' on field '%1$s'."
 			+ " '%2$s' is not available for object fields.")

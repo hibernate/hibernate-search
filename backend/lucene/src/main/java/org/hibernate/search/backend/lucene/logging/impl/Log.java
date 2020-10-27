@@ -20,9 +20,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.Version;
 
-import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchObjectFieldContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.logging.spi.AggregationKeyFormatter;
@@ -470,16 +468,9 @@ public interface Log extends BasicLogger {
 				+ " Assign an indexing analyzer and a search analyzer, or remove the search analyzer.")
 	SearchException searchAnalyzerWithoutAnalyzer(String searchAnalyzer, @Param EventContext context);
 
-	@Message(id = ID_OFFSET + 105,
-			value = "Multiple conflicting models for object field '%1$s': '%2$s' vs. '%3$s'.")
-	SearchException conflictingObjectFieldModel(String absoluteFieldPath,
-			LuceneSearchObjectFieldContext index1Model, LuceneSearchObjectFieldContext index2Model, @Param EventContext context);
-
 	@Message(id = ID_OFFSET + 106,
-			value = "Multiple conflicting models for field '%1$s': '%2$s' vs. '%3$s'.")
-	SearchException conflictingFieldModel(String absoluteFieldPath,
-			AbstractLuceneIndexSchemaFieldNode fieldNode1, AbstractLuceneIndexSchemaFieldNode fieldNode2,
-			@Param EventContext context);
+			value = "This field is a value field in some indexes, but an object field in other indexes.")
+	SearchException conflictingFieldModel();
 
 	@Message(id = ID_OFFSET + 108,
 			value = "Invalid I/O strategy name: '%1$s'. Valid names are: %2$s.")
