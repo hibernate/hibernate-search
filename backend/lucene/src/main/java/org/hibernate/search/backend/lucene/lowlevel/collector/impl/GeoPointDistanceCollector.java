@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 
 import org.apache.lucene.index.LeafReaderContext;
@@ -17,12 +16,11 @@ import org.apache.lucene.search.LeafCollector;
 import org.apache.lucene.search.Scorable;
 import org.apache.lucene.search.ScoreMode;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.GeoPointDistanceMultiValuesToSingleValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.AssertionFailure;
 
 /**
  * A Lucene distance {@code Collector} for spatial searches.
@@ -31,8 +29,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @author Nicolas Helleringer
  */
 public class GeoPointDistanceCollector implements Collector {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final double MISSING_VALUE_MARKER = Double.NEGATIVE_INFINITY;
 
@@ -100,7 +96,7 @@ public class GeoPointDistanceCollector implements Collector {
 			orderedEntries = new ArrayList<>( size );
 		}
 
-		public Double get(int index) {
+		public Double get(int docId) {
 			//Optimize for an iteration having a monotonic index:
 			int startingPoint = currentIterator;
 			for ( ; currentIterator < orderedEntries.size(); currentIterator++ ) {
@@ -108,7 +104,7 @@ public class GeoPointDistanceCollector implements Collector {
 				if ( currentEntry == null ) {
 					break;
 				}
-				if ( currentEntry.documentId == index ) {
+				if ( currentEntry.documentId == docId ) {
 					return currentEntry.distance;
 				}
 			}
@@ -119,12 +115,12 @@ public class GeoPointDistanceCollector implements Collector {
 				if ( currentEntry == null ) {
 					break;
 				}
-				if ( currentEntry.documentId == index ) {
+				if ( currentEntry.documentId == docId ) {
 					return currentEntry.distance;
 				}
 			}
 
-			throw log.documentIdNotCollected( index );
+			throw new AssertionFailure( "Unexpected Lucene docId: '%1$s'. No data was collected for this document." );
 		}
 
 		void put(int documentId, Double distance) {
