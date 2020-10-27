@@ -327,9 +327,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 62, value = "No built-in index field type for class: '%1$s'.")
 	SearchException cannotGuessFieldType(@FormatWith(ClassFormatter.class) Class<?> inputType, @Param EventContext context);
 
-	@Message(id = ID_OFFSET + 64, value = "Unexpected index: documentId '%1$s' was not collected." )
-	SearchException documentIdNotCollected(Integer documentId);
-
 	@Message(id = ID_OFFSET + 67, value = "Unable to delete all entries matching query '%1$s': %2$s")
 	SearchException unableToDeleteAllEntriesFromIndex(Query query, String causeMessage, @Param EventContext context,
 			@Cause Exception cause);
