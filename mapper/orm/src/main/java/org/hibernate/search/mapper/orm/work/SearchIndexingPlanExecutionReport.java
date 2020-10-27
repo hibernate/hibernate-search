@@ -20,29 +20,9 @@ public interface SearchIndexingPlanExecutionReport {
 	Optional<Throwable> throwable();
 
 	/**
-	 * @return The {@link Exception} or {@link Error} thrown when indexing failed,
-	 * or {@link Optional#empty()} if indexing succeeded.
-	 * @deprecated Use {@link #throwable()} instead.
-	 */
-	@Deprecated
-	default Optional<Throwable> getThrowable() {
-		return throwable();
-	}
-
-	/**
 	 * @return A list of references to entities that may not be indexed correctly as a result of the failure.
 	 * Never {@code null}, but may be empty.
 	 */
 	List<EntityReference> failingEntities();
-
-	/**
-	 * @return A list of references to entities that may not be indexed correctly as a result of the failure.
-	 * Never {@code null}, but may be empty.
-	 * @deprecated Use {@link #failingEntities()} instead.
-	 */
-	@Deprecated
-	default List<EntityReference> getFailingEntities() {
-		return failingEntities();
-	}
 
 }

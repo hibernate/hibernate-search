@@ -136,7 +136,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public <T> SearchQuerySelectStep<
 			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>,
 			EntityReference,

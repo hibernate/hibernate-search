@@ -50,14 +50,4 @@ public interface AutomaticIndexingSynchronizationConfigurationContext {
 	 */
 	FailureHandler failureHandler();
 
-	/**
-	 * @return The failure handler.
-	 * Use this to report failures that cannot be propagated by the {@link #indexingFutureHandler(Consumer)}.
-	 * @deprecated Use {@link #failureHandler()} instead.
-	 */
-	@Deprecated
-	default FailureHandler getFailureHandler() {
-		return failureHandler();
-	}
-
 }

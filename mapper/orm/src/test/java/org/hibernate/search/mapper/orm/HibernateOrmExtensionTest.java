@@ -64,14 +64,6 @@ public class HibernateOrmExtensionTest {
 	}
 
 	@Test
-	@SuppressWarnings("deprecation")
-	public void routingKeyBridge() {
-		org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext context =
-				new SessionBasedBridgeOperationContext( sessionContext );
-		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
-	}
-
-	@Test
 	public void typeBridge() {
 		TypeBridgeWriteContext context = new SessionBasedBridgeOperationContext( sessionContext );
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );

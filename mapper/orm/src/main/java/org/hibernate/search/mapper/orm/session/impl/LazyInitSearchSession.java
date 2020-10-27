@@ -46,7 +46,6 @@ public class LazyInitSearchSession implements SearchSession {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public <T> SearchQuerySelectStep<
 			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>,
 			EntityReference,
@@ -60,7 +59,6 @@ public class LazyInitSearchSession implements SearchSession {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public <T> SearchQuerySelectStep<
 			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>,
 			EntityReference,

@@ -14,26 +14,21 @@ import org.hibernate.search.engine.backend.index.IndexManager;
  *
  * @param <E> The entity type.
  */
-@SuppressWarnings("deprecation")
-public interface SearchIndexedEntity<E>
-		extends org.hibernate.search.mapper.orm.mapping.SearchIndexedEntity {
+public interface SearchIndexedEntity<E> {
 
 	/**
 	 * @return The {@link javax.persistence.Entity#name() JPA name} of the entity.
 	 */
-	@Override
 	String jpaName();
 
 	/**
 	 * @return The Java class of the entity.
 	 */
-	@Override
 	Class<E> javaClass();
 
 	/**
 	 * @return The index manager this entity is indexed in.
 	 */
-	@Override
 	IndexManager indexManager();
 
 }

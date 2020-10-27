@@ -39,7 +39,6 @@ public interface SearchSession {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	@SuppressWarnings("deprecation")
 	default <T> SearchQuerySelectStep<
 			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>,
 			EntityReference,
@@ -62,7 +61,6 @@ public interface SearchSession {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	@SuppressWarnings("deprecation")
 	<T> SearchQuerySelectStep<
 			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>,
 			EntityReference,
@@ -83,7 +81,6 @@ public interface SearchSession {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	@SuppressWarnings("deprecation")
 	<T> SearchQuerySelectStep<
 			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>,
 			EntityReference,
@@ -252,21 +249,5 @@ public interface SearchSession {
 	 * @see AutomaticIndexingSynchronizationStrategy
 	 */
 	void automaticIndexingSynchronizationStrategy(AutomaticIndexingSynchronizationStrategy synchronizationStrategy);
-
-	/**
-	 * Set the {@link AutomaticIndexingSynchronizationStrategy} to use for this session.
-	 * <p>
-	 * Behavior is undefined if called while entity changes are pending:
-	 * be sure to call this only just after creating a session,
-	 * or just after committing a transaction.
-	 *
-	 * @param synchronizationStrategy The synchronization strategy to use
-	 * @see AutomaticIndexingSynchronizationStrategy
-	 * @deprecated Use {@link #automaticIndexingSynchronizationStrategy(AutomaticIndexingSynchronizationStrategy)} instead.
-	 */
-	@Deprecated
-	default void setAutomaticIndexingSynchronizationStrategy(AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
-		automaticIndexingSynchronizationStrategy( synchronizationStrategy );
-	}
 
 }

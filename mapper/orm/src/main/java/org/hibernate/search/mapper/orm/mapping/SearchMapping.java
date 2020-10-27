@@ -109,16 +109,6 @@ public interface SearchMapping {
 	IndexManager indexManager(String indexName);
 
 	/**
-	 * @param indexName The name of an index. See {@link Indexed#index()}.
-	 * @return The index manager for the index having {@code indexName} as name.
-	 * @deprecated Use {@link #indexManager(String)} instead.
-	 */
-	@Deprecated
-	default IndexManager getIndexManager(String indexName) {
-		return indexManager( indexName );
-	}
-
-	/**
 	 * @return The default backend, if any.
 	 */
 	Backend backend();
@@ -129,13 +119,4 @@ public interface SearchMapping {
 	 */
 	Backend backend(String backendName);
 
-	/**
-	 * @param backendName The name of a backend. See {@link Indexed#backend()}.
-	 * @return The backend having {@code backendName} as name.
-	 * @deprecated Use {@link #backend(String)} instead.
-	 */
-	@Deprecated
-	default Backend getBackend(String backendName) {
-		return backend( backendName );
-	}
 }
