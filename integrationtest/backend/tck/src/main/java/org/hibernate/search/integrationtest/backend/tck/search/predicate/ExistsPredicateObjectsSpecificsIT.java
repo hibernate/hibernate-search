@@ -115,11 +115,13 @@ public class ExistsPredicateObjectsSpecificsIT {
 	public void nested_multiIndexes_incompatibleIndexBinding() {
 		assumeFullMultiIndexCompatibilityCheck();
 		SearchPredicateFactory f = mainIndex.createScope( incompatibleIndex ).predicate();
+		String fieldPath = "nested";
 
-		assertThatThrownBy( () -> f.exists().field( "nested" ) )
+		assertThatThrownBy( () -> f.exists().field( fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting models for field" )
-				.hasMessageContaining( "'nested'" )
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"This field is a value field in some indexes, but an object field in other indexes" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), incompatibleIndex.name() )
 				) );
@@ -158,11 +160,13 @@ public class ExistsPredicateObjectsSpecificsIT {
 	public void nested_multiIndexes_differentFields() {
 		assumeFullMultiIndexCompatibilityCheck();
 		SearchPredicateFactory f = mainIndex.createScope( differentFieldsIndex ).predicate();
+		String fieldPath = "nested";
 
-		assertThatThrownBy( () -> f.exists().field( "nested" ) )
+		assertThatThrownBy( () -> f.exists().field( fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting models for object field" )
-				.hasMessageContaining( "'nested'" )
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Field attribute 'staticChildren' differs" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), differentFieldsIndex.name() )
 				) );
@@ -197,11 +201,13 @@ public class ExistsPredicateObjectsSpecificsIT {
 	public void flattened_multiIndexes_incompatibleIndexBinding() {
 		assumeFullMultiIndexCompatibilityCheck();
 		SearchPredicateFactory f = incompatibleIndex.createScope( mainIndex ).predicate();
+		String fieldPath = "flattened";
 
-		assertThatThrownBy( () -> f.exists().field( "flattened" ) )
+		assertThatThrownBy( () -> f.exists().field( fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting models for field" )
-				.hasMessageContaining( "'flattened'" )
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"This field is a value field in some indexes, but an object field in other indexes" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( incompatibleIndex.name(), mainIndex.name() )
 				) );
@@ -240,11 +246,13 @@ public class ExistsPredicateObjectsSpecificsIT {
 	public void flattened_multiIndexes_differentFields() {
 		assumeFullMultiIndexCompatibilityCheck();
 		SearchPredicateFactory f = differentFieldsIndex.createScope( mainIndex ).predicate();
+		String fieldPath = "flattened";
 
-		assertThatThrownBy( () -> f.exists().field( "flattened" ) )
+		assertThatThrownBy( () -> f.exists().field( fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting models for object field" )
-				.hasMessageContaining( "'flattened'" )
+				.hasMessageContainingAll(
+						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
+						"Field attribute 'staticChildren' differs" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( differentFieldsIndex.name(), mainIndex.name() )
 				) );

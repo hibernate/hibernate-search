@@ -9,7 +9,6 @@ package org.hibernate.search.backend.lucene.search.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -88,17 +87,11 @@ public class LuceneMultiIndexSearchObjectFieldContext implements LuceneSearchObj
 		if ( staticChildrenByName != null ) {
 			return staticChildrenByName;
 		}
+
 		// TODO HSEARCH-4050 remove this unnecessary restriction?
-		Set<String> childrenNames = null;
-		for ( LuceneSearchObjectFieldContext fieldContext : fieldForEachIndex ) {
-			if ( childrenNames == null ) {
-				childrenNames = fieldContext.staticChildrenByName().keySet();
-			}
-			else if ( !childrenNames.equals( fieldContext.staticChildrenByName().keySet() ) ) {
-				throw log.conflictingObjectFieldModel( absolutePath, fieldForEachIndex.get( 0 ),
-						fieldContext, eventContext() );
-			}
-		}
+		getFromFieldIfCompatible( field -> field.staticChildrenByName().keySet(),
+				Object::equals, "staticChildren" );
+
 		Map<String, LuceneSearchFieldContext> result = new TreeMap<>();
 		Function<String, LuceneSearchFieldContext> createChildFieldContext = indexesContext::field;
 		for ( LuceneSearchObjectFieldContext fieldContext : fieldForEachIndex ) {
