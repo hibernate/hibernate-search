@@ -48,13 +48,4 @@ public interface LuceneSearchQuery<H>
 	 */
 	Sort luceneSort();
 
-	/**
-	 * @return The Lucene {@link org.apache.lucene.search.Sort} this query relies on.
-	 * @deprecated Use {@link #luceneSort()} instead.
-	 */
-	@Deprecated
-	default Sort getLuceneSort() {
-		return luceneSort();
-	}
-
 }

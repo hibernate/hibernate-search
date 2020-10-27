@@ -46,13 +46,4 @@ public enum IOStrategyName {
 	private String externalRepresentation() {
 		return externalRepresentation;
 	}
-
-	/**
-	 * @return The expected string representation in configuration properties.
-	 * @deprecated Use {@link #externalRepresentation()} instead.
-	 */
-	@Deprecated
-	private String getExternalRepresentation() {
-		return externalRepresentation();
-	}
 }

@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.cfg;
 
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
-import org.hibernate.search.backend.lucene.lowlevel.directory.FileSystemAccessStrategyName;
 import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName;
 
 import org.apache.lucene.util.Version;
@@ -46,38 +45,6 @@ public final class LuceneBackendSettings {
 	public static final String LUCENE_VERSION = "lucene_version";
 
 	/**
-	 * @deprecated Use {@link LuceneIndexSettings#DIRECTORY_PREFIX} instead.
-	 */
-	@Deprecated
-	public static final String DIRECTORY_PREFIX = "directory.";
-
-	/**
-	 * @deprecated Use {@link LuceneIndexSettings#DIRECTORY_TYPE} instead.
-	 */
-	@Deprecated
-	public static final String DIRECTORY_TYPE = DIRECTORY_PREFIX + DirectoryRadicals.TYPE;
-
-	/**
-	 * @deprecated Use {@link LuceneIndexSettings#DIRECTORY_ROOT} instead.
-	 */
-	@Deprecated
-	public static final String DIRECTORY_ROOT = DIRECTORY_PREFIX + DirectoryRadicals.ROOT;
-
-	/**
-	 * @deprecated Use {@link LuceneIndexSettings#DIRECTORY_LOCKING_STRATEGY} instead.
-	 */
-	@Deprecated
-	public static final String DIRECTORY_LOCKING_STRATEGY =
-			DIRECTORY_PREFIX + DirectoryRadicals.LOCKING_STRATEGY;
-
-	/**
-	 * @deprecated Use {@link LuceneIndexSettings#DIRECTORY_FILESYSTEM_ACCESS_STRATEGY} instead.
-	 */
-	@Deprecated
-	public static final String DIRECTORY_FILESYSTEM_ACCESS_STRATEGY =
-			DIRECTORY_PREFIX + DirectoryRadicals.FILESYSTEM_ACCESS_STRATEGY;
-
-	/**
 	 * The multi-tenancy strategy to use.
 	 * <p>
 	 * Expects a {@link MultiTenancyStrategyName} value, or a String representation of such value.
@@ -112,21 +79,6 @@ public final class LuceneBackendSettings {
 	public static final String THREAD_POOL_SIZE = "thread_pool.size";
 
 	/**
-	 * @deprecated Use {@link LuceneIndexSettings.DirectoryRadicals} instead.
-	 */
-	@Deprecated
-	public static final class DirectoryRadicals {
-
-		private DirectoryRadicals() {
-		}
-
-		public static final String TYPE = "type";
-		public static final String ROOT = "root";
-		public static final String LOCKING_STRATEGY = "locking.strategy";
-		public static final String FILESYSTEM_ACCESS_STRATEGY = "filesystem_access.strategy";
-	}
-
-	/**
 	 * Default values for the different settings if no values are given.
 	 */
 	public static final class Defaults {
@@ -135,25 +87,6 @@ public final class LuceneBackendSettings {
 		}
 
 		public static final Version LUCENE_VERSION = Version.LATEST;
-
-		/**
-		 * @deprecated Use {@link LuceneIndexSettings.Defaults#DIRECTORY_TYPE} instead.
-		 */
-		@Deprecated
-		public static final String DIRECTORY_TYPE = "local-filesystem";
-
-		/**
-		 * @deprecated Use {@link LuceneIndexSettings.Defaults#DIRECTORY_ROOT} instead.
-		 */
-		@Deprecated
-		public static final String DIRECTORY_ROOT = ".";
-
-		/**
-		 * @deprecated Use {@link LuceneIndexSettings.Defaults#DIRECTORY_FILESYSTEM_ACCESS_STRATEGY} instead.
-		 */
-		@Deprecated
-		public static final FileSystemAccessStrategyName DIRECTORY_FILESYSTEM_ACCESS_STRATEGY =
-				FileSystemAccessStrategyName.AUTO;
 
 		public static final MultiTenancyStrategyName MULTI_TENANCY_STRATEGY = MultiTenancyStrategyName.NONE;
 	}
