@@ -24,15 +24,6 @@ public interface PojoModelProperty extends PojoModelCompositeElement {
 	String name();
 
 	/**
-	 * @return The name of this property.
-	 * @deprecated Use {@link #name()} instead.
-	 */
-	@Deprecated
-	default String getName() {
-		return name();
-	}
-
-	/**
 	 * @param markerType A type of marker.
 	 * @param <M> The type of returned markers.
 	 * @return A {@link Stream} of markers with the given type found on this property.

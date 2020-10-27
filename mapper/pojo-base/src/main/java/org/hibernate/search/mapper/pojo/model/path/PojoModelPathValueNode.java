@@ -67,16 +67,6 @@ public final class PojoModelPathValueNode extends PojoModelPath {
 	}
 
 	/**
-	 * @return The extractor path from the parent property to this value.
-	 * The path is guaranteed to be explicit (i.e. it won't be {@link ContainerExtractorPath#defaultExtractors()}).
-	 * @deprecated Use {@link #extractorPath()} instead.
-	 */
-	@Deprecated
-	public ContainerExtractorPath getExtractorPath() {
-		return extractorPath();
-	}
-
-	/**
 	 * @param propertyName The name of a property exposed by the type of this value.
 	 * The property name may be invalid: no check will be performed.
 	 * @return A new path representing the current path, with an additional access to the given property at the end.

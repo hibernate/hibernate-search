@@ -186,16 +186,6 @@ public @interface IndexedEmbedded {
 	ObjectStructure structure() default ObjectStructure.DEFAULT;
 
 	/**
-	 * @return How the structure of the object field created for this indexed-embedded
-	 * is preserved upon indexing.
-	 * @see org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
-	 * @deprecated Use {@link #structure()} instead.
-	 */
-	@Deprecated
-	org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage storage()
-			default org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage.DEFAULT;
-
-	/**
 	 * @return A definition of container extractors to be applied to the property,
 	 * allowing the definition of an indexed-embedded for container elements.
 	 * This is useful when the property is of container type,

@@ -113,16 +113,6 @@ public abstract class PojoModelPath {
 	 */
 	public abstract PojoModelPath parent();
 
-	/**
-	 * @return The model path to the element from which the value represented by this node is extracted.
-	 * May be {@code null}.
-	 * @deprecated Use {@link #parent()} instead.
-	 */
-	@Deprecated
-	public PojoModelPath getParent() {
-		return parent();
-	}
-
 	abstract void appendSelfPath(StringBuilder builder);
 
 	private void appendPath(StringBuilder builder) {
