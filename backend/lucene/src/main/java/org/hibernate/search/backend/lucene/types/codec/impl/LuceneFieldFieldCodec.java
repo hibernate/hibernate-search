@@ -14,7 +14,7 @@ import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F> {
@@ -42,9 +42,8 @@ public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F> {
 	@Override
 	public F decode(IndexableField field) {
 		if ( fieldValueExtractor == null ) {
-			throw log.unsupportedProjectionForNativeField(
-					EventContexts.fromIndexFieldAbsolutePath( field.name() )
-			);
+			// This should not happen as we disable projections when fieldValueExtractor is null
+			throw new AssertionFailure( "Native field '" + field.name() + "' lacks a field value extractor" );
 		}
 		return fieldValueExtractor.extract( field );
 	}

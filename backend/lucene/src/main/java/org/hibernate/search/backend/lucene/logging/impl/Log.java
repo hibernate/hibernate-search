@@ -286,10 +286,6 @@ public interface Log extends BasicLogger {
 			value = "Multiple conflicting minimumShouldMatch constraints for ceiling '%1$s'")
 	SearchException minimumShouldMatchConflictingConstraints(int ignoreConstraintCeiling);
 
-	@Message(id = ID_OFFSET + 48,
-			value = "This native field does not support projection.")
-	SearchException unsupportedProjectionForNativeField(@Param EventContext context);
-
 	@Message(id = ID_OFFSET + 49,
 			value = "Invalid field path; expected path '%1$s', got '%2$s'.")
 	SearchException invalidFieldPath(String expectedPath, String actualPath);
