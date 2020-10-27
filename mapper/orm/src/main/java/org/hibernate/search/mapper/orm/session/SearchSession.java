@@ -14,10 +14,15 @@ import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
+import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
@@ -35,7 +40,14 @@ public interface SearchSession {
 	 * @see SearchQuerySelectStep
 	 */
 	@SuppressWarnings("deprecation")
-	default <T> org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep<T> search(
+	default <T> SearchQuerySelectStep<
+			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>,
+			EntityReference,
+			T,
+			SearchLoadingOptionsStep,
+			SearchProjectionFactory<EntityReference, T>,
+			SearchPredicateFactory
+			> search(
 			Class<T> type) {
 		return search( Collections.singleton( type ) );
 	}
@@ -51,7 +63,14 @@ public interface SearchSession {
 	 * @see SearchQuerySelectStep
 	 */
 	@SuppressWarnings("deprecation")
-	<T> org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep<T> search(
+	<T> SearchQuerySelectStep<
+			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>,
+			EntityReference,
+			T,
+			SearchLoadingOptionsStep,
+			SearchProjectionFactory<EntityReference, T>,
+			SearchPredicateFactory
+			> search(
 			Collection<? extends Class<? extends T>> types);
 
 	/**
@@ -65,7 +84,14 @@ public interface SearchSession {
 	 * @see SearchQuerySelectStep
 	 */
 	@SuppressWarnings("deprecation")
-	<T> org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep<T> search(
+	<T> SearchQuerySelectStep<
+			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>,
+			EntityReference,
+			T,
+			SearchLoadingOptionsStep,
+			SearchProjectionFactory<EntityReference, T>,
+			SearchPredicateFactory
+			> search(
 			SearchScope<T> scope);
 
 	/**
