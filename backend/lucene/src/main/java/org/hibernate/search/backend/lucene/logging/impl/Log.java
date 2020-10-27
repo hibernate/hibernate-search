@@ -392,8 +392,11 @@ public interface Log extends BasicLogger {
 			+ " Define the decimal scale explicitly.")
 	SearchException nullDecimalScale(@Param EventContext eventContext);
 
-	@Message(id = ID_OFFSET + 81, value = "The value '%1$s' cannot be indexed because its absolute value is too large.")
-	SearchException scaledNumberTooLarge(Number value);
+	@Message(id = ID_OFFSET + 81,
+			value = "Unable to encode value '%1$s': this field type only supports values ranging from '%2$s' to '%3$s'."
+					+ " If you want to encode values that are outside this range, change the decimal scale for this field."
+					+ " Do not forget to reindex all your data after changing the decimal scale.")
+	SearchException scaledNumberTooLarge(Number value, Number min, Number max);
 
 	@Message(id = ID_OFFSET + 82,
 			value = "Invalid index field type: decimal scale '%1$s' is positive."

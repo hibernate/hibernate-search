@@ -375,7 +375,10 @@ public class DecimalScaleIT {
 				"1", doc -> doc.addValue( index.binding().scaled, tooLargeDecimal )
 		) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
+				.hasMessageContainingAll( "Unable to encode value '" + tooLargeDecimal.toString() + "'",
+						"this field type only supports values ranging from ",
+						"If you want to encode values that are outside this range,"
+								+ " change the decimal scale for this field" );
 	}
 
 	@Test
@@ -398,7 +401,10 @@ public class DecimalScaleIT {
 			.where( p -> p.range().field( "scaled" ).atMost( tooLargeDecimal ) )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
+				.hasMessageContainingAll( "Unable to encode value '" + tooLargeDecimal.toString() + "'",
+						"this field type only supports values ranging from ",
+						"If you want to encode values that are outside this range,"
+								+ " change the decimal scale for this field" );
 	}
 
 	@Test
@@ -415,7 +421,10 @@ public class DecimalScaleIT {
 				"1", doc -> doc.addValue( index.binding().scaled, tooLargeDecimal )
 		) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
+				.hasMessageContainingAll( "Unable to encode value '" + tooLargeDecimal.toString() + "'",
+						"this field type only supports values ranging from ",
+						"If you want to encode values that are outside this range,"
+								+ " change the decimal scale for this field" );
 	}
 
 	@Test
@@ -432,7 +441,10 @@ public class DecimalScaleIT {
 				"1", doc -> doc.addValue( index.binding().scaled, tooLargeInteger )
 		) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
+				.hasMessageContainingAll( "Unable to encode value '" + tooLargeInteger.toString() + "'",
+						"this field type only supports values ranging from ",
+						"If you want to encode values that are outside this range,"
+								+ " change the decimal scale for this field" );
 	}
 
 	@Test
@@ -449,7 +461,10 @@ public class DecimalScaleIT {
 				"1", doc -> doc.addValue( index.binding().scaled, tooLargeInteger )
 		) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
+				.hasMessageContainingAll( "Unable to encode value '" + tooLargeInteger.toString() + "'",
+						"this field type only supports values ranging from ",
+						"If you want to encode values that are outside this range,"
+								+ " change the decimal scale for this field" );
 	}
 
 	@Test
@@ -472,7 +487,10 @@ public class DecimalScaleIT {
 			.where( p -> p.range().field( "scaled" ).atLeast( tooLargeInteger ) )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
+				.hasMessageContainingAll( "Unable to encode value '" + tooLargeInteger.toString() + "'",
+						"this field type only supports values ranging from ",
+						"If you want to encode values that are outside this range,"
+								+ " change the decimal scale for this field" );
 	}
 
 	@Test
@@ -489,7 +507,10 @@ public class DecimalScaleIT {
 				"1", doc -> doc.addValue( index.binding().scaled, tooLargeDecimal )
 		) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
+				.hasMessageContainingAll( "Unable to encode value '" + tooLargeDecimal.toString() + "'",
+						"this field type only supports values ranging from ",
+						"If you want to encode values that are outside this range,"
+								+ " change the decimal scale for this field" );
 	}
 
 	@Test
@@ -506,7 +527,10 @@ public class DecimalScaleIT {
 					"1", doc -> doc.addValue( index.binding().scaled, tooLargeDecimal )
 		) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
+				.hasMessageContainingAll( "Unable to encode value '" + tooLargeDecimal.toString() + "'",
+						"this field type only supports values ranging from ",
+						"If you want to encode values that are outside this range,"
+								+ " change the decimal scale for this field" );
 	}
 
 	@Test
@@ -529,7 +553,10 @@ public class DecimalScaleIT {
 				.where( p -> p.range().field( "scaled" ).atLeast( tooLargeDecimal ) )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
+				.hasMessageContainingAll( "Unable to encode value '" + tooLargeDecimal.toString() + "'",
+						"this field type only supports values ranging from ",
+						"If you want to encode values that are outside this range,"
+								+ " change the decimal scale for this field" );
 	}
 
 	@Test
@@ -546,7 +573,10 @@ public class DecimalScaleIT {
 				"1", doc -> doc.addValue( index.binding().scaled, tooLargeInteger )
 		) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
+				.hasMessageContainingAll( "Unable to encode value '" + tooLargeInteger.toString() + "'",
+						"this field type only supports values ranging from ",
+						"If you want to encode values that are outside this range,"
+								+ " change the decimal scale for this field" );
 	}
 
 	@Test
@@ -569,7 +599,10 @@ public class DecimalScaleIT {
 				.where( p -> p.range().field( "scaled" ).atMost( tooLargeInteger ) )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
+				.hasMessageContainingAll( "Unable to encode value '" + tooLargeInteger.toString() + "'",
+						"this field type only supports values ranging from ",
+						"If you want to encode values that are outside this range,"
+								+ " change the decimal scale for this field" );
 	}
 
 	@Test
@@ -586,7 +619,10 @@ public class DecimalScaleIT {
 				"1", doc -> doc.addValue( index.binding().scaled, tooLargeInteger )
 		) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
+				.hasMessageContainingAll( "Unable to encode value '" + tooLargeInteger.toString() + "'",
+						"this field type only supports values ranging from ",
+						"If you want to encode values that are outside this range,"
+								+ " change the decimal scale for this field" );
 	}
 
 	@Test
