@@ -27,7 +27,6 @@ import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
-import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
@@ -83,8 +82,11 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 		}
 		catch (QueryTimeoutException | javax.persistence.QueryTimeoutException | LockTimeoutException |
 				javax.persistence.LockTimeoutException e) {
-			throw new SearchTimeoutException( "Search query loading exceeded the timeout of " + timeout +
-					" milliseconds", e );
+			if ( deadline == null ) {
+				// ORM-initiated timeout: just propagate the exception.
+				throw e;
+			}
+			throw deadline.forceTimeoutAndCreateException( e );
 		}
 
 		for ( E loadedEntity : loadedEntities ) {

@@ -270,14 +270,12 @@ public class SearchQueryEntityLoadingMultipleTypesIT extends AbstractSearchQuery
 						.entity( Hierarchy2_A_C.class, 3 )
 						.entity( Hierarchy3_A_B.class, 2 )
 						.entity( Hierarchy3_A_C.class, 3 ),
-				c -> c.assertStatementExecutionCount().isEqualTo( 3 ) // Optimized: only one query per entity hierarchy
-				, 1, TimeUnit.MICROSECONDS,
+				c -> c.assertStatementExecutionCount().isEqualTo( 3 ), // Optimized: only one query per entity hierarchy
+				1, TimeUnit.MICROSECONDS,
 				session -> SlowerLoadingListener.registerSlowerLoadingListener( session, 100 )
 		) )
 				.isInstanceOf( SearchTimeoutException.class )
-				.hasMessageContaining(
-						"Search query loading exceeded the timeout of 1 milliseconds"
-				);
+				.hasMessageContaining( "Operation exceeded the timeout of 0s, 1ms and 0ns" );
 	}
 
 	/**

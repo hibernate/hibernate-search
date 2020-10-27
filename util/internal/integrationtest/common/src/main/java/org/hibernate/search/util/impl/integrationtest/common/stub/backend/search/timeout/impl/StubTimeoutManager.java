@@ -16,6 +16,7 @@ public class StubTimeoutManager extends TimeoutManager {
 
 	public StubTimeoutManager(TimingSource timingSource, Long timeoutValue, TimeUnit timeoutUnit) {
 		super( timingSource, ConvertUtils.toMilliseconds( timeoutValue, timeoutUnit ),
+				timeoutUnit == null ? null : TimeUnit.MILLISECONDS,
 				timeoutUnit == null ? null : Type.EXCEPTION );
 	}
 }

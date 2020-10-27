@@ -6,52 +6,33 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.timeout.impl;
 
-import java.lang.invoke.MethodHandles;
-import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-
-import com.google.gson.JsonObject;
 
 /**
  * @author Emmanuel Bernard
  */
 public final class ElasticsearchTimeoutManager extends TimeoutManager {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	public static ElasticsearchTimeoutManager noTimeout(TimingSource timingSource, JsonObject query) {
-		return new ElasticsearchTimeoutManager( timingSource, query, null, null, Type.NONE );
+	public static ElasticsearchTimeoutManager noTimeout(TimingSource timingSource) {
+		return new ElasticsearchTimeoutManager( timingSource, null, null, Type.NONE );
 	}
 
-	public static ElasticsearchTimeoutManager softTimeout(TimingSource timingSource, JsonObject query, long timeout, TimeUnit timeUnit) {
-		return new ElasticsearchTimeoutManager( timingSource, query, timeout, timeUnit, Type.LIMIT );
+	public static ElasticsearchTimeoutManager softTimeout(TimingSource timingSource, long timeout,
+			TimeUnit timeUnit) {
+		return new ElasticsearchTimeoutManager( timingSource, timeout, timeUnit, Type.LIMIT );
 	}
 
-	public static ElasticsearchTimeoutManager hardTimeout(TimingSource timingSource, JsonObject query, long timeout, TimeUnit timeUnit) {
-		return new ElasticsearchTimeoutManager( timingSource, query, timeout, timeUnit, Type.EXCEPTION );
+	public static ElasticsearchTimeoutManager hardTimeout(TimingSource timingSource, long timeout,
+			TimeUnit timeUnit) {
+		return new ElasticsearchTimeoutManager( timingSource, timeout, timeUnit, Type.EXCEPTION );
 	}
 
-	private final Long timeoutValue;
-	private final TimeUnit timeoutUnit;
-	private final JsonObject query;
-
-	private ElasticsearchTimeoutManager(TimingSource timingSource, JsonObject query, Long timeoutValue, TimeUnit timeoutUnit, Type type) {
-		super( timingSource, timeoutUnit == null ? null : timeoutUnit.toMillis( timeoutValue ), type );
-		this.timeoutValue = timeoutValue;
-		this.timeoutUnit = timeoutUnit;
-		this.query = query;
-	}
-
-	@Override
-	protected void onTimedOut() {
-		if ( hasHardTimeout() ) {
-			throw log.clientSideTimedOut( Duration.ofNanos( timeoutUnit.toNanos( timeoutValue ) ), query.toString() );
-		}
+	private ElasticsearchTimeoutManager(TimingSource timingSource, Long timeoutValue,
+			TimeUnit timeoutUnit, Type type) {
+		super( timingSource, timeoutValue, timeoutUnit, type );
 	}
 
 }

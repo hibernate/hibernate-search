@@ -8,6 +8,7 @@ package org.hibernate.search.engine.logging.impl;
 
 import static org.jboss.logging.Logger.Level.DEBUG;
 
+import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Collection;
@@ -23,6 +24,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
+import org.hibernate.search.util.common.logging.impl.DurationInSecondsAndFractionsFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.SimpleNameClassFormatter;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -349,8 +351,9 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassFormatter.class) Class<?> correctType,
 			@Param EventContext context);
 
-	@Message(id = ID_OFFSET + 86, value = "Search query loading exceeded the timeout of %1$s milliseconds.")
-	SearchTimeoutException timedOut(Long timeoutMs);
+	@Message(id = ID_OFFSET + 86, value = "Operation exceeded the timeout of %1$s.")
+	SearchTimeoutException timedOut(@FormatWith(DurationInSecondsAndFractionsFormatter.class) Duration timeout,
+			@Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 87,
 			value = "Unable to provide the exact total hit count: only a lower-bound approximation is available."

@@ -25,7 +25,6 @@ import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
-import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.engine.common.timing.spi.Deadline;
 
 /**
@@ -71,8 +70,11 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 			}
 			catch (QueryTimeoutException | javax.persistence.QueryTimeoutException | LockTimeoutException |
 					javax.persistence.LockTimeoutException e) {
-				throw new SearchTimeoutException( "Search query loading exceeded the timeout of " + timeout
-						+ " milliseconds", e );
+				if ( deadline == null ) {
+					// ORM-initiated timeout: just propagate the exception.
+					throw e;
+				}
+				throw deadline.forceTimeoutAndCreateException( e );
 			}
 		}
 		else {
@@ -90,8 +92,11 @@ public class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposab
 		}
 		catch (QueryTimeoutException | javax.persistence.QueryTimeoutException | LockTimeoutException |
 				javax.persistence.LockTimeoutException e) {
-			throw new SearchTimeoutException( "Search query loading exceeded the timeout of " + timeout +
-					" milliseconds", e );
+			if ( deadline == null ) {
+				// ORM-initiated timeout: just propagate the exception.
+				throw e;
+			}
+			throw deadline.forceTimeoutAndCreateException( e );
 		}
 		Iterator<EntityReference> referencesIterator = references.iterator();
 		Iterator<? extends E> loadedEntityIterator = loadedEntities.iterator();
