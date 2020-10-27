@@ -12,6 +12,7 @@ import java.util.Collection;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.util.common.annotation.Search5DeprecatedAPI;
 
 /**
  * The step in a property-to-indexed-embedded mapping where optional parameters can be set.
@@ -26,6 +27,7 @@ public interface PropertyMappingIndexedEmbeddedStep extends PropertyMappingStep 
 	 * Note that the name passed to that method does not allow dots.
 	 */
 	@Deprecated
+	@Search5DeprecatedAPI
 	PropertyMappingIndexedEmbeddedStep prefix(String prefix);
 
 	/**

@@ -21,6 +21,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.util.common.annotation.Search5DeprecatedAPI;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
@@ -77,6 +78,7 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 
 	@Override
 	@Deprecated
+	@Search5DeprecatedAPI
 	public PropertyMappingIndexedEmbeddedStep prefix(String prefix) {
 		if ( relativeFieldName != null && prefix != null ) {
 			throw log.cannotSetBothIndexedEmbeddedNameAndPrefix( relativeFieldName, prefix );

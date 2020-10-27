@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine;
 
+import org.hibernate.search.util.common.annotation.Search5DeprecatedAPI;
+
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -28,6 +30,7 @@ public final class Version {
 	 * @deprecated Use {@link #versionString()} instead.
 	 */
 	@Deprecated
+	@Search5DeprecatedAPI
 	public static String getVersionString() {
 		return versionString();
 	}
