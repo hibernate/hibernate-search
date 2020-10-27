@@ -73,15 +73,6 @@ public final class PojoModelPathPropertyNode extends PojoModelPath {
 	}
 
 	/**
-	 * @return The name of this property.
-	 * @deprecated Use {@link #propertyName()} instead.
-	 */
-	@Deprecated
-	public String getPropertyName() {
-		return propertyName();
-	}
-
-	/**
 	 * @return A simple string representation of this path taking into account property nodes only,
 	 * in the form {@code propertyA.propertyB.propertyC}.
 	 * <p>

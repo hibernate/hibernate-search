@@ -16,14 +16,4 @@ public interface BindingContext {
 	 */
 	BeanResolver beanResolver();
 
-	/**
-	 * @return A bean provider, allowing the retrieval of beans,
-	 * including CDI/Spring DI beans when in the appropriate environment.
-	 * @deprecated Use {@link #beanResolver()} instead.
-	 */
-	@Deprecated
-	default BeanResolver getBeanResolver() {
-		return beanResolver();
-	}
-
 }

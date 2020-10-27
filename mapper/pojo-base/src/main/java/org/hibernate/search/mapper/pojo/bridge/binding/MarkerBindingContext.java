@@ -15,15 +15,4 @@ public interface MarkerBindingContext extends BindingContext {
 	 */
 	void marker(Object marker);
 
-	/**
-	 * Sets the marker object resulting from this binding.
-	 *
-	 * @param marker The marker object to attach to the marked property.
-	 * @deprecated Use {@link #marker(Object)} instead.
-	 */
-	@Deprecated
-	default void setMarker(Object marker) {
-		marker( marker );
-	}
-
 }

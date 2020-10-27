@@ -56,19 +56,6 @@ public class IndexedEmbeddedProcessor implements PropertyMappingAnnotationProces
 		}
 
 		ObjectStructure structure = annotation.structure();
-		// Support for the deprecated @IndexedEmbedded.storage
-		if ( ObjectStructure.DEFAULT.equals( structure ) ) {
-			switch ( annotation.storage() ) {
-				case DEFAULT:
-					break;
-				case FLATTENED:
-					structure = ObjectStructure.FLATTENED;
-					break;
-				case NESTED:
-					structure = ObjectStructure.NESTED;
-					break;
-			}
-		}
 
 		mappingContext.indexedEmbedded( cleanedUpName )
 				.extractors( extractorPath )
