@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
-import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
 import org.hibernate.search.backend.elasticsearch.multitenancy.MultiTenancyStrategyName;
@@ -199,22 +198,6 @@ public final class ElasticsearchBackendSettings {
 	 * Defaults to {@link Defaults#MAPPING_TYPE_NAME_STRATEGY}.
 	 */
 	public static final String MAPPING_TYPE_NAME_STRATEGY = "mapping.type_name.strategy";
-
-	/**
-	 * The analysis configurer to use.
-	 * <p>
-	 * Expects a reference to a bean of type {@link ElasticsearchAnalysisConfigurer}.
-	 * <p>
-	 * Defaults to no value.
-	 *
-	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
-	 * which includes a description of the "bean reference" properties and accepted values.
-	 * @deprecated Use {@link ElasticsearchIndexSettings#ANALYSIS_CONFIGURER}.
-	 * The analysis configurer can still be configured at the backend level, as a default for all indexes,
-	 * but it can now also be configured at the index level, as an override for that particular index.
-	 */
-	@Deprecated
-	public static final String ANALYSIS_CONFIGURER = ElasticsearchIndexSettings.ANALYSIS_CONFIGURER;
 
 	/**
 	 * The layout strategy for indexes and their aliases.

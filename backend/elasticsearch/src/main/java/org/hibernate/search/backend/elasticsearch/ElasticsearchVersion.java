@@ -84,28 +84,10 @@ public class ElasticsearchVersion {
 	}
 
 	/**
-	 * @return The "major" number of this version, i.e. the {@code x} in {@code x.y.z-qualifier}.
-	 * @deprecated Use {@link #major()} instead.
-	 */
-	@Deprecated
-	public int getMajor() {
-		return major();
-	}
-
-	/**
 	 * @return The "minor" number of this version, i.e. the {@code y} in {@code x.y.z-qualifier}. May be empty.
 	 */
 	public OptionalInt minor() {
 		return minor == null ? OptionalInt.empty() : OptionalInt.of( minor );
-	}
-
-	/**
-	 * @return The "minor" number of this version, i.e. the {@code y} in {@code x.y.z-qualifier}. May be empty.
-	 * @deprecated Use {@link #minor()} instead.
-	 */
-	@Deprecated
-	public OptionalInt getMinor() {
-		return minor();
 	}
 
 	/**
@@ -116,28 +98,10 @@ public class ElasticsearchVersion {
 	}
 
 	/**
-	 * @return The "minor" number of this version, i.e. the {@code z} in {@code x.y.z-qualifier}. May be empty.
-	 * @deprecated Use {@link #micro()} instead.
-	 */
-	@Deprecated
-	public OptionalInt getMicro() {
-		return micro();
-	}
-
-	/**
 	 * @return The qualifier in this version, i.e. the {@code qualifier} in {@code x.y.z-qualifier}. May be empty.
 	 */
 	public Optional<String> qualifier() {
 		return Optional.ofNullable( qualifier );
-	}
-
-	/**
-	 * @return The qualifier in this version, i.e. the {@code qualifier} in {@code x.y.z-qualifier}. May be empty.
-	 * @deprecated Use {@link #qualifier()} instead.
-	 */
-	@Deprecated
-	public Optional<String> getQualifier() {
-		return qualifier();
 	}
 
 	/**

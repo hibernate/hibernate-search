@@ -43,14 +43,4 @@ public enum IndexStatus {
 	public String externalRepresentation() {
 		return externalRepresentation;
 	}
-
-	/**
-	 * @return The expected string representation in configuration properties,
-	 * which happens to be the string representation of this status in Elasticsearch's REST API.
-	 * @deprecated Use {@link #externalRepresentation()} instead.
-	 */
-	@Deprecated
-	public String getElasticsearchString() {
-		return externalRepresentation();
-	}
 }
