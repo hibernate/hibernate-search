@@ -12,8 +12,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
  *
  * @param <S> The "self" type (the actual exposed type of this step)
  */
-@SuppressWarnings("deprecation")
-public interface PredicateScoreStep<S> extends PredicateBoostStep<S> {
+public interface PredicateScoreStep<S> {
 
 	/**
 	 * Boost the weight of the predicate in score computation.
@@ -22,7 +21,6 @@ public interface PredicateScoreStep<S> extends PredicateBoostStep<S> {
 	 * between 0 and 1 lowers the weight. Lower than 0 is for experts only.
 	 * @return {@code this}, for method chaining.
 	 */
-	@Override
 	S boost(float boost);
 
 	/**

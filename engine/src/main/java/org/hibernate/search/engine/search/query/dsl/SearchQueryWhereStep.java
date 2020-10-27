@@ -44,28 +44,4 @@ public interface SearchQueryWhereStep<
 	 */
 	N where(Function<? super PDF, ? extends PredicateFinalStep> predicateContributor);
 
-	/**
-	 * Set the predicate for this query.
-	 * @param predicate A {@link SearchPredicate} object obtained from the search scope.
-	 * @return The next step.
-	 * @deprecated Use {@link #where(SearchPredicate)} instead.
-	 */
-	@Deprecated
-	default N predicate(SearchPredicate predicate) {
-		return where( predicate );
-	}
-
-	/**
-	 * Set the predicate for this query.
-	 * @param predicateContributor A function that will use the factory passed in parameter to create a predicate,
-	 * returning the final step in the predicate DSL.
-	 * Should generally be a lambda expression.
-	 * @return The next step.
-	 * @deprecated Use {@link #where(Function)} instead.
-	 */
-	@Deprecated
-	default N predicate(Function<? super PDF, ? extends PredicateFinalStep> predicateContributor) {
-		return where( predicateContributor );
-	}
-
 }

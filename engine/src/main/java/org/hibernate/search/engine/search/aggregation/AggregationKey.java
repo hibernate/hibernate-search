@@ -64,13 +64,4 @@ public final class AggregationKey<A> {
 	public String name() {
 		return name;
 	}
-
-	/**
-	 * @return The name passed to {@link #of(String)}.
-	 * @deprecated Use {@link #name()} instead.
-	 */
-	@Deprecated
-	public String getName() {
-		return name();
-	}
 }

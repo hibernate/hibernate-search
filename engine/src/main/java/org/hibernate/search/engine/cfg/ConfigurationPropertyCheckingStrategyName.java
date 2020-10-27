@@ -48,14 +48,4 @@ public enum ConfigurationPropertyCheckingStrategyName {
 	public String externalRepresentation() {
 		return externalRepresentation;
 	}
-
-	/**
-	 * @return The expected string representation in configuration properties.
-	 * @deprecated Use {@link #externalRepresentation} instead.
-	 */
-	@Deprecated
-	public String getExternalRepresentation() {
-		return externalRepresentation();
-	}
-
 }
