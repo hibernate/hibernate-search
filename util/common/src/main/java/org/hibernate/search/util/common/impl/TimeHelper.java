@@ -13,11 +13,14 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Helpers for classes in java.time.*
  */
 public final class TimeHelper {
+
+	private static final int NANOS_PER_MILLI = 1_000_000;
 
 	private TimeHelper() {
 		// not allowed
@@ -57,6 +60,25 @@ public final class TimeHelper {
 		ZoneOffset offset = ZoneOffset.from( temporal );
 		LocalDateTime ldt = LocalDateTime.from( temporal );
 		return ZonedDateTime.ofInstant( ldt, offset, zone );
+	}
+
+	/**
+	 * Converts in milliseconds a time duration expressed with {@code time} and {@code timeUnit}.
+	 * The result value is rounded up.
+	 * If either of the parameters is null, it will return null.
+	 *
+	 * @param time a time duration
+	 * @param timeUnit the time unit used to express the duration
+	 * @return rounded up duration in milliseconds
+	 */
+	public static Long toMillisecondsRoundedUp(Long time, TimeUnit timeUnit) {
+		if ( time == null || timeUnit == null ) {
+			return null;
+		}
+
+		long nanos = timeUnit.toNanos( time );
+		long millis = nanos / NANOS_PER_MILLI;
+		return ( nanos % NANOS_PER_MILLI == 0 ) ? millis : millis + 1;
 	}
 
 }
