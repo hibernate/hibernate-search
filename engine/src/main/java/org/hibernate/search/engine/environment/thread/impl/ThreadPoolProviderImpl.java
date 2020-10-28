@@ -26,7 +26,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *
  * @author Sanne Grinovero
  */
-public final class ThreadPoolProviderImpl implements ThreadPoolProvider {
+public class ThreadPoolProviderImpl implements ThreadPoolProvider {
 
 	private static final int QUEUE_MAX_LENGTH = 1000;
 
