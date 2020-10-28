@@ -21,7 +21,6 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.impl.PropertyIdentifierMa
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.ProvidedIdentifierMapping;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
-import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.processing.building.impl.PojoIdentityMappingCollector;
@@ -76,19 +75,6 @@ class PojoRootIdentityMappingCollector<E> implements PojoIdentityMappingCollecto
 				boundIdentifierBridge.getBridgeHolder()
 		);
 		this.documentIdSourceProperty = Optional.of( propertyModel );
-	}
-
-	@Override
-	// In practice T and E are always the same, because the routing key bridge can only be applied at the root.
-	// Leaving this case temporarily, but we'll remove it along with RoutingKeyBridge.
-	@SuppressWarnings({"unchecked", "deprecation"})
-	public <T> void routingKeyBridge(BoundPojoModelPathTypeNode<T> modelPath,
-			org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder binder) {
-		if ( routingBridge != null ) {
-			throw log.conflictingRoutingBridgeAndRoutingKeyBinder( routingBridge.getBridgeHolder().get(), binder );
-		}
-		this.routingBridge = (BoundRoutingBridge<E>) mappingHelper.indexModelBinder()
-				.bindRoutingKey( bindingContext, modelPath, binder );
 	}
 
 	void applyDefaults() {

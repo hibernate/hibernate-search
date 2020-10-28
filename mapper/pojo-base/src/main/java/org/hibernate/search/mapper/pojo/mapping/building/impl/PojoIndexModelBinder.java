@@ -59,11 +59,6 @@ public interface PojoIndexModelBinder {
 			IndexedEntityBindingContext bindingContext,
 			BoundPojoModelPathPropertyNode<?, I> modelPath, IdentifierBinder binder);
 
-	@SuppressWarnings("deprecation")
-	<T> org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingKeyBridge<T> bindRoutingKey(
-			IndexedEntityBindingContext bindingContext,
-			BoundPojoModelPathTypeNode<T> modelPath, org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder binder);
-
 	<T> Optional<BoundTypeBridge<T>> bindType(IndexBindingContext bindingContext,
 			BoundPojoModelPathTypeNode<T> modelPath, TypeBinder binder);
 

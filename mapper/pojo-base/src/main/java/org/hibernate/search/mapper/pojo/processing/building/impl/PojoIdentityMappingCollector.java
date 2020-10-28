@@ -8,14 +8,9 @@ package org.hibernate.search.mapper.pojo.processing.building.impl;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
-import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 
 public interface PojoIdentityMappingCollector {
 
 	<T> void identifierBridge(BoundPojoModelPathPropertyNode<?, T> modelPath,
 			IdentifierBinder binder);
-
-	@SuppressWarnings("deprecation")
-	<T> void routingKeyBridge(BoundPojoModelPathTypeNode<T> modelPath,
-			org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder binder);
 }

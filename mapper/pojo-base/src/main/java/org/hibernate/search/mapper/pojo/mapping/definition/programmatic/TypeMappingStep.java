@@ -23,16 +23,6 @@ public interface TypeMappingStep {
 	TypeMappingIndexedStep indexed();
 
 	/**
-	 * @param binder A {@link org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder} responsible for creating a bridge.
-	 * @return {@code this}, for method chaining.
-	 * @see org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder
-	 * @deprecated Apply a {@link org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder}
-	 * with {@code indexed().routingBinder(...)} instead.
-	 */
-	@Deprecated
-	TypeMappingStep routingKeyBinder(org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder binder);
-
-	/**
 	 * @param binder A {@link TypeBinder} responsible for creating a bridge.
 	 * @return {@code this}, for method chaining.
 	 * @see TypeBinder

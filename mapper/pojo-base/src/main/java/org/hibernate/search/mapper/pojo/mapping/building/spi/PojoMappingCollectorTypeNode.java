@@ -12,9 +12,6 @@ public interface PojoMappingCollectorTypeNode extends PojoMappingCollector {
 
 	void typeBinder(TypeBinder builder);
 
-	@Deprecated
-	void routingKeyBinder(org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder reference);
-
 	PojoMappingCollectorPropertyNode property(String propertyName);
 
 }

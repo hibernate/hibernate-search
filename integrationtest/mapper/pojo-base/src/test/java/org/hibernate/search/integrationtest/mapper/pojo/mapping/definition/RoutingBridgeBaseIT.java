@@ -73,35 +73,6 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	@SuppressWarnings("deprecation")
-	public void conflictingRoutingBridgeAndRoutingKeyBinder() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
-			@DocumentId
-			Integer id;
-			String stringProperty;
-		}
-		assertThatThrownBy( () -> setupHelper.start()
-				.withConfiguration( b -> {
-					TypeMappingStep typeMapping = b.programmaticMapping().type( IndexedEntity.class );
-					typeMapping.indexed().routingBinder( context -> {
-						context.dependencies().useRootOnly(); // Irrelevant
-						context.bridge( IndexedEntity.class, new UnusedRoutingBridge<>() );
-					} );
-					typeMapping.routingKeyBinder( new UnusedRoutingKeyBinder() );
-				} )
-				.setup( IndexedEntity.class ) )
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( IndexedEntity.class.getName() )
-						.failure( "Routing bridge '" + UnusedRoutingBridge.TOSTRING
-								+ "' is already assigned to this entity; cannot apply routing key binder '"
-								+ UnusedRoutingKeyBinder.TOSTRING + "'" )
-						.build()
-				);
-	}
-
-	@Test
 	public void currentRoute_missing() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
@@ -655,21 +626,6 @@ public class RoutingBridgeBaseIT {
 		@Override
 		public void previousRoutes(DocumentRoutes routes, Object entityIdentifier, T indexedEntity,
 				RoutingBridgeRouteContext context) {
-			throw new AssertionFailure( "Should not be called" );
-		}
-	}
-
-	@SuppressWarnings("deprecation")
-	private static class UnusedRoutingKeyBinder implements org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder {
-		public static final String TOSTRING = "UnusedRoutingKeyBinder";
-
-		@Override
-		public String toString() {
-			return TOSTRING;
-		}
-
-		@Override
-		public void bind(org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext context) {
 			throw new AssertionFailure( "Should not be called" );
 		}
 	}

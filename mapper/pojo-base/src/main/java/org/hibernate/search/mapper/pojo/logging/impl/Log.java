@@ -438,10 +438,6 @@ public interface Log extends BasicLogger {
 	SearchException invalidInputTypeForRoutingBridge(Object routingBridge,
 			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> typeModel);
 
-	@Message(id = ID_OFFSET_2 + 74,
-			value = "Routing bridge '%1$s' is already assigned to this entity; cannot apply routing key binder '%2$s'.")
-	SearchException conflictingRoutingBridgeAndRoutingKeyBinder(Object routingBridge, Object binder);
-
 	@Message(id = ID_OFFSET_2 + 75,
 			value = "Routing bridge '%1$s' did not define any current route. Exactly one current route must be defined," +
 					" or you can call notIndexed() to explicitly indicate no route is necessary.")

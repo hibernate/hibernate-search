@@ -56,13 +56,6 @@ public class TypeMappingStepImpl
 	}
 
 	@Override
-	@Deprecated
-	public TypeMappingStep routingKeyBinder(org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder binder) {
-		children.add( new RoutingKeyBridgeMappingContributor( binder ) );
-		return this;
-	}
-
-	@Override
 	public TypeMappingStep binder(TypeBinder binder) {
 		children.add( new TypeBridgeMappingContributor( binder ) );
 		return this;

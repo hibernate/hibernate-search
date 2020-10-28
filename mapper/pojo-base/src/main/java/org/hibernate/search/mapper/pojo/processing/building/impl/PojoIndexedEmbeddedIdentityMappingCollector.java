@@ -17,7 +17,6 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.Container
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
-import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -40,13 +39,6 @@ class PojoIndexedEmbeddedIdentityMappingCollector<E> implements PojoIdentityMapp
 			IdentifierBinder binder) {
 		this.identifierModelPath = modelPath;
 		this.identifierBinder = binder;
-	}
-
-	@Override
-	@SuppressWarnings("deprecation")
-	public <T> void routingKeyBridge(BoundPojoModelPathTypeNode<T> modelPath,
-			org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder binder) {
-		// Ignored
 	}
 
 	public void contributeIdentifierField(AbstractPojoIndexingProcessorTypeNodeBuilder<?, ?> embeddedTypeNodeBuilder) {
