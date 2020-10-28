@@ -26,11 +26,9 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext
  * since the only feature provided by each interface is an access to the extension.
  * This might change in the future, though, which is why the interfaces themselves are split.
  */
-@SuppressWarnings("deprecation")
 public final class SessionBasedBridgeOperationContext
 		implements IdentifierBridgeFromDocumentIdentifierContext,
 				RoutingBridgeRouteContext,
-				org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext,
 				TypeBridgeWriteContext,
 				PropertyBridgeWriteContext,
 				ValueBridgeFromIndexedValueContext {
@@ -53,11 +51,6 @@ public final class SessionBasedBridgeOperationContext
 
 	@Override
 	public <T> T extension(RoutingBridgeRouteContextExtension<T> extension) {
-		return DslExtensionState.returnIfSupported( extension, extension.extendOptional( this, sessionContext ) );
-	}
-
-	@Override
-	public <T> T extension(org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContextExtension<T> extension) {
 		return DslExtensionState.returnIfSupported( extension, extension.extendOptional( this, sessionContext ) );
 	}
 

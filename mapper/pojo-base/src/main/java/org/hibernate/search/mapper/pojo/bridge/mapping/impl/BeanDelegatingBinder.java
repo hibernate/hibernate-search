@@ -26,7 +26,6 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
  * A binder that upon building retrieves a delegate binder from the bean provider,
  * then delegates to that binder.
  */
-@SuppressWarnings("deprecation")
 public final class BeanDelegatingBinder
 		implements TypeBinder, PropertyBinder, RoutingBinder,
 				MarkerBinder, IdentifierBinder, ValueBinder {
