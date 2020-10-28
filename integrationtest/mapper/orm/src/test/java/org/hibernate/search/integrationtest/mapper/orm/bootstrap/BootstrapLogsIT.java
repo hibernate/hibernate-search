@@ -77,7 +77,7 @@ public class BootstrapLogsIT {
 	}
 
 	private static Matcher<? extends LogEvent> suspiciousLogEventMatcher() {
-		return new TypeSafeMatcher<>() {
+		return new TypeSafeMatcher<LogEvent>() {
 			private final Level level = Level.WARN;
 			@Override
 			public void describeTo(Description description) {
