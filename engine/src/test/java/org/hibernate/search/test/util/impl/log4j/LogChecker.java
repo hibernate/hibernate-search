@@ -53,7 +53,7 @@ public class LogChecker {
 				if ( extraEvents == null ) {
 					extraEvents = new ArrayList<>();
 				}
-				extraEvents.add( event );
+				extraEvents.add( event.toImmutable() );
 			}
 		}
 	}
