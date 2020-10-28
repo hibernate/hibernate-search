@@ -251,9 +251,8 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 				new SearchWorkCall<>( indexNames, work, projectionContext, loadingContext, rootProjection,
 						deadline ),
 				(call1, call2) -> call1.verify( call2 ),
-				noExpectationsBehavior( () -> new SimpleSearchResult<>(
-						true, 0L, Collections.emptyList(), Collections.emptyMap(), Duration.ZERO, false
-				) )
+				noExpectationsBehavior( () -> new SimpleSearchResult<>( SimpleSearchResultTotal.exact( 0L ),
+						Collections.emptyList(), Collections.emptyMap(), Duration.ZERO, false ) )
 		);
 	}
 
