@@ -534,10 +534,12 @@ public interface Log extends BasicLogger {
 					+ " The write alias and read alias must be different." )
 	SearchException sameWriteAndReadAliases(URLEncodedString writeAndReadAlias, @Param EventContext eventContext);
 
-	@Message(id = ID_OFFSET + 97, value = "Invalid Elasticsearch version: '%1$s'."
-			+ " When version_check.enabled is set to false, "
-			+ " the version must at least be in the form 'x.y', where 'x' and 'y' are integers")
-	SearchException invalidElasticsearchVersionCheckConfiguration(String versionString);
+	@Message(id = ID_OFFSET + 97,
+			value = "Missing or imprecise Elasticsearch version:"
+					+ " when configuration property '%1$s' is set to 'false', "
+					+ " the version is mandatory and must be at least as precise as 'x.y',"
+					+ " where 'x' and 'y' are integers.")
+	SearchException impreciseElasticsearchVersionWhenNoVersionCheck(String versionCheckPropertyKey);
 
 	@Message(id = ID_OFFSET + 98, value = "The lifecycle strategy cannot be set at the index level anymore."
 			+ " Set the schema management strategy via the property 'hibernate.search.schema_management.strategy' instead.")

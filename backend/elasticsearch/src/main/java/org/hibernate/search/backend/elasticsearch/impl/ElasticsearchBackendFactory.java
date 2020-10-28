@@ -167,15 +167,15 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 	}
 
 	private boolean getVersionCheckEnabled(ConfigurationPropertySource propertySource) {
-		Optional<ElasticsearchVersion> configuredVersionOptional = VERSION.get( propertySource );
 		boolean versionCheckEnabled = VERSION_CHECK_ENABLED.get( propertySource );
 		if ( !versionCheckEnabled ) {
-			if ( configuredVersionOptional.isPresent() && !configuredVersionOptional.get().minor().isPresent() ) {
-				throw log.invalidElasticsearchVersionCheckConfiguration( configuredVersionOptional.get().toString() );
-			}
-			else if ( !configuredVersionOptional.isPresent() ) {
-				throw log.invalidElasticsearchVersionCheckConfiguration( null );
-			}
+			VERSION.getAndTransform( propertySource, optionalValue -> {
+				if ( !optionalValue.isPresent() || optionalValue.isPresent() && !optionalValue.get().minor().isPresent() ) {
+					throw log.impreciseElasticsearchVersionWhenNoVersionCheck(
+							VERSION_CHECK_ENABLED.resolveOrRaw( propertySource ) );
+				}
+				return optionalValue;
+			} );
 		}
 		return versionCheckEnabled;
 	}
