@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.common.timing.spi.Deadline;
+import org.hibernate.search.util.common.impl.TimeHelper;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -67,7 +68,7 @@ public class TimeoutManager {
 		this.timingSource = timingSource;
 		this.timeoutValue = timeoutValue;
 		this.timeoutUnit = timeoutUnit;
-		this.timeoutMs = timeoutUnit == null ? null : timeoutUnit.toMillis( timeoutValue );
+		this.timeoutMs = TimeHelper.toMillisecondsRoundedUp( timeoutValue, timeoutUnit );
 		this.type = type;
 		this.deadline = timeoutMs == null ? null : new DynamicDeadline();
 
