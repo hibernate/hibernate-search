@@ -73,6 +73,9 @@ public class ObsoletePropertiesIT {
 	);
 
 	private static final List<String> OBSOLETE_INDEX_LEVEL_PROPERTY_KEY_SUFFIXES = CollectionHelper.asImmutableList(
+			"directory_provider",
+			"sharding_strategy",
+			"sharding_strategy.nbr_of_shards",
 			"worker.backend",
 			"worker.execution",
 			"reader.strategy",
