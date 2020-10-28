@@ -26,11 +26,13 @@ import static org.junit.Assert.assertFalse;
 
 public class LoggerInfoStreamTest {
 
+	private static final String LOGGER_NAME = LuceneLogCategories.INFOSTREAM_LOGGER_CATEGORY.getName();
+
 	private final Log4j2ConfigurationAccessor programmaticConfig;
 	private TestAppender testAppender;
 
 	public LoggerInfoStreamTest() {
-		programmaticConfig = new Log4j2ConfigurationAccessor();
+		programmaticConfig = new Log4j2ConfigurationAccessor( LOGGER_NAME );
 	}
 
 	@Before
@@ -60,9 +62,7 @@ public class LoggerInfoStreamTest {
 		indexWriter.commit();
 		indexWriter.close();
 
-		List<String> logEvents = testAppender.searchByLoggerAndMessage(
-				LuceneLogCategories.INFOSTREAM_LOGGER_CATEGORY.getName(), "IW:"
-		);
+		List<String> logEvents = testAppender.searchByLoggerAndMessage( LOGGER_NAME, "IW:" );
 
 		assertFalse( logEvents.isEmpty() );
 	}
