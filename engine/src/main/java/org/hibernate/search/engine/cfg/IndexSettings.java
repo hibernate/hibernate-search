@@ -22,28 +22,6 @@ public final class IndexSettings {
 	}
 
 	/**
-	 * Builds a configuration property key for the index defaults of the default backend, with the given radical.
-	 * <p>
-	 * See the javadoc of your backend for available radicals.
-	 * </p>
-	 * Example result: "{@code hibernate.search.backend.index_defaults.indexing.queue_size}"
-	 *
-	 * @param radical The radical of the configuration property (see constants in
-	 * {@code ElasticsearchIndexSettings}, {@code LuceneIndexSettings}, etc.)
-	 *
-	 * @return the concatenated default index settings key
-	 *
-	 * @deprecated To set defaults for a particular configuration property for all indexes in a backend,
-	 * just set the configuration property at the backend level.
-	 * E.g. instead of {@code IndexSettings.indexDefaultsKey( "indexing.queue_size" )}
-	 * use {@code BackendSettings.backendKey( "indexing.queue_size" )}.
-	 */
-	@Deprecated
-	public static String indexDefaultsKey(String radical) {
-		return join( ".", EngineSettings.BACKEND, BackendSettings.INDEX_DEFAULTS, radical );
-	}
-
-	/**
 	 * Builds a configuration property key for the index of the given backend, with the given radical.
 	 * <p>
 	 * See the javadoc of your backend for available radicals.
@@ -58,32 +36,6 @@ public final class IndexSettings {
 	 */
 	public static String indexKey(String indexName, String radical) {
 		return join( ".", EngineSettings.BACKEND, BackendSettings.INDEXES, indexName, radical );
-	}
-
-	/**
-	 * Builds a configuration property key for the index defaults of the given backend, with the given radical.
-	 * <p>
-	 * See the javadoc of your backend for available radicals.
-	 * </p>
-	 * Example result: "{@code hibernate.search.backends.myBackend.index_defaults.indexing.queue_size}"
-	 *
-	 * @param backendName The name of the backend in which the indexes to configure are located.
-	 * @param radical The radical of the configuration property (see constants in
-	 * {@code ElasticsearchIndexSettings}, {@code LuceneIndexSettings}, etc.)
-	 *
-	 * @return the concatenated default index settings key
-	 *
-	 * @deprecated To set defaults for a particular configuration property for all indexes in a backend,
-	 * just set the configuration property at the backend level.
-	 * E.g. instead of {@code IndexSettings.indexDefaultsKey( "myBackend", "indexing.queue_size" )}
-	 * use {@code BackendSettings.backendKey( "myBackend", "indexing.queue_size" )}.
-	 */
-	@Deprecated
-	public static String indexDefaultsKey(String backendName, String radical) {
-		if ( backendName == null ) {
-			return indexDefaultsKey( radical );
-		}
-		return join( ".", EngineSettings.BACKENDS, backendName, BackendSettings.INDEX_DEFAULTS, radical );
 	}
 
 	/**

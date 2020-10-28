@@ -36,8 +36,6 @@ import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.apache.logging.log4j.Level;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -157,24 +155,6 @@ public class IndexManagerBuildingStateHolderTest {
 		result = indexPropertySourceCapture.getValue().get( "foo" );
 		verifyNoOtherBackendInteractionsAndReset();
 		assertThat( result ).contains( "bar" );
-
-		// Legacy "index_defaults"
-		logged.expectEvent( Level.WARN, "Using configuration property 'hibernate.search.backend.index_defaults.foo'."
-				+ " The prefix 'index_defaults' is deprecated and its support will ultimately be removed."
-				+ " Instead, you should just set defaults for index properties at the backend level."
-				+ " For example, set 'hibernate.search.backend.indexing.queue_size'"
-				+ " instead of 'hibernate.search.backend.index_defaults.indexing.queue_size'." );
-		when( configurationSourceMock.get( "backend.indexes.myIndex.foo" ) )
-				.thenReturn( Optional.empty() );
-		when( configurationSourceMock.get( "backend.foo" ) )
-				.thenReturn( (Optional) Optional.empty() );
-		when( configurationSourceMock.get( "backend.index_defaults.foo" ) )
-				.thenReturn( (Optional) Optional.of( "bar" ) );
-		when( configurationSourceMock.resolve( "backend.index_defaults.foo" ) )
-				.thenReturn( Optional.of( "hibernate.search.backend.index_defaults.foo" ) );
-		result = indexPropertySourceCapture.getValue().get( "foo" );
-		verifyNoOtherBackendInteractionsAndReset();
-		assertThat( result ).contains( "bar" );
 	}
 
 	@Test
@@ -265,30 +245,6 @@ public class IndexManagerBuildingStateHolderTest {
 		result = indexPropertySourceCapture.getValue().get( "foo" );
 		verifyNoOtherBackendInteractionsAndReset();
 		assertThat( result ).contains( "bar" );
-
-		// Legacy "index_defaults"
-		logged.expectEvent( Level.WARN, "Using configuration property 'hibernate.search.backends.myBackend.index_defaults.foo'."
-						+ " The prefix 'index_defaults' is deprecated and its support will ultimately be removed."
-						+ " Instead, you should just set defaults for index properties at the backend level."
-						+ " For example, set 'hibernate.search.backend.indexing.queue_size'"
-						+ " instead of 'hibernate.search.backend.index_defaults.indexing.queue_size'." );
-		when( configurationSourceMock.get( "backend.indexes.myIndex.foo" ) )
-				.thenReturn( (Optional) Optional.empty() );
-		when( configurationSourceMock.get( "backends.myBackend.indexes.myIndex.foo" ) )
-				.thenReturn( Optional.empty() );
-		when( configurationSourceMock.get( "backend.foo" ) )
-				.thenReturn( (Optional) Optional.empty() );
-		when( configurationSourceMock.get( "backends.myBackend.foo" ) )
-				.thenReturn( (Optional) Optional.empty() );
-		when( configurationSourceMock.get( "backend.index_defaults.foo" ) )
-				.thenReturn( (Optional) Optional.empty() );
-		when( configurationSourceMock.get( "backends.myBackend.index_defaults.foo" ) )
-				.thenReturn( (Optional) Optional.of( "bar" ) );
-		when( configurationSourceMock.resolve( "backends.myBackend.index_defaults.foo" ) )
-				.thenReturn( Optional.of( "hibernate.search.backends.myBackend.index_defaults.foo" ) );
-		result = indexPropertySourceCapture.getValue().get( "foo" );
-		verifyNoOtherBackendInteractionsAndReset();
-		assertThat( result ).contains( "bar" );
 	}
 
 	@Test
@@ -361,24 +317,6 @@ public class IndexManagerBuildingStateHolderTest {
 				.thenReturn( Optional.empty() );
 		when( configurationSourceMock.get( "backends.myBackend.foo" ) )
 				.thenReturn( (Optional) Optional.of( "bar" ) );
-		result = indexPropertySourceCapture.getValue().get( "foo" );
-		verifyNoOtherBackendInteractionsAndReset();
-		assertThat( result ).contains( "bar" );
-
-		// Legacy "index_defaults"
-		logged.expectEvent( Level.WARN, "Using configuration property 'hibernate.search.backends.myBackend.index_defaults.foo'."
-				+ " The prefix 'index_defaults' is deprecated and its support will ultimately be removed."
-				+ " Instead, you should just set defaults for index properties at the backend level."
-				+ " For example, set 'hibernate.search.backend.indexing.queue_size'"
-				+ " instead of 'hibernate.search.backend.index_defaults.indexing.queue_size'." );
-		when( configurationSourceMock.get( "backends.myBackend.indexes.myIndex.foo" ) )
-				.thenReturn( Optional.empty() );
-		when( configurationSourceMock.get( "backends.myBackend.foo" ) )
-				.thenReturn( Optional.empty() );
-		when( configurationSourceMock.get( "backends.myBackend.index_defaults.foo" ) )
-				.thenReturn( (Optional) Optional.of( "bar" ) );
-		when( configurationSourceMock.resolve( "backends.myBackend.index_defaults.foo" ) )
-				.thenReturn( Optional.of( "hibernate.search.backends.myBackend.index_defaults.foo" ) );
 		result = indexPropertySourceCapture.getValue().get( "foo" );
 		verifyNoOtherBackendInteractionsAndReset();
 		assertThat( result ).contains( "bar" );

@@ -22,17 +22,4 @@ public class IndexSettingsTest {
 		assertThat( IndexSettings.indexKey( null, "indexName", "foo.bar" ) )
 				.isEqualTo( "hibernate.search.backend.indexes.indexName.foo.bar" );
 	}
-
-	@Test
-	@SuppressWarnings("deprecation")
-	public void indexDefaultsKey() {
-		assertThat( IndexSettings.indexDefaultsKey( "foo.bar" ) )
-				.isEqualTo( "hibernate.search.backend.index_defaults.foo.bar" );
-
-		assertThat( IndexSettings.indexDefaultsKey( "backendName", "foo.bar" ) )
-				.isEqualTo( "hibernate.search.backends.backendName.index_defaults.foo.bar" );
-		assertThat( IndexSettings.indexDefaultsKey( null, "foo.bar" ) )
-				.isEqualTo( "hibernate.search.backend.index_defaults.foo.bar" );
-	}
-
 }
