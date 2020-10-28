@@ -142,7 +142,7 @@ public class BridgeTest extends SearchTestBase {
 		result = session.createFullTextQuery( bQuery ).setProjection( "clazz" ).list();
 		assertEquals( "Clazz projection works", 1, result.size() );
 
-		query = parser.parse( "char1:[" + String.valueOf( Character.MIN_VALUE ) + " TO " + String.valueOf( Character.MAX_VALUE ) + "]" );
+		query = parser.parse( "char1:[" + String.valueOf( Character.MIN_VALUE ) + " TO " + String.valueOf( Character.MAX_VALUE - 2 ) + "]" );
 		result = session.createFullTextQuery( query ).setProjection( "char1" ).list();
 		assertEquals( "Null elements should not be stored, CharacterBridge is not working", 0, result.size() );
 
