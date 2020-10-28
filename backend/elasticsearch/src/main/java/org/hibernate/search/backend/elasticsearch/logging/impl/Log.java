@@ -63,32 +63,27 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET_LEGACY_ES = MessageConstants.BACKEND_ES_ID_RANGE_MIN;
 
 	@Message(id = ID_OFFSET_LEGACY_ES + 7,
-			value = "Elasticsearch request failed: %3$s\nRequest: %1$s\nResponse: %2$s"
-	)
+			value = "Elasticsearch request failed: %3$s\nRequest: %1$s\nResponse: %2$s")
 	SearchException elasticsearchRequestFailed(
-			@FormatWith( ElasticsearchRequestFormatter.class ) ElasticsearchRequest request,
-			@FormatWith( ElasticsearchResponseFormatter.class ) ElasticsearchResponse response,
-			String causeMessage,
-			@Cause Exception cause);
+			@FormatWith(ElasticsearchRequestFormatter.class) ElasticsearchRequest request,
+			@FormatWith(ElasticsearchResponseFormatter.class) ElasticsearchResponse response,
+			String causeMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_LEGACY_ES + 8,
 			// Note: no need to add a '\n' before "Response", since the formatter will always add one
-			value = "Elasticsearch bulked request failed: %3$s\nRequest metadata: %1$sResponse: %2$s"
-	)
+			value = "Elasticsearch bulked request failed: %3$s\nRequest metadata: %1$sResponse: %2$s")
 	SearchException elasticsearchBulkedRequestFailed(
-			@FormatWith( ElasticsearchJsonObjectFormatter.class ) JsonObject requestMetadata,
-			@FormatWith( ElasticsearchJsonObjectFormatter.class ) JsonObject response,
-			String causeMessage,
-			@Cause Exception cause);
+			@FormatWith(ElasticsearchJsonObjectFormatter.class) JsonObject requestMetadata,
+			@FormatWith(ElasticsearchJsonObjectFormatter.class) JsonObject response,
+			String causeMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_LEGACY_ES + 10,
-			value = "Elasticsearch connection time-out; check the cluster status, it should be 'green'" )
-	SearchException elasticsearchRequestTimeout();
+			value = "Elasticsearch response indicates a timeout (HTTP status 408)" )
+	SearchException elasticsearchStatus408RequestTimeout();
 
 	@Message(id = ID_OFFSET_LEGACY_ES + 20,
-			value = "Could not create mapping for index '%1$s': %2$s"
-	)
-	SearchException elasticsearchMappingCreationFailed(String indexName, String causeMessage, @Cause Exception cause);
+			value = "Unable to update mapping for index '%1$s': %2$s")
+	SearchException elasticsearchMappingUpdateFailed(String indexName, String causeMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_LEGACY_ES + 22, value = "Invalid index status: '%1$s'."
 			+ " Valid statuses are: %2$s.")
@@ -670,5 +665,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 124, value = "Cannot use '%2$s' on field '%1$s': %3$s")
 	SearchException cannotUseQueryElementForObjectFieldBecauseCreationException(String absoluteFieldPath,
 			String queryElementName, String causeMessage, @Cause SearchException cause, @Param EventContext context);
+
+	@Message(id = ID_OFFSET + 125,
+			value = "Unable to update aliases for index '%1$s': %2$s")
+	SearchException elasticsearchAliasUpdateFailed(Object indexName, String causeMessage, @Cause Exception cause);
 
 }

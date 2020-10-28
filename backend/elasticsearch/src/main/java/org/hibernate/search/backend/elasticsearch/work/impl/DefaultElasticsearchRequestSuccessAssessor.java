@@ -97,7 +97,7 @@ public class DefaultElasticsearchRequestSuccessAssessor implements Elasticsearch
 	private void checkSuccess(Optional<Integer> statusCode, JsonObject responseBody) {
 		if ( !isSuccess( statusCode, responseBody ) ) {
 			if ( statusCode.filter( isEqual( TIME_OUT_HTTP_STATUS_CODE ) ).isPresent() ) {
-				throw log.elasticsearchRequestTimeout();
+				throw log.elasticsearchStatus408RequestTimeout();
 			}
 			else {
 				throw log.elasticsearchResponseIndicatesFailure();
