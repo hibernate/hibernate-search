@@ -43,7 +43,8 @@ public class LogChecker {
 		}
 	}
 
-	void process(LogEvent event) {
+	// This must be synchronized to avoid problems when multiple threads issue log events concurrently
+	synchronized void process(LogEvent event) {
 		if ( expectation.getMaxExpectedCount() == null && expectation.getMinExpectedCount() <= count ) {
 			// We don't care about events anymore, expectations are met and it won't change
 			return;
