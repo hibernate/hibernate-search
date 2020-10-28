@@ -35,14 +35,7 @@ public class IndexedEmbeddedProcessor implements PropertyMappingAnnotationProces
 
 		Integer cleanedUpIncludeDepth = annotation.includeDepth();
 		if ( cleanedUpIncludeDepth.equals( -1 ) ) {
-			int maxDepth = annotation.maxDepth();
-			// Support for the deprecated @IndexedEmbedded.maxDepth
-			if ( maxDepth != -1 ) {
-				cleanedUpIncludeDepth = maxDepth;
-			}
-			else {
-				cleanedUpIncludeDepth = null;
-			}
+			cleanedUpIncludeDepth = null;
 		}
 
 		String[] includePathsArray = annotation.includePaths();

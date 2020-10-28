@@ -681,66 +681,6 @@ public class IndexedEmbeddedBaseIT {
 	}
 
 	/**
-	 * Check that the "maxDepth" parameter is at least taken into account.
-	 */
-	@Test
-	@SuppressWarnings("deprecation")
-	public void maxDepth() {
-		class IndexedEmbeddedLevel2 {
-			String level2Property;
-			@GenericField
-			public String getLevel2Property() {
-				return level2Property;
-			}
-		}
-		class IndexedEmbeddedLevel1 {
-			String level1Property;
-			IndexedEmbeddedLevel2 level2;
-			@GenericField
-			public String getLevel1Property() {
-				return level1Property;
-			}
-			@IndexedEmbedded
-			public IndexedEmbeddedLevel2 getLevel2() {
-				return level2;
-			}
-		}
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
-			@DocumentId
-			Integer id;
-			@IndexedEmbedded(maxDepth = 1)
-			IndexedEmbeddedLevel1 level1;
-			public IndexedEntity(int id, String level1Value, String level2Value) {
-				this.id = id;
-				this.level1 = new IndexedEmbeddedLevel1();
-				this.level1.level1Property = level1Value;
-				this.level1.level2 = new IndexedEmbeddedLevel2();
-				this.level1.level2.level2Property = level2Value;
-			}
-		}
-
-		backendMock.expectSchema( INDEX_NAME, b -> b
-				.objectField( "level1", b2 -> b2
-						.field( "level1Property", String.class )
-				)
-		);
-		SearchMapping mapping = setupHelper.start()
-				.withAnnotatedEntityTypes( IndexedEntity.class )
-				.withAnnotatedTypes( IndexedEmbeddedLevel1.class, IndexedEmbeddedLevel2.class )
-				.setup();
-		backendMock.verifyExpectationsMet();
-
-		doTestEmbeddedRuntime(
-				mapping,
-				id -> new IndexedEntity( id, "level1Value", "level2Value" ),
-				document -> document.objectField( "level1", b2 -> b2
-						.field( "level1Property", "level1Value" )
-				)
-		);
-	}
-
-	/**
 	 * Check that the "structure" parameter is at least taken into account.
 	 * <p>
 	 * Details of how filtering handles all corner cases is tested in the engine (see this class' javadoc).
