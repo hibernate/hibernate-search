@@ -107,7 +107,8 @@ public class LuceneCollectors {
 		else {
 			TotalHitCountCollector totalHitCountCollector = collectorsForAllMatchingDocs.get( TOTAL_HIT_COUNT_KEY );
 			if ( totalHitCountCollector != null ) {
-				resultTotal = SimpleSearchResultTotal.exact( totalHitCountCollector.getTotalHits() );
+				boolean exact = !timeoutManager.isTimedOut();
+				resultTotal = SimpleSearchResultTotal.of( totalHitCountCollector.getTotalHits(), exact );
 			}
 		}
 
@@ -121,7 +122,8 @@ public class LuceneCollectors {
 
 		extractTopDocs( topDocsCollector, offset, limit );
 		if ( resultTotal == null ) {
-			boolean exact = TotalHits.Relation.EQUAL_TO.equals( topDocs.totalHits.relation );
+			boolean exact = TotalHits.Relation.EQUAL_TO.equals( topDocs.totalHits.relation )
+					&& !timeoutManager.isTimedOut();
 			resultTotal = SimpleSearchResultTotal.of( topDocs.totalHits.value, exact );
 		}
 		else if ( resultTotal.isHitCountExact() ) {
