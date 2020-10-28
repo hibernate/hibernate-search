@@ -109,28 +109,12 @@ public class ExpectedLog4jLog implements TestRule {
 	}
 
 	/**
-	 * @deprecated Use {@code expectEvent( matcher ).never() }
-	 */
-	@Deprecated
-	public void expectEventMissing(Matcher<? extends LogEvent> matcher) {
-		expectEvent( matcher ).never();
-	}
-
-	/**
 	 * Expect a logging event matching the given level or higher.
 	 * <p>
 	 * Defaults to expecting the event once or more.
 	 */
 	public LogExpectation expectLevel(Level level) {
 		return expectEvent( eventLevelMatcher( level ) );
-	}
-
-	/**
-	 * @deprecated Use {@code expectLevel( level ).never() }
-	 */
-	@Deprecated
-	public void expectLevelMissing(Level level) {
-		expectLevel( level ).never();
 	}
 
 	/**
@@ -143,14 +127,6 @@ public class ExpectedLog4jLog implements TestRule {
 	}
 
 	/**
-	 * @deprecated Use {@code expectMessage( containedString ).never() }
-	 */
-	@Deprecated
-	public void expectMessageMissing(String containedString) {
-		expectMessage( containedString ).never();
-	}
-
-	/**
 	 * Expect a log message containing all of the given string.
 	 * <p>
 	 * Defaults to expecting the event once or more.
@@ -160,28 +136,12 @@ public class ExpectedLog4jLog implements TestRule {
 	}
 
 	/**
-	 * @deprecated Use {@code expectMessage( matcher ).never() }
-	 */
-	@Deprecated
-	public void expectMessageMissing(String containedString, String... otherContainedStrings) {
-		expectMessage( containedString, otherContainedStrings ).times( 0 );
-	}
-
-	/**
 	 * Expect a log message matches the given Hamcrest matcher.
 	 * <p>
 	 * Defaults to expecting the event once or more.
 	 */
 	public LogExpectation expectMessage(Matcher<String> matcher) {
 		return expectEvent( eventMessageMatcher( matcher ) );
-	}
-
-	/**
-	 * @deprecated Use {@code expectMessage( matcher ).never() }
-	 */
-	@Deprecated
-	public void expectMessageMissing(Matcher<String> matcher) {
-		expectMessage( matcher ).times( 0 );
 	}
 
 	private Matcher<String> containsAllStrings(String containedString, String... otherContainedStrings) {
