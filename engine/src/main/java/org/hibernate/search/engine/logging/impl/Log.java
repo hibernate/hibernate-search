@@ -354,14 +354,6 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassFormatter.class) Class<?> correctType,
 			@Param EventContext context);
 
-	@LogMessage(level = Logger.Level.WARN)
-	@Message(id = ID_OFFSET_2 + 85,
-			value = "Using configuration property '%1$s'. The prefix 'index_defaults' is deprecated and its support will ultimately be removed."
-					+ " Instead, you should just set defaults for index properties at the backend level."
-					+ " For example, set 'hibernate.search.backend.indexing.queue_size'"
-					+ " instead of 'hibernate.search.backend.index_defaults.indexing.queue_size'.")
-	void deprecatedIndexDefaultsPrefix(String key);
-
 	@Message(id = ID_OFFSET_2 + 86, value = "Search query loading exceeded the timeout of %1$s milliseconds.")
 	SearchTimeoutException timedOut(Long timeoutMs);
 

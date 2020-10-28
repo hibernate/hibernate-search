@@ -34,17 +34,6 @@ public final class BackendSettings {
 	public static final String TYPE = "type";
 
 	/**
-	 * The root property whose children are default properties to be applied to all indexes of this backend.
-	 *
-	 * @deprecated To set defaults for a particular configuration property for all indexes in a backend,
-	 * just set the configuration property at the backend level.
-	 * E.g. instead of {@code hibernate.search.backend.index_defaults.indexing.queue_size}
-	 * set {@code hibernate.search.backend.indexing.queue_size}.
-	 */
-	@Deprecated
-	public static final String INDEX_DEFAULTS = "index_defaults";
-
-	/**
 	 * The root property whose children are index names, e.g. {@code indexes.myIndex.<some index-scoped property> = bar}.
 	 */
 	public static final String INDEXES = "indexes";
