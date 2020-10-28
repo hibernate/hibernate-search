@@ -31,19 +31,32 @@ import org.hamcrest.TypeSafeMatcher;
  */
 public class ExpectedLog4jLog implements TestRule {
 
+	private static final String DEFAULT_LOGGER_NAME = "org.hibernate.search";
+
 	/**
-	 * Returns a {@linkplain TestRule rule} that does not mandate any particular log to be produced (identical to
-	 * behavior without this rule).
+	 * @return a {@linkplain TestRule rule} targeting the logger named '{@value DEFAULT_LOGGER_NAME}',
+	 * that originally does not mandate any particular log to be produced (identical to behavior without this rule).
 	 */
 	public static ExpectedLog4jLog create() {
-		return new ExpectedLog4jLog();
+		return create( DEFAULT_LOGGER_NAME );
 	}
+
+	/**
+	 * @return a {@linkplain TestRule rule} targeting the logger whose name is given by {@code loggerName},
+	 * that originally does not mandate any particular log to be produced (identical to behavior without this rule).
+	 */
+	public static ExpectedLog4jLog create(String loggerName) {
+		return new ExpectedLog4jLog( loggerName );
+	}
+
+	private final String loggerName;
 
 	protected List<Matcher<?>> expectations = new ArrayList<>();
 
 	protected List<Matcher<?>> absenceExpectations = new ArrayList<>();
 
-	private ExpectedLog4jLog() {
+	private ExpectedLog4jLog(String loggerName) {
+		this.loggerName = loggerName;
 	}
 
 	@Override
@@ -158,7 +171,7 @@ public class ExpectedLog4jLog implements TestRule {
 
 		@Override
 		public void evaluate() throws Throwable {
-			Log4j2ConfigurationAccessor programmaticConfig = new Log4j2ConfigurationAccessor();
+			Log4j2ConfigurationAccessor programmaticConfig = new Log4j2ConfigurationAccessor( loggerName );
 			TestAppender appender = new TestAppender( "TestAppender", ExpectedLog4jLog.this );
 			programmaticConfig.addAppender( appender );
 			try {

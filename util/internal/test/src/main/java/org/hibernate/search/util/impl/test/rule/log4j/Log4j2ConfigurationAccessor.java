@@ -17,24 +17,25 @@ public class Log4j2ConfigurationAccessor {
 
 	private final LoggerContext context;
 	private final Configuration configuration;
-	private final LoggerConfig rootLogger;
+	private final LoggerConfig logger;
 
 	private Appender appender;
-	private Level rootLoggerLevel;
+	private Level originalLoggerLevel;
 
-	public Log4j2ConfigurationAccessor() {
+	public Log4j2ConfigurationAccessor(String loggerName) {
 		context = (LoggerContext) LogManager.getContext( false );
 		configuration = context.getConfiguration();
-		rootLogger = configuration.getRootLogger();
+		// Make sure the logger exists (this call is ignored if it already exists)
+		configuration.addLogger( loggerName, new LoggerConfig() );
+		logger = configuration.getLoggerConfig( loggerName );
 	}
 
 	public void addAppender(Appender appender) {
 		this.appender = appender;
-		rootLoggerLevel = rootLogger.getLevel();
+		originalLoggerLevel = logger.getLevel();
 
-		configuration.addAppender( appender );
-		rootLogger.addAppender( appender, Level.ALL, null );
-		rootLogger.setLevel( Level.ALL );
+		logger.addAppender( appender, Level.ALL, null );
+		logger.setLevel( Level.ALL );
 		appender.start();
 		context.updateLoggers();
 	}
@@ -45,9 +46,8 @@ public class Log4j2ConfigurationAccessor {
 		}
 
 		appender.stop();
-		rootLogger.removeAppender( appender.getName() );
-		rootLogger.setLevel( rootLoggerLevel );
-		configuration.getAppenders().remove( appender.getName() );
+		logger.removeAppender( appender.getName() );
+		logger.setLevel( originalLoggerLevel );
 		context.updateLoggers();
 	}
 }
