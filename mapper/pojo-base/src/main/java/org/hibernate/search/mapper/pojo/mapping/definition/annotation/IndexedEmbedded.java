@@ -159,14 +159,6 @@ public @interface IndexedEmbedded {
 	int includeDepth() default -1;
 
 	/**
-	 * @return The number of levels of indexed-embedded that will have all their fields included by default.
-	 * @see #includeDepth()
-	 * @deprecated Use {@link #includeDepth()} instead.
-	 */
-	@Deprecated
-	int maxDepth() default -1;
-
-	/**
 	 * Whether the identifier of embedded objects should be included as an index field.
 	 * <p>
 	 * The index field will defined as if the following annotation was put on the identifier property
