@@ -92,12 +92,9 @@ public class LuceneIndexManagerImpl
 
 	@Override
 	public void stop() {
-		try ( Closer<IOException> closer = new Closer<>() ) {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( ShardHolder::stop, shardHolder );
 			closer.push( LuceneIndexModel::close, model );
-		}
-		catch (IOException | RuntimeException e) {
-			throw log.failedToShutdownBackend( e, getBackendAndIndexEventContext() );
 		}
 	}
 

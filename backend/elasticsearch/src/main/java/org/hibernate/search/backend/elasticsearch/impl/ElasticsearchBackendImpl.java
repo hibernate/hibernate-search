@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
@@ -137,14 +136,11 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 
 	@Override
 	public void stop() {
-		try ( Closer<IOException> closer = new Closer<>() ) {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( ElasticsearchSimpleWorkOrchestrator::stop, generalPurposeOrchestrator );
 			closer.push( ElasticsearchLinkImpl::onStop, link );
 			closer.push( BeanHolder::close, indexLayoutStrategyHolder );
 			closer.push( BackendThreads::onStop, threads );
-		}
-		catch (IOException | RuntimeException e) {
-			throw log.failedToShutdownBackend( e, eventContext );
 		}
 	}
 

@@ -21,17 +21,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.entity.ContentType;
-import org.elasticsearch.client.Request;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.Response;
-import org.elasticsearch.client.ResponseException;
-import org.elasticsearch.client.ResponseListener;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.sniff.Sniffer;
-
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
@@ -45,6 +34,16 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.entity.ContentType;
+import org.elasticsearch.client.Request;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.ResponseException;
+import org.elasticsearch.client.ResponseListener;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.sniff.Sniffer;
 
 
 public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
@@ -256,7 +255,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	}
 
 	@Override
-	public void close() throws IOException {
+	public void close() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			/*
 			 * There's no point waiting for timeouts: we'll just expect the RestClient to cancel all
@@ -264,6 +263,9 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 			 */
 			closer.push( Sniffer::close, this.sniffer );
 			closer.push( RestClient::close, this.restClient );
+		}
+		catch (RuntimeException | IOException e) {
+			throw log.unableToShutdownClient( e.getMessage(), e );
 		}
 	}
 

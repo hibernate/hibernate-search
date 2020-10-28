@@ -87,8 +87,8 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 		return CompletableFuture.allOf( futures );
 	}
 
-	void stop() throws IOException {
-		try ( Closer<IOException> closer = new Closer<>() ) {
+	void stop() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( Shard::stop, shards.values() );
 			shards.clear();
 			managementOrchestrators.clear();

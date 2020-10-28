@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util;
 
-import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -29,7 +28,7 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 public class ElasticsearchClientSpy implements TestRule {
-	private AtomicInteger createdClientCount = new AtomicInteger();
+	private final AtomicInteger createdClientCount = new AtomicInteger();
 	private final CallQueue<ElasticsearchClientSubmitCall> expectations = new CallQueue<>();
 
 	@Override
@@ -115,7 +114,7 @@ public class ElasticsearchClientSpy implements TestRule {
 		}
 
 		@Override
-		public void close() throws IOException {
+		public void close() {
 			delegate.close();
 		}
 

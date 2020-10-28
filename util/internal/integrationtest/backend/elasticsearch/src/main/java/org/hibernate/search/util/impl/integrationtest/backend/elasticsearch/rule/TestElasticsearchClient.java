@@ -804,7 +804,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		try {
 			client.close();
 		}
-		catch (RuntimeException | IOException e) {
+		catch (RuntimeException e) {
 			throw new AssertionFailure(
 					"Unexpected exception when closing the ElasticsearchClient used in "
 							+ TestElasticsearchClient.class.getSimpleName(),

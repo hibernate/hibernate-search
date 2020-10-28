@@ -9,6 +9,8 @@ package org.hibernate.search.engine.common.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
@@ -25,10 +27,13 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.impl.EngineEventContextMessages;
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class SearchIntegrationImpl implements SearchIntegration {
@@ -92,14 +97,41 @@ public class SearchIntegrationImpl implements SearchIntegration {
 
 	@Override
 	public void close() {
-		RootFailureCollector failureCollector = new RootFailureCollector( EngineEventContextMessages.INSTANCE.shutdown() );
+		RootFailureCollector rootFailureCollector =
+				new RootFailureCollector( EngineEventContextMessages.INSTANCE.shutdown() );
+
+		// Stop mappings
+		stopAllSafelyInParallel( mappings,
+				(mapping, contextualFailureCollector) -> {
+					MappingPreStopContextImpl preStopContext =
+							new MappingPreStopContextImpl( contextualFailureCollector );
+					return mapping.preStop( preStopContext );
+				},
+				rootFailureCollector,
+				(failureCollector, mappingKey) -> failureCollector.withContext( mappingKey ) );
+		stopAllSafely( mappings,
+				(mapping, ignored) -> mapping.stop(),
+				rootFailureCollector,
+				(failureCollector, mappingKey) -> failureCollector.withContext( mappingKey ) );
+
+		// Stop indexes
+		stopAllSafelyInParallel( indexManagers,
+				(indexManager, contextualFailureCollector) -> indexManager.preStop(),
+				rootFailureCollector,
+				(failureCollector, name) -> failureCollector.withContext( EventContexts.fromIndexName( name ) ) );
+		stopAllSafely( indexManagers,
+				(indexManager, contextualFailureCollector) -> indexManager.stop(),
+				rootFailureCollector,
+				(failureCollector, name) -> failureCollector.withContext( EventContexts.fromIndexName( name ) ) );
+
+		// Stop backends
+		stopAllSafely( backends,
+				(backend, contextualFailureCollector) -> backend.stop(),
+				rootFailureCollector,
+				(failureCollector, name) -> failureCollector.withContext( EventContexts.fromBackendName( name ) ) );
+
+		// Stop engine
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( this::preStopMappings, failureCollector );
-			closer.pushAll( MappingImplementor::stop, mappings.values() );
-			closer.push( SearchIntegrationImpl::preStopIndexManagers, this );
-			closer.pushAll( IndexManagerImplementor::stop, indexManagers.values() );
-			closer.push( SearchIntegrationImpl::preStopBackends, this );
-			closer.pushAll( BackendImplementor::stop, backends.values() );
 			closer.pushAll( ThreadPoolProviderImpl::close, threadPoolProvider );
 			closer.pushAll( BeanHolder::close, failureHandlerHolder );
 			closer.pushAll( BeanProvider::close, beanProvider );
@@ -107,41 +139,44 @@ public class SearchIntegrationImpl implements SearchIntegration {
 			closer.pushAll( TimingSource::stop, timingSource );
 		}
 		catch (RuntimeException e) {
-			failureCollector.withContext( EventContexts.defaultContext() ).add( e );
+			rootFailureCollector.withContext( EventContexts.defaultContext() ).add( e );
 		}
 
-		failureCollector.checkNoFailure();
+		rootFailureCollector.checkNoFailure();
 	}
 
-	private void preStopMappings(RootFailureCollector failureCollector) {
-		CompletableFuture<?>[] futures = new CompletableFuture[mappings.size()];
-		int i = 0;
-		for ( Map.Entry<MappingKey<?, ?>, MappingImplementor<?>> entry : mappings.entrySet() ) {
-			MappingPreStopContextImpl preStopContext = new MappingPreStopContextImpl(
-					failureCollector.withContext( entry.getKey() )
-			);
-			futures[i] = entry.getValue().preStop( preStopContext );
-			i++;
+	private <K, V> void stopAllSafely(Map<K, V> map, BiConsumer<V, ContextualFailureCollector> stop,
+			FailureCollector failureCollector,
+			BiFunction<FailureCollector, K, ContextualFailureCollector> appendEventContext) {
+		for ( Map.Entry<K, V> entry : map.entrySet() ) {
+			ContextualFailureCollector contextualFailureCollector =
+					appendEventContext.apply( failureCollector, entry.getKey() );
+			try {
+				stop.accept( entry.getValue(), contextualFailureCollector );
+			}
+			catch (RuntimeException e) {
+				contextualFailureCollector.add( e );
+			}
 		}
-		Futures.unwrappedExceptionJoin( CompletableFuture.allOf( futures ) );
 	}
 
-	private void preStopIndexManagers() {
-		CompletableFuture<?>[] futures = new CompletableFuture[indexManagers.size()];
+	private <K, V> void stopAllSafelyInParallel(Map<K, V> map,
+			BiFunction<V, ContextualFailureCollector, CompletableFuture<?>> stop,
+			FailureCollector failureCollector,
+			BiFunction<FailureCollector, K, ContextualFailureCollector> appendEventContext) {
+		CompletableFuture<?>[] futures = new CompletableFuture[map.size()];
 		int i = 0;
-		for ( IndexManagerImplementor indexManager : indexManagers.values() ) {
-			futures[i] = indexManager.preStop();
+		for ( Map.Entry<K, V> entry : map.entrySet() ) {
+			ContextualFailureCollector contextualFailureCollector =
+					appendEventContext.apply( failureCollector, entry.getKey() );
+			futures[i] = Futures.create( () -> stop.apply( entry.getValue(), contextualFailureCollector ) )
+					.exceptionally( Futures.handler( throwable -> {
+						Exception exception = Throwables.expectException( throwable );
+						contextualFailureCollector.add( exception );
+						return null;
+					} ) );
 			i++;
-		}
-		Futures.unwrappedExceptionJoin( CompletableFuture.allOf( futures ) );
-	}
 
-	private void preStopBackends() {
-		CompletableFuture<?>[] futures = new CompletableFuture[backends.size()];
-		int i = 0;
-		for ( BackendImplementor backend : backends.values() ) {
-			futures[i] = backend.preStop();
-			i++;
 		}
 		Futures.unwrappedExceptionJoin( CompletableFuture.allOf( futures ) );
 	}
