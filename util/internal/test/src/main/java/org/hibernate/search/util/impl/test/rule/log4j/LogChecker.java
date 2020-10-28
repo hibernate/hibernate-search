@@ -16,6 +16,7 @@ public class LogChecker {
 
 	private final LogExpectation expectation;
 	private int count = 0;
+	private List<LogEvent> matchingEvents;
 	private List<LogEvent> extraEvents;
 
 	LogChecker(LogExpectation expectation) {
@@ -28,17 +29,17 @@ public class LogChecker {
 			description.appendText( "Expected at least " + expectation.getMinExpectedCount() + " time(s) " );
 			expectation.getMatcher().describeTo( description );
 			description.appendText( " but only got " + count + " such event(s)." );
+			description.appendText( " Matching events: " );
+			appendEvents( description, newline, matchingEvents );
 		}
 		if ( expectation.getMaxExpectedCount() != null && expectation.getMaxExpectedCount() < count ) {
 			description.appendText( "Expected at most " + expectation.getMaxExpectedCount() + " time(s) " );
 			expectation.getMatcher().describeTo( description );
 			description.appendText( " but got " + count + " such event(s)." );
 			description.appendText( " Extra events: " );
-			for ( LogEvent extraEvent : extraEvents ) {
-				description.appendText( newline );
-				description.appendText( "\t - " );
-				description.appendText( extraEvent.getMessage().getFormattedMessage() );
-			}
+			appendEvents( description, newline, extraEvents );
+			description.appendText( " Matching events: " );
+			appendEvents( description, newline, matchingEvents );
 		}
 	}
 
@@ -55,11 +56,25 @@ public class LogChecker {
 				}
 				extraEvents.add( event.toImmutable() );
 			}
+			else {
+				if ( matchingEvents == null ) {
+					matchingEvents = new ArrayList<>();
+				}
+				matchingEvents.add( event.toImmutable() );
+			}
 		}
 	}
 
 	boolean areExpectationsMet() {
 		return expectation.getMinExpectedCount() <= count
 				&& ( expectation.getMaxExpectedCount() == null || count <= expectation.getMaxExpectedCount() );
+	}
+
+	private static void appendEvents(Description description, String newline, List<LogEvent> events) {
+		for ( LogEvent event : events ) {
+			description.appendText( newline );
+			description.appendText( "\t - " );
+			description.appendText( event.getMessage().getFormattedMessage() );
+		}
 	}
 }
