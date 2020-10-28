@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.test.engine;
 
-import java.util.Map;
-
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextQuery;
@@ -85,12 +83,6 @@ public class RollbackTransactionTest extends SearchTestBase {
 	@Override
 	public Class<?>[] getAnnotatedClasses() {
 		return new Class[] { BusLine.class, BusStop.class };
-	}
-
-	// Test setup options - SessionFactory Properties
-	@Override
-	public void configure(Map<String,Object> cfg) {
-		cfg.put( "hibernate.search.default.directory_provider", "local-heap" );
 	}
 
 }
