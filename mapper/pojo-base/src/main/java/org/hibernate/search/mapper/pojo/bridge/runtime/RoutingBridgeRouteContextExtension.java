@@ -31,7 +31,7 @@ public interface RoutingBridgeRouteContextExtension<T> {
 	 * <p>
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
-	 * @param original The original, non-extended {@link RoutingKeyBridgeToRoutingKeyContext}.
+	 * @param original The original, non-extended {@link RoutingBridgeRouteContext}.
 	 * @param sessionContext A {@link BridgeSessionContext}.
 	 * @return An optional containing the extended context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
