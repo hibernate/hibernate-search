@@ -60,6 +60,9 @@ final class HibernateSearch5Properties {
 	);
 
 	private static final Set<String> OBSOLETE_INDEX_LEVEL_PROPERTY_KEY_SUFFIXES = CollectionHelper.asImmutableSet(
+			"directory_provider",
+			"sharding_strategy",
+			"sharding_strategy.nbr_of_shards",
 			"worker.backend",
 			"worker.execution",
 			"reader.strategy",
