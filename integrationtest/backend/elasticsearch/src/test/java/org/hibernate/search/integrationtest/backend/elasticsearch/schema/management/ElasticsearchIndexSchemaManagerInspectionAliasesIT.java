@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultPrimaryName;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultReadAlias;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultWriteAlias;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.writeAliasDefinition;
 
 import java.util.EnumSet;
 
@@ -90,6 +91,27 @@ public class ElasticsearchIndexSchemaManagerInspectionAliasesIT {
 		assertThatThrownBy(
 				this::setupAndInspectIndex
 		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "Invalid Elasticsearch index layout",
+						"index aliases [" + defaultWriteAlias( index.name() ) + ", " + defaultReadAlias( index.name() )
+								+ "] resolve to multiple distinct indexes ["
+								+ defaultPrimaryName( index.name() ) + ", "
+								+ defaultPrimaryName( "otherIndex" ) + "]",
+						"These aliases must resolve to a single index" );
+	}
+
+	@Test
+	public void readAndWriteAliasTargetDifferentIndexes() {
+		elasticsearchClient.index( index.name() )
+				.deleteAndCreate();
+		// The write alias for index 1 actually targets a different index
+		elasticsearchClient.index( "otherIndex" )
+				.deleteAndCreate();
+		elasticsearchClient.index( index.name() )
+				.aliases().move( defaultWriteAlias( index.name() ).original,
+						defaultPrimaryName( "otherIndex" ).original, writeAliasDefinition() );
+
+		assertThatThrownBy( this::setupAndInspectIndex )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Invalid Elasticsearch index layout",
 						"index aliases [" + defaultWriteAlias( index.name() ) + ", " + defaultReadAlias( index.name() )
