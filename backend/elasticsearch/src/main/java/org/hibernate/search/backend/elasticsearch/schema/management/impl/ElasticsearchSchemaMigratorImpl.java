@@ -69,7 +69,7 @@ public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigra
 	}
 
 	private CompletableFuture<?> doMigrateAliases(URLEncodedString indexName, Map<String, IndexAliasDefinition> aliases) {
-		return schemaAccessor.putAliases( indexName, aliases );
+		return schemaAccessor.updateAliases( indexName, aliases );
 	}
 
 	private CompletableFuture<?> doMigrateSettings(URLEncodedString indexName, IndexSettings settings) {
@@ -84,7 +84,7 @@ public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigra
 
 	private CompletableFuture<?> doMigrateMapping(URLEncodedString indexName, RootTypeMapping mapping) {
 		// Elasticsearch itself takes care of the actual merging
-		return schemaAccessor.putMapping( indexName, mapping );
+		return schemaAccessor.updateMapping( indexName, mapping );
 	}
 
 }

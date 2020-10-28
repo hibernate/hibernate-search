@@ -111,13 +111,12 @@ public class ElasticsearchSchemaAccessor {
 				} );
 	}
 
-	public CompletableFuture<?> putAliases(URLEncodedString indexName, Map<String, IndexAliasDefinition> aliases) {
+	public CompletableFuture<?> updateAliases(URLEncodedString indexName, Map<String, IndexAliasDefinition> aliases) {
 		NonBulkableWork<?> work = getWorkFactory().putIndexAliases( indexName, aliases ).build();
 		return execute( work )
 				.exceptionally( Futures.handler( e -> {
-					throw log.elasticsearchSettingsUpdateFailed(
-							indexName.original, Throwables.expectException( e )
-					);
+					throw log.elasticsearchAliasUpdateFailed( indexName.original, e.getMessage(),
+							Throwables.expectException( e ) );
 				} ) );
 	}
 
@@ -130,11 +129,11 @@ public class ElasticsearchSchemaAccessor {
 				} ) );
 	}
 
-	public CompletableFuture<?> putMapping(URLEncodedString indexName, RootTypeMapping mapping) {
+	public CompletableFuture<?> updateMapping(URLEncodedString indexName, RootTypeMapping mapping) {
 		NonBulkableWork<?> work = getWorkFactory().putIndexTypeMapping( indexName, mapping ).build();
 		return execute( work )
 				.exceptionally( Futures.handler( e -> {
-					throw log.elasticsearchMappingCreationFailed(
+					throw log.elasticsearchMappingUpdateFailed(
 							indexName.original, e.getMessage(), Throwables.expectException( e )
 					);
 				} ) );
