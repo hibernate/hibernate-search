@@ -53,11 +53,14 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	}
 
 	@Override
-	public void close() throws IOException {
+	public void close() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			closer.push( IndexWriterProvider::clear, indexWriterProvider );
 			closer.push( IndexReaderProvider::clear, indexReaderProvider );
 			closer.push( DirectoryHolder::close, directoryHolder );
+		}
+		catch (RuntimeException | IOException e) {
+			throw log.unableToShutdownIndexAccessor( e.getMessage(), e );
 		}
 	}
 

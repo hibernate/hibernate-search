@@ -351,8 +351,8 @@ public interface Log extends BasicLogger {
 	SearchException inconsistentConfigurationForFieldForSearch(String absoluteFieldPath, String causeMessage,
 			@Param EventContext context, @Cause SearchException cause);
 
-	@Message(id = ID_OFFSET + 44, value = "Failed to shut down the Elasticsearch backend.")
-	SearchException failedToShutdownBackend(@Cause Exception cause, @Param EventContext context);
+	@Message(id = ID_OFFSET + 44, value = "Unable to shut down the Elasticsearch client: %1$s")
+	SearchException unableToShutdownClient(String causeMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 45, value = "Cannot guess field type for input type %1$s.")
 	SearchException cannotGuessFieldType(@FormatWith(ClassFormatter.class) Class<?> inputType, @Param EventContext context);
@@ -361,9 +361,6 @@ public interface Log extends BasicLogger {
 			value = "Inconsistent configuration for the identifier in a search query across multiple indexes: converter differs: '%1$s' vs. '%2$s'.")
 	SearchException inconsistentConfigurationForIdentifierForSearch(ToDocumentIdentifierValueConverter<?> component1,
 			ToDocumentIdentifierValueConverter<?> component2, @Param EventContext context);
-
-	@Message(id = ID_OFFSET + 50, value = "Failed to shut down the Elasticsearch index manager with name '%1$s'.")
-	SearchException failedToShutdownIndexManager(String indexName, @Cause Exception cause, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 53,
 			value = "Full-text features (analysis, fuzziness) are not supported for fields of this type.")

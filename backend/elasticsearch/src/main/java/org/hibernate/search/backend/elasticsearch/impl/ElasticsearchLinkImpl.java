@@ -31,7 +31,6 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
@@ -153,8 +152,8 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 		}
 	}
 
-	void onStop() throws IOException {
-		try ( Closer<IOException> closer = new Closer<>() ) {
+	void onStop() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( BeanHolder::close, clientFactoryHolder ); // Just in case start() was not called
 			closer.push( ElasticsearchClientImplementor::close, clientImplementor );
 		}

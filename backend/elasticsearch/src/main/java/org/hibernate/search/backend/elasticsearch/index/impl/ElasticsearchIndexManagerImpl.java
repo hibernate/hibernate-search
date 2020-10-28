@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -138,12 +137,9 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 
 	@Override
 	public void stop() {
-		try ( Closer<IOException> closer = new Closer<>() ) {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( ElasticsearchBatchingWorkOrchestrator::stop, indexingOrchestrator );
 			schemaManager = null;
-		}
-		catch (IOException e) {
-			throw log.failedToShutdownIndexManager( model.hibernateSearchName(), e, backendContext.getEventContext() );
 		}
 	}
 

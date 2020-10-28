@@ -65,8 +65,8 @@ public final class Shard {
 		return indexingOrchestrator.preStop();
 	}
 
-	void stop() throws IOException {
-		try ( Closer<IOException> closer = new Closer<>() ) {
+	void stop() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( LuceneSerialWorkOrchestratorImpl::stop, indexingOrchestrator );
 			closer.push( LuceneParallelWorkOrchestratorImpl::stop, managementOrchestrator );
 			// Close the index writer after the orchestrators, when we're sure all works have been performed

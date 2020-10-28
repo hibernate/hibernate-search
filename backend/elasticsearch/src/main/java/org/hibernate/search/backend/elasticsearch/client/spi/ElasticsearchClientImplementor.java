@@ -6,11 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.client.spi;
 
-import java.io.Closeable;
-
 /**
  * An interface allowing to close an {@link ElasticsearchClient}.
  */
-public interface ElasticsearchClientImplementor extends ElasticsearchClient, Closeable {
+public interface ElasticsearchClientImplementor extends ElasticsearchClient, AutoCloseable {
+
+	@Override
+	void close();
 
 }
