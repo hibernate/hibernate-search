@@ -36,7 +36,7 @@ public interface SearchIndexingPlan {
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
 	 * @param providedRoutingKey The routing key to route the add request to the appropriate index shard.
 	 * Leave {@code null} if sharding is disabled
-	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge}.
+	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @param entity The entity to add to the index.
 	 */
 	void add(Object providedId, String providedRoutingKey, Object entity);
@@ -58,7 +58,7 @@ public interface SearchIndexingPlan {
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
 	 * @param providedRoutingKey The routing key to route the addOrUpdate request to the appropriate index shard.
 	 * Leave {@code null} if sharding is disabled
-	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge}.
+	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @param entity The entity to update in the index.
 	 */
 	void addOrUpdate(Object providedId, String providedRoutingKey, Object entity);
@@ -88,7 +88,7 @@ public interface SearchIndexingPlan {
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
 	 * @param providedRoutingKey The routing key to route the addOrUpdate request to the appropriate index shard.
 	 * Leave {@code null} if sharding is disabled
-	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge}.
+	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @param entity The entity to update in the index.
 	 * @param dirtyPaths The paths to consider dirty, formatted using the dot-notation
 	 * ("directEntityProperty.nestedPropery").
@@ -114,7 +114,7 @@ public interface SearchIndexingPlan {
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
 	 * @param providedRoutingKey The routing key to route the addOrUpdate request to the appropriate index shard.
 	 * Leave {@code null} if sharding is disabled
-	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge}.
+	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @param entity The entity to delete from the index.
 	 */
 	void delete(Object providedId, String providedRoutingKey, Object entity);
@@ -135,7 +135,7 @@ public interface SearchIndexingPlan {
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * @param providedRoutingKey The routing key to route the purge request to the appropriate index shard.
-	 * Leave {@code null} if sharding is disabled or if you don't use a custom {@link org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge}.
+	 * Leave {@code null} if sharding is disabled or if you don't use a custom {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @throws org.hibernate.search.util.common.SearchException If the entity type is not indexed directly
 	 * ({@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed}).
 	 */
