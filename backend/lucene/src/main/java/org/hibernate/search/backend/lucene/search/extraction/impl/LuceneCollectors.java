@@ -121,9 +121,8 @@ public class LuceneCollectors {
 
 		extractTopDocs( topDocsCollector, offset, limit );
 		if ( resultTotal == null ) {
-			resultTotal = ( TotalHits.Relation.EQUAL_TO.equals( topDocs.totalHits.relation ) ) ?
-					SimpleSearchResultTotal.exact( topDocs.totalHits.value ) :
-					SimpleSearchResultTotal.lowerBound( topDocs.totalHits.value );
+			boolean exact = TotalHits.Relation.EQUAL_TO.equals( topDocs.totalHits.relation );
+			resultTotal = SimpleSearchResultTotal.of( topDocs.totalHits.value, exact );
 		}
 		else if ( resultTotal.isHitCountExact() ) {
 			// Update the total hit count of the topDocs, which might not be precise enough,

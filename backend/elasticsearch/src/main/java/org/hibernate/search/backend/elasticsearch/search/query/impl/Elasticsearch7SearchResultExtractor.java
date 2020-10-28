@@ -110,9 +110,9 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 	protected SearchResultTotal extractTotal(JsonObject responseBody) {
 		Long hitsTotal = HITS_TOTAL_ACCESSOR.get( responseBody ).orElse( 0L );
 		Optional<String> hitsTotalRelation = HITS_TOTAL_RELATION_ACCESSOR.get( responseBody );
-
-		return ( hitsTotalRelation.isPresent() && HITS_TOTAL_RELATION_EXACT_VALUE.equals( hitsTotalRelation.get() ) ) ?
-				SimpleSearchResultTotal.exact( hitsTotal ) : SimpleSearchResultTotal.lowerBound( hitsTotal );
+		boolean exact = hitsTotalRelation.isPresent()
+				&& HITS_TOTAL_RELATION_EXACT_VALUE.equals( hitsTotalRelation.get() );
+		return SimpleSearchResultTotal.of( hitsTotal, exact );
 	}
 
 	private List<Object> extractHits(ElasticsearchSearchQueryExtractContext extractContext) {

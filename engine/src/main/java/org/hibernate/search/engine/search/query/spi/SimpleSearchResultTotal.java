@@ -16,12 +16,16 @@ public class SimpleSearchResultTotal implements SearchResultTotal {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	public static SimpleSearchResultTotal of(long totalHitCount, boolean isExact) {
+		return new SimpleSearchResultTotal( totalHitCount, isExact );
+	}
+
 	public static SimpleSearchResultTotal exact(long totalHitCount) {
-		return new SimpleSearchResultTotal( totalHitCount, true );
+		return of( totalHitCount, true );
 	}
 
 	public static SimpleSearchResultTotal lowerBound(long totalHitCount) {
-		return new SimpleSearchResultTotal( totalHitCount, false );
+		return of( totalHitCount, false );
 	}
 
 	private final long totalHitCount;

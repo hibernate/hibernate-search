@@ -28,13 +28,6 @@ public class SimpleSearchResult<H> implements SearchResult<H> {
 	private final Duration took;
 	private final boolean timedOut;
 
-	public SimpleSearchResult(boolean hitExact, long hitCount, List<H> hits,
-			Map<AggregationKey<?>, ?> aggregationResults, Duration took, Boolean timedOut) {
-		this( ( hitExact ) ? SimpleSearchResultTotal.exact( hitCount ) : SimpleSearchResultTotal.lowerBound( hitCount ),
-				hits, aggregationResults, took, timedOut
-		);
-	}
-
 	public SimpleSearchResult(SearchResultTotal resultTotal, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults,
 			Duration took, Boolean timedOut) {
 		this.resultTotal = resultTotal;
