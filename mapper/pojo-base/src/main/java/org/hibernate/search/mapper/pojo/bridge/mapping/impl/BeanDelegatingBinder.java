@@ -29,7 +29,6 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 @SuppressWarnings("deprecation")
 public final class BeanDelegatingBinder
 		implements TypeBinder, PropertyBinder, RoutingBinder,
-				org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder,
 				MarkerBinder, IdentifierBinder, ValueBinder {
 
 	private final BeanReference<?> delegateReference;
@@ -63,14 +62,6 @@ public final class BeanDelegatingBinder
 	public void bind(RoutingBindingContext context) {
 		try ( BeanHolder<? extends RoutingBinder> delegateHolder =
 				createDelegate( context.beanResolver(), RoutingBinder.class ) ) {
-			delegateHolder.get().bind( context );
-		}
-	}
-
-	@Override
-	public void bind(org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext context) {
-		try ( BeanHolder<? extends org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder> delegateHolder =
-				createDelegate( context.beanResolver(), org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder.class ) ) {
 			delegateHolder.get().bind( context );
 		}
 	}

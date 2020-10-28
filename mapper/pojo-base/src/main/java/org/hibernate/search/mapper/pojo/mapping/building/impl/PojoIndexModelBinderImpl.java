@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundTypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.DefaultIdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.PropertyBindingContextImpl;
-import org.hibernate.search.mapper.pojo.bridge.binding.impl.RoutingKeyBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.TypeBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.ValueBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BridgeResolver;
@@ -110,31 +109,6 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		);
 
 		return bindingContext.applyBinder( defaultedBinder );
-	}
-
-	@Override
-	@SuppressWarnings("deprecation")
-	public <T> org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingKeyBridge<T> bindRoutingKey(
-			IndexedEntityBindingContext indexedEntityBindingContext,
-			BoundPojoModelPathTypeNode<T> modelPath,
-			org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder binder) {
-		PojoModelTypeRootElement<T> pojoModelRootElement =
-				new PojoModelTypeRootElement<>( modelPath, introspector, typeAdditionalMetadataProvider );
-		PojoTypeIndexingDependencyConfigurationContextImpl<T> pojoDependencyContext =
-				new PojoTypeIndexingDependencyConfigurationContextImpl<>(
-						introspector,
-						extractorBinder,
-						typeAdditionalMetadataProvider,
-						modelPath.getTypeModel()
-				);
-		RoutingKeyBindingContextImpl<T> bindingContext = new RoutingKeyBindingContextImpl<>(
-				beanResolver,
-				indexedEntityBindingContext,
-				pojoModelRootElement,
-				pojoDependencyContext
-		);
-
-		return bindingContext.applyBinder( binder );
 	}
 
 	@Override

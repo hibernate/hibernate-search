@@ -62,12 +62,6 @@ public abstract class AbstractPojoIndexingProcessorTypeNodeBuilder<T, U> extends
 	}
 
 	@Override
-	@Deprecated
-	public void routingKeyBinder(org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder builder) {
-		identityMappingCollector.routingKeyBridge( getModelPath(), builder );
-	}
-
-	@Override
 	public PojoMappingCollectorPropertyNode property(String propertyName) {
 		// TODO HSEARCH-3318 also pass an access type ("default" if not mentioned by the user, method/field otherwise) and take it into account to retrieve the right property model/handle
 		return propertyNodeBuilders.computeIfAbsent( propertyName, this::createPropertyNodeBuilder );
