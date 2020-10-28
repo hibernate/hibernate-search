@@ -12,7 +12,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -39,11 +38,6 @@ import org.junit.experimental.categories.Category;
  */
 @Category(SkipOnElasticsearch.class) // This test is specific to the Lucene backend
 public class LuceneProjectionQueryTest extends SearchTestBase {
-
-	@Override
-	public void configure(Map<String,Object> cfg) {
-		cfg.put( "hibernate.search.default.directory_provider", "local-heap" );
-	}
 
 	@Before
 	@Override

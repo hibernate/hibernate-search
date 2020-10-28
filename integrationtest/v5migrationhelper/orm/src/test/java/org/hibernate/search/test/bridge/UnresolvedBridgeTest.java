@@ -25,7 +25,6 @@ public class UnresolvedBridgeTest {
 		for ( int i = 0; i < getAnnotatedClasses().length; i++ ) {
 			cfg.addAnnotatedClass( getAnnotatedClasses()[i] );
 		}
-		cfg.setProperty( "hibernate.search.default.directory_provider", "local-heap" );
 		try {
 			cfg.buildSessionFactory();
 			fail( "Undefined bridge went through" );
