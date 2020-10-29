@@ -23,18 +23,6 @@ public final class EngineSettings {
 	public static final String PREFIX = "hibernate.search.";
 
 	/**
-	 * The name of the default backend to use when none is defined in the index configuration.
-	 * <p>
-	 * Expects a String.
-	 * <p>
-	 * Defaults to no value, meaning a backend must be set in the mapping for every single index.
-	 * @deprecated The default backend shouldn't be assigned a name;
-	 * just prefix its properties with {@link #BACKEND} instead of {@link #BACKENDS} + a name.
-	 */
-	@Deprecated
-	public static final String DEFAULT_BACKEND = PREFIX + Radicals.DEFAULT_BACKEND;
-
-	/**
 	 * The root property for properties of the default backend, e.g. "hibernate.search.backend.type = elasticsearch".
 	 */
 	public static final String BACKEND = PREFIX + Radicals.BACKEND;
@@ -77,8 +65,6 @@ public final class EngineSettings {
 		private Radicals() {
 		}
 
-		@Deprecated
-		public static final String DEFAULT_BACKEND = "default_backend";
 		public static final String BACKEND = "backend";
 		public static final String BACKENDS = "backends";
 		public static final String CONFIGURATION_PROPERTY_CHECKING_STRATEGY = "configuration_property_checking.strategy";

@@ -96,8 +96,6 @@ public class IndexManagerBuildingStateHolderTest {
 		ArgumentCaptor<ConfigurationPropertySource> indexPropertySourceCapture =
 				ArgumentCaptor.forClass( ConfigurationPropertySource.class );
 
-		when( configurationSourceMock.get( "default_backend" ) )
-				.thenReturn( (Optional) Optional.empty() );
 		IndexManagerBuildingStateHolder holder =
 				new IndexManagerBuildingStateHolder( beanResolverMock, configurationSourceMock, rootBuildContextMock );
 		verifyNoOtherBackendInteractionsAndReset();
@@ -158,104 +156,12 @@ public class IndexManagerBuildingStateHolderTest {
 	}
 
 	@Test
-	public void defaultBackend_nameSet() {
-		ArgumentCaptor<ConfigurationPropertySource> backendPropertySourceCapture =
-				ArgumentCaptor.forClass( ConfigurationPropertySource.class );
-		ArgumentCaptor<ConfigurationPropertySource> indexPropertySourceCapture =
-				ArgumentCaptor.forClass( ConfigurationPropertySource.class );
-
-		logged.expectMessage(
-				"Using configuration property 'hibernate.search.default_backend' to set the name of the default backend to 'myBackend'.",
-				"This configuration property is deprecated and shouldn't be used anymore" );
-		when( configurationSourceMock.get( "default_backend" ) )
-				.thenReturn( (Optional) Optional.of( "myBackend" ) );
-		when( configurationSourceMock.resolve( "default_backend" ) )
-				.thenReturn( Optional.of( "hibernate.search.default_backend" ) );
-		IndexManagerBuildingStateHolder holder =
-				new IndexManagerBuildingStateHolder( beanResolverMock, configurationSourceMock, rootBuildContextMock );
-		verifyNoOtherBackendInteractionsAndReset();
-
-		when( configurationSourceMock.get( "backend.type" ) )
-				.thenReturn( (Optional) Optional.empty() );
-		when( configurationSourceMock.get( "backends.myBackend.type" ) )
-				.thenReturn( (Optional) Optional.of( "someBackendType" ) );
-		when( beanResolverMock.resolve( BackendFactory.class, "someBackendType" ) )
-				.thenReturn( BeanHolder.of( backendFactoryMock ) );
-		when( backendFactoryMock.create(
-				eq( EventContexts.fromBackendName( "myBackend" ) ),
-				any(),
-				backendPropertySourceCapture.capture()
-		) )
-				.thenReturn( backendMock );
-		holder.createBackends( CollectionHelper.asSet( Optional.empty() ) );
-		verifyNoOtherBackendInteractionsAndReset();
-
-		when( backendMock.createIndexManagerBuilder(
-				eq( "myIndex" ),
-				eq( "myType" ),
-				eq( false ),
-				any(),
-				indexPropertySourceCapture.capture()
-		) )
-				.thenReturn( indexManagerBuilderMock );
-		when( indexManagerBuilderMock.schemaRootNodeBuilder() )
-				.thenReturn( indexSchemaRootNodeBuilderMock );
-		holder.getIndexManagerBuildingState(
-				Optional.empty(), "myIndex", "myType", false
-		);
-		verifyNoOtherBackendInteractionsAndReset();
-
-		// Check that configuration property sources behave as expected
-		Optional result;
-
-		// Backend configuration - syntax "hibernate.search.backend.foo"
-		when( configurationSourceMock.get( "backend.foo" ) )
-				.thenReturn( (Optional) Optional.of( "bar" ) );
-		result = backendPropertySourceCapture.getValue().get( "foo" );
-		verifyNoOtherBackendInteractionsAndReset();
-		assertThat( result ).contains( "bar" );
-
-		// Backend configuration - syntax "hibernate.search.backends.myBackend.foo"
-		when( configurationSourceMock.get( "backend.foo" ) )
-				.thenReturn( (Optional) Optional.empty() );
-		when( configurationSourceMock.get( "backends.myBackend.foo" ) )
-				.thenReturn( (Optional) Optional.of( "bar" ) );
-		result = backendPropertySourceCapture.getValue().get( "foo" );
-		verifyNoOtherBackendInteractionsAndReset();
-		assertThat( result ).contains( "bar" );
-
-		// Index configuration
-		when( configurationSourceMock.get( "backend.indexes.myIndex.foo" ) )
-				.thenReturn( (Optional) Optional.empty() );
-		when( configurationSourceMock.get( "backends.myBackend.indexes.myIndex.foo" ) )
-				.thenReturn( (Optional) Optional.of( "bar" ) );
-		result = indexPropertySourceCapture.getValue().get( "foo" );
-		verifyNoOtherBackendInteractionsAndReset();
-		assertThat( result ).contains( "bar" );
-
-		// Index configuration defaults
-		when( configurationSourceMock.get( "backend.indexes.myIndex.foo" ) )
-				.thenReturn( (Optional) Optional.empty() );
-		when( configurationSourceMock.get( "backends.myBackend.indexes.myIndex.foo" ) )
-				.thenReturn( Optional.empty() );
-		when( configurationSourceMock.get( "backend.foo" ) )
-				.thenReturn( (Optional) Optional.empty() );
-		when( configurationSourceMock.get( "backends.myBackend.foo" ) )
-				.thenReturn( (Optional) Optional.of( "bar" ) );
-		result = indexPropertySourceCapture.getValue().get( "foo" );
-		verifyNoOtherBackendInteractionsAndReset();
-		assertThat( result ).contains( "bar" );
-	}
-
-	@Test
 	public void explicitBackend() {
 		ArgumentCaptor<ConfigurationPropertySource> backendPropertySourceCapture =
 				ArgumentCaptor.forClass( ConfigurationPropertySource.class );
 		ArgumentCaptor<ConfigurationPropertySource> indexPropertySourceCapture =
 				ArgumentCaptor.forClass( ConfigurationPropertySource.class );
 
-		when( configurationSourceMock.get( "default_backend" ) )
-				.thenReturn( (Optional) Optional.empty() );
 		IndexManagerBuildingStateHolder holder =
 				new IndexManagerBuildingStateHolder( beanResolverMock, configurationSourceMock, rootBuildContextMock );
 		verifyNoOtherBackendInteractionsAndReset();
@@ -328,8 +234,6 @@ public class IndexManagerBuildingStateHolderTest {
 
 		ArgumentCaptor<Throwable> throwableCaptor = ArgumentCaptor.forClass( Throwable.class );
 
-		when( configurationSourceMock.get( "default_backend" ) )
-				.thenReturn( (Optional) Optional.empty() );
 		IndexManagerBuildingStateHolder holder =
 				new IndexManagerBuildingStateHolder( beanResolverMock, configurationSourceMock, rootBuildContextMock );
 		verifyNoOtherBackendInteractionsAndReset();
@@ -361,8 +265,6 @@ public class IndexManagerBuildingStateHolderTest {
 
 		ArgumentCaptor<Throwable> throwableCaptor = ArgumentCaptor.forClass( Throwable.class );
 
-		when( configurationSourceMock.get( "default_backend" ) )
-				.thenReturn( (Optional) Optional.empty() );
 		IndexManagerBuildingStateHolder holder =
 				new IndexManagerBuildingStateHolder( beanResolverMock, configurationSourceMock, rootBuildContextMock );
 		verifyNoOtherBackendInteractionsAndReset();
