@@ -179,7 +179,7 @@
         <!-- Dependencies versions -->
 
         <version.org.hibernate>5.4.22.Final</version.org.hibernate>
-        <version.org.hibernate.commons.annotations>5.1.0.Final</version.org.hibernate.commons.annotations>
+        <version.org.hibernate.commons.annotations>5.1.1.Final</version.org.hibernate.commons.annotations>
         <version.javax.persistence>2.2</version.javax.persistence>
 
         <version.org.apache.lucene>5.5.5</version.org.apache.lucene>
