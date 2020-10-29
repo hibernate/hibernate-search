@@ -10,6 +10,13 @@ Alternatively, rely on the logs:
 <<troubleshooting-logging-query,`org.hibernate.search.query`>> will log every query at the `DEBUG` level
 before it is executed.
 
+For more general information about what is being executed, rely on loggers:
+
+* <<troubleshooting-logging-lucene-infostream,`org.hibernate.search.backend.lucene.infostream`>>
+for Lucene.
+* <<troubleshooting-logging-elasticsearch-request,`org.hibernate.search.elasticsearch.request`>>
+for Elasticsearch.
+
 [[troubleshooting-logging]]
 == Loggers
 
