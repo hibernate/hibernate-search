@@ -76,15 +76,6 @@ public final class EventContext {
 	}
 
 	/**
-	 * @return The elements of this context. Never empty, does not contain {@code null} values.
-	 * @deprecated Use {@link #elements()} instead.
-	 */
-	@Deprecated
-	public List<EventContextElement> getElements() {
-		return elements();
-	}
-
-	/**
 	 * @return A human-readable representation of this context.
 	 * This representation may change without prior notice in new versions of Hibernate Search:
 	 * callers should not try to parse it.

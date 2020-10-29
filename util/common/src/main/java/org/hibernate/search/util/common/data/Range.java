@@ -201,30 +201,11 @@ public final class Range<T> {
 	}
 
 	/**
-	 * @return The value of the lower bound, or an empty optional to represent {-Infinity} (no lower bound).
-	 * @deprecated Use {@link #lowerBoundValue()} instead.
-	 */
-	@Deprecated
-	public Optional<T> getLowerBoundValue() {
-		return lowerBoundValue();
-	}
-
-	/**
 	 * @return Whether the lower bound is included in the range or excluded.
 	 * Always {@link RangeBoundInclusion#EXCLUDED} if there is no lower bound.
 	 */
 	public RangeBoundInclusion lowerBoundInclusion() {
 		return lowerBoundInclusion;
-	}
-
-	/**
-	 * @return Whether the lower bound is included in the range or excluded.
-	 * Always {@link RangeBoundInclusion#EXCLUDED} if there is no lower bound.
-	 * @deprecated Use {@link #lowerBoundInclusion()} instead.
-	 */
-	@Deprecated
-	public RangeBoundInclusion getLowerBoundInclusion() {
-		return lowerBoundInclusion();
 	}
 
 	/**
@@ -235,30 +216,11 @@ public final class Range<T> {
 	}
 
 	/**
-	 * @return The value of the lower bound, or an empty optional to represent {+Infinity} (no upper bound).
-	 * @deprecated Use {@link #upperBoundValue()} instead.
-	 */
-	@Deprecated
-	public Optional<T> getUpperBoundValue() {
-		return upperBoundValue();
-	}
-
-	/**
 	 * @return Whether the upper bound is included in the range or excluded.
 	 * Always {@link RangeBoundInclusion#EXCLUDED} if there is no upper bound.
 	 */
 	public RangeBoundInclusion upperBoundInclusion() {
 		return upperBoundInclusion;
-	}
-
-	/**
-	 * @return Whether the upper bound is included in the range or excluded.
-	 * Always {@link RangeBoundInclusion#EXCLUDED} if there is no upper bound.
-	 * @deprecated Use {@link #upperBoundInclusion()} instead.
-	 */
-	@Deprecated
-	public RangeBoundInclusion getUpperBoundInclusion() {
-		return upperBoundInclusion();
 	}
 
 	public <R> Range<R> map(Function<? super T, ? extends R> function) {
