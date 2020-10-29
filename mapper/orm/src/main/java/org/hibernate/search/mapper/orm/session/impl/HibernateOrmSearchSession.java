@@ -24,9 +24,6 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.common.EntityReference;
@@ -136,39 +133,18 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	}
 
 	@Override
-	public <T> SearchQuerySelectStep<
-			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>,
-			EntityReference,
-			T,
-			SearchLoadingOptionsStep,
-			SearchProjectionFactory<EntityReference, T>,
-			SearchPredicateFactory
-			> search(
+	public <T> SearchQuerySelectStep<?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
 			Collection<? extends Class<? extends T>> types) {
 		return search( scope( types ) );
 	}
 
 	@Override
-	public <T> SearchQuerySelectStep<
-			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>,
-			EntityReference,
-			T,
-			SearchLoadingOptionsStep,
-			SearchProjectionFactory<EntityReference, T>,
-			SearchPredicateFactory
-			> search(
+	public <T> SearchQuerySelectStep<?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
 			SearchScope<T> scope) {
 		return search( (SearchScopeImpl<T>) scope );
 	}
 
-	private <T> SearchQuerySelectStep<
-			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>,
-			EntityReference,
-			T,
-			SearchLoadingOptionsStep,
-			SearchProjectionFactory<EntityReference, T>,
-			SearchPredicateFactory
-			> search(
+	public <T> SearchQuerySelectStep<?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
 			SearchScopeImpl<T> scope) {
 		return scope.search( this );
 	}
