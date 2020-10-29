@@ -969,10 +969,11 @@ Generally for faster indexing performance it's best to use this setting rather t
 
 When used together with `max_buffered_docs` a flush occurs for whichever event happens first.
 
-|`[...].io.writer.infostream`
+|[[backend-lucene-io-writer-infostream]]`[...].io.writer.infostream`
 |Enables low level trace information about Lucene's internal components; `true` or `false`.
 
-Logs will be appended to the logger `org.hibernate.search.backend.lucene.infostream` at the TRACE level.
+Logs will be appended to the logger
+<<troubleshooting-logging-lucene-infostream,`org.hibernate.search.backend.lucene.infostream`>> at the `TRACE` level.
 
 This may cause significant performance degradation, even if the logger ignores the TRACE level,
 so this should only be used for troubleshooting purposes.
