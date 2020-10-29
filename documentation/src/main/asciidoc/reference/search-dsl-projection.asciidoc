@@ -352,14 +352,10 @@ are all added to same returned document.
 [[search-dsl-projection-extensions-lucene-explanation]]
 === Lucene: `explanation`
 
-The `.explanation()` projection returns an <<search-dsl-projection-extensions-lucene-explanation,explanation>>
+The `.explanation()` projection returns an <<troubleshooting-faq-search-score,explanation>>
 of the match as a native Lucene `Explanation`.
 
-[WARNING]
-====
-Explanations are rather costly performance-wise:
-only use them for <<search-dsl-query-debugging-scores,debugging>> purposes.
-====
+include::components/explanation-warning.asciidoc[]
 
 include::components/lucene-api-warning.asciidoc[]
 
@@ -390,14 +386,10 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Elasti
 [[search-dsl-projection-extensions-elasticsearch-explanation]]
 === Elasticsearch: `explanation`
 
-The `.explanation()` projection returns an <<search-dsl-projection-extensions-elasticsearch-explanation,explanation>>
+The `.explanation()` projection returns an <<troubleshooting-faq-search-score,explanation>>
 of the match as a `JsonObject`.
 
-[WARNING]
-====
-Explanations are rather costly performance-wise:
-only use them for <<search-dsl-query-debugging-scores,debugging>> purposes.
-====
+include::components/explanation-warning.asciidoc[]
 
 include::components/elasticsearch-json-warning.asciidoc[]
 

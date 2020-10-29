@@ -642,7 +642,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.
 
 This query object supports all <<search-dsl-query-fetching-results,`fetch*` methods supported by the query DSL>>.
 The main advantage over calling these methods directly at the end of a query definition
-is mostly related to debugging (see <<search-dsl-query-debugging>>),
+is mostly related to <<troubleshooting,troubleshooting>>,
 but the query object can also be useful if you need an adapter to another API.
 
 Hibernate Search provides an adapter to JPA and Hibernate ORM's native APIs,
@@ -692,53 +692,17 @@ Use <<search-dsl-projection-composite,composite projections>> instead.
 * And more: this list is not exhaustive.
 ====
 
-[[search-dsl-query-debugging]]
-== Debugging a query
+[[search-dsl-query-explain]]
+== `explain(...)`: Explaining scores
 
-[[search-dsl-query-debugging-matches]]
-=== Explaining matches
-
-When some documents unexpectedly match or don't match,
-you will need information about the exact query being executed,
-and about the index content.
-
-To gain insight about what ends up being executed exactly,
-one option is to <<search-dsl-query-object,create a `SearchQuery` object>>
+In order to <<troubleshooting-faq-search-score,explain the score>> of a particular document,
+<<search-dsl-query-object,create a `SearchQuery` object>>
 using `toQuery()` at the end of the query definition,
-then call `toString()` to get a String representation of that query.
+and then use one of the backend-specific `explain(...)` methods;
+the result of these methods will include a human-readable description of
+how the score of a specific document was computed.
 
-Another option is to take advantage of logs:
-all executed search queries are logged to the log category `org.hibernate.search.query`
-at the `DEBUG` level.
-
-You may also need to inspect the content of the index.
-This is rather obvious with Elasticsearch: run simpler queries using either Hibernate Search or the REST APIs directly.
-For the Lucene backend,
-https://medium.com/@mocobeta/luke-become-an-apache-lucene-module-as-of-lucene-8-1-7d139c998b2[use the Luke tool]
-distributed as part of the https://lucene.apache.org/core/downloads.html[Lucene binary packages].
-
-[[search-dsl-query-debugging-scores]]
-=== Explaining scores
-// Search 5 anchors backward compatibility
-[[_understanding_results]]
-
-When the score of some documents is higher or lower than expected,
-the best way to gain insight is to <<search-dsl-query-object,create a `SearchQuery` object>>
-using `toQuery()` at the end of the query definition,
-and then use the backend-specific `explain` methods;
-the result of these methods will explain how the score of a specific document was computed.
-See below for examples.
-
-To retrieve an explanation for all matches in one call,
-`explanation` projections are available:
-see <<search-dsl-projection-extensions-lucene-explanation,here for Lucene>>
-and <<search-dsl-projection-extensions-elasticsearch-explanation,here for Elasticsearch>>.
-
-[WARNING]
-====
-Regardless of the API used, explanations are rather costly performance-wise:
-only use them for debugging purposes.
-====
+include::components/explanation-warning.asciidoc[]
 
 .Retrieving score explanation -- Lucene
 ====
@@ -773,8 +737,10 @@ but also by the name of its type.
 you can instead use the Elasticsearch extension on the `SearchQuery` to convert it after its creation.
 ====
 
+[[search-dsl-query-took-timedout]]
+== `took` and `timedOut`: finding out how long the query took
+// Legacy anchors backward compatibility
 [[search-dsl-query-debugging-took-timedout]]
-=== Query metadata in SearchResult: `took` and `timedOut`
 
 .Returning query execution time and whether a timeout occurred
 ====

@@ -1,0 +1,5 @@
+[WARNING]
+====
+Regardless of the API used, explanations are rather costly performance-wise:
+only use them for debugging purposes.
+====
