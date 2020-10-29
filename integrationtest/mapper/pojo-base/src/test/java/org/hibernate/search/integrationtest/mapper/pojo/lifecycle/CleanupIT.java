@@ -49,7 +49,6 @@ import org.junit.Test;
 /**
  * Test that all resources are closed as expected upon shutdown, or when startup fails.
  */
-@SuppressWarnings("deprecation")
 public class CleanupIT {
 	private static final StartupStubBridge.CounterKeys IDENTIFIER_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
 	private static final StartupStubBridge.CounterKeys ROUTING_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();

@@ -36,7 +36,6 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-@SuppressWarnings("deprecation")
 public class EntityWriter extends AbstractItemWriter {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
