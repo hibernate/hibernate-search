@@ -7,6 +7,7 @@
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -15,48 +16,62 @@ import javax.persistence.EntityTransaction;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.search.util.common.impl.Closer;
 
 public final class OrmUtils {
 
 	private OrmUtils() {
 	}
 
+	public static PersistenceRunner<EntityManager, EntityTransaction> with(EntityManagerFactory entityManagerFactory) {
+		return new JPAPersistenceRunner( entityManagerFactory );
+	}
+
+	public static PersistenceRunner<Session, Transaction> with(SessionFactory sessionFactory) {
+		return new NativePersistenceRunner( sessionFactory );
+	}
+
 	public static void withinSession(SessionFactory sessionFactory, Consumer<? super Session> action) {
-		try ( Session session = sessionFactory.openSession() ) {
-			action.accept( session );
-		}
+		with( sessionFactory ).runNoTransaction( action );
 	}
 
 	public static void withinEntityManager(EntityManagerFactory entityManagerFactory, Consumer<EntityManager> action) {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( action::accept, entityManager );
-			closer.push( EntityManager::close, entityManager );
-		}
+		with( entityManagerFactory ).runNoTransaction( action );
 	}
 
-	public static void withinTransaction(SessionFactory entityManagerFactory, Consumer<Session> action) {
-		withinSession(
-				entityManagerFactory,
-				entityManager -> withinTransaction( entityManager, tx -> action.accept( entityManager ) )
-		);
+	public static void withinTransaction(SessionFactory sessionFactory, Consumer<Session> action) {
+		with( sessionFactory ).run( action );
 	}
 
 	public static void withinJPATransaction(EntityManagerFactory entityManagerFactory, Consumer<EntityManager> action) {
-		withinEntityManager(
-				entityManagerFactory,
-				entityManager -> withinJPATransaction( entityManager, tx -> action.accept( entityManager ) )
-		);
+		with( entityManagerFactory ).run( action );
 	}
 
 	public static void withinTransaction(Session session, Consumer<Transaction> action) {
-		Transaction tx = session.beginTransaction();
-		try {
+		withinTransaction( session, tx -> {
 			action.accept( tx );
+			return null;
+		} );
+	}
+
+	public static void withinJPATransaction(EntityManager entityManager, Consumer<EntityTransaction> action) {
+		withinJPATransaction( entityManager, tx -> {
+			action.accept( tx );
+			return null;
+		} );
+	}
+
+	public static <R> R withinTransaction(Session session, Function<Transaction, R> action) {
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			R result = action.apply( tx );
 			tx.commit();
+			return result;
 		}
 		catch (Throwable t) {
+			if ( tx == null ) {
+				throw t;
+			}
 			try {
 				tx.rollback();
 			}
@@ -73,14 +88,19 @@ public final class OrmUtils {
 		}
 	}
 
-	public static void withinJPATransaction(EntityManager entityManager, Consumer<EntityTransaction> action) {
-		EntityTransaction tx = entityManager.getTransaction();
-		tx.begin();
+	public static <R> R withinJPATransaction(EntityManager entityManager, Function<EntityTransaction, R> action) {
+		EntityTransaction tx = null;
 		try {
-			action.accept( tx );
+			tx = entityManager.getTransaction();
+			tx.begin();
+			R result = action.apply( tx );
 			tx.commit();
+			return result;
 		}
 		catch (Throwable t) {
+			if ( tx == null ) {
+				throw t;
+			}
 			try {
 				tx.rollback();
 			}
