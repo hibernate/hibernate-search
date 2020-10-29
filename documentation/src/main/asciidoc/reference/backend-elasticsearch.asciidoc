@@ -287,7 +287,7 @@ This can be helpful while developing, in particular.
 [[elasticsearch-log-json-pretty-printing]]
 
 The `hibernate.search.backend.log.json_pretty_printing` <<configuration-property-types,boolean property>>
-defines whether JSON included in logs should be pretty-printed (indented, with line breaks).
+defines whether JSON included in <<troubleshooting-logging,logs>> should be pretty-printed (indented, with line breaks).
 It defaults to `false`.
 
 [[backend-elasticsearch-configuration-sharding]]

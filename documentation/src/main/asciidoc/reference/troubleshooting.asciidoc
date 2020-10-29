@@ -19,6 +19,15 @@ Here are a few loggers that can be useful when debugging an application that use
 Available for all backends.
 +
 Logs every single search query at the `DEBUG` level, before its execution.
+[[troubleshooting-logging-elasticsearch-request]]`org.hibernate.search.elasticsearch.request`::
+Available for Elasticsearch backends only.
++
+Logs every single request sent to Elasticsearch at the `DEBUG` or `TRACE` level after its execution.
+Use the `DEBUG` level for compact information (method, path, execution time, status code, ...),
+or the `TRACE` level to also get the full request and response.
++
+You can enable pretty-printing (line breaks and indentation) for the request and response
+using a <<backend-elasticsearch-configuration-logging,configuration property>>.
 
 [[troubleshooting-faq]]
 == Frequently asked questions
