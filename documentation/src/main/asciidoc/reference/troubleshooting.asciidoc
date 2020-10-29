@@ -28,6 +28,13 @@ or the `TRACE` level to also get the full request and response.
 +
 You can enable pretty-printing (line breaks and indentation) for the request and response
 using a <<backend-elasticsearch-configuration-logging,configuration property>>.
+[[troubleshooting-logging-lucene-infostream]]`org.hibernate.search.backend.lucene.infostream`::
+Available for Lucene backends only.
++
+Logs low level trace information about Lucene's internal components, at the `TRACE` level.
++
+Enabling the `TRACE` level on this logger is not enough:
+you must also enable the infostream using a <<backend-lucene-io-writer-infostream,configuration property>>.
 
 [[troubleshooting-faq]]
 == Frequently asked questions
