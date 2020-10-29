@@ -6,18 +6,13 @@
  */
 package org.hibernate.search.engine.cfg.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.BackendSettings;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.EngineSettings;
-import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 
 public final class EngineConfigurationUtils {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private EngineConfigurationUtils() {
 	}
