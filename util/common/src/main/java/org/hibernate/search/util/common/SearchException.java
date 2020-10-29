@@ -48,27 +48,9 @@ public class SearchException extends RuntimeException {
 	}
 
 	/**
-	 * @deprecated Use {@link #messageWithoutContext} instead.
-	 * @return The exception message, without the description of the context.
-	 */
-	@Deprecated
-	public String getMessageWithoutContext() {
-		return messageWithoutContext();
-	}
-
-	/**
 	 * @return The context in which this exception occurred.
 	 */
 	public EventContext context() {
 		return context;
-	}
-
-	/**
-	 * @deprecated Use {@link #context} instead.
-	 * @return The context in which this exception occurred.
-	 */
-	@Deprecated
-	public EventContext getContext() {
-		return context();
 	}
 }
