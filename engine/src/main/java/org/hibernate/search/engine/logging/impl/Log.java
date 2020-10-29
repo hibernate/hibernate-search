@@ -299,15 +299,6 @@ public interface Log extends BasicLogger {
 					+ " Obsolete properties: %1$s.")
 	SearchException obsoleteConfigurationPropertiesFromSearch5(Set<String> propertyKeys);
 
-	@LogMessage(level = Logger.Level.WARN)
-	@Message(id = ID_OFFSET_2 + 74,
-			value = "Using configuration property '%1$s' to set the name of the default backend to '%2$s'."
-					+ " This configuration property is deprecated and shouldn't be used anymore."
-					+ " Instead, do not assign a name your default backend"
-					+ " and configure it using the 'hibernate.search.backend' prefix,"
-					+ " e.g. hibernate.search.backend.type = elasticsearch.")
-	void deprecatedExplicitDefaultBackendName(String propertyKey, String explicitDefaultBackendName);
-
 	@Message(id = ID_OFFSET_2 + 75, value = "No default backend registered.")
 	SearchException noDefaultBackendRegistered();
 

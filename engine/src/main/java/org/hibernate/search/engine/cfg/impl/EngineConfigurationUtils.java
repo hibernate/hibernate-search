@@ -17,20 +17,9 @@ public final class EngineConfigurationUtils {
 	private EngineConfigurationUtils() {
 	}
 
-	public static ConfigurationPropertySourceExtractor extractorForBackend(Optional<String> backendNameOptional,
-			String defaultBackendName) {
+	public static ConfigurationPropertySourceExtractor extractorForBackend(Optional<String> backendNameOptional) {
 		if ( !backendNameOptional.isPresent() ) {
-			if ( defaultBackendName == null ) {
-				return engineSource -> engineSource.withMask( EngineSettings.Radicals.BACKEND );
-			}
-			else {
-				return engineSource -> engineSource.withMask( EngineSettings.Radicals.BACKEND )
-						// Fall back to the syntax "hibernate.search.backends.<defaultBackendName>>.foo".
-						// Mostly supported for consistency and backward compatibility.
-						// We'll drop this when we remove the ability to assign a name to the default backend.
-						.withFallback( engineSource.withMask( EngineSettings.Radicals.BACKENDS )
-								.withMask( defaultBackendName ) );
-			}
+			return engineSource -> engineSource.withMask( EngineSettings.Radicals.BACKEND );
 		}
 		else {
 			return engineSource -> engineSource.withMask( EngineSettings.Radicals.BACKENDS )

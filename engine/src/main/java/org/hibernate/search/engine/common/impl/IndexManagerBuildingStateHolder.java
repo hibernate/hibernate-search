@@ -19,7 +19,6 @@ import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.BackendSettings;
-import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.impl.ConfigurationPropertySourceExtractor;
 import org.hibernate.search.engine.cfg.impl.EngineConfigurationUtils;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -41,10 +40,6 @@ class IndexManagerBuildingStateHolder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	@SuppressWarnings("deprecation")
-	private static final OptionalConfigurationProperty<String> EXPLICIT_DEFAULT_BACKEND_NAME =
-			ConfigurationProperty.forKey( EngineSettings.Radicals.DEFAULT_BACKEND ).asString().build();
-
 	private static final OptionalConfigurationProperty<BeanReference<? extends BackendFactory>> BACKEND_TYPE =
 			ConfigurationProperty.forKey( BackendSettings.TYPE ).asBeanReference( BackendFactory.class )
 					.build();
@@ -52,8 +47,6 @@ class IndexManagerBuildingStateHolder {
 	private final BeanResolver beanResolver;
 	private final ConfigurationPropertySource propertySource;
 	private final RootBuildContext rootBuildContext;
-
-	private final String defaultBackendName;
 
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, BackendInitialBuildState> backendBuildStateByName = new LinkedHashMap<>();
@@ -65,20 +58,11 @@ class IndexManagerBuildingStateHolder {
 		this.beanResolver = beanResolver;
 		this.propertySource = propertySource;
 		this.rootBuildContext = rootBuildContext;
-		Optional<String> explicitDefaultBackendName = EXPLICIT_DEFAULT_BACKEND_NAME.get( propertySource );
-		if ( explicitDefaultBackendName.isPresent() ) {
-			defaultBackendName = explicitDefaultBackendName.get();
-			log.deprecatedExplicitDefaultBackendName( EXPLICIT_DEFAULT_BACKEND_NAME.resolveOrRaw( propertySource ),
-					defaultBackendName );
-		}
-		else {
-			defaultBackendName = null;
-		}
 	}
 
 	void createBackends(Set<Optional<String>> backendNames) {
 		for ( Optional<String> backendNameOptional : backendNames ) {
-			String backendName = backendNameOptional.orElse( defaultBackendName );
+			String backendName = backendNameOptional.orElse( null );
 			EventContext eventContext = EventContexts.fromBackendName( backendName );
 			BackendInitialBuildState backendBuildState;
 			try {
@@ -94,7 +78,7 @@ class IndexManagerBuildingStateHolder {
 
 	IndexManagerBuildingState getIndexManagerBuildingState(Optional<String> backendName, String indexName,
 			String mappedTypeName, boolean multiTenancyEnabled) {
-		return getBackend( backendName.orElse( defaultBackendName ) )
+		return getBackend( backendName.orElse( null ) )
 				.createIndexManagerBuildingState( indexName, mappedTypeName, multiTenancyEnabled );
 	}
 
@@ -134,7 +118,7 @@ class IndexManagerBuildingStateHolder {
 
 	private BackendInitialBuildState createBackend(Optional<String> backendNameOptional, EventContext eventContext) {
 		ConfigurationPropertySourceExtractor backendPropertySourceExtractor =
-				EngineConfigurationUtils.extractorForBackend( backendNameOptional, defaultBackendName );
+				EngineConfigurationUtils.extractorForBackend( backendNameOptional );
 		ConfigurationPropertySource backendPropertySource = backendPropertySourceExtractor.extract( propertySource );
 		try ( BeanHolder<? extends BackendFactory> backendFactoryHolder =
 				BACKEND_TYPE.<BeanHolder<? extends BackendFactory>>getAndMap( backendPropertySource, beanResolver::resolve )
