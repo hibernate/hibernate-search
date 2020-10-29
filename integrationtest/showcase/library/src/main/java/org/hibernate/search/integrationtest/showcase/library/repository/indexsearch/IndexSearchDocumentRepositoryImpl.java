@@ -156,5 +156,6 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 		SearchWorkspace workspace = Search.session( entityManager ).workspace( Document.class );
 		workspace.purge();
 		workspace.flush();
+		workspace.refresh();
 	}
 }
