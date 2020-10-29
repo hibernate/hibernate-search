@@ -21,6 +21,8 @@ include::concepts.asciidoc[]
 
 include::architecture.asciidoc[]
 
+include::limitations.asciidoc[]
+
 include::configuration.asciidoc[]
 
 include::mapper-orm-mapping.asciidoc[]

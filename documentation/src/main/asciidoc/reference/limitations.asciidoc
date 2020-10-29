@@ -1,0 +1,79 @@
+[[limitations]]
+= Limitations
+// Search 5 anchors backward compatibility
+[[elasticsearch-limitations]]
+
+[[limitations-parallel-embedded-update]]
+== In rare cases, automatic indexing involving `@IndexedEmbedded` may lead to out-of sync indexes
+
+=== Description
+
+If two entity instances are <<mapper-orm-indexedembedded,indexed-embedded>> in the same "index-embedding" entity,
+and these two entity instance are updated in parallel transactions,
+there is a small risk that the transaction commits happen in just the wrong way,
+leading to the index-embedding entity being reindexed with only part of the updates.
+
+For example, consider indexed entity A, which index-embeds B and C.
+The following course of events involving two parallel transactions (T1 and T2)
+will lead to an out of date index:
+
+* T1: Load B.
+* T1: Change B in a way that will require reindexing A.
+* T2: Load C.
+* T2: Change C in a way that will require reindexing A.
+* T2: Request the transaction commit.
+  Hibernate Search builds the document for A.
+  While doing so, it automatically loads B. B appears unmodified, as T1 wasn't committed yet.
+* T1: Request the transaction commit.
+  Hibernate Search builds documents to index.
+  While doing so, it automatically loads C. C appears unmodified, as T2 wasn't committed yet.
+* T1: Transaction is committed.
+  Hibernate Search automatically sends the updated A to the index.
+  In this version, B is updated, but C is not.
+* T2: Transaction is committed.
+  Hibernate Search automatically sends the updated A to the index.
+  In this version, C is updated, but B is not.
+
+This chain of events ends with the index containing a version of A where C is updated, but B is not.
+
+=== Workaround
+
+The following solutions can help circumvent this limitation:
+
+1. Avoid parallel updates to entities that are indexed-embedded in the same indexed entity.
+This is only possible in very specific setups.
+2. OR schedule a <<mapper-orm-indexing-massindexer,full reindexing>> of your database periodically (e.g. every night)
+to get the index back in sync with the database.
+
+=== Roadmap
+
+This problem cannot be solved using
+link:{elasticsearchDocUrl}/optimistic-concurrency-control.html[Elasticsearch's optimistic concurrency control]:
+when two conflicting versions of the same documents are created due to this issue,
+neither version is completely right.
+
+We plan to address this limitation in Hibernate Search 6.1 by offering fully asynchronous indexing,
+from entity loading to index updates.
+To track progress of this feature, see https://hibernate.atlassian.net/browse/HSEARCH-3281[HSEARCH-3281].
+
+In short, entities will no longer be indexed directly in the ORM session where the entity change occurred.
+Instead, "change events" will be sent to a queue, then consumed by a background process,
+which will load the entity from a separate session and perform the indexing.
+
+As long as events are sent to the queue after the original transaction is committed,
+and background indexing processes avoid concurrent reindexing of the same entity,
+the limitation will no longer apply:
+indexing will always get data from the latest committed state of the database,
+and out-of-date documents will never "overwrite" up-to-date documents.
+
+This feature will be opt-in, as it has both upsides and downsides.
+
+Upsides::
+* It will provide opportunities for scaling out indexing,
+  by sharding the event queue and distributing the process across multiple nodes.
+* It may even clear the way for new features such as https://hibernate.atlassian.net/browse/HSEARCH-1937[HSEARCH-1937].
+Downsides::
+* It may require additional infrastructure to store the indexing queue.
+However, we intend to provide a basic solution relying on the database exclusively.
+* It will most likely prevent any form of <<mapper-orm-indexing-automatic-synchronization,synchronous indexing>>
+(waiting for indexing to finish before releasing the application thread).
