@@ -13,9 +13,6 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
@@ -46,27 +43,13 @@ public class LazyInitSearchSession implements SearchSession {
 	}
 
 	@Override
-	public <T> SearchQuerySelectStep<
-			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>,
-			EntityReference,
-			T,
-			SearchLoadingOptionsStep,
-			SearchProjectionFactory<EntityReference, T>,
-			SearchPredicateFactory
-			> search(
+	public <T> SearchQuerySelectStep<?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
 			Collection<? extends Class<? extends T>> types) {
 		return getDelegate().search( types );
 	}
 
 	@Override
-	public <T> SearchQuerySelectStep<
-			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>,
-			EntityReference,
-			T,
-			SearchLoadingOptionsStep,
-			SearchProjectionFactory<EntityReference, T>,
-			SearchPredicateFactory
-			> search(
+	public <T> SearchQuerySelectStep<?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
 			SearchScope<T> scope) {
 		return getDelegate().search( scope );
 	}

@@ -12,7 +12,6 @@ import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionCon
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
@@ -41,14 +40,8 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 		this.delegate = delegate;
 	}
 
-	public SearchQuerySelectStep<
-			SearchQueryOptionsStep<?, E, SearchLoadingOptionsStep, ?, ?>,
-			EntityReference,
-			E,
-			SearchLoadingOptionsStep,
-			SearchProjectionFactory<EntityReference, E>,
-			SearchPredicateFactory
-			> search(HibernateOrmScopeSessionContext sessionContext) {
+	public SearchQuerySelectStep<?, EntityReference, E, SearchLoadingOptionsStep, ?, ?> search(
+			HibernateOrmScopeSessionContext sessionContext) {
 		HibernateOrmLoadingContext.Builder<E> loadingContextBuilder = new HibernateOrmLoadingContext.Builder<>(
 				mappingContext, sessionContext, delegate.includedIndexedTypes()
 		);

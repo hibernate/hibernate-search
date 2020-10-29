@@ -14,9 +14,6 @@ import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.common.EntityReference;
@@ -39,15 +36,7 @@ public interface SearchSession {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	default <T> SearchQuerySelectStep<
-			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>,
-			EntityReference,
-			T,
-			SearchLoadingOptionsStep,
-			SearchProjectionFactory<EntityReference, T>,
-			SearchPredicateFactory
-			> search(
-			Class<T> type) {
+	default <T> SearchQuerySelectStep<?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(Class<T> type) {
 		return search( Collections.singleton( type ) );
 	}
 
@@ -61,14 +50,7 @@ public interface SearchSession {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	<T> SearchQuerySelectStep<
-			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>,
-			EntityReference,
-			T,
-			SearchLoadingOptionsStep,
-			SearchProjectionFactory<EntityReference, T>,
-			SearchPredicateFactory
-			> search(
+	<T> SearchQuerySelectStep<?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
 			Collection<? extends Class<? extends T>> types);
 
 	/**
@@ -81,15 +63,7 @@ public interface SearchSession {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQuerySelectStep
 	 */
-	<T> SearchQuerySelectStep<
-			SearchQueryOptionsStep<?, T, SearchLoadingOptionsStep, ?, ?>,
-			EntityReference,
-			T,
-			SearchLoadingOptionsStep,
-			SearchProjectionFactory<EntityReference, T>,
-			SearchPredicateFactory
-			> search(
-			SearchScope<T> scope);
+	<T> SearchQuerySelectStep<?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(SearchScope<T> scope);
 
 	/**
 	 * Create a {@link SearchSchemaManager} for all indexes.
