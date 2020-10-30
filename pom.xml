@@ -2148,30 +2148,6 @@
             </build>
         </profile>
 
-        <!--
-            A profile for debugging the jqassistant rules.
-            This is only necessary because we have to use extensions in the jqassistant profile (above),
-            and extensions seem to mess with explicit use of the jqassistant:server goal,
-            which doesn't work anymore.
-            So this profile just enables jqassistant, but without extensions.
-        -->
-        <profile>
-            <id>jqassistant-server</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.buschmais.jqassistant</groupId>
-                        <artifactId>jqassistant-maven-plugin</artifactId>
-                        <version>${version.com.buschmais.jqassistant.plugin}</version>
-                        <!--
-                             Do NOT enable extensions.
-                         -->
-                        <extensions>false</extensions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
         <profile>
             <id>owasp</id>
             <build>
