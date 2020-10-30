@@ -115,7 +115,7 @@ public class MassIndexingInterruptionIT {
 				+ 1; // Entity loading
 
 		MassIndexer massIndexer = prepareMassIndexingThatWillNotTerminate();
-		CompletableFuture<?> future = massIndexer.start();
+		CompletableFuture<?> future = massIndexer.start().toCompletableFuture();
 
 		waitForMassIndexingThreadsToSpawn( expectedThreadCount );
 

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.javabean.work;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 /**
  * An interface for indexing entities in the context of a session.
@@ -25,9 +25,9 @@ public interface SearchIndexer {
 	 * Shorthand for {@code add(null, null)}; see {@link #add(Object, String, Object)}.
 	 *
 	 * @param entity The entity to add to the index.
-	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 */
-	default CompletableFuture<?> add(Object entity) {
+	default CompletionStage<?> add(Object entity) {
 		return add( null, null, entity );
 	}
 
@@ -42,9 +42,9 @@ public interface SearchIndexer {
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
 	 * @param entity The entity to add to the index.
-	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 */
-	default CompletableFuture<?> add(Object providedId, Object entity) {
+	default CompletionStage<?> add(Object providedId, Object entity) {
 		return add( providedId, null, entity );
 	}
 
@@ -63,9 +63,9 @@ public interface SearchIndexer {
 	 * Leave {@code null} if sharding is disabled
 	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @param entity The entity to add to the index.
-	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 */
-	CompletableFuture<?> add(Object providedId, String providedRoutingKey, Object entity);
+	CompletionStage<?> add(Object providedId, String providedRoutingKey, Object entity);
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index.
@@ -75,9 +75,9 @@ public interface SearchIndexer {
 	 * Shorthand for {@code addOrUpdate(null, null, entity)}; see {@link #addOrUpdate(Object, String, Object)}.
 	 *
 	 * @param entity The entity to add to the index.
-	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 */
-	default CompletableFuture<?> addOrUpdate(Object entity) {
+	default CompletionStage<?> addOrUpdate(Object entity) {
 		return addOrUpdate( null, null, entity );
 	}
 
@@ -92,9 +92,9 @@ public interface SearchIndexer {
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
 	 * @param entity The entity to update in the index.
-	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 */
-	default CompletableFuture<?> addOrUpdate(Object providedId, Object entity) {
+	default CompletionStage<?> addOrUpdate(Object providedId, Object entity) {
 		return addOrUpdate( providedId, null, entity );
 	}
 
@@ -110,9 +110,9 @@ public interface SearchIndexer {
 	 * Leave {@code null} if sharding is disabled
 	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @param entity The entity to update in the index.
-	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 */
-	CompletableFuture<?> addOrUpdate(Object providedId, String providedRoutingKey, Object entity);
+	CompletionStage<?> addOrUpdate(Object providedId, String providedRoutingKey, Object entity);
 
 	/**
 	 * Delete an entity from the index.
@@ -122,9 +122,9 @@ public interface SearchIndexer {
 	 * Shorthand for {@code delete(null, null, entity)}; see {@link #delete(Object, String, Object)}.
 	 *
 	 * @param entity The entity to add to the index.
-	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 */
-	default CompletableFuture<?> delete(Object entity) {
+	default CompletionStage<?> delete(Object entity) {
 		return delete( null, entity );
 	}
 
@@ -139,9 +139,9 @@ public interface SearchIndexer {
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
 	 * @param entity The entity to delete from the index.
-	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 */
-	default CompletableFuture<?> delete(Object providedId, Object entity) {
+	default CompletionStage<?> delete(Object providedId, Object entity) {
 		return delete( providedId, null, entity );
 	}
 
@@ -159,9 +159,9 @@ public interface SearchIndexer {
 	 * Leave {@code null} if sharding is disabled
 	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @param entity The entity to delete from the index.
-	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 */
-	CompletableFuture<?> delete(Object providedId, String providedRoutingKey, Object entity);
+	CompletionStage<?> delete(Object providedId, String providedRoutingKey, Object entity);
 
 	/**
 	 * Purge an entity from the index.
@@ -174,8 +174,8 @@ public interface SearchIndexer {
 	 * @param providedId A value to extract the document ID from.
 	 * @param providedRoutingKey The routing key to route the purge request to the appropriate index shard.
 	 * Leave {@code null} if sharding is disabled or if you don't use a custom {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
-	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 */
-	CompletableFuture<?> purge(Class<?> entityClass, Object providedId, String providedRoutingKey);
+	CompletionStage<?> purge(Class<?> entityClass, Object providedId, String providedRoutingKey);
 
 }

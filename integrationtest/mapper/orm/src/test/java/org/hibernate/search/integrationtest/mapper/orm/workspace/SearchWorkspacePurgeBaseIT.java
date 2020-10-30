@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.workspace;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -26,7 +27,7 @@ public class SearchWorkspacePurgeBaseIT extends AbstractSearchWorkspaceSimpleOpe
 	}
 
 	@Override
-	protected CompletableFuture<?> executeAsync(SearchWorkspace workspace) {
+	protected CompletionStage<?> executeAsync(SearchWorkspace workspace) {
 		return workspace.purgeAsync();
 	}
 }

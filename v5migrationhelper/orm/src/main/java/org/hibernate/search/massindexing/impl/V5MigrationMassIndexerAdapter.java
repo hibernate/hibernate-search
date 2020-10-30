@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.massindexing.impl;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 import org.hibernate.CacheMode;
 import org.hibernate.search.MassIndexer;
@@ -71,8 +71,8 @@ public class V5MigrationMassIndexerAdapter implements MassIndexer {
 	}
 
 	@Override
-	public CompletableFuture<?> start() {
-		return delegate.start();
+	public Future<?> start() {
+		return delegate.start().toCompletableFuture();
 	}
 
 	@Override

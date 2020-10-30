@@ -79,7 +79,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 
 It is possible to run the mass indexer asynchronously,
 because, the mass indexer does not rely on the original Hibernate ORM session.
-When used asynchronously, the mass indexer will return a future
+When used asynchronously, the mass indexer will return a completion stage
 to track the completion of mass indexing:
 
 .Reindexing asynchronously using a `MassIndexer`
@@ -90,7 +90,9 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 ----
 <1> Create a `MassIndexer`.
 <2> Start the mass indexing process, but do not wait for the process to finish.
-A `CompletableFuture` is returned.
+A `CompletionStage` is returned.
+<3> The `CompletionStage` exposes methods to execute more code after indexing is complete.
+<4> Alternatively, call `toCompletableFuture()` on the returned object to get a `Future`.
 ====
 
 Although the `MassIndexer` is simple to use, some tweaking is recommended to speed up the process.

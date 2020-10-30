@@ -296,7 +296,7 @@ Delete all documents from indexes targeted by this workspace.
 With multi-tenancy enabled, only documents of the current tenant will be removed:
 the tenant of the session from which this workspace originated.
 `purgeAsync()`::
-Asynchronous version of `purge()` returning a `CompletableFuture`.
+Asynchronous version of `purge()` returning a `CompletionStage`.
 `purge(Set<String> routingKeys)`::
 Delete documents from indexes targeted by this workspace
 that were indexed with any of the given routing keys.
@@ -304,7 +304,7 @@ that were indexed with any of the given routing keys.
 With multi-tenancy enabled, only documents of the current tenant will be removed:
 the tenant of the session from which this workspace originated.
 `purgeAsync(Set<String> routingKeys)`::
-Asynchronous version of `purge(Set<String>)` returning a `CompletableFuture`.
+Asynchronous version of `purge(Set<String>)` returning a `CompletionStage`.
 [[mapper-orm-indexing-manual-flush]]`flush()`::
 Flush to disk the changes to indexes that have not been committed yet.
 In the case of backends with a transaction log (Elasticsearch),
@@ -313,19 +313,19 @@ also apply operations from the transaction log that were not applied yet.
 This is generally not useful as Hibernate Search commits changes automatically.
 See <<concepts-commit-refresh>> for more information.
 `flushAsync()`::
-Asynchronous version of `flush()` returning a `CompletableFuture`.
+Asynchronous version of `flush()` returning a `CompletionStage`.
 [[mapper-orm-indexing-manual-refresh]]`refresh()`::
 Refresh the indexes so that all changes executed so far will be visible in search queries.
 +
 This is generally not useful as indexes are refreshed automatically.
 See <<concepts-commit-refresh>> for more information.
 `refreshAsync()`::
-Asynchronous version of `refresh()` returning a `CompletableFuture`.
+Asynchronous version of `refresh()` returning a `CompletionStage`.
 [[mapper-orm-indexing-manual-merge]]`mergeSegments()`::
 Merge each index targeted by this workspace into a single segment.
 This operation does not always improve performance: see <<mapper-orm-indexing-merge-segments>>.
 `mergeSegmentsAsync()`::
-Asynchronous version of `mergeSegments()` returning a `CompletableFuture`.
+Asynchronous version of `mergeSegments()` returning a `CompletionStage`.
 This operation does not always improve performance: see <<mapper-orm-indexing-merge-segments>>.
 
 [NOTE]
