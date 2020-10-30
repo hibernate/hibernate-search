@@ -32,7 +32,7 @@
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-batch-jsr352-core</artifactId>
+            <artifactId>hibernate-search-mapper-orm-batch-jsr352-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
