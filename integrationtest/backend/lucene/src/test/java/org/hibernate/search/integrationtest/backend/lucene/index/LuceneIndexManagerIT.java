@@ -86,7 +86,28 @@ public class LuceneIndexManagerIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
 	public void computeSizeInBytes() {
-		CompletableFuture<Long> initialSizeFuture = indexApi.computeSizeInBytes();
+		long initialSize = indexApi.computeSizeInBytes();
+		assertThat( initialSize ).isGreaterThanOrEqualTo( 0L );
+
+		IndexBinding binding = index.binding();
+		index.bulkIndexer()
+				.add( 100, i -> documentProvider(
+						String.valueOf( i ),
+						document -> document.addValue( binding.normalized, "value" + i )
+				) )
+				.join();
+
+		index.createWorkspace().flush().join();
+
+		long finalSize = indexApi.computeSizeInBytes();
+		assertThat( finalSize ).isGreaterThan( 0L );
+		assertThat( finalSize ).isGreaterThan( initialSize );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3589")
+	public void computeSizeInBytesAsync() {
+		CompletableFuture<Long> initialSizeFuture = indexApi.computeSizeInBytesAsync();
 		await().untilAsserted( () -> assertThat( initialSizeFuture ).isCompleted() );
 		long initialSize = initialSizeFuture.join();
 		assertThat( initialSize ).isGreaterThanOrEqualTo( 0L );
@@ -101,7 +122,7 @@ public class LuceneIndexManagerIT {
 
 		index.createWorkspace().flush().join();
 
-		CompletableFuture<Long> finalSizeFuture = indexApi.computeSizeInBytes();
+		CompletableFuture<Long> finalSizeFuture = indexApi.computeSizeInBytesAsync();
 		await().untilAsserted( () -> assertThat( finalSizeFuture ).isCompleted() );
 		long finalSize = finalSizeFuture.join();
 		assertThat( finalSize ).isGreaterThan( 0L );

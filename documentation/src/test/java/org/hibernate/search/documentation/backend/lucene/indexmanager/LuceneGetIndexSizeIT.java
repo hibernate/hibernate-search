@@ -9,6 +9,7 @@ package org.hibernate.search.documentation.backend.lucene.indexmanager;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
@@ -42,10 +43,11 @@ public class LuceneGetIndexSizeIT {
 		SearchMapping mapping = Search.mapping( entityManagerFactory ); // <1>
 		IndexManager indexManager = mapping.indexManager( "Book" ); // <2>
 		LuceneIndexManager luceneIndexManager = indexManager.unwrap( LuceneIndexManager.class ); // <3>
-		CompletableFuture<Long> sizeFuture = luceneIndexManager.computeSizeInBytes(); // <4>
-		long size = sizeFuture.join(); // <5>
+		long size = luceneIndexManager.computeSizeInBytes(); // <4>
+		CompletableFuture<Long> sizeFuture = luceneIndexManager.computeSizeInBytesAsync(); // <5>
 		//end::computeIndexSize[]
 		assertThat( size ).isGreaterThanOrEqualTo( 0L );
+		assertThat( sizeFuture.join() ).isGreaterThanOrEqualTo( 0L );
 	}
 
 }
