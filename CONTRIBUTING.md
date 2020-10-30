@@ -63,10 +63,10 @@ See:
 * [here for IntelliJ IDEA](https://hibernate.org/community/contribute/intellij-idea/)
 * [here for Eclipse IDE](https://hibernate.org/community/contribute/eclipse-ide/)
 
-If you built the project at least once (`mvn clean install`),
+If you built the project at least once (`./mvnw clean install`),
 you can very quickly check that you have respected the formatting rules by running Checkstyle:
 ```bash
-mvn checkstyle:check -fn
+./mvnw checkstyle:check -fn
 ```
 
 ### Code
@@ -89,7 +89,7 @@ they make the intent of your patch less clear.
 * Run _all_ the tests to assure nothing else was accidentally broken:
 
     ```bash
-    mvn clean install
+    ./mvnw clean install
     ```
 
 _Prior to committing, if you want to pull in the latest upstream changes (highly
@@ -147,16 +147,13 @@ and do the work of converting between user entities and documents to be indexed.
 
 ### Basic build
 
-You will need:
-
-* Maven 3.6.2 or later.
-* JDK 11 or later.
+You will need JDK 11 or later.
 
 The following command will build Hibernate Search, install it in your local Maven repository,
 and run unit tests and integration tests.
 
 ```bash
-mvn clean install
+./mvnw clean install
 ```
 
 Note: the produced JARs are compatible with Java 8 and later,
@@ -167,7 +164,7 @@ The documentation is based on [Asciidoctor](http://asciidoctor.org/). By default
 output is enabled; to also generate the PDF output use:
 
 ```bash
-mvn clean install -Pdocumentation-pdf
+./mvnw clean install -Pdocumentation-pdf
 ```
 
 You can then find the freshly built documentation at the following location:
@@ -181,7 +178,7 @@ You can then find the freshly built documentation at the following location:
 To build the distribution bundle run:
 
 ```bash
-mvn clean install -Pdocumentation-pdf,dist
+./mvnw clean install -Pdocumentation-pdf,dist
 ```
 
 ### Elasticsearch
@@ -192,7 +189,7 @@ You may redefine the version to use by specifying the right profile and using th
 `test.elasticsearch.connection.version` property:
 
 ```bash
-mvn clean install -Pelasticsearch-6.0 -Dtest.elasticsearch.connection.version=6.0.0
+./mvnw clean install -Pelasticsearch-6.0 -Dtest.elasticsearch.connection.version=6.0.0
 ```
 
 The following profiles are available:
@@ -214,13 +211,13 @@ and run Elasticsearch-related tests against your own server using the
 `test.elasticsearch.connection.hosts` properties:
 
 ```bash
-mvn clean install -Dtest.elasticsearch.connection.hosts=localhost:9200
+./mvnw clean install -Dtest.elasticsearch.connection.hosts=localhost:9200
 ```
 
 If you want to use HTTPS:
 
 ```bash
-mvn clean install -Dtest.elasticsearch.connection.hosts=localhost:9200 \
+./mvnw clean install -Dtest.elasticsearch.connection.hosts=localhost:9200 \
         -Dtest.elasticsearch.connection.protocol=https
 ```
 
@@ -228,14 +225,14 @@ If you want to run tests against a different Elasticsearch version  (6.x for ins
 you will still have to select a profile among those listed above, and specify the version:
 
 ```bash
-mvn clean install -Pelasticsearch-6.0 -Dtest.elasticsearch.connection.version=6.0.0 \
+./mvnw clean install -Pelasticsearch-6.0 -Dtest.elasticsearch.connection.version=6.0.0 \
         -Dtest.elasticsearch.connection.hosts=localhost:9200
 ```
 
 You may also use authentication:
 
 ```bash
-mvn clean install -Dtest.elasticsearch.connection.hosts=localhost:9200 \
+./mvnw clean install -Dtest.elasticsearch.connection.hosts=localhost:9200 \
         -Dtest.elasticsearch.connection.username=ironman \
         -Dtest.elasticsearch.connection.password=j@rV1s
 ```
@@ -245,7 +242,7 @@ against an Elasticsearch service on AWS.
 You will need to execute something along the lines of:
 
 ```bash
-mvn clean install -Dtest.elasticsearch.connection.hosts=<host:port> \
+./mvnw clean install -Dtest.elasticsearch.connection.hosts=<host:port> \
         -Dtest.elasticsearch.connection.aws.signing.enabled=true \
         -Dtest.elasticsearch.connection.aws.region=<Your AWS region ID> \
         -Dtest.elasticsearch.connection.aws.credentials.type=static \
@@ -256,7 +253,7 @@ mvn clean install -Dtest.elasticsearch.connection.hosts=<host:port> \
 Or more simply, if your AWS credentials are already stored in `~/.aws/credentials`:
 
 ```bash
-mvn clean install -Dtest.elasticsearch.connection.hosts=<host:port> \
+./mvnw clean install -Dtest.elasticsearch.connection.hosts=<host:port> \
         -Dtest.elasticsearch.connection.aws.signing.enabled=true \
         -Dtest.elasticsearch.connection.aws.region=<Your AWS region ID>
 ```
@@ -267,7 +264,7 @@ This can be done by setting a property
 (**this will only work with the profiles for Elasticsearch 5 and above**):
 
 ```bash
-mvn clean install -Dtest.elasticsearch.run.java_home=/path/to/my/jdk
+./mvnw clean install -Dtest.elasticsearch.run.java_home=/path/to/my/jdk
 ```
 
 ### JQAssistant
@@ -276,7 +273,7 @@ You can request static analysis and sanity checks with the `jqassistant` profile
 Tests do not need to be run for these checks.
 
 ```bash
-mvn clean install -Pjqassistant -DskipTests -DskipITs
+./mvnw clean install -Pjqassistant -DskipTests -DskipITs
 ```
 
 To also check cyclic dependencies between packages, use `-Djqassistant.groups=default,cycles`.
@@ -284,14 +281,14 @@ Cyclic dependency analysis is costly and may add significant overhead to the bui
 at least 10 seconds, maybe one minute or more depending on your setup.
 
 ```bash
-mvn clean install -Pjqassistant -DskipTests -DskipITs -Djqassistant.groups=default,cycles
+./mvnw clean install -Pjqassistant -DskipTests -DskipITs -Djqassistant.groups=default,cycles
 ```
 
 You can also inspect the created Neo4j datastore after a build,
 provided that build had the `jqassistant` profile enabled:
 
 ```bash
-mvn jqassistant:server -Pjqassistant-server -pl reports
+./mvnw jqassistant:server -Pjqassistant-server -pl reports
 ```
 
 The Neo4j web UI will be accessible from http://localhost:7474/.
