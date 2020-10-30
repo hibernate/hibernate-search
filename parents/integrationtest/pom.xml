@@ -100,6 +100,11 @@
                 <artifactId>hibernate-search-util-internal-integrationtest-jbatch-runtime</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-util-internal-integrationtest-jberet-se</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- JDBC drivers -->
             <!-- Profile-specific driver, used in most database-sensitive integration tests -->

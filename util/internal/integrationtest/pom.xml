@@ -35,6 +35,7 @@
         <module>sharedresources</module>
         <module>v5migrationhelper</module>
         <module>jbatch-runtime</module>
+        <module>jberet-se</module>
     </modules>
 
     <build>
