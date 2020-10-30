@@ -22,11 +22,11 @@
         <module>mapper/orm-cdi</module>
         <module>mapper/orm-envers</module>
         <module>mapper/orm-realbackend</module>
+        <module>mapper/orm-batch-jsr352</module>
         <module>performance</module>
         <module>showcase/library</module>
         <module>v5migrationhelper/engine</module>
         <module>v5migrationhelper/orm</module>
-        <module>batch-jsr352</module>
     </modules>
 
     <profiles>
