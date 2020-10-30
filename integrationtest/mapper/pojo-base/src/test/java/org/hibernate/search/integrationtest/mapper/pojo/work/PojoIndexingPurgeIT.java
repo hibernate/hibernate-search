@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.work;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.mapper.javabean.work.SearchIndexer;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
@@ -41,17 +41,17 @@ public class PojoIndexingPurgeIT extends AbstractPojoIndexingOperationIT {
 	}
 
 	@Override
-	protected CompletableFuture<?> execute(SearchIndexer indexer, int id) {
+	protected CompletionStage<?> execute(SearchIndexer indexer, int id) {
 		return indexer.purge( IndexedEntity.class, id, null );
 	}
 
 	@Override
-	protected CompletableFuture<?> execute(SearchIndexer indexer, Object providedId, int id) {
+	protected CompletionStage<?> execute(SearchIndexer indexer, Object providedId, int id) {
 		return indexer.purge( IndexedEntity.class, providedId, null );
 	}
 
 	@Override
-	protected CompletableFuture<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey, int id) {
+	protected CompletionStage<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey, int id) {
 		return indexer.purge( IndexedEntity.class, providedId, providedRoutingKey );
 	}
 }

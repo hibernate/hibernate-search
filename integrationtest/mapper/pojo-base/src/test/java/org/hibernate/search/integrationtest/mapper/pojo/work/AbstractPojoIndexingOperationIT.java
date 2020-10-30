@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -111,7 +112,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 			SearchIndexer indexer = session.indexer();
 
 			expectOperation( futureFromBackend, 1, null, "1" );
-			CompletableFuture<?> returnedFuture = execute( indexer, 1 );
+			CompletionStage<?> returnedFuture = execute( indexer, 1 );
 			backendMock.verifyExpectationsMet();
 			assertThatFuture( returnedFuture ).isPending();
 
@@ -127,7 +128,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 			SearchIndexer indexer = session.indexer();
 
 			expectOperation( futureFromBackend, 42, null, "1" );
-			CompletableFuture<?> returnedFuture = execute( indexer, 42, 1 );
+			CompletionStage<?> returnedFuture = execute( indexer, 42, 1 );
 			backendMock.verifyExpectationsMet();
 			assertThatFuture( returnedFuture ).isPending();
 
@@ -155,7 +156,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 					},
 					// And only then, expect the actual operation.
 					42, "UE-123", "1" );
-			CompletableFuture<?> returnedFuture = execute( indexer, 42, "UE-123", 1 );
+			CompletionStage<?> returnedFuture = execute( indexer, 42, "UE-123", 1 );
 			backendMock.verifyExpectationsMet();
 			assertThatFuture( returnedFuture ).isPending();
 
@@ -187,7 +188,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 					// And only then, expect the actual operation.
 					1, null, "1"
 			);
-			CompletableFuture<?> returnedFuture = execute( indexer, 1 );
+			CompletionStage<?> returnedFuture = execute( indexer, 1 );
 			backendMock.verifyExpectationsMet();
 			assertThatFuture( returnedFuture ).isPending();
 
@@ -223,7 +224,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 					// And only then, expect the actual operation.
 					1, null, "1"
 			);
-			CompletableFuture<?> returnedFuture = execute( indexer, 1 );
+			CompletionStage<?> returnedFuture = execute( indexer, 1 );
 			backendMock.verifyExpectationsMet();
 			assertThatFuture( returnedFuture ).isPending();
 
@@ -243,7 +244,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 			MyRoutingBridge.indexed = false;
 			MyRoutingBridge.previouslyIndexed = false;
 			// We don't expect the actual operation, which should be skipped because the entity is not indexed.
-			CompletableFuture<?> returnedFuture = execute( indexer, 1 );
+			CompletionStage<?> returnedFuture = execute( indexer, 1 );
 			backendMock.verifyExpectationsMet();
 			assertThatFuture( returnedFuture ).isSuccessful();
 		}
@@ -267,7 +268,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 						.processedThenExecuted();
 			}
 			// However, we don't expect the actual operation, which should be skipped because the entity is not indexed.
-			CompletableFuture<?> returnedFuture = execute( indexer, 1 );
+			CompletionStage<?> returnedFuture = execute( indexer, 1 );
 			backendMock.verifyExpectationsMet();
 			assertThatFuture( returnedFuture ).isSuccessful();
 		}
@@ -300,7 +301,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 						.processedThenExecuted();
 			}
 			// However, we don't expect the actual operation, which should be skipped because the entity is not indexed.
-			CompletableFuture<?> returnedFuture = execute( indexer, 1 );
+			CompletionStage<?> returnedFuture = execute( indexer, 1 );
 			backendMock.verifyExpectationsMet();
 			assertThatFuture( returnedFuture ).isSuccessful();
 		}
@@ -314,7 +315,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 			SearchIndexer indexer = session.indexer();
 
 			expectOperation( futureFromBackend, 1, null, "1" );
-			CompletableFuture<?> returnedFuture = execute( indexer, 1 );
+			CompletionStage<?> returnedFuture = execute( indexer, 1 );
 			backendMock.verifyExpectationsMet();
 			assertThatFuture( returnedFuture ).isPending();
 
@@ -331,7 +332,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 			SearchIndexer indexer = session.indexer();
 
 			expectOperation( futureFromBackend, 1, null, "1" );
-			CompletableFuture<?> returnedFuture = execute( indexer, 1 );
+			CompletionStage<?> returnedFuture = execute( indexer, 1 );
 			backendMock.verifyExpectationsMet();
 			assertThatFuture( returnedFuture ).isPending();
 
@@ -578,11 +579,11 @@ public abstract class AbstractPojoIndexingOperationIT {
 
 	protected abstract void addTo(SearchIndexingPlan indexingPlan, Object providedId, String providedRoutingKey, int id);
 
-	protected abstract CompletableFuture<?> execute(SearchIndexer indexer, int id);
+	protected abstract CompletionStage<?> execute(SearchIndexer indexer, int id);
 
-	protected abstract CompletableFuture<?> execute(SearchIndexer indexer, Object providedId, int id);
+	protected abstract CompletionStage<?> execute(SearchIndexer indexer, Object providedId, int id);
 
-	protected abstract CompletableFuture<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey, int id);
+	protected abstract CompletionStage<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey, int id);
 
 	protected final IndexedEntity createEntity(int id) {
 		IndexedEntity entity = new IndexedEntity();

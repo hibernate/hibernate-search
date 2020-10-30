@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.index;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.engine.backend.index.IndexManager;
@@ -40,6 +40,6 @@ public interface LuceneIndexManager extends IndexManager {
 	/**
 	 * @return A future that will ultimately provide the size of the index on its storage support, in bytes.
 	 */
-	CompletableFuture<Long> computeSizeInBytesAsync();
+	CompletionStage<Long> computeSizeInBytesAsync();
 
 }

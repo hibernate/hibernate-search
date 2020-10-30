@@ -12,6 +12,7 @@ import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -57,7 +58,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
 			expectWork( defaultBackendMock, IndexedEntity1.INDEX_NAME, futureFromBackend );
 
-			CompletableFuture<?> futureFromWorkspace = executeAsync( workspace );
+			CompletionStage<?> futureFromWorkspace = executeAsync( workspace );
 			defaultBackendMock.verifyExpectationsMet();
 			assertThatFuture( futureFromWorkspace ).isPending();
 
@@ -76,7 +77,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 			CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
 			expectWork( defaultBackendMock, IndexedEntity1.INDEX_NAME, futureFromBackend );
 
-			CompletableFuture<?> futureFromWorkspace = executeAsync( workspace );
+			CompletionStage<?> futureFromWorkspace = executeAsync( workspace );
 			defaultBackendMock.verifyExpectationsMet();
 			assertThatFuture( futureFromWorkspace ).isPending();
 
@@ -134,7 +135,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 			expectWork( defaultBackendMock, IndexedEntity1.INDEX_NAME, future1FromBackend );
 			expectWork( backend2Mock, IndexedEntity2.INDEX_NAME, future2FromBackend );
 
-			CompletableFuture<?> futureFromWorkspace = executeAsync( workspace );
+			CompletionStage<?> futureFromWorkspace = executeAsync( workspace );
 			defaultBackendMock.verifyExpectationsMet();
 			backend2Mock.verifyExpectationsMet();
 			assertThatFuture( futureFromWorkspace ).isPending();
@@ -159,7 +160,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 		CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
 		expectWork( defaultBackendMock, IndexedEntity1.INDEX_NAME, futureFromBackend );
 
-		CompletableFuture<?> futureFromWorkspace = executeAsync( workspace );
+		CompletionStage<?> futureFromWorkspace = executeAsync( workspace );
 		defaultBackendMock.verifyExpectationsMet();
 		assertThatFuture( futureFromWorkspace ).isPending();
 
@@ -176,7 +177,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 		CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
 		expectWork( defaultBackendMock, IndexedEntity1.INDEX_NAME, futureFromBackend );
 
-		CompletableFuture<?> futureFromWriter = executeAsync( workspace );
+		CompletionStage<?> futureFromWriter = executeAsync( workspace );
 		defaultBackendMock.verifyExpectationsMet();
 		assertThatFuture( futureFromWriter ).isPending();
 
@@ -188,7 +189,7 @@ public abstract class AbstractSearchWorkspaceSimpleOperationIT {
 
 	protected abstract void executeSync(SearchWorkspace workspace);
 
-	protected abstract CompletableFuture<?> executeAsync(SearchWorkspace workspace);
+	protected abstract CompletionStage<?> executeAsync(SearchWorkspace workspace);
 
 	private SessionFactory setup() {
 		defaultBackendMock.expectAnySchema( IndexedEntity1.INDEX_NAME );

@@ -107,7 +107,7 @@ public class LuceneIndexManagerIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3589")
 	public void computeSizeInBytesAsync() {
-		CompletableFuture<Long> initialSizeFuture = indexApi.computeSizeInBytesAsync();
+		CompletableFuture<Long> initialSizeFuture = indexApi.computeSizeInBytesAsync().toCompletableFuture();
 		await().untilAsserted( () -> assertThat( initialSizeFuture ).isCompleted() );
 		long initialSize = initialSizeFuture.join();
 		assertThat( initialSize ).isGreaterThanOrEqualTo( 0L );
@@ -122,7 +122,7 @@ public class LuceneIndexManagerIT {
 
 		index.createWorkspace().flush().join();
 
-		CompletableFuture<Long> finalSizeFuture = indexApi.computeSizeInBytesAsync();
+		CompletableFuture<Long> finalSizeFuture = indexApi.computeSizeInBytesAsync().toCompletableFuture();
 		await().untilAsserted( () -> assertThat( finalSizeFuture ).isCompleted() );
 		long finalSize = finalSizeFuture.join();
 		assertThat( finalSize ).isGreaterThan( 0L );

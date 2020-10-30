@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.javabean.work.impl;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -32,25 +32,25 @@ public class SearchIndexerImpl implements SearchIndexer {
 	}
 
 	@Override
-	public CompletableFuture<?> add(Object providedId, String providedRoutingKey, Object entity) {
+	public CompletionStage<?> add(Object providedId, String providedRoutingKey, Object entity) {
 		return delegate.add( getTypeIdentifier( entity ), providedId, providedRoutingKey, entity,
 				commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public CompletableFuture<?> addOrUpdate(Object providedId, String providedRoutingKey, Object entity) {
+	public CompletionStage<?> addOrUpdate(Object providedId, String providedRoutingKey, Object entity) {
 		return delegate.addOrUpdate( getTypeIdentifier( entity ), providedId, providedRoutingKey, entity,
 				commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public CompletableFuture<?> delete(Object providedId, String providedRoutingKey, Object entity) {
+	public CompletionStage<?> delete(Object providedId, String providedRoutingKey, Object entity) {
 		return delegate.delete( getTypeIdentifier( entity ), providedId, providedRoutingKey, entity,
 				commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public CompletableFuture<?> purge(Class<?> entityClass, Object providedId, String providedRoutingKey) {
+	public CompletionStage<?> purge(Class<?> entityClass, Object providedId, String providedRoutingKey) {
 		return delegate.purge( getTypeIdentifier( entityClass ), providedId, providedRoutingKey,
 				commitStrategy, refreshStrategy );
 	}

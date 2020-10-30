@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -186,7 +187,7 @@ public class SearchITHelper {
 				SearchIndexer indexer = session.indexer();
 				CompletableFuture<?>[] futures = new CompletableFuture[works.size()];
 				for ( int i = 0; i < works.size(); i++ ) {
-					futures[i] = executeWork( indexer, works.get( i ) );
+					futures[i] = executeWork( indexer, works.get( i ) ).toCompletableFuture();
 				}
 				CompletableFuture.allOf( futures ).join();
 			}
@@ -195,7 +196,7 @@ public class SearchITHelper {
 			}
 		}
 
-		private CompletableFuture<?> executeWork(SearchIndexer indexer, Work w) {
+		private CompletionStage<?> executeWork(SearchIndexer indexer, Work w) {
 			switch ( w.workType ) {
 				case ADD:
 					return indexer.add( w.providedId, w.entity );

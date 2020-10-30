@@ -9,6 +9,8 @@ package org.hibernate.search.util.impl.test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -24,6 +26,14 @@ public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Futur
 
 	public static <T> FutureAssert<T> assertThatFuture(Future<T> future) {
 		return new FutureAssert<>( future );
+	}
+
+	public static <T> FutureAssert<T> assertThatFuture(CompletableFuture<T> future) {
+		return assertThatFuture( (Future<T>) future );
+	}
+
+	public static <T> FutureAssert<T> assertThatFuture(CompletionStage<T> stage) {
+		return assertThatFuture( stage.toCompletableFuture() );
 	}
 
 	protected FutureAssert(Future<T> actual) {

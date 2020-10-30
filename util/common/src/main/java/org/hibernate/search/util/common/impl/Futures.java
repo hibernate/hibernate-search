@@ -12,6 +12,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -201,7 +202,7 @@ public final class Futures {
 	 * @throws RuntimeException If the future fails.
 	 * @throws InterruptedException If the thread is interrupted.
 	 */
-	public static <T> T unwrappedExceptionGet(CompletableFuture<T> future) throws InterruptedException {
+	public static <T> T unwrappedExceptionGet(Future<T> future) throws InterruptedException {
 		try {
 			return future.get();
 		}

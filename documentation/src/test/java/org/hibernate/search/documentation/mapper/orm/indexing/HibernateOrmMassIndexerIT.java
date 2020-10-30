@@ -7,8 +7,11 @@
 package org.hibernate.search.documentation.mapper.orm.indexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
-import java.util.concurrent.CompletableFuture;
+import java.lang.invoke.MethodHandles;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -19,6 +22,8 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
@@ -26,6 +31,8 @@ import org.junit.Rule;
 import org.junit.Test;
 
 public class HibernateOrmMassIndexerIT {
+
+	private static final Log logger = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	static final int NUMBER_OF_BOOKS = 1000;
 	static final int INIT_DATA_TRANSACTION_SIZE = 500;
@@ -44,6 +51,10 @@ public class HibernateOrmMassIndexerIT {
 				)
 				.setup( Book.class, Author.class );
 		initData( entityManagerFactory, HibernateOrmMassIndexerIT::newAuthor );
+		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+			assertBookCount( entityManager, 0 );
+			assertAuthorCount( entityManager, 0 );
+		} );
 	}
 
 	@Test
@@ -83,16 +94,42 @@ public class HibernateOrmMassIndexerIT {
 	}
 
 	@Test
-	public void async() {
+	public void async_reactive() {
 		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::async[]
-			CompletableFuture<?> future = searchSession.massIndexer() // <1>
-					.start(); // <2>
+			searchSession.massIndexer() // <1>
+					.start() // <2>
+					.thenRun( () -> { // <3>
+						logger.info( "Mass indexing succeeded!" );
+					} )
+					.exceptionally( throwable -> {
+						logger.error( "Mass indexing failed!", throwable );
+						return null;
+					} );
 			// end::async[]
-			future.join();
-			assertBookCount( entityManager, NUMBER_OF_BOOKS );
-			assertAuthorCount( entityManager, NUMBER_OF_BOOKS );
+			await().untilAsserted( () -> {
+				assertBookCount( entityManager, NUMBER_OF_BOOKS );
+				assertAuthorCount( entityManager, NUMBER_OF_BOOKS );
+			} );
+		} );
+	}
+
+	@Test
+	public void async_future() {
+		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::async[]
+
+			// OR
+			Future<?> future = searchSession.massIndexer().start()
+					.toCompletableFuture(); // <4>
+			// end::async[]
+			await().untilAsserted( () -> {
+				assertBookCount( entityManager, NUMBER_OF_BOOKS );
+				assertAuthorCount( entityManager, NUMBER_OF_BOOKS );
+				assertThatFuture( future ).isSuccessful();
+			} );
 		} );
 	}
 

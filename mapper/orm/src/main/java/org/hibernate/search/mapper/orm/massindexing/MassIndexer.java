@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.massindexing;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import org.hibernate.CacheMode;
 import org.hibernate.search.util.common.annotation.Incubating;
@@ -121,9 +122,11 @@ public interface MassIndexer {
 	 * Starts the indexing process in background (asynchronous).
 	 * <p>
 	 * May only be called once.
-	 * @return a Future to control the indexing task.
+	 * @return a {@link java.util.concurrent.CompletionStage} to react to the completion of the indexing task.
+	 * Call {@link CompletionStage#toCompletableFuture()} on the returned object
+	 * to convert it to a {@link CompletableFuture} (which implements {@link java.util.concurrent.Future}).
 	 */
-	CompletableFuture<?> start();
+	CompletionStage<?> start();
 
 	/**
 	 * Starts the indexing process, and then block until it's finished.

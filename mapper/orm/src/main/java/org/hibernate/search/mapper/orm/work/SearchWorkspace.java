@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.orm.work;
 
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 /**
  * The entry point for explicit index operations.
@@ -34,10 +34,10 @@ public interface SearchWorkspace {
 	/**
 	 * Asynchronous version of {@link #purge()}, returning as soon as the operation is queued.
 	 *
-	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 * @see #purge()
 	 */
-	CompletableFuture<?> purgeAsync();
+	CompletionStage<?> purgeAsync();
 
 	/**
 	 * Delete documents from indexes targeted by this workspace
@@ -56,10 +56,10 @@ public interface SearchWorkspace {
 	 * Asynchronous version of {@link #purge(Set)}, returning as soon as the operation is queued.
 	 *
 	 * @param routingKeys The set of routing keys.
-	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 * @see #purge(Set)
 	 */
-	CompletableFuture<?> purgeAsync(Set<String> routingKeys);
+	CompletionStage<?> purgeAsync(Set<String> routingKeys);
 
 	/**
 	 * Flush to disk the changes to indexes that were not committed yet.
@@ -80,10 +80,10 @@ public interface SearchWorkspace {
 	/**
 	 * Asynchronous version of {@link #flush()}, returning as soon as the operation is queued.
 	 *
-	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 * @see #flush()
 	 */
-	CompletableFuture<?> flushAsync();
+	CompletionStage<?> flushAsync();
 
 	/**
 	 * Refresh the indexes so that all changes executed so far will be visible in search queries.
@@ -104,10 +104,10 @@ public interface SearchWorkspace {
 	/**
 	 * Asynchronous version of {@link #refresh()}, returning as soon as the operation is queued.
 	 *
-	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 * @see #refresh()
 	 */
-	CompletableFuture<?> refreshAsync();
+	CompletionStage<?> refreshAsync();
 
 	/**
 	 * Merge all segments of the indexes targeted by this workspace into a single one.
@@ -123,9 +123,9 @@ public interface SearchWorkspace {
 	 * Note this operation may affect performance positively as well as negatively.
 	 * See the reference documentation for more information.
 	 *
-	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 * @see #mergeSegments()
 	 */
-	CompletableFuture<?> mergeSegmentsAsync();
+	CompletionStage<?> mergeSegmentsAsync();
 
 }
