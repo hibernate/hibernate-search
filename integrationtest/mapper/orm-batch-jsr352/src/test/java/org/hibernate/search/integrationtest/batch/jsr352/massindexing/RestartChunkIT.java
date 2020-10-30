@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 import javax.batch.operations.JobOperator;
-import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 import javax.batch.runtime.StepExecution;
@@ -51,11 +50,13 @@ public class RestartChunkIT {
 
 	protected static final long DB_COMP_ROWS = 150;
 
-	private JobOperator jobOperator = BatchRuntime.getJobOperator();
+	private JobOperator jobOperator;
 	private EntityManagerFactory emf;
 
 	@Before
 	public void setup() {
+		jobOperator = JobTestUtil.getAndCheckRuntime();
+
 		String[] str = new String[] {
 				"Google",
 				"Red Hat",

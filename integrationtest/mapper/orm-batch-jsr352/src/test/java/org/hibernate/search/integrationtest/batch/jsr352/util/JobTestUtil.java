@@ -40,8 +40,17 @@ public final class JobTestUtil {
 	private JobTestUtil() {
 	}
 
+	public static JobOperator getAndCheckRuntime() {
+		JobOperator operator = BatchRuntime.getJobOperator();
+		String expectedType = System.getProperty( "org.hibernate.search.integrationtest.jsr352.type" );
+		assertThat( operator ).extracting( Object::getClass ).asString()
+				.contains( expectedType );
+		log.infof( "JSR-352 operator type is %s (%s)", expectedType, operator.getClass() );
+		return operator;
+	}
+
 	public static void startJobAndWait(String jobName, Properties jobParams, int timeoutInMs) throws InterruptedException {
-		JobOperator jobOperator = BatchRuntime.getJobOperator();
+		JobOperator jobOperator = getAndCheckRuntime();
 		long execId = jobOperator.start( jobName, jobParams );
 		JobExecution jobExec = jobOperator.getJobExecution( execId );
 		jobExec = JobTestUtil.waitForTermination( jobOperator, jobExec, timeoutInMs );
@@ -106,5 +115,4 @@ public final class JobTestUtil {
 		SingularAttribute<?, ?> idAttribute = entityType.getId( entityType.getIdType().getJavaType() );
 		return new EntityTypeDescriptor( clazz, new SingularIdOrder( idAttribute.getName() ) );
 	}
-
 }

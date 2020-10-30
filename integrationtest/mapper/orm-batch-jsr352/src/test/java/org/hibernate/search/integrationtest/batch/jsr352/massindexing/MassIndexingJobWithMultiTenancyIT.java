@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import javax.batch.operations.JobOperator;
-import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.JobExecution;
 
@@ -50,7 +49,7 @@ public class MassIndexingJobWithMultiTenancyIT {
 
 	private SessionFactory sessionFactory;
 
-	private JobOperator jobOperator = BatchRuntime.getJobOperator();
+	private JobOperator jobOperator;
 
 	private final List<Company> companies = Arrays.asList(
 			new Company( "Google" ),
@@ -60,6 +59,7 @@ public class MassIndexingJobWithMultiTenancyIT {
 
 	@Before
 	public void setUp() throws Exception {
+		jobOperator = JobTestUtil.getAndCheckRuntime();
 		sessionFactory = ormSetupHelper
 				.start()
 				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
