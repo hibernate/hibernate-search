@@ -5,7 +5,6 @@
 
 # This file contains forbidden API signatures common to all modules
 
-@ignoreUnresolvable
 @defaultMessage Should not be used
 
 ################################################################################################################
