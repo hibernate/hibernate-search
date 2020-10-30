@@ -75,6 +75,12 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 					.withDefault( ElasticsearchBackendSettings.Defaults.PROTOCOL )
 					.build();
 
+	private static final ConfigurationProperty<String> PATH_PREFIX =
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.PATH_PREFIX )
+					.asString()
+					.withDefault( ElasticsearchBackendSettings.Defaults.PATH_PREFIX )
+					.build();
+
 	private static final OptionalConfigurationProperty<String> USERNAME =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.USERNAME )
 					.asString()

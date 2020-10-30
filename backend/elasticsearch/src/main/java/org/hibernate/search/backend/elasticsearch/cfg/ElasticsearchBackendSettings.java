@@ -59,6 +59,14 @@ public final class ElasticsearchBackendSettings {
 	public static final String PROTOCOL = "protocol";
 
 	/**
+	 * Property for specifying the path prefix prepended to the request end point.
+	 * Use the path prefix if your Elasticsearch instance is located at a specific context path.
+	 * <p>
+	 * Defaults to {@link Defaults#PATH_PREFIX}.
+	 */
+	public static final String PATH_PREFIX = "path_prefix";
+
+	/**
 	 * The version of Elasticsearch running on the Elasticsearch cluster.
 	 * <p>
 	 * Expects either an {@link ElasticsearchVersion} object,
@@ -250,6 +258,7 @@ public final class ElasticsearchBackendSettings {
 
 		public static final List<String> HOSTS = Collections.singletonList( "localhost:9200" );
 		public static final String PROTOCOL = "http";
+		public static final String PATH_PREFIX = "";
 		public static final int READ_TIMEOUT = 30000;
 		public static final int CONNECTION_TIMEOUT = 1000;
 		public static final int MAX_CONNECTIONS = 20;
