@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.batch.jsr352.massindexing;
 import java.util.ArrayList;
 import java.util.List;
 import javax.batch.operations.JobOperator;
-import javax.batch.runtime.BatchRuntime;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -21,6 +20,7 @@ import javax.persistence.criteria.Root;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Person;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.WhoAmI;
+import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -41,11 +41,12 @@ public abstract class AbstractBatchIndexingIT {
 	// We have three data templates per entity type (see setup)
 	protected static final int INSTANCE_PER_ENTITY_TYPE = INSTANCES_PER_DATA_TEMPLATE * 3;
 
-	protected JobOperator jobOperator = BatchRuntime.getJobOperator();
+	protected JobOperator jobOperator;
 	protected EntityManagerFactory emf;
 
 	@Before
 	public void setup() {
+		jobOperator = JobTestUtil.getAndCheckRuntime();
 		List<Company> companies = new ArrayList();
 		List<Person> people = new ArrayList();
 		List<WhoAmI> whos = new ArrayList();
