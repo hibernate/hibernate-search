@@ -45,6 +45,3 @@ nbactions.xml
 .DS_Store
 .attach_pid*
 
-# Maven wrapper files
-.mvn
-mvnw*

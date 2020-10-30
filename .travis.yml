@@ -22,9 +22,6 @@ before_install:
   # Build options must be set before install, so that we properly retrieve *all* the necessary dependencies
   - BUILD_OPTIONS='-Pdist -Pcoverage -Pjqassistant'
 install:
-  # The Maven install provided by Travis is outdated, use Maven wrapper to get the latest version
-  - mvn -N io.takari:maven:wrapper
-  - ./mvnw -v
   # First run to download most Maven dependencies without logging and to install our artifacts for the early checkstyle execution
   # We want to start as many plugins as possible (so that their dependencies are downloaded),
   # but we want the plugins to be skipped if they are not essential,

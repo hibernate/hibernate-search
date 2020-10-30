@@ -413,6 +413,8 @@
         <!--
              We need at least 3.6.2, which includes Maven-resolver 1.4.0+,
              which fixes https://issues.apache.org/jira/browse/MRESOLVER-33
+             WARNING: Do not forget to call 'mvn -N io.takari:maven:wrapper'
+             when you update this property!
          -->
         <maven.min.version>3.6.2</maven.min.version>
 
