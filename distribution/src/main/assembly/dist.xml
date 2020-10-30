@@ -280,12 +280,12 @@
                 <include>org.hibernate.search:hibernate-search-mapper-orm-batch-jsr352-core</include>
             </includes>
             <binaries>
-                <outputDirectory>dist/batch-jsr352/core</outputDirectory>
+                <outputDirectory>dist/mapper/orm-batch-jsr352/core</outputDirectory>
                 <unpack>false</unpack>
                 <dependencySets>
                     <dependencySet>
                         <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>dist/batch-jsr352/core/lib/required</outputDirectory>
+                        <outputDirectory>dist/mapper/orm-batch-jsr352/core/lib/required</outputDirectory>
                         <scope>runtime</scope>
                         <useTransitiveDependencies>true</useTransitiveDependencies>
                         <useTransitiveFiltering>true</useTransitiveFiltering>
@@ -307,12 +307,12 @@
                 <include>org.hibernate.search:hibernate-search-mapper-orm-batch-jsr352-jberet</include>
             </includes>
             <binaries>
-                <outputDirectory>dist/batch-jsr352/jberet</outputDirectory>
+                <outputDirectory>dist/mapper/orm-batch-jsr352/jberet</outputDirectory>
                 <unpack>false</unpack>
                 <dependencySets>
                     <dependencySet>
                         <useProjectArtifact>false</useProjectArtifact>
-                        <outputDirectory>dist/batch-jsr352/jberet/lib/required</outputDirectory>
+                        <outputDirectory>dist/mapper/orm-batch-jsr352/jberet/lib/required</outputDirectory>
                         <scope>runtime</scope>
                         <useTransitiveDependencies>true</useTransitiveDependencies>
                         <useTransitiveFiltering>true</useTransitiveFiltering>
