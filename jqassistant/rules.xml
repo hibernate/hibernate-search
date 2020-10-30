@@ -384,6 +384,59 @@
         ]]></cypher>
     </constraint>
 
+
+    <constraint id="hsearch:APITypesMayNotExposeForbiddenTypes">
+        <requiresConcept refId="hsearch:Api" />
+        <requiresConcept refId="hsearch:Spi" />
+        <description>
+            API types must not expose forbidden types:
+            - CompletableFuture: expose CompletionStage instead.
+              The corresponding CompletableFuture can be retrieved with '.toCompletableFuture()'.
+        </description>
+        <cypher><![CDATA[
+            // supertypes
+            MATCH
+                (type:Type:Api)-[:EXTENDS|:IMPLEMENTS*]->(superType:Type)
+            WHERE
+                superType.fqn = "java.util.concurrent.CompletableFuture"
+            RETURN
+                type AS ExposingSite, superType AS ExposedType
+
+            // method return values
+            UNION ALL
+            MATCH
+                (type:Type:Api)-[:DECLARES]->(method)-[:RETURNS]->(returnType:Type)
+                        -[:EXTENDS|:IMPLEMENTS*0..]->(returnTypeOrSuperType:Type)
+            WHERE
+                (method.visibility="public" OR method.visibility="protected")
+                AND returnTypeOrSuperType.fqn = "java.util.concurrent.CompletableFuture"
+            RETURN
+                method AS ExposingSite, returnTypeOrSuperType AS ExposedType
+
+            // method parameters
+            UNION ALL
+            MATCH
+                (type:Type:Api)-[:DECLARES]->(method)-[:HAS]->(parameter)-[:OF_TYPE]->(parameterType:Type)
+                        -[:EXTENDS|:IMPLEMENTS*0..]->(parameterTypeOrSuperType:Type)
+            WHERE
+                (method.visibility="public" OR method.visibility="protected")
+                AND parameterTypeOrSuperType.fqn = "java.util.concurrent.CompletableFuture"
+            RETURN
+                method AS ExposingSite, parameterTypeOrSuperType AS ExposedType
+
+            // fields
+            UNION ALL
+            MATCH
+                (type:Type:Api)-[:DECLARES]->(field)-[:OF_TYPE]->(fieldType:Type)
+                        -[:EXTENDS|:IMPLEMENTS*0..]->(fieldTypeOrSuperType:Type)
+            WHERE
+                (field.visibility="public" OR field.visibility="protected")
+                AND fieldTypeOrSuperType.fqn = "java.util.concurrent.CompletableFuture"
+            RETURN
+                field AS ExposingSite, fieldTypeOrSuperType AS ExposedType
+        ]]></cypher>
+    </constraint>
+
     <constraint id="hsearch:TypesMayNotDependOnImplementationTypeFromOtherModules">
         <requiresConcept refId="hsearch:UtilArtifacts" />
         <requiresConcept refId="hsearch:Main" />
@@ -642,6 +695,7 @@
         <includeConstraint refId="hsearch:PublicTypesMayNotExposeInternalTypes" />
         <includeConstraint refId="hsearch:PublicTypesMayNotDeclareMethodsWithGetOrSetPrefix" />
         <includeConstraint refId="hsearch:APITypesMayNotExposeSPITypes" />
+        <includeConstraint refId="hsearch:APITypesMayNotExposeForbiddenTypes" />
         <includeConstraint refId="hsearch:TypesMayNotDependOnImplementationTypeFromOtherModules" />
         <includeConstraint refId="hsearch:TypesShouldUseImplSuffixWithRestraint" />
         <includeConstraint refId="hsearch:AbstractTypesShouldUseAbstractPrefix" />
