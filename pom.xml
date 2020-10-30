@@ -235,10 +235,6 @@
         <version.javax.batch>1.0.1</version.javax.batch>
         <version.org.jberet>1.4.0.Final</version.org.jberet>
 
-        <!-- >>> JSR 352 test -->
-        <version.com.ibm.jbatch>1.0</version.com.ibm.jbatch>
-        <version.org.apache.derby>10.13.1.1</version.org.apache.derby>
-
         <!-- >>> Java EE/Jakarta EE dependencies -->
         <!-- Used in the JSR352 integration in particular, but also in the ORM integration (?) and various tests -->
         <version.javax.inject>1</version.javax.inject>
@@ -275,6 +271,10 @@
 
         <!-- >>> Performance tests -->
         <version.org.openjdk.jmh>1.23</version.org.openjdk.jmh>
+
+        <!-- >>> JSR 352: JBatch runtime -->
+        <version.com.ibm.jbatch>1.0</version.com.ibm.jbatch>
+        <version.org.apache.derby>10.13.1.1</version.org.apache.derby>
 
         <!-- >>> Spring integration tests -->
         <version.org.springframework.boot>2.3.4.RELEASE</version.org.springframework.boot>
@@ -937,6 +937,18 @@
                         <artifactId>log4j</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <!-- JBatch runtime -->
+            <dependency>
+                <groupId>com.ibm.jbatch</groupId>
+                <artifactId>com.ibm.jbatch-runtime</artifactId>
+                <version>${version.com.ibm.jbatch}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derby</artifactId>
+                <version>${version.org.apache.derby}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
