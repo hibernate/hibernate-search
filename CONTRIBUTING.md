@@ -288,7 +288,7 @@ You can also inspect the created Neo4j datastore after a build,
 provided that build had the `jqassistant` profile enabled:
 
 ```bash
-./mvnw jqassistant:server -Pjqassistant-server -pl reports
+./mvnw jqassistant:server -Pjqassistant
 ```
 
 The Neo4j web UI will be accessible from http://localhost:7474/.
