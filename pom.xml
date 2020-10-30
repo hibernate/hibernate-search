@@ -2131,20 +2131,6 @@
                         <groupId>com.buschmais.jqassistant</groupId>
                         <artifactId>jqassistant-maven-plugin</artifactId>
                         <version>${version.com.buschmais.jqassistant.plugin}</version>
-                        <!--
-                            HSEARCH-3437: ALWAYS use extensions, otherwise the build of each module uses
-                            a different classloader to load classes,
-                            and we end up with some executions using a different definition of internal classes,
-                            and it wreaks havoc in the context shared between the executions.
-                            In particular it messes up the "executedModules" map,
-                            because keys that should be equal no longer are due to their class not being equal.
-                            In short: don't change this without extensive testing.
-
-                            An unfortunate side-effect is that commands such as
-                                mvn jqassistant:server -Pjqassistant -pl reports
-                            will not work anymore, so we need to use a different profile for that (see jqassistant-server).
-                         -->
-                        <extensions>true</extensions>
                         <executions>
                             <execution>
                                 <goals>
@@ -2152,8 +2138,6 @@
                                     <goal>analyze</goal>
                                 </goals>
                                 <configuration>
-                                    <!-- Necessary when using extensions (see above) -->
-                                    <storeLifecycle>MODULE</storeLifecycle>
                                     <warnOnSeverity>INFO</warnOnSeverity>
                                     <failOnSeverity>MAJOR</failOnSeverity>
                                 </configuration>
