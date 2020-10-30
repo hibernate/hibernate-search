@@ -9,6 +9,9 @@ package org.hibernate.search.documentation.testsupport.data;
 import java.io.Serializable;
 import java.util.regex.Pattern;
 
+import org.hibernate.annotations.Immutable;
+
+@Immutable
 public class ISBN implements Serializable {
 
 	private static final Pattern ISBN_13_PATTERN = Pattern.compile( "\\d{3}-\\d-\\d{2}-\\d{6}-\\d" );

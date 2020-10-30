@@ -8,6 +8,9 @@ package org.hibernate.search.integrationtest.showcase.library.model;
 
 import java.io.Serializable;
 
+import org.hibernate.annotations.Immutable;
+
+@Immutable
 public class ISBN implements Serializable {
 	private final String stringValue;
 
