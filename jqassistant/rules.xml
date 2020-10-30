@@ -265,53 +265,43 @@
         ]]></cypher>
     </concept>
 
-    <constraint id="hsearch:PublicTypesMayNotExtendInternalTypes">
+    <constraint id="hsearch:PublicTypesMayNotExposeInternalTypes">
         <requiresConcept refId="hsearch:Public" />
         <requiresConcept refId="hsearch:Impl" />
-        <description>API/SPI types must not extend/implement internal types.</description>
+        <description>API/SPI types must not expose internal types.</description>
         <cypher><![CDATA[
+            // supertypes
             MATCH
-                (type:Type:Public)-[:EXTENDS|:IMPLEMENTS]->(supertype:Type:Impl)
+                (type:Type:Public)-[:EXTENDS|:IMPLEMENTS]->(superType:Type:Impl)
             RETURN
-                type
-        ]]></cypher>
-    </constraint>
+                type AS ExposingSite, superType AS ExposedType
 
-    <constraint id="hsearch:PublicMethodsMayNotExposeInternalTypes">
-        <requiresConcept refId="hsearch:Public" />
-        <requiresConcept refId="hsearch:Impl" />
-        <description>API/SPI methods must not expose internal types.</description>
-        <cypher><![CDATA[
             // return values
+            UNION ALL
             MATCH
-                (type:Type:Public)-[:DECLARES]->(method)-[:RETURNS]->(returntype:Type:Impl)
+                (type:Type:Public)-[:DECLARES]->(method)-[:RETURNS]->(returnType:Type:Impl)
             WHERE
                 (method.visibility="public" OR method.visibility="protected")
             RETURN
-                method
+                method AS ExposingSite, returnType AS ExposedType
 
             // parameters
             UNION ALL
             MATCH
-                (type:Type:Public)-[:DECLARES]->(method)-[:HAS]->(parameter)-[:OF_TYPE]->(parametertype:Type:Impl)
+                (type:Type:Public)-[:DECLARES]->(method)-[:HAS]->(parameter)-[:OF_TYPE]->(parameterType:Type:Impl)
             WHERE
                 (method.visibility="public" OR method.visibility="protected")
             RETURN
-                method
-        ]]></cypher>
-    </constraint>
+                method AS ExposingSite, parameterType AS ExposedType
 
-    <constraint id="hsearch:PublicFieldsMayNotExposeInternalTypes">
-        <requiresConcept refId="hsearch:Public" />
-        <requiresConcept refId="hsearch:Impl" />
-        <description>API/SPI fields must not expose internal types.</description>
-        <cypher><![CDATA[
+            // fields
+            UNION ALL
             MATCH
-                (type:Type:Public)-[:DECLARES]->(field)-[:OF_TYPE]->(fieldtype:Type:Impl)
+                (type:Type:Public)-[:DECLARES]->(field)-[:OF_TYPE]->(fieldType:Type:Impl)
             WHERE
                 (field.visibility="public" OR field.visibility="protected")
             RETURN
-                field
+                field AS ExposingSite, fieldType AS ExposedType
         ]]></cypher>
     </constraint>
 
@@ -350,57 +340,47 @@
         ]]></cypher>
     </constraint>
 
-    <constraint id="hsearch:APITypesMayNotExtendSPITypes">
+    <constraint id="hsearch:APITypesMayNotExposeSPITypes">
         <requiresConcept refId="hsearch:Api" />
         <requiresConcept refId="hsearch:Spi" />
-        <description>API types must not extend/implement SPI types.</description>
+        <description>API types must not expose SPI types.</description>
         <cypher><![CDATA[
+            // supertypes
             MATCH
-                (type:Type:Api)-[:EXTENDS|:IMPLEMENTS]->(supertype:Type:Spi)
+                (type:Type:Api)-[:EXTENDS|:IMPLEMENTS]->(superType:Type:Spi)
             RETURN
-                type
-        ]]></cypher>
-    </constraint>
+                type AS ExposingSite, superType AS ExposedType
 
-    <constraint id="hsearch:APIMethodsMayNotExposeSPITypes">
-        <requiresConcept refId="hsearch:Api" />
-        <requiresConcept refId="hsearch:Spi" />
-        <description>API methods must not expose SPI types.</description>
-        <cypher><![CDATA[
-            // return values
-            MATCH
-                (type:Type:Api)-[:DECLARES]->(method)-[:RETURNS]->(returntype:Type:Spi)
-            WHERE
-                (method.visibility="public" OR method.visibility="protected")
-                // Exclude extensions from SPI leak rules: they are *meant* to allow SPI leaks
-                AND NOT type.name =~ ".*Extension"
-            RETURN
-                method
-
-            // parameters
+            // method return values
             UNION ALL
             MATCH
-                (type:Type:Api)-[:DECLARES]->(method)-[:HAS]->(parameter)-[:OF_TYPE]->(parametertype:Type:Spi)
+                (type:Type:Api)-[:DECLARES]->(method)-[:RETURNS]->(returnType:Type:Spi)
             WHERE
                 (method.visibility="public" OR method.visibility="protected")
                 // Exclude extensions from SPI leak rules: they are *meant* to allow SPI leaks
                 AND NOT type.name =~ ".*Extension"
             RETURN
-                method
-        ]]></cypher>
-    </constraint>
+                method AS ExposingSite, returnType AS ExposedType
 
-    <constraint id="hsearch:APIFieldsMayNotExposeSPITypes">
-        <requiresConcept refId="hsearch:Api" />
-        <requiresConcept refId="hsearch:Spi" />
-        <description>API fields must not expose SPI types.</description>
-        <cypher><![CDATA[
+            // method parameters
+            UNION ALL
             MATCH
-                (type:Type:Api)-[:DECLARES]->(field)-[:OF_TYPE]->(fieldtype:Type:Spi)
+                (type:Type:Api)-[:DECLARES]->(method)-[:HAS]->(parameter)-[:OF_TYPE]->(parameterType:Type:Spi)
+            WHERE
+                (method.visibility="public" OR method.visibility="protected")
+                // Exclude extensions from SPI leak rules: they are *meant* to allow SPI leaks
+                AND NOT type.name =~ ".*Extension"
+            RETURN
+                method AS ExposingSite, parameterType AS ExposedType
+
+            // fields
+            UNION ALL
+            MATCH
+                (type:Type:Api)-[:DECLARES]->(field)-[:OF_TYPE]->(fieldType:Type:Spi)
             WHERE
                 (field.visibility="public" OR field.visibility="protected")
             RETURN
-                field
+                field AS ExposingSite, fieldType AS ExposedType
         ]]></cypher>
     </constraint>
 
@@ -659,13 +639,9 @@
     </constraint>
 
     <group id="default">
-        <includeConstraint refId="hsearch:PublicTypesMayNotExtendInternalTypes" />
-        <includeConstraint refId="hsearch:PublicMethodsMayNotExposeInternalTypes" />
-        <includeConstraint refId="hsearch:PublicFieldsMayNotExposeInternalTypes" />
+        <includeConstraint refId="hsearch:PublicTypesMayNotExposeInternalTypes" />
         <includeConstraint refId="hsearch:PublicTypesMayNotDeclareMethodsWithGetOrSetPrefix" />
-        <includeConstraint refId="hsearch:APITypesMayNotExtendSPITypes" />
-        <includeConstraint refId="hsearch:APIMethodsMayNotExposeSPITypes" />
-        <includeConstraint refId="hsearch:APIFieldsMayNotExposeSPITypes" />
+        <includeConstraint refId="hsearch:APITypesMayNotExposeSPITypes" />
         <includeConstraint refId="hsearch:TypesMayNotDependOnImplementationTypeFromOtherModules" />
         <includeConstraint refId="hsearch:TypesShouldUseImplSuffixWithRestraint" />
         <includeConstraint refId="hsearch:AbstractTypesShouldUseAbstractPrefix" />
