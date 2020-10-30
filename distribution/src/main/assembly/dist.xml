@@ -304,7 +304,7 @@
         <moduleSet>
             <useAllReactorProjects>true</useAllReactorProjects>
             <includes>
-                <include>org.hibernate.search:hibernate-search-batch-jsr352-jberet</include>
+                <include>org.hibernate.search:hibernate-search-mapper-orm-batch-jsr352-jberet</include>
             </includes>
             <binaries>
                 <outputDirectory>dist/batch-jsr352/jberet</outputDirectory>
