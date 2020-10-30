@@ -2,12 +2,16 @@ Red Hat, Inc.
 Adam Harris
 Adrian Nistor
 Ales Justin
+Alexis Cucumel
 Amin Mohammed-Coleman
 Andrej Golovnin
 Andrew Hahn
 Bayo Erinle
 Boris Lublinsky
+Carsten Hammer
 Chase Seibert
+Damien Clément d'Huart
+David Steinkopff
 Davide D'Alto
 Davide Di Somma
 Dawid Kurzyniec
@@ -45,6 +49,7 @@ Oliver Siegmar
 Pedro Ruivo
 Randall Hauch
 Richard Hallier
+Rick Gagne
 Samppa Saarela
 Sanne Grinovero
 Stéphane Gleizes
@@ -56,6 +61,7 @@ Tomas Hradec
 Tom Kuo
 Tom Waterhouse
 Török László
+Waldemar Kłaczyński
 Yoann Rodière
 Zach Kurey
 
