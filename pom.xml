@@ -276,6 +276,11 @@
         <version.com.ibm.jbatch>1.0</version.com.ibm.jbatch>
         <version.org.apache.derby>10.13.1.1</version.org.apache.derby>
 
+        <!-- >>> JSR 352: JBeret SE dependencies -->
+        <version.org.jboss.marshalling>2.0.10.Final</version.org.jboss.marshalling>
+        <version.org.wildfly.security.wildfly-security-manager>1.1.2.Final</version.org.wildfly.security.wildfly-security-manager>
+        <version.org.google.guava>30.0-jre</version.org.google.guava>
+
         <!-- >>> Spring integration tests -->
         <version.org.springframework.boot>2.3.4.RELEASE</version.org.springframework.boot>
 
@@ -949,6 +954,35 @@
                 <groupId>org.apache.derby</groupId>
                 <artifactId>derby</artifactId>
                 <version>${version.org.apache.derby}</version>
+            </dependency>
+
+            <!-- JBeret Core and JBeret SE runtime dependencies -->
+            <dependency>
+                <groupId>org.jboss.marshalling</groupId>
+                <artifactId>jboss-marshalling</artifactId>
+                <version>${version.org.jboss.marshalling}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wildfly.security</groupId>
+                <artifactId>wildfly-security-manager</artifactId>
+                <version>${version.org.wildfly.security.wildfly-security-manager}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${version.org.google.guava}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jberet</groupId>
+                <artifactId>jberet-se</artifactId>
+                <version>${version.org.jberet}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${version.com.h2database}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
