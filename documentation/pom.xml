@@ -100,36 +100,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.ibm.jbatch</groupId>
-            <artifactId>com.ibm.jbatch-runtime</artifactId>
-            <version>${version.com.ibm.jbatch}</version>
-            <scope>test</scope>
-        </dependency>
-        <!--
-            JBatch doesn't provide a transitive dependency to the JSR-352 API, go figure.
-         -->
-        <dependency>
-            <groupId>javax.batch</groupId>
-            <artifactId>javax.batch-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <!--
-            JBatch doesn't provide a transitive dependency to javax.inject, go figure.
-         -->
-        <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <!--
-            JBatch requires a database in order to work, and it seems it uses SQL that won't work with H2.
-            Anyway, it uses an embedded Derby instance by default, so we just put the Derby driver in the classpath
-            so it won't complain.
-         -->
-        <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derby</artifactId>
-            <version>${version.org.apache.derby}</version>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-jbatch-runtime</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
