@@ -33,8 +33,13 @@ public interface LuceneIndexManager extends IndexManager {
 	Analyzer searchAnalyzer();
 
 	/**
+	 * @return The size of the index on its storage support, in bytes.
+	 */
+	long computeSizeInBytes();
+
+	/**
 	 * @return A future that will ultimately provide the size of the index on its storage support, in bytes.
 	 */
-	CompletableFuture<Long> computeSizeInBytes();
+	CompletableFuture<Long> computeSizeInBytesAsync();
 
 }

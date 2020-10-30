@@ -1167,7 +1167,6 @@ include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/indexmana
 <1> Retrieve the `SearchMapping`.
 <2> Retrieve the `IndexManager`.
 <3> Narrow down the index manager to the `LuceneIndexManager` type.
-<4> Request computation of the index size.
-The size is computed in a background thread, so this call is non-blocking and returns a `CompletableFuture`.
-<5> Wait until the index size is computed, then get the index size.
+<4> Compute the index size and get the result.
+<5> An asynchronous version of the method is also available.
 ====
