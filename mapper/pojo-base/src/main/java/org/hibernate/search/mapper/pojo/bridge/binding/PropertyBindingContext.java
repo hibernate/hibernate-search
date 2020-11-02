@@ -25,8 +25,6 @@ public interface PropertyBindingContext extends BindingContext {
 	 *
 	 * @param bridge The bridge to use at runtime to convert between the POJO property and the index field value.
 	 */
-	// FIXME also require the caller to pass the expected raw type here, and validate it.
-	//  We'll need to add generic type parameters to PropertyBridge, however.
 	void bridge(PropertyBridge bridge);
 
 	/**
@@ -36,8 +34,6 @@ public interface PropertyBindingContext extends BindingContext {
 	 * the bridge to use at runtime to convert between the POJO property and the index field value.
 	 * Use {@link BeanHolder#of(Object)} if you don't need any particular closing behavior.
 	 */
-	// FIXME also require the caller to pass the expected raw type here, and validate it.
-	//  We'll need to add generic type parameters to PropertyBridge, however.
 	void bridge(BeanHolder<? extends PropertyBridge> bridgeHolder);
 
 	/**
