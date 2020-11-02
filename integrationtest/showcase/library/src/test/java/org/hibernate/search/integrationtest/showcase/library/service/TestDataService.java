@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Locale;
 
 import javax.persistence.EntityManager;
@@ -255,8 +253,6 @@ public class TestDataService {
 		borrowalService.createAccount( paulJohn );
 		borrowalService.borrow( paulJohn, cityCenterLibrary, javaForDummies, BorrowalType.SHORT_TERM );
 		borrowalService.borrow( paulJohn, cityCenterLibrary, artOfComputerProg, BorrowalType.SHORT_TERM );
-
-		assertThat( true ).isEqualTo( true );
 	}
 
 	public void initBooksDataSet(int numberOfBooks) {
