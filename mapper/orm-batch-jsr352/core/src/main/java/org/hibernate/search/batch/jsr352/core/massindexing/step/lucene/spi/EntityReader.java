@@ -183,10 +183,9 @@ public class EntityReader extends AbstractItemReader {
 	 *
 	 * @param checkpointInfo The last checkpoint info persisted in the batch runtime, previously given by checkpointInfo().
 	 * If this is the first start, then the checkpoint will be null.
-	 * @throws Exception thrown for any errors.
 	 */
 	@Override
-	public void open(Serializable checkpointInfo) throws Exception {
+	public void open(Serializable checkpointInfo) throws IOException, ClassNotFoundException {
 		log.openingReader( serializedPartitionId, entityName );
 
 		final int partitionId = SerializationUtil.parseIntegerParameter( PARTITION_ID, serializedPartitionId );
@@ -246,7 +245,7 @@ public class EntityReader extends AbstractItemReader {
 	 * @throws Exception thrown for any errors.
 	 */
 	@Override
-	public void close() throws Exception {
+	public void close() {
 		log.closingReader( serializedPartitionId, entityName );
 		if ( chunkState != null ) {
 			chunkState.close();
@@ -277,11 +276,9 @@ public class EntityReader extends AbstractItemReader {
 	 * checkpoint is committed.
 	 *
 	 * @return the checkpoint info
-	 *
-	 * @throws Exception thrown for any errors.
 	 */
 	@Override
-	public Serializable checkpointInfo() throws Exception {
+	public Serializable checkpointInfo() {
 		Serializable checkpointInfo = chunkState.end();
 		log.checkpointReached( entityName, checkpointInfo );
 		return checkpointInfo;
@@ -295,7 +292,7 @@ public class EntityReader extends AbstractItemReader {
 	 *
 	 * See https://github.com/WASdev/standards.jsr352.jbatch/issues/50
 	 */
-	private JobContextData getOrCreateJobContextData() throws ClassNotFoundException, IOException {
+	private JobContextData getOrCreateJobContextData() {
 		return JobContextUtil.getOrCreateData(
 				jobContext, emfRegistry, entityManagerFactoryNamespace, entityManagerFactoryReference,
 				serializedEntityTypes
@@ -348,7 +345,7 @@ public class EntityReader extends AbstractItemReader {
 	 * and uses the last returned entity's ID as a checkpoint ID.
 	 */
 	private FetchingStrategy createCriteriaFetchingStrategy(
-			CacheMode cacheMode, int entityFetchSize, Integer maxResults) throws Exception {
+			CacheMode cacheMode, int entityFetchSize, Integer maxResults) throws IOException, ClassNotFoundException {
 		Class<?> entityType = jobData.getEntityType( entityName );
 		Object upperBound = SerializationUtil.deserialize( serializedUpperBound );
 		Object lowerBound = SerializationUtil.deserialize( serializedLowerBound );
