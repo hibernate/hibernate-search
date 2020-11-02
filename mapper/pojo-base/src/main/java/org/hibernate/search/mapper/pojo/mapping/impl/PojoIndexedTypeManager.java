@@ -20,6 +20,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
@@ -147,10 +148,10 @@ public class PojoIndexedTypeManager<I, E>
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoWorkSessionContext<?> sessionContext,
-			Object identifier, Supplier<E> entitySupplier, Set<String> dirtyPaths) {
+			Object identifier, Supplier<E> entitySupplier,
+			PojoImplicitReindexingResolverRootContext<Set<String>> context) {
 		try {
-			reindexingResolver.resolveEntitiesToReindex( collector, sessionContext.runtimeIntrospector(),
-					entitySupplier.get(), dirtyPaths );
+			reindexingResolver.resolveEntitiesToReindex( collector, entitySupplier.get(), context );
 		}
 		catch (RuntimeException e) {
 			Object entityReference = EntityReferenceFactory.safeCreateEntityReference(

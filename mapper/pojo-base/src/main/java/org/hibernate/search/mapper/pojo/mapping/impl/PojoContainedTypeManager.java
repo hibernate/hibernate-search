@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
+import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
@@ -78,10 +79,10 @@ public class PojoContainedTypeManager<E>
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoWorkSessionContext<?> sessionContext,
-			Object identifier, Supplier<E> entitySupplier, Set<String> dirtyPaths) {
+			Object identifier, Supplier<E> entitySupplier,
+			PojoImplicitReindexingResolverRootContext<Set<String>> context) {
 		try {
-			reindexingResolver.resolveEntitiesToReindex( collector, sessionContext.runtimeIntrospector(),
-					entitySupplier.get(), dirtyPaths );
+			reindexingResolver.resolveEntitiesToReindex( collector, entitySupplier.get(), context );
 		}
 		catch (RuntimeException e) {
 			Object entityReference = EntityReferenceFactory.safeCreateEntityReference(

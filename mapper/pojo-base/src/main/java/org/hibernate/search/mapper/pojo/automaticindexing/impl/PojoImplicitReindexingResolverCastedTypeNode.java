@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
@@ -51,10 +50,10 @@ public class PojoImplicitReindexingResolverCastedTypeNode<T, S, U> extends PojoI
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			PojoRuntimeIntrospector runtimeIntrospector, T dirty, S dirtinessState) {
-		U castedDirty = caster.castOrNull( runtimeIntrospector.unproxy( dirty ) );
+			T dirty, PojoImplicitReindexingResolverRootContext<S> context) {
+		U castedDirty = caster.castOrNull( context.sessionContext().runtimeIntrospector().unproxy( dirty ) );
 		if ( castedDirty != null ) {
-			nested.resolveEntitiesToReindex( collector, runtimeIntrospector, castedDirty, dirtinessState );
+			nested.resolveEntitiesToReindex( collector, castedDirty, context );
 		}
 	}
 }

@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.work.impl;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
@@ -22,7 +23,9 @@ public interface PojoWorkTypeContext<E> {
 
 	Supplier<E> toEntitySupplier(PojoWorkSessionContext<?> sessionContext, Object entity);
 
-	void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoWorkSessionContext<?> sessionContext,
-			Object identifier, Supplier<E> entitySupplier, Set<String> dirtyPaths);
+	void resolveEntitiesToReindex(PojoReindexingCollector collector,
+			PojoWorkSessionContext<?> sessionContext, Object identifier,
+			Supplier<E> entitySupplier,
+			PojoImplicitReindexingResolverRootContext<Set<String>> context);
 
 }

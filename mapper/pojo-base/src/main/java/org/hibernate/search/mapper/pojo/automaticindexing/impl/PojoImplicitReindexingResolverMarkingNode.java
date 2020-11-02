@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
-import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
 /**
@@ -29,7 +28,7 @@ public class PojoImplicitReindexingResolverMarkingNode<T, S> extends PojoImplici
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			PojoRuntimeIntrospector runtimeIntrospector, T dirty, S dirtinessState) {
+			T dirty, PojoImplicitReindexingResolverRootContext<S> context) {
 		collector.markForReindexing( dirty );
 	}
 }

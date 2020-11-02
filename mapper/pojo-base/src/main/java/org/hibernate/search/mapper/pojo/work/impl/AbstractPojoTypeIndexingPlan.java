@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
+import org.hibernate.search.mapper.pojo.automaticindexing.spi.PojoImplicitReindexingResolverSessionContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
@@ -78,7 +80,8 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 
 	protected abstract S createState(I identifier);
 
-	abstract class AbstractEntityState {
+	abstract class AbstractEntityState
+			implements PojoImplicitReindexingResolverRootContext<Set<String>> {
 		final I identifier;
 		Supplier<E> entitySupplier;
 
@@ -91,6 +94,16 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 
 		AbstractEntityState(I identifier) {
 			this.identifier = identifier;
+		}
+
+		@Override
+		public PojoImplicitReindexingResolverSessionContext sessionContext() {
+			return sessionContext;
+		}
+
+		@Override
+		public Set<String> dirtinessState() {
+			return dirtyPaths;
 		}
 
 		void add(Supplier<E> entitySupplier, String providedRoutingKey) {
@@ -151,10 +164,8 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		void resolveDirty(PojoReindexingCollector containingEntityCollector) {
 			if ( shouldResolveToReindex ) {
 				shouldResolveToReindex = false; // Avoid infinite looping
-				typeContext().resolveEntitiesToReindex(
-						containingEntityCollector, sessionContext, identifier, entitySupplier,
-						considerAllDirty ? null : dirtyPaths
-				);
+				typeContext().resolveEntitiesToReindex( containingEntityCollector, sessionContext, identifier,
+						entitySupplier, this );
 			}
 		}
 

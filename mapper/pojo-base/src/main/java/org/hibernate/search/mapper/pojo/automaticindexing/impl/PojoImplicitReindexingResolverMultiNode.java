@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
 import java.util.Collection;
 
-import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
@@ -45,9 +44,9 @@ public class PojoImplicitReindexingResolverMultiNode<T, S> extends PojoImplicitR
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			PojoRuntimeIntrospector runtimeIntrospector, T dirty, S dirtinessState) {
+			T dirty, PojoImplicitReindexingResolverRootContext<S> context) {
 		for ( PojoImplicitReindexingResolverNode<? super T, S> element : elements ) {
-			element.resolveEntitiesToReindex( collector, runtimeIntrospector, dirty, dirtinessState );
+			element.resolveEntitiesToReindex( collector, dirty, context );
 		}
 	}
 }

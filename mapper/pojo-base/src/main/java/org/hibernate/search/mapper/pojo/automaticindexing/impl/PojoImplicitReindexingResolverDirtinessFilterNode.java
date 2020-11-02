@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
@@ -47,10 +46,11 @@ public class PojoImplicitReindexingResolverDirtinessFilterNode<T, S> extends Poj
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			PojoRuntimeIntrospector runtimeIntrospector, T dirty, S dirtinessState) {
+			T dirty, PojoImplicitReindexingResolverRootContext<S> context) {
+		S dirtinessState = context.dirtinessState();
 		// See method javadoc: null means we must consider all paths as dirty
 		if ( dirtinessState == null || dirtyPathFilter.test( dirtinessState ) ) {
-			nested.resolveEntitiesToReindex( collector, runtimeIntrospector, dirty, dirtinessState );
+			nested.resolveEntitiesToReindex( collector, dirty, context );
 		}
 	}
 }

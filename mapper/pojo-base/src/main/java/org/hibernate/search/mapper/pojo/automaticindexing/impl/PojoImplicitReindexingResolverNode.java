@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
-import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
@@ -14,7 +13,7 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  * An node within a {@link PojoImplicitReindexingResolver}.
  *
  * @param <T> The type of "dirty" objects for which this resolver is able to
- * {@link #resolveEntitiesToReindex(PojoReindexingCollector, PojoRuntimeIntrospector, Object, Object)
+ * {@link #resolveEntitiesToReindex(PojoReindexingCollector, Object, PojoImplicitReindexingResolverRootContext)
  * resolve entities to reindex}.
  * This type may be an entity type, an embeddable type, a collection type, ...
  * @param <S> The expected type of the object describing the "dirtiness state".
@@ -32,17 +31,16 @@ public abstract class PojoImplicitReindexingResolverNode<T, S> implements AutoCl
 	/**
 	 * Add all entities that should be reindexed to {@code collector},
 	 * taking into account the given "dirtiness state".
-	 *
-	 * @param collector A collector for entities that should be reindexed.
+	 *  @param collector A collector for entities that should be reindexed.
 	 * @param dirty A value that is dirty to some extent.
-	 * @param dirtinessState The set of dirty paths in the object passed to the root reindexing resolver
-	 * (resolvers may delegate to other resolvers, but they will always pass the same dirtiness state to delegates).
-	 * {@code null} can be passed to mean "no information", in which case all paths are considered dirty.
+	 * @param context The set of dirty paths in the object passed to the root reindexing resolver
+ * (resolvers may delegate to other resolvers, but they will always pass the same dirtiness state to delegates).
+ * {@code null} can be passed to mean "no information", in which case all paths are considered dirty.
 	 */
 	public abstract void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			PojoRuntimeIntrospector runtimeIntrospector, T dirty, S dirtinessState);
+			T dirty, PojoImplicitReindexingResolverRootContext<S> context);
 
-	public static <T, D> PojoImplicitReindexingResolverNode<T, D> noOp() {
+	public static <T, S> PojoImplicitReindexingResolverNode<T, S> noOp() {
 		return NoOpPojoImplicitReindexingResolverNode.get();
 	}
 

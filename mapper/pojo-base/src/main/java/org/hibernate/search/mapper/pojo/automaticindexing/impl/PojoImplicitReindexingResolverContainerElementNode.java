@@ -53,16 +53,16 @@ public class PojoImplicitReindexingResolverContainerElementNode<C, S, V>
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			PojoRuntimeIntrospector runtimeIntrospector, C dirty, S dirtinessState) {
+			C dirty, PojoImplicitReindexingResolverRootContext<S> context) {
 		extractorHolder.get().extract( dirty, containerElement -> resolveEntitiesToReindexForContainerElement(
-				collector, runtimeIntrospector, containerElement, dirtinessState
+				collector, containerElement, context
 		) );
 	}
 
 	private void resolveEntitiesToReindexForContainerElement(PojoReindexingCollector collector,
-			PojoRuntimeIntrospector runtimeIntrospector, V containerElement, S dirtinessState) {
+			V containerElement, PojoImplicitReindexingResolverRootContext<S> context) {
 		if ( containerElement != null ) {
-			nested.resolveEntitiesToReindex( collector, runtimeIntrospector, containerElement, dirtinessState );
+			nested.resolveEntitiesToReindex( collector, containerElement, context );
 		}
 	}
 }

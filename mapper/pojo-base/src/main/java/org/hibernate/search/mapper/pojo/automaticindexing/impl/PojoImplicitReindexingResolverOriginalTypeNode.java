@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
-import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
@@ -44,8 +43,8 @@ public class PojoImplicitReindexingResolverOriginalTypeNode<T, S> extends PojoIm
 	@Override
 	@SuppressWarnings("unchecked") // As long as T is not a proxy-specific interface, it will also be implemented by the unproxified object
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			PojoRuntimeIntrospector runtimeIntrospector, T dirty, S dirtinessState) {
-		dirty = (T) runtimeIntrospector.unproxy( dirty );
-		nested.resolveEntitiesToReindex( collector, runtimeIntrospector, dirty, dirtinessState );
+			T dirty, PojoImplicitReindexingResolverRootContext<S> context) {
+		dirty = (T) context.sessionContext().runtimeIntrospector().unproxy( dirty );
+		nested.resolveEntitiesToReindex( collector, dirty, context );
 	}
 }

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
-import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
@@ -51,10 +50,10 @@ public class PojoImplicitReindexingResolverPropertyNode<T, S, P> extends PojoImp
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			PojoRuntimeIntrospector runtimeIntrospector, T dirty, S dirtinessState) {
+			T dirty, PojoImplicitReindexingResolverRootContext<S> context) {
 		P propertyValue = handle.get( dirty );
 		if ( propertyValue != null ) {
-			nested.resolveEntitiesToReindex( collector, runtimeIntrospector, propertyValue, dirtinessState );
+			nested.resolveEntitiesToReindex( collector, propertyValue, context );
 		}
 	}
 }
