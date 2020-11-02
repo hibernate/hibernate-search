@@ -101,12 +101,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	private final HibernateOrmRuntimeIntrospector runtimeIntrospector;
 	private ConfiguredAutomaticIndexingSynchronizationStrategy configuredAutomaticIndexingSynchronizationStrategy;
 
-	/*
-	 * FIXME HSEARCH-3317 support "enlist in transaction"? This only makes sense when index managers support it,
-	 *  maybe there's something to change here...
-	 */
-	private boolean enlistInTransaction = false;
-
 	private SearchIndexingPlanImpl indexingPlan;
 
 	private HibernateOrmSearchSession(Builder builder) {
@@ -311,18 +305,10 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 			Map<Transaction, PojoIndexingPlan<EntityReference>> indexingPlanPerTransaction,
 			Transaction transactionIdentifier,
 			ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
-		if ( enlistInTransaction ) {
-			return new InTransactionWorkQueueSynchronization(
-					indexingPlan, indexingPlanPerTransaction, transactionIdentifier,
-					synchronizationStrategy
-			);
-		}
-		else {
-			return new PostTransactionWorkQueueSynchronization(
-					indexingPlan, indexingPlanPerTransaction, transactionIdentifier,
-					synchronizationStrategy
-			);
-		}
+		return new PostTransactionWorkQueueSynchronization(
+				indexingPlan, indexingPlanPerTransaction, transactionIdentifier,
+				synchronizationStrategy
+		);
 	}
 
 	private void registerSynchronization(SessionImplementor sessionImplementor, Synchronization synchronization) {
