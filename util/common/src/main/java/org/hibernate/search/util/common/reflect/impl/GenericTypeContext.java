@@ -123,13 +123,13 @@ public final class GenericTypeContext {
 	}
 
 	private Type resolveType(Type type) {
-		Type resolvedType = type;
+		Type result = type;
 		TypeVariable<?> typeVariable = null;
 
-		while ( resolvedType instanceof TypeVariable && resolvedType != typeVariable ) {
-			typeVariable = (TypeVariable<?>) resolvedType;
+		while ( result instanceof TypeVariable && result != typeVariable ) {
+			typeVariable = (TypeVariable<?>) result;
 			if ( typeVariable.getGenericDeclaration() instanceof Class ) {
-				resolvedType = typeMappings.get( typeVariable );
+				result = typeMappings.get( typeVariable );
 			}
 			else {
 				/*
@@ -137,11 +137,11 @@ public final class GenericTypeContext {
 				 * cannot be resolved statically.
 				 * Give up and use the first upper bound.
 				 */
-				resolvedType = typeVariable.getBounds()[0];
+				result = typeVariable.getBounds()[0];
 			}
 		}
 
-		if ( resolvedType == null && typeVariable != null ) {
+		if ( result == null && typeVariable != null ) {
 			// The mappedType type was a type variable external to this type
 			if ( declaringContext != null ) {
 				// Ask the declaring context to resolve it, if possible
@@ -158,7 +158,7 @@ public final class GenericTypeContext {
 			 * or to a non-variable type.
 			 * In either case, no need to ask the declaring context to resolve any further.
 			 */
-			return resolvedType;
+			return result;
 		}
 	}
 

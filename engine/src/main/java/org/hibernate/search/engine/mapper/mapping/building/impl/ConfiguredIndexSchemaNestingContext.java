@@ -98,10 +98,10 @@ class ConfiguredIndexSchemaNestingContext implements IndexSchemaNestingContext {
 				afterPreviousDotIndex = nextDotIndex + 1;
 				nextDotIndex = prefixToParse.indexOf( '.', afterPreviousDotIndex );
 			}
-			String unconsumedPrefix = prefixToParse.substring( afterPreviousDotIndex );
+			String composedUnconsumedPrefix = prefixToParse.substring( afterPreviousDotIndex );
 
 			ConfiguredIndexSchemaNestingContext nestedContext =
-					new ConfiguredIndexSchemaNestingContext( composedFilter, "", unconsumedPrefix );
+					new ConfiguredIndexSchemaNestingContext( composedFilter, "", composedUnconsumedPrefix );
 			return Optional.of( contextBuilder.build( nestedContext ) );
 		}
 		else {
