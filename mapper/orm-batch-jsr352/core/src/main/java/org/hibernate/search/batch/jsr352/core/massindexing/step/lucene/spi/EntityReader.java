@@ -241,8 +241,6 @@ public class EntityReader extends AbstractItemReader {
 
 	/**
 	 * Close operation(s) before the class destruction.
-	 *
-	 * @throws Exception thrown for any errors.
 	 */
 	@Override
 	public void close() {
@@ -257,8 +255,6 @@ public class EntityReader extends AbstractItemReader {
 
 	/**
 	 * Read item from database using JPA. Each read, there will be only one entity fetched.
-	 *
-	 * @throws Exception thrown for any errors.
 	 */
 	@Override
 	public Object readItem() throws Exception {
