@@ -9,6 +9,7 @@ package org.hibernate.search.engine.reporting.spi;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.hibernate.search.util.common.reporting.impl.AbstractSimpleEventContextElement;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
@@ -21,49 +22,27 @@ public class EventContexts {
 
 	private static final EngineEventContextMessages MESSAGES = EngineEventContextMessages.INSTANCE;
 
-	private static final EventContext DEFAULT = EventContext.create(
-			new EventContextElement() {
-				@Override
-				public String toString() {
-					return "EventContextElement[" + render() + "]";
-				}
+	private static final EventContext DEFAULT = singleton( MESSAGES::defaultOnMissingContextElement );
 
-				@Override
-				public String render() {
-					return MESSAGES.defaultOnMissingContextElement();
-				}
-			}
-	);
+	private static final EventContext DEFAULT_BACKEND = singleton( MESSAGES::defaultBackend );
 
-	private static final EventContext DEFAULT_BACKEND = EventContext.create(
-			new EventContextElement() {
-				@Override
-				public String toString() {
-					return "EventContextElement[" + render() + "]";
-				}
-
-				@Override
-				public String render() {
-					return MESSAGES.defaultBackend();
-				}
-			}
-	);
-
-	private static final EventContext INDEX_SCHEMA_ROOT = EventContext.create(
-			new EventContextElement() {
-				@Override
-				public String toString() {
-					return "EventContextElement[" + render() + "]";
-				}
-
-				@Override
-				public String render() {
-					return MESSAGES.indexSchemaRoot();
-				}
-			}
-	);
+	private static final EventContext INDEX_SCHEMA_ROOT = singleton( MESSAGES::indexSchemaRoot );
 
 	private EventContexts() {
+	}
+
+	public static EventContext singleton(Supplier<String> render) {
+		return EventContext.create( new EventContextElement() {
+			@Override
+			public String toString() {
+				return "EventContextElement[" + render() + "]";
+			}
+
+			@Override
+			public String render() {
+				return render.get();
+			}
+		} );
 	}
 
 	public static EventContext defaultContext() {
