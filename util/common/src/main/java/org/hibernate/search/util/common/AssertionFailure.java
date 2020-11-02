@@ -19,7 +19,7 @@ public class AssertionFailure extends RuntimeException {
 	}
 
 	private static String appendIssueReportRequest(String message) {
-		if ( message == null || !message.isEmpty() ) {
+		if ( message == null || message.isEmpty() ) {
 			// Shouldn't happen, but let's be safe.
 			message = "Unknown failure";
 		}
