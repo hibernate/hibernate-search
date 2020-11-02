@@ -257,7 +257,7 @@ public class EntityReader extends AbstractItemReader {
 	 * Read item from database using JPA. Each read, there will be only one entity fetched.
 	 */
 	@Override
-	public Object readItem() throws Exception {
+	public Object readItem() {
 		log.readingEntity();
 
 		Object entity = chunkState.next();
