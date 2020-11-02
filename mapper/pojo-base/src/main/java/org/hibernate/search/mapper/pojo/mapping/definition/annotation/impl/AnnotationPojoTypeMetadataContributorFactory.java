@@ -50,13 +50,9 @@ class AnnotationPojoTypeMetadataContributorFactory {
 		TypeMappingStepImpl typeMappingStep = new TypeMappingStepImpl( typeModel );
 
 		// Process annotations and add metadata to the type mapping
-		boolean processedTypeLevelAnnotation = processTypeLevelAnnotations( typeMappingStep, typeModel );
-		boolean processedPropertyLevelAnnotation = typeModel.declaredProperties()
-				.map( propertyModel -> processPropertyLevelAnnotations( typeMappingStep, typeModel, propertyModel ) )
-				.reduce( (processedAnnotationHere, processedAnnotationThere) -> processedAnnotationHere || processedAnnotationThere )
-				.orElse( false );
+		boolean processedAtLeastOneAnnotation = processAnnotations( typeMappingStep, typeModel );
 
-		if ( !processedTypeLevelAnnotation && !processedPropertyLevelAnnotation ) {
+		if ( !processedAtLeastOneAnnotation ) {
 			// No annotation was processed, this type mapping is pointless.
 			return Optional.empty();
 		}
@@ -65,7 +61,7 @@ class AnnotationPojoTypeMetadataContributorFactory {
 		return Optional.of( typeMappingStep );
 	}
 
-	private boolean processTypeLevelAnnotations(TypeMappingStepImpl typeMappingContext, PojoRawTypeModel<?> typeModel) {
+	private boolean processAnnotations(TypeMappingStepImpl typeMappingContext, PojoRawTypeModel<?> typeModel) {
 		boolean processedAtLeastOneAnnotation = false;
 		List<Annotation> annotationList = typeModel.annotations()
 				.flatMap( annotationHelper::expandRepeatableContainingAnnotation )
@@ -75,13 +71,20 @@ class AnnotationPojoTypeMetadataContributorFactory {
 				processedAtLeastOneAnnotation = true;
 			}
 		}
+
+		for ( PojoPropertyModel<?> propertyModel : typeModel.declaredProperties() ) {
+			String propertyName = propertyModel.name();
+			PropertyMappingStep mappingContext = typeMappingContext.property( propertyName );
+			if ( processPropertyLevelAnnotations( mappingContext, typeModel, propertyModel ) ) {
+				processedAtLeastOneAnnotation = true;
+			}
+		}
+
 		return processedAtLeastOneAnnotation;
 	}
 
-	private boolean processPropertyLevelAnnotations(TypeMappingStepImpl typeMappingContext,
+	private boolean processPropertyLevelAnnotations(PropertyMappingStep mappingContext,
 			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel) {
-		String propertyName = propertyModel.name();
-		PropertyMappingStep mappingContext = typeMappingContext.property( propertyName );
 		boolean processedAtLeastOneAnnotation = false;
 		List<Annotation> annotationList = propertyModel.annotations()
 				.flatMap( annotationHelper::expandRepeatableContainingAnnotation )

@@ -7,6 +7,8 @@
 package org.hibernate.search.mapper.pojo.model.spi;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,14 +84,14 @@ public abstract class AbstractPojoRawTypeModel<T, I extends PojoBootstrapIntrosp
 	}
 
 	@Override
-	public final Stream<PojoPropertyModel<?>> declaredProperties() {
+	public final Collection<PojoPropertyModel<?>> declaredProperties() {
 		if ( declaredProperties == null ) {
-			declaredProperties = declaredPropertyNames()
+			declaredProperties = Collections.unmodifiableList( declaredPropertyNames()
 					.map( this::propertyOrNull )
 					.filter( Objects::nonNull )
-					.collect( Collectors.toList() );
+					.collect( Collectors.toList() ) );
 		}
-		return declaredProperties.stream();
+		return declaredProperties;
 	}
 
 	@Override

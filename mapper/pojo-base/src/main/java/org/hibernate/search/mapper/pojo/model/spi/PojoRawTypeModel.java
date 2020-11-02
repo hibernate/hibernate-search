@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.model.spi;
 
 import java.lang.annotation.Annotation;
+import java.util.Collection;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
@@ -54,7 +55,7 @@ public interface PojoRawTypeModel<T> extends PojoTypeModel<T>, MappableTypeModel
 
 	Stream<Annotation> annotations();
 
-	Stream<PojoPropertyModel<?>> declaredProperties();
+	Collection<PojoPropertyModel<?>> declaredProperties();
 
 	PojoCaster<T> caster();
 

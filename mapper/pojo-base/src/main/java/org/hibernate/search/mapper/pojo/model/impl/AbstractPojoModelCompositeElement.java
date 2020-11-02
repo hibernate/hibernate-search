@@ -22,7 +22,6 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAd
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -93,7 +92,7 @@ public abstract class AbstractPojoModelCompositeElement<V> implements PojoModelC
 		if ( !propertiesInitialized ) {
 			// Populate all the known properties
 			getTypeModel().rawType().ascendingSuperTypes()
-					.flatMap( PojoRawTypeModel::declaredProperties )
+					.flatMap( pojoRawTypeModel -> pojoRawTypeModel.declaredProperties().stream() )
 					.map( PojoPropertyModel::name )
 					.forEach( this::property );
 			propertiesInitialized = true;
