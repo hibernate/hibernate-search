@@ -20,7 +20,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.hibernate.search.batch.jsr352.core.massindexing.impl.JobContextData;
-import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.PartitionMapper;
+import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.HibernateSearchPartitionMapper;
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.MassIndexingPartitionProperties;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Person;
@@ -36,7 +36,7 @@ import org.junit.Test;
  *
  * @author Mincong Huang
  */
-public class PartitionMapperComponentIT {
+public class HibernateSearchPartitionMapperComponentIT {
 
 	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();
 	private static final int COMP_ROWS = 3;
@@ -46,7 +46,7 @@ public class PartitionMapperComponentIT {
 
 	private JobContext mockedJobContext;
 
-	private PartitionMapper partitionMapper;
+	private HibernateSearchPartitionMapper partitionMapper;
 
 	@Before
 	public void setUp() {
@@ -75,7 +75,7 @@ public class PartitionMapperComponentIT {
 		final String rowsPerPartition = String.valueOf( 3 );
 
 		mockedJobContext = mock( JobContext.class );
-		partitionMapper = new PartitionMapper(
+		partitionMapper = new HibernateSearchPartitionMapper(
 				fetchSize,
 				hql,
 				maxThreads,

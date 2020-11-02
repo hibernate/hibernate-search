@@ -100,7 +100,7 @@ public class RestartChunkIT {
 	@BMRules(rules = {
 			@BMRule(
 					name = "Create count-down before the step partitioning",
-					targetClass = "org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.PartitionMapper",
+					targetClass = "org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.HibernateSearchPartitionMapper",
 					targetMethod = "mapPartitions",
 					targetLocation = "AT EXIT",
 					// The counter value must be less than CHECKPOINT_INTERVAL, but non-zero
@@ -126,7 +126,7 @@ public class RestartChunkIT {
 	@BMRules(rules = {
 			@BMRule(
 					name = "Create count-down before the step partitioning",
-					targetClass = "org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.PartitionMapper",
+					targetClass = "org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.HibernateSearchPartitionMapper",
 					targetMethod = "mapPartitions",
 					targetLocation = "AT EXIT",
 					// The counter value must NOT be a multiple of CHECKPOINT_INTERVAL
@@ -166,7 +166,7 @@ public class RestartChunkIT {
 	@BMRules(rules = {
 			@BMRule(
 					name = "Create count-down before the step partitioning",
-					targetClass = "org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.PartitionMapper",
+					targetClass = "org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.HibernateSearchPartitionMapper",
 					targetMethod = "mapPartitions",
 					targetLocation = "AT EXIT",
 					// The counter value must be less than CHECKPOINT_INTERVAL, but non-zero
@@ -192,7 +192,7 @@ public class RestartChunkIT {
 	@BMRules(rules = {
 			@BMRule(
 					name = "Create count-down before the step partitioning",
-					targetClass = "org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.PartitionMapper",
+					targetClass = "org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.HibernateSearchPartitionMapper",
 					targetMethod = "mapPartitions",
 					targetLocation = "AT EXIT",
 					// The counter value must NOT be a multiple of CHECKPOINT_INTERVAL

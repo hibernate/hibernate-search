@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import javax.batch.api.BatchProperty;
+import javax.batch.api.partition.PartitionMapper;
 import javax.batch.api.partition.PartitionPlan;
 import javax.batch.api.partition.PartitionPlanImpl;
 import javax.batch.runtime.context.JobContext;
@@ -64,7 +65,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *
  * @author Mincong Huang
  */
-public class PartitionMapper implements javax.batch.api.partition.PartitionMapper {
+public class HibernateSearchPartitionMapper implements PartitionMapper {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -101,13 +102,13 @@ public class PartitionMapper implements javax.batch.api.partition.PartitionMappe
 
 	private EntityManagerFactory emf;
 
-	public PartitionMapper() {
+	public HibernateSearchPartitionMapper() {
 	}
 
 	/**
 	 * Constructor for unit test.
 	 */
-	public PartitionMapper(
+	public HibernateSearchPartitionMapper(
 				String serializedIdFetchSize,
 				String customQueryHql,
 				String serializedMaxThreads,
