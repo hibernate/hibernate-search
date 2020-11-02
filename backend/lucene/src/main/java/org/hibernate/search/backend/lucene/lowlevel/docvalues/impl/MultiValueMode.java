@@ -290,20 +290,24 @@ public enum MultiValueMode {
 	abstract long pick(SortedNumericDocValues values) throws IOException;
 
 	long pick(SortedNumericDocValues values, JoinChildrenIdIterator joinIterator) throws IOException {
-		throw new IllegalArgumentException( "Unsupported sort mode: " + this );
+		throw unsupportedSortMode();
 	}
 
 	abstract double pick(SortedNumericDoubleDocValues values) throws IOException;
 
 	double pick(SortedNumericDoubleDocValues values, JoinChildrenIdIterator joinIterator) throws IOException {
-		throw new IllegalArgumentException( "Unsupported sort mode: " + this );
+		throw unsupportedSortMode();
 	}
 
 	long pick(SortedSetDocValues values) throws IOException {
-		throw new IllegalArgumentException( "Unsupported sort mode: " + this );
+		throw unsupportedSortMode();
 	}
 
 	long pick(SortedSetDocValues values, JoinChildrenIdIterator joinIterator) throws IOException {
-		throw new IllegalArgumentException( "Unsupported sort mode: " + this );
+		throw unsupportedSortMode();
+	}
+
+	IllegalArgumentException unsupportedSortMode() {
+		return new IllegalArgumentException( "Unsupported sort mode: " + this );
 	}
 }
