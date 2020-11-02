@@ -186,29 +186,7 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 				}
 			}
 
-			if ( deadline != null ) {
-				// Server-side timeout: the search will truncate results or fail on timeout.
-				builder.param( "timeout", deadline.remainingTimeMillis() + "ms" );
-				if ( allowPartialSearchResultsSupported ) {
-					// If ( timeoutManager.exceptionOnTimeout() ):
-					// Ask the server to fail on timeout.
-					// Functionally, this does not matter, because we also have a client-side timeout.
-					// The server-side timeout is just an optimization so that Elasticsearch doesn't continue
-					// to work on a search we cancelled on the client side.
-					//
-					// Otherwise:
-					// Ask the server to truncate results on timeout.
-					// This is normally the default behavior, but can be overridden with server-side settings,
-					// so we set it just to be safe.
-					builder.param( "allow_partial_search_results", !failOnDeadline );
-				}
-
-				// Client-side timeout: the search will fail on timeout.
-				// This is necessary to address network problems: the server-side timeout would not detect that.
-				if ( failOnDeadline ) {
-					builder.deadline( deadline );
-				}
-			}
+			handleDeadline( builder );
 
 			return builder.build();
 		}
@@ -216,6 +194,32 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 		@Override
 		public SearchWork<R> build() {
 			return new SearchWork<>( this );
+		}
+
+		private void handleDeadline(ElasticsearchRequest.Builder builder) {
+			if ( deadline == null ) {
+				return;
+			}
+
+			// Client-side timeout: the search will fail on timeout.
+			// This is necessary to address network problems: the server-side timeout would not detect that.
+			if ( failOnDeadline ) {
+				builder.deadline( deadline );
+			}
+
+			// Server-side timeout
+			builder.param( "timeout", deadline.remainingTimeMillis() + "ms" );
+			if ( allowPartialSearchResultsSupported ) {
+				// If failOnDeadline is true: ask the server to fail on timeout.
+				// Functionally, this does not matter, because we also have a client-side timeout.
+				// The server-side timeout is just an optimization so that Elasticsearch doesn't continue
+				// to work on a search we cancelled on the client side.
+				//
+				// Otherwise: ask the server to truncate results on timeout.
+				// This is normally the default behavior, but can be overridden with server-side settings,
+				// so we set it just to be safe.
+				builder.param( "allow_partial_search_results", !failOnDeadline );
+			}
 		}
 	}
 }

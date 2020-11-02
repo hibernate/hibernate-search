@@ -85,53 +85,13 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // We check types using reflection (see calls to type().valueType())
 	public LuceneSearchFieldContext field(String absoluteFieldPath) {
-		LuceneSearchFieldContext resultOrNull = null;
+		LuceneSearchFieldContext resultOrNull;
 		if ( elements().size() == 1 ) {
-			// Single-index search
 			resultOrNull = elements().iterator().next().model().fieldOrNull( absoluteFieldPath );
 		}
 		else {
-			// Multi-index search
-			List<LuceneSearchFieldContext> fieldForEachIndex = new ArrayList<>();
-			LuceneScopeIndexManagerContext indexOfFirstField = null;
-			AbstractLuceneIndexSchemaFieldNode firstField = null;
-
-			for ( LuceneScopeIndexManagerContext index : elements() ) {
-				LuceneIndexModel indexModel = index.model();
-				AbstractLuceneIndexSchemaFieldNode fieldForCurrentIndex = indexModel.fieldOrNull( absoluteFieldPath );
-				if ( fieldForCurrentIndex == null ) {
-					continue;
-				}
-				if ( firstField == null ) {
-					indexOfFirstField = index;
-					firstField = fieldForCurrentIndex;
-				}
-				else {
-					if ( firstField.isObjectField() != fieldForCurrentIndex.isObjectField() ) {
-						SearchException cause = log.conflictingFieldModel();
-						throw log.inconsistentConfigurationForFieldForSearch( absoluteFieldPath, cause.getMessage(),
-								EventContexts.fromIndexNames( indexOfFirstField.model().hibernateSearchName(),
-										index.model().hibernateSearchName() ),
-								cause );
-					}
-				}
-				fieldForEachIndex.add( fieldForCurrentIndex );
-			}
-
-			if ( !fieldForEachIndex.isEmpty() ) {
-				if ( firstField.isObjectField() ) {
-					resultOrNull = new LuceneMultiIndexSearchObjectFieldContext(
-							this, absoluteFieldPath, (List) fieldForEachIndex
-					);
-				}
-				else {
-					resultOrNull = new LuceneMultiIndexSearchValueFieldContext<>(
-							indexNames, absoluteFieldPath, (List) fieldForEachIndex
-					);
-				}
-			}
+			resultOrNull = createMultiIndexFieldContext( absoluteFieldPath );
 		}
 		if ( resultOrNull == null ) {
 			throw log.unknownFieldForSearch( absoluteFieldPath, indexesEventContext() );
@@ -151,5 +111,45 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 
 	private EventContext indexesEventContext() {
 		return EventContexts.fromIndexNames( indexNames );
+	}
+
+	@SuppressWarnings({"rawtypes", "unchecked"}) // We check types using reflection
+	private LuceneSearchFieldContext createMultiIndexFieldContext(String absoluteFieldPath) {
+		List<LuceneSearchFieldContext> fieldForEachIndex = new ArrayList<>();
+		LuceneScopeIndexManagerContext indexOfFirstField = null;
+		AbstractLuceneIndexSchemaFieldNode firstField = null;
+
+		for ( LuceneScopeIndexManagerContext index : elements() ) {
+			LuceneIndexModel indexModel = index.model();
+			AbstractLuceneIndexSchemaFieldNode fieldForCurrentIndex = indexModel.fieldOrNull( absoluteFieldPath );
+			if ( fieldForCurrentIndex == null ) {
+				continue;
+			}
+			if ( firstField == null ) {
+				indexOfFirstField = index;
+				firstField = fieldForCurrentIndex;
+			}
+			else if ( firstField.isObjectField() != fieldForCurrentIndex.isObjectField() ) {
+				SearchException cause = log.conflictingFieldModel();
+				throw log.inconsistentConfigurationForFieldForSearch( absoluteFieldPath, cause.getMessage(),
+						EventContexts.fromIndexNames( indexOfFirstField.model().hibernateSearchName(),
+								index.model().hibernateSearchName() ),
+						cause );
+			}
+			fieldForEachIndex.add( fieldForCurrentIndex );
+		}
+
+		if ( fieldForEachIndex.isEmpty() ) {
+			return null;
+		}
+
+		if ( firstField.isObjectField() ) {
+			return new LuceneMultiIndexSearchObjectFieldContext( this, absoluteFieldPath,
+					(List) fieldForEachIndex );
+		}
+		else {
+			return new LuceneMultiIndexSearchValueFieldContext<>( indexNames, absoluteFieldPath,
+					(List) fieldForEachIndex );
+		}
 	}
 }

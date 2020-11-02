@@ -31,14 +31,6 @@ abstract class AbstractElasticsearchDocumentValueSort extends AbstractElasticsea
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	// new API
-	private static final JsonAccessor<JsonElement> NESTED_ACCESSOR = JsonAccessor.root().property( "nested" );
-	private static final JsonAccessor<JsonElement> PATH_ACCESSOR = JsonAccessor.root().property( "path" );
-	private static final JsonAccessor<JsonElement> FILTER_ACCESSOR = JsonAccessor.root().property( "filter" );
-	// old API
-	private static final JsonAccessor<JsonElement> NESTED_PATH_ACCESSOR = JsonAccessor.root().property( "nested_path" );
-	private static final JsonAccessor<JsonElement> NESTED_FILTER_ACCESSOR = JsonAccessor.root().property( "nested_filter" );
-
 	private static final JsonAccessor<JsonElement> MODE_ACCESSOR = JsonAccessor.root().property( "mode" );
 	private static final JsonPrimitive SUM_KEYWORD_JSON = new JsonPrimitive( "sum" );
 	private static final JsonPrimitive AVG_KEYWORD_JSON = new JsonPrimitive( "avg" );
@@ -65,37 +57,8 @@ abstract class AbstractElasticsearchDocumentValueSort extends AbstractElasticsea
 	@Override
 	protected void enrichInnerObject(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
 		if ( !nestedPathHierarchy.isEmpty() ) {
-			if ( searchSyntax.useOldSortNestedApi() ) {
-				// the old api requires only the last path ( the deepest one )
-				String lastNestedPath = nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 );
-
-				NESTED_PATH_ACCESSOR.set( innerObject, new JsonPrimitive( lastNestedPath ) );
-				if ( filter != null ) {
-					PredicateRequestContext filterContext = collector.getRootPredicateContext()
-							.withNestedPath( lastNestedPath );
-					JsonObject jsonFilter = getJsonFilter( filterContext );
-					NESTED_FILTER_ACCESSOR.set( innerObject, jsonFilter );
-				}
-			}
-			else {
-				JsonObject nextNestedObjectTarget = innerObject;
-				for ( int i = 0; i < nestedPathHierarchy.size(); i++ ) {
-					String nestedPath = nestedPathHierarchy.get( i );
-
-					JsonObject nestedObject = new JsonObject();
-					PATH_ACCESSOR.set( nestedObject, new JsonPrimitive( nestedPath ) );
-					NESTED_ACCESSOR.set( nextNestedObjectTarget, nestedObject );
-					if ( i == (nestedPathHierarchy.size() - 1) && filter != null ) {
-						PredicateRequestContext filterContext = collector.getRootPredicateContext()
-								.withNestedPath( nestedPath );
-						JsonObject jsonFilter = getJsonFilter( filterContext );
-						FILTER_ACCESSOR.set( nestedObject, jsonFilter );
-					}
-
-					// the new api requires a recursion on the path hierarchy
-					nextNestedObjectTarget = nestedObject;
-				}
-			}
+			JsonObject jsonFilter = getJsonFilter( collector.getRootPredicateContext() );
+			searchSyntax.requestNestedSort( nestedPathHierarchy, innerObject, jsonFilter );
 		}
 
 		if ( mode != null ) {
@@ -103,7 +66,12 @@ abstract class AbstractElasticsearchDocumentValueSort extends AbstractElasticsea
 		}
 	}
 
-	private JsonObject getJsonFilter(PredicateRequestContext filterContext) {
+	private JsonObject getJsonFilter(PredicateRequestContext rootPredicateContext) {
+		if ( filter == null ) {
+			return null;
+		}
+		String lastNestedPath = nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 );
+		PredicateRequestContext filterContext = rootPredicateContext.withNestedPath( lastNestedPath );
 		return filter.toJsonQuery( filterContext );
 	}
 

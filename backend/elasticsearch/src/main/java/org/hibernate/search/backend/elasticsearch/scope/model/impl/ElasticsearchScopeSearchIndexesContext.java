@@ -87,53 +87,13 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // We check types using reflection (see calls to type().valueType())
 	public ElasticsearchSearchFieldContext field(String absoluteFieldPath) {
-		ElasticsearchSearchFieldContext resultOrNull = null;
+		ElasticsearchSearchFieldContext resultOrNull;
 		if ( elements().size() == 1 ) {
-			// Single-index search
 			resultOrNull = indexModels.iterator().next().fieldOrNull( absoluteFieldPath );
 		}
 		else {
-			// Multi-index search
-			List<ElasticsearchSearchFieldContext> fieldForEachIndex = new ArrayList<>();
-			ElasticsearchSearchIndexContext indexModelOfFirstField = null;
-			AbstractElasticsearchIndexSchemaFieldNode firstField = null;
-
-			for ( ElasticsearchIndexModel indexModel : indexModels ) {
-				AbstractElasticsearchIndexSchemaFieldNode fieldForCurrentIndex =
-						indexModel.fieldOrNull( absoluteFieldPath );
-				if ( fieldForCurrentIndex == null ) {
-					continue;
-				}
-				if ( firstField == null ) {
-					indexModelOfFirstField = indexModel;
-					firstField = fieldForCurrentIndex;
-				}
-				else {
-					if ( firstField.isObjectField() != fieldForCurrentIndex.isObjectField() ) {
-						SearchException cause = log.conflictingFieldModel();
-						throw log.inconsistentConfigurationForFieldForSearch( absoluteFieldPath, cause.getMessage(),
-								EventContexts.fromIndexNames( indexModelOfFirstField.names().getHibernateSearch(),
-										indexModel.names().getHibernateSearch() ),
-								cause );
-					}
-				}
-				fieldForEachIndex.add( fieldForCurrentIndex );
-			}
-
-			if ( !fieldForEachIndex.isEmpty() ) {
-				if ( firstField.isObjectField() ) {
-					resultOrNull = new ElasticsearchMultiIndexSearchObjectFieldContext(
-							hibernateSearchIndexNames, absoluteFieldPath, (List) fieldForEachIndex
-					);
-				}
-				else {
-					resultOrNull = new ElasticsearchMultiIndexSearchValueFieldContext<>(
-							hibernateSearchIndexNames, absoluteFieldPath, (List) fieldForEachIndex
-					);
-				}
-			}
+			resultOrNull = createMultiIndexFieldContext( absoluteFieldPath );
 		}
 		if ( resultOrNull == null ) {
 			throw log.unknownFieldForSearch( absoluteFieldPath, indexesEventContext() );
@@ -158,5 +118,45 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 
 	private EventContext indexesEventContext() {
 		return EventContexts.fromIndexNames( hibernateSearchIndexNames() );
+	}
+
+	@SuppressWarnings({"rawtypes", "unchecked"}) // We check types using reflection
+	private ElasticsearchSearchFieldContext createMultiIndexFieldContext(String absoluteFieldPath) {
+		List<ElasticsearchSearchFieldContext> fieldForEachIndex = new ArrayList<>();
+		ElasticsearchSearchIndexContext indexModelOfFirstField = null;
+		AbstractElasticsearchIndexSchemaFieldNode firstField = null;
+
+		for ( ElasticsearchIndexModel indexModel : indexModels ) {
+			AbstractElasticsearchIndexSchemaFieldNode fieldForCurrentIndex =
+					indexModel.fieldOrNull( absoluteFieldPath );
+			if ( fieldForCurrentIndex == null ) {
+				continue;
+			}
+			if ( firstField == null ) {
+				indexModelOfFirstField = indexModel;
+				firstField = fieldForCurrentIndex;
+			}
+			else if ( firstField.isObjectField() != fieldForCurrentIndex.isObjectField() ) {
+				SearchException cause = log.conflictingFieldModel();
+				throw log.inconsistentConfigurationForFieldForSearch( absoluteFieldPath, cause.getMessage(),
+						EventContexts.fromIndexNames( indexModelOfFirstField.names().getHibernateSearch(),
+								indexModel.names().getHibernateSearch() ),
+						cause );
+			}
+			fieldForEachIndex.add( fieldForCurrentIndex );
+		}
+
+		if ( fieldForEachIndex.isEmpty() ) {
+			return null;
+		}
+
+		if ( fieldForEachIndex.get( 0 ).isObjectField() ) {
+			return new ElasticsearchMultiIndexSearchObjectFieldContext( hibernateSearchIndexNames, absoluteFieldPath,
+					(List) fieldForEachIndex );
+		}
+		else {
+			return new ElasticsearchMultiIndexSearchValueFieldContext<>( hibernateSearchIndexNames, absoluteFieldPath,
+					(List) fieldForEachIndex );
+		}
 	}
 }
