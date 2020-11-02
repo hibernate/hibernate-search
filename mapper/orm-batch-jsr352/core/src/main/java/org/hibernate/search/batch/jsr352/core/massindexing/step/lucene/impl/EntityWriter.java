@@ -73,7 +73,6 @@ public class EntityWriter extends AbstractItemWriter {
 	 * @throws SearchException if the entityName does not match any indexed class type in the job context data.
 	 */
 	@Override
-	@SuppressWarnings("unchecked") // mapping impl the SPI
 	public void open(Serializable checkpoint) {
 		log.openingEntityWriter( partitionIdStr, entityName );
 		JobContextData jobContextData = (JobContextData) jobContext.getTransientUserData();
