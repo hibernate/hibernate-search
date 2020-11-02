@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
-import java.util.stream.Stream;
+import java.util.Collection;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
@@ -39,7 +39,7 @@ class PojoModelNestedCompositeElement<T, P> extends AbstractPojoModelCompositeEl
 	}
 
 	@Override
-	public <M> Stream<M> markers(Class<M> markerType) {
+	public <M> Collection<M> markers(Class<M> markerType) {
 		return propertyAdditionalMetadata.getMarkers( markerType );
 	}
 

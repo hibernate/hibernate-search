@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.model;
 
-import java.util.stream.Stream;
+import java.util.Collection;
 
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -26,8 +26,8 @@ public interface PojoModelProperty extends PojoModelCompositeElement {
 	/**
 	 * @param markerType A type of marker.
 	 * @param <M> The type of returned markers.
-	 * @return A {@link Stream} of markers with the given type found on this property.
+	 * @return A collection of markers with the given type found on this property.
 	 */
-	<M> Stream<M> markers(Class<M> markerType);
+	<M> Collection<M> markers(Class<M> markerType);
 
 }

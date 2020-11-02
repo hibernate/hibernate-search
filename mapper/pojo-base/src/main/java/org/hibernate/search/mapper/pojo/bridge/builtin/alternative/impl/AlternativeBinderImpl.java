@@ -73,8 +73,8 @@ public final class AlternativeBinderImpl<D, P> implements AlternativeBinder {
 	}
 
 	private PojoModelProperty findAlternativeDiscriminatorProperty(PojoModelType bridgedElement) {
-		return bridgedElement.properties()
-				.filter( p -> p.markers( AlternativeDiscriminatorBinderImpl.Marker.class )
+		return bridgedElement.properties().stream()
+				.filter( p -> p.markers( AlternativeDiscriminatorBinderImpl.Marker.class ).stream()
 						.anyMatch( m -> Objects.equals( m.id(), alternativeId ) ) )
 				.collect( StreamHelper.singleElement(
 						() -> log.cannotFindAlternativeDiscriminator( alternativeId, fieldValueSourcePropertyName ),

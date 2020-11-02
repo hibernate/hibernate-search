@@ -178,13 +178,13 @@ public class CoordinatesBridge implements TypeBridge, PropertyBridge {
 
 		private Function<Object, GeoPoint> createCoordinatesExtractorUsingMarkers(
 				String defaultedFieldName, PojoModelCompositeElement bridgedElement) {
-			PojoElementAccessor<Double> latitudeAccessor = bridgedElement.properties()
-					.filter( model -> model.markers( LatitudeMarker.class )
+			PojoElementAccessor<Double> latitudeAccessor = bridgedElement.properties().stream()
+					.filter( model -> model.markers( LatitudeMarker.class ).stream()
 							.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
 					.collect( singleMarkedProperty( "latitude", defaultedFieldName, markerSet ) )
 					.createAccessor( Double.class );
-			PojoElementAccessor<Double> longitudeAccessor = bridgedElement.properties()
-					.filter( model -> model.markers( LongitudeMarker.class )
+			PojoElementAccessor<Double> longitudeAccessor = bridgedElement.properties().stream()
+					.filter( model -> model.markers( LongitudeMarker.class ).stream()
 							.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
 					.collect( singleMarkedProperty( "longitude", defaultedFieldName, markerSet ) )
 					.createAccessor( Double.class );

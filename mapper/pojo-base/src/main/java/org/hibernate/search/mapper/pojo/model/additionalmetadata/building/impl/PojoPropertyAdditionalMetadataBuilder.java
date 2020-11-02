@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -71,6 +72,7 @@ class PojoPropertyAdditionalMetadataBuilder implements PojoAdditionalMetadataCol
 		for ( Map.Entry<ContainerExtractorPath, PojoValueAdditionalMetadataBuilder> entry : valueBuilders.entrySet() ) {
 			values.put( entry.getKey(), entry.getValue().build() );
 		}
+		markers.replaceAll( (key, list) -> Collections.unmodifiableList( list ) );
 		return new PojoPropertyAdditionalMetadata( values, markers );
 	}
 

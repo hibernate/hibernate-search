@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.model;
 
-import java.util.stream.Stream;
+import java.util.Collection;
 
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -43,8 +43,8 @@ public interface PojoModelCompositeElement extends PojoModelElement {
 	PojoModelProperty property(String name);
 
 	/**
-	 * @return A {@link Stream} of all properties of the current element.
+	 * @return A collection of all properties of the current element.
 	 */
-	Stream<? extends PojoModelProperty> properties();
+	Collection<? extends PojoModelProperty> properties();
 
 }

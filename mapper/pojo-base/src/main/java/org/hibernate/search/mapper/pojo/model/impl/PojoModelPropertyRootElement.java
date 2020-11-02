@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
-import java.util.stream.Stream;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorValueNode;
@@ -38,8 +39,8 @@ public class PojoModelPropertyRootElement<P> extends AbstractPojoModelCompositeE
 	}
 
 	@Override
-	public <M> Stream<M> markers(Class<M> markerType) {
-		return Stream.empty();
+	public <M> Collection<M> markers(Class<M> markerType) {
+		return Collections.emptyList();
 	}
 
 	@Override

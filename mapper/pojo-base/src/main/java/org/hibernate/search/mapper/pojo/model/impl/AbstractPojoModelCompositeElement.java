@@ -7,9 +7,10 @@
 package org.hibernate.search.mapper.pojo.model.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -88,7 +89,7 @@ public abstract class AbstractPojoModelCompositeElement<V> implements PojoModelC
 	}
 
 	@Override
-	public Stream<? extends PojoModelProperty> properties() {
+	public Collection<? extends PojoModelProperty> properties() {
 		if ( !propertiesInitialized ) {
 			// Populate all the known properties
 			getTypeModel().rawType().ascendingSuperTypes()
@@ -97,7 +98,7 @@ public abstract class AbstractPojoModelCompositeElement<V> implements PojoModelC
 					.forEach( this::property );
 			propertiesInitialized = true;
 		}
-		return properties.values().stream();
+		return Collections.unmodifiableCollection( properties.values() );
 	}
 
 	public boolean hasDependency() {

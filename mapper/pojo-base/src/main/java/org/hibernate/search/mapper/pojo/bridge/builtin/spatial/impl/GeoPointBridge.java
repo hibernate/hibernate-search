@@ -143,13 +143,13 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 					.toReference();
 
 			Function<Object, GeoPoint> coordinatesExtractor;
-			PojoElementAccessor<Double> latitudeAccessor = bridgedPojoModelElement.properties()
-					.filter( model -> model.markers( LatitudeMarker.class )
+			PojoElementAccessor<Double> latitudeAccessor = bridgedPojoModelElement.properties().stream()
+					.filter( model -> model.markers( LatitudeMarker.class ).stream()
 							.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
 					.collect( singleMarkedProperty( "@Latitude", defaultedFieldName, markerSet ) )
 					.createAccessor( Double.class );
-			PojoElementAccessor<Double> longitudeAccessor = bridgedPojoModelElement.properties()
-					.filter( model -> model.markers( LongitudeMarker.class )
+			PojoElementAccessor<Double> longitudeAccessor = bridgedPojoModelElement.properties().stream()
+					.filter( model -> model.markers( LongitudeMarker.class ).stream()
 							.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
 					.collect( singleMarkedProperty( "@Longitude", defaultedFieldName, markerSet ) )
 					.createAccessor( Double.class );

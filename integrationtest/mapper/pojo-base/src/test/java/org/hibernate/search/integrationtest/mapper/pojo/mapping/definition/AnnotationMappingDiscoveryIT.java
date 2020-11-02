@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -206,17 +205,15 @@ public class AnnotationMappingDiscoveryIT {
 	}
 
 	public static final class CustomMarkerConsumingPropertyBridge implements PropertyBridge {
-		private List<IndexObjectFieldReference> objectFieldReferences = new ArrayList<>();
+		private final List<IndexObjectFieldReference> objectFieldReferences = new ArrayList<>();
 
 		private CustomMarkerConsumingPropertyBridge(PropertyBindingContext context) {
-			List<PojoModelProperty> markedProperties = context.bridgedElement().properties()
-					.filter( property -> property.markers( CustomMarker.class ).findAny().isPresent() )
-					.collect( Collectors.toList() );
-			for ( PojoModelProperty property : markedProperties ) {
+			for ( PojoModelProperty property : context.bridgedElement().properties() ) {
+				if ( property.markers( CustomMarker.class ).isEmpty() ) {
+					continue;
+				}
 				property.createAccessor();
-				objectFieldReferences.add(
-						context.indexSchemaElement().objectField( property.name() ).toReference()
-				);
+				objectFieldReferences.add( context.indexSchemaElement().objectField( property.name() ).toReference() );
 			}
 		}
 

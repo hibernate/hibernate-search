@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.impl;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 
@@ -38,8 +38,7 @@ public class PojoPropertyAdditionalMetadata {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <M> Stream<M> getMarkers(Class<M> markerType) {
-		return ( (List<M>) this.markers.getOrDefault( markerType, Collections.emptyList() ) )
-				.stream();
+	public <M> Collection<M> getMarkers(Class<M> markerType) {
+		return ( (List<M>) this.markers.getOrDefault( markerType, Collections.emptyList() ) );
 	}
 }
