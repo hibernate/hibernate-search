@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.util;
 
-import java.util.function.Consumer;
-
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ValueProcessor;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
@@ -49,7 +48,8 @@ public class StartupStubContainerExtractor implements ContainerExtractor<Object,
 	}
 
 	@Override
-	public void extract(Object container, Consumer<Object> consumer) {
+	public <T, C2> void extract(Object container, ValueProcessor<T, ? super Object, C2> perValueProcessor, T target,
+			C2 context) {
 		throw unexpectedRuntimeUse();
 	}
 

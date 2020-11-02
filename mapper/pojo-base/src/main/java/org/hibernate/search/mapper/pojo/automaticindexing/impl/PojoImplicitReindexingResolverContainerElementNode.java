@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
+import org.hibernate.search.mapper.pojo.extractor.ValueProcessor;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
@@ -29,11 +29,17 @@ public class PojoImplicitReindexingResolverContainerElementNode<C, S, V>
 
 	private final ContainerExtractorHolder<C, V> extractorHolder;
 	private final PojoImplicitReindexingResolverNode<? super V, S> nested;
+	private final ValueProcessor<PojoReindexingCollector, V, PojoImplicitReindexingResolverRootContext<S>> perValueDelegate;
 
 	public PojoImplicitReindexingResolverContainerElementNode(ContainerExtractorHolder<C, V> extractorHolder,
 			PojoImplicitReindexingResolverNode<? super V, S> nested) {
 		this.extractorHolder = extractorHolder;
 		this.nested = nested;
+		this.perValueDelegate = (collector, value, context) -> {
+			if ( value != null ) {
+				nested.resolveEntitiesToReindex( collector, value, context );
+			}
+		};
 	}
 
 	@Override
@@ -54,15 +60,7 @@ public class PojoImplicitReindexingResolverContainerElementNode<C, S, V>
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			C dirty, PojoImplicitReindexingResolverRootContext<S> context) {
-		extractorHolder.get().extract( dirty, containerElement -> resolveEntitiesToReindexForContainerElement(
-				collector, containerElement, context
-		) );
+		extractorHolder.get().extract( dirty, perValueDelegate, collector, context );
 	}
 
-	private void resolveEntitiesToReindexForContainerElement(PojoReindexingCollector collector,
-			V containerElement, PojoImplicitReindexingResolverRootContext<S> context) {
-		if ( containerElement != null ) {
-			nested.resolveEntitiesToReindex( collector, containerElement, context );
-		}
-	}
 }

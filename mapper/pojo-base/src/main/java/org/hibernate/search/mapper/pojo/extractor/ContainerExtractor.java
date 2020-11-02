@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.extractor;
 
-import java.util.function.Consumer;
-
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.util.common.annotation.Incubating;
@@ -32,12 +30,18 @@ public interface ContainerExtractor<C, V> {
 
 	/**
 	 * @param container A container to extract values from.
-	 * @param consumer A consumer for values extracted from the container.
+	 * @param perValueProcessor A processor for values extracted from the container.
+	 * @param target The target to pass to the {@code perValueProcessor}.
+	 * @param context The context to pass to the {@code perValueProcessor}.
+	 * @param <T> The type of the {@code target} of the {@code perValueProcessor},
+	 * i.e. whatever it is supposed to push the result of its processing to.
+	 * @param <C2> The type of the {@code context} of the {@code perValueProcessor},
+	 * i.e. whatever information it needs that is independent from the target or value.
 	 */
-	void extract(C container, Consumer<V> consumer);
+	<T, C2> void extract(C container, ValueProcessor<T, ? super V, C2> perValueProcessor, T target, C2 context);
 
 	/**
-	 * @return {@code true} if this extractor's {@link #extract(Object, Consumer)}
+	 * @return {@code true} if this extractor's {@link #extract(Object, ValueProcessor, Object, Object)}
 	 * method may call the consumer multiple times.
 	 * {@code false} if it will always call the {@code consumer} either zero or one time for a given container.
 	 */

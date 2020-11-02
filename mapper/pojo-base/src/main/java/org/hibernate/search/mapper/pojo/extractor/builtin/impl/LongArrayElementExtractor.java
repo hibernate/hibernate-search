@@ -6,9 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.extractor.builtin.impl;
 
-import java.util.function.Consumer;
-
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ValueProcessor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 
 public class LongArrayElementExtractor implements ContainerExtractor<long[], Long> {
@@ -18,12 +17,12 @@ public class LongArrayElementExtractor implements ContainerExtractor<long[], Lon
 	}
 
 	@Override
-	public void extract(long[] container, Consumer<Long> consumer) {
+	public <T, C2> void extract(long[] container, ValueProcessor<T, ? super Long, C2> perValueProcessor, T target, C2 context) {
 		if ( container == null ) {
 			return;
 		}
 		for ( long element : container ) {
-			consumer.accept( element );
+			perValueProcessor.process( target, element, context );
 		}
 	}
 }

@@ -7,9 +7,9 @@
 package org.hibernate.search.mapper.pojo.extractor.builtin.impl;
 
 import java.util.OptionalLong;
-import java.util.function.Consumer;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ValueProcessor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 
 public class OptionalLongValueExtractor implements ContainerExtractor<OptionalLong, Long> {
@@ -19,12 +19,13 @@ public class OptionalLongValueExtractor implements ContainerExtractor<OptionalLo
 	}
 
 	@Override
-	public void extract(OptionalLong container, Consumer<Long> consumer) {
+	public <T, C2> void extract(OptionalLong container, ValueProcessor<T, ? super Long, C2> perValueProcessor, T target,
+			C2 context) {
 		if ( container == null ) {
 			return;
 		}
 		if ( container.isPresent() ) {
-			consumer.accept( container.getAsLong() );
+			perValueProcessor.process( target, container.getAsLong(), context );
 		}
 	}
 

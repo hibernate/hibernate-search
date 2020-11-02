@@ -6,9 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.extractor.impl;
 
-import java.util.function.Consumer;
-
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ValueProcessor;
 
 class ChainingContainerExtractor<C, U, V> implements ContainerExtractor<C, V> {
 
@@ -22,8 +21,10 @@ class ChainingContainerExtractor<C, U, V> implements ContainerExtractor<C, V> {
 	}
 
 	@Override
-	public void extract(C container, Consumer<V> consumer) {
-		parent.extract( container, (U container1) -> chained.extract( container1, consumer ) );
+	public <T, C2> void extract(C container, ValueProcessor<T, ? super V, C2> perValueProcessor, T target, C2 context) {
+		parent.extract( container,
+				(T target2, U container2, C2 context2) -> chained.extract( container2, perValueProcessor, target2, context2 ),
+				target, context );
 	}
 
 	@Override

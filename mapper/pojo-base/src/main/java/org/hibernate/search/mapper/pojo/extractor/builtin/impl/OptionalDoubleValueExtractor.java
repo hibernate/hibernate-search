@@ -7,9 +7,9 @@
 package org.hibernate.search.mapper.pojo.extractor.builtin.impl;
 
 import java.util.OptionalDouble;
-import java.util.function.Consumer;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ValueProcessor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 
 public class OptionalDoubleValueExtractor implements ContainerExtractor<OptionalDouble, Double> {
@@ -19,12 +19,13 @@ public class OptionalDoubleValueExtractor implements ContainerExtractor<Optional
 	}
 
 	@Override
-	public void extract(OptionalDouble container, Consumer<Double> consumer) {
+	public <T, C2> void extract(OptionalDouble container, ValueProcessor<T, ? super Double, C2> perValueProcessor, T target,
+			C2 context) {
 		if ( container == null ) {
 			return;
 		}
 		if ( container.isPresent() ) {
-			consumer.accept( container.getAsDouble() );
+			perValueProcessor.process( target, container.getAsDouble(), context );
 		}
 	}
 

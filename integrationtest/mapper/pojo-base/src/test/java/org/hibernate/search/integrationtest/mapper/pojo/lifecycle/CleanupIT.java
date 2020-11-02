@@ -31,6 +31,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
+import org.hibernate.search.mapper.pojo.extractor.ValueProcessor;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
@@ -514,7 +515,8 @@ public class CleanupIT {
 		}
 
 		@Override
-		public void extract(Object container, Consumer<Object> consumer) {
+		public <T, C2> void extract(Object container, ValueProcessor<T, ? super Object, C2> perValueProcessor, T target,
+				C2 context) {
 			throw new UnsupportedOperationException( "Unexpected runtime use" );
 		}
 	}

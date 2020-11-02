@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.processing.impl;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.mapper.pojo.extractor.ValueProcessor;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorSessionContext;
 import org.hibernate.search.util.common.impl.Closer;
@@ -23,11 +24,13 @@ public class PojoIndexingProcessorContainerElementNode<C, V> extends PojoIndexin
 
 	private final ContainerExtractorHolder<C, V> extractorHolder;
 	private final PojoIndexingProcessor<? super V> nested;
+	private final ValueProcessor<DocumentElement, V, PojoIndexingProcessorSessionContext> perValueDelegate;
 
 	public PojoIndexingProcessorContainerElementNode(ContainerExtractorHolder<C, V> extractorHolder,
 			PojoIndexingProcessor<? super V> nested) {
 		this.extractorHolder = extractorHolder;
 		this.nested = nested;
+		this.perValueDelegate = (target, value, sessionContext) -> nested.process( target, value, sessionContext );
 	}
 
 	@Override
@@ -47,11 +50,6 @@ public class PojoIndexingProcessorContainerElementNode<C, V> extends PojoIndexin
 
 	@Override
 	public final void process(DocumentElement target, C source, PojoIndexingProcessorSessionContext sessionContext) {
-		extractorHolder.get().extract( source, sourceItem -> processItem( target, sourceItem, sessionContext ) );
+		extractorHolder.get().extract( source, perValueDelegate, target, sessionContext );
 	}
-
-	private void processItem(DocumentElement target, V sourceItem, PojoIndexingProcessorSessionContext sessionContext) {
-		nested.process( target, sourceItem, sessionContext );
-	}
-
 }

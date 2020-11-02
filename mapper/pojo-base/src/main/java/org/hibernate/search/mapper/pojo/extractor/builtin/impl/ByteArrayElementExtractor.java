@@ -6,9 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.extractor.builtin.impl;
 
-import java.util.function.Consumer;
-
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ValueProcessor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 
 public class ByteArrayElementExtractor implements ContainerExtractor<byte[], Byte> {
@@ -18,12 +17,12 @@ public class ByteArrayElementExtractor implements ContainerExtractor<byte[], Byt
 	}
 
 	@Override
-	public void extract(byte[] container, Consumer<Byte> consumer) {
+	public <T, C2> void extract(byte[] container, ValueProcessor<T, ? super Byte, C2> perValueProcessor, T target, C2 context) {
 		if ( container == null ) {
 			return;
 		}
 		for ( byte element : container ) {
-			consumer.accept( element );
+			perValueProcessor.process( target, element, context );
 		}
 	}
 }

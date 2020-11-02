@@ -11,13 +11,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ValueProcessor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.MapValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtract;
@@ -92,19 +91,23 @@ public class FieldContainerExtractorBaseIT {
 			this.elements = Arrays.asList( elements );
 		}
 
-		private Stream<T> toStream() {
-			return elements.stream();
+		private List<T> toList() {
+			return elements;
 		}
 	}
 
 	public static class MyContainerExtractor<T> implements ContainerExtractor<MyContainer<T>, T> {
 		public static final String NAME = "my-container-extractor";
+
 		@Override
-		public void extract(MyContainer<T> container, Consumer<T> consumer) {
+		public <T1, C2> void extract(MyContainer<T> container, ValueProcessor<T1, ? super T, C2> perValueProcessor, T1 target,
+				C2 context) {
 			if ( container == null ) {
 				return;
 			}
-			container.toStream().forEach( consumer );
+			for ( T element : container.toList() ) {
+				perValueProcessor.process( target, element, context );
+			}
 		}
 	}
 
@@ -165,7 +168,7 @@ public class FieldContainerExtractorBaseIT {
 	private static class RawContainerExtractor implements ContainerExtractor {
 		public static final String NAME = "raw-container-extractor";
 		@Override
-		public void extract(Object container, Consumer consumer) {
+		public void extract(Object container, ValueProcessor perValueProcessor, Object target, Object context) {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
 	}
