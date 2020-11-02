@@ -79,6 +79,7 @@ which needs to be enabled explicitly.
 An Elasticsearch backend communicates with an Elasticsearch cluster through a REST client.
 Below are the options that affect this client.
 
+[[backend-elasticsearch-configuration-hosts]]
 === Target hosts
 
 The following property configures the Elasticsearch host (or hosts)
@@ -102,14 +103,24 @@ hibernate.search.backend.protocol = http (default)
 
 This property may be set to either `http` or `https`.
 
-Optional you may provide a path prefix for the Elasticsearch instance.
+[[backend-elasticsearch-configuration-path-prefix]]
+=== Path prefix
+
+By default, the REST API is expected to be available to the root path (`/`).
+For example a search query target all indexes will be sent to path `/_search`.
+This is what you need for a standard Elasticsearch setup.
+
+If your setup is non-standard, for example because of a non-transparent proxy
+between the application and the Elasticsearch cluster,
+you can use a configuration similar to this:
 
 [source]
 ----
-hibernate.search.backend.path_prefix = # default empty string
+hibernate.search.backend.path_prefix = my/path
 ----
 
-The path will be added at each http request path, just after the protocol.
+With the above, a search query targeting all indexes will be sent to path `/my/path/_search` instead of `/_search`.
+The path will be prefixed similarly for all requests sent to Elasticsearch.
 
 [[backend-elasticsearch-configuration-discovery]]
 === Node discovery
