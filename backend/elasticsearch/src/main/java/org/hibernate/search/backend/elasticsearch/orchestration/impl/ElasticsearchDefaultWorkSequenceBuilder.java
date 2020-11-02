@@ -164,7 +164,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		}
 	}
 
-	private abstract static class AbstractWorkExecutionState<T, W extends ElasticsearchWork<T>> {
+	private abstract static class AbstractWorkExecutionState<T, W extends ElasticsearchWork> {
 
 		protected final SequenceContext sequenceContext;
 
