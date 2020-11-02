@@ -29,7 +29,7 @@ public class PojoIndexingProcessorTypeBridgeNode<T> extends PojoIndexingProcesso
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( holder -> holder.get().close(), bridgeHolder );
+			closer.push( TypeBridge::close, bridgeHolder, BeanHolder::get );
 			closer.push( BeanHolder::close, bridgeHolder );
 		}
 	}

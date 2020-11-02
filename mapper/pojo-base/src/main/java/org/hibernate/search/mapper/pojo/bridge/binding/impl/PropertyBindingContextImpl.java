@@ -123,7 +123,7 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 		}
 
 		void abort(AbstractCloser<?, ?> closer) {
-			closer.push( holder -> holder.get().close(), bridgeHolder );
+			closer.push( PropertyBridge::close, bridgeHolder, BeanHolder::get );
 			closer.push( BeanHolder::close, bridgeHolder );
 		}
 

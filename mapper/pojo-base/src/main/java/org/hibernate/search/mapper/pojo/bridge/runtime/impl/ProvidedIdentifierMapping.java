@@ -43,7 +43,7 @@ public class ProvidedIdentifierMapping implements IdentifierMappingImplementor<O
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( holder -> holder.get().close(), bridgeHolder );
+			closer.push( IdentifierBridge::close, bridgeHolder, BeanHolder::get );
 			closer.push( BeanHolder::close, bridgeHolder );
 		}
 	}

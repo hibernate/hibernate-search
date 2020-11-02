@@ -24,6 +24,10 @@ public final class BoundValueBridge<V, F> {
 		return bridgeHolder;
 	}
 
+	public ValueBridge<? super V, F> getBridge() {
+		return bridgeHolder.get();
+	}
+
 	public IndexFieldReference<F> getIndexFieldReference() {
 		return indexFieldReference;
 	}

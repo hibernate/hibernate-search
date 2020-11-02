@@ -14,9 +14,11 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorValueNode;
@@ -149,8 +151,8 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 	@Override
 	void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( boundBridge -> boundBridge.getBridgeHolder().get().close(), boundBridges );
-			closer.pushAll( boundBridge -> boundBridge.getBridgeHolder().close(), boundBridges );
+			closer.pushAll( ValueBridge::close, boundBridges, BoundValueBridge::getBridge );
+			closer.pushAll( BeanHolder::close, boundBridges, BoundValueBridge::getBridgeHolder );
 			closer.pushAll( AbstractPojoIndexingProcessorTypeNodeBuilder::closeOnFailure, typeNodeBuilders );
 		}
 	}

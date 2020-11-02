@@ -201,7 +201,7 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 	}
 
 	private static void abortBridge(AbstractCloser<?, ?> closer, BeanHolder<? extends ValueBridge<?, ?>> bridgeHolder) {
-		closer.push( holder -> holder.get().close(), bridgeHolder );
+		closer.push( ValueBridge::close, bridgeHolder, BeanHolder::get );
 		closer.push( BeanHolder::close, bridgeHolder );
 	}
 

@@ -9,10 +9,12 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
@@ -58,8 +60,8 @@ class PojoRootIdentityMappingCollector<E> implements PojoIdentityMappingCollecto
 	void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( IdentifierMappingImplementor::close, identifierMapping );
-			closer.push( boundBridge -> boundBridge.getBridgeHolder().get().close(), routingBridge );
-			closer.push( boundBridge -> boundBridge.getBridgeHolder().close(), routingBridge );
+			closer.push( RoutingBridge::close, routingBridge, BoundRoutingBridge::getBridge );
+			closer.push( BeanHolder::close, routingBridge, BoundRoutingBridge::getBridgeHolder );
 		}
 	}
 

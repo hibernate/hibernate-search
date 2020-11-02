@@ -13,7 +13,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorPropertyNode;
@@ -133,8 +135,8 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 	@Override
 	void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( boundBridge -> boundBridge.getBridgeHolder().get().close(), boundPropertyBridges );
-			closer.pushAll( boundBridge -> boundBridge.getBridgeHolder().close(), boundPropertyBridges );
+			closer.pushAll( PropertyBridge::close, boundPropertyBridges, BoundPropertyBridge::getBridge );
+			closer.pushAll( BeanHolder::close, boundPropertyBridges, BoundPropertyBridge::getBridgeHolder );
 			closer.push(
 					PojoIndexingProcessorValueNodeBuilderDelegate::closeOnFailure,
 					valueWithoutExtractorBuilderDelegate

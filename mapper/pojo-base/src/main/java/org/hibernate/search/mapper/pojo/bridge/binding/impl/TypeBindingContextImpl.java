@@ -123,7 +123,7 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 		}
 
 		void abort(AbstractCloser<?, ?> closer) {
-			closer.push( holder -> holder.get().close(), bridgeHolder );
+			closer.push( TypeBridge::close, bridgeHolder, BeanHolder::get );
 			closer.push( BeanHolder::close, bridgeHolder );
 		}
 

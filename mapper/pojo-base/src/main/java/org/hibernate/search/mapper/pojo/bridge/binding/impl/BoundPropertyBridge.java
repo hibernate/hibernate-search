@@ -29,6 +29,10 @@ public final class BoundPropertyBridge<P> {
 		return bridgeHolder;
 	}
 
+	public PropertyBridge getBridge() {
+		return bridgeHolder.get();
+	}
+
 	public void contributeDependencies(PojoIndexingDependencyCollectorPropertyNode<?, P> dependencyCollector) {
 		pojoModelRootElement.contributeDependencies( dependencyCollector );
 		pojoDependencyContext.contributeDependencies( dependencyCollector );

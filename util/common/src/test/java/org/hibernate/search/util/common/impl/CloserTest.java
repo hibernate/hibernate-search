@@ -7,11 +7,13 @@
 package org.hibernate.search.util.common.impl;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.junit.Test;
 
@@ -27,6 +29,24 @@ public class CloserTest {
 	}
 
 	@Test
+	public void extract_nullSupplier() throws IOException {
+		Supplier<Closeable> supplier = null;
+		// Should not do anything, in particular should not throw any NPE
+		try ( Closer<IOException> closer = new Closer<>() ) {
+			closer.push( Closeable::close, supplier, Supplier::get );
+		}
+	}
+
+	@Test
+	public void extract_nullCloseable() throws IOException {
+		Supplier<Closeable> supplier = () -> null;
+		// Should not do anything, in particular should not throw any NPE
+		try ( Closer<IOException> closer = new Closer<>() ) {
+			closer.push( Closeable::close, supplier, Supplier::get );
+		}
+	}
+
+	@Test
 	public void javaIOCloseable() {
 		IOException exception1 = new IOException();
 		RuntimeException exception2 = new IllegalStateException();
@@ -38,6 +58,26 @@ public class CloserTest {
 		assertThatThrownBy( () -> {
 			try ( Closer<IOException> closer = new Closer<>() ) {
 				closer.push( Closeable::close, closeable );
+				closer.push( ignored -> { throw exception2; }, new Object() );
+			}
+		} )
+				.isSameAs( exception1 )
+				.hasSuppressedException( exception2 );
+	}
+
+	@Test
+	public void extract_javaIOCloseable() {
+		IOException exception1 = new IOException();
+		RuntimeException exception2 = new IllegalStateException();
+		@SuppressWarnings("resource")
+		Closeable closeable = () -> {
+			throw exception1;
+		};
+		Supplier<Closeable> supplier = () -> closeable;
+
+		assertThatThrownBy( () -> {
+			try ( Closer<IOException> closer = new Closer<>() ) {
+				closer.push( Closeable::close, supplier, Supplier::get );
 				closer.push( ignored -> { throw exception2; }, new Object() );
 			}
 		} )
@@ -65,6 +105,26 @@ public class CloserTest {
 	}
 
 	@Test
+	public void extract_autoCloseable() {
+		Exception exception1 = new Exception();
+		RuntimeException exception2 = new IllegalStateException();
+		@SuppressWarnings("resource")
+		AutoCloseable closeable = () -> {
+			throw exception1;
+		};
+		Supplier<AutoCloseable> supplier = () -> closeable;
+
+		assertThatThrownBy( () -> {
+			try ( Closer<Exception> closer = new Closer<>() ) {
+				closer.push( AutoCloseable::close, supplier, Supplier::get );
+				closer.push( ignored -> { throw exception2; }, new Object() );
+			}
+		} )
+				.isSameAs( exception1 )
+				.hasSuppressedException( exception2 );
+	}
+
+	@Test
 	public void runtimeException() {
 		RuntimeException exception1 = new RuntimeException();
 		RuntimeException exception2 = new IllegalStateException();
@@ -75,6 +135,27 @@ public class CloserTest {
 				closer.push( ignored -> { throw exception1; }, new Object() );
 				closer.push( ignored -> { throw exception2; }, new Object() );
 				closer.push( ignored -> { throw exception3; }, new Object() );
+			}
+		} )
+				.isSameAs( exception1 )
+				.hasSuppressedException( exception2 )
+				.hasSuppressedException( exception3 );
+	}
+
+	@Test
+	public void extract_runtimeException() {
+		RuntimeException exception1 = new RuntimeException();
+		RuntimeException exception2 = new IllegalStateException();
+		RuntimeException exception3 = new UnsupportedOperationException();
+
+		Supplier<Object> supplier1 = () -> { throw exception1; };
+		Supplier<Object> supplier2 = () -> { throw exception2; };
+		Supplier<Object> supplier3 = () -> new Object();
+		assertThatThrownBy( () -> {
+			try ( Closer<RuntimeException> closer = new Closer<>() ) {
+				closer.push( ignored -> fail( "Should not be called" ), supplier1, Supplier::get );
+				closer.push( ignored -> fail( "Should not be called" ), supplier2, Supplier::get );
+				closer.push( ignored -> { throw exception3; }, supplier3, Supplier::get );
 			}
 		} )
 				.isSameAs( exception1 )
@@ -138,6 +219,30 @@ public class CloserTest {
 		assertThatThrownBy( () -> {
 			try ( Closer<IOException> closer = new Closer<>() ) {
 				closer.pushAll( Closeable::close, closeables );
+			}
+		} )
+				.isSameAs( exception1 )
+				.hasSuppressedException( exception2 )
+				.hasSuppressedException( exception3 )
+				.hasSuppressedException( exception4 );
+	}
+
+	@Test
+	public void extract_iterable() {
+		IOException exception1 = new IOException();
+		RuntimeException exception2 = new IllegalStateException();
+		IOException exception3 = new IOException();
+		RuntimeException exception4 = new UnsupportedOperationException();
+		List<Supplier<Closeable>> closeableSuppliers = Arrays.asList(
+				() -> () -> { throw exception1; },
+				() -> () -> { throw exception2; },
+				() -> () -> { throw exception3; },
+				() -> () -> { throw exception4; }
+				);
+
+		assertThatThrownBy( () -> {
+			try ( Closer<IOException> closer = new Closer<>() ) {
+				closer.pushAll( Closeable::close, closeableSuppliers, Supplier::get );
 			}
 		} )
 				.isSameAs( exception1 )

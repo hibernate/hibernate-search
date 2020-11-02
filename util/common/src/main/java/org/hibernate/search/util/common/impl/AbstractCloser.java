@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.common.impl;
 
+import java.util.function.Function;
+
 /**
  * A base class implementing the logic behind {@link Closer} and {@link SuppressingCloser}.
  *
@@ -26,7 +28,25 @@ public abstract class AbstractCloser<S, E extends Exception> {
 	 * @return {@code this}, for method chaining.
 	 */
 	public <T> S push(ClosingOperator<T, ? extends E> operator, T objectToClose) {
+		return push( operator, objectToClose, Function.identity() );
+	}
+
+	/**
+	 * If the given {@code objectToExtractFrom} is non-null, and an object can be extracted from it using {@code extract},
+	 * execute the given close {@code operator} <strong>immediately</strong> on the object to close,
+	 * swallowing any throwable in order to
+	 * {@link Throwable#addSuppressed(Throwable) add it as suppressed} to a previously caught throwable,
+	 * or to re-throw it later.
+	 * @param operator An operator to close {@code objectToClose}. Accepts lambdas
+	 * such as {@code MyType::close}.
+	 * @param objectToExtractFrom An object from which to extract the object to close.
+	 * @param extract A function to extract an object to close from {@code objectToExtractFrom}. Accepts lambdas
+	 * such as {@code MyType::get}.
+	 * @return {@code this}, for method chaining.
+	 */
+	public <T, U> S push(ClosingOperator<T, ? extends E> operator, U objectToExtractFrom, Function<U, T> extract) {
 		try {
+			T objectToClose = objectToExtractFrom == null ? null : extract.apply( objectToExtractFrom );
 			if ( objectToClose != null ) {
 				operator.close( objectToClose );
 			}
@@ -48,8 +68,25 @@ public abstract class AbstractCloser<S, E extends Exception> {
 	 * @return {@code this}, for method chaining.
 	 */
 	public <T> S pushAll(ClosingOperator<T, ? extends E> operator, Iterable<T> objectsToClose) {
-		for ( T objectToClose : objectsToClose ) {
-			push( operator, objectToClose );
+		return pushAll( operator, objectsToClose, Function.identity() );
+	}
+
+	/**
+	 * Execute the given close {@code operator} <strong>immediately</strong> on
+	 * an object extracted from each element of the given iterable, swallowing any throwable in order to
+	 * {@link Throwable#addSuppressed(Throwable) add it as suppressed} to a previously caught throwable,
+	 * or to re-throw it later.
+	 * @param operator An operator to close each element in {@code objectsToClose}. Accepts lambdas
+	 * such as {@code MyType::close}.
+	 * @param objectsToExtractFrom An iterable of objects from which to extract the objects to close.
+	 * @param extract A function to extract an object to close from the elements of {@code objectsToExtractFrom}.
+	 * Accepts lambdas such as {@code MyType::get}.
+	 * @return {@code this}, for method chaining.
+	 */
+	public <T, U> S pushAll(ClosingOperator<T, ? extends E> operator, Iterable<? extends U> objectsToExtractFrom,
+			Function<U, T> extract) {
+		for ( U objectToExtractFrom : objectsToExtractFrom ) {
+			push( operator, objectToExtractFrom, extract );
 		}
 		return getSelf();
 	}

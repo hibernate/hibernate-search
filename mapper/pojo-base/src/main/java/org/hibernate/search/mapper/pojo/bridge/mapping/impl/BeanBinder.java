@@ -51,7 +51,7 @@ public final class BeanBinder
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
-					.push( holder -> holder.get().close(), bridgeHolder )
+					.push( bridgeHolder, BeanHolder::get )
 					.push( bridgeHolder );
 			throw e;
 		}
@@ -66,7 +66,7 @@ public final class BeanBinder
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
-					.push( holder -> holder.get().close(), bridgeHolder )
+					.push( bridgeHolder, BeanHolder::get )
 					.push( bridgeHolder );
 			throw e;
 		}

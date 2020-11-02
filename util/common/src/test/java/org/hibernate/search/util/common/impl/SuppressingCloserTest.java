@@ -7,11 +7,13 @@
 package org.hibernate.search.util.common.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.junit.Test;
 
@@ -32,6 +34,32 @@ public class SuppressingCloserTest {
 	}
 
 	@Test
+	public void extract_nullSupplier() {
+		Throwable mainException = new Exception();
+
+		// Should not do anything, in particular should not throw any NPE
+		new SuppressingCloser( mainException ).push( Closeable::close, (Supplier<Closeable>) null, Supplier::get );
+		new SuppressingCloser( mainException ).pushAll( Closeable::close, Arrays.asList( (Supplier<Closeable>) null ),
+				Supplier::get );
+
+		assertThat( mainException )
+				.hasNoSuppressedExceptions();
+	}
+
+	@Test
+	public void extract_nullCloseable() {
+		Throwable mainException = new Exception();
+
+		// Should not do anything, in particular should not throw any NPE
+		new SuppressingCloser( mainException ).push( Closeable::close, (Supplier<Closeable>) () -> null, Supplier::get );
+		new SuppressingCloser( mainException ).pushAll( Closeable::close,
+				Arrays.asList( (Supplier<Closeable>) () -> null ), Supplier::get );
+
+		assertThat( mainException )
+				.hasNoSuppressedExceptions();
+	}
+
+	@Test
 	public void javaIOCloseable() {
 		Throwable mainException = new Exception();
 		IOException exception1 = new IOException();
@@ -43,6 +71,27 @@ public class SuppressingCloserTest {
 
 		new SuppressingCloser( mainException )
 				.push( closeable )
+				.push( ignored -> { throw exception2; }, new Object() );
+
+		assertThat( mainException )
+				.hasSuppressedException( exception1 )
+				.hasSuppressedException( exception2 );
+	}
+
+	@Test
+	public void extract_javaIOCloseable() {
+		Throwable mainException = new Exception();
+		IOException exception1 = new IOException();
+		RuntimeException exception2 = new IllegalStateException();
+		@SuppressWarnings("resource")
+		Closeable closeable = () -> {
+			throw exception1;
+		};
+		Supplier<Closeable> supplier = () -> closeable;
+
+
+		new SuppressingCloser( mainException )
+				.push( Closeable::close, supplier, Supplier::get )
 				.push( ignored -> { throw exception2; }, new Object() );
 
 		assertThat( mainException )
@@ -70,6 +119,26 @@ public class SuppressingCloserTest {
 	}
 
 	@Test
+	public void extract_autoCloseable() {
+		Throwable mainException = new Exception();
+		Exception exception1 = new Exception();
+		RuntimeException exception2 = new IllegalStateException();
+		@SuppressWarnings("resource")
+		AutoCloseable closeable = () -> {
+			throw exception1;
+		};
+		Supplier<AutoCloseable> supplier = () -> closeable;
+
+		new SuppressingCloser( mainException )
+				.push( AutoCloseable::close, supplier, Supplier::get )
+				.push( ignored -> { throw exception2; }, new Object() );
+
+		assertThat( mainException )
+				.hasSuppressedException( exception1 )
+				.hasSuppressedException( exception2 );
+	}
+
+	@Test
 	public void runtimeException() {
 		Throwable mainException = new Exception();
 		RuntimeException exception1 = new RuntimeException();
@@ -80,6 +149,28 @@ public class SuppressingCloserTest {
 				.push( ignored -> { throw exception1; }, new Object() )
 				.push( ignored -> { throw exception2; }, new Object() )
 				.push( ignored -> { throw exception3; }, new Object() );
+
+		assertThat( mainException )
+				.hasSuppressedException( exception1 )
+				.hasSuppressedException( exception2 )
+				.hasSuppressedException( exception3 );
+	}
+
+	@Test
+	public void extract_runtimeException() {
+		Throwable mainException = new Exception();
+		RuntimeException exception1 = new RuntimeException();
+		RuntimeException exception2 = new IllegalStateException();
+		RuntimeException exception3 = new UnsupportedOperationException();
+
+		Supplier<Object> supplier1 = () -> { throw exception1; };
+		Supplier<Object> supplier2 = () -> { throw exception2; };
+		Supplier<Object> supplier3 = () -> new Object();
+
+		new SuppressingCloser( mainException )
+				.push( ignored -> fail( "Should not be called" ), supplier1, Supplier::get )
+				.push( ignored -> fail( "Should not be called" ), supplier2, Supplier::get )
+				.push( ignored -> { throw exception3; }, supplier3, Supplier::get );
 
 		assertThat( mainException )
 				.hasSuppressedException( exception1 )
@@ -140,7 +231,7 @@ public class SuppressingCloserTest {
 	}
 
 	@Test
-	public void iterable() throws IOException {
+	public void iterable() {
 		Throwable mainException = new Exception();
 		IOException exception1 = new IOException();
 		RuntimeException exception2 = new IllegalStateException();
@@ -155,6 +246,30 @@ public class SuppressingCloserTest {
 
 		new SuppressingCloser( mainException )
 				.pushAll( closeables );
+
+		assertThat( mainException )
+				.hasSuppressedException( exception1 )
+				.hasSuppressedException( exception2 )
+				.hasSuppressedException( exception3 )
+				.hasSuppressedException( exception4 );
+	}
+
+	@Test
+	public void extract_iterable() {
+		Throwable mainException = new Exception();
+		IOException exception1 = new IOException();
+		RuntimeException exception2 = new IllegalStateException();
+		IOException exception3 = new IOException();
+		RuntimeException exception4 = new UnsupportedOperationException();
+		List<Supplier<Closeable>> closeableSuppliers = Arrays.asList(
+				() -> () -> { throw exception1; },
+				() -> () -> { throw exception2; },
+				() -> () -> { throw exception3; },
+				() -> () -> { throw exception4; }
+		);
+
+		new SuppressingCloser( mainException )
+				.pushAll( closeableSuppliers, Supplier::get );
 
 		assertThat( mainException )
 				.hasSuppressedException( exception1 )

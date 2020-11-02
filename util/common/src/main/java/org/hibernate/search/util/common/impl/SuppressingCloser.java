@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.common.impl;
 
+import java.util.function.Function;
+
 /**
  * A helper for closing multiple resources and re-throwing a provided exception,
  * {@link Throwable#addSuppressed(Throwable) suppressing} any exceptions caught while closing.
@@ -45,6 +47,23 @@ public final class SuppressingCloser extends AbstractCloser<SuppressingCloser, E
 	}
 
 	/**
+	 * Close the {@code closeable} extracted from {@code objectToExtractFrom} <strong>immediately</strong>,
+	 * swallowing any throwable in order to
+	 * {@link Throwable#addSuppressed(Throwable) add it as suppressed} to the main throwable.
+	 *<p>
+	 * See also {@link #push(ClosingOperator, Object)}
+	 * for when the object to close does not implement {@link AutoCloseable}.
+	 *
+	 * @param objectToExtractFrom An object from which to extract the object to close.
+	 * @param extract A function to extract an object to close from {@code objectToExtractFrom}. Accepts lambdas
+	 * such as {@code MyType::get}.
+	 * @return {@code this}, for method chaining.
+	 */
+	public <T> SuppressingCloser push(T objectToExtractFrom, Function<T, ? extends AutoCloseable> extract) {
+		return push( AutoCloseable::close, objectToExtractFrom, extract );
+	}
+
+	/**
 	 * Close the given {@code closeables} <strong>immediately</strong>,
 	 * swallowing any throwable in order to
 	 * {@link Throwable#addSuppressed(Throwable) add it as suppressed} to the main throwable.
@@ -64,7 +83,7 @@ public final class SuppressingCloser extends AbstractCloser<SuppressingCloser, E
 	 * swallowing any throwable in order to
 	 * {@link Throwable#addSuppressed(Throwable) add it as suppressed} to the main throwable.
 	 *<p>
-	 * See also {@link #pushAll(ClosingOperator, Object[])}
+	 * See also {@link #pushAll(ClosingOperator, Iterable)}
 	 * for when the objects to close do not implement {@link AutoCloseable}.
 	 *
 	 * @param closeables An iterable of {@link AutoCloseable}s to close.
@@ -72,6 +91,23 @@ public final class SuppressingCloser extends AbstractCloser<SuppressingCloser, E
 	 */
 	public SuppressingCloser pushAll(Iterable<? extends AutoCloseable> closeables) {
 		return pushAll( AutoCloseable::close, closeables );
+	}
+
+	/**
+	 * Close the {@link AutoCloseable} elements extracted from elements of {@code objectToExtractFrom}
+	 * <strong>immediately</strong>, swallowing any throwable in order to
+	 * {@link Throwable#addSuppressed(Throwable) add it as suppressed} to the main throwable.
+	 *<p>
+	 * See also {@link #pushAll(ClosingOperator, Iterable, Function)}
+	 * for when the objects to close do not implement {@link AutoCloseable}.
+	 *
+	 * @param objectsToExtractFrom An iterable of objects from which to extract the objects to close.
+	 * @param extract A function to extract an object to close from the elements of {@code objectsToExtractFrom}.
+	 * Accepts lambdas such as {@code MyType::get}.
+	 * @return {@code this}, for method chaining.
+	 */
+	public <U> SuppressingCloser pushAll(Iterable<? extends U> objectsToExtractFrom, Function<U, AutoCloseable> extract) {
+		return pushAll( AutoCloseable::close, objectsToExtractFrom, extract );
 	}
 
 	@Override

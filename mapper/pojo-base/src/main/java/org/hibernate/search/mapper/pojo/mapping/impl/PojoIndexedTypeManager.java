@@ -86,7 +86,7 @@ public class PojoIndexedTypeManager<I, E>
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( IdentifierMappingImplementor::close, identifierMapping );
-			closer.push( holder -> holder.get().close(), routingBridgeHolder );
+			closer.push( RoutingBridge::close, routingBridgeHolder, BeanHolder::get );
 			closer.push( BeanHolder::close, routingBridgeHolder );
 			closer.push( PojoIndexingProcessor::close, processor );
 			closer.push( PojoImplicitReindexingResolver::close, reindexingResolver );

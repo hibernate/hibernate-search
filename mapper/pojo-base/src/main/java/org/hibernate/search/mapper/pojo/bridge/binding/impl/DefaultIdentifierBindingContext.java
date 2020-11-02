@@ -103,7 +103,7 @@ public class DefaultIdentifierBindingContext<I> extends AbstractBindingContext
 	}
 
 	private static void abortBridge(AbstractCloser<?, ?> closer, BeanHolder<? extends IdentifierBridge<?>> bridgeHolder) {
-		closer.push( holder -> holder.get().close(), bridgeHolder );
+		closer.push( IdentifierBridge::close, bridgeHolder, BeanHolder::get );
 		closer.push( BeanHolder::close, bridgeHolder );
 	}
 

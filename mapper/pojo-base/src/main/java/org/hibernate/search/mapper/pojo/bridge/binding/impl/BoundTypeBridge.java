@@ -29,6 +29,10 @@ public final class BoundTypeBridge<T> {
 		return bridgeHolder;
 	}
 
+	public TypeBridge getBridge() {
+		return bridgeHolder.get();
+	}
+
 	public void contributeDependencies(PojoIndexingDependencyCollectorTypeNode<T> dependencyCollector) {
 		pojoModelRootElement.contributeDependencies( dependencyCollector );
 		pojoDependencyContext.contributeDependencies( dependencyCollector );
