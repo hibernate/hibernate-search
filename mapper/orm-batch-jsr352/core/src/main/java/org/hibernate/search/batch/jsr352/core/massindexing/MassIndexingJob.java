@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.batch.jsr352.core.massindexing;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
@@ -16,11 +15,9 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.CacheMode;
-import org.hibernate.search.batch.jsr352.core.logging.impl.Log;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.Defaults;
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.ValidationUtil;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A utility class to start the Hibernate Search JSR-352 mass indexing job.
@@ -41,8 +38,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @author Mincong Huang
  */
 public final class MassIndexingJob {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static final String NAME = "hibernate-search-mass-indexing";
 
