@@ -74,7 +74,7 @@ public class StepProgressSetupListener extends AbstractStepListener {
 					break;
 
 				case FULL_ENTITY:
-					rowCountFunction = (session, clazz) -> rowCount( session, clazz );
+					rowCountFunction = StepProgressSetupListener::countAll;
 					break;
 
 				default:
@@ -103,7 +103,7 @@ public class StepProgressSetupListener extends AbstractStepListener {
 		stepContext.setPersistentUserData( stepProgress );
 	}
 
-	private static Long rowCount(Session session, Class<?> entityType) {
+	private static Long countAll(Session session, Class<?> entityType) {
 		CriteriaBuilder builder = session.getCriteriaBuilder();
 		CriteriaQuery<Long> criteria = builder.createQuery( Long.class );
 		criteria.select( builder.count( criteria.from( entityType ) ) );

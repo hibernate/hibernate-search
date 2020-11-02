@@ -78,19 +78,19 @@ public final class IndexWriterSettings implements Serializable {
 
 	private static void registerIntegerWriterSetting(String propertyKey,
 			BiConsumer<IndexWriterConfig, Integer> writerSettingApplier) {
-		EXTRACTORS.add( Extractor.fromInteger( propertyKey, passThrough -> passThrough,
+		EXTRACTORS.add( Extractor.fromInteger( propertyKey, Function.identity(),
 				writerSettingApplier, (logByteSizeMergePolicy, integer) -> { } ) );
 	}
 
 	private static void registerIntegerMergePolicySetting(String propertyKey,
 			BiConsumer<LogByteSizeMergePolicy, Integer> mergePolicySettingApplier) {
-		EXTRACTORS.add( Extractor.fromInteger( propertyKey, passThrough -> passThrough,
+		EXTRACTORS.add( Extractor.fromInteger( propertyKey, Function.identity(),
 				(writer, integer) -> { }, mergePolicySettingApplier ) );
 	}
 
 	private static void registerBooleanMergePolicySetting(String propertyKey,
 			BiConsumer<LogByteSizeMergePolicy, Boolean> mergePolicySettingApplier) {
-		EXTRACTORS.add( Extractor.fromBoolean( propertyKey, passThrough -> passThrough,
+		EXTRACTORS.add( Extractor.fromBoolean( propertyKey, Function.identity(),
 				(writer, integer) -> { }, mergePolicySettingApplier ) );
 	}
 

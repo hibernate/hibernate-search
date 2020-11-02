@@ -63,7 +63,7 @@ public class LuceneIndexSchemaManager implements IndexSchemaManager {
 
 	public CompletableFuture<Long> computeSizeInBytes() {
 		IndexManagementWork<Long> computeSizeWork = luceneWorkFactory.computeSizeInBytes();
-		BinaryOperator<Long> add = (left, right) -> left + right;
+		BinaryOperator<Long> add = Math::addExact;
 
 		CompletableFuture<Long> totalSizeFuture = CompletableFuture.completedFuture( 0L );
 		for ( LuceneParallelWorkOrchestrator orchestrator : indexManagerContext.allManagementOrchestrators() ) {

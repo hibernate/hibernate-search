@@ -6,8 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.alternative.impl;
 
+import static java.util.function.Predicate.isEqual;
+
 import java.lang.invoke.MethodHandles;
-import java.util.Objects;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -75,7 +76,8 @@ public final class AlternativeBinderImpl<D, P> implements AlternativeBinder {
 	private PojoModelProperty findAlternativeDiscriminatorProperty(PojoModelType bridgedElement) {
 		return bridgedElement.properties().stream()
 				.filter( p -> p.markers( AlternativeDiscriminatorBinderImpl.Marker.class ).stream()
-						.anyMatch( m -> Objects.equals( m.id(), alternativeId ) ) )
+						.map( AlternativeDiscriminatorBinderImpl.Marker::id )
+						.anyMatch( isEqual( alternativeId ) ) )
 				.collect( StreamHelper.singleElement(
 						() -> log.cannotFindAlternativeDiscriminator( alternativeId, fieldValueSourcePropertyName ),
 						() -> log.conflictingAlternativeDiscriminators( alternativeId, fieldValueSourcePropertyName )

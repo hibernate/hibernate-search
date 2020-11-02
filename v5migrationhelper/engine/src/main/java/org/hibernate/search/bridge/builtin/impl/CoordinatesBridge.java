@@ -6,8 +6,9 @@
  */
 package org.hibernate.search.bridge.builtin.impl;
 
+import static java.util.function.Predicate.isEqual;
+
 import java.lang.invoke.MethodHandles;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collector;
 
@@ -180,12 +181,14 @@ public class CoordinatesBridge implements TypeBridge, PropertyBridge {
 				String defaultedFieldName, PojoModelCompositeElement bridgedElement) {
 			PojoElementAccessor<Double> latitudeAccessor = bridgedElement.properties().stream()
 					.filter( model -> model.markers( LatitudeMarker.class ).stream()
-							.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
+							.map( LatitudeMarker::getMarkerSet )
+							.anyMatch( isEqual( markerSet ) ) )
 					.collect( singleMarkedProperty( "latitude", defaultedFieldName, markerSet ) )
 					.createAccessor( Double.class );
 			PojoElementAccessor<Double> longitudeAccessor = bridgedElement.properties().stream()
 					.filter( model -> model.markers( LongitudeMarker.class ).stream()
-							.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
+							.map( LongitudeMarker::getMarkerSet )
+							.anyMatch( isEqual( markerSet ) ) )
 					.collect( singleMarkedProperty( "longitude", defaultedFieldName, markerSet ) )
 					.createAccessor( Double.class );
 
