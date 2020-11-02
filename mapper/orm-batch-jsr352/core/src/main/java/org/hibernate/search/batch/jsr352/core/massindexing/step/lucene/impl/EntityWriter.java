@@ -15,7 +15,6 @@ import javax.batch.api.chunk.AbstractItemWriter;
 import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
-import javax.naming.NamingException;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.Session;
@@ -72,11 +71,10 @@ public class EntityWriter extends AbstractItemWriter {
 	 * @param checkpoint the last checkpoint
 	 *
 	 * @throws SearchException if the entityName does not match any indexed class type in the job context data.
-	 * @throws NamingException if JNDI lookup for entity manager failed
 	 */
 	@Override
 	@SuppressWarnings("unchecked") // mapping impl the SPI
-	public void open(Serializable checkpoint) throws Exception {
+	public void open(Serializable checkpoint) {
 		log.openingEntityWriter( partitionIdStr, entityName );
 		JobContextData jobContextData = (JobContextData) jobContext.getTransientUserData();
 
@@ -98,7 +96,7 @@ public class EntityWriter extends AbstractItemWriter {
 	}
 
 	@Override
-	public void writeItems(List<Object> entities) throws Exception {
+	public void writeItems(List<Object> entities) {
 		try ( Session session = emf.unwrap( SessionFactory.class )
 				.withOptions()
 				.tenantIdentifier( tenantId )
@@ -146,7 +144,7 @@ public class EntityWriter extends AbstractItemWriter {
 		catch (InterruptedException e) {
 			// mark current thread interrupted and raise the exception to propagate the error up
 			Thread.currentThread().interrupt();
-			throw new RuntimeException( "Writer thread was interrupted", e );
+			throw new IllegalStateException( "Writer thread was interrupted", e );
 		}
 	}
 
