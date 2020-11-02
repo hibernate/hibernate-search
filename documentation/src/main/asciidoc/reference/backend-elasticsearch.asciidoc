@@ -102,6 +102,15 @@ hibernate.search.backend.protocol = http (default)
 
 This property may be set to either `http` or `https`.
 
+Optional you may provide a path prefix for the Elasticsearch instance.
+
+[source]
+----
+hibernate.search.backend.path_prefix = # default empty string
+----
+
+The path will be added at each http request path, just after the protocol.
+
 [[backend-elasticsearch-configuration-discovery]]
 === Node discovery
 
