@@ -6,30 +6,26 @@
  */
 package org.hibernate.search.mapper.pojo.extractor.impl;
 
-import java.util.List;
-
-import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
-import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.mapper.pojo.extractor.ValueProcessor;
 
-public class ContainerExtractorHolder<C, V> implements AutoCloseable {
-	private final ContainerExtractor<? super C, V> chain;
-	private final List<BeanHolder<?>> chainElementBeanHolders;
-
-	ContainerExtractorHolder(ContainerExtractor<? super C, V> chain,
-			List<BeanHolder<?>> chainElementBeanHolders) {
-		this.chain = chain;
-		this.chainElementBeanHolders = chainElementBeanHolders;
-	}
+public interface ContainerExtractorHolder<C, V> extends AutoCloseable {
 
 	@Override
-	public void close() {
-		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( BeanHolder::close, chainElementBeanHolders );
-		}
-	}
+	void close();
 
-	public ContainerExtractor<? super C, V> get() {
-		return chain;
-	}
+	/**
+	 * @param perValueProcessor A processor for values extracted from the container.
+	 * @return A processor that accepts a container,
+	 * extracts values from the given container and passes each value to the given
+	 * {@code perValueProcessor}.
+	 */
+	<T, C2> ValueProcessor<T, C, C2> wrap(ValueProcessor<T, ? super V, C2> perValueProcessor);
+
+	/**
+	 * @return See {@link ContainerExtractor#multiValued()}.
+	 */
+	boolean multiValued();
+
+	void appendToString(StringBuilder builder);
 }

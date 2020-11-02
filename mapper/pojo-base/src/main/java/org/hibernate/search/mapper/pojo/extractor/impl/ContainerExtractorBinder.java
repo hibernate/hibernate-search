@@ -155,7 +155,7 @@ public class ContainerExtractorBinder {
 					"Received a request to create extractors, but the extractor path was empty."
 			);
 		}
-		ContainerExtractor<? super C, ?> extractor = null;
+		ContainerExtractorHolder<C, ?> extractorHolder = null;
 		List<BeanHolder<?>> beanHolders = new ArrayList<>();
 		try {
 			for ( String extractorName : boundPath.getExtractorPath().explicitExtractorNames() ) {
@@ -164,17 +164,23 @@ public class ContainerExtractorBinder {
 				BeanHolder<? extends ContainerExtractor> newExtractorHolder =
 						beanResolver.resolve( extractorClass );
 				beanHolders.add( newExtractorHolder );
-				if ( extractor == null ) {
-					// First extractor: must be able to process type C
-					extractor = (ContainerExtractor<? super C, ?>) newExtractorHolder.get();
+				if ( extractorHolder == null ) {
+					// The use of a raw type is fine here:
+					// - This is the first extractor, so we know from previous reflection checks that it accepts type C
+					// - The BeanHolder's get() method, by contract, always returns the same instance,
+					//   so we know the returned extractor will always return values of the same type V.
+					extractorHolder = new SingleContainerExtractorHolder<>( (BeanHolder) newExtractorHolder );
 				}
 				else {
-					extractor = new ChainingContainerExtractor( extractor, newExtractorHolder.get() );
+					// The use of a raw type is fine here:
+					// - The BeanHolder's get() method, by contract, always returns the same instance,
+					//   so we know the returned extractor will always return values of the same type V.
+					extractorHolder = new ChainingContainerExtractorHolder<>( extractorHolder,
+							(BeanHolder) newExtractorHolder );
 				}
 			}
-			return new ContainerExtractorHolder<>(
-					(ContainerExtractor<? super C, V>) extractor, beanHolders
-			);
+			// Final extractor: must return values of type V
+			return (ContainerExtractorHolder<C, V>) extractorHolder;
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e ).pushAll( BeanHolder::close, beanHolders );

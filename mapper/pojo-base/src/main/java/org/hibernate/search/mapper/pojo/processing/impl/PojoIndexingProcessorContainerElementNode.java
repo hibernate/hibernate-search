@@ -24,13 +24,14 @@ public class PojoIndexingProcessorContainerElementNode<C, V> extends PojoIndexin
 
 	private final ContainerExtractorHolder<C, V> extractorHolder;
 	private final PojoIndexingProcessor<? super V> nested;
-	private final ValueProcessor<DocumentElement, V, PojoIndexingProcessorSessionContext> perValueDelegate;
+	private final ValueProcessor<DocumentElement, ? super C, PojoIndexingProcessorSessionContext> extractingDelegate;
 
 	public PojoIndexingProcessorContainerElementNode(ContainerExtractorHolder<C, V> extractorHolder,
 			PojoIndexingProcessor<? super V> nested) {
 		this.extractorHolder = extractorHolder;
 		this.nested = nested;
-		this.perValueDelegate = (target, value, sessionContext) -> nested.process( target, value, sessionContext );
+		this.extractingDelegate = extractorHolder.wrap( (target, value, sessionContext) ->
+				nested.process( target, value, sessionContext ) );
 	}
 
 	@Override
@@ -44,12 +45,12 @@ public class PojoIndexingProcessorContainerElementNode<C, V> extends PojoIndexin
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
 		builder.attribute( "operation", "process container element" );
-		builder.attribute( "extractor", extractorHolder.get() );
+		builder.attribute( "extractor", extractorHolder );
 		builder.attribute( "nested", nested );
 	}
 
 	@Override
 	public final void process(DocumentElement target, C source, PojoIndexingProcessorSessionContext sessionContext) {
-		extractorHolder.get().extract( source, perValueDelegate, target, sessionContext );
+		extractingDelegate.process( target, source, sessionContext );
 	}
 }

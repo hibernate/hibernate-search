@@ -29,17 +29,17 @@ public class PojoImplicitReindexingResolverContainerElementNode<C, S, V>
 
 	private final ContainerExtractorHolder<C, V> extractorHolder;
 	private final PojoImplicitReindexingResolverNode<? super V, S> nested;
-	private final ValueProcessor<PojoReindexingCollector, V, PojoImplicitReindexingResolverRootContext<S>> perValueDelegate;
+	private final ValueProcessor<PojoReindexingCollector, ? super C, PojoImplicitReindexingResolverRootContext<S>> extractingDelegate;
 
 	public PojoImplicitReindexingResolverContainerElementNode(ContainerExtractorHolder<C, V> extractorHolder,
 			PojoImplicitReindexingResolverNode<? super V, S> nested) {
 		this.extractorHolder = extractorHolder;
 		this.nested = nested;
-		this.perValueDelegate = (collector, value, context) -> {
+		this.extractingDelegate = extractorHolder.wrap( (collector, value, context) -> {
 			if ( value != null ) {
 				nested.resolveEntitiesToReindex( collector, value, context );
 			}
-		};
+		} );
 	}
 
 	@Override
@@ -53,14 +53,14 @@ public class PojoImplicitReindexingResolverContainerElementNode<C, S, V>
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
 		builder.attribute( "operation", "process container element" );
-		builder.attribute( "extractor", extractorHolder.get() );
+		builder.attribute( "extractor", extractorHolder );
 		builder.attribute( "nested", nested );
 	}
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			C dirty, PojoImplicitReindexingResolverRootContext<S> context) {
-		extractorHolder.get().extract( dirty, perValueDelegate, collector, context );
+		extractingDelegate.process( collector, dirty, context );
 	}
 
 }
