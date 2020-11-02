@@ -141,6 +141,36 @@ public class ElasticsearchClientFactoryImplIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4051")
+	public void pathPrefix_http() throws Exception {
+		String payload = "{ \"foo\": \"bar\" }";
+		String statusMessage = "StatusMessage";
+		String responseBody = "{ \"foo\": \"bar\" }";
+		wireMockRule1.stubFor( post( urlPathMatching( "/bla/bla/bla/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.andMatching( httpProtocol() )
+				.willReturn( elasticsearchResponse().withStatus( 200 )
+						.withStatusMessage( statusMessage )
+						.withBody( responseBody ) ) );
+
+		try ( ElasticsearchClientImplementor client = createClient(
+				properties -> {
+					properties.accept( ElasticsearchBackendSettings.PATH_PREFIX, "bla/bla/bla" );
+				}
+		) ) {
+			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
+			assertJsonEquals( responseBody, result.body().toString() );
+
+			wireMockRule1.verify(
+					postRequestedFor( urlPathMatching( "/bla/bla/bla/myIndex/myType" ) )
+							.andMatching( httpProtocol() )
+			);
+		}
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2274")
 	public void simple_https() throws Exception {
 		String payload = "{ \"foo\": \"bar\" }";
