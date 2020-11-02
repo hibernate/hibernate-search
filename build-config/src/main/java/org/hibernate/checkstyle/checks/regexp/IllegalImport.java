@@ -66,8 +66,8 @@ public class IllegalImport extends AbstractCheck {
 		}
 		final String text = imp.getText();
 		if ( isIllegalImport( text ) ) {
-			final String message = buildError( text );
-			log( aAST.getLineNo(), aAST.getColumnNo(), message, text );
+			final String error = buildError( text );
+			log( aAST.getLineNo(), aAST.getColumnNo(), error, text );
 		}
 	}
 

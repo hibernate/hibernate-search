@@ -55,11 +55,11 @@ public class HashShardingStrategy implements ShardingStrategy {
 
 	@Override
 	public Set<String> toShardIdentifiers(Set<String> routingKeys) {
-		Set<String> shardIds = new LinkedHashSet<>();
+		Set<String> matchingShardIds = new LinkedHashSet<>();
 		for ( String routingKey : routingKeys ) {
-			shardIds.add( toShardIdentifier( routingKey ) );
+			matchingShardIds.add( toShardIdentifier( routingKey ) );
 		}
-		return shardIds;
+		return matchingShardIds;
 	}
 
 	private String toShardIdentifier(String routingKey) {

@@ -37,11 +37,11 @@ public final class EventContext {
 	}
 
 	private final EventContext parent;
-	private final EventContextElement element;
+	private final EventContextElement appendedElement;
 
-	private EventContext(EventContext parent, EventContextElement element) {
+	private EventContext(EventContext parent, EventContextElement appendedElement) {
 		this.parent = parent;
-		this.element = element;
+		this.appendedElement = appendedElement;
 	}
 
 	@Override
@@ -58,12 +58,12 @@ public final class EventContext {
 		EventContext other = (EventContext) obj;
 
 		return Objects.equals( parent, other.parent )
-				&& element.equals( other.element );
+				&& appendedElement.equals( other.appendedElement );
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( parent, element );
+		return Objects.hash( parent, appendedElement );
 	}
 
 	/**
@@ -106,7 +106,7 @@ public final class EventContext {
 		if ( parent != null ) {
 			result = parent.appendTo( result );
 		}
-		result = new EventContext( result, element );
+		result = new EventContext( result, appendedElement );
 		return result;
 	}
 
@@ -114,7 +114,7 @@ public final class EventContext {
 		if ( parent != null ) {
 			parent.addTo( list );
 		}
-		list.add( element );
+		list.add( appendedElement );
 	}
 
 }

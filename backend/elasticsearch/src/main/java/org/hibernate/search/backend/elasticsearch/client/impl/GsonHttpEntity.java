@@ -171,12 +171,12 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 		 * because we must not close the output stream that was passed as a parameter.
 		 */
 		CountingOutputStream countingStream = new CountingOutputStream( out );
-		Writer writer = new OutputStreamWriter( countingStream, CHARSET );
+		Writer outWriter = new OutputStreamWriter( countingStream, CHARSET );
 		for ( JsonObject bodyPart : bodyParts ) {
-			gson.toJson( bodyPart, writer );
-			writer.append( '\n' );
+			gson.toJson( bodyPart, outWriter );
+			outWriter.append( '\n' );
 		}
-		writer.flush();
+		outWriter.flush();
 		//Now we finally know the content size in bytes:
 		hintContentLength( countingStream.getBytesWritten() );
 	}
