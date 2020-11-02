@@ -44,7 +44,7 @@ import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParame
 import org.hibernate.search.batch.jsr352.core.massindexing.impl.JobContextData;
 import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.IndexScope;
 import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.PartitionContextData;
-import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.PartitionMapper;
+import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.HibernateSearchPartitionMapper;
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.EntityTypeDescriptor;
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.IdOrder;
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.JobContextUtil;
@@ -61,7 +61,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * more item to read. Each reader contains only one entity type.
  * <p>
  * The reading range is restricted by the {@link PartitionBound}, which always represents as a left-closed interval.
- * See {@link PartitionMapper} for more information about these bounds.
+ * See {@link HibernateSearchPartitionMapper} for more information about these bounds.
  *
  * @author Mincong Huang
  */

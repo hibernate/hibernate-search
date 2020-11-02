@@ -85,7 +85,7 @@
             </writer>
         </chunk>
         <partition>
-            <mapper ref="org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.PartitionMapper">
+            <mapper ref="org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.HibernateSearchPartitionMapper">
                 <properties>
                     <property name="tenantId" value="#{jobParameters['tenantId']}" />
                     <property name="idFetchSize" value="#{jobParameters['idFetchSize']}" />
