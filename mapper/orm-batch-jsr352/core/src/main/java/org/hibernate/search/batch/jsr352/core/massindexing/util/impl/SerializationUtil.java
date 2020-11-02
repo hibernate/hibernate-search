@@ -93,16 +93,6 @@ public final class SerializationUtil {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public static <T> T parseParameter(@SuppressWarnings("unused") Class<T> type, String key, String value) {
-		try {
-			return (T) SerializationUtil.deserialize( value );
-		}
-		catch (IOException | ClassNotFoundException e) {
-			throw log.unableToParseJobParameter( key, value, e.getMessage(), e );
-		}
-	}
-
 	public static CacheMode parseCacheModeParameter(String key, String value, CacheMode defaultValue) {
 		return parseEnumParameter( CacheMode.class, key, value == null ? value : value.toUpperCase( Locale.ROOT ), defaultValue );
 	}
