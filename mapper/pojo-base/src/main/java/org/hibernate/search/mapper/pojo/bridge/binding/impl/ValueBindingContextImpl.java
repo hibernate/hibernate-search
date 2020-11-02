@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Type;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -181,23 +182,18 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 		return fieldContext.toReference();
 	}
 
+	@SuppressWarnings( "unchecked" ) // We ensure this cast is safe through reflection
 	private <F> IndexFieldTypeOptionsStep<?, F> inferFieldType(ValueBridge<?, F> bridge) {
 		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridge.getClass() );
-		@SuppressWarnings( "unchecked" ) // We ensure this cast is safe through reflection
-		Class<F> returnType = bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 1 )
-				.map( type -> {
-					if ( type instanceof Class ) {
-						return (Class<F>) type;
-					}
-					else {
-						throw log.invalidGenericParameterToInferFieldType( bridge, type );
-					}
-				} )
-				.orElseThrow( () -> new AssertionFailure(
-						"Could not auto-detect the return type for value bridge '"
-								+ bridge + "'."
-				) );
-		return indexFieldTypeFactory.as( returnType );
+		Type typeArgument = bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 1 )
+				.orElseThrow( () -> new AssertionFailure( "Could not auto-detect the return type for value bridge '"
+						+ bridge + "'." ) );
+		if ( typeArgument instanceof Class ) {
+			return indexFieldTypeFactory.as( (Class<F>) typeArgument );
+		}
+		else {
+			throw log.invalidGenericParameterToInferFieldType( bridge, typeArgument );
+		}
 	}
 
 	private static void abortBridge(AbstractCloser<?, ?> closer, BeanHolder<? extends ValueBridge<?, ?>> bridgeHolder) {

@@ -13,7 +13,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.hibernate.MappingException;
 import org.hibernate.boot.Metadata;
@@ -27,15 +26,13 @@ import org.hibernate.property.access.spi.Getter;
 public class HibernateOrmBasicTypeMetadataProvider {
 
 	public static HibernateOrmBasicTypeMetadataProvider create(Metadata metadata) {
-		Collection<PersistentClass> persistentClasses = metadata.getEntityBindings()
-				.stream()
-				/*
-				 * The persistent classes from Hibernate ORM are stored in a HashMap whose order is not well defined.
-				 * We use a sorted map here to make iteration deterministic.
-				 */
-				.collect( Collectors.toCollection(
-						() -> new TreeSet<>( Comparator.comparing( PersistentClass::getEntityName ) )
-				) );
+		/*
+		 * The persistent classes from Hibernate ORM are stored in a HashMap whose order is not well defined.
+		 * We use a sorted map here to make iteration deterministic.
+		 */
+		Collection<PersistentClass> persistentClasses =
+				new TreeSet<>( Comparator.comparing( PersistentClass::getEntityName ) );
+		persistentClasses.addAll( metadata.getEntityBindings() );
 
 		Builder builder = new Builder();
 

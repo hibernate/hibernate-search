@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.batch.jsr352.core.massindexing.impl;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -44,8 +45,10 @@ public class JobContextData {
 		this.entityManagerFactory = entityManagerFactory;
 	}
 
-	public void setEntityTypeDescriptors(Iterable<EntityTypeDescriptor> descriptors) {
-		descriptors.forEach( descriptor -> entityTypeDescriptorMap.put( descriptor.getJavaClass().getName(), descriptor ) );
+	public void setEntityTypeDescriptors(Collection<EntityTypeDescriptor> descriptors) {
+		for ( EntityTypeDescriptor descriptor : descriptors ) {
+			entityTypeDescriptorMap.put( descriptor.getJavaClass().getName(), descriptor );
+		}
 	}
 
 	public EntityTypeDescriptor getEntityTypeDescriptor(String entityName) {

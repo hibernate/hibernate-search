@@ -10,7 +10,6 @@ import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Stream;
 import javax.batch.api.partition.AbstractPartitionAnalyzer;
 import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
@@ -48,19 +47,14 @@ public class ProgressAggregator extends AbstractPartitionAnalyzer {
 
 		// logging
 		StringBuilder sb = new StringBuilder( System.lineSeparator() );
-		formatEntityProgresses( stepProgress ).forEach( (msg) -> {
+		Map<String, Long> entityProgress = stepProgress.getEntityProgress();
+		for ( Map.Entry<String, Long> entry : stepProgress.getEntityTotal().entrySet() ) {
+			Long processed = entityProgress.get( entry.getKey() );
+			String msg = formatEntityProgress( entry.getKey(), processed, entry.getValue() );
 			sb.append( System.lineSeparator() ).append( "\t" ).append( msg );
-		} );
+		}
 		sb.append( System.lineSeparator() );
 		log.analyzeIndexProgress( sb.toString() );
-	}
-
-	private Stream<String> formatEntityProgresses(StepProgress stepProgress) {
-		Map<String, Long> entityProgress = stepProgress.getEntityProgress();
-		return stepProgress.getEntityTotal().entrySet().stream()
-				.map( (entry) ->
-					formatEntityProgress( entry.getKey() , entityProgress.get( entry.getKey() ), entry.getValue() )
-				);
 	}
 
 	private String formatEntityProgress(String entity, Long processed, Long total) {

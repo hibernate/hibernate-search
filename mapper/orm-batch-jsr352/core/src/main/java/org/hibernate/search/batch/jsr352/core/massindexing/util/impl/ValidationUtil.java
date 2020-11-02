@@ -7,10 +7,8 @@
 package org.hibernate.search.batch.jsr352.core.massindexing.util.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.batch.jsr352.core.context.jpa.spi.EntityManagerFactoryRegistry;
@@ -64,19 +62,16 @@ public final class ValidationUtil {
 
 		SearchMapping mapping = Search.mapping( emf );
 
-		Set<String> failingTypes = Arrays.stream( serializedEntityTypes.split( "," ) )
-				.map( (String serializedEntityType) -> {
-					try {
-						mapping.indexedEntity( serializedEntityType );
-						return null;
-					}
-					// if the type is not indexed, a SearchException is thrown
-					catch (SearchException ex) {
-						return serializedEntityType;
-					}
-				} )
-				.filter( Objects::nonNull )
-				.collect( Collectors.toSet() );
+		Set<String> failingTypes = new LinkedHashSet<>();
+		for ( String serializedEntityType : serializedEntityTypes.split( "," ) ) {
+			try {
+				mapping.indexedEntity( serializedEntityType );
+			}
+			// if the type is not indexed, a SearchException is thrown
+			catch (SearchException ex) {
+				failingTypes.add( serializedEntityType );
+			}
+		}
 
 		if ( failingTypes.size() > 0 ) {
 			throw log.failingEntityTypes( String.join( ", ", failingTypes ) );

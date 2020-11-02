@@ -53,7 +53,9 @@ public class PojoTypeAdditionalMetadataProvider {
 		PojoTypeAdditionalMetadataBuilder builder = new PojoTypeAdditionalMetadataBuilder(
 				beanResolver, failureCollector, typeModel
 		);
-		modelContributorProvider.get( typeModel ).forEach( c -> c.contributeAdditionalMetadata( builder ) );
+		for ( PojoTypeMetadataContributor contributor : modelContributorProvider.get( typeModel ) ) {
+			contributor.contributeAdditionalMetadata( builder );
+		}
 		return builder.build();
 	}
 }

@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.bridge.mapping.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Type;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -75,41 +76,29 @@ public final class BeanBinder
 	private <B extends IdentifierBridge<I>, I> void doBind(BeanHolder<B> bridgeHolder, IdentifierBindingContext<?> context) {
 		IdentifierBridge<I> bridge = bridgeHolder.get();
 		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridge.getClass() );
-		@SuppressWarnings( "unchecked" ) // We ensure this cast is safe through reflection
-		Class<I> bridgeParameterType = bridgeTypeContext.resolveTypeArgument( IdentifierBridge.class, 0 )
-				.map( type -> {
-					if ( type instanceof Class ) {
-						return (Class<I>) type;
-					}
-					else {
-						throw log.invalidGenericParameterToInferIdentifierType( bridge, type );
-					}
-				} )
-				.orElseThrow( () -> new AssertionFailure(
-						"Could not auto-detect the input type for identifier bridge '"
-						+ bridge + "'."
-				) );
-		context.bridge( bridgeParameterType, bridge );
+		Type typeArgument = bridgeTypeContext.resolveTypeArgument( IdentifierBridge.class, 0 )
+				.orElseThrow( () -> new AssertionFailure( "Could not auto-detect the input type for identifier bridge '"
+						+ bridge + "'." ) );
+		if ( typeArgument instanceof Class ) {
+			context.bridge( (Class<I>) typeArgument, bridge );
+		}
+		else {
+			throw log.invalidGenericParameterToInferIdentifierType( bridge, typeArgument );
+		}
 	}
 
 	private <B extends ValueBridge<V, F>, V, F> void doBind(BeanHolder<B> bridgeHolder, ValueBindingContext<?> context) {
 		ValueBridge<V, F> bridge = bridgeHolder.get();
 		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridge.getClass() );
-		@SuppressWarnings( "unchecked" ) // We ensure this cast is safe through reflection
-		Class<V> bridgeParameterType = bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 0 )
-				.map( type -> {
-					if ( type instanceof Class ) {
-						return (Class<V>) type;
-					}
-					else {
-						throw log.invalidGenericParameterToInferValueType( bridge, type );
-					}
-				} )
-				.orElseThrow( () -> new AssertionFailure(
-						"Could not auto-detect the input type for value bridge '"
-						+ bridge + "'."
-				) );
-		context.bridge( bridgeParameterType, bridge );
+		Type typeArgument = bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 0 )
+				.orElseThrow( () -> new AssertionFailure( "Could not auto-detect the input type for value bridge '"
+						+ bridge + "'." ) );
+		if ( typeArgument instanceof Class ) {
+			context.bridge( (Class<V>) typeArgument, bridge );
+		}
+		else {
+			throw log.invalidGenericParameterToInferValueType( bridge, typeArgument );
+		}
 	}
 
 	private <T> BeanHolder<? extends T> doBuild(BeanResolver beanResolver, Class<T> expectedType) {

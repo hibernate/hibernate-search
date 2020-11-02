@@ -9,9 +9,9 @@ package org.hibernate.search.batch.jsr352.core.massindexing.util.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.batch.runtime.context.JobContext;
 import javax.persistence.EntityManagerFactory;
 
@@ -82,10 +82,10 @@ public final class JobContextUtil {
 		SearchMapping mapping = Search.mapping( emf );
 		List<String> entityNamesToIndex = Arrays.asList( entityTypes.split( "," ) );
 
-		Set<Class<?>> entityTypesToIndex = entityNamesToIndex.stream()
-				.map( mapping::indexedEntity )
-				.map( ie -> ie.javaClass() )
-				.collect( Collectors.toSet() );
+		Set<Class<?>> entityTypesToIndex = new LinkedHashSet<>();
+		for ( String s : entityNamesToIndex ) {
+			entityTypesToIndex.add( mapping.indexedEntity( s ).javaClass() );
+		}
 
 		List<EntityTypeDescriptor> descriptors = PersistenceUtil.createDescriptors( emf, entityTypesToIndex );
 

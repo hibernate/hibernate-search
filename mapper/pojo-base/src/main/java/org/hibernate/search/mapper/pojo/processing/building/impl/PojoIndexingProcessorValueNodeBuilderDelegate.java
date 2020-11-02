@@ -99,48 +99,50 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 				includeDepth, includePaths
 		);
 
-		Optional<IndexedEmbeddedBindingContext> nestedBindingContextOptional = bindingContext.addIndexedEmbeddedIfIncluded(
-				definition, multiValuedFromContainerExtractor
-		);
-		nestedBindingContextOptional.ifPresent( nestedBindingContext -> {
-			AbstractPojoIndexingProcessorTypeNodeBuilder<V, ?> nestedProcessorBuilder;
-			// Do NOT propagate the identity mapping collector to IndexedEmbeddeds
-			PojoIndexedEmbeddedIdentityMappingCollector<?> identityMappingCollector;
-			if ( targetType == null ) {
-				BoundPojoModelPathOriginalTypeNode<V> typeModelPath = modelPath.type();
-				identityMappingCollector = new PojoIndexedEmbeddedIdentityMappingCollector<>(
-						typeModelPath.getTypeModel().rawType(), mappingHelper );
-				nestedProcessorBuilder = new PojoIndexingProcessorOriginalTypeNodeBuilder<>(
-						typeModelPath, mappingHelper, nestedBindingContext,
-						identityMappingCollector,
-						nestedBindingContext.parentIndexObjectReferences()
-				);
-			}
-			else {
-				PojoRawTypeModel<?> castedType = mappingHelper.introspector().typeModel( targetType );
-				BoundPojoModelPathCastedTypeNode<V, ?> typeModelPath = modelPath.castedType( castedType );
-				identityMappingCollector = new PojoIndexedEmbeddedIdentityMappingCollector<>(
-						typeModelPath.getTypeModel().rawType(), mappingHelper );
-				nestedProcessorBuilder = new PojoIndexingProcessorCastedTypeNodeBuilder<>(
-						typeModelPath, mappingHelper, nestedBindingContext,
-						identityMappingCollector,
-						nestedBindingContext.parentIndexObjectReferences()
-				);
-			}
-			typeNodeBuilders.add( nestedProcessorBuilder );
+		Optional<IndexedEmbeddedBindingContext> nestedBindingContextOptional =
+				bindingContext.addIndexedEmbeddedIfIncluded( definition, multiValuedFromContainerExtractor );
+		if ( !nestedBindingContextOptional.isPresent() ) {
+			return;
+		}
 
-			PojoTypeModel<?> targetTypeModel = nestedProcessorBuilder.getModelPath().getTypeModel();
+		IndexedEmbeddedBindingContext nestedBindingContext = nestedBindingContextOptional.get();
+		AbstractPojoIndexingProcessorTypeNodeBuilder<V, ?> nestedProcessorBuilder;
+		// Do NOT propagate the identity mapping collector to IndexedEmbeddeds
+		PojoIndexedEmbeddedIdentityMappingCollector<?> identityMappingCollector;
+		if ( targetType == null ) {
+			BoundPojoModelPathOriginalTypeNode<V> typeModelPath = modelPath.type();
+			identityMappingCollector = new PojoIndexedEmbeddedIdentityMappingCollector<>(
+					typeModelPath.getTypeModel().rawType(), mappingHelper );
+			nestedProcessorBuilder = new PojoIndexingProcessorOriginalTypeNodeBuilder<>(
+					typeModelPath, mappingHelper, nestedBindingContext,
+					identityMappingCollector,
+					nestedBindingContext.parentIndexObjectReferences()
+			);
+		}
+		else {
+			PojoRawTypeModel<?> castedType = mappingHelper.introspector().typeModel( targetType );
+			BoundPojoModelPathCastedTypeNode<V, ?> typeModelPath = modelPath.castedType( castedType );
+			identityMappingCollector = new PojoIndexedEmbeddedIdentityMappingCollector<>(
+					typeModelPath.getTypeModel().rawType(), mappingHelper );
+			nestedProcessorBuilder = new PojoIndexingProcessorCastedTypeNodeBuilder<>(
+					typeModelPath, mappingHelper, nestedBindingContext,
+					identityMappingCollector,
+					nestedBindingContext.parentIndexObjectReferences()
+			);
+		}
+		typeNodeBuilders.add( nestedProcessorBuilder );
 
-			Set<PojoTypeMetadataContributor> contributors = mappingHelper.contributorProvider()
-					.get( targetTypeModel.rawType() );
-			if ( !includeEmbeddedObjectId && contributors.isEmpty() ) {
-				throw log.invalidIndexedEmbedded( targetTypeModel );
-			}
-			contributors.forEach( c -> c.contributeMapping( nestedProcessorBuilder ) );
-			if ( includeEmbeddedObjectId ) {
-				identityMappingCollector.contributeIdentifierField( nestedProcessorBuilder );
-			}
-		} );
+		PojoTypeModel<?> targetTypeModel = nestedProcessorBuilder.getModelPath().getTypeModel();
+
+		Set<PojoTypeMetadataContributor> contributors = mappingHelper.contributorProvider()
+				.get( targetTypeModel.rawType() );
+		if ( !includeEmbeddedObjectId && contributors.isEmpty() ) {
+			throw log.invalidIndexedEmbedded( targetTypeModel );
+		}
+		contributors.forEach( c -> c.contributeMapping( nestedProcessorBuilder ) );
+		if ( includeEmbeddedObjectId ) {
+			identityMappingCollector.contributeIdentifierField( nestedProcessorBuilder );
+		}
 	}
 
 	@Override
