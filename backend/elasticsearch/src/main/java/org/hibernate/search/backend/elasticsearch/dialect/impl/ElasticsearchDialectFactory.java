@@ -34,20 +34,12 @@ public class ElasticsearchDialectFactory {
 
 	public ElasticsearchModelDialect createModelDialect(ElasticsearchVersion version) {
 		int major = version.major();
-		OptionalInt minorOptional = version.minor();
 
 		if ( major < 5 ) {
 			throw log.unsupportedElasticsearchVersion( version );
 		}
 		else if ( major == 5 ) {
-			if ( !minorOptional.isPresent() ) {
-				throw log.ambiguousElasticsearchVersion( version );
-			}
-			int minor = minorOptional.getAsInt();
-			if ( minor < 6 ) {
-				throw log.unsupportedElasticsearchVersion( version );
-			}
-			return new Elasticsearch56ModelDialect();
+			return createModelDialectV5( version );
 		}
 		else if ( major == 6 ) {
 			return new Elasticsearch6ModelDialect();
@@ -72,30 +64,10 @@ public class ElasticsearchDialectFactory {
 			throw log.unsupportedElasticsearchVersion( version );
 		}
 		else if ( major == 5 ) {
-			if ( minor < 6 ) {
-				throw log.unsupportedElasticsearchVersion( version );
-			}
-			// Either the latest supported version, or a newer/unknown one
-			if ( minor != 6 ) {
-				log.unknownElasticsearchVersion( version );
-			}
-			return new Elasticsearch56ProtocolDialect();
+			return createProtocolDialectV5( version, minor );
 		}
 		else if ( major == 6 ) {
-			if ( minor < 3 ) {
-				return new Elasticsearch60ProtocolDialect();
-			}
-			if ( minor < 4 ) {
-				return new Elasticsearch63ProtocolDialect();
-			}
-			if ( minor < 7 ) {
-				return new Elasticsearch64ProtocolDialect();
-			}
-			// Either the latest supported version, or a newer/unknown one
-			if ( minor > 8 ) {
-				log.unknownElasticsearchVersion( version );
-			}
-			return new Elasticsearch67ProtocolDialect();
+			return createProtocolDialectV6( version, minor );
 		}
 		else {
 			// Either the latest supported version, or a newer/unknown one
@@ -104,6 +76,46 @@ public class ElasticsearchDialectFactory {
 			}
 			return new Elasticsearch70ProtocolDialect();
 		}
+	}
+
+	private ElasticsearchModelDialect createModelDialectV5(ElasticsearchVersion version) {
+		OptionalInt minorOptional = version.minor();
+		if ( !minorOptional.isPresent() ) {
+			throw log.ambiguousElasticsearchVersion( version );
+		}
+		int minor = minorOptional.getAsInt();
+		if ( minor < 6 ) {
+			throw log.unsupportedElasticsearchVersion( version );
+		}
+		return new Elasticsearch56ModelDialect();
+	}
+
+	private ElasticsearchProtocolDialect createProtocolDialectV5(ElasticsearchVersion version, int minor) {
+		if ( minor < 6 ) {
+			throw log.unsupportedElasticsearchVersion( version );
+		}
+		// Either the latest supported version, or a newer/unknown one
+		if ( minor != 6 ) {
+			log.unknownElasticsearchVersion( version );
+		}
+		return new Elasticsearch56ProtocolDialect();
+	}
+
+	private ElasticsearchProtocolDialect createProtocolDialectV6(ElasticsearchVersion version, int minor) {
+		if ( minor < 3 ) {
+			return new Elasticsearch60ProtocolDialect();
+		}
+		if ( minor < 4 ) {
+			return new Elasticsearch63ProtocolDialect();
+		}
+		if ( minor < 7 ) {
+			return new Elasticsearch64ProtocolDialect();
+		}
+		// Either the latest supported version, or a newer/unknown one
+		if ( minor > 8 ) {
+			log.unknownElasticsearchVersion( version );
+		}
+		return new Elasticsearch67ProtocolDialect();
 	}
 
 }

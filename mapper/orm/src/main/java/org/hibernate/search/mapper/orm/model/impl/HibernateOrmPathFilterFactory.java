@@ -229,16 +229,17 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 		Class<? extends Value> valueClass = baseValue.getClass();
 
 		if ( Component.class.isAssignableFrom( valueClass ) ) {
-			if ( extractorPath.isEmpty() ) {
-				if ( isWholePath ) {
-					// The path as a whole (and not just a prefix) was resolved to an embedded
-					pathsAsStrings.add( propertyNode.toPropertyString() );
-					// The string representation of the path was added, we can stop here
-					return Optional.empty();
-				}
-				else {
-					return Optional.of( baseValue );
-				}
+			if ( !extractorPath.isEmpty() ) {
+				throw log.unknownPathForDirtyChecking( path, null );
+			}
+			if ( isWholePath ) {
+				// The path as a whole (and not just a prefix) was resolved to an embedded
+				pathsAsStrings.add( propertyNode.toPropertyString() );
+				// The string representation of the path was added, we can stop here
+				return Optional.empty();
+			}
+			else {
+				return Optional.of( baseValue );
 			}
 		}
 		else if ( SimpleValue.class.equals( valueClass ) ) { // equals() and not isAssignableFrom(), we mean it.
@@ -273,8 +274,9 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 					pathsAsStrings, path, isWholePath, propertyNode, baseValue, extractorNameIterator
 			);
 		}
-
-		throw log.unknownPathForDirtyChecking( path, null );
+		else {
+			throw log.unknownPathForDirtyChecking( path, null );
+		}
 	}
 
 	private Optional<Value> resolveExtractorPath(Set<String> pathsAsStrings, PojoModelPathValueNode path,

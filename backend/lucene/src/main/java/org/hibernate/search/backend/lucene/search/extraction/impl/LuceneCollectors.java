@@ -100,6 +100,10 @@ public class LuceneCollectors {
 			deadline.forceTimeout( e );
 		}
 
+		processCollectedMatchingDocs( offset, limit );
+	}
+
+	private void processCollectedMatchingDocs(int offset, Integer limit) throws IOException {
 		if ( rewrittenLuceneQuery instanceof MatchAllDocsQuery ) {
 			// We can compute the total hit count in constant time.
 			resultTotal = SimpleSearchResultTotal.exact( indexSearcher.getIndexReader().numDocs() );

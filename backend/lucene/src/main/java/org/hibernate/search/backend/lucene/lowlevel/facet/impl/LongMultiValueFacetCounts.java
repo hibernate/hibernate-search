@@ -120,12 +120,7 @@ public class LongMultiValueFacetCounts extends Facets {
 			for ( LongIntCursor c : hashCounts ) {
 				int count = c.value;
 				if ( count != 0 ) {
-					if ( e == null ) {
-						e = new Entry();
-					}
-					e.value = c.key;
-					e.count = count;
-					e = pq.insertWithOverflow( e );
+					e = insertEntry( pq, e, c, count );
 				}
 			}
 		}
@@ -137,6 +132,17 @@ public class LongMultiValueFacetCounts extends Facets {
 		}
 
 		return new FacetResult( field, new String[0], totCount, results, childCount );
+	}
+
+	private Entry insertEntry(PriorityQueue<Entry> pq,
+			Entry e, LongIntCursor c, int count) {
+		if ( e == null ) {
+			e = new Entry();
+		}
+		e.value = c.key;
+		e.count = count;
+		e = pq.insertWithOverflow( e );
+		return e;
 	}
 
 	@Override
