@@ -34,6 +34,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.nio.conn.NoopIOSessionStrategy;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.sniff.ElasticsearchNodesSniffer;
 import org.elasticsearch.client.sniff.NodesSniffer;
 import org.elasticsearch.client.sniff.Sniffer;
@@ -147,7 +148,8 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		int connectionTimeoutMs = CONNECTION_TIMEOUT.get( propertySource );
 
 		ServerUris hosts = ServerUris.fromStrings( PROTOCOL.get( propertySource ), HOSTS.get( propertySource ) );
-		RestClient restClient = createClient( beanResolver, propertySource, threadProvider, threadNamePrefix, hosts );
+		RestClient restClient = createClient( beanResolver, propertySource, threadProvider, threadNamePrefix, hosts,
+				PATH_PREFIX.get( propertySource ) );
 		Sniffer sniffer = createSniffer( propertySource, restClient, hosts );
 
 		return new ElasticsearchClientImpl(
@@ -159,8 +161,13 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 	private RestClient createClient(BeanResolver beanResolver, ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider, String threadNamePrefix,
-			ServerUris hosts) {
-		return RestClient.builder( hosts.asHostsArray() )
+			ServerUris hosts, String pathPrefix) {
+		RestClientBuilder builder = RestClient.builder( hosts.asHostsArray() );
+		if ( !pathPrefix.isEmpty() ) {
+			builder.setPathPrefix( pathPrefix );
+		}
+
+		return builder
 				.setRequestConfigCallback( b -> customizeRequestConfig( b, propertySource ) )
 				.setHttpClientConfigCallback(
 						b -> customizeHttpClientConfig(
