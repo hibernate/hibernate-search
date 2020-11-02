@@ -218,7 +218,6 @@ public class MassIndexerImpl implements MassIndexer {
 			return monitor;
 		}
 
-		// TODO HSEARCH-3057 use a JMX monitor if JMX is enabled (see Search 5)
 		return new LoggingMassIndexingMonitor();
 	}
 }

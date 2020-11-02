@@ -277,8 +277,6 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			}
 			builder.beanProvider( beanProvider );
 
-			// TODO HSEARCH-3057 namingService (JMX)? Or maybe in second phase?
-
 			searchIntegrationPartialBuildState = builder.prepareBuild();
 
 			return new HibernateOrmIntegrationPartialBuildState(
@@ -314,10 +312,6 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		HibernateSearchContextProviderService contextService =
 				sessionFactoryImplementor.getServiceRegistry().getService( HibernateSearchContextProviderService.class );
 		contextService.initialize( integration, mapping );
-
-		// TODO HSEARCH-3057 JMX
-//		this.jmx = new JMXHook( propertySource );
-//		this.jmx.registerIfEnabled( extendedIntegrator, factory );
 
 		return contextService;
 	}
