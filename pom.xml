@@ -250,14 +250,6 @@
         <version.log4j>2.13.3</version.log4j>
         <version.junit>4.13.1</version.junit>
 
-        <!--
-            junit-vintage-engine 5.5.2 version does not support junit 4.13.1.
-            If we try to use it, a parsing error is thrown.
-            So we downgrade JUnit, so that junit-vintage-engine will handle it.
-            See https://stackoverflow.com/a/64371503/1812965
-        -->
-        <version.junit.junit-platform-workaround>4.13</version.junit.junit-platform-workaround>
-
         <version.org.hamcrest>2.2</version.org.hamcrest>
         <version.org.mockito>3.5.13</version.org.mockito>
         <version.org.assertj.assertj-core>3.15.0</version.org.assertj.assertj-core>
@@ -1573,6 +1565,17 @@
                         <argLine>${surefire.jvm.args}</argLine>
                         <reportNameSuffix>${surefire.environment}-${surefire.executing-module}</reportNameSuffix>
                     </configuration>
+                    <dependencies>
+                        <!--
+                             Force tests to execute with JUnit 4
+                             See http://maven.apache.org/surefire/maven-failsafe-plugin/examples/junit.html
+                         -->
+                        <dependency>
+                            <groupId>org.apache.maven.surefire</groupId>
+                            <artifactId>surefire-junit47</artifactId>
+                            <version>${version.failsafe.plugin}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1599,6 +1602,17 @@
                         <argLine>${failsafe.jvm.args}</argLine>
                         <reportNameSuffix>${surefire.environment}-${surefire.executing-module}</reportNameSuffix>
                     </configuration>
+                    <dependencies>
+                        <!--
+                             Force tests to execute with JUnit 4
+                             See http://maven.apache.org/surefire/maven-failsafe-plugin/examples/junit.html
+                         -->
+                        <dependency>
+                            <groupId>org.apache.maven.surefire</groupId>
+                            <artifactId>surefire-junit47</artifactId>
+                            <version>${version.failsafe.plugin}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>com.github.alexcojocaru</groupId>
