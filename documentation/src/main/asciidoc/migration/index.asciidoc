@@ -97,6 +97,15 @@ making it easier to focus on migrating configuration and to assess the effort re
 
 [IMPORTANT]
 ====
+The migration helper only works with a Lucene backend.
+
+Hibernate Search 5 APIs are not well suited to Elasticsearch,
+so applications relying on Hibernate Search 5's experimental Elasticsearch integration
+should migrate to the more adapted Hibernate Search 6 APIs right away.
+====
+
+[IMPORTANT]
+====
 The migration helper should not be used in production environments.
 
 It has limitations preventing full compatibility with Hibernate Search 5,
@@ -126,9 +135,12 @@ most of the code that still compiles should work as it used to in Hibernate Sear
 [[migration-helper-limitations]]
 === Limitations of the migration helper
 
-The migration helper does not solve everything.
+First, the migration helper **only works with a Lucene backend**.
+Hibernate Search 5 APIs are not well suited to Elasticsearch,
+so applications relying on Hibernate Search 5's experimental Elasticsearch integration
+should migrate to the more adapted Hibernate Search 6 APIs right away.
 
-First, the migration helper only addresses Java API compatibility.
+Second, the migration helper only addresses Java API compatibility.
 This excludes in particular:
 
 * Configuration properties: they must still be <<configuration,replaced with Search 6 properties>>.
@@ -136,8 +148,9 @@ This excludes in particular:
 * Behavior: most of the <<behavior,behavior changes>> in Hibernate Search 6 also affect the migration helper.
 In particular, <<index-exclusive>>, <<indexed-is-inherited>> and <<document-id-is-not-a-field>>.
 
-Second, even for Java APIs, not *all* APIs from Hibernate Search 5 are present in the migration helper.
-You should get compilation errors when APIs are missing, but here are the main pitfalls:
+Finally, even for Java APIs, not *all* APIs from Hibernate Search 5 are present in the migration helper.
+You should get compilation errors when APIs are missing, which should make them easy to spot,
+but here are the main pitfalls:
 
 * APIs that have no equivalent in Hibernate Search 6
 are not available in the migration helper.
