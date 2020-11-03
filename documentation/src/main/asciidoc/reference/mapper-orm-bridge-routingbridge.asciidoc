@@ -88,7 +88,7 @@ include::components/sharding-intro-note.asciidoc[]
 
 Routing bridges can also be used to control <<concepts-sharding-routing,routing to index shards>>.
 
-Below is a second example of a custom routing bridge that
+Below is an example of a custom routing bridge that
 uses the `genre` property of the `Book` class as a routing key.
 See <<search-dsl-query-routing>> for an example of how to use routing in search queries,
 with the same mapping as the example below.
