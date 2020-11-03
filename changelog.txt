@@ -1,6 +1,69 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.CR1 (03-11-2020)
+-------------------------
+
+** Bug
+    * HSEARCH-4080 Lucene total hit count is wrongly considered exact on timeout
+    * HSEARCH-4079 Search query always times out when timeout is lower than 1ms
+    * HSEARCH-4070 Lucene scroll ignores totalHitCountThreshold
+    * HSEARCH-4048 Relative precedence of object field templates vs. value field templates is not always taken into account
+    * HSEARCH-3905 exists() predicate ignores dynamic fields among children of the targeted object field with the Lucene backend
+    * HSEARCH-2836 Timeouts start when the request is submitted to the client, leading to systematic timeout when client is under heavy load
+
+** Improvement
+    * HSEARCH-4068 Skip non-competitive hits when running a MatchAllDocsQuery with descending score sort with Lucene
+    * HSEARCH-4047 More explicit error messages when attempting to use features specific to value fields on an object field
+    * HSEARCH-4040 Upgrade to Elasticsearch 7.9.2
+    * HSEARCH-4023 Expose the total hit count in scroll results
+    * HSEARCH-4006 More explicit failure message when two types target the same index
+    * HSEARCH-4000 @IndexingDependency, @AssociationInverseSide should be repeatable
+    * HSEARCH-3990 Optimize the retrieval of topDocs in very long Lucene scrolls
+
+** New Feature
+    * HSEARCH-4056 Expose the index size from LuceneIndexManager
+    * HSEARCH-4046 Expose a map of static children by name in the metamodel of object fields
+    * HSEARCH-2584 Introduce some commonly used Analyzer definitions by default
+
+** Remove Feature
+    * HSEARCH-4041 Remove deprecated interfaces/methods introduced during the Alphas/Betas of 6.0.0
+
+** Task
+    * HSEARCH-4092 Remove incorrect documentation related to sharding
+    * HSEARCH-4091 Remove the "preview" status from Hibernate Search 6
+    * HSEARCH-4090 Mention in the migration guide that the migration helper is only for Lucene-based applications
+    * HSEARCH-4087 Upgrade to Hibernate ORM 5.4.23.Final
+    * HSEARCH-4086 Test Hibernate Search against Elasticsearch 7.8 on AWS
+    * HSEARCH-4085 Upgrade to HCANN 5.1.2.Final
+    * HSEARCH-4084 Add a mvnw executable to the repository
+    * HSEARCH-4083 JQassistant does not collect any information from modules
+    * HSEARCH-4082 Suppress warnings from Forbiddenapis about classes not found in the classpath
+    * HSEARCH-4081 Update copyright.txt
+    * HSEARCH-4078 Fix transient failure in LibraryShowcaseMassIndexingIT
+    * HSEARCH-4077 Avoid extra logging when using ExpectedLog4jLog
+    * HSEARCH-4076 Document loggers
+    * HSEARCH-4075 Upgrade to Hibernate Annotations 5.1.1.Final
+    * HSEARCH-4073 Fix code smells detected by Sonar - 2020-10
+    * HSEARCH-4071 Remove deprecated configuration properties
+    * HSEARCH-4064 Add warnings in the documentation about concurrent updates to the same entity in a clustered application
+    * HSEARCH-4063 Upgrade all publicly exposed dependencies to their latest available version
+    * HSEARCH-4061 Clean up a few obsolete entries in the POM
+    * HSEARCH-4060 Investigate unusually long execution of integration tests with AWS Elasticsearch Service 7.7
+    * HSEARCH-4058 Remove any anchor link from legacy documentation referencing Batch JSR-351 documentation
+    * HSEARCH-4055 Add the mapper-pojo-base module to the javadoc
+    * HSEARCH-4054 Upgrade to JUnit 4.13.1
+    * HSEARCH-4053 Remove the "legacy" directory from the codebase
+    * HSEARCH-4052 Add missing properties such as "directory_provider" to HibernateSearch5Properties
+    * HSEARCH-4051 Restore support for configuring a path prefix for Elasticsearch backend
+    * HSEARCH-4049 Test the JSR-352 module with JBeret
+    * HSEARCH-4045 Infer tools.jar location (for Byteman) correctly even when a different JVM is used for Maven and Surefire/Failsafe
+    * HSEARCH-4044 Rename JSR-352 artifacts and move them to reflect their ties to the ORM mapper
+    * HSEARCH-4024 Upgrade integration tests to the latest version of Spring Boot
+    * HSEARCH-4021 Move the tests to log4j2
+    * HSEARCH-3996 Double check all Log file offsets
+    * HSEARCH-3402 Apply recommendations from Async/reactive development experts for our async APIs
+
 6.0.0.Beta11 (08-10-2020)
 -------------------------
 
