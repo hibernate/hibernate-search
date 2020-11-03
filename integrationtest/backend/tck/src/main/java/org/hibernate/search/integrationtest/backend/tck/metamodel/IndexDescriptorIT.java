@@ -86,10 +86,9 @@ public class IndexDescriptorIT {
 		assertThat( objectFieldDescriptorOptional ).isPresent();
 
 		Collection<IndexFieldDescriptor> staticFields = indexDescriptor.staticFields();
-		assertThat( staticFields ).doesNotContain(
-				valueFieldDescriptorOptional.get(),
-				objectFieldDescriptorOptional.get()
-		);
+		assertThat( staticFields )
+				.isNotEmpty()
+				.doesNotContain( valueFieldDescriptorOptional.get(), objectFieldDescriptorOptional.get() );
 	}
 
 	@Test

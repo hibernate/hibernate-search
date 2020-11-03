@@ -52,6 +52,7 @@ public class LuceneIndexWriterSettingsIT {
 				.extracting( Shard::indexAccessorForTests )
 				.extracting( IndexAccessorImpl::getWriterForTests )
 				.extracting( IndexWriter::getConfig )
+				.isNotEmpty()
 				.allSatisfy( config -> {
 					assertSoftly( softly -> {
 						softly.assertThat( config.getMaxBufferedDocs() ).as( "getMaxBufferedDocs" )
@@ -115,6 +116,7 @@ public class LuceneIndexWriterSettingsIT {
 				.extracting( Shard::indexAccessorForTests )
 				.extracting( IndexAccessorImpl::getWriterForTests )
 				.extracting( IndexWriter::getConfig )
+				.isNotEmpty()
 				.allSatisfy( config -> {
 					assertSoftly( softly -> {
 						softly.assertThat( config.getMaxBufferedDocs() ).as( "getMaxBufferedDocs" )

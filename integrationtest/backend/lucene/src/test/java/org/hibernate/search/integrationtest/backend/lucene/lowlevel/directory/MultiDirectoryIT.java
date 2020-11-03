@@ -82,6 +82,7 @@ public class MultiDirectoryIT {
 		assertThat( luceneIndexManager.getShardsForTests() )
 				.extracting( Shard::indexAccessorForTests )
 				.extracting( IndexAccessorImpl::getDirectoryForTests )
+				.isNotEmpty()
 				.allSatisfy( directory -> assertThat( directory ).isInstanceOf( ByteBuffersDirectory.class ) );
 
 		long index1ContentSizeBeforeIndexing = directorySize( index1Directory );

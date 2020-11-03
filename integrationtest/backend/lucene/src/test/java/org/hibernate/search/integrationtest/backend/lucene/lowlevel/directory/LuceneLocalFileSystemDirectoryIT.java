@@ -161,6 +161,7 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 		assertThat( luceneIndexManager.getShardsForTests() )
 				.extracting( Shard::indexAccessorForTests )
 				.extracting( IndexAccessorImpl::getDirectoryForTests )
+				.isNotEmpty()
 				.allSatisfy( directory -> assertThat( directory ).isInstanceOf( expectedDirectoryClass ) );
 	}
 

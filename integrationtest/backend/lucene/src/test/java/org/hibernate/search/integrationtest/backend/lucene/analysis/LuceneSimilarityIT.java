@@ -45,6 +45,7 @@ public class LuceneSimilarityIT {
 				.extracting( Shard::indexAccessorForTests )
 				.extracting( IndexAccessorImpl::getWriterForTests )
 				.extracting( IndexWriter::getConfig )
+				.isNotEmpty()
 				.allSatisfy( config -> {
 					assertThat( config.getSimilarity() ).as( "getSimilarity" )
 							.isInstanceOf( BM25Similarity.class );
@@ -69,6 +70,7 @@ public class LuceneSimilarityIT {
 				.extracting( Shard::indexAccessorForTests )
 				.extracting( IndexAccessorImpl::getWriterForTests )
 				.extracting( IndexWriter::getConfig )
+				.isNotEmpty()
 				.allSatisfy( config -> {
 					assertThat( config.getSimilarity() ).as( "getSimilarity" )
 							.isInstanceOf( ClassicSimilarity.class );

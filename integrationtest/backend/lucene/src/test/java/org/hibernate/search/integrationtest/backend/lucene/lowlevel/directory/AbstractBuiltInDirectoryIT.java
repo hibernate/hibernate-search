@@ -126,6 +126,7 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 		assertThat( luceneIndexManager.getShardsForTests() )
 				.extracting( Shard::indexAccessorForTests )
 				.extracting( IndexAccessorImpl::getDirectoryForTests )
+				.isNotEmpty()
 				.allSatisfy( directory -> {
 					try ( Lock lock = directory.obtainLock( "my-lock" ) ) {
 						assertThat( lock.getClass().getName() )
