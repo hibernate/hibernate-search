@@ -841,7 +841,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest {
 		assertThatFuture( sequence2Future ).isPending();
 
 		// Then simulate the end of the third work
-		work3Future.complete( null );
+		work3Future.complete( work3Result );
 		verifyNoOtherWorkInteractionsAndClear();
 		assertThatFuture( work3FutureFromSequenceBuilder ).isSuccessful( work3Result );
 		assertThatFuture( sequence2Future ).isSuccessful( (Void) null );

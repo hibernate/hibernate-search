@@ -80,7 +80,7 @@ public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Futur
 	}
 
 	public FutureAssert<T> isSuccessful(T expectedValue) {
-		return isSuccessful( value -> assertThat( expectedValue ).isEqualTo( expectedValue ) );
+		return isSuccessful( value -> assertThat( value ).isEqualTo( expectedValue ) );
 	}
 
 	public FutureAssert<T> isSuccessful(Consumer<T> valueAssertion) {
