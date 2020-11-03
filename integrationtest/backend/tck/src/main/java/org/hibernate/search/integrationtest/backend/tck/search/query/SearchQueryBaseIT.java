@@ -75,7 +75,6 @@ public class SearchQueryBaseIT {
 		SearchResult<DocumentReference> result = query.fetchAll();
 
 		assertNotNull( result.took() );
-		assertNotNull( result.timedOut() );
 		assertFalse( result.timedOut() );
 	}
 

@@ -117,7 +117,6 @@ public class SearchQueryScrollIT {
 			SearchScrollResult<DocumentReference> result = scroll.next();
 
 			assertNotNull( result.took() );
-			assertNotNull( result.timedOut() );
 			assertFalse( result.timedOut() );
 		}
 	}
