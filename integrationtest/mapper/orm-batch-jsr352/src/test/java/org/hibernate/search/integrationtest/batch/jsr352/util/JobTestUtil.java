@@ -36,6 +36,7 @@ public final class JobTestUtil {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final int THREAD_SLEEP = 1000;
+	private static final String JSR325_TYPE_FOR_IDE_TESTS = "jbatch";
 
 	private JobTestUtil() {
 	}
@@ -43,6 +44,12 @@ public final class JobTestUtil {
 	public static JobOperator getAndCheckRuntime() {
 		JobOperator operator = BatchRuntime.getJobOperator();
 		String expectedType = System.getProperty( "org.hibernate.search.integrationtest.jsr352.type" );
+
+		// only for tests run from the IDE only
+		if ( expectedType == null ) {
+			expectedType = JSR325_TYPE_FOR_IDE_TESTS;
+		}
+
 		assertThat( operator ).extracting( Object::getClass ).asString()
 				.contains( expectedType );
 		log.infof( "JSR-352 operator type is %s (%s)", expectedType, operator.getClass() );
