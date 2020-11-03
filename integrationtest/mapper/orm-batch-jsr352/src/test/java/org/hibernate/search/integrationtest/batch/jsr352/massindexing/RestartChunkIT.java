@@ -21,7 +21,7 @@ import javax.persistence.Persistence;
 
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
 import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
-import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
+import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.SimulatedFailureCompany;
 import org.hibernate.search.integrationtest.batch.jsr352.util.BytemanHelper;
 import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;
 import org.hibernate.search.mapper.orm.Search;
@@ -70,7 +70,7 @@ public class RestartChunkIT {
 		EntityManager em = emf.createEntityManager();
 		em.getTransaction().begin();
 		for ( int i = 0; i < DB_COMP_ROWS; i++ ) {
-			em.persist( new Company( str[i % 5] + "-" + i ) );
+			em.persist( new SimulatedFailureCompany( str[i % 5] + "-" + i ) );
 		}
 		em.getTransaction().commit();
 		em.close();
@@ -158,7 +158,7 @@ public class RestartChunkIT {
 			action = "simulateFailure()"
 	)
 	public void failureBeforeFirstRead_hql() throws InterruptedException, IOException {
-		doTest( "select c from Company c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
+		doTest( "select c from SimulatedFailureCompany c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
 	}
 
 	@Test
@@ -184,7 +184,7 @@ public class RestartChunkIT {
 			)
 	})
 	public void failureDuringFirstCheckpointBetweenTwoWrites_hql() throws InterruptedException, IOException {
-		doTest( "select c from Company c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
+		doTest( "select c from SimulatedFailureCompany c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
 	}
 
 	@Test
@@ -210,22 +210,22 @@ public class RestartChunkIT {
 			)
 	})
 	public void failureDuringNonFirstCheckpointBetweenTwoWrites_hql() throws InterruptedException, IOException {
-		doTest( "select c from Company c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
+		doTest( "select c from SimulatedFailureCompany c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
 	}
 
 	private void doTest(String hql, long expectedTotal, long expectedGoogle) throws InterruptedException, IOException {
-		SearchWorkspace workspace = Search.mapping( emf ).scope( Company.class ).workspace();
+		SearchWorkspace workspace = Search.mapping( emf ).scope( SimulatedFailureCompany.class ).workspace();
 		workspace.purge();
 		workspace.refresh();
 		workspace.flush();
 
-		assertEquals( 0, JobTestUtil.nbDocumentsInIndex( emf, Company.class ) );
-		List<Company> google = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
+		assertEquals( 0, JobTestUtil.nbDocumentsInIndex( emf, SimulatedFailureCompany.class ) );
+		List<SimulatedFailureCompany> google = JobTestUtil.findIndexedResults( emf, SimulatedFailureCompany.class, "name", "Google" );
 		assertEquals( 0, google.size() );
 
 		// start the job
 		MassIndexingJob.ParametersBuilder builder = MassIndexingJob.parameters()
-				.forEntities( Company.class );
+				.forEntities( SimulatedFailureCompany.class );
 		if ( hql != null ) {
 			builder = builder.restrictedBy( hql );
 		}
@@ -253,8 +253,8 @@ public class RestartChunkIT {
 		assertEquals( BatchStatus.COMPLETED, getMainStepStatus( execId2 ) );
 
 		// search again
-		assertEquals( expectedTotal, JobTestUtil.nbDocumentsInIndex( emf, Company.class ) );
-		google = JobTestUtil.findIndexedResults( emf, Company.class, "name", "google" );
+		assertEquals( expectedTotal, JobTestUtil.nbDocumentsInIndex( emf, SimulatedFailureCompany.class ) );
+		google = JobTestUtil.findIndexedResults( emf, SimulatedFailureCompany.class, "name", "google" );
 		assertEquals( expectedGoogle, google.size() );
 	}
 
