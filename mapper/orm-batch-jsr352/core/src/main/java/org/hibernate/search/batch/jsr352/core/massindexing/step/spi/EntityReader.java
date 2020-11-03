@@ -400,7 +400,7 @@ public class EntityReader extends AbstractItemReader {
 
 	private interface FetchingStrategy {
 
-		ScrollableResults createScroll(Session session, CheckpointInfo lastCheckpointInfo);
+		ScrollableResults<?> createScroll(Session session, CheckpointInfo lastCheckpointInfo);
 
 	}
 
@@ -411,7 +411,7 @@ public class EntityReader extends AbstractItemReader {
 		private final int clearInterval;
 
 		private Session session;
-		private ScrollableResults scroll;
+		private ScrollableResults<?> scroll;
 
 		private CheckpointInfo lastCheckpointInfo;
 		private int processedEntityCount = 0;

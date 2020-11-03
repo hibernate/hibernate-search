@@ -236,7 +236,7 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 			query.setMaxResults( maxResults );
 		}
 
-		try ( ScrollableResults scroll = query.scroll( ScrollMode.SCROLL_SENSITIVE ) ) {
+		try ( ScrollableResults<?> scroll = query.scroll( ScrollMode.SCROLL_SENSITIVE ) ) {
 			/*
 			 * The scroll results are originally positioned *before* the first element,
 			 * so we need to scroll rowsPerPartition + 1 positions to advanced to the
