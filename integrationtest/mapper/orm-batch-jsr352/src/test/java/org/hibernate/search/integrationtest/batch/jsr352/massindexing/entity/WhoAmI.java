@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -25,7 +24,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 public class WhoAmI {
 
 	@Id
-	@DocumentId
 	private String customId;
 
 	@FullTextField
