@@ -19,8 +19,8 @@ import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Per
 import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -32,15 +32,15 @@ public class ValidationUtilComponentIT {
 
 	private static final String EMF_SCOPE = "persistence-unit-name";
 
-	private EntityManagerFactory emf;
+	private static EntityManagerFactory emf;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeClass
+	public static void setUp() {
 		emf = Persistence.createEntityManagerFactory( PERSISTENCE_UNIT_NAME );
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@AfterClass
+	public static void tearDown() {
 		if ( emf != null ) {
 			emf.close();
 			emf = null;
