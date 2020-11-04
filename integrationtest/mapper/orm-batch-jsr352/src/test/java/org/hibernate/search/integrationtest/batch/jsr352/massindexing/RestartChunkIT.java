@@ -97,6 +97,8 @@ public class RestartChunkIT {
 		doTest( null, DB_COMP_ROWS, DB_COMP_ROWS / 5 );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2616")
 	public void failureBeforeFirstRead_hql() throws InterruptedException, IOException {
 		SimulatedFailure.raiseExceptionOnNextRead();
 		doTest( "select c from SimulatedFailureCompany c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
