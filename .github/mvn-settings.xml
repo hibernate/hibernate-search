@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+    <profiles>
+        <profile>
+            <id>google-mirror-jboss-proxy</id>
+            <repositories>
+                <repository>
+                    <id>google-maven-central</id>
+                    <name>GCS Maven Central mirror EU</name>
+                    <url>https://maven-central-eu.storage-download.googleapis.com/repos/central/data/</url>
+                </repository>
+                <repository>
+                    <id>jboss-maven-central-proxy</id>
+                    <name>JBoss Maven Central proxy</name>
+                    <url>https://repository.jboss.org/nexus/content/repositories/central/</url>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>google-maven-central</id>
+                    <name>GCS Maven Central mirror EU</name>
+                    <url>https://maven-central-eu.storage-download.googleapis.com/repos/central/data/</url>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>jboss-maven-central-proxy</id>
+                    <name>JBoss Maven Central proxy</name>
+                    <url>https://repository.jboss.org/nexus/content/repositories/central/</url>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+    </profiles>
+    <activeProfiles>
+        <activeProfile>google-mirror-jboss-proxy</activeProfile>
+    </activeProfiles>
+</settings>
