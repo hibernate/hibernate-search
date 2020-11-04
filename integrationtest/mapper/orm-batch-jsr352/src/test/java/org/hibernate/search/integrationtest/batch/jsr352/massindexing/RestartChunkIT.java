@@ -22,7 +22,6 @@ import javax.persistence.Persistence;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
 import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.SimulatedFailureCompany;
-import org.hibernate.search.integrationtest.batch.jsr352.util.BytemanHelper;
 import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.util.SimulatedFailure;
 import org.hibernate.search.mapper.orm.Search;
@@ -32,15 +31,10 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import org.jboss.byteman.contrib.bmunit.BMRule;
-import org.jboss.byteman.contrib.bmunit.BMRules;
 
 /**
  * @author Mincong Huang
  */
-@RunWith(org.jboss.byteman.contrib.bmunit.BMUnitRunner.class)
 public class RestartChunkIT {
 
 	private static final int CHECKPOINT_INTERVAL = 10;
@@ -97,27 +91,8 @@ public class RestartChunkIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2616")
-	@BMRules(rules = {
-			@BMRule(
-					name = "Create count-down before the step partitioning",
-					targetClass = "org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.HibernateSearchPartitionMapper",
-					targetMethod = "mapPartitions",
-					targetLocation = "AT EXIT",
-					// The counter value must NOT be a multiple of CHECKPOINT_INTERVAL
-					action = "createCountDown(\"failureDuringCheckpointBetweenTwoWrites_fullScope.countDown\", " + (int) ( CHECKPOINT_INTERVAL * 2.5 ) + ")"
-			),
-			@BMRule(
-					name = "Count down for each item written, simulate failure when counter is 0",
-					targetClass = "org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.EntityWriter",
-					targetMethod = "writeItem",
-					targetLocation = "AT EXIT",
-					helper = BytemanHelper.NAME,
-					condition = "countDown(\"failureDuringCheckpointBetweenTwoWrites_fullScope.countDown\")"
-							+ " && flag(\"failureDuringCheckpointBetweenTwoWrites_fullScope.failed\")",
-					action = "simulateFailure()"
-			)
-	})
 	public void failureDuringNonFirstCheckpointBetweenTwoWrites_fullScope() throws InterruptedException, IOException {
+		SimulatedFailure.raiseExceptionAfterXWrites( (int) ( CHECKPOINT_INTERVAL * 2.5 ) );
 		doTest( null, DB_COMP_ROWS, DB_COMP_ROWS / 5 );
 	}
 
@@ -135,27 +110,8 @@ public class RestartChunkIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2616")
-	@BMRules(rules = {
-			@BMRule(
-					name = "Create count-down before the step partitioning",
-					targetClass = "org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.HibernateSearchPartitionMapper",
-					targetMethod = "mapPartitions",
-					targetLocation = "AT EXIT",
-					// The counter value must NOT be a multiple of CHECKPOINT_INTERVAL
-					action = "createCountDown(\"failureDuringCheckpointBetweenTwoWrites_hql.countDown\", " + (int) ( CHECKPOINT_INTERVAL * 2.5 ) + ")"
-			),
-			@BMRule(
-					name = "Count down for each item written, simulate failure when counter is 0",
-					targetClass = "org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.EntityWriter",
-					targetMethod = "writeItem",
-					targetLocation = "AT EXIT",
-					helper = BytemanHelper.NAME,
-					condition = "countDown(\"failureDuringCheckpointBetweenTwoWrites_hql.countDown\")"
-							+ " && flag(\"failureDuringCheckpointBetweenTwoWrites_hql.failed\")",
-					action = "simulateFailure()"
-			)
-	})
 	public void failureDuringNonFirstCheckpointBetweenTwoWrites_hql() throws InterruptedException, IOException {
+		SimulatedFailure.raiseExceptionAfterXWrites( (int) ( CHECKPOINT_INTERVAL * 2.5 ) );
 		doTest( "select c from SimulatedFailureCompany c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
 	}
 
@@ -185,7 +141,7 @@ public class RestartChunkIT {
 		);
 		JobExecution jobExec1 = jobOperator.getJobExecution( execId1 );
 		JobTestUtil.waitForTermination( jobOperator, jobExec1, JOB_TIMEOUT_MS );
-		// job will be stopped by the byteman
+		// job will be stopped by the SimulatedFailure
 		assertEquals( BatchStatus.FAILED, getMainStepStatus( execId1 ) );
 
 		// restart the job
