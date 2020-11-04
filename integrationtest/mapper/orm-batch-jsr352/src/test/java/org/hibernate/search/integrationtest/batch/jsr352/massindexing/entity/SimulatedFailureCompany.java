@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.hibernate.search.integrationtest.batch.jsr352.util.SimulatedFailure;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -27,6 +28,9 @@ public class SimulatedFailureCompany {
 	private String name;
 
 	public SimulatedFailureCompany() {
+		// Called by Hibernate ORM entity loading, which in turn
+		// is called by the EntityReader phase of the batch.
+		SimulatedFailure.read();
 	}
 
 	public SimulatedFailureCompany(String name) {
