@@ -13,7 +13,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.hibernate.search.integrationtest.batch.jsr352.util.SimulatedFailure;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
@@ -38,7 +37,6 @@ public class SimulatedFailureCompany {
 
 	@Id
 	@GeneratedValue
-	@DocumentId
 	public int getId() {
 		// Called by Hibernate Search indexer#addOrUpdate, which in turn
 		// is called by the EntityWriter phase of the batch.
