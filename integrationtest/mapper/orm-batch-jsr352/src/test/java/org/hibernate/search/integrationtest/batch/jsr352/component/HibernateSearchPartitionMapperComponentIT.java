@@ -20,7 +20,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.hibernate.search.batch.jsr352.core.massindexing.impl.JobContextData;
-import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.HibernateSearchPartitionMapper;
+import org.hibernate.search.batch.jsr352.core.massindexing.step.impl.HibernateSearchPartitionMapper;
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.MassIndexingPartitionProperties;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Person;

@@ -22,8 +22,8 @@ import javax.persistence.Persistence;
 
 import org.hibernate.CacheMode;
 import org.hibernate.search.batch.jsr352.core.massindexing.impl.JobContextData;
-import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.IndexScope;
-import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.spi.EntityReader;
+import org.hibernate.search.batch.jsr352.core.massindexing.step.impl.IndexScope;
+import org.hibernate.search.batch.jsr352.core.massindexing.step.spi.EntityReader;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;

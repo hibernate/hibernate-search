@@ -22,7 +22,7 @@ import org.hibernate.search.batch.jsr352.core.context.jpa.spi.EntityManagerFacto
 import org.hibernate.search.batch.jsr352.core.inject.scope.spi.HibernateSearchJobScoped;
 import org.hibernate.search.batch.jsr352.core.inject.scope.spi.HibernateSearchPartitionScoped;
 import org.hibernate.search.batch.jsr352.core.massindexing.spi.JobContextSetupListener;
-import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.spi.EntityReader;
+import org.hibernate.search.batch.jsr352.core.massindexing.step.spi.EntityReader;
 
 import org.jberet.cdi.JobScoped;
 import org.jberet.cdi.PartitionScoped;

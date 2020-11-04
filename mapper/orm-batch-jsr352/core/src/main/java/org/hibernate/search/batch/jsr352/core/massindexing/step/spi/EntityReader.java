@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.spi;
+package org.hibernate.search.batch.jsr352.core.massindexing.step.spi;
 
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.CACHE_MODE;
 import static org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.CHECKPOINT_INTERVAL;
@@ -42,9 +42,9 @@ import org.hibernate.search.batch.jsr352.core.logging.impl.Log;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters.Defaults;
 import org.hibernate.search.batch.jsr352.core.massindexing.impl.JobContextData;
-import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.IndexScope;
-import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.PartitionContextData;
-import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.HibernateSearchPartitionMapper;
+import org.hibernate.search.batch.jsr352.core.massindexing.step.impl.IndexScope;
+import org.hibernate.search.batch.jsr352.core.massindexing.step.impl.PartitionContextData;
+import org.hibernate.search.batch.jsr352.core.massindexing.step.impl.HibernateSearchPartitionMapper;
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.EntityTypeDescriptor;
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.IdOrder;
 import org.hibernate.search.batch.jsr352.core.massindexing.util.impl.JobContextUtil;
