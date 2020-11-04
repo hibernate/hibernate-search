@@ -390,8 +390,6 @@
                 <!-- actual files which should be ignored -->
                 <exclude>.git</exclude>
                 <exclude>.github</exclude>
-                <exclude>.travis.yml</exclude>
-                <exclude>travis/**</exclude>
                 <exclude>*.log</exclude>
                 <exclude>*.sh</exclude>
                 <exclude>**/.gitignore</exclude>
