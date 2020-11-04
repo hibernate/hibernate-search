@@ -20,7 +20,7 @@ import org.hibernate.StatelessSessionBuilder;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
-import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.IndexScope;
+import org.hibernate.search.batch.jsr352.core.massindexing.step.impl.IndexScope;
 import org.hibernate.search.util.common.impl.StringHelper;
 import org.hibernate.type.ComponentType;
 import org.hibernate.type.Type;

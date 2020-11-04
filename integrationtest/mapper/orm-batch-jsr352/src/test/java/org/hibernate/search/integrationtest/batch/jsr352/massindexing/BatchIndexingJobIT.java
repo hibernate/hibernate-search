@@ -26,7 +26,7 @@ import javax.persistence.criteria.Root;
 
 import org.hibernate.search.batch.jsr352.core.logging.impl.Log;
 import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
-import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.StepProgress;
+import org.hibernate.search.batch.jsr352.core.massindexing.step.impl.StepProgress;
 import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.CompanyGroup;

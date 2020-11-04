@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.batch.jsr352.core.massindexing.util.impl;
 
-import org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.IndexScope;
+import org.hibernate.search.batch.jsr352.core.massindexing.step.impl.IndexScope;
 
 /**
  * Information about a target partition which can not be stored in the partition properties as String values. In
