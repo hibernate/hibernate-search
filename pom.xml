@@ -1560,6 +1560,11 @@
                         <reuseForks>true</reuseForks>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <runOrder>alphabetical</runOrder>
+                        <!--
+                             Stack traces for failing tests are useless if trimStackTrace = true (the default).
+                             See https://issues.apache.org/jira/browse/SUREFIRE-1226?focusedCommentId=16187391&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-16187391
+                         -->
+                        <trimStackTrace>false</trimStackTrace>
                         <systemPropertyVariables>
                             <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
@@ -1579,6 +1584,11 @@
                         <reuseForks>true</reuseForks>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <runOrder>alphabetical</runOrder>
+                        <!--
+                             Stack traces for failing tests are useless if trimStackTrace = true (the default).
+                             See https://issues.apache.org/jira/browse/SUREFIRE-1226?focusedCommentId=16187391&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-16187391
+                         -->
+                        <trimStackTrace>false</trimStackTrace>
                         <systemPropertyVariables>
                             <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
