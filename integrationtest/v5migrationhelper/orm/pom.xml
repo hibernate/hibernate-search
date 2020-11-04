@@ -127,9 +127,7 @@
                                 <!--
                                     Warning: do not use a permissive wildcard such as '**/*.java',
                                     as it would results in bugs such as HSEARCH-2481,
-                                    where Failsafe ended up loading every class from the classpath,
-                                    eventually loading Byteman classes which *must not* be loaded
-                                    before the Byteman agent has been launched.
+                                    where Failsafe ended up loading every class from the classpath.
                                     Here we use the default surefire patterns documented there:
                                     http://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclusion.html
                                  -->
