@@ -90,27 +90,8 @@ public class RestartChunkIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2616")
-	@BMRules(rules = {
-			@BMRule(
-					name = "Create count-down before the step partitioning",
-					targetClass = "org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.HibernateSearchPartitionMapper",
-					targetMethod = "mapPartitions",
-					targetLocation = "AT EXIT",
-					// The counter value must be less than CHECKPOINT_INTERVAL, but non-zero
-					action = "createCountDown(\"failureDuringFirstCheckpointBetweenTwoWrites_fullScope.countDown\", " + (int) ( CHECKPOINT_INTERVAL * 0.5 ) + ")"
-			),
-			@BMRule(
-					name = "Count down for each item written, simulate failure when counter is 0",
-					targetClass = "org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.EntityWriter",
-					targetMethod = "writeItem",
-					targetLocation = "AT EXIT",
-					helper = BytemanHelper.NAME,
-					condition = "countDown(\"failureDuringFirstCheckpointBetweenTwoWrites_fullScope.countDown\")"
-							+ " && flag(\"failureDuringFirstCheckpointBetweenTwoWrites_fullScope.failed\")",
-					action = "simulateFailure()"
-			)
-	})
 	public void failureDuringFirstCheckpointBetweenTwoWrites_fullScope() throws InterruptedException, IOException {
+		SimulatedFailure.raiseExceptionAfterXWrites( (int) ( CHECKPOINT_INTERVAL * 0.5 ) );
 		doTest( null, DB_COMP_ROWS, DB_COMP_ROWS / 5 );
 	}
 
@@ -147,27 +128,8 @@ public class RestartChunkIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2616")
-	@BMRules(rules = {
-			@BMRule(
-					name = "Create count-down before the step partitioning",
-					targetClass = "org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.HibernateSearchPartitionMapper",
-					targetMethod = "mapPartitions",
-					targetLocation = "AT EXIT",
-					// The counter value must be less than CHECKPOINT_INTERVAL, but non-zero
-					action = "createCountDown(\"failureDuringFirstCheckpointBetweenTwoWrites_hql.countDown\", " + (int) ( CHECKPOINT_INTERVAL * 0.5 ) + ")"
-			),
-			@BMRule(
-					name = "Count down for each item written, simulate failure when counter is 0",
-					targetClass = "org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.impl.EntityWriter",
-					targetMethod = "writeItem",
-					targetLocation = "AT EXIT",
-					helper = BytemanHelper.NAME,
-					condition = "countDown(\"failureDuringFirstCheckpointBetweenTwoWrites_hql.countDown\")"
-							+ " && flag(\"failureDuringFirstCheckpointBetweenTwoWrites_hql.failed\")",
-					action = "simulateFailure()"
-			)
-	})
 	public void failureDuringFirstCheckpointBetweenTwoWrites_hql() throws InterruptedException, IOException {
+		SimulatedFailure.raiseExceptionAfterXWrites( (int) ( CHECKPOINT_INTERVAL * 0.5 ) );
 		doTest( "select c from SimulatedFailureCompany c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
 	}
 

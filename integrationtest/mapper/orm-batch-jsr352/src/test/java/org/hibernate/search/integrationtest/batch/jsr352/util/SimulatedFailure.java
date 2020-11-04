@@ -7,12 +7,14 @@
 package org.hibernate.search.integrationtest.batch.jsr352.util;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SimulatedFailure {
 
 	private static final SimulatedFailure INSTANCE = new SimulatedFailure();
 
 	private final AtomicBoolean raiseExceptionOnNextRead = new AtomicBoolean( false );
+	private final AtomicInteger raiseExceptionAfterXWrites = new AtomicInteger( -1 );
 
 	private SimulatedFailure() {
 	}
@@ -21,8 +23,18 @@ public class SimulatedFailure {
 		INSTANCE.raiseExceptionOnNextRead.set( true );
 	}
 
+	public static void raiseExceptionAfterXWrites(int times) {
+		INSTANCE.raiseExceptionAfterXWrites.set( times );
+	}
+
 	public static void read() {
 		if ( INSTANCE.raiseExceptionOnNextRead.compareAndSet( true, false ) ) {
+			throw new SimulatedFailureException();
+		}
+	}
+
+	public static void write() {
+		if ( INSTANCE.raiseExceptionAfterXWrites.decrementAndGet() == 0 ) {
 			throw new SimulatedFailureException();
 		}
 	}

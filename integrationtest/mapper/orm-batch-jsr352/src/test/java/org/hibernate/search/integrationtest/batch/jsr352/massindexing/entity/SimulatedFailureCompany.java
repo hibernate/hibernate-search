@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -16,15 +18,12 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextFi
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 @Entity
+@Access(value = AccessType.PROPERTY) // Necessary to hook the getters on EntityWriter phase
 @Indexed
 public class SimulatedFailureCompany {
 
-	@Id
-	@GeneratedValue
-	@DocumentId
 	private int id;
 
-	@FullTextField
 	private String name;
 
 	public SimulatedFailureCompany() {
@@ -37,7 +36,14 @@ public class SimulatedFailureCompany {
 		this.name = name;
 	}
 
+	@Id
+	@GeneratedValue
+	@DocumentId
 	public int getId() {
+		// Called by Hibernate Search indexer#addOrUpdate, which in turn
+		// is called by the EntityWriter phase of the batch.
+		SimulatedFailure.write();
+
 		return id;
 	}
 
@@ -45,6 +51,7 @@ public class SimulatedFailureCompany {
 		this.id = id;
 	}
 
+	@FullTextField
 	public String getName() {
 		return name;
 	}
