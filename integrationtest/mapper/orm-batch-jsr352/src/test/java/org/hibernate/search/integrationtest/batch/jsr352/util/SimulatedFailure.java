@@ -27,6 +27,11 @@ public class SimulatedFailure {
 		INSTANCE.raiseExceptionAfterXWrites.set( times );
 	}
 
+	public static void reset() {
+		INSTANCE.raiseExceptionOnNextRead.set( false );
+		INSTANCE.raiseExceptionAfterXWrites.set( -1 );
+	}
+
 	public static void read() {
 		if ( INSTANCE.raiseExceptionOnNextRead.compareAndSet( true, false ) ) {
 			throw new SimulatedFailureException();

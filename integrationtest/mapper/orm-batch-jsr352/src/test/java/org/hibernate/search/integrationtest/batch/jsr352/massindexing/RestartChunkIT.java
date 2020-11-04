@@ -50,6 +50,7 @@ public class RestartChunkIT {
 
 	@Before
 	public void setup() {
+		SimulatedFailure.reset();
 		jobOperator = JobTestUtil.getAndCheckRuntime();
 
 		String[] str = new String[] {
