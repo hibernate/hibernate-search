@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.batch.jsr352.component;
+package org.hibernate.search.batch.jsr352.core.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
@@ -14,23 +14,16 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 
 import org.hibernate.CacheMode;
-import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
-import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJobParameters;
-import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author Mincong Huang
  */
-public class MassIndexingJobParametersBuilderIT {
+public class MassIndexingJobParametersBuilderTest {
 
 	private static final String SESSION_FACTORY_NAME = "someUniqueString";
 
@@ -46,22 +39,6 @@ public class MassIndexingJobParametersBuilderIT {
 	private static final int ROWS_PER_PARTITION = 500;
 	private static final int CHECKPOINT_INTERVAL = 200;
 	private static final CacheMode CACHE_MODE = CacheMode.GET;
-
-	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();
-	private EntityManagerFactory emf;
-
-	@Before
-	public void setUp() throws Exception {
-		emf = Persistence.createEntityManagerFactory( PERSISTENCE_UNIT_NAME );
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		if ( emf != null ) {
-			emf.close();
-			emf = null;
-		}
-	}
 
 	@Test
 	public void testJobParamsAll() throws IOException {
