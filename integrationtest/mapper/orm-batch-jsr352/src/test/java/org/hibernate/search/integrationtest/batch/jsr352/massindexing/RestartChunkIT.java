@@ -24,6 +24,7 @@ import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.SimulatedFailureCompany;
 import org.hibernate.search.integrationtest.batch.jsr352.util.BytemanHelper;
 import org.hibernate.search.integrationtest.batch.jsr352.util.PersistenceUnitTestUtil;
+import org.hibernate.search.integrationtest.batch.jsr352.util.SimulatedFailure;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -82,16 +83,8 @@ public class RestartChunkIT {
 	}
 
 	@Test
-	@BMRule(
-			name = "Fail before the first read",
-			targetClass = "org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.spi.EntityReader",
-			targetMethod = "readItem",
-			targetLocation = "AT ENTRY",
-			helper = BytemanHelper.NAME,
-			condition = "flag(\"failureBeforeFirstRead_fullScope.failed\")",
-			action = "simulateFailure()"
-	)
 	public void failureBeforeFirstRead_fullScope() throws InterruptedException, IOException {
+		SimulatedFailure.raiseExceptionOnNextRead();
 		doTest( null, DB_COMP_ROWS, DB_COMP_ROWS / 5 );
 	}
 
@@ -147,17 +140,8 @@ public class RestartChunkIT {
 		doTest( null, DB_COMP_ROWS, DB_COMP_ROWS / 5 );
 	}
 
-	@Test
-	@BMRule(
-			name = "Fail before the first read",
-			targetClass = "org.hibernate.search.batch.jsr352.core.massindexing.step.lucene.spi.EntityReader",
-			targetMethod = "readItem",
-			targetLocation = "AT ENTRY",
-			helper = BytemanHelper.NAME,
-			condition = "flag(\"failureBeforeFirstRead_hql.failed\")",
-			action = "simulateFailure()"
-	)
 	public void failureBeforeFirstRead_hql() throws InterruptedException, IOException {
+		SimulatedFailure.raiseExceptionOnNextRead();
 		doTest( "select c from SimulatedFailureCompany c where c.name like 'Google%'", DB_COMP_ROWS / 5, DB_COMP_ROWS / 5 );
 	}
 
