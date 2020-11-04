@@ -34,7 +34,8 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -47,18 +48,24 @@ public class SearchQueryScrollResultLoadingIT {
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
-	@Rule
-	public final SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@ClassRule
+	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	private final IndexItem[] references = new IndexItem[37];
+	private static final IndexItem[] references = new IndexItem[37];
 
-	@Before
-	public void setup() {
+	@BeforeClass
+	public static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
-		initData();
+		BulkIndexer indexer = index.bulkIndexer();
+		for ( int i = 0; i < 37; i++ ) {
+			IndexItem item = new IndexItem( i );
+			references[i] = item;
+			indexer.add( item.id, document -> document.addValue( "integer", item.value ) );
+		}
+		indexer.join();
 	}
 
 	@Test
@@ -157,17 +164,7 @@ public class SearchQueryScrollResultLoadingIT {
 		assertThat( chunk.total().hitCount() ).isEqualTo( 37 );
 	}
 
-	private void initData() {
-		BulkIndexer indexer = index.bulkIndexer();
-		for ( int i = 0; i < 37; i++ ) {
-			IndexItem item = new IndexItem( i );
-			references[i] = item;
-			indexer.add( item.id, document -> document.addValue( "integer", item.value ) );
-		}
-		indexer.join();
-	}
-
-	private class IndexItem {
+	private static class IndexItem {
 		final String id;
 		final int value;
 		final DocumentReference reference;
