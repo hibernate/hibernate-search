@@ -55,6 +55,7 @@ import org.hibernate.search.integrationtest.showcase.library.service.TestDataSer
 import org.hibernate.search.util.common.data.Range;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -67,8 +68,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles(resolver = TestActiveProfilesResolver.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class LibraryShowcaseBaseIT {
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+public class LibraryShowcaseSearchIT {
+
+	private static boolean needsInit;
 
 	@Autowired
 	private DocumentService documentService;
@@ -82,9 +85,17 @@ public class LibraryShowcaseBaseIT {
 	@Autowired
 	private TestDataService testDataService;
 
+	@BeforeClass
+	public static void beforeClass() {
+		needsInit = true;
+	}
+
 	@Before
 	public void before() {
-		testDataService.initDefaultDataSet();
+		if ( needsInit ) {
+			testDataService.initDefaultDataSet();
+			needsInit = false;
+		}
 	}
 
 	@Test
