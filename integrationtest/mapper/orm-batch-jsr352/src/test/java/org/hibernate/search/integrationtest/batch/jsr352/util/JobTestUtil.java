@@ -35,7 +35,7 @@ public final class JobTestUtil {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final int THREAD_SLEEP = 1000;
+	private static final int THREAD_SLEEP_MS = 100;
 	private static final String JSR325_TYPE_FOR_IDE_TESTS = "jbatch";
 
 	private JobTestUtil() {
@@ -66,20 +66,21 @@ public final class JobTestUtil {
 
 	public static JobExecution waitForTermination(JobOperator jobOperator, JobExecution jobExecution, int timeoutInMs)
 			throws InterruptedException {
-		long endTime = System.currentTimeMillis() + timeoutInMs;
+		long endTime = System.nanoTime() + timeoutInMs * 1_000_000L;
 
 		while ( !jobExecution.getBatchStatus().equals( BatchStatus.COMPLETED )
 				&& !jobExecution.getBatchStatus().equals( BatchStatus.STOPPED )
 				&& !jobExecution.getBatchStatus().equals( BatchStatus.FAILED )
-				&& System.currentTimeMillis() < endTime ) {
+				&& System.nanoTime() < endTime ) {
 
 			long executionId = jobExecution.getExecutionId();
 			log.infof(
 					"Job execution (id=%d) has status %s. Thread sleeps %d ms...",
 					executionId,
 					jobExecution.getBatchStatus(),
-					THREAD_SLEEP );
-			Thread.sleep( THREAD_SLEEP );
+					THREAD_SLEEP_MS
+			);
+			Thread.sleep( THREAD_SLEEP_MS );
 			jobExecution = jobOperator.getJobExecution( executionId );
 		}
 
