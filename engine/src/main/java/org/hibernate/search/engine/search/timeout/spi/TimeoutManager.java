@@ -73,20 +73,25 @@ public class TimeoutManager {
 		this.type = type;
 		this.deadline = timeoutMs == null ? null : new DynamicDeadline();
 
-		timingSource.ensureTimeEstimateIsInitialized();
+		if ( requireMonotonicTimeEstimate() ) {
+			timingSource.ensureTimeEstimateIsInitialized();
+		}
 	}
 
 	/**
 	 * we start counting from this method call (if needed)
 	 */
 	public void start() {
-		this.monotonicTimeEstimateStart = timingSource.monotonicTimeEstimate();
-		this.nanoTimeStart = timingSource.nanoTime();
+		if ( requireMonotonicTimeEstimate() ) {
+			monotonicTimeEstimateStart = timingSource.monotonicTimeEstimate();
+		}
+
+		nanoTimeStart = timingSource.nanoTime();
 	}
 
 	public void stop() {
-		this.monotonicTimeEstimateStart = null;
-		this.nanoTimeStart = null;
+		monotonicTimeEstimateStart = null;
+		nanoTimeStart = null;
 	}
 
 	public TimingSource timingSource() {
@@ -153,6 +158,10 @@ public class TimeoutManager {
 
 	protected long elapsedTimeEstimateMillis() {
 		return timingSource.monotonicTimeEstimate() - monotonicTimeEstimateStart;
+	}
+
+	private boolean requireMonotonicTimeEstimate() {
+		return !Type.NONE.equals( type );
 	}
 
 	final class DynamicDeadline implements Deadline {
