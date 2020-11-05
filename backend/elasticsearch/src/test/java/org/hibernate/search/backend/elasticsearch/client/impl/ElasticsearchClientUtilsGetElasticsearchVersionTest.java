@@ -25,6 +25,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import com.google.gson.JsonObject;
+import org.apache.http.HttpHost;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
@@ -109,6 +110,7 @@ public class ElasticsearchClientUtilsGetElasticsearchVersionTest {
 		JsonObject responseBody = new JsonObject();
 		responseBody.add( "version", versionObject );
 		when( clientMock.submit( any() ) )
-				.thenReturn( CompletableFuture.completedFuture( new ElasticsearchResponse( 200, "", responseBody ) ) );
+				.thenReturn( CompletableFuture.completedFuture( new ElasticsearchResponse(
+						new HttpHost( "mockHost:9200" ), 200, "", responseBody ) ) );
 	}
 }

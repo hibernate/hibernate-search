@@ -33,6 +33,7 @@ import org.junit.Test;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.apache.http.HttpHost;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
@@ -80,7 +81,8 @@ public class BulkWorkTest {
 		responseBody.add( "items", items );
 		items.add( new JsonObject() );
 		items.add( new JsonObject() );
-		ElasticsearchResponse response = new ElasticsearchResponse( 200, "OK", responseBody );
+		ElasticsearchResponse response = new ElasticsearchResponse( new HttpHost( "mockHost:9200" ),
+				200, "OK", responseBody );
 		futureFromClient.complete( response );
 		verifyNoOtherClientInteractionsAndReset();
 
@@ -123,7 +125,8 @@ public class BulkWorkTest {
 
 		JsonObject responseBody = new JsonObject();
 		responseBody.addProperty( "someProperty", "someValue" );
-		ElasticsearchResponse response = new ElasticsearchResponse( 500, "SomeStatus", responseBody );
+		ElasticsearchResponse response = new ElasticsearchResponse( new HttpHost( "mockHost:9200" ),
+				500, "SomeStatus", responseBody );
 		futureFromClient.complete( response );
 		verifyNoOtherClientInteractionsAndReset();
 

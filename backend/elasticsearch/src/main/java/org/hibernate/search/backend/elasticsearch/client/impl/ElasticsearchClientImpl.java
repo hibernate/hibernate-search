@@ -119,7 +119,6 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 					@Override
 					public void onFailure(Exception exception) {
 						if ( exception instanceof ResponseException ) {
-							requestLog.debug( "ES client issued a ResponseException - not necessarily a problem", exception );
 							/*
 							 * The client tries to guess what's an error and what's not, but it's too naive.
 							 * A 404 on DELETE is not always important to us, for instance.
@@ -205,6 +204,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 		try {
 			JsonObject body = parseBody( response );
 			return new ElasticsearchResponse(
+					response.getHost(),
 					response.getStatusLine().getStatusCode(),
 					response.getStatusLine().getReasonPhrase(),
 					body );
@@ -242,14 +242,14 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 		long executionTimeNs = System.nanoTime() - start;
 		long executionTimeMs = TimeUnit.NANOSECONDS.toMillis( executionTimeNs );
 		if ( successCode ) {
-			requestLog.executedRequest( request.method(), request.path(), request.parameters(),
+			requestLog.executedRequest( request.method(), response.host(), request.path(), request.parameters(),
 					request.bodyParts().size(), executionTimeMs,
 					response.statusCode(), response.statusMessage(),
 					jsonLogHelper.toString( request.bodyParts() ),
 					jsonLogHelper.toString( response.body() ) );
 		}
 		else {
-			requestLog.executedRequestWithFailure( request.method(), request.path(), request.parameters(),
+			requestLog.executedRequestWithFailure( request.method(), response.host(), request.path(), request.parameters(),
 					request.bodyParts().size(), executionTimeMs,
 					response.statusCode(), response.statusMessage(),
 					jsonLogHelper.toString( request.bodyParts() ),

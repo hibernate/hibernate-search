@@ -49,6 +49,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.apache.http.HttpHost;
 
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 @ValidIdRanges({
@@ -176,9 +177,11 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ID_OFFSET_LEGACY_ES + 82,
-			value = "Executed Elasticsearch HTTP %s request to path '%s' with query parameters %s and %d objects in payload in %dms."
+			value = "Executed Elasticsearch HTTP %s request to '%s' with path '%s',"
+					+ " query parameters %s and %d objects in payload in %dms."
 					+ " Response had status %d '%s'. Request body: <%s>. Response body: <%s>")
-	void executedRequestWithFailure(String method, String path, Map<String, String> getParameters, int bodyParts, long timeInMs,
+	void executedRequestWithFailure(String method, HttpHost host, String path, Map<String, String> getParameters,
+			int bodyParts, long timeInMs,
 			int responseStatusCode, String responseStatusMessage,
 			String requestBodyParts, String responseBody);
 
@@ -201,9 +204,11 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = Level.TRACE)
 	@Message(id = ID_OFFSET_LEGACY_ES + 93,
-			value = "Executed Elasticsearch HTTP %s request to path '%s' with query parameters %s and %d objects in payload in %dms."
+			value = "Executed Elasticsearch HTTP %s request to '%s' with path '%s',"
+					+ " query parameters %s and %d objects in payload in %dms."
 					+ " Response had status %d '%s'. Request body: <%s>. Response body: <%s>")
-	void executedRequest(String method, String path, Map<String, String> getParameters, int bodyParts, long timeInMs,
+	void executedRequest(String method, HttpHost host, String path, Map<String, String> getParameters, int bodyParts,
+			long timeInMs,
 			int responseStatusCode, String responseStatusMessage,
 			String requestBodyParts, String responseBody);
 
