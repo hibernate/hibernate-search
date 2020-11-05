@@ -29,9 +29,12 @@ Logs every single search query at the `TRACE` level, before its execution.
 [[troubleshooting-logging-elasticsearch-request]]`org.hibernate.search.elasticsearch.request`::
 Available for Elasticsearch backends only.
 +
-Logs every single request sent to Elasticsearch at the `DEBUG` or `TRACE` level after its execution.
-Use the `DEBUG` level for compact information (method, path, execution time, status code, ...),
-or the `TRACE` level to also get the full request and response.
+Logs requests sent to Elasticsearch at the `DEBUG` or `TRACE` level after their execution.
+All available request and response information is logged:
+method, path, execution time, status code, but also the full request and response.
++
+Use the `DEBUG` level to only log non-success requests (status code different from `2xx`),
+or the `TRACE` level to log every single request.
 +
 You can enable pretty-printing (line breaks and indentation) for the request and response
 using a <<backend-elasticsearch-configuration-logging,configuration property>>.
