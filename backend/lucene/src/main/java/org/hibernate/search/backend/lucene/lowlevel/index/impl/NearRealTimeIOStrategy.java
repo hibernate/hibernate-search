@@ -60,7 +60,7 @@ public class NearRealTimeIOStrategy extends IOStrategy {
 	IndexWriterProvider createIndexWriterProvider(String indexName, EventContext eventContext,
 			DirectoryHolder directoryHolder, IndexWriterConfigSource configSource) {
 		if ( commitInterval != 0 ) {
-			timingSource.ensureInitialized();
+			timingSource.ensureTimeEstimateIsInitialized();
 		}
 		return new IndexWriterProvider(
 				indexName, eventContext,
@@ -74,7 +74,7 @@ public class NearRealTimeIOStrategy extends IOStrategy {
 	IndexReaderProvider createIndexReaderProvider(DirectoryHolder directoryHolder,
 			IndexWriterProvider indexWriterProvider) {
 		if ( refreshInterval != 0 ) {
-			timingSource.ensureInitialized();
+			timingSource.ensureTimeEstimateIsInitialized();
 		}
 		return new NearRealTimeIndexReaderProvider( indexWriterProvider, timingSource, refreshInterval );
 	}

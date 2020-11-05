@@ -48,7 +48,7 @@ public final class DefaultTimingSource implements TimingSource {
 	}
 
 	@Override
-	public void ensureInitialized() {
+	public void ensureTimeEstimateIsInitialized() {
 		if ( future != null ) {
 			return;
 		}

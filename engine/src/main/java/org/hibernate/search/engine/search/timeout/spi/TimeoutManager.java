@@ -73,7 +73,7 @@ public class TimeoutManager {
 		this.type = type;
 		this.deadline = timeoutMs == null ? null : new DynamicDeadline();
 
-		timingSource.ensureInitialized();
+		timingSource.ensureTimeEstimateIsInitialized();
 	}
 
 	/**
