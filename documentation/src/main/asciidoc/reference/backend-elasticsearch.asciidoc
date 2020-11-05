@@ -179,7 +179,7 @@ You will need to add this dependency:
 [source, XML, subs="+attributes"]
 ----
 <dependency>
-   <groupId>org.hibernate</groupId>
+   <groupId>org.hibernate.search</groupId>
    <artifactId>hibernate-search-backend-elasticsearch-aws</artifactId>
    <version>{hibernateSearchVersion}</version>
 </dependency>
