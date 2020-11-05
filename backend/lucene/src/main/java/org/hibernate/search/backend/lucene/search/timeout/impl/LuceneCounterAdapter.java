@@ -20,7 +20,7 @@ public final class LuceneCounterAdapter extends Counter {
 	private final TimingSource timingSource;
 
 	public LuceneCounterAdapter(TimingSource timingSource) {
-		timingSource.ensureInitialized();
+		timingSource.ensureTimeEstimateIsInitialized();
 		this.timingSource = timingSource;
 	}
 

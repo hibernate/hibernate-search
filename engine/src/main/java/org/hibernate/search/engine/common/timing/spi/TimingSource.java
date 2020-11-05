@@ -31,7 +31,7 @@ public interface TimingSource {
 	 * Needs to be invoked at least once before {@link #monotonicTimeEstimate()} can be used.
 	 * Safe to be invoked multiple times.
 	 */
-	void ensureInitialized();
+	void ensureTimeEstimateIsInitialized();
 
 	/**
 	 * Returns current system time in nanoseconds.
