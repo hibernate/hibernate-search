@@ -151,7 +151,7 @@ public class TimeoutManager {
 		return Duration.ofMillis( timingSource.nanoTime() - nanoTimeStart );
 	}
 
-	protected long elapsedTimeInMilliseconds() {
+	protected long elapsedTimeEstimateMillis() {
 		return timingSource.monotonicTimeEstimate() - monotonicTimeEstimateStart;
 	}
 
@@ -160,7 +160,7 @@ public class TimeoutManager {
 
 		@Override
 		public long remainingTimeMillis() {
-			final long elapsedTime = elapsedTimeInMilliseconds();
+			final long elapsedTime = elapsedTimeEstimateMillis();
 			long timeLeft = timeoutMs - elapsedTime;
 			if ( timeLeft <= 0 ) {
 				forceTimeout( null );
