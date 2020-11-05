@@ -62,7 +62,8 @@ public class TimeoutManager {
 	protected final Type type;
 	private final DynamicDeadline deadline;
 
-	private Long start;
+	private Long monotonicTimeEstimateStart;
+	private Long nanoTimeStart;
 
 	public TimeoutManager(TimingSource timingSource, Long timeoutValue, TimeUnit timeoutUnit, Type type) {
 		this.timingSource = timingSource;
@@ -79,11 +80,13 @@ public class TimeoutManager {
 	 * we start counting from this method call (if needed)
 	 */
 	public void start() {
-		this.start = timingSource.monotonicTimeEstimate();
+		this.monotonicTimeEstimateStart = timingSource.monotonicTimeEstimate();
+		this.nanoTimeStart = timingSource.nanoTime();
 	}
 
 	public void stop() {
-		this.start = null;
+		this.monotonicTimeEstimateStart = null;
+		this.nanoTimeStart = null;
 	}
 
 	public TimingSource timingSource() {
@@ -111,7 +114,7 @@ public class TimeoutManager {
 	}
 
 	public long timeoutBaseline() {
-		return start;
+		return monotonicTimeEstimateStart;
 	}
 
 	/**
@@ -138,12 +141,18 @@ public class TimeoutManager {
 		return this.type == Type.EXCEPTION;
 	}
 
+	/**
+	 * Returns the time passed from the start with high precision.
+	 * This method may be performance expensive.
+	 *
+	 * @return high precision duration of took time.
+	 */
 	public Duration tookTime() {
-		return Duration.ofMillis( elapsedTimeInMilliseconds() );
+		return Duration.ofMillis( timingSource.nanoTime() - nanoTimeStart );
 	}
 
 	protected long elapsedTimeInMilliseconds() {
-		return timingSource.monotonicTimeEstimate() - start;
+		return timingSource.monotonicTimeEstimate() - monotonicTimeEstimateStart;
 	}
 
 	final class DynamicDeadline implements Deadline {
