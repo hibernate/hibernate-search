@@ -54,7 +54,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 
 == Job Parameters
 
-The following table will contain all the job parameters we can use to customize the reindexing batch processes.
+The following table contains all the job parameters you can use to customize the mass-indexing job.
 
 .Job Parameters in JSR 352 Integration
 |===
@@ -423,7 +423,7 @@ an entity manager factory by its persistence unit name when using the mass index
 [[jsr-352-emf-other-implementation]]
 === Other DI-enabled JSR-352 implementations
 
-If you want to use a different JSR-352 implementation:
+If you want to use a different JSR-352 implementation that happens to allow dependency injection:
 
 1. You must map the following two scope annotations
 to the relevant scope in the dependency injection mechanism:
