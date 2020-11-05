@@ -7,7 +7,7 @@
 For search queries, you can get a human-readable representation of a <<search-dsl-query-object,`SearchQuery` object>>
 by calling `toString()` or `queryString()`.
 Alternatively, rely on the logs:
-<<troubleshooting-logging-query,`org.hibernate.search.query`>> will log every query at the `DEBUG` level
+<<troubleshooting-logging-query,`org.hibernate.search.query`>> will log every query at the `TRACE` level
 before it is executed.
 
 For more general information about what is being executed, rely on loggers:
@@ -25,7 +25,7 @@ Here are a few loggers that can be useful when debugging an application that use
 [[troubleshooting-logging-query]]`org.hibernate.search.query`::
 Available for all backends.
 +
-Logs every single search query at the `DEBUG` level, before its execution.
+Logs every single search query at the `TRACE` level, before its execution.
 [[troubleshooting-logging-elasticsearch-request]]`org.hibernate.search.elasticsearch.request`::
 Available for Elasticsearch backends only.
 +

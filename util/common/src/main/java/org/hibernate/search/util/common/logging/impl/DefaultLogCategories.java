@@ -17,7 +17,7 @@ public final class DefaultLogCategories {
 	}
 
 	/**
-	 * Category for logging executed search queries.
+	 * Category for logging executed search queries at the TRACE level.
 	 */
 	public static final LogCategory QUERY = new LogCategory( "org.hibernate.search.query" );
 
