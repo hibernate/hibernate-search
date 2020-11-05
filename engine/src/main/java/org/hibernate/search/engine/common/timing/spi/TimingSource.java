@@ -33,4 +33,12 @@ public interface TimingSource {
 	 */
 	void ensureInitialized();
 
+	/**
+	 * Returns current system time in nanoseconds.
+	 * Accuracy is preferred over performance by the implementation.
+	 *
+	 * @return high precision current time in nanoseconds.
+	 */
+	long nanoTime();
+
 }
