@@ -177,9 +177,10 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ID_OFFSET_LEGACY_ES + 82,
 			value = "Executed Elasticsearch HTTP %s request to path '%s' with query parameters %s and %d objects in payload in %dms."
-					+ " Response had status %d '%s'.")
-	void executedRequest(String method, String path, Map<String, String> getParameters, int bodyParts, long timeInMs,
-			int responseStatusCode, String responseStatusMessage);
+					+ " Response had status %d '%s'. Request body: <%s>. Response body: <%s>")
+	void executedRequestWithFailure(String method, String path, Map<String, String> getParameters, int bodyParts, long timeInMs,
+			int responseStatusCode, String responseStatusMessage,
+			String requestBodyParts, String responseBody);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET_LEGACY_ES + 85,

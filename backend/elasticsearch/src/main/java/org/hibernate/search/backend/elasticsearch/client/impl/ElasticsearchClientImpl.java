@@ -235,9 +235,13 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	}
 
 	private void log(ElasticsearchRequest request, long start, ElasticsearchResponse response) {
+		boolean successCode = ElasticsearchClientUtils.isSuccessCode( response.statusCode() );
+		if ( !requestLog.isTraceEnabled() && successCode ) {
+			return;
+		}
 		long executionTimeNs = System.nanoTime() - start;
 		long executionTimeMs = TimeUnit.NANOSECONDS.toMillis( executionTimeNs );
-		if ( requestLog.isTraceEnabled() ) {
+		if ( successCode ) {
 			requestLog.executedRequest( request.method(), request.path(), request.parameters(),
 					request.bodyParts().size(), executionTimeMs,
 					response.statusCode(), response.statusMessage(),
@@ -245,9 +249,11 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 					jsonLogHelper.toString( response.body() ) );
 		}
 		else {
-			requestLog.executedRequest( request.method(), request.path(), request.parameters(),
+			requestLog.executedRequestWithFailure( request.method(), request.path(), request.parameters(),
 					request.bodyParts().size(), executionTimeMs,
-					response.statusCode(), response.statusMessage() );
+					response.statusCode(), response.statusMessage(),
+					jsonLogHelper.toString( request.bodyParts() ),
+					jsonLogHelper.toString( response.body() ) );
 		}
 	}
 
