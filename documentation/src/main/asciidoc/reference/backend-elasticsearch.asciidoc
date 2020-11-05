@@ -240,7 +240,7 @@ Timeouts::
 +
 [source]
 ----
-# hibernate.search.backend.request_timeout = (not defined by default)
+# hibernate.search.backend.request_timeout = 30000
 hibernate.search.backend.connection_timeout = 1000
 hibernate.search.backend.read_timeout = 30000
 ----
@@ -248,6 +248,7 @@ hibernate.search.backend.read_timeout = 30000
 * `request_timeout` defines the timeout when executing a request.
 This includes the time needed to establish a connection,
 send the request and read the response.
+This property is not defined by default.
 * `connection_timeout` defines the timeout when establishing a connection.
 The default for this property is `1000`.
 * `read_timeout` defines the timeout when reading a response.
