@@ -239,10 +239,10 @@ Multiple strategies are available:
 ----
 # To configure the defaults for all indexes:
 hibernate.search.backend.sharding.strategy = hash
-hibernate.search.backend.sharding.number_of_shards = 2 (no default)
+hibernate.search.backend.sharding.number_of_shards = 2
 # To configure a specific index:
 hibernate.search.backend.indexes.<index name>.sharding.strategy = hash
-hibernate.search.backend.indexes.<index name>.sharding.number_of_shards = 2 (no default)
+hibernate.search.backend.indexes.<index name>.sharding.number_of_shards = 2
 ----
 +
 The `hash` strategy requires to set a number of shards through the `number_of_shards` property.
@@ -265,10 +265,10 @@ to be brought down to a smaller number (e.g. "all integers").
 ----
 # To configure the defaults for all indexes:
 hibernate.search.backend.sharding.strategy = explicit
-hibernate.search.backend.sharding.shard_identifiers = fr,en,de (no default)
+hibernate.search.backend.sharding.shard_identifiers = fr,en,de
 # To configure a specific index:
 hibernate.search.backend.indexes.<index name>.sharding.strategy = explicit
-hibernate.search.backend.indexes.<index name>.sharding.shard_identifiers = fr,en,de (no default)
+hibernate.search.backend.indexes.<index name>.sharding.shard_identifiers = fr,en,de
 ----
 +
 The `explicit` strategy requires to set a list of shard identifiers through the `shard_identifiers` property.
