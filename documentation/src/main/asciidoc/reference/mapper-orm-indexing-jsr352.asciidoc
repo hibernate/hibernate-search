@@ -16,6 +16,30 @@ implementation (see <<jsr-352-emf-jberet,how to configure it here>>).
 As for other implementations, they can also be used, but will require
 <<jsr-352-emf-other-implementation,a bit more configuration on your side>>.
 
+If the runtime is JBeret, you need to add the following dependency:
+
+[source, XML, subs="+attributes"]
+----
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-mapper-orm-batch-jsr352-jberet</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+----
+
+For any other runtime, you need to add the following dependency:
+
+[source, XML, subs="+attributes"]
+----
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-mapper-orm-batch-jsr352-core</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+----
+
+Here is an example of how to run a batch instance:
+
 .Reindexing everything using a `JSR-352` mass-indexing job
 ====
 [source, JAVA, indent=0]
@@ -29,6 +53,8 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 ====
 
 == Job Parameters
+
+The following table will contain all the job parameters we can use to customize the reindexing batch processes.
 
 .Job Parameters in JSR 352 Integration
 |===
@@ -347,8 +373,6 @@ will stay open during the whole mass indexing process.
 
 If your JSR-352 runtime is JBeret (used in WildFly in particular),
 you can use CDI to retrieve the `EntityManagerFactory`.
-Unless you use an already packaged `hibernate-search-mapper-orm-batch-jsr352-*` module for your application container,
-this will require you to add the `hibernate-search-mapper-orm-batch-jsr352-jberet` jar to your classpath.
 
 If you use only one persistence unit, the mass indexer will be able to access your database
 automatically without any special configuration.
@@ -399,8 +423,7 @@ an entity manager factory by its persistence unit name when using the mass index
 [[jsr-352-emf-other-implementation]]
 === Other DI-enabled JSR-352 implementations
 
-If you want to use a different JSR-352 implementation that happens to allow dependency injection,
-you can use `hibernate-search-mapper-orm-batch-jsr352-core` under the following conditions:
+If you want to use a different JSR-352 implementation:
 
 1. You must map the following two scope annotations
 to the relevant scope in the dependency injection mechanism:
