@@ -87,8 +87,9 @@ to send indexing requests and search queries to:
 
 [source]
 ----
-hibernate.search.backend.hosts = localhost:9200 (default)
+hibernate.search.backend.hosts = localhost:9200
 ----
+The default for this property is `localhost:9200`.
 
 This property may be set to a String representing a host and port such as `localhost` or `es.mycompany.com:4400`,
 or a String containing multiple such host-and-port strings separated by commas,
@@ -98,8 +99,9 @@ You may change the protocol used to communicate with the hosts using this config
 
 [source]
 ----
-hibernate.search.backend.protocol = http (default)
+hibernate.search.backend.protocol = http
 ----
+The default for this property is `http`.
 
 This property may be set to either `http` or `https`.
 
@@ -132,14 +134,14 @@ Automatic discovery is controlled by the following properties:
 
 [source]
 ----
-hibernate.search.backend.discovery.enabled = false (default)
-hibernate.search.backend.discovery.refresh_interval = 10 (default)
+hibernate.search.backend.discovery.enabled = false
+hibernate.search.backend.discovery.refresh_interval = 10
 ----
 
 * `discovery.enabled` defines whether the feature is enabled.
-Expects a boolean value.
+Expects a boolean value. The default for this property is `false`.
 * `discovery.refresh_interval` defines the interval between two executions of the automatic discovery.
-Expects a positive integer, in seconds.
+Expects a positive integer, in seconds. The default for this property is `10`.
 
 [[backend-elasticsearch-authentication-http]]
 === HTTP authentication
@@ -239,16 +241,17 @@ Timeouts::
 [source]
 ----
 # hibernate.search.backend.request_timeout = (not defined by default)
-hibernate.search.backend.connection_timeout = 1000 (default)
-hibernate.search.backend.read_timeout = 30000 (default)
+hibernate.search.backend.connection_timeout = 1000
+hibernate.search.backend.read_timeout = 30000
 ----
 
 * `request_timeout` defines the timeout when executing a request.
 This includes the time needed to establish a connection,
 send the request and read the response.
 * `connection_timeout` defines the timeout when establishing a connection.
+The default for this property is `1000`.
 * `read_timeout` defines the timeout when reading a response.
-
+The default for this property is `30000`.
 +
 These properties expect a positive <<configuration-property-types,Integer value>> in milliseconds, such as `3000`.
 
@@ -256,14 +259,16 @@ Connection pool::
 +
 [source]
 ----
-hibernate.search.backend.max_connections = 20 (default)
-hibernate.search.backend.max_connections_per_route = 10 (default)
+hibernate.search.backend.max_connections = 20
+hibernate.search.backend.max_connections_per_route = 10
 ----
 
 * `max_connections` defines maximum number of simultaneous connections
 to the Elasticsearch cluster, all hosts taken together.
+The default for this property is `20`.
 * `max_connections_per_route` defines maximum number of simultaneous connections
 to each host of the Elasticsearch cluster.
+The default for this property is `10`.
 
 +
 These properties expect a positive <<configuration-property-types,Integer value>>, such as `20`.
@@ -333,16 +338,18 @@ For Elasticsearch specifically, some fine-tuning is available through the follow
 [source]
 ----
 # To configure the defaults for all indexes:
-hibernate.search.backend.schema_management.minimal_required_status = green (default)
-hibernate.search.backend.schema_management.minimal_required_status_wait_timeout = 10000 (default)
+hibernate.search.backend.schema_management.minimal_required_status = green
+hibernate.search.backend.schema_management.minimal_required_status_wait_timeout = 10000
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.schema_management.minimal_required_status = green (default)
-hibernate.search.backend.indexes.<index name>.schema_management.minimal_required_status_wait_timeout = 10000 (default)
+hibernate.search.backend.indexes.<index name>.schema_management.minimal_required_status = green
+hibernate.search.backend.indexes.<index name>.schema_management.minimal_required_status_wait_timeout = 10000
 ----
 
 * `minimal_required_status` defines the minimal required status of an index before creation is considered complete.
+The default for this property is `green`.
 * `minimal_required_status_wait_timeout` defines the maximum time to wait for this status,
 as an <<configuration-property-types,integer value>> in milliseconds.
+The default for this property is `10000`.
 
 These properties are only effective when creating or validating an index as part of schema management.
 
@@ -607,8 +614,9 @@ The strategy is set a the backend level:
 
 [source]
 ----
-hibernate.search.backend.mapping.type_name.strategy = discriminator (default)
+hibernate.search.backend.mapping.type_name.strategy = discriminator
 ----
+The default for this property is `discriminator`.
 
 See the following subsections for details about available strategies.
 
@@ -663,10 +671,11 @@ we can use the following index-level property to change the value.
 [source]
 ----
 # To configure the defaults for all indexes:
-hibernate.search.backend.dynamic_mapping = strict (default)
+hibernate.search.backend.dynamic_mapping = strict
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.dynamic_mapping = strict (default)
+hibernate.search.backend.indexes.<index name>.dynamic_mapping = strict
 ----
+The default for this property is `strict`.
 
 We said that Hibernate Search **usually** works on declared schema fields. More precisely, it always does
 if no <<mapper-orm-bridge-index-field-dsl-dynamic>> are defined.
@@ -687,8 +696,9 @@ The multi-tenancy strategy is set a the backend level:
 
 [source]
 ----
-hibernate.search.backend.multi_tenancy.strategy = none (default)
+hibernate.search.backend.multi_tenancy.strategy = none
 ----
+The default for this property is `none`.
 
 See the following subsections for details about available strategies.
 
@@ -901,17 +911,18 @@ This is done through the following configuration properties:
 [source]
 ----
 # To configure the defaults for all indexes:
-hibernate.search.backend.indexing.queue_count = 10 (default)
-hibernate.search.backend.indexing.queue_size = 1000 (default)
-hibernate.search.backend.indexing.max_bulk_size = 100 (default)
+hibernate.search.backend.indexing.queue_count = 10
+hibernate.search.backend.indexing.queue_size = 1000
+hibernate.search.backend.indexing.max_bulk_size = 100
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.indexing.queue_count = 10 (default)
-hibernate.search.backend.indexes.<index name>.indexing.queue_size = 1000 (default)
-hibernate.search.backend.indexes.<index name>.indexing.max_bulk_size = 100 (default)
+hibernate.search.backend.indexes.<index name>.indexing.queue_count = 10
+hibernate.search.backend.indexes.<index name>.indexing.queue_size = 1000
+hibernate.search.backend.indexes.<index name>.indexing.max_bulk_size = 100
 ----
 
 * `indexing.queue_count` defines the number of queues.
 Expects a strictly positive integer value.
+The default for this property is `10`.
 +
 Higher values will lead to more connections being used in parallel,
 which may lead to higher indexing throughput,
@@ -919,6 +930,7 @@ but incurs a risk of <<backend-elasticsearch-indexing-queues-circuit-breaker,ove
 leading to Elasticsearch giving up on some requests and resulting in indexing failures.
 * `indexing.queue_size` defines the maximum number of elements each queue can hold.
 Expects a strictly positive integer value.
+The default for this property is `1000`.
 +
 Lower values may lead to lower memory usage, especially if there are many queues,
 but values that are too low will reduce the likeliness of reaching the max bulk size
@@ -927,6 +939,7 @@ because the queue is full,
 which may lead to lower indexing throughput.
 * `indexing.max_bulk_size` defines the maximum number of indexing requests in each bulk request.
 Expects a strictly positive integer value.
+The default for this property is `100`.
 +
 Higher values will lead to more documents being sent in each HTTP request sent to Elasticsearch,
 which may lead to higher indexing throughput,
@@ -1002,8 +1015,9 @@ Use the following configuration property at the backend level to configure the t
 
 [source]
 ----
-hibernate.search.backend.scroll_timeout = 60 (default)
+hibernate.search.backend.scroll_timeout = 60
 ----
+The default for this property is `60`.
 
 [[backend-elasticsearch-access-client]]
 == Retrieving the REST client
