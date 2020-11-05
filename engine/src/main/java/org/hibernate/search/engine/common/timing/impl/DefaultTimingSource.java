@@ -63,6 +63,11 @@ public final class DefaultTimingSource implements TimingSource {
 	}
 
 	@Override
+	public long nanoTime() {
+		return System.nanoTime();
+	}
+
+	@Override
 	public synchronized void stop() {
 		if ( future != null ) {
 			future.cancel( false );
