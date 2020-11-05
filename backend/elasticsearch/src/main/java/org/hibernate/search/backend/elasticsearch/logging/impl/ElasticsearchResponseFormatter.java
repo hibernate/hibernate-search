@@ -40,6 +40,8 @@ public final class ElasticsearchResponseFormatter {
 		sb.append( response.statusCode() )
 				.append( " '" )
 				.append( response.statusMessage() )
+				.append( "' from '" )
+				.append( response.host() )
 				.append( "' with body " )
 				.append( helper.toString( response.body() ) );
 
