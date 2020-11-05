@@ -111,15 +111,16 @@ Hibernate Search exposes a configuration property:
 [source]
 ----
 # To configure the defaults for all indexes:
-hibernate.search.backend.directory.filesystem_access.strategy = auto (default)
+hibernate.search.backend.directory.filesystem_access.strategy = auto
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.directory.filesystem_access.strategy = auto (default)
+hibernate.search.backend.indexes.<index name>.directory.filesystem_access.strategy = auto
 ----
 
 Allowed values are:
 
-* `auto` (default): lets Lucene select the most appropriate implementation
+* `auto`: lets Lucene select the most appropriate implementation
 based on the operating system and architecture.
+This is the default value for the property.
 * `simple`: a straightforward strategy based on `Files.newByteChannel`.
 See `org.apache.lucene.store.SimpleFSDirectory`.
 **This strategy is deprecated and will be removed in a future version of Lucene.**
@@ -538,8 +539,9 @@ The multi-tenancy strategy is set a the backend level:
 
 [source]
 ----
-hibernate.search.backend.multi_tenancy.strategy = none (default)
+hibernate.search.backend.multi_tenancy.strategy = none
 ----
+The default for this property is `none`.
 
 See the following subsections for details about available strategies.
 
@@ -773,15 +775,16 @@ This is done through the following configuration properties:
 [source]
 ----
 # To configure the defaults for all indexes:
-hibernate.search.backend.indexing.queue_count = 10 (default)
-hibernate.search.backend.indexing.queue_size = 1000 (default)
+hibernate.search.backend.indexing.queue_count = 10
+hibernate.search.backend.indexing.queue_size = 1000
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.indexing.queue_count = 10 (default)
-hibernate.search.backend.indexes.<index name>.indexing.queue_size = 1000 (default)
+hibernate.search.backend.indexes.<index name>.indexing.queue_count = 10
+hibernate.search.backend.indexes.<index name>.indexing.queue_size = 1000
 ----
 
 * `indexing.queue_count` defines the number of queues.
 Expects a strictly positive integer value.
+The default for this property is `10`.
 +
 Higher values will lead to more indexing operations being performed in parallel,
 which may lead to higher indexing throughput if CPU power is the bottleneck when indexing.
@@ -790,6 +793,7 @@ Note that raising this number above the <<backend-lucene-threads,number of threa
 as the number of threads limits how many queues can be processed in parallel.
 * `indexing.queue_size` defines the maximum number of elements each queue can hold.
 Expects a strictly positive integer value.
+The default for this property is `1000`.
 +
 Lower values may lead to lower memory usage, especially if there are many queues,
 but values that are too low will increase the likeliness of
@@ -864,10 +868,11 @@ by setting the commit interval (in milliseconds):
 [source]
 ----
 # To configure the defaults for all indexes:
-hibernate.search.backend.io.commit_interval = 1000 (default)
+hibernate.search.backend.io.commit_interval = 1000
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.io.commit_interval = 1000 (default)
+hibernate.search.backend.indexes.<index name>.io.commit_interval = 1000
 ----
+The default for this property is `1000`.
 
 [WARNING]
 ====
@@ -915,10 +920,11 @@ The refresh interval can be set this way:
 [source]
 ----
 # To configure the defaults for all indexes:
-hibernate.search.backend.io.refresh_interval = 0 (default)
+hibernate.search.backend.io.refresh_interval = 0
 # To configure a specific index:
-hibernate.search.backend.indexes.<index name>.io.refresh_interval = 0 (default)
+hibernate.search.backend.indexes.<index name>.io.refresh_interval = 0
 ----
+The default for this property is `0`.
 
 [[backend-lucene-io-writer]]
 === `IndexWriter` settings
