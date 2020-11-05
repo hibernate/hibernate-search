@@ -78,9 +78,9 @@ public class HibernateSearchMultiReader extends MultiReader {
 
 	@Override
 	protected synchronized void doClose() throws IOException {
-		final boolean debugEnabled = log.isDebugEnabled();
-		if ( debugEnabled ) {
-			log.debugf( "Closing MultiReader: %s", this );
+		final boolean traceEnabled = log.isTraceEnabled();
+		if ( traceEnabled ) {
+			log.tracef( "Closing MultiReader: %s", this );
 		}
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			/*
@@ -90,7 +90,7 @@ public class HibernateSearchMultiReader extends MultiReader {
 			 */
 			closer.pushAll( DirectoryReader::decRef, directoryReaders );
 		}
-		if ( debugEnabled ) {
+		if ( traceEnabled ) {
 			log.trace( "MultiReader closed." );
 		}
 	}
