@@ -151,9 +151,10 @@ but may be enabled by setting the following configuration properties:
 
 [source]
 ----
-hibernate.search.backend.username = ironman (default is empty)
-hibernate.search.backend.password = j@rv1s (default is empty)
+hibernate.search.backend.username = ironman
+hibernate.search.backend.password = j@rv1s
 ----
+The default for these properties is an empty string.
 
 The username and password to send when connecting to the Elasticsearch servers.
 
