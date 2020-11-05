@@ -126,7 +126,7 @@ public interface Log extends BasicLogger {
 			value = "Unable to parse '%1$ss' into a Lucene version: %2$s" )
 	SearchException illegalLuceneVersionFormat(String property, String luceneErrorMessage, @Cause Exception e);
 
-	@LogMessage(level = Level.DEBUG)
+	@LogMessage(level = TRACE)
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 274, value = "Executing Lucene query: %s" )
 	void executingLuceneQuery(Query luceneQuery);
 

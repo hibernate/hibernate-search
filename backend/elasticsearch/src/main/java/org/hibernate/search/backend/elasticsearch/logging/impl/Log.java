@@ -105,7 +105,7 @@ public interface Log extends BasicLogger {
 			value = "Missing index: index aliases [%1$s, %2$s] do not point to any index in the Elasticsearch cluster." )
 	SearchException indexMissing(URLEncodedString write, URLEncodedString read);
 
-	@LogMessage(level = Level.DEBUG)
+	@LogMessage(level = Level.TRACE)
 	@Message(id = ID_OFFSET_LEGACY_ES + 53,
 			value = "Executing Elasticsearch query on '%s' with parameters '%s': <%s>" )
 	void executingElasticsearchQuery(String path, Map<String, String> parameters,

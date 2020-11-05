@@ -3372,3 +3372,11 @@ or right in the middle of other documents after a sort.
 
 In Hibernate Search 6, a document whose field does not have a value always ends up at the very end by default.
 This behavior link:{hibernateSearchDocUrl}#search-dsl-sort-common-missing[can be customized when defining the sort].
+
+[[query-logging-trace]]
+=== Logger `org.hibernate.search.query` uses the `TRACE` level
+
+Hibernate Search logs all executed search queries to logger `org.hibernate.search.query`.
+
+In Hibernate Search 5, these logs were at the `DEBUG` level.
+In Hibernate Search 5, they are at the `TRACE` level.
