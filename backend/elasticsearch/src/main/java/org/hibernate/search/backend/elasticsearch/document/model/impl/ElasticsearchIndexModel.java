@@ -28,6 +28,8 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.reporting.EventContext;
 
+import com.google.gson.JsonObject;
+
 
 public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSearchIndexContext {
 
@@ -36,6 +38,7 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 	private final EventContext eventContext;
 
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
+	private final JsonObject customIndexSettings;
 	private final RootTypeMapping mapping;
 
 	private final ToDocumentIdentifierValueConverter<?> idDslConverter;
@@ -47,7 +50,7 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 
 	public ElasticsearchIndexModel(IndexNames names,
 			String mappedTypeName,
-			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
+			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, JsonObject customIndexSettings,
 			RootTypeMapping mapping, ToDocumentIdentifierValueConverter<?> idDslConverter,
 			ElasticsearchIndexSchemaObjectNode rootNode,
 			Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticFields,
@@ -56,6 +59,7 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 		this.mappedTypeName = mappedTypeName;
 		this.eventContext = EventContexts.fromIndexName( hibernateSearchName() );
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
+		this.customIndexSettings = customIndexSettings;
 		this.mapping = mapping;
 		this.idDslConverter = idDslConverter;
 		this.rootNode = rootNode;

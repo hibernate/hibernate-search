@@ -6,9 +6,15 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.invoke.MethodHandles;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
@@ -19,10 +25,10 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.index.DynamicMapping;
-import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
-import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
 import org.hibernate.search.backend.elasticsearch.index.impl.IndexManagerBackendContext;
+import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
+import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
@@ -49,7 +55,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.Gson;
-
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 
 
 class ElasticsearchBackendImpl implements BackendImplementor,
@@ -67,6 +74,11 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 					.as( DynamicMapping.class, DynamicMapping::of )
 					.withDefault( ElasticsearchIndexSettings.Defaults.DYNAMIC_MAPPING )
 					.build();
+
+	private static final OptionalConfigurationProperty<String> SCHEMA_MANAGEMENT_SETTINGS_FILE =
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE )
+			.asString()
+			.build();
 
 	private final EventContext eventContext;
 
@@ -182,7 +194,9 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 		return new ElasticsearchIndexManagerBuilder(
 				indexManagerBackendContext,
 				createIndexSchemaRootNodeBuilder( indexEventContext, indexNames, mappedTypeName,
-						analysisDefinitionRegistry, DYNAMIC_MAPPING.get( propertySource ) ),
+						analysisDefinitionRegistry,
+						customIndexSettings( buildContext, propertySource, indexEventContext ),
+						DYNAMIC_MAPPING.get( propertySource ) ),
 				createDocumentMetadataContributors( mappedTypeName )
 		);
 	}
@@ -218,7 +232,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 
 	private ElasticsearchIndexSchemaRootNodeBuilder createIndexSchemaRootNodeBuilder(EventContext indexEventContext,
 			IndexNames indexNames, String mappedTypeName,
-			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
+			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, JsonObject customIndexSettings,
 			DynamicMapping dynamicMapping) {
 
 		ElasticsearchIndexSchemaRootNodeBuilder builder = new ElasticsearchIndexSchemaRootNodeBuilder(
@@ -226,7 +240,8 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 				indexEventContext,
 				indexNames,
 				mappedTypeName,
-				analysisDefinitionRegistry, dynamicMapping
+				analysisDefinitionRegistry, customIndexSettings,
+				dynamicMapping
 		);
 
 		typeNameMapping.getIndexSchemaRootContributor()
@@ -267,5 +282,30 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 		multiTenancyStrategy.documentMetadataContributor()
 				.ifPresent( contributors::add );
 		return contributors;
+	}
+
+	private JsonObject customIndexSettings(BackendBuildContext buildContext,
+			ConfigurationPropertySource propertySource, EventContext indexEventContext) {
+
+		Optional<String> schemaManagementSettingsFile = SCHEMA_MANAGEMENT_SETTINGS_FILE.get( propertySource );
+		if ( !schemaManagementSettingsFile.isPresent() ) {
+			return null;
+		}
+
+		String filePath = schemaManagementSettingsFile.get();
+		try ( InputStream inputStream = buildContext.resourceResolver().locateResourceStream( filePath ) ) {
+			if ( inputStream == null ) {
+				throw log.customIndexSettingsFileNotFound( filePath, indexEventContext );
+			}
+			try ( Reader reader = new InputStreamReader( inputStream, StandardCharsets.UTF_8 ) ) {
+				return link.getGsonProvider().getGson().fromJson( reader, JsonObject.class );
+			}
+		}
+		catch (IOException e) {
+			throw log.customIndexSettingsErrorOnLoading( filePath, e, indexEventContext );
+		}
+		catch (JsonSyntaxException e) {
+			throw log.customIndexSettingsJsonSyntaxErrors( filePath, e, indexEventContext );
+		}
 	}
 }
