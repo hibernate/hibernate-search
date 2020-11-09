@@ -120,6 +120,7 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 
 	public void contributeLowLevelMetadata(LowLevelIndexMetadataBuilder builder) {
 		builder.setAnalysisDefinitionRegistry( analysisDefinitionRegistry );
+		builder.setCustomIndexSettings( customIndexSettings );
 		builder.setMapping( mapping );
 	}
 
