@@ -38,6 +38,8 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDef
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 
+import com.google.gson.JsonObject;
+
 public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsearchIndexSchemaObjectNodeBuilder
 		implements IndexSchemaRootNodeBuilder {
 
@@ -48,6 +50,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	private final IndexNames indexNames;
 	private final String mappedTypeName;
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
+	private final JsonObject customIndexSettings;
 	private final DynamicType defaultDynamicType;
 
 	private RoutingType routing = null;
@@ -56,12 +59,14 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	public ElasticsearchIndexSchemaRootNodeBuilder(ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
 			EventContext indexEventContext,
 			IndexNames indexNames, String mappedTypeName,
-			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, DynamicMapping dynamicMapping) {
+			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, JsonObject customIndexSettings,
+			DynamicMapping dynamicMapping) {
 		this.typeFactoryProvider = typeFactoryProvider;
 		this.indexEventContext = indexEventContext;
 		this.indexNames = indexNames;
 		this.mappedTypeName = mappedTypeName;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
+		this.customIndexSettings = customIndexSettings;
 		this.defaultDynamicType = DynamicType.create( dynamicMapping );
 	}
 
@@ -139,7 +144,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 		return new ElasticsearchIndexModel(
 				indexNames,
 				mappedTypeName,
-				analysisDefinitionRegistry,
+				analysisDefinitionRegistry, customIndexSettings,
 				mapping,
 				idDslConverter == null ? new StringToDocumentIdentifierValueConverter() : idDslConverter,
 				rootNode, staticFields, fieldTemplates
