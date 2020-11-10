@@ -27,7 +27,6 @@ class ElasticsearchTckBackendSetupStrategy implements TckBackendSetupStrategy {
 	ElasticsearchTckBackendSetupStrategy() {
 		setProperty( "log.json_pretty_printing", "true" );
 		setProperty( "analysis.configurer", DefaultITAnalysisConfigurer.class.getName() );
-		setProperty( "schema_management.minimal_required_status", "yellow" );
 		// Always add configuration options that allow to connect to Elasticsearch
 		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( properties );
 	}

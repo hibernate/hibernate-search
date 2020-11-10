@@ -48,7 +48,6 @@
             <property name="hibernate.search.backend.aws.credentials.access_key_id" value="${test.elasticsearch.connection.aws.credentials.access_key_id}" />
             <property name="hibernate.search.backend.aws.credentials.secret_access_key" value="${test.elasticsearch.connection.aws.credentials.secret_access_key}" />
 
-            <property name="hibernate.search.backend.schema_management.minimal_required_status" value="yellow" />
             <property name="hibernate.search.backend.log.json_pretty_printing" value="true" />
         </properties>
     </persistence-unit>
