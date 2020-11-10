@@ -18,7 +18,6 @@ import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDial
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
-import org.hibernate.search.backend.elasticsearch.index.layout.impl.DefaultIndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.DiscriminatorTypeNameMapping;
@@ -90,7 +89,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 	private static final ConfigurationProperty<BeanReference<? extends IndexLayoutStrategy>> LAYOUT_STRATEGY =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.LAYOUT_STRATEGY )
 					.asBeanReference( IndexLayoutStrategy.class )
-					.withDefault( BeanReference.of( DefaultIndexLayoutStrategy.class ) )
+					.withDefault( ElasticsearchBackendSettings.Defaults.LAYOUT_STRATEGY )
 					.build();
 
 	@Override

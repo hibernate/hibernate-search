@@ -35,7 +35,7 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.environment.thread.impl.DefaultThreadProvider;
+import org.hibernate.search.engine.environment.thread.impl.EmbeddedThreadProvider;
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresNoRequestPostProcessing;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresRequestPostProcessing;
@@ -95,7 +95,7 @@ public class ElasticsearchContentLengthIT {
 	public TestConfigurationProvider testConfigurationProvider = new TestConfigurationProvider();
 
 	private final ThreadPoolProviderImpl threadPoolProvider = new ThreadPoolProviderImpl(
-			BeanHolder.of( new DefaultThreadProvider( ElasticsearchContentLengthIT.class.getName() + ": " ) )
+			BeanHolder.of( new EmbeddedThreadProvider( ElasticsearchContentLengthIT.class.getName() + ": " ) )
 	);
 
 	private ScheduledExecutorService timeoutExecutorService =

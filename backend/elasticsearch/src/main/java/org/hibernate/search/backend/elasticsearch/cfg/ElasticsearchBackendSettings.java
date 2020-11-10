@@ -11,8 +11,10 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
+import org.hibernate.search.backend.elasticsearch.index.layout.impl.SimpleIndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
 import org.hibernate.search.backend.elasticsearch.multitenancy.MultiTenancyStrategyName;
+import org.hibernate.search.engine.environment.bean.BeanReference;
 
 /**
  * Configuration properties for Elasticsearch backends.
@@ -232,7 +234,7 @@ public final class ElasticsearchBackendSettings {
 	 * <p>
 	 * Expects a reference to a bean of type {@link IndexLayoutStrategy}.
 	 * <p>
-	 * Defaults to the following:
+	 * Defaults to the {@code simple} strategy:
 	 * <ul>
 	 *     <li>The non-alias name follows the format {@code <hibernateSearchIndexName>-<6 digits>}</li>
 	 *     <li>The write alias follows the format {@code <hibernateSearchIndexName>-write}</li>
@@ -289,6 +291,8 @@ public final class ElasticsearchBackendSettings {
 		public static final boolean VERSION_CHECK_ENABLED = true;
 		public static final MultiTenancyStrategyName MULTI_TENANCY_STRATEGY = MultiTenancyStrategyName.NONE;
 		public static final TypeNameMappingStrategyName MAPPING_TYPE_NAME_STRATEGY = TypeNameMappingStrategyName.DISCRIMINATOR;
+		public static final BeanReference<IndexLayoutStrategy> LAYOUT_STRATEGY =
+				BeanReference.of( IndexLayoutStrategy.class, SimpleIndexLayoutStrategy.NAME );
 		public static final int SCROLL_TIMEOUT = 60;
 	}
 }

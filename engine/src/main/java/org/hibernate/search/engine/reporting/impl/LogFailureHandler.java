@@ -24,6 +24,8 @@ public class LogFailureHandler implements FailureHandler {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	public static final String NAME = "log";
+
 	@Override
 	public void handle(FailureContext context) {
 		log.exceptionOccurred( formatMessage( context ).toString(), context.throwable() );

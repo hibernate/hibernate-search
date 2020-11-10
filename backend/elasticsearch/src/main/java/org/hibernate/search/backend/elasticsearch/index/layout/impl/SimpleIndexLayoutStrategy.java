@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
- * The default layout strategy for indexes:
+ * A simple layout strategy for indexes:
  * <ul>
  *     <li>Elasticsearch index names follow the format used by Elasticsearch's Rollover API: {@code <hsearchname>-<6 digits>}.
  *     See {@code <target-index>} here:
@@ -25,9 +25,11 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *     <li>The read alias is {@code <hsearchname>-read}.
  * </ul>
  */
-public final class DefaultIndexLayoutStrategy implements IndexLayoutStrategy {
+public final class SimpleIndexLayoutStrategy implements IndexLayoutStrategy {
 
 	static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	public static final String NAME = "simple";
 
 	public static final Pattern UNIQUE_KEY_EXTRACTION_PATTERN = Pattern.compile( "(.*)-\\d{6}" );
 
