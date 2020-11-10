@@ -81,9 +81,6 @@
                       value="${test.elasticsearch.connection.aws.credentials.access_key_id}"/>
             <property name="hibernate.search.backend.aws.credentials.secret_access_key"
                       value="${test.elasticsearch.connection.aws.credentials.secret_access_key}"/>
-            <!-- Make this test work even if there is only a single node in the cluster -->
-            <property name="hibernate.search.backend.schema_management.minimal_required_status"
-                      value="yellow"/>
             <property name="hibernate.search.automatic_indexing.synchronization.strategy"
                       value="sync"/>
         </properties>
@@ -149,9 +146,6 @@
                       value="${test.elasticsearch.connection.aws.credentials.access_key_id}"/>
             <property name="hibernate.search.backend.aws.credentials.secret_access_key"
                       value="${test.elasticsearch.connection.aws.credentials.secret_access_key}"/>
-            <!-- Make this test work even if there is only a single node in the cluster -->
-            <property name="hibernate.search.backend.schema_management.minimal_required_status"
-                      value="yellow"/>
             <property name="hibernate.search.automatic_indexing.synchronization.strategy"
                       value="sync"/>
         </properties>
