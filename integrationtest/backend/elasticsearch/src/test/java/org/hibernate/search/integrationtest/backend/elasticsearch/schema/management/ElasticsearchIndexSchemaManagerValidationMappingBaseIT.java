@@ -14,6 +14,7 @@ import static org.junit.Assume.assumeTrue;
 
 import java.util.EnumSet;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
@@ -215,6 +216,102 @@ public class ElasticsearchIndexSchemaManagerValidationMappingBaseIT {
 		);
 
 		setupAndValidate( index );
+	}
+
+	@Test
+	public void floatAndDouble_nullValue() {
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.field( "float", f -> f.asFloat().indexNullAs( 1.7F ) ).toReference();
+			root.field( "double", f -> f.asDouble().indexNullAs( 1.7 ) ).toReference();
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
+				simpleMappingForInitialization(
+						"'float': {"
+								+ "'type': 'float',"
+								+ "'null_value': 1.7"
+						+ "},"
+						+ "'double': {"
+								+ "'type': 'double',"
+								+ "'null_value': 1.7"
+						+ "}"
+				)
+		);
+
+		setupAndValidate( index );
+	}
+
+	@Test
+	public void floatAndDouble_nullValue_invalids() {
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.field( "float", f -> f.asFloat().indexNullAs( 1.7F ) ).toReference();
+			root.field( "double", f -> f.asDouble().indexNullAs( 1.7 ) ).toReference();
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
+				simpleMappingForInitialization(
+						"'float': {"
+								+ "'type': 'float',"
+								+ "'null_value': 1.9"
+						+ "},"
+						+ "'double': {"
+								+ "'type': 'double',"
+								+ "'null_value': 1.9"
+						+ "}"
+				)
+		);
+
+		setupAndValidateExpectingFailure( index,
+				buildValidationFailureReportPattern()
+						.indexFieldContext( "double" )
+								.mappingAttributeContext( "null_value" )
+										.failure( "Invalid value. Expected '1.7', actual is '1.9'" )
+						.indexFieldContext( "float" )
+								.mappingAttributeContext( "null_value" )
+										.failure( "Invalid value. Expected '1.7', actual is '1.9'" )
+						.build()
+		);
+	}
+
+	@Test
+	public void floatAndDouble_nullValue_invalids_notNumbers() {
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable( root -> {
+			root.field( "float", f -> f
+					.extension( ElasticsearchExtension.get() )
+					.asNative().mapping( "{'type': 'float', 'null_value': AAA }" )
+			).toReference();
+			root.field( "double", f -> f
+					.extension( ElasticsearchExtension.get() )
+					.asNative().mapping( "{'type': 'double', 'null_value': BBB }" )
+			).toReference();
+		} );
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
+				simpleMappingForInitialization(
+						"'float': {"
+								+ "'type': 'float',"
+								+ "'null_value': 1.9"
+						+ "},"
+						+ "'double': {"
+								+ "'type': 'double',"
+								+ "'null_value': 1.9"
+						+ "}"
+				)
+		);
+
+		setupAndValidateExpectingFailure( index,
+				buildValidationFailureReportPattern()
+						.indexFieldContext( "double" )
+								.mappingAttributeContext( "null_value" )
+										.failure( "Invalid value. Expected '\"BBB\"', actual is '1.9'" )
+						.indexFieldContext( "float" )
+								.mappingAttributeContext( "null_value" )
+										.failure( "Invalid value. Expected '\"AAA\"', actual is '1.9'" )
+						.build()
+		);
 	}
 
 	/**
