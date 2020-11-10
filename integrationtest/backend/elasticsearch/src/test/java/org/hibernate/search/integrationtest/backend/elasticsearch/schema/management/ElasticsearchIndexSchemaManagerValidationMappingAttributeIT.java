@@ -212,6 +212,26 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 	}
 
 	@Test
+	public void attribute_index_valid() {
+		StubMappedIndex index = StubMappedIndex.ofNonRetrievable(
+				root -> root.field( "myField", f -> f.asInteger().searchable( Searchable.YES ) ).toReference()
+		);
+
+		elasticSearchClient.index( index.name() ).deleteAndCreate();
+		elasticSearchClient.index( index.name() ).type().putMapping(
+				simpleMappingForInitialization(
+						"'myField': {"
+								+ "'type': 'integer',"
+								+ "'index': true"
+						+ "}"
+				)
+		);
+
+		// the expected value true is the default
+		setupAndValidate( index );
+	}
+
+	@Test
 	public void attribute_index_invalid() {
 		StubMappedIndex index = StubMappedIndex.ofNonRetrievable(
 				root -> root.field( "myField", f -> f.asInteger() ).toReference()
