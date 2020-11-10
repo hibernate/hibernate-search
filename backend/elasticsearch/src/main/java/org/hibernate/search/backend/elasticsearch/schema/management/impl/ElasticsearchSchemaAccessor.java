@@ -28,6 +28,8 @@ import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import com.google.gson.JsonObject;
+
 /**
  * A utility implementing primitives for the various {@code ElasticsearchSchema*Impl}.
  * @author Gunnar Morling
@@ -47,10 +49,11 @@ public class ElasticsearchSchemaAccessor {
 	}
 
 	public CompletableFuture<?> createIndexAssumeNonExisting(URLEncodedString primaryIndexName,
-			Map<String, IndexAliasDefinition> aliases, IndexSettings settings, RootTypeMapping mapping) {
+			Map<String, IndexAliasDefinition> aliases, IndexSettings settings,
+			JsonObject customSettings, RootTypeMapping mapping) {
 		NonBulkableWork<?> work = getWorkFactory().createIndex( primaryIndexName )
 				.aliases( aliases )
-				.settings( settings )
+				.settings( settings, customSettings )
 				.mapping( mapping )
 				.build();
 		return execute( work );
@@ -60,14 +63,16 @@ public class ElasticsearchSchemaAccessor {
 	 * @param primaryIndexName The name of the created index.
 	 * @param aliases The aliases for the newly created index.
 	 * @param settings The settings for the newly created index.
+	 * @param customSettings
 	 * @param mapping The root mapping for the newly created index.
 	 * @return A future holding {@code true} if the index was actually created, {@code false} if it already existed.
 	 */
 	public CompletableFuture<Boolean> createIndexIgnoreExisting(URLEncodedString primaryIndexName,
-			Map<String, IndexAliasDefinition> aliases, IndexSettings settings, RootTypeMapping mapping) {
+			Map<String, IndexAliasDefinition> aliases, IndexSettings settings,
+			JsonObject customSettings, RootTypeMapping mapping) {
 		NonBulkableWork<CreateIndexResult> work = getWorkFactory().createIndex( primaryIndexName )
 				.aliases( aliases )
-				.settings( settings )
+				.settings( settings, customSettings )
 				.mapping( mapping )
 				.ignoreExisting()
 				.build();
