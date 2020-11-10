@@ -166,7 +166,7 @@ public class GenericFieldIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "wrap", String.class )
 		);
-		setupHelper.start().setup( IndexedEntity.class );
+		setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -183,7 +183,7 @@ public class GenericFieldIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "wrap", String.class )
 		);
-		setupHelper.start().setup( IndexedEntity.class );
+		setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -197,9 +197,7 @@ public class GenericFieldIT {
 			WrappedValue wrap;
 		}
 
-		assertThatThrownBy(
-				() -> setupHelper.start().setup( IndexedEntity.class )
-		)
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -228,7 +226,7 @@ public class GenericFieldIT {
 			String property;
 		}
 
-		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )

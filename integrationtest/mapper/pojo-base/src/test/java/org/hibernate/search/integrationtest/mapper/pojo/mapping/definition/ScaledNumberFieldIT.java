@@ -245,7 +245,7 @@ public class ScaledNumberFieldIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "wrap", BigDecimal.class, f -> f.decimalScale( 3 ) )
 		);
-		setupHelper.start().setup( IndexedEntity.class );
+		setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -262,7 +262,7 @@ public class ScaledNumberFieldIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "wrap", BigDecimal.class, f -> f.decimalScale( 3 ) )
 		);
-		setupHelper.start().setup( IndexedEntity.class );
+		setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -276,9 +276,7 @@ public class ScaledNumberFieldIT {
 			WrappedValue wrap;
 		}
 
-		assertThatThrownBy(
-				() -> setupHelper.start().setup( IndexedEntity.class )
-		)
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -307,9 +305,7 @@ public class ScaledNumberFieldIT {
 			WrappedValue wrap;
 		}
 
-		assertThatThrownBy(
-				() -> setupHelper.start().setup( IndexedEntity.class )
-		)
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -339,7 +335,7 @@ public class ScaledNumberFieldIT {
 			String property;
 		}
 
-		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )

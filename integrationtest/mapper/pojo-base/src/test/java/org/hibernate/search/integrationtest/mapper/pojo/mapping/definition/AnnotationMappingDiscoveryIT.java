@@ -72,6 +72,7 @@ public class AnnotationMappingDiscoveryIT {
 		);
 
 		setupHelper.start()
+				.expectCustomBeans()
 				.withConfiguration( builder -> {
 					builder.addEntityType( IndexedEntity.class );
 

@@ -964,9 +964,7 @@ public class PropertyBridgeBaseIT {
 			@PropertyBinding(binder = @PropertyBinderRef(type = MyStringBridge.Binder.class))
 			Integer id;
 		}
-		assertThatThrownBy(
-				() -> setupHelper.start().setup( IndexedEntity.class )
-		)
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -1010,7 +1008,7 @@ public class PropertyBridgeBaseIT {
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b.field( "someField", String.class ) );
-		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class );
+		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
 		try ( SearchSession session = mapping.createSession() ) {

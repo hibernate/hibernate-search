@@ -286,7 +286,7 @@ public class FullTextFieldIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "wrap", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
-		setupHelper.start().setup( IndexedEntity.class );
+		setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -303,7 +303,7 @@ public class FullTextFieldIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "wrap", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
-		setupHelper.start().setup( IndexedEntity.class );
+		setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -346,9 +346,7 @@ public class FullTextFieldIT {
 			WrappedValue wrap;
 		}
 
-		assertThatThrownBy(
-				() -> setupHelper.start().setup( IndexedEntity.class )
-		)
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -376,9 +374,7 @@ public class FullTextFieldIT {
 			WrappedValue wrap;
 		}
 
-		assertThatThrownBy(
-				() -> setupHelper.start().setup( IndexedEntity.class )
-		)
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -407,7 +403,7 @@ public class FullTextFieldIT {
 			String property;
 		}
 
-		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )

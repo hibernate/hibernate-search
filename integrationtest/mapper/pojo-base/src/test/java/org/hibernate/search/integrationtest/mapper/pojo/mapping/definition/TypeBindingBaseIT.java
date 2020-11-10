@@ -53,7 +53,7 @@ public class TypeBindingBaseIT {
 				b.field( "myText", String.class )
 		);
 
-		SearchMapping mapping = setupHelper.start()
+		SearchMapping mapping = setupHelper.start().expectCustomBeans()
 				.setup( IndexedEntityWithWorkingTypeBinding.class );
 		backendMock.verifyExpectationsMet();
 	}

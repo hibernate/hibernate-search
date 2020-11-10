@@ -68,7 +68,7 @@ public class CustomTypeMappingAnnotationBaseIT {
 				b.field( "myText", String.class )
 		);
 
-		SearchMapping mapping = setupHelper.start()
+		SearchMapping mapping = setupHelper.start().expectCustomBeans()
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
@@ -121,9 +121,7 @@ public class CustomTypeMappingAnnotationBaseIT {
 			@DocumentId
 			Integer id;
 		}
-		assertThatThrownBy(
-				() -> setupHelper.start().setup( IndexedEntity.class )
-		)
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.annotationTypeContext( AnnotationWithProcessorWithDifferentAnnotationType.class )
@@ -227,7 +225,7 @@ public class CustomTypeMappingAnnotationBaseIT {
 				.field( "long4", Long.class )
 		);
 
-		SearchMapping mapping = setupHelper.start()
+		SearchMapping mapping = setupHelper.start().expectCustomBeans()
 				.setup( IndexedEntityType1.class, IndexedEntityType2.class, IndexedEntityType3.class,
 						IndexedEntityType4.class, IndexedEntityType5.class );
 		backendMock.verifyExpectationsMet();
@@ -317,7 +315,7 @@ public class CustomTypeMappingAnnotationBaseIT {
 				.field( "myText", String.class )
 		);
 
-		SearchMapping mapping = setupHelper.start().setup( IndexedEntityType.class );
+		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( IndexedEntityType.class );
 		backendMock.verifyExpectationsMet();
 
 		assertThat( EventContextAwareAnnotation.Processor.lastProcessedContext ).isNotNull();

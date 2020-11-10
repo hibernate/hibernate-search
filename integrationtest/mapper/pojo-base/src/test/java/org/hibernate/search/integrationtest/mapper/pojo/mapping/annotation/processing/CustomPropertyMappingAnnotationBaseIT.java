@@ -74,6 +74,7 @@ public class CustomPropertyMappingAnnotationBaseIT {
 		);
 
 		SearchMapping mapping = setupHelper.start()
+				.expectCustomBeans()
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
@@ -125,9 +126,7 @@ public class CustomPropertyMappingAnnotationBaseIT {
 			@AnnotationWithProcessorWithDifferentAnnotationType
 			Integer id;
 		}
-		assertThatThrownBy(
-				() -> setupHelper.start().setup( IndexedEntity.class )
-		)
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.annotationTypeContext( AnnotationWithProcessorWithDifferentAnnotationType.class )
@@ -206,7 +205,7 @@ public class CustomPropertyMappingAnnotationBaseIT {
 				.field( "long4", Long.class )
 		);
 
-		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class );
+		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -320,7 +319,7 @@ public class CustomPropertyMappingAnnotationBaseIT {
 				.field( "myText", String.class )
 		);
 
-		SearchMapping mapping = setupHelper.start().setup( IndexedEntityType.class );
+		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( IndexedEntityType.class );
 		backendMock.verifyExpectationsMet();
 
 		assertThat( EventContextAwareAnnotation.Processor.lastProcessedContext ).isNotNull();

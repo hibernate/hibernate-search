@@ -11,14 +11,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
+import org.hibernate.search.mapper.javabean.cfg.spi.JavaBeanMapperSpiSettings;
 import org.hibernate.search.mapper.javabean.impl.JavaBeanMappingInitiator;
+import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingKey;
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
@@ -30,8 +35,18 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfiguratio
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class SearchMappingBuilder {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private static final OptionalConfigurationProperty<BeanProvider> BEAN_PROVIDER =
+			ConfigurationProperty.forKey( JavaBeanMapperSpiSettings.BEAN_PROVIDER )
+					.as( BeanProvider.class, value -> {
+						throw log.invalidStringForBeanProvider( value, BeanProvider.class );
+					} )
+					.build();
 
 	private static ConfigurationPropertySource getPropertySource(Map<String, Object> properties,
 			ConfigurationPropertyChecker propertyChecker) {
@@ -137,6 +152,8 @@ public final class SearchMappingBuilder {
 	}
 
 	public CloseableSearchMapping build() {
+		BEAN_PROVIDER.get( propertySource ).ifPresent( integrationBuilder::beanManagerBeanProvider );
+
 		SearchIntegrationPartialBuildState integrationPartialBuildState = integrationBuilder.prepareBuild();
 		SearchIntegration integration = null;
 		SearchMapping mapping;

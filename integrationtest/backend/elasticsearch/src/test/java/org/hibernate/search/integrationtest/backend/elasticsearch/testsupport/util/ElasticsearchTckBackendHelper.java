@@ -48,12 +48,14 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 	@Override
 	public TckBackendSetupStrategy createAnalysisBuiltinOverridesBackendSetupStrategy() {
 		return new ElasticsearchTckBackendSetupStrategy()
+				.expectCustomBeans()
 				.setProperty( "analysis.configurer", AnalysisBuiltinOverrideITAnalysisConfigurer.class.getName() );
 	}
 
 	@Override
 	public TckBackendSetupStrategy createAnalysisCustomBackendSetupStrategy() {
 		return new ElasticsearchTckBackendSetupStrategy()
+				.expectCustomBeans()
 				.setProperty( "analysis.configurer", AnalysisCustomITAnalysisConfigurer.class.getName() );
 	}
 
