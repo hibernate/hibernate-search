@@ -130,7 +130,7 @@ public final class ElasticsearchIndexSettings {
 		private Defaults() {
 		}
 
-		public static final IndexStatus SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS = IndexStatus.GREEN;
+		public static final IndexStatus SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS = IndexStatus.YELLOW;
 		public static final int SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT = 10_000;
 		public static final int INDEXING_QUEUE_COUNT = 10;
 		public static final int INDEXING_QUEUE_SIZE = 1000;

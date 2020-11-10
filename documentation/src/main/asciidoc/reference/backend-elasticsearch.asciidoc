@@ -348,7 +348,7 @@ hibernate.search.backend.indexes.<index name>.schema_management.minimal_required
 ----
 
 * `minimal_required_status` defines the minimal required status of an index before creation is considered complete.
-The default for this property is `green`.
+The default for this property is `yellow`.
 * `minimal_required_status_wait_timeout` defines the maximum time to wait for this status,
 as an <<configuration-property-types,integer value>> in milliseconds.
 The default for this property is `10000`.
