@@ -36,6 +36,7 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 				createPrimaryIndexName( indexNames ),
 				indexMetadata.getAliases(),
 				indexMetadata.getSettings(),
+				indexMetadata.getCustomSettings(),
 				indexMetadata.getMapping()
 		);
 	}
@@ -52,6 +53,7 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 								createPrimaryIndexName( indexNames ),
 								indexMetadata.getAliases(),
 								indexMetadata.getSettings(),
+								indexMetadata.getCustomSettings(),
 								indexMetadata.getMapping()
 						)
 								.thenApply( ignored -> null );
