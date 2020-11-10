@@ -1,0 +1,26 @@
+{
+  "index": {
+    "number_of_shards": "3",
+    "number_of_replicas": "3",
+    "unknown_setting" : "any-value",
+    "analysis": {
+      "analyzer": {
+        "my_standard-english": {
+          "type": "standard",
+          "stopwords": "_english_"
+        },
+        "my_analyzer_ngram": {
+          "type": "custom",
+          "tokenizer": "my_analyzer_ngram_tokenizer"
+        }
+      },
+      "tokenizer": {
+        "my_analyzer_ngram_tokenizer": {
+          "type": "ngram",
+          "min_gram": "5",
+          "max_gram": "6"
+        }
+      }
+    }
+  }
+}
