@@ -26,7 +26,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.thread.impl.DefaultThreadProvider;
+import org.hibernate.search.engine.environment.thread.impl.EmbeddedThreadProvider;
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -59,7 +59,7 @@ public class BatchingExecutorTest {
 	private final List<Object> mocks = new ArrayList<>();
 
 	private final ThreadPoolProviderImpl threadPoolProvider =
-			new ThreadPoolProviderImpl( BeanHolder.of( new DefaultThreadProvider() ) );
+			new ThreadPoolProviderImpl( BeanHolder.of( new EmbeddedThreadProvider() ) );
 
 	// To execute code asynchronously. Just use more threads than we'll ever need, we don't care about performance.
 	private final ForkJoinPool asyncExecutor = new ForkJoinPool( 12 );

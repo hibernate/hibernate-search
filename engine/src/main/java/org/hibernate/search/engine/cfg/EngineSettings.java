@@ -8,6 +8,7 @@ package org.hibernate.search.engine.cfg;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.engine.reporting.impl.LogFailureHandler;
 
 /**
  * Configuration properties for the Hibernate Search engine.
@@ -53,7 +54,7 @@ public final class EngineSettings {
 	 * <p>
 	 * Expects a reference to a bean of type {@link FailureHandler}.
 	 * <p>
-	 * Defaults to a logging handler.
+	 * Defaults to {@link Defaults#BACKGROUND_FAILURE_HANDLER}, a logging handler.
 	 */
 	public static final String BACKGROUND_FAILURE_HANDLER = PREFIX + Radicals.BACKGROUND_FAILURE_HANDLER;
 
@@ -80,7 +81,7 @@ public final class EngineSettings {
 				ConfigurationPropertyCheckingStrategyName.WARN;
 
 		public static final BeanReference<? extends FailureHandler> BACKGROUND_FAILURE_HANDLER =
-				BeanReference.of( FailureHandler.class, "log" );
+				BeanReference.of( FailureHandler.class, LogFailureHandler.NAME );
 
 		private Defaults() {
 		}

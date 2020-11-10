@@ -383,7 +383,7 @@ Hibernate Search works with link:{elasticsearchDocUrl}/indices-aliases.html[alia
 This means an index with a given name in Hibernate Search will not directly be mapped
 to an index with the same name in Elasticsearch.
 
-By default, for an index whose name in Hibernate Search is `myIndex`:
+By default, the `simple` layout strategy is used. For an index whose name in Hibernate Search is `myIndex`:
 
 * Write operations (indexing, purge, ...) will target the alias `myindex-write`.
 * Read operations (searching, explaining, ...) will target the alias `myindex-read`.

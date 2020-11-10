@@ -10,15 +10,17 @@ import java.util.concurrent.ThreadFactory;
 
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 
-public final class DefaultThreadProvider implements ThreadProvider {
+public final class EmbeddedThreadProvider implements ThreadProvider {
+
+	public static final String NAME = "embedded";
 
 	private final String commonThreadNamePrefix;
 
-	public DefaultThreadProvider() {
+	public EmbeddedThreadProvider() {
 		this( "Hibernate Search - " );
 	}
 
-	public DefaultThreadProvider(String commonThreadNamePrefix) {
+	public EmbeddedThreadProvider(String commonThreadNamePrefix) {
 		this.commonThreadNamePrefix = commonThreadNamePrefix;
 	}
 
