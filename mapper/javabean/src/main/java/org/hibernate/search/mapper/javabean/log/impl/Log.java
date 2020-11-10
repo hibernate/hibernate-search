@@ -8,6 +8,7 @@
 package org.hibernate.search.mapper.javabean.log.impl;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
@@ -54,4 +55,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 10, value = "Entity type '%1$s' does not exist or is not indexed.")
 	SearchException notIndexedEntityName(String name);
+
+	@Message(id = ID_OFFSET + 11,
+			value = "Invalid String value for the bean provider: '%s'. The bean provider must be an instance of '%s'.")
+	SearchException invalidStringForBeanProvider(String value, Class<BeanProvider> expectedType);
+
 }

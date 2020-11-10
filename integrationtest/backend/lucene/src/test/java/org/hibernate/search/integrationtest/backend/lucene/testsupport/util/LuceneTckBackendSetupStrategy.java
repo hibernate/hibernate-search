@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.configuration.DefaultITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
@@ -24,11 +25,17 @@ import org.junit.rules.TestRule;
 public class LuceneTckBackendSetupStrategy implements TckBackendSetupStrategy {
 
 	private final Map<String, Object> properties = new LinkedHashMap<>();
+	private boolean expectCustomBeans = false;
 
 	public LuceneTckBackendSetupStrategy() {
 		setProperty( "directory.root", LuceneTestIndexesPathConfiguration.get().getPath()
 				+ "/#{test.startup.timestamp}/#{test.id}/" );
-		setProperty( "analysis.configurer", DefaultITAnalysisConfigurer.class.getName() );
+		setProperty( "analysis.configurer", BeanReference.ofInstance( new DefaultITAnalysisConfigurer() ) );
+	}
+
+	LuceneTckBackendSetupStrategy expectCustomBeans() {
+		expectCustomBeans = true;
+		return this;
 	}
 
 	public LuceneTckBackendSetupStrategy setProperty(String key, Object value) {
@@ -56,6 +63,9 @@ public class LuceneTckBackendSetupStrategy implements TckBackendSetupStrategy {
 
 	@Override
 	public SearchSetupHelper.SetupContext startSetup(SearchSetupHelper.SetupContext setupContext) {
+		if ( expectCustomBeans ) {
+			setupContext = setupContext.expectCustomBeans();
+		}
 		return setupContext;
 	}
 }

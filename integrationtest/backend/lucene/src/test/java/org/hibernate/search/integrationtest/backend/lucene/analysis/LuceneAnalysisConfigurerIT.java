@@ -115,6 +115,7 @@ public class LuceneAnalysisConfigurerIT {
 	private void setup(String analysisConfigurer, Consumer<IndexBindingContext> binder) {
 		StubMappedIndex index = StubMappedIndex.ofAdvancedNonRetrievable( binder );
 		setupHelper.start()
+				.expectCustomBeans()
 				.withBackendProperty( LuceneBackendSettings.ANALYSIS_CONFIGURER, analysisConfigurer )
 				.withIndex( index )
 				.setup();

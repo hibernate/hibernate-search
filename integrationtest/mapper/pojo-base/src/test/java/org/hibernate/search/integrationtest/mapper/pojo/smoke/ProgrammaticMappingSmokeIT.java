@@ -131,6 +131,7 @@ public class ProgrammaticMappingSmokeIT {
 		);
 
 		mapping = setupHelper.start()
+				.expectCustomBeans()
 				.withConfiguration( builder -> {
 					builder.addEntityTypes( CollectionHelper.asSet(
 							IndexedEntity.class,

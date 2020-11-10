@@ -155,7 +155,7 @@ public class FieldBaseIT {
 			Integer id;
 		}
 		assertThatThrownBy(
-				() -> setupHelper.start().setup( IndexedEntity.class )
+				() -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
@@ -178,7 +178,7 @@ public class FieldBaseIT {
 			List<Integer> numbers;
 		}
 		assertThatThrownBy(
-				() -> setupHelper.start().setup( IndexedEntity.class )
+				() -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
@@ -240,7 +240,7 @@ public class FieldBaseIT {
 			@GenericField(valueBridge = @ValueBridgeRef(type = GenericTypeBridge.class))
 			Integer id;
 		}
-		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -285,7 +285,7 @@ public class FieldBaseIT {
 				.field( "integer", Integer.class, f -> f.indexNullAs( 7 ) )
 		);
 
-		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class );
+		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
 		try ( SearchSession session = mapping.createSession() ) {
@@ -322,7 +322,7 @@ public class FieldBaseIT {
 			Integer integer;
 		}
 
-		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "does not support parsing a value from a String" )
 				.hasMessageContaining( "integer" );

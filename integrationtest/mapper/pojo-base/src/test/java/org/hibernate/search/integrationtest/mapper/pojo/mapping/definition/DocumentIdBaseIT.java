@@ -135,7 +135,7 @@ public class DocumentIdBaseIT {
 			Integer id;
 		}
 		assertThatThrownBy(
-				() -> setupHelper.start().setup( IndexedEntity.class )
+				() -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
@@ -173,7 +173,7 @@ public class DocumentIdBaseIT {
 			@DocumentId(identifierBridge = @IdentifierBridgeRef(type = MyNumberBridge.class))
 			Object id;
 		}
-		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -192,7 +192,7 @@ public class DocumentIdBaseIT {
 			@DocumentId(identifierBridge = @IdentifierBridgeRef(type = MyNumberBridge.class))
 			Integer id;
 		}
-		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -254,7 +254,7 @@ public class DocumentIdBaseIT {
 			@DocumentId(identifierBridge = @IdentifierBridgeRef(type = GenericTypeBridge.class))
 			Integer id;
 		}
-		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )

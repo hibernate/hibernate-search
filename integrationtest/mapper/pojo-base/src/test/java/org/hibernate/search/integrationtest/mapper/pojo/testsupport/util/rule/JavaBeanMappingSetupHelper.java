@@ -11,10 +11,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
+import org.hibernate.search.mapper.javabean.cfg.spi.JavaBeanMapperSpiSettings;
 import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.mapping.SearchMappingBuilder;
 import org.hibernate.search.util.common.impl.CollectionHelper;
+import org.hibernate.search.util.impl.integrationtest.common.bean.ForbiddenBeanProvider;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
@@ -63,6 +66,11 @@ public final class JavaBeanMappingSetupHelper
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> properties = new LinkedHashMap<>();
 
+		// Disable the bean-manager-based bean provider by default,
+		// so that we detect code that relies on beans from the bean manager
+		// whereas it should rely on reflection or built-in beans.
+		private BeanProvider beanManagerBeanProvider = new ForbiddenBeanProvider();
+
 		SetupContext() {
 			// Ensure overridden properties will be applied
 			withConfiguration( builder -> properties.forEach( builder::property ) );
@@ -71,6 +79,11 @@ public final class JavaBeanMappingSetupHelper
 		@Override
 		public SetupContext withProperty(String key, Object value) {
 			properties.put( key, value );
+			return thisAsC();
+		}
+
+		public SetupContext expectCustomBeans() {
+			beanManagerBeanProvider = null;
 			return thisAsC();
 		}
 
@@ -106,7 +119,9 @@ public final class JavaBeanMappingSetupHelper
 
 		@Override
 		protected SearchMappingBuilder createBuilder() {
-			return SearchMapping.builder( lookup ).properties( properties );
+			return SearchMapping.builder( lookup )
+					.property( JavaBeanMapperSpiSettings.BEAN_PROVIDER, beanManagerBeanProvider )
+					.properties( properties );
 		}
 
 		@Override

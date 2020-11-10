@@ -1168,7 +1168,8 @@ public class IndexedEmbeddedBaseIT {
 								.searchable( Searchable.YES ).projectable( Projectable.YES ) )
 				)
 		);
-		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class, IndexedEmbeddedLevel1.class );
+		SearchMapping mapping = setupHelper.start().expectCustomBeans()
+				.setup( IndexedEntity.class, IndexedEmbeddedLevel1.class );
 		backendMock.verifyExpectationsMet();
 
 		doTestEmbeddedRuntime(
@@ -1211,7 +1212,8 @@ public class IndexedEmbeddedBaseIT {
 								.searchable( Searchable.YES ).projectable( Projectable.YES ) )
 				)
 		);
-		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class, IndexedEmbeddedLevel1.class );
+		SearchMapping mapping = setupHelper.start().expectCustomBeans()
+				.setup( IndexedEntity.class, IndexedEmbeddedLevel1.class );
 		backendMock.verifyExpectationsMet();
 
 		doTestEmbeddedRuntime(

@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.DefaultITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
@@ -23,12 +24,18 @@ import org.junit.rules.TestRule;
 class ElasticsearchTckBackendSetupStrategy implements TckBackendSetupStrategy {
 
 	private final Map<String, Object> properties = new LinkedHashMap<>();
+	private boolean expectCustomBeans = false;
 
 	ElasticsearchTckBackendSetupStrategy() {
 		setProperty( "log.json_pretty_printing", "true" );
-		setProperty( "analysis.configurer", DefaultITAnalysisConfigurer.class.getName() );
+		setProperty( "analysis.configurer", BeanReference.ofInstance( new DefaultITAnalysisConfigurer() ) );
 		// Always add configuration options that allow to connect to Elasticsearch
 		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( properties );
+	}
+
+	ElasticsearchTckBackendSetupStrategy expectCustomBeans() {
+		expectCustomBeans = true;
+		return this;
 	}
 
 	ElasticsearchTckBackendSetupStrategy setProperty(String key, Object value) {
@@ -55,6 +62,9 @@ class ElasticsearchTckBackendSetupStrategy implements TckBackendSetupStrategy {
 
 	@Override
 	public SearchSetupHelper.SetupContext startSetup(SearchSetupHelper.SetupContext setupContext) {
+		if ( expectCustomBeans ) {
+			setupContext = setupContext.expectCustomBeans();
+		}
 		return setupContext;
 	}
 }

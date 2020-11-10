@@ -122,7 +122,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "myProperty", String.class )
 		);
-		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class );
+		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
 		// Indexing

@@ -470,7 +470,7 @@ public class IndexedBaseIT {
 
 		defaultBackendMock.expectSchema( IndexedEntity.class.getSimpleName(), b -> { } );
 
-		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class );
+		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
 		defaultBackendMock.verifyExpectationsMet();
 
 		assertThat( staticCounters.get( StaticCounterRoutingBinder.KEY ) ).isEqualTo( 1 );
@@ -484,7 +484,7 @@ public class IndexedBaseIT {
 			@DocumentId
 			Integer id;
 		}
-		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )

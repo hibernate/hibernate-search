@@ -35,6 +35,7 @@ public class LuceneTckBackendHelper implements TckBackendHelper {
 	@Override
 	public TckBackendSetupStrategy createAnalysisCustomBackendSetupStrategy() {
 		return new LuceneTckBackendSetupStrategy()
+				.expectCustomBeans()
 				.setProperty( "analysis.configurer", AnalysisCustomITAnalysisConfigurer.class.getName() );
 	}
 
@@ -47,6 +48,7 @@ public class LuceneTckBackendHelper implements TckBackendHelper {
 	@Override
 	public TckBackendSetupStrategy createAnalysisBuiltinOverridesBackendSetupStrategy() {
 		return new LuceneTckBackendSetupStrategy()
+				.expectCustomBeans()
 				.setProperty( "analysis.configurer", AnalysisBuiltinOverrideITAnalysisConfigurer.class.getName() );
 	}
 

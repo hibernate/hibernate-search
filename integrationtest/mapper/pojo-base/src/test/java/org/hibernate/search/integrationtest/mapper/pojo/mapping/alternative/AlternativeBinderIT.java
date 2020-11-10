@@ -69,7 +69,9 @@ public class AlternativeBinderIT {
 						b2 -> b2.analyzerName( "text_de" ).projectable( Projectable.DEFAULT ) )
 		);
 
-		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class );
+		SearchMapping mapping = setupHelper.start()
+				.expectCustomBeans()
+				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
 		IndexedEntity entity1 = new IndexedEntity();
@@ -112,7 +114,9 @@ public class AlternativeBinderIT {
 			String text;
 		}
 
-		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
+		assertThatThrownBy( () -> setupHelper.start()
+				.expectCustomBeans()
+				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -140,7 +144,9 @@ public class AlternativeBinderIT {
 			String text;
 		}
 
-		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
+		assertThatThrownBy( () -> setupHelper.start()
+				.expectCustomBeans()
+				.setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )

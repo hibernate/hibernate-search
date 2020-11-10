@@ -62,7 +62,7 @@ public class NonStandardFieldIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "value", String.class )
 		);
-		setupHelper.start().setup( IndexedEntity.class );
+		setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -80,7 +80,7 @@ public class NonStandardFieldIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "explicitName", String.class )
 		);
-		setupHelper.start().setup( IndexedEntity.class );
+		setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -120,7 +120,7 @@ public class NonStandardFieldIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "wrap", String.class )
 		);
-		setupHelper.start().setup( IndexedEntity.class );
+		setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -161,9 +161,7 @@ public class NonStandardFieldIT {
 			WrappedValue wrap;
 		}
 
-		assertThatThrownBy(
-				() -> setupHelper.start().setup( IndexedEntity.class )
-		)
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -190,7 +188,7 @@ public class NonStandardFieldIT {
 			String property;
 		}
 
-		assertThatThrownBy( () -> setupHelper.start().setup( IndexedEntity.class ) )
+		assertThatThrownBy( () -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )

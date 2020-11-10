@@ -22,6 +22,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
@@ -352,6 +353,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 	@Test
 	public void list_customBridge() {
 		doTest(
+				() -> setupHelper.start().expectCustomBeans(),
 				testModelProvider.list_explicitPrefixedStringBridge(),
 				String.class, true,
 				CollectionHelper.asList( STRING_VALUE_1, STRING_VALUE_2, STRING_VALUE_3 ),
@@ -377,6 +379,14 @@ public abstract class AbstractFieldContainerExtractorIT {
 	@SafeVarargs
 	final <E, P, F> void doTest(TestModel<E, P> testModel, Class<F> indexedFieldType, boolean multiValued,
 			P propertyValue, F firstIndexedFieldValues, F... otherIndexedFieldValues) {
+		doTest( setupHelper::start, testModel, indexedFieldType, multiValued,
+				propertyValue, firstIndexedFieldValues, otherIndexedFieldValues );
+	}
+
+	@SafeVarargs
+	final <E, P, F> void doTest(Supplier<JavaBeanMappingSetupHelper.SetupContext> startSetup,
+				TestModel<E, P> testModel, Class<F> indexedFieldType, boolean multiValued,
+			P propertyValue, F firstIndexedFieldValues, F... otherIndexedFieldValues) {
 		// Schema
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "myProperty", indexedFieldType, b2 -> {
@@ -385,7 +395,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 					}
 				} )
 		);
-		SearchMapping mapping = setupHelper.start().setup( testModel.getEntityClass() );
+		SearchMapping mapping = startSetup.get().setup( testModel.getEntityClass() );
 		backendMock.verifyExpectationsMet();
 
 		// Indexing with non-null, non-empty value

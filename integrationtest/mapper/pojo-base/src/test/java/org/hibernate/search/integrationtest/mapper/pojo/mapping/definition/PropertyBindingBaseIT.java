@@ -53,7 +53,7 @@ public class PropertyBindingBaseIT {
 				b.field( "myText", String.class )
 		);
 
-		SearchMapping mapping = setupHelper.start()
+		SearchMapping mapping = setupHelper.start().expectCustomBeans()
 				.setup( IndexedEntityWithWorkingPropertyBinding.class );
 		backendMock.verifyExpectationsMet();
 	}

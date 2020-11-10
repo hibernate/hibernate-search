@@ -270,6 +270,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 
 	private void setup(String analysisConfigurer, Consumer<IndexBindingContext> mappingContributor) {
 		setupHelper.start()
+				.expectCustomBeans()
 				.withBackendProperty( ElasticsearchIndexSettings.ANALYSIS_CONFIGURER, analysisConfigurer )
 				.withIndex( StubMappedIndex.ofAdvancedNonRetrievable( mappingContributor )
 						.name( INDEX_NAME ).typeName( TYPE_NAME ) )

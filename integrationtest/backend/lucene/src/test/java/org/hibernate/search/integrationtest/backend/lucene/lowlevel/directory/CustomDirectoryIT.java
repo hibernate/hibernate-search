@@ -36,10 +36,9 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.DirectoryLifecycleTest.testLifecycle")
 	public void valid() {
-		setup( CustomDirectoryProvider.class, c -> c.withBackendProperty(
-				"directory." + CustomDirectoryProvider.CONFIGURATION_PROPERTY_KEY_RADICAL,
-				CustomDirectoryProvider.CONFIGURATION_PROPERTY_EXPECTED_VALUE
-		) );
+		setup( CustomDirectoryProvider.class, c -> c.expectCustomBeans()
+				.withBackendProperty( "directory." + CustomDirectoryProvider.CONFIGURATION_PROPERTY_KEY_RADICAL,
+						CustomDirectoryProvider.CONFIGURATION_PROPERTY_EXPECTED_VALUE ) );
 
 		assertThat( staticCounters.get( CustomDirectoryProvider.CONSTRUCTOR_COUNTER_KEY ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( CustomDirectoryProvider.CREATE_DIRECTORY_COUNTER_KEY ) ).isEqualTo( 1 );
@@ -61,9 +60,7 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	public void invalid() {
 		String invalidDirectoryType = "someInvalidDirectoryType";
-		assertThatThrownBy( () ->
-				setup( "someInvalidDirectoryType", c -> c )
-		)
+		assertThatThrownBy( () -> setup( "someInvalidDirectoryType", c -> c.expectCustomBeans() ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.indexContext( index.name() )

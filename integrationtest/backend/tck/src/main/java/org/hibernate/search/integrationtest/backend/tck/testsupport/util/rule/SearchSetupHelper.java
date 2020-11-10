@@ -26,6 +26,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
+import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
@@ -34,6 +35,7 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
+import org.hibernate.search.util.impl.integrationtest.common.bean.ForbiddenBeanProvider;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInitiator;
@@ -150,6 +152,12 @@ public class SearchSetupHelper implements TestRule {
 		private final ConfigurationPropertySource propertySource;
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
+
+		// Disable the bean-manager-based bean provider by default,
+		// so that we detect code that relies on beans from the bean manager
+		// whereas it should rely on reflection or built-in beans.
+		private BeanProvider beanManagerBeanProvider = new ForbiddenBeanProvider();
+
 		private final List<StubMappedIndex> mappedIndexes = new ArrayList<>();
 		private boolean multiTenancyEnabled = false;
 		private StubMappingSchemaManagementStrategy schemaManagementStrategy = StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP;
@@ -158,6 +166,11 @@ public class SearchSetupHelper implements TestRule {
 			this.unusedPropertyChecker = ConfigurationPropertyChecker.create();
 			this.propertySource = unusedPropertyChecker.wrap( basePropertySource )
 					.withOverride( unusedPropertyChecker.wrap( ConfigurationPropertySource.fromMap( overriddenProperties ) ) );
+		}
+
+		public SetupContext expectCustomBeans() {
+			beanManagerBeanProvider = null;
+			return this;
 		}
 
 		public SetupContext withProperty(String key, Object value) {
@@ -217,6 +230,8 @@ public class SearchSetupHelper implements TestRule {
 		public PartialSetup setupFirstPhaseOnly() {
 			SearchIntegrationBuilder integrationBuilder =
 					SearchIntegration.builder( propertySource, unusedPropertyChecker );
+
+			integrationBuilder.beanManagerBeanProvider( beanManagerBeanProvider );
 
 			StubMappingInitiator initiator = new StubMappingInitiator( multiTenancyEnabled );
 			mappedIndexes.forEach( initiator::add );
