@@ -678,4 +678,26 @@ public interface Log extends BasicLogger {
 			value = "Unable to update aliases for index '%1$s': %2$s")
 	SearchException elasticsearchAliasUpdateFailed(Object indexName, String causeMessage, @Cause Exception cause);
 
+	@Message(id = ID_OFFSET + 126, value = "Invalid target hosts configuration:"
+			+ " both the 'uris' property and the 'protocol' property are set."
+			+ " Uris: '%1$s'. Protocol: '%2$s'."
+			+ " Either set the protocol and hosts simultaneously using the 'uris' property,"
+			+ " or set them separately using the 'protocol' property and the 'hosts' property.")
+	SearchException uriAndProtocol(List<String> uris, String protocol);
+
+	@Message(id = ID_OFFSET + 127, value = "Invalid target hosts configuration:"
+			+ " both the 'uris' property and the 'hosts' property are set."
+			+ " Uris: '%1$s'. Hosts: '%2$s'."
+			+ " Either set the protocol and hosts simultaneously using the 'uris' property,"
+			+ " or set them separately using the 'protocol' property and the 'hosts' property.")
+	SearchException uriAndHosts(List<String> uris, List<String> hosts);
+
+	@Message(id = ID_OFFSET + 128,
+			value = "Invalid target hosts configuration: the 'uris' use different protocols (http, https)."
+					+ " All URIs must use the same protocol. Uris: '%1$s'.")
+	SearchException differentProtocolsOnUris(List<String> uris);
+
+	@Message(id = ID_OFFSET + 129,
+			value = "Invalid target hosts configuration: the list of URIs must not be empty.")
+	SearchException emptyListOfUris();
 }
