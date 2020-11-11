@@ -59,6 +59,22 @@ public final class ElasticsearchBackendSettings {
 	public static final String PROTOCOL = "protocol";
 
 	/**
+	 * Alternatively to {@link #HOSTS} and {@link #PROTOCOL},
+	 * it is possible to define both the terms using the same property.
+	 * <p>
+	 * Expects either a String representing an URI such as {@code http://localhost}
+	 * or {@code https://es.mycompany.com:4400},
+	 * or a String containing multiple such URIs separated by whitespace characters,
+	 * or a {@code Collection<String>} containing such URIs.
+	 * <p>
+	 * All the uris must have the same protocol.
+	 * Cannot be used if {@link #HOSTS} or {@link #PROTOCOL} are set.
+	 * <p>
+	 * Defaults to no value, {@link #HOSTS} or {@link #PROTOCOL} are supposed to be used.
+	 */
+	public static final String URIS = "uris";
+
+	/**
 	 * Property for specifying the path prefix prepended to the request end point.
 	 * Use the path prefix if your Elasticsearch instance is located at a specific context path.
 	 * <p>
