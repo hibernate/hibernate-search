@@ -9,7 +9,9 @@ package org.hibernate.search.backend.elasticsearch.client.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -27,7 +29,51 @@ final class ServerUris {
 		this.sslEnabled = sslEnabled;
 	}
 
-	static ServerUris fromStrings(String protocol, List<String> hostAndPortStrings) {
+	static ServerUris fromOptionalStrings(Optional<String> protocol, Optional<List<String>> hostAndPortStrings,
+			Optional<List<String>> uris) {
+		if ( !uris.isPresent() ) {
+			String protocolValue = ( protocol.isPresent() ) ? protocol.get() :
+					ElasticsearchBackendSettings.Defaults.PROTOCOL;
+			List<String> hostAndPortValues = ( hostAndPortStrings.isPresent() ) ? hostAndPortStrings.get() :
+					ElasticsearchBackendSettings.Defaults.HOSTS;
+			return fromStrings( protocolValue, hostAndPortValues );
+		}
+
+		if ( protocol.isPresent() ) {
+			throw log.uriAndProtocol( uris.get(), protocol.get() );
+		}
+
+		if ( hostAndPortStrings.isPresent() ) {
+			throw log.uriAndHosts( uris.get(), hostAndPortStrings.get() );
+		}
+
+		return fromStrings( uris.get() );
+	}
+
+	private static ServerUris fromStrings(List<String> serverUrisStrings) {
+		if ( serverUrisStrings.isEmpty() ) {
+			throw log.emptyListOfUris();
+		}
+
+		HttpHost[] hosts = new HttpHost[serverUrisStrings.size()];
+		Boolean https = null;
+		for ( int i = 0; i < serverUrisStrings.size(); ++i ) {
+			HttpHost host = HttpHost.create( serverUrisStrings.get( i ) );
+			hosts[i] = host;
+			String scheme = host.getSchemeName();
+			boolean currentHttps = "https".equals( scheme );
+			if ( https == null ) {
+				https = currentHttps;
+			}
+			else if ( ( currentHttps && !https || ( !currentHttps && https ) ) ) {
+				throw log.differentProtocolsOnUris( serverUrisStrings );
+			}
+		}
+
+		return new ServerUris( hosts, https );
+	}
+
+	private static ServerUris fromStrings(String protocol, List<String> hostAndPortStrings) {
 		HttpHost[] hosts = new HttpHost[hostAndPortStrings.size()];
 		// Note: protocol and URI scheme are not the same thing,
 		// but for HTTP/HTTPS both the protocol and URI scheme are named HTTP/HTTPS.

@@ -64,16 +64,19 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		}
 	};
 
-	private static final ConfigurationProperty<List<String>> HOSTS =
+	private static final OptionalConfigurationProperty<List<String>> HOSTS =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.HOSTS )
 					.asString().multivalued()
-					.withDefault( ElasticsearchBackendSettings.Defaults.HOSTS )
 					.build();
 
-	private static final ConfigurationProperty<String> PROTOCOL =
+	private static final OptionalConfigurationProperty<String> PROTOCOL =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.PROTOCOL )
 					.asString()
-					.withDefault( ElasticsearchBackendSettings.Defaults.PROTOCOL )
+					.build();
+
+	private static final OptionalConfigurationProperty<List<String>> URIS =
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.URIS )
+					.asString().multivalued()
 					.build();
 
 	private static final ConfigurationProperty<String> PATH_PREFIX =
@@ -147,7 +150,8 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		Optional<Integer> requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
 		int connectionTimeoutMs = CONNECTION_TIMEOUT.get( propertySource );
 
-		ServerUris hosts = ServerUris.fromStrings( PROTOCOL.get( propertySource ), HOSTS.get( propertySource ) );
+		ServerUris hosts = ServerUris
+				.fromOptionalStrings( PROTOCOL.get( propertySource ), HOSTS.get( propertySource ), URIS.get( propertySource ) );
 		RestClient restClient = createClient( beanResolver, propertySource, threadProvider, threadNamePrefix, hosts,
 				PATH_PREFIX.get( propertySource ) );
 		Sniffer sniffer = createSniffer( propertySource, restClient, hosts );
