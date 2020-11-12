@@ -62,13 +62,13 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 	public <T> BeanHolder<T> resolve(Class<T> typeReference) {
 		Contracts.assertNotNull( typeReference, "typeReference" );
 		try {
-			return beanProvider.forType( typeReference );
+			return resolveSingleConfiguredBean( typeReference );
 		}
-		catch (SearchException e) {
+		catch (RuntimeException e) {
 			try {
-				return resolveSingleConfiguredBean( typeReference );
+				return beanProvider.forType( typeReference );
 			}
-			catch (RuntimeException e2) {
+			catch (SearchException e2) {
 				throw log.cannotResolveBeanReference( typeReference, e.getMessage(), e2.getMessage(), e, e2 );
 			}
 		}
@@ -79,13 +79,13 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 		Contracts.assertNotNull( typeReference, "typeReference" );
 		Contracts.assertNotNullNorEmpty( nameReference, "nameReference" );
 		try {
-			return beanProvider.forTypeAndName( typeReference, nameReference );
+			return resolveSingleConfiguredBean( typeReference, nameReference );
 		}
-		catch (SearchException e) {
+		catch (RuntimeException e) {
 			try {
-				return resolveSingleConfiguredBean( typeReference, nameReference );
+				return beanProvider.forTypeAndName( typeReference, nameReference );
 			}
-			catch (RuntimeException e2) {
+			catch (SearchException e2) {
 				throw log.cannotResolveBeanReference( typeReference, nameReference, e.getMessage(), e2.getMessage(),
 						e, e2 );
 			}
@@ -112,12 +112,6 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 		return registry.named();
 	}
 
-	/*
-	 * Fall back to an explicitly configured bean.
-	 * It's important to do this *after* trying the bean resolver,
-	 * so that adding explicitly configured beans in a new version of Hibernate Search
-	 * doesn't break existing user's configuration.
-	 */
 	private <T> BeanHolder<T> resolveSingleConfiguredBean(Class<T> exposedType, String name) {
 		BeanReferenceRegistryForType<T> registry = explicitlyConfiguredBeans( exposedType );
 		BeanReference<T> reference = null;

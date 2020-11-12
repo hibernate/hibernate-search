@@ -180,7 +180,7 @@ public class ConfiguredBeanResolverTest {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Unable to resolve bean reference to type '" + Type1.class.getName() + "'",
 						" cannot find Type1" )
-				.hasCauseReference( providerType1NotFound );
+				.hasSuppressedException( providerType1NotFound );
 		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class, String)
@@ -191,7 +191,7 @@ public class ConfiguredBeanResolverTest {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Unable to resolve bean reference to type '" + Type2.class.getName() + "' and name 'someName'",
 						"cannot find Type2#someName" )
-				.hasCauseReference( providerType2NotFound );
+				.hasSuppressedException( providerType2NotFound );
 		verifyNoOtherInteractionsAndReset();
 	}
 
@@ -259,8 +259,8 @@ public class ConfiguredBeanResolverTest {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Unable to resolve bean reference to type '" + Type1.class.getName() + "'",
 						"cannot find Type1", "configured bean failed for Type1" )
-				.hasCauseReference( providerType1NotFound )
-				.hasSuppressedException( configuredBeanType1Failed );
+				.hasCauseReference( configuredBeanType1Failed )
+				.hasSuppressedException( providerType1NotFound );
 		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class, String)
@@ -274,8 +274,8 @@ public class ConfiguredBeanResolverTest {
 				.hasMessageContainingAll( "Unable to resolve bean reference to type '" + Type2.class.getName() + "' and name 'someName'",
 						"provider cannot find Type2#someName",
 						"configured bean failed for Type2#someName" )
-				.hasCauseReference( providerType2NotFound )
-				.hasSuppressedException( configuredBeanType2Failed );
+				.hasCauseReference( configuredBeanType2Failed )
+				.hasSuppressedException( providerType2NotFound );
 		verifyNoOtherInteractionsAndReset();
 	}
 

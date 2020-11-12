@@ -70,10 +70,10 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 						.failure(
 								"Invalid value for configuration property 'hibernate.search.backend.directory.type': '"
 										+ invalidDirectoryType + "'",
-								"Unable to load class '" + invalidDirectoryType + "'",
 								"No beans defined for type '" + DirectoryProvider.class.getName()
 										+ "' and name '" + invalidDirectoryType
-										+ "' in Hibernate Search's internal registry"
+										+ "' in Hibernate Search's internal registry",
+								"Unable to load class '" + invalidDirectoryType + "'"
 						)
 						.build()
 				);
