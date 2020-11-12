@@ -35,7 +35,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.environment.bean.impl.ConfiguredBeanResolver;
+import org.hibernate.search.engine.environment.bean.impl.BeanResolverImpl;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanProvider;
 import org.hibernate.search.engine.environment.classpath.spi.AggregatedClassLoader;
@@ -187,7 +187,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 				beanProvider = ReflectionBeanProvider.create( classResolver );
 			}
 
-			BeanResolver beanResolver = new ConfiguredBeanResolver( serviceResolver, beanProvider, propertySource );
+			BeanResolver beanResolver = BeanResolverImpl.create( serviceResolver, beanProvider, propertySource );
 
 			failureHandlerHolder = BACKGROUND_FAILURE_HANDLER.getAndTransform( propertySource, beanResolver::resolve );
 			// Wrap the failure handler to prevent it from throwing exceptions

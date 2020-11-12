@@ -40,7 +40,7 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
 @SuppressWarnings({ "unchecked", "rawtypes" }) // Raw types are the only way to mock parameterized types
-public class ConfiguredBeanResolverTest {
+public class BeanResolverImplTest {
 
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
@@ -64,7 +64,7 @@ public class ConfiguredBeanResolverTest {
 		when( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
 				.thenReturn( Optional.empty() );
 		BeanResolver beanResolver =
-				new ConfiguredBeanResolver( serviceResolverMock, beanProviderMock, configurationSourceMock );
+				BeanResolverImpl.create( serviceResolverMock, beanProviderMock, configurationSourceMock );
 		verifyNoOtherInteractionsAndReset();
 
 		BeanHolder<Type1> type1BeanHolder = BeanHolder.of( new Type1() );
@@ -125,7 +125,7 @@ public class ConfiguredBeanResolverTest {
 		when( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
 				.thenReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2 ) ) );
 		BeanResolver beanResolver =
-				new ConfiguredBeanResolver( serviceResolverMock, beanProviderMock, configurationSourceMock );
+				BeanResolverImpl.create( serviceResolverMock, beanProviderMock, configurationSourceMock );
 		verifyNoOtherInteractionsAndReset();
 
 		BeanHolder<Type1> type1BeanHolder = BeanHolder.of( new Type1() );
@@ -170,7 +170,7 @@ public class ConfiguredBeanResolverTest {
 		when( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
 				.thenReturn( (Optional) Optional.empty() );
 		BeanResolver beanResolver =
-				new ConfiguredBeanResolver( serviceResolverMock, beanProviderMock, configurationSourceMock );
+				BeanResolverImpl.create( serviceResolverMock, beanProviderMock, configurationSourceMock );
 		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class)
@@ -213,7 +213,7 @@ public class ConfiguredBeanResolverTest {
 		when( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
 				.thenReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2 ) ) );
 		BeanResolver beanResolver =
-				new ConfiguredBeanResolver( serviceResolverMock, beanProviderMock, configurationSourceMock );
+				BeanResolverImpl.create( serviceResolverMock, beanProviderMock, configurationSourceMock );
 		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class)
@@ -247,7 +247,7 @@ public class ConfiguredBeanResolverTest {
 		when( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
 				.thenReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2 ) ) );
 		BeanResolver beanResolver =
-				new ConfiguredBeanResolver( serviceResolverMock, beanProviderMock, configurationSourceMock );
+				BeanResolverImpl.create( serviceResolverMock, beanProviderMock, configurationSourceMock );
 		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class)
@@ -297,7 +297,7 @@ public class ConfiguredBeanResolverTest {
 		when( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
 				.thenReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2 ) ) );
 		BeanResolver beanResolver =
-				new ConfiguredBeanResolver( serviceResolverMock, beanProviderMock, configurationSourceMock );
+				BeanResolverImpl.create( serviceResolverMock, beanProviderMock, configurationSourceMock );
 		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class)
@@ -333,7 +333,7 @@ public class ConfiguredBeanResolverTest {
 		when( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
 				.thenReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2 ) ) );
 		BeanResolver beanResolver =
-				new ConfiguredBeanResolver( serviceResolverMock, beanProviderMock, configurationSourceMock );
+				BeanResolverImpl.create( serviceResolverMock, beanProviderMock, configurationSourceMock );
 		verifyNoOtherInteractionsAndReset();
 
 		BeanHolder<RoleType> beanHolder1 = BeanHolder.of( new Type3() );
