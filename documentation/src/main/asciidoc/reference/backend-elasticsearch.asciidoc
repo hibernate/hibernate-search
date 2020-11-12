@@ -105,6 +105,28 @@ The default for this property is `http`.
 
 This property may be set to either `http` or `https`.
 
+==== Provide complete URIs
+
+Alternatively to `hosts` and `protocol`, it is possible to define both the terms using the same property:
+
+[source]
+----
+hibernate.search.backend.uris = http://localhost:9200
+----
+
+This property may be set to a String representing an URI such as `http://localhost` or `https://es.mycompany.com:4400`,
+or a String containing multiple such URI strings separated by commas,
+or a `Collection<String>` containing such URI strings.
+
+[WARNING]
+====
+Note that there atrre some constraints we need to respect in order to use this property:
+
+* All the uris must have the same protocol.
+* Cannot be used if `hosts` or `protocol` are set.
+* It must contain at least a valid URI.
+====
+
 [[backend-elasticsearch-configuration-path-prefix]]
 === Path prefix
 
