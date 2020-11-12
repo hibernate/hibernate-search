@@ -91,7 +91,7 @@ public class AutomaticIndexingBridgeAccessorsIT extends AbstractAutomaticIndexin
 		}
 	}
 
-	public static class ContainingEntitySingleValuedPropertyBridge implements PropertyBridge {
+	public static class ContainingEntitySingleValuedPropertyBridge implements PropertyBridge<Object> {
 
 		private final PojoElementAccessor<String> includedInPropertyBridgeSourceAccessor;
 		private final IndexObjectFieldReference propertyBridgeObjectFieldReference;

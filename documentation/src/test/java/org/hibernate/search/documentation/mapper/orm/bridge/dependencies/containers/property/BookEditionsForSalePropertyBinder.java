@@ -34,7 +34,7 @@ public class BookEditionsForSalePropertyBinder implements PropertyBinder {
 		context.bridge( new Bridge( editionsForSaleField ) );
 	}
 
-	private static class Bridge implements PropertyBridge {
+	private static class Bridge implements PropertyBridge<Map<BookEdition, ?>> {
 
 		private final IndexFieldReference<String> editionsForSaleField;
 
@@ -43,10 +43,8 @@ public class BookEditionsForSalePropertyBinder implements PropertyBinder {
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
-			Map<BookEdition, ?> priceByEdition = (Map<BookEdition, ?>) bridgedElement;
-
+		public void write(DocumentElement target, Map<BookEdition, ?> priceByEdition,
+				PropertyBridgeWriteContext context) {
 			for ( BookEdition edition : priceByEdition.keySet() ) { // <3>
 				target.addValue( editionsForSaleField, edition.getLabel() );
 			}

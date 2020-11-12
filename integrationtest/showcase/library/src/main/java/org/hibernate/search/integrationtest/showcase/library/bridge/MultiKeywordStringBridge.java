@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 
-public class MultiKeywordStringBridge implements PropertyBridge {
+public class MultiKeywordStringBridge implements PropertyBridge<String> {
 
 	public static final String SEPARATOR_PATTERN_DEFAULT = ",";
 
@@ -35,8 +35,7 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 	}
 
 	@Override
-	public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
-		String sourceValue = (String) bridgedElement;
+	public void write(DocumentElement target, String sourceValue, PropertyBridgeWriteContext context) {
 		if ( sourceValue != null ) {
 			String[] items = separatorPattern.split( sourceValue );
 			for ( String item : items ) {

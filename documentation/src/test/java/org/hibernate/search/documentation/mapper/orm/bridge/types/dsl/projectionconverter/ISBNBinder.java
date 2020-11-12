@@ -40,7 +40,7 @@ public class ISBNBinder implements PropertyBinder {
 		) );
 	}
 
-	private static class Bridge implements PropertyBridge {
+	private static class Bridge implements PropertyBridge<ISBN> {
 		private final IndexFieldReference<String> isbnField;
 
 		private Bridge(IndexFieldReference<String> isbnField) {
@@ -48,9 +48,9 @@ public class ISBNBinder implements PropertyBinder {
 		}
 
 		@Override
-		public void write(DocumentElement target, Object bridgedElement,
+		public void write(DocumentElement target, ISBN bridgedElement,
 				PropertyBridgeWriteContext context) {
-			target.addValue( isbnField, ((ISBN) bridgedElement).getStringValue() );
+			target.addValue( isbnField, bridgedElement.getStringValue() );
 		}
 	}
 }

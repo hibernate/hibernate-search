@@ -28,7 +28,7 @@ public class MyDataPropertyBinder implements PropertyBinder {
 	}
 
 	//tag::include[]
-	private static class Bridge implements PropertyBridge {
+	private static class Bridge implements PropertyBridge<Object> {
 
 		private final IndexFieldReference<String> field;
 

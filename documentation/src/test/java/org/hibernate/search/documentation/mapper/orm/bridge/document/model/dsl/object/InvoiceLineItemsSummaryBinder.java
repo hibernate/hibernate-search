@@ -53,7 +53,7 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder {
 	}
 	//end::bind[]
 
-	private static class Bridge implements PropertyBridge {
+	private static class Bridge implements PropertyBridge<List<InvoiceLineItem>> {
 
 		private final IndexObjectFieldReference summaryField;
 		private final IndexFieldReference<BigDecimal> totalField;
@@ -73,9 +73,7 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder {
 		//tag::write[]
 		@Override
 		@SuppressWarnings("unchecked")
-		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
-			List<InvoiceLineItem> lineItems = (List<InvoiceLineItem>) bridgedElement;
-
+		public void write(DocumentElement target, List<InvoiceLineItem> lineItems, PropertyBridgeWriteContext context) {
 			BigDecimal total = BigDecimal.ZERO;
 			BigDecimal books = BigDecimal.ZERO;
 			BigDecimal shipping = BigDecimal.ZERO;

@@ -196,7 +196,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 		}
 	}
 
-	public static class BridgeGoingThroughEntityBoundaries implements PropertyBridge {
+	public static class BridgeGoingThroughEntityBoundaries implements PropertyBridge<Contained> {
 
 		private IndexFieldReference<Integer> indexFieldReference;
 
@@ -210,9 +210,8 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 		}
 
 		@Override
-		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
-			Contained castedBridgedElement = (Contained) bridgedElement;
-			Integer value = castedBridgedElement.getIndexedInContaining();
+		public void write(DocumentElement target, Contained bridgedElement, PropertyBridgeWriteContext context) {
+			Integer value = bridgedElement.getIndexedInContaining();
 			target.addValue( indexFieldReference, value );
 		}
 

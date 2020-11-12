@@ -45,7 +45,7 @@ import org.hibernate.search.util.common.impl.StreamHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-public class CoordinatesBridge implements TypeBridge, PropertyBridge {
+public class CoordinatesBridge implements TypeBridge, PropertyBridge<Object> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

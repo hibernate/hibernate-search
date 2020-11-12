@@ -50,7 +50,7 @@ public class MultiTypeUserMetadataBinder implements PropertyBinder {
 	//end::bind[]
 
 	//tag::write[]
-	private static class Bridge implements PropertyBridge {
+	private static class Bridge implements PropertyBridge<Map<String, Object>> {
 
 		private final IndexObjectFieldReference userMetadataFieldReference;
 
@@ -59,9 +59,8 @@ public class MultiTypeUserMetadataBinder implements PropertyBinder {
 		}
 
 		@Override
-		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
-			Map<String, Object> userMetadata = (Map<String, Object>) bridgedElement;
-
+		public void write(DocumentElement target, Map<String, Object> userMetadata,
+				PropertyBridgeWriteContext context) {
 			DocumentElement indexedUserMetadata = target.addObject( userMetadataFieldReference ); // <1>
 
 			for ( Map.Entry<String, Object> entry : userMetadata.entrySet() ) {

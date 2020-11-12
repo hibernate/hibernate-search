@@ -78,22 +78,22 @@ Pass references to these fields to the bridge.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/simple/InvoiceLineItemsSummaryBinder.java[tags=bridge]
 ----
-<1> The bridge must implement the `PropertyBridge` interface.
+<1> The bridge must implement the `PropertyBridge<P>` interface.
 Here the bridge class is nested in the binder class,
 because it is more convenient,
 but you are obviously free to implement it in a separate java file.
+The generic type `<P>` here reflects the type of the property on which we're going to apply the bridge,
+that we'll call the bridged element.
 <2> The bridge stores references to the fields:
 it will need them when indexing.
 <3> Implement the `write` method in the bridge.
 This method is called on indexing.
-<4> The bridged element is passed as an `Object`,
-so cast it to the correct type.
-<5> Extract data from the bridged element,
+<4> Extract data from the bridged element,
 and optionally transform it.
-<6> Add an object to the `summary` object field.
+<5> Add an object to the `summary` object field.
 Note the `summary` field was declared at the root,
 so we call `addObject` directly on the `target` argument.
-<7> Add a value to each of the `summary.total`, `summary.books`
+<6> Add a value to each of the `summary.total`, `summary.books`
 and `summary.shipping` fields.
 Note the fields were declared as sub-fields of `summary`,
 so we call `addValue` on `summaryValue` instead of `target`.
