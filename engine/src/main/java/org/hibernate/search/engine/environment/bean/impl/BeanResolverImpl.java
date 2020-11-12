@@ -26,7 +26,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public final class ConfiguredBeanResolver implements BeanResolver {
+public final class BeanResolverImpl implements BeanResolver {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -37,25 +37,30 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 					.withDefault( EngineSpiSettings.Defaults.BEAN_CONFIGURERS )
 					.build();
 
-	private final BeanProvider beanProvider;
-	private final Map<Class<?>, BeanReferenceRegistryForType<?>> explicitlyConfiguredBeans;
-
-	public ConfiguredBeanResolver(ServiceResolver serviceResolver, BeanProvider beanProvider,
+	public static BeanResolverImpl create(ServiceResolver serviceResolver, BeanProvider beanProvider,
 			ConfigurationPropertySource configurationPropertySource) {
-		this.beanProvider = beanProvider;
-
 		BeanConfigurationContextImpl configurationContext = new BeanConfigurationContextImpl();
 		for ( BeanConfigurer beanConfigurer : serviceResolver.loadJavaServices( BeanConfigurer.class ) ) {
 			beanConfigurer.configure( configurationContext );
 		}
-		BeanProviderOnlyBeanResolver beanResolverForConfigurers = new BeanProviderOnlyBeanResolver( beanProvider );
+		BeanResolverImpl beanResolverForConfigurers =
+				new BeanResolverImpl( beanProvider, Collections.emptyMap() );
 		try ( BeanHolder<List<BeanConfigurer>> beanConfigurersFromConfigurationProperties =
 				BEAN_CONFIGURERS.getAndTransform( configurationPropertySource, beanResolverForConfigurers::resolve ) ) {
 			for ( BeanConfigurer beanConfigurer : beanConfigurersFromConfigurationProperties.get() ) {
 				beanConfigurer.configure( configurationContext );
 			}
 		}
-		this.explicitlyConfiguredBeans = configurationContext.configuredBeans();
+		return new BeanResolverImpl( beanProvider, configurationContext.configuredBeans() );
+	}
+
+	private final BeanProvider beanProvider;
+	private final Map<Class<?>, BeanReferenceRegistryForType<?>> explicitlyConfiguredBeans;
+
+	private BeanResolverImpl(BeanProvider beanProvider,
+			Map<Class<?>, BeanReferenceRegistryForType<?>> explicitlyConfiguredBeans) {
+		this.beanProvider = beanProvider;
+		this.explicitlyConfiguredBeans = explicitlyConfiguredBeans;
 	}
 
 	@Override
