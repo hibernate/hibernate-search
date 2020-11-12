@@ -13,7 +13,6 @@ import org.hibernate.resource.beans.container.spi.ContainedBean;
 import org.hibernate.resource.beans.spi.BeanInstanceProducer;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
-import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanProvider;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
@@ -40,31 +39,27 @@ final class HibernateOrmBeanContainerBeanProvider implements BeanProvider {
 
 	private final BeanContainer beanContainer;
 
-	private final ReflectionBeanProvider fallback;
 	private final BeanInstanceProducer fallbackInstanceProducer;
 
-	HibernateOrmBeanContainerBeanProvider(BeanContainer beanContainer, ReflectionBeanProvider fallback) {
+	HibernateOrmBeanContainerBeanProvider(BeanContainer beanContainer) {
 		Contracts.assertNotNull( beanContainer, "beanContainer" );
 		this.beanContainer = beanContainer;
-		this.fallback = fallback;
 		this.fallbackInstanceProducer = new BeanInstanceProducer() {
-			private final ReflectionBeanProvider delegate = fallback;
-
 			@Override
 			public <B> B produceBeanInstance(Class<B> aClass) {
-				return delegate.forTypeNoClosingNecessary( aClass );
+				throw log.beanNotFoundInBeanContainer( beanContainer );
 			}
 
 			@Override
 			public <B> B produceBeanInstance(String s, Class<B> aClass) {
-				return delegate.forTypeAndNameNoClosingNecessary( aClass, s );
+				throw log.beanNotFoundInBeanContainer( beanContainer );
 			}
 		};
 	}
 
 	@Override
 	public void close() {
-		fallback.close();
+		// Nothing to do
 	}
 
 	@Override
@@ -105,21 +100,7 @@ final class HibernateOrmBeanContainerBeanProvider implements BeanProvider {
 		// This means the fallback instance producer is never called, which is a problem.
 		// Since we don't need lazy retrieval in our case (all beans are retrieved at bootstrap),
 		// we trigger initialization ourselves and use the fallback if necessary.
-		try {
-			result.get();
-		}
-		catch (Exception e) {
-			new SuppressingCloser( e ).push( result );
-			log.debugf( e, "Error resolving bean [%s] of type [%s] - using fallback", nameReference, typeReference );
-			try {
-				result = BeanHolder.of( fallbackInstanceProducer.produceBeanInstance( nameReference, typeReference ) );
-			}
-			catch (Exception e2) {
-				// Keep track of the original failure to retrieve the bean from the bean container.
-				e2.addSuppressed( e );
-				throw e2;
-			}
-		}
+		result.get();
 		return result;
 	}
 

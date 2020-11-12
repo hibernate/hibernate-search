@@ -37,7 +37,6 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.impl.BeanResolverImpl;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
-import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanProvider;
 import org.hibernate.search.engine.environment.classpath.spi.AggregatedClassLoader;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolver;
@@ -86,7 +85,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	private ClassResolver classResolver;
 	private ResourceResolver resourceResolver;
 	private ServiceResolver serviceResolver;
-	private BeanProvider beanProvider;
+	private BeanProvider beanManagerBeanProvider;
 	private boolean frozen = false;
 
 	public SearchIntegrationBuilderImpl(ConfigurationPropertySource propertySource,
@@ -120,8 +119,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	}
 
 	@Override
-	public SearchIntegrationBuilder beanProvider(BeanProvider beanProvider) {
-		this.beanProvider = beanProvider;
+	public SearchIntegrationBuilder beanManagerBeanProvider(BeanProvider beanProvider) {
+		this.beanManagerBeanProvider = beanProvider;
 		return this;
 	}
 
@@ -183,11 +182,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 				serviceResolver = DefaultServiceResolver.create( aggregatedClassLoader );
 			}
 
-			if ( beanProvider == null ) {
-				beanProvider = ReflectionBeanProvider.create( classResolver );
-			}
-
-			BeanResolver beanResolver = BeanResolverImpl.create( serviceResolver, beanProvider, propertySource );
+			BeanResolver beanResolver = BeanResolverImpl.create( classResolver, serviceResolver,
+					beanManagerBeanProvider, propertySource );
 
 			failureHandlerHolder = BACKGROUND_FAILURE_HANDLER.getAndTransform( propertySource, beanResolver::resolve );
 			// Wrap the failure handler to prevent it from throwing exceptions
@@ -266,7 +262,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			checkingRootFailures = false;
 
 			return new SearchIntegrationPartialBuildStateImpl(
-					beanProvider, beanResolver,
+					beanManagerBeanProvider, beanResolver,
 					failureHandlerHolder,
 					threadPoolProvider,
 					partiallyBuiltMappings,
@@ -313,7 +309,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			closer.pushAll( holder -> holder.closeOnFailure( closer ), indexManagerBuildingStateHolder );
 			// Close environment resources before aborting
 			closer.pushAll( BeanHolder::close, threadProviderHolder );
-			closer.pushAll( BeanProvider::close, beanProvider );
+			closer.pushAll( BeanProvider::close, beanManagerBeanProvider );
 			closer.push( EngineThreads::onStop, engineThreads );
 			closer.push( TimingSource::stop, timingSource );
 
