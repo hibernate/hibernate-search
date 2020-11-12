@@ -140,6 +140,38 @@ public class ElasticsearchClientFactoryImplIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4099")
+	public void uris_http() throws Exception {
+		String payload = "{ \"foo\": \"bar\" }";
+		String statusMessage = "StatusMessage";
+		String responseBody = "{ \"foo\": \"bar\" }";
+		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.andMatching( httpProtocol() )
+				.willReturn( elasticsearchResponse().withStatus( 200 )
+						.withStatusMessage( statusMessage )
+						.withBody( responseBody ) ) );
+
+		try ( ElasticsearchClientImplementor client = createClient(
+				properties -> {
+					properties.accept( ElasticsearchBackendSettings.HOSTS, null );
+					properties.accept( ElasticsearchBackendSettings.PROTOCOL, null );
+					properties.accept( ElasticsearchBackendSettings.URIS, httpUrisFor( wireMockRule1 ) );
+				}
+		) ) {
+			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
+			assertJsonEquals( responseBody, result.body().toString() );
+
+			wireMockRule1.verify(
+					postRequestedFor( urlPathMatching( "/myIndex/myType" ) )
+							.andMatching( httpProtocol() )
+			);
+		}
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4051")
 	public void pathPrefix_http() throws Exception {
 		String payload = "{ \"foo\": \"bar\" }";
@@ -155,6 +187,39 @@ public class ElasticsearchClientFactoryImplIT {
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.PATH_PREFIX, "bla/bla/bla" );
+				}
+		) ) {
+			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
+			assertJsonEquals( responseBody, result.body().toString() );
+
+			wireMockRule1.verify(
+					postRequestedFor( urlPathMatching( "/bla/bla/bla/myIndex/myType" ) )
+							.andMatching( httpProtocol() )
+			);
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4099")
+	public void pathPrefix_uris() throws Exception {
+		String payload = "{ \"foo\": \"bar\" }";
+		String statusMessage = "StatusMessage";
+		String responseBody = "{ \"foo\": \"bar\" }";
+		wireMockRule1.stubFor( post( urlPathMatching( "/bla/bla/bla/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.andMatching( httpProtocol() )
+				.willReturn( elasticsearchResponse().withStatus( 200 )
+						.withStatusMessage( statusMessage )
+						.withBody( responseBody ) ) );
+
+		try ( ElasticsearchClientImplementor client = createClient(
+				properties -> {
+					properties.accept( ElasticsearchBackendSettings.PATH_PREFIX, "bla/bla/bla" );
+					properties.accept( ElasticsearchBackendSettings.HOSTS, null );
+					properties.accept( ElasticsearchBackendSettings.PROTOCOL, null );
+					properties.accept( ElasticsearchBackendSettings.URIS, httpUrisFor( wireMockRule1 ) );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -186,6 +251,38 @@ public class ElasticsearchClientFactoryImplIT {
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.HOSTS, httpsHostAndPortFor( wireMockRule1 ) );
 					properties.accept( ElasticsearchBackendSettings.PROTOCOL, "https" );
+				}
+		) ) {
+			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
+			assertJsonEquals( responseBody, result.body().toString() );
+
+			wireMockRule1.verify(
+					postRequestedFor( urlPathMatching( "/myIndex/myType" ) )
+							.andMatching( httpsProtocol() )
+			);
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2274")
+	public void uris_https() throws Exception {
+		String payload = "{ \"foo\": \"bar\" }";
+		String statusMessage = "StatusMessage";
+		String responseBody = "{ \"foo\": \"bar\" }";
+		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.andMatching( httpsProtocol() )
+				.willReturn( elasticsearchResponse().withStatus( 200 )
+						.withStatusMessage( statusMessage )
+						.withBody( responseBody ) ) );
+
+		try ( ElasticsearchClientImplementor client = createClient(
+				properties -> {
+					properties.accept( ElasticsearchBackendSettings.HOSTS, null );
+					properties.accept( ElasticsearchBackendSettings.PROTOCOL, null );
+					properties.accept( ElasticsearchBackendSettings.URIS, httpsUrisFor( wireMockRule1 ) );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
@@ -839,6 +936,18 @@ public class ElasticsearchClientFactoryImplIT {
 	private static String httpsHostAndPortFor(WireMockRule ... rules) {
 		return Arrays.stream( rules )
 				.map( rule -> "localhost:" + rule.httpsPort() )
+				.collect( Collectors.joining( "," ) );
+	}
+
+	private static String httpUrisFor(WireMockRule ... rules) {
+		return Arrays.stream( rules )
+				.map( rule -> "http://localhost:" + rule.port() )
+				.collect( Collectors.joining( "," ) );
+	}
+
+	private static String httpsUrisFor(WireMockRule ... rules) {
+		return Arrays.stream( rules )
+				.map( rule -> "https://localhost:" + rule.httpsPort() )
 				.collect( Collectors.joining( "," ) );
 	}
 
