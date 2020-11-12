@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -841,12 +840,6 @@ public class ElasticsearchClientFactoryImplIT {
 		return Arrays.stream( rules )
 				.map( rule -> "localhost:" + rule.httpsPort() )
 				.collect( Collectors.joining( "," ) );
-	}
-
-	private static List<String> httpsHostsAndPortsFor(List<WireMockRule> rules) {
-		return rules.stream()
-				.map( ElasticsearchClientFactoryImplIT::httpsHostAndPortFor )
-				.collect( Collectors.toList() );
 	}
 
 	private static ResponseDefinitionBuilder elasticsearchResponse() {
