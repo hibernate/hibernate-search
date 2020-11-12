@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.environment.bean.impl;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,8 +32,8 @@ final class BeanConfigurationContextImpl implements BeanConfigurationContext {
 		configuredBeans( exposedType ).add( name, reference );
 	}
 
-	Map<Class<?>, BeanReferenceRegistryForType<?>> configuredBeans() {
-		return Collections.unmodifiableMap( configuredBeans );
+	ConfigurationBeanRegistry buildRegistry() {
+		return new ConfigurationBeanRegistry( new HashMap<>( configuredBeans ) );
 	}
 
 	@SuppressWarnings("unchecked")

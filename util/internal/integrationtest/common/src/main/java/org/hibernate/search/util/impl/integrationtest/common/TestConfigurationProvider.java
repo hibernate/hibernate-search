@@ -18,7 +18,6 @@ import java.util.Properties;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.impl.BeanResolverImpl;
-import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanProvider;
 import org.hibernate.search.engine.environment.classpath.spi.AggregatedClassLoader;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolver;
@@ -60,8 +59,8 @@ public final class TestConfigurationProvider implements TestRule {
 		AggregatedClassLoader aggregatedClassLoader = AggregatedClassLoader.createDefault();
 		ClassResolver classResolver = DefaultClassResolver.create( aggregatedClassLoader );
 		ServiceResolver serviceResolver = DefaultServiceResolver.create( aggregatedClassLoader );
-		ReflectionBeanProvider beanProvider = ReflectionBeanProvider.create( classResolver );
-		return BeanResolverImpl.create( serviceResolver, beanProvider, configurationPropertySource );
+		return BeanResolverImpl.create( classResolver, serviceResolver, null,
+				configurationPropertySource );
 	}
 
 	public Map<String, Object> getPropertiesFromFile(String propertyFilePath) {

@@ -38,7 +38,8 @@ public interface BeanProvider extends AutoCloseable {
 	 * @param <T> The expected return type.
 	 * @param typeReference The type used as a reference to the bean to retrieve. Must be non-null.
 	 * @return A {@link BeanHolder} containing the resolved bean.
-	 * @throws SearchException if the reference is invalid (null) or the bean does not exist.
+	 * @throws BeanNotFoundException if the bean does not exist.
+	 * @throws SearchException if the reference is invalid (null) or an unexpected error occurs.
 	 */
 	<T> BeanHolder<T> forType(Class<T> typeReference);
 
@@ -48,7 +49,8 @@ public interface BeanProvider extends AutoCloseable {
 	 * @param typeReference The type used as a reference to the bean to retrieve. Must be non-null.
 	 * @param nameReference The name used as a reference to the bean to retrieve. Must be non-null and non-empty.
 	 * @return A {@link BeanHolder} containing the resolved bean.
-	 * @throws SearchException if a reference is invalid (null or empty) or the bean does not exist.
+	 * @throws BeanNotFoundException if the bean does not exist.
+	 * @throws SearchException if a reference is invalid (null or empty) or an unexpected error occurs.
 	 */
 	<T> BeanHolder<T> forTypeAndName(Class<T> typeReference, String nameReference);
 

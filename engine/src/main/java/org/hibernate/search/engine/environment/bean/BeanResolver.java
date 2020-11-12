@@ -25,7 +25,7 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
  * <p>
  * Regardless of the underlying implementation, this interface is used to resolve beans,
  * referenced either
- * {@link #resolve(Class) by their type},
+ * {@link #resolve(Class)}  by their type},
  * or {@link #resolve(Class, String) by their type and name}.
  * <p>
  * It also offers ways to {@link #allConfiguredForRole(Class) get references to configured beans of a given type}.

@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.environment.bean.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -15,14 +16,15 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
+import org.hibernate.search.engine.environment.bean.spi.BeanNotFoundException;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
+import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -37,70 +39,61 @@ public final class BeanResolverImpl implements BeanResolver {
 					.withDefault( EngineSpiSettings.Defaults.BEAN_CONFIGURERS )
 					.build();
 
-	public static BeanResolverImpl create(ServiceResolver serviceResolver, BeanProvider beanProvider,
-			ConfigurationPropertySource configurationPropertySource) {
+	public static BeanResolverImpl create(ClassResolver classResolver, ServiceResolver serviceResolver,
+			BeanProvider beanManagerBeanProvider, ConfigurationPropertySource configurationPropertySource) {
+		if ( beanManagerBeanProvider == null ) {
+			beanManagerBeanProvider = new NoConfiguredBeanManagerBeanProvider();
+		}
+
+		ReflectionBeanProvider reflectionBeanProvider = new ReflectionBeanProvider( classResolver );
+
 		BeanConfigurationContextImpl configurationContext = new BeanConfigurationContextImpl();
 		for ( BeanConfigurer beanConfigurer : serviceResolver.loadJavaServices( BeanConfigurer.class ) ) {
 			beanConfigurer.configure( configurationContext );
 		}
+
+		ConfigurationBeanRegistry emptyBeanRegistry = new ConfigurationBeanRegistry( Collections.emptyMap() );
 		BeanResolverImpl beanResolverForConfigurers =
-				new BeanResolverImpl( beanProvider, Collections.emptyMap() );
+				new BeanResolverImpl( emptyBeanRegistry, beanManagerBeanProvider, reflectionBeanProvider );
 		try ( BeanHolder<List<BeanConfigurer>> beanConfigurersFromConfigurationProperties =
 				BEAN_CONFIGURERS.getAndTransform( configurationPropertySource, beanResolverForConfigurers::resolve ) ) {
 			for ( BeanConfigurer beanConfigurer : beanConfigurersFromConfigurationProperties.get() ) {
 				beanConfigurer.configure( configurationContext );
 			}
 		}
-		return new BeanResolverImpl( beanProvider, configurationContext.configuredBeans() );
+
+		return new BeanResolverImpl( configurationContext.buildRegistry(), beanManagerBeanProvider,
+				reflectionBeanProvider );
 	}
 
-	private final BeanProvider beanProvider;
-	private final Map<Class<?>, BeanReferenceRegistryForType<?>> explicitlyConfiguredBeans;
+	private final ConfigurationBeanRegistry configurationBeanRegistry;
+	private final BeanProvider beanManagerBeanProvider;
+	private final BeanProvider reflectionBeanProvider;
 
-	private BeanResolverImpl(BeanProvider beanProvider,
-			Map<Class<?>, BeanReferenceRegistryForType<?>> explicitlyConfiguredBeans) {
-		this.beanProvider = beanProvider;
-		this.explicitlyConfiguredBeans = explicitlyConfiguredBeans;
+	private BeanResolverImpl(ConfigurationBeanRegistry configurationBeanRegistry,
+			BeanProvider beanManagerBeanProvider, ReflectionBeanProvider reflectionBeanProvider) {
+		this.configurationBeanRegistry = configurationBeanRegistry;
+		this.beanManagerBeanProvider = beanManagerBeanProvider;
+		this.reflectionBeanProvider = reflectionBeanProvider;
 	}
 
 	@Override
 	public <T> BeanHolder<T> resolve(Class<T> typeReference) {
 		Contracts.assertNotNull( typeReference, "typeReference" );
-		try {
-			return resolveSingleConfiguredBean( typeReference );
-		}
-		catch (RuntimeException e) {
-			try {
-				return beanProvider.forType( typeReference );
-			}
-			catch (SearchException e2) {
-				throw log.cannotResolveBeanReference( typeReference, e.getMessage(), e2.getMessage(), e, e2 );
-			}
-		}
+		return resolveFromFirstSuccessfulSource( typeReference, BeanSource.values() );
 	}
 
 	@Override
 	public <T> BeanHolder<T> resolve(Class<T> typeReference, String nameReference) {
 		Contracts.assertNotNull( typeReference, "typeReference" );
 		Contracts.assertNotNullNorEmpty( nameReference, "nameReference" );
-		try {
-			return resolveSingleConfiguredBean( typeReference, nameReference );
-		}
-		catch (RuntimeException e) {
-			try {
-				return beanProvider.forTypeAndName( typeReference, nameReference );
-			}
-			catch (SearchException e2) {
-				throw log.cannotResolveBeanReference( typeReference, nameReference, e.getMessage(), e2.getMessage(),
-						e, e2 );
-			}
-		}
+		return resolveFromFirstSuccessfulSource( typeReference, nameReference, BeanSource.values() );
 	}
 
 	@Override
 	public <T> List<BeanReference<T>> allConfiguredForRole(Class<T> role) {
 		Contracts.assertNotNull( role, "role" );
-		BeanReferenceRegistryForType<T> registry = explicitlyConfiguredBeans( role );
+		BeanReferenceRegistryForType<T> registry = configurationBeanRegistry.explicitlyConfiguredBeans( role );
 		if ( registry == null ) {
 			return Collections.emptyList();
 		}
@@ -110,44 +103,107 @@ public final class BeanResolverImpl implements BeanResolver {
 	@Override
 	public <T> Map<String, BeanReference<T>> namedConfiguredForRole(Class<T> role) {
 		Contracts.assertNotNull( role, "role" );
-		BeanReferenceRegistryForType<T> registry = explicitlyConfiguredBeans( role );
+		BeanReferenceRegistryForType<T> registry = configurationBeanRegistry.explicitlyConfiguredBeans( role );
 		if ( registry == null ) {
 			return Collections.emptyMap();
 		}
 		return registry.named();
 	}
 
-	private <T> BeanHolder<T> resolveSingleConfiguredBean(Class<T> exposedType, String name) {
-		BeanReferenceRegistryForType<T> registry = explicitlyConfiguredBeans( exposedType );
-		BeanReference<T> reference = null;
-		if ( registry != null ) {
-			reference = registry.named( name );
+	private <T> BeanHolder<T> resolveFromFirstSuccessfulSource(Class<T> typeReference, BeanSource[] sources) {
+		BeanNotFoundException firstFailure = null;
+		List<BeanNotFoundException> otherFailures = new ArrayList<>();
+		for ( BeanSource source : sources ) {
+			try {
+				return tryResolve( typeReference, source );
+			}
+			catch (BeanNotFoundException e) {
+				if ( firstFailure == null ) {
+					firstFailure = e;
+				}
+				else {
+					otherFailures.add( e );
+				}
+			}
 		}
-		if ( reference != null ) {
-			return resolve( reference );
+		throw log.cannotResolveBeanReference( typeReference,
+				buildFailureMessage( sources, firstFailure, otherFailures ), firstFailure, otherFailures );
+	}
+
+	private <T> BeanHolder<T> resolveFromFirstSuccessfulSource(Class<T> typeReference, String nameReference,
+			BeanSource[] sources) {
+		BeanNotFoundException firstFailure = null;
+		List<BeanNotFoundException> otherFailures = new ArrayList<>();
+		for ( BeanSource source : sources ) {
+			try {
+				return tryResolve( typeReference, nameReference, source );
+			}
+			catch (BeanNotFoundException e) {
+				if ( firstFailure == null ) {
+					firstFailure = e;
+				}
+				else {
+					otherFailures.add( e );
+				}
+			}
 		}
-		else {
-			throw log.noConfiguredBeanReferenceForTypeAndName( exposedType, name );
+		throw log.cannotResolveBeanReference( typeReference, nameReference,
+				buildFailureMessage( sources, firstFailure, otherFailures ), firstFailure, otherFailures );
+	}
+
+	private <T> BeanHolder<T> tryResolve(Class<T> typeReference, BeanSource source) {
+		switch ( source ) {
+			case CONFIGURATION:
+				return configurationBeanRegistry.resolve( typeReference, this );
+			case BEAN_MANAGER:
+				return beanManagerBeanProvider.forType( typeReference );
+			case REFLECTION:
+				return reflectionBeanProvider.forType( typeReference );
+			default:
+				throw unknownBeanSource( source );
 		}
 	}
 
-	private <T> BeanHolder<T> resolveSingleConfiguredBean(Class<T> exposedType) {
-		BeanReferenceRegistryForType<T> registry = explicitlyConfiguredBeans( exposedType );
-		BeanReference<T> reference = null;
-		if ( registry != null ) {
-			reference = registry.single();
-		}
-		if ( reference != null ) {
-			return resolve( reference );
-		}
-		else {
-			throw log.noConfiguredBeanReferenceForType( exposedType );
+	private <T> BeanHolder<T> tryResolve(Class<T> typeReference, String nameReference, BeanSource source) {
+		switch ( source ) {
+			case CONFIGURATION:
+				return configurationBeanRegistry.resolve( typeReference, nameReference, this );
+			case BEAN_MANAGER:
+				return beanManagerBeanProvider.forTypeAndName( typeReference, nameReference );
+			case REFLECTION:
+				return reflectionBeanProvider.forTypeAndName( typeReference, nameReference );
+			default:
+				throw unknownBeanSource( source );
 		}
 	}
 
-	@SuppressWarnings("unchecked") // We know the registry has the correct type, see BeanConfigurationContextImpl
-	private <T> BeanReferenceRegistryForType<T> explicitlyConfiguredBeans(Class<T> exposedType) {
-		return (BeanReferenceRegistryForType<T>) explicitlyConfiguredBeans.get( exposedType );
+	private String buildFailureMessage(BeanSource[] sources, BeanNotFoundException firstFailure,
+			List<BeanNotFoundException> otherFailures) {
+		StringBuilder builder = new StringBuilder();
+		builder.append( renderFailure( sources[0], firstFailure ) );
+		for ( int i = 0; i < otherFailures.size(); i++ ) {
+			RuntimeException failure = otherFailures.get( i );
+			builder.append( " " );
+			builder.append( renderFailure( sources[i + 1], failure ) );
+		}
+		return builder.toString();
+	}
+
+	private String renderFailure(BeanSource source, RuntimeException failure) {
+		switch ( source ) {
+			case CONFIGURATION:
+				return log.failedToResolveBeanUsingInternalRegistry( failure.getMessage() );
+			case BEAN_MANAGER:
+				return log.failedToResolveBeanUsingBeanManager( failure.getMessage() );
+			case REFLECTION:
+				return log.failedToResolveBeanUsingReflection( failure.getMessage() );
+			default:
+				throw unknownBeanSource( source );
+		}
+	}
+
+	private AssertionFailure unknownBeanSource(BeanSource source) {
+		return new AssertionFailure( "Unknown bean source: " + source );
 	}
 
 }

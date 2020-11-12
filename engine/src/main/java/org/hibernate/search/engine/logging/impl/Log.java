@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.spi.BeanNotFoundException;
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoadingException;
 import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
@@ -301,33 +302,41 @@ public interface Log extends BasicLogger {
 			value = "Ambiguous bean reference to type '%1$s':"
 					+ " multiple beans are explicitly defined for this type in Hibernate Search's internal registry."
 					+ " Explicitly defined beans: %2$s.")
-	SearchException multipleConfiguredBeanReferencesForType(@FormatWith(ClassFormatter.class) Class<?> exposedType,
+	BeanNotFoundException multipleConfiguredBeanReferencesForType(@FormatWith(ClassFormatter.class) Class<?> exposedType,
 			List<? extends BeanReference<?>> references);
 
 	@Message(id = ID_OFFSET + 77,
 			value = "No beans defined for type '%1$s' in Hibernate Search's internal registry.")
-	SearchException noConfiguredBeanReferenceForType(@FormatWith(ClassFormatter.class) Class<?> exposedType);
+	BeanNotFoundException noConfiguredBeanReferenceForType(@FormatWith(ClassFormatter.class) Class<?> exposedType);
 
 	@Message(id = ID_OFFSET + 78,
 			value = "No beans defined for type '%1$s' and name '%2$s' in Hibernate Search's internal registry.")
-	SearchException noConfiguredBeanReferenceForTypeAndName(@FormatWith(ClassFormatter.class) Class<?> exposedType,
+	BeanNotFoundException noConfiguredBeanReferenceForTypeAndName(@FormatWith(ClassFormatter.class) Class<?> exposedType,
 			String nameReference);
 
 	@Message(id = ID_OFFSET + 79,
-			value = "Unable to resolve bean reference to type '%1$s' and name '%2$s'."
-					+ " Failed to resolve bean from Hibernate Search's internal registry with exception: %3$s."
-					+ " Failed to resolve bean from bean provider with exception: %4$s.")
-	SearchException cannotResolveBeanReference(@FormatWith(ClassFormatter.class) Class<?> typeReference, String nameReference,
-			String beanProviderFailureMessage, String configuredBeansFailureMessage,
-			@Cause RuntimeException beanProviderFailure, @Suppressed RuntimeException configuredBeansFailure);
+			value = "Unable to resolve bean reference to type '%1$s' and name '%2$s'. %3$s")
+	BeanNotFoundException cannotResolveBeanReference(@FormatWith(ClassFormatter.class) Class<?> typeReference,
+			String nameReference, String failureMessages, @Cause RuntimeException mainFailure,
+			@Suppressed Collection<? extends RuntimeException> otherFailures);
 
 	@Message(id = ID_OFFSET + 80,
-			value = "Unable to resolve bean reference to type '%1$s'."
-					+ " Failed to resolve bean from Hibernate Search's internal registry with exception: %2$s."
-					+ " Failed to resolve bean from bean provider with exception: %3$s.")
-	SearchException cannotResolveBeanReference(@FormatWith(ClassFormatter.class) Class<?> typeReference,
-			String beanProviderFailureMessage, String configuredBeansFailureMessage,
-			@Cause RuntimeException beanProviderFailure, @Suppressed RuntimeException configuredBeansFailure);
+			value = "Unable to resolve bean reference to type '%1$s'. %2$s")
+	BeanNotFoundException cannotResolveBeanReference(@FormatWith(ClassFormatter.class) Class<?> typeReference,
+			String failureMessages, @Cause RuntimeException beanProviderFailure,
+			@Suppressed Collection<? extends RuntimeException> otherFailures);
+
+	// No ID here: this message is always embedded in one of the two exceptions above
+	@Message(value = "Failed to resolve bean from Hibernate Search's internal registry with exception: %1$s")
+	String failedToResolveBeanUsingInternalRegistry(String exceptionMessage);
+
+	// No ID here: this message is always embedded in one of the two exceptions above
+	@Message(value = "Failed to resolve bean from bean manager with exception: %1$s")
+	String failedToResolveBeanUsingBeanManager(String exceptionMessage);
+
+	// No ID here: this message is always embedded in one of the two exceptions above
+	@Message(value = "Failed to resolve bean using reflection with exception: %1$s")
+	String failedToResolveBeanUsingReflection(String exceptionMessage);
 
 	@Message(id = ID_OFFSET + 81,
 			value = "Unable to resolve backend type:"
@@ -367,5 +376,8 @@ public interface Log extends BasicLogger {
 	SearchException twoTypesTargetSameIndex(String indexName, String mappedTypeName, String anotherMappedTypeName);
 
 	@Message(id = ID_OFFSET + 89, value = "Unable to create bean using reflection: %1$s")
-	SearchException unableToCreateBeanUsingReflection(String causeMessage, @Cause Exception e);
+	BeanNotFoundException unableToCreateBeanUsingReflection(String causeMessage, @Cause Exception e);
+
+	@Message(id = ID_OFFSET + 90, value = "No configured bean manager.")
+	BeanNotFoundException noConfiguredBeanManager();
 }

@@ -26,7 +26,7 @@ public interface SearchIntegrationBuilder {
 
 	SearchIntegrationBuilder serviceResolver(ServiceResolver serviceResolver);
 
-	SearchIntegrationBuilder beanProvider(BeanProvider beanProvider);
+	SearchIntegrationBuilder beanManagerBeanProvider(BeanProvider beanProvider);
 
 	<PBM extends MappingPartialBuildState> SearchIntegrationBuilder addMappingInitiator(
 			MappingKey<PBM, ?> mappingKey, MappingInitiator<?, PBM> initiator);

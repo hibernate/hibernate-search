@@ -30,7 +30,6 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
-import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanProvider;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBooter;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
@@ -242,7 +241,6 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	 * that the first phase of boot is never executed in the native binary.
 	 */
 	private HibernateOrmIntegrationPartialBuildState doBootFirstPhase() {
-		ReflectionBeanProvider reflectionBeanProvider = null;
 		BeanProvider beanProvider = null;
 		SearchIntegrationPartialBuildState searchIntegrationPartialBuildState = null;
 		try {
@@ -263,19 +261,15 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			builder.resourceResolver( classAndResourceAndServiceResolver );
 			builder.serviceResolver( classAndResourceAndServiceResolver );
 
-			reflectionBeanProvider = ReflectionBeanProvider.create( classAndResourceAndServiceResolver );
 			if ( managedBeanRegistryService.isPresent() ) {
 				BeanContainer beanContainer = managedBeanRegistryService.get().getBeanContainer();
 				if ( beanContainer != null ) {
 					// Only use the primary registry, so that we can implement our own fallback when beans are not found
-					beanProvider = new HibernateOrmBeanContainerBeanProvider( beanContainer, reflectionBeanProvider );
+					beanProvider = new HibernateOrmBeanContainerBeanProvider( beanContainer );
+					builder.beanManagerBeanProvider( beanProvider );
 				}
 				// else: The given ManagedBeanRegistry only implements fallback: let's ignore it
 			}
-			if ( beanProvider == null ) {
-				beanProvider = reflectionBeanProvider;
-			}
-			builder.beanProvider( beanProvider );
 
 			searchIntegrationPartialBuildState = builder.prepareBuild();
 
@@ -287,7 +281,6 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
 					.push( SearchIntegrationPartialBuildState::closeOnFailure, searchIntegrationPartialBuildState )
-					.push( BeanProvider::close, reflectionBeanProvider )
 					.push( BeanProvider::close, beanProvider );
 			throw e;
 		}

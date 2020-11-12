@@ -18,6 +18,8 @@ import java.util.List;
 import org.hibernate.ScrollMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.mapping.Value;
+import org.hibernate.resource.beans.container.spi.BeanContainer;
+import org.hibernate.search.engine.environment.bean.spi.BeanNotFoundException;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
@@ -296,4 +298,7 @@ public interface Log extends BasicLogger {
 				+ " '%2$s' is the document ID and must be assigned unique values.")
 	SearchException foundMultipleEntitiesForDocumentId(String entityName, String documentIdSourcePropertyName,
 			Object id);
+
+	@Message(id = ID_OFFSET + 41, value = "No such bean in bean container '%1$s'.")
+	BeanNotFoundException beanNotFoundInBeanContainer(BeanContainer beanContainer);
 }
