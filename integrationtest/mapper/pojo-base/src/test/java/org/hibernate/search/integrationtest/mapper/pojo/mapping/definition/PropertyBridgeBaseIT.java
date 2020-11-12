@@ -941,7 +941,7 @@ public class PropertyBridgeBaseIT {
 				);
 	}
 
-	private static class UnusedPropertyBridge implements PropertyBridge {
+	private static class UnusedPropertyBridge implements PropertyBridge<Object> {
 		@Override
 		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
 			throw new AssertionFailure( "Should not be called" );

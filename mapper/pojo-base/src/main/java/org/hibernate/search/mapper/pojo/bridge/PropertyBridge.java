@@ -18,8 +18,10 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContex
  * The {@code PropertyBridge} interface is a more powerful version of {@link ValueBridge}
  * that can use reflection to get information about the property being bridged,
  * and can contribute more than one index field, in particular.
+ *
+ * @param <P> The type of the property on the POJO side of the bridge.
  */
-public interface PropertyBridge extends AutoCloseable {
+public interface PropertyBridge<P> extends AutoCloseable {
 
 	/**
 	 * Write to fields in the given {@link DocumentElement},
@@ -43,7 +45,7 @@ public interface PropertyBridge extends AutoCloseable {
 	 * {@link PropertyBridgeWriteContext#extension(PropertyBridgeWriteContextExtension) extended}
 	 * to a more useful type, giving access to such things as a Hibernate ORM Session (if using the Hibernate ORM mapper).
 	 */
-	void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context);
+	void write(DocumentElement target, P bridgedElement, PropertyBridgeWriteContext context);
 
 	/**
 	 * Close any resource before the bridge is discarded.

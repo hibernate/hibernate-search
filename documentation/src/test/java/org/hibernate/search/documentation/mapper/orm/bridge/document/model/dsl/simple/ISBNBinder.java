@@ -41,7 +41,7 @@ public class ISBNBinder implements PropertyBinder {
 	//end::bind[]
 
 	//tag::write[]
-	private static class ISBNBridge implements PropertyBridge {
+	private static class ISBNBridge implements PropertyBridge<ISBN> {
 
 		private final IndexFieldReference<String> fieldReference;
 
@@ -50,10 +50,10 @@ public class ISBNBinder implements PropertyBinder {
 		}
 
 		@Override
-		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
+		public void write(DocumentElement target, ISBN bridgedElement, PropertyBridgeWriteContext context) {
 			String indexedValue = /* ... (extraction of data, not relevant) ... */
 					//end::write[]
-					( (ISBN) bridgedElement ).getStringValue();
+					bridgedElement.getStringValue();
 			//tag::write[]
 			target.addValue( this.fieldReference, indexedValue ); // <1>
 		}

@@ -47,7 +47,7 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder { // <1>
 	//tag::bridge[]
 	// ... class InvoiceLineItemsSummaryBinder (continued)
 
-	private static class Bridge implements PropertyBridge { // <1>
+	private static class Bridge implements PropertyBridge<List<InvoiceLineItem>> { // <1>
 
 		private final IndexObjectFieldReference summaryField;
 		private final IndexFieldReference<BigDecimal> totalField;
@@ -65,14 +65,12 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder { // <1>
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) { // <3>
-			List<InvoiceLineItem> lineItems = (List<InvoiceLineItem>) bridgedElement; // <4>
+		public void write(DocumentElement target, List<InvoiceLineItem> lineItems, PropertyBridgeWriteContext context) { // <3>
 
 			BigDecimal total = BigDecimal.ZERO;
 			BigDecimal books = BigDecimal.ZERO;
 			BigDecimal shipping = BigDecimal.ZERO;
-			for ( InvoiceLineItem lineItem : lineItems ) { // <5>
+			for ( InvoiceLineItem lineItem : lineItems ) { // <4>
 				BigDecimal amount = lineItem.getAmount();
 				total = total.add( amount );
 				switch ( lineItem.getCategory() ) {
@@ -85,10 +83,10 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder { // <1>
 				}
 			}
 
-			DocumentElement summary = target.addObject( this.summaryField ); // <6>
-			summary.addValue( this.totalField, total ); // <7>
-			summary.addValue( this.booksField, books ); // <8>
-			summary.addValue( this.shippingField, shipping ); // <9>
+			DocumentElement summary = target.addObject( this.summaryField ); // <5>
+			summary.addValue( this.totalField, total ); // <6>
+			summary.addValue( this.booksField, books ); // <6>
+			summary.addValue( this.shippingField, shipping ); // <6>
 		}
 	}
 }

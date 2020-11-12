@@ -49,7 +49,7 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder {
 		) );
 	}
 
-	private static class Bridge implements PropertyBridge {
+	private static class Bridge implements PropertyBridge<List<InvoiceLineItem>> {
 
 		/* ... same implementation as before ... */
 
@@ -70,10 +70,7 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder {
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
-			List<InvoiceLineItem> lineItems = (List<InvoiceLineItem>) bridgedElement;
-
+		public void write(DocumentElement target, List<InvoiceLineItem> lineItems, PropertyBridgeWriteContext context) {
 			BigDecimal total = BigDecimal.ZERO;
 			BigDecimal books = BigDecimal.ZERO;
 			BigDecimal shipping = BigDecimal.ZERO;

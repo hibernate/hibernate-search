@@ -368,7 +368,7 @@ public class TransientPropertyIT {
 			context.bridge( new Bridge( fieldRef ) );
 		}
 
-		private static class Bridge implements PropertyBridge {
+		private static class Bridge implements PropertyBridge<Addition> {
 			private final IndexFieldReference<Integer> fieldRef;
 
 			public Bridge(IndexFieldReference<Integer> fieldRef) {
@@ -376,8 +376,7 @@ public class TransientPropertyIT {
 			}
 
 			@Override
-			public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
-				Addition addition = (Addition) bridgedElement;
+			public void write(DocumentElement target, Addition addition, PropertyBridgeWriteContext context) {
 				target.addValue( fieldRef, addition.left + addition.right );
 			}
 		}

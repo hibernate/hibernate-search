@@ -283,7 +283,7 @@ public class AnnotationMappingDiscoveryIT {
 		}
 	}
 
-	public static final class CustomMarkerConsumingPropertyBridge implements PropertyBridge {
+	public static final class CustomMarkerConsumingPropertyBridge implements PropertyBridge<Object> {
 		private final List<IndexObjectFieldReference> objectFieldReferences = new ArrayList<>();
 
 		private CustomMarkerConsumingPropertyBridge(PropertyBindingContext context) {

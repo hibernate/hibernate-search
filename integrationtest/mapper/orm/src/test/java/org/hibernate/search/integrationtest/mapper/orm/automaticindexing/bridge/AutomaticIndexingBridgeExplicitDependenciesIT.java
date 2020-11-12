@@ -99,7 +99,7 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		}
 	}
 
-	public static class ContainingEntitySingleValuedPropertyBridge implements PropertyBridge {
+	public static class ContainingEntitySingleValuedPropertyBridge implements PropertyBridge<ContainingEntity> {
 
 		private final IndexObjectFieldReference propertyBridgeObjectFieldReference;
 		private final IndexFieldReference<String> includedInPropertyBridgeFieldReference;
@@ -117,12 +117,11 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		}
 
 		@Override
-		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
-			ContainingEntity castedBridgedElement = (ContainingEntity) bridgedElement;
+		public void write(DocumentElement target, ContainingEntity bridgedElement, PropertyBridgeWriteContext context) {
 
 			DocumentElement propertyBridgeObjectField = target.addObject( propertyBridgeObjectFieldReference );
 
-			ContainedEntity containedSingle = castedBridgedElement == null ? null : castedBridgedElement.getContainedSingle();
+			ContainedEntity containedSingle = bridgedElement == null ? null : bridgedElement.getContainedSingle();
 			propertyBridgeObjectField.addValue(
 					includedInPropertyBridgeFieldReference,
 					containedSingle == null ? null : containedSingle.getIncludedInSingleValuedPropertyBridge()
@@ -137,7 +136,7 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		}
 	}
 
-	public static class ContainingEntityMultiValuedPropertyBridge implements PropertyBridge {
+	public static class ContainingEntityMultiValuedPropertyBridge implements PropertyBridge<List<ContainingEntity>> {
 
 		private final IndexObjectFieldReference propertyBridgeObjectFieldReference;
 		private final IndexFieldReference<String> includedInPropertyBridgeFieldReference;
@@ -155,10 +154,8 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
-			List<ContainingEntity> castedBridgedElement = (List<ContainingEntity>) bridgedElement;
-
+		public void write(DocumentElement target, List<ContainingEntity> castedBridgedElement,
+				PropertyBridgeWriteContext context) {
 			DocumentElement propertyBridgeObjectField = target.addObject( propertyBridgeObjectFieldReference );
 
 			String concatenatedValue;
