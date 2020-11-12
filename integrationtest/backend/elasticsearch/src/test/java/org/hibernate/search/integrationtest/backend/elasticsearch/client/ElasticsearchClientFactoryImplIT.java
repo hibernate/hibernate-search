@@ -540,11 +540,11 @@ public class ElasticsearchClientFactoryImplIT {
 				// This test is flaky, for some reason once in a while wiremock takes a very long time to answer
 				// even though no delay was configured.
 				// The exact reason is unknown though, so just try multiple times...
-				this::try_multipleHosts_failover_timeout
+				this::try_multipleHosts_failover_fault
 		);
 	}
 
-	public void try_multipleHosts_failover_fault() throws Exception {
+	private void try_multipleHosts_failover_fault() throws Exception {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
