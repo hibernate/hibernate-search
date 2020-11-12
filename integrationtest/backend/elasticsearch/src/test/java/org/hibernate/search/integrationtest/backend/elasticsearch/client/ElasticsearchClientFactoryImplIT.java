@@ -868,6 +868,74 @@ public class ElasticsearchClientFactoryImplIT {
 		}
 	}
 
+	@Test
+	public void uriAndProtocol() {
+		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
+			properties.accept( ElasticsearchBackendSettings.HOSTS, null ); // remove HOSTS, keeping PROTOCOL
+			properties.accept( ElasticsearchBackendSettings.URIS, "http://is-not-called:12345" );
+		};
+
+		assertThatThrownBy( () -> createClient( additionalProperties ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Invalid target hosts configuration",
+						"both the 'uris' property and the 'protocol' property are set",
+						"Uris: '[http://is-not-called:12345]'", "Protocol: 'http'",
+						"Either set the protocol and hosts simultaneously using the 'uris' property",
+						"or set them separately using the 'protocol' property and the 'hosts' property"
+				);
+	}
+
+	@Test
+	public void uriAndHosts() {
+		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
+			properties.accept( ElasticsearchBackendSettings.PROTOCOL, null ); // remove PROTOCOL, keeping HOSTS
+			properties.accept( ElasticsearchBackendSettings.URIS, "http://is-not-called:12345" );
+		};
+
+		assertThatThrownBy( () -> createClient( additionalProperties ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Invalid target hosts configuration",
+						"both the 'uris' property and the 'hosts' property are set",
+						"Uris: '[http://is-not-called:12345]'", "Hosts: '[", // host and port are dynamic
+						"Either set the protocol and hosts simultaneously using the 'uris' property",
+						"or set them separately using the 'protocol' property and the 'hosts' property"
+				);
+	}
+
+	@Test
+	public void differentProtocolsOnUris() {
+		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
+			properties.accept( ElasticsearchBackendSettings.HOSTS, null );
+			properties.accept( ElasticsearchBackendSettings.PROTOCOL, null );
+			properties.accept( ElasticsearchBackendSettings.URIS, "http://is-not-called:12345, https://neather-is:12345" );
+		};
+
+		assertThatThrownBy( () -> createClient( additionalProperties ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Invalid target hosts configuration: the 'uris' use different protocols (http, https)",
+						"All URIs must use the same protocol",
+						"Uris: '[http://is-not-called:12345, https://neather-is:12345]'"
+				);
+	}
+
+	@Test
+	public void emptyListOfUris() {
+		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
+			properties.accept( ElasticsearchBackendSettings.HOSTS, null );
+			properties.accept( ElasticsearchBackendSettings.PROTOCOL, null );
+			properties.accept( ElasticsearchBackendSettings.URIS, Collections.emptyList() );
+		};
+
+		assertThatThrownBy( () -> createClient( additionalProperties ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining(
+						"Invalid target hosts configuration: the list of URIs must not be empty"
+				);
+	}
+
 	private ElasticsearchClientImplementor createClient() {
 		return createClient( ignored -> { } );
 	}
