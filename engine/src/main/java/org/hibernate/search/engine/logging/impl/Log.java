@@ -315,19 +315,19 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 79,
 			value = "Unable to resolve bean reference to type '%1$s' and name '%2$s'."
-					+ " Failed to resolve bean from bean provider with exception: %3$s."
-					+ " Failed to resolve bean from Hibernate Search's internal registry with exception: %4$s.")
+					+ " Failed to resolve bean from Hibernate Search's internal registry with exception: %3$s."
+					+ " Failed to resolve bean from bean provider with exception: %4$s.")
 	SearchException cannotResolveBeanReference(@FormatWith(ClassFormatter.class) Class<?> typeReference, String nameReference,
 			String beanProviderFailureMessage, String configuredBeansFailureMessage,
-			@Cause SearchException beanProviderFailure, @Suppressed RuntimeException configuredBeansFailure);
+			@Cause RuntimeException beanProviderFailure, @Suppressed RuntimeException configuredBeansFailure);
 
 	@Message(id = ID_OFFSET + 80,
 			value = "Unable to resolve bean reference to type '%1$s'."
-					+ " Failed to resolve bean from bean provider with exception: %2$s."
-					+ " Failed to resolve bean from Hibernate Search's internal registry with exception: %3$s.")
+					+ " Failed to resolve bean from Hibernate Search's internal registry with exception: %2$s."
+					+ " Failed to resolve bean from bean provider with exception: %3$s.")
 	SearchException cannotResolveBeanReference(@FormatWith(ClassFormatter.class) Class<?> typeReference,
 			String beanProviderFailureMessage, String configuredBeansFailureMessage,
-			@Cause SearchException beanProviderFailure, @Suppressed RuntimeException configuredBeansFailure);
+			@Cause RuntimeException beanProviderFailure, @Suppressed RuntimeException configuredBeansFailure);
 
 	@Message(id = ID_OFFSET + 81,
 			value = "Unable to resolve backend type:"
