@@ -12,6 +12,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
@@ -23,7 +24,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Documented
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = IndexedProcessor.class))
+@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = IndexedProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface Indexed {
 
 	/**

@@ -19,6 +19,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.annotations.impl.FieldAnnotationProcessor;
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
@@ -42,7 +43,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Documented
 @Deprecated
 @Repeatable(Fields.class)
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = FieldAnnotationProcessor.class))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = FieldAnnotationProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface Field {
 
 	/**

@@ -14,6 +14,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.annotations.impl.SpatialAnnotationProcessor;
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.GeoPointBinding;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -74,8 +75,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Documented
 @Deprecated
 @Repeatable(Spatials.class)
-@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = SpatialAnnotationProcessor.class))
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = SpatialAnnotationProcessor.class))
+@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = SpatialAnnotationProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = SpatialAnnotationProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface Spatial {
 	/**
 	 * Prefix used to generate field names for a default {@link Spatial} annotation

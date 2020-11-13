@@ -13,6 +13,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
@@ -36,7 +37,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(AssociationInverseSide.List.class)
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = AssociationInverseSideProcessor.class))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = AssociationInverseSideProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface AssociationInverseSide {
 
 	/**

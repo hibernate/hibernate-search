@@ -13,6 +13,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
@@ -31,7 +32,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(NonStandardField.List.class)
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = NonStandardFieldProcessor.class))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = NonStandardFieldProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface NonStandardField {
 
 	/**

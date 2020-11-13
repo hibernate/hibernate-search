@@ -11,6 +11,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.processor.impl.AlternativeDiscriminatorProcessor;
 import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.AlternativeBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
@@ -25,7 +26,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
 @Incubating
 @Target( { ElementType.FIELD, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = AlternativeDiscriminatorProcessor.class))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = AlternativeDiscriminatorProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface AlternativeDiscriminator {
 
 	/**

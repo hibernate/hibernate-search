@@ -13,6 +13,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.annotations.impl.IndexedAnnotationProcessor;
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
 
@@ -24,7 +25,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Target( ElementType.TYPE )
 @Documented
 @Deprecated
-@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = IndexedAnnotationProcessor.class))
+@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = IndexedAnnotationProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface Indexed {
 	/**
 	 * @return The filename of the index. Default to empty string

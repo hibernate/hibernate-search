@@ -13,6 +13,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.annotations.impl.LatitudeAnnotationProcessor;
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
 
@@ -29,7 +30,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Target( { ElementType.FIELD, ElementType.METHOD } )
 @Documented
 @Deprecated
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = LatitudeAnnotationProcessor.class))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = LatitudeAnnotationProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface Latitude {
 	/**
 	 * @return the name of the spatial field (defined in @Spatial.name)

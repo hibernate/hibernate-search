@@ -13,6 +13,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.annotations.impl.DocumentIdAnnotationProcessor;
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
 
@@ -29,6 +30,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Documented
 @Deprecated
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = DocumentIdAnnotationProcessor.class))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = DocumentIdAnnotationProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface DocumentId {
 }
