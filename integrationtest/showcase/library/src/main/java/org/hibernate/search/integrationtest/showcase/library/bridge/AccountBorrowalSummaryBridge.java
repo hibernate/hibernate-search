@@ -89,9 +89,7 @@ public class AccountBorrowalSummaryBridge implements TypeBridge<Account> {
 			context.dependencies()
 					.use( "borrowals.type" );
 
-			context.bridge(
-					new AccountBorrowalSummaryBridge( context.indexSchemaElement() )
-			);
+			context.bridge( Account.class, new AccountBorrowalSummaryBridge( context.indexSchemaElement() ) );
 		}
 	}
 

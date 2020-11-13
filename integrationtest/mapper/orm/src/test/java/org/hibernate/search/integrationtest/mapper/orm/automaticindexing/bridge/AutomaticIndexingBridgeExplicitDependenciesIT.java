@@ -92,7 +92,7 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		public static class Binder implements TypeBinder {
 			@Override
 			public void bind(TypeBindingContext context) {
-				context.bridge( new ContainingEntityTypeBridge( context ) );
+				context.bridge( ContainingEntity.class, new ContainingEntityTypeBridge( context ) );
 			}
 		}
 	}

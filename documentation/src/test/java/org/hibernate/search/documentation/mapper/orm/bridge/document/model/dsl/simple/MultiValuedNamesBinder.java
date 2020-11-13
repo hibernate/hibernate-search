@@ -28,7 +28,7 @@ public class MultiValuedNamesBinder implements TypeBinder {
 
 		IndexSchemaElement schemaElement = context.indexSchemaElement();
 
-		context.bridge( new Bridge(
+		context.bridge( Author.class, new Bridge(
 				schemaElement.field( "names", f -> f.asString().analyzer( "name" ) )
 						.multiValued() // <1>
 						.toReference()

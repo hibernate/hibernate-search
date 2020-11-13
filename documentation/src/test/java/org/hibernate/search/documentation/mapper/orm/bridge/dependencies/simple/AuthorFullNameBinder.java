@@ -26,7 +26,7 @@ public class AuthorFullNameBinder implements TypeBinder {
 				.field( "authorFullName", f -> f.asString().analyzer( "name" ) )
 				.toReference();
 
-		context.bridge( new Bridge( authorFullNameField ) );
+		context.bridge( Book.class, new Bridge( authorFullNameField ) );
 	}
 
 	private static class Bridge implements TypeBridge<Book> {

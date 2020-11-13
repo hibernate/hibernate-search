@@ -20,9 +20,9 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  */
 public class PojoIndexingProcessorTypeBridgeNode<T> extends PojoIndexingProcessor<T> {
 
-	private final BeanHolder<? extends TypeBridge> bridgeHolder;
+	private final BeanHolder<? extends TypeBridge<? super T>> bridgeHolder;
 
-	public PojoIndexingProcessorTypeBridgeNode(BeanHolder<? extends TypeBridge> bridgeHolder) {
+	public PojoIndexingProcessorTypeBridgeNode(BeanHolder<? extends TypeBridge<? super T>> bridgeHolder) {
 		this.bridgeHolder = bridgeHolder;
 	}
 

@@ -13,11 +13,11 @@ import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoTypeIndexingDe
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
 
 public final class BoundTypeBridge<T> {
-	private final BeanHolder<? extends TypeBridge> bridgeHolder;
+	private final BeanHolder<? extends TypeBridge<? super T>> bridgeHolder;
 	private final PojoModelTypeRootElement<T> pojoModelRootElement;
 	private final PojoTypeIndexingDependencyConfigurationContextImpl<T> pojoDependencyContext;
 
-	BoundTypeBridge(BeanHolder<? extends TypeBridge> bridgeHolder,
+	BoundTypeBridge(BeanHolder<? extends TypeBridge<? super T>> bridgeHolder,
 			PojoModelTypeRootElement<T> pojoModelRootElement,
 			PojoTypeIndexingDependencyConfigurationContextImpl<T> pojoDependencyContext) {
 		this.bridgeHolder = bridgeHolder;
@@ -25,11 +25,11 @@ public final class BoundTypeBridge<T> {
 		this.pojoDependencyContext = pojoDependencyContext;
 	}
 
-	public BeanHolder<? extends TypeBridge> getBridgeHolder() {
+	public BeanHolder<? extends TypeBridge<? super T>> getBridgeHolder() {
 		return bridgeHolder;
 	}
 
-	public TypeBridge getBridge() {
+	public TypeBridge<? super T> getBridge() {
 		return bridgeHolder.get();
 	}
 

@@ -49,7 +49,7 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 
 	public PropertyBindingContextImpl(BeanResolver beanResolver,
 			PojoBootstrapIntrospector introspector,
-			PojoTypeModel<?> propertyTypeModel,
+			PojoTypeModel<P> propertyTypeModel,
 			IndexBindingContext indexBindingContext,
 			PojoModelPropertyRootElement<P> bridgedElement,
 			PojoPropertyIndexingDependencyConfigurationContextImpl<P> dependencyContext) {
@@ -154,7 +154,7 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 			throw log.invalidInputTypeForBridge( bridgeHolder.get(), propertyTypeModel, expectedPropertyTypeModel );
 		}
 
-		@SuppressWarnings("unchecked") // We check that P extends P2\ explicitly using reflection (see above)
+		@SuppressWarnings("unchecked") // We check that P extends P2 explicitly using reflection (see above)
 		BeanHolder<? extends PropertyBridge<? super P>> castedBridgeHolder =
 				(BeanHolder<? extends PropertyBridge<? super P>>) bridgeHolder;
 

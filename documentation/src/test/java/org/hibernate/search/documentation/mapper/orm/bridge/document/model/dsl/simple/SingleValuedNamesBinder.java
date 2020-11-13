@@ -34,7 +34,7 @@ public class SingleValuedNamesBinder implements TypeBinder {
 				.analyzer( "name" )
 				.toIndexFieldType(); // <3>
 
-		context.bridge( new Bridge(
+		context.bridge( Author.class, new Bridge(
 				schemaElement.field( "firstName", nameType ) // <4>
 						.toReference(),
 				schemaElement.field( "lastName", nameType ) // <4>

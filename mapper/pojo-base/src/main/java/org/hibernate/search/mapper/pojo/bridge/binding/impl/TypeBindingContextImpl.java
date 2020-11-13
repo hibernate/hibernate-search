@@ -22,6 +22,9 @@ import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.dependency.PojoTypeIndexingDependencyConfigurationContext;
 import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoTypeIndexingDependencyConfigurationContextImpl;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.impl.AbstractCloser;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
@@ -32,6 +35,8 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final PojoBootstrapIntrospector introspector;
+	private final PojoTypeModel<T> typeModel;
 	private final PojoModelTypeRootElement<T> bridgedElement;
 	private final PojoTypeIndexingDependencyConfigurationContextImpl<T> dependencyContext;
 	private final IndexFieldTypeFactory indexFieldTypeFactory;
@@ -41,10 +46,14 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 	private PartialBinding<T> partialBinding;
 
 	public TypeBindingContextImpl(BeanResolver beanResolver,
+			PojoBootstrapIntrospector introspector,
+			PojoTypeModel<T> typeModel,
 			IndexBindingContext indexBindingContext,
 			PojoModelTypeRootElement<T> bridgedElement,
 			PojoTypeIndexingDependencyConfigurationContextImpl<T> dependencyContext) {
 		super( beanResolver );
+		this.introspector = introspector;
+		this.typeModel = typeModel;
 		this.bridgedElement = bridgedElement;
 		this.dependencyContext = dependencyContext;
 		this.indexFieldTypeFactory = indexBindingContext.createTypeFactory();
@@ -53,13 +62,13 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 	}
 
 	@Override
-	public void bridge(TypeBridge bridge) {
-		bridge( BeanHolder.of( bridge ) );
+	public <T2> void bridge(Class<T2> expectedEntityType, TypeBridge<T2> bridge) {
+		bridge( expectedEntityType, BeanHolder.of( bridge ) );
 	}
 
 	@Override
-	public void bridge(BeanHolder<? extends TypeBridge> bridgeHolder) {
-		this.partialBinding = new PartialBinding<>( bridgeHolder );
+	public <T2> void bridge(Class<T2> expectedEntityType, BeanHolder<? extends TypeBridge<T2>> bridgeHolder) {
+		checkAndBind( bridgeHolder, introspector.typeModel( expectedEntityType ) );
 	}
 
 	@Override
@@ -115,10 +124,23 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 		}
 	}
 
-	private static class PartialBinding<T> {
-		private final BeanHolder<? extends TypeBridge> bridgeHolder;
+	private <T2> void checkAndBind(BeanHolder<? extends TypeBridge<T2>> bridgeHolder,
+			PojoRawTypeModel<?> expectedPropertyTypeModel) {
+		if ( !typeModel.rawType().isSubTypeOf( expectedPropertyTypeModel ) ) {
+			throw log.invalidInputTypeForBridge( bridgeHolder.get(), typeModel, expectedPropertyTypeModel );
+		}
 
-		private PartialBinding(BeanHolder<? extends TypeBridge> bridgeHolder) {
+		@SuppressWarnings("unchecked") // We check that T extends T2 explicitly using reflection (see above)
+		BeanHolder<? extends TypeBridge<? super T>> castedBridgeHolder =
+				(BeanHolder<? extends TypeBridge<? super T>>) bridgeHolder;
+
+		this.partialBinding = new PartialBinding<>( castedBridgeHolder );
+	}
+
+	private static class PartialBinding<T> {
+		private final BeanHolder<? extends TypeBridge<? super T>> bridgeHolder;
+
+		private PartialBinding(BeanHolder<? extends TypeBridge<? super T>> bridgeHolder) {
 			this.bridgeHolder = bridgeHolder;
 		}
 
