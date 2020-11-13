@@ -32,7 +32,7 @@ public class BookEditionsForSaleTypeBinder implements TypeBinder {
 				.multiValued()
 				.toReference();
 
-		context.bridge( new Bridge( editionsForSaleField ) );
+		context.bridge( Book.class, new Bridge( editionsForSaleField ) );
 	}
 
 	private static class Bridge implements TypeBridge<Book> {

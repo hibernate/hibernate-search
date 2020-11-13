@@ -73,10 +73,10 @@ public class TypeBindingBaseIT {
 			IndexFieldReference<String> indexFieldReference =
 					context.indexSchemaElement().field( "myText", f -> f.asString() )
 							.toReference();
-			context.bridge( (DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context1) -> {
-				IndexedEntityWithWorkingTypeBinding castedBridgedElement = (IndexedEntityWithWorkingTypeBinding) bridgedElement;
+			context.bridge( IndexedEntityWithWorkingTypeBinding.class, (DocumentElement target,
+					IndexedEntityWithWorkingTypeBinding bridgedElement, TypeBridgeWriteContext context1) -> {
 				target.addValue(
-						indexFieldReference, castedBridgedElement.text
+						indexFieldReference, bridgedElement.text
 				);
 			} );
 		}

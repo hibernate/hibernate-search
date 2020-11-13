@@ -44,7 +44,7 @@ public class FullNameBinder implements TypeBinder {
 					.toReference();
 		}
 
-		context.bridge( new Bridge(
+		context.bridge( Author.class, new Bridge(
 				fullNameField,
 				fullNameSortField
 		) );

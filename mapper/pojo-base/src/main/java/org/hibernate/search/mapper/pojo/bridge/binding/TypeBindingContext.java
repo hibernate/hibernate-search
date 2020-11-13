@@ -25,7 +25,9 @@ public interface TypeBindingContext extends BindingContext {
 	 *
 	 * @param bridge The bridge to use at runtime to convert between the type and the index field value.
 	 */
-	void bridge(TypeBridge bridge);
+	default void bridge(TypeBridge<Object> bridge) {
+		bridge( Object.class, bridge );
+	}
 
 	/**
 	 * Sets the bridge implementing the type/index binding.
@@ -34,7 +36,29 @@ public interface TypeBindingContext extends BindingContext {
 	 * the bridge to use at runtime to convert between the type and the index field value.
 	 * Use {@link BeanHolder#of(Object)} if you don't need any particular closing behavior.
 	 */
-	void bridge(BeanHolder<? extends TypeBridge> bridgeHolder);
+	default void bridge(BeanHolder<? extends TypeBridge<Object>> bridgeHolder) {
+		bridge( Object.class, bridgeHolder );
+	}
+
+	/**
+	 * Sets the bridge implementing the type/index binding.
+	 *
+	 * @param expectedEntityType The type of the entity expected by the given bridge.
+	 * @param bridge The bridge to use at runtime to convert between the type and the index field value.
+	 * @param <T2> The type of bridged elements expected by the given bridge.
+	 */
+	<T2> void bridge(Class<T2> expectedEntityType, TypeBridge<T2> bridge);
+
+	/**
+	 * Sets the bridge implementing the type/index binding.
+	 *
+	 * @param expectedEntityType The type of the entity expected by the given bridge.
+	 * @param bridgeHolder A {@link BeanHolder} containing
+	 * the bridge to use at runtime to convert between the type and the index field value.
+	 * Use {@link BeanHolder#of(Object)} if you don't need any particular closing behavior.
+	 * @param <T2> The type of bridged elements expected by the given bridge.
+	 */
+	<T2> void bridge(Class<T2> expectedEntityType, BeanHolder<? extends TypeBridge<T2>> bridgeHolder);
 
 	/**
 	 * @return An entry point allowing to declare expectations and retrieve accessors to the bridged POJO type.

@@ -274,7 +274,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 		public static class Binder implements TypeBinder {
 			@Override
 			public void bind(TypeBindingContext context) {
-				context.bridge( new QueryBasedTypeBridge( context ) );
+				context.bridge( IndexedEntity.class, new QueryBasedTypeBridge( context ) );
 			}
 		}
 	}

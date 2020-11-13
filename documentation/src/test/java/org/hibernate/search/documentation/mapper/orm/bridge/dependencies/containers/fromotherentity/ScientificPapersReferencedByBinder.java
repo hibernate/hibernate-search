@@ -32,7 +32,7 @@ public class ScientificPapersReferencedByBinder implements TypeBinder {
 				.multiValued()
 				.toReference();
 
-		context.bridge( new Bridge( papersReferencingThisOneField ) );
+		context.bridge( ScientificPaper.class, new Bridge( papersReferencingThisOneField ) );
 	}
 
 	private static class Bridge implements TypeBridge<ScientificPaper> {

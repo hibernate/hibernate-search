@@ -116,15 +116,20 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			BoundPojoModelPathTypeNode<T> modelPath, TypeBinder binder) {
 		PojoModelTypeRootElement<T> pojoModelRootElement =
 				new PojoModelTypeRootElement<>( modelPath, introspector, typeAdditionalMetadataProvider );
+
+		PojoTypeModel<T> typeModel = modelPath.getTypeModel();
+
 		PojoTypeIndexingDependencyConfigurationContextImpl<T> pojoDependencyContext =
 				new PojoTypeIndexingDependencyConfigurationContextImpl<>(
 						introspector,
 						extractorBinder,
 						typeAdditionalMetadataProvider,
-						modelPath.getTypeModel()
+						typeModel
 				);
+
 		TypeBindingContextImpl<T> bindingContext = new TypeBindingContextImpl<>(
-				beanResolver,
+				beanResolver, introspector,
+				typeModel,
 				indexBindingContext,
 				pojoModelRootElement,
 				pojoDependencyContext
@@ -146,7 +151,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 						modelPath
 				);
 
-		PojoTypeModel<?> propertyTypeModel = modelPath.getPropertyModel().typeModel();
+		PojoTypeModel<P> propertyTypeModel = modelPath.getPropertyModel().typeModel();
 
 		PropertyBindingContextImpl<P> bindingContext = new PropertyBindingContextImpl<>(
 				beanResolver, introspector,
