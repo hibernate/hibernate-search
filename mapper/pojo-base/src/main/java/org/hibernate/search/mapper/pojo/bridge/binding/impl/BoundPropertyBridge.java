@@ -13,11 +13,11 @@ import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoPropertyIndexi
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelPropertyRootElement;
 
 public final class BoundPropertyBridge<P> {
-	private final BeanHolder<? extends PropertyBridge> bridgeHolder;
+	private final BeanHolder<? extends PropertyBridge<? super P>> bridgeHolder;
 	private final PojoModelPropertyRootElement<P> pojoModelRootElement;
 	private final PojoPropertyIndexingDependencyConfigurationContextImpl<P> pojoDependencyContext;
 
-	BoundPropertyBridge(BeanHolder<? extends PropertyBridge> bridgeHolder,
+	BoundPropertyBridge(BeanHolder<? extends PropertyBridge<? super P>> bridgeHolder,
 			PojoModelPropertyRootElement<P> pojoModelRootElement,
 			PojoPropertyIndexingDependencyConfigurationContextImpl<P> pojoDependencyContext) {
 		this.bridgeHolder = bridgeHolder;
@@ -25,11 +25,11 @@ public final class BoundPropertyBridge<P> {
 		this.pojoDependencyContext = pojoDependencyContext;
 	}
 
-	public BeanHolder<? extends PropertyBridge> getBridgeHolder() {
+	public BeanHolder<? extends PropertyBridge<? super P>> getBridgeHolder() {
 		return bridgeHolder;
 	}
 
-	public PropertyBridge getBridge() {
+	public PropertyBridge<? super P> getBridge() {
 		return bridgeHolder.get();
 	}
 

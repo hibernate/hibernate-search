@@ -145,8 +145,12 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 						typeAdditionalMetadataProvider,
 						modelPath
 				);
+
+		PojoTypeModel<?> propertyTypeModel = modelPath.getPropertyModel().typeModel();
+
 		PropertyBindingContextImpl<P> bindingContext = new PropertyBindingContextImpl<>(
-				beanResolver,
+				beanResolver, introspector,
+				propertyTypeModel,
 				indexBindingContext,
 				pojoModelRootElement,
 				pojoDependencyContext

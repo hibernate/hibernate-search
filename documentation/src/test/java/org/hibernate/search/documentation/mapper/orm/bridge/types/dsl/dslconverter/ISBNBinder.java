@@ -34,7 +34,7 @@ public class ISBNBinder implements PropertyBinder {
 				.toIndexFieldType();
 		//end::include[]
 
-		context.bridge( new Bridge(
+		context.bridge( ISBN.class, new Bridge(
 				context.indexSchemaElement()
 						.field( "isbn", type )
 						.toReference()

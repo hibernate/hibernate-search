@@ -45,7 +45,7 @@ public class MultiTypeUserMetadataBinder implements PropertyBinder {
 				f -> f.asString().analyzer( "english" )
 		);
 
-		context.bridge( new Bridge( userMetadataField.toReference() ) );
+		context.mapPropertyBridge( String.class, Object.class, new Bridge( userMetadataField.toReference() ) );
 	}
 	//end::bind[]
 

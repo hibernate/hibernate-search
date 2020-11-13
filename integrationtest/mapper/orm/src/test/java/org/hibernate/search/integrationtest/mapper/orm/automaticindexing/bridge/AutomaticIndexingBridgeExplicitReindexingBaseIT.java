@@ -136,7 +136,7 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 		public static class Binder implements PropertyBinder {
 			@Override
 			public void bind(PropertyBindingContext context) {
-				context.bridge( new ContainingEntitySingleValuedPropertyBridge( context ) );
+				context.bridge( ContainingEntity.class, new ContainingEntitySingleValuedPropertyBridge( context ) );
 			}
 		}
 	}
@@ -184,7 +184,8 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 		public static class Binder implements PropertyBinder {
 			@Override
 			public void bind(PropertyBindingContext context) {
-				context.bridge( new ContainingEntityMultiValuedPropertyBridge( context ) );
+				context.listPropertyBridge( ContainingEntity.class,
+						new ContainingEntityMultiValuedPropertyBridge( context ) );
 			}
 		}
 	}
