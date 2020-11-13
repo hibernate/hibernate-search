@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.mapper.orm.bridge.resolver;
 
 import org.hibernate.search.documentation.testsupport.data.ISBN;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
@@ -43,7 +44,7 @@ public class MyDefaultBridgesConfigurer implements HibernateOrmSearchMappingConf
 
 					private <T> void doBind(ValueBindingContext<?> context, Class<T> enumType) {
 						BeanHolder<EnumLabelService> serviceHolder =
-								context.beanResolver().resolve( EnumLabelService.class ); // <3>
+								context.beanResolver().resolve( EnumLabelService.class, BeanRetrieval.ANY ); // <3>
 						context.bridge( enumType, new EnumLabelBridge<>( enumType, serviceHolder ) ); // <4>
 					}
 				} );

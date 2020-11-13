@@ -23,6 +23,7 @@ import java.util.Optional;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,7 +59,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 
 		// No value
 		when( sourceMock.get( key ) ).thenReturn( Optional.empty() );
-		when( beanResolverMock.resolve( StubBean.class, "theDefault" ) )
+		when( beanResolverMock.resolve( StubBean.class, "theDefault", BeanRetrieval.ANY ) )
 				.thenReturn( expectedAsStubBean );
 		result = property.get( sourceMock ).resolve( beanResolverMock );
 		verifyNoOtherSourceInteractionsAndReset();
@@ -66,7 +67,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 
 		// String value
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( "name" ) );
-		when( beanResolverMock.resolve( StubBean.class, "name" ) )
+		when( beanResolverMock.resolve( StubBean.class, "name", BeanRetrieval.ANY ) )
 				.thenReturn( expectedAsStubBean );
 		result = property.get( sourceMock ).resolve( beanResolverMock );
 		verifyNoOtherSourceInteractionsAndReset();
@@ -74,7 +75,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 
 		// Class value
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( BeanReference.of( StubBeanImpl1.class ) ) );
-		when( beanResolverMock.resolve( StubBeanImpl1.class ) )
+		when( beanResolverMock.resolve( StubBeanImpl1.class, BeanRetrieval.ANY ) )
 				.thenReturn( expected );
 		result = property.get( sourceMock ).resolve( beanResolverMock );
 		verifyNoOtherSourceInteractionsAndReset();
@@ -82,7 +83,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 
 		// BeanReference value
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( BeanReference.of( StubBeanImpl1.class, "name" ) ) );
-		when( beanResolverMock.resolve( StubBeanImpl1.class, "name" ) )
+		when( beanResolverMock.resolve( StubBeanImpl1.class, "name", BeanRetrieval.ANY ) )
 				.thenReturn( expected );
 		result = property.get( sourceMock ).resolve( beanResolverMock );
 		verifyNoOtherSourceInteractionsAndReset();
@@ -109,7 +110,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 
 		// String value
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( "name" ) );
-		when( beanResolverMock.resolve( StubBean.class, "name" ) )
+		when( beanResolverMock.resolve( StubBean.class, "name", BeanRetrieval.ANY ) )
 				.thenReturn( expectedAsStubBean );
 		reference = property.get( sourceMock );
 		assertThat( reference ).isNotEmpty();
@@ -119,7 +120,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 
 		// Class value
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( BeanReference.of( StubBeanImpl1.class ) ) );
-		when( beanResolverMock.resolve( StubBeanImpl1.class ) )
+		when( beanResolverMock.resolve( StubBeanImpl1.class, BeanRetrieval.ANY ) )
 				.thenReturn( expected );
 		reference = property.get( sourceMock );
 		assertThat( reference ).isNotEmpty();
@@ -129,7 +130,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 
 		// BeanReference value
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( BeanReference.of( StubBeanImpl1.class, "name" ) ) );
-		when( beanResolverMock.resolve( StubBeanImpl1.class, "name" ) )
+		when( beanResolverMock.resolve( StubBeanImpl1.class, "name", BeanRetrieval.ANY ) )
 				.thenReturn( expected );
 		reference = property.get( sourceMock );
 		assertThat( reference ).isNotEmpty();
@@ -160,7 +161,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 
 		// String value - one
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( "name" ) );
-		when( beanResolverMock.resolve( StubBean.class, "name" ) )
+		when( beanResolverMock.resolve( StubBean.class, "name", BeanRetrieval.ANY ) )
 				.thenReturn( expected1AsStubBean );
 		result = property.getAndMap( sourceMock, beanResolverMock::resolve );
 		verifyNoOtherSourceInteractionsAndReset();
@@ -169,9 +170,9 @@ public class ConfigurationPropertyBeanReferenceTest {
 
 		// String value - multiple
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( "name1,name2" ) );
-		when( beanResolverMock.resolve( StubBean.class, "name1" ) )
+		when( beanResolverMock.resolve( StubBean.class, "name1", BeanRetrieval.ANY ) )
 				.thenReturn( expected1AsStubBean );
-		when( beanResolverMock.resolve( StubBean.class, "name2" ) )
+		when( beanResolverMock.resolve( StubBean.class, "name2", BeanRetrieval.ANY ) )
 				.thenReturn( expected2AsStubBean );
 		result = property.getAndMap( sourceMock, beanResolverMock::resolve );
 		verifyNoOtherSourceInteractionsAndReset();
@@ -182,7 +183,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of(
 				createCollection( StubBeanImpl1.class )
 		) );
-		when( beanResolverMock.resolve( StubBeanImpl1.class ) )
+		when( beanResolverMock.resolve( StubBeanImpl1.class, BeanRetrieval.ANY ) )
 				.thenReturn( expected1 );
 		result = property.getAndMap( sourceMock, beanResolverMock::resolve );
 		verifyNoOtherSourceInteractionsAndReset();
@@ -193,9 +194,9 @@ public class ConfigurationPropertyBeanReferenceTest {
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of(
 				createCollection( StubBeanImpl1.class, StubBeanImpl2.class )
 		) );
-		when( beanResolverMock.resolve( StubBeanImpl1.class ) )
+		when( beanResolverMock.resolve( StubBeanImpl1.class, BeanRetrieval.ANY ) )
 				.thenReturn( expected1 );
-		when( beanResolverMock.resolve( StubBeanImpl2.class ) )
+		when( beanResolverMock.resolve( StubBeanImpl2.class, BeanRetrieval.ANY ) )
 				.thenReturn( expected2 );
 		result = property.getAndMap( sourceMock, beanResolverMock::resolve );
 		verifyNoOtherSourceInteractionsAndReset();
@@ -206,7 +207,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of(
 				createCollection( BeanReference.of( StubBeanImpl1.class, "name" ) )
 		) );
-		when( beanResolverMock.resolve( StubBeanImpl1.class, "name" ) )
+		when( beanResolverMock.resolve( StubBeanImpl1.class, "name", BeanRetrieval.ANY ) )
 				.thenReturn( expected1 );
 		result = property.getAndMap( sourceMock, beanResolverMock::resolve );
 		verifyNoOtherSourceInteractionsAndReset();
@@ -220,9 +221,9 @@ public class ConfigurationPropertyBeanReferenceTest {
 						BeanReference.of( StubBeanImpl2.class, "name2" )
 				)
 		) );
-		when( beanResolverMock.resolve( StubBeanImpl1.class, "name1" ) )
+		when( beanResolverMock.resolve( StubBeanImpl1.class, "name1", BeanRetrieval.ANY ) )
 				.thenReturn( expected1 );
-		when( beanResolverMock.resolve( StubBeanImpl2.class, "name2" ) )
+		when( beanResolverMock.resolve( StubBeanImpl2.class, "name2", BeanRetrieval.ANY ) )
 				.thenReturn( expected2 );
 		result = property.getAndMap( sourceMock, beanResolverMock::resolve );
 		verifyNoOtherSourceInteractionsAndReset();
@@ -266,7 +267,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( propertyValue ) );
 		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
-		when( beanResolverMock.resolve( StubBean.class, "name" ) )
+		when( beanResolverMock.resolve( StubBean.class, "name", BeanRetrieval.ANY ) )
 				.thenThrow( simulatedFailure );
 		assertThatThrownBy(
 				() -> {
@@ -297,9 +298,9 @@ public class ConfigurationPropertyBeanReferenceTest {
 
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( propertyValue ) );
 		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
-		when( beanResolverMock.resolve( StubBean.class, "name1" ) )
+		when( beanResolverMock.resolve( StubBean.class, "name1", BeanRetrieval.ANY ) )
 				.thenReturn( bean1Mock );
-		when( beanResolverMock.resolve( StubBean.class, "name2" ) )
+		when( beanResolverMock.resolve( StubBean.class, "name2", BeanRetrieval.ANY ) )
 				.thenThrow( simulatedFailure );
 		assertThatThrownBy(
 				() -> {

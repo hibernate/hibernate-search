@@ -11,20 +11,22 @@ import org.hibernate.search.util.common.impl.Contracts;
 class TypeBeanReference<T> implements BeanReference<T> {
 
 	final Class<T> type;
+	final BeanRetrieval retrieval;
 
-	TypeBeanReference(Class<T> type) {
+	TypeBeanReference(Class<T> type, BeanRetrieval retrieval) {
+		this.retrieval = retrieval;
 		Contracts.assertNotNull( type, "type" );
 		this.type = type;
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[type=" + type + "]";
+		return getClass().getSimpleName() + "[type=" + type + ", retrieval=" + retrieval + "]";
 	}
 
 	@Override
 	public BeanHolder<T> resolve(BeanResolver beanResolver) {
-		return beanResolver.resolve( type );
+		return beanResolver.resolve( type, retrieval );
 	}
 
 	@Override

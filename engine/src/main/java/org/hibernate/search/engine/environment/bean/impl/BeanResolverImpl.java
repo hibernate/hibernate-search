@@ -8,6 +8,7 @@ package org.hibernate.search.engine.environment.bean.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -18,9 +19,11 @@ import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.engine.environment.bean.spi.BeanNotFoundException;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
+import org.hibernate.search.engine.environment.classpath.spi.ClassLoaderHelper;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
 import org.hibernate.search.engine.logging.impl.Log;
@@ -45,8 +48,6 @@ public final class BeanResolverImpl implements BeanResolver {
 			beanManagerBeanProvider = new NoConfiguredBeanManagerBeanProvider();
 		}
 
-		ReflectionBeanProvider reflectionBeanProvider = new ReflectionBeanProvider( classResolver );
-
 		BeanConfigurationContextImpl configurationContext = new BeanConfigurationContextImpl();
 		for ( BeanConfigurer beanConfigurer : serviceResolver.loadJavaServices( BeanConfigurer.class ) ) {
 			beanConfigurer.configure( configurationContext );
@@ -54,7 +55,7 @@ public final class BeanResolverImpl implements BeanResolver {
 
 		ConfigurationBeanRegistry emptyBeanRegistry = new ConfigurationBeanRegistry( Collections.emptyMap() );
 		BeanResolverImpl beanResolverForConfigurers =
-				new BeanResolverImpl( emptyBeanRegistry, beanManagerBeanProvider, reflectionBeanProvider );
+				new BeanResolverImpl( classResolver, emptyBeanRegistry, beanManagerBeanProvider );
 		try ( BeanHolder<List<BeanConfigurer>> beanConfigurersFromConfigurationProperties =
 				BEAN_CONFIGURERS.getAndTransform( configurationPropertySource, beanResolverForConfigurers::resolve ) ) {
 			for ( BeanConfigurer beanConfigurer : beanConfigurersFromConfigurationProperties.get() ) {
@@ -62,32 +63,32 @@ public final class BeanResolverImpl implements BeanResolver {
 			}
 		}
 
-		return new BeanResolverImpl( configurationContext.buildRegistry(), beanManagerBeanProvider,
-				reflectionBeanProvider );
+		return new BeanResolverImpl( classResolver, configurationContext.buildRegistry(), beanManagerBeanProvider );
 	}
 
+	private final ClassResolver classResolver;
 	private final ConfigurationBeanRegistry configurationBeanRegistry;
 	private final BeanProvider beanManagerBeanProvider;
-	private final BeanProvider reflectionBeanProvider;
 
-	private BeanResolverImpl(ConfigurationBeanRegistry configurationBeanRegistry,
-			BeanProvider beanManagerBeanProvider, ReflectionBeanProvider reflectionBeanProvider) {
+	private BeanResolverImpl(ClassResolver classResolver,
+			ConfigurationBeanRegistry configurationBeanRegistry,
+			BeanProvider beanManagerBeanProvider) {
+		this.classResolver = classResolver;
 		this.configurationBeanRegistry = configurationBeanRegistry;
 		this.beanManagerBeanProvider = beanManagerBeanProvider;
-		this.reflectionBeanProvider = reflectionBeanProvider;
 	}
 
 	@Override
-	public <T> BeanHolder<T> resolve(Class<T> typeReference) {
+	public <T> BeanHolder<T> resolve(Class<T> typeReference, BeanRetrieval retrieval) {
 		Contracts.assertNotNull( typeReference, "typeReference" );
-		return resolveFromFirstSuccessfulSource( typeReference, BeanSource.values() );
+		return resolveFromFirstSuccessfulSource( typeReference, retrieval );
 	}
 
 	@Override
-	public <T> BeanHolder<T> resolve(Class<T> typeReference, String nameReference) {
+	public <T> BeanHolder<T> resolve(Class<T> typeReference, String nameReference, BeanRetrieval retrieval) {
 		Contracts.assertNotNull( typeReference, "typeReference" );
 		Contracts.assertNotNullNorEmpty( nameReference, "nameReference" );
-		return resolveFromFirstSuccessfulSource( typeReference, nameReference, BeanSource.values() );
+		return resolveFromFirstSuccessfulSource( typeReference, nameReference, retrieval );
 	}
 
 	@Override
@@ -110,7 +111,28 @@ public final class BeanResolverImpl implements BeanResolver {
 		return registry.named();
 	}
 
-	private <T> BeanHolder<T> resolveFromFirstSuccessfulSource(Class<T> typeReference, BeanSource[] sources) {
+	private List<BeanSource> toSources(BeanRetrieval retrieval, boolean hasName) {
+		switch ( retrieval ) {
+			case BUILTIN:
+				return Collections.singletonList( BeanSource.CONFIGURATION );
+			case BEAN:
+				return Collections.singletonList( BeanSource.BEAN_MANAGER );
+			case CLASS:
+				return Arrays.asList( BeanSource.BEAN_MANAGER_ASSUME_CLASS_NAME, BeanSource.REFLECTION );
+			case CONSTRUCTOR:
+				return Collections.singletonList( BeanSource.REFLECTION );
+			case ANY:
+				return hasName
+						? Arrays.asList( BeanSource.CONFIGURATION, BeanSource.BEAN_MANAGER,
+								BeanSource.BEAN_MANAGER_ASSUME_CLASS_NAME, BeanSource.REFLECTION )
+						: Arrays.asList( BeanSource.CONFIGURATION, BeanSource.BEAN_MANAGER, BeanSource.REFLECTION );
+			default:
+				throw new AssertionFailure( "Unknown bean retrieval: " + retrieval );
+		}
+	}
+
+	private <T> BeanHolder<T> resolveFromFirstSuccessfulSource(Class<T> typeReference, BeanRetrieval retrieval) {
+		List<BeanSource> sources = toSources( retrieval, false );
 		BeanNotFoundException firstFailure = null;
 		List<BeanNotFoundException> otherFailures = new ArrayList<>();
 		for ( BeanSource source : sources ) {
@@ -131,7 +153,8 @@ public final class BeanResolverImpl implements BeanResolver {
 	}
 
 	private <T> BeanHolder<T> resolveFromFirstSuccessfulSource(Class<T> typeReference, String nameReference,
-			BeanSource[] sources) {
+			BeanRetrieval retrieval) {
+		List<BeanSource> sources = toSources( retrieval, true );
 		BeanNotFoundException firstFailure = null;
 		List<BeanNotFoundException> otherFailures = new ArrayList<>();
 		for ( BeanSource source : sources ) {
@@ -156,9 +179,10 @@ public final class BeanResolverImpl implements BeanResolver {
 			case CONFIGURATION:
 				return configurationBeanRegistry.resolve( typeReference, this );
 			case BEAN_MANAGER:
+			case BEAN_MANAGER_ASSUME_CLASS_NAME:
 				return beanManagerBeanProvider.forType( typeReference );
 			case REFLECTION:
-				return reflectionBeanProvider.forType( typeReference );
+				return retrieveUsingConstructor( typeReference );
 			default:
 				throw unknownBeanSource( source );
 		}
@@ -170,21 +194,41 @@ public final class BeanResolverImpl implements BeanResolver {
 				return configurationBeanRegistry.resolve( typeReference, nameReference, this );
 			case BEAN_MANAGER:
 				return beanManagerBeanProvider.forTypeAndName( typeReference, nameReference );
+			case BEAN_MANAGER_ASSUME_CLASS_NAME:
+				return beanManagerBeanProvider.forType( toClass( typeReference, nameReference ) );
 			case REFLECTION:
-				return reflectionBeanProvider.forTypeAndName( typeReference, nameReference );
+				return retrieveUsingConstructor( toClass( typeReference, nameReference ) );
 			default:
 				throw unknownBeanSource( source );
 		}
 	}
 
-	private String buildFailureMessage(BeanSource[] sources, BeanNotFoundException firstFailure,
+	public <T> Class<? extends T> toClass(Class<T> typeReference, String nameReference) {
+		try {
+			return ClassLoaderHelper.classForName( typeReference, nameReference, classResolver );
+		}
+		catch (RuntimeException e) {
+			throw log.unableToResolveToClassName( typeReference, nameReference, e.getMessage(), e );
+		}
+	}
+
+	public <T> BeanHolder<T> retrieveUsingConstructor(Class<T> typeReference) {
+		try {
+			return BeanHolder.of( ClassLoaderHelper.untypedInstanceFromClass( typeReference ) );
+		}
+		catch (RuntimeException e) {
+			throw log.unableToCreateBeanUsingReflection( e.getMessage(), e );
+		}
+	}
+
+	private String buildFailureMessage(List<BeanSource> sources, BeanNotFoundException firstFailure,
 			List<BeanNotFoundException> otherFailures) {
 		StringBuilder builder = new StringBuilder();
-		builder.append( renderFailure( sources[0], firstFailure ) );
+		builder.append( renderFailure( sources.get( 0 ), firstFailure ) );
 		for ( int i = 0; i < otherFailures.size(); i++ ) {
 			RuntimeException failure = otherFailures.get( i );
 			builder.append( " " );
-			builder.append( renderFailure( sources[i + 1], failure ) );
+			builder.append( renderFailure( sources.get( i + 1 ), failure ) );
 		}
 		return builder.toString();
 	}
@@ -194,6 +238,8 @@ public final class BeanResolverImpl implements BeanResolver {
 			case CONFIGURATION:
 				return log.failedToResolveBeanUsingInternalRegistry( failure.getMessage() );
 			case BEAN_MANAGER:
+				return log.failedToResolveBeanUsingBeanManager( failure.getMessage() );
+			case BEAN_MANAGER_ASSUME_CLASS_NAME:
 				return log.failedToResolveBeanUsingBeanManager( failure.getMessage() );
 			case REFLECTION:
 				return log.failedToResolveBeanUsingReflection( failure.getMessage() );

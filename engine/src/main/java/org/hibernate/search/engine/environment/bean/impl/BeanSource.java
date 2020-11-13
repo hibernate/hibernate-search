@@ -18,6 +18,10 @@ public enum BeanSource {
 	 */
 	BEAN_MANAGER,
 	/**
+	 * The bean manager, e.g. CDI, Spring, ..., but interpreting names as class names instead of bean names.
+	 */
+	BEAN_MANAGER_ASSUME_CLASS_NAME,
+	/**
 	 * Reflection, i.e. the public, no-argument constructor of the bean class.
 	 */
 	REFLECTION

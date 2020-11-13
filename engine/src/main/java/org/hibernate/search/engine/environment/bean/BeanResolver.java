@@ -25,8 +25,8 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
  * <p>
  * Regardless of the underlying implementation, this interface is used to resolve beans,
  * referenced either
- * {@link #resolve(Class)}  by their type},
- * or {@link #resolve(Class, String) by their type and name}.
+ * {@link #resolve(Class, BeanRetrieval)}  by their type},
+ * or {@link #resolve(Class, String, BeanRetrieval) by their type and name}.
  * <p>
  * It also offers ways to {@link #allConfiguredForRole(Class) get references to configured beans of a given type}.
  * <p>
@@ -41,20 +41,22 @@ public interface BeanResolver {
 	 * Resolve a bean by its type.
 	 * @param <T> The expected return type.
 	 * @param typeReference The type used as a reference to the bean to resolve. Must be non-null.
+	 * @param retrieval How to retrieve the bean. See {@link BeanRetrieval}.
 	 * @return A {@link BeanHolder} containing the resolved bean.
 	 * @throws SearchException if the reference is invalid (null) or the bean cannot be resolved.
 	 */
-	<T> BeanHolder<T> resolve(Class<T> typeReference);
+	<T> BeanHolder<T> resolve(Class<T> typeReference, BeanRetrieval retrieval);
 
 	/**
 	 * Resolve a bean by its name.
 	 * @param <T> The expected return type.
 	 * @param typeReference The type used as a reference to the bean to resolve. Must be non-null.
 	 * @param nameReference The name used as a reference to the bean to resolve. Must be non-null and non-empty.
+	 * @param retrieval How to retrieve the bean. See {@link BeanRetrieval}.
 	 * @return A {@link BeanHolder} containing the resolved bean.
 	 * @throws SearchException if a reference is invalid (null or empty) or the bean cannot be resolved.
 	 */
-	<T> BeanHolder<T> resolve(Class<T> typeReference, String nameReference);
+	<T> BeanHolder<T> resolve(Class<T> typeReference, String nameReference, BeanRetrieval retrieval);
 
 	/**
 	 * Resolve a {@link BeanReference}.
