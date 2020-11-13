@@ -388,4 +388,11 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 91, value = "Unable to resolve '%2$s' to a class extending '%1$s': %3$s")
 	BeanNotFoundException unableToResolveToClassName(@FormatWith(ClassFormatter.class) Class<?> typReference,
 			String nameReference, String causeMessage, @Cause Exception e);
+
+	@Message(id = ID_OFFSET + 92, value = "Invalid bean reference: '%1$s'."
+			+ " The reference is prefixed with '%2$s', which is not a valid bean retrieval prefix."
+			+ " If you want to reference a bean by name, and the name contains a colon, use 'bean:%1$s'."
+			+ " Otherwise, use a valid bean retrieval prefix among the following: %3$s.")
+	BeanNotFoundException invalidBeanRetrieval(String beanReference, String invalidPrefix,
+			List<String> validPrefixes, @Cause Exception e);
 }
