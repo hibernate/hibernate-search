@@ -73,13 +73,15 @@ abstract class AbstractFieldAnnotationProcessor<A extends Annotation> implements
 			bridgeReference = context.toBeanReference(
 					ValueBridge.class,
 					ValueBridgeRef.UndefinedBridgeImplementationType.class,
-					bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
+					bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name(),
+					bridgeReferenceAnnotation.retrieval()
 			);
 		}
 		Optional<BeanReference<? extends ValueBinder>> binderReference = context.toBeanReference(
 				ValueBinder.class,
 				ValueBinderRef.UndefinedBinderImplementationType.class,
-				binderReferenceAnnotation.type(), binderReferenceAnnotation.name()
+				binderReferenceAnnotation.type(), binderReferenceAnnotation.name(),
+				binderReferenceAnnotation.retrieval()
 		);
 
 		if ( bridgeReference.isPresent() && binderReference.isPresent() ) {

@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processin
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
@@ -40,6 +41,22 @@ public interface MappingAnnotationProcessorContext {
 	ContainerExtractorPath toContainerExtractorPath(ContainerExtraction extraction);
 
 	/**
+	 * Shorthand for
+	 * {@link #toBeanReference(Class, Class, Class, String, BeanRetrieval) toBeanReference(expectedType, undefinedTypeMarker, type, name, BeanRetrieval.ANY)}.
+	 *
+	 * @param expectedType The supertype of all types that can be referenced.
+	 * @param undefinedTypeMarker A marker type to detect that the {@code type} parameter has its default value (undefined).
+	 * @param type The bean type.
+	 * @param name The bean name.
+	 * @param <T> The bean type.
+	 * @return The corresponding bean reference, or an empty optional if neither the type nor the name is provided.
+	 */
+	default <T> Optional<BeanReference<? extends T>> toBeanReference(Class<T> expectedType, Class<?> undefinedTypeMarker,
+			Class<? extends T> type, String name) {
+		return toBeanReference( expectedType, undefinedTypeMarker, type, name, BeanRetrieval.ANY );
+	}
+
+	/**
 	 * Convert attributes of a bean-reference annotation,
 	 * such as {@link org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef},
 	 * to an actual {@link BeanReference}.
@@ -50,7 +67,8 @@ public interface MappingAnnotationProcessorContext {
 	 *             ValueBridge.class,
 	 *             ValueBridgeRef.UndefinedBridgeImplementationType.class,
 	 *             myValueBridgeRefInstance.type(),
-	 *             myValueBridgeRefInstance.name()
+	 *             myValueBridgeRefInstance.name(),
+	 *             myValueBridgeRefInstance.retrieval()
 	 *     );
 	 * }</pre>
 	 *
@@ -58,11 +76,12 @@ public interface MappingAnnotationProcessorContext {
 	 * @param undefinedTypeMarker A marker type to detect that the {@code type} parameter has its default value (undefined).
 	 * @param type The bean type.
 	 * @param name The bean name.
+	 * @param retrieval How to retrieve the bean. See {@link BeanRetrieval}.
 	 * @param <T> The bean type.
 	 * @return The corresponding bean reference, or an empty optional if neither the type nor the name is provided.
 	 */
 	<T> Optional<BeanReference<? extends T>> toBeanReference(Class<T> expectedType, Class<?> undefinedTypeMarker,
-			Class<? extends T> type, String name);
+			Class<? extends T> type, String name, BeanRetrieval retrieval);
 
 	/**
 	 * @return An event context describing the annotation being processed and its location,

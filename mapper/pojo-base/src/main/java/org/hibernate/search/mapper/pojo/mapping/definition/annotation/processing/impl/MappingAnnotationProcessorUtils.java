@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtract;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
@@ -64,7 +65,7 @@ public final class MappingAnnotationProcessorUtils {
 	}
 
 	public static <T> Optional<BeanReference<? extends T>> toBeanReference(Class<T> expectedType, Class<?> undefinedTypeMarker,
-			Class<? extends T> type, String name) {
+			Class<? extends T> type, String name, BeanRetrieval retrieval) {
 		String cleanedUpName = name.isEmpty() ? null : name;
 		Class<? extends T> cleanedUpType = undefinedTypeMarker.equals( type ) ? null : type;
 		if ( cleanedUpName == null && cleanedUpType == null ) {
@@ -72,7 +73,7 @@ public final class MappingAnnotationProcessorUtils {
 		}
 		else {
 			Class<? extends T> defaultedType = cleanedUpType == null ? expectedType : cleanedUpType;
-			return Optional.of( BeanReference.of( defaultedType, cleanedUpName ) );
+			return Optional.of( BeanReference.of( defaultedType, cleanedUpName, retrieval ) );
 		}
 	}
 

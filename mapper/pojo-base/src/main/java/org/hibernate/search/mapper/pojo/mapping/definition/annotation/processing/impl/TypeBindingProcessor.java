@@ -36,7 +36,8 @@ public final class TypeBindingProcessor implements TypeMappingAnnotationProcesso
 		Optional<BeanReference<? extends TypeBinder>> binderReference = context.toBeanReference(
 				TypeBinder.class,
 				TypeBinderRef.UndefinedBinderImplementationType.class,
-				binderReferenceAnnotation.type(), binderReferenceAnnotation.name()
+				binderReferenceAnnotation.type(), binderReferenceAnnotation.name(),
+				binderReferenceAnnotation.retrieval()
 		);
 
 		if ( !binderReference.isPresent() ) {

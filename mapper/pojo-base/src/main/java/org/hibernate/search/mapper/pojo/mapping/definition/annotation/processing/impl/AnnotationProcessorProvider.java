@@ -132,7 +132,8 @@ public class AnnotationProcessorProvider {
 				MappingAnnotationProcessorUtils.toBeanReference(
 						TypeMappingAnnotationProcessor.class,
 						TypeMappingAnnotationProcessorRef.UndefinedProcessorImplementationType.class,
-						referenceAnnotation.type(), referenceAnnotation.name()
+						referenceAnnotation.type(), referenceAnnotation.name(),
+						referenceAnnotation.retrieval()
 				);
 		if ( !processorReference.isPresent() ) {
 			throw log.missingProcessorReferenceInMappingAnnotation( TypeMapping.class );
@@ -153,7 +154,8 @@ public class AnnotationProcessorProvider {
 				MappingAnnotationProcessorUtils.toBeanReference(
 						PropertyMappingAnnotationProcessor.class,
 						PropertyMappingAnnotationProcessorRef.UndefinedProcessorImplementationType.class,
-						referenceAnnotation.type(), referenceAnnotation.name()
+						referenceAnnotation.type(), referenceAnnotation.name(),
+						referenceAnnotation.retrieval()
 				);
 		if ( !processorReference.isPresent() ) {
 			throw log.missingProcessorReferenceInMappingAnnotation( PropertyMapping.class );

@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processin
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
@@ -37,8 +38,8 @@ public abstract class AbstractMappingAnnotationProcessorContext
 
 	@Override
 	public <T> Optional<BeanReference<? extends T>> toBeanReference(Class<T> expectedType, Class<?> undefinedTypeMarker,
-			Class<? extends T> type, String name) {
-		return MappingAnnotationProcessorUtils.toBeanReference( expectedType, undefinedTypeMarker, type, name );
+			Class<? extends T> type, String name, BeanRetrieval retrieval) {
+		return MappingAnnotationProcessorUtils.toBeanReference( expectedType, undefinedTypeMarker, type, name, retrieval );
 	}
 
 }

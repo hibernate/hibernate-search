@@ -36,7 +36,8 @@ public final class MarkerBindingProcessor implements PropertyMappingAnnotationPr
 		Optional<BeanReference<? extends MarkerBinder>> binderReference = context.toBeanReference(
 				MarkerBinder.class,
 				MarkerBinderRef.UndefinedBinderImplementationType.class,
-				binderReferenceAnnotation.type(), binderReferenceAnnotation.name()
+				binderReferenceAnnotation.type(), binderReferenceAnnotation.name(),
+				binderReferenceAnnotation.retrieval()
 		);
 
 		if ( !binderReference.isPresent() ) {

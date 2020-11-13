@@ -11,6 +11,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -40,6 +41,11 @@ public @interface ValueBinderRef {
 	 * @return The type of the value binder.
 	 */
 	Class<? extends ValueBinder> type() default UndefinedBinderImplementationType.class;
+
+	/**
+	 * @return How to retrieve the value binder. See {@link BeanRetrieval}.
+	 */
+	BeanRetrieval retrieval() default BeanRetrieval.ANY;
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.

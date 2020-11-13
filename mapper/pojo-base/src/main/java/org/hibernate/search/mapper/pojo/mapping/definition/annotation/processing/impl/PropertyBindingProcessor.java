@@ -36,7 +36,8 @@ public final class PropertyBindingProcessor implements PropertyMappingAnnotation
 		Optional<BeanReference<? extends PropertyBinder>> binderReference = context.toBeanReference(
 				PropertyBinder.class,
 				PropertyBinderRef.UndefinedBinderImplementationType.class,
-				binderReferenceAnnotation.type(), binderReferenceAnnotation.name()
+				binderReferenceAnnotation.type(), binderReferenceAnnotation.name(),
+				binderReferenceAnnotation.retrieval()
 		);
 
 		if ( !binderReference.isPresent() ) {
