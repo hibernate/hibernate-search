@@ -41,7 +41,7 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder {
 		IndexFieldType<BigDecimal> amountFieldType = context.typeFactory()
 				.asBigDecimal().decimalScale( 2 ).toIndexFieldType();
 
-		context.bridge( new Bridge(
+		context.listPropertyBridge( InvoiceLineItem.class, new Bridge(
 				summaryField.toReference(),
 				summaryField.field( "total", amountFieldType ).toReference(),
 				summaryField.field( "books", amountFieldType ).toReference(),

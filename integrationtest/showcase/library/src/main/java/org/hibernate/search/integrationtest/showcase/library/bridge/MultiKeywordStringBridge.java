@@ -65,7 +65,7 @@ public class MultiKeywordStringBridge implements PropertyBridge<String> {
 			}
 			context.dependencies().useRootOnly();
 
-			context.bridge(
+			context.bridge( String.class,
 					new MultiKeywordStringBridge(
 							fieldName,
 							separatorPattern,

@@ -176,7 +176,7 @@ public class StartupStubBridge<T>
 					f -> f.asString()
 			)
 					.toReference();
-			context.bridge( build() );
+			context.bridge( bridgeInputType, build() );
 		}
 
 		@Override

@@ -365,7 +365,7 @@ public class TransientPropertyIT {
 					.field( context.bridgedElement().name(), f -> f.asInteger() )
 					.toReference();
 
-			context.bridge( new Bridge( fieldRef ) );
+			context.bridge( Addition.class, new Bridge( fieldRef ) );
 		}
 
 		private static class Bridge implements PropertyBridge<Addition> {

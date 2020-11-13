@@ -38,7 +38,7 @@ public class UserMetadataBinder implements PropertyBinder {
 				f -> f.asString().analyzer( "english" ) // <4>
 		); // <5>
 
-		context.bridge( new UserMetadataBridge( userMetadataField.toReference() ) ); // <6>
+		context.mapPropertyBridge( String.class, String.class, new UserMetadataBridge( userMetadataField.toReference() ) ); // <6>
 	}
 	//end::bind[]
 

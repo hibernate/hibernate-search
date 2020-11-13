@@ -41,7 +41,7 @@ public class InvoiceLineItemsDetailBinder implements PropertyBinder {
 				)
 				.multiValued(); // <4>
 
-		context.bridge( new Bridge(
+		context.listPropertyBridge( InvoiceLineItem.class, new Bridge(
 				lineItemsField.toReference(), // <5>
 				lineItemsField.field( "category", f -> f.asString() ) // <6>
 						.toReference(),

@@ -36,7 +36,7 @@ public class ISBNBinder implements PropertyBinder {
 				)
 						.toReference(); // <5>
 
-		context.bridge( new ISBNBridge( field ) ); // <6>
+		context.bridge( ISBN.class, new ISBNBridge( field ) ); // <6>
 	}
 	//end::bind[]
 

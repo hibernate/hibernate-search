@@ -7,6 +7,8 @@
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -22,6 +24,9 @@ import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.dependency.PojoPropertyIndexingDependencyConfigurationContext;
 import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoPropertyIndexingDependencyConfigurationContextImpl;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelPropertyRootElement;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.impl.AbstractCloser;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
@@ -32,6 +37,8 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final PojoBootstrapIntrospector introspector;
+	private final PojoTypeModel<?> propertyTypeModel;
 	private final PojoModelPropertyRootElement<P> bridgedElement;
 	private final PojoPropertyIndexingDependencyConfigurationContextImpl<P> dependencyContext;
 	private final IndexFieldTypeFactory indexFieldTypeFactory;
@@ -41,10 +48,14 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 	private PartialBinding<P> partialBinding;
 
 	public PropertyBindingContextImpl(BeanResolver beanResolver,
+			PojoBootstrapIntrospector introspector,
+			PojoTypeModel<?> propertyTypeModel,
 			IndexBindingContext indexBindingContext,
 			PojoModelPropertyRootElement<P> bridgedElement,
 			PojoPropertyIndexingDependencyConfigurationContextImpl<P> dependencyContext) {
 		super( beanResolver );
+		this.introspector = introspector;
+		this.propertyTypeModel = propertyTypeModel;
 		this.bridgedElement = bridgedElement;
 		this.dependencyContext = dependencyContext;
 		this.indexFieldTypeFactory = indexBindingContext.createTypeFactory();
@@ -53,13 +64,35 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 	}
 
 	@Override
-	public void bridge(PropertyBridge bridge) {
-		bridge( BeanHolder.of( bridge ) );
+	public <P2> void bridge(Class<P2> expectedPropertyType, PropertyBridge<P2> bridge) {
+		bridge( expectedPropertyType, BeanHolder.of( bridge ) );
 	}
 
 	@Override
-	public void bridge(BeanHolder<? extends PropertyBridge> bridgeHolder) {
-		this.partialBinding = new PartialBinding<>( bridgeHolder );
+	public <P2> void bridge(Class<P2> expectedPropertyType, BeanHolder<? extends PropertyBridge<P2>> bridgeHolder) {
+		checkAndBind( bridgeHolder, introspector.typeModel( expectedPropertyType ) );
+	}
+
+	@Override
+	public <K, V> void mapPropertyBridge(Class<K> keyType, Class<V> valueType, PropertyBridge<Map<K, V>> bridge) {
+		mapPropertyBridge( keyType, valueType, BeanHolder.of( bridge ) );
+	}
+
+	@Override
+	public <K, V> void mapPropertyBridge(Class<K> keyType, Class<V> valueType,
+			BeanHolder<? extends PropertyBridge<Map<K, V>>> bridgeHolder) {
+		checkAndBind( bridgeHolder, introspector.typeModel( Map.class ) );
+	}
+
+	@Override
+	public <E> void listPropertyBridge(Class<E> elementType, PropertyBridge<List<E>> bridge) {
+		listPropertyBridge( elementType, BeanHolder.of( bridge ) );
+	}
+
+	@Override
+	public <E> void listPropertyBridge(Class<E> elementType,
+			BeanHolder<? extends PropertyBridge<List<E>>> bridgeHolder) {
+		checkAndBind( bridgeHolder, introspector.typeModel( List.class ) );
 	}
 
 	@Override
@@ -115,10 +148,23 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 		}
 	}
 
-	private static class PartialBinding<P> {
-		private final BeanHolder<? extends PropertyBridge> bridgeHolder;
+	private <P2> void checkAndBind(BeanHolder<? extends PropertyBridge<P2>> bridgeHolder,
+			PojoRawTypeModel<?> expectedPropertyTypeModel) {
+		if ( !propertyTypeModel.rawType().isSubTypeOf( expectedPropertyTypeModel ) ) {
+			throw log.invalidInputTypeForBridge( bridgeHolder.get(), propertyTypeModel, expectedPropertyTypeModel );
+		}
 
-		private PartialBinding(BeanHolder<? extends PropertyBridge> bridgeHolder) {
+		@SuppressWarnings("unchecked") // We check that P extends P2\ explicitly using reflection (see above)
+		BeanHolder<? extends PropertyBridge<? super P>> castedBridgeHolder =
+				(BeanHolder<? extends PropertyBridge<? super P>>) bridgeHolder;
+
+		this.partialBinding = new PartialBinding<>( castedBridgeHolder );
+	}
+
+	private static class PartialBinding<P> {
+		private final BeanHolder<? extends PropertyBridge<? super P>> bridgeHolder;
+
+		private PartialBinding(BeanHolder<? extends PropertyBridge<? super P>> bridgeHolder) {
 			this.bridgeHolder = bridgeHolder;
 		}
 

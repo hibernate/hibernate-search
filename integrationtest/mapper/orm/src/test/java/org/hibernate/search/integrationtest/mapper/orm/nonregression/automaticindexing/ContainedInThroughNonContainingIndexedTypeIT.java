@@ -218,7 +218,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 		public static class Binder implements PropertyBinder {
 			@Override
 			public void bind(PropertyBindingContext context) {
-				context.bridge( new BridgeGoingThroughEntityBoundaries( context ) );
+				context.bridge( Contained.class, new BridgeGoingThroughEntityBoundaries( context ) );
 			}
 		}
 	}
