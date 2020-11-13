@@ -11,6 +11,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 
@@ -36,6 +37,11 @@ public @interface IdentifierBridgeRef {
 	 * @return The type of the  identifier bridge.
 	 */
 	Class<? extends IdentifierBridge> type() default UndefinedBridgeImplementationType.class;
+
+	/**
+	 * @return How to retrieve the bridge. See {@link BeanRetrieval}.
+	 */
+	BeanRetrieval retrieval() default BeanRetrieval.ANY;
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.

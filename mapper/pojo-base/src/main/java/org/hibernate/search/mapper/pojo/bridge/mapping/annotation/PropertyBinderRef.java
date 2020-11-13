@@ -11,6 +11,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 
 /**
@@ -34,6 +35,11 @@ public @interface PropertyBinderRef {
 	 * @return The type of the property binder.
 	 */
 	Class<? extends PropertyBinder> type() default UndefinedBinderImplementationType.class;
+
+	/**
+	 * @return How to retrieve the binder. See {@link BeanRetrieval}.
+	 */
+	BeanRetrieval retrieval() default BeanRetrieval.ANY;
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.

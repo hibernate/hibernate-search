@@ -12,6 +12,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
+
 /**
  * A reference to a {@link PropertyMappingAnnotationProcessor}.
  * <p>
@@ -33,6 +35,11 @@ public @interface PropertyMappingAnnotationProcessorRef {
 	 * @return The type of the annotation processor.
 	 */
 	Class<? extends PropertyMappingAnnotationProcessor<?>> type() default UndefinedProcessorImplementationType.class;
+
+	/**
+	 * @return How to retrieve the processor. See {@link BeanRetrieval}.
+	 */
+	BeanRetrieval retrieval() default BeanRetrieval.ANY;
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.

@@ -11,6 +11,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 
 /**
@@ -34,6 +35,11 @@ public @interface MarkerBinderRef {
 	 * @return The bean type of the marker binder.
 	 */
 	Class<? extends MarkerBinder> type() default UndefinedBinderImplementationType.class;
+
+	/**
+	 * @return How to retrieve the binder. See {@link BeanRetrieval}.
+	 */
+	BeanRetrieval retrieval() default BeanRetrieval.ANY;
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.

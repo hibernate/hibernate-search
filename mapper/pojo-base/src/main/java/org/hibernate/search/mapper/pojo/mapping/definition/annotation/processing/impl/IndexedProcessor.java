@@ -38,7 +38,8 @@ public class IndexedProcessor implements TypeMappingAnnotationProcessor<Indexed>
 		Optional<BeanReference<? extends RoutingBinder>> routingBinderReference = context.toBeanReference(
 				RoutingBinder.class,
 				RoutingBinderRef.UndefinedRoutingBinderImplementationType.class,
-				routingBinderReferenceAnnotation.type(), routingBinderReferenceAnnotation.name()
+				routingBinderReferenceAnnotation.type(), routingBinderReferenceAnnotation.name(),
+				routingBinderReferenceAnnotation.retrieval()
 		);
 		if ( routingBinderReference.isPresent() ) {
 			indexedStep.routingBinder( new BeanDelegatingBinder( routingBinderReference.get() ) );
