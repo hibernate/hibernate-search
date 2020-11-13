@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.extractor;
 
 import java.util.List;
 
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -23,5 +24,8 @@ import org.hibernate.search.util.common.annotation.Incubating;
 public interface ContainerExtractorConfigurationContext {
 
 	void define(String extractorName, Class<? extends ContainerExtractor> extractorClass);
+
+	<C extends ContainerExtractor> void define(String extractorName, Class<C> extractorClass,
+			BeanReference<? extends C> reference);
 
 }

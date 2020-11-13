@@ -16,10 +16,10 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.CollectionElementExtractor;
+import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorDefinition;
 import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorRegistry;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
@@ -160,10 +160,10 @@ public class ContainerExtractorBinder {
 		List<BeanHolder<?>> beanHolders = new ArrayList<>();
 		try {
 			for ( String extractorName : boundPath.getExtractorPath().explicitExtractorNames() ) {
-				Class<? extends ContainerExtractor> extractorClass =
+				ContainerExtractorDefinition<?> extractorDefinition =
 						containerExtractorRegistry.forName( extractorName );
-				BeanHolder<? extends ContainerExtractor> newExtractorHolder =
-						beanResolver.resolve( extractorClass, BeanRetrieval.ANY );
+				BeanHolder<? extends ContainerExtractor> newExtractorHolder = extractorDefinition.reference()
+						.resolve( beanResolver );
 				beanHolders.add( newExtractorHolder );
 				if ( extractorHolder == null ) {
 					// The use of a raw type is fine here:
@@ -211,7 +211,7 @@ public class ContainerExtractorBinder {
 
 	@SuppressWarnings( "rawtypes" ) // Checks are implemented using reflection
 	private SingleExtractorContributor createExtractorContributorForName(String extractorName) {
-		Class<? extends ContainerExtractor> extractorClass = containerExtractorRegistry.forName( extractorName );
+		Class<? extends ContainerExtractor> extractorClass = containerExtractorRegistry.forName( extractorName ).type();
 		GenericTypeContext typeContext = new GenericTypeContext( extractorClass );
 		Type typePattern = typeContext.resolveTypeArgument( ContainerExtractor.class, 0 )
 				.orElseThrow( () -> log.cannotInferContainerExtractorClassTypePattern( extractorClass, null ) );

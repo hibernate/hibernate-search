@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
@@ -45,10 +47,10 @@ public final class ContainerExtractorRegistry {
 		return new Builder();
 	}
 
-	private final Map<String, Class<? extends ContainerExtractor>> extractorsByName = new HashMap<>();
+	private final Map<String, ContainerExtractorDefinition<? extends ContainerExtractor>> extractorsByName = new HashMap<>();
 	private final List<String> defaultExtractors = new ArrayList<>();
 
-	private ContainerExtractorRegistry(Map<String, Class<? extends ContainerExtractor>> customExtractorsByName) {
+	private ContainerExtractorRegistry(Map<String, ContainerExtractorDefinition<? extends ContainerExtractor>> customExtractorsByName) {
 		extractorsByName.putAll( customExtractorsByName );
 
 		// Caution: the order of calls below is meaningful
@@ -76,32 +78,43 @@ public final class ContainerExtractorRegistry {
 		return Collections.unmodifiableList( defaultExtractors );
 	}
 
-	public Class<? extends ContainerExtractor> forName(String name) {
-		Class<? extends ContainerExtractor> result = extractorsByName.get( name );
+	public ContainerExtractorDefinition<?> forName(String name) {
+		ContainerExtractorDefinition<?> result = extractorsByName.get( name );
 		if ( result == null ) {
 			throw log.cannotResolveContainerExtractorName( name, BuiltinContainerExtractors.class );
 		}
 		return result;
 	}
 
-	private void addDefaultExtractor(String name, Class<? extends ContainerExtractor> extractorClass) {
-		extractorsByName.put( name, extractorClass );
+	private <C extends ContainerExtractor> void addDefaultExtractor(String name, Class<C> extractorClass) {
+		addNonDefaultExtractor( name, extractorClass );
 		defaultExtractors.add( name );
 	}
 
-	private void addNonDefaultExtractor(String name, Class<? extends ContainerExtractor> extractorClass) {
-		extractorsByName.put( name, extractorClass );
+	private <C extends ContainerExtractor> void addNonDefaultExtractor(String name, Class<C> extractorClass) {
+		extractorsByName.put( name, new ContainerExtractorDefinition<>( extractorClass,
+				BeanReference.of( extractorClass, BeanRetrieval.CONSTRUCTOR ) ) );
 	}
 
 	public static final class Builder implements ContainerExtractorConfigurationContext {
-		private final Map<String, Class<? extends ContainerExtractor>> extractorsByName = new HashMap<>();
+		private final Map<String, ContainerExtractorDefinition<?>> extractorsByName = new HashMap<>();
 
 		private Builder() {
 		}
 
 		@Override
 		public void define(String extractorName, Class<? extends ContainerExtractor> extractorClass) {
-			extractorsByName.put( extractorName, extractorClass );
+			doDefine( extractorName, extractorClass );
+		}
+
+		private <C extends ContainerExtractor> void doDefine(String extractorName, Class<C> extractorClass) {
+			define( extractorName, extractorClass, BeanReference.of( extractorClass, BeanRetrieval.CONSTRUCTOR ) );
+		}
+
+		@Override
+		public <C extends ContainerExtractor> void define(String extractorName, Class<C> extractorClass,
+				BeanReference<? extends C> reference) {
+			extractorsByName.put( extractorName, new ContainerExtractorDefinition<>( extractorClass, reference ) );
 		}
 
 		public ContainerExtractorRegistry build() {

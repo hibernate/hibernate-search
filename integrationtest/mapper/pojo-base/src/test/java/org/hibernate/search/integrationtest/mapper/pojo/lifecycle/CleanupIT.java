@@ -14,9 +14,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
-import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
-import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubContainerExtractor;
 import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
@@ -352,30 +349,20 @@ public class CleanupIT {
 
 	private void startup(Consumer<ProgrammaticMappingConfigurationContext> additionalMappingContributor) {
 		this.mapping = setupHelper.start()
-				/*
-				 * Make the StartubStubContainerExtractor available through a factory
-				 * that will return a BeanHolder that increments static counters
-				 * (so that we can check the bean holders are properly closed).
-				 */
-				.withPropertyRadical( EngineSpiSettings.Radicals.BEAN_CONFIGURERS, Arrays.asList(
-						new BeanConfigurer() {
-							@Override
-							public void configure(BeanConfigurationContext context) {
-								context.define(
-										StartupStubContainerExtractor.class,
-										beanResolver ->
-												StartupStubContainerExtractor.create( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS )
-								);
-							}
-						}
-				) )
 				.withConfiguration(
 						builder -> {
 							builder.addEntityType( IndexedEntity.class );
 							builder.addEntityType( OtherIndexedEntity.class );
 
 							ContainerExtractorConfigurationContext containerExtractorDefinition = builder.containerExtractors();
-							containerExtractorDefinition.define( StartupStubContainerExtractor.NAME, StartupStubContainerExtractor.class );
+							containerExtractorDefinition.define( StartupStubContainerExtractor.NAME,
+									StartupStubContainerExtractor.class,
+									/*
+									 * Increment static counters upon retrieval of the extractor
+									 * and closing of its bean holder,
+									 * so that we can check the bean holders are properly closed.
+									 */
+									ignored -> StartupStubContainerExtractor.create( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS ) );
 							containerExtractorDefinition.define( FailingContainerExtractor.NAME, FailingContainerExtractor.class );
 
 							ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
