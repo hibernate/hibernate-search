@@ -50,7 +50,7 @@ public class FullNameBinder implements TypeBinder {
 		) );
 	}
 
-	private static class Bridge implements TypeBridge {
+	private static class Bridge implements TypeBridge<Author> {
 
 		private final IndexFieldReference<String> fullNameField;
 		private final IndexFieldReference<String> fullNameSortField;
@@ -62,9 +62,7 @@ public class FullNameBinder implements TypeBinder {
 		}
 
 		@Override
-		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
-			Author author = (Author) bridgedElement;
-
+		public void write(DocumentElement target, Author author, TypeBridgeWriteContext context) {
 			String fullName = author.getLastName() + " " + author.getFirstName();
 
 			target.addValue( this.fullNameField, fullName );

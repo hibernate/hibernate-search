@@ -63,7 +63,9 @@ and pass an instance of the bridge.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebridge/simple/FullNameBinder.java[tags=bridge]
 ----
-<1> The bridge must implement the `TypeBridge` interface.
+<1> The bridge must implement the `TypeBridge<T>` interface.
+The generic type `<T>` here reflects the type of the entity on which we're going to apply the bridge,
+that we'll call the bridged element.
 Here the bridge class is nested in the binder class,
 because it is more convenient,
 but you are obviously free to implement it in a separate java file.
@@ -71,11 +73,9 @@ but you are obviously free to implement it in a separate java file.
 it will need them when indexing.
 <3> Implement the `write` method in the bridge.
 This method is called on indexing.
-<4> The bridged element is passed as an `Object`,
-so cast it to the correct type.
-<5> Extract data from the bridged element,
+<4> Extract data from the bridged element,
 and optionally transform it.
-<6> Set the value of the `fullName` field.
+<5> Set the value of the `fullName` field.
 Note the `fullName` field was declared at the root,
 so we call `addValue` directly on the `target` argument.
 

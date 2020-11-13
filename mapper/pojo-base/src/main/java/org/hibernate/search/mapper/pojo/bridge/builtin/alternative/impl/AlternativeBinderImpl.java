@@ -84,7 +84,7 @@ public final class AlternativeBinderImpl<D, P> implements AlternativeBinder {
 				) );
 	}
 
-	private static final class Bridge<D, P> implements TypeBridge {
+	private static final class Bridge<D, P> implements TypeBridge<Object> {
 		private final PojoElementAccessor<D> discriminatorAccessor;
 		private final PojoElementAccessor<P> fieldValueSourceAccessor;
 		private final AlternativeValueBridge<D, P> delegate;

@@ -232,7 +232,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 		}
 	}
 
-	public static class QueryBasedTypeBridge implements TypeBridge {
+	public static class QueryBasedTypeBridge implements TypeBridge<IndexedEntity> {
 
 		private final IndexObjectFieldReference typeBridgeObjectFieldReference;
 		private final IndexFieldReference<String> includedInTypeBridgeFieldReference;
@@ -251,9 +251,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 		}
 
 		@Override
-		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
-			IndexedEntity castedBridgedElement = (IndexedEntity) bridgedElement;
-
+		public void write(DocumentElement target, IndexedEntity bridgedElement, TypeBridgeWriteContext context) {
 			Session session = context.extension( HibernateOrmExtension.get() ).session();
 			/*
 			 * Note this approach is rather limited as it does not allow batching.
@@ -265,7 +263,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 							+ " order by c.includedInTypeBridge",
 					String.class
 			);
-			query.setParameter( "parent", castedBridgedElement );
+			query.setParameter( "parent", bridgedElement );
 
 			DocumentElement typeBridgeObjectField = target.addObject( typeBridgeObjectFieldReference );
 			for ( String includedInTypeBridge : query.list() ) {

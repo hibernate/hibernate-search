@@ -45,7 +45,7 @@ public class SingleValuedNamesBinder implements TypeBinder {
 	}
 	//end::bind[]
 
-	private static class Bridge implements TypeBridge {
+	private static class Bridge implements TypeBridge<Author> {
 
 		private final IndexFieldReference<String> firstNameField;
 		private final IndexFieldReference<String> lastNameField;
@@ -60,8 +60,7 @@ public class SingleValuedNamesBinder implements TypeBinder {
 		}
 
 		@Override
-		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
-			Author author = (Author) bridgedElement;
+		public void write(DocumentElement target, Author author, TypeBridgeWriteContext context) {
 			target.addValue( this.firstNameField, author.getFirstName() );
 			target.addValue( this.lastNameField, author.getLastName() );
 			target.addValue( this.fullNameField, author.getLastName() + " " + author.getFirstName() );

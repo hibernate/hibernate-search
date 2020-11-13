@@ -274,7 +274,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 		}
 	}
 
-	public static class FirstTypeBridge implements TypeBridge {
+	public static class FirstTypeBridge implements TypeBridge<Object> {
 
 		private final PojoElementAccessor<String> valueSourcePropertyAccessor;
 		private final IndexObjectFieldReference firstBridgeObjectFieldReference;
@@ -305,7 +305,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 
 	}
 
-	public static class SecondTypeBridge implements TypeBridge {
+	public static class SecondTypeBridge implements TypeBridge<Object> {
 
 		private PojoElementAccessor<String> valueSourcePropertyAccessor;
 		private IndexObjectFieldReference secondBridgeObjectFieldReference;

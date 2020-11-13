@@ -35,7 +35,7 @@ public class BookEditionsForSaleTypeBinder implements TypeBinder {
 		context.bridge( new Bridge( editionsForSaleField ) );
 	}
 
-	private static class Bridge implements TypeBridge {
+	private static class Bridge implements TypeBridge<Book> {
 
 		private final IndexFieldReference<String> editionsForSaleField;
 
@@ -44,9 +44,7 @@ public class BookEditionsForSaleTypeBinder implements TypeBinder {
 		}
 
 		@Override
-		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
-			Book book = (Book) bridgedElement;
-
+		public void write(DocumentElement target, Book book, TypeBridgeWriteContext context) {
 			for ( BookEdition edition : book.getPriceByEdition().keySet() ) { // <6>
 				target.addValue( editionsForSaleField, edition.getLabel() );
 			}

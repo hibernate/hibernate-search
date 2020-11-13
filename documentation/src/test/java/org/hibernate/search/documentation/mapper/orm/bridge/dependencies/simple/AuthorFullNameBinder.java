@@ -29,7 +29,7 @@ public class AuthorFullNameBinder implements TypeBinder {
 		context.bridge( new Bridge( authorFullNameField ) );
 	}
 
-	private static class Bridge implements TypeBridge {
+	private static class Bridge implements TypeBridge<Book> {
 
 		// ...
 		//end::binder[]
@@ -41,8 +41,7 @@ public class AuthorFullNameBinder implements TypeBinder {
 		}
 
 		@Override
-		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
-			Book book = (Book) bridgedElement;
+		public void write(DocumentElement target, Book book, TypeBridgeWriteContext context) {
 			Author author = book.getAuthor();
 
 			String fullName = author.getLastName() + " " + author.getFirstName();
