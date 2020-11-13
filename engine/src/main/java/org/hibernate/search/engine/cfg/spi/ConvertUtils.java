@@ -286,7 +286,7 @@ public final class ConvertUtils {
 				return BeanReference.of( (Class<?>) value ).asSubTypeOf( expectedType );
 			}
 			if ( value instanceof String ) {
-				return BeanReference.of( expectedType, (String) value );
+				return BeanReference.parse( expectedType, (String) value );
 			}
 		}
 		catch (RuntimeException e) {

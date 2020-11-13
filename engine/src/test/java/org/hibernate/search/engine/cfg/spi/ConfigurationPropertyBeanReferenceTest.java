@@ -24,6 +24,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
+import org.hibernate.search.util.common.SearchException;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -65,9 +66,33 @@ public class ConfigurationPropertyBeanReferenceTest {
 		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isEqualTo( expectedAsStubBean );
 
-		// String value
+		// String value - no prefix
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( "name" ) );
 		when( beanResolverMock.resolve( StubBean.class, "name", BeanRetrieval.ANY ) )
+				.thenReturn( expectedAsStubBean );
+		result = property.get( sourceMock ).resolve( beanResolverMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expectedAsStubBean );
+
+		// String value - 'bean:*'
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( "bean:name" ) );
+		when( beanResolverMock.resolve( StubBean.class, "name", BeanRetrieval.BEAN ) )
+				.thenReturn( expectedAsStubBean );
+		result = property.get( sourceMock ).resolve( beanResolverMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expectedAsStubBean );
+
+		// String value - 'class:*'
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( "class:name" ) );
+		when( beanResolverMock.resolve( StubBean.class, "name", BeanRetrieval.CLASS ) )
+				.thenReturn( expectedAsStubBean );
+		result = property.get( sourceMock ).resolve( beanResolverMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expectedAsStubBean );
+
+		// String value - 'constructor:*'
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( "constructor:name" ) );
+		when( beanResolverMock.resolve( StubBean.class, "name", BeanRetrieval.CONSTRUCTOR ) )
 				.thenReturn( expectedAsStubBean );
 		result = property.get( sourceMock ).resolve( beanResolverMock );
 		verifyNoOtherSourceInteractionsAndReset();
@@ -108,9 +133,39 @@ public class ConfigurationPropertyBeanReferenceTest {
 		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( reference ).isEmpty();
 
-		// String value
+		// String value - no prefix
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( "name" ) );
 		when( beanResolverMock.resolve( StubBean.class, "name", BeanRetrieval.ANY ) )
+				.thenReturn( expectedAsStubBean );
+		reference = property.get( sourceMock );
+		assertThat( reference ).isNotEmpty();
+		result = reference.get().resolve( beanResolverMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expectedAsStubBean );
+
+		// String value - 'bean:*'
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( "bean:name" ) );
+		when( beanResolverMock.resolve( StubBean.class, "name", BeanRetrieval.BEAN ) )
+				.thenReturn( expectedAsStubBean );
+		reference = property.get( sourceMock );
+		assertThat( reference ).isNotEmpty();
+		result = reference.get().resolve( beanResolverMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expectedAsStubBean );
+
+		// String value - 'class:*'
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( "class:name" ) );
+		when( beanResolverMock.resolve( StubBean.class, "name", BeanRetrieval.CLASS ) )
+				.thenReturn( expectedAsStubBean );
+		reference = property.get( sourceMock );
+		assertThat( reference ).isNotEmpty();
+		result = reference.get().resolve( beanResolverMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expectedAsStubBean );
+
+		// String value - 'constructor:*'
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( "constructor:name" ) );
+		when( beanResolverMock.resolve( StubBean.class, "name", BeanRetrieval.CONSTRUCTOR ) )
 				.thenReturn( expectedAsStubBean );
 		reference = property.get( sourceMock );
 		assertThat( reference ).isNotEmpty();
@@ -151,6 +206,12 @@ public class ConfigurationPropertyBeanReferenceTest {
 		BeanHolder<StubBean> expected1AsStubBean = BeanHolder.of( new StubBeanImpl1() );
 		BeanHolder<StubBeanImpl2> expected2 = BeanHolder.of( new StubBeanImpl2() );
 		BeanHolder<StubBean> expected2AsStubBean = BeanHolder.of( new StubBeanImpl2() );
+		BeanHolder<StubBeanImpl2> expected3 = BeanHolder.of( new StubBeanImpl2() );
+		BeanHolder<StubBean> expected3AsStubBean = BeanHolder.of( new StubBeanImpl2() );
+		BeanHolder<StubBeanImpl2> expected4 = BeanHolder.of( new StubBeanImpl2() );
+		BeanHolder<StubBean> expected4AsStubBean = BeanHolder.of( new StubBeanImpl2() );
+		BeanHolder<StubBeanImpl2> expected5 = BeanHolder.of( new StubBeanImpl2() );
+		BeanHolder<StubBean> expected5AsStubBean = BeanHolder.of( new StubBeanImpl2() );
 		Optional<BeanHolder<List<StubBean>>> result;
 
 		// No value
@@ -169,15 +230,23 @@ public class ConfigurationPropertyBeanReferenceTest {
 		assertThat( result.get().get() ).containsExactly( expected1AsStubBean.get() );
 
 		// String value - multiple
-		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( "name1,name2" ) );
+		when( sourceMock.get( key ) )
+				.thenReturn( (Optional) Optional.of( "name1,name2,bean:name3,class:name4,constructor:name5" ) );
 		when( beanResolverMock.resolve( StubBean.class, "name1", BeanRetrieval.ANY ) )
 				.thenReturn( expected1AsStubBean );
 		when( beanResolverMock.resolve( StubBean.class, "name2", BeanRetrieval.ANY ) )
 				.thenReturn( expected2AsStubBean );
+		when( beanResolverMock.resolve( StubBean.class, "name3", BeanRetrieval.BEAN ) )
+				.thenReturn( expected3AsStubBean );
+		when( beanResolverMock.resolve( StubBean.class, "name4", BeanRetrieval.CLASS ) )
+				.thenReturn( expected4AsStubBean );
+		when( beanResolverMock.resolve( StubBean.class, "name5", BeanRetrieval.CONSTRUCTOR ) )
+				.thenReturn( expected5AsStubBean );
 		result = property.getAndMap( sourceMock, beanResolverMock::resolve );
 		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isNotEmpty();
-		assertThat( result.get().get() ).containsExactly( expected1AsStubBean.get(), expected2AsStubBean.get() );
+		assertThat( result.get().get() ).containsExactly( expected1AsStubBean.get(), expected2AsStubBean.get(),
+				expected3AsStubBean.get(), expected4AsStubBean.get(), expected5AsStubBean.get() );
 
 		// Class value - one
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of(
@@ -315,6 +384,42 @@ public class ConfigurationPropertyBeanReferenceTest {
 		verify( bean1Mock ).close(); // Expect the first bean holder to be closed
 		verifyNoMoreInteractions( bean1Mock );
 		verifyNoOtherSourceInteractionsAndReset();
+	}
+
+	@Test
+	public void invalidBeanRetrieval() {
+		String key = "invalidBeanRetrieval";
+		String resolvedKey = "some.prefix." + key;
+		OptionalConfigurationProperty<BeanReference<? extends StubBean>> property =
+				ConfigurationProperty.forKey( key ).asBeanReference( StubBean.class )
+						.build();
+
+		String propertyValue = "notABeanRetrieval:name";
+
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( propertyValue ) );
+		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
+		assertThatThrownBy( () -> property.getAndMap( sourceMock, beanResolverMock::resolve ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Invalid value for configuration property '" + resolvedKey
+								+ "': '" + propertyValue + "'.",
+						"Invalid bean reference: 'notABeanRetrieval:name'.",
+						"The reference is prefixed with 'notABeanRetrieval:', which is not a valid bean retrieval prefix.",
+						"If you want to reference a bean by name, and the name contains a colon, use 'bean:notABeanRetrieval:name'.",
+						"Otherwise, use a valid bean retrieval prefix among the following:"
+							+ " [builtin:, bean:, class:, constructor:, any:]."
+				);
+		verifyNoOtherSourceInteractionsAndReset();
+
+		// Check that prefixing with 'bean:' solves the problem
+		BeanHolder<StubBean> expectedAsStubBean = BeanHolder.of( new StubBeanImpl1() );
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( "bean:" + propertyValue ) );
+		when( sourceMock.resolve( key ) ).thenReturn( Optional.of( resolvedKey ) );
+		when( beanResolverMock.resolve( StubBean.class, "notABeanRetrieval:name", BeanRetrieval.BEAN ) )
+				.thenReturn( expectedAsStubBean );
+		Optional<BeanHolder<? extends StubBean>> result = property.getAndMap( sourceMock, beanResolverMock::resolve );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).contains( expectedAsStubBean );
 	}
 
 	private void verifyNoOtherSourceInteractionsAndReset() {

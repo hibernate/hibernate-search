@@ -101,4 +101,13 @@ public interface BeanReference<T> {
 		return new InstanceBeanReference<>( instance );
 	}
 
+	// This method conforms to the MicroProfile Config specification. Do not change its signature.
+	static BeanReference<?> parse(String value) {
+		return BeanReference.parse( Object.class, value );
+	}
+
+	static <T> BeanReference<T> parse(Class<T> expectedType, String value) {
+		return BeanReferences.parse( expectedType, value );
+	}
+
 }
