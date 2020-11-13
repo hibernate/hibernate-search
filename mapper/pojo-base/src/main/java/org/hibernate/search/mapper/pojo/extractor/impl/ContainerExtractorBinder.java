@@ -16,6 +16,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.CollectionElementExtractor;
@@ -162,7 +163,7 @@ public class ContainerExtractorBinder {
 				Class<? extends ContainerExtractor> extractorClass =
 						containerExtractorRegistry.forName( extractorName );
 				BeanHolder<? extends ContainerExtractor> newExtractorHolder =
-						beanResolver.resolve( extractorClass );
+						beanResolver.resolve( extractorClass, BeanRetrieval.ANY );
 				beanHolders.add( newExtractorHolder );
 				if ( extractorHolder == null ) {
 					// The use of a raw type is fine here:

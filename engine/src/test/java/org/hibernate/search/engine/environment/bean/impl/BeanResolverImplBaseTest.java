@@ -23,6 +23,7 @@ import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.engine.environment.bean.spi.BeanNotFoundException;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
@@ -40,7 +41,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
-public class BeanResolverImplTest {
+public class BeanResolverImplBaseTest {
 
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
@@ -113,7 +114,7 @@ public class BeanResolverImplTest {
 
 		// resolve(Class)
 		when( type1InternalBeanFactoryMock.resolve( any() ) ).thenReturn( type1BeanHolder );
-		assertThat( beanResolver.resolve( InternalType1.class ) ).isSameAs( type1BeanHolder );
+		assertThat( beanResolver.resolve( InternalType1.class, BeanRetrieval.ANY ) ).isSameAs( type1BeanHolder );
 		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class) through BeanReference
@@ -123,7 +124,8 @@ public class BeanResolverImplTest {
 
 		// resolve(Class, String)
 		when( type2InternalBeanFactoryMock.resolve( any() ) ).thenReturn( type2BeanHolder );
-		assertThat( beanResolver.resolve( InternalType2.class, "someName" ) ).isSameAs( type2BeanHolder );
+		assertThat( beanResolver.resolve( InternalType2.class, "someName", BeanRetrieval.ANY ) )
+				.isSameAs( type2BeanHolder );
 		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class, String) through BeanReference
@@ -145,7 +147,7 @@ public class BeanResolverImplTest {
 	}
 
 	@Test
-	public void resolve_matchingBeanManager() {
+	public void resolve_matchingBeanManager_beanName() {
 		BeanHolder<BeanManagerType1> type1BeanHolder = BeanHolder.of( new BeanManagerType1() );
 		BeanHolder<BeanManagerType2> type2BeanHolder = BeanHolder.of( new BeanManagerType2() );
 		BeanHolder<BeanManagerType3> type3BeanHolder1 = BeanHolder.of( new BeanManagerType3() );
@@ -153,7 +155,7 @@ public class BeanResolverImplTest {
 
 		// resolve(Class)
 		when( beanManagerBeanProviderMock.forType( BeanManagerType1.class ) ).thenReturn( type1BeanHolder );
-		assertThat( beanResolver.resolve( BeanManagerType1.class ) ).isSameAs( type1BeanHolder );
+		assertThat( beanResolver.resolve( BeanManagerType1.class, BeanRetrieval.ANY ) ).isSameAs( type1BeanHolder );
 		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class) through BeanReference
@@ -164,7 +166,7 @@ public class BeanResolverImplTest {
 		// resolve(Class, String)
 		when( beanManagerBeanProviderMock.forTypeAndName( BeanManagerType2.class, "someName" ) )
 				.thenReturn( type2BeanHolder );
-		assertThat( beanResolver.resolve( BeanManagerType2.class, "someName" ) )
+		assertThat( beanResolver.resolve( BeanManagerType2.class, "someName", BeanRetrieval.ANY ) )
 				.isSameAs( type2BeanHolder );
 		verifyNoOtherInteractionsAndReset();
 
@@ -190,13 +192,70 @@ public class BeanResolverImplTest {
 	}
 
 	@Test
+	public void resolve_matchingBeanManager_className() {
+		BeanHolder<BeanManagerType1> type1BeanHolder = BeanHolder.of( new BeanManagerType1() );
+		BeanHolder<BeanManagerType2> type2BeanHolder = BeanHolder.of( new BeanManagerType2() );
+		BeanHolder<BeanManagerType3> type3BeanHolder1 = BeanHolder.of( new BeanManagerType3() );
+		BeanHolder<BeanManagerType3> type3BeanHolder2 = BeanHolder.of( new BeanManagerType3() );
+
+		// resolve(Class)
+		when( beanManagerBeanProviderMock.forType( BeanManagerType1.class ) ).thenReturn( type1BeanHolder );
+		assertThat( beanResolver.resolve( BeanManagerType1.class, BeanRetrieval.ANY ) ).isSameAs( type1BeanHolder );
+		verifyNoOtherInteractionsAndReset();
+
+		// resolve(Class) through BeanReference
+		when( beanManagerBeanProviderMock.forType( BeanManagerType1.class ) ).thenReturn( type1BeanHolder );
+		assertThat( beanResolver.resolve( BeanReference.of( BeanManagerType1.class ) ) )
+				.isSameAs( type1BeanHolder );
+		verifyNoOtherInteractionsAndReset();
+
+		// resolve(Class, String)
+		when( beanManagerBeanProviderMock.forTypeAndName( Object.class, BeanManagerType2.class.getName() ) )
+				.thenThrow( new BeanNotFoundException( "not found in beanManager" ) );
+		when( classResolverMock.<BeanManagerType2>classForName( BeanManagerType2.class.getName() ) )
+				.thenReturn( BeanManagerType2.class );
+		when( beanManagerBeanProviderMock.forType( BeanManagerType2.class ) )
+				.thenReturn( type2BeanHolder );
+		assertThat( beanResolver.resolve( Object.class, BeanManagerType2.class.getName(), BeanRetrieval.ANY ) )
+				.isSameAs( type2BeanHolder );
+		verifyNoOtherInteractionsAndReset();
+
+		// resolve(Class, String) through BeanReference
+		when( beanManagerBeanProviderMock.forTypeAndName( Object.class, BeanManagerType2.class.getName() ) )
+				.thenThrow( new BeanNotFoundException( "not found in beanManager" ) );
+		when( classResolverMock.<BeanManagerType2>classForName( BeanManagerType2.class.getName() ) )
+				.thenReturn( BeanManagerType2.class );
+		when( beanManagerBeanProviderMock.forType( BeanManagerType2.class ) )
+				.thenReturn( type2BeanHolder );
+		assertThat( beanResolver.resolve( BeanReference.of( Object.class, BeanManagerType2.class.getName() ) ) )
+				.isSameAs( type2BeanHolder );
+		verifyNoOtherInteractionsAndReset();
+
+		// resolve(List<BeanReference>)
+		when( beanManagerBeanProviderMock.forType( BeanManagerType3.class ) )
+				.thenReturn( type3BeanHolder1 )
+				.thenReturn( type3BeanHolder2 );
+		when( beanManagerBeanProviderMock.forTypeAndName( BeanManagerType3.class, BeanManagerType3.class.getName() ) )
+				.thenThrow( new BeanNotFoundException( "not found in beanManager" ) );
+		when( classResolverMock.<BeanManagerType3>classForName( BeanManagerType3.class.getName() ) )
+				.thenReturn( BeanManagerType3.class );
+		BeanHolder<List<BeanManagerType3>> beans = beanResolver.resolve(
+				Arrays.asList( BeanReference.of( BeanManagerType3.class ),
+						BeanReference.of( BeanManagerType3.class, BeanManagerType3.class.getName() ) )
+		);
+		verifyNoOtherInteractionsAndReset();
+		assertThat( beans.get() )
+				.containsExactly( type3BeanHolder1.get(), type3BeanHolder2.get() );
+	}
+
+	@Test
 	public void resolve_matchingReflection() {
 		BeanNotFoundException beanManagerNotFoundException = new BeanNotFoundException( "cannot find from beanManager" );
 
 		// resolve(Class)
 		when( beanManagerBeanProviderMock.forType( ReflectionType1.class ) )
 				.thenThrow( beanManagerNotFoundException );
-		assertThat( beanResolver.resolve( ReflectionType1.class ) )
+		assertThat( beanResolver.resolve( ReflectionType1.class, BeanRetrieval.ANY ) )
 				.extracting( BeanHolder::get ).isInstanceOf( ReflectionType1.class );
 		verifyNoOtherInteractionsAndReset();
 
@@ -212,7 +271,9 @@ public class BeanResolverImplTest {
 				.thenThrow( beanManagerNotFoundException );
 		when( classResolverMock.<ReflectionType2>classForName( ReflectionType2.class.getName() ) )
 				.thenReturn( ReflectionType2.class );
-		assertThat( beanResolver.resolve( Object.class, ReflectionType2.class.getName() ) )
+		when( beanManagerBeanProviderMock.forType( ReflectionType2.class ) )
+				.thenThrow( beanManagerNotFoundException );
+		assertThat( beanResolver.resolve( Object.class, ReflectionType2.class.getName(), BeanRetrieval.ANY ) )
 				.extracting( BeanHolder::get ).isInstanceOf( ReflectionType2.class );
 		verifyNoOtherInteractionsAndReset();
 
@@ -221,6 +282,8 @@ public class BeanResolverImplTest {
 				.thenThrow( beanManagerNotFoundException );
 		when( classResolverMock.<ReflectionType2>classForName( ReflectionType2.class.getName() ) )
 				.thenReturn( ReflectionType2.class );
+		when( beanManagerBeanProviderMock.forType( ReflectionType2.class ) )
+				.thenThrow( beanManagerNotFoundException );
 		assertThat( beanResolver.resolve( BeanReference.of( Object.class, ReflectionType2.class.getName() ) ) )
 				.extracting( BeanHolder::get ).isInstanceOf( ReflectionType2.class );
 		verifyNoOtherInteractionsAndReset();
@@ -250,7 +313,7 @@ public class BeanResolverImplTest {
 		// resolve(Class)
 		when( beanManagerBeanProviderMock.forType( InvalidType.class ) )
 				.thenThrow( beanManagerNotFoundException );
-		assertThatThrownBy( () -> beanResolver.resolve( InvalidType.class ) )
+		assertThatThrownBy( () -> beanResolver.resolve( InvalidType.class, BeanRetrieval.ANY ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Unable to resolve bean reference to type '" + InvalidType.class.getName() + "'",
 						"No beans defined for type", "in Hibernate Search's internal registry",
@@ -276,7 +339,7 @@ public class BeanResolverImplTest {
 				.thenThrow( beanManagerNotFoundException );
 		when( classResolverMock.<ReflectionType2>classForName( "someName" ) )
 				.thenThrow( classNotFoundException );
-		assertThatThrownBy( () -> beanResolver.resolve( InvalidType.class, "someName" ) )
+		assertThatThrownBy( () -> beanResolver.resolve( InvalidType.class, "someName", BeanRetrieval.ANY ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Unable to resolve bean reference to type '" + InvalidType.class.getName()
 								+ "' and name 'someName'",
@@ -327,14 +390,15 @@ public class BeanResolverImplTest {
 
 		// resolve(Class)
 		when( type1InternalBeanFactoryMock.resolve( any() ) ).thenThrow( beanFactoryFailure );
-		assertThatThrownBy( () -> beanResolver.resolve( InternalType1.class ) ).isSameAs( beanFactoryFailure );
+		assertThatThrownBy( () -> beanResolver.resolve( InternalType1.class, BeanRetrieval.ANY ) )
+				.isSameAs( beanFactoryFailure );
 		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class, String)
 		when( type2InternalBeanFactoryMock.resolve( any() ) ).thenThrow( beanFactoryFailure );
 		when( beanManagerBeanProviderMock.forTypeAndName( InternalType2.class, "someName" ) )
 				.thenThrow( beanFactoryFailure );
-		assertThatThrownBy( () -> beanResolver.resolve( InternalType2.class, "someName" ) )
+		assertThatThrownBy( () -> beanResolver.resolve( InternalType2.class, "someName", BeanRetrieval.ANY ) )
 				.isSameAs( beanFactoryFailure );
 		verifyNoOtherInteractionsAndReset();
 	}
@@ -345,13 +409,14 @@ public class BeanResolverImplTest {
 
 		// resolve(Class)
 		when( beanManagerBeanProviderMock.forType( BeanManagerType1.class ) ).thenThrow( beanManagerFailure );
-		assertThatThrownBy( () -> beanResolver.resolve( BeanManagerType1.class ) ).isSameAs( beanManagerFailure );
+		assertThatThrownBy( () -> beanResolver.resolve( BeanManagerType1.class, BeanRetrieval.ANY ) )
+				.isSameAs( beanManagerFailure );
 		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class, String)
 		when( beanManagerBeanProviderMock.forTypeAndName( BeanManagerType2.class, "someName" ) )
 				.thenThrow( beanManagerFailure );
-		assertThatThrownBy( () -> beanResolver.resolve( BeanManagerType2.class, "someName" ) )
+		assertThatThrownBy( () -> beanResolver.resolve( BeanManagerType2.class, "someName", BeanRetrieval.ANY ) )
 				.isSameAs( beanManagerFailure );
 		verifyNoOtherInteractionsAndReset();
 	}
@@ -363,7 +428,7 @@ public class BeanResolverImplTest {
 		// resolve(Class)
 		when( beanManagerBeanProviderMock.forType( InternalType3.class ) )
 				.thenThrow( beanManagerNotFoundException );
-		assertThatThrownBy( () -> beanResolver.resolve( InternalType3.class ) )
+		assertThatThrownBy( () -> beanResolver.resolve( InternalType3.class, BeanRetrieval.ANY ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Unable to resolve bean reference to type '" + InternalType3.class.getName() + "'",
 						"Ambiguous bean reference to type '" + InternalType3.class.getName() + "'",

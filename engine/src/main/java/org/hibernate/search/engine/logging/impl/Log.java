@@ -335,6 +335,10 @@ public interface Log extends BasicLogger {
 	String failedToResolveBeanUsingBeanManager(String exceptionMessage);
 
 	// No ID here: this message is always embedded in one of the two exceptions above
+	@Message(value = "Failed to resolve bean from bean manager (assuming the name is a class name) with exception: %1$s")
+	String failedToResolveBeanUsingBeanManagerAssumingClassName(String exceptionMessage);
+
+	// No ID here: this message is always embedded in one of the two exceptions above
 	@Message(value = "Failed to resolve bean using reflection with exception: %1$s")
 	String failedToResolveBeanUsingReflection(String exceptionMessage);
 
@@ -380,4 +384,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 90, value = "No configured bean manager.")
 	BeanNotFoundException noConfiguredBeanManager();
+
+	@Message(id = ID_OFFSET + 91, value = "Unable to resolve '%2$s' to a class extending '%1$s': %3$s")
+	BeanNotFoundException unableToResolveToClassName(@FormatWith(ClassFormatter.class) Class<?> typReference,
+			String nameReference, String causeMessage, @Cause Exception e);
 }

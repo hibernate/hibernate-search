@@ -45,7 +45,19 @@ public interface BeanReference<T> {
 	 * @return The corresponding {@link BeanReference}.
 	 */
 	static <T> BeanReference<T> of(Class<T> type) {
-		return new TypeBeanReference<>( type );
+		return of( type, BeanRetrieval.ANY );
+	}
+
+	/**
+	 * Create a {@link BeanReference} referencing a bean by its type only.
+	 *
+	 * @param type The bean type. Must not be null.
+	 * @param retrieval How to retrieve the bean. See {@link BeanRetrieval}.
+	 * @param <T> The bean type.
+	 * @return The corresponding {@link BeanReference}.
+	 */
+	static <T> BeanReference<T> of(Class<T> type, BeanRetrieval retrieval) {
+		return new TypeBeanReference<>( type, retrieval );
 	}
 
 	/**
@@ -57,11 +69,24 @@ public interface BeanReference<T> {
 	 * @return The corresponding {@link BeanReference}.
 	 */
 	static <T> BeanReference<T> of(Class<T> type, String name) {
+		return of( type, name, BeanRetrieval.ANY );
+	}
+
+	/**
+	 * Create a {@link BeanReference} referencing a bean by type and name.
+	 *
+	 * @param type The bean type. Must not be null.
+	 * @param name The bean name. May be null or empty.
+	 * @param retrieval How to retrieve the bean. See {@link BeanRetrieval}.
+	 * @param <T> The bean type.
+	 * @return The corresponding {@link BeanReference}.
+	 */
+	static <T> BeanReference<T> of(Class<T> type, String name, BeanRetrieval retrieval) {
 		if ( StringHelper.isNotEmpty( name ) ) {
-			return new TypeAndNameBeanReference<>( type, name );
+			return new TypeAndNameBeanReference<>( type, name, retrieval );
 		}
 		else {
-			return new TypeBeanReference<>( type );
+			return new TypeBeanReference<>( type, retrieval );
 		}
 	}
 

@@ -14,7 +14,7 @@ public interface BeanConfigurationContext {
 	/**
 	 * Define a way to resolve a bean referenced by its {@code exposedType}.
 	 * <p>
-	 * Affects the behavior of {@link BeanResolver#resolve(Class)}
+	 * Affects the behavior of {@link BeanResolver#resolve(Class, org.hibernate.search.engine.environment.bean.BeanRetrieval)}
 	 * in particular.
 	 *
 	 * @param exposedType The type that this definition will match (exact match: inheritance is ignored).
@@ -29,7 +29,7 @@ public interface BeanConfigurationContext {
 	/**
 	 * Define a way to resolve a bean referenced by its {@code exposedType} and {@code name}.
 	 * <p>
-	 * Affects the behavior of {@link BeanResolver#resolve(Class, String)}
+	 * Affects the behavior of {@link BeanResolver#resolve(Class, String, org.hibernate.search.engine.environment.bean.BeanRetrieval)}
 	 * in particular.
 	 *
 	 * @param exposedType The type that this definition will match (exact match: inheritance is ignored).

@@ -26,6 +26,7 @@ import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
@@ -102,7 +103,7 @@ public class IndexManagerBuildingStateHolderTest {
 
 		when( configurationSourceMock.get( "backend.type" ) )
 				.thenReturn( (Optional) Optional.of( "someBackendType" ) );
-		when( beanResolverMock.resolve( BackendFactory.class, "someBackendType" ) )
+		when( beanResolverMock.resolve( BackendFactory.class, "someBackendType", BeanRetrieval.ANY ) )
 				.thenReturn( BeanHolder.of( backendFactoryMock ) );
 		when( backendFactoryMock.create(
 				eq( EventContexts.defaultBackend() ),
@@ -168,7 +169,7 @@ public class IndexManagerBuildingStateHolderTest {
 
 		when( configurationSourceMock.get( "backends.myBackend.type" ) )
 				.thenReturn( (Optional) Optional.of( "someBackendType" ) );
-		when( beanResolverMock.resolve( BackendFactory.class, "someBackendType" ) )
+		when( beanResolverMock.resolve( BackendFactory.class, "someBackendType", BeanRetrieval.ANY ) )
 				.thenReturn( BeanHolder.of( backendFactoryMock ) );
 		when( backendFactoryMock.create(
 				eq( EventContexts.fromBackendName( "myBackend" ) ),

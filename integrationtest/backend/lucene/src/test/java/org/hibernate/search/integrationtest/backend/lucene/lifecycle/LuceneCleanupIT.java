@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.IntegerFieldTypeDescriptor;
@@ -132,7 +133,8 @@ public class LuceneCleanupIT {
 				.withBackendProperty( LuceneIndexSettings.DIRECTORY_TYPE,
 						(BeanReference<TrackingDirectoryProvider>) beanResolver -> {
 							BeanHolder<DirectoryProvider> delegateHolder = beanResolver.resolve( DirectoryProvider.class,
-									"local-filesystem" );
+									"local-filesystem", BeanRetrieval.ANY
+							);
 							return BeanHolder.of( new TrackingDirectoryProvider( delegateHolder.get(), tracker ) )
 									.withDependencyAutoClosing( delegateHolder );
 						} )
