@@ -13,6 +13,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
@@ -26,7 +27,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(MarkerBinding.List.class)
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = MarkerBindingProcessor.class))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = MarkerBindingProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface MarkerBinding {
 
 	/**

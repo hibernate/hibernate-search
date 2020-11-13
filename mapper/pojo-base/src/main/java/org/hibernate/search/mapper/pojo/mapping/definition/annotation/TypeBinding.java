@@ -13,6 +13,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
@@ -35,7 +36,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(TypeBinding.List.class)
-@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = TypeBindingProcessor.class))
+@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = TypeBindingProcessor.class, retrieval = BeanRetrieval.CONSTRUCTOR))
 public @interface TypeBinding {
 
 	/**
