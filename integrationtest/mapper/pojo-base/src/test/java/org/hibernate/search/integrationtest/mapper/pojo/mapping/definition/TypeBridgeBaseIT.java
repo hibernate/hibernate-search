@@ -874,7 +874,7 @@ public class TypeBridgeBaseIT {
 				);
 	}
 
-	private static class UnusedTypeBridge implements TypeBridge {
+	private static class UnusedTypeBridge implements TypeBridge<Object> {
 		@Override
 		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
 			throw new AssertionFailure( "Should not be called" );

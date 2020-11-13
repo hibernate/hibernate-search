@@ -28,7 +28,7 @@ public class MyEntityTypeBinder implements TypeBinder {
 	}
 
 	//tag::include[]
-	private static class Bridge implements TypeBridge {
+	private static class Bridge implements TypeBridge<Object> {
 
 		private final IndexFieldReference<String> field;
 

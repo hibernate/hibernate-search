@@ -47,7 +47,7 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 		return new ContainingEntityMultiValuedPropertyBridge.Binder();
 	}
 
-	public static class ContainingEntityTypeBridge implements TypeBridge {
+	public static class ContainingEntityTypeBridge implements TypeBridge<ContainingEntity> {
 
 		private final IndexObjectFieldReference typeBridgeObjectFieldReference;
 		private final IndexFieldReference<String> directFieldReference;
@@ -75,16 +75,14 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 		}
 
 		@Override
-		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
-			ContainingEntity castedBridgedElement = (ContainingEntity) bridgedElement;
-
+		public void write(DocumentElement target, ContainingEntity bridgedElement, TypeBridgeWriteContext context) {
 			DocumentElement typeBridgeObjectField = target.addObject( typeBridgeObjectFieldReference );
 			typeBridgeObjectField.addValue(
 					directFieldReference,
-					castedBridgedElement.getDirectField()
+					bridgedElement.getDirectField()
 			);
 
-			ContainingEntity child = castedBridgedElement.getAssociation1();
+			ContainingEntity child = bridgedElement.getAssociation1();
 			DocumentElement childObjectField = typeBridgeObjectField.addObject( childObjectFieldReference );
 
 			ContainedEntity containedSingle = child == null ? null : child.getContainedSingle();

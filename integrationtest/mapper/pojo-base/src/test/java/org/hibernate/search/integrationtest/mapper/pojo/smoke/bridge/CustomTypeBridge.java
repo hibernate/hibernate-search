@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 
-public final class CustomTypeBridge implements TypeBridge {
+public final class CustomTypeBridge implements TypeBridge<Object> {
 
 	private static final String TEXT_PROPERTY_NAME = "text";
 	private static final String LOCAL_DATE_PROPERTY_NAME = "localDate";

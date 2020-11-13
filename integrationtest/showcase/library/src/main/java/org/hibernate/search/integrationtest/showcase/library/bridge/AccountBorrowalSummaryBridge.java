@@ -32,7 +32,7 @@ import org.hibernate.search.integrationtest.showcase.library.model.Borrowal;
  * </pre></code>
  *
  */
-public class AccountBorrowalSummaryBridge implements TypeBridge {
+public class AccountBorrowalSummaryBridge implements TypeBridge<Account> {
 
 	private final IndexObjectFieldReference borrowalsObjectFieldReference;
 	private final IndexFieldReference<Integer> shortTermBorrowalCountReference;
@@ -57,8 +57,7 @@ public class AccountBorrowalSummaryBridge implements TypeBridge {
 	}
 
 	@Override
-	public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
-		Account account = (Account) bridgedElement;
+	public void write(DocumentElement target, Account account, TypeBridgeWriteContext context) {
 		if ( account == null ) {
 			return;
 		}

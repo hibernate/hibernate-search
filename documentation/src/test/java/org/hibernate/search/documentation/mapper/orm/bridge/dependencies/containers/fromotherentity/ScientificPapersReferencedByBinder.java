@@ -35,7 +35,7 @@ public class ScientificPapersReferencedByBinder implements TypeBinder {
 		context.bridge( new Bridge( papersReferencingThisOneField ) );
 	}
 
-	private static class Bridge implements TypeBridge {
+	private static class Bridge implements TypeBridge<ScientificPaper> {
 
 		private final IndexFieldReference<String> referencedByField;
 
@@ -44,9 +44,7 @@ public class ScientificPapersReferencedByBinder implements TypeBinder {
 		}
 
 		@Override
-		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
-			ScientificPaper paper = (ScientificPaper) bridgedElement;
-
+		public void write(DocumentElement target, ScientificPaper paper, TypeBridgeWriteContext context) {
 			for ( String referencingPaperTitle : findReferencingPaperTitles( context, paper ) ) { // <3>
 				target.addValue( referencedByField, referencingPaperTitle );
 			}

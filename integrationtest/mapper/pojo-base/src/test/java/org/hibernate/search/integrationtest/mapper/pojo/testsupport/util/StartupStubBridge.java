@@ -45,7 +45,7 @@ import org.hibernate.search.util.impl.test.rule.StaticCounters;
  * For our own convenience, all bridge types are implemented in the same class.
  */
 public class StartupStubBridge<T>
-		implements TypeBridge, PropertyBridge<T>, ValueBridge<T, String>,
+		implements TypeBridge<T>, PropertyBridge<T>, ValueBridge<T, String>,
 				RoutingBridge<T>, IdentifierBridge<T> {
 	public static class CounterKeys {
 		public final StaticCounters.Key instance = StaticCounters.createKey();
@@ -92,7 +92,7 @@ public class StartupStubBridge<T>
 	}
 
 	@Override
-	public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
+	public void write(DocumentElement target, T bridgedElement, TypeBridgeWriteContext context) {
 		throw unexpectedRuntimeUse();
 	}
 

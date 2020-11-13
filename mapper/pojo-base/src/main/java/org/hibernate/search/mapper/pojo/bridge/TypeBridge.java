@@ -18,8 +18,10 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContextExt
  * The {@code TypeBridge} interface is a more powerful version of {@link ValueBridge}
  * that applies to a whole type instead of a single property,
  * and can contribute more than one index field, in particular.
+ *
+ * @param <T> The type on the POJO side of the bridge.
  */
-public interface TypeBridge extends AutoCloseable {
+public interface TypeBridge<T> extends AutoCloseable {
 
 	/**
 	 * Write to fields in the given {@link DocumentElement},
@@ -43,7 +45,7 @@ public interface TypeBridge extends AutoCloseable {
 	 * {@link TypeBridgeWriteContext#extension(TypeBridgeWriteContextExtension) extended}
 	 * to a more useful type, giving access to such things as a Hibernate ORM Session (if using the Hibernate ORM mapper).
 	 */
-	void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context);
+	void write(DocumentElement target, T bridgedElement, TypeBridgeWriteContext context);
 
 	/**
 	 * Close any resource before the bridge is discarded.

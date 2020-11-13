@@ -36,7 +36,7 @@ public class MultiValuedNamesBinder implements TypeBinder {
 	}
 	//end::bind[]
 
-	private static class Bridge implements TypeBridge {
+	private static class Bridge implements TypeBridge<Author> {
 
 		private final IndexFieldReference<String> namesField;
 
@@ -45,8 +45,7 @@ public class MultiValuedNamesBinder implements TypeBinder {
 		}
 
 		@Override
-		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
-			Author author = (Author) bridgedElement;
+		public void write(DocumentElement target, Author author, TypeBridgeWriteContext context) {
 			target.addValue( this.namesField, author.getFirstName() );
 			target.addValue( this.namesField, author.getLastName() );
 		}

@@ -296,7 +296,7 @@ public class AutomaticIndexingOverReindexingIT {
 		}
 	}
 
-	public static class Level3Property1Bridge implements TypeBridge {
+	public static class Level3Property1Bridge implements TypeBridge<Object> {
 
 		private PojoElementAccessor<String> level3Property1SourceAccessor;
 		private IndexFieldReference<String> property1FromBridgeFieldReference;
