@@ -17,6 +17,7 @@ import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
 
 import org.hibernate.AssertionFailure;
+import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
@@ -39,6 +40,15 @@ public final class HibernateOrmUtils {
 		}
 		catch (IllegalStateException e) {
 			throw log.hibernateSessionFactoryAccessError( e.getMessage(), e );
+		}
+	}
+
+	public static Session toSession(EntityManager entityManager) {
+		try {
+			return entityManager.unwrap( Session.class );
+		}
+		catch (IllegalStateException e) {
+			throw log.hibernateSessionAccessError( e.getMessage(), e );
 		}
 	}
 
