@@ -15,6 +15,7 @@ import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
@@ -30,16 +31,15 @@ import org.hibernate.search.mapper.orm.work.SearchWorkspace;
  * This implementation allows to call {@link org.hibernate.search.mapper.orm.Search#session(Session)}
  * before Hibernate Search is fully initialized, which can be useful in CDI/Spring environments.
  */
-public class LazyInitSearchSession implements SearchSession {
+public class DelegatingSearchSession implements SearchSession {
 
 	private final Supplier<? extends HibernateOrmSearchSessionMappingContext> mappingContextProvider;
-	private final SessionImplementor sessionImplementor;
-	private HibernateOrmSearchSession delegate;
+	private final Session session;
 
-	public LazyInitSearchSession(Supplier<? extends HibernateOrmSearchSessionMappingContext> mappingContextProvider,
-			SessionImplementor sessionImplementor) {
+	public DelegatingSearchSession(Supplier<? extends HibernateOrmSearchSessionMappingContext> mappingContextProvider,
+			Session session) {
 		this.mappingContextProvider = mappingContextProvider;
-		this.sessionImplementor = sessionImplementor;
+		this.session = session;
 	}
 
 	@Override
@@ -81,12 +81,12 @@ public class LazyInitSearchSession implements SearchSession {
 
 	@Override
 	public EntityManager toEntityManager() {
-		return getDelegate().toEntityManager();
+		return session;
 	}
 
 	@Override
 	public Session toOrmSession() {
-		return getDelegate().toOrmSession();
+		return session;
 	}
 
 	@Override
@@ -101,9 +101,11 @@ public class LazyInitSearchSession implements SearchSession {
 	}
 
 	private HibernateOrmSearchSession getDelegate() {
-		if ( delegate == null ) {
-			delegate = HibernateOrmSearchSession.get( mappingContextProvider.get(), sessionImplementor );
-		}
-		return delegate;
+		// We cannot cache this session implementor, nor the resulting delegate,
+		// because the session may be a proxy that returns a different session based
+		// on the current thread (Spring, SessionFactory.getCurrentSession(), ...)
+		// See https://hibernate.atlassian.net/browse/HSEARCH-4108
+		SessionImplementor sessionImpl = HibernateOrmUtils.toSessionImplementor( session );
+		return HibernateOrmSearchSession.get( mappingContextProvider.get(), sessionImpl );
 	}
 }

@@ -96,7 +96,7 @@ public class ToJpaEntityManagerIT {
 
 		assertThatThrownBy( () -> createSimpleQuery( searchSession ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session is closed." );
+				.hasMessageContainingAll( "Unable to access Hibernate ORM session", "is closed" );
 	}
 
 	@Test
@@ -108,7 +108,7 @@ public class ToJpaEntityManagerIT {
 
 		assertThatThrownBy( () -> createSimpleQuery( searchSession ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session is closed." );
+				.hasMessageContainingAll( "Unable to access Hibernate ORM session", "is closed" );
 	}
 
 	private SearchQuery<IndexedEntity> createSimpleQuery(SearchSession searchSession) {

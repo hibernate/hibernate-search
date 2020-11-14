@@ -13,7 +13,6 @@ import javax.persistence.TypedQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.query.Query;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
@@ -21,7 +20,7 @@ import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
 import org.hibernate.search.mapper.orm.search.query.impl.HibernateOrmSearchQueryAdapter;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.mapper.orm.session.impl.LazyInitSearchSession;
+import org.hibernate.search.mapper.orm.session.impl.DelegatingSearchSession;
 
 public final class Search {
 
@@ -67,8 +66,7 @@ public final class Search {
 	 * @throws org.hibernate.search.util.common.SearchException if the session NOT {@link Session#isOpen()}.
 	 */
 	public static SearchSession session(Session session) {
-		SessionImplementor sessionImpl = HibernateOrmUtils.toSessionImplementor( session );
-		return createSearchSession( sessionImpl );
+		return createSearchSession( session );
 	}
 
 	/**
@@ -83,8 +81,8 @@ public final class Search {
 	 * @throws org.hibernate.search.util.common.SearchException if the entity manager NOT {@link EntityManager#isOpen()}.
 	 */
 	public static SearchSession session(EntityManager entityManager) {
-		SessionImplementor sessionImpl = HibernateOrmUtils.toSessionImplementor( entityManager );
-		return createSearchSession( sessionImpl );
+		Session session = HibernateOrmUtils.toSession( entityManager );
+		return createSearchSession( session );
 	}
 
 	/**
@@ -127,10 +125,10 @@ public final class Search {
 		return mappingContextProvider.get();
 	}
 
-	private static SearchSession createSearchSession(SessionImplementor sessionImplementor) {
-		HibernateSearchContextProviderService mappingContextProvider =
-				HibernateSearchContextProviderService.get( sessionImplementor.getSessionFactory() );
-		return new LazyInitSearchSession( mappingContextProvider, sessionImplementor );
+	private static SearchSession createSearchSession(Session session) {
+		HibernateSearchContextProviderService mappingContextProvider = HibernateSearchContextProviderService.get(
+				HibernateOrmUtils.toSessionFactoryImplementor( session.getSessionFactory() ) );
+		return new DelegatingSearchSession( mappingContextProvider, session );
 	}
 
 }
