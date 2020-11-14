@@ -23,12 +23,15 @@ import org.hibernate.event.spi.EventSource;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.test.SearchTestBase;
+import org.hibernate.search.testsupport.junit.PortedToSearch6;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * @author Emmanuel Bernard
  */
+@Category(PortedToSearch6.class)
 public class SessionTest extends SearchTestBase {
 
 	//EventSource, org.hibernate.Session, LobCreationContext
