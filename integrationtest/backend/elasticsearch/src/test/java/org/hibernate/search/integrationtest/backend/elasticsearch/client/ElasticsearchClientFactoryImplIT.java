@@ -530,6 +530,33 @@ public class ElasticsearchClientFactoryImplIT {
 	}
 
 	@Test
+	public void multipleURIs() throws Exception {
+		String payload = "{ \"foo\": \"bar\" }";
+		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
+		wireMockRule2.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
+
+		try ( ElasticsearchClientImplementor client = createClient(
+				properties -> {
+					properties.accept( ElasticsearchBackendSettings.HOSTS, null );
+					properties.accept( ElasticsearchBackendSettings.PROTOCOL, null );
+					properties.accept( ElasticsearchBackendSettings.URIS, httpsUrisFor( wireMockRule1, wireMockRule2 ) );
+				}
+		) ) {
+			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
+			result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
+
+			wireMockRule1.verify( postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
+			wireMockRule2.verify( postRequestedFor( urlPathMatching( "/myIndex/myType" ) ) );
+		}
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2469")
 	public void multipleHosts_failover_serverError() throws Exception {
 		String payload = "{ \"foo\": \"bar\" }";
