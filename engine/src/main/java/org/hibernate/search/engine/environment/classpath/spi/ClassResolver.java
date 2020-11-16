@@ -17,11 +17,9 @@ public interface ClassResolver {
 	 * Locate a class by name.
 	 *
 	 * @param className The name of the class to locate
-	 * @param <T> The returned class type.
-	 *
 	 * @return The class reference
 	 *
 	 * @throws ClassLoadingException Indicates the class could not be found
 	 */
-	<T> Class<T> classForName(String className);
+	Class<?> classForName(String className);
 }

@@ -31,10 +31,9 @@ public final class DefaultClassResolver implements ClassResolver {
 	}
 
 	@Override
-	@SuppressWarnings({ "unchecked" })
-	public <T> Class<T> classForName(String className) {
+	public Class<?> classForName(String className) {
 		try {
-			return (Class<T>) Class.forName( className, true, aggregatedClassLoader );
+			return Class.forName( className, true, aggregatedClassLoader );
 		}
 		catch (Exception | LinkageError e) {
 			throw log.unableToLoadTheClass( className, e.getMessage(), e );
