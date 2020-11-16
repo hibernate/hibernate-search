@@ -20,7 +20,8 @@ Implementing a programmatic mapping requires two steps:
 . Define a class that implements the `org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer` interface.
 . Configure Hibernate Search to use that implementation by setting the configuration property
 `hibernate.search.mapping.configurer`
-to a <<configuration-property-types,bean reference>> pointing to the implementation.
+to a <<configuration-bean-reference-parsing,bean reference>> pointing to the implementation,
+for example `class:com.mycompany.MyMappingConfigurer`.
 
 Hibernate Search will call the `configure` method of this implementation on startup,
 and the configurer will be able to take advantage of a DSL to define

@@ -93,7 +93,7 @@
         <properties>
             <!-- tag::gettingstarted-configuration-orm_lucene-analysis[] -->
             <property name="hibernate.search.backend.analysis.configurer"
-                      value="org.hibernate.search.documentation.gettingstarted.withhsearch.customanalysis.MyLuceneAnalysisConfigurer"/> <!--6-->
+                      value="class:org.hibernate.search.documentation.gettingstarted.withhsearch.customanalysis.MyLuceneAnalysisConfigurer"/> <!--6-->
             <!-- end::gettingstarted-configuration-orm_lucene-analysis[] -->
 
             <!--
@@ -116,7 +116,7 @@
         <properties>
             <!-- tag::gettingstarted-configuration-orm_elasticsearch-analysis[] -->
             <property name="hibernate.search.backend.analysis.configurer"
-                      value="org.hibernate.search.documentation.gettingstarted.withhsearch.customanalysis.MyElasticsearchAnalysisConfigurer"/> <!--7-->
+                      value="class:org.hibernate.search.documentation.gettingstarted.withhsearch.customanalysis.MyElasticsearchAnalysisConfigurer"/> <!--7-->
             <!-- end::gettingstarted-configuration-orm_elasticsearch-analysis[] -->
 
             <!--

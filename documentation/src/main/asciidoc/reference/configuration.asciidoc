@@ -93,7 +93,7 @@ and this type defines the accepted values in both cases.
 
 Here are the definitions of all property types.
 
-[cols="h,2*", options="header"]
+[cols="h,1,2a", options="header"]
 |===============
 |Designation|Accepted Java objects|Accepted String format
 |String|`java.lang.String`|Any string
@@ -102,13 +102,10 @@ Here are the definitions of all property types.
 |Long|`java.lang.Number` (will call .longValue())|Any string that can be parsed by `Long.parseLong`
 
 |Bean reference of type T
-|An instance of `T`
-or `org.hibernate.search.engine.environment.bean.BeanReference`
+|An instance of `T` or `BeanReference`
 or a reference by type as a `java.lang.Class`
-(see <<configuration-bean-resolution>>)
-|A reference by name as a `java.lang.String`
-(this can be a fully-qualified class name, see <<configuration-bean-resolution>>)
-
+(see <<configuration-bean-reference>>)
+|See <<configuration-bean-reference-parsing>>
 |Multi-valued bean reference of type T
 |A `java.util.Collection` containing bean references (see above)
 |Comma-separated string containing bean references (see above)
@@ -170,8 +167,9 @@ Hibernate Search allows to plug in references to custom beans in various places:
 configuration properties, mapping annotations, arguments to APIs, ...
 
 This section describes <<configuration-bean-frameworks,the supported frameworks>>,
+<<configuration-bean-reference,how to reference beans>>,
 <<configuration-bean-resolution,how the beans are resolved>>
-and <<configuration-bean-injection,how the beans can be injected with other beans>>.
+and <<configuration-bean-injection,how the beans can get injected with other beans>>.
 
 [[configuration-bean-frameworks]]
 === Supported frameworks
@@ -187,29 +185,16 @@ This includes, but may not be limited to:
 When the framework is not supported, or when using Hibernate Search without Hibernate ORM,
 beans can only be retrieved using reflection by calling the public, no-arg constructor of the referenced type.
 
-[[configuration-bean-resolution]]
-=== Bean resolution
-// Search 5 anchors backward compatibility
-[[section-services]]
+[[configuration-bean-reference]]
+== Bean references
 
-Everywhere a custom bean reference is expected, three types of references are accepted:
+Bean references are composed of two parts:
 
-* A reference by type, as a `java.lang.Class`.
-* A reference by name, as a `java.lang.String`.
-* A reference by type *and* name (through a `BeanReference`, see below).
+* The type, i.e. a `java.lang.Class`.
+* Optionally, the name, as a `String`.
 
-Bean resolution (i.e. the process of turning this reference into an object instance) happens as follows:
-
-* If a dependency injection framework is integrated into Hibernate ORM,
-the reference is first requested to the DI framework.
-Currently CDI and recent versions of Spring are supported.
-* Otherwise, or if the DI framework cannot find a matching bean definition,
-reflection is used to resolve the bean.
-References by name are turned into a reference by type by interpreting the bean name
-as the fully-qualified class name
-Reference by type are resolved by calling the public, no-argument constructor of the given type.
-References by type *and* name are resolved as a reference by name,
-then the resulting object is checked to be an instance of the given type.
+When referencing beans using a string value in configuration properties,
+the type is implicitly set to whatever interface Hibernate Search expects for that configuration property.
 
 [TIP]
 ====
@@ -217,6 +202,92 @@ For experienced users, Hibernate Search also provides the `org.hibernate.search.
 which is accepted in configuration properties and APIs.
 This interface allows to plug in custom instantiation and cleanup code.
 See the javadoc of this interface for details.
+====
+
+[[configuration-bean-reference-parsing]]
+=== Parsing of bean references
+
+When referencing beans using a string value in configuration properties, that string is parsed.
+
+Here are the most common formats:
+
+* `bean:` followed by the name of a Spring or CDI bean.
+For example `bean:myBean`.
+* `class:` followed by the fully-qualified name of a class, to be instantiated through Spring/CDI if available,
+or through its public, no-argument constructor otherwise.
+For example `class:com.mycompany.MyClass`.
+* An arbitrary string that doesn't contain a colon:
+it will be interpreted as explained in <<configuration-bean-resolution>>. In short:
+** first, look for a built-in bean with the given name;
+** then try to retrieve a bean with the given name from Spring/CDI (if available);
+** then try to interpret the string as a fully-qualified class name
+and to retrieve the corresponding bean from Spring/CDI (if available);
+** then try to interpret the string as a fully-qualified class name
+and to instantiate it through its public, no-argument constructor.
+
+The following formats are also accepted, but are only useful for advanced use cases:
+
+* `any:` followed by an arbitrary string.
+Equivalent to leaving out the prefix in most cases. Only useful if the arbitrary string contains a colon.
+* `builtin:` followed by the name of a built-in bean,
+e.g. `simple` for the <<backend-elasticsearch-indexlayout,Elasticsearch index layout strategies>>.
+This will not fall back to Spring/CDI or a direct constructor call.
+* `constructor:` followed by the fully-qualified name of a class, to be instantiated through Spring/CDI if available,
+or through its public, no-argument constructor otherwise.
+This will ignore built-in beans and will not try to instantiate the class through Spring/CDI.
+
+[[configuration-bean-resolution]]
+=== Bean resolution
+// Search 5 anchors backward compatibility
+[[section-services]]
+
+Bean resolution (i.e. the process of turning this reference into an object instance)
+happens as follows by default:
+
+* If the given reference matches a built-in bean, that bean is used.
++
+Example: the name `simple`,
+when used as the value of the property `hibernate.search.backend.layout.strategy`
+to configure the <<backend-elasticsearch-indexlayout,Elasticsearch index layout strategy>>,
+resolves to the built-in `simple` strategy.
+* Otherwise, if a dependency injection framework is integrated into Hibernate ORM,
+the reference is resolved using the DI framework (see <<configuration-bean-frameworks>>).
+** If a managed bean with the given type (and if provided, name) exists, that bean is used.
++
+Example: the name `myLayoutStrategy`,
+when used as the value of the property `hibernate.search.backend.layout.strategy`
+to configure the <<backend-elasticsearch-indexlayout,Elasticsearch index layout strategy>>,
+resolves to any bean known from CDI/Spring of type `IndexLayoutStrategy` and annotated with `@Named("myShardinStrategy")`.
+** Otherwise, if a name is given, and that name is a fully-qualified class name,
+and a managed bean of that type exists, that bean is used.
++
+Example: the name `com.mycompany.MyLayoutStrategy`,
+when used as the value of the property `hibernate.search.backend.layout.strategy`
+to configure the <<backend-elasticsearch-indexlayout,Elasticsearch index layout strategy>>,
+resolves to any bean known from CDI/Spring and extending `com.mycompany.MyLayoutStrategy`.
+* Otherwise, reflection is used to resolve the bean.
+** If a name is given, and that name is a fully-qualified class name,
+and that class extends the type reference,
+an instance is created by invoking the public, no-argument constructor of that class.
++
+Example: the name `com.mycompany.MyLayoutStrategy`,
+when used as the value of the property `hibernate.search.backend.layout.strategy`
+to configure the <<backend-elasticsearch-indexlayout,Elasticsearch index layout strategy>>,
+resolves to an instance of `com.mycompany.MyLayoutStrategy`.
+** If no name is given,
+an instance is created by invoking the public, no-argument constructor of the referenced type.
++
+Example: the class `com.mycompany.MyLayoutStrategy.class` (a `java.lang.Class`, not a `String`),
+when used as the value of the property `hibernate.search.backend.layout.strategy`
+to configure the <<backend-elasticsearch-indexlayout,Elasticsearch index layout strategy>>,
+resolves to an instance of `com.mycompany.MyLayoutStrategy`.
+
+[TIP]
+====
+It is possible to control bean retrieval more finely by selecting a `BeanRetrieval`;
+see the javadoc of `org.hibernate.search.engine.environment.bean.BeanRetrieval` for more information.
+See also <<configuration-bean-reference-parsing>> for the prefixes that allow to specify the bean retrieval
+when referencing a bean from configuration properties.
 ====
 
 [[configuration-bean-injection]]
@@ -287,10 +358,11 @@ By default, when that happens, the failure is logged at the `ERROR` level.
 
 To customize background failure handling, you will need to:
 
-* Define a class that implements the `org.hibernate.search.engine.reporting.FailureHandler` interface.
-* Configure the backend to use that implementation by setting the configuration property
+. Define a class that implements the `org.hibernate.search.engine.reporting.FailureHandler` interface.
+. Configure the backend to use that implementation by setting the configuration property
 `hibernate.search.background_failure_handler`
-to a <<configuration-property-types,bean reference>> pointing to the implementation.
+to a <<configuration-bean-reference-parsing,bean reference>> pointing to the implementation,
+for example `class:com.mycompany.MyFailureHandler`.
 
 Hibernate Search will call the `handle` methods whenever a failure occurs.
 
