@@ -1,6 +1,33 @@
 Hibernate Search Changelog
 ==========================
 
+5.11.6.Final (16-11-2020)
+-------------------------
+
+** Bug
+    * HSEARCH-4107 Session cast fails when creating a FullTextSession with Spring 2.4.0
+
+** Improvement
+    * HSEARCH-4030 Upgrade to Hibernate ORM 5.4.22.Final
+    * HSEARCH-3972 Upgrade to ORM 5.4.19.Final
+    * HSEARCH-3957 Upgrade to Hibernate ORM 5.4.18.Final
+    * HSEARCH-3932 Upgrade to Hibernate ORM 5.4.17.Final
+    * HSEARCH-3873 Upgrade to Hibernate ORM 5.4.13.Final
+
+** Task
+    * HSEARCH-4087 Upgrade to Hibernate ORM 5.4.23.Final
+    * HSEARCH-4085 Upgrade to HCANN 5.1.2.Final
+    * HSEARCH-4075 Upgrade to Hibernate Annotations 5.1.1.Final
+    * HSEARCH-4062 Test Hibernate Search 5.11 against JDK 15 and JDK 16
+    * HSEARCH-3989 Upgrade to Hibernate ORM 5.4.21.Final
+    * HSEARCH-3982 Upgrade to Byteman 4.0.13
+    * HSEARCH-3981 Upgrade to Hibernate ORM 5.4.20.Final
+    * HSEARCH-3968 Upgrade to byteman 4.0.12
+    * HSEARCH-3923 Upgrade to Hibernate ORM 5.4.16.Final
+    * HSEARCH-3907 Upgrade to Hibernate ORM 5.4.15.Final
+    * HSEARCH-3890 Upgrade to Hibernate ORM 5.4.14.Final
+    * HSEARCH-3840 Upgrade to Byteman 4.0.11
+
 5.11.5.Final (18-02-2020)
 -------------------------
 
