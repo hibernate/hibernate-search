@@ -57,6 +57,9 @@ See <<mapper-orm-bridge-index-field-type-dsl>>
 for more information about declaring index field types.
 <6> Call `context.bridge(...)` to define the type bridge to use,
 and pass an instance of the bridge.
+Optionally you can provide the expected type for the bridged element,
+using the method `<P> bridge(Class<P>, TypeBridge<P>)`,
+to statically define the type and so avoid casting on the bridge.
 <7> Pass a reference to the `fullName` field to the bridge.
 
 [source, JAVA, indent=0, subs="+callouts"]
