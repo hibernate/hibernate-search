@@ -60,17 +60,17 @@ public final class ElasticsearchBackendSettings {
 
 	/**
 	 * Alternatively to {@link #HOSTS} and {@link #PROTOCOL},
-	 * it is possible to define both the terms using the same property.
+	 * it is possible to define both the protocol and hosts as one or more URIs using this property.
 	 * <p>
 	 * Expects either a String representing an URI such as {@code http://localhost}
 	 * or {@code https://es.mycompany.com:4400},
-	 * or a String containing multiple such URIs separated by whitespace characters,
+	 * or a String containing multiple such URIs separated by commas,
 	 * or a {@code Collection<String>} containing such URIs.
 	 * <p>
-	 * All the uris must have the same protocol.
+	 * All the URIs must have the same protocol.
 	 * Cannot be used if {@link #HOSTS} or {@link #PROTOCOL} are set.
 	 * <p>
-	 * Defaults to no value, {@link #HOSTS} or {@link #PROTOCOL} are supposed to be used.
+	 * Defaults to {@code http://localhost:9200}, unless {@link #HOSTS} or {@link #PROTOCOL} are set, in which case they take precedence.
 	 */
 	public static final String URIS = "uris";
 

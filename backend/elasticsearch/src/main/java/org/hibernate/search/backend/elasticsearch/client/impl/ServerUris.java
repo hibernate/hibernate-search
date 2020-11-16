@@ -65,7 +65,7 @@ final class ServerUris {
 			if ( https == null ) {
 				https = currentHttps;
 			}
-			else if ( ( currentHttps && !https || ( !currentHttps && https ) ) ) {
+			else if ( currentHttps != https ) {
 				throw log.differentProtocolsOnUris( serverUrisStrings );
 			}
 		}
