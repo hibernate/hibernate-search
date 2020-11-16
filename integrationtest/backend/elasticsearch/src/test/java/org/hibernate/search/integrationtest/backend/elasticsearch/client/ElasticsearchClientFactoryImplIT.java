@@ -936,6 +936,19 @@ public class ElasticsearchClientFactoryImplIT {
 				);
 	}
 
+	@Test
+	public void emptyListOfHosts() {
+		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
+			properties.accept( ElasticsearchBackendSettings.HOSTS, Collections.emptyList() );
+		};
+
+		assertThatThrownBy( () -> createClient( additionalProperties ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining(
+						"Invalid target hosts configuration: the list of hosts must not be empty"
+				);
+	}
+
 	private ElasticsearchClientImplementor createClient() {
 		return createClient( ignored -> { } );
 	}
