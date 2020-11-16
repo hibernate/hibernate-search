@@ -698,6 +698,10 @@ public interface Log extends BasicLogger {
 	SearchException differentProtocolsOnUris(List<String> uris);
 
 	@Message(id = ID_OFFSET + 129,
+			value = "Invalid target hosts configuration: the list of hosts must not be empty.")
+	SearchException emptyListOfHosts();
+
+	@Message(id = ID_OFFSET + 130,
 			value = "Invalid target hosts configuration: the list of URIs must not be empty.")
 	SearchException emptyListOfUris();
 }

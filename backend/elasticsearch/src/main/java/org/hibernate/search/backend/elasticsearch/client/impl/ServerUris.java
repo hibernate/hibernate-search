@@ -74,6 +74,10 @@ final class ServerUris {
 	}
 
 	private static ServerUris fromStrings(String protocol, List<String> hostAndPortStrings) {
+		if ( hostAndPortStrings.isEmpty() ) {
+			throw log.emptyListOfHosts();
+		}
+
 		HttpHost[] hosts = new HttpHost[hostAndPortStrings.size()];
 		// Note: protocol and URI scheme are not the same thing,
 		// but for HTTP/HTTPS both the protocol and URI scheme are named HTTP/HTTPS.
