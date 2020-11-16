@@ -578,10 +578,11 @@ but analysis can also be configured explicitly.
 
 To configure analysis in a Lucene backend, you will need to:
 
-* Define a class that implements the `org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer` interface.
-* Configure the backend to use that implementation by setting the configuration property
+. Define a class that implements the `org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer` interface.
+. Configure the backend to use that implementation by setting the configuration property
 `hibernate.search.backend.analysis.configurer`
-to a <<configuration-property-types,bean reference>> pointing to the implementation.
+to a <<configuration-bean-reference-parsing,bean reference>> pointing to the implementation,
+for example `class:com.mycompany.MyAnalysisConfigurer`.
 
 Hibernate Search will call the `configure` method of this implementation on startup,
 and the configurer will be able to take advantage of a DSL to define

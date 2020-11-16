@@ -425,10 +425,11 @@ and https://hibernate.atlassian.net/browse/HSEARCH-3499[HSEARCH-3499].
 If the default names and aliases used by Hibernate Search do not match your needs,
 you can define a custom layout in two simple steps:
 
-1. Define a class that implements the interface `org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy`.
-2. Configure the backend to use that implementation by setting the configuration property
+. Define a class that implements the interface `org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy`.
+. Configure the backend to use that implementation by setting the configuration property
 `hibernate.search.backend.layout.strategy`
-to a <<configuration-property-types,bean reference>> pointing to the implementation.
+to a <<configuration-bean-reference-parsing,bean reference>> pointing to the implementation,
+for example `class:com.mycompany.MyLayoutStrategy`.
 
 For example, the implementation below will lead to the following layout for an index named `myIndex`:
 
@@ -776,10 +777,11 @@ through <<mapper-orm-schema-management,schema management>>.
 
 To configure analysis in an Elasticsearch backend, you will need to:
 
-* Define a class that implements the `org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer` interface.
-* Configure the backend to use that implementation by setting the configuration property
+. Define a class that implements the `org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer` interface.
+. Configure the backend to use that implementation by setting the configuration property
 `hibernate.search.backend.analysis.configurer`
-to a <<configuration-property-types,bean reference>> pointing to the implementation.
+to a <<configuration-bean-reference-parsing,bean reference>> pointing to the implementation,
+for example `class:com.mycompany.MyAnalysisConfigurer`.
 
 Hibernate Search will call the `configure` method of this implementation on startup,
 and the configurer will be able to take advantage of a DSL to define

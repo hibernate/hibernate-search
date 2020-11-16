@@ -520,6 +520,7 @@ include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configurati
 On contrary to the first one, do not use enable stemming,
 as it is unlikely to lead to useful results on proper nouns.
 <6> Assign the configurer to the backend in the Hibernate Search configuration (here in `persistence.xml`).
+For more information about the format of bean references, see <<configuration-bean-reference-parsing>>.
 ====
 
 .Analysis configurer implementation and configuration in `persistence.xml` for a "Hibernate ORM + Elasticsearch" setup
@@ -542,6 +543,7 @@ must be defined separately and assigned a name.
 On contrary to the first one, do not use enable stemming,
 as it is unlikely to lead to useful results on proper nouns.
 <7> Assign the configurer to the backend in the Hibernate Search configuration (here in `persistence.xml`).
+For more information about the format of bean references, see <<configuration-bean-reference-parsing>>.
 ====
 
 Once analysis is configured, the mapping must be adapted to assign the relevant analyzer to each field:

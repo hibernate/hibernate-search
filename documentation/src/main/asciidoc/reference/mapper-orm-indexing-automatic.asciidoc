@@ -237,6 +237,7 @@ The custom strategy can then be set just like the built-in strategies:
 
 * as the default by setting
 the configuration property `hibernate.search.automatic_indexing.synchronization.strategy`
-to a <<configuration-property-types,bean reference>> pointing to the custom implementation.
+to a <<configuration-bean-reference-parsing,bean reference>> pointing to the custom implementation,
+for example `class:com.mycompany.MySynchronizationStrategy`.
 * at the session level by passing an instance of the custom implementation
 to `SearchSession#automaticIndexingSynchronizationStrategy(...)`.
