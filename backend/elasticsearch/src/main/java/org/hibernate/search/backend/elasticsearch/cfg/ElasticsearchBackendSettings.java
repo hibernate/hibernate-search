@@ -43,6 +43,8 @@ public final class ElasticsearchBackendSettings {
 	 * or a String containing multiple such host-and-port strings separated by commas,
 	 * or a {@code Collection<String>} containing such host-and-port strings.
 	 * <p>
+	 * Cannot be used if {@link #URIS} is set.
+	 * <p>
 	 * Defaults to {@link Defaults#HOSTS}.
 	 * <p>
 	 * Multiple servers may be specified for load-balancing: requests will be assigned to each host in turns.
@@ -53,6 +55,8 @@ public final class ElasticsearchBackendSettings {
 	 * The protocol to use when connecting to the Elasticsearch servers.
 	 * <p>
 	 * Expects a String: either {@code http} or {@code https}.
+	 * <p>
+	 * Cannot be used if {@link #URIS} is set.
 	 * <p>
 	 * Defaults to {@link Defaults#PROTOCOL}.
 	 */
