@@ -41,7 +41,7 @@ public class InvoiceLineItemsDetailBinder implements PropertyBinder {
 				)
 				.multiValued(); // <4>
 
-		context.listPropertyBridge( InvoiceLineItem.class, new Bridge(
+		context.bridge( List.class, new Bridge(
 				lineItemsField.toReference(), // <5>
 				lineItemsField.field( "category", f -> f.asString() ) // <6>
 						.toReference(),
@@ -51,7 +51,7 @@ public class InvoiceLineItemsDetailBinder implements PropertyBinder {
 	}
 	//end::bind[]
 
-	private static class Bridge implements PropertyBridge<List<InvoiceLineItem>> {
+	private static class Bridge implements PropertyBridge<List> {
 
 		private final IndexObjectFieldReference lineItemsField;
 		private final IndexFieldReference<String> categoryField;
@@ -66,7 +66,10 @@ public class InvoiceLineItemsDetailBinder implements PropertyBinder {
 		}
 
 		@Override
-		public void write(DocumentElement target, List<InvoiceLineItem> lineItems, PropertyBridgeWriteContext context) {
+		@SuppressWarnings("unchecked")
+		public void write(DocumentElement target, List bridgedElement, PropertyBridgeWriteContext context) {
+			List<InvoiceLineItem> lineItems = (List<InvoiceLineItem>) bridgedElement;
+
 			for ( InvoiceLineItem lineItem : lineItems ) {
 				DocumentElement indexedLineItem = target.addObject( this.lineItemsField );
 				indexedLineItem.addValue( this.categoryField, lineItem.getCategory().name() );

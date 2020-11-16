@@ -139,7 +139,7 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 		}
 	}
 
-	public static class ContainingEntityMultiValuedPropertyBridge implements PropertyBridge<List<ContainingEntity>> {
+	public static class ContainingEntityMultiValuedPropertyBridge implements PropertyBridge<List> {
 
 		private final IndexObjectFieldReference propertyBridgeObjectFieldReference;
 		private final IndexFieldReference<String> includedInPropertyBridgeFieldReference;
@@ -158,8 +158,9 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 		}
 
 		@Override
-		public void write(DocumentElement target, List<ContainingEntity> bridgedElement,
-				PropertyBridgeWriteContext context) {
+		@SuppressWarnings("unchecked")
+		public void write(DocumentElement target, List bridgedElement, PropertyBridgeWriteContext context) {
+			List<ContainingEntity> castedBridgedElement = (List<ContainingEntity>) bridgedElement;
 
 			DocumentElement propertyBridgeObjectField = target.addObject( propertyBridgeObjectFieldReference );
 
@@ -168,7 +169,7 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 				concatenatedValue = null;
 			}
 			else {
-				concatenatedValue = bridgedElement.stream()
+				concatenatedValue = castedBridgedElement.stream()
 						.map( ContainingEntity::getContainedSingle )
 						.map( ContainedEntity::getIncludedInMultiValuedPropertyBridge )
 						.collect( Collectors.joining( " " ) );
@@ -182,8 +183,7 @@ public class AutomaticIndexingBridgeExplicitReindexingBaseIT extends AbstractAut
 		public static class Binder implements PropertyBinder {
 			@Override
 			public void bind(PropertyBindingContext context) {
-				context.listPropertyBridge( ContainingEntity.class,
-						new ContainingEntityMultiValuedPropertyBridge( context ) );
+				context.bridge( List.class, new ContainingEntityMultiValuedPropertyBridge( context ) );
 			}
 		}
 	}

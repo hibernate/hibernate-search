@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.binding;
 
-import java.util.List;
-import java.util.Map;
-
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -64,56 +61,6 @@ public interface PropertyBindingContext extends BindingContext {
 	 * @param <P2> The type of the property expected by the given bridge.
 	 */
 	<P2> void bridge(Class<P2> expectedPropertyType, BeanHolder<? extends PropertyBridge<P2>> bridgeHolder);
-
-	/**
-	 * Sets the bridge implementing the property/index binding.
-	 * Can be used if the property type of the bridged element is a {@link Map}.
-	 *
-	 * @param keyType The key type of the map property expected by the given bridge.
-	 * @param valueType The value type of the map property expected by the given bridge.
-	 * @param bridge The bridge to use at runtime to convert between the POJO property and the index field value.
-	 * @param <K> The key type of the map property expected by the given bridge.
-	 * @param <V> The value type of the map property expected by the given bridge.
-	 */
-	<K, V> void mapPropertyBridge(Class<K> keyType, Class<V> valueType, PropertyBridge<Map<K, V>> bridge);
-
-	/**
-	 * Sets the bridge implementing the property/index binding.
-	 * Can be used if the property type of the bridged element is a {@link Map}.
-	 *
-	 * @param keyType The key type of the map property expected by the given bridge.
-	 * @param valueType The value type of the map property expected by the given bridge.
-	 * @param bridgeHolder A {@link BeanHolder} containing
-	 * the bridge to use at runtime to convert between the POJO property and the index field value.
-	 * Use {@link BeanHolder#of(Object)} if you don't need any particular closing behavior.
-	 * @param <K> The key type of the map property expected by the given bridge.
-	 * @param <V> The value type of the map property expected by the given bridge.
-	 */
-	<K, V> void mapPropertyBridge(Class<K> keyType, Class<V> valueType,
-			BeanHolder<? extends PropertyBridge<Map<K, V>>> bridgeHolder);
-
-	/**
-	 * Sets the bridge implementing the property/index binding.
-	 * Can be used if the property type of the bridged element is a {@link List}.
-	 *
-	 * @param elementType The element type of the list property expected by the given bridge.
-	 * @param bridge The bridge to use at runtime to convert between the POJO property and the index field value.
-	 * @param <E> The element type of the list property expected by the given bridge.
-	 */
-	<E> void listPropertyBridge(Class<E> elementType, PropertyBridge<List<E>> bridge );
-
-	/**
-	 * Sets the bridge implementing the property/index binding.
-	 * Can be used if the property type of the bridged element is a {@link List}.
-	 *
-	 * @param elementType The element type of the list property expected by the given bridge.
-	 * @param bridgeHolder A {@link BeanHolder} containing
-	 * the bridge to use at runtime to convert between the POJO property and the index field value.
-	 * Use {@link BeanHolder#of(Object)} if you don't need any particular closing behavior.
-	 * @param <E> The element type of the list property expected by the given bridge.
-	 */
-	<E> void listPropertyBridge(Class<E> elementType,
-			BeanHolder<? extends PropertyBridge<List<E>>> bridgeHolder );
 
 	/**
 	 * @return An entry point allowing to declare expectations and retrieve accessors to the bridged POJO property.
