@@ -41,7 +41,7 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder {
 		IndexFieldType<BigDecimal> amountFieldType = context.typeFactory()
 				.asBigDecimal().decimalScale( 2 ).toIndexFieldType();
 
-		context.listPropertyBridge( InvoiceLineItem.class, new Bridge(
+		context.bridge( List.class, new Bridge(
 				summaryField.toReference(),
 				summaryField.field( "total", amountFieldType ).toReference(),
 				summaryField.field( "books", amountFieldType ).toReference(),
@@ -49,7 +49,7 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder {
 		) );
 	}
 
-	private static class Bridge implements PropertyBridge<List<InvoiceLineItem>> {
+	private static class Bridge implements PropertyBridge<List> {
 
 		/* ... same implementation as before ... */
 
@@ -70,7 +70,10 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder {
 		}
 
 		@Override
-		public void write(DocumentElement target, List<InvoiceLineItem> lineItems, PropertyBridgeWriteContext context) {
+		@SuppressWarnings("unchecked")
+		public void write(DocumentElement target, List bridgedElement, PropertyBridgeWriteContext context) {
+			List<InvoiceLineItem> lineItems = (List<InvoiceLineItem>) bridgedElement;
+
 			BigDecimal total = BigDecimal.ZERO;
 			BigDecimal books = BigDecimal.ZERO;
 			BigDecimal shipping = BigDecimal.ZERO;

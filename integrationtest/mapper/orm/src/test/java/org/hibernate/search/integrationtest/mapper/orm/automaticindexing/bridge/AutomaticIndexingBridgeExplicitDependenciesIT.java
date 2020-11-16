@@ -134,7 +134,7 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		}
 	}
 
-	public static class ContainingEntityMultiValuedPropertyBridge implements PropertyBridge<List<ContainingEntity>> {
+	public static class ContainingEntityMultiValuedPropertyBridge implements PropertyBridge<List> {
 
 		private final IndexObjectFieldReference propertyBridgeObjectFieldReference;
 		private final IndexFieldReference<String> includedInPropertyBridgeFieldReference;
@@ -152,8 +152,10 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		}
 
 		@Override
-		public void write(DocumentElement target, List<ContainingEntity> castedBridgedElement,
-				PropertyBridgeWriteContext context) {
+		@SuppressWarnings("unchecked")
+		public void write(DocumentElement target, List bridgedElement, PropertyBridgeWriteContext context) {
+			List<ContainingEntity> castedBridgedElement = (List<ContainingEntity>) bridgedElement;
+
 			DocumentElement propertyBridgeObjectField = target.addObject( propertyBridgeObjectFieldReference );
 
 			String concatenatedValue;
@@ -175,7 +177,7 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 		public static class Binder implements PropertyBinder {
 			@Override
 			public void bind(PropertyBindingContext context) {
-				context.listPropertyBridge( ContainingEntity.class,
+				context.bridge( List.class,
 						new ContainingEntityMultiValuedPropertyBridge( context ) );
 			}
 		}

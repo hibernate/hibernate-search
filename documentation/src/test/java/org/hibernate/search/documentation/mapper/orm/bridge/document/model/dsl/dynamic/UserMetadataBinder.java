@@ -38,12 +38,12 @@ public class UserMetadataBinder implements PropertyBinder {
 				f -> f.asString().analyzer( "english" ) // <4>
 		); // <5>
 
-		context.mapPropertyBridge( String.class, String.class, new UserMetadataBridge( userMetadataField.toReference() ) ); // <6>
+		context.bridge( Map.class, new UserMetadataBridge( userMetadataField.toReference() ) ); // <6>
 	}
 	//end::bind[]
 
 	//tag::write[]
-	private static class UserMetadataBridge implements PropertyBridge<Map<String, String>> {
+	private static class UserMetadataBridge implements PropertyBridge<Map> {
 
 		private final IndexObjectFieldReference userMetadataFieldReference;
 
@@ -52,7 +52,9 @@ public class UserMetadataBinder implements PropertyBinder {
 		}
 
 		@Override
-		public void write(DocumentElement target, Map<String, String> userMetadata, PropertyBridgeWriteContext context) {
+		public void write(DocumentElement target, Map bridgedElement, PropertyBridgeWriteContext context) {
+			Map<String, String> userMetadata = (Map<String, String>) bridgedElement;
+
 			DocumentElement indexedUserMetadata = target.addObject( userMetadataFieldReference ); // <1>
 
 			for ( Map.Entry<String, String> entry : userMetadata.entrySet() ) {

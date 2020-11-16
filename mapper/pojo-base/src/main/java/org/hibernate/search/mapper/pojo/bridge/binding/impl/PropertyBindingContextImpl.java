@@ -7,8 +7,6 @@
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -71,28 +69,6 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 	@Override
 	public <P2> void bridge(Class<P2> expectedPropertyType, BeanHolder<? extends PropertyBridge<P2>> bridgeHolder) {
 		checkAndBind( bridgeHolder, introspector.typeModel( expectedPropertyType ) );
-	}
-
-	@Override
-	public <K, V> void mapPropertyBridge(Class<K> keyType, Class<V> valueType, PropertyBridge<Map<K, V>> bridge) {
-		mapPropertyBridge( keyType, valueType, BeanHolder.of( bridge ) );
-	}
-
-	@Override
-	public <K, V> void mapPropertyBridge(Class<K> keyType, Class<V> valueType,
-			BeanHolder<? extends PropertyBridge<Map<K, V>>> bridgeHolder) {
-		checkAndBind( bridgeHolder, introspector.typeModel( Map.class ) );
-	}
-
-	@Override
-	public <E> void listPropertyBridge(Class<E> elementType, PropertyBridge<List<E>> bridge) {
-		listPropertyBridge( elementType, BeanHolder.of( bridge ) );
-	}
-
-	@Override
-	public <E> void listPropertyBridge(Class<E> elementType,
-			BeanHolder<? extends PropertyBridge<List<E>>> bridgeHolder) {
-		checkAndBind( bridgeHolder, introspector.typeModel( List.class ) );
 	}
 
 	@Override
