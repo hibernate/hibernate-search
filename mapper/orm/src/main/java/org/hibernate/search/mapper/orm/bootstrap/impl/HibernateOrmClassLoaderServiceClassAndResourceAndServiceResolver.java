@@ -53,7 +53,7 @@ final class HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver
 	}
 
 	@Override
-	public <T> Class<T> classForName(String className) {
+	public Class<?> classForName(String className) {
 		try {
 			return hibernateClassLoaderService.classForName( className );
 		}

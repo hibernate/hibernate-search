@@ -8,6 +8,7 @@ package org.hibernate.search.engine.environment.bean.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -110,8 +111,7 @@ public class BeanResolverImplRetrievalClassTest {
 		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class, String)
-		when( classResolverMock.<BeanManagerType2>classForName( BeanManagerType2.class.getName() ) )
-				.thenReturn( BeanManagerType2.class );
+		doReturn( BeanManagerType2.class ).when( classResolverMock ).classForName( BeanManagerType2.class.getName() );
 		when( beanManagerBeanProviderMock.forType( BeanManagerType2.class ) )
 				.thenReturn( type2BeanHolder );
 		assertThat( beanResolver.resolve( Object.class, BeanManagerType2.class.getName(), BeanRetrieval.CLASS ) )
@@ -119,8 +119,7 @@ public class BeanResolverImplRetrievalClassTest {
 		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class, String) through BeanReference
-		when( classResolverMock.<BeanManagerType2>classForName( BeanManagerType2.class.getName() ) )
-				.thenReturn( BeanManagerType2.class );
+		doReturn( BeanManagerType2.class ).when( classResolverMock ).classForName( BeanManagerType2.class.getName() );
 		when( beanManagerBeanProviderMock.forType( BeanManagerType2.class ) )
 				.thenReturn( type2BeanHolder );
 		assertThat( beanResolver.resolve( BeanReference.of( Object.class, BeanManagerType2.class.getName(), BeanRetrieval.CLASS ) ) )
@@ -131,8 +130,7 @@ public class BeanResolverImplRetrievalClassTest {
 		when( beanManagerBeanProviderMock.forType( BeanManagerType3.class ) )
 				.thenReturn( type3BeanHolder1 )
 				.thenReturn( type3BeanHolder2 );
-		when( classResolverMock.<BeanManagerType3>classForName( BeanManagerType3.class.getName() ) )
-				.thenReturn( BeanManagerType3.class );
+		doReturn( BeanManagerType3.class ).when( classResolverMock ).classForName( BeanManagerType3.class.getName() );
 		BeanHolder<List<BeanManagerType3>> beans = beanResolver.resolve(
 				Arrays.asList( BeanReference.of( BeanManagerType3.class, BeanRetrieval.CLASS ),
 						BeanReference.of( BeanManagerType3.class, BeanManagerType3.class.getName(), BeanRetrieval.CLASS ) )
@@ -161,8 +159,7 @@ public class BeanResolverImplRetrievalClassTest {
 		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class, String)
-		when( classResolverMock.<ReflectionType2>classForName( ReflectionType2.class.getName() ) )
-				.thenReturn( ReflectionType2.class );
+		doReturn( ReflectionType2.class ).when( classResolverMock ).classForName( ReflectionType2.class.getName() );
 		when( beanManagerBeanProviderMock.forType( ReflectionType2.class ) )
 				.thenThrow( beanManagerNotFoundException );
 		assertThat( beanResolver.resolve( Object.class, ReflectionType2.class.getName(), BeanRetrieval.CLASS ) )
@@ -170,8 +167,7 @@ public class BeanResolverImplRetrievalClassTest {
 		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class, String) through BeanReference
-		when( classResolverMock.<ReflectionType2>classForName( ReflectionType2.class.getName() ) )
-				.thenReturn( ReflectionType2.class );
+		doReturn( ReflectionType2.class ).when( classResolverMock ).classForName( ReflectionType2.class.getName() );
 		when( beanManagerBeanProviderMock.forType( ReflectionType2.class ) )
 				.thenThrow( beanManagerNotFoundException );
 		assertThat( beanResolver.resolve( BeanReference.of( Object.class, ReflectionType2.class.getName(), BeanRetrieval.CLASS ) ) )
@@ -181,8 +177,7 @@ public class BeanResolverImplRetrievalClassTest {
 		// resolve(List<BeanReference>)
 		when( beanManagerBeanProviderMock.forType( ReflectionType3.class ) )
 				.thenThrow( beanManagerNotFoundException );
-		when( classResolverMock.<ReflectionType3>classForName( ReflectionType3.class.getName() ) )
-				.thenReturn( ReflectionType3.class );
+		doReturn( ReflectionType3.class ).when( classResolverMock ).classForName( ReflectionType3.class.getName() );
 		BeanHolder<List<Object>> beans = beanResolver.resolve(
 				Arrays.asList( BeanReference.of( ReflectionType3.class, BeanRetrieval.CLASS ),
 						BeanReference.of( Object.class, ReflectionType3.class.getName(), BeanRetrieval.CLASS ) )
@@ -223,7 +218,7 @@ public class BeanResolverImplRetrievalClassTest {
 		// resolve(Class, String) => Class not found
 		when( beanManagerBeanProviderMock.forTypeAndName( InvalidType.class, "someName" ) )
 				.thenThrow( beanManagerNotFoundException );
-		when( classResolverMock.<ReflectionType2>classForName( "someName" ) )
+		when( classResolverMock.classForName( "someName" ) )
 				.thenThrow( classNotFoundException );
 		assertThatThrownBy( () -> beanResolver.resolve( InvalidType.class, "someName", BeanRetrieval.CLASS ) )
 				.isInstanceOf( SearchException.class )
@@ -233,8 +228,7 @@ public class BeanResolverImplRetrievalClassTest {
 		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class, String) => Bean not not found
-		when( classResolverMock.<InvalidType>classForName( InvalidType.class.getName() ) )
-				.thenReturn( InvalidType.class );
+		doReturn( InvalidType.class ).when( classResolverMock ).classForName( InvalidType.class.getName() );
 		when( beanManagerBeanProviderMock.forType( InvalidType.class ) )
 				.thenThrow( beanManagerNotFoundException );
 		assertThatThrownBy( () -> beanResolver.resolve( Object.class, InvalidType.class.getName(), BeanRetrieval.CLASS ) )
@@ -249,8 +243,7 @@ public class BeanResolverImplRetrievalClassTest {
 		// resolve(List<BeanReference>)
 		when( beanManagerBeanProviderMock.forType( InvalidType.class ) )
 				.thenThrow( beanManagerNotFoundException );
-		when( classResolverMock.<InvalidType>classForName( InvalidType.class.getName() ) )
-				.thenReturn( InvalidType.class );
+		doReturn( InvalidType.class ).when( classResolverMock ).classForName( InvalidType.class.getName() );
 		when( beanManagerBeanProviderMock.forTypeAndName( Object.class, InvalidType.class.getName() ) )
 				.thenThrow( beanManagerNotFoundException );
 		assertThatThrownBy( () -> beanResolver.resolve(
@@ -276,8 +269,7 @@ public class BeanResolverImplRetrievalClassTest {
 		verifyNoOtherInteractionsAndReset();
 
 		// resolve(Class, String)
-		when( classResolverMock.<BeanManagerType2>classForName( BeanManagerType2.class.getName() ) )
-				.thenReturn( BeanManagerType2.class );
+		doReturn( BeanManagerType2.class ).when( classResolverMock ).classForName( BeanManagerType2.class.getName() );
 		when( beanManagerBeanProviderMock.forType( BeanManagerType2.class ) )
 				.thenThrow( beanManagerFailure );
 		assertThatThrownBy( () -> beanResolver.resolve( Object.class, BeanManagerType2.class.getName(), BeanRetrieval.CLASS ) )
