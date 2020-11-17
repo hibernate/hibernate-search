@@ -44,7 +44,7 @@ public class AutomaticIndexingBridgeAccessorsIT extends AbstractAutomaticIndexin
 		return null; // Not supported with accessors
 	}
 
-	public static class ContainingEntityTypeBridge implements TypeBridge {
+	public static class ContainingEntityTypeBridge implements TypeBridge<Object> {
 
 		private final PojoElementAccessor<String> directFieldSourceAccessor;
 		private final PojoElementAccessor<String> includedInTypeBridgeFieldSourceAccessor;

@@ -165,12 +165,11 @@ public class PropertyBridgeBaseIT {
 									f -> f.asString().analyzer( "myAnalyzer" )
 							)
 									.toReference();
-							context.bridge( (DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context1) -> {
-								Contained castedBridgedElement = (Contained) bridgedElement;
-								target.addValue(
-									indexFieldReference, castedBridgedElement.stringProperty
-								);
-							} );
+							context.bridge( Contained.class,
+									(DocumentElement target, Contained bridgedElement,
+											PropertyBridgeWriteContext context1) -> {
+										target.addValue( indexFieldReference, bridgedElement.stringProperty );
+									} );
 						} )
 		)
 				.setup( IndexedEntity.class );
@@ -303,17 +302,18 @@ public class PropertyBridgeBaseIT {
 									f -> f.asString().analyzer( "myAnalyzer" )
 							)
 									.toReference();
-							context.bridge( (DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context1) -> {
-								PropertyBridgeExplicitIndexingClasses.ContainedLevel1Entity castedBridgedElement =
-									(PropertyBridgeExplicitIndexingClasses.ContainedLevel1Entity) bridgedElement;
-								/*
-								* In a real application this would run a query,
-								* but we don't have the necessary infrastructure here
-								* so we'll cut short and just index a constant.
-								* We just need to know the bridge is executed anyway.
-								*/
-								target.addValue( indexFieldReference, "constant" );
-							} );
+							context.bridge( PropertyBridgeExplicitIndexingClasses.ContainedLevel1Entity.class,
+									(DocumentElement target,
+											PropertyBridgeExplicitIndexingClasses.ContainedLevel1Entity bridgedElement,
+											PropertyBridgeWriteContext context1) -> {
+										/*
+										* In a real application this would run a query,
+										* but we don't have the necessary infrastructure here
+										* so we'll cut short and just index a constant.
+										* We just need to know the bridge is executed anyway.
+										*/
+										target.addValue( indexFieldReference, "constant" );
+									} );
 						} )
 		)
 				.setup(
@@ -666,7 +666,7 @@ public class PropertyBridgeBaseIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void useRootOnly() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
@@ -691,12 +691,14 @@ public class PropertyBridgeBaseIT {
 									f -> f.asString().analyzer( "myAnalyzer" )
 							)
 									.toReference();
-							context.bridge( (DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context1) -> {
-								List<String> castedBridgedElement = (List<String>) bridgedElement;
-								for ( String string : castedBridgedElement ) {
-									target.addValue( indexFieldReference, string );
-								}
-							} );
+							context.bridge( List.class,
+									(DocumentElement target, List bridgedElement,
+											PropertyBridgeWriteContext context1) -> {
+										List<String> castedBridgedElement = (List<String>) bridgedElement;
+										for ( String string : castedBridgedElement ) {
+											target.addValue( indexFieldReference, string );
+										}
+									} );
 						} )
 		)
 				.setup( IndexedEntity.class );
