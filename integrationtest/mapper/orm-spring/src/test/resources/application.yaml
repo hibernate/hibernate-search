@@ -1,0 +1,27 @@
+spring.jpa:
+  hibernate:
+    ddl-auto: create-drop
+  properties:
+    hibernate:
+      dialect: ${HIBERNATE_DIALECT} # From environment variable
+    hibernate.search:
+      # The backend is a mock anyway.
+      schema_management.strategy: none
+
+spring.datasource:
+  driver-class: ${JDBC_DRIVER} # From environment variable
+  url: ${JDBC_URL} # From environment variable
+  username: ${JDBC_USERNAME} # From environment variable
+  password: ${JDBC_PASSWORD} # From environment variable
+
+logging.level:
+  org.springframework.core.env: DEBUG
+  org.hibernate.SQL: DEBUG
+  org.hibernate.search.mapper.orm.massindexing: INFO
+  org.hibernate.search.query: DEBUG
+  org.hibernate.search.elasticsearch.request: DEBUG
+  org.hibernate.search.backend.lucene: DEBUG
+
+# Default environment variable values for IDEs that are unable to extract them from the maven-failsafe configuration
+# These values are overridden when running tests from Intellij IDEA or directly from Maven
+JDBC_URL: jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1

@@ -62,6 +62,11 @@ public class BackendMock implements TestRule {
 		};
 	}
 
+	public BackendMock ignoreSchema() {
+		backendBehavior.ignoreSchema( true );
+		return this;
+	}
+
 	public StubBackendFactory factory() {
 		return new StubBackendFactory( backendBehavior );
 	}
@@ -75,12 +80,12 @@ public class BackendMock implements TestRule {
 	}
 
 	public void inLenientMode(Runnable action) {
-		backendBehavior().setLenient( true );
+		backendBehavior().lenient( true );
 		try {
 			action.run();
 		}
 		finally {
-			backendBehavior().setLenient( false );
+			backendBehavior().lenient( false );
 		}
 	}
 
