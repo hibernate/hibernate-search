@@ -66,24 +66,40 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	 *
 	 * @return The {@link HibernateOrmSearchSession} to use within the context of the given session.
 	 */
-	@SuppressWarnings("unchecked")
 	public static HibernateOrmSearchSession get(HibernateOrmSearchSessionMappingContext context,
 			SessionImplementor sessionImplementor) {
+		return get( context, sessionImplementor, true );
+	}
+
+	/**
+	 * @param sessionImplementor A Hibernate session
+	 *
+	 * @return The {@link HibernateOrmSearchSession} to use within the context of the given session.
+	 */
+	@SuppressWarnings("unchecked")
+	public static HibernateOrmSearchSession get(HibernateOrmSearchSessionMappingContext context,
+			SessionImplementor sessionImplementor, boolean createIfDoesNotExist) {
 		checkOrmSessionIsOpen( sessionImplementor );
 		TransientReference<HibernateOrmSearchSession> reference =
 				(TransientReference<HibernateOrmSearchSession>) sessionImplementor.getProperties()
 						.get( SEARCH_SESSION_KEY );
 		@SuppressWarnings("resource") // The listener below handles closing
-				HibernateOrmSearchSession searchSession = reference == null ? null : reference.get();
-		if ( searchSession == null ) {
-			searchSession = context.createSessionBuilder( sessionImplementor ).build();
-			reference = new TransientReference<>( searchSession );
-			sessionImplementor.setProperty( SEARCH_SESSION_KEY, reference );
-
-			// Make sure we will ultimately close the query manager
-			sessionImplementor.getEventListenerManager()
-					.addListener( new SearchSessionClosingListener( sessionImplementor ) );
+		HibernateOrmSearchSession searchSession = reference == null ? null : reference.get();
+		if ( searchSession != null ) {
+			return searchSession;
 		}
+
+		if ( !createIfDoesNotExist ) {
+			return null;
+		}
+
+		searchSession = context.createSessionBuilder( sessionImplementor ).build();
+		reference = new TransientReference<>( searchSession );
+		sessionImplementor.setProperty( SEARCH_SESSION_KEY, reference );
+
+		// Make sure we will ultimately close the query manager
+		sessionImplementor.getEventListenerManager()
+				.addListener( new SearchSessionClosingListener( sessionImplementor ) );
 		return searchSession;
 	}
 
