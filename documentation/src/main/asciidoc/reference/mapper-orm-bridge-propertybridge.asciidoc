@@ -68,10 +68,6 @@ See <<mapper-orm-bridge-index-field-type-dsl>>
 for more information about declaring index field types.
 <6> Call `context.bridge(...)` to define the property bridge to use,
 and pass an instance of the bridge.
-Instead of using the `bridge` method,
-if the type of the bridged property is a `java.util.List`,
-it is possible to bind the bridge using the `listPropertyBridge` method,
-to statically define the type of the elements.
 <7> Pass a reference to the `summary` object field to the bridge.
 <8> Create a sub-field for the `total` amount of the invoice,
 a sub-field for the sub-total for `books`,
