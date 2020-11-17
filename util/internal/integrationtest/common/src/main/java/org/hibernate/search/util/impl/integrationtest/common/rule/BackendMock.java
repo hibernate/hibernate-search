@@ -368,7 +368,7 @@ public class BackendMock implements TestRule {
 			return this;
 		}
 
-		public BackendMock processedThenExecuted(CompletableFuture<?> future) {
+		public DocumentWorkCallListContext processedThenExecuted(CompletableFuture<?> future) {
 			log.debugf( "Expecting %d works to be prepared, then executed", works.size() );
 			// First expect all works to be prepared, then expect all works to be executed
 			works.stream()
@@ -378,40 +378,40 @@ public class BackendMock implements TestRule {
 					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work, future ) )
 					.forEach( expectationConsumer );
 			works.clear();
-			return BackendMock.this;
+			return this;
 		}
 
-		public BackendMock processedThenExecuted() {
+		public DocumentWorkCallListContext processedThenExecuted() {
 			return processedThenExecuted( CompletableFuture.completedFuture( null ) );
 		}
 
-		public BackendMock executed(CompletableFuture<?> future) {
+		public DocumentWorkCallListContext executed(CompletableFuture<?> future) {
 			log.debugf( "Expecting %d works to be executed", works.size() );
 			works.stream()
 					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work, future ) )
 					.forEach( expectationConsumer );
 			works.clear();
-			return BackendMock.this;
+			return this;
 		}
 
-		public BackendMock executed() {
+		public DocumentWorkCallListContext executed() {
 			return executed( CompletableFuture.completedFuture( null ) );
 		}
 
-		public BackendMock processed() {
+		public DocumentWorkCallListContext processed() {
 			log.debugf( "Expecting %d works to be prepared", works.size() );
 			works.stream()
 					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PROCESS, work ) )
 					.forEach( expectationConsumer );
-			return BackendMock.this;
+			return this;
 		}
 
-		public BackendMock discarded() {
+		public DocumentWorkCallListContext discarded() {
 			log.debugf( "Expecting %d works to be discarded", works.size() );
 			works.stream()
 					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.DISCARD, work ) )
 					.forEach( expectationConsumer );
-			return BackendMock.this;
+			return this;
 		}
 	}
 
