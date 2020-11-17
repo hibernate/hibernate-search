@@ -57,18 +57,14 @@ See <<mapper-orm-bridge-index-field-type-dsl>>
 for more information about declaring index field types.
 <6> Call `context.bridge(...)` to define the type bridge to use,
 and pass an instance of the bridge.
-Optionally you can provide the expected type for the bridged element,
-using the method `<P> bridge(Class<P>, TypeBridge<P>)`,
-to statically define the type and so avoid casting on the bridge.
-<7> Pass a reference to the `fullName` field to the bridge.
+<7> Pass the expected type of the entity.
+<8> Pass a reference to the `fullName` field to the bridge.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebridge/simple/FullNameBinder.java[tags=bridge]
 ----
-<1> The bridge must implement the `TypeBridge<T>` interface.
-The generic type `<T>` here reflects the type of the entity on which we're going to apply the bridge,
-that we'll call the bridged element.
+<1> The bridge must implement the `TypeBridge` interface.
 Here the bridge class is nested in the binder class,
 because it is more convenient,
 but you are obviously free to implement it in a separate java file.

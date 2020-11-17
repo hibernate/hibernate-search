@@ -33,10 +33,9 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/docume
 This is done through a lambda taking advantage of another DSL.
 See <<mapper-orm-bridge-index-field-type-dsl>> for more information.
 <5> Get a reference to the declared field.
-<6> Pass the reference to the bridge for later use.
-Optionally you can provide the expected type for the bridged property,
-using the method `<P> bridge(Class<P>, PropertyBridge<P>)`,
-to statically define the type and so avoid casting on the bridge.
+<6> Call `context.bridge(...)` to define the bridge to use.
+<7> Pass the expected type of values.
+<8> Pass the bridge instance.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -212,10 +211,6 @@ to avoid conflicts with other templates.
 because you won't need it when writing to the document.
 <6> Get a reference to the declared object field
 and pass it to the bridge for later use.
-Instead of using the `bridge` method,
-if the type of the bridged property is a `java.util.Map`,
-it is possible to bind the bridge using the `mapPropertyBridge` method,
-to statically define the types of the key and the value.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----

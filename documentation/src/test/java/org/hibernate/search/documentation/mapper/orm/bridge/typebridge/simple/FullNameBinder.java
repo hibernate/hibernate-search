@@ -26,9 +26,12 @@ public class FullNameBinder implements TypeBinder { // <1>
 				.field( "fullName", f -> f.asString().analyzer( "name" ) ) // <5>
 				.toReference();
 
-		context.bridge( Author.class, new Bridge( // <6>
-				fullNameField // <7>
-		) );
+		context.bridge( // <6>
+				Author.class, // <7>
+				new Bridge(
+					fullNameField // <8>
+				)
+		);
 	}
 
 	// ... class continues below
