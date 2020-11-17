@@ -21,14 +21,19 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.CollectionElementExtractor;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyBinding;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
@@ -948,4 +953,99 @@ public class PropertyBridgeBaseIT {
 		}
 	}
 
+	@Test
+	public void propertyBridge_invalidInputType() {
+		@Indexed
+		class IndexedEntity {
+			@DocumentId
+			@GenericField
+			@PropertyBinding(binder = @PropertyBinderRef(type = MyStringBridge.Binder.class))
+			Integer id;
+		}
+		assertThatThrownBy(
+				() -> setupHelper.start().setup( IndexedEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".id" )
+						.failure( "Invalid bridge for input type '" + Integer.class.getName()
+										+ "': '" + MyStringBridge.TOSTRING + "'",
+								"This bridge expects an input of type '" + String.class.getName() + "'" )
+						.build()
+				);
+	}
+
+	public static class MyStringBridge implements PropertyBridge<String> {
+		private static final String TOSTRING = "<MyStringPropertyBridge toString() result>";
+		@Override
+		public void write(DocumentElement target, String bridgedElement, PropertyBridgeWriteContext context) {
+			throw new UnsupportedOperationException( "Should not be called" );
+		}
+		@Override
+		public String toString() {
+			return TOSTRING;
+		}
+
+		public static class Binder implements PropertyBinder {
+			@Override
+			public void bind(PropertyBindingContext context) {
+				context.bridge( String.class, new MyStringBridge() );
+			}
+		}
+	}
+
+	/**
+	 * Test for backward compatibility with 6.0.0.CR1 APIs
+	 */
+	@Test
+	public void propertyBridge_noGenericType() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			@PropertyBinding(binder = @PropertyBinderRef(type = RawTypeBridge.Binder.class))
+			Integer id;
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b.field( "someField", String.class ) );
+		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			IndexedEntity entity = new IndexedEntity();
+			entity.id = 739;
+
+			session.indexingPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "739", b -> b.field( "someField", "739" ) )
+					.processedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	public static class RawTypeBridge implements PropertyBridge {
+
+		private final IndexFieldReference<String> fieldReference;
+
+		public RawTypeBridge(IndexFieldReference<String> fieldReference) {
+			this.fieldReference = fieldReference;
+		}
+
+		@Override
+		public void write(DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context) {
+			target.addValue( fieldReference, bridgedElement.toString() );
+		}
+
+		public static class Binder implements PropertyBinder {
+			@Override
+			public void bind(PropertyBindingContext context) {
+				context.dependencies().useRootOnly();
+
+				IndexFieldReference<String> fieldReference = context.indexSchemaElement().field(
+						"someField", f -> f.asString() ).toReference();
+				context.bridge( new RawTypeBridge( fieldReference ) );
+			}
+		}
+	}
 }
