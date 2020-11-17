@@ -65,6 +65,7 @@ and pass an instance of the bridge.
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebridge/simple/FullNameBinder.java[tags=bridge]
 ----
 <1> The bridge must implement the `TypeBridge` interface.
+One generic type argument must be provided: the type of the "bridged element".
 Here the bridge class is nested in the binder class,
 because it is more convenient,
 but you are obviously free to implement it in a separate java file.
