@@ -156,12 +156,11 @@ public class TypeBridgeBaseIT {
 											f -> f.asString().analyzer( "myAnalyzer" )
 									)
 											.toReference();
-							context.bridge( (DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context1) -> {
-								IndexedEntity castedBridgedElement = (IndexedEntity) bridgedElement;
-								target.addValue(
-									indexFieldReference, castedBridgedElement.stringProperty
-								);
-							} );
+							context.bridge( IndexedEntity.class,
+									(DocumentElement target, IndexedEntity bridgedElement,
+											TypeBridgeWriteContext context1) -> {
+										target.addValue( indexFieldReference, bridgedElement.stringProperty );
+									} );
 						} )
 		)
 				.setup( IndexedEntity.class );
@@ -257,16 +256,17 @@ public class TypeBridgeBaseIT {
 											f -> f.asString().analyzer( "myAnalyzer" )
 									)
 											.toReference();
-							context.bridge( (DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context1) -> {
-								IndexedEntity castedBridgedElement = (IndexedEntity) bridgedElement;
-								/*
-								* In a real application this would run a query,
-								* but we don't have the necessary infrastructure here
-								* so we'll cut short and just index a constant.
-								* We just need to know the bridge is executed anyway.
-								*/
-								target.addValue( indexFieldReference, "constant" );
-							} );
+							context.bridge( IndexedEntity.class,
+									(DocumentElement target, IndexedEntity bridgedElement,
+											TypeBridgeWriteContext context1) -> {
+										/*
+										* In a real application this would run a query,
+										* but we don't have the necessary infrastructure here
+										* so we'll cut short and just index a constant.
+										* We just need to know the bridge is executed anyway.
+										*/
+										target.addValue( indexFieldReference, "constant" );
+									} );
 						} )
 		)
 				.setup( IndexedEntity.class, ContainedEntity.class );
@@ -593,12 +593,13 @@ public class TypeBridgeBaseIT {
 									f -> f.asString()
 							)
 									.toReference();
-							context.bridge( (DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context1) -> {
-								CustomEnum castedBridgedElement = (CustomEnum) bridgedElement;
-								// This is a strange way to use bridges,
-								// but then again a type bridges that only uses the root *is* strange
-								target.addValue( indexFieldReference, castedBridgedElement.stringProperty );
-							} );
+							context.bridge( CustomEnum.class,
+									(DocumentElement target, CustomEnum bridgedElement,
+											TypeBridgeWriteContext context1) -> {
+										// This is a strange way to use bridges,
+										// but then again a type bridges that only uses the root *is* strange
+										target.addValue( indexFieldReference, bridgedElement.stringProperty );
+									} );
 						} )
 		)
 				.setup( IndexedEntity.class );

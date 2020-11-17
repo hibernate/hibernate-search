@@ -73,12 +73,11 @@ public class PropertyBindingBaseIT {
 			IndexFieldReference<String> indexFieldReference =
 					context.indexSchemaElement().field( "myText", f -> f.asString() )
 							.toReference();
-			context.bridge( (DocumentElement target, Object bridgedElement, PropertyBridgeWriteContext context1) -> {
-				IndexedEntityWithWorkingPropertyBinding castedBridgedElement = (IndexedEntityWithWorkingPropertyBinding) bridgedElement;
-				target.addValue(
-						indexFieldReference, castedBridgedElement.text
-				);
-			} );
+			context.bridge( String.class,
+					(DocumentElement target, String bridgedElement,
+							PropertyBridgeWriteContext context1) -> {
+						target.addValue( indexFieldReference, bridgedElement );
+					} );
 		}
 	}
 
