@@ -9,7 +9,7 @@
     </parent>
     <artifactId>hibernate-search-integrationtest-mapper-orm-realbackend</artifactId>
 
-    <name>Hibernate Search Integration Tests - ORM - Real backend</name>
+    <name>Hibernate Search ITs - ORM - Real backend</name>
     <description>Hibernate Search integration tests for the Hibernate ORM mapper with a real (non-mock) backend</description>
 
     <dependencyManagement>

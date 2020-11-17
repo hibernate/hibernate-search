@@ -10,7 +10,7 @@
     <artifactId>hibernate-search-util-internal-integrationtest-parent</artifactId>
     <packaging>pom</packaging>
 
-    <name>Hibernate Search Utils - Internal - Integration Tests - Parent POM</name>
+    <name>Hibernate Search Utils - Internal - ITs - Parent POM</name>
     <description>Parent POM of Hibernate Search integration testing utilities</description>
 
     <properties>

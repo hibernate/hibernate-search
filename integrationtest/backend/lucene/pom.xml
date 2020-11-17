@@ -9,7 +9,7 @@
     </parent>
     <artifactId>hibernate-search-integrationtest-backend-lucene</artifactId>
 
-    <name>Hibernate Search Integration Tests - Backend - Lucene</name>
+    <name>Hibernate Search ITs - Backend - Lucene</name>
     <description>Hibernate Search integration tests for the Lucene backend, running the Backend TCK in particular</description>
 
     <properties>

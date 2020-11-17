@@ -15,7 +15,7 @@
     </parent>
     <artifactId>hibernate-search-integrationtest-performance-backend-elasticsearch</artifactId>
 
-    <name>Hibernate Search Integration Tests - Performance - Backend - Elasticsearch</name>
+    <name>Hibernate Search ITs - Performance - Backend - Elasticsearch</name>
     <description>Performance tests for the Elasticsearch backend</description>
 
     <dependencies>

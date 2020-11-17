@@ -16,7 +16,7 @@
     </parent>
     <artifactId>hibernate-search-util-internal-integrationtest-backend-lucene</artifactId>
 
-    <name>Hibernate Search Utils - Internal - Integration Tests - Lucene</name>
+    <name>Hibernate Search Utils - Internal - ITs - Lucene</name>
     <description>Hibernate Search integration testing utilities for tests involving the Lucene backend</description>
 
     <dependencies>

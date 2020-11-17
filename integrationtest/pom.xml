@@ -10,7 +10,7 @@
     <artifactId>hibernate-search-integrationtest</artifactId>
     <packaging>pom</packaging>
 
-    <name>Hibernate Search Integration Tests - Aggregator POM</name>
+    <name>Hibernate Search ITs - Aggregator POM</name>
     <description>Aggregator POM of Hibernate Search integration tests (except documentation)</description>
 
     <modules>

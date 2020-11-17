@@ -16,7 +16,7 @@
 
     <artifactId>hibernate-search-integrationtest-v5migrationhelper-orm</artifactId>
 
-    <name>Hibernate Search Integration Tests - Migration Helper - ORM</name>
+    <name>Hibernate Search ITs - Migration Helper - ORM</name>
     <description>Hibernate Search integration tests for the migration helper for Hibernate ORM</description>
 
     <properties>

@@ -9,7 +9,7 @@
     </parent>
     <artifactId>hibernate-search-util-internal-integrationtest-common</artifactId>
 
-    <name>Hibernate Search Utils - Internal - Integration Tests - Common</name>
+    <name>Hibernate Search Utils - Internal - ITs - Common</name>
     <description>Hibernate Search common integration testing utilities</description>
 
     <dependencies>

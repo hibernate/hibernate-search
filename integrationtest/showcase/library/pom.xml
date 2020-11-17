@@ -9,7 +9,7 @@
     </parent>
     <artifactId>hibernate-search-integrationtest-showcase-library</artifactId>
 
-    <name>Hibernate Search Integration Tests - Showcase - Library</name>
+    <name>Hibernate Search ITs - Showcase - Library</name>
     <description>Hibernate Search showcase based on the ORM and Elasticsearch integrations, using libraries and books as business objects</description>
 
     <properties>

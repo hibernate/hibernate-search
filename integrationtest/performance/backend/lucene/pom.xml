@@ -15,7 +15,7 @@
     </parent>
     <artifactId>hibernate-search-integrationtest-performance-backend-lucene</artifactId>
 
-    <name>Hibernate Search Integration Tests - Performance - Backend - Lucene</name>
+    <name>Hibernate Search ITs - Performance - Backend - Lucene</name>
     <description>Performance tests for the Lucene backend</description>
 
     <dependencies>

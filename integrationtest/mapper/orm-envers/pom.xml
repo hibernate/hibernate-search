@@ -9,7 +9,7 @@
     </parent>
     <artifactId>hibernate-search-integrationtest-mapper-orm-envers</artifactId>
 
-    <name>Hibernate Search Integration Tests - ORM - Envers</name>
+    <name>Hibernate Search ITs - ORM - Envers</name>
     <description>Hibernate Search integration tests for the Hibernate ORM integration with Envers</description>
 
     <dependencyManagement>

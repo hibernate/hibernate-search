@@ -9,7 +9,7 @@
     </parent>
     <artifactId>hibernate-search-util-internal-integrationtest-jberet-se</artifactId>
 
-    <name>Hibernate Search Utils - Internal - Integration Tests - JBeret SE</name>
+    <name>Hibernate Search Utils - Internal - ITs - JBeret SE</name>
     <description>JBeret-SE and runtime dependencies</description>
 
     <!--

@@ -9,7 +9,7 @@
     </parent>
     <artifactId>hibernate-search-util-internal-integrationtest-jbatch-runtime</artifactId>
 
-    <name>Hibernate Search Utils - Internal - Integration Tests - JBatch Runtime</name>
+    <name>Hibernate Search Utils - Internal - ITs - JBatch Runtime</name>
     <description>JBatch-runtime and runtime dependencies</description>
 
     <!--

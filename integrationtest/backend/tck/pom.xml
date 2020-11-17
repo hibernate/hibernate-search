@@ -9,7 +9,7 @@
     </parent>
     <artifactId>hibernate-search-integrationtest-backend-tck</artifactId>
 
-    <name>Hibernate Search Integration Tests - Backend TCK</name>
+    <name>Hibernate Search ITs - Backend TCK</name>
     <description>Hibernate Search backend TCK, including tests for every feature common to all the backends</description>
 
     <dependencies>

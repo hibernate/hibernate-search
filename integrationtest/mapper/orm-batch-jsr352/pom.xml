@@ -9,7 +9,7 @@
     </parent>
     <artifactId>hibernate-search-integrationtest-mapper-orm-batch-jsr352</artifactId>
 
-    <name>Hibernate Search Integration Tests - Batch JSR-352</name>
+    <name>Hibernate Search ITs - ORM - Batch JSR-352</name>
     <description>Hibernate Search integration tests for the Batch JSR-352 integration</description>
 
     <properties>

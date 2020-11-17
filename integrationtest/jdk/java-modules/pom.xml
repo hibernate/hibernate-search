@@ -13,7 +13,7 @@
     <artifactId>hibernate-search-integrationtest-java-modules</artifactId>
     <packaging>jar</packaging>
 
-    <name>Hibernate Search Integration Tests - JDK - Java modules</name>
+    <name>Hibernate Search ITs - JDK - Java modules</name>
     <description>Hibernate Search integration tests for (JDK 11+) Java modules</description>
 
     <properties>
