@@ -16,7 +16,7 @@
     </parent>
     <artifactId>hibernate-search-integrationtest-mapper-pojo-base</artifactId>
 
-    <name>Hibernate Search Integration Tests - Mapper - POJO Base</name>
+    <name>Hibernate Search ITs - POJO Mapper Base</name>
     <description>Hibernate Search integration tests for the abstract base for POJO Mappers</description>
 
     <dependencies>

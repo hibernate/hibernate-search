@@ -9,7 +9,7 @@
     </parent>
     <artifactId>hibernate-search-integrationtest-mapper-orm-cdi</artifactId>
 
-    <name>Hibernate Search Integration Tests - ORM - CDI</name>
+    <name>Hibernate Search ITs - ORM - CDI</name>
     <description>Hibernate Search integration tests for the Hibernate ORM integration with CDI</description>
 
     <properties>

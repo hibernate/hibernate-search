@@ -16,7 +16,7 @@
     </parent>
     <artifactId>hibernate-search-util-internal-integrationtest-v5migrationhelper</artifactId>
 
-    <name>Hibernate Search Utils - Internal - Integration Tests - Migration helper</name>
+    <name>Hibernate Search Utils - Internal - ITs - Migration helper</name>
     <description>Hibernate Search integration testing utilities for tests involving the Migration helper</description>
 
     <properties>

@@ -16,7 +16,7 @@
     </parent>
     <artifactId>hibernate-search-util-internal-integrationtest-mapper-stub</artifactId>
 
-    <name>Hibernate Search Utils - Internal - Integration Tests - Stub Mapper</name>
+    <name>Hibernate Search Utils - Internal - ITs - Stub Mapper</name>
     <description>Hibernate Search Stub Mapper for testing purposes</description>
 
     <dependencies>

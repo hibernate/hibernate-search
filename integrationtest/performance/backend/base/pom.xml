@@ -15,7 +15,7 @@
     </parent>
     <artifactId>hibernate-search-integrationtest-performance-backend-base</artifactId>
 
-    <name>Hibernate Search Integration Tests - Performance - Backend base</name>
+    <name>Hibernate Search ITs - Performance - Backend base</name>
     <description>Base for backend performance tests</description>
 
     <dependencies>

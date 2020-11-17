@@ -9,7 +9,7 @@
     </parent>
     <artifactId>hibernate-search-integrationtest-backend-elasticsearch</artifactId>
 
-    <name>Hibernate Search Integration Tests - Backend - Elasticsearch</name>
+    <name>Hibernate Search ITs - Backend - Elasticsearch</name>
     <description>Hibernate Search integration tests for the Elasticsearch backend, running the Backend TCK in particular</description>
 
     <properties>

@@ -9,7 +9,7 @@
     <artifactId>hibernate-search-integrationtest-performance</artifactId>
     <packaging>pom</packaging>
 
-    <name>Hibernate Search Integration Tests - Performance - Parent POM</name>
+    <name>Hibernate Search ITs - Performance - Parent POM</name>
     <description>Parent POM of Hibernate Search performance tests</description>
 
     <modules>

@@ -17,7 +17,7 @@
     <artifactId>hibernate-search-util-internal-integrationtest-sharedresources</artifactId>
     <packaging>pom</packaging>
 
-    <name>Hibernate Search Utils - Internal - Integration Tests - Shared Resources</name>
+    <name>Hibernate Search Utils - Internal - ITs - Shared Resources</name>
     <description>Contains resources which we want to reuse across multiple modules for integration testing purposes</description>
 
     <properties>

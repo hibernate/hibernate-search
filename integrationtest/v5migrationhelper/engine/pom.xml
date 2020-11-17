@@ -16,7 +16,7 @@
 
     <artifactId>hibernate-search-integrationtest-v5migrationhelper-engine</artifactId>
 
-    <name>Hibernate Search Integration Tests - Migration Helper - Engine</name>
+    <name>Hibernate Search ITs - Migration Helper - Engine</name>
     <description>Hibernate Search integration tests for the migration helper for Hibernate Search's Engine</description>
 
     <properties>

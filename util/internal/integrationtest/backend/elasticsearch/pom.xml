@@ -16,7 +16,7 @@
     </parent>
     <artifactId>hibernate-search-util-internal-integrationtest-backend-elasticsearch</artifactId>
 
-    <name>Hibernate Search Utils - Internal - Integration Tests - Elasticsearch</name>
+    <name>Hibernate Search Utils - Internal - ITs - Elasticsearch</name>
     <description>Hibernate Search integration testing utilities for tests involving the Elasticsearch backend</description>
 
     <dependencies>
