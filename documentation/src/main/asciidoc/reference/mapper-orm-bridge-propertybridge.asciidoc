@@ -79,7 +79,7 @@ Pass references to these fields to the bridge.
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/simple/InvoiceLineItemsSummaryBinder.java[tags=bridge]
 ----
 <1> The bridge must implement the `PropertyBridge` interface.
-One generic type arguments must be provided: the type of the property,
+One generic type argument must be provided: the type of the property,
 i.e. the type of the "bridged element".
 Here the bridge class is nested in the binder class,
 because it is more convenient,
