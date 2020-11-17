@@ -1,0 +1,54 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.integrationtest.spring.jta;
+
+import org.hibernate.search.integrationtest.spring.jta.dao.SnertDAO;
+import org.hibernate.search.integrationtest.spring.jta.entity.Snert;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JtaAndSpringApplicationConfiguration.class)
+@ActiveProfiles("jta")
+@PortedFromSearch5(original = "org.hibernate.search.test.integration.spring.jta.JtaAndSpringIT")
+public class JtaAndSpringIT {
+
+	@Autowired
+	@Rule
+	public BackendMock backendMock;
+
+	@Autowired
+	private SnertDAO snertDAO;
+
+	@Test
+	public void test() {
+		Snert snert = new Snert();
+		snert.setId( 1L );
+		snert.setName( "dave" );
+		snert.setNickname( "dude" );
+		snert.setAge( 99 );
+		snert.setCool( Boolean.TRUE );
+
+		backendMock.expectWorks( "Snert" )
+				.add( "1", b -> b
+						.field( "age", 99 )
+						.field( "cool", true )
+						.field( "name", "dave" ) )
+				.processedThenExecuted();
+		snertDAO.persist( snert );
+		backendMock.verifyExpectationsMet();
+	}
+}

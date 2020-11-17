@@ -11,11 +11,12 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer;
+import org.springframework.boot.autoconfigure.transaction.jta.JtaAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableAutoConfiguration
+@EnableAutoConfiguration(exclude = JtaAutoConfiguration.class)
 public abstract class AbstractSpringITConfig {
 
 	@Bean
