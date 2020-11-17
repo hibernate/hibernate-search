@@ -1,0 +1,138 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.search</groupId>
+        <artifactId>hibernate-search-integrationtest</artifactId>
+        <version>6.0.0-SNAPSHOT</version>
+        <relativePath>../..</relativePath>
+    </parent>
+    <artifactId>hibernate-search-integrationtest-mapper-orm-spring</artifactId>
+
+    <name>Hibernate Search ITs - ORM - Spring</name>
+    <description>Hibernate Search integration tests for the Hibernate ORM integration with Spring</description>
+
+    <properties>
+        <!--
+            Remove Hibernate system properties from parent settings:
+            They are supposed to be handled by the spring.datasource subsystem
+            and not by the Hibernate internal pool!
+            See also the failsafe configuration.
+         -->
+        <failsafe.jvm.args.hibernate-orm></failsafe.jvm.args.hibernate-orm>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${version.org.springframework.boot}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${version.org.mockito}</version>
+                <scope>test</scope>
+                <exclusions>
+                    <!-- Bytebuddy is already imported by Hibernate ORM with a different version -->
+                    <exclusion>
+                        <groupId>net.bytebuddy</groupId>
+                        <artifactId>byte-buddy</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-mapper-orm</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <exclusions>
+                <!-- Using JBoss Logging -->
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--
+            Leave this dependency here, not in a utils module, so that we don't need to recompile
+            the utils to re-run the tests with a different database.
+         -->
+        <dependency>
+            <groupId>${jdbc.driver.groupId}</groupId>
+            <artifactId>${jdbc.driver.artifactId}</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <!-- Using JBoss Logging -->
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <skip>${failsafe.spring.skip}</skip>
+                    <!--
+                        Since we do not pass the Hibernate ORM settings through system properties directly
+                        (see the override of the failsafe.jvm.args.hibernate-orm near the top of this file),
+                        we need to pass the settings some other way.
+                        Here we chose to use environment variables.
+                     -->
+                    <environmentVariables>
+                        <HIBERNATE_DIALECT>${db.dialect}</HIBERNATE_DIALECT>
+                        <JDBC_DRIVER>${jdbc.driver}</JDBC_DRIVER>
+                        <JDBC_URL>${jdbc.url}</JDBC_URL>
+                        <JDBC_USERNAME>${jdbc.user}</JDBC_USERNAME>
+                        <JDBC_PASSWORD>${jdbc.pass}</JDBC_PASSWORD>
+                        <JDBC_ISOLATION>${jdbc.isolation}</JDBC_ISOLATION>
+                    </environmentVariables>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>it</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.alexcojocaru</groupId>
+                <artifactId>elasticsearch-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+

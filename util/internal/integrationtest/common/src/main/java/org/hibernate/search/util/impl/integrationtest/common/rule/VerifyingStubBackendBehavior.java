@@ -69,8 +69,14 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	private boolean lenient = false;
 
-	void setLenient(boolean lenient) {
+	private boolean ignoreSchema = false;
+
+	void lenient(boolean lenient) {
 		this.lenient = lenient;
+	}
+
+	void ignoreSchema(boolean ignoreSchema) {
+		this.ignoreSchema = ignoreSchema;
 	}
 
 	public void addCreateBackendBehavior(ParameterizedCallBehavior<BackendBuildContext, Void> createBackendBehavior) {
@@ -179,6 +185,9 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	@Override
 	public void defineSchema(String indexName, StubIndexSchemaNode rootSchemaNode) {
+		if ( ignoreSchema ) {
+			return;
+		}
 		getSchemaDefinitionCalls( indexName )
 				.verify(
 						new SchemaDefinitionCall( indexName, rootSchemaNode ),
