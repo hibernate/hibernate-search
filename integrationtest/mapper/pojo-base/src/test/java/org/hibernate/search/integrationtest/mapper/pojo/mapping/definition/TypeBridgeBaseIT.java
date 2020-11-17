@@ -19,11 +19,15 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.TypeBinding;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
@@ -879,5 +883,105 @@ public class TypeBridgeBaseIT {
 		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
 			throw new AssertionFailure( "Should not be called" );
 		}
+	}
+
+	@Test
+	public void typeBridge_invalidInputType() {
+		@Indexed
+		@TypeBinding(binder = @TypeBinderRef(type = MyTargetTypeBridge.Binder.class))
+		class IndexedEntity {
+			@DocumentId
+			@GenericField
+			Integer id;
+		}
+		assertThatThrownBy(
+				() -> setupHelper.start().setup( IndexedEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.failure( "Invalid bridge for input type '" + IndexedEntity.class.getName()
+										+ "': '" + MyTargetTypeBridge.TOSTRING + "'",
+								"This bridge expects an input of type '" + TargetType.class.getName() + "'" )
+						.build()
+				);
+	}
+
+	public static class MyTargetTypeBridge implements TypeBridge<TargetType> {
+		private static final String TOSTRING = "<MyTargetTypeBridge toString() result>";
+		@Override
+		public void write(DocumentElement target, TargetType bridgedElement, TypeBridgeWriteContext context) {
+			throw new UnsupportedOperationException( "Should not be called" );
+		}
+		@Override
+		public String toString() {
+			return TOSTRING;
+		}
+
+		public static class Binder implements TypeBinder {
+			@Override
+			public void bind(TypeBindingContext context) {
+				context.dependencies().useRootOnly();
+				context.bridge( TargetType.class, new MyTargetTypeBridge() );
+			}
+		}
+	}
+
+	public interface TargetType {
+	}
+
+	/**
+	 * Test for backward compatibility with 6.0.0.CR1 APIs
+	 */
+	@Test
+	public void typeBridge_noGenericType() {
+		backendMock.expectSchema( INDEX_NAME, b -> b.field( "someField", String.class ) );
+		SearchMapping mapping = setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			IndexedEntity entity = new IndexedEntity();
+			entity.id = 739;
+
+			session.indexingPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "739", b -> b.field( "someField", "739" ) )
+					.processedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	public static class RawTypeBridge implements TypeBridge {
+
+		private final IndexFieldReference<String> fieldReference;
+
+		public RawTypeBridge(IndexFieldReference<String> fieldReference) {
+			this.fieldReference = fieldReference;
+		}
+
+		@Override
+		public void write(DocumentElement target, Object bridgedElement, TypeBridgeWriteContext context) {
+			IndexedEntity castedBridgedElement = (IndexedEntity) bridgedElement;
+			target.addValue( fieldReference, castedBridgedElement.id.toString() );
+		}
+
+		public static class Binder implements TypeBinder {
+			@Override
+			public void bind(TypeBindingContext context) {
+				context.dependencies().useRootOnly();
+
+				IndexFieldReference<String> fieldReference = context.indexSchemaElement().field(
+						"someField", f -> f.asString() ).toReference();
+				context.bridge( new RawTypeBridge( fieldReference ) );
+			}
+		}
+	}
+
+	@Indexed(index = INDEX_NAME)
+	@TypeBinding(binder = @TypeBinderRef(type = RawTypeBridge.Binder.class))
+	private static class IndexedEntity {
+		@DocumentId
+		Integer id;
 	}
 }
