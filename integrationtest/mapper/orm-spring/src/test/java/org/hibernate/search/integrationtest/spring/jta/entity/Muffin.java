@@ -14,6 +14,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 
 // Hibernate
 @Entity
@@ -28,6 +29,7 @@ public class Muffin {
 	private Box box;
 
 	@Column(length = 255, nullable = false)
+	@GenericField
 	private String kind;
 
 	public Muffin() {

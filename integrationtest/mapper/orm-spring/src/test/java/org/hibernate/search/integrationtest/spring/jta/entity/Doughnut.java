@@ -32,6 +32,7 @@ public class Doughnut {
 	private Box box;
 
 	@Column(length = 255, nullable = false)
+	@GenericField
 	private String kind;
 
 	/**

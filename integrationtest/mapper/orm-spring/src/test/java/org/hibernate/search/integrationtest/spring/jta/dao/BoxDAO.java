@@ -31,6 +31,12 @@ public class BoxDAO {
 	}
 
 	@Transactional
+	public void changeColor(long boxId, String newColor) {
+		Box box = entityManager.find( Box.class, boxId );
+		box.setColor( newColor );
+	}
+
+	@Transactional
 	public void remove(Box box) {
 		entityManager.remove( box );
 	}
