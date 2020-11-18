@@ -14,7 +14,6 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettin
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -49,6 +48,7 @@ public class ElasticsearchSearchQueryIT {
 	public static Object[][] configurations() {
 		return new Object[][] {
 				{ null, defaultReadAlias( index.name() ) },
+				{ "no-alias", encodeName( index.name() ) },
 				{ new StubSingleIndexLayoutStrategy( "custom-write", "custom-read" ), encodeName( "custom-read" ) }
 		};
 	}
@@ -59,12 +59,12 @@ public class ElasticsearchSearchQueryIT {
 	@Rule
 	public ElasticsearchClientSpy clientSpy = new ElasticsearchClientSpy();
 
-	private final IndexLayoutStrategy layoutStrategy;
-	private final URLEncodedString readAlias;
+	private final Object layoutStrategy;
+	private final URLEncodedString readName;
 
-	public ElasticsearchSearchQueryIT(IndexLayoutStrategy layoutStrategy, URLEncodedString readAlias) {
+	public ElasticsearchSearchQueryIT(Object layoutStrategy, URLEncodedString readName) {
 		this.layoutStrategy = layoutStrategy;
-		this.readAlias = readAlias;
+		this.readName = readName;
 	}
 
 	@Before
@@ -81,6 +81,26 @@ public class ElasticsearchSearchQueryIT {
 	}
 
 	@Test
+	public void simple() {
+		StubMappingScope scope = index.createScope();
+
+		SearchQuery<?> query = scope.query()
+				.where( f -> f.matchAll() )
+				.toQuery();
+
+		clientSpy.expectNext(
+				ElasticsearchRequest.post()
+						.pathComponent( readName )
+						.pathComponent( Paths._SEARCH )
+						.body( new JsonObject() ) // We don't care about the payload
+						.build(),
+				ElasticsearchRequestAssertionMode.EXTENSIBLE
+		);
+
+		query.fetchAll();
+	}
+
+	@Test
 	public void defaultSourceFiltering() {
 		StubMappingScope scope = index.createScope();
 
@@ -90,7 +110,7 @@ public class ElasticsearchSearchQueryIT {
 
 		clientSpy.expectNext(
 				ElasticsearchRequest.post()
-						.pathComponent( readAlias )
+						.pathComponent( readName )
 						.pathComponent( Paths._SEARCH )
 						.body( new Gson().fromJson( "{'_source':false}", JsonObject.class ) )
 						.build(),
@@ -111,7 +131,7 @@ public class ElasticsearchSearchQueryIT {
 
 		clientSpy.expectNext(
 				ElasticsearchRequest.post()
-						.pathComponent( readAlias )
+						.pathComponent( readName )
 						.pathComponent( Paths._SEARCH )
 						.body( new Gson().fromJson( "{'_source':['string']}", JsonObject.class ) )
 						.build(),
@@ -134,7 +154,7 @@ public class ElasticsearchSearchQueryIT {
 
 		clientSpy.expectNext(
 				ElasticsearchRequest.post()
-						.pathComponent( readAlias )
+						.pathComponent( readName )
 						.pathComponent( Paths._SEARCH )
 						.body( new JsonObject() ) // We don't care about the payload
 						.param( "routing", routingKey )
@@ -161,7 +181,7 @@ public class ElasticsearchSearchQueryIT {
 		clientSpy.expectNext(
 				ElasticsearchRequest.post()
 						.param( "track_total_hits", true )
-						.pathComponent( readAlias )
+						.pathComponent( readName )
 						.pathComponent( Paths._SEARCH )
 						.body( new JsonObject() ) // We don't care about the payload
 						.build(),
@@ -187,7 +207,7 @@ public class ElasticsearchSearchQueryIT {
 		clientSpy.expectNext(
 				ElasticsearchRequest.post()
 						.param( "track_total_hits", false )
-						.pathComponent( readAlias )
+						.pathComponent( readName )
 						.pathComponent( Paths._SEARCH )
 						.body( new JsonObject() ) // We don't care about the payload
 						.build(),

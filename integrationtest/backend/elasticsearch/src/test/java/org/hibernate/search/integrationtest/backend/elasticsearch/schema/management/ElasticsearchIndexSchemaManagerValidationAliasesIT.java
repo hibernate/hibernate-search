@@ -18,6 +18,7 @@ import java.util.EnumSet;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexAliasIsWriteIndex;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -63,7 +64,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 	}
 
 	@Test
-	public void success_simple() {
+	public void success_defaultLayoutStrategy() {
 		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
@@ -71,6 +72,19 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 				.put( "somePreExistingAlias" );
 
 		setupAndValidate();
+
+		// If we get here, it means validation passed (no exception was thrown)
+	}
+
+	@Test
+	public void success_noAliasLayoutStrategy() {
+		elasticsearchClient.indexNoAlias( index.name() )
+				.deleteAndCreate()
+				.type().putMapping( simpleMappingForInitialization( "" ) );
+		elasticsearchClient.indexNoAlias( index.name() ).aliases()
+				.put( "somePreExistingAlias" );
+
+		setupAndValidate( "no-alias" );
 
 		// If we get here, it means validation passed (no exception was thrown)
 	}
@@ -179,6 +193,10 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 	}
 
 	private void setupAndValidate() {
+		setupAndValidate( null );
+	}
+
+	private void setupAndValidate(Object layoutStrategy) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(
@@ -188,6 +206,7 @@ public class ElasticsearchIndexSchemaManagerValidationAliasesIT {
 							// No-op
 						}
 				)
+				.withBackendProperty( ElasticsearchBackendSettings.LAYOUT_STRATEGY, layoutStrategy )
 				.withIndex( index )
 				.setup();
 

@@ -20,7 +20,6 @@ import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysis
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.StubSingleIndexLayoutStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -79,6 +78,20 @@ public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 	}
 
 	@Test
+	public void success_noAliasLayoutStrategy() {
+		elasticsearchClient.indexNoAlias( index.name() )
+				.ensureDoesNotExist().registerForCleanup();
+
+		setupAndCreateIndex( "no-alias" );
+
+		assertJsonEquals(
+				"{"
+						+ "}",
+				elasticsearchClient.indexNoAlias( index.name() ).aliases().get()
+		);
+	}
+
+	@Test
 	public void success_customLayoutStrategy() {
 		elasticsearchClient.index( index.name() )
 				.ensureDoesNotExist().registerForCleanup();
@@ -124,7 +137,7 @@ public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 		);
 	}
 
-	private void setupAndCreateIndex(IndexLayoutStrategy layoutStrategy) {
+	private void setupAndCreateIndex(Object layoutStrategy) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(

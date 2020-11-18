@@ -37,16 +37,28 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 			ContextualFailureCollector contextualFailureCollector) {
 		ValidationErrorCollector errorCollector = new ValidationErrorCollector( contextualFailureCollector );
 
-		aliasDefinitionValidator.validateAllIgnoreUnexpected(
-				errorCollector, ValidationContextType.ALIAS,
-				ElasticsearchValidationMessages.INSTANCE.aliasMissing(),
-				expectedIndexMetadata.getAliases(), actualIndexMetadata.getAliases()
-		);
+		validateAliases( errorCollector, expectedIndexMetadata, actualIndexMetadata );
 
 		validateSettings( errorCollector, expectedIndexMetadata, actualIndexMetadata );
 
 		rootTypeMappingValidator.validate(
 				errorCollector, expectedIndexMetadata.getMapping(), actualIndexMetadata.getMapping()
+		);
+	}
+
+	@Override
+	public boolean isAliasesValid(IndexMetadata expectedIndexMetadata, IndexMetadata actualIndexMetadata) {
+		ValidationErrorCollector errorCollector = new ValidationErrorCollector();
+		validateAliases( errorCollector, expectedIndexMetadata, actualIndexMetadata );
+		return !errorCollector.hasError();
+	}
+
+	private void validateAliases(ValidationErrorCollector errorCollector, IndexMetadata expectedIndexMetadata,
+			IndexMetadata actualIndexMetadata) {
+		aliasDefinitionValidator.validateAllIgnoreUnexpected(
+				errorCollector, ValidationContextType.ALIAS,
+				ElasticsearchValidationMessages.INSTANCE.aliasMissing(),
+				expectedIndexMetadata.getAliases(), actualIndexMetadata.getAliases()
 		);
 	}
 

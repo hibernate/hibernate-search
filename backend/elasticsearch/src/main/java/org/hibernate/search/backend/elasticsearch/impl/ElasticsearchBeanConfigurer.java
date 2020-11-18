@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.impl;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
+import org.hibernate.search.backend.elasticsearch.index.layout.impl.NoAliasIndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.SimpleIndexLayoutStrategy;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -24,6 +25,10 @@ public class ElasticsearchBeanConfigurer implements BeanConfigurer {
 		context.define(
 				IndexLayoutStrategy.class, SimpleIndexLayoutStrategy.NAME,
 				beanResolver -> BeanHolder.of( new SimpleIndexLayoutStrategy() )
+		);
+		context.define(
+				IndexLayoutStrategy.class, NoAliasIndexLayoutStrategy.NAME,
+				beanResolver -> BeanHolder.of( new NoAliasIndexLayoutStrategy() )
 		);
 	}
 }

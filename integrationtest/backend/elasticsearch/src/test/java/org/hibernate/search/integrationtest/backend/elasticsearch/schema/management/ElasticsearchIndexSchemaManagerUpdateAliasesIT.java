@@ -13,6 +13,7 @@ import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexAliasIsWriteIndex;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -40,7 +41,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 	private final StubMappedIndex index = StubMappedIndex.withoutFields();
 
 	@Test
-	public void nothingToDo() {
+	public void nothingToDo_defaultLayoutStrategy() {
 		elasticsearchClient.index( index.name() )
 				.deleteAndCreate()
 				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
@@ -59,6 +60,25 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 						+ "}"
 				+ "}",
 				elasticsearchClient.index( index.name() ).aliases().get()
+		);
+	}
+
+	@Test
+	public void nothingToDo_noAliasLayoutStrategy() {
+		elasticsearchClient.indexNoAlias( index.name() )
+				.deleteAndCreate()
+				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
+		elasticsearchClient.indexNoAlias( index.name() ).aliases()
+				.put( "somePreExistingAlias" );
+
+		setupAndUpdateIndex( "no-alias" );
+
+		assertJsonEquals(
+				"{"
+						+ "'somePreExistingAlias': {"
+						+ "}"
+						+ "}",
+				elasticsearchClient.indexNoAlias( index.name() ).aliases().get()
 		);
 	}
 
@@ -182,6 +202,10 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 	}
 
 	private void setupAndUpdateIndex() {
+		setupAndUpdateIndex( null );
+	}
+
+	private void setupAndUpdateIndex(Object layoutStrategy) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(
@@ -191,6 +215,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 							// No-op
 						}
 				)
+				.withBackendProperty( ElasticsearchBackendSettings.LAYOUT_STRATEGY, layoutStrategy )
 				.withIndex( index )
 				.setup();
 

@@ -383,16 +383,28 @@ Hibernate Search works with link:{elasticsearchDocUrl}/indices-aliases.html[alia
 This means an index with a given name in Hibernate Search will not directly be mapped
 to an index with the same name in Elasticsearch.
 
-By default, the `simple` layout strategy is used. For an index whose name in Hibernate Search is `myIndex`:
+Multiple layout strategies are available:
 
-* Write operations (indexing, purge, ...) will target the alias `myindex-write`.
-* Read operations (searching, explaining, ...) will target the alias `myindex-read`.
+[[backend-elasticsearch-indexlayout-strategy-simple]]`simple`::
+The default, future-proof strategy.
++
+For an index whose name in Hibernate Search is `myIndex`:
 * If Hibernate Search <<backend-elasticsearch-index-lifecycle,creates the index automatically>>,
 it will name the index `myindex-000001` and will automatically create the write and read aliases.
+* Write operations (indexing, purge, ...) will target the alias `myindex-write`.
+* Read operations (searching, explaining, ...) will target the alias `myindex-read`.
+[[backend-elasticsearch-indexlayout-strategy-no-alias]]`no-alias`::
+A strategy without aliases. Mostly useful on legacy clusters.
++
+For an index whose name in Hibernate Search is `myIndex`:
+* If Hibernate Search <<backend-elasticsearch-index-lifecycle,creates the index automatically>>,
+it will name the index `myindex` and will not create any alias.
+* Write operations (indexing, purge, ...) will target the index directly by its name, `myindex`.
+* Read operations (searching, explaining, ...) will target the index directly by its name `myindex`.
 
 [TIP]
 ====
-This layout is a bit more complex than it could be, but it follows the best practices.
+The `simple` layout is a bit more complex than it could be, but it follows the best practices.
 
 Using aliases has a significant advantage over directly targeting the index:
 it makes full reindexing on a live application possible without downtime,
@@ -402,6 +414,7 @@ and you need to fully reindex periodically (for example on a daily basis).
 
 With aliases, you just need to direct the read alias (used by search queries) to an old copy of the index,
 while the write alias (used by document writes) is redirected to a new copy of the index.
+Without aliases (in particular with the `no-alias` layout), this is impossible.
 
 This "zero-downtime" reindexing,
 which shares some characteristics with link:https://martinfowler.com/bliki/BlueGreenDeployment.html["blue/green" deployment],
@@ -422,7 +435,7 @@ You will find discussions on this topic in https://hibernate.atlassian.net/brows
 and https://hibernate.atlassian.net/browse/HSEARCH-3499[HSEARCH-3499].
 ====
 
-If the default names and aliases used by Hibernate Search do not match your needs,
+If the built-in layout strategies do not fit your requirements,
 you can define a custom layout in two simple steps:
 
 . Define a class that implements the interface `org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy`.

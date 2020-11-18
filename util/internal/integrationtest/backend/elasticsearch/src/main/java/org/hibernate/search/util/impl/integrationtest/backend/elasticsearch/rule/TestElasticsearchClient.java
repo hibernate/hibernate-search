@@ -33,6 +33,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
+import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchRequestFormatter;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchResponseFormatter;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -79,6 +80,10 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 				defaultWriteAlias( hibernateSearchIndexName ),
 				defaultReadAlias( hibernateSearchIndexName )
 		);
+	}
+
+	public IndexClient indexNoAlias(String hibernateSearchIndexName) {
+		return index( IndexNames.encodeName( hibernateSearchIndexName ), null, (URLEncodedString) null );
 	}
 
 	public IndexClient index(URLEncodedString primaryIndexName, URLEncodedString writeAlias, URLEncodedString readAlias) {
