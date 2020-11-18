@@ -7,10 +7,10 @@
 package org.hibernate.search.mapper.orm.session.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Map;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
+import org.hibernate.Transaction;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
@@ -27,15 +27,15 @@ class PostTransactionWorkQueueSynchronization implements Synchronization {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoIndexingPlan<EntityReference> indexingPlan;
-	private final Map<?, ?> indexingPlanPerTransaction;
-	private final Object transactionIdentifier;
+	private final HibernateOrmSearchSessionHolder sessionHolder;
+	private final Transaction transactionIdentifier;
 	private final ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 
 	PostTransactionWorkQueueSynchronization(PojoIndexingPlan<EntityReference> indexingPlan,
-			Map<?, ?> indexingPlanPerTransaction, Object transactionIdentifier,
+			HibernateOrmSearchSessionHolder sessionHolder, Transaction transactionIdentifier,
 			ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		this.indexingPlan = indexingPlan;
-		this.indexingPlanPerTransaction = indexingPlanPerTransaction;
+		this.sessionHolder = sessionHolder;
 		this.transactionIdentifier = transactionIdentifier;
 		this.synchronizationStrategy = synchronizationStrategy;
 	}
@@ -64,7 +64,7 @@ class PostTransactionWorkQueueSynchronization implements Synchronization {
 		}
 		finally {
 			//clean the Synchronization per Transaction
-			indexingPlanPerTransaction.remove( transactionIdentifier );
+			sessionHolder.clear( transactionIdentifier );
 		}
 	}
 }

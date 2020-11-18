@@ -8,8 +8,6 @@ package org.hibernate.search.mapper.orm.session.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.transaction.Synchronization;
 
@@ -28,7 +26,6 @@ import org.hibernate.search.mapper.orm.automaticindexing.session.impl.Configured
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospector;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
@@ -49,7 +46,6 @@ import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.impl.TransientReference;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -75,14 +71,17 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	 *
 	 * @return The {@link HibernateOrmSearchSession} to use within the context of the given session.
 	 */
-	@SuppressWarnings("unchecked")
 	public static HibernateOrmSearchSession get(HibernateOrmSearchSessionMappingContext context,
 			SessionImplementor sessionImplementor, boolean createIfDoesNotExist) {
 		checkOrmSessionIsOpen( sessionImplementor );
-		TransientReference<HibernateOrmSearchSession> reference =
-				(TransientReference<HibernateOrmSearchSession>) sessionImplementor.getProperties()
-						.get( SEARCH_SESSION_KEY );
-		HibernateOrmSearchSession searchSession = reference == null ? null : reference.get();
+
+		HibernateOrmSearchSessionHolder holder =
+				HibernateOrmSearchSessionHolder.get( sessionImplementor, createIfDoesNotExist );
+		if ( holder == null ) {
+			// Can only happen if createIfDoesNotExist is false
+			return null;
+		}
+		HibernateOrmSearchSession searchSession = holder.searchSession();
 		if ( searchSession != null ) {
 			return searchSession;
 		}
@@ -92,16 +91,9 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 		}
 
 		searchSession = context.createSessionBuilder( sessionImplementor ).build();
-		reference = new TransientReference<>( searchSession );
-		sessionImplementor.setProperty( SEARCH_SESSION_KEY, reference );
+		holder.searchSession( searchSession );
 		return searchSession;
 	}
-
-	private static final String SEARCH_SESSION_KEY =
-			HibernateOrmMapping.class.getName() + "#SEARCH_SESSION_KEY";
-
-	private static final String INDEXING_PLAN_PER_TRANSACTION_MAP_KEY =
-			HibernateOrmSearchSession.class.getName() + "#INDEXING_PLAN_PER_TRANSACTION_KEY";
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -255,27 +247,24 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public PojoIndexingPlan<EntityReference> currentIndexingPlan(boolean createIfDoesNotExist) {
 		checkOrmSessionIsOpen();
-		Transaction transactionIdentifier = null;
-
-		TransientReference<Map<Transaction, PojoIndexingPlan<EntityReference>>> reference =
-				(TransientReference<Map<Transaction, PojoIndexingPlan<EntityReference>>>) sessionImplementor.getProperties()
-				.get( INDEXING_PLAN_PER_TRANSACTION_MAP_KEY );
-		Map<Transaction, PojoIndexingPlan<EntityReference>> planPerTransaction = reference == null ? null : reference.get();
-		if ( planPerTransaction == null ) {
-			planPerTransaction = new HashMap<>();
-			reference = new TransientReference<>( planPerTransaction );
-			sessionImplementor.setProperty( INDEXING_PLAN_PER_TRANSACTION_MAP_KEY, reference );
+		HibernateOrmSearchSessionHolder holder =
+				HibernateOrmSearchSessionHolder.get( sessionImplementor, createIfDoesNotExist );
+		if ( holder == null ) {
+			// Can only happen if createIfDoesNotExist is false
+			return null;
 		}
 
+		Transaction transactionIdentifier;
 		if ( sessionImplementor.isTransactionInProgress() ) {
 			transactionIdentifier = sessionImplementor.accessTransaction();
 		}
-		// For out of transaction case we will use null as transaction identifier
+		else {
+			transactionIdentifier = null;
+		}
 
-		PojoIndexingPlan<EntityReference> plan = planPerTransaction.get( transactionIdentifier );
+		PojoIndexingPlan<EntityReference> plan = holder.pojoIndexingPlan( transactionIdentifier );
 		if ( plan != null ) {
 			return plan;
 		}
@@ -290,11 +279,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 				currentSynchronizationStrategy.getDocumentCommitStrategy(),
 				currentSynchronizationStrategy.getDocumentRefreshStrategy()
 		);
-		planPerTransaction.put( transactionIdentifier, plan );
+		holder.pojoIndexingPlan( transactionIdentifier, plan );
 
 		if ( sessionImplementor.isTransactionInProgress() ) {
 			Synchronization txSync = createTransactionWorkQueueSynchronization(
-					plan, planPerTransaction, transactionIdentifier,
+					plan, holder, transactionIdentifier,
 					currentSynchronizationStrategy
 			);
 			registerSynchronization( sessionImplementor, txSync );
@@ -308,11 +297,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	}
 
 	private Synchronization createTransactionWorkQueueSynchronization(PojoIndexingPlan<EntityReference> indexingPlan,
-			Map<Transaction, PojoIndexingPlan<EntityReference>> indexingPlanPerTransaction,
+			HibernateOrmSearchSessionHolder sessionProperties,
 			Transaction transactionIdentifier,
 			ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		return new PostTransactionWorkQueueSynchronization(
-				indexingPlan, indexingPlanPerTransaction, transactionIdentifier,
+				indexingPlan, sessionProperties, transactionIdentifier,
 				synchronizationStrategy
 		);
 	}
