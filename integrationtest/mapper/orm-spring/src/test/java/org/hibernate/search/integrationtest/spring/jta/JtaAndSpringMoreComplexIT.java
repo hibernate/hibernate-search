@@ -59,7 +59,8 @@ public class JtaAndSpringMoreComplexIT {
 		box.setColor( "red-and-white" );
 
 		backendMock.expectWorks( "Box" )
-				.add( "1", b -> { } )
+				.add( "1", b -> b
+						.field( "color", "red-and-white" ) )
 				.processedThenExecuted();
 		boxDAO.persist( box );
 		backendMock.verifyExpectationsMet();
@@ -71,7 +72,23 @@ public class JtaAndSpringMoreComplexIT {
 
 		box.addMuffin( muffin );
 
+		backendMock.expectWorks( "Box" )
+				.update( "1", b -> b
+						.field( "color", "red-and-white" )
+						.objectField( "muffinSet", b2 -> b2
+								.field( "kind", "blueberry" ) ) )
+				.processedThenExecuted();
 		boxDAO.merge( box );
+		backendMock.verifyExpectationsMet();
+
+		// Test lazy-loading a set of muffins
+		backendMock.expectWorks( "Box" )
+				.update( "1", b -> b
+						.field( "color", "blue" )
+						.objectField( "muffinSet", b2 -> b2
+								.field( "kind", "blueberry" ) ) )
+				.processedThenExecuted();
+		boxDAO.changeColor( box.getContainerId(), "blue" );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -82,7 +99,8 @@ public class JtaAndSpringMoreComplexIT {
 		box.setColor( "red-and-white" );
 
 		backendMock.expectWorks( "Box" )
-				.add( "2", b -> { } )
+				.add( "2", b -> b
+						.field( "color", "red-and-white" ) )
 				.processedThenExecuted();
 		boxDAO.persist( box );
 		backendMock.verifyExpectationsMet();
@@ -95,9 +113,25 @@ public class JtaAndSpringMoreComplexIT {
 		box.addDoughnut( doughnut );
 
 		backendMock.expectWorks( "Doughnut" )
-				.add( "2", b -> { } )
+				.add( "2", b -> b.field( "kind", "glazed" ) )
+				.processedThenExecuted();
+		backendMock.expectWorks( "Box" )
+				.update( "2", b -> b
+						.field( "color", "red-and-white" )
+						.objectField( "doughnutSet", b2 -> b2
+								.field( "kind", "glazed" ) ) )
 				.processedThenExecuted();
 		boxDAO.merge( box );
+		backendMock.verifyExpectationsMet();
+
+		// Test lazy-loading a set of doughnuts
+		backendMock.expectWorks( "Box" )
+				.update( "2", b -> b
+						.field( "color", "blue" )
+						.objectField( "doughnutSet", b2 -> b2
+								.field( "kind", "glazed" ) ) )
+				.processedThenExecuted();
+		boxDAO.changeColor( box.getContainerId(), "blue" );
 		backendMock.verifyExpectationsMet();
 	}
 }

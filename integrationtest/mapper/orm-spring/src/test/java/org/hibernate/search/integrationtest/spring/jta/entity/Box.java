@@ -16,6 +16,7 @@ import javax.persistence.OneToMany;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL, region = "container")
@@ -23,9 +24,11 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 public class Box extends Container {
 
 	@OneToMany(mappedBy = "box", cascade = { CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.PERSIST }, fetch = FetchType.LAZY)
+	@IndexedEmbedded
 	private Set<Muffin> muffinSet;
 
 	@OneToMany(mappedBy = "box", cascade = { CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.PERSIST }, fetch = FetchType.LAZY)
+	@IndexedEmbedded
 	private Set<Doughnut> doughnutSet;
 
 	public Box() {

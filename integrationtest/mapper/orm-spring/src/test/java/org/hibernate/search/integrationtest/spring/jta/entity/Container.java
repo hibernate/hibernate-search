@@ -32,6 +32,7 @@ public class Container extends AbstractEntity {
 	private Long containerId;
 
 	@Column(length = 255)
+	@FullTextField
 	private String color;
 
 	/**
