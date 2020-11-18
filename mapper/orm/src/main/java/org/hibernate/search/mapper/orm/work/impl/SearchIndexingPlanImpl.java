@@ -24,31 +24,31 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void addOrUpdate(Object entity) {
-		sessionContext.currentIndexingPlan( true )
+		delegate( true )
 				.addOrUpdate( getTypeIdentifier( entity ), null, null, entity );
 	}
 
 	@Override
 	public void delete(Object entity) {
-		sessionContext.currentIndexingPlan( true )
+		delegate( true )
 				.delete( getTypeIdentifier( entity ), null, null, entity );
 	}
 
 	@Override
 	public void purge(Class<?> entityClass, Object providedId, String providedRoutingKey) {
-		sessionContext.currentIndexingPlan( true )
+		delegate( true )
 				.purge( getTypeIdentifier( entityClass ), providedId, providedRoutingKey );
 	}
 
 	@Override
 	public void purge(String entityName, Object providedId, String providedRoutingKey) {
-		sessionContext.currentIndexingPlan( true )
+		delegate( true )
 				.purge( getTypeIdentifier( entityName ), providedId, providedRoutingKey );
 	}
 
 	@Override
 	public void process() {
-		PojoIndexingPlan<?> plan = sessionContext.currentIndexingPlan( false );
+		PojoIndexingPlan<?> plan = delegate( false );
 		if ( plan == null ) {
 			return;
 		}
@@ -57,12 +57,17 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void execute() {
-		PojoIndexingPlan<EntityReference> plan = sessionContext.currentIndexingPlan( false );
+		PojoIndexingPlan<EntityReference> plan = delegate( false );
 		if ( plan == null ) {
 			return;
 		}
 		sessionContext.configuredAutomaticIndexingSynchronizationStrategy()
 				.executeAndSynchronize( plan );
+	}
+
+	private PojoIndexingPlan<EntityReference> delegate(boolean createIfDoesNotExist) {
+		sessionContext.checkOpen();
+		return sessionContext.currentIndexingPlan( createIfDoesNotExist );
 	}
 
 	private <T> PojoRawTypeIdentifier<? extends T> getTypeIdentifier(T entity) {

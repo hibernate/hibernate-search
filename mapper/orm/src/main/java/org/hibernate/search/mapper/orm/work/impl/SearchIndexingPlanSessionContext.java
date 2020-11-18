@@ -19,4 +19,6 @@ public interface SearchIndexingPlanSessionContext {
 
 	PojoIndexingPlan<EntityReference> currentIndexingPlan(boolean createIfDoesNotExist);
 
+	void checkOpen();
+
 }
