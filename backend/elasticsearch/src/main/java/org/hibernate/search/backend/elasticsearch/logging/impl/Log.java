@@ -103,7 +103,7 @@ public interface Log extends BasicLogger {
 	SearchException schemaUpdateFailed(URLEncodedString indexName, String causeMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_LEGACY_ES + 50,
-			value = "Missing index: index aliases [%1$s, %2$s] do not point to any index in the Elasticsearch cluster." )
+			value = "Missing index: index names [%1$s, %2$s] do not point to any index in the Elasticsearch cluster." )
 	SearchException indexMissing(URLEncodedString write, URLEncodedString read);
 
 	@LogMessage(level = Level.TRACE)
@@ -518,8 +518,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 93,
 			value = "Invalid Elasticsearch index layout:"
-					+ " index aliases [%1$s, %2$s] resolve to multiple distinct indexes %3$s."
-					+ " These aliases must resolve to a single index.")
+					+ " index names [%1$s, %2$s] resolve to multiple distinct indexes %3$s."
+					+ " These names must resolve to a single index.")
 	SearchException elasticsearchIndexNameAndAliasesMatchMultipleIndexes(URLEncodedString write, URLEncodedString read,
 			Set<String> matchingIndexes);
 

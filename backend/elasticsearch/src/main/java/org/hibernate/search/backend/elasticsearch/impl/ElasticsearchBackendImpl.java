@@ -192,15 +192,20 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 		URLEncodedString writeAlias = IndexNames.encodeName( indexLayoutStrategy.createWriteAlias( hibernateSearchIndexName ) );
 		URLEncodedString readAlias = IndexNames.encodeName( indexLayoutStrategy.createReadAlias( hibernateSearchIndexName ) );
 
-		if ( writeAlias.equals( readAlias ) ) {
+		URLEncodedString primaryName = null;
+		if ( writeAlias == null || readAlias == null ) {
+			primaryName = IndexNames.encodeName(
+					indexLayoutStrategy.createInitialElasticsearchIndexName( hibernateSearchIndexName ) );
+		}
+		else if ( writeAlias.equals( readAlias ) ) {
 			throw log.sameWriteAndReadAliases( writeAlias, indexEventContext );
 		}
 
-		IndexNames indexNames = new IndexNames(
-				hibernateSearchIndexName,
-				writeAlias,
-				readAlias
-		);
+		URLEncodedString readName = readAlias != null ? readAlias : primaryName;
+		URLEncodedString writeName = writeAlias != null ? writeAlias : primaryName;
+
+		IndexNames indexNames = new IndexNames( hibernateSearchIndexName,
+				writeName, writeAlias != null, readName, readAlias != null );
 
 		// This will check that names are unique.
 		indexNamesRegistry.register( indexNames );

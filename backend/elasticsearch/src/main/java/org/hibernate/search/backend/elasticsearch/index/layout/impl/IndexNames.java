@@ -26,17 +26,22 @@ public final class IndexNames {
 	}
 
 	public static URLEncodedString encodeName(String name) {
-		return URLEncodedString.fromString( normalizeName( name ) );
+		return name == null ? null : URLEncodedString.fromString( normalizeName( name ) );
 	}
 
 	private final String hibernateSearch;
 	private final URLEncodedString write;
+	private final boolean writeIsAlias;
 	private final URLEncodedString read;
+	private final boolean readIsAlias;
 
-	public IndexNames(String hibernateSearch, URLEncodedString write, URLEncodedString read) {
+	public IndexNames(String hibernateSearch, URLEncodedString write, boolean writeIsAlias,
+			URLEncodedString read, boolean readIsAlias) {
 		this.hibernateSearch = hibernateSearch;
 		this.write = write;
+		this.writeIsAlias = writeIsAlias;
 		this.read = read;
+		this.readIsAlias = readIsAlias;
 	}
 
 	@Override
@@ -45,11 +50,13 @@ public final class IndexNames {
 				"hibernateSearch=" + hibernateSearch +
 				", read=" + read +
 				", write=" + write +
+				", readIsAlias=" + readIsAlias +
+				", writeIsAlias=" + writeIsAlias +
 				"]";
 	}
 
 	/**
-	 * The Hibernate Search index name,
+	 * @return The Hibernate Search index name,
 	 * i.e. the name that Hibernate Search uses internally to designate that index, for example in configuration files.
 	 */
 	public String hibernateSearchIndex() {
@@ -57,7 +64,7 @@ public final class IndexNames {
 	}
 
 	/**
-	 * The write name,
+	 * @return The write name,
 	 * i.e. the name that Hibernate Search is supposed to use when indexing or purging the index.
 	 */
 	public URLEncodedString write() {
@@ -65,10 +72,24 @@ public final class IndexNames {
 	}
 
 	/**
-	 * The read name,
+	 * @return Whether the {@link #write write name} is an alias ({@code true}) or not ({@code false}).
+	 */
+	public boolean writeIsAlias() {
+		return writeIsAlias;
+	}
+
+	/**
+	 * @return The read name,
 	 * i.e. the name that Hibernate Search is supposed to use when executing searches on the index.
 	 */
 	public URLEncodedString read() {
 		return read;
+	}
+
+	/**
+	 * @return Whether the {@link #write write name} is an alias ({@code true}) or not ({@code false}).
+	 */
+	public boolean readIsAlias() {
+		return readIsAlias;
 	}
 }

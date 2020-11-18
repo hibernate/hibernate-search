@@ -143,15 +143,15 @@ public class ElasticsearchSchemaAccessor {
 		IndexStatus requiredIndexStatus = executionOptions.getRequiredStatus();
 		int requiredStatusTimeoutInMs = executionOptions.getRequiredStatusTimeoutInMs();
 
-		URLEncodedString alias = indexNames.write();
+		URLEncodedString name = indexNames.write();
 
 		NonBulkableWork<?> work =
-				getWorkFactory().waitForIndexStatusWork( alias, requiredIndexStatus, requiredStatusTimeoutInMs )
+				getWorkFactory().waitForIndexStatusWork( name, requiredIndexStatus, requiredStatusTimeoutInMs )
 						.build();
 		return execute( work )
 				.exceptionally( Futures.handler( e -> {
 					throw log.unexpectedIndexStatus(
-							alias, requiredIndexStatus.externalRepresentation(), requiredStatusTimeoutInMs,
+							name, requiredIndexStatus.externalRepresentation(), requiredStatusTimeoutInMs,
 							Throwables.expectException( e )
 					);
 				} ) );
