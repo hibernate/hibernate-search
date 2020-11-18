@@ -61,7 +61,7 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 
 	private URLEncodedString createPrimaryIndexName(IndexNames indexNames) {
 		return IndexNames.encodeName(
-				indexLayoutStrategy.createInitialElasticsearchIndexName( indexNames.getHibernateSearch() )
+				indexLayoutStrategy.createInitialElasticsearchIndexName( indexNames.hibernateSearchIndex() )
 		);
 	}
 

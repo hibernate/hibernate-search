@@ -150,7 +150,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 
 	@Override
 	public URLEncodedString getElasticsearchIndexWriteName() {
-		return model.names().getWrite();
+		return model.names().write();
 	}
 
 	@Override

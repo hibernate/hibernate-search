@@ -84,8 +84,8 @@ public class ElasticsearchSchemaAccessor {
 
 	private CompletableFuture<ExistingIndexMetadata> getCurrentIndexMetadata(IndexNames indexNames, boolean allowNull) {
 		NonBulkableWork<List<ExistingIndexMetadata>> work = getWorkFactory().getIndexMetadata()
-				.index( indexNames.getWrite() )
-				.index( indexNames.getRead() )
+				.index( indexNames.write() )
+				.index( indexNames.read() )
 				.build();
 		return execute( work )
 				.exceptionally( Futures.handler( e -> {
@@ -98,12 +98,12 @@ public class ElasticsearchSchemaAccessor {
 							return null;
 						}
 						else {
-							throw log.indexMissing( indexNames.getWrite(), indexNames.getRead() );
+							throw log.indexMissing( indexNames.write(), indexNames.read() );
 						}
 					}
 					if ( list.size() > 1 ) {
 						throw log.elasticsearchIndexNameAndAliasesMatchMultipleIndexes(
-								indexNames.getWrite(), indexNames.getRead(),
+								indexNames.write(), indexNames.read(),
 								list.stream().map( ExistingIndexMetadata::getPrimaryName ).collect( Collectors.toSet() )
 						);
 					}
@@ -143,7 +143,7 @@ public class ElasticsearchSchemaAccessor {
 		IndexStatus requiredIndexStatus = executionOptions.getRequiredStatus();
 		int requiredStatusTimeoutInMs = executionOptions.getRequiredStatusTimeoutInMs();
 
-		URLEncodedString alias = indexNames.getWrite();
+		URLEncodedString alias = indexNames.write();
 
 		NonBulkableWork<?> work =
 				getWorkFactory().waitForIndexStatusWork( alias, requiredIndexStatus, requiredStatusTimeoutInMs )

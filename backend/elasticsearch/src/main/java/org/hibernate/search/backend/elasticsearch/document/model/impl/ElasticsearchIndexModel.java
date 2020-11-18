@@ -68,7 +68,7 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 
 	@Override
 	public String hibernateSearchName() {
-		return names.getHibernateSearch();
+		return names.hibernateSearchIndex();
 	}
 
 	@Override

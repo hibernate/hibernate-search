@@ -57,7 +57,7 @@ public class IndexNameTypeNameMapping implements TypeNameMapping {
 	public void register(IndexNames indexNames, String mappedTypeName) {
 		String uniqueKey = IndexNames.normalizeName(
 				indexLayoutStrategy.extractUniqueKeyFromHibernateSearchIndexName(
-						indexNames.getHibernateSearch()
+						indexNames.hibernateSearchIndex()
 				)
 		);
 		mappedTypeNameExtractionHelper.primaryIndexNameUniqueKeyToMappedTypeNames

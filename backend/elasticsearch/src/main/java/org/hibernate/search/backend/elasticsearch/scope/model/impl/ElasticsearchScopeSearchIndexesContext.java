@@ -139,8 +139,8 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 			else if ( firstField.isObjectField() != fieldForCurrentIndex.isObjectField() ) {
 				SearchException cause = log.conflictingFieldModel();
 				throw log.inconsistentConfigurationForFieldForSearch( absoluteFieldPath, cause.getMessage(),
-						EventContexts.fromIndexNames( indexModelOfFirstField.names().getHibernateSearch(),
-								indexModel.names().getHibernateSearch() ),
+						EventContexts.fromIndexNames( indexModelOfFirstField.names().hibernateSearchIndex(),
+								indexModel.names().hibernateSearchIndex() ),
 						cause );
 			}
 			fieldForEachIndex.add( fieldForCurrentIndex );

@@ -52,7 +52,7 @@ public final class IndexNames {
 	 * The Hibernate Search index name,
 	 * i.e. the name that Hibernate Search uses internally to designate that index, for example in configuration files.
 	 */
-	public String getHibernateSearch() {
+	public String hibernateSearchIndex() {
 		return hibernateSearch;
 	}
 
@@ -60,7 +60,7 @@ public final class IndexNames {
 	 * The write name,
 	 * i.e. the name that Hibernate Search is supposed to use when indexing or purging the index.
 	 */
-	public URLEncodedString getWrite() {
+	public URLEncodedString write() {
 		return write;
 	}
 
@@ -68,7 +68,7 @@ public final class IndexNames {
 	 * The read name,
 	 * i.e. the name that Hibernate Search is supposed to use when executing searches on the index.
 	 */
-	public URLEncodedString getRead() {
+	public URLEncodedString read() {
 		return read;
 	}
 }
