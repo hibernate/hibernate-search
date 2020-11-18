@@ -42,9 +42,15 @@ public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigra
 			IndexMetadata expectedIndexMetadata, IndexMetadata actualIndexMetadata) {
 		/*
 		 * We only update aliases if it's really necessary,
-		 * because we might overwrite custom user attributes.
+		 * because we might not even need aliases.
 		 */
-		CompletableFuture<?> aliasMigration = doMigrateAliases( indexName, expectedIndexMetadata.getAliases() );
+		CompletableFuture<?> aliasMigration;
+		if ( schemaValidator.isAliasesValid( expectedIndexMetadata, actualIndexMetadata ) ) {
+			aliasMigration = CompletableFuture.completedFuture( null );
+		}
+		else {
+			aliasMigration = doMigrateAliases( indexName, expectedIndexMetadata.getAliases() );
+		}
 
 		/*
 		 * We only update settings if it's really necessary, because closing the index,

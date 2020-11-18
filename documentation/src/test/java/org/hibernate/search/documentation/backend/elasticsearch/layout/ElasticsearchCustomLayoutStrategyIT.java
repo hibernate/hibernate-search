@@ -24,7 +24,6 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.JsonHelper;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -36,10 +35,6 @@ public class ElasticsearchCustomLayoutStrategyIT {
 
 	@Rule
 	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
-
-	@Before
-	public void setup() {
-	}
 
 	@Test
 	public void smoke() {
