@@ -1,6 +1,20 @@
 Hibernate Search Changelog
 ==========================
 
+5.10.10.Final (18-11-2020)
+-------------------------
+
+** Improvement
+    * HSEARCH-4103 Upgrade to Hibernate ORM 5.3.19.Final
+
+** Task
+    * HSEARCH-4110 Upgrade to Hibernate ORM 5.3.20.Final
+    * HSEARCH-3982 Upgrade to Byteman 4.0.13
+    * HSEARCH-3968 Upgrade to byteman 4.0.12
+    * HSEARCH-3908 Upgrade to Hibernate ORM 5.3.17.Final
+    * HSEARCH-3895 Upgrade to Hibernate ORM 5.3.16.Final
+    * HSEARCH-3840 Upgrade to Byteman 4.0.11
+
 5.10.9.Final (18-02-2020)
 -------------------------
 
