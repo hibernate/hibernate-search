@@ -166,7 +166,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 		CountWorkBuilder builder = workFactory.count();
 		for ( ElasticsearchSearchIndexContext index : searchContext.indexes().elements() ) {
-			builder.index( index.names().getRead() );
+			builder.index( index.names().read() );
 		}
 		builder.query( filteredPayload )
 				.routingKeys( routingKeys )
@@ -224,7 +224,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		SearchWorkBuilder<ElasticsearchLoadableSearchResult<H>> builder =
 				workFactory.search( payload, searchResultExtractor );
 		for ( ElasticsearchSearchIndexContext index : searchContext.indexes().elements() ) {
-			builder.index( index.names().getRead() );
+			builder.index( index.names().read() );
 		}
 		builder
 				.routingKeys( routingKeys )
@@ -262,7 +262,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 		URLEncodedString elasticsearchId = toElasticsearchId( index, id );
 
-		URLEncodedString indexName = index.names().getRead();
+		URLEncodedString indexName = index.names().read();
 		NonBulkableWork<ExplainResult> work = workFactory.explain( indexName, elasticsearchId, queryOnlyPayload )
 				.routingKeys( routingKeys )
 				.requestTransformer(
