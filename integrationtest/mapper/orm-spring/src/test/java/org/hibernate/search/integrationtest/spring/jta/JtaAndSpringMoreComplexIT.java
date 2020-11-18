@@ -16,9 +16,11 @@ import org.hibernate.search.integrationtest.spring.jta.dao.BoxDAO;
 import org.hibernate.search.integrationtest.spring.jta.entity.Box;
 import org.hibernate.search.integrationtest.spring.jta.entity.Doughnut;
 import org.hibernate.search.integrationtest.spring.jta.entity.Muffin;
+import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSessionHolder;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,6 +52,11 @@ public class JtaAndSpringMoreComplexIT {
 		assertThat( entityManagerFactory.unwrap( SessionFactoryImplementor.class )
 				.getServiceRegistry().getService( TransactionCoordinatorBuilder.class ) )
 				.returns( true, TransactionCoordinatorBuilder::isJta );
+	}
+
+	@After
+	public void checkNoMemoryLeak() {
+		assertThat( HibernateOrmSearchSessionHolder.staticMapSize() ).isZero();
 	}
 
 	@Test
