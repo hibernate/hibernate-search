@@ -1,6 +1,12 @@
 Hibernate Search Changelog
 ==========================
 
+5.11.7.Final (18-11-2020)
+-------------------------
+
+** Task
+    * HSEARCH-4111 Upgrade to Hibernate ORM 5.4.24.Final
+
 5.11.6.Final (16-11-2020)
 -------------------------
 
