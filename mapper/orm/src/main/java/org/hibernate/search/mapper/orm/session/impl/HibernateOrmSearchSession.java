@@ -73,8 +73,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	 */
 	public static HibernateOrmSearchSession get(HibernateOrmSearchSessionMappingContext context,
 			SessionImplementor sessionImplementor, boolean createIfDoesNotExist) {
-		checkOrmSessionIsOpen( sessionImplementor );
-
 		HibernateOrmSearchSessionHolder holder =
 				HibernateOrmSearchSessionHolder.get( sessionImplementor, createIfDoesNotExist );
 		if ( holder == null ) {
@@ -158,13 +156,13 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 
 	@Override
 	public <T> SearchScopeImpl<T> scope(Collection<? extends Class<? extends T>> types) {
-		checkOrmSessionIsOpen();
+		checkOpen();
 		return mappingContext.createScope( types );
 	}
 
 	@Override
 	public <T> SearchScope<T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
-		checkOrmSessionIsOpen();
+		checkOpen();
 		return mappingContext.createScope( expectedSuperType, entityNames );
 	}
 
@@ -248,7 +246,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 
 	@Override
 	public PojoIndexingPlan<EntityReference> currentIndexingPlan(boolean createIfDoesNotExist) {
-		checkOrmSessionIsOpen();
 		HibernateOrmSearchSessionHolder holder =
 				HibernateOrmSearchSessionHolder.get( sessionImplementor, createIfDoesNotExist );
 		if ( holder == null ) {
@@ -289,6 +286,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 			registerSynchronization( sessionImplementor, txSync );
 		}
 		return plan;
+	}
+
+	@Override
+	public void checkOpen() {
+		checkOpen( sessionImplementor );
 	}
 
 	@Override
@@ -344,11 +346,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 				.isJta();
 	}
 
-	private void checkOrmSessionIsOpen() {
-		checkOrmSessionIsOpen( sessionImplementor );
-	}
-
-	private static void checkOrmSessionIsOpen(SessionImplementor session) {
+	private static void checkOpen(SessionImplementor session) {
 		try {
 			session.checkOpen();
 		}
