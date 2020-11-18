@@ -6,11 +6,18 @@
  */
 package org.hibernate.search.integrationtest.spring.jta;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import javax.persistence.EntityManagerFactory;
+
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.resource.transaction.spi.TransactionCoordinatorBuilder;
 import org.hibernate.search.integrationtest.spring.jta.dao.SnertDAO;
 import org.hibernate.search.integrationtest.spring.jta.entity.Snert;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +39,16 @@ public class JtaAndSpringIT {
 
 	@Autowired
 	private SnertDAO snertDAO;
+
+	@Autowired
+	private EntityManagerFactory entityManagerFactory;
+
+	@Before
+	public void checkJta() {
+		assertThat( entityManagerFactory.unwrap( SessionFactoryImplementor.class )
+				.getServiceRegistry().getService( TransactionCoordinatorBuilder.class ) )
+				.returns( true, TransactionCoordinatorBuilder::isJta );
+	}
 
 	@Test
 	public void test() {
