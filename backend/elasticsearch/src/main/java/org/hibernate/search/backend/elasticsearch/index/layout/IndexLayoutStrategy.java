@@ -17,6 +17,11 @@ public interface IndexLayoutStrategy {
 
 	/**
 	 * Generates an initial non-alias Elasticsearch name for an index.
+	 * <p>
+	 * When {@link #createReadAlias(String)} or {@link #createWriteAlias(String)} returns {@code null},
+	 * this must consistently return the same value for each index,
+	 * even across multiple executions of the application.
+	 * Otherwise, the only requirement is that returned names are unique.
 	 *
 	 * @param hibernateSearchIndexName The Hibernate Search name of an index.
 	 * @return The non-alias Elasticsearch name for this index.
@@ -30,6 +35,10 @@ public interface IndexLayoutStrategy {
 	 * <p>
 	 * This must consistently return the same value for each index,
 	 * even across multiple executions of the application.
+	 * <p>
+	 * If you do not want to use aliases for write operations, return {@code null}:
+	 * the non-alias name returned by {@link #createInitialElasticsearchIndexName(String)}
+	 * will be used instead.
 	 *
 	 * @param hibernateSearchIndexName The Hibernate Search name of an index.
 	 * @return The write alias for this index.
@@ -43,6 +52,10 @@ public interface IndexLayoutStrategy {
 	 * <p>
 	 * This must consistently return the same value for each index,
 	 * even across multiple executions of the application.
+	 * <p>
+	 * If you do not want to use aliases for read operations, return {@code null}:
+	 * the non-alias name returned by {@link #createInitialElasticsearchIndexName(String)}
+	 * will be used instead.
 	 *
 	 * @param hibernateSearchIndexName The Hibernate Search name of an index.
 	 * @return The read alias for this index.

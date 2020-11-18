@@ -49,8 +49,12 @@ public class LowLevelIndexMetadataBuilder {
 
 	private Map<String, IndexAliasDefinition> buildAliases() {
 		Map<String, IndexAliasDefinition> aliases = new LinkedHashMap<>();
-		aliases.put( indexNames.write().original, syntax.createWriteAliasDefinition() );
-		aliases.put( indexNames.read().original, syntax.createReadAliasDefinition() );
+		if ( indexNames.writeIsAlias() ) {
+			aliases.put( indexNames.write().original, syntax.createWriteAliasDefinition() );
+		}
+		if ( indexNames.readIsAlias() ) {
+			aliases.put( indexNames.read().original, syntax.createReadAliasDefinition() );
+		}
 		return aliases;
 	}
 
