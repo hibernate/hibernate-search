@@ -13,7 +13,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.transaction.Synchronization;
 
-import org.hibernate.BaseSessionEventListener;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.action.spi.AfterTransactionCompletionProcess;
@@ -83,7 +82,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 		TransientReference<HibernateOrmSearchSession> reference =
 				(TransientReference<HibernateOrmSearchSession>) sessionImplementor.getProperties()
 						.get( SEARCH_SESSION_KEY );
-		@SuppressWarnings("resource") // The listener below handles closing
 		HibernateOrmSearchSession searchSession = reference == null ? null : reference.get();
 		if ( searchSession != null ) {
 			return searchSession;
@@ -96,10 +94,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 		searchSession = context.createSessionBuilder( sessionImplementor ).build();
 		reference = new TransientReference<>( searchSession );
 		sessionImplementor.setProperty( SEARCH_SESSION_KEY, reference );
-
-		// Make sure we will ultimately close the query manager
-		sessionImplementor.getEventListenerManager()
-				.addListener( new SearchSessionClosingListener( sessionImplementor ) );
 		return searchSession;
 	}
 
@@ -126,10 +120,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 		this.sessionImplementor = builder.sessionImplementor;
 		this.runtimeIntrospector = builder.buildRuntimeIntrospector();
 		automaticIndexingSynchronizationStrategy( builder.automaticIndexingSynchronizationStrategy );
-	}
-
-	public void close() {
-		// Nothing to do
 	}
 
 	@Override
@@ -403,23 +393,4 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 		}
 	}
 
-	private static class SearchSessionClosingListener extends BaseSessionEventListener {
-		private final SessionImplementor sessionImplementor;
-
-		private SearchSessionClosingListener(SessionImplementor sessionImplementor) {
-			this.sessionImplementor = sessionImplementor;
-		}
-
-		@Override
-		public void end() {
-			@SuppressWarnings("unchecked") // This key "belongs" to us, we know what we put in there.
-					TransientReference<HibernateOrmSearchSession> reference =
-					(TransientReference<HibernateOrmSearchSession>) sessionImplementor.getProperties()
-							.get( SEARCH_SESSION_KEY );
-			HibernateOrmSearchSession searchSession = reference == null ? null : reference.get();
-			if ( searchSession != null ) {
-				searchSession.close();
-			}
-		}
-	}
 }
