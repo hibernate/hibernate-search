@@ -9,15 +9,26 @@ package org.hibernate.search.mapper.orm.session.impl;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.transaction.Synchronization;
 
 import org.hibernate.Transaction;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 
-class HibernateOrmSearchSessionHolder implements Serializable {
+public class HibernateOrmSearchSessionHolder implements Serializable {
 
 	private static final String SESSION_PROPERTY_KEY = "hibernate.search.session";
+
+	private static final Map<Transaction, HibernateOrmSearchSessionHolder> holderPerClosedSessionTransaction =
+			new ConcurrentHashMap<>();
+
+	// Public for tests only
+	public static int staticMapSize() {
+		return holderPerClosedSessionTransaction.size();
+	}
 
 	public static HibernateOrmSearchSessionHolder get(SessionImplementor session) {
 		return get( session, true );
@@ -29,11 +40,29 @@ class HibernateOrmSearchSessionHolder implements Serializable {
 		if ( holder != null ) {
 			return holder;
 		}
+		boolean closedSessionAndTransaction = session.isClosed() && session.isTransactionInProgress();
+		if ( closedSessionAndTransaction ) {
+			// This can happen when using JTA.
+			// Only do this as a fallback: if somehow the session holder was added to the session properties
+			// before the session was closed, we definitely want to use it and avoid the static map.
+			holder = holderPerClosedSessionTransaction.get( session.accessTransaction() );
+		}
+		if ( holder != null ) {
+			return holder;
+		}
 		if ( !createIfMissing ) {
 			return null;
 		}
 		holder = new HibernateOrmSearchSessionHolder();
-		session.setProperty( SESSION_PROPERTY_KEY, holder );
+		if ( closedSessionAndTransaction ) {
+			// This can happen when using JTA.
+			Transaction transaction = session.accessTransaction();
+			transaction.registerSynchronization( new HolderPerClosedSessionTransactionCleanup( transaction ) );
+			holderPerClosedSessionTransaction.put( transaction, holder );
+		}
+		else {
+			session.setProperty( SESSION_PROPERTY_KEY, holder );
+		}
 		return holder;
 	}
 
@@ -67,5 +96,23 @@ class HibernateOrmSearchSessionHolder implements Serializable {
 			return;
 		}
 		planPerTransaction.remove( transactionIdentifier );
+	}
+
+	private static class HolderPerClosedSessionTransactionCleanup implements Synchronization {
+		private final Transaction transaction;
+
+		public HolderPerClosedSessionTransactionCleanup(Transaction transaction) {
+			this.transaction = transaction;
+		}
+
+		@Override
+		public void beforeCompletion() {
+			// Nothing to do
+		}
+
+		@Override
+		public void afterCompletion(int i) {
+			holderPerClosedSessionTransaction.remove( transaction );
+		}
 	}
 }
