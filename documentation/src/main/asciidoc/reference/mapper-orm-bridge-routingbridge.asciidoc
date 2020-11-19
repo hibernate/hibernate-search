@@ -1,5 +1,5 @@
 [[mapper-orm-bridge-routingbridge]]
-= Routing bridges
+= Routing bridge
 // Legacy anchor from earlier 6.0 beta versions
 [[mapper-orm-bridge-routingkeybridge]]
 

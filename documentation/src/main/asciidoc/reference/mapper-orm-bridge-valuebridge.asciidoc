@@ -1,5 +1,5 @@
 [[mapper-orm-bridge-valuebridge]]
-= Value bridges
+= Value bridge
 // Search 5 anchors backward compatibility
 [[_stringbridge]]
 

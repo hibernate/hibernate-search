@@ -1,5 +1,5 @@
 [[mapper-orm-bridge-identifierbridge]]
-= Identifier bridges
+= Identifier bridge
 
 == Basics
 
