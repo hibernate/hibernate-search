@@ -28,7 +28,6 @@ public final class Paths {
 	public static final URLEncodedString _MAPPING = URLEncodedString.fromString( "_mapping" );
 	public static final URLEncodedString _REFRESH = URLEncodedString.fromString( "_refresh" );
 	public static final URLEncodedString _SEARCH = URLEncodedString.fromString( "_search" );
-	public static final URLEncodedString _TEMPLATE = URLEncodedString.fromString( "_template" );
 	public static final URLEncodedString _CLUSTER = URLEncodedString.fromString( "_cluster" );
 	public static final URLEncodedString _BULK = URLEncodedString.fromString( "_bulk" );
 	public static final URLEncodedString _DOC = URLEncodedString.fromString( "_doc" );

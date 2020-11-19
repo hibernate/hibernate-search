@@ -9,6 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dia
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
 import com.google.gson.JsonObject;
@@ -44,6 +45,10 @@ public interface ElasticsearchTestDialect {
 
 	Boolean getIncludeTypeNameParameterForMappingApi();
 
+	ElasticsearchRequest createTemplatePutRequest(String templateName, String pattern, int priority, JsonObject settings);
+
+	ElasticsearchRequest createTemplateDeleteRequest(String templateName);
+
 	List<String> getAllLocalDateDefaultMappingFormats();
 
 	default String getFirstLocalDateDefaultMappingFormat() {
@@ -53,8 +58,6 @@ public interface ElasticsearchTestDialect {
 	default String getConcatenatedLocalDateDefaultMappingFormats() {
 		return String.join( "||", getAllLocalDateDefaultMappingFormats() );
 	}
-
-	void setTemplatePattern(JsonObject object, String pattern);
 
 	boolean supportsGeoPointIndexNullAs();
 

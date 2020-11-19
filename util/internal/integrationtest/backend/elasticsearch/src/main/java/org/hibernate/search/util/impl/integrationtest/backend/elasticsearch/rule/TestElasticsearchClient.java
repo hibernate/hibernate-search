@@ -335,21 +335,20 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		}
 
 		public TemplateClient create(String templateString, String settings) {
-			return create( templateString, 0, settings );
+			return create( templateString, 99999, settings );
 		}
 
-		public TemplateClient create(String templateString, int templateOrder, String settings) {
-			return create( templateString, templateOrder, toJsonElement( settings ).getAsJsonObject() );
+		public TemplateClient create(String templateString, int priority, String settings) {
+			return create( templateString, priority, toJsonElement( settings ).getAsJsonObject() );
 		}
 
-		public TemplateClient create(String templateString, int templateOrder, JsonObject settings) {
-			TestElasticsearchClient.this.createTemplate( templateName, templateString, templateOrder, settings );
+		public TemplateClient create(String templateString, int priority, JsonObject settings) {
+			TestElasticsearchClient.this.createTemplate( templateName, templateString, priority, settings );
 			return this;
 		}
 
 		public TemplateClient registerForCleanup() {
 			TestElasticsearchClient.this.registerTemplateForCleanup( templateName );
-			return this;
 		}
 	}
 
@@ -419,24 +418,11 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		}
 	}
 
-	private void createTemplate(String templateName, String templateString, int templateOrder, JsonObject settings) {
-		JsonObject source = new JsonObject();
-		dialect.setTemplatePattern( source, templateString );
-		source.addProperty( "order", templateOrder );
-		source.add( "settings", settings );
-
+	private void createTemplate(String templateName, String templateString, int priority, JsonObject settings) {
+		ElasticsearchRequest request =
+				dialect.createTemplatePutRequest( templateName, templateString, priority, settings );
 		registerTemplateForCleanup( templateName );
-
-		ElasticsearchRequest.Builder builder = ElasticsearchRequest.put()
-				.pathComponent( Paths._TEMPLATE ).pathComponent( URLEncodedString.fromString( templateName ) )
-				.body( source );
-
-		Boolean includeTypeName = dialect.getIncludeTypeNameParameterForMappingApi();
-		if ( includeTypeName != null ) {
-			builder.param( "include_type_name", includeTypeName );
-		}
-
-		performRequest( builder.build() );
+		performRequest( request );
 	}
 
 	private void ensureIndexDoesNotExist(URLEncodedString indexName) {
@@ -793,9 +779,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 
 	private void tryDeleteESTemplate(String templateName) {
 		try {
-			performRequestIgnore404( ElasticsearchRequest.delete()
-					.pathComponent( Paths._TEMPLATE ).pathComponent( URLEncodedString.fromString( templateName ) )
-					.build() );
+			performRequestIgnore404( dialect.createTemplateDeleteRequest( templateName ) );
 		}
 		catch (RuntimeException e) {
 			throw new AssertionFailure(

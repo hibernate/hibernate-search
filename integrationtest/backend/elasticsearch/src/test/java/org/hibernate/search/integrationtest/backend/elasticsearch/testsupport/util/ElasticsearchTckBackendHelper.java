@@ -85,7 +85,6 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 				elasticsearchClient.template( "sharded_index" )
 						.create(
 								"*",
-								99999, // Override other templates, if any
 								"{'number_of_shards': " + shardCount + "}"
 						);
 
@@ -111,7 +110,6 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 				elasticsearchClient.template( "explicit_refresh_interval" )
 						.create(
 								"*",
-								99999, // Override other templates, if any
 								"{'refresh_interval': '" + refreshIntervalMs + "ms' }"
 						);
 
