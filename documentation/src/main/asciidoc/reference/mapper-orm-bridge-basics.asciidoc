@@ -43,19 +43,12 @@ the following table may help:
 |<<mapper-orm-bridge-identifierbridge,`IdentifierBridge`>>
 |<<mapper-orm-bridge-routingbridge,`RoutingBridge`>>
 
-|Built-in annotation(s)
-|<<mapper-orm-directfieldmapping,`@GenericField`, `@FullTextField`, ...>>
-|`@PropertyBinding`
-|`@TypeBinding`
-|<<mapper-orm-identifiermapping,`@DocumentId`>>
-|`@Indexed(routingBinder = ...)`
-
-|Maps from...
-|One property
-|One property
-|One property or more
-|One property (usually the entity identifier)
-|One property or more
+|Applied to...
+|Class field or getter
+|Class field or getter
+|Class
+|Class field or getter (usually entity ID)
+|Class
 
 |Maps to...
 |One index field
@@ -63,6 +56,13 @@ the following table may help:
 |One index field or more
 |Document identifier
 |Route (conditional indexing, <<concepts-sharding-routing,routing key>>)
+
+|Built-in annotation(s)
+|<<mapper-orm-directfieldmapping,`@GenericField`, `@FullTextField`, ...>>
+|`@PropertyBinding`
+|`@TypeBinding`
+|<<mapper-orm-identifiermapping,`@DocumentId`>>
+|`@Indexed(routingBinder = ...)`
 
 |Supports <<mapper-orm-containerextractor,container extractors>>
 |Yes
