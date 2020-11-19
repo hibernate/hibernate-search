@@ -11,7 +11,7 @@ import com.google.gson.JsonObject;
 public class Elasticsearch5TestDialect extends Elasticsearch60TestDialect {
 
 	@Override
-	public void setTemplatePattern(JsonObject object, String pattern) {
+	protected void setLegacyTemplatePattern(JsonObject object, String pattern) {
 		object.addProperty( "template", pattern );
 	}
 

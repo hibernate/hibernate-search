@@ -56,7 +56,6 @@ public class BackendConfigurations {
 						testElasticsearchClient.template( "sharded_index" )
 								.create(
 										"*",
-										99999, // Override other templates, if any
 										"{'number_of_shards': " + shardCount + "}"
 								);
 						return super.setup( setupContext, backendNameOrNull, configurationProvider );
