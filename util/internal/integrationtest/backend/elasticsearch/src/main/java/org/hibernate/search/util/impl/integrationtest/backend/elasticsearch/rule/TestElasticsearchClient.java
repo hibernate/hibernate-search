@@ -90,10 +90,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		return new IndexClient( primaryIndexName, writeAlias, readAlias );
 	}
 
-	public ClusterSettingsClient clusterSettings(String settingsPath) {
-		return new ClusterSettingsClient( settingsPath );
-	}
-
 	public class IndexClient {
 
 		private final URLEncodedString primaryIndexName;
@@ -108,10 +104,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 
 		public boolean exists() {
 			return TestElasticsearchClient.this.exists( primaryIndexName );
-		}
-
-		public void waitForRequiredIndexStatus() {
-			TestElasticsearchClient.this.waitForRequiredIndexStatus( primaryIndexName );
 		}
 
 		public IndexClient deleteAndCreate() {
@@ -215,24 +207,11 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		 * Put settings without closing the index first.
 		 *
 		 * @param settings The settings value to put
-		 * @throws IOException
 		 */
 		public void putDynamic(String settings) {
 			URLEncodedString indexName = indexClient.primaryIndexName;
 			JsonObject settingsAsJsonObject = buildStructuredSettings( settingsPath, settings );
 			TestElasticsearchClient.this.putIndexSettingsDynamic( indexName, settingsAsJsonObject );
-		}
-
-		/**
-		 * Put settings, closing the index first and reopening the index afterwards.
-		 *
-		 * @param settings The settings value to put
-		 * @throws IOException
-		 */
-		public void putNonDynamic(String settings) {
-			URLEncodedString indexName = indexClient.primaryIndexName;
-			JsonObject settingsAsJsonObject = buildStructuredSettings( settingsPath, settings );
-			TestElasticsearchClient.this.putIndexSettingsNonDynamic( indexName, settingsAsJsonObject );
 		}
 	}
 
@@ -296,32 +275,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		}
 	}
 
-	public class ClusterSettingsClient {
-
-		private final String settingsPath;
-
-		public ClusterSettingsClient(String settingsPath) {
-			this.settingsPath = settingsPath;
-		}
-
-		/**
-		 * Put cluster settings.
-		 *
-		 * @param settings The settings value to put
-		 */
-		public void put(String settings) {
-			/*
-			 * We must use a "flat" structure in the payload,
-			 * e.g. "action.auto-create-index": "value"
-			 * rather than "action": { "auto-create-index": "value" }
-			 * otherwise AWS will reject our request because the security layer doesn't recognize the setting
-			 * and rejects it by default.
-			 */
-			JsonObject settingsAsJsonObject = buildFlatSettings( "transient", settingsPath, settings );
-			TestElasticsearchClient.this.putClusterSettings( settingsAsJsonObject );
-		}
-	}
-
 	public TemplateClient template(String templateName) {
 		return new TemplateClient( templateName );
 	}
@@ -345,10 +298,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		public TemplateClient create(String templateString, int priority, JsonObject settings) {
 			TestElasticsearchClient.this.createTemplate( templateName, templateString, priority, settings );
 			return this;
-		}
-
-		public TemplateClient registerForCleanup() {
-			TestElasticsearchClient.this.registerTemplateForCleanup( templateName );
 		}
 	}
 
@@ -475,19 +424,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		performRequest( builder.build() );
 	}
 
-	private void moveAlias(URLEncodedString oldIndexName, String alias, URLEncodedString newIndexName, JsonObject aliasAttributes) {
-		ElasticsearchRequest.Builder builder = ElasticsearchRequest.put()
-				.pathComponent( Paths._ALIASES )
-				.pathComponent( URLEncodedString.fromString( "_alias" ) )
-				.pathComponent( URLEncodedString.fromString( alias ) );
-
-		if ( aliasAttributes != null ) {
-			builder.body( aliasAttributes );
-		}
-
-		performRequest( builder.build() );
-	}
-
 	private void registerIndexForCleanup(URLEncodedString indexName) {
 		createdIndicesNames.add( indexName );
 	}
@@ -574,43 +510,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 				.pathComponent( indexName ).pathComponent( Paths._SETTINGS )
 				.body( settingsJsonObject )
 				.build() );
-	}
-
-	private void putIndexSettingsNonDynamic(URLEncodedString indexName, JsonObject settingsJsonObject) {
-		performRequest( ElasticsearchRequest.post()
-				.pathComponent( indexName )
-				.pathComponent( Paths._CLOSE )
-				.build() );
-
-		performRequest( ElasticsearchRequest.put()
-				.pathComponent( indexName ).pathComponent( Paths._SETTINGS )
-				.body( settingsJsonObject )
-				.build() );
-
-		performRequest( ElasticsearchRequest.post()
-				.pathComponent( indexName )
-				.pathComponent( Paths._OPEN )
-				.build() );
-	}
-
-	private void putClusterSettings(JsonObject settingsJsonObject) {
-		performRequest( ElasticsearchRequest.put()
-				.pathComponent( URLEncodedString.fromString( "_cluster" ) )
-				.pathComponent( URLEncodedString.fromString( "settings" ) )
-				.body( settingsJsonObject )
-				.build() );
-	}
-
-	private JsonObject buildFlatSettings(String categoryKey, String settingKey, String settings) {
-		JsonElement settingsJsonElement = toJsonElement( settings );
-
-		JsonObject categoryObject = new JsonObject();
-		categoryObject.add( settingKey, settingsJsonElement );
-
-		JsonObject payloadObject = new JsonObject();
-		payloadObject.add( categoryKey, categoryObject );
-
-		return payloadObject;
 	}
 
 	private JsonObject buildStructuredSettings(String settingsPath, String settings) {
