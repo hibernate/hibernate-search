@@ -77,3 +77,32 @@ Downsides::
 However, we intend to provide a basic solution relying on the database exclusively.
 * It will most likely prevent any form of <<mapper-orm-indexing-automatic-synchronization,synchronous indexing>>
 (waiting for indexing to finish before releasing the application thread).
+
+[[limitations-indexing-plan-serialization]]
+== Automatic indexing is not compatible with `Session` serialization
+
+=== Description
+
+When <<mapper-orm-indexing-automatic,automatic indexing>> is enabled,
+Hibernate Search collects entity change events
+to build an "indexing plan" inside the ORM `EntityManager`/`Session`.
+The indexing plan holds information relative to which entities need to be reindexed,
+and sometimes documents that have not been indexed yet.
+
+The indexing plan cannot be serialized.
+
+If the ORM `Session` gets serialized,
+all collected change events will be lost upon deserializing the session,
+and Hibernate Search will likely "forget" to reindex some entities.
+
+This is fine in most applications, since they do not rely on serializing the session,
+but it might be a problem with some JEE applications relying on Bean Passivation.
+
+=== Workaround
+
+Avoid serializing an ORM `EntityManager`/`Session` after changing entities.
+
+=== Roadmap
+
+There are no plans to address this limitation.
+We do not intend to support `Session` serialization when Hibernate Search is enabled.
