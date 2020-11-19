@@ -524,7 +524,7 @@
                             <version>${version.com.github.alexcojocaru.elasticsearch.plugin}</version>
                             <configuration>
                                 <pathConf>${project.build.directory}/elasticsearch-maven-plugin/7.8/configuration/</pathConf>
-                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/7.8/init/init.script</pathInitScript>
+                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/7.8/init/init.json</pathInitScript>
                             </configuration>
                         </plugin>
                     </plugins>
