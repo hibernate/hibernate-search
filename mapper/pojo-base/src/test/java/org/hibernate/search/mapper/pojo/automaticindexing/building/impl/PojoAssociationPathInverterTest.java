@@ -28,7 +28,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.SearchException;
 
 import org.junit.Rule;
@@ -182,12 +181,10 @@ public class PojoAssociationPathInverterTest {
 
 	private void setupPropertyStub(PojoTypeModel<?> holdingTypeMock, String propertyName,
 			PojoGenericTypeModel<?> propertyTypeMock) {
-		ValueReadHandle<?> valueReadHandleMock = mock( ValueReadHandle.class, propertyName + "HandleMock" );
 		PojoPropertyModel<?> propertyModelMock = mock( PojoPropertyModel.class, propertyName + "ModelMock" );
 		when( holdingTypeMock.property( propertyName ) )
 				.thenReturn( (PojoPropertyModel) propertyModelMock );
 		when( propertyModelMock.name() ).thenReturn( propertyName );
-		when( propertyModelMock.handle() ).thenReturn( (ValueReadHandle) valueReadHandleMock );
 		when( propertyModelMock.typeModel() )
 				.thenReturn( (PojoGenericTypeModel) propertyTypeMock );
 	}

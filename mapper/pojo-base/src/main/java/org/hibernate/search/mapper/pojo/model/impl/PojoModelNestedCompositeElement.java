@@ -71,6 +71,6 @@ class PojoModelNestedCompositeElement<T, P> extends AbstractPojoModelCompositeEl
 	}
 
 	ValueReadHandle<P> getHandle() {
-		return modelPath.getParent().getValueReadHandle();
+		return modelPath.getParent().getPropertyModel().handle();
 	}
 }
