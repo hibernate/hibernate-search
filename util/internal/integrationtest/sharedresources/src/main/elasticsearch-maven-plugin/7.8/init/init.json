@@ -1,0 +1,48 @@
+[
+  {
+    "method": "PUT",
+    "path": "_index_template/test_index_defaults",
+    "payload": {
+      "index_patterns": ["*"],
+      "priority": 0,
+      "template": {
+        "settings": {
+          "number_of_shards": 1,
+          "number_of_replicas": 0,
+          "indexing": {
+            "slowlog": {
+              "level": "debug",
+              "threshold": {
+                "index": {
+                  "warn": "2s",
+                  "trace": "10ms",
+                  "debug": "100ms",
+                  "info": "500ms"
+                }
+              }
+            }
+          },
+          "search": {
+            "slowlog": {
+              "level": "debug",
+              "threshold": {
+                "fetch": {
+                  "warn": "1s",
+                  "trace": "10ms",
+                  "debug": "100ms",
+                  "info": "200ms"
+                },
+                "query": {
+                  "warn": "5s",
+                  "trace": "10ms",
+                  "debug": "100ms",
+                  "info": "500ms"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+]
