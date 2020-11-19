@@ -194,7 +194,7 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 			}
 			else {
 				return Optional.of( new PojoIndexingProcessorPropertyNode<>(
-						modelPath.getValueReadHandle(),
+						modelPath.getPropertyModel().handle(),
 						createNested( nestedNodes )
 				) );
 			}
