@@ -201,6 +201,87 @@ public class PropertyBridgeBaseIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	/**
+	 * Check that referencing an inaccessible property through "use" will work properly.
+	 * <p>
+	 * Inaccessible properties are properties that we can see through reflection,
+	 * but that we cannot retrieve a value from at runtime,
+	 * because the call to Field.setAccessible is denied by the JVM.
+	 * For example: Enum#name (the field, not the method).
+	 * <p>
+	 * Before HSEARCH-4114 was fixed, this test used to fail with the following report:
+	 *
+	 * <pre>{@literal
+	 *     JavaBean mapping:
+	 *         type 'org.hibernate.search.integrationtest.mapper.pojo.mapping.definition.
+	 *         PropertyBridgeBaseIT$PropertyBridgeExplicitDependenciesInaccessibleObjectClasses$IndexedEntity':
+	 *             path '.myEnum':
+	 *                 failures:
+	 *                   - HSEARCH700079: Exception while retrieving property type model for 'name' on
+	 *                   'org.hibernate.search.integrationtest.mapper.pojo.mapping.definition.
+	 *                   PropertyBridgeBaseIT$PropertyBridgeExplicitDependenciesInaccessibleObjectClasses$MyEnum'.
+	 * }</pre>
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3297")
+	public void explicitDependencies_inacessibleObject() {
+		backendMock.expectSchema( INDEX_NAME, b ->
+				b.field( "someField", String.class, b2 -> {
+					b2.analyzerName( "myAnalyzer" ); // For HSEARCH-2641
+				} )
+		);
+
+		SearchMapping mapping = setupHelper.start().withConfiguration(
+				b -> b.programmaticMapping()
+						.type( PropertyBridgeExplicitDependenciesInaccessibleObjectClasses.IndexedEntity.class )
+						.property( "myEnum" )
+						.binder( context -> {
+							// This references the "name" field, which is not accessible
+							context.dependencies().use( "name" );
+							IndexFieldReference<String> indexFieldReference = context.indexSchemaElement()
+									.field( "someField", f -> f.asString().analyzer( "myAnalyzer" ) )
+									.toReference();
+							context.bridge( PropertyBridgeExplicitDependenciesInaccessibleObjectClasses.MyEnum.class,
+									(DocumentElement target,
+											PropertyBridgeExplicitDependenciesInaccessibleObjectClasses.MyEnum bridgedElement,
+											PropertyBridgeWriteContext context1) -> {
+										target.addValue( indexFieldReference, bridgedElement.name() );
+									} );
+						} )
+		)
+				.setup( PropertyBridgeExplicitDependenciesInaccessibleObjectClasses.IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		// If the above didn't throw any exception, we're good.
+
+		// Check that indexing works, just in case...
+		PropertyBridgeExplicitDependenciesInaccessibleObjectClasses.IndexedEntity entity =
+				new PropertyBridgeExplicitDependenciesInaccessibleObjectClasses.IndexedEntity();
+		entity.id = 1;
+		entity.myEnum = PropertyBridgeExplicitDependenciesInaccessibleObjectClasses.MyEnum.VALUE1;
+
+		try ( SearchSession session = mapping.createSession() ) {
+			session.indexingPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b.field( "someField", "VALUE1" ) )
+					.processedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	static class PropertyBridgeExplicitDependenciesInaccessibleObjectClasses {
+		@Indexed(index = INDEX_NAME)
+		static class IndexedEntity {
+			@DocumentId
+			Integer id;
+			MyEnum myEnum;
+		}
+		enum MyEnum {
+			VALUE1, VALUE2
+		}
+	}
+
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
 	public void explicitDependencies_error_invalidProperty() {
