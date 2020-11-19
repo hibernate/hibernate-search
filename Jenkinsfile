@@ -231,7 +231,12 @@ stage('Configure') {
 					new EsLocalBuildEnvironment(versionRange: '[7.3,7.7)', mavenProfile: 'elasticsearch-7.3',
 							jdkTool: 'OpenJDK 11 Latest',
 							condition: TestCondition.AFTER_MERGE),
-					new EsLocalBuildEnvironment(versionRange: '[7.7,7.x)', mavenProfile: 'elasticsearch-7.7',
+					// Not testing 7.7 to make the build quicker.
+					// The only difference with 7.7+ is how we create templates for tests.
+					new EsLocalBuildEnvironment(versionRange: '[7.7,7.8)', mavenProfile: 'elasticsearch-7.7',
+							jdkTool: 'OpenJDK 11 Latest',
+							condition: TestCondition.ON_DEMAND),
+					new EsLocalBuildEnvironment(versionRange: '[7.8,7.x)', mavenProfile: 'elasticsearch-7.8',
 							jdkTool: 'OpenJDK 11 Latest',
 							condition: TestCondition.BEFORE_MERGE,
 							isDefault: true)
@@ -265,11 +270,11 @@ stage('Configure') {
 							condition: TestCondition.AFTER_MERGE),
 					new EsAwsBuildEnvironment(version: '7.7', mavenProfile: 'elasticsearch-7.7',
 							condition: TestCondition.AFTER_MERGE),
-					new EsAwsBuildEnvironment(version: '7.8', mavenProfile: 'elasticsearch-7.7',
+					new EsAwsBuildEnvironment(version: '7.8', mavenProfile: 'elasticsearch-7.8',
 							condition: TestCondition.AFTER_MERGE),
 
 					// Also test static credentials, but only for the latest version
-					new EsAwsBuildEnvironment(version: '7.8', mavenProfile: 'elasticsearch-7.7',
+					new EsAwsBuildEnvironment(version: '7.8', mavenProfile: 'elasticsearch-7.8',
 							staticCredentials: true,
 							condition: TestCondition.AFTER_MERGE)
 			]
