@@ -1,0 +1,9 @@
+network.host: _local_
+
+# Avoid warnings related to clustering
+discovery.type: single-node
+
+# Prevent swapping
+# This may trigger warnings upon boot if the system is not correctly set up.
+# See https://www.elastic.co/guide/en/elasticsearch/reference/7.5/setup-configuration-memory.html#bootstrap-memory_lock
+bootstrap.memory_lock: true
