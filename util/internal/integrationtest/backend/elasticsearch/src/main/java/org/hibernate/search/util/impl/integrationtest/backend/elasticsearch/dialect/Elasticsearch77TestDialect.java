@@ -69,4 +69,24 @@ public class Elasticsearch77TestDialect implements ElasticsearchTestDialect {
 	public boolean supportsIsWriteIndex() {
 		return true;
 	}
+
+	@Override
+	public boolean hasBugForSortMaxOnNegativeFloats() {
+		return false;
+	}
+
+	@Override
+	public boolean hasBugForBigIntegerValuesForDynamicField() {
+		return false;
+	}
+
+	@Override
+	public boolean normalizesStringArgumentToWildcardPredicateForAnalyzedStringField() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsSkipOrLimitingTotalHitCount() {
+		return true;
+	}
 }

@@ -64,19 +64,11 @@ public interface ElasticsearchTestDialect {
 
 	boolean supportsIsWriteIndex();
 
-	default boolean hasBugForSortMaxOnNegativeFloats() {
-		return false;
-	}
+	boolean hasBugForSortMaxOnNegativeFloats();
 
-	default boolean hasBugForBigIntegerValuesForDynamicField() {
-		return false;
-	}
+	boolean hasBugForBigIntegerValuesForDynamicField();
 
-	default boolean normalizesStringArgumentToWildcardPredicateForAnalyzedStringField() {
-		return true;
-	}
+	boolean normalizesStringArgumentToWildcardPredicateForAnalyzedStringField();
 
-	default boolean supportsSkipOrLimitingTotalHitCount() {
-		return true;
-	}
+	boolean supportsSkipOrLimitingTotalHitCount();
 }
