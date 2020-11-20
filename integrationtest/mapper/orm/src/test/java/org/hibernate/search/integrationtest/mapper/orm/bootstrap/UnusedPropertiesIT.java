@@ -26,6 +26,10 @@ import org.junit.Test;
 import org.apache.logging.log4j.Level;
 
 public class UnusedPropertiesIT {
+	private static final String KEY_UNUSED = "hibernate.search.indexes.myIndex.foo";
+	private static final String KEY_UNUSED_BUT_EMPTY_VALUE = "hibernate.search.indexes.myIndex.emptyValue";
+	private static final String KEY_UNUSED_BUT_BLANK_VALUE = "hibernate.search.indexes.myIndex.blankValue";
+	private static final String KEY_UNUSED_BUT_NULL_VALUE = "hibernate.search.indexes.myIndex.nullValue";
 
 	@Rule
 	public BackendMock backendMock = new BackendMock();
@@ -38,24 +42,26 @@ public class UnusedPropertiesIT {
 
 	@Test
 	public void checkDisabled_unusedProperty() {
-		String unusedPropertyKey = "hibernate.search.indexes.myIndex.foo";
 		logged.expectMessage( "some properties in the given configuration are not used" )
 				.never();
 		logged.expectEvent( Level.INFO, "Configuration property tracking is disabled" )
 				.once();
 		setup( builder -> {
 			builder.setProperty( EngineSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY, "ignore" );
-			builder.setProperty( unusedPropertyKey, "bar" );
+			builder.setProperty( KEY_UNUSED, "bar" );
+			// These properties should be ignored
+			builder.setProperty( KEY_UNUSED_BUT_EMPTY_VALUE, "" );
+			builder.setProperty( KEY_UNUSED_BUT_BLANK_VALUE, "   " );
+			builder.setProperty( KEY_UNUSED_BUT_NULL_VALUE, null );
 		} );
 	}
 
 	@Test
 	public void checkEnabledByDefault_unusedProperty() {
-		String unusedPropertyKey = "hibernate.search.indexes.myIndex.foo";
 		logged.expectEvent( Level.WARN,
 				"Invalid configuration passed to Hibernate Search",
 				"some properties in the given configuration are not used",
-				"[" + unusedPropertyKey + "]",
+				"[" + KEY_UNUSED + "]",
 				"To disable this warning, set the property '"
 						+ EngineSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY + "' to 'ignore'" )
 				.once();
@@ -66,8 +72,12 @@ public class UnusedPropertiesIT {
 				.never();
 
 		setup( builder -> {
-			builder.setProperty( unusedPropertyKey, "bar" );
+			builder.setProperty( KEY_UNUSED, "bar" );
 			builder.setProperty( HibernateOrmMapperSettings.QUERY_LOADING_FETCH_SIZE, 2 );
+			// These properties should be ignored
+			builder.setProperty( KEY_UNUSED_BUT_EMPTY_VALUE, "" );
+			builder.setProperty( KEY_UNUSED_BUT_BLANK_VALUE, "   " );
+			builder.setProperty( KEY_UNUSED_BUT_NULL_VALUE, null );
 		} );
 	}
 
@@ -84,6 +94,10 @@ public class UnusedPropertiesIT {
 				.never();
 		setup( builder -> {
 			builder.setProperty( EngineSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY, "warn" );
+			// These properties should be ignored
+			builder.setProperty( KEY_UNUSED_BUT_EMPTY_VALUE, "" );
+			builder.setProperty( KEY_UNUSED_BUT_BLANK_VALUE, "   " );
+			builder.setProperty( KEY_UNUSED_BUT_NULL_VALUE, null );
 		} );
 	}
 
