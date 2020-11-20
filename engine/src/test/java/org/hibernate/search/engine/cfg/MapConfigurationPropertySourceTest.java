@@ -9,7 +9,6 @@ package org.hibernate.search.engine.cfg;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -38,17 +37,7 @@ public class MapConfigurationPropertySourceTest extends AbstractAllAwareConfigur
 	}
 
 	@Override
-	protected AllAwareConfigurationPropertySource createPropertySource(String key, String value) {
-		Map<String, Object> map = Collections.singletonMap( key, value );
-		return ConfigurationPropertySource.fromMap( map );
-	}
-
-	@Override
-	protected AllAwareConfigurationPropertySource createPropertySource(String key, String value,
-			String key2, String value2) {
-		Map<String, Object> map = new LinkedHashMap<>();
-		map.put( key, value );
-		map.put( key2, value2 );
-		return ConfigurationPropertySource.fromMap( map );
+	protected AllAwareConfigurationPropertySource createPropertySource(Map<String, String> content) {
+		return ConfigurationPropertySource.fromMap( content );
 	}
 }

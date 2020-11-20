@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.engine.cfg.impl;
 
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 
@@ -36,18 +36,17 @@ public class SystemConfigurationPropertySource implements AllAwareConfigurationP
 	}
 
 	@Override
-	public Set<String> resolveAll(String prefix) {
-		Set<String> prefixedPropertyKeys = new HashSet<>();
-		for ( Map.Entry<Object, Object> entry : System.getProperties().entrySet() ) {
-			Object key = entry.getKey();
-			if ( key instanceof String ) {
-				String stringKey = (String) key;
-				if ( stringKey.startsWith( prefix ) ) {
-					prefixedPropertyKeys.add( stringKey );
-				}
-			}
-		}
-		return prefixedPropertyKeys;
+	public Set<String> resolveAll(BiPredicate<String, Object> predicate) {
+		return System.getProperties().entrySet().stream()
+				.filter( e -> {
+					Object key = e.getKey();
+					if ( ! ( key instanceof String ) ) {
+						return false;
+					}
+					return predicate.test( (String) key, e.getValue() );
+				} )
+				.map( e -> (String) e.getKey() )
+				.collect( Collectors.toSet() );
 	}
 
 	@Override

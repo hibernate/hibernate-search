@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
@@ -34,21 +35,14 @@ public class SystemConfigurationPropertySourceTest extends AbstractAllAwareConfi
 	}
 
 	@Override
-	protected AllAwareConfigurationPropertySource createPropertySource(String key, String value) {
+	protected AllAwareConfigurationPropertySource createPropertySource(Map<String, String> content) {
 		clearSystemProperties();
-		toClear.add( key );
-		System.setProperty( key, value );
-		return ConfigurationPropertySource.system();
-	}
-
-	@Override
-	protected AllAwareConfigurationPropertySource createPropertySource(String key, String value,
-			String key2, String value2) {
-		clearSystemProperties();
-		toClear.add( key );
-		toClear.add( key2 );
-		System.setProperty( key, value );
-		System.setProperty( key2, value2 );
+		for ( Map.Entry<String, String> entry : content.entrySet() ) {
+			String key = entry.getKey();
+			String value = entry.getValue();
+			toClear.add( key );
+			System.setProperty( key, value );
+		}
 		return ConfigurationPropertySource.system();
 	}
 }

@@ -8,7 +8,11 @@ package org.hibernate.search.engine.cfg;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
@@ -43,23 +47,46 @@ public abstract class AbstractAllAwareConfigurationPropertySourceTest {
 	}
 
 	@Test
-	public void resolveAll_missing() {
-		AllAwareConfigurationPropertySource propertySource = createPropertySource( "ignored", "foo" );
-		assertThat( propertySource.resolveAll( "someKey" ) ).isEmpty();
+	public void resolveAll_empty() {
+		AllAwareConfigurationPropertySource propertySource = createPropertySource( b -> { } );
+		assertThat( propertySource.resolveAll( (k, v) -> false ) ).isEmpty();
 	}
 
 	@Test
-	public void resolveAll_present() {
-		AllAwareConfigurationPropertySource propertySource = createPropertySource(
-				"someKey.someSubKey1", "foo",
-				"someKey.someSubKey2", "foo"
-		);
-		assertThat( propertySource.resolveAll( "someKey." ) )
+	public void resolveAll_keyPredicate() {
+		AllAwareConfigurationPropertySource propertySource = createPropertySource( b -> {
+			b.accept( "someKey.someSubKey1", "foo" );
+			b.accept( "someKey.someSubKey2", "bar" );
+			b.accept( "someOtherKey.someSubKey1", "foo" );
+			b.accept( "someOtherKey.someSubKey2", "bar" );
+		} );
+		assertThat( propertySource.resolveAll( (k, v) -> k.startsWith( "someKey." ) ) )
 				.containsExactlyInAnyOrder( "someKey.someSubKey1", "someKey.someSubKey2" );
 	}
 
-	protected abstract AllAwareConfigurationPropertySource createPropertySource(String key, String value);
+	@Test
+	public void resolveAll_keyAndValuePredicate() {
+		AllAwareConfigurationPropertySource propertySource = createPropertySource( b -> {
+			b.accept( "someKey.someSubKey1", "foo" );
+			b.accept( "someKey.someSubKey2", "bar" );
+			b.accept( "someOtherKey.someSubKey1", "foo" );
+			b.accept( "someOtherKey.someSubKey2", "bar" );
+		} );
+		assertThat( propertySource.resolveAll( (k, v) -> k.startsWith( "someKey." ) && v.equals( "bar" ) ) )
+				.containsExactlyInAnyOrder( "someKey.someSubKey2" );
+	}
 
-	protected abstract AllAwareConfigurationPropertySource createPropertySource(String key, String value,
-			String key2, String value2);
+	protected AllAwareConfigurationPropertySource createPropertySource(
+			Consumer<BiConsumer<String, String>> contentProducer) {
+		Map<String, String> map = new LinkedHashMap<>();
+		contentProducer.accept( map::put );
+		return createPropertySource( map );
+	}
+
+	protected AllAwareConfigurationPropertySource createPropertySource(String key, String value) {
+		return createPropertySource( b -> b.accept( key, value ) );
+	}
+
+	protected abstract AllAwareConfigurationPropertySource createPropertySource(Map<String, String> content);
+
 }
