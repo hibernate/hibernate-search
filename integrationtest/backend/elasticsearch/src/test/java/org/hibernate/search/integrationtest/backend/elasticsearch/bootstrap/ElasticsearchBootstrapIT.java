@@ -140,7 +140,7 @@ public class ElasticsearchBootstrapIT {
 						ElasticsearchBackendSettings.VERSION_CHECK_ENABLED, false
 				)
 				.withBackendProperty(
-						ElasticsearchBackendSettings.VERSION, "7.9"
+						ElasticsearchBackendSettings.VERSION, "7.10"
 				)
 				.withBackendProperty(
 						ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
