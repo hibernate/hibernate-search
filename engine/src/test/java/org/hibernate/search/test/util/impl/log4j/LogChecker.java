@@ -72,6 +72,10 @@ public class LogChecker {
 	}
 
 	private static void appendEvents(Description description, String newline, List<LogEvent> events) {
+		if ( events == null || events.isEmpty() ) {
+			description.appendText( "<none>" );
+			return;
+		}
 		for ( LogEvent event : events ) {
 			description.appendText( newline );
 			description.appendText( "\t - " );
