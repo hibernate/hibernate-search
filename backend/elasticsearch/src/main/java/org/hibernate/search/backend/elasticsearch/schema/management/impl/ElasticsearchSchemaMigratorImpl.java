@@ -65,13 +65,27 @@ public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigra
 					.thenCompose( ignored -> doMigrateSettings( indexName, expectedIndexMetadata.getSettings() ) );
 		}
 
-		return settingsMigration.thenCompose( ignored -> doMigrateMapping( indexName, expectedIndexMetadata.getMapping() ) )
-				.exceptionally( Futures.handler( e -> {
-					throw log.schemaUpdateFailed(
-							indexName, e.getMessage(),
-							Throwables.expectException( e )
-					);
-				} ) );
+		/*
+		 * We only update mapping if it's really necessary,
+		 * because migrating might erase some user-defined attributes on existing fields,
+		 * even fields that we did not need to migrate.
+		 * even for just a moment, may hurt if other clients are using the index.
+		 */
+		CompletableFuture<?> mappingMigration;
+		if ( schemaValidator.isMappingValid( expectedIndexMetadata, actualIndexMetadata ) ) {
+			mappingMigration = settingsMigration;
+		}
+		else {
+			mappingMigration = settingsMigration
+					.thenCompose( ignored -> doMigrateMapping( indexName, expectedIndexMetadata.getMapping() ) );
+		}
+
+		return mappingMigration.exceptionally( Futures.handler( e -> {
+			throw log.schemaUpdateFailed(
+					indexName, e.getMessage(),
+					Throwables.expectException( e )
+			);
+		} ) );
 	}
 
 	private CompletableFuture<?> doMigrateAliases(URLEncodedString indexName, Map<String, IndexAliasDefinition> aliases) {
