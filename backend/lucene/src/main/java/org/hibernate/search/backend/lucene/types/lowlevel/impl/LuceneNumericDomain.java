@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
 
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.util.common.data.Range;
 
@@ -18,7 +19,6 @@ import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 
 public interface LuceneNumericDomain<E extends Number> {
 
@@ -49,6 +49,7 @@ public interface LuceneNumericDomain<E extends Number> {
 
 	IndexableField createSortedDocValuesField(String absoluteFieldPath, E numericValue);
 
-	FieldComparator.NumericComparator<E> createFieldComparator(String absoluteFieldPath, int numHits,
-			MultiValueMode multiValueMode, E missingValue, NestedDocsProvider nestedDocsProvider);
+	FieldComparator<E> createFieldComparator(String absoluteFieldPath, int numHits,
+			E missingValue, boolean reversed, int sortPos, MultiValueMode multiValueMode,
+			NestedDocsProvider nestedDocsProvider);
 }

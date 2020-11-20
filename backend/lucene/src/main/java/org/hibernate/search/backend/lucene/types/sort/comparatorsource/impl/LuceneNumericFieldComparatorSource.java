@@ -27,6 +27,7 @@ public class LuceneNumericFieldComparatorSource<E extends Number> extends Lucene
 
 	@Override
 	public FieldComparator<?> newComparator(String fieldname, int numHits, int sortPos, boolean reversed) {
-		return numericDomain.createFieldComparator( fieldname, numHits, sortMode, missingValue, nestedDocsProvider );
+		return numericDomain.createFieldComparator( fieldname, numHits, missingValue, reversed, sortPos,
+				sortMode, nestedDocsProvider );
 	}
 }

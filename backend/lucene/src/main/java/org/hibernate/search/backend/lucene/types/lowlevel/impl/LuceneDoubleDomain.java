@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
 
+import org.hibernate.search.backend.lucene.lowlevel.comparator.impl.DoubleValuesSourceComparator;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesToSingleValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
@@ -24,9 +25,6 @@ import org.apache.lucene.document.SortedNumericDocValuesField;
 import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.NumericDocValues;
-import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.NumericUtils;
@@ -123,27 +121,12 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	}
 
 	@Override
-	public FieldComparator.NumericComparator<Double> createFieldComparator(String fieldName, int numHits,
-			MultiValueMode multiValueMode, Double missingValue, NestedDocsProvider nestedDocsProvider) {
+	public FieldComparator<Double> createFieldComparator(String fieldName, int numHits,
+			Double missingValue, boolean reversed, int sortPos, MultiValueMode multiValueMode,
+			NestedDocsProvider nestedDocsProvider) {
 		DoubleMultiValuesToSingleValuesSource source = DoubleMultiValuesToSingleValuesSource
 				.fromDoubleField( fieldName, multiValueMode, nestedDocsProvider );
-
-		return new DoubleFieldComparator( numHits, fieldName, missingValue, source );
-	}
-
-	public static class DoubleFieldComparator extends FieldComparator.DoubleComparator {
-
-		private final DoubleMultiValuesToSingleValuesSource source;
-
-		public DoubleFieldComparator(int numHits, String field, Double missingValue, DoubleMultiValuesToSingleValuesSource source) {
-			super( numHits, field, missingValue );
-			this.source = source;
-		}
-
-		@Override
-		protected NumericDocValues getNumericDocValues(LeafReaderContext context, String field) throws IOException {
-			return source.getValues( context, DoubleValues.withDefault( DoubleValues.EMPTY, missingValue ) ).getRawDoubleValues();
-		}
+		return new DoubleValuesSourceComparator( numHits, fieldName, missingValue, reversed, sortPos, source );
 	}
 
 }

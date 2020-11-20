@@ -10,8 +10,13 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
 
+import org.hibernate.search.backend.lucene.lowlevel.comparator.impl.IntValuesSourceComparator;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesToSingleValuesSource;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
+import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueFacetCounts;
+import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueRangeFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.util.common.data.Range;
 
@@ -20,15 +25,8 @@ import org.apache.lucene.document.SortedNumericDocValuesField;
 import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.NumericDocValues;
-import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesToSingleValuesSource;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
-import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueFacetCounts;
-import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueRangeFacetCounts;
 
 public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 	private static final LuceneNumericDomain<Integer> INSTANCE = new LuceneIntegerDomain();
@@ -116,24 +114,11 @@ public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 	}
 
 	@Override
-	public FieldComparator.NumericComparator<Integer> createFieldComparator(String fieldName, int numHits,
-			MultiValueMode multiValueMode, Integer missingValue, NestedDocsProvider nestedDocsProvider) {
-		LongMultiValuesToSingleValuesSource source = LongMultiValuesToSingleValuesSource.fromIntField( fieldName, multiValueMode, nestedDocsProvider );
-		return new IntegerFieldComparator( numHits, fieldName, missingValue, source );
-	}
-
-	public static class IntegerFieldComparator extends FieldComparator.IntComparator {
-
-		private final LongMultiValuesToSingleValuesSource source;
-
-		public IntegerFieldComparator(int numHits, String field, Integer missingValue, LongMultiValuesToSingleValuesSource source) {
-			super( numHits, field, missingValue );
-			this.source = source;
-		}
-
-		@Override
-		protected NumericDocValues getNumericDocValues(LeafReaderContext context, String field) throws IOException {
-			return source.getRawNumericDocValues( context, DoubleValues.withDefault( DoubleValues.EMPTY, missingValue ) );
-		}
+	public FieldComparator<Integer> createFieldComparator(String fieldName, int numHits,
+			Integer missingValue, boolean reversed, int sortPos, MultiValueMode multiValueMode,
+			NestedDocsProvider nestedDocsProvider) {
+		LongMultiValuesToSingleValuesSource source =
+				LongMultiValuesToSingleValuesSource.fromIntField( fieldName, multiValueMode, nestedDocsProvider );
+		return new IntValuesSourceComparator( numHits, fieldName, missingValue, reversed, sortPos, source );
 	}
 }
