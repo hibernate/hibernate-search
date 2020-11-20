@@ -29,7 +29,7 @@ public class ElasticsearchTestHostConnectionConfiguration {
 	private final String protocol;
 	private final String username;
 	private final String password;
-	private final boolean awsSigningEnabled;
+	private final Boolean awsSigningEnabled;
 	private final String awsRegion;
 	private final String awsCredentialsType;
 	private final String awsCredentialsAccessKeyId;
@@ -40,7 +40,8 @@ public class ElasticsearchTestHostConnectionConfiguration {
 		this.protocol = System.getProperty( "test.elasticsearch.connection.protocol" );
 		this.username = System.getProperty( "test.elasticsearch.connection.username" );
 		this.password = System.getProperty( "test.elasticsearch.connection.password" );
-		this.awsSigningEnabled = Boolean.getBoolean( "test.elasticsearch.connection.aws.signing.enabled" );
+		String enabledAsString = System.getProperty( "test.elasticsearch.connection.aws.signing.enabled" );
+		this.awsSigningEnabled = enabledAsString == null ? null : Boolean.parseBoolean( enabledAsString );
 		this.awsRegion = System.getProperty( "test.elasticsearch.connection.aws.region" );
 		this.awsCredentialsType = System.getProperty( "test.elasticsearch.connection.aws.credentials.type" );
 		this.awsCredentialsAccessKeyId = System.getProperty( "test.elasticsearch.connection.aws.credentials.access_key_id" );
@@ -53,7 +54,7 @@ public class ElasticsearchTestHostConnectionConfiguration {
 	}
 
 	public boolean isAws() {
-		return awsSigningEnabled;
+		return awsSigningEnabled != null && awsSigningEnabled;
 	}
 
 	public void addToBackendProperties(Map<String, ? super String> properties) {
@@ -61,12 +62,12 @@ public class ElasticsearchTestHostConnectionConfiguration {
 		properties.put( "protocol", protocol );
 		properties.put( "username", username );
 		properties.put( "password", password );
-		properties.put( "aws.signing.enabled", String.valueOf( awsSigningEnabled ) );
+		properties.put( "aws.signing.enabled", awsSigningEnabled == null ? null : awsSigningEnabled.toString() );
 		properties.put( "aws.region", awsRegion );
 		properties.put( "aws.credentials.type", awsCredentialsType );
 		properties.put( "aws.credentials.access_key_id", awsCredentialsAccessKeyId );
 		properties.put( "aws.credentials.secret_access_key", awsCredentialsSecretAccessKey );
-		if ( awsSigningEnabled ) {
+		if ( awsSigningEnabled != null && awsSigningEnabled ) {
 			// AWS Elasticsearch Service is (sometimes) super slow for index creation.
 			// Just raise the default timeout so that we don't fail a full 30-min
 			// test run just for one small freeze.
