@@ -236,7 +236,13 @@ stage('Configure') {
 					new EsLocalBuildEnvironment(versionRange: '[7.7,7.8)', mavenProfile: 'elasticsearch-7.7',
 							jdkTool: 'OpenJDK 11 Latest',
 							condition: TestCondition.ON_DEMAND),
-					new EsLocalBuildEnvironment(versionRange: '[7.8,7.x)', mavenProfile: 'elasticsearch-7.8',
+					// Not testing 7.9 to make the build quicker.
+					// The only difference with 7.10+ is an additional test for exists on null values,
+					// which is disabled on 7.10 but enabled on all older versions (not just 7.9).
+					new EsLocalBuildEnvironment(versionRange: '[7.8,7.10)', mavenProfile: 'elasticsearch-7.8',
+							jdkTool: 'OpenJDK 11 Latest',
+							condition: TestCondition.AFTER_MERGE),
+					new EsLocalBuildEnvironment(versionRange: '[7.10,7.x)', mavenProfile: 'elasticsearch-7.10',
 							jdkTool: 'OpenJDK 11 Latest',
 							condition: TestCondition.BEFORE_MERGE,
 							isDefault: true)
