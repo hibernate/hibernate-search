@@ -210,9 +210,19 @@
             </properties>
         </profile>
 
-        <!-- Elasticsearch 7.8+ test environment (default) -->
+        <!-- Elasticsearch 7.8 to 7.9 test environment -->
         <profile>
             <id>elasticsearch-7.8</id>
+            <properties>
+                <failsafe.excludedGroups.elasticsearch.version>
+                    <!-- Nothing here -->
+                </failsafe.excludedGroups.elasticsearch.version>
+            </properties>
+        </profile>
+
+        <!-- Elasticsearch 7.10+ test environment (default) -->
+        <profile>
+            <id>elasticsearch-7.10</id>
             <activation>
                 <!-- This must be re-defined here: the activation defined in the parent pom is not enough -->
                 <!-- Activate by default, i.e. if test.elasticsearch.connection.version has not been defined explicitly -->
