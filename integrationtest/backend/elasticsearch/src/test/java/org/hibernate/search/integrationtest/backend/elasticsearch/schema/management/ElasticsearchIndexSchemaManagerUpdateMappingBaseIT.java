@@ -310,7 +310,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 				MAPPING_CREATION_FAILED_MESSAGE_ID,
 				ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID,
 				"Elasticsearch request failed",
-				"different [index]"
+				"[index]"
 		);
 	}
 
@@ -342,7 +342,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 				MAPPING_CREATION_FAILED_MESSAGE_ID,
 				ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID,
 				"Elasticsearch request failed",
-				"different [analyzer]"
+				"[analyzer]"
 		);
 	}
 
@@ -374,7 +374,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingBaseIT {
 				MAPPING_CREATION_FAILED_MESSAGE_ID,
 				ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID,
 				"Elasticsearch request failed",
-				"different [normalizer]"
+				"[normalizer]"
 		);
 	}
 
