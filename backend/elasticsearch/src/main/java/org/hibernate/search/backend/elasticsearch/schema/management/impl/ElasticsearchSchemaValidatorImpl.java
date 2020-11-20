@@ -41,9 +41,7 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 
 		validateSettings( errorCollector, expectedIndexMetadata, actualIndexMetadata );
 
-		rootTypeMappingValidator.validate(
-				errorCollector, expectedIndexMetadata.getMapping(), actualIndexMetadata.getMapping()
-		);
+		validateMapping( errorCollector, expectedIndexMetadata, actualIndexMetadata );
 	}
 
 	@Override
@@ -76,6 +74,21 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 		indexSettingsValidator.validate(
 				errorCollector, expectedIndexMetadata.getSettings(), actualIndexMetadata.getSettings()
 		);
+	}
+
+	@Override
+	public boolean isMappingValid(IndexMetadata expectedIndexMetadata, IndexMetadata actualIndexMetadata) {
+		ValidationErrorCollector errorCollector = new ValidationErrorCollector();
+
+		validateMapping( errorCollector, expectedIndexMetadata, actualIndexMetadata );
+
+		return !errorCollector.hasError();
+	}
+
+	private void validateMapping(ValidationErrorCollector errorCollector,
+			IndexMetadata expectedIndexMetadata, IndexMetadata actualIndexMetadata) {
+		rootTypeMappingValidator.validate( errorCollector, expectedIndexMetadata.getMapping(),
+				actualIndexMetadata.getMapping() );
 	}
 
 }
