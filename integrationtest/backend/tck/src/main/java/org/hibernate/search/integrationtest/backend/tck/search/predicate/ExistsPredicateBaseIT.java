@@ -200,15 +200,11 @@ public class ExistsPredicateBaseIT {
 				IndexBinding binding = index.binding();
 				scoreIndexer.add( docId( 0 ), routingKey, document -> {
 					document.addValue( binding.field0.get( fieldType ).reference, values.value() );
-					document.addValue( binding.field1.get( fieldType ).reference, null );
 				} );
 				scoreIndexer.add( docId( 1 ), routingKey, document -> {
-					document.addValue( binding.field0.get( fieldType ).reference, null );
 					document.addValue( binding.field1.get( fieldType ).reference, values.value() );
 				} );
 				scoreIndexer.add( docId( 2 ), routingKey, document -> {
-					document.addValue( binding.field0.get( fieldType ).reference, null );
-					document.addValue( binding.field1.get( fieldType ).reference, null );
 				} );
 			}
 		}

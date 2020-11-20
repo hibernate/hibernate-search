@@ -330,6 +330,12 @@ public class ExistsPredicateSpecificsIT<F> {
 						}
 					} )
 					.add( docId( 2 ), routingKey, document -> {
+						// Add null values for fields: they should be considered as missing too.
+						document.addValue( mainIndex.binding().fieldWithDefaults.get( fieldType ).reference, null );
+						if ( docValues ) {
+							document.addValue( mainIndex.binding().fieldWithDocValues.get( fieldType ).reference, null );
+						}
+
 						// Add two empty objects
 						document.addObject( mainIndex.binding().flattenedObject.self );
 						document.addObject( mainIndex.binding().flattenedObject.self );
