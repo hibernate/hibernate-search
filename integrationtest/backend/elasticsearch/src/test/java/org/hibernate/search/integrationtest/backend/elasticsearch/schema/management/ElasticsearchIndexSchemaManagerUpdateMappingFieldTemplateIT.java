@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.schema.manage
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.defaultMetadataMappingForExpectations;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.defaultMetadataMappingForInitialization;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
+import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEqualsIgnoringUnknownFields;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
@@ -76,9 +77,8 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		setupAndUpdate( index );
 
-		assertJsonEquals(
+		assertJsonEqualsIgnoringUnknownFields(
 				"{"
-					+ "'dynamic': 'true',"
 					+ "'dynamic_templates': ["
 							+ "{'myTemplate1': {"
 									+ "'path_match': '*_t1',"
@@ -95,7 +95,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 							+ "{ 'myTemplate4': {"
 									+ "'match_mapping_type': 'object',"
 									+ "'path_match': '*',"
-									+ "'mapping': { 'type': 'nested', 'dynamic': 'true' }"
+									+ "'mapping': { 'type': 'nested' }"
 							+ "} }"
 					+ "],"
 					+ "'properties': {"
@@ -135,7 +135,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		setupAndUpdate( index );
 
-		assertJsonEquals(
+		assertJsonEqualsIgnoringUnknownFields(
 				"{"
 					+ "'dynamic': 'true',"
 					+ "'dynamic_templates': ["
@@ -197,7 +197,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		setupAndUpdate( index );
 
-		assertJsonEquals(
+		assertJsonEqualsIgnoringUnknownFields(
 				"{"
 					+ "'dynamic': 'true',"
 					+ "'dynamic_templates': ["
@@ -255,7 +255,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		setupAndUpdate( index );
 
-		assertJsonEquals(
+		assertJsonEqualsIgnoringUnknownFields(
 				"{"
 					+ "'dynamic': 'true',"
 					+ "'dynamic_templates': ["
@@ -307,7 +307,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		setupAndUpdate( index );
 
-		assertJsonEquals(
+		assertJsonEqualsIgnoringUnknownFields(
 				"{"
 					+ "'dynamic': 'true',"
 					+ "'dynamic_templates': ["
@@ -432,7 +432,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		setupAndUpdate( index );
 
-		assertJsonEquals(
+		assertJsonEqualsIgnoringUnknownFields(
 				"{"
 					+ "'dynamic': 'true',"
 					+ "'dynamic_templates': ["
@@ -556,7 +556,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		setupAndUpdate( index );
 
-		assertJsonEquals(
+		assertJsonEqualsIgnoringUnknownFields(
 				"{"
 					+ "'dynamic': 'true',"
 					+ "'dynamic_templates': ["
@@ -597,7 +597,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		setupAndUpdate( index );
 
-		assertJsonEquals(
+		assertJsonEqualsIgnoringUnknownFields(
 				"{"
 					+ "'dynamic': 'true',"
 					+ "'dynamic_templates': ["
@@ -637,7 +637,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 
 		setupAndUpdate( index );
 
-		assertJsonEquals(
+		assertJsonEqualsIgnoringUnknownFields(
 				"{"
 					+ "'dynamic': 'true',"
 					+ "'dynamic_templates': ["
@@ -673,27 +673,20 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingFieldTemplateIT {
 	private String integerMappingForExpectations() {
 		return "{"
 				+ "'type': 'integer',"
-				+ "'doc_values': false,"
-				+ "'index': true"
+				+ "'doc_values': false"
 				+ "}";
 	}
 
 	private String textMappingForExpectations() {
 		return "{"
 				+ "'type': 'text',"
-				+ "'analyzer': 'default',"
-				+ "'index': true,"
-				+ "'norms': true,"
-				+ "'term_vector': 'no'"
+				+ "'analyzer': 'default'"
 				+ "}";
 	}
 
 	private String keywordMappingForExpectations() {
 		return "{"
-				+ "'type': 'keyword',"
-				+ "'doc_values': false,"
-				+ "'index': true,"
-				+ "'norms': false"
+				+ "'type': 'keyword'"
 				+ "}";
 	}
 }
