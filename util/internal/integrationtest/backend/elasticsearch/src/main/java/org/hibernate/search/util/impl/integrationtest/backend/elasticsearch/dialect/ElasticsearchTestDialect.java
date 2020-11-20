@@ -74,4 +74,6 @@ public interface ElasticsearchTestDialect {
 	boolean normalizesStringArgumentToWildcardPredicateForAnalyzedStringField();
 
 	boolean supportsSkipOrLimitingTotalHitCount();
+
+	boolean hasBugForExistsOnNullGeoPointFieldWithoutDocValues();
 }

@@ -25,6 +25,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.Analyz
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -331,7 +332,11 @@ public class ExistsPredicateSpecificsIT<F> {
 					} )
 					.add( docId( 2 ), routingKey, document -> {
 						// Add null values for fields: they should be considered as missing too.
-						document.addValue( mainIndex.binding().fieldWithDefaults.get( fieldType ).reference, null );
+						if ( TckConfiguration.get().getBackendFeatures()
+								.supportsExistsForFieldWithoutDocValues( fieldType.getJavaType() ) ) {
+							document.addValue( mainIndex.binding().fieldWithDefaults.get( fieldType ).reference,
+									null );
+						}
 						if ( docValues ) {
 							document.addValue( mainIndex.binding().fieldWithDocValues.get( fieldType ).reference, null );
 						}
