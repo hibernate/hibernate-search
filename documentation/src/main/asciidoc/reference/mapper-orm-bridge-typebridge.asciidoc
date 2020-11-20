@@ -88,6 +88,15 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebr
 as long as index field names are distinct from the names used in the type binder.
 But no annotation is necessary on the `firstName` and `lastName` properties:
 these are already handled by the bridge.
+
+Here is an example of what an indexed document would look like, with the Elasticsearch backend:
+
+[source, JSON]
+----
+{
+  "fullName": "Asimov Isaac"
+}
+----
 ====
 
 [[mapper-orm-bridge-typebridge-parameters]]

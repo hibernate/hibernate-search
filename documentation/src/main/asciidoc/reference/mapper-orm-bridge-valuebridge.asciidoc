@@ -72,6 +72,15 @@ but necessary in order for Hibernate ORM to store the data correctly in the data
 <3> Instruct Hibernate Search to use our custom value bridge.
 It is also possible to reference the bridge by its name, in the case of a CDI/Spring bean.
 <4> Customize the field as usual.
+
+Here is an example of what an indexed document would look like, with the Elasticsearch backend:
+
+[source, JSON]
+----
+{
+  "isbn": "978-0-58-600835-5"
+}
+----
 ====
 
 The example above is just a minimal implementations.
