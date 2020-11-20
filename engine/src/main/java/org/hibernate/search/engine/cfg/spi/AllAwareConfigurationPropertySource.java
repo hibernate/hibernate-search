@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.cfg.spi;
 
 import java.util.Set;
+import java.util.function.BiPredicate;
 
 /**
  * A source of property values for Hibernate Search with knowledge of the full set of properties.
@@ -17,6 +18,6 @@ import java.util.Set;
  */
 public interface AllAwareConfigurationPropertySource extends ConfigurationPropertySource {
 
-	Set<String> resolveAll(String prefix);
+	Set<String> resolveAll(BiPredicate<String, Object> predicate);
 
 }

@@ -39,6 +39,11 @@ public final class ConfigurationPropertyChecker {
 		return new ConfigurationPropertyChecker();
 	}
 
+	private static boolean isRelevantPropertyEntry(String key, Object value) {
+		return key.startsWith( EngineSettings.PREFIX )
+				&& ConvertUtils.trimIfString( value ) != null;
+	}
+
 	private String configurationPropertyCheckingStrategyPropertyName;
 
 	private final Set<String> availablePropertyKeys = ConcurrentHashMap.newKeySet();
@@ -61,7 +66,7 @@ public final class ConfigurationPropertyChecker {
 		switch ( checkingStrategy ) {
 			case WARN:
 				this.warn = true;
-				availablePropertyKeys.addAll( source.resolveAll( EngineSettings.PREFIX ) );
+				availablePropertyKeys.addAll( source.resolveAll( ConfigurationPropertyChecker::isRelevantPropertyEntry ) );
 				return trackingSource;
 			case IGNORE:
 				return source;
