@@ -34,7 +34,7 @@ public class ElasticsearchConfigurationIT {
 				BackendSettings.backendKey( ElasticsearchBackendSettings.MULTI_TENANCY_STRATEGY ),
 				MultiTenancyStrategyName.DISCRIMINATOR.externalRepresentation()
 		);
-		config.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION ), "7.9" );
+		config.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION ), "7.10" );
 		config.put(
 				BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION_CHECK_ENABLED ), "false" );
 		config.put(
@@ -64,7 +64,7 @@ public class ElasticsearchConfigurationIT {
 						entry( "hibernate.search.backend.hosts", "127.0.0.1:9200" ),
 						entry( "hibernate.search.backend.protocol", "http" ),
 						entry( "hibernate.search.backend.multi_tenancy.strategy", "discriminator" ),
-						entry( "hibernate.search.backend.version", "7.9" ),
+						entry( "hibernate.search.backend.version", "7.10" ),
 						entry( "hibernate.search.backend.version_check.enabled", "false" ),
 						entry( "hibernate.search.backend.schema_management.minimal_required_status", "yellow" ),
 						entry( "hibernate.search.backend.indexes.myIndex.indexing.max_bulk_size", 20 ),
