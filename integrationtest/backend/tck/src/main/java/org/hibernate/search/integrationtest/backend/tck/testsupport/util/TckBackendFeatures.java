@@ -70,4 +70,8 @@ public class TckBackendFeatures {
 	public boolean supportsTruncateAfterForScroll() {
 		return true;
 	}
+
+	public boolean supportsExistsForFieldWithoutDocValues(Class<?> fieldType) {
+		return true;
+	}
 }

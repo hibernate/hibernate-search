@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import org.hibernate.search.engine.search.common.SortMode;
+import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
@@ -121,5 +122,14 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	public boolean supportsTruncateAfterForScroll() {
 		// See https://hibernate.atlassian.net/browse/HSEARCH-4029
 		return false;
+	}
+
+	@Override
+	public boolean supportsExistsForFieldWithoutDocValues(Class<?> fieldType) {
+		if ( GeoPoint.class.equals( fieldType ) ) {
+			// See https://github.com/elastic/elasticsearch/issues/65306
+			return !dialect.hasBugForExistsOnNullGeoPointFieldWithoutDocValues();
+		}
+		return true;
 	}
 }

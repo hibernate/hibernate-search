@@ -156,4 +156,9 @@ public class Elasticsearch710TestDialect implements ElasticsearchTestDialect {
 	public boolean supportsSkipOrLimitingTotalHitCount() {
 		return true;
 	}
+
+	@Override
+	public boolean hasBugForExistsOnNullGeoPointFieldWithoutDocValues() {
+		return true;
+	}
 }

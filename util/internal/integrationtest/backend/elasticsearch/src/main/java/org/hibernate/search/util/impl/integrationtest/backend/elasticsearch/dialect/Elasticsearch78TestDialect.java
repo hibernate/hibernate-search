@@ -8,6 +8,8 @@ package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dia
 
 public class Elasticsearch78TestDialect extends Elasticsearch710TestDialect {
 
-	// TODO add behavior that differs from ES 7.10
-
+	@Override
+	public boolean hasBugForExistsOnNullGeoPointFieldWithoutDocValues() {
+		return false;
+	}
 }
