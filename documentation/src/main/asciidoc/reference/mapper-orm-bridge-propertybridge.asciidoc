@@ -103,6 +103,19 @@ so we call `addValue` on `summaryValue` instead of `target`.
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/simple/Invoice.java[tags=include;!getters-setters]
 ----
 <1> Apply the bridge using the `@PropertyBinding` annotation.
+
+Here is an example of what an indexed document would look like, with the Elasticsearch backend:
+
+[source, JSON]
+----
+{
+  "summary": {
+    "total": 38.96,
+    "books": 30.97,
+    "shipping": 7.99
+  }
+}
+----
 ====
 
 [[mapper-orm-bridge-propertybridge-parameters]]
