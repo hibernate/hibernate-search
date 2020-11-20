@@ -323,7 +323,6 @@ public class ElasticsearchClientFactoryImplIT {
 				.willReturn(
 						elasticsearchResponse()
 						.withBody( "'unparseable" )
-						.withFixedDelay( 2000 )
 				) );
 
 		assertThatThrownBy( () -> {
