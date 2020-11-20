@@ -51,9 +51,13 @@ the following table may help:
 |Class
 
 |Maps to...
-|One index field
-|One index field or more
-|One index field or more
+|One index field.
+Value field only: integer, text, geopoint, etc.
+No <<mapper-orm-bridge-index-field-dsl-object,object field>> (composite).
+|One index field or more.
+Value fields as well as <<mapper-orm-bridge-index-field-dsl-object,object fields>> (composite).
+|One index field or more.
+Value fields as well as <<mapper-orm-bridge-index-field-dsl-object,object fields>> (composite).
 |Document identifier
 |Route (conditional indexing, <<concepts-sharding-routing,routing key>>)
 

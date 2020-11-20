@@ -84,9 +84,10 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/docume
 <1> Declare the field as multi-valued.
 ====
 
+[[mapper-orm-bridge-index-field-dsl-object]]
 == Object fields
 
-The previous sections only presented flat schemas with atomic fields,
+The previous sections only presented flat schemas with value fields,
 but the index schema can actually be organized in a tree structure,
 with two categories of index fields:
 
