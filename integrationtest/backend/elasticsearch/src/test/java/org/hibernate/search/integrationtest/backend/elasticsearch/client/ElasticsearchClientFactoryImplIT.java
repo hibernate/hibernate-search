@@ -54,10 +54,10 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
-import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
+import org.hibernate.search.util.impl.test.rule.Retry;
 
 import org.junit.After;
 import org.junit.Rule;
@@ -87,18 +87,20 @@ public class ElasticsearchClientFactoryImplIT {
 
 	private static final JsonParser JSON_PARSER = new JsonParser();
 
+	// Some tests in here are flaky, for some reason once in a while wiremock takes a very long time to answer
+	// even though no delay was configured.
+	// The exact reason is unknown though, so just try multiple times...
 	@Rule
-	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
+	public Retry retry;
 
-	@Rule
-	public WireMockRule wireMockRule1 = new WireMockRule( wireMockConfig().port( 0 )
+	private final ExpectedLog4jLog logged = ExpectedLog4jLog.create();
+
+	private final WireMockRule wireMockRule1 = new WireMockRule( wireMockConfig().port( 0 )
 			.httpsPort( 0 ) /* Automatic port selection */ );
 
-	@Rule
-	public WireMockRule wireMockRule2 = new WireMockRule( wireMockConfig().port( 0 ).httpsPort( 0 ) /* Automatic port selection */ );
+	private final WireMockRule wireMockRule2 = new WireMockRule( wireMockConfig().port( 0 ).httpsPort( 0 ) /* Automatic port selection */ );
 
-	@Rule
-	public TestConfigurationProvider testConfigurationProvider = new TestConfigurationProvider();
+	private final TestConfigurationProvider testConfigurationProvider = new TestConfigurationProvider();
 
 	private final ThreadPoolProviderImpl threadPoolProvider = new ThreadPoolProviderImpl(
 			BeanHolder.of( new EmbeddedThreadProvider( ElasticsearchClientFactoryImplIT.class.getName() + ": " ) )
@@ -106,6 +108,10 @@ public class ElasticsearchClientFactoryImplIT {
 
 	private final ScheduledExecutorService timeoutExecutorService =
 			threadPoolProvider.newScheduledExecutor( 1, "Timeout - " );
+
+	public ElasticsearchClientFactoryImplIT() {
+		this.retry = Retry.withOtherRules( logged, wireMockRule1, wireMockRule2, testConfigurationProvider );
+	}
 
 	@After
 	public void cleanup() {
@@ -405,18 +411,6 @@ public class ElasticsearchClientFactoryImplIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2836")
 	public void cloggedClient_noTimeout_read() {
-		SubTest.expectSuccessAfterRetry(
-				// This test is flaky, for some reason once in a while wiremock takes a very long time to answer
-				// even though no delay was configured.
-				// The exact reason is unknown though, so just try multiple times...
-				this::try_cloggedClient_noTimeout_read
-		);
-	}
-
-	private void try_cloggedClient_noTimeout_read() throws Exception {
-		wireMockRule1.resetRequests();
-		wireMockRule1.resetMappings();
-
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/long" ) )
 				.willReturn( elasticsearchResponse()
@@ -454,18 +448,6 @@ public class ElasticsearchClientFactoryImplIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2836")
 	public void cloggedClient_timeout_request() {
-		SubTest.expectSuccessAfterRetry(
-				// This test is flaky, for some reason once in a while wiremock takes a very long time to answer
-				// even though no delay was configured.
-				// The exact reason is unknown though, so just try multiple times...
-				this::try_cloggedClient_timeout_request
-		);
-	}
-
-	private void try_cloggedClient_timeout_request() throws Exception {
-		wireMockRule1.resetRequests();
-		wireMockRule1.resetMappings();
-
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/long" ) )
 				.willReturn( elasticsearchResponse()
@@ -596,20 +578,6 @@ public class ElasticsearchClientFactoryImplIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2469")
 	public void multipleHosts_failover_timeout() {
-		SubTest.expectSuccessAfterRetry(
-				// This test is flaky, for some reason once in a while wiremock takes a very long time to answer
-				// even though no delay was configured.
-				// The exact reason is unknown though, so just try multiple times...
-				this::try_multipleHosts_failover_timeout
-		);
-	}
-
-	private void try_multipleHosts_failover_timeout() throws Exception {
-		wireMockRule1.resetRequests();
-		wireMockRule2.resetRequests();
-		wireMockRule1.resetMappings();
-		wireMockRule2.resetMappings();
-
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
@@ -659,15 +627,6 @@ public class ElasticsearchClientFactoryImplIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2469")
 	public void multipleHosts_failover_fault() {
-		SubTest.expectSuccessAfterRetry(
-				// This test is flaky, for some reason once in a while wiremock takes a very long time to answer
-				// even though no delay was configured.
-				// The exact reason is unknown though, so just try multiple times...
-				this::try_multipleHosts_failover_fault
-		);
-	}
-
-	private void try_multipleHosts_failover_fault() throws Exception {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
