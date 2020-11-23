@@ -121,7 +121,7 @@ public class ElasticsearchClientFactoryImplIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2274")
-	public void simple_http() throws Exception {
+	public void simple_http() {
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessage";
 		String responseBody = "{ \"foo\": \"bar\" }";
@@ -147,7 +147,7 @@ public class ElasticsearchClientFactoryImplIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4099")
-	public void uris_http() throws Exception {
+	public void uris_http() {
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessage";
 		String responseBody = "{ \"foo\": \"bar\" }";
@@ -179,7 +179,7 @@ public class ElasticsearchClientFactoryImplIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4051")
-	public void pathPrefix_http() throws Exception {
+	public void pathPrefix_http() {
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessage";
 		String responseBody = "{ \"foo\": \"bar\" }";
@@ -209,7 +209,7 @@ public class ElasticsearchClientFactoryImplIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-4099")
-	public void pathPrefix_uris() throws Exception {
+	public void pathPrefix_uris() {
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessage";
 		String responseBody = "{ \"foo\": \"bar\" }";
@@ -242,7 +242,7 @@ public class ElasticsearchClientFactoryImplIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2274")
-	public void simple_https() throws Exception {
+	public void simple_https() {
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessage";
 		String responseBody = "{ \"foo\": \"bar\" }";
@@ -273,7 +273,7 @@ public class ElasticsearchClientFactoryImplIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2274")
-	public void uris_https() throws Exception {
+	public void uris_https() {
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessage";
 		String responseBody = "{ \"foo\": \"bar\" }";
@@ -304,7 +304,7 @@ public class ElasticsearchClientFactoryImplIT {
 	}
 
 	@Test
-	public void error() throws Exception {
+	public void error() {
 		String payload = "{ \"foo\": \"bar\" }";
 		String responseBody = "{ \"error\": \"ErrorMessageExplainingTheError\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
@@ -322,7 +322,7 @@ public class ElasticsearchClientFactoryImplIT {
 	}
 
 	@Test
-	public void unparseable() throws Exception {
+	public void unparseable() {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
@@ -347,7 +347,7 @@ public class ElasticsearchClientFactoryImplIT {
 	}
 
 	@Test
-	public void timeout_read() throws Exception {
+	public void timeout_read() {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
@@ -374,7 +374,7 @@ public class ElasticsearchClientFactoryImplIT {
 	}
 
 	@Test
-	public void timeout_request() throws Exception {
+	public void timeout_request() {
 		String payload = "{ \"foo\": \"bar\" }";
 
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
@@ -486,7 +486,7 @@ public class ElasticsearchClientFactoryImplIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2235")
-	public void multipleHosts() throws Exception {
+	public void multipleHosts() {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
@@ -511,7 +511,7 @@ public class ElasticsearchClientFactoryImplIT {
 	}
 
 	@Test
-	public void multipleURIs() throws Exception {
+	public void multipleURIs() {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
@@ -539,7 +539,7 @@ public class ElasticsearchClientFactoryImplIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2469")
-	public void multipleHosts_failover_serverError() throws Exception {
+	public void multipleHosts_failover_serverError() {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
@@ -664,7 +664,7 @@ public class ElasticsearchClientFactoryImplIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2449")
-	public void discovery_http() throws Exception {
+	public void discovery_http() {
 		String nodesInfoResult = dummyNodeInfoResponse( wireMockRule1.port(), wireMockRule2.port() );
 
 		wireMockRule1.stubFor( get( urlPathMatching( "/_nodes.*" ) )
@@ -718,7 +718,7 @@ public class ElasticsearchClientFactoryImplIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2736")
-	public void discovery_https() throws Exception {
+	public void discovery_https() {
 		String nodesInfoResult = dummyNodeInfoResponse( wireMockRule1.httpsPort(), wireMockRule2.httpsPort() );
 
 		wireMockRule1.stubFor( get( urlPathMatching( "/_nodes.*" ) )
@@ -794,7 +794,7 @@ public class ElasticsearchClientFactoryImplIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2453")
 	@Category(RequiresNoAutomaticAuthenticationHeader.class)
-	public void authentication() throws Exception {
+	public void authentication() {
 		String username = "ironman";
 		String password = "j@rV1s";
 
@@ -818,7 +818,7 @@ public class ElasticsearchClientFactoryImplIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2453")
-	public void authentication_error() throws Exception {
+	public void authentication_error() {
 		String payload = "{ \"foo\": \"bar\" }";
 		String statusMessage = "StatusMessageUnauthorized";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType/_search" ) )
@@ -837,7 +837,7 @@ public class ElasticsearchClientFactoryImplIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2453")
-	public void authentication_http_password() throws Exception {
+	public void authentication_http_password() {
 		String username = "ironman";
 		String password = "j@rV1s";
 
