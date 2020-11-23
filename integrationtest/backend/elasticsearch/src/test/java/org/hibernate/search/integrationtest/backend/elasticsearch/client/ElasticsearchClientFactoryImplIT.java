@@ -117,6 +117,11 @@ public class ElasticsearchClientFactoryImplIT {
 	public void cleanup() {
 		timeoutExecutorService.shutdownNow();
 		threadPoolProvider.close();
+
+		// Avoid side-effects from one test to another
+		// Ideally WiremockRule should do that by itself, but it doesn't...
+		wireMockRule1.resetAll();
+		wireMockRule2.resetAll();
 	}
 
 	@Test
