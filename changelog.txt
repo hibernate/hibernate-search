@@ -1,6 +1,46 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.CR2 (23-11-2020)
+-------------------------
+
+** Bug
+    * HSEARCH-4114 java.lang.reflect.InaccessibleObjectException when declaring dependencies to private fields from non-open modules in a bridge
+    * HSEARCH-4112 Hibernate Search + Spring-JTA fails because of closed entity manager
+    * HSEARCH-4108 Search.session() does not work with session proxies 
+    * HSEARCH-4107 Session cast fails when creating a FullTextSession with Spring 2.4.0
+    * HSEARCH-4100 Query/request logs should use the TRACE level
+    * HSEARCH-4096 Spring Boot hangs while trying to retrieve (built-in) beans for Hibernate Search
+
+** Improvement
+    * HSEARCH-4116 Ignore empty, blank or null configuration properties when detecting unused properties
+    * HSEARCH-4104 Upgrade to Elasticsearch 7.10.0
+    * HSEARCH-4102 Alias-free IndexLayoutStrategy
+    * HSEARCH-4101 Change default required status for Elasticsearch indexes to "yellow"
+    * HSEARCH-4098 Upgrade to Lucene 8.7.0
+    * HSEARCH-4074 Clarify how to pick a bridge type in the documentation
+    * HSEARCH-4069 Measure time more precisely when computing execution time of Lucene queries
+
+** New Feature
+    * HSEARCH-4099 Allow option for setting Elasticsearch connection information via full URIs.
+
+** Task
+    * HSEARCH-4115 Fix transient failure in ElasticsearchClientFactoryImplIT
+    * HSEARCH-4113 Document that serializing the indexing plan is not supported
+    * HSEARCH-4111 Upgrade to Hibernate ORM 5.4.24.Final
+    * HSEARCH-4106 Force tests to execute with JUnit 4
+    * HSEARCH-4097 Disable maven-surefire-plugin's trimStackTrace by default
+    * HSEARCH-4095 Fix some legacy package names in Batch JSR 352
+    * HSEARCH-4094 JSR-352 documentation should mention that an additional dependency is necessary
+    * HSEARCH-4093 Fix incorrect assertions in tests detected by Sonar
+    * HSEARCH-4089 Fix warnings related to templates in Elasticsearch integration tests
+    * HSEARCH-4088 Type safe PropertyBridge/TypeBridge
+    * HSEARCH-4072 Move from Travis to GitHub actions
+    * HSEARCH-4067 Remove "(default)"/"(no default)" from configuration examples in the documentation
+    * HSEARCH-4043 Remove Byteman from RestartChunkIT
+    * HSEARCH-3821 Improve test coverage for Elasticsearch schema validation
+    * HSEARCH-3479 Migrate Search 5 CDI and Spring integration tests to Search 6
+
 6.0.0.CR1 (03-11-2020)
 -------------------------
 
