@@ -395,7 +395,7 @@ it will name the index `myindex-000001` and will automatically create the write 
 * Write operations (indexing, purge, ...) will target the alias `myindex-write`.
 * Read operations (searching, explaining, ...) will target the alias `myindex-read`.
 [[backend-elasticsearch-indexlayout-strategy-no-alias]]`no-alias`::
-A strategy without aliases. Mostly useful on legacy clusters.
+A strategy without index aliases. Mostly useful on legacy clusters.
 +
 For an index whose name in Hibernate Search is `myIndex`:
 
