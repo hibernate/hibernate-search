@@ -389,6 +389,7 @@ Multiple layout strategies are available:
 The default, future-proof strategy.
 +
 For an index whose name in Hibernate Search is `myIndex`:
+
 * If Hibernate Search <<backend-elasticsearch-index-lifecycle,creates the index automatically>>,
 it will name the index `myindex-000001` and will automatically create the write and read aliases.
 * Write operations (indexing, purge, ...) will target the alias `myindex-write`.
@@ -397,6 +398,7 @@ it will name the index `myindex-000001` and will automatically create the write 
 A strategy without aliases. Mostly useful on legacy clusters.
 +
 For an index whose name in Hibernate Search is `myIndex`:
+
 * If Hibernate Search <<backend-elasticsearch-index-lifecycle,creates the index automatically>>,
 it will name the index `myindex` and will not create any alias.
 * Write operations (indexing, purge, ...) will target the index directly by its name, `myindex`.
