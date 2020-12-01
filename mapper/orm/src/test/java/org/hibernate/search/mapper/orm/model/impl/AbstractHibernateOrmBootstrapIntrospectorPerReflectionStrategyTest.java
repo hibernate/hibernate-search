@@ -7,11 +7,10 @@
 package org.hibernate.search.mapper.orm.model.impl;
 
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.boot.Metadata;
@@ -21,9 +20,8 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.dialect.H2Dialect;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
 
 import org.junit.After;
 import org.junit.runner.RunWith;
@@ -35,16 +33,15 @@ public abstract class AbstractHibernateOrmBootstrapIntrospectorPerReflectionStra
 	@Parameterized.Parameters(name = "Reflection strategy = {0}")
 	public static List<Object[]> data() {
 		return Arrays.asList( new Object[][] {
-				{ null },
-				{ "method-handle" },
-				{ "java-lang-reflect" }
+				{ ValueReadHandleFactory.usingJavaLangReflect() },
+				{ ValueReadHandleFactory.usingMethodHandle( MethodHandles.publicLookup() ) }
 		} );
 	}
 
 	private final List<AutoCloseable> toClose = new ArrayList<>();
 
 	@Parameterized.Parameter
-	public String reflectionStrategyName = "java-lang-reflect";
+	public ValueReadHandleFactory valueReadHandleFactory;
 
 	@After
 	public void cleanup() throws Exception {
@@ -71,21 +68,11 @@ public abstract class AbstractHibernateOrmBootstrapIntrospectorPerReflectionStra
 		ReflectionManager reflectionManager = metadataImplementor.getTypeConfiguration()
 				.getMetadataBuildingContext().getBootstrapContext().getReflectionManager();
 
-		Map<String, Object> properties = new HashMap<>();
-		if ( reflectionStrategyName != null ) {
-			properties.put(
-					HibernateOrmMapperSpiSettings.Radicals.REFLECTION_STRATEGY,
-					reflectionStrategyName
-			);
-		}
-
 		HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider =
 				HibernateOrmBasicTypeMetadataProvider.create( metadata );
 
-		return HibernateOrmBootstrapIntrospector.create(
-				basicTypeMetadataProvider, reflectionManager,
-				ConfigurationPropertySource.fromMap( properties )
-		);
+		return HibernateOrmBootstrapIntrospector.create( basicTypeMetadataProvider, reflectionManager,
+				valueReadHandleFactory );
 	}
 
 }
