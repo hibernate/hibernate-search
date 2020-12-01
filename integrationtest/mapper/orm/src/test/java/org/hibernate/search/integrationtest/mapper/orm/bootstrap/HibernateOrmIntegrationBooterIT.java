@@ -6,11 +6,15 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.bootstrap;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -21,14 +25,18 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.boot.spi.MetadataImplementor;
+import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBooter;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
@@ -39,6 +47,10 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import org.assertj.core.api.Fail;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 public class HibernateOrmIntegrationBooterIT {
 
@@ -49,6 +61,18 @@ public class HibernateOrmIntegrationBooterIT {
 	@Rule
 	public BackendMock backendMock = new BackendMock();
 
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+
+	@Mock
+	private ValueReadHandle<Integer> idValueReadHandleMock;
+
+	@Mock
+	private ValueReadHandle<String> textValueReadHandleMock;
+
+	@Mock
+	private ValueReadHandleFactory valueReadHandleFactoryMock;
+
 	@After
 	public void cleanup() throws Exception {
 		try ( Closer<Exception> closer = new Closer<>() ) {
@@ -57,14 +81,24 @@ public class HibernateOrmIntegrationBooterIT {
 	}
 
 	@Test
-	public void twoPhaseBoot() {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void twoPhaseBoot() throws Exception {
 		HibernateOrmIntegrationBooter booter = createBooter( IndexedEntity.class );
 		Map<String, Object> booterGeneratedProperties = new LinkedHashMap<>();
 
 		// Pre-booting should lead to a schema definition in the backend.
-		backendMock.expectSchema( INDEX_NAME, b -> { } );
+		backendMock.expectSchema( INDEX_NAME, b -> b.field( "text", String.class,
+				b2 -> b2.analyzerName( AnalyzerNames.DEFAULT ) ) );
+		// Pre-booting should retrieve value-read handles
+		// Simulate a custom handle from a framework, e.g. Quarkus
+		when( valueReadHandleFactoryMock.createForField( IndexedEntity.ID_FIELD ) )
+				.thenReturn( (ValueReadHandle) idValueReadHandleMock );
+		when( valueReadHandleFactoryMock.createForField( IndexedEntity.TEXT_FIELD ) )
+				.thenReturn( (ValueReadHandle) textValueReadHandleMock );
 		booter.preBoot( booterGeneratedProperties::put );
 		backendMock.verifyExpectationsMet();
+		verify( valueReadHandleFactoryMock ).createForField( IndexedEntity.ID_FIELD );
+		verify( valueReadHandleFactoryMock ).createForField( IndexedEntity.TEXT_FIELD );
 
 		SimpleSessionFactoryBuilder builder = new SimpleSessionFactoryBuilder()
 				.addAnnotatedClass( IndexedEntity.class )
@@ -96,14 +130,20 @@ public class HibernateOrmIntegrationBooterIT {
 			OrmUtils.withinTransaction( sessionFactory, session -> {
 				IndexedEntity entity = new IndexedEntity();
 				entity.id = 1;
+				entity.text = "someText";
 				session.persist( entity );
 
+				when( textValueReadHandleMock.get( entity ) ).thenReturn( entity.text );
+
 				backendMock.expectWorks( INDEX_NAME )
-						.add( "1", b -> { } )
+						.add( "1", b -> b.field( "text", "someText" ) )
 						.processedThenExecuted();
 			} );
 			// If the entity was indexed, it means Hibernate Search booted correctly
 			backendMock.verifyExpectationsMet();
+
+			// Also check that the value handle has been called
+			verify( textValueReadHandleMock ).get( any() );
 		}
 	}
 
@@ -129,13 +169,30 @@ public class HibernateOrmIntegrationBooterIT {
 		BootstrapContext bootstrapContext =
 				metadataImplementor.getTypeConfiguration().getMetadataBuildingContext().getBootstrapContext();
 
-		return HibernateOrmIntegrationBooter.builder( metadata, bootstrapContext ).build();
+		return HibernateOrmIntegrationBooter.builder( metadata, bootstrapContext )
+				.valueReadHandleFactory( valueReadHandleFactoryMock )
+				.build();
 	}
 
 	@Entity
 	@Indexed(index = INDEX_NAME)
 	private static class IndexedEntity {
+		private static final Field ID_FIELD;
+		private static final Field TEXT_FIELD;
+
+		static {
+			try {
+				ID_FIELD = IndexedEntity.class.getDeclaredField( "id" );
+				TEXT_FIELD = IndexedEntity.class.getDeclaredField( "text" );
+			}
+			catch (NoSuchFieldException e) {
+				throw new IllegalStateException( e );
+			}
+		}
+
 		@Id
 		private Integer id;
+		@FullTextField
+		private String text;
 	}
 }

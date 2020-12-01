@@ -15,16 +15,6 @@ public final class HibernateOrmMapperSpiSettings {
 
 	public static final String PREFIX = HibernateOrmMapperSettings.PREFIX;
 
-	/**
-	 * The strategy to follow when performing reflection operations,
-	 * in particular when calling methods or accessing field dynamically.
-	 * <p>
-	 * Expects a {@link HibernateOrmReflectionStrategyName} value, or a String representation of such value.
-	 * <p>
-	 * Defaults to {@link Defaults#REFLECTION_STRATEGY}.
-	 */
-	public static final String REFLECTION_STRATEGY = PREFIX + Radicals.REFLECTION_STRATEGY;
-
 	public static final String INTEGRATION_PARTIAL_BUILD_STATE =
 			PREFIX + Radicals.INTEGRATION_PARTIAL_BUILD_STATE;
 
@@ -32,8 +22,6 @@ public final class HibernateOrmMapperSpiSettings {
 
 		private Radicals() {
 		}
-
-		public static final String REFLECTION_STRATEGY = "reflection.strategy";
 
 		public static final String INTEGRATION_PARTIAL_BUILD_STATE = "integration_partial_build_state";
 	}
@@ -45,9 +33,6 @@ public final class HibernateOrmMapperSpiSettings {
 
 		private Defaults() {
 		}
-
-		public static final HibernateOrmReflectionStrategyName REFLECTION_STRATEGY =
-				HibernateOrmReflectionStrategyName.METHOD_HANDLE;
 	}
 
 }

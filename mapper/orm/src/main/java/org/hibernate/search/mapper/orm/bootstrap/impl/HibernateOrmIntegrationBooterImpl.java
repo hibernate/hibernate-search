@@ -43,6 +43,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
 import org.hibernate.service.Service;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.spi.ServiceBinding;
@@ -70,6 +71,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	private final Metadata metadata;
 	private final ServiceRegistryImplementor serviceRegistry;
 	private final ReflectionManager reflectionManager;
+	private final ValueReadHandleFactory valueReadHandleFactory;
 	private final ConfigurationService ormConfigurationService;
 	private final ConfigurationPropertySource rootPropertySource;
 	private final ConfigurationPropertyChecker propertyChecker;
@@ -81,6 +83,8 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		this.metadata = builder.metadata;
 		this.serviceRegistry = (ServiceRegistryImplementor) builder.bootstrapContext.getServiceRegistry();
 		this.reflectionManager = builder.bootstrapContext.getReflectionManager();
+		this.valueReadHandleFactory = builder.valueReadHandleFactory != null ? builder.valueReadHandleFactory
+				: ValueReadHandleFactory.usingMethodHandle( MethodHandles.publicLookup() );
 		this.propertyChecker = builder.propertyChecker != null ? builder.propertyChecker : ConfigurationPropertyChecker.create();
 		this.rootPropertySource = builder.rootPropertySource != null ? builder.rootPropertySource
 				: getPropertySource( serviceRegistry, propertyChecker );
@@ -232,9 +236,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 			HibernateOrmMappingKey mappingKey = new HibernateOrmMappingKey();
 			HibernateOrmMappingInitiator mappingInitiator = HibernateOrmMappingInitiator.create(
-					metadata, reflectionManager, ormConfigurationService,
-					builder.maskedPropertySource()
-			);
+					metadata, reflectionManager, valueReadHandleFactory, ormConfigurationService );
 			builder.addMappingInitiator( mappingKey, mappingInitiator );
 
 			ClassLoaderService hibernateOrmClassLoaderService = getOrmServiceOrFail( ClassLoaderService.class );
@@ -349,10 +351,17 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 		private ConfigurationPropertySource rootPropertySource;
 		private ConfigurationPropertyChecker propertyChecker;
+		private ValueReadHandleFactory valueReadHandleFactory;
 
 		public BuilderImpl(Metadata metadata, BootstrapContext bootstrapContext) {
 			this.metadata = metadata;
 			this.bootstrapContext = bootstrapContext;
+		}
+
+		@Override
+		public Builder valueReadHandleFactory(ValueReadHandleFactory valueReadHandleFactory) {
+			this.valueReadHandleFactory = valueReadHandleFactory;
+			return this;
 		}
 
 		@Override

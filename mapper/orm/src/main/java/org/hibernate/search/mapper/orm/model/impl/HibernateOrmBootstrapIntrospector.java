@@ -21,10 +21,6 @@ import org.hibernate.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.bytecode.enhance.spi.EnhancerConstants;
 import org.hibernate.engine.spi.PersistentAttributeInterceptable;
-import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
-import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmReflectionStrategyName;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.hcann.spi.PojoHCannOrmGenericContextHelper;
@@ -32,9 +28,9 @@ import org.hibernate.search.mapper.pojo.model.spi.AbstractPojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.impl.ReflectionHelper;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
 
@@ -43,31 +39,10 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ConfigurationProperty<HibernateOrmReflectionStrategyName> REFLECTION_STRATEGY =
-			ConfigurationProperty.forKey( HibernateOrmMapperSpiSettings.Radicals.REFLECTION_STRATEGY )
-					.as( HibernateOrmReflectionStrategyName.class, HibernateOrmReflectionStrategyName::of )
-					.withDefault( HibernateOrmMapperSpiSettings.Defaults.REFLECTION_STRATEGY )
-					.build();
-
 	public static HibernateOrmBootstrapIntrospector create(
 			HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
 			ReflectionManager ormReflectionManager,
-			ConfigurationPropertySource propertySource) {
-		MethodHandles.Lookup lookup = MethodHandles.publicLookup();
-
-		HibernateOrmReflectionStrategyName reflectionStrategyName = REFLECTION_STRATEGY.get( propertySource );
-		ValueReadHandleFactory valueReadHandleFactory;
-		switch ( reflectionStrategyName ) {
-			case JAVA_LANG_REFLECT:
-				valueReadHandleFactory = ValueReadHandleFactory.usingJavaLangReflect();
-				break;
-			case METHOD_HANDLE:
-				valueReadHandleFactory = ValueReadHandleFactory.usingMethodHandle( lookup );
-				break;
-			default:
-				throw new AssertionFailure( "Unexpected reflection strategy name: " + reflectionStrategyName );
-		}
-
+			ValueReadHandleFactory valueReadHandleFactory) {
 		return new HibernateOrmBootstrapIntrospector(
 				basicTypeMetadataProvider, ormReflectionManager, valueReadHandleFactory
 		);

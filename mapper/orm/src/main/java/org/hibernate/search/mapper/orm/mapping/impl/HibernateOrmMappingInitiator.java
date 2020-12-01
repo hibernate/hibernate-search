@@ -28,6 +28,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
 
 public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<HibernateOrmMappingPartialBuildState>
 		implements HibernateOrmMappingConfigurationContext {
@@ -44,24 +45,20 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 					.build();
 
 	public static HibernateOrmMappingInitiator create(Metadata metadata, ReflectionManager reflectionManager,
-			ConfigurationService ormConfigurationService,
-			ConfigurationPropertySource propertySource) {
+			ValueReadHandleFactory valueReadHandleFactory, ConfigurationService ormConfigurationService) {
 		HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider =
 				HibernateOrmBasicTypeMetadataProvider.create( metadata );
-		HibernateOrmBootstrapIntrospector introspector =
-				HibernateOrmBootstrapIntrospector.create( basicTypeMetadataProvider, reflectionManager, propertySource );
+		HibernateOrmBootstrapIntrospector introspector = HibernateOrmBootstrapIntrospector.create(
+				basicTypeMetadataProvider, reflectionManager, valueReadHandleFactory );
 
-		return new HibernateOrmMappingInitiator(
-				basicTypeMetadataProvider, ormConfigurationService, introspector
-		);
+		return new HibernateOrmMappingInitiator( basicTypeMetadataProvider, introspector, ormConfigurationService );
 	}
 
 	private final HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider;
 	private final HibernateOrmBootstrapIntrospector introspector;
 
 	private HibernateOrmMappingInitiator(HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
-			ConfigurationService ormConfigurationService,
-			HibernateOrmBootstrapIntrospector introspector) {
+			HibernateOrmBootstrapIntrospector introspector, ConfigurationService ormConfigurationService) {
 		super( introspector );
 
 		this.basicTypeMetadataProvider = basicTypeMetadataProvider;
