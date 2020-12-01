@@ -377,7 +377,7 @@ public class MyClassBridge implements MetadataProvidingFieldBridge {
 
   @Override
   public void set(String name, Object value,
-          Document document, LuceneOptions luceneOps) {
+          Document document, LuceneOptions luceneOptions) {
 
       Map<String, String> map = (Map<String, String>) value;
 
@@ -385,12 +385,14 @@ public class MyClassBridge implements MetadataProvidingFieldBridge {
       String lastName = map.get( "lastName" );
 
       // add regular document fields
-      luceneOps.addFieldToDocument( name + "_firstName", lastName, document );
-      luceneOps.addFieldToDocument( name + "_lastName", lastName, document );
+      luceneOptions.addFieldToDocument( name + "_firstName", lastName, document );
+      luceneOptions.addFieldToDocument( name + "_lastName", lastName, document );
 
       // add doc value fields to allow for sorting
-      document.addSortedDocValuesFieldToDocument( name + "_firstName", firstName );
-      document.addSortedDocValuesFieldToDocument( name + "_lastName", lastName );
+      luceneOptions.addSortedDocValuesFieldToDocument(
+      		name + "_firstName", firstName, document );
+      luceneOptions.addSortedDocValuesFieldToDocument(
+      		name + "_lastName", lastName, document );
   }
 
   @Override
