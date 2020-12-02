@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl;
 
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.gson.impl.SerializeExtraProperties;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.CharFilterDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.NormalizerDefinition;
@@ -15,8 +16,11 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.T
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.TokenizerDefinition;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
+@JsonAdapter(AnalysisJsonAdapterFactory.class)
 public class Analysis {
 
 	@SerializedName("analyzer")
@@ -33,6 +37,9 @@ public class Analysis {
 
 	@SerializedName("char_filter")
 	private Map<String, CharFilterDefinition> charFilters;
+
+	@SerializeExtraProperties
+	private Map<String, JsonElement> extraAttributes;
 
 	public boolean isEmpty() {
 		return ! hasContent( analyzers, normalizers, tokenizers, tokenFilters, charFilters );
