@@ -124,4 +124,9 @@ public interface ElasticsearchValidationMessages {
 	)
 	String dynamicTemplateDuplicate();
 
+	@Message(
+			value = "Custom index setting attribute missing"
+	)
+	String customIndexSettingAttributeMissing();
+
 }

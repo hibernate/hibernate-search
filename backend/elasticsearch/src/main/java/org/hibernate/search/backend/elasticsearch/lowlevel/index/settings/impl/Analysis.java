@@ -95,6 +95,10 @@ public class Analysis {
 		this.charFilters = charFilters;
 	}
 
+	public Map<String, JsonElement> getExtraAttributes() {
+		return extraAttributes;
+	}
+
 	@Override
 	public String toString() {
 		return new GsonBuilder().setPrettyPrinting().create().toJson( this );

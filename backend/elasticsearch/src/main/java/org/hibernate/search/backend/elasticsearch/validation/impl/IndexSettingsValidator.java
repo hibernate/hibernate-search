@@ -14,13 +14,16 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.T
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.Analysis;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 
+import com.google.gson.JsonElement;
+
 public class IndexSettingsValidator implements Validator<IndexSettings> {
 
-	final Validator<AnalyzerDefinition> analyzerDefinitionValidator = new AnalyzerDefinitionValidator();
-	final Validator<NormalizerDefinition> normalizerDefinitionValidator = new NormalizerDefinitionValidator();
-	final Validator<CharFilterDefinition> charFilterDefinitionValidator = AnalysisComponentDefinitionValidators.charFilterDefinitionValidator();
-	final Validator<TokenizerDefinition> tokenizerDefinitionValidator = AnalysisComponentDefinitionValidators.tokenizerDefinitionValidator();
-	final Validator<TokenFilterDefinition> tokenFilterDefinitionValidator = AnalysisComponentDefinitionValidators.tokenFilterDefinitionValidator();
+	private final Validator<AnalyzerDefinition> analyzerDefinitionValidator = new AnalyzerDefinitionValidator();
+	private final Validator<NormalizerDefinition> normalizerDefinitionValidator = new NormalizerDefinitionValidator();
+	private final Validator<CharFilterDefinition> charFilterDefinitionValidator = AnalysisComponentDefinitionValidators.charFilterDefinitionValidator();
+	private final Validator<TokenizerDefinition> tokenizerDefinitionValidator = AnalysisComponentDefinitionValidators.tokenizerDefinitionValidator();
+	private final Validator<TokenFilterDefinition> tokenFilterDefinitionValidator = AnalysisComponentDefinitionValidators.tokenFilterDefinitionValidator();
+	private final Validator<JsonElement> extraAttributeValidator = new JsonElementValidator( new JsonElementEquivalence() );
 
 	@Override
 	public void validate(ValidationErrorCollector errorCollector, IndexSettings expected, IndexSettings actual) {
@@ -32,6 +35,12 @@ public class IndexSettingsValidator implements Validator<IndexSettings> {
 		Analysis actualAnalysis = actual.getAnalysis();
 
 		validateAnalysisSettings( errorCollector, expectedAnalysis, actualAnalysis );
+
+		extraAttributeValidator.validateAllIgnoreUnexpected(
+				errorCollector, ValidationContextType.CUSTOM_INDEX_SETTINGS_ATTRIBUTE,
+				ElasticsearchValidationMessages.INSTANCE.customIndexSettingAttributeMissing(),
+				expected.getExtraAttributes(), actual.getExtraAttributes()
+		);
 	}
 
 	private void validateAnalysisSettings(ValidationErrorCollector errorCollector,
@@ -68,6 +77,12 @@ public class IndexSettingsValidator implements Validator<IndexSettings> {
 				errorCollector, ValidationContextType.TOKEN_FILTER,
 				ElasticsearchValidationMessages.INSTANCE.tokenFilterMissing(),
 				expectedAnalysis.getTokenFilters(), actualAnalysis == null ? null : actualAnalysis.getTokenFilters()
+		);
+
+		extraAttributeValidator.validateAllIgnoreUnexpected(
+				errorCollector, ValidationContextType.CUSTOM_INDEX_SETTINGS_ATTRIBUTE,
+				ElasticsearchValidationMessages.INSTANCE.customIndexSettingAttributeMissing(),
+				expectedAnalysis.getExtraAttributes(), actualAnalysis.getExtraAttributes()
 		);
 	}
 }
