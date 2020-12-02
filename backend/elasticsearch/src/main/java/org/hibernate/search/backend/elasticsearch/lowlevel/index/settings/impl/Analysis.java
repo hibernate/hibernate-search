@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.SerializeExtraProperties;
@@ -97,5 +98,46 @@ public class Analysis {
 	@Override
 	public String toString() {
 		return new GsonBuilder().setPrettyPrinting().create().toJson( this );
+	}
+
+	/**
+	 * Merge this analysis with another one.
+	 * Any conflict of definition will be solved in favour of the other analysis.
+	 * {@link #extraAttributes} will be always overridden.
+	 *
+	 * @param overridingAnalysis The other analysis definition
+	 */
+	public void merge(Analysis overridingAnalysis) {
+		if ( overridingAnalysis == null ) {
+			// nothing to do
+			return;
+		}
+
+		if ( overridingAnalysis.analyzers != null ) {
+			analyzers = new HashMap<>( analyzers );
+			analyzers.putAll( overridingAnalysis.analyzers );
+		}
+
+		if ( overridingAnalysis.normalizers != null ) {
+			normalizers = new HashMap<>( normalizers );
+			normalizers.putAll( overridingAnalysis.normalizers );
+		}
+
+		if ( overridingAnalysis.tokenizers != null ) {
+			tokenizers = new HashMap<>( tokenizers );
+			tokenizers.putAll( overridingAnalysis.tokenizers );
+		}
+
+		if ( overridingAnalysis.tokenFilters != null ) {
+			tokenFilters = new HashMap<>( tokenFilters );
+			tokenFilters.putAll( overridingAnalysis.tokenFilters );
+		}
+
+		if ( overridingAnalysis.charFilters != null ) {
+			charFilters = new HashMap<>( charFilters );
+			charFilters.putAll( overridingAnalysis.charFilters );
+		}
+
+		extraAttributes = overridingAnalysis.extraAttributes;
 	}
 }

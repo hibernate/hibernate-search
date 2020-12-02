@@ -35,7 +35,7 @@ public class IndexSettings {
 	}
 
 	public boolean isEmpty() {
-		return analysis == null || analysis.isEmpty();
+		return ( analysis == null || analysis.isEmpty() ) && ( extraAttributes == null || extraAttributes.isEmpty() );
 	}
 
 	@Override
@@ -43,4 +43,20 @@ public class IndexSettings {
 		return new GsonBuilder().setPrettyPrinting().create().toJson( this );
 	}
 
+	/**
+	 * Merge these settings with other settings.
+	 * Any conflict of definition will be solved in favour of the other settings.
+	 * {@link #extraAttributes} will be always overridden.
+	 *
+	 * @param overridingIndexSettings The other index settings
+	 */
+	public void merge(IndexSettings overridingIndexSettings) {
+		if ( overridingIndexSettings == null ) {
+			// nothing to do
+			return;
+		}
+
+		analysis.merge( overridingIndexSettings.analysis );
+		extraAttributes = overridingIndexSettings.extraAttributes;
+	}
 }
