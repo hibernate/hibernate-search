@@ -94,8 +94,11 @@ public class CreateIndexWork extends AbstractNonBulkableWork<CreateIndexResult> 
 			 * We better not include the null fields.
 			 */
 			Gson gson = gsonProvider.getGsonNoSerializeNulls();
-			// TODO HSEARCH-3934 Merge customSettings into settings
-			payload.add( "settings", gson.toJsonTree( ( customSettings == null ) ? settings : customSettings ) );
+
+			// if customSettings are present, merge them with the ones created by Search
+			settings.merge( customSettings );
+
+			payload.add( "settings", gson.toJsonTree( settings ) );
 			return this;
 		}
 
@@ -147,5 +150,9 @@ public class CreateIndexWork extends AbstractNonBulkableWork<CreateIndexResult> 
 		public CreateIndexWork build() {
 			return new CreateIndexWork( this );
 		}
+	}
+
+	private static IndexSettings merge(IndexSettings generatedSettings, IndexSettings customSettings) {
+		return generatedSettings;
 	}
 }

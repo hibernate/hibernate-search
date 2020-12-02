@@ -48,12 +48,8 @@ public class LowLevelIndexMetadataBuilder {
 		IndexMetadata indexMetadata = new IndexMetadata();
 		indexMetadata.setAliases( buildAliases() );
 
-		if ( customIndexSettings == null ) {
-			indexMetadata.setSettings( buildSettings() );
-		}
-		else {
-			indexMetadata.setCustomSettings( customIndexSettings );
-		}
+		indexMetadata.setSettings( buildSettings() );
+		indexMetadata.setCustomSettings( customIndexSettings );
 
 		indexMetadata.setMapping( mapping );
 		return indexMetadata;
