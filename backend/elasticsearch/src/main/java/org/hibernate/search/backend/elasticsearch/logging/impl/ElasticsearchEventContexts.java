@@ -60,4 +60,14 @@ public final class ElasticsearchEventContexts {
 			}
 		} );
 	}
+
+	public static EventContext fromCustomIndexSettingAttribute(String name) {
+		return EventContext.create( new AbstractSimpleEventContextElement<String>( name ) {
+			@Override
+			public String render(String name) {
+				return MESSAGES.customIndexSettingAttribute( name );
+			}
+		} );
+	}
+
 }

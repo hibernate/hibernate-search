@@ -34,6 +34,10 @@ public class IndexSettings {
 		this.analysis = analysis;
 	}
 
+	public Map<String, JsonElement> getExtraAttributes() {
+		return extraAttributes;
+	}
+
 	public boolean isEmpty() {
 		return ( analysis == null || analysis.isEmpty() ) && ( extraAttributes == null || extraAttributes.isEmpty() );
 	}
