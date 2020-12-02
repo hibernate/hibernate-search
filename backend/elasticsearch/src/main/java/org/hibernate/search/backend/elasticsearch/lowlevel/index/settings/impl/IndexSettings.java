@@ -6,15 +6,25 @@
  */
 package org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl;
 
+import java.util.Map;
+
+import org.hibernate.search.backend.elasticsearch.gson.impl.SerializeExtraProperties;
+
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.annotations.JsonAdapter;
 
 /**
  * Settings for an Elasticsearch index.
  *
  */
+@JsonAdapter(IndexSettingsJsonAdapterFactory.class)
 public class IndexSettings {
 
 	private Analysis analysis;
+
+	@SerializeExtraProperties
+	private Map<String, JsonElement> extraAttributes;
 
 	public Analysis getAnalysis() {
 		return analysis;
