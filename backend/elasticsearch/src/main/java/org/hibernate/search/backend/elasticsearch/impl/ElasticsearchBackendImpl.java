@@ -30,6 +30,7 @@ import org.hibernate.search.backend.elasticsearch.index.impl.IndexManagerBackend
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSimpleWorkOrchestrator;
@@ -55,7 +56,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
 
@@ -232,7 +232,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 
 	private ElasticsearchIndexSchemaRootNodeBuilder createIndexSchemaRootNodeBuilder(EventContext indexEventContext,
 			IndexNames indexNames, String mappedTypeName,
-			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, JsonObject customIndexSettings,
+			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, IndexSettings customIndexSettings,
 			DynamicMapping dynamicMapping) {
 
 		ElasticsearchIndexSchemaRootNodeBuilder builder = new ElasticsearchIndexSchemaRootNodeBuilder(
@@ -284,7 +284,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 		return contributors;
 	}
 
-	private JsonObject customIndexSettings(BackendBuildContext buildContext,
+	private IndexSettings customIndexSettings(BackendBuildContext buildContext,
 			ConfigurationPropertySource propertySource, EventContext indexEventContext) {
 
 		Optional<String> schemaManagementSettingsFile = SCHEMA_MANAGEMENT_SETTINGS_FILE.get( propertySource );
@@ -298,7 +298,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 				throw log.customIndexSettingsFileNotFound( filePath, indexEventContext );
 			}
 			try ( Reader reader = new InputStreamReader( inputStream, StandardCharsets.UTF_8 ) ) {
-				return link.getGsonProvider().getGson().fromJson( reader, JsonObject.class );
+				return link.getGsonProvider().getGson().fromJson( reader, IndexSettings.class );
 			}
 		}
 		catch (IOException e) {

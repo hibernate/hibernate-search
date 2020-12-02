@@ -18,6 +18,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.LowLevelIndexMetadataBuilder;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexContext;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
@@ -28,8 +29,6 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-import com.google.gson.JsonObject;
-
 
 public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSearchIndexContext {
 
@@ -38,7 +37,7 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 	private final EventContext eventContext;
 
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
-	private final JsonObject customIndexSettings;
+	private final IndexSettings customIndexSettings;
 	private final RootTypeMapping mapping;
 
 	private final ToDocumentIdentifierValueConverter<?> idDslConverter;
@@ -50,7 +49,7 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 
 	public ElasticsearchIndexModel(IndexNames names,
 			String mappedTypeName,
-			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, JsonObject customIndexSettings,
+			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, IndexSettings customIndexSettings,
 			RootTypeMapping mapping, ToDocumentIdentifierValueConverter<?> idDslConverter,
 			ElasticsearchIndexSchemaObjectNode rootNode,
 			Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticFields,

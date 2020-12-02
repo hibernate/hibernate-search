@@ -14,7 +14,6 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.In
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.CreateIndexResult;
 
-import com.google.gson.JsonObject;
 
 
 public interface CreateIndexWorkBuilder extends ElasticsearchWorkBuilder<NonBulkableWork<CreateIndexResult>> {
@@ -23,7 +22,7 @@ public interface CreateIndexWorkBuilder extends ElasticsearchWorkBuilder<NonBulk
 
 	CreateIndexWorkBuilder aliases(Map<String, IndexAliasDefinition> aliases);
 
-	CreateIndexWorkBuilder settings(IndexSettings settings, JsonObject customSettings);
+	CreateIndexWorkBuilder settings(IndexSettings settings, IndexSettings customSettings);
 
 	CreateIndexWorkBuilder mapping(RootTypeMapping mapping);
 }

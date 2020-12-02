@@ -28,8 +28,6 @@ import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import com.google.gson.JsonObject;
-
 /**
  * A utility implementing primitives for the various {@code ElasticsearchSchema*Impl}.
  * @author Gunnar Morling
@@ -50,7 +48,7 @@ public class ElasticsearchSchemaAccessor {
 
 	public CompletableFuture<?> createIndexAssumeNonExisting(URLEncodedString primaryIndexName,
 			Map<String, IndexAliasDefinition> aliases, IndexSettings settings,
-			JsonObject customSettings, RootTypeMapping mapping) {
+			IndexSettings customSettings, RootTypeMapping mapping) {
 		NonBulkableWork<?> work = getWorkFactory().createIndex( primaryIndexName )
 				.aliases( aliases )
 				.settings( settings, customSettings )
@@ -69,7 +67,7 @@ public class ElasticsearchSchemaAccessor {
 	 */
 	public CompletableFuture<Boolean> createIndexIgnoreExisting(URLEncodedString primaryIndexName,
 			Map<String, IndexAliasDefinition> aliases, IndexSettings settings,
-			JsonObject customSettings, RootTypeMapping mapping) {
+			IndexSettings customSettings, RootTypeMapping mapping) {
 		NonBulkableWork<CreateIndexResult> work = getWorkFactory().createIndex( primaryIndexName )
 				.aliases( aliases )
 				.settings( settings, customSettings )

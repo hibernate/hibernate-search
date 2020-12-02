@@ -13,7 +13,6 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.I
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 
 /**
  * An object representing metadata of an Elasticsearch index: aliases, mapping, settings, ...
@@ -25,7 +24,7 @@ public class IndexMetadata {
 	private RootTypeMapping mapping;
 
 	private IndexSettings settings;
-	private JsonObject customSettings;
+	private IndexSettings customSettings;
 
 	public Map<String, IndexAliasDefinition> getAliases() {
 		return aliases;
@@ -51,11 +50,11 @@ public class IndexMetadata {
 		this.settings = settings;
 	}
 
-	public void setCustomSettings(JsonObject customSettings) {
+	public void setCustomSettings(IndexSettings customSettings) {
 		this.customSettings = customSettings;
 	}
 
-	public JsonObject getCustomSettings() {
+	public IndexSettings getCustomSettings() {
 		return customSettings;
 	}
 

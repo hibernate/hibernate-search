@@ -18,15 +18,13 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.I
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.ElasticsearchIndexMetadataSyntax;
 
-import com.google.gson.JsonObject;
-
 
 public class LowLevelIndexMetadataBuilder {
 
 	private final ElasticsearchIndexMetadataSyntax syntax;
 	private final IndexNames indexNames;
 	private ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
-	private JsonObject customIndexSettings;
+	private IndexSettings customIndexSettings;
 	private RootTypeMapping mapping;
 
 	public LowLevelIndexMetadataBuilder(ElasticsearchIndexMetadataSyntax syntax, IndexNames indexNames) {
@@ -38,7 +36,7 @@ public class LowLevelIndexMetadataBuilder {
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 	}
 
-	public void setCustomIndexSettings(JsonObject customIndexSettings) {
+	public void setCustomIndexSettings(IndexSettings customIndexSettings) {
 		this.customIndexSettings = customIndexSettings;
 	}
 

@@ -29,6 +29,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Na
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RoutingType;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
@@ -37,8 +38,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRoo
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
-
-import com.google.gson.JsonObject;
 
 public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsearchIndexSchemaObjectNodeBuilder
 		implements IndexSchemaRootNodeBuilder {
@@ -50,7 +49,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	private final IndexNames indexNames;
 	private final String mappedTypeName;
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
-	private final JsonObject customIndexSettings;
+	private final IndexSettings customIndexSettings;
 	private final DynamicType defaultDynamicType;
 
 	private RoutingType routing = null;
@@ -59,7 +58,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	public ElasticsearchIndexSchemaRootNodeBuilder(ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
 			EventContext indexEventContext,
 			IndexNames indexNames, String mappedTypeName,
-			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, JsonObject customIndexSettings,
+			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, IndexSettings customIndexSettings,
 			DynamicMapping dynamicMapping) {
 		this.typeFactoryProvider = typeFactoryProvider;
 		this.indexEventContext = indexEventContext;
