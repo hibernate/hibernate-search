@@ -22,7 +22,7 @@ public interface CreateIndexWorkBuilder extends ElasticsearchWorkBuilder<NonBulk
 
 	CreateIndexWorkBuilder aliases(Map<String, IndexAliasDefinition> aliases);
 
-	CreateIndexWorkBuilder settings(IndexSettings settings, IndexSettings customSettings);
+	CreateIndexWorkBuilder settings(IndexSettings settings);
 
 	CreateIndexWorkBuilder mapping(RootTypeMapping mapping);
 }

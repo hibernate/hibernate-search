@@ -24,7 +24,6 @@ public class IndexMetadata {
 	private RootTypeMapping mapping;
 
 	private IndexSettings settings;
-	private IndexSettings customSettings;
 
 	public Map<String, IndexAliasDefinition> getAliases() {
 		return aliases;
@@ -48,14 +47,6 @@ public class IndexMetadata {
 
 	public void setSettings(IndexSettings settings) {
 		this.settings = settings;
-	}
-
-	public void setCustomSettings(IndexSettings customSettings) {
-		this.customSettings = customSettings;
-	}
-
-	public IndexSettings getCustomSettings() {
-		return customSettings;
 	}
 
 	@Override

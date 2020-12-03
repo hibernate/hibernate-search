@@ -47,11 +47,10 @@ public class ElasticsearchSchemaAccessor {
 	}
 
 	public CompletableFuture<?> createIndexAssumeNonExisting(URLEncodedString primaryIndexName,
-			Map<String, IndexAliasDefinition> aliases, IndexSettings settings,
-			IndexSettings customSettings, RootTypeMapping mapping) {
+			Map<String, IndexAliasDefinition> aliases, IndexSettings settings, RootTypeMapping mapping) {
 		NonBulkableWork<?> work = getWorkFactory().createIndex( primaryIndexName )
 				.aliases( aliases )
-				.settings( settings, customSettings )
+				.settings( settings )
 				.mapping( mapping )
 				.build();
 		return execute( work );
@@ -61,16 +60,15 @@ public class ElasticsearchSchemaAccessor {
 	 * @param primaryIndexName The name of the created index.
 	 * @param aliases The aliases for the newly created index.
 	 * @param settings The settings for the newly created index.
-	 * @param customSettings
 	 * @param mapping The root mapping for the newly created index.
 	 * @return A future holding {@code true} if the index was actually created, {@code false} if it already existed.
 	 */
 	public CompletableFuture<Boolean> createIndexIgnoreExisting(URLEncodedString primaryIndexName,
 			Map<String, IndexAliasDefinition> aliases, IndexSettings settings,
-			IndexSettings customSettings, RootTypeMapping mapping) {
+			RootTypeMapping mapping) {
 		NonBulkableWork<CreateIndexResult> work = getWorkFactory().createIndex( primaryIndexName )
 				.aliases( aliases )
-				.settings( settings, customSettings )
+				.settings( settings )
 				.mapping( mapping )
 				.ignoreExisting()
 				.build();

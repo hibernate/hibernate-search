@@ -88,16 +88,12 @@ public class CreateIndexWork extends AbstractNonBulkableWork<CreateIndexResult> 
 		}
 
 		@Override
-		public Builder settings(IndexSettings settings, IndexSettings customSettings) {
+		public Builder settings(IndexSettings settings) {
 			/*
 			 * Serializing nulls is really not a good idea here, it triggers NPEs in Elasticsearch
 			 * We better not include the null fields.
 			 */
 			Gson gson = gsonProvider.getGsonNoSerializeNulls();
-
-			// if customSettings are present, merge them with the ones created by Search
-			settings.merge( customSettings );
-
 			payload.add( "settings", gson.toJsonTree( settings ) );
 			return this;
 		}
@@ -150,9 +146,5 @@ public class CreateIndexWork extends AbstractNonBulkableWork<CreateIndexResult> 
 		public CreateIndexWork build() {
 			return new CreateIndexWork( this );
 		}
-	}
-
-	private static IndexSettings merge(IndexSettings generatedSettings, IndexSettings customSettings) {
-		return generatedSettings;
 	}
 }
