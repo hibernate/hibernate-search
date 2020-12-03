@@ -60,7 +60,13 @@ public class IndexSettings {
 			return;
 		}
 
-		analysis.merge( overridingIndexSettings.analysis );
+		if ( analysis == null ) {
+			analysis = overridingIndexSettings.analysis;
+		}
+		else {
+			analysis.merge( overridingIndexSettings.analysis );
+		}
+
 		extraAttributes = overridingIndexSettings.extraAttributes;
 	}
 }
