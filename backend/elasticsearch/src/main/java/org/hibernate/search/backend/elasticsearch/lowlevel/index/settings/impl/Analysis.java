@@ -117,31 +117,27 @@ public class Analysis {
 			return;
 		}
 
-		if ( overridingAnalysis.analyzers != null ) {
-			analyzers = new HashMap<>( analyzers );
-			analyzers.putAll( overridingAnalysis.analyzers );
-		}
-
-		if ( overridingAnalysis.normalizers != null ) {
-			normalizers = new HashMap<>( normalizers );
-			normalizers.putAll( overridingAnalysis.normalizers );
-		}
-
-		if ( overridingAnalysis.tokenizers != null ) {
-			tokenizers = new HashMap<>( tokenizers );
-			tokenizers.putAll( overridingAnalysis.tokenizers );
-		}
-
-		if ( overridingAnalysis.tokenFilters != null ) {
-			tokenFilters = new HashMap<>( tokenFilters );
-			tokenFilters.putAll( overridingAnalysis.tokenFilters );
-		}
-
-		if ( overridingAnalysis.charFilters != null ) {
-			charFilters = new HashMap<>( charFilters );
-			charFilters.putAll( overridingAnalysis.charFilters );
-		}
+		analyzers = merge( analyzers, overridingAnalysis.analyzers );
+		normalizers = merge( normalizers, overridingAnalysis.normalizers );
+		tokenizers = merge( tokenizers, overridingAnalysis.tokenizers );
+		tokenFilters = merge( tokenFilters, overridingAnalysis.tokenFilters );
+		charFilters = merge( charFilters, overridingAnalysis.charFilters );
 
 		extraAttributes = overridingAnalysis.extraAttributes;
+	}
+
+	private static <K> Map<String, K> merge(Map<String, K> originalImmutableMap, Map<String, K> overridingMap) {
+		if ( overridingMap == null || overridingMap.isEmpty() ) {
+			return originalImmutableMap;
+		}
+
+		if ( originalImmutableMap == null || originalImmutableMap.isEmpty() ) {
+			return overridingMap;
+		}
+
+		// let's merge
+		HashMap<String, K> result = new HashMap<>( originalImmutableMap );
+		result.putAll( overridingMap );
+		return result;
 	}
 }
