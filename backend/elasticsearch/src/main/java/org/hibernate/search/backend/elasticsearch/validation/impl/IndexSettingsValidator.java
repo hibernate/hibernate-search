@@ -82,7 +82,8 @@ public class IndexSettingsValidator implements Validator<IndexSettings> {
 		extraAttributeValidator.validateAllIgnoreUnexpected(
 				errorCollector, ValidationContextType.CUSTOM_INDEX_SETTINGS_ATTRIBUTE,
 				ElasticsearchValidationMessages.INSTANCE.customIndexSettingAttributeMissing(),
-				expectedAnalysis.getExtraAttributes(), actualAnalysis.getExtraAttributes()
+				expectedAnalysis.getExtraAttributes(),
+				actualAnalysis == null ? null : actualAnalysis.getExtraAttributes()
 		);
 	}
 }
