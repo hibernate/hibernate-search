@@ -49,7 +49,6 @@ public class LowLevelIndexMetadataBuilder {
 		indexMetadata.setAliases( buildAliases() );
 
 		indexMetadata.setSettings( buildSettings() );
-		indexMetadata.setCustomSettings( customIndexSettings );
 
 		indexMetadata.setMapping( mapping );
 		return indexMetadata;
@@ -84,6 +83,9 @@ public class LowLevelIndexMetadataBuilder {
 		if ( !analysisDefinitionRegistry.getCharFilterDefinitions().isEmpty() ) {
 			getAnalysis( settings ).setCharFilters( analysisDefinitionRegistry.getCharFilterDefinitions() );
 		}
+
+		// if customSettings are present, merge them with the ones created by Search
+		settings.merge( customIndexSettings );
 
 		return settings;
 	}
