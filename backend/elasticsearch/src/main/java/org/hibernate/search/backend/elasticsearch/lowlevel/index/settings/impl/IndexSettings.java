@@ -6,7 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.SerializeExtraProperties;
 
@@ -16,7 +20,6 @@ import com.google.gson.annotations.JsonAdapter;
 
 /**
  * Settings for an Elasticsearch index.
- *
  */
 @JsonAdapter(IndexSettingsJsonAdapterFactory.class)
 public class IndexSettings {
@@ -25,6 +28,14 @@ public class IndexSettings {
 
 	@SerializeExtraProperties
 	private Map<String, JsonElement> extraAttributes;
+
+	public IndexSettings() {
+	}
+
+	public IndexSettings(Analysis analysis, Map<String, JsonElement> extraAttributes) {
+		this.analysis = analysis;
+		this.extraAttributes = extraAttributes;
+	}
 
 	public Analysis getAnalysis() {
 		return analysis;
@@ -68,5 +79,41 @@ public class IndexSettings {
 		}
 
 		extraAttributes = overridingIndexSettings.extraAttributes;
+	}
+
+	/**
+	 * Remove all entries from {@link #extraAttributes} that are present
+	 * with the exact same values on {@code extraAttributesToRemove} parameter.
+	 *
+	 * @param extraAttributesToRemove Other index settings extra attributes
+	 */
+	public IndexSettings diff(Map<String, JsonElement> extraAttributesToRemove) {
+		if ( extraAttributes == null || extraAttributes.isEmpty() ) {
+			// nothing to do
+			return this;
+		}
+
+		Set<String> keysToRemove = new HashSet<>();
+		for ( Map.Entry<String, JsonElement> extraAttribute : extraAttributes.entrySet() ) {
+			String key = extraAttribute.getKey();
+			if ( !extraAttributesToRemove.containsKey( key ) ) {
+				continue;
+			}
+
+			if ( Objects.equals( extraAttributesToRemove.get( key ), extraAttribute.getValue() ) ) {
+				keysToRemove.add( key );
+			}
+		}
+
+		if ( keysToRemove.isEmpty() ) {
+			// nothing to do
+			return this;
+		}
+
+		Map<String, JsonElement> newExtraAttributes = new HashMap<>( extraAttributes );
+		for ( String key : keysToRemove ) {
+			newExtraAttributes.remove( key );
+		}
+		return new IndexSettings( analysis, newExtraAttributes );
 	}
 }
