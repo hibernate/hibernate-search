@@ -151,6 +151,10 @@ public final class FailureReportUtils {
 			return contextLiteral( "attribute '" + exactName + "'" );
 		}
 
+		public FailureReportPatternBuilder indexSettingsCustomAttributeContext(String exactName) {
+			return contextLiteral( "attribute '" + exactName + "'" );
+		}
+
 		public FailureReportPatternBuilder annotationContextAnyParameters(Class<? extends Annotation> annotationType) {
 			return contextPattern( "annotation '@\\Q" + annotationType.getName() + "\\E\\(.*'" );
 		}
