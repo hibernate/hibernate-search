@@ -1,0 +1,13 @@
+{
+  "analysis": {
+    "tokenizer": {
+      "DefaultAnalysisDefinitions_analyzer_ngram_tokenizer": {
+        "type": "ngram",
+        "min_gram": 7,
+        "max_gram": 8
+      }
+    }
+  },
+  "number_of_shards": "3",
+  "number_of_replicas": "3"
+}
