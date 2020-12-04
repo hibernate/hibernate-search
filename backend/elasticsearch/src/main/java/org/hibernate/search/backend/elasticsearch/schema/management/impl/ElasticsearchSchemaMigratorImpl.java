@@ -61,8 +61,10 @@ public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigra
 			settingsMigration = aliasMigration;
 		}
 		else {
-			settingsMigration = aliasMigration
-					.thenCompose( ignored -> doMigrateSettings( indexName, expectedIndexMetadata.getSettings() ) );
+			settingsMigration = aliasMigration.thenCompose(
+					ignored -> doMigrateSettings( indexName, expectedIndexMetadata.getSettings(),
+							actualIndexMetadata.getSettings()
+					) );
 		}
 
 		/*
@@ -92,10 +94,15 @@ public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigra
 		return schemaAccessor.updateAliases( indexName, aliases );
 	}
 
-	private CompletableFuture<?> doMigrateSettings(URLEncodedString indexName, IndexSettings settings) {
+	private CompletableFuture<?> doMigrateSettings(URLEncodedString indexName, IndexSettings expectedSettings,
+			IndexSettings actualSettings) {
+
+		// remove all already present settings extra attributes
+		IndexSettings indexSettings = expectedSettings.diff( actualSettings.getExtraAttributes() );
+
 		return schemaAccessor.closeIndex( indexName )
 				.thenCompose( ignored -> Futures.whenCompleteExecute(
-						schemaAccessor.updateSettings( indexName, settings ),
+						schemaAccessor.updateSettings( indexName, indexSettings ),
 						// Re-open the index after the settings have been successfully updated
 						// ... or if the settings update fails.
 						() -> schemaAccessor.openIndex( indexName )
