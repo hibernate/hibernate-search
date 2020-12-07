@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.index;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.util.common.impl.StringHelper;
+import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public enum IndexStatus {
@@ -22,7 +22,7 @@ public enum IndexStatus {
 
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
 	public static IndexStatus of(String value) {
-		return StringHelper.parseDiscreteValues(
+		return ParseUtils.parseDiscreteValues(
 				IndexStatus.values(),
 				IndexStatus::externalRepresentation,
 				log::invalidIndexStatus,

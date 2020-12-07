@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.lowlevel.directory;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.common.impl.StringHelper;
+import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public enum FileSystemAccessStrategyName {
@@ -27,7 +27,7 @@ public enum FileSystemAccessStrategyName {
 
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
 	public static FileSystemAccessStrategyName of(String value) {
-		return StringHelper.parseDiscreteValues(
+		return ParseUtils.parseDiscreteValues(
 				FileSystemAccessStrategyName.values(),
 				FileSystemAccessStrategyName::externalRepresentation,
 				log::invalidFileSystemAccessStrategyName,

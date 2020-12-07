@@ -9,9 +9,9 @@ package org.hibernate.search.mapper.orm.automaticindexing;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.hibernate.search.util.common.impl.StringHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -36,7 +36,7 @@ public enum AutomaticIndexingStrategyName {
 
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
 	public static AutomaticIndexingStrategyName of(String value) {
-		return StringHelper.parseDiscreteValues(
+		return ParseUtils.parseDiscreteValues(
 				AutomaticIndexingStrategyName.values(),
 				AutomaticIndexingStrategyName::getExternalRepresentation,
 				log::invalidAutomaticIndexingStrategyName,

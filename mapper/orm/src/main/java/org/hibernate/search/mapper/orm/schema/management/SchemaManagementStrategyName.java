@@ -8,8 +8,8 @@ package org.hibernate.search.mapper.orm.schema.management;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.util.common.impl.StringHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public enum SchemaManagementStrategyName {
@@ -119,7 +119,7 @@ public enum SchemaManagementStrategyName {
 
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
 	public static SchemaManagementStrategyName of(String value) {
-		return StringHelper.parseDiscreteValues(
+		return ParseUtils.parseDiscreteValues(
 				SchemaManagementStrategyName.values(),
 				SchemaManagementStrategyName::externalRepresentation,
 				log::invalidSchemaManagementStrategyName,

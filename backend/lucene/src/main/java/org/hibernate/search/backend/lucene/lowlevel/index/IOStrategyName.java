@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.lowlevel.index;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.common.impl.StringHelper;
+import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public enum IOStrategyName {
@@ -26,7 +26,7 @@ public enum IOStrategyName {
 
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
 	public static IOStrategyName of(String value) {
-		return StringHelper.parseDiscreteValues(
+		return ParseUtils.parseDiscreteValues(
 				IOStrategyName.values(),
 				IOStrategyName::externalRepresentation,
 				log::invalidIOStrategyName,

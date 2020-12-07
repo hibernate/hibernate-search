@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.index;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.util.common.impl.StringHelper;
+import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public enum DynamicMapping {
@@ -33,7 +33,7 @@ public enum DynamicMapping {
 
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
 	public static DynamicMapping of(String value) {
-		return StringHelper.parseDiscreteValues(
+		return ParseUtils.parseDiscreteValues(
 				DynamicMapping.values(),
 				DynamicMapping::externalRepresentation,
 				log::invalidDynamicType,
