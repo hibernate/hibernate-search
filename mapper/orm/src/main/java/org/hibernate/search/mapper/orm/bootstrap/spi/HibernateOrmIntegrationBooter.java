@@ -14,8 +14,12 @@ import org.hibernate.search.mapper.orm.bootstrap.impl.HibernateOrmIntegrationBoo
 
 public interface HibernateOrmIntegrationBooter {
 
-	static HibernateOrmIntegrationBooter create(Metadata metadata, BootstrapContext bootstrapContext) {
-		return new HibernateOrmIntegrationBooterImpl( metadata, bootstrapContext );
+	static HibernateOrmIntegrationBooter.Builder builder(Metadata metadata, BootstrapContext bootstrapContext) {
+		return new HibernateOrmIntegrationBooterImpl.BuilderImpl( metadata, bootstrapContext );
+	}
+
+	interface Builder {
+		HibernateOrmIntegrationBooter build();
 	}
 
 	void preBoot(BiConsumer<String, Object> propertyCollector);
