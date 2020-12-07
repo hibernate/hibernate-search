@@ -32,6 +32,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBooter;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
+import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBooterBehavior;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
@@ -205,13 +206,16 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 				INTEGRATION_PARTIAL_BUILD_STATE.get( rootPropertySource );
 
 		HibernateOrmIntegrationPartialBuildState partialBuildState;
-		if ( partialBuildStateOptional.isPresent() ) {
-			// The first phase of booting was already performed externally; just re-use the result
-			partialBuildState = partialBuildStateOptional.get();
-		}
-		else {
-			partialBuildState = doBootFirstPhase();
-		}
+		partialBuildState = partialBuildStateOptional
+				/*
+				 * Most common path (except for Quarkus): Hibernate Search wasn't pre-booted ahead of time,
+				 * so we need to perform the first phase of booting now.
+				 *
+				 * Do not remove the use of HibernateOrmIntegrationBooterBehavior as an intermediary:
+				 * its implementation is overridden by Quarkus to make it clear to SubstrateVM
+				 * that the first phase of boot is never executed in the native binary.
+				 */
+				.orElseGet( () -> HibernateOrmIntegrationBooterBehavior.bootFirstPhase( this::doBootFirstPhase ) );
 
 		try {
 			return doBootSecondPhase( partialBuildState, sessionFactoryImplementor );
@@ -223,11 +227,6 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		}
 	}
 
-	/*
-	 * Do not change this method's signature and do not stop using it:
-	 * it's overridden by Quarkus to make it clear to SubstrateVM
-	 * that the first phase of boot is never executed in the native binary.
-	 */
 	private HibernateOrmIntegrationPartialBuildState doBootFirstPhase() {
 		BeanProvider beanProvider = null;
 		SearchIntegrationPartialBuildState searchIntegrationPartialBuildState = null;
