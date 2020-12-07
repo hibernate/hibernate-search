@@ -76,30 +76,14 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 	private final Optional<EnvironmentSynchronizer> environmentSynchronizer;
 
-	public HibernateOrmIntegrationBooterImpl(Metadata metadata, BootstrapContext bootstrapContext) {
-		this(
-				metadata, bootstrapContext,
-				ConfigurationPropertyChecker.create()
-		);
-	}
-
-	private HibernateOrmIntegrationBooterImpl(Metadata metadata, BootstrapContext bootstrapContext,
-			ConfigurationPropertyChecker propertyChecker) {
-		this(
-				metadata, bootstrapContext,
-				getPropertySource( bootstrapContext.getServiceRegistry(), propertyChecker ),
-				propertyChecker
-		);
-	}
-
 	@SuppressWarnings("deprecation") // There is no alternative to getReflectionManager() at the moment.
-	HibernateOrmIntegrationBooterImpl(Metadata metadata, BootstrapContext bootstrapContext,
-			ConfigurationPropertySource checkerWrappedPropertySource, ConfigurationPropertyChecker propertyChecker) {
-		this.metadata = metadata;
-		this.serviceRegistry = (ServiceRegistryImplementor) bootstrapContext.getServiceRegistry();
-		this.reflectionManager = bootstrapContext.getReflectionManager();
-		this.rootPropertySource = checkerWrappedPropertySource;
-		this.propertyChecker = propertyChecker;
+	private HibernateOrmIntegrationBooterImpl(BuilderImpl builder) {
+		this.metadata = builder.metadata;
+		this.serviceRegistry = (ServiceRegistryImplementor) builder.bootstrapContext.getServiceRegistry();
+		this.reflectionManager = builder.bootstrapContext.getReflectionManager();
+		this.propertyChecker = builder.propertyChecker != null ? builder.propertyChecker : ConfigurationPropertyChecker.create();
+		this.rootPropertySource = builder.rootPropertySource != null ? builder.rootPropertySource
+				: getPropertySource( serviceRegistry, propertyChecker );
 		this.ormConfigurationService = serviceRegistry.getService( ConfigurationService.class );
 
 		Optional<EnvironmentSynchronizer> providedEnvironmentSynchronizer = getOrmServiceOrEmpty( EnvironmentSynchronizer.class );
@@ -356,6 +340,31 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 		void closeOnFailure() {
 			this.integrationBuildState.closeOnFailure();
+		}
+	}
+
+	public static class BuilderImpl implements Builder {
+		private final Metadata metadata;
+		private final BootstrapContext bootstrapContext;
+
+		private ConfigurationPropertySource rootPropertySource;
+		private ConfigurationPropertyChecker propertyChecker;
+
+		public BuilderImpl(Metadata metadata, BootstrapContext bootstrapContext) {
+			this.metadata = metadata;
+			this.bootstrapContext = bootstrapContext;
+		}
+
+		@Override
+		public HibernateOrmIntegrationBooterImpl build() {
+			return new HibernateOrmIntegrationBooterImpl( this );
+		}
+
+		public BuilderImpl configurationPropertySource(ConfigurationPropertySource rootPropertySource,
+				ConfigurationPropertyChecker propertyChecker) {
+			this.rootPropertySource = rootPropertySource;
+			this.propertyChecker = propertyChecker;
+			return this;
 		}
 	}
 }

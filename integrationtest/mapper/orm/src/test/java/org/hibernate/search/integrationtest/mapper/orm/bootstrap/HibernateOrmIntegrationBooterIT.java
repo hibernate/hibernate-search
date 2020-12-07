@@ -129,9 +129,7 @@ public class HibernateOrmIntegrationBooterIT {
 		BootstrapContext bootstrapContext =
 				metadataImplementor.getTypeConfiguration().getMetadataBuildingContext().getBootstrapContext();
 
-		return HibernateOrmIntegrationBooter.create(
-				metadata, bootstrapContext
-		);
+		return HibernateOrmIntegrationBooter.builder( metadata, bootstrapContext ).build();
 	}
 
 	@Entity
