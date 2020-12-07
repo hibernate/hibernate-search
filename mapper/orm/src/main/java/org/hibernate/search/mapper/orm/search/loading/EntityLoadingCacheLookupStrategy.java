@@ -8,8 +8,8 @@ package org.hibernate.search.mapper.orm.search.loading;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.util.common.impl.StringHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -49,7 +49,7 @@ public enum EntityLoadingCacheLookupStrategy {
 
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
 	public static EntityLoadingCacheLookupStrategy of(String value) {
-		return StringHelper.parseDiscreteValues(
+		return ParseUtils.parseDiscreteValues(
 				EntityLoadingCacheLookupStrategy.values(),
 				EntityLoadingCacheLookupStrategy::externalRepresentation,
 				log::invalidAutomaticIndexingSynchronizationStrategyName,

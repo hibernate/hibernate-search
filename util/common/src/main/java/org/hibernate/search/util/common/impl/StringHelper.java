@@ -8,11 +8,6 @@ package org.hibernate.search.util.common.impl;
 
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Inspired from {@code org.hibernate.util.StringHelper}, but removing
@@ -109,22 +104,4 @@ public final class StringHelper {
 		return sb.toString();
 	}
 
-	public static <T> T parseDiscreteValues(T[] allowedValues, Function<T, String> stringRepresentationFunction,
-			BiFunction<String, List<String>, RuntimeException> invalidValueFunction,
-			String value) {
-		final String normalizedValue = value.trim().toLowerCase( Locale.ROOT );
-
-		for ( T candidate : allowedValues ) {
-			if ( stringRepresentationFunction.apply( candidate ).equals( normalizedValue ) ) {
-				return candidate;
-			}
-		}
-
-		throw invalidValueFunction.apply(
-				normalizedValue,
-				Arrays.stream( allowedValues )
-						.map( stringRepresentationFunction )
-						.collect( Collectors.toList() )
-		);
-	}
 }

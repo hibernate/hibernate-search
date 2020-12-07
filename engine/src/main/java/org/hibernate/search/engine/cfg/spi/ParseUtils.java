@@ -29,6 +29,12 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.format.SignStyle;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -216,5 +222,24 @@ public final class ParseUtils {
 		catch (NumberFormatException e) {
 			throw log.unableToParseGeoPoint( value );
 		}
+	}
+
+	public static <T> T parseDiscreteValues(T[] allowedValues, Function<T, String> stringRepresentationFunction,
+			BiFunction<String, List<String>, RuntimeException> invalidValueFunction,
+			String value) {
+		final String normalizedValue = value.trim().toLowerCase( Locale.ROOT );
+
+		for ( T candidate : allowedValues ) {
+			if ( stringRepresentationFunction.apply( candidate ).equals( normalizedValue ) ) {
+				return candidate;
+			}
+		}
+
+		throw invalidValueFunction.apply(
+				normalizedValue,
+				Arrays.stream( allowedValues )
+						.map( stringRepresentationFunction )
+						.collect( Collectors.toList() )
+		);
 	}
 }

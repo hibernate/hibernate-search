@@ -8,8 +8,8 @@ package org.hibernate.search.engine.cfg;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.engine.cfg.spi.ParseUtils;
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.common.impl.StringHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public enum ConfigurationPropertyCheckingStrategyName {
@@ -28,7 +28,7 @@ public enum ConfigurationPropertyCheckingStrategyName {
 
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
 	public static ConfigurationPropertyCheckingStrategyName of(String value) {
-		return StringHelper.parseDiscreteValues(
+		return ParseUtils.parseDiscreteValues(
 				ConfigurationPropertyCheckingStrategyName.values(),
 				ConfigurationPropertyCheckingStrategyName::externalRepresentation,
 				log::invalidConfigurationPropertyCheckingStrategyName,
