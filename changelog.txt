@@ -1,6 +1,16 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Final (10-12-2020)
+-------------------------
+
+** Improvement
+    * HSEARCH-4120 Upgrade to Hibernate ORM 5.4.25.Final
+
+** Task
+    * HSEARCH-4118 Fix formatting in Elasticsearch layout strategy documentation
+    * HSEARCH-3527 Add proper SPIs for the Quarkus integration
+
 6.0.0.CR2 (23-11-2020)
 -------------------------
 
