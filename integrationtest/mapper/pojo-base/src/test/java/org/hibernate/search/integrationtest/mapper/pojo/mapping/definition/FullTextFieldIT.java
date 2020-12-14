@@ -28,6 +28,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -70,6 +72,28 @@ public class FullTextFieldIT {
 				.field( "value", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4123")
+	public void defaultAttributes_programmaticAPI() {
+		class IndexedEntity {
+			Integer id;
+			String value;
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "value", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
+		);
+		setupHelper.start().withConfiguration( b -> {
+			ProgrammaticMappingConfigurationContext mapping = b.programmaticMapping();
+
+			TypeMappingStep type = mapping.type( IndexedEntity.class );
+			type.indexed().index( INDEX_NAME );
+			type.property( "id" ).documentId();
+			type.property( "value" ).fullTextField();
+		} ).setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 

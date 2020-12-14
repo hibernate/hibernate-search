@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
+import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributorContext;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFullTextFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
@@ -21,6 +23,8 @@ class PropertyMappingFullTextFieldOptionsStepImpl
 		super( parent, relativeFieldName, FieldModelContributorContext::stringTypeOptionsStep );
 	}
 
+	private boolean contributeDefaultAnalyzer = true;
+
 	@Override
 	PropertyMappingFullTextFieldOptionsStep thisAsS() {
 		return this;
@@ -28,6 +32,7 @@ class PropertyMappingFullTextFieldOptionsStepImpl
 
 	@Override
 	public PropertyMappingFullTextFieldOptionsStep analyzer(String analyzerName) {
+		contributeDefaultAnalyzer = false;
 		fieldModelContributor.add( c -> c.stringTypeOptionsStep().analyzer( analyzerName ) );
 		return thisAsS();
 	}
@@ -50,4 +55,12 @@ class PropertyMappingFullTextFieldOptionsStepImpl
 		return thisAsS();
 	}
 
+	@Override
+	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
+		if ( contributeDefaultAnalyzer ) {
+			analyzer( AnalyzerNames.DEFAULT );
+		}
+
+		super.contributeMapping( collector );
+	}
 }
