@@ -27,8 +27,8 @@ class PropertyMappingFullTextFieldOptionsStepImpl
 	}
 
 	@Override
-	public PropertyMappingFullTextFieldOptionsStep analyzer(String normalizerName) {
-		fieldModelContributor.add( c -> c.stringTypeOptionsStep().analyzer( normalizerName ) );
+	public PropertyMappingFullTextFieldOptionsStep analyzer(String analyzerName) {
+		fieldModelContributor.add( c -> c.stringTypeOptionsStep().analyzer( analyzerName ) );
 		return thisAsS();
 	}
 
