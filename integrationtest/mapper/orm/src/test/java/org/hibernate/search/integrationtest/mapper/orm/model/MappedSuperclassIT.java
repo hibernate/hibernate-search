@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
@@ -39,7 +40,8 @@ public class MappedSuperclassIT {
 
 	@Before
 	public void setup() {
-		backendMock.expectSchema( INDEX_NAME, b -> b.field( "text", String.class ) );
+		backendMock.expectSchema(
+				INDEX_NAME, b -> b.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) ) );
 
 		sessionFactory = ormSetupHelper.start()
 				.withProperty( HibernateOrmMapperSettings.MAPPING_CONFIGURER, (HibernateOrmSearchMappingConfigurer) context -> {
