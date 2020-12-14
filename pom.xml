@@ -438,14 +438,16 @@
         <surefire.jvm.args.java-version>${surefire.jvm.args.java-version.strict}</surefire.jvm.args.java-version>
         <surefire.jvm.args.jacoco></surefire.jvm.args.jacoco>
         <failsafe.jvm.args.jacoco></failsafe.jvm.args.jacoco>
+        <!-- JVM args to be customized by each Maven module -->
+        <surefire.jvm.args.module></surefire.jvm.args.module>
         <!--
              Pass these properties as system properties to be able to switch to
              a different database without re-compiling the hibernate.properties file
              (which is located in a dependency of the integration tests modules)
          -->
         <failsafe.jvm.args.hibernate-orm></failsafe.jvm.args.hibernate-orm>
-        <surefire.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${surefire.jvm.args.jacoco}</surefire.jvm.args>
-        <failsafe.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${failsafe.jvm.args.jacoco} ${failsafe.jvm.args.hibernate-orm}</failsafe.jvm.args>
+        <surefire.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} ${surefire.jvm.args.jacoco}</surefire.jvm.args>
+        <failsafe.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${surefire.jvm.args.module} ${failsafe.jvm.args.jacoco} ${failsafe.jvm.args.hibernate-orm}</failsafe.jvm.args>
 
         <!-- Disable integration tests selectively. To be set in specific profile, e.g. for a specific JDK version. -->
         <failsafe.spring.skip>${skipITs}</failsafe.spring.skip>

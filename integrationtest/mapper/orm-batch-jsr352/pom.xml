@@ -12,11 +12,6 @@
     <name>Hibernate Search ITs - ORM - Batch JSR-352</name>
     <description>Hibernate Search integration tests for the Batch JSR-352 integration</description>
 
-    <properties>
-        <!-- Weld performs illegal accesses to java.base to generate proxies, so we can't use strict access validation -->
-        <surefire.jvm.args.java-version>${surefire.jvm.args.java-version.lenient}</surefire.jvm.args.java-version>
-    </properties>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -196,6 +191,25 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>testWithJdk11+</id>
+            <activation>
+                <property>
+                    <name>maven.compiler.testRelease</name>
+                    <value>!8</value>
+                </property>
+            </activation>
+            <properties>
+                <!-- Weld performs illegal accesses to java.base to generate proxies, so we need to allow them -->
+                <surefire.jvm.args.module>
+                    --add-opens java.base/java.security=ALL-UNNAMED
+                    --add-opens java.base/java.lang=ALL-UNNAMED
+                </surefire.jvm.args.module>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>
 
