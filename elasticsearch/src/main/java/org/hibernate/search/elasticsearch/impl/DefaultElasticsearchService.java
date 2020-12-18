@@ -93,6 +93,7 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 		try ( ServiceReference<ElasticsearchClientFactory> clientFactory =
 				serviceManager.requestReference( ElasticsearchClientFactory.class ) ) {
 			clientImplementor = clientFactory.get().create( properties );
+			this.client = clientImplementor;
 		}
 
 		try ( ServiceReference<ElasticsearchDialectFactory> dialectFactory =
@@ -101,7 +102,6 @@ public class DefaultElasticsearchService implements ElasticsearchService, Starta
 			this.gsonProvider = DefaultGsonProvider.create( dialect::createGsonBuilderBase, logPrettyPrinting );
 
 			clientImplementor.init( gsonProvider );
-			this.client = clientImplementor;
 
 			this.workFactory = dialect.createWorkFactory( gsonProvider );
 
