@@ -46,10 +46,10 @@ Hibernate Search 6 is still compatible with both JDK8 and JDK11.
 
 The required versions of dependencies changed:
 
-* The Hibernate ORM mapper now requires Hibernate ORM 5.4.4.Final or later
+* The Hibernate ORM mapper now requires Hibernate ORM {hibernateVersion}
 (5.4.3.Final and earlier won't work correctly).
-* The Elasticsearch backend now requires Elasticsearch 5.6, 6.8 or 7.9.
-* The Lucene backend now requires Lucene 8.6.
+* The Elasticsearch backend now requires Elasticsearch {elasticsearchCompatibleVersions}.
+* The Lucene backend now requires Lucene {luceneVersion}.
 
 [[maven-coordinates]]
 == Maven coordinates changes
