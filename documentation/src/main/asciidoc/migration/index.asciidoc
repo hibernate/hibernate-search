@@ -2156,6 +2156,7 @@ f.spatial().within()
                 DistanceUnit.KILOMETERS)
 
 |qb.moreLikeThis()
+|-
 |No equivalent in Hibernate Search 6.
 
 If you need more-like-this predicates,
