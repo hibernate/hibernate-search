@@ -1,6 +1,18 @@
 Hibernate Search Changelog
 ==========================
 
+5.11.8.Final (05-01-2021)
+-------------------------
+
+** Bug
+    * HSEARCH-4128 Hibernatesearch does not close client in case elasticsearch is unavailable
+
+** Improvement
+    * HSEARCH-4120 Upgrade to Hibernate ORM 5.4.25.Final
+
+** Task
+    * HSEARCH-4119 Fix example for custom bridge with sortable field in documentation
+
 5.11.7.Final (18-11-2020)
 -------------------------
 
