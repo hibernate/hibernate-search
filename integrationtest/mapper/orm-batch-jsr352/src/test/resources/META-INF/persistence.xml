@@ -39,7 +39,7 @@
             <property name="hibernate.search.automatic_indexing.strategy" value="none"/>
             <property name="hibernate.search.schema_management.strategy" value="drop-and-create-and-drop"/>
             <property name="hibernate.search.backend.type" value="elasticsearch" />
-            <property name="hibernate.search.backend.hosts" value="${test.elasticsearch.connection.hosts}" />
+            <property name="hibernate.search.backend.uris" value="${test.elasticsearch.connection.uris}" />
             <property name="hibernate.search.backend.username" value="${test.elasticsearch.connection.username}" />
             <property name="hibernate.search.backend.password" value="${test.elasticsearch.connection.password}" />
             <property name="hibernate.search.backend.aws.signing.enabled" value="${test.elasticsearch.connection.aws.signing.enabled}" />

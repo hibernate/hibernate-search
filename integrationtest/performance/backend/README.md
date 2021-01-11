@@ -27,7 +27,7 @@ You may set parameters:
 
 ```
 java -jar integrationtest/performance/backend/elasticsearch/benchmarks.jar \
-    -jvmArgsPrepend -Dhosts=es1.mycompany.com \
+    -jvmArgsPrepend -Duris=http://es1.mycompany.com \
     -jvmArgsPrepend -Dprotocol=https \
     -i 10 -p batchSize=50
 ```

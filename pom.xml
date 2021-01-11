@@ -473,8 +473,7 @@
              because we will be able to change the configuration without re-compiling the configuration file
              (which is located in a dependency of the integration tests modules).
          -->
-        <test.elasticsearch.connection.hosts></test.elasticsearch.connection.hosts>
-        <test.elasticsearch.connection.protocol></test.elasticsearch.connection.protocol>
+        <test.elasticsearch.connection.uris></test.elasticsearch.connection.uris>
         <test.elasticsearch.connection.username></test.elasticsearch.connection.username>
         <test.elasticsearch.connection.password></test.elasticsearch.connection.password>
         <test.elasticsearch.connection.aws.signing.enabled>false</test.elasticsearch.connection.aws.signing.enabled>

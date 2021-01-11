@@ -371,8 +371,8 @@ Some useful filters: 'default', 'jdk', 'jdk-10', 'eclipse', 'postgresql', 'elast
 	}
 
 	environments.content.esAws.enabled.removeAll { buildEnv ->
-		buildEnv.endpointUrl = env.getProperty(buildEnv.endpointVariableName)
-		if (!buildEnv.endpointUrl) {
+		buildEnv.endpointUris = env.getProperty(buildEnv.endpointVariableName)
+		if (!buildEnv.endpointUris) {
 			echo "Skipping test ${buildEnv.tag} because environment variable '${buildEnv.endpointVariableName}' is not defined."
 			return true
 		}
@@ -580,8 +580,8 @@ stage('Non-default environments') {
 
 	// Test Elasticsearch integration with multiple versions in an AWS instance
 	environments.content.esAws.enabled.each { EsAwsBuildEnvironment buildEnv ->
-		if (!buildEnv.endpointHostAndPort) {
-			throw new IllegalStateException("Unexpected empty endpoint host")
+		if (!buildEnv.endpointUris) {
+			throw new IllegalStateException("Unexpected empty endpoint URI")
 		}
 		if (!buildEnv.awsRegion) {
 			throw new IllegalStateException("Unexpected empty AWS region")
@@ -615,8 +615,7 @@ stage('Non-default environments') {
 										--fail-fast \
 										-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
 										${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
-										-Dtest.elasticsearch.connection.hosts=$buildEnv.endpointHostAndPort \
-										-Dtest.elasticsearch.connection.protocol=$buildEnv.endpointProtocol \
+										-Dtest.elasticsearch.connection.uris=$buildEnv.endpointUris \
 										-Dtest.elasticsearch.connection.aws.signing.enabled=true \
 										-Dtest.elasticsearch.connection.aws.region=$buildEnv.awsRegion \
 									"""
@@ -648,8 +647,7 @@ stage('Non-default environments') {
 										--fail-fast \
 										-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
 										${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
-										-Dtest.elasticsearch.connection.hosts=$buildEnv.endpointHostAndPort \
-										-Dtest.elasticsearch.connection.protocol=$buildEnv.endpointProtocol \
+										-Dtest.elasticsearch.connection.uris=$buildEnv.endpointUris \
 										-Dtest.elasticsearch.connection.aws.signing.enabled=true \
 										-Dtest.elasticsearch.connection.aws.region=$buildEnv.awsRegion \
 										-Dtest.elasticsearch.connection.aws.credentials.type=static \
@@ -801,9 +799,7 @@ class EsLocalBuildEnvironment extends BuildEnvironment {
 class EsAwsBuildEnvironment extends BuildEnvironment {
 	String version
 	String mavenProfile
-	String endpointUrl = null
-	String endpointHostAndPort = null
-	String endpointProtocol = null
+	String endpointUris = null
 	String awsRegion = null
 	boolean staticCredentials = false
 	@Override
@@ -820,18 +816,6 @@ class EsAwsBuildEnvironment extends BuildEnvironment {
 	}
 	String getLockedResourcesLabel() {
 		"es-aws-${nameEmbeddableVersion}"
-	}
-	String setEndpointUrl(String url) {
-		this.endpointUrl = url
-		if ( endpointUrl ) {
-			def matcher = endpointUrl =~ /^(?:(https?):\/\/)?(.*)$/
-			endpointProtocol = matcher[0][1]
-			endpointHostAndPort = matcher[0][2]
-		}
-		else {
-			endpointProtocol = null
-			endpointHostAndPort = null
-		}
 	}
 }
 

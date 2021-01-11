@@ -210,17 +210,16 @@ A list of available versions for `test.elasticsearch.connection.version` can be 
 
 Alternatively, you can prevent the build from launching an Elasticsearch server automatically
 and run Elasticsearch-related tests against your own server using the
-`test.elasticsearch.connection.hosts` properties:
+`test.elasticsearch.connection.uris` property:
 
 ```bash
-./mvnw clean install -Dtest.elasticsearch.connection.hosts=localhost:9200
+./mvnw clean install -Dtest.elasticsearch.connection.uris=http://localhost:9200
 ```
 
 If you want to use HTTPS:
 
 ```bash
-./mvnw clean install -Dtest.elasticsearch.connection.hosts=localhost:9200 \
-        -Dtest.elasticsearch.connection.protocol=https
+./mvnw clean install -Dtest.elasticsearch.connection.uris=https://localhost:9200
 ```
 
 If you want to run tests against a different Elasticsearch version  (6.x for instance),
@@ -228,13 +227,13 @@ you will still have to select a profile among those listed above, and specify th
 
 ```bash
 ./mvnw clean install -Pelasticsearch-6.0 -Dtest.elasticsearch.connection.version=6.0.0 \
-        -Dtest.elasticsearch.connection.hosts=localhost:9200
+        -Dtest.elasticsearch.connection.uris=http://localhost:9200
 ```
 
 You may also use authentication:
 
 ```bash
-./mvnw clean install -Dtest.elasticsearch.connection.hosts=localhost:9200 \
+./mvnw clean install -Dtest.elasticsearch.connection.uris=http://localhost:9200 \
         -Dtest.elasticsearch.connection.username=ironman \
         -Dtest.elasticsearch.connection.password=j@rV1s
 ```
@@ -244,7 +243,7 @@ against an Elasticsearch service on AWS.
 You will need to execute something along the lines of:
 
 ```bash
-./mvnw clean install -Dtest.elasticsearch.connection.hosts=<host:port> \
+./mvnw clean install -Dtest.elasticsearch.connection.uris=http://<host:port> \
         -Dtest.elasticsearch.connection.aws.signing.enabled=true \
         -Dtest.elasticsearch.connection.aws.region=<Your AWS region ID> \
         -Dtest.elasticsearch.connection.aws.credentials.type=static \
@@ -255,7 +254,7 @@ You will need to execute something along the lines of:
 Or more simply, if your AWS credentials are already stored in `~/.aws/credentials`:
 
 ```bash
-./mvnw clean install -Dtest.elasticsearch.connection.hosts=<host:port> \
+./mvnw clean install -Dtest.elasticsearch.connection.uris=http://<host:port> \
         -Dtest.elasticsearch.connection.aws.signing.enabled=true \
         -Dtest.elasticsearch.connection.aws.region=<Your AWS region ID>
 ```
