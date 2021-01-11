@@ -13,11 +13,11 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.Elas
 public class DocumentationElasticsearchBackendConfiguration extends ElasticsearchBackendConfiguration {
 
 	@Override
-	protected Map<String, Object> backendProperties() {
-		Map<String, Object> properties = super.backendProperties();
+	protected Map<String, String> rawBackendProperties() {
+		Map<String, String> properties = super.rawBackendProperties();
 		properties.put(
 				"analysis.configurer",
-				new ElasticsearchSimpleMappingAnalysisConfigurer()
+				"constructor:" + ElasticsearchSimpleMappingAnalysisConfigurer.class.getName()
 		);
 		return properties;
 	}

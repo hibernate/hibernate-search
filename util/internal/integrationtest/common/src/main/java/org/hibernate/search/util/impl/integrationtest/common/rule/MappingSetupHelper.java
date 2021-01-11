@@ -82,7 +82,7 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 
 		public abstract C withProperty(String keyRadical, Object value);
 
-		public final C withProperties(Map<String, Object> properties) {
+		public final C withProperties(Map<String, ?> properties) {
 			properties.forEach( this::withProperty );
 			return thisAsC();
 		}
@@ -104,7 +104,7 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 			}
 		}
 
-		public final C withBackendProperties(String backendName, Map<String, Object> relativeProperties) {
+		public final C withBackendProperties(String backendName, Map<String, ?> relativeProperties) {
 			relativeProperties.forEach( (k, v) -> withBackendProperty( backendName, k, v ) );
 			return thisAsC();
 		}

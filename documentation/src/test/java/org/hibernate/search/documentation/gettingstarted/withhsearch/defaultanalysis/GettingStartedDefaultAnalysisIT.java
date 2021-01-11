@@ -8,25 +8,25 @@ package org.hibernate.search.documentation.gettingstarted.withhsearch.defaultana
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.BACKEND_TYPE;
-import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.IS_IDE;
 import static org.junit.Assert.assertEquals;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import org.hibernate.search.documentation.testsupport.JpaConfiguration;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class GettingStartedDefaultAnalysisIT {
@@ -35,17 +35,13 @@ public class GettingStartedDefaultAnalysisIT {
 
 	private EntityManagerFactory entityManagerFactory;
 
+	@Rule
+	public TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
+
 	@Before
 	public void setup() {
-		if ( IS_IDE ) {
-			Map<String, String> properties = new HashMap<>();
-			// More than one backend type in the classpath, we have to set it explicitly.
-			properties.put( "hibernate.search.backend.type", BACKEND_TYPE );
-			entityManagerFactory = Persistence.createEntityManagerFactory( persistenceUnitName, properties );
-		}
-		else {
-			entityManagerFactory = Persistence.createEntityManagerFactory( persistenceUnitName );
-		}
+		entityManagerFactory = Persistence.createEntityManagerFactory( persistenceUnitName,
+				JpaConfiguration.properties( configurationProvider ) );
 	}
 
 	@After

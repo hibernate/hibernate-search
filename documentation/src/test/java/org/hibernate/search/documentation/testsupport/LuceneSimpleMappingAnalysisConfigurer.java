@@ -17,7 +17,7 @@ import org.apache.lucene.analysis.pattern.PatternReplaceCharFilterFactory;
 import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 
-class LuceneSimpleMappingAnalysisConfigurer implements LuceneAnalysisConfigurer {
+public class LuceneSimpleMappingAnalysisConfigurer implements LuceneAnalysisConfigurer {
 	@Override
 	public void configure(LuceneAnalysisConfigurationContext context) {
 		context.analyzer( "english" ).custom()
