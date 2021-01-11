@@ -36,9 +36,9 @@ public class ElasticsearchBootstrapFailureIT {
 		assertThatThrownBy(
 				() -> setupHelper.start()
 						.withBackendProperty(
-								ElasticsearchBackendSettings.HOSTS,
+								ElasticsearchBackendSettings.URIS,
 								// We just need a closed port, hopefully this one will generally be closed
-								"localhost:9199"
+								"http://localhost:9199"
 						)
 						.withIndex( StubMappedIndex.withoutFields() )
 						.setup(),

@@ -25,8 +25,7 @@ public class ElasticsearchTestHostConnectionConfiguration {
 		return instance;
 	}
 
-	private final String hosts;
-	private final String protocol;
+	private final String uris;
 	private final String username;
 	private final String password;
 	private final Boolean awsSigningEnabled;
@@ -36,8 +35,7 @@ public class ElasticsearchTestHostConnectionConfiguration {
 	private final String awsCredentialsSecretAccessKey;
 
 	private ElasticsearchTestHostConnectionConfiguration() {
-		this.hosts = System.getProperty( "test.elasticsearch.connection.hosts" );
-		this.protocol = System.getProperty( "test.elasticsearch.connection.protocol" );
+		this.uris = System.getProperty( "test.elasticsearch.connection.uris" );
 		this.username = System.getProperty( "test.elasticsearch.connection.username" );
 		this.password = System.getProperty( "test.elasticsearch.connection.password" );
 		String enabledAsString = System.getProperty( "test.elasticsearch.connection.aws.signing.enabled" );
@@ -48,8 +46,8 @@ public class ElasticsearchTestHostConnectionConfiguration {
 		this.awsCredentialsSecretAccessKey = System.getProperty( "test.elasticsearch.connection.aws.credentials.secret_access_key" );
 
 		log.infof(
-				"Integration tests will connect to '%s' using protocol '%s' (AWS signing enabled: '%s')",
-				hosts, protocol, awsSigningEnabled
+				"Integration tests will connect to '%s' (AWS signing enabled: '%s')",
+				uris, awsSigningEnabled
 		);
 	}
 
@@ -58,8 +56,7 @@ public class ElasticsearchTestHostConnectionConfiguration {
 	}
 
 	public void addToBackendProperties(Map<String, ? super String> properties) {
-		properties.put( "hosts", hosts );
-		properties.put( "protocol", protocol );
+		properties.put( "uris", uris );
 		properties.put( "username", username );
 		properties.put( "password", password );
 		properties.put( "aws.signing.enabled", awsSigningEnabled == null ? null : awsSigningEnabled.toString() );

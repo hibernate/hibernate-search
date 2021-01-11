@@ -52,8 +52,8 @@ stage('Configure') {
 			helper.generateNotificationProperty()
 	])
 
-	esAwsBuildEnv.endpointUrl = env.getProperty(esAwsBuildEnv.endpointVariableName)
-	if (!esAwsBuildEnv.endpointUrl) {
+	esAwsBuildEnv.endpointUris = env.getProperty(esAwsBuildEnv.endpointVariableName)
+	if (!esAwsBuildEnv.endpointUris) {
 		throw new IllegalStateException(
 				"Cannot run performance test because environment variable '$esAwsBuildEnv.endpointVariableName' is not defined."
 		)
@@ -101,8 +101,7 @@ lock(label: esAwsBuildEnv.lockedResourcesLabel) {
 					sh """ \
 							java \
 							-jar benchmarks.jar \
-							-jvmArgsAppend -Dhosts=$esAwsBuildEnv.endpointHostAndPort \
-							-jvmArgsAppend -Dprotocol=$esAwsBuildEnv.endpointProtocol \
+							-jvmArgsAppend -Duris=$esAwsBuildEnv.endpointUris \
 							-jvmArgsAppend -Daws.signing.enabled=true \
 							-jvmArgsAppend -Daws.region=$esAwsBuildEnv.awsRegion \
 							-jvmArgsAppend -Daws.credentials.type=static \
@@ -125,9 +124,7 @@ lock(label: esAwsBuildEnv.lockedResourcesLabel) {
 
 class EsAwsBuildEnvironment {
 	String version
-	String endpointUrl = null
-	String endpointHostAndPort = null
-	String endpointProtocol = null
+	String endpointUris = null
 	String awsRegion = null
 	String getNameEmbeddableVersion() {
 		version.replaceAll('\\.', '')
@@ -137,17 +134,5 @@ class EsAwsBuildEnvironment {
 	}
 	String getLockedResourcesLabel() {
 		"es-aws-${nameEmbeddableVersion}"
-	}
-	String setEndpointUrl(String url) {
-		this.endpointUrl = url
-		if ( endpointUrl ) {
-			def matcher = endpointUrl =~ /^(?:(https?):\/\/)?(.*)$/
-			endpointProtocol = matcher[0][1]
-			endpointHostAndPort = matcher[0][2]
-		}
-		else {
-			endpointProtocol = null
-			endpointHostAndPort = null
-		}
 	}
 }

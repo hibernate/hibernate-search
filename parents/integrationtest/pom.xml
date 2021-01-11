@@ -267,23 +267,22 @@
         <profile>
             <id>elasticsearch-run</id>
             <activation>
-                <!-- Activate by default, i.e. if test.elasticsearch.connection.hosts has not been defined explicitly -->
+                <!-- Activate by default, i.e. if test.elasticsearch.connection.uris has not been defined explicitly -->
                 <property>
-                    <name>!test.elasticsearch.connection.hosts</name>
+                    <name>!test.elasticsearch.connection.uris</name>
                 </property>
             </activation>
             <properties>
-                <test.elasticsearch.connection.hosts>localhost:9200</test.elasticsearch.connection.hosts>
-                <test.elasticsearch.connection.protocol>http</test.elasticsearch.connection.protocol>
+                <test.elasticsearch.connection.uris>http://localhost:9200</test.elasticsearch.connection.uris>
             </properties>
         </profile>
         <!-- Profile enabled when an Elasticsearch instance must NOT be run by Maven -->
         <profile>
             <id>elasticsearch-do-not-run</id>
             <activation>
-                <!-- Activate if test.elasticsearch.connection.hosts has been defined explicitly -->
+                <!-- Activate if test.elasticsearch.connection.uris has been defined explicitly -->
                 <property>
-                    <name>test.elasticsearch.connection.hosts</name>
+                    <name>test.elasticsearch.connection.uris</name>
                 </property>
             </activation>
             <properties>

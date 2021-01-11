@@ -3,8 +3,7 @@ spring.jpa:
     hibernate.search:
       backend:
         type: elasticsearch # Only necessary because we have both the Elasticsearch and Lucene backend in the classpath
-        hosts: ${ELASTICSEARCH_HOSTS} # From environment variable
-        protocol: ${ELASTICSEARCH_PROTOCOL} # From environment variable
+        uris: ${ELASTICSEARCH_URIS} # From environment variable
         username: ${ELASTICSEARCH_USERNAME} # From environment variable
         password: ${ELASTICSEARCH_PASSWORD} # From environment variable
         aws:

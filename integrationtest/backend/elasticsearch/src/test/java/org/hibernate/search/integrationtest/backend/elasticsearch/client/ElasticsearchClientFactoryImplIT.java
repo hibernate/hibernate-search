@@ -165,8 +165,6 @@ public class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendSettings.HOSTS, null );
-					properties.accept( ElasticsearchBackendSettings.PROTOCOL, null );
 					properties.accept( ElasticsearchBackendSettings.URIS, httpUrisFor( wireMockRule1 ) );
 				}
 		) ) {
@@ -228,8 +226,6 @@ public class ElasticsearchClientFactoryImplIT {
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.PATH_PREFIX, "bla/bla/bla" );
-					properties.accept( ElasticsearchBackendSettings.HOSTS, null );
-					properties.accept( ElasticsearchBackendSettings.PROTOCOL, null );
 					properties.accept( ElasticsearchBackendSettings.URIS, httpUrisFor( wireMockRule1 ) );
 				}
 		) ) {
@@ -291,8 +287,6 @@ public class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendSettings.HOSTS, null );
-					properties.accept( ElasticsearchBackendSettings.PROTOCOL, null );
 					properties.accept( ElasticsearchBackendSettings.URIS, httpsUrisFor( wireMockRule1 ) );
 				}
 		) ) {
@@ -527,8 +521,6 @@ public class ElasticsearchClientFactoryImplIT {
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
-					properties.accept( ElasticsearchBackendSettings.HOSTS, null );
-					properties.accept( ElasticsearchBackendSettings.PROTOCOL, null );
 					properties.accept( ElasticsearchBackendSettings.URIS, httpsUrisFor( wireMockRule1, wireMockRule2 ) );
 				}
 		) ) {
@@ -861,8 +853,8 @@ public class ElasticsearchClientFactoryImplIT {
 	@Test
 	public void uriAndProtocol() {
 		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
-			properties.accept( ElasticsearchBackendSettings.HOSTS, null ); // remove HOSTS, keeping PROTOCOL
 			properties.accept( ElasticsearchBackendSettings.URIS, "http://is-not-called:12345" );
+			properties.accept( ElasticsearchBackendSettings.PROTOCOL, "http" );
 		};
 
 		assertThatThrownBy( () -> createClient( additionalProperties ) )
@@ -879,8 +871,8 @@ public class ElasticsearchClientFactoryImplIT {
 	@Test
 	public void uriAndHosts() {
 		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
-			properties.accept( ElasticsearchBackendSettings.PROTOCOL, null ); // remove PROTOCOL, keeping HOSTS
 			properties.accept( ElasticsearchBackendSettings.URIS, "http://is-not-called:12345" );
+			properties.accept( ElasticsearchBackendSettings.HOSTS, "not-called-either:234" );
 		};
 
 		assertThatThrownBy( () -> createClient( additionalProperties ) )
@@ -897,8 +889,6 @@ public class ElasticsearchClientFactoryImplIT {
 	@Test
 	public void differentProtocolsOnUris() {
 		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
-			properties.accept( ElasticsearchBackendSettings.HOSTS, null );
-			properties.accept( ElasticsearchBackendSettings.PROTOCOL, null );
 			properties.accept( ElasticsearchBackendSettings.URIS, "http://is-not-called:12345, https://neather-is:12345" );
 		};
 
@@ -914,8 +904,6 @@ public class ElasticsearchClientFactoryImplIT {
 	@Test
 	public void emptyListOfUris() {
 		Consumer<BiConsumer<String, Object>> additionalProperties = properties -> {
-			properties.accept( ElasticsearchBackendSettings.HOSTS, null );
-			properties.accept( ElasticsearchBackendSettings.PROTOCOL, null );
 			properties.accept( ElasticsearchBackendSettings.URIS, Collections.emptyList() );
 		};
 
@@ -949,11 +937,21 @@ public class ElasticsearchClientFactoryImplIT {
 						.createBackendConfigurationProperties( testConfigurationProvider );
 
 		Map<String, Object> clientProperties = new HashMap<>( defaultBackendProperties );
-		// Redirect requests to Wiremock (rule 1 only by default)
-		clientProperties.put( ElasticsearchBackendSettings.HOSTS, httpHostAndPortFor( wireMockRule1 ) );
-		clientProperties.put( ElasticsearchBackendSettings.PROTOCOL, "http" );
+
+		// We won't target the provided ES instance, but Wiremock
+		clientProperties.remove( ElasticsearchBackendSettings.HOSTS );
+		clientProperties.remove( ElasticsearchBackendSettings.PROTOCOL );
+		clientProperties.remove( ElasticsearchBackendSettings.URIS );
+
 		// Per-test overrides
 		additionalProperties.accept( clientProperties::put );
+
+		// By default, target the Wiremock server 1 using HTTP
+		if ( !clientProperties.containsKey( ElasticsearchBackendSettings.HOSTS )
+				&& !clientProperties.containsKey( ElasticsearchBackendSettings.URIS ) ) {
+			clientProperties.put( ElasticsearchBackendSettings.URIS, httpUrisFor( wireMockRule1 ) );
+		}
+
 		ConfigurationPropertySource clientPropertySource = ConfigurationPropertySource.fromMap( clientProperties );
 
 		Map<String, Object> beanResolverConfiguration = new HashMap<>();

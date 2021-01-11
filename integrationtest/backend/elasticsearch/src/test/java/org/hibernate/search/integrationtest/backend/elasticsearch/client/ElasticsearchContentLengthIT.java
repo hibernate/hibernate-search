@@ -194,11 +194,16 @@ public class ElasticsearchContentLengthIT {
 				new ElasticsearchTckBackendHelper().createDefaultBackendSetupStrategy()
 						.createBackendConfigurationProperties( testConfigurationProvider );
 
-		// Redirect requests to Wiremock
 		Map<String, Object> clientProperties = new HashMap<>( defaultBackendProperties );
-		// Redirect requests to Wiremock (rule 1 only by default)
-		clientProperties.put( ElasticsearchBackendSettings.HOSTS, hostAndPortFor( wireMockRule ) );
-		clientProperties.put( ElasticsearchBackendSettings.PROTOCOL, "http" );
+
+		// We won't target the provided ES instance, but Wiremock
+		clientProperties.remove( ElasticsearchBackendSettings.HOSTS );
+		clientProperties.remove( ElasticsearchBackendSettings.PROTOCOL );
+		clientProperties.remove( ElasticsearchBackendSettings.URIS );
+
+		// Target the Wiremock server using HTTP
+		clientProperties.put( ElasticsearchBackendSettings.URIS, httpUriFor( wireMockRule ) );
+
 		ConfigurationPropertySource clientPropertySource = ConfigurationPropertySource.fromMap( clientProperties );
 
 		BeanResolver beanResolver = testConfigurationProvider.createBeanResolverForTest();
@@ -228,8 +233,8 @@ public class ElasticsearchContentLengthIT {
 		return builder.build();
 	}
 
-	private static String hostAndPortFor(WireMockRule rule) {
-		return "localhost:" + rule.port();
+	private static String httpUriFor(WireMockRule rule) {
+		return "http://localhost:" + rule.port();
 	}
 
 	private static UrlPathPattern urlPathLike(String path) {

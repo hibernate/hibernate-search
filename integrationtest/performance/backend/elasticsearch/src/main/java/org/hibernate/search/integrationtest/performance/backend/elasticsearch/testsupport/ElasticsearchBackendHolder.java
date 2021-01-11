@@ -39,7 +39,7 @@ public class ElasticsearchBackendHolder extends AbstractBackendHolder {
 		Map<String, Object> map = new LinkedHashMap<>();
 
 		// Custom connection info is provided by setting system properties,
-		// e.g. "hosts" or "aws.signing.enabled".
+		// e.g. "uris" or "aws.signing.enabled".
 		map.put( ElasticsearchIndexSettings.ANALYSIS_CONFIGURER, ElasticsearchPerformanceAnalysisConfigurer.class );
 
 		map.put( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS, IndexStatus.YELLOW );

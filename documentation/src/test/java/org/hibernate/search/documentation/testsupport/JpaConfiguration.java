@@ -30,6 +30,11 @@ public final class JpaConfiguration {
 		}
 		properties.put( "hibernate.search.schema_management.strategy", "drop-and-create-and-drop" );
 		properties.put( "hibernate.search.automatic_indexing.synchronization.strategy", "sync" );
+
+		// Hack: override example properties from persistence.xml
+		properties.put( "hibernate.search.backend.hosts", "" );
+		properties.put( "hibernate.search.backend.protocol", "" );
+
 		return properties;
 	}
 
