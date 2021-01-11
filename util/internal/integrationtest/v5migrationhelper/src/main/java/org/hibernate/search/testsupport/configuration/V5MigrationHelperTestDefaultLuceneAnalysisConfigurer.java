@@ -21,7 +21,7 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.apache.lucene.search.similarities.ClassicSimilarity;
 
-class V5MigrationHelperTestDefaultLuceneAnalysisConfigurer implements LuceneAnalysisConfigurer {
+public class V5MigrationHelperTestDefaultLuceneAnalysisConfigurer implements LuceneAnalysisConfigurer {
 	@Override
 	public void configure(LuceneAnalysisConfigurationContext context) {
 		context.similarity( new ClassicSimilarity() );

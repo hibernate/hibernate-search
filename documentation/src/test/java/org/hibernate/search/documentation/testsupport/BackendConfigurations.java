@@ -9,6 +9,8 @@ package org.hibernate.search.documentation.testsupport;
 import static org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration.BACKEND_TYPE;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchBackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneBackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
@@ -16,6 +18,18 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHe
 public final class BackendConfigurations {
 
 	private BackendConfigurations() {
+	}
+
+	// Plain configuration, without analysis configurers
+	public static BackendConfiguration plain() {
+		switch ( BACKEND_TYPE ) {
+			case "lucene":
+				return new LuceneBackendConfiguration();
+			case "elasticsearch":
+				return new ElasticsearchBackendConfiguration();
+			default:
+				throw new IllegalStateException( "Unknown backend type: " + BACKEND_TYPE );
+		}
 	}
 
 	public static BackendConfiguration simple() {

@@ -85,14 +85,15 @@ public final class TestConfigurationProvider implements TestRule {
 		return interpolateProperties( propertiesAsMap );
 	}
 
-	public Map<String, Object> interpolateProperties(Map<String, Object> properties) {
-		Map<String, Object> interpolatedProperties = new LinkedHashMap<>();
+	@SuppressWarnings("unchecked")
+	public <V> Map<String, V> interpolateProperties(Map<String, V> properties) {
+		Map<String, V> interpolatedProperties = new LinkedHashMap<>();
 
 		properties.forEach( (k, v) -> {
 			if ( v instanceof String ) {
 				interpolatedProperties.put(
 						k,
-						( (String) v ).replace( "#{test.id}", testId )
+						(V) ( (String) v ).replace( "#{test.id}", testId )
 								.replace( "#{test.startup.timestamp}", STARTUP_TIMESTAMP ) );
 			}
 			else {

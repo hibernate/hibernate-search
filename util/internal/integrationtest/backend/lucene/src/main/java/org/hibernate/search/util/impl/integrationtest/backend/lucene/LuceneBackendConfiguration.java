@@ -18,8 +18,8 @@ public class LuceneBackendConfiguration extends BackendConfiguration {
 	}
 
 	@Override
-	protected Map<String, Object> backendProperties() {
-		Map<String, Object> properties = new LinkedHashMap<>();
+	protected Map<String, String> rawBackendProperties() {
+		Map<String, String> properties = new LinkedHashMap<>();
 		properties.put(
 				"directory.root",
 				LuceneTestIndexesPathConfiguration.get().getPath()

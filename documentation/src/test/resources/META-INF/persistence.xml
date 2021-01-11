@@ -25,17 +25,6 @@
             <property name="hibernate.search.backend.directory.root"
                       value="some/filesystem/path"/> <!--1-->
             <!-- end::gettingstarted-configuration-orm_lucene[] -->
-
-            <!--
-                Not to be included in the documentation:
-                this configuration is only relevant in our own testing infrastructure.
-                WARNING: if you update the property name below,
-                take care to also update the name of the commented property just above.
-             -->
-            <property name="hibernate.search.schema_management.strategy"
-                      value="drop-and-create-and-drop"/>
-            <property name="hibernate.search.backend.directory.root"
-                      value="${project.build.directory}/test-indexes/gettingstarted/defaultanalysis/"/>
         </properties>
     </persistence-unit>
 
@@ -54,35 +43,6 @@
             <property name="hibernate.search.backend.password"
                       value="j@rV1s"/>
             <!-- end::gettingstarted-configuration-orm_elasticsearch[] -->
-
-            <!--
-                Not to be included in the documentation:
-                this configuration is only relevant in our own testing infrastructure.
-                WARNING: if you update the property names below,
-                take care to also update the name of the commented properties just above.
-             -->
-            <property name="hibernate.search.schema_management.strategy"
-                      value="drop-and-create-and-drop"/>
-            <property name="hibernate.search.backend.hosts"
-                      value="${test.elasticsearch.connection.hosts}"/>
-            <property name="hibernate.search.backend.protocol"
-                      value="${test.elasticsearch.connection.protocol}"/>
-            <property name="hibernate.search.backend.username"
-                      value="${test.elasticsearch.connection.username}"/>
-            <property name="hibernate.search.backend.password"
-                      value="${test.elasticsearch.connection.password}"/>
-            <property name="hibernate.search.backend.aws.signing.enabled"
-                      value="${test.elasticsearch.connection.aws.signing.enabled}"/>
-            <property name="hibernate.search.backend.aws.region"
-                      value="${test.elasticsearch.connection.aws.region}"/>
-            <property name="hibernate.search.backend.aws.credentials.type"
-                      value="${test.elasticsearch.connection.aws.credentials.type}"/>
-            <property name="hibernate.search.backend.aws.credentials.access_key_id"
-                      value="${test.elasticsearch.connection.aws.credentials.access_key_id}"/>
-            <property name="hibernate.search.backend.aws.credentials.secret_access_key"
-                      value="${test.elasticsearch.connection.aws.credentials.secret_access_key}"/>
-            <property name="hibernate.search.automatic_indexing.synchronization.strategy"
-                      value="sync"/>
         </properties>
     </persistence-unit>
 
@@ -95,17 +55,6 @@
             <property name="hibernate.search.backend.analysis.configurer"
                       value="class:org.hibernate.search.documentation.gettingstarted.withhsearch.customanalysis.MyLuceneAnalysisConfigurer"/> <!--6-->
             <!-- end::gettingstarted-configuration-orm_lucene-analysis[] -->
-
-            <!--
-                Not to be included in the documentation:
-                this configuration is only relevant in our own testing infrastructure.
-                WARNING: if you update the property name below,
-                take care to also update the name of the commented property just above.
-             -->
-            <property name="hibernate.search.schema_management.strategy"
-                      value="drop-and-create-and-drop"/>
-            <property name="hibernate.search.backend.directory.root"
-                      value="${project.build.directory}/test-indexes/gettingstarted/customanalysis/"/>
         </properties>
     </persistence-unit>
 
@@ -118,36 +67,6 @@
             <property name="hibernate.search.backend.analysis.configurer"
                       value="class:org.hibernate.search.documentation.gettingstarted.withhsearch.customanalysis.MyElasticsearchAnalysisConfigurer"/> <!--7-->
             <!-- end::gettingstarted-configuration-orm_elasticsearch-analysis[] -->
-
-            <!--
-                Not to be included in the documentation:
-                this configuration is only relevant in our own testing in
-                frastructure.
-                WARNING: if you update the property names below,
-                take care to also update the name of the commented properties just above.
-             -->
-            <property name="hibernate.search.schema_management.strategy"
-                      value="drop-and-create-and-drop"/>
-            <property name="hibernate.search.backend.hosts"
-                      value="${test.elasticsearch.connection.hosts}"/>
-            <property name="hibernate.search.backend.protocol"
-                      value="${test.elasticsearch.connection.protocol}"/>
-            <property name="hibernate.search.backend.username"
-                      value="${test.elasticsearch.connection.username}"/>
-            <property name="hibernate.search.backend.password"
-                      value="${test.elasticsearch.connection.password}"/>
-            <property name="hibernate.search.backend.aws.signing.enabled"
-                      value="${test.elasticsearch.connection.aws.signing.enabled}"/>
-            <property name="hibernate.search.backend.aws.region"
-                      value="${test.elasticsearch.connection.aws.region}"/>
-            <property name="hibernate.search.backend.aws.credentials.type"
-                      value="${test.elasticsearch.connection.aws.credentials.type}"/>
-            <property name="hibernate.search.backend.aws.credentials.access_key_id"
-                      value="${test.elasticsearch.connection.aws.credentials.access_key_id}"/>
-            <property name="hibernate.search.backend.aws.credentials.secret_access_key"
-                      value="${test.elasticsearch.connection.aws.credentials.secret_access_key}"/>
-            <property name="hibernate.search.automatic_indexing.synchronization.strategy"
-                      value="sync"/>
         </properties>
     </persistence-unit>
 </persistence>

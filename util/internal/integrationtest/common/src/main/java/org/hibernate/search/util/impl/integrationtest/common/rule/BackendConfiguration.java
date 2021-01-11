@@ -62,18 +62,20 @@ public abstract class BackendConfiguration {
 	public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setup(C setupContext,
 			String backendNameOrNull, TestConfigurationProvider configurationProvider) {
 		setupContext = setupContext
-				.withBackendProperties(
-						backendNameOrNull,
-						configurationProvider.interpolateProperties( backendProperties() )
-				);
-		if ( IS_IDE ) {
-			// More than one backend type in the classpath, we have to set it explicitly.
-			setupContext = setupContext.withBackendProperty( backendNameOrNull,
-					BackendSettings.TYPE, BACKEND_TYPE );
-		}
+				.withBackendProperties( backendNameOrNull, backendProperties( configurationProvider ) );
+
 		return setupContext;
 	}
 
-	protected abstract Map<String, Object> backendProperties();
+	public final Map<String, String> backendProperties(TestConfigurationProvider configurationProvider) {
+		Map<String, String> rawBackendProperties = rawBackendProperties();
+		if ( IS_IDE ) {
+			// More than one backend type in the classpath, we have to set it explicitly.
+			rawBackendProperties.put( BackendSettings.TYPE, BACKEND_TYPE );
+		}
+		return configurationProvider.interpolateProperties( rawBackendProperties );
+	}
+
+	protected abstract Map<String, String> rawBackendProperties();
 
 }

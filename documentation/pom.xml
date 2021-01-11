@@ -109,7 +109,7 @@
     <build>
         <testResources>
             <testResource>
-                <filtering>true</filtering>
+                <filtering>false</filtering>
                 <directory>src/test/resources</directory>
             </testResource>
         </testResources>

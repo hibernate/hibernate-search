@@ -12,11 +12,11 @@ import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneBacke
 
 public class V5MigrationHelperTestLuceneBackendConfiguration extends LuceneBackendConfiguration {
 	@Override
-	protected Map<String, Object> backendProperties() {
-		Map<String, Object> properties = super.backendProperties();
+	protected Map<String, String> rawBackendProperties() {
+		Map<String, String> properties = super.rawBackendProperties();
 		properties.put(
 				"analysis.configurer",
-				new V5MigrationHelperTestDefaultLuceneAnalysisConfigurer()
+				"constructor:" + V5MigrationHelperTestDefaultLuceneAnalysisConfigurer.class.getName()
 		);
 		return properties;
 	}
