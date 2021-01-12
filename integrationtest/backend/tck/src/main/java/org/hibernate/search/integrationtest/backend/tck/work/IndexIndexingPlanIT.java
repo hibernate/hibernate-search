@@ -51,12 +51,12 @@ public class IndexIndexingPlanIT {
 		return new Object[][] {
 				{
 						"No multi-tenancy",
-						(Function<TckBackendHelper, TckBackendSetupStrategy>) TckBackendHelper::createDefaultBackendSetupStrategy,
+						(Function<TckBackendHelper, TckBackendSetupStrategy<?>>) TckBackendHelper::createDefaultBackendSetupStrategy,
 						new StubBackendSessionContext()
 				},
 				{
 						"Multi-tenancy enabled explicitly",
-						(Function<TckBackendHelper, TckBackendSetupStrategy>) TckBackendHelper::createMultiTenancyBackendSetupStrategy,
+						(Function<TckBackendHelper, TckBackendSetupStrategy<?>>) TckBackendHelper::createMultiTenancyBackendSetupStrategy,
 						new StubBackendSessionContext( "tenant_1" )
 				}
 		};
@@ -69,7 +69,7 @@ public class IndexIndexingPlanIT {
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
-	public IndexIndexingPlanIT(String label, Function<TckBackendHelper, TckBackendSetupStrategy> setupStrategyFunction,
+	public IndexIndexingPlanIT(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
 			StubBackendSessionContext sessionContext) {
 		this.setupHelper = new SearchSetupHelper( setupStrategyFunction );
 		this.sessionContext = sessionContext;

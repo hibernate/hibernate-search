@@ -76,6 +76,6 @@ public abstract class BackendConfiguration {
 		return configurationProvider.interpolateProperties( rawBackendProperties );
 	}
 
-	protected abstract Map<String, String> rawBackendProperties();
+	public abstract Map<String, String> rawBackendProperties();
 
 }

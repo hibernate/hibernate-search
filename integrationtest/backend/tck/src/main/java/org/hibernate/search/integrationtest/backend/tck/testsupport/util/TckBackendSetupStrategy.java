@@ -6,22 +6,58 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 
 import org.junit.rules.TestRule;
 
-public interface TckBackendSetupStrategy {
+public abstract class TckBackendSetupStrategy<C extends BackendConfiguration> {
 
-	Optional<TestRule> getTestRule();
+	protected final C backendConfiguration;
+	protected final Map<String, Object> properties = new LinkedHashMap<>();
+	private boolean expectCustomBeans = false;
+	private boolean useConfigurationTestRule = false;
 
-	TckBackendAccessor createBackendAccessor(TestConfigurationProvider configurationProvider);
+	public TckBackendSetupStrategy(C backendConfiguration) {
+		this.backendConfiguration = backendConfiguration;
+		properties.putAll( backendConfiguration.rawBackendProperties() );
+	}
 
-	Map<String, ?> createBackendConfigurationProperties(TestConfigurationProvider configurationProvider);
+	public final Optional<TestRule> testRule() {
+		return useConfigurationTestRule ? backendConfiguration.testRule() : Optional.empty();
+	}
 
-	SearchSetupHelper.SetupContext startSetup(SearchSetupHelper.SetupContext setupHelper);
+	public Map<String, ?> createBackendConfigurationProperties(TestConfigurationProvider configurationProvider) {
+		return configurationProvider.interpolateProperties( properties );
+	}
+
+	public SearchSetupHelper.SetupContext startSetup(SearchSetupHelper.SetupContext setupContext) {
+		if ( expectCustomBeans ) {
+			setupContext = setupContext.expectCustomBeans();
+		}
+		return setupContext;
+	}
+
+	public abstract TckBackendAccessor createBackendAccessor(TestConfigurationProvider configurationProvider);
+
+	public TckBackendSetupStrategy<C> setProperty(String key, Object value) {
+		properties.put( key, value );
+		return this;
+	}
+
+	public TckBackendSetupStrategy<C> expectCustomBeans() {
+		expectCustomBeans = true;
+		return this;
+	}
+
+	protected TckBackendSetupStrategy<C> useConfigurationTestRule() {
+		useConfigurationTestRule = true;
+		return this;
+	}
 
 }

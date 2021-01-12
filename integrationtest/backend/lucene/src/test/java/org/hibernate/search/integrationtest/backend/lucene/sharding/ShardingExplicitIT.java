@@ -11,6 +11,7 @@ import java.util.Set;
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneTckBackendSetupStrategy;
 import org.hibernate.search.integrationtest.backend.tck.sharding.AbstractShardingRoutingKeyIT;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 /**
@@ -18,7 +19,7 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
  */
 public class ShardingExplicitIT extends AbstractShardingRoutingKeyIT {
 
-	protected static LuceneTckBackendSetupStrategy explicitShardingBackendSetupStrategy(Set<String> shardIds) {
+	protected static TckBackendSetupStrategy<?> explicitShardingBackendSetupStrategy(Set<String> shardIds) {
 		return new LuceneTckBackendSetupStrategy()
 				.setProperty( LuceneIndexSettings.SHARDING_STRATEGY, "explicit" )
 				.setProperty( LuceneIndexSettings.SHARDING_SHARD_IDENTIFIERS, String.join( ",", shardIds ) );

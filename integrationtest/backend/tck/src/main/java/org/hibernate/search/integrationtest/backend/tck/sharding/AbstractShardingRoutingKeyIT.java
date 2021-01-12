@@ -43,7 +43,7 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 
 	private final Map<String, List<String>> docIdByRoutingKey = new HashMap<>();
 
-	public AbstractShardingRoutingKeyIT(Function<TckBackendHelper, TckBackendSetupStrategy> setupStrategyFunction,
+	public AbstractShardingRoutingKeyIT(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
 			Set<String> routingKeys) {
 		super( RoutingMode.EXPLICIT_ROUTING_KEYS );
 		this.setupHelper = new SearchSetupHelper( setupStrategyFunction );

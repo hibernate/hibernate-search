@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util;
 
-import java.util.Optional;
-
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.AnalysisBuiltinOverrideITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.AnalysisCustomITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
@@ -15,9 +13,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBack
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
-
-import org.junit.rules.TestRule;
 
 public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 
@@ -29,38 +24,38 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 	}
 
 	@Override
-	public TckBackendSetupStrategy createDefaultBackendSetupStrategy() {
+	public TckBackendSetupStrategy<?> createDefaultBackendSetupStrategy() {
 		return new ElasticsearchTckBackendSetupStrategy();
 	}
 
 	@Override
-	public TckBackendSetupStrategy createMultiTenancyBackendSetupStrategy() {
+	public TckBackendSetupStrategy<?> createMultiTenancyBackendSetupStrategy() {
 		return new ElasticsearchTckBackendSetupStrategy()
 				.setProperty( "multi_tenancy.strategy", "discriminator" );
 	}
 
 	@Override
-	public TckBackendSetupStrategy createAnalysisNotConfiguredBackendSetupStrategy() {
+	public TckBackendSetupStrategy<?> createAnalysisNotConfiguredBackendSetupStrategy() {
 		return new ElasticsearchTckBackendSetupStrategy()
 				.setProperty( "analysis.configurer", null );
 	}
 
 	@Override
-	public TckBackendSetupStrategy createAnalysisBuiltinOverridesBackendSetupStrategy() {
+	public TckBackendSetupStrategy<?> createAnalysisBuiltinOverridesBackendSetupStrategy() {
 		return new ElasticsearchTckBackendSetupStrategy()
 				.expectCustomBeans()
 				.setProperty( "analysis.configurer", AnalysisBuiltinOverrideITAnalysisConfigurer.class.getName() );
 	}
 
 	@Override
-	public TckBackendSetupStrategy createAnalysisCustomBackendSetupStrategy() {
+	public TckBackendSetupStrategy<?> createAnalysisCustomBackendSetupStrategy() {
 		return new ElasticsearchTckBackendSetupStrategy()
 				.expectCustomBeans()
 				.setProperty( "analysis.configurer", AnalysisCustomITAnalysisConfigurer.class.getName() );
 	}
 
 	@Override
-	public TckBackendSetupStrategy createNoShardingBackendSetupStrategy() {
+	public TckBackendSetupStrategy<?> createNoShardingBackendSetupStrategy() {
 		/*
 		 * Just configure Elasticsearch to only have one shard.
 		 * This is the default when we launch ES as part of the Maven build,
@@ -70,19 +65,16 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 	}
 
 	@Override
-	public TckBackendSetupStrategy createHashBasedShardingBackendSetupStrategy(int shardCount) {
+	public TckBackendSetupStrategy<?> createHashBasedShardingBackendSetupStrategy(int shardCount) {
 		return new ElasticsearchTckBackendSetupStrategy() {
-			private final TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
-
-			@Override
-			public Optional<TestRule> getTestRule() {
-				return Optional.of( elasticsearchClient );
+			{
+				useConfigurationTestRule();
 			}
 
 			@Override
 			public SearchSetupHelper.SetupContext startSetup(SearchSetupHelper.SetupContext setupHelper) {
 				// Make sure automatically created indexes will have an appropriate number of shards
-				elasticsearchClient.template( "sharded_index" )
+				backendConfiguration.testElasticsearchClient().template( "sharded_index" )
 						.create(
 								"*",
 								"{'number_of_shards': " + shardCount + "}"
@@ -95,19 +87,16 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 	}
 
 	@Override
-	public TckBackendSetupStrategy createPeriodicRefreshBackendSetupStrategy(int refreshIntervalMs) {
+	public TckBackendSetupStrategy<?> createPeriodicRefreshBackendSetupStrategy(int refreshIntervalMs) {
 		return new ElasticsearchTckBackendSetupStrategy() {
-			private final TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
-
-			@Override
-			public Optional<TestRule> getTestRule() {
-				return Optional.of( elasticsearchClient );
+			{
+				useConfigurationTestRule();
 			}
 
 			@Override
 			public SearchSetupHelper.SetupContext startSetup(SearchSetupHelper.SetupContext setupHelper) {
 				// Make sure automatically created indexes will have an appropriate number of shards
-				elasticsearchClient.template( "explicit_refresh_interval" )
+				backendConfiguration.testElasticsearchClient().template( "explicit_refresh_interval" )
 						.create(
 								"*",
 								"{'refresh_interval': '" + refreshIntervalMs + "ms' }"
