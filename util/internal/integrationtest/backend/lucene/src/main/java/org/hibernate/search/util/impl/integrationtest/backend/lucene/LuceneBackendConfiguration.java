@@ -18,7 +18,7 @@ public class LuceneBackendConfiguration extends BackendConfiguration {
 	}
 
 	@Override
-	protected Map<String, String> rawBackendProperties() {
+	public Map<String, String> rawBackendProperties() {
 		Map<String, String> properties = new LinkedHashMap<>();
 		properties.put(
 				"directory.root",

@@ -22,51 +22,51 @@ public class LuceneTckBackendHelper implements TckBackendHelper {
 	}
 
 	@Override
-	public TckBackendSetupStrategy createDefaultBackendSetupStrategy() {
+	public TckBackendSetupStrategy<?> createDefaultBackendSetupStrategy() {
 		return new LuceneTckBackendSetupStrategy();
 	}
 
 	@Override
-	public TckBackendSetupStrategy createMultiTenancyBackendSetupStrategy() {
+	public TckBackendSetupStrategy<?> createMultiTenancyBackendSetupStrategy() {
 		return new LuceneTckBackendSetupStrategy()
 				.setProperty( "multi_tenancy.strategy", "discriminator" );
 	}
 
 	@Override
-	public TckBackendSetupStrategy createAnalysisCustomBackendSetupStrategy() {
+	public TckBackendSetupStrategy<?> createAnalysisCustomBackendSetupStrategy() {
 		return new LuceneTckBackendSetupStrategy()
 				.expectCustomBeans()
 				.setProperty( "analysis.configurer", AnalysisCustomITAnalysisConfigurer.class.getName() );
 	}
 
 	@Override
-	public TckBackendSetupStrategy createAnalysisNotConfiguredBackendSetupStrategy() {
+	public TckBackendSetupStrategy<?> createAnalysisNotConfiguredBackendSetupStrategy() {
 		return new LuceneTckBackendSetupStrategy()
 				.setProperty( "analysis.configurer", null );
 	}
 
 	@Override
-	public TckBackendSetupStrategy createAnalysisBuiltinOverridesBackendSetupStrategy() {
+	public TckBackendSetupStrategy<?> createAnalysisBuiltinOverridesBackendSetupStrategy() {
 		return new LuceneTckBackendSetupStrategy()
 				.expectCustomBeans()
 				.setProperty( "analysis.configurer", AnalysisBuiltinOverrideITAnalysisConfigurer.class.getName() );
 	}
 
 	@Override
-	public TckBackendSetupStrategy createNoShardingBackendSetupStrategy() {
+	public TckBackendSetupStrategy<?> createNoShardingBackendSetupStrategy() {
 		// Sharding is disabled by default
 		return createDefaultBackendSetupStrategy();
 	}
 
 	@Override
-	public TckBackendSetupStrategy createHashBasedShardingBackendSetupStrategy(int shardCount) {
+	public TckBackendSetupStrategy<?> createHashBasedShardingBackendSetupStrategy(int shardCount) {
 		return new LuceneTckBackendSetupStrategy()
 				.setProperty( "sharding.strategy", "hash" )
 				.setProperty( "sharding.number_of_shards", String.valueOf( shardCount ) );
 	}
 
 	@Override
-	public TckBackendSetupStrategy createPeriodicRefreshBackendSetupStrategy(int refreshIntervalMs) {
+	public TckBackendSetupStrategy<?> createPeriodicRefreshBackendSetupStrategy(int refreshIntervalMs) {
 		return new LuceneTckBackendSetupStrategy()
 				.setProperty( "io.refresh_interval", String.valueOf( refreshIntervalMs ) );
 	}

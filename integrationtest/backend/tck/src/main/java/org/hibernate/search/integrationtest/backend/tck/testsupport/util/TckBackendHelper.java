@@ -10,29 +10,29 @@ public interface TckBackendHelper {
 
 	TckBackendFeatures getBackendFeatures();
 
-	TckBackendSetupStrategy createDefaultBackendSetupStrategy();
+	TckBackendSetupStrategy<?> createDefaultBackendSetupStrategy();
 
-	TckBackendSetupStrategy createMultiTenancyBackendSetupStrategy();
+	TckBackendSetupStrategy<?> createMultiTenancyBackendSetupStrategy();
 
 	/**
 	 * @return A setup strategy for {@link org.hibernate.search.integrationtest.backend.tck.analysis.AnalysisBuiltinIT}.
 	 */
-	TckBackendSetupStrategy createAnalysisNotConfiguredBackendSetupStrategy();
+	TckBackendSetupStrategy<?> createAnalysisNotConfiguredBackendSetupStrategy();
 
 	/**
 	 * @return A setup strategy for {@link org.hibernate.search.integrationtest.backend.tck.analysis.AnalysisBuiltinOverrideIT}.
 	 */
-	TckBackendSetupStrategy createAnalysisBuiltinOverridesBackendSetupStrategy();
+	TckBackendSetupStrategy<?> createAnalysisBuiltinOverridesBackendSetupStrategy();
 
 	/**
 	 * @return A setup strategy for {@link org.hibernate.search.integrationtest.backend.tck.analysis.AnalysisCustomIT}.
 	 */
-	TckBackendSetupStrategy createAnalysisCustomBackendSetupStrategy();
+	TckBackendSetupStrategy<?> createAnalysisCustomBackendSetupStrategy();
 
-	TckBackendSetupStrategy createNoShardingBackendSetupStrategy();
+	TckBackendSetupStrategy<?> createNoShardingBackendSetupStrategy();
 
-	TckBackendSetupStrategy createHashBasedShardingBackendSetupStrategy(int shardCount);
+	TckBackendSetupStrategy<?> createHashBasedShardingBackendSetupStrategy(int shardCount);
 
-	TckBackendSetupStrategy createPeriodicRefreshBackendSetupStrategy(int refreshIntervalMs);
+	TckBackendSetupStrategy<?> createPeriodicRefreshBackendSetupStrategy(int refreshIntervalMs);
 
 }

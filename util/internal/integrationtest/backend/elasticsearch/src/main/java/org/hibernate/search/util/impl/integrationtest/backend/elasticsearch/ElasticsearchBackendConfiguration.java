@@ -29,8 +29,12 @@ public class ElasticsearchBackendConfiguration extends BackendConfiguration {
 		return Optional.of( testElasticsearchClient );
 	}
 
+	public TestElasticsearchClient testElasticsearchClient() {
+		return testElasticsearchClient;
+	}
+
 	@Override
-	protected Map<String, String> rawBackendProperties() {
+	public Map<String, String> rawBackendProperties() {
 		Map<String, String> properties = new LinkedHashMap<>();
 		properties.put( "log.json_pretty_printing", "true" );
 		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( properties );

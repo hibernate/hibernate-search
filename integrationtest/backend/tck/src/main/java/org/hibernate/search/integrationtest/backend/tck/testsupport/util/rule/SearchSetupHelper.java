@@ -52,7 +52,7 @@ public class SearchSetupHelper implements TestRule {
 	private final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final TestConfigurationProvider configurationProvider;
-	private final TckBackendSetupStrategy setupStrategy;
+	private final TckBackendSetupStrategy<?> setupStrategy;
 	private final TestRule delegateRule;
 
 	private final List<SearchIntegrationPartialBuildState> integrationPartialBuildStates = new ArrayList<>();
@@ -63,10 +63,10 @@ public class SearchSetupHelper implements TestRule {
 		this( TckBackendHelper::createDefaultBackendSetupStrategy );
 	}
 
-	public SearchSetupHelper(Function<TckBackendHelper, TckBackendSetupStrategy> setupStrategyFunction) {
+	public SearchSetupHelper(Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction) {
 		this.configurationProvider = new TestConfigurationProvider();
 		this.setupStrategy = setupStrategyFunction.apply( TckConfiguration.get().getBackendHelper() );
-		Optional<TestRule> setupStrategyTestRule = setupStrategy.getTestRule();
+		Optional<TestRule> setupStrategyTestRule = setupStrategy.testRule();
 		this.delegateRule = setupStrategyTestRule
 				.<TestRule>map( rule -> RuleChain.outerRule( configurationProvider ).around( rule ) )
 				.orElse( configurationProvider );

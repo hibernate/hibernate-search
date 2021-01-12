@@ -12,7 +12,7 @@ import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneBacke
 
 public class DocumentationLuceneBackendConfiguration extends LuceneBackendConfiguration {
 	@Override
-	protected Map<String, String> rawBackendProperties() {
+	public Map<String, String> rawBackendProperties() {
 		Map<String, String> properties = super.rawBackendProperties();
 		properties.put(
 				"analysis.configurer",

@@ -6,51 +6,19 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.DefaultITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchBackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
-import org.junit.rules.TestRule;
-
-class ElasticsearchTckBackendSetupStrategy implements TckBackendSetupStrategy {
-
-	private final Map<String, Object> properties = new LinkedHashMap<>();
-	private boolean expectCustomBeans = false;
+class ElasticsearchTckBackendSetupStrategy extends TckBackendSetupStrategy<ElasticsearchBackendConfiguration> {
 
 	ElasticsearchTckBackendSetupStrategy() {
-		setProperty( "log.json_pretty_printing", "true" );
+		super( new ElasticsearchBackendConfiguration() );
 		setProperty( "analysis.configurer", BeanReference.ofInstance( new DefaultITAnalysisConfigurer() ) );
-		// Always add configuration options that allow to connect to Elasticsearch
-		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( properties );
-	}
-
-	ElasticsearchTckBackendSetupStrategy expectCustomBeans() {
-		expectCustomBeans = true;
-		return this;
-	}
-
-	ElasticsearchTckBackendSetupStrategy setProperty(String key, Object value) {
-		properties.put( key, value );
-		return this;
-	}
-
-	@Override
-	public Optional<TestRule> getTestRule() {
-		return Optional.empty();
-	}
-
-	@Override
-	public Map<String, ?> createBackendConfigurationProperties(TestConfigurationProvider configurationProvider) {
-		return configurationProvider.interpolateProperties( properties );
 	}
 
 	@Override
@@ -60,11 +28,4 @@ class ElasticsearchTckBackendSetupStrategy implements TckBackendSetupStrategy {
 		return new ElasticsearchTckBackendAccessor( client );
 	}
 
-	@Override
-	public SearchSetupHelper.SetupContext startSetup(SearchSetupHelper.SetupContext setupContext) {
-		if ( expectCustomBeans ) {
-			setupContext = setupContext.expectCustomBeans();
-		}
-		return setupContext;
-	}
 }
