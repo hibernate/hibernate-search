@@ -46,10 +46,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 	void updateBecauseOfContained(Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.identifierMapping().getIdentifier( null, entitySupplier );
-		if ( !statesPerId.containsKey( identifier ) ) {
-			getState( identifier ).updateBecauseOfContained( entitySupplier );
-		}
-		// If the entry is already there, no need for an additional update
+		getState( identifier ).updateBecauseOfContained( entitySupplier );
 	}
 
 	@Override
@@ -131,6 +128,12 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 		}
 
 		void updateBecauseOfContained(Supplier<E> entitySupplier) {
+			if ( currentStatus == EntityStatus.ABSENT ) {
+				// This entity was deleted, but a containing entity still has a reference to it.
+				// Someone probably just forgot to clear an association.
+				// Just ignore the call.
+				return;
+			}
 			doUpdate( entitySupplier, null );
 			updatedBecauseOfContained = true;
 			// We don't want contained entities that haven't been modified to trigger an update of their
