@@ -14,10 +14,10 @@ import java.util.Set;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverMultiNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverDirtinessFilterNode;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathFilterProvider;
 import org.hibernate.search.util.common.AssertionFailure;
 
 abstract class AbstractPojoImplicitReindexingResolverNodeBuilder<T> {
@@ -76,11 +76,11 @@ abstract class AbstractPojoImplicitReindexingResolverNodeBuilder<T> {
 	}
 
 	/**
-	 * @param pathFilterFactory A factory for path filters that will be used in the resolver (and its nested resolvers)
+	 * @param pathFilterProvider A provider for path filters that will be used in the resolver (and its nested resolvers)
 	 * @param allPotentialDirtyPaths A comprehensive list of all paths that may be dirty
 	 * when the built resolver will be called. {@code null} if unknown.
 	 */
-	final Optional<PojoImplicitReindexingResolverNode<T>> build(PojoPathFilterFactory pathFilterFactory,
+	final Optional<PojoImplicitReindexingResolverNode<T>> build(PojoPathFilterProvider pathFilterProvider,
 			Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
 		freeze();
 
@@ -109,10 +109,10 @@ abstract class AbstractPojoImplicitReindexingResolverNodeBuilder<T> {
 			 *
 			 * Thus we need to filter out all the paths that are not tied to this node.
 			 */
-			result = doBuild( pathFilterFactory, immutableDirtyPathsAcceptedByFilter );
+			result = doBuild( pathFilterProvider, immutableDirtyPathsAcceptedByFilter );
 			if ( result.isPresent() ) {
 				result = Optional.of(
-						wrapWithFilter( result.get(), pathFilterFactory, immutableDirtyPathsAcceptedByFilter )
+						wrapWithFilter( result.get(), pathFilterProvider, immutableDirtyPathsAcceptedByFilter )
 				);
 			}
 		}
@@ -132,7 +132,7 @@ abstract class AbstractPojoImplicitReindexingResolverNodeBuilder<T> {
 			 * Thus we do not need to add our own dirty check: no filter node wrapping the node we are building
 			 * is necessary.
 			 */
-			result = doBuild( pathFilterFactory, allPotentialDirtyPaths );
+			result = doBuild( pathFilterProvider, allPotentialDirtyPaths );
 		}
 
 		if ( !result.isPresent() ) {
@@ -143,13 +143,13 @@ abstract class AbstractPojoImplicitReindexingResolverNodeBuilder<T> {
 		return result;
 	}
 
-	abstract Optional<PojoImplicitReindexingResolverNode<T>> doBuild(PojoPathFilterFactory pathFilterFactory,
+	abstract Optional<PojoImplicitReindexingResolverNode<T>> doBuild(PojoPathFilterProvider pathFilterProvider,
 			Set<PojoModelPathValueNode> allPotentialDirtyPaths);
 
 	private PojoImplicitReindexingResolverNode<T> wrapWithFilter(PojoImplicitReindexingResolverNode<T> resolver,
-			PojoPathFilterFactory pathFilterFactory,
+			PojoPathFilterProvider pathFilterProvider,
 			Set<PojoModelPathValueNode> immutableDirtyPathsTriggeringReindexing) {
-		PojoPathFilter filter = pathFilterFactory.create( immutableDirtyPathsTriggeringReindexing );
+		PojoPathFilter filter = pathFilterProvider.create( immutableDirtyPathsTriggeringReindexing );
 		return new PojoImplicitReindexingResolverDirtinessFilterNode<>(
 				filter, resolver
 		);

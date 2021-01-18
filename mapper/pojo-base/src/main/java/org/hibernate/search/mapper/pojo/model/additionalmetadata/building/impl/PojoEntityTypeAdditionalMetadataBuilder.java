@@ -12,8 +12,8 @@ import java.util.Optional;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorEntityTypeNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollectorEntityTypeNode {
@@ -22,15 +22,15 @@ class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataC
 
 	private final PojoTypeAdditionalMetadataBuilder rootBuilder;
 	private final String entityName;
-	private final PojoPathFilterFactory pathFilterFactory;
+	private final PojoPathsDefinition pathsDefinition;
 	private String entityIdPropertyName;
 
 	PojoEntityTypeAdditionalMetadataBuilder(PojoTypeAdditionalMetadataBuilder rootBuilder,
 			String entityName,
-			PojoPathFilterFactory pathFilterFactory) {
+			PojoPathsDefinition pathsDefinition) {
 		this.rootBuilder = rootBuilder;
 		this.entityName = entityName;
-		this.pathFilterFactory = pathFilterFactory;
+		this.pathsDefinition = pathsDefinition;
 	}
 
 	@Override
@@ -57,7 +57,7 @@ class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataC
 	public PojoEntityTypeAdditionalMetadata build() {
 		return new PojoEntityTypeAdditionalMetadata(
 				entityName,
-				pathFilterFactory,
+				pathsDefinition,
 				Optional.ofNullable( entityIdPropertyName )
 		);
 	}

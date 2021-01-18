@@ -55,7 +55,7 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAd
 import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoRoutingIndexingDependencyConfigurationContextImpl;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
@@ -362,9 +362,9 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				.getEntityTypeMetadata()
 				// This should not be possible since this method is only called for entity types (see caller)
 				.orElseThrow( () -> new AssertionFailure( "Missing metadata for entity type '" + entityType ) );
-		PojoPathFilterFactory pathFilterFactory = entityTypeMetadata.getPathFilterFactory();
+		PojoPathsDefinition pathsDefinition = entityTypeMetadata.getPathsDefinition();
 		Optional<? extends PojoImplicitReindexingResolver<T>> reindexingResolverOptional =
-				reindexingResolverBuildingHelper.buildOptional( entityType, pathFilterFactory );
+				reindexingResolverBuildingHelper.buildOptional( entityType, pathsDefinition );
 		if ( reindexingResolverOptional.isPresent() ) {
 			String entityName = entityTypeMetadata.getEntityName();
 

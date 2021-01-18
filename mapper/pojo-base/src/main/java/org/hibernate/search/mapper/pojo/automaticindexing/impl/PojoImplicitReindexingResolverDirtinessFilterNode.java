@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathFilter;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 

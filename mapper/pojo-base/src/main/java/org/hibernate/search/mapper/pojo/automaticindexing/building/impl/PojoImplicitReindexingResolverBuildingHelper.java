@@ -24,8 +24,8 @@ import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathFilterProvider;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.impl.Closer;
@@ -85,15 +85,19 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 	}
 
 	public <T> PojoImplicitReindexingResolver<T> build(PojoRawTypeModel<T> typeModel,
-			PojoPathFilterFactory pathFilterFactory) {
-		return buildOptional( typeModel, pathFilterFactory )
-				.orElseGet( () -> new PojoImplicitReindexingResolverImpl<>(
-						PojoPathFilter.empty(), PojoImplicitReindexingResolverNode.noOp()
-				) );
+			PojoPathsDefinition pathsDefinition) {
+		return buildOptional( typeModel, pathsDefinition )
+				.orElseGet( () -> {
+					PojoPathFilterProvider pathFilterProvider = new PojoPathFilterProvider( pathsDefinition );
+					return new PojoImplicitReindexingResolverImpl<>(
+							pathFilterProvider.create( Collections.emptySet() ),
+							PojoImplicitReindexingResolverNode.noOp()
+					);
+				} );
 	}
 
 	public <T> Optional<PojoImplicitReindexingResolver<T>> buildOptional(PojoRawTypeModel<T> typeModel,
-			PojoPathFilterFactory pathFilterFactory) {
+			PojoPathsDefinition pathsDefinition) {
 		@SuppressWarnings("unchecked") // We know builders have this type, by construction
 		PojoImplicitReindexingResolverBuilder<T> builder =
 				(PojoImplicitReindexingResolverBuilder<T>) builderByType.get( typeModel );
@@ -101,7 +105,8 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 			return Optional.empty();
 		}
 		else {
-			return builder.build( pathFilterFactory );
+			PojoPathFilterProvider pathFilterProvider = new PojoPathFilterProvider( pathsDefinition );
+			return builder.build( pathFilterProvider );
 		}
 	}
 

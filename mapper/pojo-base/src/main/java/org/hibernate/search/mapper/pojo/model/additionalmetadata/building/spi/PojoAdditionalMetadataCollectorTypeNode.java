@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface PojoAdditionalMetadataCollectorTypeNode extends PojoAdditionalMetadataCollector {
@@ -32,14 +32,14 @@ public interface PojoAdditionalMetadataCollectorTypeNode extends PojoAdditionalM
 	 * @see PojoTypeAdditionalMetadata#isEntity()
 	 *
 	 * @param entityName The name of this entity type.
-	 * @param pathFilterFactory The path filter factory for this entity type,
-	 * i.e. the object allowing to create path filters that will be used in particular
+	 * @param pathsDefinition The paths definition for this entity type,
+	 * i.e. the object supporting the creation of path filters that will be used in particular
 	 * when performing dirty checking during automatic reindexing.
 	 * @return A {@link PojoAdditionalMetadataCollectorEntityTypeNode}, to provide optional metadata
 	 * about the entity.
 	 */
 	PojoAdditionalMetadataCollectorEntityTypeNode markAsEntity(String entityName,
-			PojoPathFilterFactory pathFilterFactory);
+			PojoPathsDefinition pathsDefinition);
 
 	/**
 	 * Mark this type as an indexed type.
