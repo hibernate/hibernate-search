@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
@@ -56,7 +55,7 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 
 	@Override
 	public PojoEntityTypeAdditionalMetadataBuilder markAsEntity(String entityName,
-			PojoPathFilterFactory<Set<String>> pathFilterFactory) {
+			PojoPathFilterFactory pathFilterFactory) {
 		if ( entityTypeMetadataBuilder == null ) {
 			entityTypeMetadataBuilder = new PojoEntityTypeAdditionalMetadataBuilder(
 					this, entityName, pathFilterFactory

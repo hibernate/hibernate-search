@@ -7,17 +7,16 @@
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.impl;
 
 import java.util.Optional;
-import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 
 public class PojoEntityTypeAdditionalMetadata {
 	private final String entityName;
-	private final PojoPathFilterFactory<Set<String>> pathFilterFactory;
+	private final PojoPathFilterFactory pathFilterFactory;
 	private final Optional<String> entityIdPropertyName;
 
 	public PojoEntityTypeAdditionalMetadata(String entityName,
-			PojoPathFilterFactory<Set<String>> pathFilterFactory,
+			PojoPathFilterFactory pathFilterFactory,
 			Optional<String> entityIdPropertyName) {
 		this.entityName = entityName;
 		this.pathFilterFactory = pathFilterFactory;
@@ -31,7 +30,7 @@ public class PojoEntityTypeAdditionalMetadata {
 	/**
 	 * @return A path filter factory for this type.
 	 */
-	public PojoPathFilterFactory<Set<String>> getPathFilterFactory() {
+	public PojoPathFilterFactory getPathFilterFactory() {
 		return pathFilterFactory;
 	}
 

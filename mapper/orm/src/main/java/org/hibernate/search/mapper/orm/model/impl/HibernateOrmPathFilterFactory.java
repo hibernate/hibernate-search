@@ -143,7 +143,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *     </li>
  * </ul>
  */
-public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<String>> {
+public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final Set<String> PRIMITIVE_EXTRACTOR_NAMES = CollectionHelper.asImmutableSet(
@@ -164,7 +164,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 	}
 
 	@Override
-	public PojoPathFilter<Set<String>> create(Set<PojoModelPathValueNode> paths) {
+	public PojoPathFilter create(Set<PojoModelPathValueNode> paths) {
 		// Use a LinkedHashSet for deterministic iteration
 		Set<String> pathsAsStrings = CollectionHelper.newLinkedHashSet( paths.size() );
 		for ( PojoModelPathValueNode path : paths ) {

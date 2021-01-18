@@ -27,7 +27,7 @@ class PojoImplicitReindexingResolverOriginalTypeNodeBuilder<T>
 	}
 
 	@Override
-	<S> PojoImplicitReindexingResolverNode<T, S> doBuild(PojoImplicitReindexingResolverNode<? super T, S> nestedNode) {
+	PojoImplicitReindexingResolverNode<T> doBuild(PojoImplicitReindexingResolverNode<? super T> nestedNode) {
 		return new PojoImplicitReindexingResolverOriginalTypeNode<>( nestedNode );
 	}
 }

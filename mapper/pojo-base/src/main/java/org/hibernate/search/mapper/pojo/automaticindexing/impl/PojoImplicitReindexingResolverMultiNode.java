@@ -15,14 +15,13 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  * A {@link PojoImplicitReindexingResolverNode} responsible for applying multiple resolvers.
  *
  * @param <T> The type of "dirty" objects received as input.
- * @param <S> The expected type of the object describing the "dirtiness state".
  */
-public class PojoImplicitReindexingResolverMultiNode<T, S> extends PojoImplicitReindexingResolverNode<T, S> {
+public class PojoImplicitReindexingResolverMultiNode<T> extends PojoImplicitReindexingResolverNode<T> {
 
-	private final Collection<? extends PojoImplicitReindexingResolverNode<? super T, S>> elements;
+	private final Collection<? extends PojoImplicitReindexingResolverNode<? super T>> elements;
 
 	public PojoImplicitReindexingResolverMultiNode(
-			Collection<? extends PojoImplicitReindexingResolverNode<? super T, S>> elements) {
+			Collection<? extends PojoImplicitReindexingResolverNode<? super T>> elements) {
 		this.elements = elements;
 	}
 
@@ -36,7 +35,7 @@ public class PojoImplicitReindexingResolverMultiNode<T, S> extends PojoImplicitR
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
 		builder.startList();
-		for ( PojoImplicitReindexingResolverNode<?, ?> element : elements ) {
+		for ( PojoImplicitReindexingResolverNode<?> element : elements ) {
 			builder.value( element );
 		}
 		builder.endList();
@@ -44,8 +43,8 @@ public class PojoImplicitReindexingResolverMultiNode<T, S> extends PojoImplicitR
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			T dirty, PojoImplicitReindexingResolverRootContext<S> context) {
-		for ( PojoImplicitReindexingResolverNode<? super T, S> element : elements ) {
+			T dirty, PojoImplicitReindexingResolverRootContext context) {
+		for ( PojoImplicitReindexingResolverNode<? super T> element : elements ) {
 			element.resolveEntitiesToReindex( collector, dirty, context );
 		}
 	}

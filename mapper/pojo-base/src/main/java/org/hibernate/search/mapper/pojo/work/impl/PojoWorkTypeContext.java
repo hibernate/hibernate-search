@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
-import java.util.Set;
 import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
@@ -26,6 +25,6 @@ public interface PojoWorkTypeContext<E> {
 	void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			PojoWorkSessionContext<?> sessionContext, Object identifier,
 			Supplier<E> entitySupplier,
-			PojoImplicitReindexingResolverRootContext<Set<String>> context);
+			PojoImplicitReindexingResolverRootContext context);
 
 }

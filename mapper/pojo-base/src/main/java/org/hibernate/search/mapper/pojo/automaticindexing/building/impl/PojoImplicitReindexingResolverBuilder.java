@@ -66,14 +66,13 @@ class PojoImplicitReindexingResolverBuilder<T> {
 
 	/**
 	 * @param pathFilterFactory A factory for path filters that will be used in the resolver (and its nested resolvers)
-	 * @param <S> The expected type of the objects representing a set of paths at runtime.
 	 */
-	final <S> Optional<PojoImplicitReindexingResolver<T, S>> build(PojoPathFilterFactory<S> pathFilterFactory) {
+	final Optional<PojoImplicitReindexingResolver<T>> build(PojoPathFilterFactory pathFilterFactory) {
 		freeze();
 
 		Set<PojoModelPathValueNode> immutableDirtyPathsAcceptedByFilter = dirtyPathsTriggeringSelfReindexing;
 
-		Optional<PojoImplicitReindexingResolverNode<T, S>> containingEntitiesResolverRootOptional =
+		Optional<PojoImplicitReindexingResolverNode<T>> containingEntitiesResolverRootOptional =
 				containingEntitiesResolverRootBuilder.build( pathFilterFactory, null );
 
 		if ( immutableDirtyPathsAcceptedByFilter.isEmpty() && !containingEntitiesResolverRootOptional.isPresent() ) {
@@ -83,9 +82,9 @@ class PojoImplicitReindexingResolverBuilder<T> {
 			return Optional.empty();
 		}
 		else {
-			PojoPathFilter<S> filter = immutableDirtyPathsAcceptedByFilter.isEmpty()
+			PojoPathFilter filter = immutableDirtyPathsAcceptedByFilter.isEmpty()
 					? PojoPathFilter.empty() : pathFilterFactory.create( immutableDirtyPathsAcceptedByFilter );
-			PojoImplicitReindexingResolverNode<T, S> containingEntitiesResolverRoot =
+			PojoImplicitReindexingResolverNode<T> containingEntitiesResolverRoot =
 					containingEntitiesResolverRootOptional.orElseGet( PojoImplicitReindexingResolverNode::noOp );
 
 			return Optional.of(

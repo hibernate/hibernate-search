@@ -358,16 +358,12 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			PojoContainedTypeManagerContainer.Builder containedTypeManagerContainerBuilder,
 			PojoImplicitReindexingResolverBuildingHelper reindexingResolverBuildingHelper,
 			PojoRawTypeModel<T> entityType) {
-		/*
-		 * TODO offer more flexibility to mapper implementations, allowing them to define their own dirtiness state?
-		 * Note this will require to allow them to define their own indexing plan APIs.
-		 */
 		PojoEntityTypeAdditionalMetadata entityTypeMetadata = typeAdditionalMetadataProvider.get( entityType )
 				.getEntityTypeMetadata()
 				// This should not be possible since this method is only called for entity types (see caller)
 				.orElseThrow( () -> new AssertionFailure( "Missing metadata for entity type '" + entityType ) );
-		PojoPathFilterFactory<Set<String>> pathFilterFactory = entityTypeMetadata.getPathFilterFactory();
-		Optional<? extends PojoImplicitReindexingResolver<T, Set<String>>> reindexingResolverOptional =
+		PojoPathFilterFactory pathFilterFactory = entityTypeMetadata.getPathFilterFactory();
+		Optional<? extends PojoImplicitReindexingResolver<T>> reindexingResolverOptional =
 				reindexingResolverBuildingHelper.buildOptional( entityType, pathFilterFactory );
 		if ( reindexingResolverOptional.isPresent() ) {
 			String entityName = entityTypeMetadata.getEntityName();

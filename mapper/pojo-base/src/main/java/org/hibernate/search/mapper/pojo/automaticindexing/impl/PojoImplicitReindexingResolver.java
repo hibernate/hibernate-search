@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
 
 /**
@@ -16,9 +18,8 @@ import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
  * so that they can be reindexed by Hibernate Search.
  *
  * @param <T> The type of entities this object is able to handle.
- * @param <S> The expected type of the object describing the "dirtiness state".
  */
-public interface PojoImplicitReindexingResolver<T, S> extends AutoCloseable, ToStringTreeAppendable {
+public interface PojoImplicitReindexingResolver<T> extends AutoCloseable, ToStringTreeAppendable {
 
 	@Override
 	void close();
@@ -29,7 +30,7 @@ public interface PojoImplicitReindexingResolver<T, S> extends AutoCloseable, ToS
 	 * @return {@code true} if the given dirty paths would require to reindex an entity
 	 * of the type handled by this resolver, {@code false} if no reindexing is required.
 	 */
-	boolean requiresSelfReindexing(S dirtinessState);
+	boolean requiresSelfReindexing(Set<String> dirtinessState);
 
 	/**
 	 * Add all entities that should be reindexed to {@code collector},
@@ -40,6 +41,6 @@ public interface PojoImplicitReindexingResolver<T, S> extends AutoCloseable, ToS
  * {@code null} can be passed to mean "no information", in which case all paths are considered dirty.
 	 */
 	void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			T dirty, PojoImplicitReindexingResolverRootContext<S> context);
+			T dirty, PojoImplicitReindexingResolverRootContext context);
 
 }

@@ -20,16 +20,15 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  * but we might allow other nodes in the future for optimization purposes.
  *
  * @param <T> The property holder type received as input.
- * @param <S> The expected type of the object describing the "dirtiness state".
  * @param <P> The property type.
  */
-public class PojoImplicitReindexingResolverPropertyNode<T, S, P> extends PojoImplicitReindexingResolverNode<T, S> {
+public class PojoImplicitReindexingResolverPropertyNode<T, P> extends PojoImplicitReindexingResolverNode<T> {
 
 	private final ValueReadHandle<P> handle;
-	private final PojoImplicitReindexingResolverNode<? super P, S> nested;
+	private final PojoImplicitReindexingResolverNode<? super P> nested;
 
 	public PojoImplicitReindexingResolverPropertyNode(ValueReadHandle<P> handle,
-			PojoImplicitReindexingResolverNode<? super P, S> nested) {
+			PojoImplicitReindexingResolverNode<? super P> nested) {
 		this.handle = handle;
 		this.nested = nested;
 	}
@@ -50,7 +49,7 @@ public class PojoImplicitReindexingResolverPropertyNode<T, S, P> extends PojoImp
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			T dirty, PojoImplicitReindexingResolverRootContext<S> context) {
+			T dirty, PojoImplicitReindexingResolverRootContext context) {
 		P propertyValue = handle.get( dirty );
 		if ( propertyValue != null ) {
 			nested.resolveEntitiesToReindex( collector, propertyValue, context );

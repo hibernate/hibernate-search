@@ -6,17 +6,18 @@
  */
 package org.hibernate.search.mapper.pojo.model.path.spi;
 
-final class EmptyPojoPathFilter implements PojoPathFilter<Object> {
+import java.util.Set;
+
+final class EmptyPojoPathFilter implements PojoPathFilter {
 
 	private static final EmptyPojoPathFilter INSTANCE = new EmptyPojoPathFilter();
 
-	@SuppressWarnings( "unchecked" ) // This instance works for any S
-	public static <S> PojoPathFilter<S> get() {
-		return (PojoPathFilter<S>) INSTANCE;
+	public static PojoPathFilter get() {
+		return INSTANCE;
 	}
 
 	@Override
-	public boolean test(Object paths) {
+	public boolean test(Set<String> paths) {
 		return false;
 	}
 }

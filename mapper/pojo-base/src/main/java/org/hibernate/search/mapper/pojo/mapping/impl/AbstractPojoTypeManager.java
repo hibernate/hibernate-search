@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
@@ -36,11 +35,11 @@ public class AbstractPojoTypeManager<E>
 	protected final String entityName;
 	protected final PojoRawTypeIdentifier<E> typeIdentifier;
 	protected final PojoCaster<E> caster;
-	protected final PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver;
+	protected final PojoImplicitReindexingResolver<E> reindexingResolver;
 
 	public AbstractPojoTypeManager(String entityName, PojoRawTypeIdentifier<E> typeIdentifier,
 			PojoCaster<E> caster,
-			PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver) {
+			PojoImplicitReindexingResolver<E> reindexingResolver) {
 		this.entityName = entityName;
 		this.typeIdentifier = typeIdentifier;
 		this.caster = caster;
@@ -78,7 +77,7 @@ public class AbstractPojoTypeManager<E>
 	@Override
 	public final void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoWorkSessionContext<?> sessionContext,
 			Object identifier, Supplier<E> entitySupplier,
-			PojoImplicitReindexingResolverRootContext<Set<String>> context) {
+			PojoImplicitReindexingResolverRootContext context) {
 		try {
 			reindexingResolver.resolveEntitiesToReindex( collector, entitySupplier.get(), context );
 		}

@@ -13,10 +13,8 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 /**
  * A factory for {@link PojoPathFilter} instances.
- *
- * @param <S> The expected type of the object representing a set of paths.
  */
-public interface PojoPathFilterFactory<S> {
+public interface PojoPathFilterFactory {
 
 	/**
 	 * @param paths The set of paths to test for dirtiness.
@@ -26,6 +24,6 @@ public interface PojoPathFilterFactory<S> {
 	 * that must never appear in the given paths.
 	 * @return A filter accepting only the given paths.
 	 */
-	PojoPathFilter<S> create(Set<PojoModelPathValueNode> paths);
+	PojoPathFilter create(Set<PojoModelPathValueNode> paths);
 
 }

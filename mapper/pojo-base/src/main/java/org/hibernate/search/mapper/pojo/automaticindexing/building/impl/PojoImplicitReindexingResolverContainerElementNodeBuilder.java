@@ -58,11 +58,11 @@ class PojoImplicitReindexingResolverContainerElementNodeBuilder<C, V>
 	}
 
 	@Override
-	<S> Optional<PojoImplicitReindexingResolverNode<C, S>> doBuild(PojoPathFilterFactory<S> pathFilterFactory,
+	Optional<PojoImplicitReindexingResolverNode<C>> doBuild(PojoPathFilterFactory pathFilterFactory,
 			Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
 		checkFrozen();
 
-		Collection<PojoImplicitReindexingResolverNode<V, S>> valueTypeNodes =
+		Collection<PojoImplicitReindexingResolverNode<V>> valueTypeNodes =
 				valueBuilderDelegate.buildTypeNodes( pathFilterFactory, allPotentialDirtyPaths );
 
 		if ( valueTypeNodes.isEmpty() ) {

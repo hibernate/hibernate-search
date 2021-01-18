@@ -81,7 +81,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 	protected abstract S createState(I identifier);
 
 	abstract class AbstractEntityState
-			implements PojoImplicitReindexingResolverRootContext<Set<String>> {
+			implements PojoImplicitReindexingResolverRootContext {
 		final I identifier;
 		Supplier<E> entitySupplier;
 

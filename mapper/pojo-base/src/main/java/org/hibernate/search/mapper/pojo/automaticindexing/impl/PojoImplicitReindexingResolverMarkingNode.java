@@ -12,9 +12,8 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  * A {@link PojoImplicitReindexingResolverNode} marking as "to reindex" any dirty object passed as an input.
  *
  * @param <T> The type of "dirty" objects received as input.
- * @param <S> The expected type of the object describing the "dirtiness state".
  */
-public class PojoImplicitReindexingResolverMarkingNode<T, S> extends PojoImplicitReindexingResolverNode<T, S> {
+public class PojoImplicitReindexingResolverMarkingNode<T> extends PojoImplicitReindexingResolverNode<T> {
 
 	@Override
 	public void close() {
@@ -28,7 +27,7 @@ public class PojoImplicitReindexingResolverMarkingNode<T, S> extends PojoImplici
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			T dirty, PojoImplicitReindexingResolverRootContext<S> context) {
+			T dirty, PojoImplicitReindexingResolverRootContext context) {
 		collector.markForReindexing( dirty );
 	}
 }

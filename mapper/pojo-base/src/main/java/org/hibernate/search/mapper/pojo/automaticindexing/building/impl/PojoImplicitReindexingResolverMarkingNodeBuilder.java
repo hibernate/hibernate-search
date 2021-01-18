@@ -53,7 +53,7 @@ class PojoImplicitReindexingResolverMarkingNodeBuilder<T>
 	}
 
 	@Override
-	<S> Optional<PojoImplicitReindexingResolverNode<T, S>> doBuild(PojoPathFilterFactory<S> pathFilterFactory,
+	Optional<PojoImplicitReindexingResolverNode<T>> doBuild(PojoPathFilterFactory pathFilterFactory,
 			Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
 		checkFrozen();
 
