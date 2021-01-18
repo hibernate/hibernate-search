@@ -85,8 +85,8 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		final I identifier;
 		Supplier<E> entitySupplier;
 
-		boolean deleted;
-		boolean added;
+		EntityStatus initialStatus = EntityStatus.UNKNOWN;
+		EntityStatus currentStatus = EntityStatus.UNKNOWN;
 
 		boolean shouldResolveToReindex;
 		boolean considerAllDirty;
@@ -109,7 +109,10 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		void add(Supplier<E> entitySupplier, String providedRoutingKey) {
 			this.entitySupplier = entitySupplier;
 			shouldResolveToReindex = true;
-			added = true;
+			if ( EntityStatus.UNKNOWN.equals( initialStatus ) ) {
+				initialStatus = EntityStatus.ABSENT;
+			}
+			currentStatus = EntityStatus.PRESENT;
 		}
 
 		void update(Supplier<E> entitySupplier, String providedRoutingKey) {
@@ -131,29 +134,18 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 
 		void doUpdate(Supplier<E> entitySupplier, String providedRoutingKey) {
 			this.entitySupplier = entitySupplier;
-			if ( !added ) {
-				deleted = true;
-				added = true;
+			if ( EntityStatus.UNKNOWN.equals( initialStatus ) ) {
+				initialStatus = EntityStatus.PRESENT;
 			}
-			// else: If add is true, either this is already an update (in which case update + update = update)
-			// or we called add() in the same plan (in which case add + update = add).
-			// In any case we don't need to change anything.
+			currentStatus = EntityStatus.PRESENT;
 		}
 
 		void delete(Supplier<E> entitySupplier, String providedRoutingKey) {
 			this.entitySupplier = entitySupplier;
-			if ( added && !deleted ) {
-				// We called add() in the same plan, so the entity didn't exist.
-				// Don't delete, just cancel the addition.
-				added = false;
-				deleted = false;
+			if ( EntityStatus.UNKNOWN.equals( initialStatus ) ) {
+				initialStatus = EntityStatus.PRESENT;
 			}
-			else {
-				// No add or update yet, or already deleted.
-				// Either way, delete.
-				added = false;
-				deleted = true;
-			}
+			currentStatus = EntityStatus.ABSENT;
 
 			// Reindexing does not make sense for a deleted entity
 			shouldResolveToReindex = false;
@@ -177,5 +169,9 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		}
 	}
 
-
+	protected enum EntityStatus {
+		UNKNOWN,
+		PRESENT,
+		ABSENT;
+	}
 }

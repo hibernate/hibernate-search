@@ -148,31 +148,43 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 		}
 
 		void purge(String providedRoutingKey) {
-			entitySupplier = null;
-			this.providedRoutingKey = providedRoutingKey;
-			// This is a purge: do not resolve reindexing
-			shouldResolveToReindex = false;
-			// This is a purge: force deletion even if it doesn't seem this document was added
-			considerAllDirty = false;
-			dirtyPaths = null;
-			added = false;
-			deleted = true;
+			// This is a purge: assume the document exists in order to force deletion.
+			this.initialStatus = EntityStatus.PRESENT;
+			delete( null, providedRoutingKey );
 		}
 
 		void sendCommandsToDelegate() {
-			if ( added ) {
-				if ( deleted ) {
-					if ( considerAllDirty || updatedBecauseOfContained
-							|| typeContext.requiresSelfReindexing( dirtyPaths ) ) {
-						delegateUpdate();
+			switch ( currentStatus ) {
+				case UNKNOWN:
+					// No operation was called on this state.
+					// Don't do anything.
+					return;
+				case PRESENT:
+					switch ( initialStatus ) {
+						case ABSENT:
+							delegateAdd();
+							return;
+						case PRESENT:
+						case UNKNOWN:
+							if ( considerAllDirty || updatedBecauseOfContained
+									|| typeContext.requiresSelfReindexing( dirtyPaths ) ) {
+								delegateUpdate();
+							}
+							return;
 					}
-				}
-				else {
-					delegateAdd();
-				}
-			}
-			else if ( deleted ) {
-				delegateDelete();
+					break;
+				case ABSENT:
+					switch ( initialStatus ) {
+						case ABSENT:
+							// The entity was added, then deleted in the same plan.
+							// Don't do anything.
+							return;
+						case UNKNOWN:
+						case PRESENT:
+							delegateDelete();
+							return;
+					}
+					break;
 			}
 		}
 
