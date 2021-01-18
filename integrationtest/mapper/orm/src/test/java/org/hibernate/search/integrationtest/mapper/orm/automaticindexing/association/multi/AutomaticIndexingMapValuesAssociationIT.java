@@ -97,6 +97,11 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 		}
 
 		@Override
+		public void setContainingEntityNonIndexedField(ContainingEntity containingEntity, String value) {
+			containingEntity.setNonIndexedField( value );
+		}
+
+		@Override
 		public void setChild(ContainingEntity parent, ContainingEntity child) {
 			parent.setChild( child );
 		}
@@ -276,6 +281,8 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 		@Id
 		private Integer id;
 
+		private String nonIndexedField;
+
 		@OneToOne
 		private ContainingEntity parent;
 
@@ -367,6 +374,14 @@ public class AutomaticIndexingMapValuesAssociationIT extends AbstractAutomaticIn
 
 		public void setId(Integer id) {
 			this.id = id;
+		}
+
+		public String getNonIndexedField() {
+			return nonIndexedField;
+		}
+
+		public void setNonIndexedField(String nonIndexedField) {
+			this.nonIndexedField = nonIndexedField;
 		}
 
 		public ContainingEntity getParent() {

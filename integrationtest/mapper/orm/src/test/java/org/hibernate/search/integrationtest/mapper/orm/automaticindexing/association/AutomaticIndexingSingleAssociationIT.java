@@ -850,6 +850,11 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		}
 
 		@Override
+		public void setContainingEntityNonIndexedField(ContainingEntity containingEntity, String value) {
+			containingEntity.setNonIndexedField( value );
+		}
+
+		@Override
 		public void setChild(ContainingEntity parent, ContainingEntity child) {
 			parent.setChild( child );
 		}
@@ -962,6 +967,8 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 		@Id
 		private Integer id;
 
+		private String nonIndexedField;
+
 		@OneToOne
 		private ContainingEntity parent;
 
@@ -1011,6 +1018,14 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 
 		public void setId(Integer id) {
 			this.id = id;
+		}
+
+		public String getNonIndexedField() {
+			return nonIndexedField;
+		}
+
+		public void setNonIndexedField(String nonIndexedField) {
+			this.nonIndexedField = nonIndexedField;
 		}
 
 		public ContainingEntity getParent() {

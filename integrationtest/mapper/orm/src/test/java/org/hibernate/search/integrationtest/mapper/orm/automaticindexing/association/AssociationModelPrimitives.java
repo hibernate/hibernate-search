@@ -29,6 +29,8 @@ public interface AssociationModelPrimitives<
 
 	TContained newContained(int id);
 
+	void setContainingEntityNonIndexedField(TContaining containing, String value);
+
 	void setChild(TContaining parent, TContaining child);
 
 	void setParent(TContaining child, TContaining parent);
