@@ -243,6 +243,58 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 		backendMock.verifyExpectationsMet();
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4137")
+	public void directValueUpdate_nonIndexed_then_indirectValueUpdate_indexedEmbedded_singleValue_indexed() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TIndexed entity1 = primitives.newIndexed( 1 );
+			primitives.setContainingEntityNonIndexedField( entity1, "initialValue" );
+
+			TContaining containingEntity1 = primitives.newContaining( 2 );
+			primitives.setChild( entity1, containingEntity1 );
+			primitives.setParent( containingEntity1, entity1 );
+
+			TContained contained1 = primitives.newContained( 4 );
+			primitives.setIndexedField( contained1, "initialValue" );
+			primitives.setContainedIndexedEmbeddedSingle( containingEntity1, contained1 );
+			primitives.setContainingAsIndexedEmbeddedSingle( contained1, containingEntity1 );
+
+			session.persist( contained1 );
+			session.persist( containingEntity1 );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.add( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbedded", b3 -> b3
+											.field( "indexedField", "initialValue" )
+									)
+							)
+					)
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		// Test updating a value in the indexed entity, then in the same transaction updating a value in a contained entity
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			TIndexed indexed = session.get( primitives.getIndexedClass(), 1 );
+			primitives.setContainingEntityNonIndexedField( indexed, "updatedValue" );
+			TContained contained = session.get( primitives.getContainedClass(), 4 );
+			primitives.setIndexedField( contained, "updatedValue" );
+
+			backendMock.expectWorks( primitives.getIndexName() )
+					.update( "1", b -> b
+							.objectField( "child", b2 -> b2
+									.objectField( "containedIndexedEmbedded", b3 -> b3
+											.field( "indexedField", "updatedValue" )
+									)
+							)
+					)
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
 	/**
 	 * Test that updating a non-indexed, basic property in an entity
 	 * whose properties are otherwise used in an IndexedEmbedded from an indexed entity
