@@ -25,7 +25,7 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.processing.building.impl.PojoIndexingProcessorOriginalTypeNodeBuilder;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
@@ -125,11 +125,11 @@ class PojoIndexedTypeManagerBuilder<E> {
 
 		extendedMappingCollector.identifierMapping( identityMappingCollector.identifierMapping );
 
-		PojoPathFilterFactory pathFilterFactory = typeAdditionalMetadata
+		PojoPathsDefinition pathsDefinition = typeAdditionalMetadata
 				.getEntityTypeMetadata().orElseThrow( () -> log.missingEntityTypeMetadata( typeModel ) )
-				.getPathFilterFactory();
+				.getPathsDefinition();
 		PojoImplicitReindexingResolver<E> reindexingResolver =
-				reindexingResolverBuildingHelper.build( typeModel, pathFilterFactory );
+				reindexingResolverBuildingHelper.build( typeModel, pathsDefinition );
 
 		MappedIndexManager indexManager = indexManagerBuilder.build();
 		extendedMappingCollector.indexManager( indexManager );

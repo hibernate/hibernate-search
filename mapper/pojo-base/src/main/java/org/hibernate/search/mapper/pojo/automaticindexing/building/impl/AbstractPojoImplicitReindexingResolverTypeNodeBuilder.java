@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReind
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathFilterProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.impl.Closer;
 
@@ -78,15 +78,15 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 	}
 
 	@Override
-	final Optional<PojoImplicitReindexingResolverNode<T>> doBuild(PojoPathFilterFactory pathFilterFactory,
+	final Optional<PojoImplicitReindexingResolverNode<T>> doBuild(PojoPathFilterProvider pathFilterProvider,
 			Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
 		checkFrozen();
 
 		Collection<PojoImplicitReindexingResolverNode<? super U>> immutableNestedNodes = new ArrayList<>();
-		markingNodeBuilder.build( pathFilterFactory, allPotentialDirtyPaths )
+		markingNodeBuilder.build( pathFilterProvider, allPotentialDirtyPaths )
 				.ifPresent( immutableNestedNodes::add );
 		propertyNodeBuilders.values().stream()
-				.map( builder -> builder.build( pathFilterFactory, allPotentialDirtyPaths ) )
+				.map( builder -> builder.build( pathFilterProvider, allPotentialDirtyPaths ) )
 				.filter( Optional::isPresent )
 				.map( Optional::get )
 				.forEach( immutableNestedNodes::add );

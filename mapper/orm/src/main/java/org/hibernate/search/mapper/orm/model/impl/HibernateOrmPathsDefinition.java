@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.model.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -27,19 +28,20 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.Container
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
-import org.hibernate.search.mapper.pojo.model.path.spi.StringSetPojoPathFilter;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
- * A {@link PojoPathFilterFactory} suitable for use with Hibernate ORM,
+ * A {@link PojoPathsDefinition} suitable for use with Hibernate ORM,
  * in particular with its event system.
  * <p>
- * Paths passed to this factory are assigned a string representation as follows:
+ * Paths passed to this factory are assigned a string representation so as to match the property names
+ * and collection roles from Hibernate ORM.
+ * <p>
+ * Implementation is as follows:
  * <ul>
  *     <li>
  *         If the whole path does not contain any multi-valued {@link Value}
@@ -143,7 +145,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *     </li>
  * </ul>
  */
-public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory {
+public class HibernateOrmPathsDefinition implements PojoPathsDefinition {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final Set<String> PRIMITIVE_EXTRACTOR_NAMES = CollectionHelper.asImmutableSet(
@@ -159,18 +161,26 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory {
 
 	private final PersistentClass persistentClass;
 
-	public HibernateOrmPathFilterFactory(PersistentClass persistentClass) {
+	public HibernateOrmPathsDefinition(PersistentClass persistentClass) {
 		this.persistentClass = persistentClass;
 	}
 
 	@Override
-	public PojoPathFilter create(Set<PojoModelPathValueNode> paths) {
-		// Use a LinkedHashSet for deterministic iteration
-		Set<String> pathsAsStrings = CollectionHelper.newLinkedHashSet( paths.size() );
-		for ( PojoModelPathValueNode path : paths ) {
-			addDirtyPathStringRepresentations( pathsAsStrings, path );
+	@SuppressWarnings("unchecked")
+	public List<String> preDefinedOrdinals() {
+		List<String> preDefinedOrdinals = new ArrayList<>();
+		for ( Iterator<Property> iterator = persistentClass.getPropertyClosureIterator(); iterator.hasNext(); ) {
+			Property property = iterator.next();
+			preDefinedOrdinals.add( property.getName() );
 		}
-		return new StringSetPojoPathFilter( pathsAsStrings );
+		return preDefinedOrdinals;
+	}
+
+	@Override
+	public void interpretPaths(Set<String> target, Set<PojoModelPathValueNode> source) {
+		for ( PojoModelPathValueNode path : source ) {
+			addDirtyPathStringRepresentations( target, path );
+		}
 	}
 
 	private void addDirtyPathStringRepresentations(Set<String> pathsAsStrings, PojoModelPathValueNode path) {
@@ -222,7 +232,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory {
 		if ( extractorPath.isDefault() ) {
 			throw new AssertionFailure(
 					"Expected a non-default extractor path as per the "
-					+ PojoPathFilterFactory.class.getSimpleName() + " contract"
+					+ HibernateOrmPathsDefinition.class.getSimpleName() + " contract"
 			);
 		}
 

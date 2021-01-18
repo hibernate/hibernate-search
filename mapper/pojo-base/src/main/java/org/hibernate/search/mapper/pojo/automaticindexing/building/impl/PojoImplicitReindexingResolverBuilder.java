@@ -18,8 +18,8 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathWalker;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathFilter;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathFilterProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.AssertionFailure;
 
@@ -65,15 +65,15 @@ class PojoImplicitReindexingResolverBuilder<T> {
 	}
 
 	/**
-	 * @param pathFilterFactory A factory for path filters that will be used in the resolver (and its nested resolvers)
+	 * @param pathFilterProvider A provider for path filters that will be used in the resolver (and its nested resolvers)
 	 */
-	final Optional<PojoImplicitReindexingResolver<T>> build(PojoPathFilterFactory pathFilterFactory) {
+	final Optional<PojoImplicitReindexingResolver<T>> build(PojoPathFilterProvider pathFilterProvider) {
 		freeze();
 
 		Set<PojoModelPathValueNode> immutableDirtyPathsAcceptedByFilter = dirtyPathsTriggeringSelfReindexing;
 
 		Optional<PojoImplicitReindexingResolverNode<T>> containingEntitiesResolverRootOptional =
-				containingEntitiesResolverRootBuilder.build( pathFilterFactory, null );
+				containingEntitiesResolverRootBuilder.build( pathFilterProvider, null );
 
 		if ( immutableDirtyPathsAcceptedByFilter.isEmpty() && !containingEntitiesResolverRootOptional.isPresent() ) {
 			/*
@@ -82,8 +82,7 @@ class PojoImplicitReindexingResolverBuilder<T> {
 			return Optional.empty();
 		}
 		else {
-			PojoPathFilter filter = immutableDirtyPathsAcceptedByFilter.isEmpty()
-					? PojoPathFilter.empty() : pathFilterFactory.create( immutableDirtyPathsAcceptedByFilter );
+			PojoPathFilter filter = pathFilterProvider.create( immutableDirtyPathsAcceptedByFilter );
 			PojoImplicitReindexingResolverNode<T> containingEntitiesResolverRoot =
 					containingEntitiesResolverRootOptional.orElseGet( PojoImplicitReindexingResolverNode::noOp );
 
