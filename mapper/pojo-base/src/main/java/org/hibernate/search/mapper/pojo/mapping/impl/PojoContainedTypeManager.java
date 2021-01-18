@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
-import java.util.Set;
-
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -23,7 +21,7 @@ public class PojoContainedTypeManager<E> extends AbstractPojoTypeManager<E>
 		implements PojoWorkContainedTypeContext<E>, PojoScopeContainedTypeContext<E> {
 	public PojoContainedTypeManager(String entityName, PojoRawTypeIdentifier<E> typeIdentifier,
 			PojoCaster<E> caster,
-			PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver) {
+			PojoImplicitReindexingResolver<E> reindexingResolver) {
 		super( entityName, typeIdentifier, caster, reindexingResolver );
 	}
 

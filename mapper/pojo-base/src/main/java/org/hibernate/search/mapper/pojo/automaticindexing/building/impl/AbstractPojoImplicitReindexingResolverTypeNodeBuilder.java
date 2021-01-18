@@ -78,11 +78,11 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 	}
 
 	@Override
-	final <S> Optional<PojoImplicitReindexingResolverNode<T, S>> doBuild(PojoPathFilterFactory<S> pathFilterFactory,
+	final Optional<PojoImplicitReindexingResolverNode<T>> doBuild(PojoPathFilterFactory pathFilterFactory,
 			Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
 		checkFrozen();
 
-		Collection<PojoImplicitReindexingResolverNode<? super U, S>> immutableNestedNodes = new ArrayList<>();
+		Collection<PojoImplicitReindexingResolverNode<? super U>> immutableNestedNodes = new ArrayList<>();
 		markingNodeBuilder.build( pathFilterFactory, allPotentialDirtyPaths )
 				.ifPresent( immutableNestedNodes::add );
 		propertyNodeBuilders.values().stream()
@@ -103,8 +103,8 @@ abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 		}
 	}
 
-	abstract <S> PojoImplicitReindexingResolverNode<T, S> doBuild(
-			PojoImplicitReindexingResolverNode<? super U, S> nestedNode);
+	abstract PojoImplicitReindexingResolverNode<T> doBuild(
+			PojoImplicitReindexingResolverNode<? super U> nestedNode);
 
 	private PojoImplicitReindexingResolverPropertyNodeBuilder<U, ?> getOrCreatePropertyBuilder(String propertyName) {
 		return propertyNodeBuilders.computeIfAbsent( propertyName, this::createPropertyBuilder );

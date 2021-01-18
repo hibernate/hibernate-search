@@ -20,16 +20,15 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  * This node will ignore entities that cannot be cast to type {@code U}.
  *
  * @param <T> The type of "dirty" objects received as input.
- * @param <S> The expected type of the object describing the "dirtiness state".
  * @param <U> The type the input objects will be casted to, if possible.
  */
-public class PojoImplicitReindexingResolverCastedTypeNode<T, S, U> extends PojoImplicitReindexingResolverNode<T, S> {
+public class PojoImplicitReindexingResolverCastedTypeNode<T, U> extends PojoImplicitReindexingResolverNode<T> {
 
 	private final PojoCaster<U> caster;
-	private final PojoImplicitReindexingResolverNode<? super U, S> nested;
+	private final PojoImplicitReindexingResolverNode<? super U> nested;
 
 	public PojoImplicitReindexingResolverCastedTypeNode(PojoCaster<U> caster,
-			PojoImplicitReindexingResolverNode<? super U, S> nested) {
+			PojoImplicitReindexingResolverNode<? super U> nested) {
 		this.caster = caster;
 		this.nested = nested;
 	}
@@ -50,7 +49,7 @@ public class PojoImplicitReindexingResolverCastedTypeNode<T, S, U> extends PojoI
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			T dirty, PojoImplicitReindexingResolverRootContext<S> context) {
+			T dirty, PojoImplicitReindexingResolverRootContext context) {
 		U castedDirty = caster.castOrNull( context.sessionContext().runtimeIntrospector().unproxy( dirty ) );
 		if ( castedDirty != null ) {
 			nested.resolveEntitiesToReindex( collector, castedDirty, context );

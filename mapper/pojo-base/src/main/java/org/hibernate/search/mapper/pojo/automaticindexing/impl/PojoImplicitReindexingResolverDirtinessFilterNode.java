@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
@@ -16,15 +18,14 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  * This node allows to optimize reindexing by ignoring some changes when they do not affect a given indexed type.
  *
  * @param <T> The type of "dirty" objects received as input and passed to the delegate.
- * @param <S> The expected type of the object describing the "dirtiness state".
  */
-public class PojoImplicitReindexingResolverDirtinessFilterNode<T, S> extends PojoImplicitReindexingResolverNode<T, S> {
+public class PojoImplicitReindexingResolverDirtinessFilterNode<T> extends PojoImplicitReindexingResolverNode<T> {
 
-	private final PojoPathFilter<S> dirtyPathFilter;
-	private final PojoImplicitReindexingResolverNode<T, S> nested;
+	private final PojoPathFilter dirtyPathFilter;
+	private final PojoImplicitReindexingResolverNode<T> nested;
 
-	public PojoImplicitReindexingResolverDirtinessFilterNode(PojoPathFilter<S> dirtyPathFilter,
-			PojoImplicitReindexingResolverNode<T, S> nested) {
+	public PojoImplicitReindexingResolverDirtinessFilterNode(PojoPathFilter dirtyPathFilter,
+			PojoImplicitReindexingResolverNode<T> nested) {
 		Contracts.assertNotNull(
 				dirtyPathFilter, "dirtyPathFilter"
 		);
@@ -46,8 +47,8 @@ public class PojoImplicitReindexingResolverDirtinessFilterNode<T, S> extends Poj
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			T dirty, PojoImplicitReindexingResolverRootContext<S> context) {
-		S dirtinessState = context.dirtinessState();
+			T dirty, PojoImplicitReindexingResolverRootContext context) {
+		Set<String> dirtinessState = context.dirtinessState();
 		// See method javadoc: null means we must consider all paths as dirty
 		if ( dirtinessState == null || dirtyPathFilter.test( dirtinessState ) ) {
 			nested.resolveEntitiesToReindex( collector, dirty, context );

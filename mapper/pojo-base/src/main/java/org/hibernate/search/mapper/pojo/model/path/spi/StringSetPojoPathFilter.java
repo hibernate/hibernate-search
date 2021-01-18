@@ -13,7 +13,7 @@ import java.util.Set;
  * <p>
  * Completely ignores container value extractors.
  */
-public final class StringSetPojoPathFilter implements PojoPathFilter<Set<String>> {
+public final class StringSetPojoPathFilter implements PojoPathFilter {
 
 	private final Set<String> acceptedPaths;
 

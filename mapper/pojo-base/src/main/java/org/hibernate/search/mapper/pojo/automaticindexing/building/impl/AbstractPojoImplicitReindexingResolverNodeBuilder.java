@@ -79,16 +79,15 @@ abstract class AbstractPojoImplicitReindexingResolverNodeBuilder<T> {
 	 * @param pathFilterFactory A factory for path filters that will be used in the resolver (and its nested resolvers)
 	 * @param allPotentialDirtyPaths A comprehensive list of all paths that may be dirty
 	 * when the built resolver will be called. {@code null} if unknown.
-	 * @param <S> The expected type of the objects representing a set of paths at runtime.
 	 */
-	final <S> Optional<PojoImplicitReindexingResolverNode<T, S>> build(PojoPathFilterFactory<S> pathFilterFactory,
+	final Optional<PojoImplicitReindexingResolverNode<T>> build(PojoPathFilterFactory pathFilterFactory,
 			Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
 		freeze();
 
 		Set<PojoModelPathValueNode> immutableDirtyPathsAcceptedByFilter =
 				getDirtyPathsTriggeringReindexingIncludingNestedNodes();
 
-		Optional<PojoImplicitReindexingResolverNode<T, S>> result;
+		Optional<PojoImplicitReindexingResolverNode<T>> result;
 
 		/*
 		 * The following code allows us to decide whether we need a path filter
@@ -144,20 +143,20 @@ abstract class AbstractPojoImplicitReindexingResolverNodeBuilder<T> {
 		return result;
 	}
 
-	abstract <S> Optional<PojoImplicitReindexingResolverNode<T, S>> doBuild(PojoPathFilterFactory<S> pathFilterFactory,
+	abstract Optional<PojoImplicitReindexingResolverNode<T>> doBuild(PojoPathFilterFactory pathFilterFactory,
 			Set<PojoModelPathValueNode> allPotentialDirtyPaths);
 
-	private <S> PojoImplicitReindexingResolverNode<T, S> wrapWithFilter(PojoImplicitReindexingResolverNode<T, S> resolver,
-			PojoPathFilterFactory<S> pathFilterFactory,
+	private PojoImplicitReindexingResolverNode<T> wrapWithFilter(PojoImplicitReindexingResolverNode<T> resolver,
+			PojoPathFilterFactory pathFilterFactory,
 			Set<PojoModelPathValueNode> immutableDirtyPathsTriggeringReindexing) {
-		PojoPathFilter<S> filter = pathFilterFactory.create( immutableDirtyPathsTriggeringReindexing );
+		PojoPathFilter filter = pathFilterFactory.create( immutableDirtyPathsTriggeringReindexing );
 		return new PojoImplicitReindexingResolverDirtinessFilterNode<>(
 				filter, resolver
 		);
 	}
 
-	protected final <T2, S> PojoImplicitReindexingResolverNode<? super T2, S> createNested(
-			Collection<? extends PojoImplicitReindexingResolverNode<? super T2, S>> elements) {
+	protected final <T2> PojoImplicitReindexingResolverNode<? super T2> createNested(
+			Collection<? extends PojoImplicitReindexingResolverNode<? super T2>> elements) {
 		int size = elements.size();
 		if ( size == 0 ) {
 			// Simplify the tree: no need for a node here

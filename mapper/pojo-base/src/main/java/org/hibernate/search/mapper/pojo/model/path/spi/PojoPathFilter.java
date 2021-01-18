@@ -6,16 +6,16 @@
  */
 package org.hibernate.search.mapper.pojo.model.path.spi;
 
+import java.util.Set;
+
 /**
  * Defines a set of paths that are of importance,
  * so that they can be detected at runtime when given a set of paths.
  * <p>
  * Used in particular in dirty checking,
  * see {@link org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver}.
- *
- * @param <S> The expected type of the object representing a set of paths.
  */
-public interface PojoPathFilter<S> {
+public interface PojoPathFilter {
 
 	/**
 	 * Determines if any path in the given set of paths of is accepted by this filter.
@@ -27,9 +27,9 @@ public interface PojoPathFilter<S> {
 	 * @return {@code true} if any path in the given set is accepted by this filter,
 	 * {@code false} otherwise.
 	 */
-	boolean test(S paths);
+	boolean test(Set<String> paths);
 
-	static <S> PojoPathFilter<S> empty() {
+	static PojoPathFilter empty() {
 		return EmptyPojoPathFilter.get();
 	}
 

@@ -50,7 +50,7 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<E>
 			IdentifierMappingImplementor<I, E> identifierMapping,
 			BeanHolder<? extends RoutingBridge<? super E>> routingBridgeHolder,
 			PojoIndexingProcessor<E> processor, MappedIndexManager indexManager,
-			PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver) {
+			PojoImplicitReindexingResolver<E> reindexingResolver) {
 		super( entityName, typeIdentifier, caster, reindexingResolver );
 		this.identifierMapping = identifierMapping;
 		this.routingBridgeHolder = routingBridgeHolder;

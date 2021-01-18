@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
-import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorEntityTypeNode;
@@ -23,12 +22,12 @@ class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataC
 
 	private final PojoTypeAdditionalMetadataBuilder rootBuilder;
 	private final String entityName;
-	private final PojoPathFilterFactory<Set<String>> pathFilterFactory;
+	private final PojoPathFilterFactory pathFilterFactory;
 	private String entityIdPropertyName;
 
 	PojoEntityTypeAdditionalMetadataBuilder(PojoTypeAdditionalMetadataBuilder rootBuilder,
 			String entityName,
-			PojoPathFilterFactory<Set<String>> pathFilterFactory) {
+			PojoPathFilterFactory pathFilterFactory) {
 		this.rootBuilder = rootBuilder;
 		this.entityName = entityName;
 		this.pathFilterFactory = pathFilterFactory;

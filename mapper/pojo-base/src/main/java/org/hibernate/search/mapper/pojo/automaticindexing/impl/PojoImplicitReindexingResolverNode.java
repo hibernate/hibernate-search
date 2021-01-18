@@ -16,9 +16,8 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  * {@link #resolveEntitiesToReindex(PojoReindexingCollector, Object, PojoImplicitReindexingResolverRootContext)
  * resolve entities to reindex}.
  * This type may be an entity type, an embeddable type, a collection type, ...
- * @param <S> The expected type of the object describing the "dirtiness state".
  */
-public abstract class PojoImplicitReindexingResolverNode<T, S> implements AutoCloseable, ToStringTreeAppendable {
+public abstract class PojoImplicitReindexingResolverNode<T> implements AutoCloseable, ToStringTreeAppendable {
 
 	@Override
 	public String toString() {
@@ -38,9 +37,9 @@ public abstract class PojoImplicitReindexingResolverNode<T, S> implements AutoCl
  * {@code null} can be passed to mean "no information", in which case all paths are considered dirty.
 	 */
 	public abstract void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			T dirty, PojoImplicitReindexingResolverRootContext<S> context);
+			T dirty, PojoImplicitReindexingResolverRootContext context);
 
-	public static <T, S> PojoImplicitReindexingResolverNode<T, S> noOp() {
+	public static <T> PojoImplicitReindexingResolverNode<T> noOp() {
 		return NoOpPojoImplicitReindexingResolverNode.get();
 	}
 

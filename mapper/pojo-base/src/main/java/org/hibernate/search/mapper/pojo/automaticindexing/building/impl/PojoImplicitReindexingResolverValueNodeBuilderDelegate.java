@@ -108,11 +108,11 @@ class PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> {
 		}
 	}
 
-	<S> Collection<PojoImplicitReindexingResolverNode<V, S>> buildTypeNodes(PojoPathFilterFactory<S> pathFilterFactory,
+	Collection<PojoImplicitReindexingResolverNode<V>> buildTypeNodes(PojoPathFilterFactory pathFilterFactory,
 			Set<PojoModelPathValueNode> allPotentialDirtyPaths) {
 		checkFrozen();
 
-		Collection<PojoImplicitReindexingResolverNode<V, S>> immutableTypeNodes = new ArrayList<>();
+		Collection<PojoImplicitReindexingResolverNode<V>> immutableTypeNodes = new ArrayList<>();
 		if ( typeNodeBuilder != null ) {
 			typeNodeBuilder.build( pathFilterFactory, allPotentialDirtyPaths )
 					.ifPresent( immutableTypeNodes::add );

@@ -21,18 +21,17 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  * but we might allow other nodes in the future for optimization purposes.
  *
  * @param <C> The container type received as input, for instance {@code Map<String, Collection<MyEntityType>>}.
- * @param <S> The expected type of the object describing the "dirtiness state".
  * @param <V> The extracted value type, for instance {@code MyEntityType}.
  */
-public class PojoImplicitReindexingResolverContainerElementNode<C, S, V>
-		extends PojoImplicitReindexingResolverNode<C, S> {
+public class PojoImplicitReindexingResolverContainerElementNode<C, V>
+		extends PojoImplicitReindexingResolverNode<C> {
 
 	private final ContainerExtractorHolder<C, V> extractorHolder;
-	private final PojoImplicitReindexingResolverNode<? super V, S> nested;
-	private final ValueProcessor<PojoReindexingCollector, ? super C, PojoImplicitReindexingResolverRootContext<S>> extractingDelegate;
+	private final PojoImplicitReindexingResolverNode<? super V> nested;
+	private final ValueProcessor<PojoReindexingCollector, ? super C, PojoImplicitReindexingResolverRootContext> extractingDelegate;
 
 	public PojoImplicitReindexingResolverContainerElementNode(ContainerExtractorHolder<C, V> extractorHolder,
-			PojoImplicitReindexingResolverNode<? super V, S> nested) {
+			PojoImplicitReindexingResolverNode<? super V> nested) {
 		this.extractorHolder = extractorHolder;
 		this.nested = nested;
 		this.extractingDelegate = extractorHolder.wrap( (collector, value, context) -> {
@@ -59,7 +58,7 @@ public class PojoImplicitReindexingResolverContainerElementNode<C, S, V>
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			C dirty, PojoImplicitReindexingResolverRootContext<S> context) {
+			C dirty, PojoImplicitReindexingResolverRootContext context) {
 		extractingDelegate.process( collector, dirty, context );
 	}
 

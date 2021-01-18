@@ -6,17 +6,19 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
-public class PojoImplicitReindexingResolverImpl<T, S> implements PojoImplicitReindexingResolver<T, S> {
+public class PojoImplicitReindexingResolverImpl<T> implements PojoImplicitReindexingResolver<T> {
 
-	private final PojoPathFilter<S> dirtyPathsTriggeringSelfReindexing;
-	private final PojoImplicitReindexingResolverNode<T, S> containingEntitiesResolverRoot;
+	private final PojoPathFilter dirtyPathsTriggeringSelfReindexing;
+	private final PojoImplicitReindexingResolverNode<T> containingEntitiesResolverRoot;
 
 	public PojoImplicitReindexingResolverImpl(
-			PojoPathFilter<S> dirtyPathsTriggeringSelfReindexing,
-			PojoImplicitReindexingResolverNode<T, S> containingEntitiesResolverRoot) {
+			PojoPathFilter dirtyPathsTriggeringSelfReindexing,
+			PojoImplicitReindexingResolverNode<T> containingEntitiesResolverRoot) {
 		this.dirtyPathsTriggeringSelfReindexing = dirtyPathsTriggeringSelfReindexing;
 		this.containingEntitiesResolverRoot = containingEntitiesResolverRoot;
 	}
@@ -39,13 +41,13 @@ public class PojoImplicitReindexingResolverImpl<T, S> implements PojoImplicitRei
 	}
 
 	@Override
-	public boolean requiresSelfReindexing(S dirtinessState) {
+	public boolean requiresSelfReindexing(Set<String> dirtinessState) {
 		return dirtinessState == null || dirtyPathsTriggeringSelfReindexing.test( dirtinessState );
 	}
 
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			T dirty, PojoImplicitReindexingResolverRootContext<S> context) {
+			T dirty, PojoImplicitReindexingResolverRootContext context) {
 		containingEntitiesResolverRoot.resolveEntitiesToReindex( collector, dirty, context );
 	}
 

@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
-import java.util.Set;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -126,14 +125,10 @@ class PojoIndexedTypeManagerBuilder<E> {
 
 		extendedMappingCollector.identifierMapping( identityMappingCollector.identifierMapping );
 
-		/*
-		 * TODO offer more flexibility to mapper implementations, allowing them to define their own dirtiness state?
-		 * Note this will require to allow them to define their own indexing plan APIs.
-		 */
-		PojoPathFilterFactory<Set<String>> pathFilterFactory = typeAdditionalMetadata
+		PojoPathFilterFactory pathFilterFactory = typeAdditionalMetadata
 				.getEntityTypeMetadata().orElseThrow( () -> log.missingEntityTypeMetadata( typeModel ) )
 				.getPathFilterFactory();
-		PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver =
+		PojoImplicitReindexingResolver<E> reindexingResolver =
 				reindexingResolverBuildingHelper.build( typeModel, pathFilterFactory );
 
 		MappedIndexManager indexManager = indexManagerBuilder.build();

@@ -17,13 +17,12 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  * {@link PojoImplicitReindexingResolverPropertyNode property nodes} for deeper resolution.
  *
  * @param <T> The type of "dirty" objects received as input.
- * @param <S> The expected type of the object describing the "dirtiness state".
  */
-public class PojoImplicitReindexingResolverOriginalTypeNode<T, S> extends PojoImplicitReindexingResolverNode<T, S> {
+public class PojoImplicitReindexingResolverOriginalTypeNode<T> extends PojoImplicitReindexingResolverNode<T> {
 
-	private final PojoImplicitReindexingResolverNode<? super T, S> nested;
+	private final PojoImplicitReindexingResolverNode<? super T> nested;
 
-	public PojoImplicitReindexingResolverOriginalTypeNode(PojoImplicitReindexingResolverNode<? super T, S> nested) {
+	public PojoImplicitReindexingResolverOriginalTypeNode(PojoImplicitReindexingResolverNode<? super T> nested) {
 		this.nested = nested;
 	}
 
@@ -43,7 +42,7 @@ public class PojoImplicitReindexingResolverOriginalTypeNode<T, S> extends PojoIm
 	@Override
 	@SuppressWarnings("unchecked") // As long as T is not a proxy-specific interface, it will also be implemented by the unproxified object
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			T dirty, PojoImplicitReindexingResolverRootContext<S> context) {
+			T dirty, PojoImplicitReindexingResolverRootContext context) {
 		dirty = (T) context.sessionContext().runtimeIntrospector().unproxy( dirty );
 		nested.resolveEntitiesToReindex( collector, dirty, context );
 	}

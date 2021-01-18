@@ -84,16 +84,16 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		}
 	}
 
-	public <T, S> PojoImplicitReindexingResolver<T, S> build(PojoRawTypeModel<T> typeModel,
-			PojoPathFilterFactory<S> pathFilterFactory) {
+	public <T> PojoImplicitReindexingResolver<T> build(PojoRawTypeModel<T> typeModel,
+			PojoPathFilterFactory pathFilterFactory) {
 		return buildOptional( typeModel, pathFilterFactory )
 				.orElseGet( () -> new PojoImplicitReindexingResolverImpl<>(
 						PojoPathFilter.empty(), PojoImplicitReindexingResolverNode.noOp()
 				) );
 	}
 
-	public <T, S> Optional<PojoImplicitReindexingResolver<T, S>> buildOptional(PojoRawTypeModel<T> typeModel,
-			PojoPathFilterFactory<S> pathFilterFactory) {
+	public <T> Optional<PojoImplicitReindexingResolver<T>> buildOptional(PojoRawTypeModel<T> typeModel,
+			PojoPathFilterFactory pathFilterFactory) {
 		@SuppressWarnings("unchecked") // We know builders have this type, by construction
 		PojoImplicitReindexingResolverBuilder<T> builder =
 				(PojoImplicitReindexingResolverBuilder<T>) builderByType.get( typeModel );

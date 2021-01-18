@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi;
 
-import java.util.Set;
-
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
@@ -41,7 +39,7 @@ public interface PojoAdditionalMetadataCollectorTypeNode extends PojoAdditionalM
 	 * about the entity.
 	 */
 	PojoAdditionalMetadataCollectorEntityTypeNode markAsEntity(String entityName,
-			PojoPathFilterFactory<Set<String>> pathFilterFactory);
+			PojoPathFilterFactory pathFilterFactory);
 
 	/**
 	 * Mark this type as an indexed type.

@@ -8,13 +8,13 @@ package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
-class NoOpPojoImplicitReindexingResolverNode extends PojoImplicitReindexingResolverNode<Object, Object> {
+class NoOpPojoImplicitReindexingResolverNode extends PojoImplicitReindexingResolverNode<Object> {
 
 	private static final NoOpPojoImplicitReindexingResolverNode INSTANCE = new NoOpPojoImplicitReindexingResolverNode();
 
-	@SuppressWarnings( "unchecked" ) // This instance works for any T or D
-	public static <T, D> PojoImplicitReindexingResolverNode<T, D> get() {
-		return (PojoImplicitReindexingResolverNode<T, D>) INSTANCE;
+	@SuppressWarnings( "unchecked" ) // This instance works for any T
+	public static <T> PojoImplicitReindexingResolverNode<T> get() {
+		return (PojoImplicitReindexingResolverNode<T>) INSTANCE;
 	}
 
 	@Override
@@ -25,7 +25,7 @@ class NoOpPojoImplicitReindexingResolverNode extends PojoImplicitReindexingResol
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			Object dirty,
-			PojoImplicitReindexingResolverRootContext<Object> context) {
+			PojoImplicitReindexingResolverRootContext context) {
 		// No-op
 	}
 
