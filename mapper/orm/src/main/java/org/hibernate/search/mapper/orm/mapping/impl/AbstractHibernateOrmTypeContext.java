@@ -29,12 +29,11 @@ abstract class AbstractHibernateOrmTypeContext<E>
 	private final EntityPersister entityPersister;
 	private final EntityTypeDescriptor<E> entityTypeDescriptor;
 
-	AbstractHibernateOrmTypeContext(SessionFactoryImplementor sessionFactory,
-			PojoRawTypeIdentifier<E> typeIdentifier, String jpaEntityName, String hibernateOrmEntityName) {
-		this.typeIdentifier = typeIdentifier;
-		this.jpaEntityName = jpaEntityName;
+	AbstractHibernateOrmTypeContext(AbstractBuilder<E> builder, SessionFactoryImplementor sessionFactory) {
+		this.typeIdentifier = builder.typeIdentifier;
+		this.jpaEntityName = builder.jpaEntityName;
 		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
-		this.entityPersister = metamodel.entityPersister( hibernateOrmEntityName );
+		this.entityPersister = metamodel.entityPersister( builder.hibernateOrmEntityName );
 		this.entityTypeDescriptor = metamodel.entity( entityPersister.getEntityName() );
 	}
 
@@ -67,5 +66,17 @@ abstract class AbstractHibernateOrmTypeContext<E>
 			throw log.nonJpaEntityType( typeIdentifier );
 		}
 		return entityTypeDescriptor;
+	}
+
+	abstract static class AbstractBuilder<E> {
+		private final PojoRawTypeIdentifier<E> typeIdentifier;
+		private final String jpaEntityName;
+		private final String hibernateOrmEntityName;
+
+		AbstractBuilder(PojoRawTypeIdentifier<E> typeIdentifier, String jpaEntityName, String hibernateOrmEntityName) {
+			this.typeIdentifier = typeIdentifier;
+			this.jpaEntityName = jpaEntityName;
+			this.hibernateOrmEntityName = hibernateOrmEntityName;
+		}
 	}
 }
