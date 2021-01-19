@@ -32,7 +32,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 	private final MappedIndexManager indexManager;
 
 	private HibernateOrmIndexedTypeContext(Builder<E> builder, SessionFactoryImplementor sessionFactory) {
-		super( sessionFactory, builder.typeIdentifier, builder.jpaEntityName, builder.hibernateOrmEntityName );
+		super( builder, sessionFactory );
 
 		if ( builder.documentIdSourcePropertyName.equals( entityPersister().getIdentifierPropertyName() ) ) {
 			documentIdIsEntityId = true;
@@ -90,11 +90,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 		return loaderFactory;
 	}
 
-	static class Builder<E> implements PojoIndexedTypeExtendedMappingCollector {
-
-		private final PojoRawTypeIdentifier<E> typeIdentifier;
-		private final String jpaEntityName;
-		private final String hibernateOrmEntityName;
+	static class Builder<E> extends AbstractBuilder<E> implements PojoIndexedTypeExtendedMappingCollector {
 
 		private String documentIdSourcePropertyName;
 		private ValueReadHandle<?> documentIdSourcePropertyHandle;
@@ -103,9 +99,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 		private MappedIndexManager indexManager;
 
 		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String jpaEntityName, String hibernateOrmEntityName) {
-			this.typeIdentifier = typeIdentifier;
-			this.jpaEntityName = jpaEntityName;
-			this.hibernateOrmEntityName = hibernateOrmEntityName;
+			super( typeIdentifier, jpaEntityName, hibernateOrmEntityName );
 		}
 
 		@Override
