@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
@@ -21,6 +22,8 @@ public interface PojoWorkTypeContext<E> {
 	PojoRawTypeIdentifier<E> typeIdentifier();
 
 	Supplier<E> toEntitySupplier(PojoWorkSessionContext<?> sessionContext, Object entity);
+
+	PojoPathFilter dirtySelfOrContainingFilter();
 
 	void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			PojoWorkSessionContext<?> sessionContext, Object identifier,

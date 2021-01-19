@@ -6,20 +6,20 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
-import java.util.Set;
-
 import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathFilter;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
 public class PojoImplicitReindexingResolverImpl<T> implements PojoImplicitReindexingResolver<T> {
 
-	private final PojoPathFilter dirtyPathsTriggeringSelfReindexing;
+	private final PojoPathFilter dirtySelfFilter;
+	private final PojoPathFilter dirtySelfOrContainingFilter;
 	private final PojoImplicitReindexingResolverNode<T> containingEntitiesResolverRoot;
 
-	public PojoImplicitReindexingResolverImpl(
-			PojoPathFilter dirtyPathsTriggeringSelfReindexing,
+	public PojoImplicitReindexingResolverImpl(PojoPathFilter dirtySelfFilter,
+			PojoPathFilter dirtySelfOrContainingFilter,
 			PojoImplicitReindexingResolverNode<T> containingEntitiesResolverRoot) {
-		this.dirtyPathsTriggeringSelfReindexing = dirtyPathsTriggeringSelfReindexing;
+		this.dirtySelfFilter = dirtySelfFilter;
+		this.dirtySelfOrContainingFilter = dirtySelfOrContainingFilter;
 		this.containingEntitiesResolverRoot = containingEntitiesResolverRoot;
 	}
 
@@ -36,13 +36,18 @@ public class PojoImplicitReindexingResolverImpl<T> implements PojoImplicitReinde
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
 		builder.attribute( "operation", "root" );
-		builder.attribute( "dirtyPathsTriggeringSelfReindexing", dirtyPathsTriggeringSelfReindexing );
+		builder.attribute( "dirtyPathsTriggeringSelfReindexing", dirtySelfFilter );
 		builder.attribute( "containingEntitiesResolverRoot", containingEntitiesResolverRoot );
 	}
 
 	@Override
-	public boolean requiresSelfReindexing(Set<String> dirtinessState) {
-		return dirtinessState == null || dirtyPathsTriggeringSelfReindexing.test( dirtinessState );
+	public PojoPathFilter dirtySelfFilter() {
+		return dirtySelfFilter;
+	}
+
+	@Override
+	public PojoPathFilter dirtySelfOrContainingFilter() {
+		return dirtySelfOrContainingFilter;
 	}
 
 	@Override

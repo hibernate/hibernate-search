@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
-import java.util.HashSet;
+import java.util.BitSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
@@ -90,7 +89,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 
 		boolean shouldResolveToReindex;
 		boolean considerAllDirty;
-		Set<String> dirtyPaths;
+		BitSet dirtyPaths;
 
 		AbstractEntityState(I identifier) {
 			this.identifier = identifier;
@@ -102,7 +101,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		}
 
 		@Override
-		public Set<String> dirtinessState() {
+		public BitSet dirtinessState() {
 			return dirtyPaths;
 		}
 
@@ -122,13 +121,11 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			dirtyPaths = null;
 		}
 
-		void update(Supplier<E> entitySupplier, String providedRoutingKey, String... dirtyPaths) {
+		void update(Supplier<E> entitySupplier, String providedRoutingKey, String... dirtyPathsAsStrings) {
 			doUpdate( entitySupplier, providedRoutingKey );
 			shouldResolveToReindex = true;
 			if ( !considerAllDirty ) {
-				for ( String dirtyPath : dirtyPaths ) {
-					addDirtyPath( dirtyPath );
-				}
+				addDirtyPaths( dirtyPathsAsStrings );
 			}
 		}
 
@@ -161,11 +158,11 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			}
 		}
 
-		private void addDirtyPath(String dirtyPath) {
+		private void addDirtyPaths(String[] dirtyPathsAsStrings) {
 			if ( dirtyPaths == null ) {
-				dirtyPaths = new HashSet<>();
+				dirtyPaths = new BitSet();
 			}
-			dirtyPaths.add( dirtyPath );
+			typeContext().dirtySelfOrContainingFilter().setAccepted( dirtyPaths, dirtyPathsAsStrings );
 		}
 	}
 
