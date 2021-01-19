@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.event.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.BitSet;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.HibernateException;
@@ -55,8 +56,6 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final String[] EMPTY_STRING_ARRAY = new String[0];
-
 	private final boolean dirtyCheckingEnabled;
 
 	private volatile EventsHibernateSearchState state;
@@ -97,15 +96,43 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
 		final Object entity = event.getEntity();
 		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, event.getPersister() );
-		if ( typeContext != null ) {
-			PojoIndexingPlan<?> plan = getCurrentIndexingPlan( contextProvider, event.getSession() );
-			Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
-			if ( dirtyCheckingEnabled ) {
-				plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, entity, getDirtyPropertyNames( event ) );
+		if ( typeContext == null ) {
+			// This type is not indexed, nor contained in an indexed type.
+			// Return early, to avoid creating an indexing plan.
+			return;
+		}
+
+		BitSet dirtyPaths;
+		if ( dirtyCheckingEnabled ) {
+			int[] dirtyProperties = event.getDirtyProperties();
+			if ( dirtyProperties == null || dirtyProperties.length == 0 ) {
+				// No information about dirty properties.
+				// This can happen when an entity is merged before it's even been loaded.
+				// Just assume everything is dirty.
+				dirtyPaths = null;
 			}
 			else {
-				plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, entity );
+				dirtyPaths = typeContext.dirtyFilter().filter( dirtyProperties );
+				if ( dirtyPaths == null ) {
+					// No property relevant for indexing was changed.
+					// Return early, to avoid creating an indexing plan.
+					return;
+				}
 			}
+		}
+		else {
+			// Dirty checking is disabled.
+			// Just assume everything is dirty.
+			dirtyPaths = null;
+		}
+
+		PojoIndexingPlan<?> plan = getCurrentIndexingPlan( contextProvider, event.getSession() );
+		Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
+		if ( dirtyPaths != null ) {
+			plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, entity, dirtyPaths );
+		}
+		else {
+			plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, entity );
 		}
 	}
 
@@ -211,53 +238,48 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 		HibernateOrmListenerTypeContext typeContext = contextProvider.typeContextProvider()
 				.forHibernateOrmEntityName( event.getAffectedOwnerEntityName() );
-		if ( typeContext != null ) {
-			PojoIndexingPlan<?> plan = getCurrentIndexingPlan( contextProvider, event.getSession() );
-			Object providedId = typeContext.toIndexingPlanProvidedId( event.getAffectedOwnerIdOrNull() );
+		if ( typeContext == null ) {
+			// This type is not indexed, nor contained in an indexed type.
+			// Return early, to avoid creating an indexing plan.
+			return;
+		}
 
-			if ( dirtyCheckingEnabled ) {
-				PersistentCollection persistentCollection = event.getCollection();
-				String collectionRole = null;
-				if ( persistentCollection != null ) {
-					collectionRole = persistentCollection.getRole();
-				}
-				if ( collectionRole != null ) {
-					/*
-					 * Collection role will only be non-null for PostCollectionUpdateEvents.
-					 * For those events, we can pass the role to the indexing plan
-					 * which can then decide whether to reindex based on whether the collection
-					 * has any impact on indexing.
-					 */
-					plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, ownerEntity, collectionRole );
-				}
-				else {
-					/*
-					 * We don't know which collection is being changed,
-					 * so we have to default to reindexing, just in case.
-					 */
-					plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, ownerEntity );
+		BitSet dirtyPaths;
+		if ( dirtyCheckingEnabled ) {
+			PersistentCollection persistentCollection = event.getCollection();
+			String collectionRole = null;
+			if ( persistentCollection != null ) {
+				collectionRole = persistentCollection.getRole();
+			}
+			if ( collectionRole != null ) {
+				// Collection role will only be non-null for PostCollectionUpdateEvents.
+				// For those events, we can determine whether the collection has any impact on indexing.
+				dirtyPaths = typeContext.dirtyFilter().filter( collectionRole );
+				if ( dirtyPaths == null ) {
+					// This collection is not relevant for indexing.
+					// Return early, to avoid creating an indexing plan.
+					return;
 				}
 			}
 			else {
-				plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, ownerEntity );
+				 // We don't know which collection is being changed,
+				 // so we have to default to reindexing, just in case.
+				dirtyPaths = null;
 			}
-		}
-	}
-
-	private String[] getDirtyPropertyNames(PostUpdateEvent event) {
-		EntityPersister persister = event.getPersister();
-		final int[] dirtyProperties = event.getDirtyProperties();
-		if ( dirtyProperties != null && dirtyProperties.length > 0 ) {
-			String[] propertyNames = persister.getPropertyNames();
-			int length = dirtyProperties.length;
-			String[] dirtyPropertyNames = new String[length];
-			for ( int i = 0; i < length; i++ ) {
-				dirtyPropertyNames[i] = propertyNames[dirtyProperties[i]];
-			}
-			return dirtyPropertyNames;
 		}
 		else {
-			return EMPTY_STRING_ARRAY;
+			// Dirty checking is disabled.
+			// Just assume everything is dirty.
+			dirtyPaths = null;
+		}
+
+		PojoIndexingPlan<?> plan = getCurrentIndexingPlan( contextProvider, event.getSession() );
+		Object providedId = typeContext.toIndexingPlanProvidedId( event.getAffectedOwnerIdOrNull() );
+		if ( dirtyPaths != null ) {
+			plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, ownerEntity, dirtyPaths );
+		}
+		else {
+			plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, ownerEntity );
 		}
 	}
 

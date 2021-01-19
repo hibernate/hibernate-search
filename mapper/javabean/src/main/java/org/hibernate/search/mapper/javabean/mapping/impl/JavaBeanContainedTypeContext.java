@@ -7,17 +7,21 @@
 package org.hibernate.search.mapper.javabean.mapping.impl;
 
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
-/*
- * There's nothing here at the moment, just a placeholder.
- */
-class JavaBeanContainedTypeContext {
+class JavaBeanContainedTypeContext<E> extends AbstractJavaBeanTypeContext<E> {
 
-	private JavaBeanContainedTypeContext() {
+	private JavaBeanContainedTypeContext(Builder<E> builder) {
+		super( builder );
 	}
 
-	static class Builder implements PojoContainedTypeExtendedMappingCollector {
-		Builder() {
+	static class Builder<E> extends AbstractBuilder<E> implements PojoContainedTypeExtendedMappingCollector {
+		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String entityName) {
+			super( typeIdentifier, entityName );
+		}
+
+		JavaBeanContainedTypeContext<E> build() {
+			return new JavaBeanContainedTypeContext<>( this );
 		}
 	}
 }

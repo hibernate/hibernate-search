@@ -90,7 +90,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession<EntityRefer
 	public SearchIndexingPlan indexingPlan() {
 		if ( indexingPlan == null ) {
 			indexingPlan = new SearchIndexingPlanImpl(
-					runtimeIntrospector(),
+					typeContextProvider, runtimeIntrospector(),
 					createIndexingPlan( commitStrategy, refreshStrategy )
 			);
 		}

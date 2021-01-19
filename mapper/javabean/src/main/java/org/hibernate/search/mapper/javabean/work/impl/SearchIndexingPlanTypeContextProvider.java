@@ -4,17 +4,12 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.event.impl;
+package org.hibernate.search.mapper.javabean.work.impl;
 
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
-public interface HibernateOrmListenerTypeContext {
+public interface SearchIndexingPlanTypeContextProvider {
 
-	PojoRawTypeIdentifier<?> typeIdentifier();
-
-	Object toIndexingPlanProvidedId(Object entityId);
-
-	PojoPathFilter dirtyFilter();
+	<T> SearchIndexingPlanTypeContext forExactType(PojoRawTypeIdentifier<T> typeIdentifier);
 
 }

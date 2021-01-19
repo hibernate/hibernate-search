@@ -44,7 +44,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		getState( identifier ).update( entitySupplier, providedRoutingKey );
 	}
 
-	void update(Object providedId, String providedRoutingKey, Object entity, String... dirtyPaths) {
+	void update(Object providedId, String providedRoutingKey, Object entity, BitSet dirtyPaths) {
 		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
 		I identifier = toIdentifier( providedId, entitySupplier );
 		getState( identifier ).update( entitySupplier, providedRoutingKey, dirtyPaths );
@@ -121,11 +121,11 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			dirtyPaths = null;
 		}
 
-		void update(Supplier<E> entitySupplier, String providedRoutingKey, String... dirtyPathsAsStrings) {
+		void update(Supplier<E> entitySupplier, String providedRoutingKey, BitSet dirtyPaths) {
 			doUpdate( entitySupplier, providedRoutingKey );
 			shouldResolveToReindex = true;
 			if ( !considerAllDirty ) {
-				addDirtyPaths( dirtyPathsAsStrings );
+				addDirtyPaths( dirtyPaths );
 			}
 		}
 
@@ -158,11 +158,14 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			}
 		}
 
-		private void addDirtyPaths(String[] dirtyPathsAsStrings) {
+		private void addDirtyPaths(BitSet newDirtyPaths) {
+			if ( newDirtyPaths == null ) {
+				return;
+			}
 			if ( dirtyPaths == null ) {
 				dirtyPaths = new BitSet();
 			}
-			typeContext().dirtySelfOrContainingFilter().setAccepted( dirtyPaths, dirtyPathsAsStrings );
+			dirtyPaths.or( newDirtyPaths );
 		}
 	}
 
