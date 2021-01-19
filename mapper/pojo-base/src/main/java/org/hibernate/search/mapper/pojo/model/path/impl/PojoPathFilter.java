@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.model.path.impl;
 
 import java.util.BitSet;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -47,24 +46,31 @@ public final class PojoPathFilter {
 	/**
 	 * Determines if any path in the given set of paths of is accepted by this filter.
 	 * <p>
-	 * This method is not optimized and should not be called too often.
+	 * This method is optimized to be called very often.
 	 *
-	 * @param paths A {@link Set} of paths, where bit N represents path with ordinal N.
+	 * @param pathSelection A {@link BitSet} representing a set of paths using the path ordinals.
 	 * Never {@code null}.
 	 * @return {@code true} if any path in the given set is accepted by this filter,
 	 * {@code false} otherwise.
 	 */
-	public boolean test(Set<String> paths) {
+	public boolean test(BitSet pathSelection) {
+		return acceptedPaths.intersects( pathSelection );
+	}
+
+	/**
+	 * For each path in the given array, sets the corresponding ordinal in the given bitset if it is accepted by the filter.
+	 *
+	 * @param bitSet A {@link BitSet}. Never {@code null}.
+	 * @param paths A array of string representations of paths. Never {@code null}.
+	 */
+	public void setAccepted(BitSet bitSet, String ... paths) {
 		for ( String path : paths ) {
 			Integer ordinal = ordinals.toOrdinal( path );
-			if ( ordinal == null ) {
+			if ( ordinal == null || !acceptedPaths.get( ordinal ) ) {
 				continue;
 			}
-			if ( acceptedPaths.get( ordinal ) ) {
-				return true;
-			}
+			bitSet.set( ordinal );
 		}
-		return false;
 	}
 
 }

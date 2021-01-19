@@ -170,7 +170,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 						case PRESENT:
 						case UNKNOWN:
 							if ( considerAllDirty || updatedBecauseOfContained
-									|| typeContext.requiresSelfReindexing( dirtyPaths ) ) {
+									|| dirtyPaths != null && typeContext.dirtySelfFilter().test( dirtyPaths ) ) {
 								delegateUpdate();
 							}
 							return;

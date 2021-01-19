@@ -24,6 +24,7 @@ import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathFilterProvider;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -89,8 +90,10 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		return buildOptional( typeModel, pathsDefinition )
 				.orElseGet( () -> {
 					PojoPathFilterProvider pathFilterProvider = new PojoPathFilterProvider( pathsDefinition );
+					PojoPathFilter emptyFilter = pathFilterProvider
+							.create( Collections.emptySet() );
 					return new PojoImplicitReindexingResolverImpl<>(
-							pathFilterProvider.create( Collections.emptySet() ),
+							emptyFilter, emptyFilter,
 							PojoImplicitReindexingResolverNode.noOp()
 					);
 				} );

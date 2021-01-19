@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
-import java.util.Set;
+import java.util.BitSet;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.spi.PojoImplicitReindexingResolverSessionContext;
 
@@ -29,6 +29,6 @@ public interface PojoImplicitReindexingResolverRootContext {
 	 * @return The set of dirty paths in the root entity.
 	 * {@code null} means "no information", in which case all paths are considered dirty.
 	 */
-	Set<String> dirtinessState();
+	BitSet dirtinessState();
 
 }

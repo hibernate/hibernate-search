@@ -14,6 +14,7 @@ import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReind
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -72,6 +73,11 @@ public class AbstractPojoTypeManager<E>
 	public final Supplier<E> toEntitySupplier(PojoWorkSessionContext<?> sessionContext, Object entity) {
 		PojoRuntimeIntrospector introspector = sessionContext.runtimeIntrospector();
 		return new CachingCastingEntitySupplier<>( caster, introspector, entity );
+	}
+
+	@Override
+	public PojoPathFilter dirtySelfOrContainingFilter() {
+		return reindexingResolver.dirtySelfOrContainingFilter();
 	}
 
 	@Override

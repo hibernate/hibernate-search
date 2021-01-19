@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.building.impl;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -82,13 +83,19 @@ class PojoImplicitReindexingResolverBuilder<T> {
 			return Optional.empty();
 		}
 		else {
-			PojoPathFilter filter = pathFilterProvider.create( immutableDirtyPathsAcceptedByFilter );
+			PojoPathFilter dirtySelfFilter = pathFilterProvider.create( immutableDirtyPathsAcceptedByFilter );
+
 			PojoImplicitReindexingResolverNode<T> containingEntitiesResolverRoot =
 					containingEntitiesResolverRootOptional.orElseGet( PojoImplicitReindexingResolverNode::noOp );
 
-			return Optional.of(
-					new PojoImplicitReindexingResolverImpl<>( filter, containingEntitiesResolverRoot )
-			);
+			Set<PojoModelPathValueNode> dirtySelfOrContainingPaths =
+					new HashSet<>( immutableDirtyPathsAcceptedByFilter );
+			dirtySelfOrContainingPaths.addAll(
+					containingEntitiesResolverRootBuilder.getDirtyPathsTriggeringReindexingIncludingNestedNodes() );
+			PojoPathFilter dirtySelfOrContainingFilter = pathFilterProvider.create( dirtySelfOrContainingPaths );
+
+			return Optional.of( new PojoImplicitReindexingResolverImpl<>( dirtySelfFilter, dirtySelfOrContainingFilter,
+					containingEntitiesResolverRoot ) );
 		}
 	}
 
