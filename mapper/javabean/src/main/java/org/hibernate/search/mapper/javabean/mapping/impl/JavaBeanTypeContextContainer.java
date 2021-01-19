@@ -22,19 +22,31 @@ class JavaBeanTypeContextContainer implements JavaBeanSearchSessionTypeContextPr
 	private final Map<PojoRawTypeIdentifier<?>, JavaBeanIndexedTypeContext<?>> indexedTypeContexts = new LinkedHashMap<>();
 	private final Map<Class<?>, JavaBeanIndexedTypeContext<?>> indexedTypeContextsByClass = new LinkedHashMap<>();
 	private final Map<String, JavaBeanIndexedTypeContext<?>> indexedTypeContextsByEntityName = new LinkedHashMap<>();
+	private final Map<PojoRawTypeIdentifier<?>, AbstractJavaBeanTypeContext<?>> typeContexts = new LinkedHashMap<>();
 
 	private JavaBeanTypeContextContainer(Builder builder) {
 		for ( JavaBeanIndexedTypeContext.Builder<?> contextBuilder : builder.indexedTypeContextBuilders ) {
-			JavaBeanIndexedTypeContext<?> indexedTypeContext = contextBuilder.build();
-			indexedTypeContexts.put( indexedTypeContext.typeIdentifier(), indexedTypeContext );
-			indexedTypeContextsByClass.put( indexedTypeContext.javaClass(), indexedTypeContext );
-			indexedTypeContextsByEntityName.put( indexedTypeContext.name(), indexedTypeContext );
+			JavaBeanIndexedTypeContext<?> typeContext = contextBuilder.build();
+			indexedTypeContexts.put( typeContext.typeIdentifier(), typeContext );
+			indexedTypeContextsByClass.put( typeContext.javaClass(), typeContext );
+			indexedTypeContextsByEntityName.put( typeContext.name(), typeContext );
+			typeContexts.put( typeContext.typeIdentifier(), typeContext );
+		}
+		for ( JavaBeanContainedTypeContext.Builder<?> contextBuilder : builder.containedTypeContextBuilders ) {
+			JavaBeanContainedTypeContext<?> typeContext = contextBuilder.build();
+			typeContexts.put( typeContext.typeIdentifier(), typeContext );
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	public <E> JavaBeanIndexedTypeContext<E> indexedForExactType(PojoRawTypeIdentifier<E> typeIdentifier) {
 		return (JavaBeanIndexedTypeContext<E>) indexedTypeContexts.get( typeIdentifier );
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <E> AbstractJavaBeanTypeContext<E> forExactType(PojoRawTypeIdentifier<E> typeIdentifier) {
+		return (AbstractJavaBeanTypeContext<E>) typeContexts.get( typeIdentifier );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -54,6 +66,7 @@ class JavaBeanTypeContextContainer implements JavaBeanSearchSessionTypeContextPr
 	static class Builder {
 
 		private final List<JavaBeanIndexedTypeContext.Builder<?>> indexedTypeContextBuilders = new ArrayList<>();
+		private final List<JavaBeanContainedTypeContext.Builder<?>> containedTypeContextBuilders = new ArrayList<>();
 
 		Builder() {
 		}
@@ -62,6 +75,13 @@ class JavaBeanTypeContextContainer implements JavaBeanSearchSessionTypeContextPr
 			JavaBeanIndexedTypeContext.Builder<E> builder =
 					new JavaBeanIndexedTypeContext.Builder<>( typeModel.typeIdentifier(), entityName );
 			indexedTypeContextBuilders.add( builder );
+			return builder;
+		}
+
+		<E> JavaBeanContainedTypeContext.Builder<E> addContained(PojoRawTypeModel<E> typeModel, String entityName) {
+			JavaBeanContainedTypeContext.Builder<E> builder =
+					new JavaBeanContainedTypeContext.Builder<>( typeModel.typeIdentifier(), entityName );
+			containedTypeContextBuilders.add( builder );
 			return builder;
 		}
 

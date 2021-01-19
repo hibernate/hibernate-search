@@ -11,11 +11,12 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 /**
- * A provider of {@link PojoPathFilter} instances.
+ * A provider of {@link PojoPathFilterImpl} instances.
  */
 public final class PojoPathFilterProvider {
 
@@ -46,7 +47,7 @@ public final class PojoPathFilterProvider {
 		for ( String pathsAsString : pathsAsStrings ) {
 			acceptedPaths.set( ordinals.toExistingOrNewOrdinal( pathsAsString ) );
 		}
-		return new PojoPathFilter( ordinals, acceptedPaths );
+		return new PojoPathFilterImpl( ordinals, acceptedPaths );
 	}
 
 }

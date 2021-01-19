@@ -1,0 +1,86 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.mapper.pojo.model.path.impl;
+
+import java.util.BitSet;
+import java.util.stream.Collectors;
+
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
+
+final class PojoPathFilterImpl implements PojoPathFilter {
+
+	private final PojoPathOrdinals ordinals;
+	private final BitSet acceptedPaths;
+
+	public PojoPathFilterImpl(PojoPathOrdinals ordinals, BitSet acceptedPaths) {
+		this.ordinals = ordinals;
+		this.acceptedPaths = acceptedPaths;
+	}
+
+	@Override
+	public String toString() {
+		return toString( acceptedPaths );
+	}
+
+	@Override
+	public String toString(BitSet pathSelection) {
+		return "{"
+				+ pathSelection.stream().mapToObj( ordinals::toPath )
+				.collect( Collectors.joining( ", " ) )
+				+ "}";
+	}
+
+	@Override
+	public boolean test(BitSet pathSelection) {
+		return acceptedPaths.intersects( pathSelection );
+	}
+
+	@Override
+	public BitSet filter(String path) {
+		Integer ordinal = ordinals.toOrdinal( path );
+		if ( ordinal != null && acceptedPaths.get( ordinal ) ) {
+			BitSet result = new BitSet( ordinal );
+			result.set( ordinal );
+			return result;
+		}
+		else {
+			return null;
+		}
+	}
+
+	@Override
+	public BitSet filter(String... paths) {
+		BitSet bitSet = null;
+		for ( String path : paths ) {
+			Integer ordinal = ordinals.toOrdinal( path );
+			if ( ordinal == null || !acceptedPaths.get( ordinal ) ) {
+				continue;
+			}
+			if ( bitSet == null ) {
+				bitSet = new BitSet();
+			}
+			bitSet.set( ordinal );
+		}
+		return bitSet;
+	}
+
+	@Override
+	public BitSet filter(int[] pathOrdinals) {
+		BitSet bitSet = null;
+		for ( int pathOrdinal : pathOrdinals ) {
+			if ( !acceptedPaths.get( pathOrdinal ) ) {
+				continue;
+			}
+			if ( bitSet == null ) {
+				bitSet = new BitSet();
+			}
+			bitSet.set( pathOrdinal );
+		}
+		return bitSet;
+	}
+
+}

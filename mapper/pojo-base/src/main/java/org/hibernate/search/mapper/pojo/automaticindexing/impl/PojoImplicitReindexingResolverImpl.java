@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
-import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathFilter;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
 public class PojoImplicitReindexingResolverImpl<T> implements PojoImplicitReindexingResolver<T> {

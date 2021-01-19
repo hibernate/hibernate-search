@@ -40,6 +40,7 @@ import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReind
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
@@ -368,13 +369,16 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		if ( reindexingResolverOptional.isPresent() ) {
 			String entityName = entityTypeMetadata.getEntityName();
 
-			// Nothing to contribute to contained types at the moment,
-			// but create the collector just so the mapper knows the type is contained
-			delegate.createContainedTypeExtendedMappingCollector( entityType, entityName );
+			PojoImplicitReindexingResolver<T> reindexingResolver = reindexingResolverOptional.get();
+
+			PojoContainedTypeExtendedMappingCollector extendedMappingCollector = delegate
+					.createContainedTypeExtendedMappingCollector( entityType, entityName );
+
+			extendedMappingCollector.dirtyFilter( reindexingResolver.dirtySelfOrContainingFilter() );
 
 			PojoContainedTypeManager<T> typeManager = new PojoContainedTypeManager<>(
 					entityName, entityType.typeIdentifier(), entityType.caster(),
-					reindexingResolverOptional.get()
+					reindexingResolver
 			);
 			log.containedTypeManager( entityType, typeManager );
 			containedTypeManagerContainerBuilder.add( entityType, typeManager );

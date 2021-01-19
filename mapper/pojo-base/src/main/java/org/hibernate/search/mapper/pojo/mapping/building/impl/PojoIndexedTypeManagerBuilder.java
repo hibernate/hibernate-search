@@ -131,6 +131,8 @@ class PojoIndexedTypeManagerBuilder<E> {
 		PojoImplicitReindexingResolver<E> reindexingResolver =
 				reindexingResolverBuildingHelper.build( typeModel, pathsDefinition );
 
+		extendedMappingCollector.dirtyFilter( reindexingResolver.dirtySelfOrContainingFilter() );
+
 		MappedIndexManager indexManager = indexManagerBuilder.build();
 		extendedMappingCollector.indexManager( indexManager );
 

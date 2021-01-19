@@ -16,6 +16,8 @@ import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContex
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeTypeContext;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContext;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -28,6 +30,7 @@ abstract class AbstractHibernateOrmTypeContext<E>
 	private final String jpaEntityName;
 	private final EntityPersister entityPersister;
 	private final EntityTypeDescriptor<E> entityTypeDescriptor;
+	private final PojoPathFilter dirtyFilter;
 
 	AbstractHibernateOrmTypeContext(AbstractBuilder<E> builder, SessionFactoryImplementor sessionFactory) {
 		this.typeIdentifier = builder.typeIdentifier;
@@ -35,6 +38,7 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
 		this.entityPersister = metamodel.entityPersister( builder.hibernateOrmEntityName );
 		this.entityTypeDescriptor = metamodel.entity( entityPersister.getEntityName() );
+		this.dirtyFilter = builder.dirtyFilter;
 	}
 
 	@Override
@@ -60,6 +64,11 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		return entityPersister;
 	}
 
+	@Override
+	public PojoPathFilter dirtyFilter() {
+		return dirtyFilter;
+	}
+
 	public EntityTypeDescriptor<E> entityTypeDescriptor() {
 		if ( entityTypeDescriptor == null ) {
 			// TODO HSEARCH-3771 Mass indexing for ORM's dynamic-map entity types
@@ -68,15 +77,21 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		return entityTypeDescriptor;
 	}
 
-	abstract static class AbstractBuilder<E> {
+	abstract static class AbstractBuilder<E> implements PojoTypeExtendedMappingCollector {
 		private final PojoRawTypeIdentifier<E> typeIdentifier;
 		private final String jpaEntityName;
 		private final String hibernateOrmEntityName;
+		private PojoPathFilter dirtyFilter;
 
 		AbstractBuilder(PojoRawTypeIdentifier<E> typeIdentifier, String jpaEntityName, String hibernateOrmEntityName) {
 			this.typeIdentifier = typeIdentifier;
 			this.jpaEntityName = jpaEntityName;
 			this.hibernateOrmEntityName = hibernateOrmEntityName;
+		}
+
+		@Override
+		public void dirtyFilter(PojoPathFilter dirtyFilter) {
+			this.dirtyFilter = dirtyFilter;
 		}
 	}
 }

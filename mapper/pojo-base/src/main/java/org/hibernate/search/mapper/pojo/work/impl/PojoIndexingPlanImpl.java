@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +69,8 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 	}
 
 	@Override
-	public void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity, String... dirtyPaths) {
+	public void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey,
+			Object entity, BitSet dirtyPaths) {
 		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegate( typeIdentifier );
 		delegate.update( providedId, providedRoutingKey, entity, dirtyPaths );
 	}

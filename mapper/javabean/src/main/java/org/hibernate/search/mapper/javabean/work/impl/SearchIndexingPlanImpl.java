@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.javabean.work.impl;
 
+import java.util.BitSet;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
@@ -16,11 +17,14 @@ import org.hibernate.search.util.common.impl.Throwables;
 
 public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
+	private final SearchIndexingPlanTypeContextProvider typeContextProvider;
 	private final PojoRuntimeIntrospector introspector;
 	private final PojoIndexingPlan<?> delegate;
 
-	public SearchIndexingPlanImpl(PojoRuntimeIntrospector introspector,
+	public SearchIndexingPlanImpl(SearchIndexingPlanTypeContextProvider typeContextProvider,
+			PojoRuntimeIntrospector introspector,
 			PojoIndexingPlan<?> delegate) {
+		this.typeContextProvider = typeContextProvider;
 		this.introspector = introspector;
 		this.delegate = delegate;
 	}
@@ -51,8 +55,11 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	}
 
 	@Override
-	public void addOrUpdate(Object providedId, String providedRoutingKey, Object entity, String... dirtyPaths) {
-		delegate.addOrUpdate( getTypeIdentifier( entity ), providedId, providedRoutingKey, entity, dirtyPaths );
+	public void addOrUpdate(Object providedId, String providedRoutingKey, Object entity, String... dirtyPathsAsStrings) {
+		PojoRawTypeIdentifier<?> typeIdentifier = getTypeIdentifier( entity );
+		SearchIndexingPlanTypeContext typeContext = typeContextProvider.forExactType( typeIdentifier );
+		BitSet dirtyPaths = typeContext == null ? null : typeContext.dirtyFilter().filter( dirtyPathsAsStrings );
+		delegate.addOrUpdate( typeIdentifier, providedId, providedRoutingKey, entity, dirtyPaths );
 	}
 
 	@Override

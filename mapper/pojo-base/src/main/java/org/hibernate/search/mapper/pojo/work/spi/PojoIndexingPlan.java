@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.mapper.pojo.work.spi;
 
+import java.util.BitSet;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 /**
@@ -75,10 +77,13 @@ public interface PojoIndexingPlan<R> {
 	 * Leave {@code null} if sharding is disabled
 	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @param entity The entity to update in the index.
-	 * @param dirtyPaths The paths to consider dirty, formatted using the dot-notation
-	 * ("directEntityProperty.nestedPropery").
+	 * @param dirtyPaths The paths to consider dirty, as a {@link BitSet}.
+	 * You can build such a {@link BitSet} by obtaining the
+	 * {@link org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector#dirtyFilter(PojoPathFilter) dirty filter}
+	 * for the entity type and calling one of the {@code filter} methods.
 	 */
-	void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity, String... dirtyPaths);
+	void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey,
+			Object entity, BitSet dirtyPaths);
 
 	/**
 	 * Delete an entity from the index.
