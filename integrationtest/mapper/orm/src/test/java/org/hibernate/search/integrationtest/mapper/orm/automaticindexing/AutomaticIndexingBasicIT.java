@@ -8,12 +8,8 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.function.Consumer;
 import javax.persistence.Basic;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -36,7 +32,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Test automatic indexing based on Hibernate ORM entity events.
+ * Test automatic indexing based on Hibernate ORM entity events for basic fields.
  *
  * This test only checks basic, direct updates to the entity state.
  * Other tests in the same package check more complex updates involving associations.
@@ -57,9 +53,6 @@ public class AutomaticIndexingBasicIT {
 				.field( "indexedField", String.class )
 				.field( "shallowReindexOnUpdateField", String.class )
 				.field( "noReindexOnUpdateField", String.class )
-				.field( "indexedElementCollectionField", String.class, b2 -> b2.multiValued( true ) )
-				.field( "shallowReindexOnUpdateElementCollectionField", String.class, b2 -> b2.multiValued( true ) )
-				.field( "noReindexOnUpdateElementCollectionField", String.class, b2 -> b2.multiValued( true ) )
 		);
 
 		sessionFactory = ormSetupHelper.start()
@@ -73,7 +66,6 @@ public class AutomaticIndexingBasicIT {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setIndexedField( "initialValue" );
-			entity1.getIndexedElementCollectionField().add( "firstValue" );
 
 			session.persist( entity1 );
 
@@ -82,10 +74,6 @@ public class AutomaticIndexingBasicIT {
 							.field( "indexedField", entity1.getIndexedField() )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
-							.field(
-									"indexedElementCollectionField",
-									entity1.getIndexedElementCollectionField().get( 0 )
-							)
 					)
 					.processedThenExecuted();
 		} );
@@ -100,10 +88,6 @@ public class AutomaticIndexingBasicIT {
 							.field( "indexedField", entity1.getIndexedField() )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
-							.field(
-									"indexedElementCollectionField",
-									entity1.getIndexedElementCollectionField().get( 0 )
-							)
 					)
 					.processedThenExecuted();
 		} );
@@ -128,7 +112,6 @@ public class AutomaticIndexingBasicIT {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setIndexedField( "initialValue" );
-			entity1.getIndexedElementCollectionField().add( "firstValue" );
 
 			session.persist( entity1 );
 
@@ -137,10 +120,6 @@ public class AutomaticIndexingBasicIT {
 							.field( "indexedField", entity1.getIndexedField() )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
-							.field(
-									"indexedElementCollectionField",
-									entity1.getIndexedElementCollectionField().get( 0 )
-							)
 					)
 					.processed();
 
@@ -152,132 +131,12 @@ public class AutomaticIndexingBasicIT {
 							.field( "indexedField", entity1.getIndexedField() )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
-							.field(
-									"indexedElementCollectionField",
-									entity1.getIndexedElementCollectionField().get( 0 )
-							)
 					)
 					.discarded();
 
 			trx.rollback();
 			backendMock.verifyExpectationsMet();
 		} );
-	}
-
-	@Test
-	public void directValueUpdate_indexedElementCollectionField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = new IndexedEntity();
-			entity1.setId( 1 );
-			entity1.getIndexedElementCollectionField().add( "firstValue" );
-
-			session.persist( entity1 );
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.add( "1", b -> b
-							.field( "indexedField", null )
-							.field( "shallowReindexOnUpdateField", null )
-							.field( "noReindexOnUpdateField", null )
-							.field(
-									"indexedElementCollectionField",
-									entity1.getIndexedElementCollectionField().get( 0 )
-							)
-					)
-					.processedThenExecuted();
-		} );
-		backendMock.verifyExpectationsMet();
-
-		// Test adding a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
-			entity1.getIndexedElementCollectionField().add( "secondValue" );
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
-							.field( "indexedField", null )
-							.field( "shallowReindexOnUpdateField", null )
-							.field( "noReindexOnUpdateField", null )
-							.field(
-									"indexedElementCollectionField",
-									entity1.getIndexedElementCollectionField().get( 0 ),
-									entity1.getIndexedElementCollectionField().get( 1 )
-							)
-					)
-					.processedThenExecuted();
-		} );
-		backendMock.verifyExpectationsMet();
-
-		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
-			entity1.getIndexedElementCollectionField().remove( 1 );
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
-							.field( "indexedField", null )
-							.field( "shallowReindexOnUpdateField", null )
-							.field( "noReindexOnUpdateField", null )
-							.field(
-									"indexedElementCollectionField",
-									entity1.getIndexedElementCollectionField().get( 0 )
-							)
-					)
-					.processedThenExecuted();
-		} );
-		backendMock.verifyExpectationsMet();
-	}
-
-	/**
-	 * Test that replacing an indexed element collection
-	 * does trigger reindexing of the indexed entity owning the collection.
-	 * <p>
-	 * We need dedicated tests for this because Hibernate ORM does not handle
-	 * replaced collections the same way as it does updated collections.
-	 */
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3199")
-	public void directValueReplace_indexedElementCollectionField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = new IndexedEntity();
-			entity1.setId( 1 );
-			entity1.getIndexedElementCollectionField().add( "firstValue" );
-
-			session.persist( entity1 );
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.add( "1", b -> b
-							.field( "indexedField", null )
-							.field( "shallowReindexOnUpdateField", null )
-							.field( "noReindexOnUpdateField", null )
-							.field(
-									"indexedElementCollectionField",
-									entity1.getIndexedElementCollectionField().get( 0 )
-							)
-					)
-					.processedThenExecuted();
-		} );
-		backendMock.verifyExpectationsMet();
-
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
-			entity1.setIndexedElementCollectionField( new ArrayList<>( Arrays.asList(
-					"newFirstValue", "newSecondValue"
-			) ) );
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
-							.field( "indexedField", null )
-							.field( "shallowReindexOnUpdateField", null )
-							.field( "noReindexOnUpdateField", null )
-							.field(
-									"indexedElementCollectionField",
-									entity1.getIndexedElementCollectionField().get( 0 ),
-									entity1.getIndexedElementCollectionField().get( 1 )
-							)
-					)
-					.processedThenExecuted();
-		} );
-		backendMock.verifyExpectationsMet();
 	}
 
 	/**
@@ -317,94 +176,6 @@ public class AutomaticIndexingBasicIT {
 			entity1.setNonIndexedField( null );
 
 			// Do not expect any work
-		} );
-		backendMock.verifyExpectationsMet();
-	}
-
-	/**
-	 * Test that updating a non-indexed element collection
-	 * does not trigger reindexing of the indexed entity owning the collection.
-	 */
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3199")
-	public void directValueUpdate_nonIndexedElementCollectionField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = new IndexedEntity();
-			entity1.setId( 1 );
-			entity1.getNonIndexedElementCollectionField().add( "firstValue" );
-
-			session.persist( entity1 );
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.add( "1", b -> b
-							.field( "indexedField", null )
-							.field( "shallowReindexOnUpdateField", null )
-							.field( "noReindexOnUpdateField", null )
-					)
-					.processedThenExecuted();
-		} );
-		backendMock.verifyExpectationsMet();
-
-		// Test adding a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
-			entity1.getNonIndexedElementCollectionField().add( "secondValue" );
-
-			// Do not expect any work
-		} );
-		backendMock.verifyExpectationsMet();
-
-		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
-			entity1.getNonIndexedElementCollectionField().remove( 1 );
-
-			// Do not expect any work
-		} );
-		backendMock.verifyExpectationsMet();
-	}
-
-	/**
-	 * Test that replacing a non-indexed element collection
-	 * does not trigger reindexing of the indexed entity owning the collection.
-	 * <p>
-	 * We need dedicated tests for this because Hibernate ORM does not handle
-	 * replaced collections the same way as it does updated collections.
-	 */
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3204")
-	public void directValueReplace_nonIndexedElementCollectionField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = new IndexedEntity();
-			entity1.setId( 1 );
-			entity1.getNonIndexedElementCollectionField().add( "firstValue" );
-
-			session.persist( entity1 );
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.add( "1", b -> b
-							.field( "indexedField", null )
-							.field( "shallowReindexOnUpdateField", null )
-							.field( "noReindexOnUpdateField", null )
-					)
-					.processedThenExecuted();
-		} );
-		backendMock.verifyExpectationsMet();
-
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
-			entity1.setNonIndexedElementCollectionField( new ArrayList<>( Arrays.asList(
-					"newFirstValue", "newSecondValue"
-			) ) );
-
-			// TODO HSEARCH-3204: remove the statement below to not expect any work
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
-							.field( "indexedField", null )
-							.field( "shallowReindexOnUpdateField", null )
-							.field( "noReindexOnUpdateField", null )
-					)
-					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -466,118 +237,6 @@ public class AutomaticIndexingBasicIT {
 	}
 
 	/**
-	 * Test that updating an indexed element collection configured with reindexOnUpdate = SHALLOW
-	 * does trigger reindexing of the indexed entity owning the collection.
-	 * <p>
-	 * SHALLOW isn't really useful in this case, since there's no "depth" to speak of,
-	 * but we're testing this anyway, for the sake of completeness.
-	 */
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-4001")
-	public void directValueUpdate_shallowReindexOnUpdateElementCollectionField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = new IndexedEntity();
-			entity1.setId( 1 );
-			entity1.getShallowReindexOnUpdateElementCollectionField().add( "firstValue" );
-
-			session.persist( entity1 );
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.add( "1", b -> b
-							.field( "indexedField", null )
-							.field( "shallowReindexOnUpdateField", null )
-							.field( "noReindexOnUpdateField", null )
-							.field( "shallowReindexOnUpdateElementCollectionField", "firstValue" )
-					)
-					.processedThenExecuted();
-		} );
-		backendMock.verifyExpectationsMet();
-
-		// Test adding a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
-			entity1.getShallowReindexOnUpdateElementCollectionField().add( "secondValue" );
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
-							.field( "indexedField", null )
-							.field( "shallowReindexOnUpdateField", null )
-							.field( "noReindexOnUpdateField", null )
-							.field( "shallowReindexOnUpdateElementCollectionField",
-									"firstValue", "secondValue" )
-					)
-					.processedThenExecuted();
-		} );
-		backendMock.verifyExpectationsMet();
-
-		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
-			entity1.getShallowReindexOnUpdateElementCollectionField().remove( 1 );
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
-							.field( "indexedField", null )
-							.field( "shallowReindexOnUpdateField", null )
-							.field( "noReindexOnUpdateField", null )
-							.field( "shallowReindexOnUpdateElementCollectionField", "firstValue" )
-					)
-					.processedThenExecuted();
-		} );
-		backendMock.verifyExpectationsMet();
-	}
-
-	/**
-	 * Test that replacing an indexed element collection configured with reindexOnUpdate = SHALLOW
-	 * does trigger reindexing of the indexed entity owning the collection.
-	 * <p>
-	 * We need dedicated tests for this because Hibernate ORM does not handle
-	 * replaced collections the same way as it does updated collections.
-	 * <p>
-	 * SHALLOW isn't really useful in this case, since there's no "depth" to speak of,
-	 * but we're testing this anyway, for the sake of completeness.
-	 */
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-4001")
-	public void directValueReplace_shallowReindexOnUpdateElementCollectionField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = new IndexedEntity();
-			entity1.setId( 1 );
-			entity1.getShallowReindexOnUpdateElementCollectionField().add( "firstValue" );
-
-			session.persist( entity1 );
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.add( "1", b -> b
-							.field( "indexedField", null )
-							.field( "shallowReindexOnUpdateField", null )
-							.field( "noReindexOnUpdateField", null )
-							.field( "shallowReindexOnUpdateElementCollectionField", "firstValue" )
-					)
-					.processedThenExecuted();
-		} );
-		backendMock.verifyExpectationsMet();
-
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
-			entity1.setShallowReindexOnUpdateElementCollectionField( new ArrayList<>( Arrays.asList(
-					"newFirstValue", "newSecondValue"
-			) ) );
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
-							.field( "indexedField", null )
-							.field( "shallowReindexOnUpdateField", null )
-							.field( "noReindexOnUpdateField", null )
-							.field( "shallowReindexOnUpdateElementCollectionField",
-									"newFirstValue", "newSecondValue" )
-					)
-					.processedThenExecuted();
-		} );
-		backendMock.verifyExpectationsMet();
-	}
-
-	/**
 	 * Test that updating a indexed basic property configured with reindexOnUpdate = NO
 	 * does not trigger reindexing of the indexed entity owning the property.
 	 */
@@ -614,100 +273,6 @@ public class AutomaticIndexingBasicIT {
 			entity1.setNoReindexOnUpdateField( null );
 
 			// Do not expect any work
-		} );
-		backendMock.verifyExpectationsMet();
-	}
-
-	/**
-	 * Test that updating an indexed element collection configured with reindexOnUpdate = NO
-	 * does not trigger reindexing of the indexed entity owning the collection.
-	 */
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3206")
-	public void directValueUpdate_noReindexOnUpdateElementCollectionField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = new IndexedEntity();
-			entity1.setId( 1 );
-			entity1.getNoReindexOnUpdateElementCollectionField().add( "firstValue" );
-
-			session.persist( entity1 );
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.add( "1", b -> b
-							.field( "indexedField", null )
-							.field( "shallowReindexOnUpdateField", null )
-							.field( "noReindexOnUpdateField", null )
-							.field( "noReindexOnUpdateElementCollectionField", "firstValue" )
-					)
-					.processedThenExecuted();
-		} );
-		backendMock.verifyExpectationsMet();
-
-		// Test adding a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
-			entity1.getNoReindexOnUpdateElementCollectionField().add( "secondValue" );
-
-			// Do not expect any work
-		} );
-		backendMock.verifyExpectationsMet();
-
-		// Test removing a value
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
-			entity1.getNoReindexOnUpdateElementCollectionField().remove( 1 );
-
-			// Do not expect any work
-		} );
-		backendMock.verifyExpectationsMet();
-	}
-
-	/**
-	 * Test that replacing an indexed element collection configured with reindexOnUpdate = NO
-	 * does not trigger reindexing of the indexed entity owning the collection.
-	 * <p>
-	 * We need dedicated tests for this because Hibernate ORM does not handle
-	 * replaced collections the same way as it does updated collections.
-	 */
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3204")
-	public void directValueReplace_noReindexOnUpdateElementCollectionField() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = new IndexedEntity();
-			entity1.setId( 1 );
-			entity1.getNoReindexOnUpdateElementCollectionField().add( "firstValue" );
-
-			session.persist( entity1 );
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.add( "1", b -> b
-							.field( "indexedField", null )
-							.field( "shallowReindexOnUpdateField", null )
-							.field( "noReindexOnUpdateField", null )
-							.field( "noReindexOnUpdateElementCollectionField", "firstValue" )
-					)
-					.processedThenExecuted();
-		} );
-		backendMock.verifyExpectationsMet();
-
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = session.get( IndexedEntity.class, 1 );
-			entity1.setNoReindexOnUpdateElementCollectionField( new ArrayList<>( Arrays.asList(
-					"newFirstValue", "newSecondValue"
-			) ) );
-
-			// TODO HSEARCH-3204: remove the statement below to not expect any work
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
-							.field( "indexedField", null )
-							.field( "shallowReindexOnUpdateField", null )
-							.field( "noReindexOnUpdateField", null )
-							.field(
-									"noReindexOnUpdateElementCollectionField",
-									"newFirstValue", "newSecondValue"
-							)
-					)
-					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -820,35 +385,18 @@ public class AutomaticIndexingBasicIT {
 		@GenericField
 		private String indexedField;
 
-		@ElementCollection
-		@GenericField
-		private List<String> indexedElementCollectionField = new ArrayList<>();
-
 		@Basic
 		private String nonIndexedField;
-
-		@ElementCollection
-		private List<String> nonIndexedElementCollectionField = new ArrayList<>();
 
 		@Basic
 		@GenericField
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
 		private String shallowReindexOnUpdateField;
 
-		@ElementCollection
-		@GenericField
-		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
-		private List<String> shallowReindexOnUpdateElementCollectionField = new ArrayList<>();
-
 		@Basic
 		@GenericField
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		private String noReindexOnUpdateField;
-
-		@ElementCollection
-		@GenericField
-		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
-		private List<String> noReindexOnUpdateElementCollectionField = new ArrayList<>();
 
 		public IndexedEntity() {
 		}
@@ -874,28 +422,12 @@ public class AutomaticIndexingBasicIT {
 			this.indexedField = indexedField;
 		}
 
-		public List<String> getIndexedElementCollectionField() {
-			return indexedElementCollectionField;
-		}
-
-		public void setIndexedElementCollectionField(List<String> indexedElementCollectionField) {
-			this.indexedElementCollectionField = indexedElementCollectionField;
-		}
-
 		public String getNonIndexedField() {
 			return nonIndexedField;
 		}
 
 		public void setNonIndexedField(String nonIndexedField) {
 			this.nonIndexedField = nonIndexedField;
-		}
-
-		public List<String> getNonIndexedElementCollectionField() {
-			return nonIndexedElementCollectionField;
-		}
-
-		public void setNonIndexedElementCollectionField(List<String> nonIndexedElementCollectionField) {
-			this.nonIndexedElementCollectionField = nonIndexedElementCollectionField;
 		}
 
 		public String getShallowReindexOnUpdateField() {
@@ -906,14 +438,6 @@ public class AutomaticIndexingBasicIT {
 			this.shallowReindexOnUpdateField = shallowReindexOnUpdateField;
 		}
 
-		public List<String> getShallowReindexOnUpdateElementCollectionField() {
-			return shallowReindexOnUpdateElementCollectionField;
-		}
-
-		public void setShallowReindexOnUpdateElementCollectionField(List<String> shallowReindexOnUpdateElementCollectionField) {
-			this.shallowReindexOnUpdateElementCollectionField = shallowReindexOnUpdateElementCollectionField;
-		}
-
 		public String getNoReindexOnUpdateField() {
 			return noReindexOnUpdateField;
 		}
@@ -922,13 +446,6 @@ public class AutomaticIndexingBasicIT {
 			this.noReindexOnUpdateField = noReindexOnUpdateField;
 		}
 
-		public List<String> getNoReindexOnUpdateElementCollectionField() {
-			return noReindexOnUpdateElementCollectionField;
-		}
-
-		public void setNoReindexOnUpdateElementCollectionField(List<String> noReindexOnUpdateElementCollectionField) {
-			this.noReindexOnUpdateElementCollectionField = noReindexOnUpdateElementCollectionField;
-		}
 	}
 
 }
