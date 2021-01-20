@@ -366,6 +366,91 @@ public class AutomaticIndexingBasicIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	/**
+	 * Test that merging an entity to change an indexed field
+	 * triggers reindexing of the indexed entity owning the property.
+	 */
+	@Test
+	public void sessionUpdate_directValueUpdate_indexedField() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setIndexedField( "initialValue" );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "indexedField", entity1.getIndexedField() )
+							.field( "shallowReindexOnUpdateField", null )
+							.field( "noReindexOnUpdateField", null )
+					)
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setIndexedField( "updatedValue" );
+
+			session.update( entity1 );
+
+			// Hibernate ORM does not track dirtiness on merges: we assume everything is dirty.
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "indexedField", entity1.getIndexedField() )
+							.field( "shallowReindexOnUpdateField", null )
+							.field( "noReindexOnUpdateField", null )
+					)
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that merging an entity to change an non-indexed field
+	 * triggers reindexing of the indexed entity owning the property:
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3199")
+	public void sessionUpdate_directValueUpdate_nonIndexedField() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setNonIndexedField( "initialValue" );
+
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "indexedField", entity1.getIndexedField() )
+							.field( "shallowReindexOnUpdateField", null )
+							.field( "noReindexOnUpdateField", null )
+					)
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setNonIndexedField( "updatedValue" );
+
+			session.update( entity1 );
+
+			// Hibernate ORM does not track dirtiness on calls to update(): we assume everything is dirty.
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.update( "1", b -> b
+							.field( "indexedField", entity1.getIndexedField() )
+							.field( "shallowReindexOnUpdateField", null )
+							.field( "noReindexOnUpdateField", null )
+					)
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
 	public Consumer<StubDocumentNode.Builder> expectedValue(String indexedFieldExpectedValue) {
 		return b -> b.field( "indexedField", indexedFieldExpectedValue )
 				.field( "shallowReindexOnUpdateField", null )
