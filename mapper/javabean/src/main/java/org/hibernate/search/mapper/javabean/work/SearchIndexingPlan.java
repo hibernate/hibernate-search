@@ -44,7 +44,7 @@ public interface SearchIndexingPlan {
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index.
 	 * <p>
-	 * Shorthand for {@code update(null, entity)}; see {@link #addOrUpdate(Object, String, Object)}.
+	 * Shorthand for {@code addOrUpdate(null, entity)}; see {@link #addOrUpdate(Object, String, Object)}.
 	 *
 	 * @param entity The entity to update in the index.
 	 */
@@ -70,7 +70,7 @@ public interface SearchIndexingPlan {
 	 * <p>
 	 * Assumes that the entity may already be present in the index.
 	 * <p>
-	 * Shorthand for {@code update(null, entity, dirtyPaths)}; see {@link #addOrUpdate(Object, String, Object, String...)}.
+	 * Shorthand for {@code addOrUpdate(null, entity, dirtyPaths)}; see {@link #addOrUpdate(Object, String, Object, String...)}.
 	 *
 	 * @param entity The entity to update in the index.
 	 * @param dirtyPaths The paths to consider dirty, formatted using the dot-notation
