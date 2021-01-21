@@ -203,7 +203,11 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 	}
 
 	private void updateBecauseOfContained(Object containingEntity) {
-		// TODO ignore the event when containingEntity has provided IDs
+		// Note this method won't work when using provided identifiers
+		// Fortunately, all platforms relying on provided identifiers (Infinispan)
+		// also disable reindexing of other entities on updates,
+		// so they won't ever call this method.
+
 		PojoRawTypeIdentifier<?> typeIdentifier = getIntrospector().detectEntityType( containingEntity );
 		if ( typeIdentifier == null ) {
 			throw new AssertionFailure(
