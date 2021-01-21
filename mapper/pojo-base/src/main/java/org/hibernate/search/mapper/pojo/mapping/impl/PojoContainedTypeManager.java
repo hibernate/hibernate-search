@@ -10,10 +10,7 @@ import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReind
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeContainedTypeContext;
-import org.hibernate.search.mapper.pojo.work.impl.PojoContainedTypeIndexingPlan;
-import org.hibernate.search.mapper.pojo.work.impl.PojoIndexingPlanImpl;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkContainedTypeContext;
-import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 /**
  * @param <E> The contained entity type.
@@ -25,11 +22,4 @@ public class PojoContainedTypeManager<E> extends AbstractPojoTypeManager<E>
 			PojoImplicitReindexingResolver<E> reindexingResolver) {
 		super( entityName, typeIdentifier, caster, reindexingResolver );
 	}
-
-	@Override
-	public PojoContainedTypeIndexingPlan<E> createIndexingPlan(PojoWorkSessionContext<?> sessionContext,
-			PojoIndexingPlanImpl<?> root) {
-		return new PojoContainedTypeIndexingPlan<>( this, sessionContext, root );
-	}
-
 }

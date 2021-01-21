@@ -13,6 +13,8 @@ import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaMana
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
@@ -26,9 +28,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.work.impl.PojoDocumentContributor;
-import org.hibernate.search.mapper.pojo.work.impl.PojoIndexedTypeIndexingPlan;
-import org.hibernate.search.mapper.pojo.work.impl.PojoIndexingPlanImpl;
-import org.hibernate.search.mapper.pojo.work.impl.PojoTypeIndexer;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkRouter;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
@@ -118,13 +117,8 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<E>
 	}
 
 	@Override
-	public PojoTypeIndexer<I, E> createIndexer(PojoWorkSessionContext<?> sessionContext) {
-		return new PojoTypeIndexer<>(
-				this, sessionContext,
-				indexManager.createIndexer(
-						sessionContext
-				)
-		);
+	public IndexIndexer createIndexer(PojoWorkSessionContext<?> sessionContext) {
+		return indexManager.createIndexer( sessionContext );
 	}
 
 	@Override
@@ -133,16 +127,10 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<E>
 	}
 
 	@Override
-	public <R> PojoIndexedTypeIndexingPlan<I, E, R> createIndexingPlan(PojoWorkSessionContext<R> sessionContext,
-			PojoIndexingPlanImpl<?> root,
+	public <R> IndexIndexingPlan<R> createIndexingPlan(PojoWorkSessionContext<R> sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		return new PojoIndexedTypeIndexingPlan<>(
-				this, sessionContext, root,
-				indexManager.createIndexingPlan(
-						sessionContext, sessionContext.entityReferenceFactory(),
-						commitStrategy, refreshStrategy
-				)
-		);
+		return indexManager.createIndexingPlan( sessionContext, sessionContext.entityReferenceFactory(),
+				commitStrategy, refreshStrategy );
 	}
 
 	@Override

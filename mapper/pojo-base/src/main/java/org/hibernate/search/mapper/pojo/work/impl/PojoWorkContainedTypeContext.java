@@ -6,14 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
-import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
-
 /**
  * @param <E> The contained entity type.
  */
 public interface PojoWorkContainedTypeContext<E> extends PojoWorkTypeContext<E> {
-
-	PojoContainedTypeIndexingPlan<E> createIndexingPlan(PojoWorkSessionContext<?> sessionContext,
-			PojoIndexingPlanImpl<?> root);
 
 }

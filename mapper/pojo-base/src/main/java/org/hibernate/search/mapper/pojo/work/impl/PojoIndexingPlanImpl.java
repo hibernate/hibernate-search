@@ -206,8 +206,7 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> indexedTypeContextOptional =
 				indexedTypeContextProvider.getByExactType( typeIdentifier );
 		if ( indexedTypeContextOptional.isPresent() ) {
-			PojoIndexedTypeIndexingPlan<?, ?, R> delegate = indexedTypeContextOptional.get()
-					.createIndexingPlan( sessionContext, this, commitStrategy, refreshStrategy );
+			PojoIndexedTypeIndexingPlan<?, ?, R> delegate = createDelegate( indexedTypeContextOptional.get() );
 			indexedTypeDelegates.put( typeIdentifier, delegate );
 			return delegate;
 		}
@@ -215,8 +214,7 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 			Optional<? extends PojoWorkContainedTypeContext<?>> containedTypeContextOptional =
 					containedTypeContextProvider.getByExactType( typeIdentifier );
 			if ( containedTypeContextOptional.isPresent() ) {
-				PojoContainedTypeIndexingPlan<?> delegate = containedTypeContextOptional.get()
-						.createIndexingPlan( sessionContext, this );
+				PojoContainedTypeIndexingPlan<?> delegate = createDelegate( containedTypeContextOptional.get() );
 				containedTypeDelegates.put( typeIdentifier, delegate );
 				return delegate;
 			}
@@ -230,11 +228,10 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 			return delegate;
 		}
 
-		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> indexedTypeManagerOptional =
+		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> indexedTypeContextOptional =
 				indexedTypeContextProvider.getByExactType( typeIdentifier );
-		if ( indexedTypeManagerOptional.isPresent() ) {
-			delegate = indexedTypeManagerOptional.get()
-					.createIndexingPlan( sessionContext, this, commitStrategy, refreshStrategy );
+		if ( indexedTypeContextOptional.isPresent() ) {
+			delegate = createDelegate( indexedTypeContextOptional.get() );
 			indexedTypeDelegates.put( typeIdentifier, delegate );
 			return delegate;
 		}
@@ -248,7 +245,17 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 	public PojoLoadingPlan<Object> loadingPlan() {
 		if ( loadingPlan == null ) {
 			loadingPlan = new PojoMultiLoaderLoadingPlan<>( sessionContext.defaultLoadingContext() );
+
 		}
 		return loadingPlan;
+	}
+
+	private PojoIndexedTypeIndexingPlan<?, ?, R> createDelegate(PojoWorkIndexedTypeContext<?, ?> typeContext) {
+		return new PojoIndexedTypeIndexingPlan<>( typeContext, sessionContext, this,
+				typeContext.createIndexingPlan( sessionContext, commitStrategy, refreshStrategy ) );
+	}
+
+	private PojoContainedTypeIndexingPlan<?> createDelegate(PojoWorkContainedTypeContext<?> typeContext) {
+		return new PojoContainedTypeIndexingPlan<>( typeContext, sessionContext, this );
 	}
 }
