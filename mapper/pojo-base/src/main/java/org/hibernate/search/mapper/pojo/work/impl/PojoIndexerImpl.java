@@ -79,12 +79,13 @@ public class PojoIndexerImpl implements PojoIndexer {
 	}
 
 	private PojoTypeIndexer<?, ?> createTypeIndexer(PojoRawTypeIdentifier<?> typeIdentifier) {
-		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> typeContext =
+		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> typeContextOptional =
 				indexedTypeContextProvider.getByExactType( typeIdentifier );
-		if ( !typeContext.isPresent() ) {
+		if ( !typeContextOptional.isPresent() ) {
 			throw log.nonIndexedTypeInIndexer( typeIdentifier );
 		}
 
-		return typeContext.get().createIndexer( sessionContext );
+		PojoWorkIndexedTypeContext<?, ?> typeContext = typeContextOptional.get();
+		return new PojoTypeIndexer<>( typeContext, sessionContext, typeContext.createIndexer( sessionContext ) );
 	}
 }

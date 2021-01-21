@@ -11,6 +11,8 @@ import java.util.function.Supplier;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
@@ -33,11 +35,10 @@ public interface PojoWorkIndexedTypeContext<I, E> extends PojoWorkTypeContext<E>
 
 	PojoPathFilter dirtySelfFilter();
 
-	<R> PojoIndexedTypeIndexingPlan<I, E, R> createIndexingPlan(PojoWorkSessionContext<R> sessionContext,
-			PojoIndexingPlanImpl<?> root,
+	<R> IndexIndexingPlan<R> createIndexingPlan(PojoWorkSessionContext<R> sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	PojoTypeIndexer<I, E> createIndexer(PojoWorkSessionContext<?> sessionContext);
+	IndexIndexer createIndexer(PojoWorkSessionContext<?> sessionContext);
 
 	IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext);
 
