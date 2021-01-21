@@ -131,7 +131,7 @@ public abstract class AbstractOnTheFlyIndexingBenchmarks extends AbstractBackend
 		}
 		for ( Long documentIdInThread : idsToUpdate ) {
 			long documentId = partition.toDocumentId( documentIdInThread );
-			indexingPlan.update(
+			indexingPlan.addOrUpdate(
 					StubMapperUtils.referenceProvider( String.valueOf( documentId ) ),
 					document -> dataset.populate( index, document, documentId, invocationCount )
 			);

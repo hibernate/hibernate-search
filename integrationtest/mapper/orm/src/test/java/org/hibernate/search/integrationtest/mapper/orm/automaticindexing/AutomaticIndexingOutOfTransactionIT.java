@@ -81,7 +81,7 @@ public class AutomaticIndexingOutOfTransactionIT {
 
 			// only entity 2 is supposed to be flushed here
 			backendMock.expectWorks( IndexedEntity.INDEX_NAME )
-					.update( "2", b -> b.field( "text", "number2" ) )
+					.addOrUpdate( "2", b -> b.field( "text", "number2" ) )
 					.processedThenExecuted();
 
 			session.flush();

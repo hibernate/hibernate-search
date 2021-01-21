@@ -37,7 +37,7 @@ public interface IndexIndexer {
 	 * @param refreshStrategy How to handle the refresh.
 	 * @return A {@link CompletableFuture} that completes once the document is updated.
 	 */
-	CompletableFuture<?> update(DocumentReferenceProvider referenceProvider, DocumentContributor documentContributor,
+	CompletableFuture<?> addOrUpdate(DocumentReferenceProvider referenceProvider, DocumentContributor documentContributor,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 	/**

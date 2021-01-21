@@ -102,7 +102,7 @@ public class ElasticsearchIndexingIT {
 		plan.execute().join();
 		clientSpy.verifyExpectationsMet();
 
-		plan.update( referenceProvider( "1" ), document -> {
+		plan.addOrUpdate( referenceProvider( "1" ), document -> {
 			document.addValue( index.binding().string, "text2" );
 		} );
 		clientSpy.expectNext(
@@ -156,7 +156,7 @@ public class ElasticsearchIndexingIT {
 		plan.execute().join();
 		clientSpy.verifyExpectationsMet();
 
-		plan.update( referenceProvider( "1", routingKey ), document -> {
+		plan.addOrUpdate( referenceProvider( "1", routingKey ), document -> {
 			document.addValue( index.binding().string, "text2" );
 		} );
 		clientSpy.expectNext(

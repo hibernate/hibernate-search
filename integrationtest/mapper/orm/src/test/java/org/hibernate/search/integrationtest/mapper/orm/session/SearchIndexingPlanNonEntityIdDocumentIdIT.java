@@ -58,8 +58,8 @@ public class SearchIndexingPlanNonEntityIdDocumentIdIT {
 			indexingPlan.purge( IndexedEntity.class, 47, null ); // Does not exist in database, but may exist in the index
 
 			backendMock.expectWorks( IndexedEntity.INDEX_NAME )
-					.update( "41", b -> b.field( "text", "number1" ) )
-					.update( "42", b -> b.field( "text", "number2" ) )
+					.addOrUpdate( "41", b -> b.field( "text", "number1" ) )
+					.addOrUpdate( "42", b -> b.field( "text", "number2" ) )
 					.delete( "43" )
 					.delete( "47" )
 					.processedThenExecuted();

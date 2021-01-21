@@ -88,7 +88,7 @@ public class ProxyIT {
 
 			// ... the ID is correctly detected
 			backendMock.expectWorks( EntityWithPropertyAccessTypeForId.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "text", proxy.getText() )
 					)
 					.processedThenExecuted();

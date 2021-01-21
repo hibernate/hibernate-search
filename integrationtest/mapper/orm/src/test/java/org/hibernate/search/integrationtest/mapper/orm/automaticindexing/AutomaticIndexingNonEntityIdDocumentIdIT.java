@@ -83,7 +83,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 			entity1.setIndexedField( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "42", b -> b
+					.addOrUpdate( "42", b -> b
 							.field( "indexedField", entity1.getIndexedField() )
 							.field(
 									"indexedElementCollectionField",
@@ -135,7 +135,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 			entity1.getIndexedElementCollectionField().add( "secondValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "42", b -> b
+					.addOrUpdate( "42", b -> b
 							.field( "indexedField", null )
 							.field(
 									"indexedElementCollectionField",
@@ -153,7 +153,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 			entity1.getIndexedElementCollectionField().remove( 1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "42", b -> b
+					.addOrUpdate( "42", b -> b
 							.field( "indexedField", null )
 							.field(
 									"indexedElementCollectionField",
@@ -202,7 +202,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 			) ) );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "42", b -> b
+					.addOrUpdate( "42", b -> b
 							.field( "indexedField", null )
 							.field(
 									"indexedElementCollectionField",

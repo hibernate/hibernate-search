@@ -107,7 +107,7 @@ public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 			group.setSomeField( "updatedValue" );
 
 			backendMock.expectWorks( Group.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "someField", "updatedValue" )
 							.field( "someInteger", 42 )
 					)

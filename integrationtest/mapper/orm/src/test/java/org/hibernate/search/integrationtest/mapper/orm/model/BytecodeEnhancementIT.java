@@ -183,7 +183,7 @@ public class BytecodeEnhancementIT {
 
 				// Expect all properties to be correctly loaded, even though we're using bytecode enhancement
 				backendMock.expectWorks( IndexedEntity.INDEX )
-						.update( "1", b -> b
+						.addOrUpdate( "1", b -> b
 								.field( "mappedSuperClassText", "initialValue" )
 								.field( "entitySuperClassText", "initialValue" )
 								.field( "id", 1 )

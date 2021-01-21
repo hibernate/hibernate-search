@@ -14,7 +14,7 @@ import org.hibernate.search.util.common.impl.Throwables;
  * A set of works to be executed on a single index.
  * <p>
  * Works are accumulated when methods such as {@link #add(DocumentReferenceProvider, DocumentContributor)}
- * or {@link #update(DocumentReferenceProvider, DocumentContributor)} are called,
+ * or {@link #addOrUpdate(DocumentReferenceProvider, DocumentContributor)} are called,
  * and executed only when {@link #execute()} is called.
  * <p>
  * Relative ordering of works within a plan will be preserved.
@@ -39,7 +39,7 @@ public interface IndexIndexingPlan<R> {
 	 * @param documentReferenceProvider A source of information about the identity of the document to update.
 	 * @param documentContributor A contributor to the document, adding fields to the indexed document.
 	 */
-	void update(DocumentReferenceProvider documentReferenceProvider, DocumentContributor documentContributor);
+	void addOrUpdate(DocumentReferenceProvider documentReferenceProvider, DocumentContributor documentContributor);
 
 	/**
 	 * Delete a document from the index.

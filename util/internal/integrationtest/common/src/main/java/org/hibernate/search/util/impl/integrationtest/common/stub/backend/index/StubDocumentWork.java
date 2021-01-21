@@ -13,7 +13,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 public final class StubDocumentWork {
 
 	public enum Type {
-		ADD, UPDATE, DELETE
+		ADD, ADD_OR_UPDATE, DELETE
 	}
 
 	public static Builder builder(Type type) {

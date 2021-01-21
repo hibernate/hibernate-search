@@ -118,7 +118,7 @@ public class TypeBridgeBaseIT {
 			session.indexingPlan().addOrUpdate( entity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.update( "1", b -> b.field( "someField", entity.stringProperty ) )
+					.addOrUpdate( "1", b -> b.field( "someField", entity.stringProperty ) )
 					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
@@ -184,7 +184,7 @@ public class TypeBridgeBaseIT {
 			session.indexingPlan().addOrUpdate( entity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.update( "1", b -> b.field( "someField", entity.stringProperty ) )
+					.addOrUpdate( "1", b -> b.field( "someField", entity.stringProperty ) )
 					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
@@ -294,7 +294,7 @@ public class TypeBridgeBaseIT {
 			session.indexingPlan().addOrUpdate( containedEntity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.update( "1", b -> b.field( "someField", "constant" ) )
+					.addOrUpdate( "1", b -> b.field( "someField", "constant" ) )
 					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
@@ -629,7 +629,7 @@ public class TypeBridgeBaseIT {
 			session.indexingPlan().addOrUpdate( entity, new String[] { "enumProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "enumProperty", b2 -> b2
 									.field( "someField", entity.enumProperty.stringProperty )
 							)

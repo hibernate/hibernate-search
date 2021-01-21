@@ -107,7 +107,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 			// This update is caused by the call to owner1.setOptionalOneToOne;
 			// it has nothing to do with the deletion.
 			backendMock.expectWorks( AssociationOwner.NAME )
-					.update( "1", b -> b.field( "basic", "text 1" )
+					.addOrUpdate( "1", b -> b.field( "basic", "text 1" )
 							.field( "elementCollection", 1001, 2001 ) )
 					.processedThenExecuted();
 
@@ -207,11 +207,11 @@ public class AutomaticIndexingAssociationDeletionIT {
 			backendMock.expectWorks( AssociationOwner.NAME )
 					// This update is caused by the call to owner1.setManyToOne;
 					// it has nothing to do with the deletion.
-					.update( "1", b -> b.field( "basic", "text 1" )
+					.addOrUpdate( "1", b -> b.field( "basic", "text 1" )
 							.field( "elementCollection", 1001, 2001 ) )
 					// This update is caused by the call to owner3.setManyToOne;
 					// it has nothing to do with the deletion.
-					.update( "3", b -> b.field( "basic", "text 3" )
+					.addOrUpdate( "3", b -> b.field( "basic", "text 3" )
 							.field( "elementCollection", 1003, 2003 ) )
 					.processedThenExecuted();
 
@@ -240,7 +240,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 			backendMock.expectWorks( AssociationOwner.NAME )
 					// This update is caused by the call to owner3.setManyToOne;
 					// it has nothing to do with the deletion.
-					.update( "3", b -> b.field( "basic", "text 3" )
+					.addOrUpdate( "3", b -> b.field( "basic", "text 3" )
 							.field( "elementCollection", 1003, 2003 ) )
 					.delete( "1" )
 					.processedThenExecuted();
@@ -331,14 +331,14 @@ public class AutomaticIndexingAssociationDeletionIT {
 			backendMock.expectWorks( AssociationOwner.NAME )
 					// This update is caused by the call to owner1.getManyToMany().remove();
 					// it has nothing to do with the deletion.
-					.update( "1", b -> b.field( "basic", "text 1" )
+					.addOrUpdate( "1", b -> b.field( "basic", "text 1" )
 							.field( "elementCollection", 1001, 2001 )
 							.objectField( "manyToMany", b2 -> b2
 									.field( "basic", "text 4" )
 									.field( "elementCollection", 1004, 2004 ) ) )
 					// This update is caused by the call to owner3.getManyToMany().remove();
 					// it has nothing to do with the deletion.
-					.update( "3", b -> b.field( "basic", "text 3" )
+					.addOrUpdate( "3", b -> b.field( "basic", "text 3" )
 							.field( "elementCollection", 1003, 2003 )
 							.objectField( "manyToMany", b2 -> b2
 									.field( "basic", "text 4" )
@@ -371,7 +371,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 					.delete( "1" )
 					// This update is caused by the call to owner3.getManyToMany().remove;
 					// it has nothing to do with the deletion.
-					.update( "3", b -> b.field( "basic", "text 3" )
+					.addOrUpdate( "3", b -> b.field( "basic", "text 3" )
 							.field( "elementCollection", 1003, 2003 )
 							.objectField( "manyToMany", b2 -> b2
 									.field( "basic", "text 4" )
