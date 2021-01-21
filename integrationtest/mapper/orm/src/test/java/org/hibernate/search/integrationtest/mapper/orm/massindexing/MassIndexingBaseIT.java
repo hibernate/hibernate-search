@@ -91,7 +91,7 @@ public class MassIndexingBaseIT {
 							.field( "title", TITLE_3 )
 							.field( "author", AUTHOR_3 )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
@@ -136,7 +136,7 @@ public class MassIndexingBaseIT {
 							.field( "title", TITLE_3 )
 							.field( "author", AUTHOR_3 )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 
 			backendMock.expectSchemaManagementWorks( Book.INDEX )
 					.work( StubSchemaManagementWork.Type.DROP_AND_CREATE );
@@ -184,7 +184,7 @@ public class MassIndexingBaseIT {
 							.field( "title", TITLE_3 )
 							.field( "author", AUTHOR_3 )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// and optimizeOnFinish is enabled explicitly,
@@ -230,7 +230,7 @@ public class MassIndexingBaseIT {
 						.field( "title", TITLE_3 )
 						.field( "author", AUTHOR_3 )
 				)
-				.processedThenExecuted();
+				.createdThenExecuted();
 
 		// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 		// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:

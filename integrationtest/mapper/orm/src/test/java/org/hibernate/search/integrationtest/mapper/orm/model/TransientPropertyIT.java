@@ -85,7 +85,7 @@ public class TransientPropertyIT {
 					.add( "1", b -> b
 							.field( "APlusB", 7 )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -101,7 +101,7 @@ public class TransientPropertyIT {
 					.addOrUpdate( "1", b -> b
 							.field( "APlusB", 9 )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -136,7 +136,7 @@ public class TransientPropertyIT {
 					.add( "1", b -> b
 							.field( "APlusB", 7 )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -152,7 +152,7 @@ public class TransientPropertyIT {
 					.addOrUpdate( "1", b -> b
 							.field( "APlusB", 9 )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 

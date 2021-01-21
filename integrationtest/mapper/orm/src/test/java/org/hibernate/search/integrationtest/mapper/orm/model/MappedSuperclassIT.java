@@ -63,7 +63,7 @@ public class MappedSuperclassIT {
 
 			backendMock.expectWorks( IndexedEntity.class.getSimpleName() ).add( "1", b -> b
 					.field( "text", "Using some text here" )
-			).processedThenExecuted();
+			).createdThenExecuted();
 		} );
 	}
 

@@ -70,7 +70,7 @@ public class IdClassIT {
 
 			backendMock.expectWorks( NonIdClassIndexed.NAME )
 					.add( "1", b -> { } )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -96,7 +96,7 @@ public class IdClassIT {
 
 			backendMock.expectWorks( IdClassIndexedWithDocumentId.NAME )
 					.add( "8", b -> { } )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}

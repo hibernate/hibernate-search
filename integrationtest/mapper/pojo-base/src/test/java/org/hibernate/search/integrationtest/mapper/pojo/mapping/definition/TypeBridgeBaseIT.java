@@ -109,7 +109,7 @@ public class TypeBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", entity.stringProperty ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -119,7 +119,7 @@ public class TypeBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.addOrUpdate( "1", b -> b.field( "someField", entity.stringProperty ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -175,7 +175,7 @@ public class TypeBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", entity.stringProperty ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -185,7 +185,7 @@ public class TypeBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.addOrUpdate( "1", b -> b.field( "someField", entity.stringProperty ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -284,7 +284,7 @@ public class TypeBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", "constant" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -295,7 +295,7 @@ public class TypeBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.addOrUpdate( "1", b -> b.field( "someField", "constant" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -619,7 +619,7 @@ public class TypeBridgeBaseIT {
 									.field( "someField", entity.enumProperty.stringProperty )
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -634,7 +634,7 @@ public class TypeBridgeBaseIT {
 									.field( "someField", entity.enumProperty.stringProperty )
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -946,7 +946,7 @@ public class TypeBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "739", b -> b.field( "someField", "739" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}

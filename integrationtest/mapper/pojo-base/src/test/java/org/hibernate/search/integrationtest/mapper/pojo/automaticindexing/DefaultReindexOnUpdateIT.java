@@ -107,7 +107,7 @@ public class DefaultReindexOnUpdateIT {
 									.field( "value", "val2" )
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 
 		// Test automatic reindexing
@@ -118,7 +118,7 @@ public class DefaultReindexOnUpdateIT {
 					.addOrUpdate( "2", b -> b
 							.field( "value", "val2" )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 			// The child was updated, thus the parent (which index-embeds the childs) is reindexed.
 			backendMock.expectWorks( "ParentEntity" )
 					.addOrUpdate( "1", b -> b
@@ -127,7 +127,7 @@ public class DefaultReindexOnUpdateIT {
 									.field( "value", "val2" )
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 	}
 
@@ -241,7 +241,7 @@ public class DefaultReindexOnUpdateIT {
 									.field( "value", "val2" )
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 
 		// Test automatic reindexing
@@ -252,7 +252,7 @@ public class DefaultReindexOnUpdateIT {
 					.addOrUpdate( "2", b -> b
 							.field( "value", "val2" )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 			// The child was updated, but automatic reindexing is disabled,
 			// thus the parent (which index-embeds the childs) will NOT be reindexed.
 		}

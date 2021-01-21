@@ -134,7 +134,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "myProperty", STRING_VALUE_1 ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}

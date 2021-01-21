@@ -98,7 +98,7 @@ public class ProgrammaticMappingAccessTypeIT {
 							.field( "propertyWithFieldOnly", entity1.propertyWithFieldOnly )
 							.field( "propertyWithGetterAndDifferentlyNamedField", entity1.internalFieldForPropertyWithGetterAndDifferentlyNamedField )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 	}
 

@@ -79,14 +79,6 @@ public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	}
 
 	@Override
-	public void process() {
-		/*
-		 * Nothing to do: we can't execute anything more
-		 * without sending a request to the cluster.
-		 */
-	}
-
-	@Override
 	public CompletableFuture<IndexIndexingPlanExecutionReport<R>> executeAndReport() {
 		try {
 			ElasticsearchIndexIndexingPlanExecution<R> execution = new ElasticsearchIndexIndexingPlanExecution<>(

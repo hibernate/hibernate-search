@@ -319,7 +319,7 @@ public class RoutingBridgeBaseIT {
 			backendMock.expectWorks( INDEX_NAME )
 					.add( b -> b.identifier( "1" ).routingKey( entity.stringProperty )
 							.document( StubDocumentNode.document().build() ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -334,7 +334,7 @@ public class RoutingBridgeBaseIT {
 					.delete( b -> b.identifier( "1" ).routingKey( "some string 3" ) )
 					.addOrUpdate( b -> b.identifier( "1" ).routingKey( entity.stringProperty )
 							.document( StubDocumentNode.document().build() ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -345,7 +345,7 @@ public class RoutingBridgeBaseIT {
 					.delete( b -> b.identifier( "1" ).routingKey( "some string" ) )
 					.delete( b -> b.identifier( "1" ).routingKey( "some string 3" ) )
 					.delete( b -> b.identifier( "1" ).routingKey( entity.stringProperty ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -433,7 +433,7 @@ public class RoutingBridgeBaseIT {
 			backendMock.expectWorks( INDEX_NAME )
 					.add( b -> b.identifier( "1" ).routingKey( entity.stringProperty )
 							.document( StubDocumentNode.document().build() ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -448,7 +448,7 @@ public class RoutingBridgeBaseIT {
 					.delete( b -> b.identifier( "1" ).routingKey( "some string 3" ) )
 					.addOrUpdate( b -> b.identifier( "1" ).routingKey( entity.stringProperty )
 							.document( StubDocumentNode.document().build() ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -459,7 +459,7 @@ public class RoutingBridgeBaseIT {
 					.delete( b -> b.identifier( "1" ).routingKey( "some string" ) )
 					.delete( b -> b.identifier( "1" ).routingKey( "some string 3" ) )
 					.delete( b -> b.identifier( "1" ).routingKey( entity.stringProperty ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -594,7 +594,7 @@ public class RoutingBridgeBaseIT {
 			backendMock.expectWorks( INDEX_NAME )
 					.add( b -> b.identifier( "1" ).routingKey( "route/1" )
 							.document( StubDocumentNode.document().build() ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -612,7 +612,7 @@ public class RoutingBridgeBaseIT {
 			backendMock.expectWorks( INDEX_NAME )
 					.addOrUpdate( b -> b.identifier( "1" ).routingKey( "route/1" )
 							.document( StubDocumentNode.document().build() ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -621,7 +621,7 @@ public class RoutingBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.delete( b -> b.identifier( "1" ).routingKey( "route/1" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}

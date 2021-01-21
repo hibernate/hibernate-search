@@ -368,11 +368,11 @@ public class BackendMock implements TestRule {
 			return this;
 		}
 
-		public DocumentWorkCallListContext processedThenExecuted(CompletableFuture<?> future) {
-			log.debugf( "Expecting %d works to be prepared, then executed", works.size() );
-			// First expect all works to be prepared, then expect all works to be executed
+		public DocumentWorkCallListContext createdThenExecuted(CompletableFuture<?> future) {
+			log.debugf( "Expecting %d works to be created, then executed", works.size() );
+			// First expect all works to be created, then expect all works to be executed
 			works.stream()
-					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PROCESS, work ) )
+					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.CREATE, work ) )
 					.forEach( expectationConsumer );
 			works.stream()
 					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work, future ) )
@@ -381,8 +381,16 @@ public class BackendMock implements TestRule {
 			return this;
 		}
 
-		public DocumentWorkCallListContext processedThenExecuted() {
-			return processedThenExecuted( CompletableFuture.completedFuture( null ) );
+		public DocumentWorkCallListContext createdThenExecuted() {
+			return createdThenExecuted( CompletableFuture.completedFuture( null ) );
+		}
+
+		public DocumentWorkCallListContext created() {
+			log.debugf( "Expecting %d works to be created", works.size() );
+			works.stream()
+					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.CREATE, work ) )
+					.forEach( expectationConsumer );
+			return this;
 		}
 
 		public DocumentWorkCallListContext executed(CompletableFuture<?> future) {
@@ -396,14 +404,6 @@ public class BackendMock implements TestRule {
 
 		public DocumentWorkCallListContext executed() {
 			return executed( CompletableFuture.completedFuture( null ) );
-		}
-
-		public DocumentWorkCallListContext processed() {
-			log.debugf( "Expecting %d works to be prepared", works.size() );
-			works.stream()
-					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PROCESS, work ) )
-					.forEach( expectationConsumer );
-			return this;
 		}
 
 		public DocumentWorkCallListContext discarded() {

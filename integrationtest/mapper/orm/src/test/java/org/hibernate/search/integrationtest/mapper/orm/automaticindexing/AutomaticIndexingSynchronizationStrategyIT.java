@@ -534,7 +534,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 						.add( "2", b -> b
 								.field( "indexedField", entity2.getIndexedField() )
 						)
-						.processedThenExecuted( indexingWorkFuture );
+						.createdThenExecuted( indexingWorkFuture );
 				justBeforeTransactionCommitFuture.complete( null );
 			} );
 			backendMock.verifyExpectationsMet();

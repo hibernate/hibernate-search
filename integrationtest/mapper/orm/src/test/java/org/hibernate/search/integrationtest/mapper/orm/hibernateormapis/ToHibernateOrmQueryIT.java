@@ -120,7 +120,7 @@ public class ToHibernateOrmQueryIT {
 									.field( "text", contained2_2.getText() )
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
