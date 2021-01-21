@@ -110,7 +110,7 @@ public class AutomaticIndexingGenericPolymorphicAssociationIT {
 			containedEntity.setIncludedInSingle( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedSingle", b3 -> b3
 											.field( "includedInSingle", "updatedValue" )

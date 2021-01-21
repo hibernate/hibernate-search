@@ -105,7 +105,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 			containedEntity.setIncludedInTypeBridge( "value1" );
 			session.persist( containedEntity );
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "typeBridge", b2 -> b2
 									.field( "includedInTypeBridge", "value1" )
 							)
@@ -128,7 +128,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 				session.persist( containedEntity );
 			}
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "typeBridge", b2 -> b2
 									.field( "includedInTypeBridge", "value1" )
 							)
@@ -146,7 +146,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 				ContainedEntity containedEntity = session.getReference( ContainedEntity.class, 10 );
 				containedEntity.setIncludedInTypeBridge( "value2" );
 				backendMock.expectWorks( IndexedEntity.INDEX )
-						.update( "1", b -> b
+						.addOrUpdate( "1", b -> b
 								.objectField( "typeBridge", b2 -> b2
 										.field( "includedInTypeBridge", "value1", "value2" )
 								)

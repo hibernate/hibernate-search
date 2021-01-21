@@ -122,8 +122,8 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 		}
 
 		@Override
-		void doUpdate(Supplier<E> entitySupplier, String providedRoutingKey) {
-			super.doUpdate( entitySupplier, providedRoutingKey );
+		void doAddOrUpdate(Supplier<E> entitySupplier, String providedRoutingKey) {
+			super.doAddOrUpdate( entitySupplier, providedRoutingKey );
 			this.providedRoutingKey = providedRoutingKey;
 		}
 
@@ -134,7 +134,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 				// Just ignore the call.
 				return;
 			}
-			doUpdate( entitySupplier, null );
+			doAddOrUpdate( entitySupplier, null );
 			updatedBecauseOfContained = true;
 			// We don't want contained entities that haven't been modified to trigger an update of their
 			// containing entities.
@@ -171,7 +171,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 						case UNKNOWN:
 							if ( considerAllDirty || updatedBecauseOfContained
 									|| typeContext.requiresSelfReindexing( dirtyPaths ) ) {
-								delegateUpdate();
+								delegateAddOrUpdate();
 							}
 							return;
 					}
@@ -209,7 +209,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 					typeContext.toDocumentContributor( sessionContext, identifier, entitySupplier ) );
 		}
 
-		private void delegateUpdate() {
+		private void delegateAddOrUpdate() {
 			PojoWorkRouter router = typeContext.createRouter( sessionContext, identifier, entitySupplier );
 			DocumentRouteImpl currentRoute = router.currentRoute( providedRoutingKey );
 			List<DocumentRouteImpl> previousRoutes = router.previousRoutes( currentRoute );
@@ -226,7 +226,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 			}
 			DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
 					currentRoute.routingKey(), identifier );
-			delegate.update( referenceProvider,
+			delegate.addOrUpdate( referenceProvider,
 					typeContext.toDocumentContributor( sessionContext, identifier, entitySupplier ) );
 		}
 

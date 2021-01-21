@@ -96,7 +96,7 @@ public class AutomaticIndexingBasicIT {
 			entity1.setIndexedField( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "indexedField", entity1.getIndexedField() )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
@@ -193,7 +193,7 @@ public class AutomaticIndexingBasicIT {
 			entity1.getIndexedElementCollectionField().add( "secondValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "indexedField", null )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
@@ -213,7 +213,7 @@ public class AutomaticIndexingBasicIT {
 			entity1.getIndexedElementCollectionField().remove( 1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "indexedField", null )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
@@ -265,7 +265,7 @@ public class AutomaticIndexingBasicIT {
 			) ) );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "indexedField", null )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
@@ -399,7 +399,7 @@ public class AutomaticIndexingBasicIT {
 
 			// TODO HSEARCH-3204: remove the statement below to not expect any work
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "indexedField", null )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
@@ -441,7 +441,7 @@ public class AutomaticIndexingBasicIT {
 			entity1.setShallowReindexOnUpdateField( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "indexedField", null )
 							.field( "shallowReindexOnUpdateField", entity1.getShallowReindexOnUpdateField() )
 							.field( "noReindexOnUpdateField", null )
@@ -455,7 +455,7 @@ public class AutomaticIndexingBasicIT {
 			entity1.setShallowReindexOnUpdateField( null );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "indexedField", null )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
@@ -499,7 +499,7 @@ public class AutomaticIndexingBasicIT {
 			entity1.getShallowReindexOnUpdateElementCollectionField().add( "secondValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "indexedField", null )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
@@ -516,7 +516,7 @@ public class AutomaticIndexingBasicIT {
 			entity1.getShallowReindexOnUpdateElementCollectionField().remove( 1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "indexedField", null )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
@@ -565,7 +565,7 @@ public class AutomaticIndexingBasicIT {
 			) ) );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "indexedField", null )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
@@ -698,7 +698,7 @@ public class AutomaticIndexingBasicIT {
 
 			// TODO HSEARCH-3204: remove the statement below to not expect any work
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "indexedField", null )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )

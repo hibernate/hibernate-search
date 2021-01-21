@@ -107,7 +107,7 @@ public class EnversIT {
 			indexed.setText( "updated" );
 
 			backendMock.expectWorks( IndexedEntity.NAME )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "text", "updated" )
 							.objectField( "contained", b2 -> b2
 									.field( "text", "initial" )
@@ -128,7 +128,7 @@ public class EnversIT {
 			contained.setText( "updated" );
 
 			backendMock.expectWorks( IndexedEntity.NAME )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "text", "updated" )
 							.objectField( "contained", b2 -> b2
 									.field( "text", "updated" )

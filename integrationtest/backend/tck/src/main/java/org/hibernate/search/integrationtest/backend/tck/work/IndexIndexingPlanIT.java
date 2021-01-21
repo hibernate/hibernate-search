@@ -99,7 +99,7 @@ public class IndexIndexingPlanIT {
 				.hasDocRefHitsAnyOrder( index.typeName(), "1", "2", "3" );
 
 		// Update
-		plan.update( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "The Boss of the Rings chap. 2" ) );
+		plan.addOrUpdate( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "The Boss of the Rings chap. 2" ) );
 		future = plan.execute();
 		Awaitility.await().until( future::isDone );
 		// The operations should succeed.
@@ -167,12 +167,12 @@ public class IndexIndexingPlanIT {
 	}
 
 	@Test
-	public void update_failure() {
+	public void addOrUpdate_failure() {
 		setup();
 
 		IndexIndexingPlan<?> plan = index.createIndexingPlan( sessionContext );
-		plan.update( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "Title of Book 1" ) );
-		plan.update( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "Title of Book 2" ) );
+		plan.addOrUpdate( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "Title of Book 1" ) );
+		plan.addOrUpdate( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "Title of Book 2" ) );
 
 		// Trigger failures in the next operations
 		setupHelper.getBackendAccessor().ensureIndexingOperationsFail( index.name() );

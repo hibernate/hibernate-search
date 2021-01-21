@@ -93,7 +93,7 @@ public class IndexingProcessorProxiedAssociatedEntityIT {
 			indexed1.setText( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.NAME )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "text", "updatedValue" )
 							.objectField( "containedSingle", b2 -> b2
 									.field( "text", "initialValue" )
@@ -141,7 +141,7 @@ public class IndexingProcessorProxiedAssociatedEntityIT {
 			indexed1.setText( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.NAME )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "text", "updatedValue" )
 							.objectField( "containedList", b2 -> b2
 									.field( "text", "initialValue1" )

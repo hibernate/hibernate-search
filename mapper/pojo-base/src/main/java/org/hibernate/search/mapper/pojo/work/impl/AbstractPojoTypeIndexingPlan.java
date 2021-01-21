@@ -39,16 +39,16 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		getState( identifier ).add( entitySupplier, providedRoutingKey );
 	}
 
-	void update(Object providedId, String providedRoutingKey, Object entity) {
+	void addOrUpdate(Object providedId, String providedRoutingKey, Object entity) {
 		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
 		I identifier = toIdentifier( providedId, entitySupplier );
-		getState( identifier ).update( entitySupplier, providedRoutingKey );
+		getState( identifier ).addOrUpdate( entitySupplier, providedRoutingKey );
 	}
 
-	void update(Object providedId, String providedRoutingKey, Object entity, String... dirtyPaths) {
+	void addOrUpdate(Object providedId, String providedRoutingKey, Object entity, String... dirtyPaths) {
 		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
 		I identifier = toIdentifier( providedId, entitySupplier );
-		getState( identifier ).update( entitySupplier, providedRoutingKey, dirtyPaths );
+		getState( identifier ).addOrUpdate( entitySupplier, providedRoutingKey, dirtyPaths );
 	}
 
 	void delete(Object providedId, String providedRoutingKey, Object entity) {
@@ -115,15 +115,15 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			currentStatus = EntityStatus.PRESENT;
 		}
 
-		void update(Supplier<E> entitySupplier, String providedRoutingKey) {
-			doUpdate( entitySupplier, providedRoutingKey );
+		void addOrUpdate(Supplier<E> entitySupplier, String providedRoutingKey) {
+			doAddOrUpdate( entitySupplier, providedRoutingKey );
 			shouldResolveToReindex = true;
 			considerAllDirty = true;
 			dirtyPaths = null;
 		}
 
-		void update(Supplier<E> entitySupplier, String providedRoutingKey, String... dirtyPaths) {
-			doUpdate( entitySupplier, providedRoutingKey );
+		void addOrUpdate(Supplier<E> entitySupplier, String providedRoutingKey, String... dirtyPaths) {
+			doAddOrUpdate( entitySupplier, providedRoutingKey );
 			shouldResolveToReindex = true;
 			if ( !considerAllDirty ) {
 				for ( String dirtyPath : dirtyPaths ) {
@@ -132,7 +132,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			}
 		}
 
-		void doUpdate(Supplier<E> entitySupplier, String providedRoutingKey) {
+		void doAddOrUpdate(Supplier<E> entitySupplier, String providedRoutingKey) {
 			this.entitySupplier = entitySupplier;
 			if ( EntityStatus.UNKNOWN.equals( initialStatus ) ) {
 				initialStatus = EntityStatus.PRESENT;

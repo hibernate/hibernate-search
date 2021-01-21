@@ -80,7 +80,7 @@ public class PojoIndexingPlanBaseIT {
 									.build()
 							)
 					)
-					.update( b -> b
+					.addOrUpdate( b -> b
 							.identifier( "2" )
 							.document( StubDocumentNode.document()
 									.field( "value", entity2.value )

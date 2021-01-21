@@ -17,7 +17,7 @@ public class PojoIndexingAddOrUpdateIT extends AbstractPojoIndexingOperationIT {
 	@Override
 	protected void expectOperation(BackendMock.DocumentWorkCallListContext context, String tenantId,
 			String id, String routingKey, String value) {
-		context.update( b -> addWorkInfoAndDocument( b, tenantId, id, routingKey, value ) );
+		context.addOrUpdate( b -> addWorkInfoAndDocument( b, tenantId, id, routingKey, value ) );
 	}
 
 	@Override

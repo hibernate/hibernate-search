@@ -115,13 +115,13 @@ public class DefaultReindexOnUpdateIT {
 			session.indexingPlan().addOrUpdate( child );
 
 			backendMock.expectWorks( "ChildEntity" )
-					.update( "2", b -> b
+					.addOrUpdate( "2", b -> b
 							.field( "value", "val2" )
 					)
 					.processedThenExecuted();
 			// The child was updated, thus the parent (which index-embeds the childs) is reindexed.
 			backendMock.expectWorks( "ParentEntity" )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "value", "val1" )
 							.objectField( "child", b2 -> b2
 									.field( "value", "val2" )
@@ -249,7 +249,7 @@ public class DefaultReindexOnUpdateIT {
 			session.indexingPlan().addOrUpdate( child );
 
 			backendMock.expectWorks( "ChildEntity" )
-					.update( "2", b -> b
+					.addOrUpdate( "2", b -> b
 							.field( "value", "val2" )
 					)
 					.processedThenExecuted();
