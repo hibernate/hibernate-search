@@ -1366,7 +1366,7 @@ public class IndexedEmbeddedBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", expectedDocumentContributor )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}

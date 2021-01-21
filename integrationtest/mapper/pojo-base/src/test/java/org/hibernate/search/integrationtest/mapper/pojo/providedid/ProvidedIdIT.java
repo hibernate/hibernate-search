@@ -63,7 +63,7 @@ public class ProvidedIdIT {
 
 			backendMock.expectWorks( entityAndIndexName )
 					.add( "42", b -> { } )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 

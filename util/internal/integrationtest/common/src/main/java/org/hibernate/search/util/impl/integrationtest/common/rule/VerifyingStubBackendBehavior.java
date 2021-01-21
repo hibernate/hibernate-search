@@ -208,10 +208,10 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	@Override
-	public void processDocumentWork(String indexName, StubDocumentWork work) {
+	public void createDocumentWork(String indexName, StubDocumentWork work) {
 		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
 		callQueue.verify(
-				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PROCESS, work ),
+				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.CREATE, work ),
 				DocumentWorkCall::verify,
 				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
 		);
@@ -230,21 +230,6 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	@Override
 	public CompletableFuture<?> executeDocumentWork(String indexName, StubDocumentWork work) {
 		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
-		return callQueue.verify(
-				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work ),
-				DocumentWorkCall::verify,
-				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
-		);
-	}
-
-	@Override
-	public CompletableFuture<?> processAndExecuteDocumentWork(String indexName, StubDocumentWork work) {
-		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
-		callQueue.verify(
-				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PROCESS, work ),
-				DocumentWorkCall::verify,
-				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
-		);
 		return callQueue.verify(
 				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work ),
 				DocumentWorkCall::verify,

@@ -41,13 +41,11 @@ public abstract class StubBackendBehavior {
 	public abstract CompletableFuture<?> executeSchemaManagementWork(String indexName, StubSchemaManagementWork work,
 			ContextualFailureCollector failureCollector);
 
-	public abstract void processDocumentWork(String indexName, StubDocumentWork work);
+	public abstract void createDocumentWork(String indexName, StubDocumentWork work);
 
 	public abstract void discardDocumentWork(String indexName, StubDocumentWork work);
 
 	public abstract CompletableFuture<?> executeDocumentWork(String indexName, StubDocumentWork work);
-
-	public abstract CompletableFuture<?> processAndExecuteDocumentWork(String indexName, StubDocumentWork work);
 
 	public abstract <T> SearchResult<T> executeSearchWork(Set<String> indexNames, StubSearchWork work,
 			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext,

@@ -46,8 +46,8 @@ public class StubIndexIndexer implements IndexIndexer {
 				.commit( commitStrategy )
 				.refresh( refreshStrategy )
 				.build();
-
-		return behavior.processAndExecuteDocumentWork( indexName, work );
+		behavior.createDocumentWork( indexName, work );
+		return behavior.executeDocumentWork( indexName, work );
 	}
 
 	@Override
@@ -65,8 +65,8 @@ public class StubIndexIndexer implements IndexIndexer {
 				.commit( commitStrategy )
 				.refresh( refreshStrategy )
 				.build();
-
-		return behavior.processAndExecuteDocumentWork( indexName, work );
+		behavior.createDocumentWork( indexName, work );
+		return behavior.executeDocumentWork( indexName, work );
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class StubIndexIndexer implements IndexIndexer {
 				.commit( commitStrategy )
 				.refresh( refreshStrategy )
 				.build();
-
-		return behavior.processAndExecuteDocumentWork( indexName, work );
+		behavior.createDocumentWork( indexName, work );
+		return behavior.executeDocumentWork( indexName, work );
 	}
 }

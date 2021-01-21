@@ -118,7 +118,7 @@ public class DocumentIdDefaultBridgeAdditionIT {
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "id1", b -> { } )
 					.add( "id2", b -> { } )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}

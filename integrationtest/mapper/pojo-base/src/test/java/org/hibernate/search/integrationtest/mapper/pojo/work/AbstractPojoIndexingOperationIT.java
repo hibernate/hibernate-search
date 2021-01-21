@@ -151,7 +151,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 							worksBefore
 									.delete( b -> addWorkInfo( b, tenantId, "42",
 											MyRoutingBridge.toRoutingKey( tenantId, 42, "1" ) ) )
-									.processedThenExecuted( futureFromBackend );
+									.createdThenExecuted( futureFromBackend );
 						}
 					},
 					// And only then, expect the actual operation.
@@ -182,7 +182,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 							worksBefore
 									.delete( b -> addWorkInfo( b, tenantId, "1",
 											MyRoutingBridge.toRoutingKey( tenantId, 1, "foo" ) ) )
-									.processedThenExecuted( futureFromBackend );
+									.createdThenExecuted( futureFromBackend );
 						}
 					},
 					// And only then, expect the actual operation.
@@ -214,11 +214,11 @@ public abstract class AbstractPojoIndexingOperationIT {
 							backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
 									.delete( b -> addWorkInfo( b, tenantId, "1",
 											MyRoutingBridge.toRoutingKey( tenantId, 1, "foo" ) ) )
-									.processedThenExecuted();
+									.createdThenExecuted();
 							backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
 									.delete( b -> addWorkInfo( b, tenantId, "1",
 											MyRoutingBridge.toRoutingKey( tenantId, 1, "3" ) ) )
-									.processedThenExecuted();
+									.createdThenExecuted();
 						}
 					},
 					// And only then, expect the actual operation.
@@ -265,7 +265,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 				backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
 						.delete( b -> addWorkInfo( b, tenantId, "1",
 								MyRoutingBridge.toRoutingKey( tenantId, 1, "1" ) ) )
-						.processedThenExecuted();
+						.createdThenExecuted();
 			}
 			// However, we don't expect the actual operation, which should be skipped because the entity is not indexed.
 			CompletionStage<?> returnedFuture = execute( indexer, 1 );
@@ -290,15 +290,15 @@ public abstract class AbstractPojoIndexingOperationIT {
 				backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
 						.delete( b -> addWorkInfo( b, tenantId, "1",
 								MyRoutingBridge.toRoutingKey( tenantId, 1, "1" ) ) )
-						.processedThenExecuted();
+						.createdThenExecuted();
 				backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
 						.delete( b -> addWorkInfo( b, tenantId, "1",
 								MyRoutingBridge.toRoutingKey( tenantId, 1, "foo" ) ) )
-						.processedThenExecuted();
+						.createdThenExecuted();
 				backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
 						.delete( b -> addWorkInfo( b, tenantId, "1",
 								MyRoutingBridge.toRoutingKey( tenantId, 1, "3" ) ) )
-						.processedThenExecuted();
+						.createdThenExecuted();
 			}
 			// However, we don't expect the actual operation, which should be skipped because the entity is not indexed.
 			CompletionStage<?> returnedFuture = execute( indexer, 1 );
@@ -486,7 +486,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 				backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
 						.delete( b -> addWorkInfo( b, tenantId, "1",
 								MyRoutingBridge.toRoutingKey( tenantId, 1, "1" ) ) )
-						.processedThenExecuted( futureFromBackend );
+						.createdThenExecuted( futureFromBackend );
 			}
 			// However, we don't expect the actual operation, which should be skipped because the entity is not indexed.
 			addTo( indexingPlan, 1 );
@@ -517,7 +517,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 								MyRoutingBridge.toRoutingKey( tenantId, 1, "foo" ) ) )
 						.delete( b -> addWorkInfo( b, tenantId, "1",
 								MyRoutingBridge.toRoutingKey( tenantId, 1, "3" ) ) )
-						.processedThenExecuted( futureFromBackend );
+						.createdThenExecuted( futureFromBackend );
 			}
 			// However, we don't expect the actual operation, which should be skipped because the entity is not indexed.
 			addTo( indexingPlan, 1 );
@@ -644,7 +644,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 			expectedRoutingKey = null;
 		}
 		expectOperation( context, tenantId, String.valueOf( id ), expectedRoutingKey, value );
-		context.processedThenExecuted( futureFromBackend );
+		context.createdThenExecuted( futureFromBackend );
 	}
 
 	@Indexed(index = PojoIndexingPlanBaseIT.IndexedEntity.INDEX)

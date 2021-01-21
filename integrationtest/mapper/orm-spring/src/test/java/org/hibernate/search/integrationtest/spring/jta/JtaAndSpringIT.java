@@ -71,7 +71,7 @@ public class JtaAndSpringIT {
 						.field( "age", 99 )
 						.field( "cool", true )
 						.field( "name", "dave" ) )
-				.processedThenExecuted();
+				.createdThenExecuted();
 		snertDAO.persist( snert );
 		backendMock.verifyExpectationsMet();
 	}

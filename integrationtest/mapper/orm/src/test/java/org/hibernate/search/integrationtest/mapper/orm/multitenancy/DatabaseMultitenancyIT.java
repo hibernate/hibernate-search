@@ -105,7 +105,7 @@ public class DatabaseMultitenancyIT {
 		for ( Clock clock : models ) {
 			expectWorks.add( clock.getId() + "", b -> b.field( "brand", clock.getBrand() ) );
 		}
-		expectWorks.processedThenExecuted();
+		expectWorks.createdThenExecuted();
 
 		try ( Session session = openSessionWithTenantId( tenantId ) ) {
 			session.beginTransaction();

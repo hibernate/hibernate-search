@@ -68,7 +68,7 @@ public class MassIndexingPrimitiveIdIT {
 					.add( "1", b -> { } )
 					.add( "2", b -> { } )
 					.add( "3", b -> { } )
-					.processedThenExecuted();
+					.createdThenExecuted();
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:

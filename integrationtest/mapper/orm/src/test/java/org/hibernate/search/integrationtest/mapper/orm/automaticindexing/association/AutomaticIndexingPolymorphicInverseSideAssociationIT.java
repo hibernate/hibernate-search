@@ -113,7 +113,7 @@ public class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -130,7 +130,7 @@ public class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -198,7 +198,7 @@ public class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -222,7 +222,7 @@ public class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}

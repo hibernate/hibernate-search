@@ -68,7 +68,7 @@ public class JtaAndSpringMoreComplexIT {
 		backendMock.expectWorks( "Box" )
 				.add( "1", b -> b
 						.field( "color", "red-and-white" ) )
-				.processedThenExecuted();
+				.createdThenExecuted();
 		boxDAO.persist( box );
 		backendMock.verifyExpectationsMet();
 
@@ -84,7 +84,7 @@ public class JtaAndSpringMoreComplexIT {
 						.field( "color", "red-and-white" )
 						.objectField( "muffinSet", b2 -> b2
 								.field( "kind", "blueberry" ) ) )
-				.processedThenExecuted();
+				.createdThenExecuted();
 		boxDAO.merge( box );
 		backendMock.verifyExpectationsMet();
 
@@ -94,7 +94,7 @@ public class JtaAndSpringMoreComplexIT {
 						.field( "color", "blue" )
 						.objectField( "muffinSet", b2 -> b2
 								.field( "kind", "blueberry" ) ) )
-				.processedThenExecuted();
+				.createdThenExecuted();
 		boxDAO.changeColor( box.getContainerId(), "blue" );
 		backendMock.verifyExpectationsMet();
 	}
@@ -108,7 +108,7 @@ public class JtaAndSpringMoreComplexIT {
 		backendMock.expectWorks( "Box" )
 				.add( "2", b -> b
 						.field( "color", "red-and-white" ) )
-				.processedThenExecuted();
+				.createdThenExecuted();
 		boxDAO.persist( box );
 		backendMock.verifyExpectationsMet();
 
@@ -121,13 +121,13 @@ public class JtaAndSpringMoreComplexIT {
 
 		backendMock.expectWorks( "Doughnut" )
 				.add( "2", b -> b.field( "kind", "glazed" ) )
-				.processedThenExecuted();
+				.createdThenExecuted();
 		backendMock.expectWorks( "Box" )
 				.addOrUpdate( "2", b -> b
 						.field( "color", "red-and-white" )
 						.objectField( "doughnutSet", b2 -> b2
 								.field( "kind", "glazed" ) ) )
-				.processedThenExecuted();
+				.createdThenExecuted();
 		boxDAO.merge( box );
 		backendMock.verifyExpectationsMet();
 
@@ -137,7 +137,7 @@ public class JtaAndSpringMoreComplexIT {
 						.field( "color", "blue" )
 						.objectField( "doughnutSet", b2 -> b2
 								.field( "kind", "glazed" ) ) )
-				.processedThenExecuted();
+				.createdThenExecuted();
 		boxDAO.changeColor( box.getContainerId(), "blue" );
 		backendMock.verifyExpectationsMet();
 	}

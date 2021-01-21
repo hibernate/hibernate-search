@@ -86,7 +86,7 @@ public class SyntheticPropertyIT {
 					.add( "1", b -> b
 							.objectField( "contained", b2 -> b2
 									.field( "ref", "theRef" ) ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 	}
 

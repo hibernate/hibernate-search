@@ -93,11 +93,6 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	}
 
 	@Override
-	public void process() {
-		// Nothing to do: we only have to send the works to the orchestrator
-	}
-
-	@Override
 	public CompletableFuture<IndexIndexingPlanExecutionReport<R>> executeAndReport() {
 		try {
 			List<CompletableFuture<IndexIndexingPlanExecutionReport<R>>> shardReportFutures = new ArrayList<>();

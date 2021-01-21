@@ -108,7 +108,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -125,7 +125,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 

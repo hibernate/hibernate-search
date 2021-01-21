@@ -388,7 +388,7 @@ public class KeywordFieldIT {
 					.add( "1", b -> b
 							.field( "myProperty", indexedFieldValue )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}

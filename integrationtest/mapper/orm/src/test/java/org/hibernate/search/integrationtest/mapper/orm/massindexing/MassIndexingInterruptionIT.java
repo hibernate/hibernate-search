@@ -196,7 +196,7 @@ public class MassIndexingInterruptionIT {
 						.field( "author", AUTHOR_1 )
 				)
 				// Return a CompletableFuture that will never complete
-				.processedThenExecuted( new CompletableFuture<>() );
+				.createdThenExecuted( new CompletableFuture<>() );
 
 		return indexer;
 	}
