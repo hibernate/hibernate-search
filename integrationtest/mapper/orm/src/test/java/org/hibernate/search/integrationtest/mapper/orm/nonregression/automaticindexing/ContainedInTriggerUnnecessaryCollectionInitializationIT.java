@@ -79,7 +79,7 @@ public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 							.field( "someField", "initialValue" )
 							.field( "someInteger", 42 )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 
 			backendMock.expectWorks( Post.INDEX )
 					.add( "2", b -> b
@@ -87,7 +87,7 @@ public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 									.field( "someInteger", 42 )
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -111,7 +111,7 @@ public class ContainedInTriggerUnnecessaryCollectionInitializationIT {
 							.field( "someField", "updatedValue" )
 							.field( "someInteger", 42 )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 
 			// Do not expect any work on the Post index
 		} );

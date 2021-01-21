@@ -78,7 +78,7 @@ public class SearchIndexingPlanBaseIT {
 					.addOrUpdate( "2", b -> b.field( "text", "number2" ) )
 					.delete( "3" )
 					.delete( "42" )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		defaultBackendMock.verifyExpectationsMet();
 	}
@@ -154,7 +154,7 @@ public class SearchIndexingPlanBaseIT {
 					.delete( "7" )
 					// purge then addOrUpdate => update
 					.addOrUpdate( "8", b -> b.field( "text", "number8" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		defaultBackendMock.verifyExpectationsMet();
 	}
@@ -187,7 +187,7 @@ public class SearchIndexingPlanBaseIT {
 
 			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.delete( "42" )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		defaultBackendMock.verifyExpectationsMet();
 	}
@@ -235,7 +235,7 @@ public class SearchIndexingPlanBaseIT {
 			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
 					.add( "2", b -> b.field( "text", "number2" ) )
-					.processed();
+					.created();
 
 			session.flush();
 
@@ -276,7 +276,7 @@ public class SearchIndexingPlanBaseIT {
 			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
 					.add( "2", b -> b.field( "text", "number2" ) )
-					.processed();
+					.created();
 
 			session.flush();
 			defaultBackendMock.verifyExpectationsMet();
@@ -311,7 +311,7 @@ public class SearchIndexingPlanBaseIT {
 			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
 					.add( "2", b -> b.field( "text", "number2" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		defaultBackendMock.verifyExpectationsMet();
 
@@ -332,7 +332,7 @@ public class SearchIndexingPlanBaseIT {
 					.delete( "2" )
 					// Automatic on persist
 					.add( "3", b -> b.field( "text", "number3" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		defaultBackendMock.verifyExpectationsMet();
 	}
@@ -358,10 +358,10 @@ public class SearchIndexingPlanBaseIT {
 			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.addOrUpdate( "1", b -> b.field( "text", "number1" ) )
 					.delete( "3" )
-					.processedThenExecuted();
+					.createdThenExecuted();
 			backend2Mock.expectWorks( IndexedEntity2.INDEX_NAME )
 					.addOrUpdate( "2", b -> b.field( "text", "number2" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		defaultBackendMock.verifyExpectationsMet();
 		backend2Mock.verifyExpectationsMet();

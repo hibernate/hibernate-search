@@ -98,7 +98,7 @@ public class PojoIndexingPlanBaseIT {
 					)
 					.delete( b -> b.identifier( "3" ) )
 					.delete( b -> b.identifier( "4" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 	}
 
@@ -175,7 +175,7 @@ public class PojoIndexingPlanBaseIT {
 			session.indexingPlan().addOrUpdate( entity );
 			expectations.addOrUpdate( "10", b -> b.field( "value", "val10" ) );
 
-			expectations.processedThenExecuted();
+			expectations.createdThenExecuted();
 		}
 	}
 
@@ -218,7 +218,7 @@ public class PojoIndexingPlanBaseIT {
 					)
 					.delete( b -> b.identifier( "3" ) )
 					.delete( b -> b.identifier( "4" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 	}
 
@@ -316,7 +316,7 @@ public class PojoIndexingPlanBaseIT {
 
 			when( loaderMock.load( idsToLoad ) ).thenReturn( loadedEntities );
 
-			expectations.processedThenExecuted();
+			expectations.createdThenExecuted();
 		}
 
 		verify( loaderMock ).load( any() );
@@ -342,7 +342,7 @@ public class PojoIndexingPlanBaseIT {
 										.build()
 								)
 						)
-						.processedThenExecuted( failingFuture );
+						.createdThenExecuted( failingFuture );
 			}
 		} )
 				.isSameAs( simulatedFailure );

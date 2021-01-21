@@ -18,19 +18,19 @@ class DocumentWorkCall extends Call<DocumentWorkCall> {
 
 	enum WorkPhase {
 		/**
-		 * Processing of the work, in preparation for its execution.
+		 * Creation of the work, in preparation for its execution.
 		 */
-		PROCESS,
+		CREATE,
 
 		/**
 		 * Actual execution of the work.
-		 * Happens after processing, unless the work was discarded.
+		 * Happens after creation, unless the work was discarded.
 		 */
 		EXECUTE,
 
 		/**
 		 * Discarding of the work.
-		 * Happens after processing, if the mapper decides to cancel some changes.
+		 * Happens after creation, if the mapper decides to cancel some changes.
 		 */
 		DISCARD
 	}

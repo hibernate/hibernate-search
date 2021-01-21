@@ -115,7 +115,7 @@ public class PropertyBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", entity.stringProperty ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -125,7 +125,7 @@ public class PropertyBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.addOrUpdate( "1", b -> b.field( "someField", entity.stringProperty ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -186,7 +186,7 @@ public class PropertyBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", contained.stringProperty ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -196,7 +196,7 @@ public class PropertyBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.addOrUpdate( "1", b -> b.field( "someField", contained.stringProperty ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -265,7 +265,7 @@ public class PropertyBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", "VALUE1" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -422,7 +422,7 @@ public class PropertyBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", "constant" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -432,7 +432,7 @@ public class PropertyBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.addOrUpdate( "1", b -> b.field( "someField", "constant" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -794,7 +794,7 @@ public class PropertyBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", "value1" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -804,7 +804,7 @@ public class PropertyBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.addOrUpdate( "1", b -> b.field( "someField", "value1", "value2" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -1100,7 +1100,7 @@ public class PropertyBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "739", b -> b.field( "someField", "739" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}

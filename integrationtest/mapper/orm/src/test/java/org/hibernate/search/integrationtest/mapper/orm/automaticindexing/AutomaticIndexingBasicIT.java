@@ -75,7 +75,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -89,7 +89,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -100,7 +100,7 @@ public class AutomaticIndexingBasicIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.delete( "1" )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -121,7 +121,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
 					)
-					.processed();
+					.created();
 
 			session.flush();
 			backendMock.verifyExpectationsMet();
@@ -159,7 +159,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -203,7 +203,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "shallowReindexOnUpdateField", entity1.getShallowReindexOnUpdateField() )
 							.field( "noReindexOnUpdateField", null )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -217,7 +217,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "shallowReindexOnUpdateField", entity1.getShallowReindexOnUpdateField() )
 							.field( "noReindexOnUpdateField", null )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -231,7 +231,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -256,7 +256,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", entity1.getNoReindexOnUpdateField() )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -294,7 +294,7 @@ public class AutomaticIndexingBasicIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", expectedValue( "number1" ) )
 					.add( "2", expectedValue( "number2" ) )
-					.processed();
+					.created();
 
 			session.flush();
 
@@ -311,7 +311,7 @@ public class AutomaticIndexingBasicIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "3", expectedValue( "number3" ) )
 					.add( "4", expectedValue( "number4" ) )
-					.processed();
+					.created();
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", expectedValue( "number1" ) )
@@ -334,7 +334,7 @@ public class AutomaticIndexingBasicIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "5", expectedValue( "number5" ) )
 					.add( "6", expectedValue( "number6" ) )
-					.processed();
+					.created();
 
 			session.flush();
 
@@ -385,7 +385,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -403,7 +403,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -428,7 +428,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -446,7 +446,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}

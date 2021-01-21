@@ -86,7 +86,7 @@ public class PojoIndexerOperationNullEntityIT extends AbstractPojoIndexingOperat
 									.delete( b -> addWorkInfo( b, tenantId, "42",
 											MyRoutingBridge
 													.toRoutingKey( tenantId, 42, "1" ) ) )
-									.processedThenExecuted( futureFromBackend );
+									.createdThenExecuted( futureFromBackend );
 						}
 					},
 					// And only then, expect the actual operation.

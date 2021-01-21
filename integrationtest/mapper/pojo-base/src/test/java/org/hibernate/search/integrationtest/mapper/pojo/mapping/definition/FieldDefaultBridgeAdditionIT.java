@@ -124,7 +124,7 @@ public class FieldDefaultBridgeAdditionIT {
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "property", "value1" ) )
 					.add( "2", b -> b.field( "property", "value2" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}

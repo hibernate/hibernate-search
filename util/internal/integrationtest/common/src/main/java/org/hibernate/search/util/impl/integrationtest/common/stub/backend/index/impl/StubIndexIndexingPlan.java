@@ -35,8 +35,6 @@ class StubIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 
 	private final List<StubDocumentWork> works = new ArrayList<>();
 
-	private int preparedIndex = 0;
-
 	StubIndexIndexingPlan(String indexName, String typeName,
 			StubBackendBehavior behavior,
 			BackendSessionContext sessionContext,
@@ -89,19 +87,9 @@ class StubIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	}
 
 	@Override
-	public void process() {
-		for ( StubDocumentWork work : works.subList( preparedIndex, works.size() ) ) {
-			behavior.processDocumentWork( indexName, work );
-		}
-		preparedIndex = works.size();
-	}
-
-	@Override
 	public CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport() {
-		process();
 		List<StubDocumentWork> worksToExecute = new ArrayList<>( works );
 		works.clear();
-		preparedIndex = 0;
 		CompletableFuture<?>[] workFutures = worksToExecute.stream()
 				.map( work -> behavior.executeDocumentWork( indexName, work ) )
 				.toArray( CompletableFuture<?>[]::new );
@@ -143,5 +131,6 @@ class StubIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 
 	private void addWork(StubDocumentWork work) {
 		works.add( work );
+		behavior.createDocumentWork( indexName, work );
 	}
 }

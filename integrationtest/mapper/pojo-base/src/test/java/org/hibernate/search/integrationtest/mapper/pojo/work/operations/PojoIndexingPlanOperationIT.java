@@ -171,7 +171,7 @@ public class PojoIndexingPlanOperationIT extends AbstractPojoIndexingOperationIT
 				backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
 						.delete( b -> addWorkInfo( b, tenantId, "1",
 								MyRoutingBridge.toRoutingKey( tenantId, 1, "1" ) ) )
-						.processedThenExecuted( futureFromBackend );
+						.createdThenExecuted( futureFromBackend );
 			}
 			// However, we don't expect the actual operation, which should be skipped because the entity is not indexed.
 			operation.addTo( indexingPlan, null, IndexedEntity.of( 1 ) );
@@ -202,7 +202,7 @@ public class PojoIndexingPlanOperationIT extends AbstractPojoIndexingOperationIT
 								MyRoutingBridge.toRoutingKey( tenantId, 1, "foo" ) ) )
 						.delete( b -> addWorkInfo( b, tenantId, "1",
 								MyRoutingBridge.toRoutingKey( tenantId, 1, "3" ) ) )
-						.processedThenExecuted( futureFromBackend );
+						.createdThenExecuted( futureFromBackend );
 			}
 			// However, we don't expect the actual operation, which should be skipped because the entity is not indexed.
 			operation.addTo( indexingPlan, null, IndexedEntity.of( 1 ) );

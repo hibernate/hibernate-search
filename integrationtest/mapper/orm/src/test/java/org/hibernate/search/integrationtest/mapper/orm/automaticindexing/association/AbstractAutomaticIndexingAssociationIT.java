@@ -212,7 +212,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -229,7 +229,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -271,7 +271,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -290,7 +290,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -327,7 +327,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -382,7 +382,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -403,7 +403,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -424,7 +424,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -488,7 +488,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -511,7 +511,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -559,7 +559,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -617,7 +617,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -637,7 +637,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -674,7 +674,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -695,7 +695,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -716,7 +716,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -754,7 +754,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -772,7 +772,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -790,7 +790,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -821,7 +821,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -871,7 +871,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -933,7 +933,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -975,7 +975,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1025,7 +1025,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1087,7 +1087,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1141,7 +1141,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1158,7 +1158,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 									)
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 

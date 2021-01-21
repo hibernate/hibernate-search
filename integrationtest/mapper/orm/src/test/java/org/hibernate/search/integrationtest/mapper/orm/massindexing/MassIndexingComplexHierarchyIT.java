@@ -83,7 +83,7 @@ public class MassIndexingComplexHierarchyIT {
 			backendMock.expectWorksAnyOrder( H1_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "3", b -> b.field( "rootText", "text3" )
 							.field( "bText", "text3" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 
 			backendMock.expectIndexScaleWorks( H1_B_Indexed.NAME, session.getTenantIdentifier() )
 					.purge()
@@ -111,7 +111,7 @@ public class MassIndexingComplexHierarchyIT {
 			backendMock.expectWorksAnyOrder( H1_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "3", b -> b.field( "rootText", "text3" )
 							.field( "bText", "text3" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 
 			backendMock.expectIndexScaleWorks( H1_B_Indexed.NAME, session.getTenantIdentifier() )
 					.purge()
@@ -138,16 +138,16 @@ public class MassIndexingComplexHierarchyIT {
 
 			backendMock.expectWorksAnyOrder( H2_Root_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "1", b -> b.field( "rootText", "text1" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 			backendMock.expectWorksAnyOrder( H2_A_C_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "3", b -> b.field( "rootText", "text3" )
 							.field( "aText", "text3" )
 							.field( "cText", "text3" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 			backendMock.expectWorksAnyOrder( H2_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "4", b -> b.field( "rootText", "text4" )
 							.field( "bText", "text4" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 
 			backendMock.expectIndexScaleWorks( H2_Root_Indexed.NAME, session.getTenantIdentifier() )
 					.purge()
@@ -185,7 +185,7 @@ public class MassIndexingComplexHierarchyIT {
 			backendMock.expectWorksAnyOrder( H2_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "4", b -> b.field( "rootText", "text4" )
 							.field( "bText", "text4" ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 
 			backendMock.expectIndexScaleWorks( H2_B_Indexed.NAME, session.getTenantIdentifier() )
 					.purge()

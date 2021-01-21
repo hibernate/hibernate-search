@@ -70,7 +70,7 @@ public class FlushClearEvictAllIT {
 
 			backendMock.expectWorks( Post.NAME )
 					.add( post.getId().toString(), b -> b.field( "name", "This is a post" ) )
-					.processed();
+					.created();
 			entityManager.flush();
 			backendMock.verifyExpectationsMet();
 
@@ -94,7 +94,7 @@ public class FlushClearEvictAllIT {
 
 			backendMock.expectWorks( Comment.NAME )
 					.add( "2", b -> b.field( "name", "This is a comment" ) )
-					.processed();
+					.created();
 			entityManager.flush();
 			backendMock.verifyExpectationsMet();
 

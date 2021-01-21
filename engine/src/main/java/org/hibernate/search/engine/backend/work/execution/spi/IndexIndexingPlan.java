@@ -50,14 +50,6 @@ public interface IndexIndexingPlan<R> {
 	void delete(DocumentReferenceProvider documentReferenceProvider);
 
 	/**
-	 * Process works before their execution, i.e. do as much as possible without writing to the index.
-	 * <p>
-	 * Calling this method is optional: the {@link #execute()} method
-	 * will perform the processing if necessary.
-	 */
-	void process();
-
-	/**
 	 * Start executing all the works in this plan, and clear the plan so that it can be re-used.
 	 *
 	 * @return A {@link CompletableFuture} that will be completed when all the works are complete.

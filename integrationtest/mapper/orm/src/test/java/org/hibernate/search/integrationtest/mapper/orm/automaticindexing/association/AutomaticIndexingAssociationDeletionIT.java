@@ -82,7 +82,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 
 			backendMock.expectWorks( AssociationOwner.NAME )
 					.delete( "1" )
-					.processedThenExecuted();
+					.createdThenExecuted();
 
 			// We don't expect any update of the containing entity (id 2),
 			// since its association to 1 was not updated
@@ -109,11 +109,11 @@ public class AutomaticIndexingAssociationDeletionIT {
 			backendMock.expectWorks( AssociationOwner.NAME )
 					.addOrUpdate( "1", b -> b.field( "basic", "text 1" )
 							.field( "elementCollection", 1001, 2001 ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 
 			backendMock.expectWorks( AssociationNonOwner.NAME )
 					.delete( "2" )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -131,11 +131,11 @@ public class AutomaticIndexingAssociationDeletionIT {
 
 			backendMock.expectWorks( AssociationOwner.NAME )
 					.delete( "1" )
-					.processedThenExecuted();
+					.createdThenExecuted();
 
 			backendMock.expectWorks( AssociationNonOwner.NAME )
 					.delete( "2" )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -157,14 +157,14 @@ public class AutomaticIndexingAssociationDeletionIT {
 							.objectField( "optionalOneToOne", b2 -> b2
 									.field( "basic", "text 2" )
 									.field( "elementCollection", 1002, 2002 ) ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 			backendMock.expectWorks( AssociationNonOwner.NAME )
 					.add( "2", b -> b.field( "basic", "text 2" )
 							.field( "elementCollection", 1002, 2002 )
 							.objectField( "optionalOneToOne", b2 -> b2
 									.field( "basic", "text 1" )
 									.field( "elementCollection", 1001, 2001 ) ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -180,7 +180,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 
 			backendMock.expectWorks( AssociationOwner.NAME )
 					.delete( "1" )
-					.processedThenExecuted();
+					.createdThenExecuted();
 
 			// We don't expect any update of the containing entity (id 2),
 			// since its association to 1 was not updated
@@ -213,11 +213,11 @@ public class AutomaticIndexingAssociationDeletionIT {
 					// it has nothing to do with the deletion.
 					.addOrUpdate( "3", b -> b.field( "basic", "text 3" )
 							.field( "elementCollection", 1003, 2003 ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 
 			backendMock.expectWorks( AssociationNonOwner.NAME )
 					.delete( "2" )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -243,11 +243,11 @@ public class AutomaticIndexingAssociationDeletionIT {
 					.addOrUpdate( "3", b -> b.field( "basic", "text 3" )
 							.field( "elementCollection", 1003, 2003 ) )
 					.delete( "1" )
-					.processedThenExecuted();
+					.createdThenExecuted();
 
 			backendMock.expectWorks( AssociationNonOwner.NAME )
 					.delete( "2" )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -278,7 +278,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 							.objectField( "manyToOne", b2 -> b2
 									.field( "basic", "text 2" )
 									.field( "elementCollection", 1002, 2002 ) ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 			backendMock.expectWorks( AssociationNonOwner.NAME )
 					.add( "2", b -> b.field( "basic", "text 2" )
 							.field( "elementCollection", 1002, 2002 )
@@ -288,7 +288,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 							.objectField( "oneToMany", b2 -> b2
 									.field( "basic", "text 3" )
 									.field( "elementCollection", 1003, 2003 ) ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -304,7 +304,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 
 			backendMock.expectWorks( AssociationOwner.NAME )
 					.delete( "1" )
-					.processedThenExecuted();
+					.createdThenExecuted();
 
 			// We don't expect any update of the containing entity (id 2),
 			// since its association to 1 was not updated
@@ -343,11 +343,11 @@ public class AutomaticIndexingAssociationDeletionIT {
 							.objectField( "manyToMany", b2 -> b2
 									.field( "basic", "text 4" )
 									.field( "elementCollection", 1004, 2004 ) ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 
 			backendMock.expectWorks( AssociationNonOwner.NAME )
 					.delete( "2" )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -376,14 +376,14 @@ public class AutomaticIndexingAssociationDeletionIT {
 							.objectField( "manyToMany", b2 -> b2
 									.field( "basic", "text 4" )
 									.field( "elementCollection", 1004, 2004 ) ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 
 			backendMock.expectWorks( AssociationNonOwner.NAME )
 					.delete( "2" )
 					// We don't expect any update of the containing entity (id 4),
 					// since its association to 1 was not updated
 					// (the code above is technically incorrect).
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -426,7 +426,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 							.objectField( "manyToMany", b2 -> b2
 									.field( "basic", "text 4" )
 									.field( "elementCollection", 1004, 2004 ) ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 			backendMock.expectWorks( AssociationNonOwner.NAME )
 					.add( "2", b -> b.field( "basic", "text 2" )
 							.field( "elementCollection", 1002, 2002 )
@@ -444,7 +444,7 @@ public class AutomaticIndexingAssociationDeletionIT {
 							.objectField( "manyToMany", b2 -> b2
 									.field( "basic", "text 3" )
 									.field( "elementCollection", 1003, 2003 ) ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}

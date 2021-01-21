@@ -111,7 +111,7 @@ public class FieldDefaultBridgeOverridingIT<V, F> {
 							b.field( FIELD_INDEXNULLAS_NAME, new FieldTypeForOverridingDefaultBridge( null ) );
 						}
 					} )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}
