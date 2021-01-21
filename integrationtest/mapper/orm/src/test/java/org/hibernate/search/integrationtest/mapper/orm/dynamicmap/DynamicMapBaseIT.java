@@ -102,7 +102,7 @@ public class DynamicMapBaseIT {
 							.field( "pageCount", entity1.get( "pageCount" ) )
 							.field( "publicationDate", entity1.get( "publicationDate" ) )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -163,7 +163,7 @@ public class DynamicMapBaseIT {
 					.add( "1", b -> b
 							.field( "title", entity1.get( "title" ) )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -240,7 +240,7 @@ public class DynamicMapBaseIT {
 				int id = i;
 				backendMock.expectWorksAnyOrder( INDEX1_NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 						.add( String.valueOf( id ), b -> b.field( "title","Hyperion " + id ) )
-						.processedThenExecuted();
+						.createdThenExecuted();
 			}
 
 			try {
@@ -285,7 +285,7 @@ public class DynamicMapBaseIT {
 					.add( "Hyperion", b -> b
 							.field( "title", entity1.get( "title" ) )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -367,13 +367,13 @@ public class DynamicMapBaseIT {
 							.field( "propertyOfA", entity1.get( "propertyOfA" ) )
 							.field( "propertyOfB", entity1.get( "propertyOfB" ) )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 			backendMock.expectWorks( INDEX2_NAME )
 					.add( "2", b -> b
 							.field( "propertyOfA", entity2.get( "propertyOfA" ) )
 							.field( "propertyOfC", entity2.get( "propertyOfC" ) )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -455,7 +455,7 @@ public class DynamicMapBaseIT {
 									.field( "content", quote1.get( "content" ) )
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -511,7 +511,7 @@ public class DynamicMapBaseIT {
 									.field( "content", quote1.content )
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -579,7 +579,7 @@ public class DynamicMapBaseIT {
 									.field( "content", quote2.content )
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -627,7 +627,7 @@ public class DynamicMapBaseIT {
 							.field( "title", book.get( "title" ) )
 							.field( "quotes", quote1 , quote2 )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -687,7 +687,7 @@ public class DynamicMapBaseIT {
 									.field( "content", quote1.get( "content" ) )
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -765,7 +765,7 @@ public class DynamicMapBaseIT {
 									.field( "content", quote2.get( "content" ) )
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -843,7 +843,7 @@ public class DynamicMapBaseIT {
 									.field( "content", quote2.get( "content" ) )
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -921,7 +921,7 @@ public class DynamicMapBaseIT {
 									.field( "content", quote2.get( "content" ) )
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -1001,7 +1001,7 @@ public class DynamicMapBaseIT {
 									.field( "content", quote2.get( "content" ) )
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -1079,7 +1079,7 @@ public class DynamicMapBaseIT {
 									.field( "content", quote2.get( "content" ) )
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}

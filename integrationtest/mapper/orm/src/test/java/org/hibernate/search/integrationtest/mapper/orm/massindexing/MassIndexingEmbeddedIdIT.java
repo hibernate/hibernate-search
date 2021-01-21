@@ -97,7 +97,7 @@ public class MassIndexingEmbeddedIdIT {
 							.field( "title", TITLE_3 )
 							.field( "author", AUTHOR_3 )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:

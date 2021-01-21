@@ -114,7 +114,7 @@ public class AutomaticIndexingConcurrentModificationInSameTypeIT {
 							.field( "name", entity3.getName() )
 							.field( "firstName", entity3.getFirstName() )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 
 		backendMock.verifyExpectationsMet();

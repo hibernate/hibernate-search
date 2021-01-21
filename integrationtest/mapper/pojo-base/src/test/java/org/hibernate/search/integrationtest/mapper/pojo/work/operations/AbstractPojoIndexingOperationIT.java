@@ -168,7 +168,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 			expectedRoutingKey = null;
 		}
 		operation.expect( context, tenantId, String.valueOf( id ), expectedRoutingKey, value );
-		context.processedThenExecuted( futureFromBackend );
+		context.createdThenExecuted( futureFromBackend );
 	}
 
 }

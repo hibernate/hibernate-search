@@ -60,16 +60,16 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 	}
 
 	void process() {
-		sendCommandsToDelegate();
-		delegate.process();
+		try {
+			statesPerId.values().forEach( IndexedEntityState::sendCommandsToDelegate );
+		}
+		finally {
+			statesPerId.clear();
+		}
 	}
 
 	CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport() {
-		sendCommandsToDelegate();
-		/*
-		 * No need to call prepare() here:
-		 * delegates are supposed to handle execute() even without a prior call to prepare().
-		 */
+		process();
 		return delegate.executeAndReport();
 	}
 
@@ -86,15 +86,6 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 	@Override
 	protected IndexedEntityState createState(I identifier) {
 		return new IndexedEntityState( identifier );
-	}
-
-	private void sendCommandsToDelegate() {
-		try {
-			statesPerId.values().forEach( IndexedEntityState::sendCommandsToDelegate );
-		}
-		finally {
-			statesPerId.clear();
-		}
 	}
 
 	class IndexedEntityState

@@ -77,7 +77,7 @@ public class MassIndexingMonitorIT {
 							.field( "title", TITLE_3 )
 							.field( "author", AUTHOR_3 )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 			backendMock.expectWorksAnyOrder(
 					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
@@ -85,7 +85,7 @@ public class MassIndexingMonitorIT {
 							.field( "title", TITLE_2 )
 							.field( "author", AUTHOR_2 )
 					)
-					.processedThenExecuted( indexingFuture );
+					.createdThenExecuted( indexingFuture );
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:

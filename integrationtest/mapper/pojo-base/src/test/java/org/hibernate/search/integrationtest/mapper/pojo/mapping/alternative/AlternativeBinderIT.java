@@ -96,7 +96,7 @@ public class AlternativeBinderIT {
 					.add( "2", b -> b
 							.field( "title_fr", entity2.title )
 							.field( "content_fr", entity2.text ) )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}

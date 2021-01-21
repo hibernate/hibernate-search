@@ -92,7 +92,7 @@ public class EnversIT {
 									.field( "text", "initial" )
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 		checkEnversAuditedCorrectly( IndexedEntity.class,
@@ -113,7 +113,7 @@ public class EnversIT {
 									.field( "text", "initial" )
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 		checkEnversAuditedCorrectly( IndexedEntity.class,
@@ -134,7 +134,7 @@ public class EnversIT {
 									.field( "text", "updated" )
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 		checkEnversAuditedCorrectly( IndexedEntity.class,
@@ -150,7 +150,7 @@ public class EnversIT {
 
 			backendMock.expectWorks( IndexedEntity.NAME )
 					.delete( "1" )
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 		checkEnversAuditedCorrectly( IndexedEntity.class,

@@ -675,7 +675,7 @@ public class SearchQueryBaseIT {
 									.field( "name", AUTHOR_CIDER_HOUSE )
 							)
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 			backendMock.expectWorks( Author.NAME )
 					.add( "1", b -> b
 							.field( "name", AUTHOR_4_3_2_1 )
@@ -686,7 +686,7 @@ public class SearchQueryBaseIT {
 					.add( "3", b -> b
 							.field( "name", AUTHOR_AVENUE_OF_MYSTERIES )
 					)
-					.processedThenExecuted();
+					.createdThenExecuted();
 		} );
 
 		backendMock.verifyExpectationsMet();
