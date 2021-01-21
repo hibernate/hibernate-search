@@ -73,7 +73,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "containedIndexedEmbedded", b2 -> b2
 									.field( "indexedField", "initialValue" )
 							)
@@ -97,7 +97,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "containedIndexedEmbedded", b2 -> b2
 									.field( "indexedField", "updatedValue" )
 							)
@@ -114,7 +114,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			entity1.setContainedIndexedEmbedded( null );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> { } )
+					.addOrUpdate( "1", b -> { } )
 					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
@@ -220,7 +220,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b2 -> b2
 									.field( "indexedField", "initialValue" )
 							)
@@ -242,7 +242,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b2 -> b2
 									.field( "indexedField", "updatedValue" )
 							)
@@ -258,7 +258,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			entity1.setContainedIndexedEmbeddedShallowReindexOnUpdate( null );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> { } )
+					.addOrUpdate( "1", b -> { } )
 					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
@@ -369,7 +369,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", "initialValue" )
@@ -395,7 +395,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", "updatedValue" )
@@ -431,7 +431,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			containingEntity1.setContainedIndexedEmbedded( null );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> { } )
 					)
 					.processedThenExecuted();
@@ -556,7 +556,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b3 -> b3
 											.field( "indexedField", "initialValue" )
@@ -580,7 +580,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b3 -> b3
 											.field( "indexedField", "updatedValue" )
@@ -598,7 +598,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			containingEntity1.setContainedIndexedEmbeddedShallowReindexOnUpdate( null );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> { } )
 					)
 					.processedThenExecuted();
@@ -726,7 +726,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.field(
 											"crossEntityDerivedField",
@@ -754,7 +754,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.field(
 											"crossEntityDerivedField",
@@ -792,7 +792,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 			containingEntity1.setContainedUsedInCrossEntityDerivedProperty( null );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> { } )
 					)
 					.processedThenExecuted();

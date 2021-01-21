@@ -118,7 +118,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 			containedEntity.setIncludedInFirstBridge( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "firstBridge", b3 -> b3
 											.field( "value", "updatedValue" )

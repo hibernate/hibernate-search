@@ -74,7 +74,7 @@ public class MultiTenancyMismatchIT {
 
 		assertThatThrownBy( () -> {
 			IndexIndexingPlan<?> plan = index.createIndexingPlan( tenant1SessionContext );
-			plan.update( referenceProvider( "1" ), document -> { } );
+			plan.addOrUpdate( referenceProvider( "1" ), document -> { } );
 			plan.execute().join();
 		} )
 				.isInstanceOf( SearchException.class )
@@ -90,7 +90,7 @@ public class MultiTenancyMismatchIT {
 
 		assertThatThrownBy( () -> {
 			IndexIndexingPlan<?> plan = index.createIndexingPlan( tenant1SessionContext );
-			plan.update( referenceProvider( "1" ), document -> { } );
+			plan.addOrUpdate( referenceProvider( "1" ), document -> { } );
 			plan.execute().join();
 		} )
 				.isInstanceOf( SearchException.class )

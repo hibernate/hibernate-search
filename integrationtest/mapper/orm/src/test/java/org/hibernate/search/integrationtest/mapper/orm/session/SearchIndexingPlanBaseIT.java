@@ -74,8 +74,8 @@ public class SearchIndexingPlanBaseIT {
 			indexingPlan.purge( IndexedEntity1.class, 42, null ); // Does not exist in database, but may exist in the index
 
 			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
-					.update( "1", b -> b.field( "text", "number1" ) )
-					.update( "2", b -> b.field( "text", "number2" ) )
+					.addOrUpdate( "1", b -> b.field( "text", "number1" ) )
+					.addOrUpdate( "2", b -> b.field( "text", "number2" ) )
 					.delete( "3" )
 					.delete( "42" )
 					.processedThenExecuted();
@@ -137,13 +137,13 @@ public class SearchIndexingPlanBaseIT {
 
 			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
 					// multiple addOrUpdate => single update
-					.update( "1", b -> b.field( "text", "number1" ) )
+					.addOrUpdate( "1", b -> b.field( "text", "number1" ) )
 					// multiple delete => single delete
 					.delete( "2" )
 					// addOrUpdate then delete => delete
 					.delete( "3" )
 					// delete then addOrUpdate => update
-					.update( "4", b -> b.field( "text", "number4" ) )
+					.addOrUpdate( "4", b -> b.field( "text", "number4" ) )
 					// multiple purge => single delete
 					.delete( "42" )
 					// delete then purge => single delete
@@ -153,7 +153,7 @@ public class SearchIndexingPlanBaseIT {
 					// addOrUpdate then purge => delete
 					.delete( "7" )
 					// purge then addOrUpdate => update
-					.update( "8", b -> b.field( "text", "number8" ) )
+					.addOrUpdate( "8", b -> b.field( "text", "number8" ) )
 					.processedThenExecuted();
 		} );
 		defaultBackendMock.verifyExpectationsMet();
@@ -348,7 +348,7 @@ public class SearchIndexingPlanBaseIT {
 
 			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
 					// Requested explicitly
-					.update( "1", b -> b.field( "text", "number1" ) )
+					.addOrUpdate( "1", b -> b.field( "text", "number1" ) )
 					.delete( "2" )
 					// Automatic on persist
 					.add( "3", b -> b.field( "text", "number3" ) )
@@ -376,11 +376,11 @@ public class SearchIndexingPlanBaseIT {
 			indexingPlan.delete( entity3 );
 
 			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
-					.update( "1", b -> b.field( "text", "number1" ) )
+					.addOrUpdate( "1", b -> b.field( "text", "number1" ) )
 					.delete( "3" )
 					.processedThenExecuted();
 			backend2Mock.expectWorks( IndexedEntity2.INDEX_NAME )
-					.update( "2", b -> b.field( "text", "number2" ) )
+					.addOrUpdate( "2", b -> b.field( "text", "number2" ) )
 					.processedThenExecuted();
 		} );
 		defaultBackendMock.verifyExpectationsMet();

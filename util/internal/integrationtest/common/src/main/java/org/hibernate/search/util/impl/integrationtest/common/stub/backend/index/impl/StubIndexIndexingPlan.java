@@ -66,9 +66,9 @@ class StubIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	}
 
 	@Override
-	public void update(DocumentReferenceProvider documentReferenceProvider,
+	public void addOrUpdate(DocumentReferenceProvider documentReferenceProvider,
 			DocumentContributor documentContributor) {
-		StubDocumentWork.Builder builder = StubDocumentWork.builder( StubDocumentWork.Type.UPDATE );
+		StubDocumentWork.Builder builder = StubDocumentWork.builder( StubDocumentWork.Type.ADD_OR_UPDATE );
 		populate( builder, documentReferenceProvider );
 		StubDocumentNode.Builder documentBuilder = StubDocumentNode.document();
 		StubDocumentElement documentElement = new StubDocumentElement( documentBuilder );

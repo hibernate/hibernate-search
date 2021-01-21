@@ -100,7 +100,7 @@ public class ReindexingResolverProxiedAssociatedEntityIT {
 			contained2.setText( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.NAME )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "contained", b2 -> b2
 									.objectField( "containedSingle", b3 -> b3
 											.field( "text", "updatedValue" )
@@ -159,7 +159,7 @@ public class ReindexingResolverProxiedAssociatedEntityIT {
 			contained2.setText( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.NAME )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "contained", b2 -> b2
 									.objectField( "containedList", b3 -> b3
 											.field( "text", "updatedValue" )

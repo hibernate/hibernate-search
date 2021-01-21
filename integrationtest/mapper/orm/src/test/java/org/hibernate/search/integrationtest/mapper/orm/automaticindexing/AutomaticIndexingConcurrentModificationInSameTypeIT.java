@@ -98,11 +98,11 @@ public class AutomaticIndexingConcurrentModificationInSameTypeIT {
 
 			backendMock.expectWorksAnyOrder(
 					IndexedEntity.INDEX, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE )
-					.update( entity1.getId().toString(), b -> b
+					.addOrUpdate( entity1.getId().toString(), b -> b
 							.field( "name", entity1.getName() )
 							.field( "firstName", entity1.getFirstName() )
 					)
-					.update( entity2.getId().toString(), b -> b
+					.addOrUpdate( entity2.getId().toString(), b -> b
 							.field( "name", entity2.getName() )
 							.field( "firstName", entity2.getFirstName() )
 							.objectField( "child", b2 -> b2
@@ -110,7 +110,7 @@ public class AutomaticIndexingConcurrentModificationInSameTypeIT {
 									.field( "name", entity1.getName() )
 							)
 					)
-					.update( entity3.getId().toString(), b -> b
+					.addOrUpdate( entity3.getId().toString(), b -> b
 							.field( "name", entity3.getName() )
 							.field( "firstName", entity3.getFirstName() )
 					)

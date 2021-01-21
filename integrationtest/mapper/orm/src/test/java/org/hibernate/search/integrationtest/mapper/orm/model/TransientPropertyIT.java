@@ -98,7 +98,7 @@ public class TransientPropertyIT {
 			session.persist( entity1 );
 
 			backendMock.expectWorks( EntityWithDerivedFrom.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "APlusB", 9 )
 					)
 					.processedThenExecuted();
@@ -149,7 +149,7 @@ public class TransientPropertyIT {
 			session.persist( entity1 );
 
 			backendMock.expectWorks( EntityWithDerivedFromAndBridge.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "APlusB", 9 )
 					)
 					.processedThenExecuted();

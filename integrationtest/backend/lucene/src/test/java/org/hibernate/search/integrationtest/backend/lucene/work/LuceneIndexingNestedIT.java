@@ -57,7 +57,7 @@ public class LuceneIndexingNestedIT {
 		setup( MultiTenancyStrategyName.NONE );
 
 		IndexIndexingPlan<?> plan = index.createIndexingPlan( sessionContext );
-		plan.update( referenceProvider( "1" ), document -> {
+		plan.addOrUpdate( referenceProvider( "1" ), document -> {
 			DocumentElement nested = document.addObject( index.binding().nestedObject.self );
 			nested.addValue( index.binding().nestedObject.field2, "value" );
 		} );
@@ -75,7 +75,7 @@ public class LuceneIndexingNestedIT {
 		setup( MultiTenancyStrategyName.DISCRIMINATOR );
 
 		IndexIndexingPlan<?> plan = index.createIndexingPlan( sessionContext );
-		plan.update( referenceProvider( "1" ), document -> {
+		plan.addOrUpdate( referenceProvider( "1" ), document -> {
 			DocumentElement nested = document.addObject( index.binding().nestedObject.self );
 			nested.addValue( index.binding().nestedObject.field2, "value" );
 		} );

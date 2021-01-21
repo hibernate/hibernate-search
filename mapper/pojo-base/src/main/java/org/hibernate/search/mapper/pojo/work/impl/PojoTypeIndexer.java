@@ -79,7 +79,7 @@ public class PojoTypeIndexer<I, E> {
 		// the backend is responsible for preserving relative order of works on the same index/shard + docId,
 		// and we don't care about relative order of works on different indexes/shards.
 		return deletePreviousFuture.thenCombine(
-				delegate.update( referenceProvider,
+				delegate.addOrUpdate( referenceProvider,
 						typeContext.toDocumentContributor( sessionContext, identifier, entitySupplier ),
 						commitStrategy, refreshStrategy ),
 				(deletePreviousResult, updateResult) -> updateResult );

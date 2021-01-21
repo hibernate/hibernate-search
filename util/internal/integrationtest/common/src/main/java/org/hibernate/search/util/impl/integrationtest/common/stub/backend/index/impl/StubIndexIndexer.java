@@ -51,13 +51,13 @@ public class StubIndexIndexer implements IndexIndexer {
 	}
 
 	@Override
-	public CompletableFuture<?> update(DocumentReferenceProvider referenceProvider,
+	public CompletableFuture<?> addOrUpdate(DocumentReferenceProvider referenceProvider,
 			DocumentContributor documentContributor,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		StubDocumentNode.Builder documentBuilder = StubDocumentNode.document();
 		documentContributor.contribute( new StubDocumentElement( documentBuilder ) );
 
-		StubDocumentWork work = StubDocumentWork.builder( StubDocumentWork.Type.UPDATE )
+		StubDocumentWork work = StubDocumentWork.builder( StubDocumentWork.Type.ADD_OR_UPDATE )
 				.tenantIdentifier( sessionContext.tenantIdentifier() )
 				.identifier( referenceProvider.identifier() )
 				.routingKey( referenceProvider.routingKey() )

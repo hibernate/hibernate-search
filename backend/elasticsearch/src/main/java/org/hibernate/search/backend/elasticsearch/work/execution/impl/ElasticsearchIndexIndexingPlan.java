@@ -57,7 +57,7 @@ public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	}
 
 	@Override
-	public void update(DocumentReferenceProvider referenceProvider,
+	public void addOrUpdate(DocumentReferenceProvider referenceProvider,
 			DocumentContributor documentContributor) {
 		index( referenceProvider, documentContributor );
 	}
