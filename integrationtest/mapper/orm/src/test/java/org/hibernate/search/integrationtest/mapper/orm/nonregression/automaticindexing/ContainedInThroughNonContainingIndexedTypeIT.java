@@ -100,7 +100,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 			 * the modified property.
 			 */
 			backendMock.expectWorks( Containing.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "indexedInContaining", 42 )
 					)
 					.processedThenExecuted();

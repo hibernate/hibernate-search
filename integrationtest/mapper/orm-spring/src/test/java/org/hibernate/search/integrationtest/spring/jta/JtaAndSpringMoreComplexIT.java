@@ -80,7 +80,7 @@ public class JtaAndSpringMoreComplexIT {
 		box.addMuffin( muffin );
 
 		backendMock.expectWorks( "Box" )
-				.update( "1", b -> b
+				.addOrUpdate( "1", b -> b
 						.field( "color", "red-and-white" )
 						.objectField( "muffinSet", b2 -> b2
 								.field( "kind", "blueberry" ) ) )
@@ -90,7 +90,7 @@ public class JtaAndSpringMoreComplexIT {
 
 		// Test lazy-loading a set of muffins
 		backendMock.expectWorks( "Box" )
-				.update( "1", b -> b
+				.addOrUpdate( "1", b -> b
 						.field( "color", "blue" )
 						.objectField( "muffinSet", b2 -> b2
 								.field( "kind", "blueberry" ) ) )
@@ -123,7 +123,7 @@ public class JtaAndSpringMoreComplexIT {
 				.add( "2", b -> b.field( "kind", "glazed" ) )
 				.processedThenExecuted();
 		backendMock.expectWorks( "Box" )
-				.update( "2", b -> b
+				.addOrUpdate( "2", b -> b
 						.field( "color", "red-and-white" )
 						.objectField( "doughnutSet", b2 -> b2
 								.field( "kind", "glazed" ) ) )
@@ -133,7 +133,7 @@ public class JtaAndSpringMoreComplexIT {
 
 		// Test lazy-loading a set of doughnuts
 		backendMock.expectWorks( "Box" )
-				.update( "2", b -> b
+				.addOrUpdate( "2", b -> b
 						.field( "color", "blue" )
 						.objectField( "doughnutSet", b2 -> b2
 								.field( "kind", "glazed" ) ) )

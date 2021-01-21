@@ -124,7 +124,7 @@ public class PropertyBridgeBaseIT {
 			session.indexingPlan().addOrUpdate( entity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.update( "1", b -> b.field( "someField", entity.stringProperty ) )
+					.addOrUpdate( "1", b -> b.field( "someField", entity.stringProperty ) )
 					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
@@ -195,7 +195,7 @@ public class PropertyBridgeBaseIT {
 			session.indexingPlan().addOrUpdate( entity, new String[] { "contained.stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.update( "1", b -> b.field( "someField", contained.stringProperty ) )
+					.addOrUpdate( "1", b -> b.field( "someField", contained.stringProperty ) )
 					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
@@ -431,7 +431,7 @@ public class PropertyBridgeBaseIT {
 			session.indexingPlan().addOrUpdate( containedLevel2Entity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.update( "1", b -> b.field( "someField", "constant" ) )
+					.addOrUpdate( "1", b -> b.field( "someField", "constant" ) )
 					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
@@ -803,7 +803,7 @@ public class PropertyBridgeBaseIT {
 			session.indexingPlan().addOrUpdate( entity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.update( "1", b -> b.field( "someField", "value1", "value2" ) )
+					.addOrUpdate( "1", b -> b.field( "someField", "value1", "value2" ) )
 					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();

@@ -84,7 +84,7 @@ public class AutomaticIndexingBasicIT {
 			entity1.setIndexedField( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "indexedField", entity1.getIndexedField() )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
@@ -212,7 +212,7 @@ public class AutomaticIndexingBasicIT {
 			entity1.setShallowReindexOnUpdateField( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "indexedField", null )
 							.field( "shallowReindexOnUpdateField", entity1.getShallowReindexOnUpdateField() )
 							.field( "noReindexOnUpdateField", null )
@@ -226,7 +226,7 @@ public class AutomaticIndexingBasicIT {
 			entity1.setShallowReindexOnUpdateField( null );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "indexedField", null )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
@@ -398,7 +398,7 @@ public class AutomaticIndexingBasicIT {
 
 			// Hibernate ORM does not track dirtiness on merges: we assume everything is dirty.
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "indexedField", entity1.getIndexedField() )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
@@ -441,7 +441,7 @@ public class AutomaticIndexingBasicIT {
 
 			// Hibernate ORM does not track dirtiness on calls to update(): we assume everything is dirty.
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "indexedField", entity1.getIndexedField() )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )

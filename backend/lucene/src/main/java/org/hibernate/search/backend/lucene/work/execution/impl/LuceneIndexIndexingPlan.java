@@ -68,7 +68,7 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	}
 
 	@Override
-	public void update(DocumentReferenceProvider referenceProvider,
+	public void addOrUpdate(DocumentReferenceProvider referenceProvider,
 			DocumentContributor documentContributor) {
 		String id = referenceProvider.identifier();
 		String routingKey = referenceProvider.routingKey();

@@ -102,7 +102,7 @@ public class AutomaticIndexingConcurrentModificationInDifferentTypeIT {
 			backendMock.expectWorksAnyOrder(
 					ParentEntity.NAME, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE
 			)
-					.update( entity2.getId().toString(), b -> b
+					.addOrUpdate( entity2.getId().toString(), b -> b
 							.field( "name", entity2.getName() )
 							.objectField( "child", b2 -> b2
 									.field( "name", entity1.getName() )
@@ -112,14 +112,14 @@ public class AutomaticIndexingConcurrentModificationInDifferentTypeIT {
 			backendMock.expectWorksAnyOrder(
 					ChildEntity.NAME, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE
 			)
-					.update( entity1.getId().toString(), b -> b
+					.addOrUpdate( entity1.getId().toString(), b -> b
 							.field( "name", entity1.getName() )
 					)
 					.processedThenExecuted();
 			backendMock.expectWorksAnyOrder(
 					OtherEntity.NAME, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE
 			)
-					.update( entity3.getId().toString(), b -> b
+					.addOrUpdate( entity3.getId().toString(), b -> b
 							.field( "name", entity3.getName() )
 					)
 					.processedThenExecuted();

@@ -82,7 +82,7 @@ public class AutomaticIndexingElementCollectionIT {
 			entity1.getIndexedElementCollectionField().add( "secondValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field(
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 ),
@@ -99,7 +99,7 @@ public class AutomaticIndexingElementCollectionIT {
 			entity1.getIndexedElementCollectionField().remove( 1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field(
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 )
@@ -145,7 +145,7 @@ public class AutomaticIndexingElementCollectionIT {
 			) ) );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field(
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 ),
@@ -227,7 +227,7 @@ public class AutomaticIndexingElementCollectionIT {
 
 			// TODO HSEARCH-3204: remove the statement below to not expect any work
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> { } )
+					.addOrUpdate( "1", b -> { } )
 					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
@@ -264,7 +264,7 @@ public class AutomaticIndexingElementCollectionIT {
 			entity1.getShallowReindexOnUpdateElementCollectionField().add( "secondValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "shallowReindexOnUpdateElementCollectionField",
 									"firstValue", "secondValue" )
 					)
@@ -278,7 +278,7 @@ public class AutomaticIndexingElementCollectionIT {
 			entity1.getShallowReindexOnUpdateElementCollectionField().remove( 1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "shallowReindexOnUpdateElementCollectionField", "firstValue" )
 					)
 					.processedThenExecuted();
@@ -321,7 +321,7 @@ public class AutomaticIndexingElementCollectionIT {
 			) ) );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "shallowReindexOnUpdateElementCollectionField",
 									"newFirstValue", "newSecondValue" )
 					)
@@ -404,7 +404,7 @@ public class AutomaticIndexingElementCollectionIT {
 
 			// TODO HSEARCH-3204: remove the statement below to not expect any work
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field(
 									"noReindexOnUpdateElementCollectionField",
 									"newFirstValue", "newSecondValue"

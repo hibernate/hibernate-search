@@ -327,12 +327,12 @@ public class BackendMock implements TestRule {
 			return documentWork( StubDocumentWork.Type.ADD, id, documentContributor );
 		}
 
-		public DocumentWorkCallListContext update(Consumer<StubDocumentWork.Builder> contributor) {
-			return documentWork( StubDocumentWork.Type.UPDATE, contributor );
+		public DocumentWorkCallListContext addOrUpdate(Consumer<StubDocumentWork.Builder> contributor) {
+			return documentWork( StubDocumentWork.Type.ADD_OR_UPDATE, contributor );
 		}
 
-		public DocumentWorkCallListContext update(String id, Consumer<StubDocumentNode.Builder> documentContributor) {
-			return documentWork( StubDocumentWork.Type.UPDATE, id, documentContributor );
+		public DocumentWorkCallListContext addOrUpdate(String id, Consumer<StubDocumentNode.Builder> documentContributor) {
+			return documentWork( StubDocumentWork.Type.ADD_OR_UPDATE, id, documentContributor );
 		}
 
 		public DocumentWorkCallListContext delete(String id) {

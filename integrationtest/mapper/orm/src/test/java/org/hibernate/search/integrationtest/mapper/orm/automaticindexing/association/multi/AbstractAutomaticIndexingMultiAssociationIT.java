@@ -69,7 +69,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			session.persist( contained );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "containedIndexedEmbedded", b2 -> b2
 									.field( "indexedField", VALUE_1 )
 							)
@@ -91,7 +91,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			session.persist( contained );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "containedIndexedEmbedded", b2 -> b2
 									.field( "indexedField", VALUE_1 )
 							)
@@ -113,7 +113,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			primitives.removeContained( primitives.getContainedIndexedEmbedded( entity1 ), contained );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "containedIndexedEmbedded", b2 -> b2
 									.field( "indexedField", VALUE_2 )
 							)
@@ -171,7 +171,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			session.persist( contained );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "containedIndexedEmbedded", b2 -> b2
 									.field( "indexedField", VALUE_1 )
 							)
@@ -295,7 +295,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 
 			// TODO HSEARCH-3204: remove the statement below to not expect any work
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> { } )
+					.addOrUpdate( "1", b -> { } )
 					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
@@ -332,7 +332,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			session.persist( contained );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b2 -> b2
 									.field( "indexedField", VALUE_1 )
 							)
@@ -353,7 +353,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			session.persist( contained );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b2 -> b2
 									.field( "indexedField", VALUE_1 )
 							)
@@ -374,7 +374,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			primitives.removeContained( primitives.getContainedIndexedEmbeddedShallowReindexOnUpdate( entity1 ), contained );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b2 -> b2
 									.field( "indexedField", VALUE_2 )
 							)
@@ -431,7 +431,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			session.persist( contained );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b2 -> b2
 									.field( "indexedField", VALUE_1 )
 							)
@@ -554,7 +554,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 
 			// TODO HSEARCH-3204: remove the statement below to not expect any work
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "containedIndexedEmbeddedNoReindexOnUpdate", b2 -> b2
 									.field( "indexedField", VALUE_1 )
 							)
@@ -605,7 +605,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			session.persist( contained );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", VALUE_1 )
@@ -629,7 +629,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			session.persist( contained );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", VALUE_1 )
@@ -669,7 +669,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			primitives.removeContained( primitives.getContainedIndexedEmbedded( containingEntity1 ), contained );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", VALUE_2 )
@@ -736,7 +736,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			session.persist( contained );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", VALUE_1 )
@@ -875,7 +875,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 
 			// TODO HSEARCH-3204: remove the statement below to not expect any work
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> { } )
 					)
 					.processedThenExecuted();
@@ -922,7 +922,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			session.persist( contained );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b3 -> b3
 											.field( "indexedField", VALUE_1 )
@@ -945,7 +945,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			session.persist( contained );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b3 -> b3
 											.field( "indexedField", VALUE_1 )
@@ -968,7 +968,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			primitives.removeContained( primitives.getContainedIndexedEmbeddedShallowReindexOnUpdate( containingEntity1 ), contained );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b3 -> b3
 											.field( "indexedField", VALUE_2 )
@@ -1036,7 +1036,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			session.persist( contained );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b3 -> b3
 											.field( "indexedField", VALUE_1 )
@@ -1176,7 +1176,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 
 			// TODO HSEARCH-3204: remove the statement below to not expect any work
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbeddedNoReindexOnUpdate", b3 -> b3
 											.field( "indexedField", VALUE_1 )
@@ -1238,7 +1238,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			primitives.setIndexedField( contained, "updatedValue" );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", "updatedValue" )

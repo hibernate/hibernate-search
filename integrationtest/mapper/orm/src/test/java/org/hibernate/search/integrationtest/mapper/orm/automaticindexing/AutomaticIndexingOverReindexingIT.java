@@ -149,7 +149,7 @@ public class AutomaticIndexingOverReindexingIT {
 			level3.setProperty2( "updatedValue" );
 
 			backendMock.expectWorks( Level2Entity.INDEX )
-					.update( "2", b -> b
+					.addOrUpdate( "2", b -> b
 							.objectField( "level3", b2 -> b2
 									.field( "property2", "updatedValue" )
 							)
@@ -165,7 +165,7 @@ public class AutomaticIndexingOverReindexingIT {
 			level3.setProperty1( "updatedValue" );
 
 			backendMock.expectWorks( Level1Entity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.field( "property1FromBridge", "updatedValue" )
 					)
 					.processedThenExecuted();

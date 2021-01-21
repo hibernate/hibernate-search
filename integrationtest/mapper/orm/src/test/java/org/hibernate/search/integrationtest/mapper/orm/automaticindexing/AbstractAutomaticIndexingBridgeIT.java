@@ -76,7 +76,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			entity1.setDirectField( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "typeBridge", b2 -> b2
 									.field( "directField", entity1.getDirectField() )
 									.objectField( "child", b3 -> b3
@@ -148,7 +148,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "typeBridge", b2 -> b2
 									.field( "directField", null )
 									.objectField( "child", b3 -> b3
@@ -174,7 +174,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "typeBridge", b2 -> b2
 									.field( "directField", null )
 									.objectField( "child", b3 -> b3
@@ -209,7 +209,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			containingEntity1.setContainedSingle( null );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "typeBridge", b2 -> b2
 									.field( "directField", null )
 									.objectField( "child", b3 -> b3
@@ -277,7 +277,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			containedEntity.setIncludedInTypeBridge( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "typeBridge", b2 -> b2
 									.field( "directField", null )
 									.objectField( "child", b3 -> b3
@@ -353,7 +353,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "singleValuedPropertyBridge", b2 -> b2
 									.field( "includedInSingleValuedPropertyBridge", "initialValue" )
 							)
@@ -376,7 +376,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "singleValuedPropertyBridge", b2 -> b2
 									.field( "includedInSingleValuedPropertyBridge", "updatedValue" )
 							)
@@ -408,7 +408,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			containingEntity1.setContainedSingle( null );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "singleValuedPropertyBridge", b2 -> b2
 									.field( "includedInSingleValuedPropertyBridge", null )
 							)
@@ -471,7 +471,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			containedEntity.setIncludedInSingleValuedPropertyBridge( "updatedValue" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "singleValuedPropertyBridge", b2 -> b2
 									.field( "includedInSingleValuedPropertyBridge", "updatedValue" )
 							)
@@ -539,7 +539,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "multiValuedPropertyBridge", b2 -> b2
 									.field( "includedInMultiValuedPropertyBridge", "value1" )
 							)
@@ -567,7 +567,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "multiValuedPropertyBridge", b2 -> b2
 									.field( "includedInMultiValuedPropertyBridge", "value1 value2" )
 							)
@@ -599,7 +599,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			session.persist( containedEntity );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "multiValuedPropertyBridge", b2 -> b2
 									.field( "includedInMultiValuedPropertyBridge", "updatedValue" )
 							)
@@ -617,7 +617,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 			entity1.getAssociation2().clear();
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "multiValuedPropertyBridge", b2 -> b2
 									.field( "includedInMultiValuedPropertyBridge", null )
 							)

@@ -107,7 +107,7 @@ public class IndexIndexerIT {
 		tasks = new CompletableFuture<?>[booksToUpdate];
 		for ( int i = 0; i < booksToUpdate; i++ ) {
 			final String id = String.valueOf( i );
-			tasks[i] = indexer.update(
+			tasks[i] = indexer.addOrUpdate(
 					referenceProvider( id ),
 					document -> document.addValue( index.binding().title, "The Boss of the Rings chap. " + id ),
 					commitStrategy, refreshStrategy
@@ -175,13 +175,13 @@ public class IndexIndexerIT {
 	}
 
 	@Test
-	public void update_failure() {
+	public void addOrUpdate_failure() {
 		IndexIndexer indexer = index.createIndexer();
 
 		// Trigger failures in the next operations
 		setupHelper.getBackendAccessor().ensureIndexingOperationsFail( index.name() );
 
-		CompletableFuture<?> future = indexer.update(
+		CompletableFuture<?> future = indexer.addOrUpdate(
 				referenceProvider( "1" ),
 				document -> document.addValue( index.binding().title, "Document #1" ),
 				commitStrategy, refreshStrategy

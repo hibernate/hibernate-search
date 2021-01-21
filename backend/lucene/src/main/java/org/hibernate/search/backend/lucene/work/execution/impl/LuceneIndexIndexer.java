@@ -58,7 +58,7 @@ public class LuceneIndexIndexer implements IndexIndexer {
 	}
 
 	@Override
-	public CompletableFuture<?> update(DocumentReferenceProvider referenceProvider,
+	public CompletableFuture<?> addOrUpdate(DocumentReferenceProvider referenceProvider,
 			DocumentContributor documentContributor,
 			DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy) {

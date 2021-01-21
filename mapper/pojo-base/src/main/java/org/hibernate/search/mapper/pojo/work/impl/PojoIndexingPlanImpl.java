@@ -65,14 +65,14 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 	@Override
 	public void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity) {
 		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegate( typeIdentifier );
-		delegate.update( providedId, providedRoutingKey, entity );
+		delegate.addOrUpdate( providedId, providedRoutingKey, entity );
 	}
 
 	@Override
 	public void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey,
 			Object entity, BitSet dirtyPaths) {
 		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegate( typeIdentifier );
-		delegate.update( providedId, providedRoutingKey, entity, dirtyPaths );
+		delegate.addOrUpdate( providedId, providedRoutingKey, entity, dirtyPaths );
 	}
 
 	@Override

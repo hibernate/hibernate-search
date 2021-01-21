@@ -222,7 +222,7 @@ public class MultiTenancyBaseIT {
 		assertThatQuery( checkQuery )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
-		plan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
+		plan.addOrUpdate( referenceProvider( DOCUMENT_ID_2 ), document -> {
 			document.addValue( index.binding().string, UPDATED_STRING );
 			document.addValue( index.binding().integer, INTEGER_VALUE_4 );
 
@@ -355,7 +355,7 @@ public class MultiTenancyBaseIT {
 		assertThatThrownBy( () -> {
 			IndexIndexingPlan<?> plan = index.createIndexingPlan( new StubBackendSessionContext() );
 
-			plan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
+			plan.addOrUpdate( referenceProvider( DOCUMENT_ID_2 ), document -> {
 				document.addValue( index.binding().string, UPDATED_STRING );
 				document.addValue( index.binding().integer, INTEGER_VALUE_4 );
 

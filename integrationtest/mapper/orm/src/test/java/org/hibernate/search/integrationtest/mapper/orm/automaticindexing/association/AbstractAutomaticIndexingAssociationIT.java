@@ -222,7 +222,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			primitives.setIndexedField( contained, "updatedValue" );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", "updatedValue" )
@@ -283,7 +283,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			primitives.setIndexedField( contained, "updatedValue" );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", "updatedValue" )
@@ -392,7 +392,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			primitives.getIndexedElementCollectionField( contained ).add( "secondValue" );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", null )
@@ -413,7 +413,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			primitives.getIndexedElementCollectionField( contained ).remove( 0 );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", null )
@@ -500,7 +500,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			) ) );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", null )
@@ -630,7 +630,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 
 			// TODO HSEARCH-3204: remove the statement below to not expect any work
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", null )
@@ -684,7 +684,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			primitives.setFieldUsedInContainedDerivedField1( contained, "field1_updatedValue" );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", null )
@@ -705,7 +705,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			primitives.setFieldUsedInContainedDerivedField2( contained, "field2_updatedValue" );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbedded", b3 -> b3
 											.field( "indexedField", null )
@@ -764,7 +764,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			primitives.setFieldUsedInCrossEntityDerivedField1( contained, "field1_updatedValue" );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.field(
 											"crossEntityDerivedField",
@@ -782,7 +782,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			primitives.setFieldUsedInCrossEntityDerivedField2( contained, "field2_updatedValue" );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.field(
 											"crossEntityDerivedField",
@@ -1151,7 +1151,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 			primitives.setIndexedField( contained, "updatedValue" );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b
+					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> b2
 									.objectField( "containedIndexedEmbeddedWithCast", b3 -> b3
 											.field( "indexedField", "updatedValue" )

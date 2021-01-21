@@ -79,7 +79,7 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 			primitives.setSerializedArray( entity1, array2 );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b.field( "serializedArray",
+					.addOrUpdate( "1", b -> b.field( "serializedArray",
 							primitives.getExpectedIndexFieldValue( array2, 0 ),
 							primitives.getExpectedIndexFieldValue( array2, 1 ),
 							primitives.getExpectedIndexFieldValue( array2, 2 ) ) )
@@ -116,7 +116,7 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 			primitives.setElement( array, 1, 2 );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b.field( "serializedArray",
+					.addOrUpdate( "1", b -> b.field( "serializedArray",
 							primitives.getExpectedIndexFieldValue( array, 0 ),
 							primitives.getExpectedIndexFieldValue( array, 1 ) ) )
 					.processedThenExecuted();
@@ -155,7 +155,7 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 			primitives.setElementCollectionArray( entity1, array2 );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b.field( "elementCollectionArray",
+					.addOrUpdate( "1", b -> b.field( "elementCollectionArray",
 							primitives.getExpectedIndexFieldValue( array2, 0 ),
 							primitives.getExpectedIndexFieldValue( array2, 1 ),
 							primitives.getExpectedIndexFieldValue( array2, 2 ) ) )
@@ -192,7 +192,7 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 			primitives.setElement( array, 1, 2 );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.update( "1", b -> b.field( "elementCollectionArray",
+					.addOrUpdate( "1", b -> b.field( "elementCollectionArray",
 							primitives.getExpectedIndexFieldValue( array, 0 ),
 							primitives.getExpectedIndexFieldValue( array, 1 ) ) )
 					.processedThenExecuted();
