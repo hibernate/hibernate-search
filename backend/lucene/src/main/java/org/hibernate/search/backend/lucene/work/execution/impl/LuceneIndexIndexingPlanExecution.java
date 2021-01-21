@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.work.impl.SingleDocumentIndexingWork;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
+import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.util.common.impl.Futures;
 
 /**
@@ -57,12 +57,12 @@ class LuceneIndexIndexingPlanExecution<R> {
 	 * @return A future that completes when all works and optionally commit/refresh have completed,
 	 * holding an execution report.
 	 */
-	CompletableFuture<IndexIndexingPlanExecutionReport<R>> execute() {
+	CompletableFuture<MultiEntityOperationExecutionReport<R>> execute() {
 		// Add the handler to the future *before* submitting the works,
 		// so as to be sure that onAllWorksFinished is executed in the background,
 		// not in the current thread.
 		// It's important because we don't want to block the current thread.
-		CompletableFuture<IndexIndexingPlanExecutionReport<R>> reportFuture = CompletableFuture.allOf( futures )
+		CompletableFuture<MultiEntityOperationExecutionReport<R>> reportFuture = CompletableFuture.allOf( futures )
 				// We don't care about the throwable, as it comes from a work and
 				// work failures are handled in onAllWorksFinished
 				.handle( (result, throwable) -> onAllWorksFinished() );
@@ -76,7 +76,7 @@ class LuceneIndexIndexingPlanExecution<R> {
 		return reportFuture;
 	}
 
-	private IndexIndexingPlanExecutionReport<R> onAllWorksFinished() {
+	private MultiEntityOperationExecutionReport<R> onAllWorksFinished() {
 		Throwable commitOrRefreshThrowable = null;
 		try {
 			commitOrRefreshAsNecessary();
@@ -100,8 +100,8 @@ class LuceneIndexIndexingPlanExecution<R> {
 		}
 	}
 
-	private IndexIndexingPlanExecutionReport<R> buildReport(Throwable commitOrRefreshThrowable) {
-		IndexIndexingPlanExecutionReport.Builder<R> reportBuilder = IndexIndexingPlanExecutionReport.builder();
+	private MultiEntityOperationExecutionReport<R> buildReport(Throwable commitOrRefreshThrowable) {
+		MultiEntityOperationExecutionReport.Builder<R> reportBuilder = MultiEntityOperationExecutionReport.builder();
 		for ( int i = 0; i < futures.length; i++ ) {
 			CompletableFuture<?> future = futures[i];
 			if ( future.isCompletedExceptionally() ) {

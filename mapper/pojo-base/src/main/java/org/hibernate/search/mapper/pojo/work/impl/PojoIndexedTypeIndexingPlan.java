@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
+import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.mapper.pojo.route.impl.DocumentRouteImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
@@ -64,7 +64,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 		delegate.process();
 	}
 
-	CompletableFuture<IndexIndexingPlanExecutionReport<R>> executeAndReport() {
+	CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport() {
 		sendCommandsToDelegate();
 		/*
 		 * No need to call prepare() here:

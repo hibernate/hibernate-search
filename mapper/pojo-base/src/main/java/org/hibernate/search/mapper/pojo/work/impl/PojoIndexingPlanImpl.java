@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
+import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.loading.impl.PojoLoadingPlan;
 import org.hibernate.search.mapper.pojo.loading.impl.PojoMultiLoaderLoadingPlan;
@@ -136,14 +136,14 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 	}
 
 	@Override
-	public CompletableFuture<IndexIndexingPlanExecutionReport<R>> executeAndReport() {
+	public CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport() {
 		try {
 			process();
-			List<CompletableFuture<IndexIndexingPlanExecutionReport<R>>> futures = new ArrayList<>();
+			List<CompletableFuture<MultiEntityOperationExecutionReport<R>>> futures = new ArrayList<>();
 			for ( PojoIndexedTypeIndexingPlan<?, ?, R> delegate : indexedTypeDelegates.values() ) {
 				futures.add( delegate.executeAndReport() );
 			}
-			return IndexIndexingPlanExecutionReport.allOf( futures );
+			return MultiEntityOperationExecutionReport.allOf( futures );
 		}
 		finally {
 			indexedTypeDelegates.clear();

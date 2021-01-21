@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributo
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
+import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
@@ -97,7 +97,7 @@ class StubIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	}
 
 	@Override
-	public CompletableFuture<IndexIndexingPlanExecutionReport<R>> executeAndReport() {
+	public CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport() {
 		process();
 		List<StubDocumentWork> worksToExecute = new ArrayList<>( works );
 		works.clear();
@@ -112,9 +112,9 @@ class StubIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 				} ) );
 	}
 
-	private IndexIndexingPlanExecutionReport<R> buildResult(List<StubDocumentWork> worksToExecute,
+	private MultiEntityOperationExecutionReport<R> buildResult(List<StubDocumentWork> worksToExecute,
 			CompletableFuture<?>[] finishedWorkFutures) {
-		IndexIndexingPlanExecutionReport.Builder<R> builder = IndexIndexingPlanExecutionReport.builder();
+		MultiEntityOperationExecutionReport.Builder<R> builder = MultiEntityOperationExecutionReport.builder();
 		for ( int i = 0; i < finishedWorkFutures.length; i++ ) {
 			CompletableFuture<?> future = finishedWorkFutures[i];
 			if ( future.isCompletedExceptionally() ) {

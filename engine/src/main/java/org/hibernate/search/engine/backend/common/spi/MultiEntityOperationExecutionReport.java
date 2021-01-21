@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.backend.work.execution.spi;
+package org.hibernate.search.engine.backend.common.spi;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,32 +12,31 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.util.common.AssertionFailure;
 
 /**
  * @param <R> The type of entity references.
  */
-public final class IndexIndexingPlanExecutionReport<R> {
+public final class MultiEntityOperationExecutionReport<R> {
 
-	public static <R> IndexIndexingPlanExecutionReport.Builder<R> builder() {
-		return new IndexIndexingPlanExecutionReport.Builder<>();
+	public static <R> MultiEntityOperationExecutionReport.Builder<R> builder() {
+		return new MultiEntityOperationExecutionReport.Builder<>();
 	}
 
-	public static <R> CompletableFuture<IndexIndexingPlanExecutionReport<R>> allOf(
-			List<CompletableFuture<IndexIndexingPlanExecutionReport<R>>> reportFutures) {
+	public static <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> allOf(
+			List<CompletableFuture<MultiEntityOperationExecutionReport<R>>> reportFutures) {
 		if ( reportFutures.size() == 1 ) {
 			return reportFutures.get( 0 );
 		}
 		else {
-			CompletableFuture<IndexIndexingPlanExecutionReport.Builder<R>> reportBuilderFuture =
-					CompletableFuture.completedFuture( IndexIndexingPlanExecutionReport.builder() );
-			for ( CompletableFuture<IndexIndexingPlanExecutionReport<R>> future : reportFutures ) {
+			CompletableFuture<MultiEntityOperationExecutionReport.Builder<R>> reportBuilderFuture =
+					CompletableFuture.completedFuture( MultiEntityOperationExecutionReport.builder() );
+			for ( CompletableFuture<MultiEntityOperationExecutionReport<R>> future : reportFutures ) {
 				reportBuilderFuture = reportBuilderFuture.thenCombine(
-						future, IndexIndexingPlanExecutionReport.Builder::add
+						future, MultiEntityOperationExecutionReport.Builder::add
 				);
 			}
-			return reportBuilderFuture.thenApply( IndexIndexingPlanExecutionReport.Builder::build );
+			return reportBuilderFuture.thenApply( MultiEntityOperationExecutionReport.Builder::build );
 		}
 	}
 
@@ -45,7 +44,7 @@ public final class IndexIndexingPlanExecutionReport<R> {
 
 	private final List<R> failingEntityReferences;
 
-	private IndexIndexingPlanExecutionReport(Builder<R> builder) {
+	private MultiEntityOperationExecutionReport(Builder<R> builder) {
 		this.failingEntityReferences = builder.failingEntityReferences == null
 				? Collections.emptyList() : Collections.unmodifiableList( builder.failingEntityReferences );
 		if ( builder.throwable == null && !failingEntityReferences.isEmpty() ) {
@@ -74,7 +73,7 @@ public final class IndexIndexingPlanExecutionReport<R> {
 		private Builder() {
 		}
 
-		public Builder<R> add(IndexIndexingPlanExecutionReport<R> report) {
+		public Builder<R> add(MultiEntityOperationExecutionReport<R> report) {
 			report.throwable().ifPresent( this::throwable );
 			for ( R failingEntityReference : report.failingEntityReferences() ) {
 				failingEntityReference( failingEntityReference );
@@ -110,8 +109,8 @@ public final class IndexIndexingPlanExecutionReport<R> {
 			return this;
 		}
 
-		public IndexIndexingPlanExecutionReport<R> build() {
-			return new IndexIndexingPlanExecutionReport<>( this );
+		public MultiEntityOperationExecutionReport<R> build() {
+			return new MultiEntityOperationExecutionReport<>( this );
 		}
 
 	}

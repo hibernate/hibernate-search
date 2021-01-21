@@ -24,7 +24,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
+import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 
 public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 
@@ -98,9 +98,9 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	}
 
 	@Override
-	public CompletableFuture<IndexIndexingPlanExecutionReport<R>> executeAndReport() {
+	public CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport() {
 		try {
-			List<CompletableFuture<IndexIndexingPlanExecutionReport<R>>> shardReportFutures = new ArrayList<>();
+			List<CompletableFuture<MultiEntityOperationExecutionReport<R>>> shardReportFutures = new ArrayList<>();
 			for ( Map.Entry<LuceneSerialWorkOrchestrator, List<SingleDocumentIndexingWork>> entry : worksByOrchestrator.entrySet() ) {
 				LuceneSerialWorkOrchestrator orchestrator = entry.getKey();
 				List<SingleDocumentIndexingWork> works = entry.getValue();
@@ -111,7 +111,7 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 				);
 				shardReportFutures.add( execution.execute() );
 			}
-			return IndexIndexingPlanExecutionReport.allOf( shardReportFutures );
+			return MultiEntityOperationExecutionReport.allOf( shardReportFutures );
 		}
 		finally {
 			worksByOrchestrator.clear();

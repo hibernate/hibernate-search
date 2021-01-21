@@ -8,6 +8,7 @@ package org.hibernate.search.engine.backend.work.execution.spi;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.util.common.impl.Throwables;
 
 /**
@@ -78,7 +79,7 @@ public interface IndexIndexingPlan<R> {
 	 * The future will be completed normally even if a work failed,
 	 * but the report will contain an exception.
 	 */
-	CompletableFuture<IndexIndexingPlanExecutionReport<R>> executeAndReport();
+	CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport();
 
 	/**
 	 * Discard all works that are present in this plan.
