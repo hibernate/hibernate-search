@@ -41,7 +41,7 @@ public final class ConfiguredAutomaticIndexingSynchronizationStrategy {
 
 	public void executeAndSynchronize(PojoIndexingPlan<EntityReference> indexingPlan) {
 		CompletableFuture<SearchIndexingPlanExecutionReport> reportFuture =
-				indexingPlan.executeAndReport().thenApply( SearchIndexingPlanExecutionReportImpl::from );
+				indexingPlan.executeAndReport().thenApply( SearchIndexingPlanExecutionReportImpl::new );
 		indexingFutureHandler.accept( reportFuture );
 	}
 
