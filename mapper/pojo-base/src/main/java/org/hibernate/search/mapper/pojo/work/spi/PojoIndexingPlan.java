@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.work.spi;
 import java.util.BitSet;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
+import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
@@ -127,7 +127,7 @@ public interface PojoIndexingPlan<R> {
 	 *
 	 * @return A {@link CompletableFuture} that will be completed with an execution report when all the works are complete.
 	 */
-	CompletableFuture<IndexIndexingPlanExecutionReport<R>> executeAndReport();
+	CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport();
 
 	/**
 	 * Discard all plans of indexing.

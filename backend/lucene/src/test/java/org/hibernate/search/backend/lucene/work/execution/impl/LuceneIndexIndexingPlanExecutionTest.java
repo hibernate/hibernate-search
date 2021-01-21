@@ -30,7 +30,7 @@ import org.hibernate.search.backend.lucene.work.impl.SingleDocumentIndexingWork;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
+import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -100,7 +100,7 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		ArgumentCaptor<CompletableFuture<Long>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
-		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> planExecutionFuture;
+		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> planExecutionFuture;
 
 		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
 				orchestratorMock,
@@ -155,7 +155,7 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		ArgumentCaptor<CompletableFuture<Long>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
-		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> planExecutionFuture;
+		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> planExecutionFuture;
 
 		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
 				orchestratorMock,
@@ -213,7 +213,7 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		ArgumentCaptor<CompletableFuture<Long>> work4FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
-		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> planExecutionFuture;
+		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> planExecutionFuture;
 
 		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
 				orchestratorMock,
@@ -278,7 +278,7 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		ArgumentCaptor<CompletableFuture<Long>> work4FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
-		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> planExecutionFuture;
+		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> planExecutionFuture;
 
 		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
 				orchestratorMock,
@@ -352,7 +352,7 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		ArgumentCaptor<CompletableFuture<Long>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
-		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> planExecutionFuture;
+		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> planExecutionFuture;
 
 		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
 				orchestratorMock,
@@ -410,7 +410,7 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		ArgumentCaptor<CompletableFuture<Long>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
-		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> planExecutionFuture;
+		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> planExecutionFuture;
 
 		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
 				orchestratorMock,
@@ -470,7 +470,7 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		ArgumentCaptor<CompletableFuture<Long>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
-		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> planExecutionFuture;
+		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> planExecutionFuture;
 
 		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
 				orchestratorMock,
@@ -529,7 +529,7 @@ public class LuceneIndexIndexingPlanExecutionTest {
 		ArgumentCaptor<CompletableFuture<Long>> work3FutureCaptor = futureCaptor();
 
 		// Plan future: we will test it
-		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> planExecutionFuture;
+		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> planExecutionFuture;
 
 		LuceneIndexIndexingPlanExecution<StubEntityReference> execution = new LuceneIndexIndexingPlanExecution<>(
 				orchestratorMock,
