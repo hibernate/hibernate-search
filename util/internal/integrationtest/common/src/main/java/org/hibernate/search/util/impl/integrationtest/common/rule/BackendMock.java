@@ -300,7 +300,7 @@ public class BackendMock implements TestRule {
 		}
 	}
 
-	public class DocumentWorkCallListContext {
+	public static class DocumentWorkCallListContext {
 		private final String indexName;
 		private final String tenantId;
 		private final DocumentCommitStrategy commitStrategyForDocumentWorks;
