@@ -12,9 +12,9 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -197,7 +197,7 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> {
 		result = property.get( sourceMock );
 		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isNotEmpty();
-		assertThat( result.get() ).containsExactly( expectedValue );
+		assertThat( result.get() ).containsExactly( expectedValue, expectedValue );
 	}
 
 	private void verifyNoOtherSourceInteractionsAndReset() {
@@ -207,10 +207,9 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> {
 
 	@SafeVarargs
 	private static <T> Collection<T> createCollection(T... values) {
-		// Don't create a List, that would be too easy.
-		Collection<T> collection = new LinkedHashSet<>();
-		Collections.addAll( collection, values );
-		return collection;
+		// Don't expose a List, that would be too easy.
+		// Instead, wrap the list into a collection.
+		return Collections.unmodifiableCollection( Arrays.asList( values ) );
 	}
 
 	private static class MyPropertyType {
