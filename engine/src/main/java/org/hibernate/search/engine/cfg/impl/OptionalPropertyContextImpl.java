@@ -7,8 +7,10 @@
 package org.hibernate.search.engine.cfg.impl;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.engine.cfg.spi.ConvertUtils;
@@ -26,6 +28,23 @@ final class OptionalPropertyContextImpl<T> implements OptionalPropertyContext<T>
 	OptionalPropertyContextImpl(String key, Function<Object, T> converter) {
 		this.key = key;
 		this.converter = converter;
+	}
+
+	@Override
+	public OptionalPropertyContext<T> substitute(UnaryOperator<Object> substitution) {
+		return new OptionalPropertyContextImpl<>( key, substitution.andThen( converter ) );
+	}
+
+	@Override
+	public OptionalPropertyContext<T> substitute(Object expected, Object replacement) {
+		return substitute( v -> {
+			if ( Objects.equals( v, expected ) ) {
+				return replacement;
+			}
+			else {
+				return v;
+			}
+		} );
 	}
 
 	@Override

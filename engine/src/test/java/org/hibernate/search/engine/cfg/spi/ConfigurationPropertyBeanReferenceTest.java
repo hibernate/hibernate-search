@@ -422,6 +422,180 @@ public class ConfigurationPropertyBeanReferenceTest {
 		assertThat( result ).contains( expectedAsStubBean );
 	}
 
+	@Test
+	public void substitute_function() {
+		String key = "substitute_function";
+		ConfigurationProperty<Optional<BeanReference<? extends StubBean>>> property =
+				ConfigurationProperty.forKey( key ).asBeanReference( StubBean.class )
+						.substitute( v -> {
+							if ( v instanceof MyEnum ) {
+								switch ( (MyEnum) v ) {
+									case VALUE1:
+										return "bean:name";
+									case VALUE2:
+										return StubBeanImpl1.class;
+									case VALUE3:
+										return BeanReference.of( StubBeanImpl1.class, "name" );
+								}
+							}
+							return v;
+						} )
+						.build();
+
+		BeanHolder<StubBeanImpl1> expected = BeanHolder.of( new StubBeanImpl1() );
+		BeanHolder<StubBean> expectedAsStubBean = BeanHolder.of( new StubBeanImpl1() );
+		Optional<BeanReference<? extends StubBean>> reference;
+		BeanHolder<? extends StubBean> result;
+
+		// No value
+		when( sourceMock.get( key ) ).thenReturn( Optional.empty() );
+		reference = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( reference ).isEmpty();
+
+		// Enum substituted with String value - 'bean:*'
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( MyEnum.VALUE1 ) );
+		when( beanResolverMock.resolve( StubBean.class, "name", BeanRetrieval.BEAN ) )
+				.thenReturn( expectedAsStubBean );
+		reference = property.get( sourceMock );
+		assertThat( reference ).isNotEmpty();
+		result = reference.get().resolve( beanResolverMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expectedAsStubBean );
+
+		// Enum substituted with Class value
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( MyEnum.VALUE2 ) );
+		when( beanResolverMock.resolve( StubBeanImpl1.class, BeanRetrieval.ANY ) )
+				.thenReturn( expected );
+		reference = property.get( sourceMock );
+		assertThat( reference ).isNotEmpty();
+		result = reference.get().resolve( beanResolverMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expected );
+
+		// Enum substituted with BeanReference value
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( MyEnum.VALUE3 ) );
+		when( beanResolverMock.resolve( StubBeanImpl1.class, "name", BeanRetrieval.ANY ) )
+				.thenReturn( expected );
+		reference = property.get( sourceMock );
+		assertThat( reference ).isNotEmpty();
+		result = reference.get().resolve( beanResolverMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expected );
+
+		// String value - 'bean:*'
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( "bean:name" ) );
+		when( beanResolverMock.resolve( StubBean.class, "name", BeanRetrieval.BEAN ) )
+				.thenReturn( expectedAsStubBean );
+		reference = property.get( sourceMock );
+		assertThat( reference ).isNotEmpty();
+		result = reference.get().resolve( beanResolverMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expectedAsStubBean );
+
+		// Class value
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( StubBeanImpl1.class ) );
+		when( beanResolverMock.resolve( StubBeanImpl1.class, BeanRetrieval.ANY ) )
+				.thenReturn( expected );
+		reference = property.get( sourceMock );
+		assertThat( reference ).isNotEmpty();
+		result = reference.get().resolve( beanResolverMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expected );
+
+		// BeanReference value
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( BeanReference.of( StubBeanImpl1.class, "name" ) ) );
+		when( beanResolverMock.resolve( StubBeanImpl1.class, "name", BeanRetrieval.ANY ) )
+				.thenReturn( expected );
+		reference = property.get( sourceMock );
+		assertThat( reference ).isNotEmpty();
+		result = reference.get().resolve( beanResolverMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expected );
+	}
+
+	@Test
+	public void substitute_literals() {
+		String key = "substitute_literals";
+		ConfigurationProperty<Optional<BeanReference<? extends StubBean>>> property =
+				ConfigurationProperty.forKey( key ).asBeanReference( StubBean.class )
+						.substitute( MyEnum.VALUE1, "bean:name" )
+						.substitute( MyEnum.VALUE2, StubBeanImpl1.class )
+						.substitute( MyEnum.VALUE3, BeanReference.of( StubBeanImpl1.class, "name" ) )
+						.build();
+
+		BeanHolder<StubBeanImpl1> expected = BeanHolder.of( new StubBeanImpl1() );
+		BeanHolder<StubBean> expectedAsStubBean = BeanHolder.of( new StubBeanImpl1() );
+		Optional<BeanReference<? extends StubBean>> reference;
+		BeanHolder<? extends StubBean> result;
+
+		// No value
+		when( sourceMock.get( key ) ).thenReturn( Optional.empty() );
+		reference = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( reference ).isEmpty();
+
+		// Enum substituted with String value - 'bean:*'
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( MyEnum.VALUE1 ) );
+		when( beanResolverMock.resolve( StubBean.class, "name", BeanRetrieval.BEAN ) )
+				.thenReturn( expectedAsStubBean );
+		reference = property.get( sourceMock );
+		assertThat( reference ).isNotEmpty();
+		result = reference.get().resolve( beanResolverMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expectedAsStubBean );
+
+		// Enum substituted with Class value
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( MyEnum.VALUE2 ) );
+		when( beanResolverMock.resolve( StubBeanImpl1.class, BeanRetrieval.ANY ) )
+				.thenReturn( expected );
+		reference = property.get( sourceMock );
+		assertThat( reference ).isNotEmpty();
+		result = reference.get().resolve( beanResolverMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expected );
+
+		// Enum substituted with BeanReference value
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( MyEnum.VALUE3 ) );
+		when( beanResolverMock.resolve( StubBeanImpl1.class, "name", BeanRetrieval.ANY ) )
+				.thenReturn( expected );
+		reference = property.get( sourceMock );
+		assertThat( reference ).isNotEmpty();
+		result = reference.get().resolve( beanResolverMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expected );
+
+		// String value - 'bean:*'
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( "bean:name" ) );
+		when( beanResolverMock.resolve( StubBean.class, "name", BeanRetrieval.BEAN ) )
+				.thenReturn( expectedAsStubBean );
+		reference = property.get( sourceMock );
+		assertThat( reference ).isNotEmpty();
+		result = reference.get().resolve( beanResolverMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expectedAsStubBean );
+
+		// Class value
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( StubBeanImpl1.class ) );
+		when( beanResolverMock.resolve( StubBeanImpl1.class, BeanRetrieval.ANY ) )
+				.thenReturn( expected );
+		reference = property.get( sourceMock );
+		assertThat( reference ).isNotEmpty();
+		result = reference.get().resolve( beanResolverMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expected );
+
+		// BeanReference value
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( BeanReference.of( StubBeanImpl1.class, "name" ) ) );
+		when( beanResolverMock.resolve( StubBeanImpl1.class, "name", BeanRetrieval.ANY ) )
+				.thenReturn( expected );
+		reference = property.get( sourceMock );
+		assertThat( reference ).isNotEmpty();
+		result = reference.get().resolve( beanResolverMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expected );
+	}
+
 	private void verifyNoOtherSourceInteractionsAndReset() {
 		verifyNoMoreInteractions( sourceMock );
 		reset( sourceMock, beanResolverMock );
@@ -451,6 +625,12 @@ public class ConfigurationPropertyBeanReferenceTest {
 	}
 
 	private class SimulatedFailure extends RuntimeException {
+	}
+
+	enum MyEnum {
+		VALUE1,
+		VALUE2,
+		VALUE3;
 	}
 
 }

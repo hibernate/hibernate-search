@@ -173,6 +173,179 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> {
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( stringValue ) );
 		result = property.get( sourceMock );
 		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result.get() ).containsExactly( expectedValue );
+
+		// String value - multiple
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( stringValue + "," + stringValue ) );
+		result = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isNotEmpty();
+		assertThat( result.get() ).containsExactly( expectedValue, expectedValue );
+
+		// Typed value - one
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( createCollection( expectedValue ) ) );
+		result = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isNotEmpty();
+		assertThat( result.get() ).containsExactly( expectedValue );
+
+		// Typed value - multiple
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( createCollection( expectedValue, expectedValue ) ) );
+		result = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isNotEmpty();
+		assertThat( result.get() ).containsExactly( expectedValue, expectedValue );
+	}
+
+	@Test
+	public void substitute_function() {
+		String key = "substitute_function";
+		OptionalConfigurationProperty<T> property = testedMethod.apply( ConfigurationProperty.forKey( key ) )
+				.substitute( v -> {
+					if ( v instanceof MyEnum ) {
+						switch ( (MyEnum) v ) {
+							case VALUE1:
+								return expectedValue;
+							case VALUE2:
+								break;
+						}
+					}
+					return v;
+				} )
+				.build();
+
+		Optional<T> result;
+
+		// Substituted value
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( MyEnum.VALUE1 ) );
+		result = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).contains( expectedValue );
+
+		// No value
+		when( sourceMock.get( key ) ).thenReturn( Optional.empty() );
+		result = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEmpty();
+
+		// String value
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( stringValue ) );
+		result = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).contains( expectedValue );
+
+		// Typed value
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( expectedValue ) );
+		result = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).contains( expectedValue );
+	}
+
+	@Test
+	public void substitute_literals() {
+		String key = "substitute_literals";
+		OptionalConfigurationProperty<T> property = testedMethod.apply( ConfigurationProperty.forKey( key ) )
+				.substitute( MyEnum.VALUE1, expectedValue )
+				.build();
+
+		Optional<T> result;
+
+		// Substituted value
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( MyEnum.VALUE1 ) );
+		result = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).contains( expectedValue );
+
+		// No value
+		when( sourceMock.get( key ) ).thenReturn( Optional.empty() );
+		result = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEmpty();
+
+		// String value
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( stringValue ) );
+		result = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).contains( expectedValue );
+
+		// Typed value
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( expectedValue ) );
+		result = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).contains( expectedValue );
+	}
+
+	@Test
+	public void substitute_literals_withDefault() {
+		String key = "substitute_literals_withDefault";
+		ConfigurationProperty<T> property = testedMethod.apply( ConfigurationProperty.forKey( key ) )
+				.substitute( MyEnum.VALUE1, expectedValue )
+				.withDefault( expectedValue )
+				.build();
+
+		T result;
+
+		// Substituted value
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( MyEnum.VALUE1 ) );
+		result = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expectedValue );
+
+		// No value
+		when( sourceMock.get( key ) ).thenReturn( Optional.empty() );
+		result = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expectedValue );
+
+		// String value
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( stringValue ) );
+		result = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expectedValue );
+
+		// Typed value
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( expectedValue ) );
+		result = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isEqualTo( expectedValue );
+	}
+
+	@Test
+	public void substitute_literals_multiValued() {
+		String key = "substitute_literals_multiValued";
+		OptionalConfigurationProperty<List<T>> property = testedMethod.apply( ConfigurationProperty.forKey( key ) )
+				.substitute( MyEnum.VALUE1, expectedValue )
+				.substitute( MyEnum.VALUE2, expectedValue )
+				.multivalued()
+				.build();
+
+		Optional<List<T>> result;
+
+		// Substituted value - one
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( createCollection( MyEnum.VALUE1 ) ) );
+		result = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isNotEmpty();
+		assertThat( result.get() ).containsExactly( expectedValue );
+
+		// Substituted value - multiple
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( createCollection( MyEnum.VALUE1, MyEnum.VALUE2 ) ) );
+		result = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isNotEmpty();
+		assertThat( result.get() ).containsExactly( expectedValue, expectedValue );
+
+		// Substituted value - multiple and mixed
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( createCollection( expectedValue, MyEnum.VALUE1 ) ) );
+		result = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
+		assertThat( result ).isNotEmpty();
+		assertThat( result.get() ).containsExactly( expectedValue, expectedValue );
+
+		// String value - one
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( stringValue ) );
+		result = property.get( sourceMock );
+		verifyNoOtherSourceInteractionsAndReset();
 		assertThat( result ).isNotEmpty();
 		assertThat( result.get() ).containsExactly( expectedValue );
 
@@ -236,6 +409,11 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> {
 		SimulatedFailure(String message) {
 			super( message );
 		}
+	}
+
+	private enum MyEnum {
+		VALUE1,
+		VALUE2;
 	}
 
 }
