@@ -19,7 +19,7 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.logging.impl.Log;
@@ -47,7 +47,7 @@ public class HibernateOrmMassIndexerIT {
 		this.entityManagerFactory = setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
-						AutomaticIndexingStrategyName.NONE
+						AutomaticIndexingStrategyNames.NONE
 				)
 				.setup( Book.class, Author.class );
 		initData( entityManagerFactory, HibernateOrmMassIndexerIT::newAuthor );

@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.orm.cfg;
 
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
@@ -43,11 +43,14 @@ public final class HibernateOrmMapperSettings {
 	/**
 	 * The automatic indexing strategy to use.
 	 * <p>
-	 * Expects a {@link AutomaticIndexingStrategyName} value, or a String representation of such value.
+	 * Expects one of the string constants exposed in {@link AutomaticIndexingStrategyNames}.
+	 * <p>
+	 * For backward compatibility reasons, values of type {@link org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName}
+	 * are also accepted, but are deprecated.
 	 * <p>
 	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_STRATEGY}.
 	 *
-	 * @see AutomaticIndexingStrategyName
+	 * @see AutomaticIndexingStrategyNames
 	 */
 	public static final String AUTOMATIC_INDEXING_STRATEGY = PREFIX + Radicals.AUTOMATIC_INDEXING_STRATEGY;
 
@@ -162,8 +165,7 @@ public final class HibernateOrmMapperSettings {
 		}
 
 		public static final boolean ENABLED = true;
-		public static final AutomaticIndexingStrategyName AUTOMATIC_INDEXING_STRATEGY =
-				AutomaticIndexingStrategyName.SESSION;
+		public static final String AUTOMATIC_INDEXING_STRATEGY = AutomaticIndexingStrategyNames.SESSION;
 		public static final BeanReference<AutomaticIndexingSynchronizationStrategy> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
 				BeanReference.of( AutomaticIndexingSynchronizationStrategy.class, "write-sync" );
 		public static final boolean AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = true;

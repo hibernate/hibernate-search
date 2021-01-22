@@ -22,7 +22,7 @@ import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.mapper.orm.event.impl.HibernateSearchEventListener;
@@ -48,9 +48,12 @@ public class HibernateSearchIntegrator implements Integrator {
 					.withDefault( HibernateOrmMapperSettings.Defaults.ENABLED )
 					.build();
 
-	private static final ConfigurationProperty<AutomaticIndexingStrategyName> AUTOMATIC_INDEXING_STRATEGY =
+	@SuppressWarnings("deprecation")
+	private static final ConfigurationProperty<String> AUTOMATIC_INDEXING_STRATEGY =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY )
-					.as( AutomaticIndexingStrategyName.class, AutomaticIndexingStrategyName::of )
+					.asString()
+					.substitute( org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.NONE, AutomaticIndexingStrategyNames.NONE )
+					.substitute( org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.SESSION, AutomaticIndexingStrategyNames.SESSION )
 					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_STRATEGY )
 					.build();
 
@@ -93,9 +96,8 @@ public class HibernateSearchIntegrator implements Integrator {
 		sessionFactory.addObserver( observer );
 
 		// Listen to Hibernate ORM events to index automatically
-		AutomaticIndexingStrategyName automaticIndexingStrategyName =
-				AUTOMATIC_INDEXING_STRATEGY.get( propertySource );
-		if ( AutomaticIndexingStrategyName.SESSION.equals( automaticIndexingStrategyName ) ) {
+		String automaticIndexingStrategyName = AUTOMATIC_INDEXING_STRATEGY.get( propertySource );
+		if ( AutomaticIndexingStrategyNames.SESSION.equals( automaticIndexingStrategyName ) ) {
 			log.debug( "Hibernate Search event listeners activated" );
 			HibernateSearchEventListener hibernateSearchEventListener = new HibernateSearchEventListener(
 					contextFuture.thenApply( Supplier::get ),

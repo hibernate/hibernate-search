@@ -16,20 +16,29 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Strategy for automatic indexing in Hibernate Search.
+ *
+ * @deprecated Use the constants from {@link AutomaticIndexingStrategyNames} instead.
  */
+@Deprecated
 public enum AutomaticIndexingStrategyName {
 
 	/**
 	 * No automatic indexing is performed:
 	 * indexing will only happen when explicitly requested through APIs
 	 * such as {@link SearchSession#indexingPlan()}.
+	 *
+	 * @deprecated Use {@link AutomaticIndexingStrategyNames#NONE} instead.
 	 */
+	@Deprecated
 	NONE("none"),
 
 	/**
 	 * Indexing is triggered automatically when entities are modified in the Hibernate ORM session:
 	 * entity insertion, update etc.
+	 *
+	 * @deprecated Use {@link AutomaticIndexingStrategyNames#SESSION} instead.
 	 */
+	@Deprecated
 	SESSION("session");
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
