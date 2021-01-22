@@ -34,11 +34,13 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerContextProvider;
+import org.hibernate.search.mapper.orm.event.impl.HibernateSearchEventListener;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
@@ -74,6 +76,21 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	@SuppressWarnings("deprecation")
+	private static final ConfigurationProperty<String> AUTOMATIC_INDEXING_STRATEGY =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY )
+					.asString()
+					.substitute( org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.NONE, AutomaticIndexingStrategyNames.NONE )
+					.substitute( org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.SESSION, AutomaticIndexingStrategyNames.SESSION )
+					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_STRATEGY )
+					.build();
+
+	private static final ConfigurationProperty<Boolean> DIRTY_CHECK_ENABLED =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK )
+					.asBoolean()
+					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK )
+					.build();
+
 	private static final ConfigurationProperty<BeanReference<? extends AutomaticIndexingSynchronizationStrategy>> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY )
 					.asBeanReference( AutomaticIndexingSynchronizationStrategy.class )
@@ -106,8 +123,6 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 				AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.getAndTransform( propertySource, beanResolver::resolve );
 
 		try {
-			log.defaultAutomaticIndexingSynchronizationStrategy( synchronizationStrategyHolder.get() );
-
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy =
 					QUERY_LOADING_CACHE_LOOKUP_STRATEGY.get( propertySource );
 
@@ -156,13 +171,35 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public CompletableFuture<?> start(MappingStartContext context) {
-		Optional<SearchScopeImpl<Object>> scope = createAllScope();
-		if ( !scope.isPresent() ) {
+		configureAutomaticIndexing( context );
+
+		Optional<SearchScopeImpl<Object>> scopeOptional = createAllScope();
+		if ( !scopeOptional.isPresent() ) {
 			// No indexed type
 			return CompletableFuture.completedFuture( null );
 		}
-		PojoScopeSchemaManager schemaManager = scope.get().schemaManagerDelegate();
+		SearchScopeImpl<Object> scope = scopeOptional.get();
+
+		// Schema management
+		PojoScopeSchemaManager schemaManager = scope.schemaManagerDelegate();
 		return schemaManagementListener.onStart( context, schemaManager );
+	}
+
+	private void configureAutomaticIndexing(MappingStartContext context) {
+		ConfigurationPropertySource propertySource = context.configurationPropertySource();
+
+		String automaticIndexingStrategyName = AUTOMATIC_INDEXING_STRATEGY.get( propertySource );
+		if ( AutomaticIndexingStrategyNames.SESSION.equals( automaticIndexingStrategyName ) ) {
+			log.debug( "Hibernate Search event listeners activated" );
+			HibernateSearchEventListener hibernateSearchEventListener = new HibernateSearchEventListener(
+					this, DIRTY_CHECK_ENABLED.get( propertySource ) );
+			hibernateSearchEventListener.registerTo( sessionFactory() );
+		}
+		else {
+			log.debug( "Hibernate Search event listeners deactivated" );
+		}
+
+		log.defaultAutomaticIndexingSynchronizationStrategy( defaultSynchronizationStrategyHolder.get() );
 	}
 
 	@Override
