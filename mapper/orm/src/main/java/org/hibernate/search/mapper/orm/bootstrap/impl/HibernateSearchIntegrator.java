@@ -9,23 +9,18 @@ package org.hibernate.search.mapper.orm.bootstrap.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.event.service.spi.DuplicationStrategy;
-import org.hibernate.event.service.spi.EventListenerRegistry;
-import org.hibernate.event.spi.EventType;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
+
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
-import org.hibernate.search.mapper.orm.event.impl.HibernateSearchEventListener;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -48,23 +43,9 @@ public class HibernateSearchIntegrator implements Integrator {
 					.withDefault( HibernateOrmMapperSettings.Defaults.ENABLED )
 					.build();
 
-	@SuppressWarnings("deprecation")
-	private static final ConfigurationProperty<String> AUTOMATIC_INDEXING_STRATEGY =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY )
-					.asString()
-					.substitute( org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.NONE, AutomaticIndexingStrategyNames.NONE )
-					.substitute( org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.SESSION, AutomaticIndexingStrategyNames.SESSION )
-					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_STRATEGY )
-					.build();
-
-	private static final ConfigurationProperty<Boolean> DIRTY_CHECK_ENABLED =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK )
-					.asBoolean()
-					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK )
-					.build();
-
 	@Override
-	public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
+	public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory,
+			SessionFactoryServiceRegistry serviceRegistry) {
 		log.version( Version.versionString() );
 
 		ConfigurationPropertyChecker propertyChecker = ConfigurationPropertyChecker.create();
@@ -94,59 +75,11 @@ public class HibernateSearchIntegrator implements Integrator {
 				contextFuture, sessionFactoryCreatedFuture, sessionFactoryClosingFuture
 		);
 		sessionFactory.addObserver( observer );
-
-		// Listen to Hibernate ORM events to index automatically
-		String automaticIndexingStrategyName = AUTOMATIC_INDEXING_STRATEGY.get( propertySource );
-		if ( AutomaticIndexingStrategyNames.SESSION.equals( automaticIndexingStrategyName ) ) {
-			log.debug( "Hibernate Search event listeners activated" );
-			HibernateSearchEventListener hibernateSearchEventListener = new HibernateSearchEventListener(
-					contextFuture.thenApply( Supplier::get ),
-					DIRTY_CHECK_ENABLED.get( propertySource )
-			);
-			registerHibernateSearchEventListener( hibernateSearchEventListener, serviceRegistry );
-		}
-		else {
-			log.debug( "Hibernate Search event listeners deactivated" );
-		}
 	}
 
 	@Override
 	public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
 		// Nothing to do, Hibernate Search shuts down automatically when the SessionFactory is closed
-	}
-
-	private void registerHibernateSearchEventListener(HibernateSearchEventListener eventListener, SessionFactoryServiceRegistry serviceRegistry) {
-		EventListenerRegistry listenerRegistry = serviceRegistry.getService( EventListenerRegistry.class );
-		listenerRegistry.addDuplicationStrategy( new KeepIfSameClassDuplicationStrategy( HibernateSearchEventListener.class ) );
-
-		listenerRegistry.appendListeners( EventType.POST_INSERT, eventListener );
-		listenerRegistry.appendListeners( EventType.POST_UPDATE, eventListener );
-		listenerRegistry.appendListeners( EventType.POST_DELETE, eventListener );
-		listenerRegistry.appendListeners( EventType.POST_COLLECTION_RECREATE, eventListener );
-		listenerRegistry.appendListeners( EventType.POST_COLLECTION_REMOVE, eventListener );
-		listenerRegistry.appendListeners( EventType.POST_COLLECTION_UPDATE, eventListener );
-		listenerRegistry.appendListeners( EventType.FLUSH, eventListener );
-		listenerRegistry.appendListeners( EventType.AUTO_FLUSH, eventListener );
-		listenerRegistry.appendListeners( EventType.CLEAR, eventListener );
-	}
-
-	public static class KeepIfSameClassDuplicationStrategy implements DuplicationStrategy {
-		private final Class<?> checkClass;
-
-		public KeepIfSameClassDuplicationStrategy(Class<?> checkClass) {
-			this.checkClass = checkClass;
-		}
-
-		@Override
-		public boolean areMatch(Object listener, Object original) {
-			// not isAssignableFrom since the user could subclass
-			return checkClass == original.getClass() && checkClass == listener.getClass();
-		}
-
-		@Override
-		public Action getAction() {
-			return Action.KEEP_ORIGINAL;
-		}
 	}
 
 }
