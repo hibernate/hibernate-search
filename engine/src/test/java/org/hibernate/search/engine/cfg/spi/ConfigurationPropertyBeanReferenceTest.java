@@ -99,7 +99,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 		assertThat( result ).isEqualTo( expectedAsStubBean );
 
 		// Class value
-		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( BeanReference.of( StubBeanImpl1.class ) ) );
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( StubBeanImpl1.class ) );
 		when( beanResolverMock.resolve( StubBeanImpl1.class, BeanRetrieval.ANY ) )
 				.thenReturn( expected );
 		result = property.get( sourceMock ).resolve( beanResolverMock );
@@ -174,7 +174,7 @@ public class ConfigurationPropertyBeanReferenceTest {
 		assertThat( result ).isEqualTo( expectedAsStubBean );
 
 		// Class value
-		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( BeanReference.of( StubBeanImpl1.class ) ) );
+		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( StubBeanImpl1.class ) );
 		when( beanResolverMock.resolve( StubBeanImpl1.class, BeanRetrieval.ANY ) )
 				.thenReturn( expected );
 		reference = property.get( sourceMock );
