@@ -15,7 +15,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -52,7 +52,7 @@ public class AutomaticIndexingConcurrentModificationInSameTypeIT {
 
 		sessionFactory = ormSetupHelper.start().withProperty(
 				HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
-				AutomaticIndexingStrategyName.NONE
+				AutomaticIndexingStrategyNames.NONE
 		).setup( IndexedEntity.class );
 
 		backendMock.verifyExpectationsMet();

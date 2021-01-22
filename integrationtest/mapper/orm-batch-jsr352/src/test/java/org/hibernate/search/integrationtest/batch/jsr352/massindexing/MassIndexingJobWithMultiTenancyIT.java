@@ -22,7 +22,7 @@ import org.hibernate.search.batch.jsr352.core.massindexing.MassIndexingJob;
 import org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil;
 import org.hibernate.search.integrationtest.batch.jsr352.massindexing.entity.Company;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchBackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneBackendConfiguration;
@@ -63,7 +63,7 @@ public class MassIndexingJobWithMultiTenancyIT {
 		sessionFactory = ormSetupHelper
 				.start()
 				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
-						AutomaticIndexingStrategyName.NONE )
+						AutomaticIndexingStrategyNames.NONE )
 				.withBackendProperty( "multi_tenancy.strategy", "discriminator" )
 				.tenants( TARGET_TENANT_ID, UNUSED_TENANT_ID )
 				.setup( Company.class );

@@ -15,7 +15,7 @@ import javax.persistence.Table;
 
 import org.hibernate.Session;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.test.SearchTestBase;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class ManualIndexingStrategyTest extends SearchTestBase {
 
 	@Override
 	public void configure(Map<String,Object> cfg) {
-		cfg.put( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY, AutomaticIndexingStrategyName.NONE );
+		cfg.put( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY, AutomaticIndexingStrategyNames.NONE );
 	}
 
 	private void indexTestEntity() {

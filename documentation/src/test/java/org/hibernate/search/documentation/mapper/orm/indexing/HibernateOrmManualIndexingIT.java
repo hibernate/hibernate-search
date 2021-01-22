@@ -15,7 +15,7 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -37,7 +37,7 @@ public class HibernateOrmManualIndexingIT {
 
 	@Test
 	public void persist_automaticIndexing_periodicFlushClear() {
-		EntityManagerFactory entityManagerFactory = setup( AutomaticIndexingStrategyName.SESSION );
+		EntityManagerFactory entityManagerFactory = setup( AutomaticIndexingStrategyNames.SESSION );
 
 		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
 			assertBookCount( entityManager, 0 );
@@ -68,7 +68,7 @@ public class HibernateOrmManualIndexingIT {
 
 	@Test
 	public void persist_automaticIndexing_periodicFlushExecuteClear() {
-		EntityManagerFactory entityManagerFactory = setup( AutomaticIndexingStrategyName.SESSION );
+		EntityManagerFactory entityManagerFactory = setup( AutomaticIndexingStrategyNames.SESSION );
 
 		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
 			assertBookCount( entityManager, 0 );
@@ -103,7 +103,7 @@ public class HibernateOrmManualIndexingIT {
 
 	@Test
 	public void persist_automaticIndexing_multipleTransactions() {
-		EntityManagerFactory entityManagerFactory = setup( AutomaticIndexingStrategyName.SESSION );
+		EntityManagerFactory entityManagerFactory = setup( AutomaticIndexingStrategyNames.SESSION );
 
 		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
 			assertBookCount( entityManager, 0 );
@@ -134,7 +134,7 @@ public class HibernateOrmManualIndexingIT {
 	@Test
 	public void addOrUpdate() {
 		int numberOfBooks = 10;
-		EntityManagerFactory entityManagerFactory = setup( AutomaticIndexingStrategyName.NONE );
+		EntityManagerFactory entityManagerFactory = setup( AutomaticIndexingStrategyNames.NONE );
 		initBooksAndAuthors( entityManagerFactory, numberOfBooks );
 
 		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
@@ -165,7 +165,7 @@ public class HibernateOrmManualIndexingIT {
 	@Test
 	public void delete() {
 		int numberOfBooks = 10;
-		EntityManagerFactory entityManagerFactory = setup( AutomaticIndexingStrategyName.SESSION );
+		EntityManagerFactory entityManagerFactory = setup( AutomaticIndexingStrategyNames.SESSION );
 		initBooksAndAuthors( entityManagerFactory, numberOfBooks );
 
 		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
@@ -196,7 +196,7 @@ public class HibernateOrmManualIndexingIT {
 	@Test
 	public void workspace() {
 		int numberOfBooks = 10;
-		EntityManagerFactory entityManagerFactory = setup( AutomaticIndexingStrategyName.SESSION );
+		EntityManagerFactory entityManagerFactory = setup( AutomaticIndexingStrategyNames.SESSION );
 		initBooksAndAuthors( entityManagerFactory, numberOfBooks );
 
 		{
@@ -297,7 +297,7 @@ public class HibernateOrmManualIndexingIT {
 				.isEqualTo( expectedCount );
 	}
 
-	private EntityManagerFactory setup(AutomaticIndexingStrategyName automaticIndexingStrategy) {
+	private EntityManagerFactory setup(String automaticIndexingStrategy) {
 		return setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
