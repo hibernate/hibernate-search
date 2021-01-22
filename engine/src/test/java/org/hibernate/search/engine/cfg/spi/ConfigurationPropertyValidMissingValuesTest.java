@@ -127,15 +127,13 @@ public class ConfigurationPropertyValidMissingValuesTest<T> {
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( stringValue ) );
 		result = property.get( sourceMock );
 		verifyNoOtherSourceInteractionsAndReset();
-		assertThat( result ).isNotEmpty();
-		assertThat( result.get() ).isEqualTo( expectedValue );
+		assertThat( result ).contains( expectedValue );
 
 		// Typed value
 		when( sourceMock.get( key ) ).thenReturn( (Optional) Optional.of( expectedValue ) );
 		result = property.get( sourceMock );
 		verifyNoOtherSourceInteractionsAndReset();
-		assertThat( result ).isNotEmpty();
-		assertThat( result.get() ).isEqualTo( expectedValue );
+		assertThat( result ).contains( expectedValue );
 	}
 
 	@Test
