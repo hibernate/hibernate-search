@@ -23,6 +23,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingEventSendingSessionContext;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmLoadingContext;
@@ -46,6 +47,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -54,7 +56,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		implements SearchSession, HibernateOrmSessionContext, HibernateOrmScopeSessionContext,
-				SearchIndexingPlanSessionContext, DocumentReferenceConverter<EntityReference> {
+				SearchIndexingPlanSessionContext, DocumentReferenceConverter<EntityReference>,
+				AutomaticIndexingEventSendingSessionContext {
 
 	/**
 	 * @param sessionImplementor A Hibernate session
@@ -99,7 +102,8 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	private final HibernateOrmSessionTypeContextProvider typeContextProvider;
 	private final SessionImplementor sessionImplementor;
 	private final HibernateOrmRuntimeIntrospector runtimeIntrospector;
-	private ConfiguredAutomaticIndexingSynchronizationStrategy automaticIndexingSynchronizationStrategy;
+	private final ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy;
+	private ConfiguredAutomaticIndexingSynchronizationStrategy indexingPlanSynchronizationStrategy;
 
 	private SearchIndexingPlanImpl indexingPlan;
 
@@ -107,9 +111,10 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		super( builder.mappingContext );
 		this.mappingContext = builder.mappingContext;
 		this.typeContextProvider = builder.typeContextProvider;
+		this.automaticIndexingStrategy = builder.automaticIndexingStrategy;
 		this.sessionImplementor = builder.sessionImplementor;
 		this.runtimeIntrospector = builder.buildRuntimeIntrospector();
-		this.automaticIndexingSynchronizationStrategy = builder.automaticIndexingSynchronizationStrategy;
+		this.indexingPlanSynchronizationStrategy = automaticIndexingStrategy.defaultIndexingPlanSynchronizationStrategy();
 	}
 
 	@Override
@@ -187,11 +192,8 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	@Override
 	public void automaticIndexingSynchronizationStrategy(
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
-		ConfiguredAutomaticIndexingSynchronizationStrategy.Builder builder =
-				new ConfiguredAutomaticIndexingSynchronizationStrategy.Builder( mappingContext.failureHandler(),
-						mappingContext.entityReferenceFactory() );
-		synchronizationStrategy.apply( builder );
-		this.automaticIndexingSynchronizationStrategy = builder.build();
+		this.indexingPlanSynchronizationStrategy =
+				automaticIndexingStrategy.configureOverriddenSynchronizationStrategy( synchronizationStrategy );
 	}
 
 	@Override
@@ -260,20 +262,23 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		}
 
 		ConfiguredAutomaticIndexingSynchronizationStrategy currentSynchronizationStrategy =
-				automaticIndexingSynchronizationStrategy;
-		plan = mappingContext.createIndexingPlan( this,
-				currentSynchronizationStrategy.getDocumentCommitStrategy(),
-				currentSynchronizationStrategy.getDocumentRefreshStrategy() );
+				indexingPlanSynchronizationStrategy;
+		plan = automaticIndexingStrategy.createIndexingPlan( this, currentSynchronizationStrategy );
 		holder.pojoIndexingPlan( transactionIdentifier, plan );
 
 		if ( sessionImplementor.isTransactionInProgress() ) {
-			Synchronization txSync = createTransactionWorkQueueSynchronization(
+			Synchronization txSync = automaticIndexingStrategy.createTransactionWorkQueueSynchronization(
 					plan, holder, transactionIdentifier,
 					currentSynchronizationStrategy
 			);
 			registerSynchronization( sessionImplementor, txSync );
 		}
 		return plan;
+	}
+
+	public PojoIndexingQueueEventProcessingPlan createIndexingQueueEventProcessingPlan() {
+		return automaticIndexingStrategy
+				.createIndexingQueueEventProcessingPlan( this, indexingPlanSynchronizationStrategy );
 	}
 
 	@Override
@@ -283,21 +288,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public ConfiguredAutomaticIndexingSynchronizationStrategy configuredAutomaticIndexingSynchronizationStrategy() {
-		return automaticIndexingSynchronizationStrategy;
+		return indexingPlanSynchronizationStrategy;
 	}
 
 	private HibernateOrmLoadingContext.Builder loadingContextBuilder() {
 		return new HibernateOrmLoadingContext.Builder( mappingContext, typeContextProvider, this );
-	}
-
-	private Synchronization createTransactionWorkQueueSynchronization(PojoIndexingPlan indexingPlan,
-			HibernateOrmSearchSessionHolder sessionProperties,
-			Transaction transactionIdentifier,
-			ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
-		return new PostTransactionWorkQueueSynchronization(
-				indexingPlan, sessionProperties, transactionIdentifier,
-				synchronizationStrategy
-		);
 	}
 
 	private void registerSynchronization(SessionImplementor sessionImplementor, Synchronization synchronization) {
@@ -350,17 +345,17 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	public static class Builder {
 		private final HibernateOrmSearchSessionMappingContext mappingContext;
 		private final HibernateOrmSessionTypeContextProvider typeContextProvider;
+		private final ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy;
 		private final SessionImplementor sessionImplementor;
-		private final ConfiguredAutomaticIndexingSynchronizationStrategy automaticIndexingSynchronizationStrategy;
 
 		public Builder(HibernateOrmSearchSessionMappingContext mappingContext,
 				HibernateOrmSessionTypeContextProvider typeContextProvider,
-				SessionImplementor sessionImplementor,
-				ConfiguredAutomaticIndexingSynchronizationStrategy automaticIndexingSynchronizationStrategy) {
+				ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy,
+				SessionImplementor sessionImplementor) {
 			this.mappingContext = mappingContext;
 			this.typeContextProvider = typeContextProvider;
+			this.automaticIndexingStrategy = automaticIndexingStrategy;
 			this.sessionImplementor = sessionImplementor;
-			this.automaticIndexingSynchronizationStrategy = automaticIndexingSynchronizationStrategy;
 		}
 
 		private HibernateOrmRuntimeIntrospector buildRuntimeIntrospector() {

@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
+import org.hibernate.search.mapper.orm.automaticindexing.impl.AutomaticIndexingIndexedTypeContext;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmEntityIdEntityLoadingStrategy;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmNonEntityIdPropertyEntityLoadingStrategy;
@@ -23,7 +24,7 @@ import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<E>
 		implements SearchIndexedEntity<E>, HibernateOrmSessionIndexedTypeContext<E>,
-				HibernateOrmScopeIndexedTypeContext<E> {
+				HibernateOrmScopeIndexedTypeContext<E>, AutomaticIndexingIndexedTypeContext {
 
 	private final boolean documentIdIsEntityId;
 	private final EntityLoadingStrategy<? super E, ?> loadingStrategy;

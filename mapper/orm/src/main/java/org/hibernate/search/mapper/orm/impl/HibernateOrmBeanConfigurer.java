@@ -9,12 +9,27 @@ package org.hibernate.search.mapper.orm.impl;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
+import org.hibernate.search.mapper.orm.automaticindexing.impl.NoneAutomaticIndexingStrategy;
+import org.hibernate.search.mapper.orm.automaticindexing.impl.SessionAutomaticIndexingStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategy;
 
 public class HibernateOrmBeanConfigurer implements BeanConfigurer {
 	@Override
 	public void configure(BeanConfigurationContext context) {
+		context.define(
+				AutomaticIndexingStrategy.class,
+				AutomaticIndexingStrategyNames.NONE,
+				BeanReference.ofInstance( new NoneAutomaticIndexingStrategy() )
+		);
+		context.define(
+				AutomaticIndexingStrategy.class,
+				AutomaticIndexingStrategyNames.SESSION,
+				BeanReference.ofInstance( new SessionAutomaticIndexingStrategy() )
+		);
+
 		context.define(
 				AutomaticIndexingSynchronizationStrategy.class,
 				AutomaticIndexingSynchronizationStrategyNames.ASYNC,

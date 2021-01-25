@@ -17,11 +17,9 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
- * Execute final work in the after transaction synchronization.
- *
- * @author Emmanuel Bernard
+ * Executes the indexing plan outside the transaction, after the commit.
  */
-class PostTransactionWorkQueueSynchronization implements Synchronization {
+class AfterCommitIndexingPlanSynchronization implements Synchronization {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -30,7 +28,7 @@ class PostTransactionWorkQueueSynchronization implements Synchronization {
 	private final Transaction transactionIdentifier;
 	private final ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 
-	PostTransactionWorkQueueSynchronization(PojoIndexingPlan indexingPlan,
+	AfterCommitIndexingPlanSynchronization(PojoIndexingPlan indexingPlan,
 			HibernateOrmSearchSessionHolder sessionHolder, Transaction transactionIdentifier,
 			ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		this.indexingPlan = indexingPlan;
@@ -41,7 +39,7 @@ class PostTransactionWorkQueueSynchronization implements Synchronization {
 
 	@Override
 	public void beforeCompletion() {
-		log.tracef( "Processing Transaction's beforeCompletion() phase: %s", this );
+		log.tracef( "Processing Transaction's beforeCompletion() phase for %s.", transactionIdentifier );
 		indexingPlan.process();
 	}
 
@@ -49,13 +47,13 @@ class PostTransactionWorkQueueSynchronization implements Synchronization {
 	public void afterCompletion(int i) {
 		try {
 			if ( Status.STATUS_COMMITTED == i ) {
-				log.tracef( "Processing Transaction's afterCompletion() phase for %s. Performing work.", this );
+				log.tracef( "Processing Transaction's afterCompletion() phase for %s. Executing indexing plan.", transactionIdentifier );
 				synchronizationStrategy.executeAndSynchronize( indexingPlan );
 			}
 			else {
 				log.tracef(
-						"Processing Transaction's afterCompletion() phase for %s. Cancelling work due to transaction status %d",
-						this,
+						"Processing Transaction's afterCompletion() phase for %s. Cancelling indexing plan due to transaction status %d",
+						transactionIdentifier,
 						i
 				);
 				indexingPlan.discard();

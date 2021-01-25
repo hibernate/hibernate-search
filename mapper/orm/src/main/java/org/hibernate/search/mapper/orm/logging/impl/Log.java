@@ -289,4 +289,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 41, value = "No such bean in bean container '%1$s'.")
 	BeanNotFoundException beanNotFoundInBeanContainer(BeanContainer beanContainer);
+
+	@Message(id = ID_OFFSET + 42, value = "Cannot customize the synchronization strategy: "
+			+ " the selected automatic indexing strategy always processes events asynchronously, through a queue.")
+	SearchException cannotConfigureSynchronizationStrategyWithIndexingEventQueue();
+
 }

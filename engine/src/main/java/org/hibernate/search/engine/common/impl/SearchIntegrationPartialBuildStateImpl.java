@@ -172,7 +172,8 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			int mappingIndex = 0;
 			// Start
 			for ( MappingNonStartedState state : fullyBuiltNonStartedMappings.values() ) {
-				mappingFutures[mappingIndex] = state.start( failureCollector, beanResolver, propertySource );
+				mappingFutures[mappingIndex] = state.start( failureCollector, beanResolver, propertySource,
+						threadPoolProvider );
 				++mappingIndex;
 			}
 			// Wait for the starting operation to finish
