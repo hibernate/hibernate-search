@@ -20,6 +20,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.Backend;
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -35,6 +36,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerContextProvider;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
@@ -53,6 +55,7 @@ import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexi
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSession;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSessionMappingContext;
+import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionIndexedTypeContext;
 import org.hibernate.search.mapper.orm.spi.BatchMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
@@ -60,11 +63,12 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class HibernateOrmMapping extends AbstractPojoMappingImplementor<HibernateOrmMapping>
-		implements SearchMapping, HibernateOrmMappingContext,
+		implements SearchMapping, HibernateOrmMappingContext, EntityReferenceFactory<EntityReference>,
 				HibernateOrmListenerContextProvider, BatchMappingContext,
 				HibernateOrmScopeMappingContext, HibernateOrmSearchSessionMappingContext {
 
@@ -175,6 +179,23 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	@Override
 	protected void doStop() {
 		defaultSynchronizationStrategyHolder.close();
+	}
+
+	@Override
+	public EntityReferenceFactory<EntityReference> entityReferenceFactory() {
+		return this;
+	}
+
+	@Override
+	public EntityReference createEntityReference(String typeName, Object identifier) {
+		HibernateOrmSessionIndexedTypeContext<?> typeContext =
+				typeContextContainer.indexedForJpaEntityName( typeName );
+		if ( typeContext == null ) {
+			throw new AssertionFailure(
+					"Type " + typeName + " refers to an unknown type"
+			);
+		}
+		return new EntityReferenceImpl( typeContext.typeIdentifier(), typeContext.jpaEntityName(), identifier );
 	}
 
 	@Override

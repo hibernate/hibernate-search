@@ -170,6 +170,7 @@ public class MassIndexerImpl implements MassIndexer {
 
 	protected BatchCoordinator createCoordinator() {
 		MassIndexingNotifier notifier = new MassIndexingNotifier(
+				mappingContext,
 				getOrCreateFailureHandler(),
 				getOrCreateMonitor()
 		);

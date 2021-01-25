@@ -25,6 +25,7 @@ class MassIndexingNotifier {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final MassIndexingFailureHandler failureHandler;
 	private final MassIndexingMonitor monitor;
 
@@ -32,7 +33,9 @@ class MassIndexingNotifier {
 			new AtomicReference<>( null );
 	private final LongAdder entityIndexingFailureCount = new LongAdder();
 
-	MassIndexingNotifier(MassIndexingFailureHandler failureHandler, MassIndexingMonitor monitor) {
+	MassIndexingNotifier(HibernateOrmMassIndexingMappingContext mappingContext,
+			MassIndexingFailureHandler failureHandler, MassIndexingMonitor monitor) {
+		this.mappingContext = mappingContext;
 		this.failureHandler = failureHandler;
 		this.monitor = monitor;
 	}
@@ -126,7 +129,7 @@ class MassIndexingNotifier {
 		try {
 			Session session = sessionContext.session();
 			Object identifier = session.getIdentifier( entity );
-			return EntityReferenceFactory.safeCreateEntityReference( sessionContext.entityReferenceFactory(),
+			return EntityReferenceFactory.safeCreateEntityReference( mappingContext.entityReferenceFactory(),
 					typeGroup.commonSuperType().jpaEntityName(), identifier, throwable::addSuppressed );
 		}
 		catch (RuntimeException e) {

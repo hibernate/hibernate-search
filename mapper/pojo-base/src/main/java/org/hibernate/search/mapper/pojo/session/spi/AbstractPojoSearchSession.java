@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.session.spi;
 
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
@@ -21,8 +20,7 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 
-public abstract class AbstractPojoSearchSession
-		implements PojoWorkSessionContext, PojoScopeSessionContext {
+public abstract class AbstractPojoSearchSession implements PojoWorkSessionContext, PojoScopeSessionContext {
 
 	private final PojoSearchSessionMappingContext mappingContext;
 
@@ -37,9 +35,6 @@ public abstract class AbstractPojoSearchSession
 	public PojoSearchSessionMappingContext mappingContext() {
 		return mappingContext;
 	}
-
-	@Override
-	public abstract EntityReferenceFactory<R> entityReferenceFactory();
 
 	@Override
 	public final IdentifierBridgeFromDocumentIdentifierContext identifierBridgeFromDocumentIdentifierContext() {

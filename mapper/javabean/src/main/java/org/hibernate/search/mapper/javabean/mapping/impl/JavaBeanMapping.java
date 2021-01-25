@@ -12,7 +12,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.mapper.javabean.common.EntityReference;
+import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.javabean.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
@@ -23,13 +26,15 @@ import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchSession;
 import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchSessionMappingContext;
+import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSessionIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMapping>
-		implements CloseableSearchMapping, JavaBeanSearchSessionMappingContext {
+		implements CloseableSearchMapping, JavaBeanSearchSessionMappingContext, EntityReferenceFactory<EntityReference> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -47,6 +52,23 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 		if ( integration != null ) {
 			integration.close();
 		}
+	}
+
+	@Override
+	public EntityReferenceFactory<EntityReference> entityReferenceFactory() {
+		return this;
+	}
+
+	@Override
+	public EntityReference createEntityReference(String typeName, Object identifier) {
+		JavaBeanSessionIndexedTypeContext<?> typeContext =
+				typeContextContainer.indexedForEntityName( typeName );
+		if ( typeContext == null ) {
+			throw new AssertionFailure(
+					"Type name " + typeName + " refers to an unknown type"
+			);
+		}
+		return new EntityReferenceImpl( typeContext.typeIdentifier(), typeContext.name(), identifier );
 	}
 
 	@Override
