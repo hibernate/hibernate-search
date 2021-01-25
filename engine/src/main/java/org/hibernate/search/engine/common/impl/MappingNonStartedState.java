@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
@@ -32,12 +33,13 @@ class MappingNonStartedState {
 	}
 
 	CompletableFuture<?> start(RootFailureCollector rootFailureCollector, BeanResolver beanResolver,
-			ConfigurationPropertySource propertySource) {
+			ConfigurationPropertySource propertySource, ThreadPoolProvider threadPoolProvider) {
 		ContextualFailureCollector mappingFailureCollector = rootFailureCollector.withContext( key );
 		MappingStartContextImpl startContext = new MappingStartContextImpl(
 				mappingFailureCollector,
 				beanResolver,
-				propertySource
+				propertySource,
+				threadPoolProvider
 		);
 		return mapping.start( startContext )
 				.exceptionally( Futures.handler( e -> {

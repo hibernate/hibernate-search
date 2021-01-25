@@ -10,6 +10,7 @@ import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
+import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategy;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
@@ -43,7 +44,8 @@ public final class HibernateOrmMapperSettings {
 	/**
 	 * The automatic indexing strategy to use.
 	 * <p>
-	 * Expects one of the string constants exposed in {@link AutomaticIndexingStrategyNames}.
+	 * Expects one of the strings defined in {@link AutomaticIndexingStrategyNames},
+	 * or a different string for a strategy provided by an external module.
 	 * <p>
 	 * For backward compatibility reasons, values of type {@link org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName}
 	 * are also accepted, but are deprecated.
@@ -146,9 +148,11 @@ public final class HibernateOrmMapperSettings {
 		}
 
 		public static final String ENABLED = "enabled";
-		public static final String AUTOMATIC_INDEXING_STRATEGY = "automatic_indexing.strategy";
-		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = "automatic_indexing.synchronization.strategy";
-		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = "automatic_indexing.enable_dirty_check";
+		public static final String AUTOMATIC_INDEXING = "automatic_indexing";
+		public static final String AUTOMATIC_INDEXING_PREFIX = AUTOMATIC_INDEXING + ".";
+		public static final String AUTOMATIC_INDEXING_STRATEGY = AUTOMATIC_INDEXING_PREFIX + "strategy";
+		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = AUTOMATIC_INDEXING_PREFIX + "synchronization.strategy";
+		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = AUTOMATIC_INDEXING_PREFIX + "enable_dirty_check";
 		public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = "query.loading.cache_lookup.strategy";
 		public static final String QUERY_LOADING_FETCH_SIZE = "query.loading.fetch_size";
 		public static final String MAPPING_PROCESS_ANNOTATIONS = "mapping.process_annotations";
@@ -165,7 +169,8 @@ public final class HibernateOrmMapperSettings {
 		}
 
 		public static final boolean ENABLED = true;
-		public static final String AUTOMATIC_INDEXING_STRATEGY = AutomaticIndexingStrategyNames.SESSION;
+		public static final BeanReference<AutomaticIndexingStrategy> AUTOMATIC_INDEXING_STRATEGY =
+				BeanReference.of( AutomaticIndexingStrategy.class, AutomaticIndexingStrategyNames.SESSION );
 		public static final BeanReference<AutomaticIndexingSynchronizationStrategy> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
 				BeanReference.of( AutomaticIndexingSynchronizationStrategy.class, "write-sync" );
 		public static final boolean AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = true;
