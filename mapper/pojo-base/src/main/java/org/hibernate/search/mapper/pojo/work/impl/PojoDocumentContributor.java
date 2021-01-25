@@ -46,8 +46,9 @@ public final class PojoDocumentContributor<E> implements DocumentContributor {
 			processor.process( state, entitySupplier.get(), sessionContext );
 		}
 		catch (RuntimeException e) {
+			EntityReferenceFactory<?> entityReferenceFactory = sessionContext.mappingContext().entityReferenceFactory();
 			Object entityReference = EntityReferenceFactory.safeCreateEntityReference(
-					sessionContext.entityReferenceFactory(), entityName, identifier, e::addSuppressed );
+					entityReferenceFactory, entityName, identifier, e::addSuppressed );
 			throw log.errorBuildingDocument( entityReference, e.getMessage(), e );
 		}
 	}

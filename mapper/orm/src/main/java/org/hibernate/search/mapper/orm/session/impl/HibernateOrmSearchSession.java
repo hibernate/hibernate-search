@@ -41,7 +41,6 @@ import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanSessionContext;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanImpl;
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
@@ -53,10 +52,9 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * The actual implementation of {@link SearchSession}.
  */
-public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityReference>
+public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		implements SearchSession, HibernateOrmSessionContext, HibernateOrmScopeSessionContext,
-				SearchIndexingPlanSessionContext, DocumentReferenceConverter<EntityReference>,
-				EntityReferenceFactory<EntityReference> {
+				SearchIndexingPlanSessionContext, DocumentReferenceConverter<EntityReference> {
 
 	/**
 	 * @param sessionImplementor A Hibernate session
@@ -191,7 +189,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		ConfiguredAutomaticIndexingSynchronizationStrategy.Builder builder =
 				new ConfiguredAutomaticIndexingSynchronizationStrategy.Builder( mappingContext.failureHandler(),
-						entityReferenceFactory() );
+						mappingContext.entityReferenceFactory() );
 		synchronizationStrategy.apply( builder );
 		this.configuredAutomaticIndexingSynchronizationStrategy = builder.build();
 	}
@@ -223,23 +221,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 		Object id = typeContext.getIdentifierMapping()
 				.fromDocumentIdentifier( reference.id(), this );
 		return new EntityReferenceImpl( typeContext.typeIdentifier(), typeContext.jpaEntityName(), id );
-	}
-
-	@Override
-	public EntityReferenceFactory<EntityReference> entityReferenceFactory() {
-		return this;
-	}
-
-	@Override
-	public EntityReference createEntityReference(String typeName, Object identifier) {
-		HibernateOrmSessionIndexedTypeContext<?> typeContext =
-				typeContextProvider.indexedForJpaEntityName( typeName );
-		if ( typeContext == null ) {
-			throw new AssertionFailure(
-					"Type " + typeName + " refers to an unknown type"
-			);
-		}
-		return new EntityReferenceImpl( typeContext.typeIdentifier(), typeContext.jpaEntityName(), identifier );
 	}
 
 	@Override

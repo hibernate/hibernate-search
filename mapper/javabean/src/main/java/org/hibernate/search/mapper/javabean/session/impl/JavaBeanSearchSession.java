@@ -27,7 +27,6 @@ import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.javabean.work.impl.SearchIndexerImpl;
 import org.hibernate.search.mapper.javabean.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -35,9 +34,8 @@ import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
 
-public class JavaBeanSearchSession extends AbstractPojoSearchSession<EntityReference>
-		implements SearchSession, DocumentReferenceConverter<EntityReference>,
-		EntityReferenceFactory<EntityReference> {
+public class JavaBeanSearchSession extends AbstractPojoSearchSession
+		implements SearchSession, DocumentReferenceConverter<EntityReference> {
 
 	private final JavaBeanSearchSessionMappingContext mappingContext;
 	private final JavaBeanSearchSessionTypeContextProvider typeContextProvider;
@@ -100,7 +98,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession<EntityRefer
 			indexingPlan = new SearchIndexingPlanImpl(
 					typeContextProvider, runtimeIntrospector(),
 					createIndexingPlan( commitStrategy, refreshStrategy ),
-					entityReferenceFactory()
+					mappingContext.entityReferenceFactory()
 			);
 		}
 		return indexingPlan;
@@ -130,23 +128,6 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession<EntityRefer
 		Object id = typeContext.identifierMapping()
 				.fromDocumentIdentifier( reference.id(), this );
 		return new EntityReferenceImpl( typeContext.typeIdentifier(), typeContext.name(), id );
-	}
-
-	@Override
-	public EntityReferenceFactory<EntityReference> entityReferenceFactory() {
-		return this;
-	}
-
-	@Override
-	public EntityReference createEntityReference(String typeName, Object identifier) {
-		JavaBeanSessionIndexedTypeContext<?> typeContext =
-				typeContextProvider.indexedForEntityName( typeName );
-		if ( typeContext == null ) {
-			throw new AssertionFailure(
-					"Type name " + typeName + " refers to an unknown type"
-			);
-		}
-		return new EntityReferenceImpl( typeContext.typeIdentifier(), typeContext.name(), identifier );
 	}
 
 	@Override

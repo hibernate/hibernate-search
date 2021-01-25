@@ -89,8 +89,9 @@ public class AbstractPojoTypeManager<E>
 			reindexingResolver.resolveEntitiesToReindex( collector, entitySupplier.get(), context );
 		}
 		catch (RuntimeException e) {
+			EntityReferenceFactory<?> entityReferenceFactory = sessionContext.mappingContext().entityReferenceFactory();
 			Object entityReference = EntityReferenceFactory.safeCreateEntityReference(
-					sessionContext.entityReferenceFactory(), entityName, identifier, e::addSuppressed );
+					entityReferenceFactory, entityName, identifier, e::addSuppressed );
 			throw log.errorResolvingEntitiesToReindex( entityReference, e.getMessage(), e );
 		}
 	}
