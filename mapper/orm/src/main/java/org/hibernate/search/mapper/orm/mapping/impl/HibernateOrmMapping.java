@@ -153,6 +153,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	private final SchemaManagementListener schemaManagementListener;
 
+	private ConfiguredAutomaticIndexingSynchronizationStrategy defaultSynchronizationStrategy;
+
 	private HibernateOrmMapping(PojoMappingDelegate mappingDelegate,
 			HibernateOrmTypeContextContainer typeContextContainer,
 			SessionFactoryImplementor sessionFactory,
@@ -200,6 +202,10 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		}
 
 		log.defaultAutomaticIndexingSynchronizationStrategy( defaultSynchronizationStrategyHolder.get() );
+		ConfiguredAutomaticIndexingSynchronizationStrategy.Builder builder =
+				new ConfiguredAutomaticIndexingSynchronizationStrategy.Builder( failureHandler(), entityReferenceFactory() );
+		defaultSynchronizationStrategyHolder.get().apply( builder );
+		this.defaultSynchronizationStrategy = builder.build();
 	}
 
 	@Override
@@ -390,7 +396,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		return new HibernateOrmSearchSession.Builder(
 				this, typeContextContainer,
 				sessionImplementor,
-				defaultSynchronizationStrategyHolder.get()
+				defaultSynchronizationStrategy
 		);
 	}
 
