@@ -6,19 +6,14 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class HqlTypeQueryFactory<E, I> implements TypeQueryFactory<E, I> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final EntityPersister entityPersister;
 	private final String uniquePropertyName;
@@ -31,15 +26,20 @@ class HqlTypeQueryFactory<E, I> implements TypeQueryFactory<E, I> {
 	@Override
 	public Query<Long> createQueryForCount(SharedSessionContractImplementor session,
 			Set<? extends Class<? extends E>> includedTypesFilter) {
-		// TODO HSEARCH-3771 Mass indexing for ORM's dynamic-map entity types
-		throw log.nonJpaEntityType( entityPersister.getEntityName() );
+		return createQueryWithTypesFilter( session,
+				"select count(e) from " + entityPersister.getEntityName() + " e",
+				Long.class,
+				"e", includedTypesFilter );
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
 			Set<? extends Class<? extends E>> includedTypesFilter) {
-		// TODO HSEARCH-3771 Mass indexing for ORM's dynamic-map entity types
-		throw log.nonJpaEntityType( entityPersister.getEntityName() );
+		return createQueryWithTypesFilter( session,
+				"select e. " + uniquePropertyName + " from " + entityPersister.getEntityName() + " e",
+				(Class<I>) entityPersister.getIdentifierType().getReturnedClass(),
+				"e", includedTypesFilter );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -50,5 +50,18 @@ class HqlTypeQueryFactory<E, I> implements TypeQueryFactory<E, I> {
 						+ " e where " + uniquePropertyName + " in (:" + parameterName + ")",
 				(Class<E>) entityPersister.getMappedClass()
 		);
+	}
+
+	private <T> Query<T> createQueryWithTypesFilter(SharedSessionContractImplementor session,
+			String hql, Class<T> returnedType, String entityAlias,
+			Set<? extends Class<? extends E>> includedTypesFilter) {
+		if ( !includedTypesFilter.isEmpty() ) {
+			hql += " where " + entityAlias + " .type() in (:types)";
+		}
+		Query<T> query = session.createQuery( hql, returnedType );
+		if ( !includedTypesFilter.isEmpty() ) {
+			query.setParameterList( "types", includedTypesFilter );
+		}
+		return query;
 	}
 }
