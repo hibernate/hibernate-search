@@ -9,12 +9,9 @@ package org.hibernate.search.mapper.orm.massindexing.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
-
-import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.CacheMode;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
@@ -39,9 +36,8 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final DetachedBackendSessionContext sessionContext;
 
-	private final HibernateOrmMassIndexingIndexedTypeContext<E> type;
-	private final SingularAttribute<? super E, I> idAttributeOfType;
-	private final Set<Class<? extends E>> includedTypesFilter;
+	private final MassIndexingIndexedTypeGroup<E, I> typeGroup;
+	private final MassIndexingTypeGroupLoader<? super E, I> typeGroupLoader;
 
 	private final ProducerConsumerQueue<List<I>> primaryKeyStream;
 
@@ -62,8 +58,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 	BatchIndexingWorkspace(HibernateOrmMassIndexingMappingContext mappingContext,
 			DetachedBackendSessionContext sessionContext,
 			MassIndexingNotifier notifier,
-			HibernateOrmMassIndexingIndexedTypeContext<E> type, SingularAttribute<? super E, I> idAttributeOfType,
-			Set<Class<? extends E>> includedTypesFilter,
+			MassIndexingIndexedTypeGroup<E, I> typeGroup,
 			int objectLoadingThreads, CacheMode cacheMode, int objectLoadingBatchSize,
 			long objectsLimit,
 			int idFetchSize, Integer transactionTimeout) {
@@ -71,9 +66,8 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
 
-		this.type = type;
-		this.idAttributeOfType = idAttributeOfType;
-		this.includedTypesFilter = includedTypesFilter;
+		this.typeGroup = typeGroup;
+		this.typeGroupLoader = typeGroup.createLoader();
 		this.idFetchSize = idFetchSize;
 		this.transactionTimeout = transactionTimeout;
 
@@ -105,7 +99,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 		Futures.unwrappedExceptionGet(
 				CompletableFuture.allOf( indexingFutures.toArray( new CompletableFuture[0] ) )
 		);
-		log.debugf( "Indexing for %s is done", type.jpaEntityName() );
+		log.debugf( "Indexing for %s is done", typeGroup.includedEntityNames() );
 	}
 
 	@Override
@@ -135,9 +129,9 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 				new IdentifierProducer<>(
 						mappingContext.sessionFactory(), sessionContext.tenantIdentifier(),
 						getNotifier(),
+						typeGroup, typeGroupLoader,
 						primaryKeyStream,
 						objectLoadingBatchSize,
-						type, idAttributeOfType, includedTypesFilter,
 						objectsLimit,
 						idFetchSize
 				),
@@ -146,7 +140,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
 		final ThreadPoolExecutor identifierProducingExecutor = mappingContext.threadPoolProvider().newFixedThreadPool(
 				1,
-				MassIndexerImpl.THREAD_NAME_PREFIX + type.jpaEntityName() + " - ID loading"
+				MassIndexerImpl.THREAD_NAME_PREFIX + typeGroup.includedEntityNames() + " - ID loading"
 		);
 		try {
 			identifierProducingFutures.add( Futures.runAsync( primaryKeyOutputter, identifierProducingExecutor ) );
@@ -160,14 +154,14 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 		final Runnable documentOutputter = new IdentifierConsumerDocumentProducer<>(
 				mappingContext, sessionContext.tenantIdentifier(),
 				getNotifier(),
-				type, idAttributeOfType,
+				typeGroup, typeGroupLoader,
 				primaryKeyStream,
 				cacheMode,
 				transactionTimeout
 		);
 		final ThreadPoolExecutor indexingExecutor = mappingContext.threadPoolProvider().newFixedThreadPool(
 				documentBuilderThreads,
-				MassIndexerImpl.THREAD_NAME_PREFIX + type.jpaEntityName() + " - Entity loading"
+				MassIndexerImpl.THREAD_NAME_PREFIX + typeGroup.includedEntityNames() + " - Entity loading"
 		);
 		try {
 			for ( int i = 0; i < documentBuilderThreads; i++ ) {

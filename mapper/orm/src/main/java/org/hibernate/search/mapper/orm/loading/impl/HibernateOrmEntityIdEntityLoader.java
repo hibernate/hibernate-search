@@ -35,13 +35,13 @@ class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposableSearc
 	private static final String IDS_PARAMETER_NAME = "ids";
 
 	private final EntityPersister entityPersister;
-	private final TypeQueryFactory<? super E> queryFactory;
+	private final TypeQueryFactory<? super E, ?> queryFactory;
 	private final SessionImplementor session;
 	private final PersistenceContextLookupStrategy persistenceContextLookup;
 	private final EntityLoadingCacheLookupStrategyImplementor cacheLookupStrategyImplementor;
 	private final MutableEntityLoadingOptions loadingOptions;
 
-	HibernateOrmEntityIdEntityLoader(EntityPersister entityPersister, TypeQueryFactory<E> queryFactory,
+	HibernateOrmEntityIdEntityLoader(EntityPersister entityPersister, TypeQueryFactory<E, ?> queryFactory,
 			SessionImplementor session,
 			PersistenceContextLookupStrategy persistenceContextLookup,
 			EntityLoadingCacheLookupStrategyImplementor cacheLookupStrategyImplementor,

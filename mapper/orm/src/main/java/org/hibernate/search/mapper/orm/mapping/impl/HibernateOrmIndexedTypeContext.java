@@ -26,25 +26,28 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 				HibernateOrmScopeIndexedTypeContext<E> {
 
 	private final boolean documentIdIsEntityId;
-	private final EntityLoadingStrategy loadingStrategy;
+	private final EntityLoadingStrategy<? super E, ?> loadingStrategy;
 	private final IdentifierMapping identifierMapping;
 
 	private final MappedIndexManager indexManager;
 
+	// Casts are safe because the loading strategy will target either "E" or "? super E", by contract
+	@SuppressWarnings("unchecked")
 	private HibernateOrmIndexedTypeContext(Builder<E> builder, SessionFactoryImplementor sessionFactory) {
 		super( builder, sessionFactory );
 
 		if ( builder.documentIdSourcePropertyName.equals( entityPersister().getIdentifierPropertyName() ) ) {
 			documentIdIsEntityId = true;
-			loadingStrategy = HibernateOrmEntityIdEntityLoadingStrategy.create( sessionFactory, entityPersister() );
+			loadingStrategy = (EntityLoadingStrategy<? super E, ?>)
+					HibernateOrmEntityIdEntityLoadingStrategy.create( sessionFactory, entityPersister() );
 		}
 		else {
 			// The entity ID is not the property used to generate the document ID
 			// We need to use a criteria query to load entities from the document IDs
 			documentIdIsEntityId = false;
-			loadingStrategy = HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.create( sessionFactory,
-					entityPersister(),
-					builder.documentIdSourcePropertyName, builder.documentIdSourcePropertyHandle );
+			loadingStrategy = (EntityLoadingStrategy<? super E, ?>)
+					HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.create( sessionFactory, entityPersister(),
+							builder.documentIdSourcePropertyName, builder.documentIdSourcePropertyHandle );
 		}
 
 		this.identifierMapping = builder.identifierMapping;
@@ -84,7 +87,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 	}
 
 	@Override
-	public EntityLoadingStrategy loadingStrategy() {
+	public EntityLoadingStrategy<? super E, ?> loadingStrategy() {
 		return loadingStrategy;
 	}
 

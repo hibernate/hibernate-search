@@ -40,7 +40,7 @@ public class MassIndexerImpl implements MassIndexer {
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final DetachedBackendSessionContext sessionContext;
 
-	private final List<MassIndexingIndexedTypeGroup<?>> typeGroupsToIndex;
+	private final List<MassIndexingIndexedTypeGroup<?, ?>> typeGroupsToIndex;
 	private final PojoScopeSchemaManager scopeSchemaManager;
 	private final PojoScopeWorkspace scopeWorkspace;
 

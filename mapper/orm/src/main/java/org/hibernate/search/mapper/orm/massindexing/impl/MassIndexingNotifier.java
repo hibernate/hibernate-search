@@ -60,8 +60,8 @@ class MassIndexingNotifier {
 		monitor.documentsAdded( size );
 	}
 
-	<T> void notifyEntityIndexingFailure(HibernateOrmMassIndexingIndexedTypeContext<T> type,
-			HibernateOrmMassIndexingSessionContext sessionContext, T entity, Exception exception) {
+	void notifyEntityIndexingFailure(MassIndexingIndexedTypeGroup<?, ?> typeGroup,
+			HibernateOrmMassIndexingSessionContext sessionContext, Object entity, Exception exception) {
 		RecordedEntityIndexingFailure recordedFailure = new RecordedEntityIndexingFailure( exception );
 		entityIndexingFirstFailure.compareAndSet( null, recordedFailure );
 		entityIndexingFailureCount.increment();
@@ -69,10 +69,10 @@ class MassIndexingNotifier {
 		MassIndexingEntityFailureContext.Builder contextBuilder = MassIndexingEntityFailureContext.builder();
 		contextBuilder.throwable( exception );
 		// Add minimal information here, but information we're sure we can get
-		contextBuilder.failingOperation( log.massIndexerIndexingInstance( type.jpaEntityName() ) );
+		contextBuilder.failingOperation( log.massIndexerIndexingInstance( typeGroup.includedEntityNames() ) );
 		// Add more information here, but information that may not be available if the session completely broke down
 		// (we're being extra careful here because we don't want to throw an exception while handling and exception)
-		EntityReference entityReference = extractReferenceOrSuppress( type, sessionContext, entity, exception );
+		EntityReference entityReference = extractReferenceOrSuppress( typeGroup, sessionContext, entity, exception );
 		if ( entityReference != null ) {
 			contextBuilder.entityReference( entityReference );
 			recordedFailure.entityReference = entityReference;
@@ -121,13 +121,13 @@ class MassIndexingNotifier {
 		);
 	}
 
-	private <T> EntityReference extractReferenceOrSuppress(HibernateOrmMassIndexingIndexedTypeContext<T> type,
+	private EntityReference extractReferenceOrSuppress(MassIndexingIndexedTypeGroup<?, ?> typeGroup,
 			HibernateOrmMassIndexingSessionContext sessionContext, Object entity, Throwable throwable) {
 		try {
 			Session session = sessionContext.session();
 			Object identifier = session.getIdentifier( entity );
 			return EntityReferenceFactory.safeCreateEntityReference( sessionContext.entityReferenceFactory(),
-					type.jpaEntityName(), identifier, throwable::addSuppressed );
+					typeGroup.commonSuperType().jpaEntityName(), identifier, throwable::addSuppressed );
 		}
 		catch (RuntimeException e) {
 			// We failed to extract a reference.

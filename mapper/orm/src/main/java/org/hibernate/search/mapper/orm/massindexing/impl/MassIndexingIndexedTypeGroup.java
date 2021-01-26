@@ -12,13 +12,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
-import javax.persistence.metamodel.EntityType;
-import javax.persistence.metamodel.SingularAttribute;
+import java.util.stream.Collectors;
 
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 
-class MassIndexingIndexedTypeGroup<E> {
+class MassIndexingIndexedTypeGroup<E, I> {
 
 	/**
 	 * Group indexed types by their closest common supertype,
@@ -33,15 +32,15 @@ class MassIndexingIndexedTypeGroup<E> {
 	 * @param indexedTypeContexts A set of indexed types to group together.
 	 * @return One or more type groups that are guaranteed to be disjoint.
 	 */
-	public static List<MassIndexingIndexedTypeGroup<?>> disjoint(
+	public static List<MassIndexingIndexedTypeGroup<?, ?>> disjoint(
 			Set<? extends HibernateOrmMassIndexingIndexedTypeContext<?>> indexedTypeContexts) {
-		List<MassIndexingIndexedTypeGroup<?>> typeGroups = new ArrayList<>();
+		List<MassIndexingIndexedTypeGroup<?, ?>> typeGroups = new ArrayList<>();
 		for ( HibernateOrmMassIndexingIndexedTypeContext<?> typeContext : indexedTypeContexts ) {
-			MassIndexingIndexedTypeGroup<?> typeGroup = MassIndexingIndexedTypeGroup.single( typeContext );
+			MassIndexingIndexedTypeGroup<?, ?> typeGroup = MassIndexingIndexedTypeGroup.single( typeContext );
 			// First try to merge this new type group with an existing one
-			ListIterator<MassIndexingIndexedTypeGroup<?>> iterator = typeGroups.listIterator();
+			ListIterator<MassIndexingIndexedTypeGroup<?, ?>> iterator = typeGroups.listIterator();
 			while ( iterator.hasNext() ) {
-				MassIndexingIndexedTypeGroup<?> mergeResult = iterator.next().mergeOrNull( typeGroup );
+				MassIndexingIndexedTypeGroup<?, ?> mergeResult = iterator.next().mergeOrNull( typeGroup );
 				if ( mergeResult != null ) {
 					// We found an existing group that can be merged with this one.
 					// Remove that group, we'll add the merge result to the list later.
@@ -55,16 +54,20 @@ class MassIndexingIndexedTypeGroup<E> {
 		return typeGroups;
 	}
 
-	private static <E> MassIndexingIndexedTypeGroup<E> single(HibernateOrmMassIndexingIndexedTypeContext<E> typeContext) {
-		return new MassIndexingIndexedTypeGroup<>( typeContext, Collections.singleton( typeContext ) );
+	private static <E> MassIndexingIndexedTypeGroup<E, ?> single(HibernateOrmMassIndexingIndexedTypeContext<E> typeContext) {
+		return new MassIndexingIndexedTypeGroup<>( typeContext, typeContext.loadingStrategy(),
+				Collections.singleton( typeContext ) );
 	}
 
 	private final HibernateOrmMassIndexingIndexedTypeContext<E> commonSuperType;
+	private final MassIndexingTypeLoadingStrategy<? super E, I> loadingStrategy;
 	private final Set<HibernateOrmMassIndexingIndexedTypeContext<? extends E>> includedTypes;
 
 	private MassIndexingIndexedTypeGroup(HibernateOrmMassIndexingIndexedTypeContext<E> commonSuperType,
+			MassIndexingTypeLoadingStrategy<? super E, I> loadingStrategy,
 			Set<HibernateOrmMassIndexingIndexedTypeContext<? extends E>> includedTypes) {
 		this.commonSuperType = commonSuperType;
+		this.loadingStrategy = loadingStrategy;
 		this.includedTypes = includedTypes;
 	}
 
@@ -72,6 +75,7 @@ class MassIndexingIndexedTypeGroup<E> {
 	public String toString() {
 		return getClass().getSimpleName() + "["
 				+ "commonSuperType=" + commonSuperType
+				+ ", loadingStrategy=" + includedTypes
 				+ ", includedSubTypes=" + includedTypes
 				+ "]";
 	}
@@ -80,52 +84,47 @@ class MassIndexingIndexedTypeGroup<E> {
 		return commonSuperType;
 	}
 
-	public SingularAttribute<? super E, ?> idAttribute() {
-		EntityType<E> typeDescriptor = commonSuperType.entityTypeDescriptor();
-		return typeDescriptor.getId( typeDescriptor.getIdType().getJavaType() );
+	public String includedEntityNames() {
+		return includedTypes.stream().map( HibernateOrmMassIndexingIndexedTypeContext::jpaEntityName )
+				.collect( Collectors.joining( "," ) );
 	}
 
-	public Set<Class<? extends E>> includedIndexedTypesOrEmpty() {
-		if ( commonSuperType.entityPersister().getEntityMetamodel().getSubclassEntityNames().size()
-				== includedTypes.size() ) {
-			// All types are included, no need to filter.
-			return Collections.emptySet();
-		}
-
-		Set<Class<? extends E>> classes = new HashSet<>( includedTypes.size() );
-		for ( HibernateOrmMassIndexingIndexedTypeContext<? extends E> includedType : includedTypes ) {
-			classes.add( includedType.entityTypeDescriptor().getJavaType() );
-		}
-		return classes;
+	public MassIndexingTypeGroupLoader<? super E, I> createLoader() {
+		return loadingStrategy.createLoader( includedTypes );
 	}
 
 	/**
 	 * Merge this group with the other group if
+	 * the other group uses the same loading strategy and
 	 * the other group's {@code commonSuperType} represents a supertype or subtype
 	 * of this group's {@code commonSuperType}.
 	 * @param other The other group to merge with (if possible).
 	 * @return The merged group, or {@code null} if
+	 * the other group uses a different loading strategy or
 	 * the other group's {@code commonSuperType} does <strong>not</strong> represent
 	 * a supertype or subtype of this group's {@code commonSuperType}.
 	 */
 	@SuppressWarnings("unchecked") // The casts are guarded by reflection checks
-	private MassIndexingIndexedTypeGroup<?> mergeOrNull(MassIndexingIndexedTypeGroup<?> other) {
+	private MassIndexingIndexedTypeGroup<?, ?> mergeOrNull(MassIndexingIndexedTypeGroup<?, ?> other) {
+		if ( !loadingStrategy.equals( other.loadingStrategy ) ) {
+			return null;
+		}
 		EntityPersister entityPersister = commonSuperType.entityPersister();
 		EntityPersister otherEntityPersister = other.commonSuperType.entityPersister();
 		if ( HibernateOrmUtils.isSuperTypeOf( entityPersister, otherEntityPersister ) ) {
-			return withAdditionalTypes( ( (MassIndexingIndexedTypeGroup<? extends E>) other ).includedTypes );
+			return withAdditionalTypes( ( (MassIndexingIndexedTypeGroup<? extends E, I>) other ).includedTypes );
 		}
 		if ( HibernateOrmUtils.isSuperTypeOf( otherEntityPersister, entityPersister ) ) {
-			return ( (MassIndexingIndexedTypeGroup<? super E>) other ).withAdditionalTypes( includedTypes );
+			return ( (MassIndexingIndexedTypeGroup<? super E, I>) other ).withAdditionalTypes( includedTypes );
 		}
 		return null;
 	}
 
-	private MassIndexingIndexedTypeGroup<E> withAdditionalTypes(
+	private MassIndexingIndexedTypeGroup<E, I> withAdditionalTypes(
 			Set<? extends HibernateOrmMassIndexingIndexedTypeContext<? extends E>> otherIncludedSubTypes) {
 		Set<HibernateOrmMassIndexingIndexedTypeContext<? extends E>> mergedIncludedSubTypes =
 				new HashSet<>( includedTypes );
 		mergedIncludedSubTypes.addAll( otherIncludedSubTypes );
-		return new MassIndexingIndexedTypeGroup<>( commonSuperType, mergedIncludedSubTypes );
+		return new MassIndexingIndexedTypeGroup<>( commonSuperType, loadingStrategy, mergedIncludedSubTypes );
 	}
 }

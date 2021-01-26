@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -14,25 +17,27 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
+import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingIndexedTypeContext;
+import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexingTypeGroupLoader;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmComposableSearchEntityLoader;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.orm.search.loading.impl.SearchLoadingIndexedTypeContext;
 
-public class HibernateOrmEntityIdEntityLoadingStrategy implements EntityLoadingStrategy {
+public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> implements EntityLoadingStrategy<E, I> {
 
-	public static EntityLoadingStrategy create(SessionFactoryImplementor sessionFactory,
+	public static EntityLoadingStrategy<?, ?> create(SessionFactoryImplementor sessionFactory,
 			EntityPersister entityPersister) {
 		EntityPersister rootEntityPersister = HibernateOrmUtils.toRootEntityType( sessionFactory, entityPersister );
-		TypeQueryFactory<?> queryFactory = TypeQueryFactory.create( sessionFactory, rootEntityPersister,
+		TypeQueryFactory<?, ?> queryFactory = TypeQueryFactory.create( sessionFactory, rootEntityPersister,
 				entityPersister.getIdentifierPropertyName() );
-		return new HibernateOrmEntityIdEntityLoadingStrategy( rootEntityPersister, queryFactory );
+		return new HibernateOrmEntityIdEntityLoadingStrategy<>( rootEntityPersister, queryFactory );
 	}
 
 	private final EntityPersister rootEntityPersister;
-	private final TypeQueryFactory<?> queryFactory;
+	private final TypeQueryFactory<E, I> queryFactory;
 
-	HibernateOrmEntityIdEntityLoadingStrategy(EntityPersister rootEntityPersister, TypeQueryFactory<?> queryFactory) {
+	HibernateOrmEntityIdEntityLoadingStrategy(EntityPersister rootEntityPersister, TypeQueryFactory<E, I> queryFactory) {
 		this.rootEntityPersister = rootEntityPersister;
 		this.queryFactory = queryFactory;
 	}
@@ -42,7 +47,7 @@ public class HibernateOrmEntityIdEntityLoadingStrategy implements EntityLoadingS
 		if ( obj == null || !( getClass().equals( obj.getClass() ) ) ) {
 			return false;
 		}
-		HibernateOrmEntityIdEntityLoadingStrategy other = (HibernateOrmEntityIdEntityLoadingStrategy) obj;
+		HibernateOrmEntityIdEntityLoadingStrategy<?, ?> other = (HibernateOrmEntityIdEntityLoadingStrategy<?, ?>) obj;
 		// If the root entity type is different,
 		// the factories work in separate ID spaces and should be used separately.
 		return rootEntityPersister.equals( other.rootEntityPersister );
@@ -54,24 +59,24 @@ public class HibernateOrmEntityIdEntityLoadingStrategy implements EntityLoadingS
 	}
 
 	@Override
-	public <E> HibernateOrmComposableSearchEntityLoader<E> createLoader(
+	public <E2> HibernateOrmComposableSearchEntityLoader<E2> createLoader(
 			SearchLoadingIndexedTypeContext targetEntityTypeContext,
 			SessionImplementor session,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
 		/*
-		 * This cast is safe: the loader will only return instances of E.
+		 * This cast is safe: the loader will only return instances of E2.
 		 * See hasExpectedType() and its callers for more information,
 		 * in particular runtime checks handling edge cases.
 		 */
 		@SuppressWarnings("unchecked")
-		HibernateOrmComposableSearchEntityLoader<E> result = (HibernateOrmComposableSearchEntityLoader<E>) doCreate(
+		HibernateOrmComposableSearchEntityLoader<E2> result = (HibernateOrmComposableSearchEntityLoader<E2>) doCreate(
 				targetEntityTypeContext.entityPersister(), session, cacheLookupStrategy, loadingOptions
 		);
 		return result;
 	}
 
 	@Override
-	public <E> HibernateOrmComposableSearchEntityLoader<? extends E> createLoader(
+	public <E2> HibernateOrmComposableSearchEntityLoader<? extends E2> createLoader(
 			List<SearchLoadingIndexedTypeContext> targetEntityTypeContexts,
 			SessionImplementor session, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions) {
@@ -80,20 +85,38 @@ public class HibernateOrmEntityIdEntityLoadingStrategy implements EntityLoadingS
 		/*
 		 * Theoretically, this cast is unsafe,
 		 * since the loader could return entities of any type T extending "commonSuperClass",
-		 * which is either E (good: T = E)
-		 * or a common supertype of some child types of E
-		 * (not good: T might be an interface that E doesn't implement but its children do).
+		 * which is either E2 (good: T = E2)
+		 * or a common supertype of some child types of E2
+		 * (not good: T might be an interface that E2 doesn't implement but its children do).
 		 *
 		 * However, we perform some runtime checks that make this cast safe.
 		 *
 		 * See hasExpectedType() and its callers for more information.
 		 */
 		@SuppressWarnings("unchecked")
-		HibernateOrmComposableSearchEntityLoader<E> result = (HibernateOrmComposableSearchEntityLoader<E>) doCreate(
+		HibernateOrmComposableSearchEntityLoader<E2> result = (HibernateOrmComposableSearchEntityLoader<E2>) doCreate(
 				commonSuperType, session, cacheLookupStrategy, loadingOptions
 		);
 
 		return result;
+	}
+
+	@Override
+	public MassIndexingTypeGroupLoader<E, I> createLoader(
+			Set<? extends HibernateOrmMassIndexingIndexedTypeContext<? extends E>> targetEntityTypeContexts) {
+		Set<Class<? extends E>> includedTypesFilter;
+		if ( rootEntityPersister.getEntityMetamodel().getSubclassEntityNames().size()
+				== targetEntityTypeContexts.size() ) {
+			// All types are included, no need to filter.
+			includedTypesFilter = Collections.emptySet();
+		}
+		else {
+			includedTypesFilter = new HashSet<>( targetEntityTypeContexts.size() );
+			for ( HibernateOrmMassIndexingIndexedTypeContext<? extends E> includedType : targetEntityTypeContexts ) {
+				includedTypesFilter.add( includedType.typeIdentifier().javaClass() );
+			}
+		}
+		return new MassIndexingTypeGroupLoaderImpl<>( queryFactory, includedTypesFilter );
 	}
 
 	private HibernateOrmComposableSearchEntityLoader<?> doCreate(EntityPersister entityPersister,
