@@ -24,8 +24,11 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
@@ -198,6 +201,8 @@ public class DynamicMapBaseIT {
 		);
 		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withConfiguration( builder -> builder.addHbmFromClassPath( hbmPath ) )
+				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
+						AutomaticIndexingStrategyName.NONE )
 				.withProperty(
 						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						(HibernateOrmSearchMappingConfigurer) context -> {
@@ -207,6 +212,17 @@ public class DynamicMapBaseIT {
 						}
 				)
 				.setup();
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			for ( int i = 0; i < 100; i++ ) {
+				Map<String, Object> entity = new HashMap<>();
+				entity.put( "id", i );
+				entity.put( "title", "Hyperion " + i );
+
+				session.persist( entityTypeName, entity );
+			}
+		} );
 		backendMock.verifyExpectationsMet();
 
 		OrmUtils.withinSession( sessionFactory, session -> {
@@ -220,7 +236,13 @@ public class DynamicMapBaseIT {
 					.flush()
 					.refresh();
 
-			// TODO HSEARCH-3771 this fails for every single entity when creating the count/ID queries
+			for ( int i = 0; i < 100; i++ ) {
+				int id = i;
+				backendMock.expectWorksAnyOrder( INDEX1_NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+						.add( String.valueOf( id ), b -> b.field( "title","Hyperion " + id ) )
+						.processedThenExecuted();
+			}
+
 			try {
 				scope.massIndexer().startAndWait();
 			}
