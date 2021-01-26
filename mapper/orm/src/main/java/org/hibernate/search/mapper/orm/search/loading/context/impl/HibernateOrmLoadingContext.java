@@ -25,9 +25,9 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.search.loading.impl.EntityGraphHint;
-import org.hibernate.search.mapper.orm.search.loading.impl.EntityLoaderBuilder;
-import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmLoadingMappingContext;
-import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmLoadingSessionContext;
+import org.hibernate.search.mapper.orm.search.loading.impl.SearchEntityLoaderBuilder;
+import org.hibernate.search.mapper.orm.search.loading.impl.SearchLoadingMappingContext;
+import org.hibernate.search.mapper.orm.search.loading.impl.SearchLoadingSessionContext;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.util.common.impl.Contracts;
@@ -74,15 +74,15 @@ public final class HibernateOrmLoadingContext<E> implements LoadingContext<Entit
 
 	public static final class Builder<E>
 			implements LoadingContextBuilder<EntityReference, E, SearchLoadingOptionsStep>, SearchLoadingOptionsStep {
-		private final HibernateOrmLoadingSessionContext sessionContext;
-		private final EntityLoaderBuilder<E> entityLoaderBuilder;
+		private final SearchLoadingSessionContext sessionContext;
+		private final SearchEntityLoaderBuilder<E> entityLoaderBuilder;
 		private final MutableEntityLoadingOptions loadingOptions;
 
-		public Builder(HibernateOrmLoadingMappingContext mappingContext,
-				HibernateOrmLoadingSessionContext sessionContext,
+		public Builder(SearchLoadingMappingContext mappingContext,
+				SearchLoadingSessionContext sessionContext,
 				Set<HibernateOrmScopeIndexedTypeContext<? extends E>> indexedTypeContexts) {
 			this.sessionContext = sessionContext;
-			this.entityLoaderBuilder = new EntityLoaderBuilder<>( mappingContext, sessionContext, indexedTypeContexts );
+			this.entityLoaderBuilder = new SearchEntityLoaderBuilder<>( mappingContext, sessionContext, indexedTypeContexts );
 			this.loadingOptions = new MutableEntityLoadingOptions( mappingContext );
 		}
 

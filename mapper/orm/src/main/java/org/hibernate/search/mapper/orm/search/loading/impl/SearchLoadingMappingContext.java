@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.orm.search.loading.impl;
 
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 
-public interface HibernateOrmLoadingMappingContext {
+public interface SearchLoadingMappingContext {
 
 	EntityLoadingCacheLookupStrategy cacheLookupStrategy();
 

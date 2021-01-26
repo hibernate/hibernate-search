@@ -8,11 +8,11 @@ package org.hibernate.search.mapper.orm.scope.impl;
 
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingSessionContext;
-import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmLoadingSessionContext;
+import org.hibernate.search.mapper.orm.search.loading.impl.SearchLoadingSessionContext;
 import org.hibernate.search.mapper.orm.spi.BatchSessionContext;
 
 public interface HibernateOrmScopeSessionContext
-		extends HibernateOrmLoadingSessionContext, HibernateOrmMassIndexingSessionContext, BatchSessionContext {
+		extends SearchLoadingSessionContext, HibernateOrmMassIndexingSessionContext, BatchSessionContext {
 
 	BackendSessionContext backendSessionContext();
 

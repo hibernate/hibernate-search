@@ -10,7 +10,7 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 
-public interface HibernateOrmLoadingSessionContext {
+public interface SearchLoadingSessionContext {
 
 	SessionImplementor session();
 
