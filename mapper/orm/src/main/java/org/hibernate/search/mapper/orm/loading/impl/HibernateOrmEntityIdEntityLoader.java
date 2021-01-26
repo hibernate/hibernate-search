@@ -34,19 +34,20 @@ class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposableSearc
 
 	private static final String IDS_PARAMETER_NAME = "ids";
 
-	private final SessionImplementor session;
 	private final EntityPersister entityPersister;
+	private final TypeQueryFactory<? super E> queryFactory;
+	private final SessionImplementor session;
 	private final PersistenceContextLookupStrategy persistenceContextLookup;
 	private final EntityLoadingCacheLookupStrategyImplementor cacheLookupStrategyImplementor;
 	private final MutableEntityLoadingOptions loadingOptions;
 
-	HibernateOrmEntityIdEntityLoader(
-			EntityPersister entityPersister,
+	HibernateOrmEntityIdEntityLoader(EntityPersister entityPersister, TypeQueryFactory<E> queryFactory,
 			SessionImplementor session,
 			PersistenceContextLookupStrategy persistenceContextLookup,
 			EntityLoadingCacheLookupStrategyImplementor cacheLookupStrategyImplementor,
 			MutableEntityLoadingOptions loadingOptions) {
 		this.entityPersister = entityPersister;
+		this.queryFactory = queryFactory;
 		this.session = session;
 		this.persistenceContextLookup = persistenceContextLookup;
 		this.cacheLookupStrategyImplementor = cacheLookupStrategyImplementor;
@@ -107,7 +108,7 @@ class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposableSearc
 		List<E> loadedEntities = createListContainingNulls( references.size() );
 
 		int fetchSize = loadingOptions.fetchSize();
-		Query<?> query = createQuery( fetchSize, timeout );
+		Query<? super E> query = createQuery( fetchSize, timeout );
 
 		List<Object> ids = new ArrayList<>( fetchSize );
 		for ( int i = 0; i < keys.length; i++ ) {
@@ -163,10 +164,8 @@ class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposableSearc
 		return (E) loadedEntity;
 	}
 
-	private Query<?> createQuery(int fetchSize, Long timeout) {
-		Query<?> query = HibernateOrmQueryUtils.createQueryForLoadByUniqueProperty(
-				session, entityPersister, entityPersister.getIdentifierPropertyName(), IDS_PARAMETER_NAME
-		);
+	private Query<? super E> createQuery(int fetchSize, Long timeout) {
+		Query<? super E> query = queryFactory.createQueryForLoadByUniqueProperty( session, IDS_PARAMETER_NAME );
 
 		query.setFetchSize( fetchSize );
 		if ( timeout != null ) {

@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.hibernate.AssertionFailure;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
@@ -26,20 +27,26 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy implements Ent
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static EntityLoadingStrategy create(EntityPersister entityPersister,
+	public static EntityLoadingStrategy create(SessionFactoryImplementor sessionFactory,
+			EntityPersister entityPersister,
 			String documentIdSourcePropertyName, ValueReadHandle<?> documentIdSourceHandle) {
-		return new HibernateOrmNonEntityIdPropertyEntityLoadingStrategy( entityPersister,
+		TypeQueryFactory<?> queryFactory = TypeQueryFactory.create( sessionFactory, entityPersister,
+				documentIdSourcePropertyName );
+		return new HibernateOrmNonEntityIdPropertyEntityLoadingStrategy( entityPersister, queryFactory,
 				documentIdSourcePropertyName, documentIdSourceHandle );
 	}
 
 	private final EntityPersister entityPersister;
+	private final TypeQueryFactory<?> queryFactory;
 	private final String documentIdSourcePropertyName;
 	private final ValueReadHandle<?> documentIdSourceHandle;
 
 	HibernateOrmNonEntityIdPropertyEntityLoadingStrategy(EntityPersister entityPersister,
+			TypeQueryFactory<?> queryFactory,
 			String documentIdSourcePropertyName,
 			ValueReadHandle<?> documentIdSourceHandle) {
 		this.entityPersister = entityPersister;
+		this.queryFactory = queryFactory;
 		this.documentIdSourcePropertyName = documentIdSourcePropertyName;
 		this.documentIdSourceHandle = documentIdSourceHandle;
 	}
@@ -108,8 +115,10 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy implements Ent
 		 * We checked just above that "entityPersister" is equal to "targetEntityTypeContext.entityPersister()",
 		 * so this loader will actually return entities of type E.
 		 */
+		@SuppressWarnings("unchecked")
 		HibernateOrmComposableSearchEntityLoader<E> result = new HibernateOrmNonEntityIdPropertyEntityLoader<>(
-				entityPersister, documentIdSourcePropertyName, documentIdSourceHandle,
+				entityPersister, (TypeQueryFactory<E>) queryFactory,
+				documentIdSourcePropertyName, documentIdSourceHandle,
 				session, loadingOptions
 		);
 

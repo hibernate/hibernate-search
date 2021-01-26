@@ -42,18 +42,20 @@ class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements HibernateOrmComp
 	private static final String DOCUMENT_ID_SOURCE_PROPERTY_PARAMETER_NAME = "docId";
 
 	private final EntityPersister entityPersister;
+	private final TypeQueryFactory<E> queryFactory;
 	private final String documentIdSourcePropertyName;
 	private final ValueReadHandle<?> documentIdSourceHandle;
 	private final SessionImplementor session;
 	private final MutableEntityLoadingOptions loadingOptions;
 
-	HibernateOrmNonEntityIdPropertyEntityLoader(
-			EntityPersister entityPersister,
+	HibernateOrmNonEntityIdPropertyEntityLoader(EntityPersister entityPersister,
+			TypeQueryFactory<E> queryFactory,
 			String documentIdSourcePropertyName,
 			ValueReadHandle<?> documentIdSourceHandle,
 			SessionImplementor session,
 			MutableEntityLoadingOptions loadingOptions) {
 		this.entityPersister = entityPersister;
+		this.queryFactory = queryFactory;
 		this.documentIdSourcePropertyName = documentIdSourcePropertyName;
 		this.documentIdSourceHandle = documentIdSourceHandle;
 		this.session = session;
@@ -126,12 +128,8 @@ class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements HibernateOrmComp
 		}
 	}
 
-	@SuppressWarnings("unchecked") // Cast is safe because entityPersister represents type E. See Strategy.doCreate().
 	private Query<? extends E> createQuery(int fetchSize, Long timeout) {
-		Query<? extends E> query = (Query<? extends E>) HibernateOrmQueryUtils.createQueryForLoadByUniqueProperty(
-				session, entityPersister, documentIdSourcePropertyName,
-				DOCUMENT_ID_SOURCE_PROPERTY_PARAMETER_NAME
-		);
+		Query<E> query = queryFactory.createQueryForLoadByUniqueProperty( session, DOCUMENT_ID_SOURCE_PROPERTY_PARAMETER_NAME );
 
 		query.setFetchSize( fetchSize );
 		if ( timeout != null ) {
