@@ -42,7 +42,8 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 			// The entity ID is not the property used to generate the document ID
 			// We need to use a criteria query to load entities from the document IDs
 			documentIdIsEntityId = false;
-			loadingStrategy = HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.create( entityPersister(),
+			loadingStrategy = HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.create( sessionFactory,
+					entityPersister(),
 					builder.documentIdSourcePropertyName, builder.documentIdSourcePropertyHandle );
 		}
 

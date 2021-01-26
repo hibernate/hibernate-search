@@ -23,13 +23,18 @@ public class HibernateOrmEntityIdEntityLoadingStrategy implements EntityLoadingS
 
 	public static EntityLoadingStrategy create(SessionFactoryImplementor sessionFactory,
 			EntityPersister entityPersister) {
-		return new HibernateOrmEntityIdEntityLoadingStrategy( HibernateOrmUtils.toRootEntityType( sessionFactory, entityPersister ) );
+		EntityPersister rootEntityPersister = HibernateOrmUtils.toRootEntityType( sessionFactory, entityPersister );
+		TypeQueryFactory<?> queryFactory = TypeQueryFactory.create( sessionFactory, rootEntityPersister,
+				entityPersister.getIdentifierPropertyName() );
+		return new HibernateOrmEntityIdEntityLoadingStrategy( rootEntityPersister, queryFactory );
 	}
 
 	private final EntityPersister rootEntityPersister;
+	private final TypeQueryFactory<?> queryFactory;
 
-	HibernateOrmEntityIdEntityLoadingStrategy(EntityPersister rootEntityPersister) {
+	HibernateOrmEntityIdEntityLoadingStrategy(EntityPersister rootEntityPersister, TypeQueryFactory<?> queryFactory) {
 		this.rootEntityPersister = rootEntityPersister;
+		this.queryFactory = queryFactory;
 	}
 
 	@Override
@@ -133,8 +138,8 @@ public class HibernateOrmEntityIdEntityLoadingStrategy implements EntityLoadingS
 				throw new AssertionFailure( "Unexpected cache lookup strategy: " + cacheLookupStrategy );
 		}
 
-		return new HibernateOrmEntityIdEntityLoader<>(
-				entityPersister, session, persistenceContextLookup, cacheLookupStrategyImplementor, loadingOptions
+		return new HibernateOrmEntityIdEntityLoader<>( entityPersister, queryFactory,
+				session, persistenceContextLookup, cacheLookupStrategyImplementor, loadingOptions
 		);
 	}
 
