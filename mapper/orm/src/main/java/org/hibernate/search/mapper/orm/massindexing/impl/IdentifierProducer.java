@@ -9,12 +9,6 @@ package org.hibernate.search.mapper.orm.massindexing.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
@@ -49,40 +43,27 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 	private final MassIndexingNotifier notifier;
 	private final String tenantId;
 
-	private final HibernateOrmMassIndexingIndexedTypeContext<E> type;
-	private final SingularAttribute<? super E, I> idAttributeOfType;
-	private final Set<Class<? extends E>> includedTypesFilter;
+	private final MassIndexingIndexedTypeGroup<E, I> typeGroup;
+	private final MassIndexingTypeGroupLoader<? super E, I> typeGroupLoader;
 
 	private final ProducerConsumerQueue<List<I>> destination;
 	private final int batchSize;
 	private final long objectsLimit;
 	private final int idFetchSize;
 
-	/**
-	 * @param sessionFactory the Hibernate SessionFactory to use to load entities
-	 * @param tenantId the tenant identifier
-	 * @param notifier the mass indexing notifier
-	 * @param fromIdentifierListToEntities the target queue where the produced identifiers are sent to
-	 * @param objectLoadingBatchSize affects mostly the next consumer: IdentifierConsumerEntityProducer
-	 * @param type the entity type whose identifiers are to be loaded
-	 * @param idAttributeOfType the id attribute to be loaded
-	 * @param objectsLimit if not zero
-	 * @param idFetchSize the fetch size
-	 */
 	IdentifierProducer(SessionFactory sessionFactory, String tenantId,
 			MassIndexingNotifier notifier,
-			ProducerConsumerQueue<List<I>> fromIdentifierListToEntities,
+			MassIndexingIndexedTypeGroup<E, I> typeGroup,
+			MassIndexingTypeGroupLoader<? super E, I> typeGroupLoader,
+			ProducerConsumerQueue<List<I>> destination,
 			int objectLoadingBatchSize,
-			HibernateOrmMassIndexingIndexedTypeContext<E> type, SingularAttribute<? super E, I> idAttributeOfType,
-			Set<Class<? extends E>> includedTypesFilter,
 			long objectsLimit, int idFetchSize) {
 		this.sessionFactory = sessionFactory;
 		this.tenantId = tenantId;
 		this.notifier = notifier;
-		this.type = type;
-		this.idAttributeOfType = idAttributeOfType;
-		this.includedTypesFilter = includedTypesFilter;
-		this.destination = fromIdentifierListToEntities;
+		this.typeGroup = typeGroup;
+		this.typeGroupLoader = typeGroupLoader;
+		this.destination = destination;
 		this.batchSize = objectLoadingBatchSize;
 		this.objectsLimit = objectsLimit;
 		this.idFetchSize = idFetchSize;
@@ -96,7 +77,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 			inTransactionWrapper( upperSession );
 		}
 		catch (RuntimeException exception) {
-			notifier.notifyRunnableFailure( exception, log.massIndexerFetchingIds( type.jpaEntityName() ) );
+			notifier.notifyRunnableFailure( exception, log.massIndexerFetchingIds( typeGroup.includedEntityNames() ) );
 		}
 		finally {
 			destination.producerStopping();
@@ -121,7 +102,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 				transaction.begin();
 			}
 			try {
-				loadAllIdentifiers( session );
+				loadAllIdentifiers( (SharedSessionContractImplementor) session );
 			}
 			finally {
 				if ( controlTransactions ) {
@@ -140,7 +121,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 		}
 	}
 
-	private void loadAllIdentifiers(final StatelessSession session) throws InterruptedException {
+	private void loadAllIdentifiers(final SharedSessionContractImplementor session) throws InterruptedException {
 		long totalCount = createTotalCountQuery( session ).uniqueResult();
 		if ( objectsLimit != 0 && objectsLimit < totalCount ) {
 			totalCount = objectsLimit;
@@ -160,11 +141,8 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 				if ( destinationList.size() == batchSize ) {
 					// Explicitly checking whether the TX is still open; Depending on the driver implementation new ids
 					// might be produced otherwise if the driver fetches all rows up-front
-					SharedSessionContractImplementor sessionImpl = (SharedSessionContractImplementor) session;
-					if ( !sessionImpl.isTransactionInProgress() ) {
-						throw log.transactionNotActiveWhileProducingIdsForBatchIndexing(
-								type.jpaEntityName()
-						);
+					if ( !session.isTransactionInProgress() ) {
+						throw log.transactionNotActiveWhileProducingIdsForBatchIndexing( typeGroup.includedEntityNames() );
 					}
 
 					enqueueList( destinationList );
@@ -179,32 +157,13 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 		enqueueList( destinationList );
 	}
 
-	private Query<Long> createTotalCountQuery(StatelessSession session) {
-		CriteriaBuilder criteriaBuilder = sessionFactory.getCriteriaBuilder();
-		CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery( Long.class );
-
-		Root<E> root = criteriaQuery.from( type.entityTypeDescriptor() );
-		criteriaQuery.select( criteriaBuilder.count( root ) );
-		if ( !includedTypesFilter.isEmpty() ) {
-			criteriaQuery.where( root.type().in( includedTypesFilter ) );
-		}
-
-		return session.createQuery( criteriaQuery )
+	private Query<Long> createTotalCountQuery(SharedSessionContractImplementor session) {
+		return typeGroupLoader.createCountQuery( session )
 				.setCacheable( false );
 	}
 
-	private Query<I> createIdentifiersQuery(StatelessSession session) {
-		CriteriaBuilder criteriaBuilder = sessionFactory.getCriteriaBuilder();
-		CriteriaQuery<I> criteriaQuery = criteriaBuilder.createQuery( idAttributeOfType.getJavaType() );
-
-		Root<E> root = criteriaQuery.from( type.entityTypeDescriptor() );
-		Path<I> idPath = root.get( idAttributeOfType );
-		criteriaQuery.select( idPath );
-		if ( !includedTypesFilter.isEmpty() ) {
-			criteriaQuery.where( root.type().in( includedTypesFilter ) );
-		}
-
-		return session.createQuery( criteriaQuery )
+	private Query<I> createIdentifiersQuery(SharedSessionContractImplementor session) {
+		return typeGroupLoader.createIdentifiersQuery( session )
 				.setCacheable( false )
 				.setFetchSize( idFetchSize );
 	}

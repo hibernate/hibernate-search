@@ -10,10 +10,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import javax.persistence.LockModeType;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.SingularAttribute;
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
@@ -50,12 +46,14 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private static final String ID_PARAMETER_NAME = "ids";
+
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final String tenantId;
 	private final MassIndexingNotifier notifier;
 
-	private final HibernateOrmMassIndexingIndexedTypeContext<E> type;
-	private final SingularAttribute<? super E, I> idAttributeOfType;
+	private final MassIndexingIndexedTypeGroup<E, I> typeGroup;
+	private final MassIndexingTypeGroupLoader<? super E, I> typeGroupLoader;
 
 	private final ProducerConsumerQueue<List<I>> source;
 	private final CacheMode cacheMode;
@@ -69,7 +67,8 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 	IdentifierConsumerDocumentProducer(
 			HibernateOrmMassIndexingMappingContext mappingContext, String tenantId,
 			MassIndexingNotifier notifier,
-			HibernateOrmMassIndexingIndexedTypeContext<E> type, SingularAttribute<? super E, I> idAttributeOfType,
+			MassIndexingIndexedTypeGroup<E, I> typeGroup,
+			MassIndexingTypeGroupLoader<? super E, I> typeGroupLoader,
 			ProducerConsumerQueue<List<I>> fromIdentifierListToEntities,
 			CacheMode cacheMode,
 			Integer transactionTimeout
@@ -77,10 +76,10 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		this.mappingContext = mappingContext;
 		this.tenantId = tenantId;
 		this.notifier = notifier;
+		this.typeGroup = typeGroup;
+		this.typeGroupLoader = typeGroupLoader;
 		this.source = fromIdentifierListToEntities;
 		this.cacheMode = cacheMode;
-		this.type = type;
-		this.idAttributeOfType = idAttributeOfType;
 		this.transactionTimeout = transactionTimeout;
 		this.transactionManager = mappingContext.sessionFactory()
 				.getServiceRegistry()
@@ -105,7 +104,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		catch (Exception exception) {
 			notifier.notifyRunnableFailure(
 					exception,
-					log.massIndexingLoadingAndExtractingEntityData( type.jpaEntityName() )
+					log.massIndexingLoadingAndExtractingEntityData( typeGroup.includedEntityNames() )
 			);
 		}
 		log.trace( "finished" );
@@ -138,13 +137,8 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		try {
 			beginTransaction( session );
 
-			CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
-			CriteriaQuery<E> criteriaQuery = criteriaBuilder.createQuery( type.entityTypeDescriptor().getJavaType() );
-			Root<E> root = criteriaQuery.from( type.entityTypeDescriptor() );
-			criteriaQuery.select( root );
-			criteriaQuery.where( root.get( idAttributeOfType ).in( listIds ) );
-
-			Query<E> query = session.createQuery( criteriaQuery )
+			Query<? super E> query = typeGroupLoader.createLoadingQuery( session, ID_PARAMETER_NAME )
+					.setParameter( ID_PARAMETER_NAME, listIds )
 					.setCacheMode( cacheMode )
 					.setLockMode( LockModeType.NONE )
 					.setCacheable( false )
@@ -187,7 +181,8 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		}
 	}
 
-	private void indexList(HibernateOrmMassIndexingSessionContext sessionContext, PojoIndexer indexer, List<E> entities)
+	private void indexList(HibernateOrmMassIndexingSessionContext sessionContext, PojoIndexer indexer,
+			List<? super E> entities)
 			throws InterruptedException {
 		if ( entities == null || entities.isEmpty() ) {
 			return;
@@ -197,7 +192,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		CompletableFuture<?>[] indexingFutures = new CompletableFuture<?>[entities.size()];
 
 		for ( int i = 0; i < entities.size(); i++ ) {
-			final E entity = entities.get( i );
+			Object entity = entities.get( i );
 			indexingFutures[i] = index( sessionContext, indexer, entity );
 		}
 
@@ -212,12 +207,12 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			CompletableFuture<?> future = indexingFutures[i];
 
 			if ( future.isCompletedExceptionally() ) {
-				E entity = entities.get( i );
+				Object entity = entities.get( i );
 				notifier.notifyEntityIndexingFailure(
 						// We don't try to detect the exact entity type here,
 						// because that could fail if the type is not indexed
 						// (which should not happen, but well... failures should not happen to begin with).
-						type, sessionContext, entity,
+						typeGroup, sessionContext, entity,
 						Throwables.expectException( Futures.getThrowableNow( future ) )
 				);
 			}
@@ -230,7 +225,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 	}
 
 	private CompletableFuture<?> index(HibernateOrmMassIndexingSessionContext sessionContext,
-			PojoIndexer indexer, E entity) throws InterruptedException {
+			PojoIndexer indexer, Object entity) throws InterruptedException {
 		// abort if the thread has been interrupted while not in wait(), I/O or similar which themselves would have
 		// raised the InterruptedException
 		if ( Thread.currentThread().isInterrupted() ) {
@@ -239,7 +234,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 
 		CompletableFuture<?> future;
 		try {
-			PojoRawTypeIdentifier<? extends E> typeIdentifier = detectTypeIdentifier( sessionContext, entity );
+			PojoRawTypeIdentifier<?> typeIdentifier = detectTypeIdentifier( sessionContext, entity );
 			future = indexer.add( typeIdentifier, null, null, entity,
 					// Commit and refresh are handled globally after all documents are indexed.
 					DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
@@ -256,8 +251,8 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		return future;
 	}
 
-	private PojoRawTypeIdentifier<? extends E> detectTypeIdentifier(
-			HibernateOrmMassIndexingSessionContext sessionContext, E entity) {
+	private PojoRawTypeIdentifier<?> detectTypeIdentifier(HibernateOrmMassIndexingSessionContext sessionContext,
+			Object entity) {
 		return sessionContext.runtimeIntrospector().detectEntityType( entity );
 	}
 

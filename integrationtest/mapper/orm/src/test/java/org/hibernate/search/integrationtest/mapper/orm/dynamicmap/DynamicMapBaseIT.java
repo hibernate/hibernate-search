@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.mapper.orm.dynamicmap;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 
@@ -217,22 +216,17 @@ public class DynamicMapBaseIT {
 
 			backendMock.expectIndexScaleWorks( INDEX1_NAME )
 					.purge()
-					.mergeSegments();
+					.mergeSegments()
+					.flush()
+					.refresh();
 
-			assertThatThrownBy( () -> {
-				try {
-					scope.massIndexer().startAndWait();
-				}
-				catch (InterruptedException e) {
-					fail( "Unexpected exception", e );
-				}
-			} )
-					.hasMessageContainingAll(
-							"Type '" + entityTypeName + " (" + Map.class.getName()
-									+ ")' doesn't have any representation in the JPA metamodel.",
-							"Hibernate Search cannot use the Criteria API to automatically build queries targeting this type",
-							"this type cannot", "be mass-indexed"
-					);
+			// TODO HSEARCH-3771 this fails for every single entity when creating the count/ID queries
+			try {
+				scope.massIndexer().startAndWait();
+			}
+			catch (InterruptedException e) {
+				fail( "Unexpected exception", e );
+			}
 		} );
 	}
 

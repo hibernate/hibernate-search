@@ -6,16 +6,19 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
+import java.util.Set;
+
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
 
-interface TypeQueryFactory<E> {
+interface TypeQueryFactory<E, I> {
 
-	static TypeQueryFactory<?> create(SessionFactoryImplementor sessionFactory, EntityPersister entityPersister,
+	static TypeQueryFactory<?, ?> create(SessionFactoryImplementor sessionFactory, EntityPersister entityPersister,
 			String uniquePropertyName) {
 		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
 		EntityTypeDescriptor<?> typeDescriptorOrNull = metamodel.entity( entityPersister.getEntityName() );
@@ -29,6 +32,12 @@ interface TypeQueryFactory<E> {
 			return new HqlTypeQueryFactory<>( entityPersister, uniquePropertyName );
 		}
 	}
+
+	Query<Long> createQueryForCount(SharedSessionContractImplementor session,
+			Set<? extends Class<? extends E>> includedTypesFilter);
+
+	Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
+			Set<? extends Class<? extends E>> includedTypesFilter);
 
 	Query<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName);
 

@@ -42,14 +42,14 @@ class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements HibernateOrmComp
 	private static final String DOCUMENT_ID_SOURCE_PROPERTY_PARAMETER_NAME = "docId";
 
 	private final EntityPersister entityPersister;
-	private final TypeQueryFactory<E> queryFactory;
+	private final TypeQueryFactory<E, ?> queryFactory;
 	private final String documentIdSourcePropertyName;
 	private final ValueReadHandle<?> documentIdSourceHandle;
 	private final SessionImplementor session;
 	private final MutableEntityLoadingOptions loadingOptions;
 
 	HibernateOrmNonEntityIdPropertyEntityLoader(EntityPersister entityPersister,
-			TypeQueryFactory<E> queryFactory,
+			TypeQueryFactory<E, ?> queryFactory,
 			String documentIdSourcePropertyName,
 			ValueReadHandle<?> documentIdSourceHandle,
 			SessionImplementor session,

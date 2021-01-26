@@ -6,30 +6,23 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContext;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeTypeContext;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContext;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 abstract class AbstractHibernateOrmTypeContext<E>
 		implements HibernateOrmScopeTypeContext<E>, HibernateOrmListenerTypeContext,
 				HibernateOrmSessionTypeContext<E> {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private final PojoRawTypeIdentifier<E> typeIdentifier;
 	private final String jpaEntityName;
 	private final EntityPersister entityPersister;
-	private final EntityTypeDescriptor<E> entityTypeDescriptor;
 	private final PojoPathFilter dirtyFilter;
 
 	AbstractHibernateOrmTypeContext(AbstractBuilder<E> builder, SessionFactoryImplementor sessionFactory) {
@@ -37,7 +30,6 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		this.jpaEntityName = builder.jpaEntityName;
 		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
 		this.entityPersister = metamodel.entityPersister( builder.hibernateOrmEntityName );
-		this.entityTypeDescriptor = metamodel.entity( entityPersister.getEntityName() );
 		this.dirtyFilter = builder.dirtyFilter;
 	}
 
@@ -67,14 +59,6 @@ abstract class AbstractHibernateOrmTypeContext<E>
 	@Override
 	public PojoPathFilter dirtyFilter() {
 		return dirtyFilter;
-	}
-
-	public EntityTypeDescriptor<E> entityTypeDescriptor() {
-		if ( entityTypeDescriptor == null ) {
-			// TODO HSEARCH-3771 Mass indexing for ORM's dynamic-map entity types
-			throw log.nonJpaEntityType( typeIdentifier );
-		}
-		return entityTypeDescriptor;
 	}
 
 	abstract static class AbstractBuilder<E> implements PojoTypeExtendedMappingCollector {

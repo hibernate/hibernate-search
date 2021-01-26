@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.loading.impl;
 
 import java.util.Collection;
+import java.util.Set;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.ParameterExpression;
@@ -15,24 +16,52 @@ import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
 import org.hibernate.query.Query;
 
-class CriteriaTypeQueryFactory<E> implements TypeQueryFactory<E> {
+class CriteriaTypeQueryFactory<E, I> implements TypeQueryFactory<E, I> {
 
-	public static <E> CriteriaTypeQueryFactory<E> create(EntityTypeDescriptor<E> typeDescriptor,
+	public static <E> CriteriaTypeQueryFactory<E, ?> create(EntityTypeDescriptor<E> typeDescriptor,
 			String uniquePropertyName) {
 		return new CriteriaTypeQueryFactory<>( typeDescriptor,
 				typeDescriptor.getSingularAttribute( uniquePropertyName ) );
 	}
 
 	private final EntityTypeDescriptor<E> typeDescriptor;
-	private final SingularAttribute<? super E, ?> uniqueProperty;
+	private final SingularAttribute<? super E, I> uniqueProperty;
 
 	private CriteriaTypeQueryFactory(EntityTypeDescriptor<E> typeDescriptor,
-			SingularAttribute<? super E, ?> uniqueProperty) {
+			SingularAttribute<? super E, I> uniqueProperty) {
 		this.typeDescriptor = typeDescriptor;
 		this.uniqueProperty = uniqueProperty;
+	}
+
+	@Override
+	public Query<Long> createQueryForCount(SharedSessionContractImplementor session,
+			Set<? extends Class<? extends E>> includedTypesFilter) {
+		CriteriaBuilder criteriaBuilder = session.getFactory().getCriteriaBuilder();
+		CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery( Long.class );
+		Root<E> root = criteriaQuery.from( typeDescriptor );
+		criteriaQuery.select( criteriaBuilder.count( root ) );
+		if ( !includedTypesFilter.isEmpty() ) {
+			criteriaQuery.where( root.type().in( includedTypesFilter ) );
+		}
+		return session.createQuery( criteriaQuery );
+	}
+
+	@Override
+	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
+			Set<? extends Class<? extends E>> includedTypesFilter) {
+		CriteriaBuilder criteriaBuilder = session.getFactory().getCriteriaBuilder();
+		CriteriaQuery<I> criteriaQuery = criteriaBuilder.createQuery( uniqueProperty.getJavaType() );
+		Root<E> root = criteriaQuery.from( typeDescriptor );
+		Path<I> idPath = root.get( uniqueProperty );
+		criteriaQuery.select( idPath );
+		if ( !includedTypesFilter.isEmpty() ) {
+			criteriaQuery.where( root.type().in( includedTypesFilter ) );
+		}
+		return session.createQuery( criteriaQuery );
 	}
 
 	@Override

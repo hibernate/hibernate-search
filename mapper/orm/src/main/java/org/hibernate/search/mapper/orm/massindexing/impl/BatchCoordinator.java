@@ -34,7 +34,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final DetachedBackendSessionContext sessionContext;
 	// Disjoint groups of entity types.
-	private final List<MassIndexingIndexedTypeGroup<?>> typeGroupsToIndex;
+	private final List<MassIndexingIndexedTypeGroup<?, ?>> typeGroupsToIndex;
 	private final PojoScopeSchemaManager scopeSchemaManager;
 	private final PojoScopeWorkspace scopeWorkspace;
 
@@ -54,7 +54,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	BatchCoordinator(HibernateOrmMassIndexingMappingContext mappingContext,
 			DetachedBackendSessionContext sessionContext,
 			MassIndexingNotifier notifier,
-			List<MassIndexingIndexedTypeGroup<?>> typeGroupsToIndex,
+			List<MassIndexingIndexedTypeGroup<?, ?>> typeGroupsToIndex,
 			PojoScopeSchemaManager scopeSchemaManager, PojoScopeWorkspace scopeWorkspace,
 			int typesToIndexInParallel, int documentBuilderThreads, CacheMode cacheMode,
 			int objectLoadingBatchSize, long objectsLimit, boolean mergeSegmentsOnFinish,
@@ -137,7 +137,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 		ExecutorService executor = mappingContext.threadPoolProvider()
 				.newFixedThreadPool( typesToIndexInParallel, MassIndexerImpl.THREAD_NAME_PREFIX + "Workspace" );
 
-		for ( MassIndexingIndexedTypeGroup<?> typeGroup : typeGroupsToIndex ) {
+		for ( MassIndexingIndexedTypeGroup<?, ?> typeGroup : typeGroupsToIndex ) {
 			indexingFutures.add( Futures.runAsync( createBatchIndexingWorkspace( typeGroup ), executor ) );
 		}
 		executor.shutdown();
@@ -148,10 +148,11 @@ public class BatchCoordinator extends FailureHandledRunnable {
 		);
 	}
 
-	private <E> BatchIndexingWorkspace<E, ?> createBatchIndexingWorkspace(MassIndexingIndexedTypeGroup<E> typeGroup) {
+	private <E, I> BatchIndexingWorkspace<E, I> createBatchIndexingWorkspace(
+			MassIndexingIndexedTypeGroup<E, I> typeGroup) {
 		return new BatchIndexingWorkspace<>(
 				mappingContext, sessionContext, getNotifier(),
-				typeGroup.commonSuperType(), typeGroup.idAttribute(), typeGroup.includedIndexedTypesOrEmpty(),
+				typeGroup,
 				documentBuilderThreads, cacheMode,
 				objectLoadingBatchSize,
 				objectsLimit, idFetchSize, transactionTimeout

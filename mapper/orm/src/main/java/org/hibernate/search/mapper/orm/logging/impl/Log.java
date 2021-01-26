@@ -25,7 +25,6 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
@@ -253,11 +252,11 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassFormatter.class) Class<?> actualJavaType);
 
 	@Message(id = ID_OFFSET + 30,
-			value = "Type '%1$s' doesn't have any representation in the JPA metamodel."
+			value = "Entity '%1$s' doesn't have any representation in the JPA metamodel."
 					+ " As a result, Hibernate Search cannot use the Criteria API to automatically build queries targeting this type."
 					+ " This means in particular that this type cannot be mass-indexed."
 	)
-	SearchException nonJpaEntityType(PojoRawTypeIdentifier<?> typeIdentifier);
+	SearchException nonJpaEntityType(String entityName);
 
 	@LogMessage(level = Logger.Level.ERROR)
 	@Message(id = ID_OFFSET + 31,
