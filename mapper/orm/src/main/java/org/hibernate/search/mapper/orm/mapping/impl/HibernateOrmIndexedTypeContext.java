@@ -10,10 +10,10 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
+import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmEntityIdEntityLoadingStrategy;
+import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmNonEntityIdPropertyEntityLoadingStrategy;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
-import org.hibernate.search.mapper.orm.search.loading.impl.EntityLoaderFactory;
-import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmEntityIdEntityLoader;
-import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmNonEntityIdPropertyEntityLoader;
+import org.hibernate.search.mapper.orm.loading.impl.EntityLoadingStrategy;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
@@ -26,7 +26,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 				HibernateOrmScopeIndexedTypeContext<E> {
 
 	private final boolean documentIdIsEntityId;
-	private final EntityLoaderFactory loaderFactory;
+	private final EntityLoadingStrategy loadingStrategy;
 	private final IdentifierMapping identifierMapping;
 
 	private final MappedIndexManager indexManager;
@@ -36,17 +36,14 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 
 		if ( builder.documentIdSourcePropertyName.equals( entityPersister().getIdentifierPropertyName() ) ) {
 			documentIdIsEntityId = true;
-			loaderFactory = HibernateOrmEntityIdEntityLoader.factory(
-					sessionFactory, entityPersister()
-			);
+			loadingStrategy = HibernateOrmEntityIdEntityLoadingStrategy.create( sessionFactory, entityPersister() );
 		}
 		else {
 			// The entity ID is not the property used to generate the document ID
 			// We need to use a criteria query to load entities from the document IDs
 			documentIdIsEntityId = false;
-			loaderFactory = HibernateOrmNonEntityIdPropertyEntityLoader.factory(
-					entityPersister(), builder.documentIdSourcePropertyName, builder.documentIdSourcePropertyHandle
-			);
+			loadingStrategy = HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.create( entityPersister(),
+					builder.documentIdSourcePropertyName, builder.documentIdSourcePropertyHandle );
 		}
 
 		this.identifierMapping = builder.identifierMapping;
@@ -86,8 +83,8 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 	}
 
 	@Override
-	public EntityLoaderFactory loaderFactory() {
-		return loaderFactory;
+	public EntityLoadingStrategy loadingStrategy() {
+		return loadingStrategy;
 	}
 
 	static class Builder<E> extends AbstractBuilder<E> implements PojoIndexedTypeExtendedMappingCollector {

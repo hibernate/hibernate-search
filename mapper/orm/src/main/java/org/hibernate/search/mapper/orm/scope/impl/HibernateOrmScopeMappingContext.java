@@ -10,10 +10,10 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingMappingContext;
-import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmLoadingMappingContext;
+import org.hibernate.search.mapper.orm.search.loading.impl.SearchLoadingMappingContext;
 
 public interface HibernateOrmScopeMappingContext
-		extends HibernateOrmMassIndexingMappingContext, HibernateOrmLoadingMappingContext {
+		extends HibernateOrmMassIndexingMappingContext, SearchLoadingMappingContext {
 
 	@Override
 	HibernateOrmScopeSessionContext sessionContext(EntityManager entityManager);

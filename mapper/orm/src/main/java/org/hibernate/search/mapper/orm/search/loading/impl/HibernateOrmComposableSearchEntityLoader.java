@@ -22,7 +22,7 @@ import org.hibernate.search.engine.common.timing.spi.Deadline;
  *
  * @param <E> The type of loaded entities.
  */
-public interface HibernateOrmComposableEntityLoader<E> extends EntityLoader<EntityReference, E> {
+public interface HibernateOrmComposableSearchEntityLoader<E> extends EntityLoader<EntityReference, E> {
 
 	@Override
 	default List<E> loadBlocking(List<EntityReference> references, Deadline deadline) {

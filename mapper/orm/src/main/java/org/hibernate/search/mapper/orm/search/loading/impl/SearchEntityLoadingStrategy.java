@@ -11,11 +11,11 @@ import java.util.List;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 
-public interface EntityLoaderFactory {
+public interface SearchEntityLoadingStrategy {
 
 	/**
-	 * @param obj Another factory
-	 * @return {@code true} if the other factory returns the same type of loaders,
+	 * @param obj Another strategy
+	 * @return {@code true} if the other strategy returns the same type of loaders,
 	 * able to target the exact same entity types.
 	 * {@code false} otherwise or when unsure.
 	 */
@@ -26,13 +26,13 @@ public interface EntityLoaderFactory {
 	 */
 	int hashCode();
 
-	<E> HibernateOrmComposableEntityLoader<E> create(HibernateOrmLoadingIndexedTypeContext targetEntityTypeContext,
+	<E> HibernateOrmComposableSearchEntityLoader<E> createLoader(
+			SearchLoadingIndexedTypeContext targetEntityTypeContext,
 			SessionImplementor session, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions);
 
-	<E> HibernateOrmComposableEntityLoader<? extends E> create(
-			List<HibernateOrmLoadingIndexedTypeContext> targetEntityTypeContexts,
+	<E> HibernateOrmComposableSearchEntityLoader<? extends E> createLoader(
+			List<SearchLoadingIndexedTypeContext> targetEntityTypeContexts,
 			SessionImplementor session, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions);
-
 }

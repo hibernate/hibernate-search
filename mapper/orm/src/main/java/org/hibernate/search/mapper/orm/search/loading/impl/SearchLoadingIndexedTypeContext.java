@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.orm.search.loading.impl;
 
 import org.hibernate.persister.entity.EntityPersister;
 
-public interface HibernateOrmLoadingIndexedTypeContext {
+public interface SearchLoadingIndexedTypeContext {
 
 	/**
 	 * @return The name of the entity in the JPA metamodel.
@@ -25,6 +25,6 @@ public interface HibernateOrmLoadingIndexedTypeContext {
 	 */
 	EntityPersister entityPersister();
 
-	EntityLoaderFactory loaderFactory();
+	SearchEntityLoadingStrategy loadingStrategy();
 
 }
