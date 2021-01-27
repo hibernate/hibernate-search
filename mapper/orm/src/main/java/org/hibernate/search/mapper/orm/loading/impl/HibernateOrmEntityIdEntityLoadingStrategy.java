@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -81,6 +83,9 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> implements EntityLo
 			SessionImplementor session, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions) {
 		EntityPersister commonSuperType = toMostSpecificCommonEntitySuperType( session, targetEntityTypeContexts );
+		if ( commonSuperType == null ) {
+			throw invalidTypesException( targetEntityTypeContexts );
+		}
 
 		/*
 		 * Theoretically, this cast is unsafe,
@@ -123,12 +128,7 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> implements EntityLo
 			SessionImplementor session,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
 		if ( !rootEntityPersister.getMappedClass().isAssignableFrom( entityPersister.getMappedClass() ) ) {
-			throw new AssertionFailure(
-					"Some types among the targeted entity types are not subclasses of the expected root entity type."
-							+ " There is a bug in Hibernate Search, please report it."
-							+ " Expected root entity name: " + rootEntityPersister.getEntityName()
-							+ " Targeted entity name: " + entityPersister.getEntityName()
-			);
+			throw invalidTypeException( entityPersister );
 		}
 
 		PersistenceContextLookupStrategy persistenceContextLookup =
@@ -180,6 +180,27 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> implements EntityLo
 			}
 		}
 		return result;
+	}
+
+	private AssertionFailure invalidTypeException(EntityPersister otherEntityPersister) {
+		throw new AssertionFailure(
+				"The targeted entity type is not a subclass of the expected root entity type."
+						+ " Expected root entity name: " + rootEntityPersister.getEntityName()
+						+ " Targeted entity name: " + otherEntityPersister.getEntityName()
+		);
+	}
+
+	private AssertionFailure invalidTypesException(
+			Collection<? extends SearchLoadingIndexedTypeContext> targetEntityTypeContexts) {
+		return new AssertionFailure(
+				"Some types among the targeted entity types are not subclasses of the expected root entity type."
+						+ " Expected entity name: " + rootEntityPersister.getEntityName()
+						+ " Targeted entity names: "
+						+ targetEntityTypeContexts.stream()
+						.map( SearchLoadingIndexedTypeContext::entityPersister )
+						.map( EntityPersister::getEntityName )
+						.collect( Collectors.toList() )
+		);
 	}
 
 }
