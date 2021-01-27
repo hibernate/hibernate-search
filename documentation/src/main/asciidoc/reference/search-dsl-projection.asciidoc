@@ -186,7 +186,7 @@ See <<search-dsl-projected-value-type>> for more information.
 [[search-dsl-projection-score]]
 == `score`: return the score of matched documents
 
-The `field` projection returns the <<search-dsl-predicate-common-score,score>> of the matched document.
+The `score` projection returns the <<search-dsl-predicate-common-score,score>> of the matched document.
 
 .Returning the score of matched documents
 ====
