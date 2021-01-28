@@ -49,8 +49,8 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( PojoIndexedTypeManager::close, indexedTypeManagers.getAll() );
-			closer.pushAll( PojoContainedTypeManager::close, containedTypeManagers.getAll() );
+			closer.pushAll( PojoIndexedTypeManager::close, indexedTypeManagers.all() );
+			closer.pushAll( PojoContainedTypeManager::close, containedTypeManagers.all() );
 		}
 	}
 
@@ -80,11 +80,11 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	@Override
 	public <R, C> Optional<PojoScopeDelegate<R, Object, C>> createPojoAllScope(PojoScopeMappingContext mappingContext,
 			PojoScopeTypeExtendedContextProvider<Object, C> indexedTypeExtendedContextProvider) {
-		if ( indexedTypeManagers.getAll().isEmpty() ) {
+		if ( indexedTypeManagers.all().isEmpty() ) {
 			return Optional.empty();
 		}
 		Set<PojoRawTypeIdentifier<?>> typeIdentifiers = new LinkedHashSet<>();
-		for ( PojoIndexedTypeManager<?, ?> typeManager : indexedTypeManagers.getAll() ) {
+		for ( PojoIndexedTypeManager<?, ?> typeManager : indexedTypeManagers.all() ) {
 			typeIdentifiers.add( typeManager.typeIdentifier() );
 		}
 		return Optional.of( PojoScopeDelegateImpl.create(

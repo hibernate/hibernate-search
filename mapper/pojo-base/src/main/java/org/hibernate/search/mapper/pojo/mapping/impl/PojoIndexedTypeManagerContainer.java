@@ -42,19 +42,19 @@ public class PojoIndexedTypeManagerContainer
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <E> Optional<? extends PojoWorkIndexedTypeContext<?, E>> getByExactType(
+	public <E> Optional<? extends PojoWorkIndexedTypeContext<?, E>> forExactType(
 			PojoRawTypeIdentifier<E> typeIdentifier) {
 		return Optional.ofNullable( (PojoIndexedTypeManager<?, E>) byExactType.get( typeIdentifier ) );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <E> Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>>> getAllBySuperType(
+	public <E> Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>>> allForSuperType(
 			PojoRawTypeIdentifier<E> typeIdentifier) {
 		return Optional.ofNullable( (Set<PojoIndexedTypeManager<?, ? extends E>>) bySuperType.get( typeIdentifier ) );
 	}
 
-	Set<PojoIndexedTypeManager<?, ?>> getAll() {
+	Set<PojoIndexedTypeManager<?, ?>> all() {
 		return all;
 	}
 

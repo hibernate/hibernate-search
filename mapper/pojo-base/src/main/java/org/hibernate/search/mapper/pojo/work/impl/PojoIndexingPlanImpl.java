@@ -206,7 +206,7 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoReindexingCol
 
 	private AbstractPojoTypeIndexingPlan<?, ?, ?> createDelegate(PojoRawTypeIdentifier<?> typeIdentifier) {
 		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> indexedTypeContextOptional =
-				indexedTypeContextProvider.getByExactType( typeIdentifier );
+				indexedTypeContextProvider.forExactType( typeIdentifier );
 		if ( indexedTypeContextOptional.isPresent() ) {
 			PojoIndexedTypeIndexingPlan<?, ?> delegate = createDelegate( indexedTypeContextOptional.get() );
 			indexedTypeDelegates.put( typeIdentifier, delegate );
@@ -214,7 +214,7 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoReindexingCol
 		}
 		else {
 			Optional<? extends PojoWorkContainedTypeContext<?>> containedTypeContextOptional =
-					containedTypeContextProvider.getByExactType( typeIdentifier );
+					containedTypeContextProvider.forExactType( typeIdentifier );
 			if ( containedTypeContextOptional.isPresent() ) {
 				PojoContainedTypeIndexingPlan<?> delegate = createDelegate( containedTypeContextOptional.get() );
 				containedTypeDelegates.put( typeIdentifier, delegate );
@@ -231,7 +231,7 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoReindexingCol
 		}
 
 		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> indexedTypeContextOptional =
-				indexedTypeContextProvider.getByExactType( typeIdentifier );
+				indexedTypeContextProvider.forExactType( typeIdentifier );
 		if ( indexedTypeContextOptional.isPresent() ) {
 			delegate = createDelegate( indexedTypeContextOptional.get() );
 			indexedTypeDelegates.put( typeIdentifier, delegate );

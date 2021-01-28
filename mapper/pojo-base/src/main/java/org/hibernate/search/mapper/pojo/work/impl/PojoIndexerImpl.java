@@ -80,7 +80,7 @@ public class PojoIndexerImpl implements PojoIndexer {
 
 	private PojoTypeIndexer<?, ?> createTypeIndexer(PojoRawTypeIdentifier<?> typeIdentifier) {
 		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> typeContextOptional =
-				indexedTypeContextProvider.getByExactType( typeIdentifier );
+				indexedTypeContextProvider.forExactType( typeIdentifier );
 		if ( !typeContextOptional.isPresent() ) {
 			throw log.nonIndexedTypeInIndexer( typeIdentifier );
 		}
