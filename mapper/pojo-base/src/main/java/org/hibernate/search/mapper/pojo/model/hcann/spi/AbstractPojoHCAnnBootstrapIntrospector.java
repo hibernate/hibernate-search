@@ -41,13 +41,11 @@ public abstract class AbstractPojoHCAnnBootstrapIntrospector implements PojoBoot
 	}
 
 	public Map<String, XProperty> declaredFieldAccessXPropertiesByName(XClass xClass) {
-		// TODO HSEARCH-3056 remove lambdas if possible
 		return xClass.getDeclaredProperties( XClass.ACCESS_FIELD ).stream()
 				.collect( xPropertiesByNameNoDuplicate() );
 	}
 
 	public Map<String, XProperty> declaredMethodAccessXPropertiesByName(XClass xClass) {
-		// TODO HSEARCH-3056 remove lambdas if possible
 		return xClass.getDeclaredProperties( XClass.ACCESS_PROPERTY ).stream()
 				.collect( xPropertiesByNameNoDuplicate() );
 	}
