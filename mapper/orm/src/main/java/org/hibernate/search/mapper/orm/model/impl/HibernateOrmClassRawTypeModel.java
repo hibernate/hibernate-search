@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -61,9 +62,9 @@ public class HibernateOrmClassRawTypeModel<T>
 	@Override
 	protected HibernateOrmClassPropertyModel<?> createPropertyModel(String propertyName) {
 		List<XProperty> declaredXProperties = new ArrayList<>( 2 );
-		XProperty methodAccessXProperty = declaredMethodAccessXPropertiesByName().get( propertyName );
-		if ( methodAccessXProperty != null ) {
-			declaredXProperties.add( methodAccessXProperty );
+		List<XProperty> methodAccessXProperties = declaredMethodAccessXPropertiesByName().get( propertyName );
+		if ( methodAccessXProperties != null ) {
+			declaredXProperties.addAll( methodAccessXProperties );
 		}
 		XProperty fieldAccessXProperty = declaredFieldAccessXPropertiesByName().get( propertyName );
 		if ( fieldAccessXProperty != null ) {
@@ -71,16 +72,14 @@ public class HibernateOrmClassRawTypeModel<T>
 		}
 
 		HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata = findOrmPropertyMetadata( propertyName );
-		Member member = findPropertyMember( propertyName, ormPropertyMetadata );
+		List<Member> members = findPropertyMember( propertyName, ormPropertyMetadata );
 
-		if ( member == null ) {
+		if ( members == null ) {
 			return null;
 		}
 
-		return new HibernateOrmClassPropertyModel<>(
-				introspector, this, propertyName,
-				declaredXProperties, ormPropertyMetadata, member
-		);
+		return new HibernateOrmClassPropertyModel<>( introspector, this, propertyName,
+				declaredXProperties, ormPropertyMetadata, members );
 	}
 
 	private HibernateOrmBasicClassPropertyMetadata findOrmPropertyMetadata(String propertyName) {
@@ -96,7 +95,7 @@ public class HibernateOrmClassRawTypeModel<T>
 		}
 	}
 
-	private Member findPropertyMember(String propertyName, HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata) {
+	private List<Member> findPropertyMember(String propertyName, HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata) {
 		if ( ormPropertyMetadata != null ) {
 			/*
 			 * Hibernate ORM has metadata for this property,
@@ -112,10 +111,11 @@ public class HibernateOrmClassRawTypeModel<T>
 			 */
 			Member memberFromHibernateOrmMetamodel = ormPropertyMetadata.getMember();
 			if ( memberFromHibernateOrmMetamodel instanceof Method ) {
-				return findInSelfOrParents( t -> t.declaredPropertyGetter( propertyName ) );
+				return findInSelfOrParents( t -> t.declaredPropertyGetters( propertyName ) );
 			}
 			else if ( memberFromHibernateOrmMetamodel instanceof Field ) {
-				return findInSelfOrParents( t -> t.declaredPropertyField( propertyName ) );
+				Member field = findInSelfOrParents( t -> t.declaredPropertyField( propertyName ) );
+				return field == null ? null : Collections.singletonList( field );
 			}
 			else {
 				return null;
@@ -124,12 +124,13 @@ public class HibernateOrmClassRawTypeModel<T>
 		else {
 			// Hibernate ORM doesn't have any metadata for this property (the property is transient).
 			// Try using the getter first (if declared)...
-			Member getter = findInSelfOrParents( t -> t.declaredPropertyGetter( propertyName ) );
-			if ( getter != null ) {
-				return getter;
+			List<Member> getters = findInSelfOrParents( t -> t.declaredPropertyGetters( propertyName ) );
+			if ( getters != null ) {
+				return getters;
 			}
 			// ... and fall back to the field (or null if not found)
-			return findInSelfOrParents( t -> t.declaredPropertyField( propertyName ) );
+			Member field = findInSelfOrParents( t -> t.declaredPropertyField( propertyName ) );
+			return field == null ? null : Collections.singletonList( field );
 		}
 	}
 
