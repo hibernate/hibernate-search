@@ -8,7 +8,9 @@ package org.hibernate.search.mapper.pojo.model.hcann.spi;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hibernate.annotations.common.reflection.XClass;
@@ -25,7 +27,7 @@ public abstract class AbstractPojoHCAnnRawTypeModel<T, I extends AbstractPojoHCA
 	final RawTypeDeclaringContext<T> rawTypeDeclaringContext;
 
 	private Map<String, XProperty> declaredFieldAccessXPropertiesByName;
-	private Map<String, XProperty> declaredMethodAccessXPropertiesByName;
+	private Map<String, List<XProperty>> declaredMethodAccessXPropertiesByName;
 
 	public AbstractPojoHCAnnRawTypeModel(I introspector, PojoRawTypeIdentifier<T> typeIdentifier,
 			RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
@@ -67,7 +69,7 @@ public abstract class AbstractPojoHCAnnRawTypeModel<T, I extends AbstractPojoHCA
 		return declaredFieldAccessXPropertiesByName;
 	}
 
-	protected final Map<String, XProperty> declaredMethodAccessXPropertiesByName() {
+	protected final Map<String, List<XProperty>> declaredMethodAccessXPropertiesByName() {
 		if ( declaredMethodAccessXPropertiesByName == null ) {
 			declaredMethodAccessXPropertiesByName =
 					introspector.declaredMethodAccessXPropertiesByName( xClass );
@@ -75,11 +77,11 @@ public abstract class AbstractPojoHCAnnRawTypeModel<T, I extends AbstractPojoHCA
 		return declaredMethodAccessXPropertiesByName;
 	}
 
-	protected final Member declaredPropertyGetter(String propertyName) {
-		XProperty methodAccessXProperty = declaredMethodAccessXPropertiesByName().get( propertyName );
-		if ( methodAccessXProperty != null ) {
-			// Method access is available. Get values from the getter.
-			return PojoCommonsAnnotationsHelper.extractUnderlyingMember( methodAccessXProperty );
+	protected final List<Member> declaredPropertyGetters(String propertyName) {
+		List<XProperty> methodAccessXProperties = declaredMethodAccessXPropertiesByName().get( propertyName );
+		if ( methodAccessXProperties != null ) {
+			return methodAccessXProperties.stream().map( PojoCommonsAnnotationsHelper::extractUnderlyingMember )
+					.collect( Collectors.toList() );
 		}
 		return null;
 	}
@@ -87,7 +89,6 @@ public abstract class AbstractPojoHCAnnRawTypeModel<T, I extends AbstractPojoHCA
 	protected final Member declaredPropertyField(String propertyName) {
 		XProperty fieldAccessXProperty = declaredFieldAccessXPropertiesByName().get( propertyName );
 		if ( fieldAccessXProperty != null ) {
-			// Method access is available. Get values from the getter.
 			return PojoCommonsAnnotationsHelper.extractUnderlyingMember( fieldAccessXProperty );
 		}
 		return null;

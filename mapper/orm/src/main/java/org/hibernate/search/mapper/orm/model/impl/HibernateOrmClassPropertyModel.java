@@ -22,14 +22,14 @@ class HibernateOrmClassPropertyModel<T>
 			HibernateOrmClassRawTypeModel<?> holderTypeModel,
 			String name, List<XProperty> declaredXProperties,
 			HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata,
-			Member member) {
-		super( introspector, holderTypeModel, name, declaredXProperties, member );
+			List<Member> members) {
+		super( introspector, holderTypeModel, name, declaredXProperties, members );
 		this.ormPropertyMetadata = ormPropertyMetadata;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked") // By construction, we know the member returns values of type T
-	protected ValueReadHandle<T> createHandle() throws IllegalAccessException {
+	protected ValueReadHandle<T> createHandle(Member member) throws IllegalAccessException {
 		return (ValueReadHandle<T>) introspector.createValueReadHandle( holderTypeModel.typeIdentifier().javaClass(),
 				member, ormPropertyMetadata );
 	}
