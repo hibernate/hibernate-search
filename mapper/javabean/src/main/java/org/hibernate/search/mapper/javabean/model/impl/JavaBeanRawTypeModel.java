@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.javabean.model.impl;
 
 import java.lang.reflect.Member;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -42,34 +43,33 @@ class JavaBeanRawTypeModel<T> extends AbstractPojoHCAnnRawTypeModel<T, JavaBeanB
 	@Override
 	protected JavaBeanPropertyModel<?> createPropertyModel(String propertyName) {
 		List<XProperty> declaredXProperties = new ArrayList<>( 2 );
-		XProperty methodAccessXProperty = declaredMethodAccessXPropertiesByName().get( propertyName );
-		if ( methodAccessXProperty != null ) {
-			declaredXProperties.add( methodAccessXProperty );
+		List<XProperty> methodAccessXProperties = declaredMethodAccessXPropertiesByName().get( propertyName );
+		if ( methodAccessXProperties != null ) {
+			declaredXProperties.addAll( methodAccessXProperties );
 		}
 		XProperty fieldAccessXProperty = declaredFieldAccessXPropertiesByName().get( propertyName );
 		if ( fieldAccessXProperty != null ) {
 			declaredXProperties.add( fieldAccessXProperty );
 		}
 
-		Member member = findPropertyMember( propertyName );
-		if ( member == null ) {
+		List<Member> members = findPropertyMember( propertyName );
+		if ( members == null ) {
 			return null;
 		}
 
-		return new JavaBeanPropertyModel<>(
-				introspector, this, propertyName,
-				declaredXProperties, member
-		);
+		return new JavaBeanPropertyModel<>( introspector, this, propertyName,
+				declaredXProperties, members );
 	}
 
-	private Member findPropertyMember(String propertyName) {
+	private List<Member> findPropertyMember(String propertyName) {
 		// Try using the getter first (if declared)...
-		Member getter = findInSelfOrParents( t -> t.declaredPropertyGetter( propertyName ) );
-		if ( getter != null ) {
-			return getter;
+		List<Member> getters = findInSelfOrParents( t -> t.declaredPropertyGetters( propertyName ) );
+		if ( getters != null ) {
+			return getters;
 		}
 		// ... and fall back to the field (or null if not found)
-		return findInSelfOrParents( t -> t.declaredPropertyField( propertyName ) );
+		Member field = findInSelfOrParents( t -> t.declaredPropertyField( propertyName ) );
+		return field == null ? null : Collections.singletonList( field );
 	}
 
 	private <T2> T2 findInSelfOrParents(Function<JavaBeanRawTypeModel<?>, T2> getter) {
