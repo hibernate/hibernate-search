@@ -7,10 +7,12 @@
 package org.hibernate.search.mapper.pojo.logging.impl;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
@@ -535,4 +537,15 @@ public interface Log extends BasicLogger {
 			value = "Exception while resolving other entities to reindex as a result of changes on entity '%1$s': %2$s")
 	SearchException errorResolvingEntitiesToReindex(Object entityReference,
 			String message, @Cause Exception e);
+
+	@LogMessage(level = Logger.Level.WARN)
+	@Message(id = ID_OFFSET + 85,
+			value = "Multiple getters exist for property named '%2$s' on type '%1$s'."
+					+ " Hibernate Search will use '%3$s' and ignore %4$s."
+					+ " The selected getter may change from one startup to the next."
+					+ " To get rid of this warning, either remove the extra getters"
+					+ " or configure the access type for this property to 'FIELD'.")
+	void arbitraryMemberSelection(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
+			String propertyName, Member selectedMember, List<Member> otherMembers);
+
 }

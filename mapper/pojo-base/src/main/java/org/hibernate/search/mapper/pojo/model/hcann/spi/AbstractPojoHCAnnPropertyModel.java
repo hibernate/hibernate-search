@@ -20,6 +20,7 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
@@ -38,19 +39,20 @@ public abstract class AbstractPojoHCAnnPropertyModel<T, I extends AbstractPojoHC
 	 * and not overridden in the holder type.
  	 */
 	protected final List<XProperty> declaredXProperties;
+	private final List<Member> members;
 
-	protected final Member member;
-
-	private ValueReadHandle<T> handle;
-	private PojoGenericTypeModel<T> typeModel;
+	private ValueReadHandle<T> handleCache;
+	private PojoGenericTypeModel<T> typeModelCache;
+	private Member memberCache;
 
 	public AbstractPojoHCAnnPropertyModel(I introspector, AbstractPojoHCAnnRawTypeModel<?, I> holderTypeModel,
-			String name, List<XProperty> declaredXProperties, Member member) {
+			String name, List<XProperty> declaredXProperties, List<Member> members) {
 		this.introspector = introspector;
 		this.holderTypeModel = holderTypeModel;
 		this.name = name;
 		this.declaredXProperties = declaredXProperties;
-		this.member = member;
+		this.members = members;
+		Contracts.assertNotNullNorEmpty( members, "members" );
 	}
 
 	@Override
@@ -70,34 +72,45 @@ public abstract class AbstractPojoHCAnnPropertyModel<T, I extends AbstractPojoHC
 	 */
 	@SuppressWarnings( "unchecked" )
 	public final PojoGenericTypeModel<T> typeModel() {
-		if ( typeModel == null ) {
+		if ( typeModelCache == null ) {
 			try {
-				typeModel = (PojoGenericTypeModel<T>) holderTypeModel.rawTypeDeclaringContext
+				typeModelCache = (PojoGenericTypeModel<T>) holderTypeModel.rawTypeDeclaringContext
 						.createGenericTypeModel( getterGenericReturnType() );
 			}
 			catch (RuntimeException e) {
 				throw log.errorRetrievingPropertyTypeModel( name(), holderTypeModel, e );
 			}
 		}
-		return typeModel;
+		return typeModelCache;
 	}
 
 	@Override
 	public final ValueReadHandle<T> handle() {
-		if ( handle == null ) {
+		if ( handleCache == null ) {
 			try {
-				handle = createHandle();
+				handleCache = createHandle( member() );
 			}
 			catch (ReflectiveOperationException | RuntimeException e) {
 				throw log.errorRetrievingPropertyTypeModel( name(), holderTypeModel, e );
 			}
 		}
-		return handle;
+		return handleCache;
 	}
 
-	protected abstract ValueReadHandle<T> createHandle() throws ReflectiveOperationException;
+	protected final Member member() {
+		if ( memberCache == null ) {
+			memberCache = members.get( 0 );
+			if ( members.size() > 1 ) {
+				log.arbitraryMemberSelection( holderTypeModel, name, memberCache, members.subList( 1, members.size() ) );
+			}
+		}
+		return memberCache;
+	}
+
+	protected abstract ValueReadHandle<T> createHandle(Member member) throws ReflectiveOperationException;
 
 	final Type getterGenericReturnType() {
+		Member member = member();
 		// Try to preserve generics information if possible
 		if ( member instanceof Method ) {
 			return ( (Method) member ).getGenericReturnType();

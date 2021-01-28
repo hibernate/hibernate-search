@@ -8,10 +8,12 @@ package org.hibernate.search.mapper.pojo.model.hcann.spi;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -45,9 +47,9 @@ public abstract class AbstractPojoHCAnnBootstrapIntrospector implements PojoBoot
 				.collect( xPropertiesByNameNoDuplicate() );
 	}
 
-	public Map<String, XProperty> declaredMethodAccessXPropertiesByName(XClass xClass) {
+	public Map<String, List<XProperty>> declaredMethodAccessXPropertiesByName(XClass xClass) {
 		return xClass.getDeclaredProperties( XClass.ACCESS_PROPERTY ).stream()
-				.collect( xPropertiesByNameNoDuplicate() );
+				.collect( xPropertiesByName() );
 	}
 
 	public Stream<Class<?>> ascendingSuperClasses(XClass xClass) {
@@ -62,10 +64,16 @@ public abstract class AbstractPojoHCAnnBootstrapIntrospector implements PojoBoot
 		return reflectionManager.toClass( xClass );
 	}
 
-	private Collector<XProperty, ?, Map<String, XProperty>> xPropertiesByNameNoDuplicate() {
+	private static Collector<XProperty, ?, Map<String, XProperty>> xPropertiesByNameNoDuplicate() {
 		return StreamHelper.toMap(
 				XProperty::getName, Function.identity(),
 				TreeMap::new // Sort properties by name for deterministic iteration
 		);
+	}
+
+	private static Collector<XProperty, ?, Map<String, List<XProperty>>> xPropertiesByName() {
+		return Collectors.groupingBy( XProperty::getName,
+				TreeMap::new, // Sort properties by name for deterministic iteration
+				Collectors.toList() );
 	}
 }
