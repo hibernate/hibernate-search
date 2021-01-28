@@ -49,15 +49,19 @@ class InitialPropertyMappingStep
 
 	@Override
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
-		PojoAdditionalMetadataCollectorPropertyNode collectorPropertyNode =
-				collector.property( propertyModel.name() );
-		children.contributeAdditionalMetadata( collectorPropertyNode );
+		if ( children.hasContent() ) {
+			PojoAdditionalMetadataCollectorPropertyNode collectorPropertyNode =
+					collector.property( propertyModel.name() );
+			children.contributeAdditionalMetadata( collectorPropertyNode );
+		}
 	}
 
 	@Override
 	public void contributeMapping(PojoMappingCollectorTypeNode collector) {
-		PojoMappingCollectorPropertyNode collectorPropertyNode = collector.property( propertyModel.name() );
-		children.contributeMapping( collectorPropertyNode );
+		if ( children.hasContent() ) {
+			PojoMappingCollectorPropertyNode collectorPropertyNode = collector.property( propertyModel.name() );
+			children.contributeMapping( collectorPropertyNode );
+		}
 	}
 
 	@Override
