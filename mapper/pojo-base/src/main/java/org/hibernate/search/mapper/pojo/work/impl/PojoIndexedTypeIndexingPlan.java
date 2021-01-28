@@ -7,7 +7,10 @@
 package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -15,7 +18,8 @@ import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
-import org.hibernate.search.mapper.pojo.route.impl.DocumentRouteImpl;
+import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 /**
@@ -92,24 +96,12 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 	class IndexedEntityState
 			extends AbstractPojoTypeIndexingPlan<I, E, IndexedEntityState>.AbstractEntityState {
 
-		private String providedRoutingKey;
+		private DocumentRoutesDescriptor providedRoutes;
 
 		private boolean updatedBecauseOfContained;
 
 		private IndexedEntityState(I identifier) {
 			super( identifier );
-		}
-
-		@Override
-		void add(Supplier<E> entitySupplier, String providedRoutingKey) {
-			super.add( entitySupplier, providedRoutingKey );
-			this.providedRoutingKey = providedRoutingKey;
-		}
-
-		@Override
-		void doAddOrUpdate(Supplier<E> entitySupplier, String providedRoutingKey) {
-			super.doAddOrUpdate( entitySupplier, providedRoutingKey );
-			this.providedRoutingKey = providedRoutingKey;
 		}
 
 		void updateBecauseOfContained(Supplier<E> entitySupplier) {
@@ -119,7 +111,7 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 				// Just ignore the call.
 				return;
 			}
-			doAddOrUpdate( entitySupplier, null );
+			doAddOrUpdate( entitySupplier );
 			updatedBecauseOfContained = true;
 			// We don't want contained entities that haven't been modified to trigger an update of their
 			// containing entities.
@@ -127,12 +119,26 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 		}
 
 		@Override
-		void delete(Supplier<E> entitySupplier, String providedRoutingKey) {
-			super.delete( entitySupplier, providedRoutingKey );
-			this.providedRoutingKey = providedRoutingKey;
+		void delete(Supplier<E> entitySupplier) {
+			super.delete( entitySupplier );
 
 			// Reindexing does not make sense for a deleted entity
 			updatedBecauseOfContained = false;
+		}
+
+		@Override
+		void providedRoutes(DocumentRoutesDescriptor routes) {
+			if ( routes == null ) {
+				return;
+			}
+			if ( this.providedRoutes == null ) {
+				this.providedRoutes = routes;
+			}
+			else {
+				Set<DocumentRouteDescriptor> mergedPrevious = new LinkedHashSet<>( this.providedRoutes.previousRoutes() );
+				mergedPrevious.addAll( routes.previousRoutes() );
+				this.providedRoutes = DocumentRoutesDescriptor.of( routes.currentRoute(), mergedPrevious );
+			}
 		}
 
 		void sendCommandsToDelegate() {
@@ -180,7 +186,7 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 			}
 
 			PojoWorkRouter router = typeContext.createRouter( sessionContext, identifier, entitySupplier );
-			DocumentRouteImpl currentRoute = router.currentRoute( providedRoutingKey );
+			DocumentRouteDescriptor currentRoute = router.currentRoute( providedRoutes );
 			// We don't care about previous routes: the add() operation expects that the document isn't in the index yet.
 
 			String documentIdentifier = typeContext.toDocumentIdentifier( sessionContext, identifier );
@@ -206,21 +212,20 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 			}
 
 			PojoWorkRouter router = typeContext.createRouter( sessionContext, identifier, entitySupplier );
-			DocumentRouteImpl currentRoute = router.currentRoute( providedRoutingKey );
-			List<DocumentRouteImpl> previousRoutes = router.previousRoutes( currentRoute );
+			DocumentRoutesDescriptor routes = router.routes( providedRoutes );
 
 			String documentIdentifier = typeContext.toDocumentIdentifier( sessionContext, identifier );
 
-			delegateDeletePrevious( documentIdentifier, previousRoutes );
+			delegateDeletePrevious( documentIdentifier, routes.previousRoutes() );
 
-			if ( currentRoute == null ) {
+			if ( routes.currentRoute() == null ) {
 				// The routing bridge decided the entity should not be indexed.
 				// We should have deleted it using the "previous routes" (if it was actually indexed previously),
 				// and we don't have anything else to do.
 				return;
 			}
 			DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
-					currentRoute.routingKey(), identifier );
+					routes.currentRoute().routingKey(), identifier );
 			delegate.addOrUpdate( referenceProvider,
 					typeContext.toDocumentContributor( sessionContext, identifier, entitySupplier ) );
 		}
@@ -229,34 +234,33 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 			Supplier<E> entitySupplier = entitySupplierOrLoad();
 			String documentIdentifier = typeContext.toDocumentIdentifier( sessionContext, identifier );
 
-			if ( entitySupplier == null ) {
-				// Purge: entity is not available and we can't route automatically.
-				DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
-						providedRoutingKey, identifier );
-				delegate.delete( referenceProvider );
-				return;
+			PojoWorkRouter router;
+			if ( entitySupplier != null ) {
+				router = typeContext.createRouter( sessionContext, identifier, entitySupplier );
+			}
+			else {
+				// Purge: entity is not available and we can't route according to its state.
+				// We can use the provided routing keys, though, which is what the no-op router does.
+				router = NoOpDocumentRouter.INSTANCE;
 			}
 
-			PojoWorkRouter router = typeContext.createRouter( sessionContext, identifier, entitySupplier );
-			DocumentRouteImpl currentRoute = router.currentRoute( providedRoutingKey );
-			List<DocumentRouteImpl> previousRoutes = router.previousRoutes( currentRoute );
+			DocumentRoutesDescriptor routes = router.routes( providedRoutes );
 
-			delegateDeletePrevious( documentIdentifier, previousRoutes );
+			delegateDeletePrevious( documentIdentifier, routes.previousRoutes() );
 
-			if ( currentRoute == null ) {
+			if ( routes.currentRoute() == null ) {
 				// The routing bridge decided the entity should not be indexed.
 				// We should have deleted it using the "previous routes" (if it was actually indexed previously).
 				return;
 			}
 
 			DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
-					currentRoute.routingKey(), identifier );
+					routes.currentRoute().routingKey(), identifier );
 			delegate.delete( referenceProvider );
 		}
 
-		private void delegateDeletePrevious(String documentIdentifier,
-				List<DocumentRouteImpl> previousRoutes) {
-			for ( DocumentRouteImpl route : previousRoutes ) {
+		private void delegateDeletePrevious(String documentIdentifier, Collection<DocumentRouteDescriptor> previousRoutes) {
+			for ( DocumentRouteDescriptor route : previousRoutes ) {
 				DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
 						route.routingKey(), identifier );
 				delegate.delete( referenceProvider );

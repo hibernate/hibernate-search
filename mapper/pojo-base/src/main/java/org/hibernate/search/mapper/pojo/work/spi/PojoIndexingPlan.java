@@ -13,6 +13,7 @@ import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 
 /**
  * An interface for indexing entities in the context of a session in a POJO mapper.
@@ -38,18 +39,19 @@ public interface PojoIndexingPlan {
 	 * <p>
 	 * <strong>Note:</strong> depending on the backend, this may lead to errors or duplicate entries in the index
 	 * if the entity was actually already present in the index before this call.
-	 * When in doubt, you should rather use {@link #addOrUpdate(PojoRawTypeIdentifier, Object, String, Object)}.
+	 * When in doubt, you should rather use {@link #addOrUpdate(PojoRawTypeIdentifier, Object, DocumentRoutesDescriptor, Object)}.
 	 *
 	 * @param typeIdentifier The identifier of the entity type.
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
-	 * @param providedRoutingKey The routing key to route the add request to the appropriate index shard.
+	 * @param providedRoutes The route to the current index shard.
 	 * Leave {@code null} if sharding is disabled
 	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @param entity The entity to add to the index.
 	 */
-	void add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity);
+	void add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			DocumentRoutesDescriptor providedRoutes, Object entity);
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index.
@@ -58,12 +60,13 @@ public interface PojoIndexingPlan {
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
-	 * @param providedRoutingKey The routing key to route the addOrUpdate request to the appropriate index shard.
+	 * @param providedRoutes The routes to the current and previous index shards.
 	 * Leave {@code null} if sharding is disabled
 	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @param entity The entity to update in the index.
 	 */
-	void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity);
+	void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			DocumentRoutesDescriptor providedRoutes, Object entity);
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index,
@@ -74,7 +77,7 @@ public interface PojoIndexingPlan {
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
-	 * @param providedRoutingKey The routing key to route the addOrUpdate request to the appropriate index shard.
+	 * @param providedRoutes The routes to the current and previous index shards.
 	 * Leave {@code null} if sharding is disabled
 	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @param entity The entity to update in the index.
@@ -83,8 +86,8 @@ public interface PojoIndexingPlan {
 	 * {@link org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector#dirtyFilter(PojoPathFilter) dirty filter}
 	 * for the entity type and calling one of the {@code filter} methods.
 	 */
-	void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey,
-			Object entity, BitSet dirtyPaths);
+	void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			DocumentRoutesDescriptor providedRoutes, Object entity, BitSet dirtyPaths);
 
 	/**
 	 * Delete an entity from the index.
@@ -98,7 +101,7 @@ public interface PojoIndexingPlan {
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If the provided ID is {@code null},
 	 * Hibernate Search will attempt to extract the ID from the entity (which must be non-{@code null} in that case).
-	 * @param providedRoutingKey The routing key to route the delete request to the appropriate index shard.
+	 * @param providedRoutes The routes to the current and previous index shards.
 	 * Leave {@code null} if sharding is disabled,
 	 * or if you don't use a custom {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge},
 	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}
@@ -106,7 +109,8 @@ public interface PojoIndexingPlan {
 	 * @param entity The entity to delete from the index. May be {@code null} if {@code providedId} is non-{@code null}.
 	 * @throws IllegalArgumentException If both {@code providedId} and {@code entity} are {@code null}.
 	 */
-	void delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity);
+	void delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			DocumentRoutesDescriptor providedRoutes, Object entity);
 
 	/**
 	 * Extract all data from objects passed to the indexing plan so far,

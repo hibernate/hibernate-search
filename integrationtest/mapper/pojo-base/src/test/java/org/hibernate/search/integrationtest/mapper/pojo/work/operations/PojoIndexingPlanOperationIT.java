@@ -10,10 +10,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.mapper.pojo.work.operations.PojoIndexingOperation.addWorkInfo;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
+import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Test;
@@ -53,25 +56,46 @@ public class PojoIndexingPlanOperationIT extends AbstractPojoIndexingOperationIT
 	}
 
 	@Test
-	public void providedId_providedRoutingKey() {
+	public void providedId_providedRoutes_currentAndNoPrevious() {
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
 
+			// Since we don't provide any previous routes, we don't expect additional deletes.
+			expectOperation( futureFromBackend, 42, "UE-123", "1" );
+			operation.addTo( indexingPlan, 42,
+					DocumentRoutesDescriptor.of( DocumentRouteDescriptor.of( "UE-123" ), Collections.emptyList() ),
+					IndexedEntity.of( 1 ) );
+			// The session will wait for completion of the indexing plan upon closing,
+			// so we need to complete it now.
+			futureFromBackend.complete( null );
+		}
+	}
+
+	@Test
+	public void providedId_providedRoutes_currentAndPrevious() {
+		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
+		try ( SearchSession session = createSession() ) {
+			SearchIndexingPlan indexingPlan = session.indexingPlan();
 			expectOperation(
 					futureFromBackend,
 					worksBeforeInSamePlan -> {
-						if ( routingBinder != null && !isAdd() ) {
-							// If a routing bridge is enabled, and for operations other than add,
-							// expect a delete for the default route (if different).
+						if ( !isAdd() ) {
+							// For operations other than add,
+							// expect a delete for the previous routes (if different).
 							worksBeforeInSamePlan
-									.delete( b -> addWorkInfo( b, tenantId, "42",
-											MyRoutingBridge.toRoutingKey( tenantId, 42, "1" ) ) );
+									.delete( b -> addWorkInfo( b, tenantId, "42", "UE-121" ) )
+									.delete( b -> addWorkInfo( b, tenantId, "42", "UE-122" ) );
 						}
 					},
 					42, "UE-123", "1"
 			);
-			operation.addTo( indexingPlan, 42, "UE-123", IndexedEntity.of( 1 ) );
+			operation.addTo( indexingPlan, 42,
+					DocumentRoutesDescriptor.of( DocumentRouteDescriptor.of( "UE-123" ),
+							Arrays.asList( DocumentRouteDescriptor.of( "UE-121" ),
+									DocumentRouteDescriptor.of( "UE-122" ),
+									DocumentRouteDescriptor.of( "UE-123" ) ) ),
+					IndexedEntity.of( 1 ) );
 			// The session will wait for completion of the indexing plan upon closing,
 			// so we need to complete it now.
 			futureFromBackend.complete( null );

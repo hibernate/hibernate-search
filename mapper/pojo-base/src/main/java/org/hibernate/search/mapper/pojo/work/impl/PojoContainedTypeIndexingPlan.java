@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.util.function.Supplier;
 
+import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 /**
@@ -43,6 +44,12 @@ public class PojoContainedTypeIndexingPlan<E>
 			extends AbstractPojoTypeIndexingPlan<Object, E, ContainedEntityState>.AbstractEntityState {
 		private ContainedEntityState(Object identifier) {
 			super( identifier );
+		}
+
+		@Override
+		void providedRoutes(DocumentRoutesDescriptor routes) {
+			// The routes don't make sense for contained types.
+			// Ignore non-null values, for backwards compatibility.
 		}
 	}
 

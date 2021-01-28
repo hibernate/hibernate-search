@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,6 +18,9 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.route.DocumentRoute;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutes;
 import org.hibernate.search.mapper.pojo.route.impl.DocumentRouteImpl;
+import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.mapper.pojo.work.impl.NoOpDocumentRouter;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkRouter;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -56,24 +60,31 @@ public final class RoutingBridgeDocumentRouter<E> implements DocumentRoutes, Poj
 	}
 
 	@Override
-	public DocumentRouteImpl currentRoute(String providedRoutingKey) {
-		routingBridge.route( this, entityIdentifier, entity, context );
+	public DocumentRouteDescriptor currentRoute(DocumentRoutesDescriptor providedRoutes) {
+		if ( providedRoutes != null ) {
+			return NoOpDocumentRouter.INSTANCE.currentRoute( providedRoutes );
+		}
 
+		routingBridge.route( this, entityIdentifier, entity, context );
 		if ( skip ) {
 			return null;
 		}
 		if ( currentRoute == null ) {
 			throw log.noCurrentRoute( routingBridge );
 		}
-		if ( providedRoutingKey != null ) {
-			currentRoute.routingKey( providedRoutingKey );
-		}
-		return currentRoute;
+
+		return currentRoute.toDescriptor();
 	}
 
 	@Override
-	public List<DocumentRouteImpl> previousRoutes(DocumentRouteImpl currentRoute) {
-		return new PreviousDocumentRoutes().previousDifferentRoutes( currentRoute );
+	public DocumentRoutesDescriptor routes(DocumentRoutesDescriptor providedRoutes) {
+		if ( providedRoutes != null ) {
+			return NoOpDocumentRouter.INSTANCE.routes( providedRoutes );
+		}
+		DocumentRouteDescriptor currentRoute = currentRoute( null );
+		Collection<DocumentRouteDescriptor> previousRoutes =
+				new PreviousDocumentRoutes().previousDifferentRoutes( currentRoute );
+		return DocumentRoutesDescriptor.of( currentRoute, previousRoutes );
 	}
 
 	private final class PreviousDocumentRoutes implements DocumentRoutes {
@@ -95,20 +106,25 @@ public final class RoutingBridgeDocumentRouter<E> implements DocumentRoutes, Poj
 			skip = true;
 		}
 
-		List<DocumentRouteImpl> previousDifferentRoutes(DocumentRouteImpl currentRoute) {
+		List<DocumentRouteDescriptor> previousDifferentRoutes(DocumentRouteDescriptor currentRoute) {
 			routingBridge.previousRoutes( this, entityIdentifier, entity, context );
-
 			if ( skip ) {
 				return Collections.emptyList();
 			}
 			if ( previousRoutes == null || previousRoutes.isEmpty() ) {
 				throw log.noPreviousRoute( routingBridge );
 			}
-			if ( currentRoute != null ) {
-				// Remove previous routes that are the same as the current one
-				previousRoutes.remove( currentRoute );
+
+			List<DocumentRouteDescriptor> result = new ArrayList<>( previousRoutes.size() );
+			for ( DocumentRouteImpl previousRoute : previousRoutes ) {
+				DocumentRouteDescriptor descriptor = previousRoute.toDescriptor();
+				if ( descriptor.equals( currentRoute ) ) {
+					// Exclude previous routes that are the same as the current one
+					continue;
+				}
+				result.add( descriptor );
 			}
-			return previousRoutes;
+			return result;
 		}
 	}
 }

@@ -14,6 +14,7 @@ import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.impl.Throwables;
 
@@ -40,13 +41,13 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	}
 
 	@Override
-	public void add(Object providedId, String providedRoutingKey, Object entity) {
-		delegate.add( getTypeIdentifier( entity ), providedId, providedRoutingKey, entity );
+	public void add(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
+		delegate.add( getTypeIdentifier( entity ), providedId, providedRoutes, entity );
 	}
 
 	@Override
-	public void add(Class<?> entityClass, Object providedId, String providedRoutingKey) {
-		delegate.add( getTypeIdentifier( entityClass ), providedId, providedRoutingKey, null );
+	public void add(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes) {
+		delegate.add( getTypeIdentifier( entityClass ), providedId, providedRoutes, null );
 	}
 
 	@Override
@@ -55,8 +56,8 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	}
 
 	@Override
-	public void addOrUpdate(Object providedId, String providedRoutingKey, Object entity) {
-		delegate.addOrUpdate( getTypeIdentifier( entity ), providedId, providedRoutingKey, entity );
+	public void addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
+		delegate.addOrUpdate( getTypeIdentifier( entity ), providedId, providedRoutes, entity );
 	}
 
 	@Override
@@ -65,17 +66,18 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	}
 
 	@Override
-	public void addOrUpdate(Object providedId, String providedRoutingKey, Object entity, String... dirtyPathsAsStrings) {
+	public void addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity,
+			String... dirtyPathsAsStrings) {
 		PojoRawTypeIdentifier<?> typeIdentifier = getTypeIdentifier( entity );
 		SearchIndexingPlanTypeContext typeContext = typeContextProvider.forExactType( typeIdentifier );
 		BitSet dirtyPaths = typeContext == null ? null : typeContext.dirtyFilter().filter( dirtyPathsAsStrings );
-		delegate.addOrUpdate( typeIdentifier, providedId, providedRoutingKey, entity, dirtyPaths );
+		delegate.addOrUpdate( typeIdentifier, providedId, providedRoutes, entity, dirtyPaths );
 	}
 
 	@Override
-	public void addOrUpdate(Class<?> entityClass, Object providedId, String providedRoutingKey) {
+	public void addOrUpdate(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes) {
 		PojoRawTypeIdentifier<?> typeIdentifier = getTypeIdentifier( entityClass );
-		delegate.addOrUpdate( typeIdentifier, providedId, providedRoutingKey, null );
+		delegate.addOrUpdate( typeIdentifier, providedId, providedRoutes, null );
 	}
 
 	@Override
@@ -84,13 +86,13 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	}
 
 	@Override
-	public void delete(Object providedId, String providedRoutingKey, Object entity) {
-		delegate.delete( getTypeIdentifier( entity ), providedId, providedRoutingKey, entity );
+	public void delete(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
+		delegate.delete( getTypeIdentifier( entity ), providedId, providedRoutes, entity );
 	}
 
 	@Override
-	public void delete(Class<?> entityClass, Object providedId, String providedRoutingKey) {
-		delegate.delete( getTypeIdentifier( entityClass ), providedId, providedRoutingKey, null );
+	public void delete(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes) {
+		delegate.delete( getTypeIdentifier( entityClass ), providedId, providedRoutes, null );
 	}
 
 	public CompletableFuture<?> execute() {

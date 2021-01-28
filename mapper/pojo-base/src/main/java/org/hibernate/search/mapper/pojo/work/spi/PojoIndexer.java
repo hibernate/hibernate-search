@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 
 /**
  * An interface for indexing entities in the context of a session in a POJO mapper,
@@ -33,7 +34,7 @@ public interface PojoIndexer {
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
-	 * @param providedRoutingKey The routing key to route the add request to the appropriate index shard.
+	 * @param providedRoutes The route to the current index shard.
 	 * Leave {@code null} if sharding is disabled
 	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @param entity The entity to add to the index.
@@ -41,7 +42,8 @@ public interface PojoIndexer {
 	 * @param refreshStrategy How to handle the refresh.
 	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
 	 */
-	CompletableFuture<?> add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity,
+	CompletableFuture<?> add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			DocumentRoutesDescriptor providedRoutes, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 	/**
@@ -53,7 +55,7 @@ public interface PojoIndexer {
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
-	 * @param providedRoutingKey The routing key to route the addOrUpdate request to the appropriate index shard.
+	 * @param providedRoutes The routes to the current and previous index shards.
 	 * Leave {@code null} if sharding is disabled
 	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @param entity The entity to update in the index.
@@ -61,7 +63,8 @@ public interface PojoIndexer {
 	 * @param refreshStrategy How to handle the refresh.
 	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
 	 */
-	CompletableFuture<?> addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity,
+	CompletableFuture<?> addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			DocumentRoutesDescriptor providedRoutes, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 	/**
@@ -75,7 +78,7 @@ public interface PojoIndexer {
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
-	 * @param providedRoutingKey The routing key to route the delete request to the appropriate index shard.
+	 * @param providedRoutes The routes to the current and previous index shards.
 	 * Leave {@code null} if sharding is disabled
 	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @param entity The entity to delete from the index.
@@ -83,7 +86,8 @@ public interface PojoIndexer {
 	 * @param refreshStrategy How to handle the refresh.
 	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
 	 */
-	CompletableFuture<?> delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity,
+	CompletableFuture<?> delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			DocumentRoutesDescriptor providedRoutes, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 	/**
@@ -95,13 +99,15 @@ public interface PojoIndexer {
 	 *
 	 * @param typeIdentifier The identifier of the entity type.
 	 * @param providedId A value to extract the document ID from.
-	 * @param providedRoutingKey The routing key to route the purge request to the appropriate index shard.
-	 * Leave {@code null} if sharding is disabled or if you don't use a custom {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
+	 * @param providedRoutes The routes to the current and previous index shards.
+	 * Leave {@code null} if sharding is disabled
+	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @param commitStrategy How to handle the commit.
 	 * @param refreshStrategy How to handle the refresh.
 	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
 	 */
-	CompletableFuture<?> delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey,
+	CompletableFuture<?> delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			DocumentRoutesDescriptor providedRoutes,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 }

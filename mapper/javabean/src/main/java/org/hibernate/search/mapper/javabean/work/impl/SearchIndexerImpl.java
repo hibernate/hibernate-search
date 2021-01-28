@@ -13,6 +13,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.mapper.javabean.work.SearchIndexer;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 
 public class SearchIndexerImpl implements SearchIndexer {
@@ -32,38 +33,38 @@ public class SearchIndexerImpl implements SearchIndexer {
 	}
 
 	@Override
-	public CompletionStage<?> add(Object providedId, String providedRoutingKey, Object entity) {
-		return delegate.add( getTypeIdentifier( entity ), providedId, providedRoutingKey, entity,
+	public CompletionStage<?> add(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
+		return delegate.add( getTypeIdentifier( entity ), providedId, providedRoutes, entity,
 				commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public CompletionStage<?> add(Class<?> entityClass, Object providedId, String providedRoutingKey) {
-		return delegate.add( getTypeIdentifier( entityClass ), providedId, providedRoutingKey, null,
+	public CompletionStage<?> add(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes) {
+		return delegate.add( getTypeIdentifier( entityClass ), providedId, providedRoutes, null,
 				commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public CompletionStage<?> addOrUpdate(Object providedId, String providedRoutingKey, Object entity) {
-		return delegate.addOrUpdate( getTypeIdentifier( entity ), providedId, providedRoutingKey, entity,
+	public CompletionStage<?> addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
+		return delegate.addOrUpdate( getTypeIdentifier( entity ), providedId, providedRoutes, entity,
 				commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public CompletionStage<?> addOrUpdate(Class<?> entityClass, Object providedId, String providedRoutingKey) {
-		return delegate.addOrUpdate( getTypeIdentifier( entityClass ), providedId, providedRoutingKey, null,
+	public CompletionStage<?> addOrUpdate(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes) {
+		return delegate.addOrUpdate( getTypeIdentifier( entityClass ), providedId, providedRoutes, null,
 				commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public CompletionStage<?> delete(Object providedId, String providedRoutingKey, Object entity) {
-		return delegate.delete( getTypeIdentifier( entity ), providedId, providedRoutingKey, entity,
+	public CompletionStage<?> delete(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
+		return delegate.delete( getTypeIdentifier( entity ), providedId, providedRoutes, entity,
 				commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public CompletionStage<?> delete(Class<?> entityClass, Object providedId, String providedRoutingKey) {
-		return delegate.delete( getTypeIdentifier( entityClass ), providedId, providedRoutingKey,
+	public CompletionStage<?> delete(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes) {
+		return delegate.delete( getTypeIdentifier( entityClass ), providedId, providedRoutes,
 				commitStrategy, refreshStrategy );
 	}
 

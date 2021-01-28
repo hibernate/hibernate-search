@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.work.impl;
 
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 
 public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
@@ -36,13 +37,15 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	@Override
 	public void purge(Class<?> entityClass, Object providedId, String providedRoutingKey) {
 		delegate( true )
-				.delete( getTypeIdentifier( entityClass ), providedId, providedRoutingKey, null );
+				.delete( getTypeIdentifier( entityClass ), providedId,
+						DocumentRoutesDescriptor.fromLegacyRoutingKey( providedRoutingKey ), null );
 	}
 
 	@Override
 	public void purge(String entityName, Object providedId, String providedRoutingKey) {
 		delegate( true )
-				.delete( getTypeIdentifier( entityName ), providedId, providedRoutingKey, null );
+				.delete( getTypeIdentifier( entityName ), providedId,
+						DocumentRoutesDescriptor.fromLegacyRoutingKey( providedRoutingKey ), null );
 	}
 
 	@Override

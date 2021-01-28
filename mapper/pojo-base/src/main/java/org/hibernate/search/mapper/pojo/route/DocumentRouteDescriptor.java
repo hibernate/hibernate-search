@@ -4,24 +4,20 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.route.impl;
+package org.hibernate.search.mapper.pojo.route;
 
 import java.util.Objects;
 
-import org.hibernate.search.mapper.pojo.route.DocumentRoute;
-import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
+public final class DocumentRouteDescriptor {
 
-public class DocumentRouteImpl implements DocumentRoute {
-
-	private String routingKey;
-
-	@Override
-	public void routingKey(String routingKey) {
-		this.routingKey = routingKey;
+	public static DocumentRouteDescriptor of(String routingKey) {
+		return new DocumentRouteDescriptor( routingKey );
 	}
 
-	public String routingKey() {
-		return routingKey;
+	private final String routingKey;
+
+	private DocumentRouteDescriptor(String routingKey) {
+		this.routingKey = routingKey;
 	}
 
 	@Override
@@ -32,7 +28,7 @@ public class DocumentRouteImpl implements DocumentRoute {
 		if ( o == null || getClass() != o.getClass() ) {
 			return false;
 		}
-		DocumentRouteImpl that = (DocumentRouteImpl) o;
+		DocumentRouteDescriptor that = (DocumentRouteDescriptor) o;
 		return Objects.equals( routingKey, that.routingKey );
 	}
 
@@ -41,7 +37,8 @@ public class DocumentRouteImpl implements DocumentRoute {
 		return Objects.hash( routingKey );
 	}
 
-	public DocumentRouteDescriptor toDescriptor() {
-		return DocumentRouteDescriptor.of( routingKey );
+	public String routingKey() {
+		return routingKey;
 	}
+
 }

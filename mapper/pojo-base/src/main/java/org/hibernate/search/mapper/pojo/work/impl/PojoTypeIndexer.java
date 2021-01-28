@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -14,7 +14,8 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
-import org.hibernate.search.mapper.pojo.route.impl.DocumentRouteImpl;
+import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 public class PojoTypeIndexer<I, E> {
@@ -31,13 +32,13 @@ public class PojoTypeIndexer<I, E> {
 		this.delegate = delegate;
 	}
 
-	CompletableFuture<?> add(Object providedId, String providedRoutingKey, Object entity,
+	CompletableFuture<?> add(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
 
 		PojoWorkRouter router = typeContext.createRouter( sessionContext, identifier, entitySupplier );
-		DocumentRouteImpl currentRoute = router.currentRoute( providedRoutingKey );
+		DocumentRouteDescriptor currentRoute = router.currentRoute( providedRoutes );
 		// We don't care about previous routes: the add() operation expects that the document isn't in the index yet.
 
 		if ( currentRoute == null ) {
@@ -53,28 +54,27 @@ public class PojoTypeIndexer<I, E> {
 				commitStrategy, refreshStrategy );
 	}
 
-	CompletableFuture<?> addOrUpdate(Object providedId, String providedRoutingKey, Object entity,
+	CompletableFuture<?> addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
 
 		PojoWorkRouter router = typeContext.createRouter( sessionContext, identifier, entitySupplier );
-		DocumentRouteImpl currentRoute = router.currentRoute( providedRoutingKey );
-		List<DocumentRouteImpl> previousRoutes = router.previousRoutes( currentRoute );
+		DocumentRoutesDescriptor routes = router.routes( providedRoutes );
 
 		String documentIdentifier = typeContext.toDocumentIdentifier( sessionContext, identifier );
 
-		CompletableFuture<?> deletePreviousFuture = deletePrevious( documentIdentifier, previousRoutes, identifier,
-				commitStrategy, refreshStrategy );
+		CompletableFuture<?> deletePreviousFuture = deletePrevious( documentIdentifier, routes.previousRoutes(),
+				identifier, commitStrategy, refreshStrategy );
 
-		if ( currentRoute == null ) {
+		if ( routes.currentRoute() == null ) {
 			// The routing bridge decided the entity should not be indexed.
 			// We should have deleted it using the "previous routes" (if it was actually indexed previously),
 			// and we don't have anything else to do.
 			return deletePreviousFuture;
 		}
 		DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
-				currentRoute.routingKey(), identifier );
+				routes.currentRoute().routingKey(), identifier );
 		// Deletion on previous routes and update on current route can happen in parallel:
 		// the backend is responsible for preserving relative order of works on the same index/shard + docId,
 		// and we don't care about relative order of works on different indexes/shards.
@@ -85,51 +85,60 @@ public class PojoTypeIndexer<I, E> {
 				(deletePreviousResult, updateResult) -> updateResult );
 	}
 
-	CompletableFuture<?> delete(Object providedId, String providedRoutingKey, Object entity,
+	CompletableFuture<?> delete(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
 
 		PojoWorkRouter router = typeContext.createRouter( sessionContext, identifier, entitySupplier );
-		DocumentRouteImpl currentRoute = router.currentRoute( providedRoutingKey );
-		List<DocumentRouteImpl> previousRoutes = router.previousRoutes( currentRoute );
+		DocumentRoutesDescriptor routes = router.routes( providedRoutes );
 
 		String documentIdentifier = typeContext.toDocumentIdentifier( sessionContext, identifier );
 
-		CompletableFuture<?> deletePreviousFuture = deletePrevious( documentIdentifier, previousRoutes, identifier,
-				commitStrategy, refreshStrategy );
+		CompletableFuture<?> deletePreviousFuture = deletePrevious( documentIdentifier, routes.previousRoutes(),
+				identifier, commitStrategy, refreshStrategy );
 
-		if ( currentRoute == null ) {
+		if ( routes.currentRoute() == null ) {
 			// The routing bridge decided the entity should not be indexed.
 			// We should have deleted it using the "previous routes" (if it was actually indexed previously).
 			return deletePreviousFuture;
 		}
 		DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
-				currentRoute.routingKey(), identifier );
+				routes.currentRoute().routingKey(), identifier );
 		return deletePreviousFuture.thenCombine( delegate.delete( referenceProvider, commitStrategy, refreshStrategy ),
 				(deletePreviousResult, deleteResult) -> deleteResult );
 	}
 
-	CompletableFuture<?> delete(Object providedId, String providedRoutingKey,
+	CompletableFuture<?> delete(Object providedId, DocumentRoutesDescriptor providedRoutes,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		I identifier = typeContext.identifierMapping().getIdentifier( providedId, null );
+
+		// Purge: entity is not available and we can't route according to its state.
+		// We can use the provided routing keys, though, which is what the no-op router does.
+		PojoWorkRouter router = NoOpDocumentRouter.INSTANCE;
+		DocumentRoutesDescriptor routes = router.routes( providedRoutes );
 		String documentIdentifier = typeContext.toDocumentIdentifier( sessionContext, identifier );
+
+		CompletableFuture<?> deletePreviousFuture = deletePrevious( documentIdentifier, routes.previousRoutes(),
+				identifier, commitStrategy, refreshStrategy );
+
 		DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
-				providedRoutingKey, identifier );
-		return delegate.delete( referenceProvider, commitStrategy, refreshStrategy );
+				routes.currentRoute().routingKey(), identifier );
+		return deletePreviousFuture.thenCombine( delegate.delete( referenceProvider, commitStrategy, refreshStrategy ),
+				(deletePreviousResult, deleteResult) -> deleteResult );
 	}
 
-	private CompletableFuture<?> deletePrevious(String documentIdentifier, List<DocumentRouteImpl> previousRoutes,
+	private CompletableFuture<?> deletePrevious(String documentIdentifier, Collection<DocumentRouteDescriptor> previousRoutes,
 			I identifier, DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		if ( previousRoutes.isEmpty() ) {
 			return CompletableFuture.completedFuture( null );
 		}
 		CompletableFuture<?>[] futures = new CompletableFuture[previousRoutes.size()];
-		for ( int i = 0; i < previousRoutes.size(); i++ ) {
-			DocumentRouteImpl route = previousRoutes.get( i );
+		int i = 0;
+		for ( DocumentRouteDescriptor route : previousRoutes ) {
 			DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
 					route.routingKey(), identifier );
-			futures[i] = delegate.delete( referenceProvider, commitStrategy, refreshStrategy );
+			futures[i++] = delegate.delete( referenceProvider, commitStrategy, refreshStrategy );
 		}
 		return CompletableFuture.allOf( futures );
 	}

@@ -16,6 +16,8 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
+import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -64,7 +66,7 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 	public void nullProvidedId() {
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
-			assertThatThrownBy( () -> operation.addTo( indexingPlan, null, (String) null ) )
+			assertThatThrownBy( () -> operation.addTo( indexingPlan, null, (DocumentRoutesDescriptor) null ) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll( "Invalid indexing request",
 							"if the entity is null, the identifier must be provided explicitly" );
@@ -72,7 +74,26 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 	}
 
 	@Test
-	public void providedRoutingKey() {
+	public void providedId_providedRoutes_currentAndNoPrevious() {
+		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
+		try ( SearchSession session = createSession() ) {
+			SearchIndexingPlan indexingPlan = session.indexingPlan();
+
+			if ( !isDelete() ) {
+				expectLoading( Collections.singletonList( 42 ), Collections.singletonList( IndexedEntity.of( 1 ) ) );
+			}
+			// Since we don't provide any previous routes, we don't expect additional deletes.
+			expectOperation( futureFromBackend, 42, "UE-123", "1" );
+			operation.addTo( indexingPlan, 42,
+					DocumentRoutesDescriptor.of( DocumentRouteDescriptor.of( "UE-123" ), Collections.emptyList() ) );
+			// The session will wait for completion of the indexing plan upon closing,
+			// so we need to complete it now.
+			futureFromBackend.complete( null );
+		}
+	}
+
+	@Test
+	public void providedId_providedRoutes_currentAndPrevious() {
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
@@ -83,17 +104,21 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 			expectOperation(
 					futureFromBackend,
 					worksBeforeInSamePlan -> {
-						if ( routingBinder != null && !isDelete() && !isAdd() ) {
-							// If a routing bridge is enabled, and for operations other than add and delete,
-							// expect a delete for the default route (if different).
+						if ( !isAdd() ) {
+							// For operations other than add,
+							// expect a delete for the previous routes (if different).
 							worksBeforeInSamePlan
-									.delete( b -> addWorkInfo( b, tenantId, "42",
-											MyRoutingBridge.toRoutingKey( tenantId, 42, "1" ) ) );
+									.delete( b -> addWorkInfo( b, tenantId, "42", "UE-121" ) )
+									.delete( b -> addWorkInfo( b, tenantId, "42", "UE-122" ) );
 						}
 					},
 					42, "UE-123", "1"
 			);
-			operation.addTo( indexingPlan, 42, "UE-123" );
+			operation.addTo( indexingPlan, 42,
+					DocumentRoutesDescriptor.of( DocumentRouteDescriptor.of( "UE-123" ),
+							Arrays.asList( DocumentRouteDescriptor.of( "UE-121" ),
+									DocumentRouteDescriptor.of( "UE-122" ),
+									DocumentRouteDescriptor.of( "UE-123" ) ) ) );
 			// The session will wait for completion of the indexing plan upon closing,
 			// so we need to complete it now.
 			futureFromBackend.complete( null );
