@@ -58,7 +58,7 @@ public final class PojoScopeDelegateImpl<R, E, C> implements PojoScopeDelegate<R
 		Set<PojoRawTypeIdentifier<?>> nonIndexedTypes = new LinkedHashSet<>();
 		for ( PojoRawTypeIdentifier<? extends E> targetedType : targetedTypes ) {
 			Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>>> targetedTypeManagersForType =
-					indexedTypeContextProvider.getAllBySuperType( targetedType );
+					indexedTypeContextProvider.allForSuperType( targetedType );
 			if ( targetedTypeManagersForType.isPresent() ) {
 				targetedTypeContexts.addAll( targetedTypeManagersForType.get() );
 			}

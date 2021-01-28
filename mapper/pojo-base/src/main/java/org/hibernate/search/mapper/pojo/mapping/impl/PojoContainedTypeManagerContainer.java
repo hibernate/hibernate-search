@@ -36,12 +36,12 @@ public class PojoContainedTypeManagerContainer
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <E> Optional<? extends PojoContainedTypeManager<E>> getByExactType(
+	public <E> Optional<? extends PojoContainedTypeManager<E>> forExactType(
 			PojoRawTypeIdentifier<E> typeIdentifier) {
 		return Optional.ofNullable( (PojoContainedTypeManager<E>) byExactType.get( typeIdentifier ) );
 	}
 
-	Set<PojoContainedTypeManager<?>> getAll() {
+	Set<PojoContainedTypeManager<?>> all() {
 		return all;
 	}
 

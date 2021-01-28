@@ -12,6 +12,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface PojoWorkContainedTypeContextProvider {
 
-	<E> Optional<? extends PojoWorkContainedTypeContext<E>> getByExactType(PojoRawTypeIdentifier<E> typeIdentifier);
+	<E> Optional<? extends PojoWorkContainedTypeContext<E>> forExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 
 }
