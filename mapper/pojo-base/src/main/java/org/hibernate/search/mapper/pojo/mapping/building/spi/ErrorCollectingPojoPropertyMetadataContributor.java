@@ -17,7 +17,7 @@ public final class ErrorCollectingPojoPropertyMetadataContributor implements Poj
 
 	@Override
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorPropertyNode collector) {
-		if ( children != null ) {
+		if ( hasContent() ) {
 			for ( PojoPropertyMetadataContributor child : children ) {
 				try {
 					child.contributeAdditionalMetadata( collector );
@@ -31,7 +31,7 @@ public final class ErrorCollectingPojoPropertyMetadataContributor implements Poj
 
 	@Override
 	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
-		if ( children != null ) {
+		if ( hasContent() ) {
 			for ( PojoPropertyMetadataContributor child : children ) {
 				try {
 					child.contributeMapping( collector );
@@ -47,6 +47,10 @@ public final class ErrorCollectingPojoPropertyMetadataContributor implements Poj
 		initChildren();
 		this.children.add( child );
 		return this;
+	}
+
+	public boolean hasContent() {
+		return children != null && !children.isEmpty();
 	}
 
 	private void initChildren() {
