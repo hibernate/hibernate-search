@@ -8,6 +8,8 @@ package org.hibernate.search.mapper.javabean.work;
 
 import java.util.concurrent.CompletionStage;
 
+import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+
 /**
  * An interface for indexing entities in the context of a session.
  * <p>
@@ -22,7 +24,7 @@ public interface SearchIndexer {
 	 * <p>
 	 * Entities to reindex as a result of this operation will not be resolved.
 	 * <p>
-	 * Shorthand for {@code add(null, null)}; see {@link #add(Object, String, Object)}.
+	 * Shorthand for {@code add(null, null, entity)}; see {@link #add(Object, DocumentRoutesDescriptor, Object)}.
 	 *
 	 * @param entity The entity to add to the index.
 	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
@@ -36,7 +38,7 @@ public interface SearchIndexer {
 	 * <p>
 	 * Entities to reindex as a result of this operation will not be resolved.
 	 * <p>
-	 * Shorthand for {@code add(null, entity)}; see {@link #add(Object, String, Object)}.
+	 * Shorthand for {@code add(providedId, null, entity)}; see {@link #add(Object, DocumentRoutesDescriptor, Object)}.
 	 *
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
@@ -59,13 +61,13 @@ public interface SearchIndexer {
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
-	 * @param providedRoutingKey The routing key to route the add request to the appropriate index shard.
+	 * @param providedRoutes The route to the current index shard.
 	 * Leave {@code null} if sharding is disabled
 	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @param entity The entity to add to the index.
 	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 */
-	CompletionStage<?> add(Object providedId, String providedRoutingKey, Object entity);
+	CompletionStage<?> add(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity);
 
 	/**
 	 * Add an entity to the index, assuming that the entity is absent from the index.
@@ -78,18 +80,18 @@ public interface SearchIndexer {
 	 * @param entityClass The class of the entity to add to the index.
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
-	 * @param providedRoutingKey The routing key to route the add request to the appropriate index shard.
+	 * @param providedRoutes The route to the current index shard.
 	 * Leave {@code null} if sharding is disabled or if you don't use a custom {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 */
-	CompletionStage<?> add(Class<?> entityClass, Object providedId, String providedRoutingKey);
+	CompletionStage<?> add(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes);
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index.
 	 * <p>
 	 * Entities to reindex as a result of this operation will not be resolved.
 	 * <p>
-	 * Shorthand for {@code addOrUpdate(null, null, entity)}; see {@link #addOrUpdate(Object, String, Object)}.
+	 * Shorthand for {@code addOrUpdate(null, null, entity)}; see {@link #addOrUpdate(Object, DocumentRoutesDescriptor, Object)}.
 	 *
 	 * @param entity The entity to add to the index.
 	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
@@ -103,7 +105,7 @@ public interface SearchIndexer {
 	 * <p>
 	 * Entities to reindex as a result of this operation will not be resolved.
 	 * <p>
-	 * Shorthand for {@code addOrUpdate(providedId, null, entity)}; see {@link #addOrUpdate(Object, String, Object)}.
+	 * Shorthand for {@code addOrUpdate(providedId, null, entity)}; see {@link #addOrUpdate(Object, DocumentRoutesDescriptor, Object)}.
 	 *
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
@@ -123,13 +125,13 @@ public interface SearchIndexer {
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
-	 * @param providedRoutingKey The routing key to route the addOrUpdate request to the appropriate index shard.
+	 * @param providedRoutes The routes to the current and previous index shards.
 	 * Leave {@code null} if sharding is disabled
 	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @param entity The entity to update in the index.
 	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 */
-	CompletionStage<?> addOrUpdate(Object providedId, String providedRoutingKey, Object entity);
+	CompletionStage<?> addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity);
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index.
@@ -139,18 +141,19 @@ public interface SearchIndexer {
 	 * @param entityClass The class of the entity to update in the index.
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
-	 * @param providedRoutingKey The routing key to route the addOrUpdate request to the appropriate index shard.
+	 * @param providedRoutes The routes to the current and previous index shards.
+	 * Leave {@code null} if sharding is disabled
 	 * Leave {@code null} if sharding is disabled or if you don't use a custom {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 */
-	CompletionStage<?> addOrUpdate(Class<?> entityClass, Object providedId, String providedRoutingKey);
+	CompletionStage<?> addOrUpdate(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes);
 
 	/**
 	 * Delete an entity from the index.
 	 * <p>
 	 * Entities to reindex as a result of this operation will not be resolved.
 	 * <p>
-	 * Shorthand for {@code delete(null, null, entity)}; see {@link #delete(Object, String, Object)}.
+	 * Shorthand for {@code delete(null, null, entity)}; see {@link #delete(Object, DocumentRoutesDescriptor, Object)}.
 	 *
 	 * @param entity The entity to add to the index.
 	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
@@ -164,7 +167,7 @@ public interface SearchIndexer {
 	 * <p>
 	 * Entities to reindex as a result of this operation will not be resolved.
 	 * <p>
-	 * Shorthand for {@code delete(providedId, null, entity)}; see {@link #delete(Object, String, Object)}.
+	 * Shorthand for {@code delete(providedId, null, entity)}; see {@link #delete(Object, DocumentRoutesDescriptor, Object)}.
 	 *
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
@@ -186,13 +189,13 @@ public interface SearchIndexer {
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
-	 * @param providedRoutingKey The routing key to route the delete request to the appropriate index shard.
+	 * @param providedRoutes The routes to the current and previous index shards.
 	 * Leave {@code null} if sharding is disabled
 	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @param entity The entity to delete from the index.
 	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 */
-	CompletionStage<?> delete(Object providedId, String providedRoutingKey, Object entity);
+	CompletionStage<?> delete(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity);
 
 	/**
 	 * Purge an entity from the index.
@@ -203,10 +206,11 @@ public interface SearchIndexer {
 	 *
 	 * @param entityClass The class of the entity to delete from the index.
 	 * @param providedId A value to extract the document ID from.
-	 * @param providedRoutingKey The routing key to route the purge request to the appropriate index shard.
-	 * Leave {@code null} if sharding is disabled or if you don't use a custom {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
+	 * @param providedRoutes The routes to the current and previous index shards.
+	 * Leave {@code null} if sharding is disabled
+	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 */
-	CompletionStage<?> delete(Class<?> entityClass, Object providedId, String providedRoutingKey);
+	CompletionStage<?> delete(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes);
 
 }

@@ -6,14 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
-import java.util.List;
-
-import org.hibernate.search.mapper.pojo.route.impl.DocumentRouteImpl;
+import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 
 public interface PojoWorkRouter {
 
-	DocumentRouteImpl currentRoute(String providedRoutingKey);
+	DocumentRouteDescriptor currentRoute(DocumentRoutesDescriptor providedRoutes);
 
-	List<DocumentRouteImpl> previousRoutes(DocumentRouteImpl currentRoute);
+	DocumentRoutesDescriptor routes(DocumentRoutesDescriptor providedRoutes);
 
 }

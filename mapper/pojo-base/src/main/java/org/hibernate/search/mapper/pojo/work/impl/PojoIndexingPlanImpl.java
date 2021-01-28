@@ -25,6 +25,7 @@ import org.hibernate.search.mapper.pojo.loading.impl.PojoMultiLoaderLoadingPlan;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -63,39 +64,42 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoReindexingCol
 	}
 
 	@Override
-	public void add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity) {
+	public void add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			DocumentRoutesDescriptor providedRoutes, Object entity) {
 		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegate( typeIdentifier );
 		if ( ! mayRequireLoading && entity == null ) {
 			mayRequireLoading = true;
 		}
-		delegate.add( providedId, providedRoutingKey, entity );
+		delegate.add( providedId, providedRoutes, entity );
 	}
 
 	@Override
-	public void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey,
+	public void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			DocumentRoutesDescriptor providedRoutes,
 			Object entity) {
 		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegate( typeIdentifier );
 		if ( ! mayRequireLoading && entity == null ) {
 			mayRequireLoading = true;
 		}
-		delegate.addOrUpdate( providedId, providedRoutingKey, entity );
+		delegate.addOrUpdate( providedId, providedRoutes, entity );
 	}
 
 	@Override
-	public void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey,
-			Object entity, BitSet dirtyPaths) {
+	public void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			DocumentRoutesDescriptor providedRoutes, Object entity, BitSet dirtyPaths) {
 		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegate( typeIdentifier );
 		if ( ! mayRequireLoading && entity == null ) {
 			mayRequireLoading = true;
 		}
-		delegate.addOrUpdate( providedId, providedRoutingKey, entity, dirtyPaths );
+		delegate.addOrUpdate( providedId, providedRoutes, entity, dirtyPaths );
 	}
 
 	@Override
-	public void delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey,
+	public void delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			DocumentRoutesDescriptor providedRoutes,
 			Object entity) {
 		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegate( typeIdentifier );
-		delegate.delete( providedId, providedRoutingKey, entity );
+		delegate.delete( providedId, providedRoutes, entity );
 	}
 
 	@Override

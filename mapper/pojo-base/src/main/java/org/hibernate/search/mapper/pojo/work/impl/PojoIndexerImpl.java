@@ -16,6 +16,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -36,36 +37,41 @@ public class PojoIndexerImpl implements PojoIndexer {
 	}
 
 	@Override
-	public CompletableFuture<?> add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey,
+	public CompletableFuture<?> add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			DocumentRoutesDescriptor providedRoutes,
 			Object entity, DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		if ( entity == null ) {
 			throw log.nullEntityForIndexerAddOrUpdate();
 		}
-		return getDelegate( typeIdentifier ).add( providedId, providedRoutingKey, entity, commitStrategy, refreshStrategy );
+		return getDelegate( typeIdentifier )
+				.add( providedId, providedRoutes, entity, commitStrategy, refreshStrategy );
 	}
 
 	@Override
 	public CompletableFuture<?> addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
-			String providedRoutingKey, Object entity,
+			DocumentRoutesDescriptor providedRoutes, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		if ( entity == null ) {
 			throw log.nullEntityForIndexerAddOrUpdate();
 		}
-		return getDelegate( typeIdentifier ).addOrUpdate( providedId, providedRoutingKey, entity, commitStrategy, refreshStrategy );
+		return getDelegate( typeIdentifier )
+				.addOrUpdate( providedId, providedRoutes, entity, commitStrategy, refreshStrategy );
 	}
 
 	@Override
 	public CompletableFuture<?> delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
-			String providedRoutingKey, Object entity,
+			DocumentRoutesDescriptor providedRoutes, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		return getDelegate( typeIdentifier ).delete( providedId, providedRoutingKey, entity, commitStrategy, refreshStrategy );
+		return getDelegate( typeIdentifier )
+				.delete( providedId, providedRoutes, entity, commitStrategy, refreshStrategy );
 	}
 
 	@Override
 	public CompletableFuture<?> delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
-			String providedRoutingKey,
+			DocumentRoutesDescriptor providedRoutes,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		return getDelegate( typeIdentifier ).delete( providedId, providedRoutingKey, commitStrategy, refreshStrategy );
+		return getDelegate( typeIdentifier )
+				.delete( providedId, providedRoutes, commitStrategy, refreshStrategy );
 	}
 
 	private PojoTypeIndexer<?, ?> getDelegate(PojoRawTypeIdentifier<?> typeIdentifier) {

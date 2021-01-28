@@ -11,11 +11,15 @@ import static org.hibernate.search.integrationtest.mapper.pojo.work.operations.P
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 import static org.junit.Assume.assumeTrue;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.work.SearchIndexer;
+import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -62,7 +66,7 @@ public class PojoIndexerOperationNullEntityIT extends AbstractPojoIndexingOperat
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();
 
-			assertThatThrownBy( () -> operation.execute( indexer, null, (String) null ) )
+			assertThatThrownBy( () -> operation.execute( indexer, null, (DocumentRoutesDescriptor) null ) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll( "Invalid indexing request",
 							"if the entity is null, the identifier must be provided explicitly" );
@@ -70,28 +74,52 @@ public class PojoIndexerOperationNullEntityIT extends AbstractPojoIndexingOperat
 	}
 
 	@Test
-	public void providedId_providedRoutingKey() {
+	public void providedId_providedRoutes_currentAndNoPrevious() {
 		assumeCanWorkWithNullEntity();
 
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();
 
+			// Since we don't provide any previous routes, we don't expect additional deletes.
+			expectOperation( futureFromBackend, 42, "UE-123", "1" );
+			CompletionStage<?> returnedFuture = operation.execute( indexer, 42,
+					DocumentRoutesDescriptor.of( DocumentRouteDescriptor.of( "UE-123" ), Collections.emptyList() ) );
+			backendMock.verifyExpectationsMet();
+			assertThatFuture( returnedFuture ).isPending();
+
+			futureFromBackend.complete( null );
+			assertThatFuture( returnedFuture ).isSuccessful();
+		}
+	}
+
+	@Test
+	public void providedId_providedRoutes_currentAndPrevious() {
+		assumeCanWorkWithNullEntity();
+
+		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
+		try ( SearchSession session = createSession() ) {
+			SearchIndexer indexer = session.indexer();
+
+			// Since we don't provide any previous routes, we don't expect additional deletes.
 			expectOperation( futureFromBackend,
 					worksBefore -> {
-						if ( routingBinder != null && !isDelete() && !isAdd() ) {
-							// If a routing bridge is enabled, and for operations other than add and delete,
-							// expect a delete for the default route (if different).
+						if ( !isAdd() ) {
+							// For operations other than add, expect a delete for the previous routes (if different).
 							worksBefore
-									.delete( b -> addWorkInfo( b, tenantId, "42",
-											MyRoutingBridge
-													.toRoutingKey( tenantId, 42, "1" ) ) )
+									.delete( b -> addWorkInfo( b, tenantId, "42", "UE-121" ) )
+									.createdThenExecuted( futureFromBackend )
+									.delete( b -> addWorkInfo( b, tenantId, "42", "UE-122" ) )
 									.createdThenExecuted( futureFromBackend );
 						}
 					},
 					// And only then, expect the actual operation.
 					42, "UE-123", "1" );
-			CompletionStage<?> returnedFuture = operation.execute( indexer, 42, "UE-123" );
+			CompletionStage<?> returnedFuture = operation.execute( indexer, 42,
+					DocumentRoutesDescriptor.of( DocumentRouteDescriptor.of( "UE-123" ),
+							Arrays.asList( DocumentRouteDescriptor.of( "UE-121" ),
+									DocumentRouteDescriptor.of( "UE-122" ),
+									DocumentRouteDescriptor.of( "UE-123" ) ) ) );
 			backendMock.verifyExpectationsMet();
 			assertThatFuture( returnedFuture ).isPending();
 

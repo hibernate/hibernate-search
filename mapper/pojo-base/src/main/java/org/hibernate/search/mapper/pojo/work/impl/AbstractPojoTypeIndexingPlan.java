@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.spi.PojoImplicitReindexingResolverSessionContext;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 /**
@@ -33,28 +34,36 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		this.root = root;
 	}
 
-	void add(Object providedId, String providedRoutingKey, Object entity) {
+	void add(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
 		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
 		I identifier = toIdentifier( providedId, entitySupplier );
-		getState( identifier ).add( entitySupplier, providedRoutingKey );
+		S state = getState( identifier );
+		state.add( entitySupplier );
+		state.providedRoutes( providedRoutes );
 	}
 
-	void addOrUpdate(Object providedId, String providedRoutingKey, Object entity) {
+	void addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
 		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
 		I identifier = toIdentifier( providedId, entitySupplier );
-		getState( identifier ).addOrUpdate( entitySupplier, providedRoutingKey );
+		S state = getState( identifier );
+		state.addOrUpdate( entitySupplier );
+		state.providedRoutes( providedRoutes );
 	}
 
-	void addOrUpdate(Object providedId, String providedRoutingKey, Object entity, BitSet dirtyPaths) {
+	void addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity, BitSet dirtyPaths) {
 		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
 		I identifier = toIdentifier( providedId, entitySupplier );
-		getState( identifier ).addOrUpdate( entitySupplier, providedRoutingKey, dirtyPaths );
+		S state = getState( identifier );
+		state.addOrUpdate( entitySupplier, dirtyPaths );
+		state.providedRoutes( providedRoutes );
 	}
 
-	void delete(Object providedId, String providedRoutingKey, Object entity) {
+	void delete(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
 		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
 		I identifier = toIdentifier( providedId, entitySupplier );
-		getState( identifier ).delete( entitySupplier, providedRoutingKey );
+		S state = getState( identifier );
+		state.delete( entitySupplier );
+		state.providedRoutes( providedRoutes );
 	}
 
 	void planLoading() {
@@ -111,7 +120,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			return dirtyPaths;
 		}
 
-		void add(Supplier<E> entitySupplier, String providedRoutingKey) {
+		void add(Supplier<E> entitySupplier) {
 			this.entitySupplier = entitySupplier;
 			shouldResolveToReindex = true;
 			if ( EntityStatus.UNKNOWN.equals( initialStatus ) ) {
@@ -122,22 +131,22 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			dirtyPaths = null;
 		}
 
-		void addOrUpdate(Supplier<E> entitySupplier, String providedRoutingKey) {
-			doAddOrUpdate( entitySupplier, providedRoutingKey );
+		void addOrUpdate(Supplier<E> entitySupplier) {
+			doAddOrUpdate( entitySupplier );
 			shouldResolveToReindex = true;
 			considerAllDirty = true;
 			dirtyPaths = null;
 		}
 
-		void addOrUpdate(Supplier<E> entitySupplier, String providedRoutingKey, BitSet dirtyPaths) {
-			doAddOrUpdate( entitySupplier, providedRoutingKey );
+		void addOrUpdate(Supplier<E> entitySupplier, BitSet dirtyPaths) {
+			doAddOrUpdate( entitySupplier );
 			shouldResolveToReindex = true;
 			if ( !considerAllDirty ) {
 				addDirtyPaths( dirtyPaths );
 			}
 		}
 
-		void doAddOrUpdate(Supplier<E> entitySupplier, String providedRoutingKey) {
+		void doAddOrUpdate(Supplier<E> entitySupplier) {
 			this.entitySupplier = entitySupplier;
 			if ( EntityStatus.UNKNOWN.equals( initialStatus ) ) {
 				initialStatus = EntityStatus.PRESENT;
@@ -145,7 +154,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			currentStatus = EntityStatus.PRESENT;
 		}
 
-		void delete(Supplier<E> entitySupplier, String providedRoutingKey) {
+		void delete(Supplier<E> entitySupplier) {
 			this.entitySupplier = entitySupplier;
 			if ( EntityStatus.UNKNOWN.equals( initialStatus ) ) {
 				initialStatus = EntityStatus.PRESENT;
@@ -158,12 +167,13 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			dirtyPaths = null;
 		}
 
+		abstract void providedRoutes(DocumentRoutesDescriptor routes);
+
 		void planLoading() {
 			if ( EntityStatus.PRESENT == currentStatus && entitySupplier == null ) {
 				loadingOrdinal = root.loadingPlan().planLoading( typeContext().typeIdentifier(), identifier );
 			}
 		}
-
 		void resolveDirty() {
 			if ( shouldResolveToReindex ) {
 				shouldResolveToReindex = false; // Avoid infinite looping

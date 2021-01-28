@@ -10,6 +10,7 @@ import java.util.concurrent.CompletionStage;
 
 import org.hibernate.search.mapper.javabean.work.SearchIndexer;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
@@ -24,24 +25,24 @@ public enum PojoIndexingOperation {
 		}
 
 		@Override
-		void addTo(SearchIndexingPlan indexingPlan, Object providedId, String providedRoutingKey, IndexedEntity entity) {
-			indexingPlan.add( providedId, providedRoutingKey, entity );
+		void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes, IndexedEntity entity) {
+			indexingPlan.add( providedId, providedRoutes, entity );
 		}
 
 		@Override
-		void addTo(SearchIndexingPlan indexingPlan, Object providedId, String providedRoutingKey) {
-			indexingPlan.add( IndexedEntity.class, providedId, providedRoutingKey );
+		void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes) {
+			indexingPlan.add( IndexedEntity.class, providedId, providedRoutes );
 		}
 
 		@Override
-		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey,
+		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, DocumentRoutesDescriptor providedRoutes,
 				IndexedEntity entity) {
-			return indexer.add( providedId, providedRoutingKey, entity );
+			return indexer.add( providedId, providedRoutes, entity );
 		}
 
 		@Override
-		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey) {
-			return indexer.add( IndexedEntity.class, providedId, providedRoutingKey );
+		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, DocumentRoutesDescriptor providedRoutes) {
+			return indexer.add( IndexedEntity.class, providedId, providedRoutes );
 		}
 	},
 	ADD_OR_UPDATE {
@@ -52,25 +53,25 @@ public enum PojoIndexingOperation {
 		}
 
 		@Override
-		void addTo(SearchIndexingPlan indexingPlan, Object providedId, String providedRoutingKey,
+		void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes,
 				IndexedEntity entity) {
-			indexingPlan.addOrUpdate( providedId, providedRoutingKey, entity );
+			indexingPlan.addOrUpdate( providedId, providedRoutes, entity );
 		}
 
 		@Override
-		void addTo(SearchIndexingPlan indexingPlan, Object providedId, String providedRoutingKey) {
-			indexingPlan.addOrUpdate( IndexedEntity.class, providedId, providedRoutingKey );
+		void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes) {
+			indexingPlan.addOrUpdate( IndexedEntity.class, providedId, providedRoutes );
 		}
 
 		@Override
-		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey,
+		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, DocumentRoutesDescriptor providedRoutes,
 				IndexedEntity entity) {
-			return indexer.addOrUpdate( providedId, providedRoutingKey, entity );
+			return indexer.addOrUpdate( providedId, providedRoutes, entity );
 		}
 
 		@Override
-		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey) {
-			return indexer.addOrUpdate( IndexedEntity.class, providedId, providedRoutingKey );
+		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, DocumentRoutesDescriptor providedRoutes) {
+			return indexer.addOrUpdate( IndexedEntity.class, providedId, providedRoutes );
 		}
 	},
 	DELETE {
@@ -81,25 +82,25 @@ public enum PojoIndexingOperation {
 		}
 
 		@Override
-		void addTo(SearchIndexingPlan indexingPlan, Object providedId, String providedRoutingKey,
+		void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes,
 				IndexedEntity entity) {
-			indexingPlan.delete( providedId, providedRoutingKey, entity );
+			indexingPlan.delete( providedId, providedRoutes, entity );
 		}
 
 		@Override
-		void addTo(SearchIndexingPlan indexingPlan, Object providedId, String providedRoutingKey) {
-			indexingPlan.delete( IndexedEntity.class, providedId, providedRoutingKey );
+		void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes) {
+			indexingPlan.delete( IndexedEntity.class, providedId, providedRoutes );
 		}
 
 		@Override
-		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey,
+		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, DocumentRoutesDescriptor providedRoutes,
 				IndexedEntity entity) {
-			return indexer.delete( providedId, providedRoutingKey, entity );
+			return indexer.delete( providedId, providedRoutes, entity );
 		}
 
 		@Override
-		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey) {
-			return indexer.delete( IndexedEntity.class, providedId, providedRoutingKey );
+		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, DocumentRoutesDescriptor providedRoutes) {
+			return indexer.delete( IndexedEntity.class, providedId, providedRoutes );
 		}
 	};
 
@@ -110,28 +111,28 @@ public enum PojoIndexingOperation {
 		addTo( indexingPlan, providedId, null, entity );
 	}
 
-	abstract void addTo(SearchIndexingPlan indexingPlan, Object providedId, String providedRoutingKey,
+	abstract void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes,
 			IndexedEntity entity);
 
 	final void addTo(SearchIndexingPlan indexingPlan, Object providedId) {
-		addTo( indexingPlan, providedId, (String) null );
+		addTo( indexingPlan, providedId, (DocumentRoutesDescriptor) null );
 	}
 
-	abstract void addTo(SearchIndexingPlan indexingPlan, Object providedId, String providedRoutingKey);
+	abstract void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes);
 
 	final CompletionStage<?> execute(SearchIndexer indexer, Object providedId, IndexedEntity entity) {
 		return execute( indexer, providedId, null, entity );
 	}
 
-	abstract CompletionStage<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey,
+	abstract CompletionStage<?> execute(SearchIndexer indexer, Object providedId, DocumentRoutesDescriptor providedRoutes,
 			IndexedEntity entity);
 
 	final CompletionStage<?> execute(SearchIndexer indexer, Object providedId) {
-		return execute( indexer, providedId, (String) null );
+		return execute( indexer, providedId, (DocumentRoutesDescriptor) null );
 	}
 
 	abstract CompletionStage<?> execute(SearchIndexer indexer, Object providedId,
-			String providedRoutingKey);
+			DocumentRoutesDescriptor providedRoutes);
 
 	static void addWorkInfo(StubDocumentWork.Builder builder, String tenantId,
 			String identifier, String routingKey) {
