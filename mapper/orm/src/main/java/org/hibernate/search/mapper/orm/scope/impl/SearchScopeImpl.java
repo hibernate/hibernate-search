@@ -21,7 +21,6 @@ import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.schema.management.impl.SearchSchemaManagerImpl;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
-import org.hibernate.search.mapper.orm.search.query.dsl.impl.HibernateOrmSearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmSearchLoadingContext;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.work.impl.SearchWorkspaceImpl;
@@ -45,9 +44,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 		HibernateOrmSearchLoadingContext.Builder<E> loadingContextBuilder = new HibernateOrmSearchLoadingContext.Builder<>(
 				mappingContext, sessionContext, delegate.includedIndexedTypes()
 		);
-		return new HibernateOrmSearchQuerySelectStep<>(
-				delegate.search( sessionContext.backendSessionContext(), loadingContextBuilder )
-		);
+		return delegate.search( sessionContext.backendSessionContext(), loadingContextBuilder );
 	}
 
 	@Override
