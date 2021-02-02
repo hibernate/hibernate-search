@@ -30,7 +30,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
@@ -99,8 +99,8 @@ public class SearchQueryResultLoadingOrTransformingIT {
 		StubLoadedObject mainLoadedObject = new StubLoadedObject( mainReference );
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyReference );
 
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				mock( LoadingContext.class );
+		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+				mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
 				mock( StubDocumentReferenceConverter.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
@@ -144,8 +144,8 @@ public class SearchQueryResultLoadingOrTransformingIT {
 		StubLoadedObject mainLoadedObject = new StubLoadedObject( mainReference );
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyReference );
 
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				mock( LoadingContext.class );
+		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+				mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
 				mock( StubDocumentReferenceConverter.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
@@ -220,8 +220,8 @@ public class SearchQueryResultLoadingOrTransformingIT {
 		StubTransformedReference mainTransformedReference = new StubTransformedReference( mainReference );
 		StubTransformedReference emptyTransformedReference = new StubTransformedReference( emptyReference );
 
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				mock( LoadingContext.class );
+		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+				mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
 				mock( StubDocumentReferenceConverter.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
@@ -266,8 +266,8 @@ public class SearchQueryResultLoadingOrTransformingIT {
 		StubLoadedObject mainLoadedObject = new StubLoadedObject( mainReference );
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyReference );
 
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				mock( LoadingContext.class );
+		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+				mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
 				mock( StubDocumentReferenceConverter.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
@@ -312,8 +312,8 @@ public class SearchQueryResultLoadingOrTransformingIT {
 		StubLoadedObject mainLoadedObject = new StubLoadedObject( mainReference );
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyReference );
 
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				mock( LoadingContext.class );
+		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+				mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
 				mock( StubDocumentReferenceConverter.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
@@ -438,8 +438,8 @@ public class SearchQueryResultLoadingOrTransformingIT {
 		StubLoadedObject mainLoadedObject = new StubLoadedObject( mainReference );
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyReference );
 
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				mock( LoadingContext.class );
+		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+				mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
 				mock( StubDocumentReferenceConverter.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
@@ -563,8 +563,8 @@ public class SearchQueryResultLoadingOrTransformingIT {
 
 	@Test
 	public void callGetProjectionHitMapperEveryTime() {
-		LoadingContext<DocumentReference, DocumentReference> loadingContextMock =
-				mock( LoadingContext.class );
+		SearchLoadingContext<DocumentReference, DocumentReference> loadingContextMock =
+				mock( SearchLoadingContext.class );
 
 		GenericStubMappingScope<DocumentReference, DocumentReference> scope = index.createGenericScope();
 		SearchQuery<DocumentReference> query = scope.query( loadingContextMock )
@@ -597,8 +597,8 @@ public class SearchQueryResultLoadingOrTransformingIT {
 		StubTransformedReference emptyEntityReference = new StubTransformedReference( emptyDocumentReference );
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyDocumentReference );
 
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				mock( LoadingContext.class );
+		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+				mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
 				mock( StubDocumentReferenceConverter.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =

@@ -30,8 +30,8 @@ import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elas
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -60,7 +60,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private final BackendSessionContext sessionContext;
 
 	private final PredicateRequestContext rootPredicateContext;
-	private final LoadingContextBuilder<?, ?, ?> loadingContextBuilder;
+	private final SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder;
 	private final ElasticsearchSearchProjection<?, H> rootProjection;
 	private final Integer scrollTimeout;
 
@@ -81,7 +81,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 			ElasticsearchParallelWorkOrchestrator queryOrchestrator,
 			ElasticsearchSearchContext searchContext,
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<?, ?, ?> loadingContextBuilder,
+			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<?, H> rootProjection,
 			Integer scrollTimeout) {
 		this.workFactory = workFactory;
@@ -197,7 +197,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 			payload.add( "sort", jsonSort );
 		}
 
-		LoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
+		SearchLoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
 
 		ElasticsearchSearchQueryRequestContext requestContext = new ElasticsearchSearchQueryRequestContext(
 				searchContext, sessionContext, loadingContext, rootPredicateContext, distanceSorts

@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractSearchQuerySelectStep;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 public final class DefaultSearchQuerySelectStep<R, E, LOS, C>
@@ -35,11 +35,11 @@ public final class DefaultSearchQuerySelectStep<R, E, LOS, C>
 
 	private final IndexScope<C> indexScope;
 	private final BackendSessionContext sessionContext;
-	private final LoadingContextBuilder<R, E, LOS> loadingContextBuilder;
+	private final SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder;
 
 	public DefaultSearchQuerySelectStep(IndexScope<C> indexScope,
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
+			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		this.indexScope = indexScope;
 		this.sessionContext = sessionContext;
 		this.loadingContextBuilder = loadingContextBuilder;
@@ -103,7 +103,7 @@ public final class DefaultSearchQuerySelectStep<R, E, LOS, C>
 	}
 
 	@Override
-	protected LoadingContextBuilder<R, E, LOS> loadingContextBuilder() {
+	protected SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder() {
 		return loadingContextBuilder;
 	}
 }

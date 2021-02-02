@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
@@ -50,7 +50,7 @@ public abstract class StubBackendBehavior {
 	public abstract CompletableFuture<?> processAndExecuteDocumentWork(String indexName, StubDocumentWork work);
 
 	public abstract <T> SearchResult<T> executeSearchWork(Set<String> indexNames, StubSearchWork work,
-			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext,
+			StubSearchProjectionContext projectionContext, SearchLoadingContext<?, ?> loadingContext,
 			StubSearchProjection<T> rootProjection, Deadline deadline);
 
 	public abstract CompletableFuture<?> executeIndexScaleWork(String indexName, StubIndexScaleWork work);
@@ -58,13 +58,13 @@ public abstract class StubBackendBehavior {
 	public abstract long executeCountWork(Set<String> indexNames);
 
 	public abstract <T> SearchScroll<T> executeScrollWork(Set<String> indexNames, StubSearchWork work, int chunkSize,
-			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext,
+			StubSearchProjectionContext projectionContext, SearchLoadingContext<?, ?> loadingContext,
 			StubSearchProjection<T> rootProjection, TimingSource timingSource);
 
 	public abstract void executeCloseScrollWork(Set<String> indexNames);
 
 	public abstract <T> SearchScrollResult<T> executeNextScrollWork(Set<String> indexNames, StubSearchWork work,
-			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext,
+			StubSearchProjectionContext projectionContext, SearchLoadingContext<?, ?> loadingContext,
 			StubSearchProjection<T> rootProjection, Deadline deadline);
 
 }

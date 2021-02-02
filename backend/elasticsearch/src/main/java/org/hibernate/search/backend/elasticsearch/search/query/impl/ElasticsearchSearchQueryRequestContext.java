@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.Distanc
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionRequestContext;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 import com.google.gson.JsonObject;
@@ -36,14 +36,14 @@ class ElasticsearchSearchQueryRequestContext implements SearchProjectionRequestC
 
 	private final ElasticsearchSearchContext searchContext;
 	private final BackendSessionContext sessionContext;
-	private final LoadingContext<?, ?> loadingContext;
+	private final SearchLoadingContext<?, ?> loadingContext;
 	private final PredicateRequestContext rootPredicateContext;
 	private final Map<DistanceSortKey, Integer> distanceSorts;
 
 	ElasticsearchSearchQueryRequestContext(
 			ElasticsearchSearchContext searchContext,
 			BackendSessionContext sessionContext,
-			LoadingContext<?, ?> loadingContext,
+			SearchLoadingContext<?, ?> loadingContext,
 			PredicateRequestContext rootPredicateContext,
 			Map<DistanceSortKey, Integer> distanceSorts) {
 		this.searchContext = searchContext;

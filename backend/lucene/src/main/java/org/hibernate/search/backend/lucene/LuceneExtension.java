@@ -45,8 +45,8 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -120,7 +120,7 @@ public final class LuceneExtension<H, R, E, LOS>
 			SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
 			IndexScope<?> indexScope,
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
+			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		if ( indexScope instanceof LuceneIndexScope ) {
 			return Optional.of( new LuceneSearchQuerySelectStepImpl<>(
 					(LuceneIndexScope) indexScope, sessionContext, loadingContextBuilder
@@ -136,7 +136,7 @@ public final class LuceneExtension<H, R, E, LOS>
 	 */
 	@Override
 	public Optional<LuceneSearchQuery<H>> extendOptional(SearchQuery<H> original,
-			LoadingContext<?, ?> loadingContext) {
+			SearchLoadingContext<?, ?> loadingContext) {
 		if ( original instanceof LuceneSearchQuery ) {
 			return Optional.of( (LuceneSearchQuery<H>) original );
 		}

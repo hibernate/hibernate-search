@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
@@ -254,7 +254,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	@Override
 	public <T> SearchResult<T> executeSearchWork(Set<String> indexNames, StubSearchWork work,
-			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext,
+			StubSearchProjectionContext projectionContext, SearchLoadingContext<?, ?> loadingContext,
 			StubSearchProjection<T> rootProjection, Deadline deadline) {
 		return searchCalls.verify(
 				new SearchWorkCall<>( indexNames, work, projectionContext, loadingContext, rootProjection,
@@ -286,7 +286,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	@Override
 	public <T> SearchScroll<T> executeScrollWork(Set<String> indexNames, StubSearchWork work, int chunkSize,
-			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext,
+			StubSearchProjectionContext projectionContext, SearchLoadingContext<?, ?> loadingContext,
 			StubSearchProjection<T> rootProjection, TimingSource timingSource) {
 		return scrollCalls.verify(
 				new ScrollWorkCall<>( indexNames, work, chunkSize, this, projectionContext, loadingContext,
@@ -309,7 +309,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	@Override
 	public <T> SearchScrollResult<T> executeNextScrollWork(Set<String> indexNames, StubSearchWork work,
-			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext,
+			StubSearchProjectionContext projectionContext, SearchLoadingContext<?, ?> loadingContext,
 			StubSearchProjection<T> rootProjection, Deadline deadline) {
 		return nextScrollCalls.verify(
 				new NextScrollWorkCall<>( indexNames, work, projectionContext, loadingContext, rootProjection,

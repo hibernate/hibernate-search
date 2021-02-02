@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
@@ -70,7 +70,7 @@ public class SearchQueryScrollResultLoadingIT {
 
 	@Test
 	public void resultLoadingOnScrolling() {
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( LoadingContext.class );
+		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock = mock( StubDocumentReferenceConverter.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock = mock( StubEntityLoader.class );
 
@@ -86,7 +86,7 @@ public class SearchQueryScrollResultLoadingIT {
 
 	@Test
 	public void resultLoadingOnScrolling_entityLoadingTimeout() {
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( LoadingContext.class );
+		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock = mock( StubDocumentReferenceConverter.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock = mock( StubEntityLoader.class );
 
@@ -103,7 +103,7 @@ public class SearchQueryScrollResultLoadingIT {
 
 	@Test
 	public void resultLoadingOnScrolling_softTimeout() {
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( LoadingContext.class );
+		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock = mock( StubDocumentReferenceConverter.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock = mock( StubEntityLoader.class );
 
@@ -119,7 +119,7 @@ public class SearchQueryScrollResultLoadingIT {
 		verifyLoading( loadingContextMock, documentReferenceConverterMock, objectLoaderMock, scroll );
 	}
 
-	private void verifyLoading(LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock,
+	private void verifyLoading(SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock,
 			DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock,
 			EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock,
 			SearchScroll<StubLoadedObject> scroll) {

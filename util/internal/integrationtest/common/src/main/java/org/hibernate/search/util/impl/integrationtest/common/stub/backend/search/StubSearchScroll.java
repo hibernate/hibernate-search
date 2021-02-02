@@ -9,7 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 import java.util.Set;
 
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
@@ -23,12 +23,12 @@ public class StubSearchScroll<T> implements SearchScroll<T> {
 	private final Set<String> indexNames;
 	private final StubSearchWork work;
 	private final StubSearchProjectionContext projectionContext;
-	private final LoadingContext<?, ?> loadingContext;
+	private final SearchLoadingContext<?, ?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
 	private final StubTimeoutManager timeoutManager;
 
 	public StubSearchScroll(StubBackendBehavior behavior, Set<String> indexNames, StubSearchWork work,
-			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext,
+			StubSearchProjectionContext projectionContext, SearchLoadingContext<?, ?> loadingContext,
 			StubSearchProjection<T> rootProjection, TimingSource timingSource) {
 		this.behavior = behavior;
 		this.indexNames = indexNames;

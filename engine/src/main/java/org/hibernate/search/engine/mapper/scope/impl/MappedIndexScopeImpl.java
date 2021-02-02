@@ -12,7 +12,7 @@ import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.DefaultSearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.SearchAggregationDslContextImpl;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.impl.DefaultSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.impl.SearchPredicateDslContextImpl;
@@ -45,7 +45,7 @@ class MappedIndexScopeImpl<C, R, E> implements MappedIndexScope<R, E> {
 	@Override
 	public <LOS> SearchQuerySelectStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
+			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		return new DefaultSearchQuerySelectStep<>( delegate, sessionContext, loadingContextBuilder );
 	}
 

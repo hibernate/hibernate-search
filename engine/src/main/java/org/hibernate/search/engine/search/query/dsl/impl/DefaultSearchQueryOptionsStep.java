@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.search.query.dsl.impl;
 
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
@@ -30,7 +30,7 @@ final class DefaultSearchQueryOptionsStep<H, LOS, C>
 				SearchQueryOptionsStep<DefaultSearchQueryOptionsStep<H, LOS, C>, H, LOS, SearchSortFactory, SearchAggregationFactory> {
 
 	DefaultSearchQueryOptionsStep(IndexScope<C> indexScope, SearchQueryBuilder<H, C> searchQueryBuilder,
-			LoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
+			SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
 		super( indexScope, searchQueryBuilder, loadingContextBuilder );
 	}
 

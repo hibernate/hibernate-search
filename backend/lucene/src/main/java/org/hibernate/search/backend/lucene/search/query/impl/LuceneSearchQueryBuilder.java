@@ -32,8 +32,8 @@ import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.Luce
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -57,7 +57,7 @@ public class LuceneSearchQueryBuilder<H>
 	private final BackendSessionContext sessionContext;
 	private final Set<String> routingKeys;
 
-	private final LoadingContextBuilder<?, ?, ?> loadingContextBuilder;
+	private final SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder;
 	private final LuceneSearchProjection<?, H> rootProjection;
 
 	private List<LuceneFieldComparatorSource> nestedFieldSorts;
@@ -75,7 +75,7 @@ public class LuceneSearchQueryBuilder<H>
 			LuceneSyncWorkOrchestrator queryOrchestrator,
 			LuceneSearchContext searchContext,
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<?, ?, ?> loadingContextBuilder,
+			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			LuceneSearchProjection<?, H> rootProjection) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
@@ -170,7 +170,7 @@ public class LuceneSearchQueryBuilder<H>
 
 	@Override
 	public LuceneSearchQuery<H> build() {
-		LoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
+		SearchLoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
 
 		BooleanQuery.Builder luceneQueryBuilder = new BooleanQuery.Builder();
 		luceneQueryBuilder.add( luceneQuery, Occur.MUST );

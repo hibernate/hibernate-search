@@ -49,7 +49,7 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.sort.SearchSort;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -163,7 +163,7 @@ public class ElasticsearchExtensionIT {
 
 		// Unsupported extension
 		assertThatThrownBy(
-				() -> query.extension( (SearchQuery<DocumentReference> original, LoadingContext<?, ?> loadingContext) -> Optional.empty() )
+				() -> query.extension( (SearchQuery<DocumentReference> original, SearchLoadingContext<?, ?> loadingContext) -> Optional.empty() )
 		)
 				.isInstanceOf( SearchException.class );
 	}

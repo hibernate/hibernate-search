@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.search.query.dsl.spi;
 
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
@@ -32,7 +32,7 @@ public abstract class AbstractExtendedSearchQueryOptionsStep<
 
 	public AbstractExtendedSearchQueryOptionsStep(IndexScope<C> indexScope,
 			SearchQueryBuilder<H, C> searchQueryBuilder,
-			LoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
+			SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
 		super( indexScope, searchQueryBuilder, loadingContextBuilder );
 	}
 

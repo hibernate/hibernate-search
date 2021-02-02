@@ -63,7 +63,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubLoadingOptionsStep;
@@ -169,7 +169,7 @@ public class LuceneExtensionIT {
 
 		// Unsupported extension
 		assertThatThrownBy(
-				() -> query.extension( (SearchQuery<DocumentReference> original, LoadingContext<?, ?> loadingContext) -> Optional.empty() )
+				() -> query.extension( (SearchQuery<DocumentReference> original, SearchLoadingContext<?, ?> loadingContext) -> Optional.empty() )
 		)
 				.isInstanceOf( SearchException.class );
 	}

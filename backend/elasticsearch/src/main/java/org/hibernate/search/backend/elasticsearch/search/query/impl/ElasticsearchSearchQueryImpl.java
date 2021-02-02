@@ -33,7 +33,7 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
@@ -59,7 +59,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private final ElasticsearchParallelWorkOrchestrator queryOrchestrator;
 	private final ElasticsearchSearchContext searchContext;
 	private final BackendSessionContext sessionContext;
-	private final LoadingContext<?, ?> loadingContext;
+	private final SearchLoadingContext<?, ?> loadingContext;
 	private final Set<String> routingKeys;
 	private final JsonObject payload;
 	private final ElasticsearchSearchRequestTransformer requestTransformer;
@@ -73,7 +73,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			ElasticsearchParallelWorkOrchestrator queryOrchestrator,
 			ElasticsearchSearchContext searchContext,
 			BackendSessionContext sessionContext,
-			LoadingContext<?, ?> loadingContext,
+			SearchLoadingContext<?, ?> loadingContext,
 			Set<String> routingKeys,
 			JsonObject payload,
 			ElasticsearchSearchRequestTransformer requestTransformer,

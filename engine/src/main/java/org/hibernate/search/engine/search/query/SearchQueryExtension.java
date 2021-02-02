@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.query;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 
 /**
  * An extension to the search query, allowing to wrap a query.
@@ -32,10 +32,10 @@ public interface SearchQueryExtension<Q, H> {
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
 	 * @param original The original, non-extended {@link org.hibernate.search.engine.search.query.SearchQuery}.
-	 * @param loadingContext The {@link LoadingContext} used by the original query.
+	 * @param loadingContext The {@link SearchLoadingContext} used by the original query.
 	 * @return An optional containing the extended search query ({@link Q}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<Q> extendOptional(SearchQuery<H> original, LoadingContext<?, ?> loadingContext);
+	Optional<Q> extendOptional(SearchQuery<H> original, SearchLoadingContext<?, ?> loadingContext);
 
 }

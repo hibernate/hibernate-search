@@ -7,14 +7,14 @@
 package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-public class StubLoadingContext implements LoadingContext<DocumentReference, DocumentReference> {
+public class StubSearchLoadingContext implements SearchLoadingContext<DocumentReference, DocumentReference> {
 
-	StubLoadingContext() {
+	StubSearchLoadingContext() {
 	}
 
 	@Override

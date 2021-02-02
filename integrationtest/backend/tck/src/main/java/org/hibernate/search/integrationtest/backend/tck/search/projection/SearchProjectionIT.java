@@ -29,7 +29,7 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
@@ -159,8 +159,8 @@ public class SearchProjectionIT {
 		StubLoadedObject document3LoadedObject = new StubLoadedObject( document3Reference );
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyReference );
 
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				mock( LoadingContext.class );
+		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+				mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
 				mock( StubDocumentReferenceConverter.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =

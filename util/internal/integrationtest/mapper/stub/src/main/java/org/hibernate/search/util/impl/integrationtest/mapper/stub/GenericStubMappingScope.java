@@ -12,8 +12,8 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 
 /**
  * A wrapper around {@link MappedIndexScope} providing some syntactic sugar,
@@ -27,25 +27,26 @@ public class GenericStubMappingScope<R, E> {
 		this.delegate = delegate;
 	}
 
-	public SearchQuerySelectStep<?, R, E, StubLoadingOptionsStep, ?, ?> query(LoadingContext<R, E> loadingContext) {
+	public SearchQuerySelectStep<?, R, E, StubLoadingOptionsStep, ?, ?> query(
+			SearchLoadingContext<R, E> loadingContext) {
 		return query( new StubBackendSessionContext(), loadingContext );
 	}
 
 	public SearchQuerySelectStep<?, R, E, StubLoadingOptionsStep, ?, ?> query(StubBackendSessionContext sessionContext,
-			LoadingContext<R, E> loadingContext) {
+			SearchLoadingContext<R, E> loadingContext) {
 		return query( sessionContext, loadingContext, new StubLoadingOptionsStep() );
 	}
 
 	public <LOS> SearchQuerySelectStep<?, R, E, LOS, ?, ?> query(StubBackendSessionContext sessionContext,
-			LoadingContext<R, E> loadingContext, LOS loadingOptionsStep) {
-		LoadingContextBuilder<R, E, LOS> loadingContextBuilder = new LoadingContextBuilder<R, E, LOS>() {
+			SearchLoadingContext<R, E> loadingContext, LOS loadingOptionsStep) {
+		SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder = new SearchLoadingContextBuilder<R, E, LOS>() {
 			@Override
 			public LOS toAPI() {
 				return loadingOptionsStep;
 			}
 
 			@Override
-			public LoadingContext<R, E> build() {
+			public SearchLoadingContext<R, E> build() {
 				return loadingContext;
 			}
 		};

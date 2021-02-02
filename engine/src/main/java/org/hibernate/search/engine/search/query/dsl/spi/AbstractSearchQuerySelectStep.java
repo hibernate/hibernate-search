@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 
 public abstract class AbstractSearchQuerySelectStep<
 				N extends SearchQueryOptionsStep<?, E, LOS, ?, ?>,
@@ -49,5 +49,5 @@ public abstract class AbstractSearchQuerySelectStep<
 
 	protected abstract BackendSessionContext sessionContext();
 
-	protected abstract LoadingContextBuilder<R, E, LOS> loadingContextBuilder();
+	protected abstract SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder();
 }
