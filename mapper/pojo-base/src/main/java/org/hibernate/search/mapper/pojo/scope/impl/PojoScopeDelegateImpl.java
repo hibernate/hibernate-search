@@ -10,28 +10,33 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.schema.management.impl.PojoScopeSchemaManagerImpl;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeMappingContext;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeSessionContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextProvider;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.mapper.pojo.search.loading.impl.PojoSearchLoadingContextBuilder;
+import org.hibernate.search.mapper.pojo.search.loading.impl.PojoSearchLoadingIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.work.impl.PojoScopeWorkspaceImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -99,9 +104,14 @@ public final class PojoScopeDelegateImpl<R, E, C> implements PojoScopeDelegate<R
 
 	@Override
 	public <LOS> SearchQuerySelectStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
-			BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
-		return getIndexScope().search( sessionContext, loadingContextBuilder );
+			PojoScopeSessionContext sessionContext, DocumentReferenceConverter<R> documentReferenceConverter,
+			PojoLoadingContextBuilder<LOS> loadingContextBuilder) {
+		Map<String, PojoSearchLoadingIndexedTypeContext<? extends E>> targetTypesByEntityName = new LinkedHashMap<>();
+		for ( PojoScopeIndexedTypeContext<?, ? extends E> type : targetedTypeContexts ) {
+			targetTypesByEntityName.put( type.entityName(), type );
+		}
+		return getIndexScope().search( sessionContext, new PojoSearchLoadingContextBuilder<>(
+				targetTypesByEntityName, documentReferenceConverter, sessionContext, loadingContextBuilder ) );
 	}
 
 	@Override

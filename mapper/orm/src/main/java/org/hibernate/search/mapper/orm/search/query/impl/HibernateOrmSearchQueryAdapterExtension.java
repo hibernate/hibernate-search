@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.spi.SearchQueryImplementor;
-import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmSearchLoadingContext;
+import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmLoadingContext;
 
 final class HibernateOrmSearchQueryAdapterExtension<H> implements
 		SearchQueryExtension<HibernateOrmSearchQueryAdapter<H>, H> {
@@ -26,8 +26,9 @@ final class HibernateOrmSearchQueryAdapterExtension<H> implements
 
 	@Override
 	public Optional<HibernateOrmSearchQueryAdapter<H>> extendOptional(SearchQuery<H> original, SearchLoadingContext<?, ?> loadingContext) {
-		if ( loadingContext instanceof HibernateOrmSearchLoadingContext ) {
-			HibernateOrmSearchLoadingContext<?> castedLoadingContext = (HibernateOrmSearchLoadingContext<?>) loadingContext;
+		Object unwrapped = loadingContext.unwrap();
+		if ( unwrapped instanceof HibernateOrmLoadingContext ) {
+			HibernateOrmLoadingContext castedLoadingContext = (HibernateOrmLoadingContext) unwrapped;
 			return Optional.of( new HibernateOrmSearchQueryAdapter<>(
 					// All SearchQuery implementations should implement SearchQueryImplementor
 					(SearchQueryImplementor<H>) original,

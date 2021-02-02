@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.javabean.scope.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -18,8 +17,9 @@ import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
-import org.hibernate.search.mapper.javabean.search.loading.impl.JavaBeanSearchLoadingContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeSessionContext;
 
 public class SearchScopeImpl<E> implements SearchScope<E> {
 
@@ -54,8 +54,9 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 		return delegate.includedIndexedTypes();
 	}
 
-	public SearchQuerySelectStep<?, EntityReference, E, ?, ?, ?> search(BackendSessionContext sessionContext,
-			DocumentReferenceConverter<EntityReference> documentReferenceConverter) {
-		return delegate.search( sessionContext, new JavaBeanSearchLoadingContext.Builder<>( documentReferenceConverter ) );
+	public SearchQuerySelectStep<?, EntityReference, E, ?, ?, ?> search(PojoScopeSessionContext sessionContext,
+			DocumentReferenceConverter<EntityReference> documentReferenceConverter,
+			PojoLoadingContextBuilder<?> loadingContextBuilder) {
+		return delegate.search( sessionContext, documentReferenceConverter, loadingContextBuilder );
 	}
 }

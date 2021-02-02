@@ -548,4 +548,8 @@ public interface Log extends BasicLogger {
 	void arbitraryMemberSelection(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
 			String propertyName, Member selectedMember, List<Member> otherMembers);
 
+	@Message(id = ID_OFFSET + 86,
+			value = "Unexpected entity name for entity loading: '%1$s'. Expected one of %2$s.")
+	SearchException unexpectedEntityNameForEntityLoading(String entityName, Collection<String> expectedNames);
+
 }
