@@ -23,8 +23,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.SearchResult;
@@ -37,7 +37,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConf
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubLoadingContext;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubSearchLoadingContext;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Before;
@@ -225,9 +225,9 @@ public class SearchQueryBaseIT {
 	private static class SupportedQueryExtension<H> implements SearchQueryExtension<QueryWrapper<H>, H> {
 		@Override
 		public Optional<QueryWrapper<H>> extendOptional(SearchQuery<H> original,
-				LoadingContext<?, ?> loadingContext) {
+				SearchLoadingContext<?, ?> loadingContext) {
 			assertThat( original ).isNotNull();
-			assertThat( loadingContext ).isNotNull().isInstanceOf( StubLoadingContext.class );
+			assertThat( loadingContext ).isNotNull().isInstanceOf( StubSearchLoadingContext.class );
 			return Optional.of( new QueryWrapper<>( original ) );
 		}
 	}
@@ -235,9 +235,9 @@ public class SearchQueryBaseIT {
 	private static class UnSupportedQueryExtension<H> implements SearchQueryExtension<QueryWrapper<H>, H> {
 		@Override
 		public Optional<QueryWrapper<H>> extendOptional(SearchQuery<H> original,
-				LoadingContext<?, ?> loadingContext) {
+				SearchLoadingContext<?, ?> loadingContext) {
 			assertThat( original ).isNotNull();
-			assertThat( loadingContext ).isNotNull().isInstanceOf( StubLoadingContext.class );
+			assertThat( loadingContext ).isNotNull().isInstanceOf( StubSearchLoadingContext.class );
 			return Optional.empty();
 		}
 	}
@@ -247,7 +247,7 @@ public class SearchQueryBaseIT {
 		@Override
 		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
 				IndexScope<?> indexScope, BackendSessionContext sessionContext,
-				LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
+				SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 			assertThat( original ).isNotNull();
 			assertThat( indexScope ).isNotNull();
 			assertThat( sessionContext ).isNotNull();
@@ -261,7 +261,7 @@ public class SearchQueryBaseIT {
 		@Override
 		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
 				IndexScope<?> indexScope, BackendSessionContext sessionContext,
-				LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
+				SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 			assertThat( original ).isNotNull();
 			assertThat( indexScope ).isNotNull();
 			assertThat( sessionContext ).isNotNull();

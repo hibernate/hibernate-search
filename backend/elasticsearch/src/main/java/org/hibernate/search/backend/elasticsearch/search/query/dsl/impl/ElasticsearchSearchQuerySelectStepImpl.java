@@ -24,7 +24,7 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractSearchQuerySelectStep;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 
 public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 		extends AbstractSearchQuerySelectStep<
@@ -40,11 +40,11 @@ public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 
 	private final ElasticsearchIndexScope indexScope;
 	private final BackendSessionContext sessionContext;
-	private final LoadingContextBuilder<R, E, LOS> loadingContextBuilder;
+	private final SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder;
 
 	public ElasticsearchSearchQuerySelectStepImpl(ElasticsearchIndexScope indexScope,
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
+			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		this.indexScope = indexScope;
 		this.sessionContext = sessionContext;
 		this.loadingContextBuilder = loadingContextBuilder;
@@ -109,7 +109,7 @@ public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 	}
 
 	@Override
-	protected LoadingContextBuilder<R, E, LOS> loadingContextBuilder() {
+	protected SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder() {
 		return loadingContextBuilder;
 	}
 

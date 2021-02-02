@@ -27,7 +27,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentif
 import org.hibernate.search.backend.lucene.work.impl.ReadWork;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
@@ -48,7 +48,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private final LuceneWorkFactory workFactory;
 	private final LuceneSearchContext searchContext;
 	private final BackendSessionContext sessionContext;
-	private final LoadingContext<?, ?> loadingContext;
+	private final SearchLoadingContext<?, ?> loadingContext;
 	private final Set<String> routingKeys;
 	private final Query luceneQuery;
 	private final Sort luceneSort;
@@ -60,7 +60,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	LuceneSearchQueryImpl(LuceneSyncWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, LuceneSearchContext searchContext,
 			BackendSessionContext sessionContext,
-			LoadingContext<?, ?> loadingContext,
+			SearchLoadingContext<?, ?> loadingContext,
 			Set<String> routingKeys,
 			TimeoutManager timeoutManager,
 			Query luceneQuery, Sort luceneSort,

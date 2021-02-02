@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 
 /**
  * @param <R> The type of entity references, i.e. the type of hits returned by
@@ -32,7 +32,7 @@ public interface MappedIndexScope<R, E> {
 	 */
 	<LOS> SearchQuerySelectStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<R, E, LOS> loadingContextBuilder);
+			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder);
 
 	SearchPredicateFactory predicate();
 

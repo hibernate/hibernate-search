@@ -34,8 +34,8 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryExtens
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactoryExtension;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
@@ -120,7 +120,7 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 			SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
 			IndexScope<?> indexScope,
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
+			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		if ( indexScope instanceof ElasticsearchIndexScope ) {
 			return Optional.of( new ElasticsearchSearchQuerySelectStepImpl<>(
 					(ElasticsearchIndexScope) indexScope, sessionContext, loadingContextBuilder
@@ -136,7 +136,7 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	 */
 	@Override
 	public Optional<ElasticsearchSearchQuery<H>> extendOptional(SearchQuery<H> original,
-			LoadingContext<?, ?> loadingContext) {
+			SearchLoadingContext<?, ?> loadingContext) {
 		if ( original instanceof ElasticsearchSearchQuery ) {
 			return Optional.of( (ElasticsearchSearchQuery<H>) original );
 		}

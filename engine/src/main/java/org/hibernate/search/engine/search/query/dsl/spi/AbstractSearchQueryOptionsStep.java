@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.predicate.dsl.impl.SearchPredicateDslContextImpl;
@@ -54,11 +54,11 @@ public abstract class AbstractSearchQueryOptionsStep<
 
 	private final IndexScope<C> indexScope;
 	private final SearchQueryBuilder<H, C> searchQueryBuilder;
-	private final LoadingContextBuilder<?, ?, LOS> loadingContextBuilder;
+	private final SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder;
 
 	public AbstractSearchQueryOptionsStep(IndexScope<C> indexScope,
 			SearchQueryBuilder<H, C> searchQueryBuilder,
-			LoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
+			SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
 		this.indexScope = indexScope;
 		this.searchQueryBuilder = searchQueryBuilder;
 		this.loadingContextBuilder = loadingContextBuilder;

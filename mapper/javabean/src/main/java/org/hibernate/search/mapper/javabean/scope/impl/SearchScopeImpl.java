@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
-import org.hibernate.search.mapper.javabean.search.loading.context.impl.JavaBeanLoadingContext;
+import org.hibernate.search.mapper.javabean.search.loading.impl.JavaBeanSearchLoadingContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
 public class SearchScopeImpl<E> implements SearchScope<E> {
@@ -56,6 +56,6 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	public SearchQuerySelectStep<?, EntityReference, Void, ?, ?, ?> search(BackendSessionContext sessionContext,
 			DocumentReferenceConverter<EntityReference> documentReferenceConverter) {
-		return delegate.search( sessionContext, new JavaBeanLoadingContext.Builder( documentReferenceConverter ) );
+		return delegate.search( sessionContext, new JavaBeanSearchLoadingContext.Builder( documentReferenceConverter ) );
 	}
 }

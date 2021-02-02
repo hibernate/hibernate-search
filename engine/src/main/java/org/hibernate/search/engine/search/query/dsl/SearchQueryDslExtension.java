@@ -12,7 +12,7 @@ import java.util.Optional;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractSearchQueryOptionsStep;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 
 /**
  * An extension to the search query DSL, allowing to set non-standard options on a query.
@@ -41,13 +41,13 @@ public interface SearchQueryDslExtension<T, R, E, LOS> {
 	 * @param original The original, non-extended {@link SearchQuerySelectStep}.
 	 * @param indexScope An {@link IndexScope}.
 	 * @param sessionContext A {@link BackendSessionContext}.
-	 * @param loadingContextBuilder A {@link LoadingContextBuilder}.
+	 * @param loadingContextBuilder A {@link SearchLoadingContextBuilder}.
 	 * @return An optional containing the extended search query DSL step ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
 	Optional<T> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
 			IndexScope<?> indexScope,
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<R, E, LOS> loadingContextBuilder);
+			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder);
 
 }

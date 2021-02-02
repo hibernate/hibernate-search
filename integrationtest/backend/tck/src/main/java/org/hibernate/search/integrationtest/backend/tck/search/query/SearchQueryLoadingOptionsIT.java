@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubLoadedObject;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -50,7 +50,7 @@ public class SearchQueryLoadingOptionsIT {
 
 	@Test
 	public void defaultResultType() {
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( LoadingContext.class );
+		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( SearchLoadingContext.class );
 		Consumer<Object> loadingOptionsStepMock = mock( Consumer.class );
 
 		Object someOption = new Object();
@@ -66,7 +66,7 @@ public class SearchQueryLoadingOptionsIT {
 
 	@Test
 	public void selectEntity() {
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( LoadingContext.class );
+		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( SearchLoadingContext.class );
 		Consumer<Object> loadingOptionsStepMock = mock( Consumer.class );
 
 		Object someOption = new Object();
@@ -81,7 +81,7 @@ public class SearchQueryLoadingOptionsIT {
 
 	@Test
 	public void selectEntityReference() {
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( LoadingContext.class );
+		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( SearchLoadingContext.class );
 		Consumer<Object> loadingOptionsStepMock = mock( Consumer.class );
 
 		Object someOption = new Object();
@@ -96,8 +96,8 @@ public class SearchQueryLoadingOptionsIT {
 
 	@Test
 	public void select() {
-		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
-				mock( LoadingContext.class );
+		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
+				mock( SearchLoadingContext.class );
 		Consumer<Object> loadingOptionsStepMock = mock( Consumer.class );
 
 		Object someOption = new Object();

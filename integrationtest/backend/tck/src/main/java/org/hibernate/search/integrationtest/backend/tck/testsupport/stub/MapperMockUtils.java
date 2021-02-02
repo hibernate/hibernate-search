@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.util.impl.integrationtest.common.MockUtils;
@@ -41,7 +41,7 @@ public final class MapperMockUtils {
 	 * @param <E> The entity type.
 	 */
 	public static <R, E> void expectHitMapping(
-			LoadingContext<R, E> loadingContextMock,
+			SearchLoadingContext<R, E> loadingContextMock,
 			DocumentReferenceConverter<R> referenceTransformerMock,
 			EntityLoader<R, E> objectLoaderMock,
 			Consumer<HitMappingDefinitionContext<R, E>> hitMappingDefinition) {

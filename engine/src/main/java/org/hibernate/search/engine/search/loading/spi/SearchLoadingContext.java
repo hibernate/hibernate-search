@@ -4,9 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.search.loading.context.spi;
-
-import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+package org.hibernate.search.engine.search.loading.spi;
 
 /**
  * An execution context for queries,
@@ -15,7 +13,7 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
  * @param <R> The type of entity references.
  * @param <E> The type of loaded entities.
  */
-public interface LoadingContext<R, E> {
+public interface SearchLoadingContext<R, E> {
 
 	ProjectionHitMapper<R, E> createProjectionHitMapper();
 

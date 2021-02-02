@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.spi.AbstractSearchQuery;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -29,12 +29,12 @@ final class StubSearchQuery<H> extends AbstractSearchQuery<H, SearchResult<H>>
 	private final Set<String> indexNames;
 	private final StubSearchWork.Builder workBuilder;
 	private final StubSearchProjectionContext projectionContext;
-	private final LoadingContext<?, ?> loadingContext;
+	private final SearchLoadingContext<?, ?> loadingContext;
 	private final StubSearchProjection<H> rootProjection;
 
 	StubSearchQuery(StubBackend backend, Set<String> indexNames, StubSearchWork.Builder workBuilder,
 			StubSearchProjectionContext projectionContext,
-			LoadingContext<?, ?> loadingContext, StubSearchProjection<H> rootProjection) {
+			SearchLoadingContext<?, ?> loadingContext, StubSearchProjection<H> rootProjection) {
 		this.backend = backend;
 		this.indexNames = indexNames;
 		this.workBuilder = workBuilder;

@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchScroll;
@@ -28,12 +28,12 @@ public class ScrollWorkCall<T> extends Call<ScrollWorkCall<?>> {
 	private final int chunkSize;
 	private final StubBackendBehavior behavior;
 	private final StubSearchProjectionContext projectionContext;
-	private final LoadingContext<?, ?> loadingContext;
+	private final SearchLoadingContext<?, ?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
 	private final TimingSource timingSource;
 
 	ScrollWorkCall(Set<String> indexNames, StubSearchWork work, int chunkSize, StubBackendBehavior behavior,
-			StubSearchProjectionContext projectionContext, LoadingContext<?, ?> loadingContext,
+			StubSearchProjectionContext projectionContext, SearchLoadingContext<?, ?> loadingContext,
 			StubSearchProjection<T> rootProjection, TimingSource timingSource) {
 		this.indexNames = indexNames;
 		this.work = work;

@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.orm.schema.management.impl.SearchSchemaManage
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.search.query.dsl.impl.HibernateOrmSearchQuerySelectStep;
-import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmLoadingContext;
+import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmSearchLoadingContext;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.work.impl.SearchWorkspaceImpl;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
@@ -42,7 +42,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	public SearchQuerySelectStep<?, EntityReference, E, SearchLoadingOptionsStep, ?, ?> search(
 			HibernateOrmScopeSessionContext sessionContext) {
-		HibernateOrmLoadingContext.Builder<E> loadingContextBuilder = new HibernateOrmLoadingContext.Builder<>(
+		HibernateOrmSearchLoadingContext.Builder<E> loadingContextBuilder = new HibernateOrmSearchLoadingContext.Builder<>(
 				mappingContext, sessionContext, delegate.includedIndexedTypes()
 		);
 		return new HibernateOrmSearchQuerySelectStep<>(

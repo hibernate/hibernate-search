@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -32,7 +32,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 	private final Set<String> indexNames;
 	private final StubSearchWork work;
 	private final StubSearchProjectionContext projectionContext;
-	private final LoadingContext<?, ?> loadingContext;
+	private final SearchLoadingContext<?, ?> loadingContext;
 	private final StubSearchProjection<T> rootProjection;
 	private final StubSearchWorkBehavior<?> behavior;
 	private final Deadline deadline;
@@ -40,7 +40,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 	SearchWorkCall(Set<String> indexNames,
 			StubSearchWork work,
 			StubSearchProjectionContext projectionContext,
-			LoadingContext<?, ?> loadingContext,
+			SearchLoadingContext<?, ?> loadingContext,
 			StubSearchProjection<T> rootProjection,
 			Deadline deadline) {
 		this.indexNames = indexNames;
