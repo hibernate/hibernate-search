@@ -119,7 +119,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public PojoIndexer createIndexer() {
-		return super.createIndexer();
+		return mappingContext.createIndexer( this );
 	}
 
 	@Override
@@ -261,10 +261,9 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 		ConfiguredAutomaticIndexingSynchronizationStrategy currentSynchronizationStrategy =
 				configuredAutomaticIndexingSynchronizationStrategy;
-		plan = createIndexingPlan(
+		plan = mappingContext.createIndexingPlan( this,
 				currentSynchronizationStrategy.getDocumentCommitStrategy(),
-				currentSynchronizationStrategy.getDocumentRefreshStrategy()
-		);
+				currentSynchronizationStrategy.getDocumentRefreshStrategy() );
 		holder.pojoIndexingPlan( transactionIdentifier, plan );
 
 		if ( sessionImplementor.isTransactionInProgress() ) {

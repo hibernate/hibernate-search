@@ -19,6 +19,8 @@ import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.loading.impl.PojoLoadingPlan;
 import org.hibernate.search.mapper.pojo.loading.impl.PojoMultiLoaderLoadingPlan;
@@ -39,8 +41,10 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoReindexingCol
 	private final PojoWorkContainedTypeContextProvider containedTypeContextProvider;
 	private final PojoWorkSessionContext sessionContext;
 	private final PojoRuntimeIntrospector introspector;
+	private final PojoIndexingQueueEventSendingPlan sink;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
+	private final boolean enableReindexingResolution;
 
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeIndexingPlan<?, ?>> indexedTypeDelegates = new LinkedHashMap<>();
@@ -53,14 +57,31 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoReindexingCol
 	public PojoIndexingPlanImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
 			PojoWorkContainedTypeContextProvider containedTypeContextProvider,
 			PojoWorkSessionContext sessionContext,
-			DocumentCommitStrategy commitStrategy,
-			DocumentRefreshStrategy refreshStrategy) {
+			PojoIndexingQueueEventSendingPlan sink) {
 		this.indexedTypeContextProvider = indexedTypeContextProvider;
 		this.containedTypeContextProvider = containedTypeContextProvider;
 		this.sessionContext = sessionContext;
 		this.introspector = sessionContext.runtimeIntrospector();
+		this.sink = sink;
+		this.commitStrategy = null;
+		this.refreshStrategy = null;
+		this.enableReindexingResolution = true;
+	}
+
+	public PojoIndexingPlanImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
+			PojoWorkContainedTypeContextProvider containedTypeContextProvider,
+			PojoWorkSessionContext sessionContext,
+			DocumentCommitStrategy commitStrategy,
+			DocumentRefreshStrategy refreshStrategy,
+			boolean enableReindexingResolution) {
+		this.indexedTypeContextProvider = indexedTypeContextProvider;
+		this.containedTypeContextProvider = containedTypeContextProvider;
+		this.sessionContext = sessionContext;
+		this.introspector = sessionContext.runtimeIntrospector();
+		this.sink = null;
 		this.commitStrategy = commitStrategy;
 		this.refreshStrategy = refreshStrategy;
+		this.enableReindexingResolution = enableReindexingResolution;
 	}
 
 	@Override
@@ -121,13 +142,18 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoReindexingCol
 			if ( loadingPlan != null ) {
 				loadingPlan.loadBlocking( null );
 			}
-			for ( PojoContainedTypeIndexingPlan<?> delegate : containedTypeDelegates.values() ) {
-				delegate.resolveDirty();
-			}
-			// We need to iterate on a "frozen snapshot" of the indexedTypeDelegates values because of HSEARCH-3857
-			List<PojoIndexedTypeIndexingPlan<?, ?>> frozenIndexedTypeDelegates = new ArrayList<>( indexedTypeDelegates.values() );
-			for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : frozenIndexedTypeDelegates ) {
-				delegate.resolveDirty();
+			// The caller may choose to disable reindexing resolution.
+			// See PojoMappingDelegateImpl#createEventProcessingPlan.
+			if ( enableReindexingResolution ) {
+				for ( PojoContainedTypeIndexingPlan<?> delegate : containedTypeDelegates.values() ) {
+					delegate.resolveDirty();
+				}
+				// We need to iterate on a "frozen snapshot" of the indexedTypeDelegates values because of HSEARCH-3857
+				List<PojoIndexedTypeIndexingPlan<?, ?>> frozenIndexedTypeDelegates = new ArrayList<>(
+						indexedTypeDelegates.values() );
+				for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : frozenIndexedTypeDelegates ) {
+					delegate.resolveDirty();
+				}
 			}
 			for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : indexedTypeDelegates.values() ) {
 				delegate.process();
@@ -212,7 +238,9 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoReindexingCol
 		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> indexedTypeContextOptional =
 				indexedTypeContextProvider.forExactType( typeIdentifier );
 		if ( indexedTypeContextOptional.isPresent() ) {
-			PojoIndexedTypeIndexingPlan<?, ?> delegate = createDelegate( indexedTypeContextOptional.get() );
+			// extracting a variable to workaround an Eclipse compiler issue
+			PojoWorkIndexedTypeContext<?, ?> typeContext = indexedTypeContextOptional.get();
+			PojoIndexedTypeIndexingPlan<?, ?> delegate = createDelegate( typeContext );
 			indexedTypeDelegates.put( typeIdentifier, delegate );
 			return delegate;
 		}
@@ -237,7 +265,9 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoReindexingCol
 		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> indexedTypeContextOptional =
 				indexedTypeContextProvider.forExactType( typeIdentifier );
 		if ( indexedTypeContextOptional.isPresent() ) {
-			delegate = createDelegate( indexedTypeContextOptional.get() );
+			// extracting a variable to workaround an Eclipse compiler issue
+			PojoWorkIndexedTypeContext<?, ?> typeContext = indexedTypeContextOptional.get();
+			delegate = createDelegate( typeContext );
 			indexedTypeDelegates.put( typeIdentifier, delegate );
 			return delegate;
 		}
@@ -256,9 +286,19 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoReindexingCol
 		return loadingPlan;
 	}
 
-	private PojoIndexedTypeIndexingPlan<?, ?> createDelegate(PojoWorkIndexedTypeContext<?, ?> typeContext) {
-		return new PojoIndexedTypeIndexingPlan<>( typeContext, sessionContext, this,
-				typeContext.createIndexingPlan( sessionContext, commitStrategy, refreshStrategy ) );
+	private <I, E> PojoIndexedTypeIndexingPlan<I, E> createDelegate(PojoWorkIndexedTypeContext<I, E> typeContext) {
+		if ( sink != null ) {
+			// Will send indexing events to an external queue.
+			return new PojoIndexedTypeIndexingPlan<>( typeContext, sessionContext, this,
+					new PojoTypeIndexingPlanEventQueueDelegate<>( typeContext, sessionContext, sink ) );
+		}
+		else {
+			// Will process indexing events locally.
+			IndexIndexingPlan indexIndexingPlan =
+					typeContext.createIndexingPlan( sessionContext, commitStrategy, refreshStrategy );
+			return new PojoIndexedTypeIndexingPlan<>( typeContext, sessionContext, this,
+					new PojoTypeIndexingPlanIndexDelegate<>( typeContext, sessionContext, indexIndexingPlan ) );
+		}
 	}
 
 	private PojoContainedTypeIndexingPlan<?> createDelegate(PojoWorkContainedTypeContext<?> typeContext) {

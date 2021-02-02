@@ -554,4 +554,8 @@ public interface Log extends BasicLogger {
 			+ " the add and update operations require a non-null entity." )
 	SearchException nullEntityForIndexerAddOrUpdate();
 
+	@Message(id = ID_OFFSET + 89,
+			value = "Invalid entity name '%1$s' in an indexing event: this entity does not exist or is not indexed.")
+	SearchException nonIndexedTypeInIndexingEvent(String entityName);
+
 }

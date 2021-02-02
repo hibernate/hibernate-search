@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.session.spi;
 
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
@@ -16,7 +14,6 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedVal
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.SessionBasedBridgeOperationContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeSessionContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
-import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 
@@ -59,11 +56,6 @@ public abstract class AbstractPojoSearchSession implements PojoWorkSessionContex
 	@Override
 	public final ValueBridgeFromIndexedValueContext valueBridgeFromIndexedValueContext() {
 		return sessionBasedBridgeOperationContext;
-	}
-
-	protected PojoIndexingPlan createIndexingPlan(DocumentCommitStrategy commitStrategy,
-			DocumentRefreshStrategy refreshStrategy) {
-		return mappingContext.createIndexingPlan( this, commitStrategy, refreshStrategy );
 	}
 
 	protected PojoIndexer createIndexer() {
