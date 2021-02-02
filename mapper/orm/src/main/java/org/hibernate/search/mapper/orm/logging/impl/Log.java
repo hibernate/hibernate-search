@@ -290,4 +290,8 @@ public interface Log extends BasicLogger {
 			+ " the selected automatic indexing strategy always processes events asynchronously, through a queue.")
 	SearchException cannotConfigureSynchronizationStrategyWithIndexingEventQueue();
 
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 43, value = "Outbox-generated entity mapping: %1$s")
+	void outboxGeneratedEntityMapping(String xmlMappingDefinition);
+
 }
