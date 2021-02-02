@@ -18,7 +18,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class JavaBeanProjectionHitMapper implements ProjectionHitMapper<EntityReference, Void> {
+public class JavaBeanProjectionHitMapper<E> implements ProjectionHitMapper<EntityReference, E> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -34,11 +34,11 @@ public class JavaBeanProjectionHitMapper implements ProjectionHitMapper<EntityRe
 	}
 
 	@Override
-	public LoadingResult<EntityReference, Void> loadBlocking(Deadline deadline) {
-		return new JavaBeanUnusuableGetLoadingResult( documentReferenceConverter );
+	public LoadingResult<EntityReference, E> loadBlocking(Deadline deadline) {
+		return new JavaBeanUnusuableGetLoadingResult<>( documentReferenceConverter );
 	}
 
-	private static class JavaBeanUnusuableGetLoadingResult implements LoadingResult<EntityReference, Void> {
+	private static class JavaBeanUnusuableGetLoadingResult<E> implements LoadingResult<EntityReference, E> {
 
 		private final DocumentReferenceConverter<EntityReference> documentReferenceConverter;
 
@@ -47,7 +47,7 @@ public class JavaBeanProjectionHitMapper implements ProjectionHitMapper<EntityRe
 		}
 
 		@Override
-		public Void get(Object key) {
+		public E get(Object key) {
 			throw new AssertionFailure( "Attempt to load an entity with a key that was never issued." );
 		}
 

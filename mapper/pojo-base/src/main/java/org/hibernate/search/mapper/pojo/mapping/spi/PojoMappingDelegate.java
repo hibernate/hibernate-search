@@ -30,7 +30,7 @@ public interface PojoMappingDelegate extends AutoCloseable {
 
 	FailureHandler failureHandler();
 
-	<R, E, E2, C> PojoScopeDelegate<R, E2, C> createPojoScope(
+	<R, E, C> PojoScopeDelegate<R, E, C> createPojoScope(
 			PojoScopeMappingContext mappingContext,
 			Collection<? extends PojoRawTypeIdentifier<? extends E>> targetedTypes,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider);

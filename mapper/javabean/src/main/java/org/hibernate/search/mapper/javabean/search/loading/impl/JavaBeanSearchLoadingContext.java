@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public final class JavaBeanSearchLoadingContext implements SearchLoadingContext<EntityReference, Void> {
+public final class JavaBeanSearchLoadingContext<E> implements SearchLoadingContext<EntityReference, E> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -27,11 +27,11 @@ public final class JavaBeanSearchLoadingContext implements SearchLoadingContext<
 	}
 
 	@Override
-	public ProjectionHitMapper<EntityReference, Void> createProjectionHitMapper() {
-		return new JavaBeanProjectionHitMapper( documentReferenceConverter );
+	public ProjectionHitMapper<EntityReference, E> createProjectionHitMapper() {
+		return new JavaBeanProjectionHitMapper<>( documentReferenceConverter );
 	}
 
-	public static final class Builder implements SearchLoadingContextBuilder<EntityReference, Void, Void> {
+	public static final class Builder<E> implements SearchLoadingContextBuilder<EntityReference, E, Void> {
 		private final DocumentReferenceConverter<EntityReference> documentReferenceConverter;
 
 		public Builder(DocumentReferenceConverter<EntityReference> documentReferenceConverter) {
@@ -44,8 +44,8 @@ public final class JavaBeanSearchLoadingContext implements SearchLoadingContext<
 		}
 
 		@Override
-		public SearchLoadingContext<EntityReference, Void> build() {
-			return new JavaBeanSearchLoadingContext( documentReferenceConverter );
+		public SearchLoadingContext<EntityReference, E> build() {
+			return new JavaBeanSearchLoadingContext<>( documentReferenceConverter );
 		}
 	}
 }

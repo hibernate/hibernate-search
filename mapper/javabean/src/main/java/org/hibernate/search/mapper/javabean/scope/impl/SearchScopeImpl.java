@@ -23,9 +23,9 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
 public class SearchScopeImpl<E> implements SearchScope<E> {
 
-	private final PojoScopeDelegate<EntityReference, Void, JavaBeanScopeIndexedTypeContext<? extends E>> delegate;
+	private final PojoScopeDelegate<EntityReference, E, JavaBeanScopeIndexedTypeContext<? extends E>> delegate;
 
-	public SearchScopeImpl(PojoScopeDelegate<EntityReference, Void, JavaBeanScopeIndexedTypeContext<? extends E>> delegate) {
+	public SearchScopeImpl(PojoScopeDelegate<EntityReference, E, JavaBeanScopeIndexedTypeContext<? extends E>> delegate) {
 		this.delegate = delegate;
 	}
 
@@ -54,8 +54,8 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 		return delegate.includedIndexedTypes();
 	}
 
-	public SearchQuerySelectStep<?, EntityReference, Void, ?, ?, ?> search(BackendSessionContext sessionContext,
+	public SearchQuerySelectStep<?, EntityReference, E, ?, ?, ?> search(BackendSessionContext sessionContext,
 			DocumentReferenceConverter<EntityReference> documentReferenceConverter) {
-		return delegate.search( sessionContext, new JavaBeanSearchLoadingContext.Builder( documentReferenceConverter ) );
+		return delegate.search( sessionContext, new JavaBeanSearchLoadingContext.Builder<>( documentReferenceConverter ) );
 	}
 }
