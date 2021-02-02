@@ -14,6 +14,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.NoOpDocumentRouter;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
@@ -37,8 +38,8 @@ public class PojoTypeIndexer<I, E> {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
 
-		PojoWorkRouter router = typeContext.createRouter( sessionContext, identifier, entitySupplier );
-		DocumentRouteDescriptor currentRoute = router.currentRoute( providedRoutes );
+		DocumentRouteDescriptor currentRoute = typeContext.router()
+				.currentRoute( identifier, entitySupplier, providedRoutes, sessionContext );
 		// We don't care about previous routes: the add() operation expects that the document isn't in the index yet.
 
 		if ( currentRoute == null ) {
@@ -59,8 +60,8 @@ public class PojoTypeIndexer<I, E> {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
 
-		PojoWorkRouter router = typeContext.createRouter( sessionContext, identifier, entitySupplier );
-		DocumentRoutesDescriptor routes = router.routes( providedRoutes );
+		DocumentRoutesDescriptor routes = typeContext.router()
+				.routes( identifier, entitySupplier, providedRoutes, sessionContext );
 
 		String documentIdentifier = typeContext.toDocumentIdentifier( sessionContext, identifier );
 
@@ -90,8 +91,8 @@ public class PojoTypeIndexer<I, E> {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
 
-		PojoWorkRouter router = typeContext.createRouter( sessionContext, identifier, entitySupplier );
-		DocumentRoutesDescriptor routes = router.routes( providedRoutes );
+		DocumentRoutesDescriptor routes = typeContext.router()
+				.routes( identifier, entitySupplier, providedRoutes, sessionContext );
 
 		String documentIdentifier = typeContext.toDocumentIdentifier( sessionContext, identifier );
 
@@ -115,8 +116,8 @@ public class PojoTypeIndexer<I, E> {
 
 		// Purge: entity is not available and we can't route according to its state.
 		// We can use the provided routing keys, though, which is what the no-op router does.
-		PojoWorkRouter router = NoOpDocumentRouter.INSTANCE;
-		DocumentRoutesDescriptor routes = router.routes( providedRoutes );
+		DocumentRoutesDescriptor routes = NoOpDocumentRouter.INSTANCE
+				.routes( identifier, null, providedRoutes, sessionContext );
 		String documentIdentifier = typeContext.toDocumentIdentifier( sessionContext, identifier );
 
 		CompletableFuture<?> deletePreviousFuture = deletePrevious( documentIdentifier, routes.previousRoutes(),

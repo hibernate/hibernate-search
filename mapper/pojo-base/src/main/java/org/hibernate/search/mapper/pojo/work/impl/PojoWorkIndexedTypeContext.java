@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierMappingImplementor;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.DocumentRouter;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
@@ -28,7 +29,7 @@ public interface PojoWorkIndexedTypeContext<I, E> extends PojoWorkTypeContext<E>
 
 	String toDocumentIdentifier(PojoWorkSessionContext sessionContext, I identifier);
 
-	PojoWorkRouter createRouter(PojoWorkSessionContext sessionContext, I identifier, Supplier<E> entitySupplier);
+	DocumentRouter<? super E> router();
 
 	PojoDocumentContributor<E> toDocumentContributor(PojoWorkSessionContext sessionContext, I identifier,
 			Supplier<E> entitySupplier);

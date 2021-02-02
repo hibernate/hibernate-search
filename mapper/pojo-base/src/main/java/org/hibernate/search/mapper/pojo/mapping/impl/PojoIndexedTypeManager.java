@@ -16,21 +16,18 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
-import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
-import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.DocumentRouter;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContext;
-import org.hibernate.search.mapper.pojo.work.impl.NoOpDocumentRouter;
 import org.hibernate.search.mapper.pojo.work.impl.PojoDocumentContributor;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkIndexedTypeContext;
-import org.hibernate.search.mapper.pojo.work.impl.PojoWorkRouter;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
@@ -42,19 +39,19 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<E>
 		implements PojoWorkIndexedTypeContext<I, E>, PojoScopeIndexedTypeContext<I, E> {
 	private final IdentifierMappingImplementor<I, E> identifierMapping;
-	private final BeanHolder<? extends RoutingBridge<? super E>> routingBridgeHolder;
+	private final DocumentRouter<? super E> documentRouter;
 	private final PojoIndexingProcessor<E> processor;
 	private final MappedIndexManager indexManager;
 
 	public PojoIndexedTypeManager(String entityName, PojoRawTypeIdentifier<E> typeIdentifier,
 			PojoCaster<E> caster,
 			IdentifierMappingImplementor<I, E> identifierMapping,
-			BeanHolder<? extends RoutingBridge<? super E>> routingBridgeHolder,
+			DocumentRouter<? super E> documentRouter,
 			PojoIndexingProcessor<E> processor, MappedIndexManager indexManager,
 			PojoImplicitReindexingResolver<E> reindexingResolver) {
 		super( entityName, typeIdentifier, caster, reindexingResolver );
 		this.identifierMapping = identifierMapping;
-		this.routingBridgeHolder = routingBridgeHolder;
+		this.documentRouter = documentRouter;
 		this.processor = processor;
 		this.indexManager = indexManager;
 	}
@@ -63,8 +60,7 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<E>
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( IdentifierMappingImplementor::close, identifierMapping );
-			closer.push( RoutingBridge::close, routingBridgeHolder, BeanHolder::get );
-			closer.push( BeanHolder::close, routingBridgeHolder );
+			closer.push( DocumentRouter::close, documentRouter );
 			closer.push( PojoIndexingProcessor::close, processor );
 			closer.push( PojoImplicitReindexingResolver::close, reindexingResolver );
 		}
@@ -76,7 +72,7 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<E>
 				.attribute( "typeIdentifier", typeIdentifier )
 				.attribute( "indexManager", indexManager )
 				.attribute( "identifierMapping", identifierMapping )
-				.attribute( "routingBridgeHolder", routingBridgeHolder )
+				.attribute( "documentRouter", documentRouter )
 				.attribute( "processor", processor )
 				.attribute( "reindexingResolver", reindexingResolver );
 	}
@@ -92,13 +88,8 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<E>
 	}
 
 	@Override
-	public PojoWorkRouter createRouter(PojoWorkSessionContext sessionContext, I identifier,
-			Supplier<E> entitySupplier) {
-		if ( routingBridgeHolder == null ) {
-			return NoOpDocumentRouter.INSTANCE;
-		}
-		return new RoutingBridgeDocumentRouter<>( sessionContext.routingBridgeRouteContext(), routingBridgeHolder.get(),
-				identifier, entitySupplier.get() );
+	public DocumentRouter<? super E> router() {
+		return documentRouter;
 	}
 
 	@Override
