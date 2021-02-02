@@ -18,6 +18,8 @@ import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoInde
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingBridge;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.NoOpDocumentRouter;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.RoutingBridgeDocumentRouter;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
@@ -139,8 +141,8 @@ class PojoIndexedTypeManagerBuilder<E> {
 		PojoIndexedTypeManager<?, E> typeManager = new PojoIndexedTypeManager<>(
 				entityName, typeModel.typeIdentifier(), typeModel.caster(),
 				identityMappingCollector.identifierMapping,
-				identityMappingCollector.routingBridge == null ? null
-						: identityMappingCollector.routingBridge.getBridgeHolder(),
+				identityMappingCollector.routingBridge == null ? NoOpDocumentRouter.INSTANCE
+						: new RoutingBridgeDocumentRouter<>( identityMappingCollector.routingBridge.getBridgeHolder() ),
 				preBuiltIndexingProcessor,
 				indexManager,
 				reindexingResolver
