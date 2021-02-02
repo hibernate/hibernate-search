@@ -137,10 +137,6 @@ public interface Log extends BasicLogger {
 			value = "Hibernate Search was not initialized.")
 	SearchException hibernateSearchNotInitialized();
 
-	@Message(id = ID_OFFSET + 2,
-			value = "Unexpected entity name for a query hit: '%1$s'. Expected one of %2$s.")
-	SearchException unexpectedSearchHitEntityName(String entityName, Collection<String> expectedNames);
-
 	@Message(id = ID_OFFSET + 3,
 			value = "Invalid automatic indexing strategy name: '%1$s'. Valid names are: %2$s.")
 	SearchException invalidAutomaticIndexingStrategyName(String invalidRepresentation, List<String> validRepresentations);

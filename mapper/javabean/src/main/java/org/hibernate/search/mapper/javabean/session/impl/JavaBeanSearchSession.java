@@ -17,6 +17,7 @@ import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.scope.impl.SearchScopeImpl;
+import org.hibernate.search.mapper.javabean.loading.impl.JavaBeanSearchLoadingContext;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
 import org.hibernate.search.mapper.javabean.work.SearchIndexer;
@@ -25,6 +26,7 @@ import org.hibernate.search.mapper.javabean.work.impl.SearchIndexerImpl;
 import org.hibernate.search.mapper.javabean.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -141,7 +143,11 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession<EntityRefer
 	}
 
 	private <T> SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(SearchScopeImpl<T> scope) {
-		return scope.search( this, this );
+		return scope.search( this, this, loadingContextBuilder() );
+	}
+
+	private PojoLoadingContextBuilder<?> loadingContextBuilder() {
+		return new JavaBeanSearchLoadingContext.Builder();
 	}
 
 	public static class Builder

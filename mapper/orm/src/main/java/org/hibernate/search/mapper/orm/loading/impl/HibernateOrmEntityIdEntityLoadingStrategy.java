@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.orm.loading.impl;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,9 +21,7 @@ import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingIndexedTypeContext;
 import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexingTypeGroupLoader;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
-import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmComposableSearchEntityLoader;
-import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
-import org.hibernate.search.mapper.orm.search.loading.impl.SearchLoadingIndexedTypeContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
 
 public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> implements EntityLoadingStrategy<E, I> {
 
@@ -61,28 +58,25 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> implements EntityLo
 	}
 
 	@Override
-	public <E2> HibernateOrmComposableSearchEntityLoader<E2> createLoader(
-			SearchLoadingIndexedTypeContext targetEntityTypeContext,
-			SessionImplementor session,
-			EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
-		/*
-		 * This cast is safe: the loader will only return instances of E2.
-		 * See hasExpectedType() and its callers for more information,
-		 * in particular runtime checks handling edge cases.
-		 */
-		@SuppressWarnings("unchecked")
-		HibernateOrmComposableSearchEntityLoader<E2> result = (HibernateOrmComposableSearchEntityLoader<E2>) doCreate(
-				targetEntityTypeContext.entityPersister(), session, cacheLookupStrategy, loadingOptions
-		);
-		return result;
-	}
-
-	@Override
-	public <E2> HibernateOrmComposableSearchEntityLoader<? extends E2> createLoader(
-			List<SearchLoadingIndexedTypeContext> targetEntityTypeContexts,
-			SessionImplementor session, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
+	public <E2> PojoLoader<E2> createLoader(Set<LoadingIndexedTypeContext<? extends E2>> targetEntityTypeContexts,
+			LoadingSessionContext sessionContext, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions) {
-		EntityPersister commonSuperType = toMostSpecificCommonEntitySuperType( session, targetEntityTypeContexts );
+		if ( targetEntityTypeContexts.size() == 1 ) {
+			LoadingIndexedTypeContext<? extends E2> targetEntityTypeContext =
+					targetEntityTypeContexts.iterator().next();
+			/*
+			 * This cast is safe: the loader will only return instances of E2.
+			 * See hasExpectedType() and its callers for more information,
+			 * in particular runtime checks handling edge cases.
+			 */
+			@SuppressWarnings("unchecked")
+			PojoLoader<E2> result = (PojoLoader<E2>) doCreate( targetEntityTypeContext.entityPersister(), sessionContext,
+					cacheLookupStrategy, loadingOptions );
+			return result;
+		}
+
+		EntityPersister commonSuperType =
+				toMostSpecificCommonEntitySuperType( sessionContext.session(), targetEntityTypeContexts );
 		if ( commonSuperType == null ) {
 			throw invalidTypesException( targetEntityTypeContexts );
 		}
@@ -99,9 +93,8 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> implements EntityLo
 		 * See hasExpectedType() and its callers for more information.
 		 */
 		@SuppressWarnings("unchecked")
-		HibernateOrmComposableSearchEntityLoader<E2> result = (HibernateOrmComposableSearchEntityLoader<E2>) doCreate(
-				commonSuperType, session, cacheLookupStrategy, loadingOptions
-		);
+		PojoLoader<E2> result = (PojoLoader<E2>) doCreate( commonSuperType, sessionContext, cacheLookupStrategy,
+				loadingOptions );
 
 		return result;
 	}
@@ -124,12 +117,14 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> implements EntityLo
 		return new MassIndexingTypeGroupLoaderImpl<>( queryFactory, includedTypesFilter );
 	}
 
-	private HibernateOrmComposableSearchEntityLoader<?> doCreate(EntityPersister entityPersister,
-			SessionImplementor session,
-			EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
+	private PojoLoader<?> doCreate(EntityPersister entityPersister,
+			LoadingSessionContext sessionContext, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
+			MutableEntityLoadingOptions loadingOptions) {
 		if ( !rootEntityPersister.getMappedClass().isAssignableFrom( entityPersister.getMappedClass() ) ) {
 			throw invalidTypeException( entityPersister );
 		}
+
+		SessionImplementor session = sessionContext.session();
 
 		PersistenceContextLookupStrategy persistenceContextLookup =
 				PersistenceContextLookupStrategy.create( session );
@@ -154,23 +149,25 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> implements EntityLo
 				cacheLookupStrategyImplementor = persistenceContextLookup;
 				break;
 			case PERSISTENCE_CONTEXT_THEN_SECOND_LEVEL_CACHE:
+				// We must use the root entity persister here,
+				// to avoid a WrongClassException when the type of an entity changes,
+				// because that exception cannot be recovered from.
 				cacheLookupStrategyImplementor =
-						PersistenceContextThenSecondLevelCacheLookupStrategy.create( entityPersister, session );
+						PersistenceContextThenSecondLevelCacheLookupStrategy.create( rootEntityPersister, session );
 				break;
 			default:
 				throw new AssertionFailure( "Unexpected cache lookup strategy: " + cacheLookupStrategy );
 		}
 
-		return new HibernateOrmEntityIdEntityLoader<>( entityPersister, queryFactory,
-				session, persistenceContextLookup, cacheLookupStrategyImplementor, loadingOptions
-		);
+		return new HibernateOrmEntityIdEntityLoader<>( rootEntityPersister, queryFactory, sessionContext,
+				persistenceContextLookup, cacheLookupStrategyImplementor, loadingOptions );
 	}
 
 	private static EntityPersister toMostSpecificCommonEntitySuperType(SessionImplementor session,
-			Iterable<? extends SearchLoadingIndexedTypeContext> targetEntityTypeContexts) {
+			Iterable<? extends LoadingIndexedTypeContext<?>> targetEntityTypeContexts) {
 		MetamodelImplementor metamodel = session.getSessionFactory().getMetamodel();
 		EntityPersister result = null;
-		for ( SearchLoadingIndexedTypeContext targetTypeContext : targetEntityTypeContexts ) {
+		for ( LoadingIndexedTypeContext<?> targetTypeContext : targetEntityTypeContexts ) {
 			EntityPersister type = targetTypeContext.entityPersister();
 			if ( result == null ) {
 				result = type;
@@ -191,13 +188,13 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> implements EntityLo
 	}
 
 	private AssertionFailure invalidTypesException(
-			Collection<? extends SearchLoadingIndexedTypeContext> targetEntityTypeContexts) {
+			Collection<? extends LoadingIndexedTypeContext<?>> targetEntityTypeContexts) {
 		return new AssertionFailure(
 				"Some types among the targeted entity types are not subclasses of the expected root entity type."
 						+ " Expected entity name: " + rootEntityPersister.getEntityName()
 						+ " Targeted entity names: "
 						+ targetEntityTypeContexts.stream()
-						.map( SearchLoadingIndexedTypeContext::entityPersister )
+						.map( LoadingIndexedTypeContext::entityPersister )
 						.map( EntityPersister::getEntityName )
 						.collect( Collectors.toList() )
 		);

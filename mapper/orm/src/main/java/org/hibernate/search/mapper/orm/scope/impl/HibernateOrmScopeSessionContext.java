@@ -6,14 +6,20 @@
  */
 package org.hibernate.search.mapper.orm.scope.impl;
 
+import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingSessionContext;
-import org.hibernate.search.mapper.orm.search.loading.impl.SearchLoadingSessionContext;
+import org.hibernate.search.mapper.orm.loading.impl.LoadingSessionContext;
 import org.hibernate.search.mapper.orm.spi.BatchSessionContext;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeSessionContext;
 
 public interface HibernateOrmScopeSessionContext
-		extends SearchLoadingSessionContext, HibernateOrmMassIndexingSessionContext, BatchSessionContext {
+		extends PojoScopeSessionContext, LoadingSessionContext, HibernateOrmMassIndexingSessionContext,
+				BatchSessionContext {
 
 	BackendSessionContext backendSessionContext();
+
+	DocumentReferenceConverter<EntityReference> documentReferenceConverter();
 
 }

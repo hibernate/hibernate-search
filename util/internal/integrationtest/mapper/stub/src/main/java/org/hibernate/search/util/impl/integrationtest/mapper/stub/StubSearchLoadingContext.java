@@ -18,6 +18,11 @@ public class StubSearchLoadingContext implements SearchLoadingContext<DocumentRe
 	}
 
 	@Override
+	public Object unwrap() {
+		return this;
+	}
+
+	@Override
 	public ProjectionHitMapper<DocumentReference, DocumentReference> createProjectionHitMapper() {
 		return new DefaultProjectionHitMapper<>(
 				documentReference -> documentReference,

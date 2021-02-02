@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.search.mapper.orm.loading.impl.LoadingIndexedTypeContextProvider;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContextProvider;
@@ -25,7 +26,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class HibernateOrmTypeContextContainer implements HibernateOrmListenerTypeContextProvider,
-		HibernateOrmSessionTypeContextProvider, BatchTypeIdentifierProvider {
+		HibernateOrmSessionTypeContextProvider, LoadingIndexedTypeContextProvider, BatchTypeIdentifierProvider {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

@@ -9,22 +9,18 @@ package org.hibernate.search.mapper.orm.loading.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingIndexedTypeContext;
 import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexingTypeGroupLoader;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
-import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmComposableSearchEntityLoader;
-import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
-import org.hibernate.search.mapper.orm.search.loading.impl.SearchLoadingIndexedTypeContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
@@ -104,28 +100,18 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> implemen
 	}
 
 	@Override
-	public <E2> HibernateOrmComposableSearchEntityLoader<E2> createLoader(
-			SearchLoadingIndexedTypeContext targetEntityTypeContext,
-			SessionImplementor session,
-			EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
-		return doCreate( targetEntityTypeContext, session, cacheLookupStrategy, loadingOptions );
-	}
-
-	@Override
-	public <E2> HibernateOrmComposableSearchEntityLoader<? extends E2> createLoader(
-			List<SearchLoadingIndexedTypeContext> targetEntityTypeContexts,
-			SessionImplementor session,
+	public <E2> PojoLoader<E2> createLoader(Set<LoadingIndexedTypeContext<? extends E2>> targetEntityTypeContexts,
+			LoadingSessionContext sessionContext,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
 		if ( targetEntityTypeContexts.size() != 1 ) {
-			throw multipleTypesException( targetEntityTypeContexts, SearchLoadingIndexedTypeContext::entityPersister );
+			throw multipleTypesException( targetEntityTypeContexts, LoadingIndexedTypeContext::entityPersister );
 		}
 
-		return doCreate( targetEntityTypeContexts.get( 0 ), session, cacheLookupStrategy, loadingOptions );
+		return doCreate( targetEntityTypeContexts.iterator().next(), sessionContext, cacheLookupStrategy, loadingOptions );
 	}
 
-	private <E2> HibernateOrmComposableSearchEntityLoader<E2> doCreate(
-			SearchLoadingIndexedTypeContext targetEntityTypeContext,
-			SessionImplementor session,
+	private <E2> PojoLoader<E2> doCreate(LoadingIndexedTypeContext<?> targetEntityTypeContext,
+			LoadingSessionContext sessionContext,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions) {
 		if ( !entityPersister.equals( targetEntityTypeContext.entityPersister() ) ) {
@@ -137,10 +123,11 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> implemen
 		 * so this loader will actually return entities of type E2.
 		 */
 		@SuppressWarnings("unchecked")
-		HibernateOrmComposableSearchEntityLoader<E2> result = new HibernateOrmNonEntityIdPropertyEntityLoader<>(
-				entityPersister, (TypeQueryFactory<E2, ?>) queryFactory,
+		PojoLoader<E2> result = new HibernateOrmNonEntityIdPropertyEntityLoader<>(
+				entityPersister, (LoadingIndexedTypeContext<E2>) targetEntityTypeContext,
+				(TypeQueryFactory<E2, ?>) queryFactory,
 				documentIdSourcePropertyName, documentIdSourceHandle,
-				session, loadingOptions
+				sessionContext, loadingOptions
 		);
 
 		if ( !EntityLoadingCacheLookupStrategy.SKIP.equals( cacheLookupStrategy ) ) {

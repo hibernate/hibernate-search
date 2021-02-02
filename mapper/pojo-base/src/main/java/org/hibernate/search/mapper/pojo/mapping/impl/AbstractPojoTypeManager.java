@@ -68,6 +68,10 @@ public class AbstractPojoTypeManager<E>
 		return typeIdentifier;
 	}
 
+	public String entityName() {
+		return entityName;
+	}
+
 	@Override
 	public final Supplier<E> toEntitySupplier(PojoWorkSessionContext<?> sessionContext, Object entity) {
 		PojoRuntimeIntrospector introspector = sessionContext.runtimeIntrospector();

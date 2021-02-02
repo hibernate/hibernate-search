@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.orm.scope.impl;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.loading.impl.EntityLoadingStrategy;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingIndexedTypeContext;
-import org.hibernate.search.mapper.orm.search.loading.impl.SearchLoadingIndexedTypeContext;
+import org.hibernate.search.mapper.orm.loading.impl.LoadingIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
 /**
@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
  * @param <E> The entity type mapped to the index.
  */
 public interface HibernateOrmScopeIndexedTypeContext<E>
-		extends SearchIndexedEntity<E>, HibernateOrmScopeTypeContext<E>, SearchLoadingIndexedTypeContext,
+		extends SearchIndexedEntity<E>, HibernateOrmScopeTypeContext<E>, LoadingIndexedTypeContext<E>,
 				HibernateOrmMassIndexingIndexedTypeContext<E> {
 
 	@Override

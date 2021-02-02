@@ -15,6 +15,8 @@ package org.hibernate.search.engine.search.loading.spi;
  */
 public interface SearchLoadingContext<R, E> {
 
+	Object unwrap();
+
 	ProjectionHitMapper<R, E> createProjectionHitMapper();
 
 }

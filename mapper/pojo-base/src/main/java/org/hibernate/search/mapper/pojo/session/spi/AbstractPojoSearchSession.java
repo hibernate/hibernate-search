@@ -14,12 +14,14 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.SessionBasedBridgeOperationContext;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeSessionContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 
-public abstract class AbstractPojoSearchSession<R> implements PojoWorkSessionContext<R> {
+public abstract class AbstractPojoSearchSession<R>
+		implements PojoWorkSessionContext<R>, PojoScopeSessionContext {
 
 	private final PojoSearchSessionMappingContext mappingContext;
 

@@ -25,6 +25,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
+import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmLoadingContext;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospector;
@@ -136,7 +137,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 
 	public <T> SearchQuerySelectStep<?, EntityReference, T, SearchLoadingOptionsStep, ?, ?> search(
 			SearchScopeImpl<T> scope) {
-		return scope.search( this );
+		return scope.search( this, loadingContextBuilder() );
 	}
 
 	@Override
@@ -204,7 +205,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	}
 
 	@Override
-	public DocumentReferenceConverter<EntityReference> referenceHitMapper() {
+	public DocumentReferenceConverter<EntityReference> documentReferenceConverter() {
 		return this;
 	}
 
@@ -296,6 +297,10 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	@Override
 	public ConfiguredAutomaticIndexingSynchronizationStrategy configuredAutomaticIndexingSynchronizationStrategy() {
 		return configuredAutomaticIndexingSynchronizationStrategy;
+	}
+
+	private HibernateOrmLoadingContext.Builder loadingContextBuilder() {
+		return new HibernateOrmLoadingContext.Builder( mappingContext, typeContextProvider, this );
 	}
 
 	private Synchronization createTransactionWorkQueueSynchronization(PojoIndexingPlan<EntityReference> indexingPlan,

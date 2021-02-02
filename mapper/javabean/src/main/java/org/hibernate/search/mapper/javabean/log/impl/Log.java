@@ -45,10 +45,8 @@ public interface Log extends BasicLogger {
 	SearchException namedTypesNotSupported(String name);
 
 	@Message(id = ID_OFFSET + 8,
-			value = "Unable to configure entity loading:"
-					+ " the JavaBean mapper does not support entity loading."
-	)
-	SearchException entityLoadingConfigurationNotSupported();
+			value = "Unable to set up entity loading: the JavaBean mapper does not support entity loading.")
+	SearchException entityLoadingNotSupported();
 
 	@Message(id = ID_OFFSET + 9, value = "Type '%1$s' is not an entity type, or this entity type is not indexed.")
 	SearchException notIndexedEntityType(@FormatWith(ClassFormatter.class) Class<?> type);

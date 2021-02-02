@@ -8,14 +8,14 @@ package org.hibernate.search.mapper.pojo.scope.spi;
 
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 
@@ -34,8 +34,8 @@ public interface PojoScopeDelegate<R, E, C> {
 	Set<C> includedIndexedTypes();
 
 	<LOS> SearchQuerySelectStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
-			BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder);
+			PojoScopeSessionContext sessionContext, DocumentReferenceConverter<R> documentReferenceConverter,
+			PojoLoadingContextBuilder<LOS> loadingContextBuilder);
 
 	SearchPredicateFactory predicate();
 
