@@ -97,7 +97,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 		if ( indexingPlan == null ) {
 			indexingPlan = new SearchIndexingPlanImpl(
 					typeContextProvider, runtimeIntrospector(),
-					createIndexingPlan( commitStrategy, refreshStrategy ),
+					mappingContext().createIndexingPlan( this, commitStrategy, refreshStrategy ),
 					mappingContext.entityReferenceFactory()
 			);
 		}
@@ -109,7 +109,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 		if ( indexer == null ) {
 			indexer = new SearchIndexerImpl(
 					runtimeIntrospector(),
-					createIndexer(),
+					mappingContext().createIndexer( this ),
 					commitStrategy, refreshStrategy
 			);
 		}

@@ -30,6 +30,7 @@ public class PojoIndexedTypeManagerContainer
 
 	private final Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeManager<?, ?>> byExactType;
 	private final Map<PojoRawTypeIdentifier<?>, Set<? extends PojoIndexedTypeManager<?, ?>>> bySuperType;
+	private final Map<String, PojoIndexedTypeManager<?, ?>> byEntityName;
 	private final Set<PojoIndexedTypeManager<?, ?>> all;
 
 	private PojoIndexedTypeManagerContainer(Builder builder) {
@@ -37,6 +38,10 @@ public class PojoIndexedTypeManagerContainer
 		this.byExactType = new LinkedHashMap<>( builder.byExactType );
 		this.bySuperType = new LinkedHashMap<>( builder.bySuperType );
 		this.bySuperType.replaceAll( (k, v) -> Collections.unmodifiableSet( v ) );
+		this.byEntityName = new LinkedHashMap<>( builder.byExactType.size() );
+		for ( PojoIndexedTypeManager<?, ?> typeManager : builder.byExactType.values() ) {
+			byEntityName.put( typeManager.entityName(), typeManager );
+		}
 		this.all = Collections.unmodifiableSet( new LinkedHashSet<>( byExactType.values() ) );
 	}
 
@@ -52,6 +57,11 @@ public class PojoIndexedTypeManagerContainer
 	public <E> Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>>> allForSuperType(
 			PojoRawTypeIdentifier<E> typeIdentifier) {
 		return Optional.ofNullable( (Set<PojoIndexedTypeManager<?, ? extends E>>) bySuperType.get( typeIdentifier ) );
+	}
+
+	@Override
+	public Optional<? extends PojoWorkIndexedTypeContext<?, ?>> forEntityName(String entityName) {
+		return Optional.ofNullable( (PojoIndexedTypeManager<?, ?>) byEntityName.get( entityName ) );
 	}
 
 	Set<PojoIndexedTypeManager<?, ?>> all() {

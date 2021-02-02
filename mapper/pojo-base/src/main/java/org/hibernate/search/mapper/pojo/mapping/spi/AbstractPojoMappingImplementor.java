@@ -17,6 +17,8 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumen
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierBridgeToDocumentIdentifierContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.ValueBridgeToIndexedValueContextImpl;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeMappingContext;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionMappingContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
@@ -81,8 +83,19 @@ public abstract class AbstractPojoMappingImplementor<M>
 	}
 
 	@Override
+	public PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext context, PojoIndexingQueueEventSendingPlan sink) {
+		return delegate.createIndexingPlan( context, sink );
+	}
+
+	@Override
 	public PojoIndexer createIndexer(PojoWorkSessionContext context) {
 		return delegate.createIndexer( context );
+	}
+
+	@Override
+	public PojoIndexingQueueEventProcessingPlan createIndexingQueueEventProcessingPlan(PojoWorkSessionContext context,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		return delegate.createEventProcessingPlan( context, commitStrategy, refreshStrategy );
 	}
 
 	protected final PojoMappingDelegate delegate() {

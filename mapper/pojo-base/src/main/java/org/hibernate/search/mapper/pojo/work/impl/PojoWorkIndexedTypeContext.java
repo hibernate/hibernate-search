@@ -25,6 +25,8 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
  */
 public interface PojoWorkIndexedTypeContext<I, E> extends PojoWorkTypeContext<E> {
 
+	String entityName();
+
 	IdentifierMappingImplementor<I, E> identifierMapping();
 
 	String toDocumentIdentifier(PojoWorkSessionContext sessionContext, I identifier);

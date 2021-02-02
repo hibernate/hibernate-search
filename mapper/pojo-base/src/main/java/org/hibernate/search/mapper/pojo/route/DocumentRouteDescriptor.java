@@ -6,9 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.route;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public final class DocumentRouteDescriptor {
+public final class DocumentRouteDescriptor implements Serializable {
 
 	public static DocumentRouteDescriptor of(String routingKey) {
 		return new DocumentRouteDescriptor( routingKey );

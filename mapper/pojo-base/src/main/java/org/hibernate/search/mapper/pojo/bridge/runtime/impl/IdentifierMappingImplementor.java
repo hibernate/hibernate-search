@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.IdentifierMapping;
 
 /**
@@ -20,6 +21,9 @@ public interface IdentifierMappingImplementor<I, E> extends IdentifierMapping, A
 	@Override
 	default void close() {
 	}
+
+	@Override
+	I fromDocumentIdentifier(String documentId, BridgeSessionContext sessionContext);
 
 	I getIdentifier(Object providedId, Supplier<? extends E> entitySupplier);
 

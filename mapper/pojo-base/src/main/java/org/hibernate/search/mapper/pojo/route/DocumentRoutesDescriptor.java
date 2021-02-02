@@ -6,12 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.route;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 
 import org.hibernate.search.util.common.impl.Contracts;
 
-public final class DocumentRoutesDescriptor {
+public final class DocumentRoutesDescriptor implements Serializable {
 
 	public static DocumentRoutesDescriptor of(DocumentRouteDescriptor currentRoute) {
 		return of( currentRoute, Collections.emptyList() );

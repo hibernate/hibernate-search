@@ -15,6 +15,9 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.mapper.pojo.work.impl.PojoIndexingQueueEventProcessingPlanImpl;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeDelegateImpl;
@@ -98,10 +101,25 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	@Override
 	public PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext context,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		return new PojoIndexingPlanImpl(
-				indexedTypeManagers, containedTypeManagers,
-				context, commitStrategy, refreshStrategy
-		);
+		return new PojoIndexingPlanImpl( indexedTypeManagers, containedTypeManagers,
+				context, commitStrategy, refreshStrategy, true );
+	}
+
+	@Override
+	public PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext context, PojoIndexingQueueEventSendingPlan sink) {
+		return new PojoIndexingPlanImpl( indexedTypeManagers, containedTypeManagers, context, sink );
+	}
+
+	@Override
+	public PojoIndexingQueueEventProcessingPlan createEventProcessingPlan(PojoWorkSessionContext context,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		return new PojoIndexingQueueEventProcessingPlanImpl( indexedTypeManagers, context,
+				new PojoIndexingPlanImpl( indexedTypeManagers, containedTypeManagers,
+						context, commitStrategy, refreshStrategy,
+						// When processing indexing events sent from a queue,
+						// Reindexing resolution is performed before the events are sent to the queue,
+						// so we don't do it again when processing the events.
+						false ) );
 	}
 
 	@Override
