@@ -11,6 +11,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -22,6 +24,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,6 +62,543 @@ public class DependencyIT {
 						)
 						.build()
 				);
+	}
+
+	@Test
+	public void derivedFrom() {
+		final String indexName = "index1";
+		@Indexed(index = indexName)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			String source1;
+			String source2;
+			String unused;
+			@GenericField
+			@IndexingDependency(derivedFrom = {
+					@ObjectPath(@PropertyValue(propertyName = "source1")),
+					@ObjectPath(@PropertyValue(propertyName = "source2"))})
+			public String getDerived() {
+				return source1 + " " + source2;
+			}
+		}
+
+		backendMock.expectSchema( indexName, b -> b
+				.field( "derived", String.class )
+		);
+
+		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		IndexedEntity entity = new IndexedEntity();
+		entity.id = 1;
+		entity.source1 = "init1";
+		entity.source2 = "init2";
+		entity.unused = "init3";
+
+		try ( SearchSession session = mapping.createSession() ) {
+			session.indexingPlan().add( entity );
+
+			backendMock.expectWorks( indexName )
+					.add( "1", b -> b.field( "derived", "init1 init2" ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		// Changed to unused properties are ignored
+		try ( SearchSession session = mapping.createSession() ) {
+			entity.unused = "updated3";
+			session.indexingPlan().addOrUpdate( entity, "unused" );
+
+			// Expect no reindexing at all
+		}
+		backendMock.verifyExpectationsMet();
+
+		// Changes to source properties trigger reindexing
+		try ( SearchSession session = mapping.createSession() ) {
+			entity.source1 = "updated1";
+			session.indexingPlan().addOrUpdate( entity, "source1" );
+
+			backendMock.expectWorks( indexName )
+					.addOrUpdate( "1", b -> b.field( "derived", "updated1 init2" ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4148")
+	public void derivedFrom_polymorphism() {
+		final String index1Name = "index1Name";
+		final String index2Name = "index2Name";
+		@Indexed
+		abstract class AbstractIndexedEntity {
+			@DocumentId
+			Integer id;
+			@GenericField
+			public abstract String getDerived();
+		}
+		@Indexed(index = index1Name)
+		class IndexedEntity1 extends AbstractIndexedEntity {
+			String source1;
+			String source2;
+			String source3;
+			String source4;
+			@Override
+			@IndexingDependency(derivedFrom = {
+					@ObjectPath(@PropertyValue(propertyName = "source1")),
+					@ObjectPath(@PropertyValue(propertyName = "source2")),
+					@ObjectPath(@PropertyValue(propertyName = "source4"))})
+			public String getDerived() {
+				return source1 + " " + source2 + " " + source4;
+			}
+		}
+		@Indexed(index = index2Name)
+		class IndexedEntity2 extends AbstractIndexedEntity {
+			String source1;
+			String source2;
+			String source3;
+			String source5;
+			@Override
+			@IndexingDependency(derivedFrom = {
+					@ObjectPath(@PropertyValue(propertyName = "source1")),
+					@ObjectPath(@PropertyValue(propertyName = "source3")),
+					@ObjectPath(@PropertyValue(propertyName = "source5"))})
+			public String getDerived() {
+				return source1 + " " + source3 + " " + source5;
+			}
+		}
+
+		backendMock.expectSchema( index1Name, b -> b
+				.field( "derived", String.class )
+		);
+		backendMock.expectSchema( index2Name, b -> b
+				.field( "derived", String.class )
+		);
+
+		SearchMapping mapping = setupHelper.start().expectCustomBeans()
+				.setup( AbstractIndexedEntity.class, IndexedEntity1.class, IndexedEntity2.class );
+		backendMock.verifyExpectationsMet();
+
+		IndexedEntity1 entity1 = new IndexedEntity1();
+		entity1.id = 1;
+		entity1.source1 = "init1";
+		entity1.source2 = "init2";
+		entity1.source3 = "init3";
+		entity1.source4 = "init4";
+
+		IndexedEntity2 entity2 = new IndexedEntity2();
+		entity2.id = 2;
+		entity2.source1 = "init1";
+		entity2.source2 = "init2";
+		entity2.source3 = "init3";
+		entity2.source5 = "init5";
+
+		try ( SearchSession session = mapping.createSession() ) {
+			session.indexingPlan().add( entity1 );
+			session.indexingPlan().add( entity2 );
+
+			backendMock.expectWorks( index1Name )
+					.add( "1", b -> b.field( "derived", "init1 init2 init4" ) )
+					.createdThenExecuted();
+			backendMock.expectWorks( index2Name )
+					.add( "2", b -> b.field( "derived", "init1 init3 init5" ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		// Changed to unused properties are ignored
+		try ( SearchSession session = mapping.createSession() ) {
+			entity1.source3 = "updated3";
+			entity2.source2 = "updated2";
+			session.indexingPlan().addOrUpdate( entity1, "source3" );
+			session.indexingPlan().addOrUpdate( entity2, "source2" );
+
+			// Expect no reindexing at all
+		}
+		backendMock.verifyExpectationsMet();
+
+		// Changes to common source properties trigger reindexing
+		try ( SearchSession session = mapping.createSession() ) {
+			entity1.source1 = "updated1";
+			entity2.source1 = "updated1";
+			session.indexingPlan().addOrUpdate( entity1, "source1" );
+			session.indexingPlan().addOrUpdate( entity2, "source1" );
+
+			backendMock.expectWorks( index1Name )
+					.addOrUpdate( "1", b -> b.field( "derived", "updated1 init2 init4" ) )
+					.createdThenExecuted();
+			backendMock.expectWorks( index2Name )
+					.addOrUpdate( "2", b -> b.field( "derived", "updated1 init3 init5" ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		// Changes to specific properties that exist in both types, but are source in only one type
+		// trigger reindexing for the relevant types.
+		try ( SearchSession session = mapping.createSession() ) {
+			entity1.source2 = "updated2";
+			entity2.source3 = "updated3";
+			session.indexingPlan().addOrUpdate( entity1, "source2" );
+			session.indexingPlan().addOrUpdate( entity2, "source3" );
+
+			backendMock.expectWorks( index1Name )
+					.addOrUpdate( "1", b -> b.field( "derived", "updated1 updated2 init4" ) )
+					.createdThenExecuted();
+			backendMock.expectWorks( index2Name )
+					.addOrUpdate( "2", b -> b.field( "derived", "updated1 updated3 init5" ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		// Changes to specific properties that exist in only one type and are source in only one type
+		// trigger reindexing for the relevant types.
+		try ( SearchSession session = mapping.createSession() ) {
+			entity1.source4 = "updated4";
+			entity2.source5 = "updated5";
+			session.indexingPlan().addOrUpdate( entity1, "source4" );
+			session.indexingPlan().addOrUpdate( entity2, "source5" );
+
+			backendMock.expectWorks( index1Name )
+					.addOrUpdate( "1", b -> b.field( "derived", "updated1 updated2 updated4" ) )
+					.createdThenExecuted();
+			backendMock.expectWorks( index2Name )
+					.addOrUpdate( "2", b -> b.field( "derived", "updated1 updated3 updated5" ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test a polymorphic derivedFrom that is not at the root, e.g. on a property in an @IndexedEmbedded.
+	 * <p>
+	 * This is sensibly different from a polymorphic derivedFrom at the root,
+	 * since we need to handle polymorphism in a single reindexing resolver,
+	 * instead of having a separate reindexing resolver per type.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4148")
+	public void derivedFrom_nonRoot_polymorphism() {
+		final String indexName = "indexName";
+		class Model {
+			@Indexed(index = indexName)
+			class IndexedEntity {
+				@DocumentId
+				Integer id;
+				@IndexedEmbedded
+				AbstractContainedEntity contained;
+			}
+
+			abstract class AbstractContainedEntity {
+				@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "contained")))
+				IndexedEntity containing;
+
+				@GenericField
+				public abstract String getDerived();
+			}
+
+			class ContainedEntity1 extends AbstractContainedEntity {
+				String source1;
+				String source2;
+				String source3;
+				String source4;
+
+				@Override
+				@IndexingDependency(derivedFrom = {
+						@ObjectPath(@PropertyValue(propertyName = "source1")),
+						@ObjectPath(@PropertyValue(propertyName = "source2")),
+						@ObjectPath(@PropertyValue(propertyName = "source4"))
+				})
+				public String getDerived() {
+					return source1 + " " + source2 + " " + source4;
+				}
+			}
+
+			class ContainedEntity2 extends AbstractContainedEntity {
+				String source1;
+				String source2;
+				String source3;
+				String source5;
+
+				@Override
+				@IndexingDependency(derivedFrom = {
+						@ObjectPath(@PropertyValue(propertyName = "source1")),
+						@ObjectPath(@PropertyValue(propertyName = "source3")),
+						@ObjectPath(@PropertyValue(propertyName = "source5"))
+				})
+				public String getDerived() {
+					return source1 + " " + source3 + " " + source5;
+				}
+			}
+		}
+
+		backendMock.expectSchema( indexName, b -> b
+				.objectField( "contained", b2 -> b2
+						.field( "derived", String.class )
+				)
+		);
+
+		SearchMapping mapping = setupHelper.start().expectCustomBeans()
+				.setup( Model.IndexedEntity.class, Model.AbstractContainedEntity.class,
+						Model.ContainedEntity1.class, Model.ContainedEntity2.class );
+		backendMock.verifyExpectationsMet();
+
+		Model model = new Model();
+
+		Model.IndexedEntity indexed1 = model.new IndexedEntity();
+		indexed1.id = 1;
+		Model.ContainedEntity1 contained1 = model.new ContainedEntity1();
+		indexed1.contained = contained1;
+		contained1.containing = indexed1;
+		contained1.source1 = "init1";
+		contained1.source2 = "init2";
+		contained1.source3 = "init3";
+		contained1.source4 = "init4";
+
+		Model.IndexedEntity indexed2 = model.new IndexedEntity();
+		indexed2.id = 2;
+		Model.ContainedEntity2 contained2 = model.new ContainedEntity2();
+		indexed2.contained = contained2;
+		contained2.containing = indexed2;
+		contained2.source1 = "init1";
+		contained2.source2 = "init2";
+		contained2.source3 = "init3";
+		contained2.source5 = "init5";
+
+		try ( SearchSession session = mapping.createSession() ) {
+			session.indexingPlan().add( indexed1 );
+			session.indexingPlan().add( indexed2 );
+
+			backendMock.expectWorks( indexName )
+					.add( "1", b -> b.objectField( "contained", b2 -> b2
+							.field( "derived", "init1 init2 init4" ) ) )
+					.add( "2", b -> b.objectField( "contained", b2 -> b2
+							.field( "derived", "init1 init3 init5" ) ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		// Changed to unused properties are ignored
+		try ( SearchSession session = mapping.createSession() ) {
+			contained1.source3 = "updated3";
+			contained2.source2 = "updated2";
+			session.indexingPlan().addOrUpdate( 1, null, contained1, "source3" );
+			session.indexingPlan().addOrUpdate( 2, null, contained2, "source2" );
+
+			// Expect no reindexing at all
+		}
+		backendMock.verifyExpectationsMet();
+
+		// Changes to common source properties trigger reindexing
+		try ( SearchSession session = mapping.createSession() ) {
+			contained1.source1 = "updated1";
+			contained2.source1 = "updated1";
+			session.indexingPlan().addOrUpdate( 1, null, contained1, "source1" );
+			session.indexingPlan().addOrUpdate( 2, null, contained2, "source1" );
+
+			backendMock.expectWorks( indexName )
+					.addOrUpdate( "1", b -> b.objectField( "contained", b2 -> b2
+							.field( "derived", "updated1 init2 init4" ) ) )
+					.addOrUpdate( "2", b -> b.objectField( "contained", b2 -> b2
+							.field( "derived", "updated1 init3 init5" ) ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		// Changes to specific properties that exist in both types, but are source in only one type
+		// trigger reindexing for the relevant types.
+		try ( SearchSession session = mapping.createSession() ) {
+			contained1.source2 = "updated2";
+			contained2.source3 = "updated3";
+			session.indexingPlan().addOrUpdate( 1, null, contained1, "source2" );
+			session.indexingPlan().addOrUpdate( 2, null, contained2, "source3" );
+
+			backendMock.expectWorks( indexName )
+					.addOrUpdate( "1", b -> b.objectField( "contained", b2 -> b2
+							.field( "derived", "updated1 updated2 init4" ) ) )
+					.addOrUpdate( "2", b -> b.objectField( "contained", b2 -> b2
+							.field( "derived", "updated1 updated3 init5" ) ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		// Changes to specific properties that exist in only one type and are source in only one type
+		// trigger reindexing for the relevant types.
+		try ( SearchSession session = mapping.createSession() ) {
+			contained1.source4 = "updated4";
+			contained2.source5 = "updated5";
+			session.indexingPlan().addOrUpdate( 1, null, contained1, "source4" );
+			session.indexingPlan().addOrUpdate( 2, null, contained2, "source5" );
+
+			backendMock.expectWorks( indexName )
+					.addOrUpdate( "1", b -> b.objectField( "contained", b2 -> b2
+							.field( "derived", "updated1 updated2 updated4" ) ) )
+					.addOrUpdate( "2", b -> b.objectField( "contained", b2 -> b2
+							.field( "derived", "updated1 updated3 updated5" ) ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test a polymorphic derivedFrom that is not at the root, e.g. on a property in an @IndexedEmbedded,
+	 * and that involves generics (which should thus be preserved).
+	 * <p>
+	 * This test is useful mainly for non-regression, because the handling of polymorphism involves casts,
+	 * and if implemented incorrectly those cases could result in type erasure that would make the whole process fail.
+	 *
+	 * @see #derivedFrom_nonRoot_polymorphism()
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4148")
+	public void derivedFrom_nonRoot_polymorphism_prevervesGenerics() {
+		final String indexName = "indexName";
+		class Model {
+			@Indexed(index = indexName)
+			class IndexedEntity {
+				@DocumentId
+				Integer id;
+				@IndexedEmbedded
+				AbstractContainedEntity<Model.OtherContainedEntity> contained;
+			}
+
+			abstract class AbstractContainedEntity<T> {
+				@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "contained")))
+				IndexedEntity containing;
+
+				T contained;
+
+				@GenericField
+				public abstract String getDerived();
+			}
+
+			class ContainedEntity1<T extends OtherContainedSuperClass> extends AbstractContainedEntity<T> {
+				@Override
+				@IndexingDependency(derivedFrom = {
+						@ObjectPath({@PropertyValue(propertyName = "contained"), @PropertyValue(propertyName = "source1")}),
+						@ObjectPath({@PropertyValue(propertyName = "contained"), @PropertyValue(propertyName = "source2")})
+				})
+				public String getDerived() {
+					return contained.source1 + " " + contained.source2;
+				}
+			}
+
+			class ContainedEntity2<T extends OtherContainedSuperClass> extends AbstractContainedEntity<T> {
+				@Override
+				@IndexingDependency(derivedFrom = {
+						@ObjectPath({@PropertyValue(propertyName = "contained"), @PropertyValue(propertyName = "source1")}),
+						@ObjectPath({@PropertyValue(propertyName = "contained"), @PropertyValue(propertyName = "source3")})
+				})
+				public String getDerived() {
+					return contained.source1 + " " + contained.source3;
+				}
+			}
+
+			class OtherContainedSuperClass {
+				String source1;
+				String source2;
+				String source3;
+			}
+
+			class OtherContainedEntity extends OtherContainedSuperClass {
+				@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "contained")))
+				AbstractContainedEntity<OtherContainedEntity> containing;
+			}
+		}
+
+		backendMock.expectSchema( indexName, b -> b
+				.objectField( "contained", b2 -> b2
+						.field( "derived", String.class )
+				)
+		);
+
+		SearchMapping mapping = setupHelper.start().expectCustomBeans()
+				.setup( Model.IndexedEntity.class, Model.AbstractContainedEntity.class,
+						Model.ContainedEntity1.class, Model.ContainedEntity2.class, Model.OtherContainedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		Model model = new Model();
+
+		Model.IndexedEntity indexed1 = model.new IndexedEntity();
+		indexed1.id = 1;
+		Model.ContainedEntity1<Model.OtherContainedEntity> contained1 = model.new ContainedEntity1<>();
+		indexed1.contained = contained1;
+		contained1.containing = indexed1;
+		Model.OtherContainedEntity otherContained1 = model.new OtherContainedEntity();
+		contained1.contained = otherContained1;
+		otherContained1.containing = contained1;
+		otherContained1.source1 = "init1";
+		otherContained1.source2 = "init2";
+		otherContained1.source3 = "init3";
+
+		Model.IndexedEntity indexed2 = model.new IndexedEntity();
+		indexed2.id = 2;
+		Model.ContainedEntity2<Model.OtherContainedEntity> contained2 = model.new ContainedEntity2<>();
+		indexed2.contained = contained2;
+		contained2.containing = indexed2;
+		Model.OtherContainedEntity otherContained2 = model.new OtherContainedEntity();
+		contained2.contained = otherContained2;
+		otherContained2.containing = contained2;
+		otherContained2.source1 = "init1";
+		otherContained2.source2 = "init2";
+		otherContained2.source3 = "init3";
+
+		try ( SearchSession session = mapping.createSession() ) {
+			session.indexingPlan().add( indexed1 );
+			session.indexingPlan().add( indexed2 );
+
+			backendMock.expectWorks( indexName )
+					.add( "1", b -> b.objectField( "contained", b2 -> b2
+							.field( "derived", "init1 init2" ) ) )
+					.add( "2", b -> b.objectField( "contained", b2 -> b2
+							.field( "derived", "init1 init3" ) ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		// Changed to unused properties are ignored
+		try ( SearchSession session = mapping.createSession() ) {
+			otherContained1.source3 = "updated3";
+			otherContained2.source2 = "updated2";
+			session.indexingPlan().addOrUpdate( 1, null, otherContained1, "source3" );
+			session.indexingPlan().addOrUpdate( 2, null, otherContained2, "source2" );
+
+			// Expect no reindexing at all
+		}
+		backendMock.verifyExpectationsMet();
+
+		// Changes to common source properties trigger reindexing
+		try ( SearchSession session = mapping.createSession() ) {
+			otherContained1.source1 = "updated1";
+			otherContained2.source1 = "updated1";
+			session.indexingPlan().addOrUpdate( 1, null, otherContained1, "source1" );
+			session.indexingPlan().addOrUpdate( 2, null, otherContained2, "source1" );
+
+			backendMock.expectWorks( indexName )
+					.addOrUpdate( "1", b -> b.objectField( "contained", b2 -> b2
+							.field( "derived", "updated1 init2" ) ) )
+					.addOrUpdate( "2", b -> b.objectField( "contained", b2 -> b2
+							.field( "derived", "updated1 init3" ) ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		// Changes to specific properties that exist in both types, but are source in only one type
+		// trigger reindexing for the relevant types.
+		try ( SearchSession session = mapping.createSession() ) {
+			otherContained1.source2 = "updated2";
+			otherContained2.source3 = "updated3";
+			session.indexingPlan().addOrUpdate( 1, null, otherContained1, "source2" );
+			session.indexingPlan().addOrUpdate( 2, null, otherContained2, "source3" );
+
+			backendMock.expectWorks( indexName )
+					.addOrUpdate( "1", b -> b.objectField( "contained", b2 -> b2
+							.field( "derived", "updated1 updated2" ) ) )
+					.addOrUpdate( "2", b -> b.objectField( "contained", b2 -> b2
+							.field( "derived", "updated1 updated3" ) ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
