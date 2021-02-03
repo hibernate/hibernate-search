@@ -8,8 +8,6 @@ package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
-import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper;
-import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
 public class StubSearchLoadingContext implements SearchLoadingContext<DocumentReference, DocumentReference> {
@@ -24,9 +22,6 @@ public class StubSearchLoadingContext implements SearchLoadingContext<DocumentRe
 
 	@Override
 	public ProjectionHitMapper<DocumentReference, DocumentReference> createProjectionHitMapper() {
-		return new DefaultProjectionHitMapper<>(
-				documentReference -> documentReference,
-				EntityLoader.identity()
-		);
+		return new StubProjectionHitMapper();
 	}
 }
