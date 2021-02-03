@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,8 +17,6 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
-import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingIndexedTypeContext;
-import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexingTypeGroupLoader;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
 
@@ -100,8 +97,8 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> implements EntityLo
 	}
 
 	@Override
-	public MassIndexingTypeGroupLoader<E, I> createLoader(
-			Set<? extends HibernateOrmMassIndexingIndexedTypeContext<? extends E>> targetEntityTypeContexts) {
+	public HibernateOrmQueryLoader<E, I> createLoader(
+			Set<? extends LoadingIndexedTypeContext<? extends E>> targetEntityTypeContexts) {
 		Set<Class<? extends E>> includedTypesFilter;
 		if ( rootEntityPersister.getEntityMetamodel().getSubclassEntityNames().size()
 				== targetEntityTypeContexts.size() ) {
@@ -110,11 +107,11 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> implements EntityLo
 		}
 		else {
 			includedTypesFilter = new HashSet<>( targetEntityTypeContexts.size() );
-			for ( HibernateOrmMassIndexingIndexedTypeContext<? extends E> includedType : targetEntityTypeContexts ) {
+			for ( LoadingIndexedTypeContext<? extends E> includedType : targetEntityTypeContexts ) {
 				includedTypesFilter.add( includedType.typeIdentifier().javaClass() );
 			}
 		}
-		return new MassIndexingTypeGroupLoaderImpl<>( queryFactory, includedTypesFilter );
+		return new HibernateOrmQueryLoader<>( queryFactory, includedTypesFilter );
 	}
 
 	private PojoLoader<?> doCreate(EntityPersister entityPersister,
@@ -188,7 +185,7 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> implements EntityLo
 	}
 
 	private AssertionFailure invalidTypesException(
-			Collection<? extends LoadingIndexedTypeContext<?>> targetEntityTypeContexts) {
+			Set<? extends LoadingIndexedTypeContext<?>> targetEntityTypeContexts) {
 		return new AssertionFailure(
 				"Some types among the targeted entity types are not subclasses of the expected root entity type."
 						+ " Expected entity name: " + rootEntityPersister.getEntityName()

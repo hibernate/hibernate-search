@@ -7,18 +7,14 @@
 package org.hibernate.search.mapper.orm.loading.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingIndexedTypeContext;
-import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexingTypeGroupLoader;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -77,13 +73,12 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> implemen
 
 
 	@Override
-	public MassIndexingTypeGroupLoader<E, I> createLoader(
-			Set<? extends HibernateOrmMassIndexingIndexedTypeContext<? extends E>> targetEntityTypeContexts) {
+	public HibernateOrmQueryLoader<E, I> createLoader(
+			Set<? extends LoadingIndexedTypeContext<? extends E>> targetEntityTypeContexts) {
 		if ( targetEntityTypeContexts.size() != 1 ) {
-			throw multipleTypesException( targetEntityTypeContexts, HibernateOrmMassIndexingIndexedTypeContext::entityPersister );
+			throw multipleTypesException( targetEntityTypeContexts );
 		}
-		HibernateOrmMassIndexingIndexedTypeContext<? extends E> targetEntityTypeContext =
-				targetEntityTypeContexts.iterator().next();
+		LoadingIndexedTypeContext<? extends E> targetEntityTypeContext = targetEntityTypeContexts.iterator().next();
 		if ( !entityPersister.equals( targetEntityTypeContext.entityPersister() ) ) {
 			throw invalidTypeException( targetEntityTypeContext.entityPersister() );
 		}
@@ -96,7 +91,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> implemen
 		else {
 			includedTypesFilter = Collections.singleton( targetEntityTypeContext.typeIdentifier().javaClass() );
 		}
-		return new MassIndexingTypeGroupLoaderImpl<>( queryFactory, includedTypesFilter );
+		return new HibernateOrmQueryLoader<>( queryFactory, includedTypesFilter );
 	}
 
 	@Override
@@ -104,7 +99,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> implemen
 			LoadingSessionContext sessionContext,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
 		if ( targetEntityTypeContexts.size() != 1 ) {
-			throw multipleTypesException( targetEntityTypeContexts, LoadingIndexedTypeContext::entityPersister );
+			throw multipleTypesException( targetEntityTypeContexts );
 		}
 
 		return doCreate( targetEntityTypeContexts.iterator().next(), sessionContext, cacheLookupStrategy, loadingOptions );
@@ -154,14 +149,13 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> implemen
 		);
 	}
 
-	private <T> AssertionFailure multipleTypesException(Collection<? extends T> targetEntityTypeContexts,
-			Function<T, EntityPersister> entityPersisterGetter) {
+	private AssertionFailure multipleTypesException(Set<? extends LoadingIndexedTypeContext<?>> targetEntityTypeContexts) {
 		return new AssertionFailure(
 				"Attempt to use a criteria-based entity loader with multiple target entity types."
 						+ " Expected entity name: " + entityPersister.getEntityName()
 						+ " Targeted entity names: "
 						+ targetEntityTypeContexts.stream()
-						.map( entityPersisterGetter )
+						.map( LoadingIndexedTypeContext::entityPersister )
 						.map( EntityPersister::getEntityName )
 						.collect( Collectors.toList() )
 		);

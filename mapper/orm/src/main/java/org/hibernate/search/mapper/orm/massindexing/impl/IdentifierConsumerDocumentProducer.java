@@ -22,6 +22,7 @@ import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
 import org.hibernate.query.Query;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmQueryLoader;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -53,7 +54,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 	private final MassIndexingNotifier notifier;
 
 	private final MassIndexingIndexedTypeGroup<E, I> typeGroup;
-	private final MassIndexingTypeGroupLoader<? super E, I> typeGroupLoader;
+	private final HibernateOrmQueryLoader<? super E, I> typeGroupLoader;
 
 	private final ProducerConsumerQueue<List<I>> source;
 	private final CacheMode cacheMode;
@@ -68,7 +69,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			HibernateOrmMassIndexingMappingContext mappingContext, String tenantId,
 			MassIndexingNotifier notifier,
 			MassIndexingIndexedTypeGroup<E, I> typeGroup,
-			MassIndexingTypeGroupLoader<? super E, I> typeGroupLoader,
+			HibernateOrmQueryLoader<? super E, I> typeGroupLoader,
 			ProducerConsumerQueue<List<I>> fromIdentifierListToEntities,
 			CacheMode cacheMode,
 			Integer transactionTimeout
