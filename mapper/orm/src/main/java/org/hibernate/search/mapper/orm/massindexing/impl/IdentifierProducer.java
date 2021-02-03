@@ -17,6 +17,7 @@ import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.query.Query;
+import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmQueryLoader;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -44,7 +45,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 	private final String tenantId;
 
 	private final MassIndexingIndexedTypeGroup<E, I> typeGroup;
-	private final MassIndexingTypeGroupLoader<? super E, I> typeGroupLoader;
+	private final HibernateOrmQueryLoader<? super E, I> typeGroupLoader;
 
 	private final ProducerConsumerQueue<List<I>> destination;
 	private final int batchSize;
@@ -54,7 +55,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 	IdentifierProducer(SessionFactory sessionFactory, String tenantId,
 			MassIndexingNotifier notifier,
 			MassIndexingIndexedTypeGroup<E, I> typeGroup,
-			MassIndexingTypeGroupLoader<? super E, I> typeGroupLoader,
+			HibernateOrmQueryLoader<? super E, I> typeGroupLoader,
 			ProducerConsumerQueue<List<I>> destination,
 			int objectLoadingBatchSize,
 			long objectsLimit, int idFetchSize) {

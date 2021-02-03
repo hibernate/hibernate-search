@@ -15,6 +15,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.hibernate.CacheMode;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmQueryLoader;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
@@ -37,7 +38,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 	private final DetachedBackendSessionContext sessionContext;
 
 	private final MassIndexingIndexedTypeGroup<E, I> typeGroup;
-	private final MassIndexingTypeGroupLoader<? super E, I> typeGroupLoader;
+	private final HibernateOrmQueryLoader<? super E, I> typeGroupLoader;
 
 	private final ProducerConsumerQueue<List<I>> primaryKeyStream;
 

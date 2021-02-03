@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
+import org.hibernate.search.mapper.orm.loading.impl.EntityLoadingStrategy;
+import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmQueryLoader;
 
 class MassIndexingIndexedTypeGroup<E, I> {
 
@@ -60,11 +62,11 @@ class MassIndexingIndexedTypeGroup<E, I> {
 	}
 
 	private final HibernateOrmMassIndexingIndexedTypeContext<E> commonSuperType;
-	private final MassIndexingTypeLoadingStrategy<? super E, I> loadingStrategy;
+	private final EntityLoadingStrategy<? super E, I> loadingStrategy;
 	private final Set<HibernateOrmMassIndexingIndexedTypeContext<? extends E>> includedTypes;
 
 	private MassIndexingIndexedTypeGroup(HibernateOrmMassIndexingIndexedTypeContext<E> commonSuperType,
-			MassIndexingTypeLoadingStrategy<? super E, I> loadingStrategy,
+			EntityLoadingStrategy<? super E, I> loadingStrategy,
 			Set<HibernateOrmMassIndexingIndexedTypeContext<? extends E>> includedTypes) {
 		this.commonSuperType = commonSuperType;
 		this.loadingStrategy = loadingStrategy;
@@ -89,7 +91,7 @@ class MassIndexingIndexedTypeGroup<E, I> {
 				.collect( Collectors.joining( "," ) );
 	}
 
-	public MassIndexingTypeGroupLoader<? super E, I> createLoader() {
+	public HibernateOrmQueryLoader<? super E, I> createLoader() {
 		return loadingStrategy.createLoader( includedTypes );
 	}
 

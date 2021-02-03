@@ -11,29 +11,25 @@ import java.util.Set;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.query.Query;
-import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexingTypeGroupLoader;
 
-public class MassIndexingTypeGroupLoaderImpl<E, I> implements MassIndexingTypeGroupLoader<E, I> {
+public class HibernateOrmQueryLoader<E, I> {
 	private final TypeQueryFactory<E, I> queryFactory;
 	private final Set<Class<? extends E>> includedTypesFilter;
 
-	public MassIndexingTypeGroupLoaderImpl(TypeQueryFactory<E, I> queryFactory,
+	public HibernateOrmQueryLoader(TypeQueryFactory<E, I> queryFactory,
 			Set<Class<? extends E>> includedTypesFilter) {
 		this.queryFactory = queryFactory;
 		this.includedTypesFilter = includedTypesFilter;
 	}
 
-	@Override
 	public Query<Long> createCountQuery(SharedSessionContractImplementor session) {
 		return queryFactory.createQueryForCount( session, includedTypesFilter );
 	}
 
-	@Override
 	public Query<I> createIdentifiersQuery(SharedSessionContractImplementor session) {
 		return queryFactory.createQueryForIdentifierListing( session, includedTypesFilter );
 	}
 
-	@Override
 	public Query<E> createLoadingQuery(SessionImplementor session, String idParameterName) {
 		return queryFactory.createQueryForLoadByUniqueProperty( session, idParameterName );
 	}
