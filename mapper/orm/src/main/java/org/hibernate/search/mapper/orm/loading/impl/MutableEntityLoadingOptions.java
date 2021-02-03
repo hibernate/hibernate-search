@@ -15,7 +15,7 @@ import org.hibernate.search.util.common.impl.Contracts;
 public class MutableEntityLoadingOptions {
 	private int fetchSize;
 
-	private List<EntityGraphHint> entityGraphHints;
+	private List<EntityGraphHint<?>> entityGraphHints;
 
 	public MutableEntityLoadingOptions(LoadingMappingContext mappingContext) {
 		this.fetchSize = mappingContext.fetchSize();
@@ -35,7 +35,7 @@ public class MutableEntityLoadingOptions {
 			return null;
 		}
 		String hibernateOrmEntityName = entityPersister.getEntityName();
-		for ( EntityGraphHint entityGraphHint : entityGraphHints ) {
+		for ( EntityGraphHint<?> entityGraphHint : entityGraphHints ) {
 			if ( entityGraphHint.graph.appliesTo( hibernateOrmEntityName ) ) {
 				return entityGraphHint;
 			}
