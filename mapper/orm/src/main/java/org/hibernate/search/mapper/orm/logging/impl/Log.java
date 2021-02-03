@@ -293,4 +293,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 41, value = "No such bean in bean container '%1$s'.")
 	BeanNotFoundException beanNotFoundInBeanContainer(BeanContainer beanContainer);
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET + 42, value = "Outbox-generated entity mapping: %1$s")
+	void outboxGeneratedEntityMapping(String xmlMappingDefinition);
 }
