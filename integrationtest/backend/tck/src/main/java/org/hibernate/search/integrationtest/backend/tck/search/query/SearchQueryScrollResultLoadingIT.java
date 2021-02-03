@@ -21,12 +21,10 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
-import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubDocumentReferenceConverter;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntityLoader;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubLoadedObject;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -72,7 +70,6 @@ public class SearchQueryScrollResultLoadingIT {
 	public void resultLoadingOnScrolling() {
 		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock = mock( StubDocumentReferenceConverter.class );
-		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock = mock( StubEntityLoader.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope = index.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
@@ -81,14 +78,13 @@ public class SearchQueryScrollResultLoadingIT {
 				.toQuery();
 		SearchScroll<StubLoadedObject> scroll = objectsQuery.scroll( 5 );
 
-		verifyLoading( loadingContextMock, documentReferenceConverterMock, objectLoaderMock, scroll );
+		verifyLoading( loadingContextMock, documentReferenceConverterMock, scroll );
 	}
 
 	@Test
 	public void resultLoadingOnScrolling_entityLoadingTimeout() {
 		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock = mock( StubDocumentReferenceConverter.class );
-		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock = mock( StubEntityLoader.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope = index.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
@@ -98,14 +94,13 @@ public class SearchQueryScrollResultLoadingIT {
 				.toQuery();
 		SearchScroll<StubLoadedObject> scroll = objectsQuery.scroll( 5 );
 
-		verifyLoading( loadingContextMock, documentReferenceConverterMock, objectLoaderMock, scroll );
+		verifyLoading( loadingContextMock, documentReferenceConverterMock, scroll );
 	}
 
 	@Test
 	public void resultLoadingOnScrolling_softTimeout() {
 		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock = mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock = mock( StubDocumentReferenceConverter.class );
-		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock = mock( StubEntityLoader.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope = index.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
@@ -116,22 +111,21 @@ public class SearchQueryScrollResultLoadingIT {
 		SearchScroll<StubLoadedObject> scroll = objectsQuery.scroll( 5 );
 
 		// softTimeout is passed to the entity loading too
-		verifyLoading( loadingContextMock, documentReferenceConverterMock, objectLoaderMock, scroll );
+		verifyLoading( loadingContextMock, documentReferenceConverterMock, scroll );
 	}
 
 	private void verifyLoading(SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock,
 			DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock,
-			EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock,
 			SearchScroll<StubLoadedObject> scroll) {
 		// 7 full size pages
 		for ( int j = 0; j < 7; j++ ) {
 			int base = j * 5;
 
 			expectHitMapping(
-					loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+					loadingContextMock, documentReferenceConverterMock,
 					c -> {
 						for ( int i = 0; i < 5; i++ ) {
-							c.load( references[base + i].reference, references[base + i].transformedReference, references[base + i].loadedObject );
+							c.load( references[base + i].reference, references[base + i].loadedObject );
 						}
 					}
 			);
@@ -149,10 +143,10 @@ public class SearchQueryScrollResultLoadingIT {
 
 		// page with the few remaining items
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+				loadingContextMock, documentReferenceConverterMock,
 				c -> {
 					for ( int i = 35; i <= 36; i++ ) {
-						c.load( references[i].reference, references[i].transformedReference, references[i].loadedObject );
+						c.load( references[i].reference, references[i].loadedObject );
 					}
 				}
 		);
@@ -168,14 +162,12 @@ public class SearchQueryScrollResultLoadingIT {
 		final String id;
 		final int value;
 		final DocumentReference reference;
-		final StubTransformedReference transformedReference;
 		final StubLoadedObject loadedObject;
 
 		IndexItem(int i) {
 			id = i + "";
 			value = i;
 			reference = reference( index.typeName(), id );
-			transformedReference = new StubTransformedReference( reference );
 			loadedObject = new StubLoadedObject( reference );
 		}
 	}

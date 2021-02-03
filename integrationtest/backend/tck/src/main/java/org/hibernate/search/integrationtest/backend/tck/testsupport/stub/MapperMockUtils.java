@@ -18,14 +18,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
+import org.hibernate.search.engine.search.loading.spi.LoadingResult;
+import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
-import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper;
-import org.hibernate.search.engine.search.loading.spi.EntityLoader;
-import org.hibernate.search.util.impl.integrationtest.common.MockUtils;
+
+import org.mockito.Mockito;
 
 public final class MapperMockUtils {
 
@@ -35,7 +35,6 @@ public final class MapperMockUtils {
 	/**
 	 * @param loadingContextMock The mock for the loading context.
 	 * @param referenceTransformerMock The mock for the reference transformer.
-	 * @param objectLoaderMock The mock for the entity loader.
 	 * @param hitMappingDefinition A definition of the reference -> entity mapping.
 	 * @param <R> The reference type.
 	 * @param <E> The entity type.
@@ -43,43 +42,56 @@ public final class MapperMockUtils {
 	public static <R, E> void expectHitMapping(
 			SearchLoadingContext<R, E> loadingContextMock,
 			DocumentReferenceConverter<R> referenceTransformerMock,
-			EntityLoader<R, E> objectLoaderMock,
 			Consumer<HitMappingDefinitionContext<R, E>> hitMappingDefinition) {
-		reset( loadingContextMock, referenceTransformerMock, objectLoaderMock );
+		reset( loadingContextMock, referenceTransformerMock );
+
+		@SuppressWarnings("unchecked")
+		ProjectionHitMapper<R, E> projectionHitMapperMock = Mockito.mock( ProjectionHitMapper.class );
+		@SuppressWarnings("unchecked")
+		LoadingResult<R, E> loadingResultMock = Mockito.mock( LoadingResult.class );
 
 		/*
 		 * We expect getProjectionHitMapper to be called *every time* a load is performed,
-		 * so that the mapper can check its state (session is open in ORM, for example).
+		 * because it may not reset its internal state,
+		 * and also so that the mapper can check the session state (session is still open in ORM, for example).
 		 */
 		when( loadingContextMock.createProjectionHitMapper() )
-				.thenReturn( new DefaultProjectionHitMapper<>(
-						referenceTransformerMock,
-						objectLoaderMock
-				) );
+				.thenReturn( projectionHitMapperMock );
+		when( projectionHitMapperMock.loadBlocking( any() ) )
+				.thenReturn( loadingResultMock );
 
 		HitMappingDefinitionContext<R, E> context = new HitMappingDefinitionContext<>();
 		hitMappingDefinition.accept( context );
 
-		for ( Map.Entry<DocumentReference, Set<R>> entry : context.referenceMap.entrySet() ) {
-			for ( R transformedReference : entry.getValue() ) {
-				when( referenceTransformerMock.fromDocumentReference( referenceMatcher( entry.getKey() ) ) )
-						.thenReturn( transformedReference );
-			}
+		List<StubLoadingKey> loadingKeys = new ArrayList<>();
+		for ( int i = 0; i < context.referencesToLoad.size(); i++ ) {
+			DocumentReference documentReference = context.referencesToLoad.get( i );
+			StubLoadingKey loadingKey = new StubLoadingKey( i );
+			loadingKeys.add( loadingKey );
+			when( projectionHitMapperMock.planLoading( referenceMatcher( documentReference ) ) )
+					.thenReturn( loadingKey );
 		}
 
-		Set<R> keysToLoad = context.loadingMap.keySet();
-		if ( !keysToLoad.isEmpty() ) {
-			when( objectLoaderMock.loadBlocking(
-					MockUtils.collectionAnyOrderMatcher( new ArrayList<>( keysToLoad ) ), any() ) )
-					.thenAnswer( invocationOnMock -> invocationOnMock.<List<R>>getArgument( 0 ).stream()
-							.map( context.loadingMap::get )
-							.collect( Collectors.toList() ) );
+		when( projectionHitMapperMock.loadBlocking( any() ) )
+				.thenReturn( loadingResultMock );
+
+		for ( int i = 0; i < context.loadedObjects.size(); i++ ) {
+			when( loadingResultMock.get( loadingKeys.get( i ) ) )
+					.thenReturn( context.loadedObjects.get( i ) );
+		}
+
+		for ( Map.Entry<DocumentReference, Set<R>> entry : context.referenceMap.entrySet() ) {
+			for ( R transformedReference : entry.getValue() ) {
+				when( loadingResultMock.convertReference( referenceMatcher( entry.getKey() ) ) )
+						.thenReturn( transformedReference );
+			}
 		}
 	}
 
 	public static class HitMappingDefinitionContext<R, E> {
 		private final Map<DocumentReference, Set<R>> referenceMap = new HashMap<>();
-		private final Map<R, E> loadingMap = new HashMap<>();
+		private final List<DocumentReference> referencesToLoad = new ArrayList<>();
+		private final List<E> loadedObjects = new ArrayList<>();
 
 		public HitMappingDefinitionContext<R, E> entityReference(DocumentReference documentReference, R transformedReference) {
 			referenceMap.computeIfAbsent( documentReference, ignored -> new LinkedHashSet<>() )
@@ -87,12 +99,17 @@ public final class MapperMockUtils {
 			return this;
 		}
 
-		public HitMappingDefinitionContext<R, E> load(DocumentReference documentReference, R transformedReference, E loadedObject) {
-			// For each load, the backend must first transform the reference
-			entityReference( documentReference, transformedReference );
-			// Then it will need to trigger loading
-			loadingMap.put( transformedReference, loadedObject );
+		public HitMappingDefinitionContext<R, E> load(DocumentReference documentReference, E loadedObject) {
+			referencesToLoad.add( documentReference );
+			loadedObjects.add( loadedObject );
 			return this;
+		}
+	}
+
+	private static class StubLoadingKey {
+		private final int ordinal;
+		public StubLoadingKey(int ordinal) {
+			this.ordinal = ordinal;
 		}
 	}
 }

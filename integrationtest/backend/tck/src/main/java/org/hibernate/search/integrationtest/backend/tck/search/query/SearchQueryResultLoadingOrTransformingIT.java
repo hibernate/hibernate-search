@@ -31,14 +31,11 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
-import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper;
-import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubDocumentReferenceConverter;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntityLoader;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubHitTransformer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubLoadedObject;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedHit;
@@ -94,8 +91,6 @@ public class SearchQueryResultLoadingOrTransformingIT {
 	public void defaultResultType() {
 		DocumentReference mainReference = reference( index.typeName(), MAIN_ID );
 		DocumentReference emptyReference = reference( index.typeName(), EMPTY_ID );
-		StubTransformedReference mainTransformedReference = new StubTransformedReference( mainReference );
-		StubTransformedReference emptyTransformedReference = new StubTransformedReference( emptyReference );
 		StubLoadedObject mainLoadedObject = new StubLoadedObject( mainReference );
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyReference );
 
@@ -103,8 +98,6 @@ public class SearchQueryResultLoadingOrTransformingIT {
 				mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
 				mock( StubDocumentReferenceConverter.class );
-		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				mock( StubEntityLoader.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
@@ -118,19 +111,19 @@ public class SearchQueryResultLoadingOrTransformingIT {
 		 * so that the mapper can run state checks (session is still open, ...).
 		 */
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+				loadingContextMock, documentReferenceConverterMock,
 				c -> c
-						.load( mainReference, mainTransformedReference, mainLoadedObject )
-						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
+						.load( mainReference, mainLoadedObject )
+						.load( emptyReference, emptyLoadedObject )
 		);
 		assertThatQuery( objectsQuery ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
 
 		// check the same for the scroll API
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+				loadingContextMock, documentReferenceConverterMock,
 				c -> c
-						.load( mainReference, mainTransformedReference, mainLoadedObject )
-						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
+						.load( mainReference, mainLoadedObject )
+						.load( emptyReference, emptyLoadedObject )
 		);
 		assertThatHits( hitsUsingScroll( objectsQuery ) ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
 	}
@@ -139,8 +132,6 @@ public class SearchQueryResultLoadingOrTransformingIT {
 	public void defaultResultType_entityLoadingTimeout() {
 		DocumentReference mainReference = reference( index.typeName(), MAIN_ID );
 		DocumentReference emptyReference = reference( index.typeName(), EMPTY_ID );
-		StubTransformedReference mainTransformedReference = new StubTransformedReference( mainReference );
-		StubTransformedReference emptyTransformedReference = new StubTransformedReference( emptyReference );
 		StubLoadedObject mainLoadedObject = new StubLoadedObject( mainReference );
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyReference );
 
@@ -148,8 +139,6 @@ public class SearchQueryResultLoadingOrTransformingIT {
 				mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
 				mock( StubDocumentReferenceConverter.class );
-		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				mock( StubEntityLoader.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
@@ -159,10 +148,10 @@ public class SearchQueryResultLoadingOrTransformingIT {
 				.toQuery();
 
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+				loadingContextMock, documentReferenceConverterMock,
 				c -> c
-						.load( mainReference, mainTransformedReference, mainLoadedObject )
-						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
+						.load( mainReference, mainLoadedObject )
+						.load( emptyReference, emptyLoadedObject )
 		);
 		assertThatQuery( objectsQuery ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
 		// Check in particular that the backend gets the projection hit mapper from the loading context,
@@ -172,10 +161,10 @@ public class SearchQueryResultLoadingOrTransformingIT {
 
 		// check the same for the scroll API
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+				loadingContextMock, documentReferenceConverterMock,
 				c -> c
-						.load( mainReference, mainTransformedReference, mainLoadedObject )
-						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
+						.load( mainReference, mainLoadedObject )
+						.load( emptyReference, emptyLoadedObject )
 		);
 		assertThatHits( hitsUsingScroll( objectsQuery ) ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
 		verify( loadingContextMock ).createProjectionHitMapper();
@@ -224,8 +213,6 @@ public class SearchQueryResultLoadingOrTransformingIT {
 				mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
 				mock( StubDocumentReferenceConverter.class );
-		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				mock( StubEntityLoader.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
@@ -235,7 +222,7 @@ public class SearchQueryResultLoadingOrTransformingIT {
 				.toQuery();
 
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+				loadingContextMock, documentReferenceConverterMock,
 				c -> c
 						.entityReference( mainReference, mainTransformedReference )
 						.entityReference( emptyReference, emptyTransformedReference )
@@ -248,7 +235,7 @@ public class SearchQueryResultLoadingOrTransformingIT {
 
 		// check the same for the scroll API
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+				loadingContextMock, documentReferenceConverterMock,
 				c -> c
 						.entityReference( mainReference, mainTransformedReference )
 						.entityReference( emptyReference, emptyTransformedReference )
@@ -261,8 +248,6 @@ public class SearchQueryResultLoadingOrTransformingIT {
 	public void selectEntity_referencesTransformer_entityLoading() {
 		DocumentReference mainReference = reference( index.typeName(), MAIN_ID );
 		DocumentReference emptyReference = reference( index.typeName(), EMPTY_ID );
-		StubTransformedReference mainTransformedReference = new StubTransformedReference( mainReference );
-		StubTransformedReference emptyTransformedReference = new StubTransformedReference( emptyReference );
 		StubLoadedObject mainLoadedObject = new StubLoadedObject( mainReference );
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyReference );
 
@@ -270,8 +255,6 @@ public class SearchQueryResultLoadingOrTransformingIT {
 				mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
 				mock( StubDocumentReferenceConverter.class );
-		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				mock( StubEntityLoader.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
@@ -281,10 +264,10 @@ public class SearchQueryResultLoadingOrTransformingIT {
 				.toQuery();
 
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+				loadingContextMock, documentReferenceConverterMock,
 				c -> c
-						.load( mainReference, mainTransformedReference, mainLoadedObject )
-						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
+						.load( mainReference, mainLoadedObject )
+						.load( emptyReference, emptyLoadedObject )
 		);
 		assertThatQuery( objectsQuery ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
 		// Check in particular that the backend gets the projection hit mapper from the loading context,
@@ -294,10 +277,10 @@ public class SearchQueryResultLoadingOrTransformingIT {
 
 		// check the same for the scroll API
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+				loadingContextMock, documentReferenceConverterMock,
 				c -> c
-						.load( mainReference, mainTransformedReference, mainLoadedObject )
-						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
+						.load( mainReference, mainLoadedObject )
+						.load( emptyReference, emptyLoadedObject )
 		);
 		assertThatHits( hitsUsingScroll( objectsQuery ) ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
 		verify( loadingContextMock ).createProjectionHitMapper();
@@ -316,8 +299,6 @@ public class SearchQueryResultLoadingOrTransformingIT {
 				mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
 				mock( StubDocumentReferenceConverter.class );
-		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				mock( StubEntityLoader.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
@@ -334,16 +315,16 @@ public class SearchQueryResultLoadingOrTransformingIT {
 				.toQuery();
 
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+				loadingContextMock, documentReferenceConverterMock,
 				/*
 				 * Expect each reference to be transformed because of the entity reference projection,
 				 * but also loaded because of the entity projection.
 				 */
 				c -> c
 						.entityReference( mainReference, mainTransformedReference )
-						.load( mainReference, mainTransformedReference, mainLoadedObject )
+						.load( mainReference, mainLoadedObject )
 						.entityReference( emptyReference, emptyTransformedReference )
-						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
+						.load( emptyReference, emptyLoadedObject )
 		);
 		assertThatQuery( projectionsQuery ).hasListHitsAnyOrder( b -> {
 			b.list( STRING_VALUE, mainReference, mainTransformedReference, mainLoadedObject );
@@ -356,16 +337,16 @@ public class SearchQueryResultLoadingOrTransformingIT {
 
 		// check the same for the scroll API
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+				loadingContextMock, documentReferenceConverterMock,
 				/*
 				 * Expect each reference to be transformed because of the entity reference projection,
 				 * but also loaded because of the entity projection.
 				 */
 				c -> c
 						.entityReference( mainReference, mainTransformedReference )
-						.load( mainReference, mainTransformedReference, mainLoadedObject )
+						.load( mainReference, mainLoadedObject )
 						.entityReference( emptyReference, emptyTransformedReference )
-						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
+						.load( emptyReference, emptyLoadedObject )
 		);
 		assertThatHits( hitsUsingScroll( projectionsQuery ) ).hasListHitsAnyOrder( b -> {
 			b.list( STRING_VALUE, mainReference, mainTransformedReference, mainLoadedObject );
@@ -442,8 +423,6 @@ public class SearchQueryResultLoadingOrTransformingIT {
 				mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
 				mock( StubDocumentReferenceConverter.class );
-		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				mock( StubEntityLoader.class );
 		Function<List<?>, StubTransformedHit> hitTransformerMock = mock( StubHitTransformer.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
@@ -462,16 +441,16 @@ public class SearchQueryResultLoadingOrTransformingIT {
 				.toQuery();
 
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+				loadingContextMock, documentReferenceConverterMock,
 				/*
 				 * Expect each reference to be transformed because of the entity reference projection,
 				 * but also loaded because of the entity projection.
 				 */
 				c -> c
 						.entityReference( mainReference, mainTransformedReference )
-						.load( mainReference, mainTransformedReference, mainLoadedObject )
+						.load( mainReference, mainLoadedObject )
 						.entityReference( emptyReference, emptyTransformedReference )
-						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
+						.load( emptyReference, emptyLoadedObject )
 		);
 		when( hitTransformerMock.apply( projectionMatcher(
 				STRING_VALUE, mainReference, mainTransformedReference, mainLoadedObject
@@ -489,16 +468,16 @@ public class SearchQueryResultLoadingOrTransformingIT {
 
 		// check the same for the scroll API
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+				loadingContextMock, documentReferenceConverterMock,
 				/*
 				 * Expect each reference to be transformed because of the entity reference projection,
 				 * but also loaded because of the entity projection.
 				 */
 				c -> c
 						.entityReference( mainReference, mainTransformedReference )
-						.load( mainReference, mainTransformedReference, mainLoadedObject )
+						.load( mainReference, mainLoadedObject )
 						.entityReference( emptyReference, emptyTransformedReference )
-						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
+						.load( emptyReference, emptyLoadedObject )
 		);
 		when( hitTransformerMock.apply( projectionMatcher(
 				STRING_VALUE, mainReference, mainTransformedReference, mainLoadedObject
@@ -563,8 +542,13 @@ public class SearchQueryResultLoadingOrTransformingIT {
 
 	@Test
 	public void callGetProjectionHitMapperEveryTime() {
+		DocumentReference mainReference = reference( index.typeName(), MAIN_ID );
+		DocumentReference emptyReference = reference( index.typeName(), EMPTY_ID );
+
 		SearchLoadingContext<DocumentReference, DocumentReference> loadingContextMock =
 				mock( SearchLoadingContext.class );
+		DocumentReferenceConverter<DocumentReference> documentReferenceConverterMock =
+				mock( DocumentReferenceConverter.class );
 
 		GenericStubMappingScope<DocumentReference, DocumentReference> scope = index.createGenericScope();
 		SearchQuery<DocumentReference> query = scope.query( loadingContextMock )
@@ -572,8 +556,12 @@ public class SearchQueryResultLoadingOrTransformingIT {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		when( loadingContextMock.createProjectionHitMapper() )
-				.thenReturn( new DefaultProjectionHitMapper<>( reference -> reference, EntityLoader.identity() ) );
+		expectHitMapping(
+				loadingContextMock, documentReferenceConverterMock,
+				c -> c
+						.load( mainReference, mainReference )
+						.load( emptyReference, emptyReference )
+		);
 		query.fetchAll();
 		// Check in particular that the backend gets the projection hit mapper from the loading context,
 		// which must happen every time we execute the query,
@@ -582,8 +570,12 @@ public class SearchQueryResultLoadingOrTransformingIT {
 
 		// Second query execution to make sure the backend doesn't try to cache the projection hit mapper...
 		reset( loadingContextMock );
-		when( loadingContextMock.createProjectionHitMapper() )
-				.thenReturn( new DefaultProjectionHitMapper<>( reference -> reference, EntityLoader.identity() ) );
+		expectHitMapping(
+				loadingContextMock, documentReferenceConverterMock,
+				c -> c
+						.load( mainReference, mainReference )
+						.load( emptyReference, emptyReference )
+		);
 		query.fetchAll();
 		verify( loadingContextMock ).createProjectionHitMapper();
 	}
@@ -593,16 +585,12 @@ public class SearchQueryResultLoadingOrTransformingIT {
 	public void failedEntityLoading_skipHit() {
 		DocumentReference mainDocumentReference = reference( index.typeName(), MAIN_ID );
 		DocumentReference emptyDocumentReference = reference( index.typeName(), EMPTY_ID );
-		StubTransformedReference mainEntityReference = new StubTransformedReference( mainDocumentReference );
-		StubTransformedReference emptyEntityReference = new StubTransformedReference( emptyDocumentReference );
 		StubLoadedObject emptyLoadedObject = new StubLoadedObject( emptyDocumentReference );
 
 		SearchLoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
 				mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
 				mock( StubDocumentReferenceConverter.class );
-		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				mock( StubEntityLoader.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				index.createGenericScope();
@@ -611,11 +599,11 @@ public class SearchQueryResultLoadingOrTransformingIT {
 				.toQuery();
 
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+				loadingContextMock, documentReferenceConverterMock,
 				c -> c
 						// Return "null" when loading, meaning the entity failed to load
-						.load( mainDocumentReference, mainEntityReference, null )
-						.load( emptyDocumentReference, emptyEntityReference, emptyLoadedObject )
+						.load( mainDocumentReference, null )
+						.load( emptyDocumentReference, emptyLoadedObject )
 		);
 		// Expect the main document to be excluded from hits, since it could not be loaded.
 		assertThatQuery( objectsQuery ).hasHitsAnyOrder( emptyLoadedObject );

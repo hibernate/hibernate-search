@@ -30,7 +30,6 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
-import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -40,7 +39,6 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubDocumentReferenceConverter;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntityLoader;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubLoadedObject;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
@@ -163,8 +161,6 @@ public class SearchProjectionIT {
 				mock( SearchLoadingContext.class );
 		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
 				mock( StubDocumentReferenceConverter.class );
-		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
-				mock( StubEntityLoader.class );
 
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				mainIndex.createGenericScope();
@@ -189,20 +185,20 @@ public class SearchProjectionIT {
 				.toQuery();
 
 		expectHitMapping(
-				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
+				loadingContextMock, documentReferenceConverterMock,
 				/*
 				 * Expect each reference to be transformed because of the reference projection,
 				 * but also loaded because of the entity projection.
 				 */
 				c -> c
 						.entityReference( document1Reference, document1TransformedReference )
-						.load( document1Reference, document1TransformedReference, document1LoadedObject )
+						.load( document1Reference, document1LoadedObject )
 						.entityReference( document2Reference, document2TransformedReference )
-						.load( document2Reference, document2TransformedReference, document2LoadedObject )
+						.load( document2Reference, document2LoadedObject )
 						.entityReference( document3Reference, document3TransformedReference )
-						.load( document3Reference, document3TransformedReference, document3LoadedObject )
+						.load( document3Reference, document3LoadedObject )
 						.entityReference( emptyReference, emptyTransformedReference )
-						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
+						.load( emptyReference, emptyLoadedObject )
 		);
 		assertThatQuery( query ).hasListHitsAnyOrder( b -> {
 			b.list( document1Reference, document1TransformedReference, document1LoadedObject );
