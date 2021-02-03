@@ -49,6 +49,7 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 			"        </id>\n\r" +
 			"        <property name=\"entityName\" column=\"ENTITY_NAME\" type=\"string\" />\n" +
 			"        <property name=\"entityId\" column=\"ENTITY_ID\" type=\"string\" />\n" +
+			"        <property name=\"routingKey\" column=\"ROUTING_KEY\" type=\"string\" />\n" +
 			"    </class>\n" +
 			"</hibernate-mapping>\n";
 

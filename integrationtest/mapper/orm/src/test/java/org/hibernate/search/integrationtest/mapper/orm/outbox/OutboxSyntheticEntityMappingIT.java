@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.outbox;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -82,19 +83,25 @@ public class OutboxSyntheticEntityMappingIT {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			HashMap<String, Object> entityData = new HashMap<>();
 			entityData.put( "entityName", entityName );
-			entityData.put( "entityId", 1 + "" );
+			entityData.put( "entityId", "739" );
+			entityData.put( "routingKey", "fake-routing-key" );
 
 			session.save( "Outbox", entityData );
 
-			@SuppressWarnings( "unchecked" ) // this field is defined as integer
+			@SuppressWarnings("unchecked") // this field is defined as integer
 			Integer generatedId = (Integer) entityData.get( "id" );
 
 			id.set( generatedId );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			Object load = session.load( "Outbox", id.get() );
+			@SuppressWarnings("unchecked") // synthetic entities are loaded as map
+			Map<String, Object> load = (Map<String, Object>) session.load( "Outbox", id.get() );
 			assertThat( load ).isNotNull();
+
+			assertThat( load ).containsEntry( "entityName", entityName );
+			assertThat( load ).containsEntry( "entityId", "739" );
+			assertThat( load ).containsEntry( "routingKey", "fake-routing-key" );
 		} );
 	}
 
