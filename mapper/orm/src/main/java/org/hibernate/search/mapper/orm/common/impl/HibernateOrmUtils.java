@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.common.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
@@ -93,6 +94,46 @@ public final class HibernateOrmUtils {
 			);
 		}
 		return superTypeCandidate;
+	}
+
+	public static boolean hasAtMostOneConcreteSubType(SessionFactoryImplementor sessionFactory,
+			EntityPersister parentType) {
+		@SuppressWarnings("unchecked")
+		Set<String> subClassEntityNames = parentType.getEntityMetamodel().getSubclassEntityNames();
+		// Quick check to return true immediately if there's only one type
+		if ( subClassEntityNames.size() == 1 ) {
+			return true;
+		}
+
+		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
+		int concreteSubTypesCount = 0;
+		for ( String subClassEntityName : subClassEntityNames ) {
+			if ( !metamodel.entityPersister( subClassEntityName ).getEntityMetamodel().isAbstract() ) {
+				if ( ++concreteSubTypesCount > 1 ) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	public static boolean targetsAllConcreteSubTypes(SessionFactoryImplementor sessionFactory,
+			EntityPersister parentType, Set<?> targetConcreteSubTypes) {
+		@SuppressWarnings("unchecked")
+		Set<String> subClassEntityNames = parentType.getEntityMetamodel().getSubclassEntityNames();
+		// Quick check to return true immediately if all subtypes are concrete
+		if ( subClassEntityNames.size() == targetConcreteSubTypes.size() ) {
+			return true;
+		}
+
+		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
+		int concreteSubTypesCount = 0;
+		for ( String subClassEntityName : subClassEntityNames ) {
+			if ( !metamodel.entityPersister( subClassEntityName ).getEntityMetamodel().isAbstract() ) {
+				++concreteSubTypesCount;
+			}
+		}
+		return concreteSubTypesCount == targetConcreteSubTypes.size();
 	}
 
 }

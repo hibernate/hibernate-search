@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
@@ -33,19 +34,22 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> implemen
 		@SuppressWarnings("unchecked")
 		TypeQueryFactory<?, I> queryFactory = (TypeQueryFactory<?, I>)
 				TypeQueryFactory.create( sessionFactory, entityPersister, documentIdSourcePropertyName );
-		return new HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<>( entityPersister, queryFactory,
+		return new HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<>( sessionFactory, entityPersister, queryFactory,
 				documentIdSourcePropertyName, documentIdSourceHandle );
 	}
 
+	private final SessionFactoryImplementor sessionFactory;
 	private final EntityPersister entityPersister;
 	private final TypeQueryFactory<E, I> queryFactory;
 	private final String documentIdSourcePropertyName;
 	private final ValueReadHandle<?> documentIdSourceHandle;
 
-	HibernateOrmNonEntityIdPropertyEntityLoadingStrategy(EntityPersister entityPersister,
+	private HibernateOrmNonEntityIdPropertyEntityLoadingStrategy(SessionFactoryImplementor sessionFactory,
+			EntityPersister entityPersister,
 			TypeQueryFactory<E, I> queryFactory,
 			String documentIdSourcePropertyName,
 			ValueReadHandle<I> documentIdSourceHandle) {
+		this.sessionFactory = sessionFactory;
 		this.entityPersister = entityPersister;
 		this.queryFactory = queryFactory;
 		this.documentIdSourcePropertyName = documentIdSourcePropertyName;
@@ -84,8 +88,8 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> implemen
 		}
 
 		Set<Class<? extends E>> includedTypesFilter;
-		if ( entityPersister.getEntityMetamodel().getSubclassEntityNames().size() == 1 ) {
-			// Not subtype, no need to filter.
+		if ( HibernateOrmUtils.targetsAllConcreteSubTypes( sessionFactory, entityPersister, targetEntityTypeContexts ) ) {
+			// All concrete types are included, no need to filter by type.
 			includedTypesFilter = Collections.emptySet();
 		}
 		else {

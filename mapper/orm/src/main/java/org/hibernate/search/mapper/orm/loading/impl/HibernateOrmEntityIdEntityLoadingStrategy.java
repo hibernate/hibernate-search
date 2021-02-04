@@ -27,13 +27,16 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> implements EntityLo
 		EntityPersister rootEntityPersister = HibernateOrmUtils.toRootEntityType( sessionFactory, entityPersister );
 		TypeQueryFactory<?, ?> queryFactory = TypeQueryFactory.create( sessionFactory, rootEntityPersister,
 				entityPersister.getIdentifierPropertyName() );
-		return new HibernateOrmEntityIdEntityLoadingStrategy<>( rootEntityPersister, queryFactory );
+		return new HibernateOrmEntityIdEntityLoadingStrategy<>( sessionFactory, rootEntityPersister, queryFactory );
 	}
 
+	private final SessionFactoryImplementor sessionFactory;
 	private final EntityPersister rootEntityPersister;
 	private final TypeQueryFactory<E, I> queryFactory;
 
-	HibernateOrmEntityIdEntityLoadingStrategy(EntityPersister rootEntityPersister, TypeQueryFactory<E, I> queryFactory) {
+	HibernateOrmEntityIdEntityLoadingStrategy(SessionFactoryImplementor sessionFactory,
+			EntityPersister rootEntityPersister, TypeQueryFactory<E, I> queryFactory) {
+		this.sessionFactory = sessionFactory;
 		this.rootEntityPersister = rootEntityPersister;
 		this.queryFactory = queryFactory;
 	}
@@ -100,9 +103,9 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> implements EntityLo
 	public HibernateOrmQueryLoader<E, I> createLoader(
 			Set<? extends LoadingIndexedTypeContext<? extends E>> targetEntityTypeContexts) {
 		Set<Class<? extends E>> includedTypesFilter;
-		if ( rootEntityPersister.getEntityMetamodel().getSubclassEntityNames().size()
-				== targetEntityTypeContexts.size() ) {
-			// All types are included, no need to filter.
+		if ( HibernateOrmUtils.targetsAllConcreteSubTypes( sessionFactory, rootEntityPersister,
+				targetEntityTypeContexts ) ) {
+			// All concrete types are included, no need to filter by type.
 			includedTypesFilter = Collections.emptySet();
 		}
 		else {
@@ -156,6 +159,9 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> implements EntityLo
 				throw new AssertionFailure( "Unexpected cache lookup strategy: " + cacheLookupStrategy );
 		}
 
+		// We must pass rootEntityPersister here, to avoid getting a WrongClassException when loading from the cache,
+		// even if we know we actually want instances from the most specific entity persister,
+		// because that exception cannot be recovered from.
 		return new HibernateOrmEntityIdEntityLoader<>( rootEntityPersister, queryFactory, sessionContext,
 				persistenceContextLookup, cacheLookupStrategyImplementor, loadingOptions );
 	}
