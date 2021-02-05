@@ -50,6 +50,21 @@ public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort 
 		}
 
 		@Override
+		public void missingFirst() {
+			// TODO HSEARCH-3863 Support for Lucene
+		}
+
+		@Override
+		public void missingLast() {
+			// TODO HSEARCH-3863 Support for Lucene
+		}
+
+		@Override
+		public void missingAs(GeoPoint value) {
+			// TODO HSEARCH-3863 Support for Lucene
+		}
+
+		@Override
 		public void mode(SortMode mode) {
 			switch ( mode ) {
 				case MIN:

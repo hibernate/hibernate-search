@@ -36,6 +36,11 @@ public class StubSortBuilder implements ScoreSortBuilder,
 	}
 
 	@Override
+	public void missingAs(GeoPoint value) {
+		// No-op
+	}
+
+	@Override
 	public void missingAs(Object value, ValueConvert convert) {
 		// No-op
 	}

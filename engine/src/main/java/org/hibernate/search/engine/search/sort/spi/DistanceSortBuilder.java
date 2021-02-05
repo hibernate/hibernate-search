@@ -17,6 +17,12 @@ public interface DistanceSortBuilder extends SearchSortBuilder {
 
 	void order(SortOrder order);
 
+	void missingFirst();
+
+	void missingLast();
+
+	void missingAs(GeoPoint value);
+
 	void mode(SortMode mode);
 
 	void filter(SearchPredicate filter);
