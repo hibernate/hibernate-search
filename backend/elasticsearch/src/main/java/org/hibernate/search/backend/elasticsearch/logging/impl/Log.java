@@ -715,4 +715,14 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 133, value = "There are some JSON syntax errors on the given custom index settings file: '%1$s'.")
 	SearchException customIndexSettingsJsonSyntaxErrors(String filePath, @Cause Exception cause,
 			@Param EventContext context);
+
+	@Message(id = ID_OFFSET + 134, value = "Missing first on sort with ascending order is not supported.")
+	SearchException missingFirstOnAscSortNotSupported(@Param EventContext context);
+
+	@Message(id = ID_OFFSET + 135, value = "Missing last on sort with descending order is not supported.")
+	SearchException missingLastOnDescSortNotSupported(@Param EventContext context);
+
+	@Message(id = ID_OFFSET + 136, value = "Missing as on sort is not supported with Elasticsearch backend.")
+	SearchException missingAsOnSortNotSupported(@Param EventContext context);
+
 }
