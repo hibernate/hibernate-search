@@ -13,6 +13,10 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.backend
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -22,9 +26,9 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
-import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SimpleEntity;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubNextScrollWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
@@ -114,6 +118,56 @@ public class SearchQueryEntityChangingScrollingIT {
 	private static void changeNames(List<SimpleEntity> entities) {
 		for ( SimpleEntity entity : entities ) {
 			entity.setName( NEW_NAME );
+		}
+	}
+
+	@Entity(name = SimpleEntity.NAME)
+	@Indexed(index = SimpleEntity.NAME)
+	public static class SimpleEntity {
+
+		public static final String NAME = "SimpleEntity";
+
+		@Id
+		private Integer id;
+
+		private String name;
+
+		public SimpleEntity() {
+		}
+
+		public SimpleEntity(Integer id) {
+			this.id = id;
+			this.name = "name-" + id;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if ( this == o ) {
+				return true;
+			}
+			if ( o == null || getClass() != o.getClass() ) {
+				return false;
+			}
+			SimpleEntity that = (SimpleEntity) o;
+			return Objects.equals( id, that.id ) &&
+					Objects.equals( name, that.name );
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash( id, name );
+		}
+
+		@Override
+		public String toString() {
+			return "SimpleEntity{" +
+					"id=" + id +
+					", name='" + name + '\'' +
+					'}';
 		}
 	}
 }
