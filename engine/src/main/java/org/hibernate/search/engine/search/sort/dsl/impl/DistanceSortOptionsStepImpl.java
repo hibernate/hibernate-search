@@ -13,6 +13,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.sort.SearchSort;
+import org.hibernate.search.engine.search.sort.dsl.DistanceSortMissingValueBehaviorStep;
 import org.hibernate.search.engine.search.sort.dsl.DistanceSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.dsl.spi.AbstractSortThenStep;
@@ -22,7 +23,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 public class DistanceSortOptionsStepImpl<PDF extends SearchPredicateFactory>
 		extends AbstractSortThenStep
-		implements DistanceSortOptionsStep<DistanceSortOptionsStepImpl<PDF>, PDF> {
+		implements DistanceSortOptionsStep<DistanceSortOptionsStepImpl<PDF>, PDF>,
+		DistanceSortMissingValueBehaviorStep<DistanceSortOptionsStepImpl<PDF>> {
 
 	private final DistanceSortBuilder builder;
 	private final SearchSortDslContext<?, ? extends PDF> dslContext;
@@ -58,6 +60,30 @@ public class DistanceSortOptionsStepImpl<PDF extends SearchPredicateFactory>
 	@Override
 	public DistanceSortOptionsStepImpl<PDF> filter(SearchPredicate searchPredicate) {
 		builder.filter( searchPredicate );
+		return this;
+	}
+
+
+	@Override
+	public DistanceSortMissingValueBehaviorStep<DistanceSortOptionsStepImpl<PDF>> missing() {
+		return this;
+	}
+
+	@Override
+	public DistanceSortOptionsStepImpl<PDF> first() {
+		// TODO HSEARCH-3863 builder.missingFirst();
+		return this;
+	}
+
+	@Override
+	public DistanceSortOptionsStepImpl<PDF> last() {
+		// TODO HSEARCH-3863 builder.missingLast();
+		return this;
+	}
+
+	@Override
+	public DistanceSortOptionsStepImpl<PDF> use(GeoPoint value) {
+		// TODO HSEARCH-3863 builder.missingAs( value );
 		return this;
 	}
 
