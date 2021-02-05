@@ -19,4 +19,12 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 public interface DistanceSortOptionsStep<S extends DistanceSortOptionsStep<?, PDF>, PDF extends SearchPredicateFactory>
 		extends SortFinalStep, SortThenStep, SortOrderStep<S>, SortModeStep<S>, SortFilterStep<S, PDF> {
 
+	/**
+	 * Start describing the behavior of this sort when a document doesn't
+	 * have any value for the targeted field.
+	 *
+	 * @return The next step.
+	 */
+	DistanceSortMissingValueBehaviorStep<S> missing();
+
 }
