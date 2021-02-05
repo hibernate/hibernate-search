@@ -108,7 +108,6 @@ class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposableSearc
 		List<E> loadedEntities = createListContainingNulls( references.size() );
 
 		int fetchSize = loadingOptions.fetchSize();
-		Query<? super E> query = createQuery( fetchSize, timeout );
 
 		List<Object> ids = new ArrayList<>( fetchSize );
 		for ( int i = 0; i < keys.length; i++ ) {
@@ -125,6 +124,8 @@ class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposableSearc
 
 			ids.add( key.getIdentifier() );
 			if ( ids.size() >= fetchSize ) {
+				// Don't reuse the query; see https://hibernate.atlassian.net/browse/HHH-14439
+				Query<? super E> query = createQuery( fetchSize, timeout );
 				query.setParameterList( IDS_PARAMETER_NAME, ids );
 				// The result is worthless, as entities are not in the right order.
 				// However, this will load entities into the persistence context... see further down.
@@ -133,6 +134,7 @@ class HibernateOrmEntityIdEntityLoader<E> implements HibernateOrmComposableSearc
 			}
 		}
 		if ( !ids.isEmpty() ) {
+			Query<? super E> query = createQuery( fetchSize, timeout );
 			query.setParameterList( IDS_PARAMETER_NAME, ids );
 			// Same as above: the result is worthless.
 			query.getResultList();
