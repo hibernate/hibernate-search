@@ -16,14 +16,15 @@ import org.apache.lucene.search.Query;
 
 public class LuceneGeoPointDistanceComparatorSource extends LuceneFieldComparatorSource {
 
-	private static final double MISSING_VALUE_IMPLICIT_DISTANCE_VALUE = Double.POSITIVE_INFINITY;
-
 	private final GeoPoint center;
+	private final double missingValue;
 	private final MultiValueMode mode;
 
-	public LuceneGeoPointDistanceComparatorSource(String nestedDocumentPath, GeoPoint center, MultiValueMode mode, Query filter) {
+	public LuceneGeoPointDistanceComparatorSource(String nestedDocumentPath, GeoPoint center, double missingValue,
+			MultiValueMode mode, Query filter) {
 		super( nestedDocumentPath, filter );
 		this.center = center;
+		this.missingValue = missingValue;
 		this.mode = mode;
 	}
 
@@ -32,7 +33,6 @@ public class LuceneGeoPointDistanceComparatorSource extends LuceneFieldComparato
 		GeoPointDistanceMultiValuesToSingleValuesSource source = new GeoPointDistanceMultiValuesToSingleValuesSource(
 				fieldname, mode, nestedDocsProvider, center
 		);
-		return new DoubleValuesSourceComparator( numHits, fieldname, MISSING_VALUE_IMPLICIT_DISTANCE_VALUE,
-				reversed, sortPos, source );
+		return new DoubleValuesSourceComparator( numHits, fieldname, missingValue, reversed, sortPos, source );
 	}
 }

@@ -16,9 +16,13 @@ import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.Luce
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneGeoPointDistanceComparatorSource;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.sort.SearchSort;
+import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+
+import org.apache.lucene.util.SloppyMath;
 
 public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort {
 
@@ -39,6 +43,7 @@ public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort 
 
 	private static class Builder extends AbstractBuilder implements DistanceSortBuilder {
 		private GeoPoint center;
+		private Object missingValue;
 
 		private Builder(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<GeoPoint> field) {
 			super( searchContext, field );
@@ -51,17 +56,17 @@ public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort 
 
 		@Override
 		public void missingFirst() {
-			// TODO HSEARCH-3863 Support for Lucene
+			missingValue = SortMissingValue.MISSING_FIRST;
 		}
 
 		@Override
 		public void missingLast() {
-			// TODO HSEARCH-3863 Support for Lucene
+			missingValue = SortMissingValue.MISSING_LAST;
 		}
 
 		@Override
 		public void missingAs(GeoPoint value) {
-			// TODO HSEARCH-3863 Support for Lucene
+			missingValue = value;
 		}
 
 		@Override
@@ -86,8 +91,35 @@ public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort 
 
 		@Override
 		protected LuceneFieldComparatorSource toFieldComparatorSource() {
-			return new LuceneGeoPointDistanceComparatorSource( nestedDocumentPath, center, getMultiValueMode(),
-					getNestedFilter() );
+			return new LuceneGeoPointDistanceComparatorSource( nestedDocumentPath, center, getEffectiveMissingValue(),
+					getMultiValueMode(), getNestedFilter()
+			);
+		}
+
+		protected final double getEffectiveMissingValue() {
+			if ( missingValue == null ) {
+				// missing value implicit distance (same as ES):
+				return Double.POSITIVE_INFINITY;
+			}
+
+			if ( missingValue == SortMissingValue.MISSING_FIRST ) {
+				return ( order == SortOrder.DESC ) ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
+			}
+
+			if ( missingValue == SortMissingValue.MISSING_LAST ) {
+				return ( order == SortOrder.DESC ) ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
+			}
+
+			if ( missingValue instanceof GeoPoint ) {
+				GeoPoint geoPointMissingValue = (GeoPoint) missingValue;
+
+				return SloppyMath.haversinMeters(
+						geoPointMissingValue.latitude(), geoPointMissingValue.longitude(),
+						center.latitude(), center.longitude()
+				);
+			}
+
+			throw new AssertionFailure( "Unexpected missing value: " + missingValue );
 		}
 	}
 }
