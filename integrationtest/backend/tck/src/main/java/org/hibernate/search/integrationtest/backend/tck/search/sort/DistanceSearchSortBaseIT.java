@@ -31,6 +31,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.model.single
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueDistanceFromCenterValues;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -186,6 +187,16 @@ public class DistanceSearchSortBaseIT {
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
 
+		if ( !TckConfiguration.get().getBackendFeatures().geoDistanceSortingSupportsConfigurableMissingValues() ) {
+			assertThatThrownBy( () -> simpleQuery(
+					dataSetForDesc,
+					b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
+							.desc().missing().last()
+			) )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContainingAll( "Missing last on sort with descending order is not supported." );
+		}
+
 		// Explicit order with missing().first()
 		dataSet = dataSetForDesc;
 		query = simpleQuery(
@@ -195,6 +206,27 @@ public class DistanceSearchSortBaseIT {
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id );
+
+		if ( !TckConfiguration.get().getBackendFeatures().geoDistanceSortingSupportsConfigurableMissingValues() ) {
+			assertThatThrownBy( () -> simpleQuery(
+					dataSetForAsc,
+					b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
+							.asc().missing().first()
+			) )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContainingAll( "Missing first on sort with ascending order is not supported." );
+		}
+
+		// Explicit order with missing().use( ... )
+		if ( !TckConfiguration.get().getBackendFeatures().geoDistanceSortingSupportsConfigurableMissingValues() ) {
+			assertThatThrownBy( () -> simpleQuery(
+					dataSetForAsc,
+					b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
+							.asc().missing().use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) )
+			) )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContainingAll( "Missing as on sort is not supported" );
+		}
 	}
 
 	@Test
@@ -282,6 +314,10 @@ public class DistanceSearchSortBaseIT {
 
 	private String getFieldPath() {
 		return index.binding().getFieldPath( fieldStructure, fieldType );
+	}
+
+	private GeoPoint getSingleValueForMissingUse(int ordinal) {
+		return AscendingUniqueDistanceFromCenterValues.INSTANCE.getSingle().get( ordinal );
 	}
 
 	private static class DataSet {

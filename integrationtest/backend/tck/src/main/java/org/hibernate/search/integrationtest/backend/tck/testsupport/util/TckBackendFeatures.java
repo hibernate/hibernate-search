@@ -74,4 +74,8 @@ public class TckBackendFeatures {
 	public boolean supportsExistsForFieldWithoutDocValues(Class<?> fieldType) {
 		return true;
 	}
+
+	public boolean geoDistanceSortingSupportsConfigurableMissingValues() {
+		return true;
+	}
 }
