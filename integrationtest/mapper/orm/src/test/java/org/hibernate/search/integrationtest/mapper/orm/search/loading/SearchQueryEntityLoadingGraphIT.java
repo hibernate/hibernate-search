@@ -10,11 +10,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.ManagedAssert.assertThatManaged;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.graph.GraphSemantic;
 import org.hibernate.graph.RootGraph;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingMapping;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingModel;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -31,30 +34,34 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntityLoadingSingleTypeIT<T> {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<SingleTypeLoadingModelPrimitives<?>> data() {
-		return allSingleTypeLoadingModelPrimitives();
+	@Parameterized.Parameters(name = "{0}, {1}")
+	public static List<Object[]> params() {
+		List<Object[]> result = new ArrayList<>();
+		forAllModelMappingCombinations( (model, mapping) -> {
+			result.add( new Object[] { model, mapping } );
+		} );
+		return result;
 	}
 
 	private SessionFactory sessionFactory;
 
-	public SearchQueryEntityLoadingGraphIT(SingleTypeLoadingModelPrimitives<T> primitives) {
-		super( primitives );
+	public SearchQueryEntityLoadingGraphIT(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+		super( model, mapping );
 	}
 
 	@Before
 	public void setup() {
-		backendMock.expectAnySchema( primitives.getIndexName() );
+		backendMock.expectAnySchema( model.getIndexName() );
 
-		sessionFactory = ormSetupHelper.start().setup( primitives.getEntityClasses() );
+		sessionFactory = ormSetupHelper.start().withConfiguration( c -> mapping.configure( c, model ) ).setup();
 
 		backendMock.verifyExpectationsMet();
 
 		// We don't care about what is indexed exactly, so use the lenient mode
 		backendMock.inLenientMode( () -> withinTransaction( sessionFactory(), session -> {
-			session.persist( primitives.newIndexedWithContained( 0 ) );
-			session.persist( primitives.newIndexedWithContained( 1 ) );
-			session.persist( primitives.newIndexedWithContained( 2 ) );
+			session.persist( model.newIndexedWithContained( 0, mapping ) );
+			session.persist( model.newIndexedWithContained( 1, mapping ) );
+			session.persist( model.newIndexedWithContained( 2, mapping ) );
 		} ) );
 	}
 
@@ -75,7 +82,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 		testLoadingWithEntityGraph(
 				// Use a graph that forces eager loading of all associations
 				// with FETCH semantic, meaning default EAGERs are overridden.
-				primitives.getEagerGraphName(), GraphSemantic.FETCH,
+				model.getEagerGraphName(), GraphSemantic.FETCH,
 				// Both associations are loaded
 				true, true
 		);
@@ -87,7 +94,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 		testLoadingWithEntityGraph(
 				// Use a graph that forces eager loading of all associations
 				// with LOAD semantic, meaning default EAGERs are NOT overridden.
-				primitives.getEagerGraphName(), GraphSemantic.LOAD,
+				model.getEagerGraphName(), GraphSemantic.LOAD,
 				// Both associations are loaded
 				true, true
 		);
@@ -99,7 +106,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 		testLoadingWithEntityGraph(
 				// Use a graph that doesn't force loading of any association,
 				// with FETCH semantic, meaning default EAGERs are overridden.
-				primitives.getLazyGraphName(), GraphSemantic.FETCH,
+				model.getLazyGraphName(), GraphSemantic.FETCH,
 				// Neither association is loaded
 				false, false
 		);
@@ -111,7 +118,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 		testLoadingWithEntityGraph(
 				// Use a "lazy" graph that doesn't force loading of any association,
 				// with LOAD semantic, meaning default EAGERs are NOT overridden.
-				primitives.getLazyGraphName(), GraphSemantic.LOAD,
+				model.getLazyGraphName(), GraphSemantic.LOAD,
 				// The eager association is loaded, but not the lazy one
 				true, false
 		);
@@ -121,7 +128,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graphName_null() {
 		assertThatThrownBy( () -> OrmUtils.withinSession( sessionFactory(), session -> {
-			Search.session( session ).search( primitives.getIndexedClass() )
+			Search.session( session ).search( model.getIndexedClass() )
 					.where( f -> f.matchAll() )
 					.loading( o -> o.graph( (String) null, GraphSemantic.FETCH ) )
 					.toQuery();
@@ -134,7 +141,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graphName_invalid() {
 		assertThatThrownBy( () -> OrmUtils.withinSession( sessionFactory(), session -> {
-			Search.session( session ).search( primitives.getIndexedClass() )
+			Search.session( session ).search( model.getIndexedClass() )
 					.where( f -> f.matchAll() )
 					.loading( o -> o.graph( "invalidGraphName", GraphSemantic.FETCH ) )
 					.toQuery();
@@ -147,9 +154,9 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graphName_graphSemantic_null() {
 		assertThatThrownBy( () -> OrmUtils.withinSession( sessionFactory(), session -> {
-			Search.session( session ).search( primitives.getIndexedClass() )
+			Search.session( session ).search( model.getIndexedClass() )
 					.where( f -> f.matchAll() )
-					.loading( o -> o.graph( primitives.getEagerGraphName(), null ) )
+					.loading( o -> o.graph( model.getEagerGraphName(), null ) )
 					.toQuery();
 		} ) )
 				.isInstanceOf( IllegalArgumentException.class )
@@ -160,7 +167,7 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graph_null() {
 		assertThatThrownBy( () -> OrmUtils.withinSession( sessionFactory(), session -> {
-			Search.session( session ).search( primitives.getIndexedClass() )
+			Search.session( session ).search( model.getIndexedClass() )
 					.where( f -> f.matchAll() )
 					.loading( o -> o.graph( (RootGraph<?>) null, GraphSemantic.FETCH ) )
 					.toQuery();
@@ -173,9 +180,9 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 	@TestForIssue(jiraKey = "HSEARCH-3628")
 	public void graph_graphSemantic_null() {
 		assertThatThrownBy( () -> OrmUtils.withinSession( sessionFactory(), session -> {
-			Search.session( session ).search( primitives.getIndexedClass() )
+			Search.session( session ).search( model.getIndexedClass() )
 					.where( f -> f.matchAll() )
-					.loading( o -> o.graph( session.getEntityGraph( primitives.getEagerGraphName() ), null ) )
+					.loading( o -> o.graph( session.getEntityGraph( model.getEagerGraphName() ), null ) )
 					.toQuery();
 		} ) )
 				.isInstanceOf( IllegalArgumentException.class )
@@ -197,19 +204,19 @@ public class SearchQueryEntityLoadingGraphIT<T> extends AbstractSearchQueryEntit
 					}
 				},
 				c -> c
-						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 0 ) )
-						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 1 ) )
-						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 2 ) ),
+						.doc( model.getIndexName(), mapping.getDocumentIdForEntityId( 0 ) )
+						.doc( model.getIndexName(), mapping.getDocumentIdForEntityId( 1 ) )
+						.doc( model.getIndexName(), mapping.getDocumentIdForEntityId( 2 ) ),
 				c -> c
-						.entity( primitives.getIndexedClass(), 0 )
-						.entity( primitives.getIndexedClass(), 1 )
-						.entity( primitives.getIndexedClass(), 2 ),
+						.entity( model.getIndexedClass(), 0 )
+						.entity( model.getIndexedClass(), 1 )
+						.entity( model.getIndexedClass(), 2 ),
 				(assertions, loadedList) -> assertions.assertThat( loadedList )
 						.isNotEmpty()
-						.allSatisfy( loaded -> assertThatManaged( primitives.getContainedEager( loaded ) )
+						.allSatisfy( loaded -> assertThatManaged( model.getContainedEager( loaded ) )
 								.as( "Eager contained for " + loaded )
 								.isInitialized( expectEagerAssociationLoaded ) )
-						.allSatisfy( loaded -> assertThatManaged( primitives.getContainedLazy( loaded ) )
+						.allSatisfy( loaded -> assertThatManaged( model.getContainedLazy( loaded ) )
 								.as( "Lazy contained for " + loaded )
 								.isInitialized( expectLazyAssociationLoaded ) )
 		);

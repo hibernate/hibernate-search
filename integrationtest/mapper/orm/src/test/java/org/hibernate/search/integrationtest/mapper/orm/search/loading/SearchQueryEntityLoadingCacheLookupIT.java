@@ -18,6 +18,8 @@ import org.hibernate.Hibernate;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingMapping;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingModel;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -38,15 +40,15 @@ import org.apache.logging.log4j.Level;
 @RunWith(Parameterized.class)
 public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQueryEntityLoadingSingleTypeIT<T> {
 
-	@Parameterized.Parameters(name = "Default strategy: {1} - {0}")
-	public static List<Object[]> data() {
+	@Parameterized.Parameters(name = "Default strategy: {2} - {0}, {1}")
+	public static List<Object[]> params() {
 		List<Object[]> result = new ArrayList<>();
-		for ( SingleTypeLoadingModelPrimitives<?> primitives : allSingleTypeLoadingModelPrimitives() ) {
-			result.add( new Object[] { primitives, null } );
+		forAllModelMappingCombinations( (model, mapping) -> {
+			result.add( new Object[] { model, mapping, null } );
 			for ( EntityLoadingCacheLookupStrategy strategy : EntityLoadingCacheLookupStrategy.values() ) {
-				result.add( new Object[] { primitives, strategy } );
+				result.add( new Object[] { model, mapping, strategy } );
 			}
-		}
+		} );
 		return result;
 	}
 
@@ -57,15 +59,15 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 
 	private SessionFactory sessionFactory;
 
-	public SearchQueryEntityLoadingCacheLookupIT(SingleTypeLoadingModelPrimitives<T> primitives,
+	public SearchQueryEntityLoadingCacheLookupIT(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping,
 			EntityLoadingCacheLookupStrategy defaultCacheLookupStrategy) {
-		super( primitives );
+		super( model, mapping );
 		this.defaultCacheLookupStrategy = defaultCacheLookupStrategy;
 	}
 
 	@Before
 	public void setup() {
-		backendMock.expectAnySchema( primitives.getIndexName() );
+		backendMock.expectAnySchema( model.getIndexName() );
 
 		sessionFactory = ormSetupHelper.start()
 				.withProperty(
@@ -73,7 +75,8 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 						defaultCacheLookupStrategy
 				)
 				.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ALL.name() )
-				.setup( primitives.getEntityClasses() );
+				.withConfiguration( c -> mapping.configure( c, model ) )
+				.setup();
 
 		backendMock.verifyExpectationsMet();
 	}
@@ -148,7 +151,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 	public void overriddenStrategy_persistenceContext_fullCacheHits() {
 		assumeTrue(
 				"This test only makes sense if cache lookups are supported",
-				primitives.isCacheLookupSupported()
+				mapping.isCacheLookupSupported()
 		);
 
 		testLoadingCacheLookup(
@@ -173,7 +176,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 	public void overriddenStrategy_2LC_fullCacheHits() {
 		assumeTrue(
 				"This test only makes sense if cache lookups are supported",
-				primitives.isCacheLookupSupported()
+				mapping.isCacheLookupSupported()
 		);
 
 		testLoadingCacheLookup(
@@ -219,8 +222,8 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 
 	private void testLoadingCacheLookupExpectingPersistenceContextOnlyLookup(
 			EntityLoadingCacheLookupStrategy overriddenLookupStrategy) {
-		if ( !primitives.isCacheLookupSupported() ) {
-			logged.expectEvent( Level.DEBUG, "The entity loader for '" + primitives.getIndexedEntityName()
+		if ( !mapping.isCacheLookupSupported() ) {
+			logged.expectEvent( Level.DEBUG, "The entity loader for '" + model.getIndexedEntityName()
 					+ "' is ignoring the cache lookup strategy" );
 			testLoadingCacheLookupExpectingSkipCacheLookup( overriddenLookupStrategy );
 			return;
@@ -245,8 +248,8 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 
 	private void testLoadingCacheLookupExpectingSecondLevelCacheLookup(
 			EntityLoadingCacheLookupStrategy overriddenLookupStrategy) {
-		if ( !primitives.isCacheLookupSupported() ) {
-			logged.expectEvent( Level.DEBUG, "The entity loader for '" + primitives.getIndexedEntityName()
+		if ( !mapping.isCacheLookupSupported() ) {
+			logged.expectEvent( Level.DEBUG, "The entity loader for '" + model.getIndexedEntityName()
 					+ "' is ignoring the cache lookup strategy" );
 			testLoadingCacheLookupExpectingSkipCacheLookup( overriddenLookupStrategy );
 			return;
@@ -287,7 +290,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 		// Remove some entities from the second level cache
 		for ( int i = 0; i < entityCount; i++ ) {
 			if ( !entitiesToPutInSecondLevelCache.contains( i ) ) {
-				sessionFactory.getCache().evict( primitives.getIndexedClass(), i );
+				sessionFactory.getCache().evict( model.getIndexedClass(), i );
 			}
 		}
 
@@ -295,7 +298,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 				session -> {
 					// Pre-load some entities into the session
 					for ( Integer id : entitiesToLoadInSession ) {
-						Hibernate.initialize( session.getReference( primitives.getIndexedClass(), id ) );
+						Hibernate.initialize( session.getReference( model.getIndexedClass(), id ) );
 					}
 					assertThat( session.unwrap( SessionImplementor.class ).getPersistenceContext().getEntitiesByKey() )
 							.as( "Test setup sanity check" )
