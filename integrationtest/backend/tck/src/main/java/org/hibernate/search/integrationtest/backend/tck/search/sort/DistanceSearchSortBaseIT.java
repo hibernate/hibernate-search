@@ -80,7 +80,6 @@ public class DistanceSearchSortBaseIT {
 		return parameters.toArray( new Object[0][] );
 	}
 
-	// TODO HSEARCH-3863 use the other ordinals when we implement.missing().use/last/first for distance sorts
 	private static final int BEFORE_DOCUMENT_1_ORDINAL = 0;
 	private static final int DOCUMENT_1_ORDINAL = 1;
 	private static final int BETWEEN_DOCUMENT_1_AND_2_ORDINAL = 2;
@@ -196,6 +195,16 @@ public class DistanceSearchSortBaseIT {
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll( "Missing last on sort with descending order is not supported." );
 		}
+		else {
+			dataSet = dataSetForDesc;
+			query = simpleQuery(
+					dataSet,
+					b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
+							.desc().missing().last()
+			);
+			assertThatQuery( query )
+					.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id, dataSet.emptyDoc1Id );
+		}
 
 		// Explicit order with missing().first()
 		dataSet = dataSetForDesc;
@@ -216,6 +225,16 @@ public class DistanceSearchSortBaseIT {
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll( "Missing first on sort with ascending order is not supported." );
 		}
+		else {
+			dataSet = dataSetForAsc;
+			query = simpleQuery(
+					dataSet,
+					b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
+							.asc().missing().first()
+			);
+			assertThatQuery( query )
+					.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id );
+		}
 
 		// Explicit order with missing().use( ... )
 		if ( !TckConfiguration.get().getBackendFeatures().geoDistanceSortingSupportsConfigurableMissingValues() ) {
@@ -226,7 +245,46 @@ public class DistanceSearchSortBaseIT {
 			) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll( "Missing as on sort is not supported" );
+
+			return;
 		}
+
+		// Backend supports missing().use( ... )
+		dataSet = dataSetForAsc;
+		query = simpleQuery(
+				dataSet,
+				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
+						.asc().missing().use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) )
+		);
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id );
+
+		dataSet = dataSetForAsc;
+		query = simpleQuery(
+				dataSet,
+				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
+						.asc().missing().use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) )
+		);
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.emptyDoc1Id, dataSet.doc2Id, dataSet.doc3Id );
+
+		dataSet = dataSetForAsc;
+		query = simpleQuery(
+				dataSet,
+				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
+						.asc().missing().use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ) )
+		);
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.emptyDoc1Id, dataSet.doc3Id );
+
+		dataSet = dataSetForAsc;
+		query = simpleQuery(
+				dataSet,
+				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
+						.asc().missing().use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ) )
+		);
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
 	}
 
 	@Test
