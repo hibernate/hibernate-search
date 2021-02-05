@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.graph.GraphSemantic;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingMapping;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingModel;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
@@ -122,16 +123,44 @@ public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryE
 				.hasMessageContaining( "'fetchSize' must be strictly positive" );
 	}
 
+	/**
+	 * Test a fetch size causing multiple query executions with the last execution involving fewer identifiers
+	 * when the collection associations are loaded eagerly.
+	 * This used to fail with FetchMode.SUBSELECT.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4150")
+	public void multipleStatements_lastWithFewerIds_eagerAssociations() {
+		testLoadingFetchSize(
+				// Set a fetch size lower than the number of entities
+				null, 100,
+				// Persist that many entities
+				150,
+				// 150 entities to load with a fetch size of 100 => 2 fetches are necessary
+				2,
+				// Make sure collection associations are loaded eagerly,
+				// so as to always trigger a subselect for associations with FetchMode.SUBSELECT.
+				model.getEagerGraphName()
+		);
+	}
+
 	@Override
 	protected SessionFactory sessionFactory() {
 		return sessionFactory;
+	}
+
+	private void testLoadingFetchSize(Integer searchLoadingFetchSize, Integer overriddenFetchSize,
+			int entityCount, int expectStatementExecutionCount) {
+		testLoadingFetchSize( searchLoadingFetchSize, overriddenFetchSize, entityCount, expectStatementExecutionCount,
+				null );
 	}
 
 	private void testLoadingFetchSize(
 			Integer searchLoadingFetchSize,
 			Integer overriddenFetchSize,
 			int entityCount,
-			int expectStatementExecutionCount) {
+			int expectStatementExecutionCount,
+			String entityGraph) {
 		setup( searchLoadingFetchSize );
 
 		persistThatManyEntities( entityCount );
@@ -139,6 +168,9 @@ public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryE
 		testLoadingThatManyEntities(
 				session -> { }, // No particular session setup
 				o -> {
+					if ( entityGraph != null ) {
+						o.graph( entityGraph, GraphSemantic.LOAD );
+					}
 					if ( overriddenFetchSize != null ) {
 						o.fetchSize( overriddenFetchSize );
 					}
