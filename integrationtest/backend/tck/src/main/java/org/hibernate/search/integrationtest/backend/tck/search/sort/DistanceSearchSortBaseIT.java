@@ -169,6 +169,35 @@ public class DistanceSearchSortBaseIT {
 	}
 
 	@Test
+	public void missingValue_explicit() {
+		assumeTestParametersWork();
+
+		DataSet dataSet;
+		SearchQuery<DocumentReference> query;
+		String fieldPath = getFieldPath();
+
+		// Explicit order with missing().last()
+		dataSet = dataSetForAsc;
+		query = simpleQuery(
+				dataSet,
+				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
+						.asc().missing().last()
+		);
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
+
+		// Explicit order with missing().first()
+		dataSet = dataSetForDesc;
+		query = simpleQuery(
+				dataSet,
+				b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
+						.desc().missing().first()
+		);
+		assertThatQuery( query )
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id );
+	}
+
+	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-3103" })
 	public void medianWithNestedField() {
 		assumeTrue(
