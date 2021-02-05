@@ -15,14 +15,14 @@ import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubNextScrollWorkBehavior;
 
-public class SearchQueryEntityLoadingScrollingIT extends SearchQueryEntityLoadingBaseIT {
+public class SearchQueryEntityLoadingScrollingIT<T> extends SearchQueryEntityLoadingBaseIT<T> {
 
-	public SearchQueryEntityLoadingScrollingIT(SingleTypeLoadingModelPrimitives primitives) {
+	public SearchQueryEntityLoadingScrollingIT(SingleTypeLoadingModelPrimitives<T> primitives) {
 		super( primitives );
 	}
 
 	@Override
-	protected <T> List<T> getHits(List<String> targetIndexes, SearchQuery<T> query, List<DocumentReference> hitDocumentReferences,
+	protected <T2> List<T2> getHits(List<String> targetIndexes, SearchQuery<T2> query, List<DocumentReference> hitDocumentReferences,
 			Integer timeout, TimeUnit timeUnit) {
 		backendMock.expectScrollObjects(
 				targetIndexes,
@@ -39,8 +39,8 @@ public class SearchQueryEntityLoadingScrollingIT extends SearchQueryEntityLoadin
 
 		backendMock.expectCloseScroll( targetIndexes );
 
-		try ( SearchScroll<T> scroll = query.scroll( hitDocumentReferences.size() ) ) {
-			SearchScrollResult<T> next = scroll.next();
+		try ( SearchScroll<T2> scroll = query.scroll( hitDocumentReferences.size() ) ) {
+			SearchScrollResult<T2> next = scroll.next();
 			return next.hits();
 		}
 	}
