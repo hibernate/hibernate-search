@@ -132,4 +132,14 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		}
 		return true;
 	}
+
+	@Override
+	public boolean geoDistanceSortingSupportsConfigurableMissingValues() {
+		// See https://www.elastic.co/guide/en/elasticsearch/reference/7.10/sort-search-results.html
+		// In particular:
+		// geo distance sorting does not support configurable missing values:
+		// the distance will always be considered equal to Infinity when a document does not have values for the field
+		// that is used for distance computation.
+		return false;
+	}
 }
