@@ -68,6 +68,21 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 		}
 
 		@Override
+		public void missingFirst() {
+			// TODO HSEARCH-3863 Support for ES
+		}
+
+		@Override
+		public void missingLast() {
+			// TODO HSEARCH-3863 Support for ES
+		}
+
+		@Override
+		public void missingAs(GeoPoint value) {
+			// TODO HSEARCH-3863 Support for ES
+		}
+
+		@Override
 		public void mode(SortMode mode) {
 			switch ( mode ) {
 				case MIN:

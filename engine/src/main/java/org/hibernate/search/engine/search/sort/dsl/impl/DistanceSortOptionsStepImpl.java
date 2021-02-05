@@ -71,19 +71,19 @@ public class DistanceSortOptionsStepImpl<PDF extends SearchPredicateFactory>
 
 	@Override
 	public DistanceSortOptionsStepImpl<PDF> first() {
-		// TODO HSEARCH-3863 builder.missingFirst();
+		builder.missingFirst();
 		return this;
 	}
 
 	@Override
 	public DistanceSortOptionsStepImpl<PDF> last() {
-		// TODO HSEARCH-3863 builder.missingLast();
+		builder.missingLast();
 		return this;
 	}
 
 	@Override
 	public DistanceSortOptionsStepImpl<PDF> use(GeoPoint value) {
-		// TODO HSEARCH-3863 builder.missingAs( value );
+		builder.missingAs( value );
 		return this;
 	}
 
