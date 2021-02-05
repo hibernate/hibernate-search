@@ -59,14 +59,10 @@ public class DistanceSearchSortTypeCheckingAndConversionIT {
 	private static final String COMPATIBLE_INDEX_DOCUMENT_1 = "compatible_1";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
 
-	// TODO HSEARCH-3863 use the other ordinals when we implement.missing().use/last/first for distance sorts
-	private static final int BEFORE_DOCUMENT_1_ORDINAL = 0;
 	private static final int DOCUMENT_1_ORDINAL = 1;
 	private static final int BETWEEN_DOCUMENT_1_AND_2_ORDINAL = 2;
 	private static final int DOCUMENT_2_ORDINAL = 3;
-	private static final int BETWEEN_DOCUMENT_2_AND_3_ORDINAL = 4;
 	private static final int DOCUMENT_3_ORDINAL = 5;
-	private static final int AFTER_DOCUMENT_3_ORDINAL = 6;
 
 	@ClassRule
 	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -88,9 +84,6 @@ public class DistanceSearchSortTypeCheckingAndConversionIT {
 
 		initData();
 	}
-
-	// TODO HSEARCH-3863 implement tests related to DSL converters when we implement.missing().use/last/first for distance sorts
-	//   See test methods in FieldSearchSortTypeCheckingAndConversionIT
 
 	@Test
 	public void unsortable() {
