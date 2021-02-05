@@ -13,8 +13,8 @@ public abstract class SingleTypeLoadingModel<T> {
 
 	public static List<SingleTypeLoadingModel<?>> all() {
 		return Arrays.asList(
-				new BasicModel()
-				// TODO add more
+				new BasicModel(),
+				new FetchSubSelectModel()
 		);
 	}
 
