@@ -106,9 +106,9 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 
 	private List<? extends E> loadEntities(Collection<Object> documentIdSourceValues, Long timeout) {
 		int fetchSize = loadingOptions.fetchSize();
-		Query<? extends E> query = createQuery( fetchSize, timeout );
 
 		if ( fetchSize >= documentIdSourceValues.size() ) {
+			Query<? extends E> query = createQuery( fetchSize, timeout );
 			query.setParameterList( DOCUMENT_ID_SOURCE_PROPERTY_PARAMETER_NAME, documentIdSourceValues );
 			return query.getResultList();
 		}
@@ -119,12 +119,14 @@ public class HibernateOrmNonEntityIdPropertyEntityLoader<E> implements Hibernate
 			for ( Object documentIdSourceValue : documentIdSourceValues ) {
 				ids.add( documentIdSourceValue );
 				if ( ids.size() >= fetchSize ) {
+					Query<? extends E> query = createQuery( fetchSize, timeout );
 					query.setParameterList( DOCUMENT_ID_SOURCE_PROPERTY_PARAMETER_NAME, ids );
 					result.addAll( query.getResultList() );
 					ids.clear();
 				}
 			}
 			if ( !ids.isEmpty() ) {
+				Query<? extends E> query = createQuery( fetchSize, timeout );
 				query.setParameterList( DOCUMENT_ID_SOURCE_PROPERTY_PARAMETER_NAME, ids );
 				result.addAll( query.getResultList() );
 			}
