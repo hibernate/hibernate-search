@@ -18,6 +18,7 @@ import org.hibernate.search.backend.elasticsearch.search.sort.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.sort.SearchSort;
+import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -58,6 +59,9 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 	private static class Builder extends AbstractBuilder<GeoPoint> implements DistanceSortBuilder {
 		private GeoPoint center;
 
+		private boolean missingFirst = false;
+		private boolean missingLast = false;
+
 		private Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<GeoPoint> field) {
 			super( searchContext, field );
 		}
@@ -69,17 +73,17 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 
 		@Override
 		public void missingFirst() {
-			// TODO HSEARCH-3863 Support for ES
+			this.missingFirst = true;
 		}
 
 		@Override
 		public void missingLast() {
-			// TODO HSEARCH-3863 Support for ES
+			this.missingLast = true;
 		}
 
 		@Override
 		public void missingAs(GeoPoint value) {
-			// TODO HSEARCH-3863 Support for ES
+			throw log.missingAsOnSortNotSupported( field.eventContext() );
 		}
 
 		@Override
@@ -99,6 +103,13 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 
 		@Override
 		public SearchSort build() {
+			if ( missingFirst && SortOrder.ASC.equals( order ) ) {
+				throw log.missingFirstOnAscSortNotSupported( field.eventContext() );
+			}
+			if ( missingLast && SortOrder.DESC.equals( order ) ) {
+				throw log.missingLastOnDescSortNotSupported( field.eventContext() );
+			}
+
 			return new ElasticsearchDistanceSort( this );
 		}
 	}

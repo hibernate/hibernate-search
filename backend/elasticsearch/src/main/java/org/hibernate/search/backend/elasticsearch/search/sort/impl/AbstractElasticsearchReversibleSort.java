@@ -52,7 +52,7 @@ public abstract class AbstractElasticsearchReversibleSort extends AbstractElasti
 
 	public abstract static class AbstractBuilder extends AbstractElasticsearchSort.AbstractBuilder {
 
-		private SortOrder order;
+		protected SortOrder order;
 
 		protected AbstractBuilder(ElasticsearchSearchContext searchContext) {
 			super( searchContext );
