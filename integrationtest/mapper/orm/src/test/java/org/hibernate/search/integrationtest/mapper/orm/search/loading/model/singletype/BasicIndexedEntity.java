@@ -16,22 +16,17 @@ import javax.persistence.NamedEntityGraph;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-
-@Entity(name = NonEntityIdDocumentIdIndexedEntity.NAME)
-@Indexed(index = NonEntityIdDocumentIdIndexedEntity.NAME)
+@Entity(name = BasicIndexedEntity.NAME)
 @NamedEntityGraph(
-		name = NonEntityIdDocumentIdIndexedEntity.GRAPH_EAGER,
+		name = BasicIndexedEntity.GRAPH_EAGER,
 		includeAllAttributes = true
 )
 @NamedEntityGraph(
-		name = NonEntityIdDocumentIdIndexedEntity.GRAPH_LAZY
+		name = BasicIndexedEntity.GRAPH_LAZY
 )
-public class NonEntityIdDocumentIdIndexedEntity {
+public class BasicIndexedEntity {
 
-	public static final String NAME = "NonEntityIdDocumentId";
+	public static final String NAME = "indexed";
 
 	public static final String GRAPH_EAGER = "graph-eager";
 	public static final String GRAPH_LAZY = "graph-lazy";
@@ -39,23 +34,20 @@ public class NonEntityIdDocumentIdIndexedEntity {
 	@Id
 	private Integer id;
 
-	@DocumentId
-	private Integer documentId;
+	private Integer uniqueProperty;
 
 	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-	@IndexedEmbedded
-	private NonEntityIdDocumentIdContainedEntity containedEager;
+	private BasicContainedEntity containedEager;
 
 	@OneToMany(mappedBy = "containingLazy", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-	@IndexedEmbedded
-	private List<NonEntityIdDocumentIdContainedEntity> containedLazy = new ArrayList<>();
+	private List<BasicContainedEntity> containedLazy = new ArrayList<>();
 
-	protected NonEntityIdDocumentIdIndexedEntity() {
+	protected BasicIndexedEntity() {
 	}
 
-	public NonEntityIdDocumentIdIndexedEntity(int id, int documentId) {
+	public BasicIndexedEntity(int id, Integer uniqueProperty) {
 		this.id = id;
-		this.documentId = documentId;
+		this.uniqueProperty = uniqueProperty;
 	}
 
 	@Override
@@ -67,15 +59,15 @@ public class NonEntityIdDocumentIdIndexedEntity {
 		return id;
 	}
 
-	public NonEntityIdDocumentIdContainedEntity getContainedEager() {
+	public BasicContainedEntity getContainedEager() {
 		return containedEager;
 	}
 
-	public void setContainedEager(NonEntityIdDocumentIdContainedEntity containedEager) {
+	public void setContainedEager(BasicContainedEntity containedEager) {
 		this.containedEager = containedEager;
 	}
 
-	public List<NonEntityIdDocumentIdContainedEntity> getContainedLazy() {
+	public List<BasicContainedEntity> getContainedLazy() {
 		return containedLazy;
 	}
 }

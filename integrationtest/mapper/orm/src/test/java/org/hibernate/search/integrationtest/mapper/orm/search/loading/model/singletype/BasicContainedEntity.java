@@ -11,24 +11,24 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-@Entity(name = NonEntityIdDocumentIdContainedEntity.NAME)
-public class NonEntityIdDocumentIdContainedEntity {
+@Entity(name = BasicContainedEntity.NAME)
+public class BasicContainedEntity {
 
-	public static final String NAME = "NonEntIdDocIdContained";
+	public static final String NAME = "contained";
 
 	@Id
 	private Integer id;
 
 	@OneToOne(mappedBy = "containedEager")
-	private NonEntityIdDocumentIdIndexedEntity containingEager;
+	private BasicIndexedEntity containingEager;
 
 	@ManyToOne
-	private NonEntityIdDocumentIdIndexedEntity containingLazy;
+	private BasicIndexedEntity containingLazy;
 
-	protected NonEntityIdDocumentIdContainedEntity() {
+	protected BasicContainedEntity() {
 	}
 
-	public NonEntityIdDocumentIdContainedEntity(int id) {
+	public BasicContainedEntity(int id) {
 		this.id = id;
 	}
 
@@ -41,19 +41,19 @@ public class NonEntityIdDocumentIdContainedEntity {
 		return id;
 	}
 
-	public NonEntityIdDocumentIdIndexedEntity getContainingEager() {
+	public BasicIndexedEntity getContainingEager() {
 		return containingEager;
 	}
 
-	public void setContainingEager(NonEntityIdDocumentIdIndexedEntity containingEager) {
+	public void setContainingEager(BasicIndexedEntity containingEager) {
 		this.containingEager = containingEager;
 	}
 
-	public NonEntityIdDocumentIdIndexedEntity getContainingLazy() {
+	public BasicIndexedEntity getContainingLazy() {
 		return containingLazy;
 	}
 
-	public void setContainingLazy(NonEntityIdDocumentIdIndexedEntity containingLazy) {
+	public void setContainingLazy(BasicIndexedEntity containingLazy) {
 		this.containingLazy = containingLazy;
 	}
 }

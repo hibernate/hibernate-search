@@ -8,11 +8,14 @@ package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingMapping;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingModel;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.TimeoutLoadingListener;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -29,22 +32,26 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntityLoadingSingleTypeIT<T> {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<SingleTypeLoadingModelPrimitives<?>> data() {
-		return allSingleTypeLoadingModelPrimitives();
+	@Parameterized.Parameters(name = "{0}, {1}")
+	public static List<Object[]> params() {
+		List<Object[]> result = new ArrayList<>();
+		forAllModelMappingCombinations( (model, mapping) -> {
+			result.add( new Object[] { model, mapping } );
+		} );
+		return result;
 	}
 
 	private SessionFactory sessionFactory;
 
-	public SearchQueryEntityLoadingBaseIT(SingleTypeLoadingModelPrimitives<T> primitives) {
-		super( primitives );
+	public SearchQueryEntityLoadingBaseIT(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+		super( model, mapping );
 	}
 
 	@Before
 	public void setup() {
-		backendMock.expectAnySchema( primitives.getIndexName() );
+		backendMock.expectAnySchema( model.getIndexName() );
 
-		sessionFactory = ormSetupHelper.start().setup( primitives.getEntityClasses() );
+		sessionFactory = ormSetupHelper.start().withConfiguration( c -> mapping.configure( c, model ) ).setup();
 
 		backendMock.verifyExpectationsMet();
 	}
@@ -116,12 +123,12 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 				session -> { }, // No particular session setup
 				o -> { }, // No particular loading option
 				c -> c
-						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 0 ) )
-						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 1 ) )
-						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 2 ) ),
+						.doc( model.getIndexName(), mapping.getDocumentIdForEntityId( 0 ) )
+						.doc( model.getIndexName(), mapping.getDocumentIdForEntityId( 1 ) )
+						.doc( model.getIndexName(), mapping.getDocumentIdForEntityId( 2 ) ),
 				c -> c
-						.entity( primitives.getIndexedClass(), 0 )
-						.entity( primitives.getIndexedClass(), 1 ),
+						.entity( model.getIndexedClass(), 0 )
+						.entity( model.getIndexedClass(), 1 ),
 				// Only one entity type means only one statement should be executed, even if there are multiple hits
 				c -> c.assertStatementExecutionCount().isEqualTo( 1 )
 		);
@@ -147,7 +154,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 					 * testLoading() will assert that search results are not initialized.
 					 * NB: "session.load" does not load the entity but really creates a proxy.
 					 */
-					T proxy = session.load( primitives.getIndexedClass(), 1 );
+					T proxy = session.load( model.getIndexedClass(), 1 );
 					/*
 					 * We need to keep a reference to the proxy, otherwise it will be garbage collected
 					 * and ORM (who only holds a weak reference to it) will forget about it.

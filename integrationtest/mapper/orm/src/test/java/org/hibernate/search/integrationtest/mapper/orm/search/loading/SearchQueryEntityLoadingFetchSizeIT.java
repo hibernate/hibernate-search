@@ -8,9 +8,12 @@ package org.hibernate.search.integrationtest.mapper.orm.search.loading;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingMapping;
+import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.SingleTypeLoadingModel;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -25,15 +28,19 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryEntityLoadingSingleTypeIT<T> {
 
-	@Parameterized.Parameters(name = "{0}")
-	public static List<SingleTypeLoadingModelPrimitives<?>> data() {
-		return allSingleTypeLoadingModelPrimitives();
+	@Parameterized.Parameters(name = "{0}, {1}")
+	public static List<Object[]> params() {
+		List<Object[]> result = new ArrayList<>();
+		forAllModelMappingCombinations( (model, mapping) -> {
+			result.add( new Object[] { model, mapping } );
+		} );
+		return result;
 	}
 
 	private SessionFactory sessionFactory;
 
-	public SearchQueryEntityLoadingFetchSizeIT(SingleTypeLoadingModelPrimitives<T> primitives) {
-		super( primitives );
+	public SearchQueryEntityLoadingFetchSizeIT(SingleTypeLoadingModel<T> model, SingleTypeLoadingMapping mapping) {
+		super( model, mapping );
 	}
 
 	@Test
@@ -145,14 +152,15 @@ public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryE
 	}
 
 	public void setup(Integer searchLoadingFetchSize) {
-		backendMock.expectAnySchema( primitives.getIndexName() );
+		backendMock.expectAnySchema( model.getIndexName() );
 
 		sessionFactory = ormSetupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.QUERY_LOADING_FETCH_SIZE,
 						searchLoadingFetchSize
 				)
-				.setup( primitives.getEntityClasses() );
+				.withConfiguration( c -> mapping.configure( c, model ) )
+				.setup();
 
 		backendMock.verifyExpectationsMet();
 	}
