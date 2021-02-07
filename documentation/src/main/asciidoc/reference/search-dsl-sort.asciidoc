@@ -373,13 +373,27 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 // Search 5 anchors backward compatibility
 [[_handling_missing_values]]
 
-Documents that do not have any value for a sort field will appear in the last position by default.
+In case of <<search-dsl-sort-field, sort by field values>>, the documents that do not have any value for a sort field
+will appear in the last position by default.
+In case of <<search-dsl-sort-distance, sort by distance to a point>>, the documents that do not have any value for a sort field
+will be treated as they were at plus infinite distance from the given point.
 
 The behavior for missing values can be controlled explicitly through the `.missing()` option:
 
 * `.missing().first()` puts documents with no value in first position (regardless of the sort order).
 * `.missing().last()` puts documents with no value in last position (regardless of the sort order).
 * `.missing().use(...)` uses the given value as a default for documents with no value.
+
+[NOTE]
+====
+All these options are supported in case of sort by field values or in case of sort by distance to a point
+using the Lucene backend.
+In case of sort by distance to a point using the Elasticsearch backend, due to the current Elasticsearch APIs,
+only the following combinations are supported:
+
+* `.missing().first()` using a descending order.
+* `.missing().last()` using an ascending order.
+====
 
 Below are a few examples with the <<search-dsl-sort-field,field sort>>.
 
