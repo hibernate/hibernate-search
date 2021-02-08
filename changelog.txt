@@ -1,6 +1,23 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.1.Final (08-02-2021)
+-------------------------
+
+** Bug
+    * HSEARCH-4150 Entity loading fails when using FetchMode.SUBSELECT
+    * HSEARCH-4137 Reindexing is skipped when a contained entity change follows a change that is irrelevant to indexing
+    * HSEARCH-4123 Default analyzer not applied by default on programmatic-defined full text fields
+
+** Task
+    * HSEARCH-4145 Fix copy/paste error in the documentation of the "score" projection
+    * HSEARCH-4136 Use hibernate.search.backend.uris rather than hibernate.search.backend.hosts for tests in POMs
+    * HSEARCH-4135 Upgrade to ES 7.8 in Jenkinsfile of backend performance tests
+    * HSEARCH-4131 Upgrade to Hibernate ORM 5.4.27.Final
+    * HSEARCH-4129 Mention More Like This queries in the migration guide
+    * HSEARCH-4127 Update out of date dependency versions in migration guide
+    * HSEARCH-4124 Add --add-opens options required for tests on JDK16-ea28
+
 6.0.0.Final (10-12-2020)
 -------------------------
 
