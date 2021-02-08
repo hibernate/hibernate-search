@@ -716,13 +716,13 @@ public interface Log extends BasicLogger {
 	SearchException customIndexSettingsJsonSyntaxErrors(String filePath, @Cause Exception cause,
 			@Param EventContext context);
 
-	@Message(id = ID_OFFSET + 134, value = "Missing first on sort with ascending order is not supported.")
+	@Message(id = ID_OFFSET + 134, value = "Invalid use of 'missing().first()' for an ascending distance sort. Elasticsearch always assumes missing values have a distance of '+Infinity', and this behavior cannot be customized.")
 	SearchException missingFirstOnAscSortNotSupported(@Param EventContext context);
 
-	@Message(id = ID_OFFSET + 135, value = "Missing last on sort with descending order is not supported.")
+	@Message(id = ID_OFFSET + 135, value = "Invalid use of 'missing().first()' for a descending distance sort. Elasticsearch always assumes missing values have a distance of '+Infinity', and this behavior cannot be customized.")
 	SearchException missingLastOnDescSortNotSupported(@Param EventContext context);
 
-	@Message(id = ID_OFFSET + 136, value = "Missing as on sort is not supported with Elasticsearch backend.")
+	@Message(id = ID_OFFSET + 136, value = "Invalid use of 'missing().use(...)' for a distance sort. Elasticsearch always assumes missing values have a distance of '+Infinity', and this behavior cannot be customized.")
 	SearchException missingAsOnSortNotSupported(@Param EventContext context);
 
 }
