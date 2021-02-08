@@ -218,6 +218,7 @@ public class DistanceSearchSortBaseIT {
 				.hasDocRefHitsExactOrder( index.typeName(), dataSet.emptyDoc1Id, dataSet.doc3Id, dataSet.doc2Id, dataSet.doc1Id );
 
 		if ( !TckConfiguration.get().getBackendFeatures().geoDistanceSortingSupportsConfigurableMissingValues() ) {
+			// explicit .asc()
 			assertThatThrownBy( () -> simpleQuery(
 					dataSetForAsc,
 					b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
@@ -225,7 +226,17 @@ public class DistanceSearchSortBaseIT {
 			) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll( "Invalid use of 'missing().first()' for an ascending distance sort.",
-							"Elasticsearch always assumes missing values have a distance of '+Infinity', and this behavior cannot be customized.");
+							"Elasticsearch always assumes missing values have a distance of '+Infinity', and this behavior cannot be customized." );
+
+			// implicit .asc()
+			assertThatThrownBy( () -> simpleQuery(
+					dataSetForAsc,
+					b -> b.distance( fieldPath, CENTER_POINT.latitude(), CENTER_POINT.longitude() )
+							.missing().first()
+			) )
+					.isInstanceOf( SearchException.class )
+					.hasMessageContainingAll( "Invalid use of 'missing().first()' for an ascending distance sort.",
+							"Elasticsearch always assumes missing values have a distance of '+Infinity', and this behavior cannot be customized." );
 		}
 		else {
 			dataSet = dataSetForAsc;
@@ -247,7 +258,7 @@ public class DistanceSearchSortBaseIT {
 			) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll( "Invalid use of 'missing().use(...)' for a distance sort.",
-							"Elasticsearch always assumes missing values have a distance of '+Infinity', and this behavior cannot be customized.");
+							"Elasticsearch always assumes missing values have a distance of '+Infinity', and this behavior cannot be customized." );
 
 			return;
 		}

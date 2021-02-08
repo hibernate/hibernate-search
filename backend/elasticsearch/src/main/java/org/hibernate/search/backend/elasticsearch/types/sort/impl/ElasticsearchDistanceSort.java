@@ -103,7 +103,7 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 
 		@Override
 		public SearchSort build() {
-			if ( missingFirst && SortOrder.ASC.equals( order ) ) {
+			if ( missingFirst && ( order == null || SortOrder.ASC.equals( order ) ) ) {
 				throw log.missingFirstOnAscSortNotSupported( field.eventContext() );
 			}
 			if ( missingLast && SortOrder.DESC.equals( order ) ) {
