@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl.StubFieldConverter;
@@ -53,6 +54,18 @@ public class StubScopeModel {
 			}
 		}
 		return result;
+	}
+
+	public DocumentIdentifierValueConverter<?> idDslConverter() {
+		for ( StubIndexSchemaNode index : rootSchemaNodes ) {
+			DocumentIdentifierValueConverter<?> converter = index.getIdDslConverter();
+
+			// there is no need to check the compatibility - this is a stub backend
+			if ( converter != null ) {
+				return converter;
+			}
+		}
+		return null;
 	}
 
 	private static List<StubIndexSchemaNode> getSchemaNodes(StubIndexSchemaNode root, String[] pathComponents) {

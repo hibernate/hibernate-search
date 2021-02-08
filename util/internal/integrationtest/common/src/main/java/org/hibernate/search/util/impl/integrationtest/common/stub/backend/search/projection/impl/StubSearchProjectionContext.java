@@ -9,19 +9,26 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContextImpl;
 
 public class StubSearchProjectionContext {
 
 	private final FromDocumentFieldValueConvertContext fromDocumentFieldValueConvertContext;
+	private final FromDocumentIdentifierValueConvertContextImpl fromDocumentIdentifierValueConvertContext;
 
 	private boolean hasFailedLoad = false;
 
 	public StubSearchProjectionContext(BackendSessionContext sessionContext) {
-		this.fromDocumentFieldValueConvertContext = new FromDocumentFieldValueConvertContextImpl( sessionContext );
+		fromDocumentFieldValueConvertContext = new FromDocumentFieldValueConvertContextImpl( sessionContext );
+		fromDocumentIdentifierValueConvertContext = new FromDocumentIdentifierValueConvertContextImpl( sessionContext );
 	}
 
-	FromDocumentFieldValueConvertContext getFromDocumentFieldValueConvertContext() {
+	FromDocumentFieldValueConvertContext fromDocumentFieldValueConvertContext() {
 		return fromDocumentFieldValueConvertContext;
+	}
+
+	FromDocumentIdentifierValueConvertContextImpl fromDocumentIdentifierValueConvertContext() {
+		return fromDocumentIdentifierValueConvertContext;
 	}
 
 	void reportFailedLoad() {
