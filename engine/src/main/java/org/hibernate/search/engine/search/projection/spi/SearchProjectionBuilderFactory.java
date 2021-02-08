@@ -30,6 +30,8 @@ public interface SearchProjectionBuilderFactory {
 
 	<R> EntityReferenceProjectionBuilder<R> entityReference();
 
+	<I> IdProjectionBuilder<I> id(Class<I> identifierType);
+
 	ScoreProjectionBuilder score();
 
 	DistanceToFieldProjectionBuilder distance(String absoluteFieldPath);

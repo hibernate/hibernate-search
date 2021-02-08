@@ -18,6 +18,7 @@ import org.hibernate.search.engine.search.projection.dsl.DocumentReferenceProjec
 import org.hibernate.search.engine.search.projection.dsl.EntityProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.EntityReferenceProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.FieldProjectionValueStep;
+import org.hibernate.search.engine.search.projection.dsl.IdProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.ScoreProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
@@ -56,6 +57,11 @@ public class DefaultSearchProjectionFactory<R, E> implements SearchProjectionFac
 	@Override
 	public EntityReferenceProjectionOptionsStep<?, R> entityReference() {
 		return new EntityReferenceProjectionOptionsStepImpl<>( dslContext );
+	}
+
+	@Override
+	public <I> IdProjectionOptionsStep<?, I> id(Class<I> identifierType) {
+		return new IdProjectionOptionsStepImpl( dslContext, identifierType );
 	}
 
 	@Override
