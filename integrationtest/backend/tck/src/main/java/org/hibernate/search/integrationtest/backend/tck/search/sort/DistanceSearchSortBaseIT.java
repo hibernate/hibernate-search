@@ -193,7 +193,8 @@ public class DistanceSearchSortBaseIT {
 							.desc().missing().last()
 			) )
 					.isInstanceOf( SearchException.class )
-					.hasMessageContainingAll( "Missing last on sort with descending order is not supported." );
+					.hasMessageContainingAll( "Invalid use of 'missing().last()' for a descending distance sort.",
+							"Elasticsearch always assumes missing values have a distance of '+Infinity', and this behavior cannot be customized." );
 		}
 		else {
 			dataSet = dataSetForDesc;
@@ -223,7 +224,8 @@ public class DistanceSearchSortBaseIT {
 							.asc().missing().first()
 			) )
 					.isInstanceOf( SearchException.class )
-					.hasMessageContainingAll( "Missing first on sort with ascending order is not supported." );
+					.hasMessageContainingAll( "Invalid use of 'missing().first()' for an ascending distance sort.",
+							"Elasticsearch always assumes missing values have a distance of '+Infinity', and this behavior cannot be customized.");
 		}
 		else {
 			dataSet = dataSetForAsc;
@@ -244,7 +246,8 @@ public class DistanceSearchSortBaseIT {
 							.asc().missing().use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) )
 			) )
 					.isInstanceOf( SearchException.class )
-					.hasMessageContainingAll( "Missing as on sort is not supported" );
+					.hasMessageContainingAll( "Invalid use of 'missing().use(...)' for a distance sort.",
+							"Elasticsearch always assumes missing values have a distance of '+Infinity', and this behavior cannot be customized.");
 
 			return;
 		}

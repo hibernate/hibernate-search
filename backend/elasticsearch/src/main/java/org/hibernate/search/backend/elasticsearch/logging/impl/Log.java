@@ -719,7 +719,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 134, value = "Invalid use of 'missing().first()' for an ascending distance sort. Elasticsearch always assumes missing values have a distance of '+Infinity', and this behavior cannot be customized.")
 	SearchException missingFirstOnAscSortNotSupported(@Param EventContext context);
 
-	@Message(id = ID_OFFSET + 135, value = "Invalid use of 'missing().first()' for a descending distance sort. Elasticsearch always assumes missing values have a distance of '+Infinity', and this behavior cannot be customized.")
+	@Message(id = ID_OFFSET + 135, value = "Invalid use of 'missing().last()' for a descending distance sort. Elasticsearch always assumes missing values have a distance of '+Infinity', and this behavior cannot be customized.")
 	SearchException missingLastOnDescSortNotSupported(@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 136, value = "Invalid use of 'missing().use(...)' for a distance sort. Elasticsearch always assumes missing values have a distance of '+Infinity', and this behavior cannot be customized.")
