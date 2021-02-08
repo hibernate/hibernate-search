@@ -22,6 +22,7 @@ import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjec
 import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.EntityReferenceProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.IdProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
@@ -62,6 +63,12 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	@Override
 	public <R> EntityReferenceProjectionBuilder<R> entityReference() {
 		return new LuceneEntityReferenceProjection.Builder<>( searchContext );
+	}
+
+	@Override
+	public <I> IdProjectionBuilder<I> id(Class<I> identifierType) {
+		// TODO HSEARCH-4142 Support from this backend
+		return null;
 	}
 
 	@Override
