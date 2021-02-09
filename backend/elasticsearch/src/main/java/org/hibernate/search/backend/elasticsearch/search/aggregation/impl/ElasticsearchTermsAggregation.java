@@ -64,7 +64,7 @@ public class ElasticsearchTermsAggregation<F, K>
 	protected Map<K, Long> doExtract(AggregationExtractContext context, JsonElement buckets) {
 		JsonArray bucketArray = buckets.getAsJsonArray();
 		Map<K, Long> result = CollectionHelper.newLinkedHashMap( bucketArray.size() );
-		FromDocumentFieldValueConvertContext convertContext = context.getConvertContext();
+		FromDocumentFieldValueConvertContext convertContext = context.getFieldConvertContext();
 		for ( JsonElement bucketElement : bucketArray ) {
 			JsonObject bucket = bucketElement.getAsJsonObject();
 			JsonElement keyJson = bucket.get( "key" );

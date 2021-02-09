@@ -35,13 +35,14 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	private final ElasticsearchSearchContext searchContext;
 	private final ElasticsearchSearchIndexesContext indexes;
 	private final DocumentReferenceExtractionHelper documentReferenceExtractionHelper;
+	private final ProjectionExtractionHelper<String> idProjectionExtractionHelper;
 
 	public ElasticsearchSearchProjectionBuilderFactory(SearchProjectionBackendContext searchProjectionBackendContext,
 			ElasticsearchSearchContext searchContext) {
 		this.searchContext = searchContext;
 		this.indexes = searchContext.indexes();
-		this.documentReferenceExtractionHelper =
-				searchProjectionBackendContext.createDocumentReferenceExtractionHelper( searchContext );
+		this.documentReferenceExtractionHelper = searchProjectionBackendContext.createDocumentReferenceExtractionHelper( searchContext );
+		this.idProjectionExtractionHelper = searchProjectionBackendContext.idProjectionExtractionHelper();
 	}
 
 	@Override
@@ -70,8 +71,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 	@Override
 	public <I> IdProjectionBuilder<I> id(Class<I> identifierType) {
-		// TODO HSEARCH-4142 Support from this backend
-		return null;
+		return new ElasticsearchIdProjection.Builder<>( searchContext, idProjectionExtractionHelper, identifierType );
 	}
 
 	@Override

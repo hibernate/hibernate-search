@@ -35,4 +35,7 @@ public final class SearchProjectionBackendContext {
 		return new DocumentReferenceExtractionHelper( mappedTypeNameHelper, idProjectionExtractionHelper );
 	}
 
+	public ProjectionExtractionHelper<String> idProjectionExtractionHelper() {
+		return idProjectionExtractionHelper;
+	}
 }

@@ -10,6 +10,6 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentF
 
 public interface AggregationExtractContext {
 
-	FromDocumentFieldValueConvertContext getConvertContext();
+	FromDocumentFieldValueConvertContext getFieldConvertContext();
 
 }
