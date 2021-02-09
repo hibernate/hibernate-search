@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.orm.work.impl;
 
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 
@@ -17,7 +16,7 @@ public interface SearchIndexingPlanSessionContext {
 
 	PojoRuntimeIntrospector runtimeIntrospector();
 
-	PojoIndexingPlan<EntityReference> currentIndexingPlan(boolean createIfDoesNotExist);
+	PojoIndexingPlan currentIndexingPlan(boolean createIfDoesNotExist);
 
 	void checkOpen();
 

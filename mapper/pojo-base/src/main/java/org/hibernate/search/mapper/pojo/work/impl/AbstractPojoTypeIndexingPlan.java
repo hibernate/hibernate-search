@@ -22,13 +22,13 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
  */
 abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeIndexingPlan<I, E, S>.AbstractEntityState> {
 
-	final PojoWorkSessionContext<?> sessionContext;
-	final PojoIndexingPlanImpl<?> root;
+	final PojoWorkSessionContext sessionContext;
+	final PojoIndexingPlanImpl root;
 
 	// Use a LinkedHashMap for deterministic iteration
 	final Map<I, S> statesPerId = new LinkedHashMap<>();
 
-	AbstractPojoTypeIndexingPlan(PojoWorkSessionContext<?> sessionContext, PojoIndexingPlanImpl<?> root) {
+	AbstractPojoTypeIndexingPlan(PojoWorkSessionContext sessionContext, PojoIndexingPlanImpl root) {
 		this.sessionContext = sessionContext;
 		this.root = root;
 	}

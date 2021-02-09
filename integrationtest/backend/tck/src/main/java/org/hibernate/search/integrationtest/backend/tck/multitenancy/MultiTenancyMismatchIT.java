@@ -73,7 +73,7 @@ public class MultiTenancyMismatchIT {
 		setupHelper.start().withIndex( index ).setup();
 
 		assertThatThrownBy( () -> {
-			IndexIndexingPlan<?> plan = index.createIndexingPlan( tenant1SessionContext );
+			IndexIndexingPlan plan = index.createIndexingPlan( tenant1SessionContext );
 			plan.addOrUpdate( referenceProvider( "1" ), document -> { } );
 			plan.execute().join();
 		} )
@@ -89,7 +89,7 @@ public class MultiTenancyMismatchIT {
 		setupHelper.start().withIndex( index ).setup();
 
 		assertThatThrownBy( () -> {
-			IndexIndexingPlan<?> plan = index.createIndexingPlan( tenant1SessionContext );
+			IndexIndexingPlan plan = index.createIndexingPlan( tenant1SessionContext );
 			plan.addOrUpdate( referenceProvider( "1" ), document -> { } );
 			plan.execute().join();
 		} )
@@ -105,7 +105,7 @@ public class MultiTenancyMismatchIT {
 		setupHelper.start().withIndex( index ).setup();
 
 		assertThatThrownBy( () -> {
-			IndexIndexingPlan<?> plan = index.createIndexingPlan( tenant1SessionContext );
+			IndexIndexingPlan plan = index.createIndexingPlan( tenant1SessionContext );
 			plan.delete( referenceProvider( "1" ) );
 			plan.execute().join();
 		} )

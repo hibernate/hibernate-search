@@ -11,7 +11,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.Backend;
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -94,13 +93,12 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 	}
 
 	@Override
-	public <R> IndexIndexingPlan<R> createIndexingPlan(BackendSessionContext context,
-			EntityReferenceFactory<R> entityReferenceFactory,
+	public IndexIndexingPlan createIndexingPlan(BackendSessionContext context,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		checkStarted();
-		return new StubIndexIndexingPlan<>(
+		return new StubIndexIndexingPlan(
 				name, mappedTypeName, backend.getBehavior(),
-				context, entityReferenceFactory, commitStrategy, refreshStrategy
+				context, commitStrategy, refreshStrategy
 		);
 	}
 

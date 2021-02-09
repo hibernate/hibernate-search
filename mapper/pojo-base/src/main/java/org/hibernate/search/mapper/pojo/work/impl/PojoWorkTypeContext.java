@@ -20,10 +20,10 @@ public interface PojoWorkTypeContext<E> {
 
 	PojoRawTypeIdentifier<E> typeIdentifier();
 
-	Supplier<E> toEntitySupplier(PojoWorkSessionContext<?> sessionContext, Object entity);
+	Supplier<E> toEntitySupplier(PojoWorkSessionContext sessionContext, Object entity);
 
 	void resolveEntitiesToReindex(PojoReindexingCollector collector,
-			PojoWorkSessionContext<?> sessionContext, Object identifier,
+			PojoWorkSessionContext sessionContext, Object identifier,
 			Supplier<E> entitySupplier,
 			PojoImplicitReindexingResolverRootContext context);
 

@@ -39,4 +39,8 @@ public interface EntityReferenceFactory<R> {
 		}
 	}
 
+	static EntityReferenceFactory<String> asString() {
+		return StringEntityReferenceFactory.INSTANCE;
+	}
+
 }

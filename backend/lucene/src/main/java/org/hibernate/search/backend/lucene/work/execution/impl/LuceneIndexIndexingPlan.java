@@ -26,13 +26,12 @@ import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceP
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 
-public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
+public class LuceneIndexIndexingPlan implements IndexIndexingPlan {
 
 	private final LuceneWorkFactory factory;
 	private final LuceneIndexEntryFactory indexEntryFactory;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
 	private final String tenantId;
-	private final EntityReferenceFactory<R> entityReferenceFactory;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
@@ -42,13 +41,11 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
 			BackendSessionContext sessionContext,
-			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		this.factory = factory;
 		this.indexEntryFactory = indexEntryFactory;
 		this.indexManagerContext = indexManagerContext;
 		this.tenantId = sessionContext.tenantIdentifier();
-		this.entityReferenceFactory = entityReferenceFactory;
 		this.commitStrategy = commitStrategy;
 		this.refreshStrategy = refreshStrategy;
 	}
@@ -93,7 +90,8 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	}
 
 	@Override
-	public CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport() {
+	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
+			EntityReferenceFactory<R> entityReferenceFactory) {
 		try {
 			List<CompletableFuture<MultiEntityOperationExecutionReport<R>>> shardReportFutures = new ArrayList<>();
 			for ( Map.Entry<LuceneSerialWorkOrchestrator, List<SingleDocumentIndexingWork>> entry : worksByOrchestrator.entrySet() ) {

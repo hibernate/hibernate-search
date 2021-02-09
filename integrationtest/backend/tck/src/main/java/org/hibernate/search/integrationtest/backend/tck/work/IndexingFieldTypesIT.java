@@ -73,7 +73,7 @@ public class IndexingFieldTypesIT<F> {
 		SimpleFieldModel<F> fieldModel = index.binding().fieldModel;
 
 		// Index all values, each in its own document
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
+		IndexIndexingPlan plan = index.createIndexingPlan();
 		for ( int i = 0; i < values.size(); i++ ) {
 			String documentId = "document_" + i;
 			F value = values.get( i );
@@ -113,7 +113,7 @@ public class IndexingFieldTypesIT<F> {
 		SimpleFieldModel<F> fieldModel = index.binding().fieldModel;
 
 		// Index all values, each in its own document
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
+		IndexIndexingPlan plan = index.createIndexingPlan();
 		for ( int i = 0; i < values.size(); i++ ) {
 			String documentId = "document_" + i;
 			F value = values.get( i );
@@ -160,7 +160,7 @@ public class IndexingFieldTypesIT<F> {
 		String relativeFieldName = "foo_" + typeDescriptor.getUniqueName();
 
 		// Index all values, each in its own document
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
+		IndexIndexingPlan plan = index.createIndexingPlan();
 		for ( int i = 0; i < values.size(); i++ ) {
 			String documentId = "document_" + i;
 			F value = values.get( i );

@@ -8,14 +8,13 @@ package org.hibernate.search.mapper.orm.event.impl;
 
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 
 public interface HibernateOrmListenerContextProvider {
 
 	HibernateOrmListenerTypeContextProvider typeContextProvider();
 
-	PojoIndexingPlan<EntityReference> currentIndexingPlan(SessionImplementor session, boolean createIfDoesNotExist);
+	PojoIndexingPlan currentIndexingPlan(SessionImplementor session, boolean createIfDoesNotExist);
 
 	ConfiguredAutomaticIndexingSynchronizationStrategy currentAutomaticIndexingSynchronizationStrategy(
 			SessionImplementor session);

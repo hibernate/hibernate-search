@@ -84,7 +84,7 @@ public class ElasticsearchIndexingIT {
 	public void addUpdateDelete_noRouting() {
 		Gson gson = new Gson();
 
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
+		IndexIndexingPlan plan = index.createIndexingPlan();
 
 		plan.add( referenceProvider( "1" ), document -> {
 			document.addValue( index.binding().string, "text1" );
@@ -137,7 +137,7 @@ public class ElasticsearchIndexingIT {
 		Gson gson = new Gson();
 
 		String routingKey = "someRoutingKey";
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
+		IndexIndexingPlan plan = index.createIndexingPlan();
 
 		plan.add( referenceProvider( "1", routingKey ), document -> {
 			document.addValue( index.binding().string, "text1" );

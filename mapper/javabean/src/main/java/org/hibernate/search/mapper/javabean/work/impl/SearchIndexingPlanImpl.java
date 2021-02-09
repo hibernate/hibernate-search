@@ -9,6 +9,8 @@ package org.hibernate.search.mapper.javabean.work.impl;
 import java.util.BitSet;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
+import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -19,14 +21,17 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	private final SearchIndexingPlanTypeContextProvider typeContextProvider;
 	private final PojoRuntimeIntrospector introspector;
-	private final PojoIndexingPlan<?> delegate;
+	private final PojoIndexingPlan delegate;
+	private final EntityReferenceFactory<EntityReference> entityReferenceFactory;
 
 	public SearchIndexingPlanImpl(SearchIndexingPlanTypeContextProvider typeContextProvider,
 			PojoRuntimeIntrospector introspector,
-			PojoIndexingPlan<?> delegate) {
+			PojoIndexingPlan delegate,
+			EntityReferenceFactory<EntityReference> entityReferenceFactory) {
 		this.typeContextProvider = typeContextProvider;
 		this.introspector = introspector;
 		this.delegate = delegate;
+		this.entityReferenceFactory = entityReferenceFactory;
 	}
 
 	@Override
@@ -89,7 +94,7 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	}
 
 	public CompletableFuture<?> execute() {
-		return delegate.executeAndReport().thenApply( report -> {
+		return delegate.executeAndReport( entityReferenceFactory ).thenApply( report -> {
 			report.throwable().ifPresent( t -> {
 				throw Throwables.toRuntimeException( t );
 			} );

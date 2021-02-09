@@ -85,7 +85,7 @@ public class LuceneIndexWriterSettingsIT {
 				} );
 
 		// Add a document to the index
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
+		IndexIndexingPlan plan = index.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), document -> { } );
 		plan.execute().join();
 
@@ -148,7 +148,7 @@ public class LuceneIndexWriterSettingsIT {
 				} );
 
 		// Add a document to the index
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
+		IndexIndexingPlan plan = index.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), document -> { } );
 		plan.execute().join();
 

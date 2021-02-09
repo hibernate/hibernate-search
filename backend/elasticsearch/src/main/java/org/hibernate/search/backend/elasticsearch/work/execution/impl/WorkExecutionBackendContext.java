@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.work.execution.impl;
 
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSerialWorkOrchestrator;
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
@@ -28,10 +27,10 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
  */
 public interface WorkExecutionBackendContext {
 
-	<R> IndexIndexingPlan<R> createIndexingPlan(
+	IndexIndexingPlan createIndexingPlan(
 			ElasticsearchSerialWorkOrchestrator orchestrator,
 			WorkExecutionIndexManagerContext indexManagerContext,
-			BackendSessionContext sessionContext, EntityReferenceFactory<R> entityReferenceFactory,
+			BackendSessionContext sessionContext,
 			DocumentRefreshStrategy refreshStrategy);
 
 	IndexIndexer createIndexer(

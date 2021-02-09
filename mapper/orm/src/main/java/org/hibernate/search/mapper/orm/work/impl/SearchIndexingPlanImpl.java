@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.work.impl;
 
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
@@ -48,7 +47,7 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void process() {
-		PojoIndexingPlan<?> plan = delegate( false );
+		PojoIndexingPlan plan = delegate( false );
 		if ( plan == null ) {
 			return;
 		}
@@ -57,7 +56,7 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void execute() {
-		PojoIndexingPlan<EntityReference> plan = delegate( false );
+		PojoIndexingPlan plan = delegate( false );
 		if ( plan == null ) {
 			return;
 		}
@@ -65,7 +64,7 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 				.executeAndSynchronize( plan );
 	}
 
-	private PojoIndexingPlan<EntityReference> delegate(boolean createIfDoesNotExist) {
+	private PojoIndexingPlan delegate(boolean createIfDoesNotExist) {
 		sessionContext.checkOpen();
 		return sessionContext.currentIndexingPlan( createIfDoesNotExist );
 	}

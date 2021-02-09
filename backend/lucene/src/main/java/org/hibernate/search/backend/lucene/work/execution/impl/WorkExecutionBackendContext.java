@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.work.execution.impl;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -28,11 +27,10 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
  * we would end up with methods with many parameters.
  */
 public interface WorkExecutionBackendContext {
-	<R> IndexIndexingPlan<R> createIndexingPlan(
+	IndexIndexingPlan createIndexingPlan(
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
 			BackendSessionContext sessionContext,
-			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 	IndexIndexer createIndexer(

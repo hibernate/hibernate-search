@@ -26,13 +26,13 @@ public final class PojoDocumentContributor<E> implements DocumentContributor {
 	private final String entityName;
 	private final PojoIndexingProcessor<E> processor;
 
-	private final PojoWorkSessionContext<?> sessionContext;
+	private final PojoWorkSessionContext sessionContext;
 
 	private final Object identifier;
 	private final Supplier<E> entitySupplier;
 
 	public PojoDocumentContributor(String entityName, PojoIndexingProcessor<E> processor,
-			PojoWorkSessionContext<?> sessionContext, Object identifier, Supplier<E> entitySupplier) {
+			PojoWorkSessionContext sessionContext, Object identifier, Supplier<E> entitySupplier) {
 		this.entityName = entityName;
 		this.processor = processor;
 		this.sessionContext = sessionContext;

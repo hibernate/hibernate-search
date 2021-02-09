@@ -42,7 +42,7 @@ public abstract class AbstractDirectoryIT {
 	protected SearchIntegration searchIntegration;
 
 	protected final void checkIndexingAndQuerying() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
+		IndexIndexingPlan plan = index.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			document.addValue( index.binding().string, "text 1" );
 		} );

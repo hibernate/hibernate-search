@@ -24,12 +24,11 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 
-class StubIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
+class StubIndexIndexingPlan implements IndexIndexingPlan {
 	private final String indexName;
 	private final String typeName;
 	private final StubBackendBehavior behavior;
 	private final BackendSessionContext sessionContext;
-	private final EntityReferenceFactory<R> entityReferenceFactory;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
@@ -38,13 +37,11 @@ class StubIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	StubIndexIndexingPlan(String indexName, String typeName,
 			StubBackendBehavior behavior,
 			BackendSessionContext sessionContext,
-			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		this.indexName = indexName;
 		this.typeName = typeName;
 		this.sessionContext = sessionContext;
 		this.behavior = behavior;
-		this.entityReferenceFactory = entityReferenceFactory;
 		this.commitStrategy = commitStrategy;
 		this.refreshStrategy = refreshStrategy;
 	}
@@ -87,7 +84,8 @@ class StubIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	}
 
 	@Override
-	public CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport() {
+	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
+			EntityReferenceFactory<R> entityReferenceFactory) {
 		List<StubDocumentWork> worksToExecute = new ArrayList<>( works );
 		works.clear();
 		CompletableFuture<?>[] workFutures = worksToExecute.stream()
@@ -96,11 +94,12 @@ class StubIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 		return CompletableFuture.allOf( workFutures )
 				.handle( Futures.handler( (ignored1, ignored2) -> {
 					// The throwable is ignored, because it comes from a work future and we'll address this below.
-					return buildResult( worksToExecute, workFutures );
+					return buildResult( entityReferenceFactory, worksToExecute, workFutures );
 				} ) );
 	}
 
-	private MultiEntityOperationExecutionReport<R> buildResult(List<StubDocumentWork> worksToExecute,
+	private <R> MultiEntityOperationExecutionReport<R> buildResult(EntityReferenceFactory<R> entityReferenceFactory,
+			List<StubDocumentWork> worksToExecute,
 			CompletableFuture<?>[] finishedWorkFutures) {
 		MultiEntityOperationExecutionReport.Builder<R> builder = MultiEntityOperationExecutionReport.builder();
 		for ( int i = 0; i < finishedWorkFutures.length; i++ ) {

@@ -8,6 +8,7 @@ package org.hibernate.search.engine.backend.work.execution.spi;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.util.common.impl.Throwables;
 
@@ -21,10 +22,8 @@ import org.hibernate.search.util.common.impl.Throwables;
  * Relative ordering of works within a plan will be preserved.
  * <p>
  * Implementations may not be thread-safe.
- *
- * @param <R> The type of entity references in the {@link #executeAndReport() execution report}.
  */
-public interface IndexIndexingPlan<R> {
+public interface IndexIndexingPlan {
 
 	/**
 	 * Add a document to the index, assuming that the document is absent from the index.
@@ -56,7 +55,7 @@ public interface IndexIndexingPlan<R> {
 	 * The future will be completed with an exception if a work failed.
 	 */
 	default CompletableFuture<?> execute() {
-		return executeAndReport().thenApply( report -> {
+		return executeAndReport( EntityReferenceFactory.asString() ).thenApply( report -> {
 				report.throwable().ifPresent( t -> {
 					throw Throwables.toRuntimeException( t );
 				} );
@@ -67,11 +66,14 @@ public interface IndexIndexingPlan<R> {
 	/**
 	 * Start executing all the works in this plan, and clear the plan so that it can be re-used.
 	 *
+	 * @param <R> The type of entity references in the returned execution report.
+	 * @param entityReferenceFactory A factory for entity references in the returned execution report.
 	 * @return A {@link CompletableFuture} that will hold an execution report when all the works are complete.
 	 * The future will be completed normally even if a work failed,
 	 * but the report will contain an exception.
 	 */
-	CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport();
+	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
+			EntityReferenceFactory<R> entityReferenceFactory);
 
 	/**
 	 * Discard all works that are present in this plan.

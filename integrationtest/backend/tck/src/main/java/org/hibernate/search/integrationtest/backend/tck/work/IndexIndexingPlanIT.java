@@ -82,7 +82,7 @@ public class IndexIndexingPlanIT {
 
 	@Test
 	public void success() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan( sessionContext );
+		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 
 		// Add
 		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "The Lord of the Rings chap. 1" ) );
@@ -125,7 +125,7 @@ public class IndexIndexingPlanIT {
 
 	@Test
 	public void discard() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan( sessionContext );
+		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 
 		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "Title of Book 1" ) );
 		plan.discard();
@@ -144,7 +144,7 @@ public class IndexIndexingPlanIT {
 
 	@Test
 	public void add_failure() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan( sessionContext );
+		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "Title of Book 1" ) );
 		plan.add( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "Title of Book 2" ) );
 
@@ -170,7 +170,7 @@ public class IndexIndexingPlanIT {
 	public void addOrUpdate_failure() {
 		setup();
 
-		IndexIndexingPlan<?> plan = index.createIndexingPlan( sessionContext );
+		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 		plan.addOrUpdate( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "Title of Book 1" ) );
 		plan.addOrUpdate( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "Title of Book 2" ) );
 
@@ -196,7 +196,7 @@ public class IndexIndexingPlanIT {
 	public void delete_failure() {
 		setup();
 
-		IndexIndexingPlan<?> plan = index.createIndexingPlan( sessionContext );
+		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 		plan.delete( referenceProvider( "1" ) );
 		plan.delete( referenceProvider( "2" ) );
 
@@ -223,14 +223,15 @@ public class IndexIndexingPlanIT {
 	public void failure_report() {
 		setup();
 
-		IndexIndexingPlan<StubEntityReference> plan = index.createIndexingPlan( sessionContext );
+		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 		plan.add( referenceProvider( "1" ), document -> document.addValue( index.binding().title, "Title of Book 1" ) );
 		plan.add( referenceProvider( "2" ), document -> document.addValue( index.binding().title, "Title of Book 2" ) );
 
 		// Trigger failures in the next operations
 		setupHelper.getBackendAccessor().ensureIndexingOperationsFail( index.name() );
 
-		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> future = plan.executeAndReport();
+		CompletableFuture<MultiEntityOperationExecutionReport<StubEntityReference>> future =
+				plan.executeAndReport( StubEntityReference.FACTORY );
 		Awaitility.await().until( future::isDone );
 
 		// The operation should succeed, but the report should indicate a failure.

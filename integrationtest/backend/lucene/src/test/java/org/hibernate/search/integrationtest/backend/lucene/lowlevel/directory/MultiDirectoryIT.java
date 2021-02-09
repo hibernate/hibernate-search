@@ -106,7 +106,7 @@ public class MultiDirectoryIT {
 	}
 
 	protected final void checkIndexingAndQuerying(SimpleMappedIndex<IndexBinding> index) {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
+		IndexIndexingPlan plan = index.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			document.addValue( index.binding().string, "text 1" );
 		} );

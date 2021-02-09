@@ -15,17 +15,15 @@ import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorSess
 
 /**
  * Session-scoped information and operations for use in POJO work execution.
- *
- * @param <R> The type of entity references.
  */
-public interface PojoWorkSessionContext<R>
+public interface PojoWorkSessionContext
 		extends BackendSessionContext, BridgeSessionContext, PojoIndexingProcessorSessionContext,
 				PojoImplicitReindexingResolverSessionContext {
 
 	@Override
 	PojoWorkMappingContext mappingContext();
 
-	EntityReferenceFactory<R> entityReferenceFactory();
+	EntityReferenceFactory<?> entityReferenceFactory();
 
 	PojoLoadingContext defaultLoadingContext();
 
