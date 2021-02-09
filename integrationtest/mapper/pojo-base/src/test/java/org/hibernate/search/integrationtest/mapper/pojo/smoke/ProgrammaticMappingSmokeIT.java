@@ -492,6 +492,7 @@ public class ProgrammaticMappingSmokeIT {
 					.select(
 							scope.projection().field( "myTextField", String.class ).toProjection(),
 							scope.projection().entityReference().toProjection(),
+							scope.projection().id( Integer.class ).toProjection(),
 							scope.projection().field( "myLocalDateField", LocalDate.class ).toProjection(),
 							scope.projection().documentReference().toProjection(),
 							scope.projection().field( "customBridgeOnClass.text", String.class ).toProjection()
@@ -507,12 +508,14 @@ public class ProgrammaticMappingSmokeIT {
 							Arrays.asList(
 									"text1",
 									reference( IndexedEntity.INDEX, "0" ),
+									reference( IndexedEntity.INDEX, "0" ),
 									LocalDate.of( 2017, 11, 1 ),
 									reference( IndexedEntity.INDEX, "0" ),
 									"text2"
 							),
 							Arrays.asList(
 									null,
+									reference( YetAnotherIndexedEntity.INDEX, "1" ),
 									reference( YetAnotherIndexedEntity.INDEX, "1" ),
 									LocalDate.of( 2017, 11, 2 ),
 									reference( YetAnotherIndexedEntity.INDEX, "1" ),
@@ -527,6 +530,7 @@ public class ProgrammaticMappingSmokeIT {
 							Arrays.asList(
 									"text1",
 									EntityReferenceImpl.withDefaultName( IndexedEntity.class, 0 ),
+									0,
 									LocalDate.of( 2017, 11, 1 ),
 									reference( IndexedEntity.INDEX, "0" ),
 									"text2"
@@ -534,6 +538,7 @@ public class ProgrammaticMappingSmokeIT {
 							Arrays.asList(
 									null,
 									EntityReferenceImpl.withDefaultName( YetAnotherIndexedEntity.class, 1 ),
+									1,
 									LocalDate.of( 2017, 11, 2 ),
 									reference( YetAnotherIndexedEntity.INDEX, "1" ),
 									null
