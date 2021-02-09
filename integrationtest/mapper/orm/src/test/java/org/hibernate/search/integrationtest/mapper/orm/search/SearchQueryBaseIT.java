@@ -418,6 +418,7 @@ public class SearchQueryBaseIT {
 			SearchQuery<List<?>> query = searchSession.search( scope )
 					.select(
 							scope.projection().field( "title", String.class ).toProjection(),
+							scope.projection().id( Integer.class ).toProjection(),
 							scope.projection().entityReference().toProjection(),
 							scope.projection().documentReference().toProjection(),
 							scope.projection().field( "author.name", String.class ).toProjection()
@@ -434,16 +435,19 @@ public class SearchQueryBaseIT {
 									TITLE_4_3_2_1,
 									reference( Book.NAME, "1" ),
 									reference( Book.NAME, "1" ),
+									reference( Book.NAME, "1" ),
 									AUTHOR_4_3_2_1
 							),
 							Arrays.asList(
 									TITLE_CIDER_HOUSE,
 									reference( Book.NAME, "2" ),
 									reference( Book.NAME, "2" ),
+									reference( Book.NAME, "2" ),
 									AUTHOR_CIDER_HOUSE
 							),
 							Arrays.asList(
 									TITLE_AVENUE_OF_MYSTERIES,
+									reference( Book.NAME, "3" ),
 									reference( Book.NAME, "3" ),
 									reference( Book.NAME, "3" ),
 									AUTHOR_AVENUE_OF_MYSTERIES
@@ -454,18 +458,21 @@ public class SearchQueryBaseIT {
 			assertThat( query.fetchAllHits() ).containsExactly(
 					Arrays.asList(
 							TITLE_4_3_2_1,
+							1,
 							EntityReferenceImpl.withName( Book.class, Book.NAME, 1 ),
 							reference( Book.NAME, "1" ),
 							AUTHOR_4_3_2_1
 					),
 					Arrays.asList(
 							TITLE_CIDER_HOUSE,
+							2,
 							EntityReferenceImpl.withName( Book.class, Book.NAME, 2 ),
 							reference( Book.NAME, "2" ),
 							AUTHOR_CIDER_HOUSE
 					),
 					Arrays.asList(
 							TITLE_AVENUE_OF_MYSTERIES,
+							3,
 							EntityReferenceImpl.withName( Book.class, Book.NAME, 3 ),
 							reference( Book.NAME, "3" ),
 							AUTHOR_AVENUE_OF_MYSTERIES
