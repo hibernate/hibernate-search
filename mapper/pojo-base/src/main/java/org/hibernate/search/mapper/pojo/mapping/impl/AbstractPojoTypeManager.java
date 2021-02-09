@@ -74,6 +74,9 @@ public class AbstractPojoTypeManager<E>
 
 	@Override
 	public final Supplier<E> toEntitySupplier(PojoWorkSessionContext<?> sessionContext, Object entity) {
+		if ( entity == null ) {
+			return null;
+		}
 		PojoRuntimeIntrospector introspector = sessionContext.runtimeIntrospector();
 		return new CachingCastingEntitySupplier<>( caster, introspector, entity );
 	}

@@ -46,15 +46,21 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 	}
 
 	void addOrUpdate(Object providedId, String providedRoutingKey, Object entity, BitSet dirtyPaths) {
-		Supplier<E> entitySupplier = entity == null ? null : typeContext().toEntitySupplier( sessionContext, entity );
+		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
 		I identifier = toIdentifier( providedId, entitySupplier );
 		getState( identifier ).addOrUpdate( entitySupplier, providedRoutingKey, dirtyPaths );
 	}
 
 	void delete(Object providedId, String providedRoutingKey, Object entity) {
-		Supplier<E> entitySupplier = entity == null ? null : typeContext().toEntitySupplier( sessionContext, entity );
+		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
 		I identifier = toIdentifier( providedId, entitySupplier );
 		getState( identifier ).delete( entitySupplier, providedRoutingKey );
+	}
+
+	void planLoading() {
+		for ( S state : statesPerId.values() ) {
+			state.planLoading();
+		}
 	}
 
 	void resolveDirty() {
@@ -81,7 +87,8 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 	abstract class AbstractEntityState
 			implements PojoImplicitReindexingResolverRootContext {
 		final I identifier;
-		Supplier<E> entitySupplier;
+		private Supplier<E> entitySupplier;
+		private Integer loadingOrdinal;
 
 		EntityStatus initialStatus = EntityStatus.UNKNOWN;
 		EntityStatus currentStatus = EntityStatus.UNKNOWN;
@@ -151,12 +158,33 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			dirtyPaths = null;
 		}
 
+		void planLoading() {
+			if ( EntityStatus.PRESENT == currentStatus && entitySupplier == null ) {
+				loadingOrdinal = root.loadingPlan().planLoading( typeContext().typeIdentifier(), identifier );
+			}
+		}
+
 		void resolveDirty() {
 			if ( shouldResolveToReindex ) {
 				shouldResolveToReindex = false; // Avoid infinite looping
+				Supplier<E> entitySupplier = entitySupplierOrLoad();
+				if ( entitySupplier == null ) {
+					// We couldn't retrieve the entity.
+					// Assume it was deleted and there's nothing to resolve.
+					return;
+				}
 				typeContext().resolveEntitiesToReindex( root, sessionContext, identifier,
 						entitySupplier, this );
 			}
+		}
+
+		Supplier<E> entitySupplierOrLoad() {
+			if ( entitySupplier == null && loadingOrdinal != null ) {
+				E loaded = root.loadingPlan().retrieve( typeContext().typeIdentifier(), loadingOrdinal );
+				entitySupplier = typeContext().toEntitySupplier( sessionContext, loaded );
+				loadingOrdinal = null;
+			}
+			return entitySupplier;
 		}
 
 		private void addDirtyPaths(BitSet newDirtyPaths) {

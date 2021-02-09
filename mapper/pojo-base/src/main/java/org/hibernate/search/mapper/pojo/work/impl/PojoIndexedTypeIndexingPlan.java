@@ -179,6 +179,14 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 		}
 
 		private void delegateAdd() {
+			Supplier<E> entitySupplier = entitySupplierOrLoad();
+			if ( entitySupplier == null ) {
+				// We couldn't retrieve the entity.
+				// Assume it was deleted and there's nothing to add.
+				// A delete event should follow at some point.
+				return;
+			}
+
 			PojoWorkRouter router = typeContext.createRouter( sessionContext, identifier, entitySupplier );
 			DocumentRouteImpl currentRoute = router.currentRoute( providedRoutingKey );
 			// We don't care about previous routes: the add() operation expects that the document isn't in the index yet.
@@ -197,6 +205,14 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 		}
 
 		private void delegateAddOrUpdate() {
+			Supplier<E> entitySupplier = entitySupplierOrLoad();
+			if ( entitySupplier == null ) {
+				// We couldn't retrieve the entity.
+				// Assume it was deleted and there's nothing to add or update.
+				// A delete event should follow at some point.
+				return;
+			}
+
 			PojoWorkRouter router = typeContext.createRouter( sessionContext, identifier, entitySupplier );
 			DocumentRouteImpl currentRoute = router.currentRoute( providedRoutingKey );
 			List<DocumentRouteImpl> previousRoutes = router.previousRoutes( currentRoute );
@@ -218,6 +234,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 		}
 
 		private void delegateDelete() {
+			Supplier<E> entitySupplier = entitySupplierOrLoad();
 			String documentIdentifier = typeContext.toDocumentIdentifier( sessionContext, identifier );
 
 			if ( entitySupplier == null ) {
