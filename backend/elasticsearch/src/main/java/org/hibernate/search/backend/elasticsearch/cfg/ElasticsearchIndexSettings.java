@@ -65,6 +65,18 @@ public final class ElasticsearchIndexSettings {
 	public static final String SCHEMA_MANAGEMENT_SETTINGS_FILE = "schema_management.settings_file";
 
 	/**
+	 * Specify the default behavior to handle dynamically-mapped fields in the Elasticsearch mapping.
+	 * <p>
+	 * Defaults to {@link Defaults#DYNAMIC_MAPPING}.
+	 * <p>
+	 * In case of dynamic fields with field templates, the value will be ignored,
+	 * since this feature requires a {@link DynamicMapping#TRUE} to operate.
+	 *
+	 * @see DynamicMapping
+	 */
+	public static final String DYNAMIC_MAPPING = "dynamic_mapping";
+
+	/**
 	 * The prefix for indexing-related property keys.
 	 */
 	public static final String INDEXING_PREFIX = "indexing.";
@@ -109,18 +121,6 @@ public final class ElasticsearchIndexSettings {
 	public static final String INDEXING_MAX_BULK_SIZE = INDEXING_PREFIX + IndexingRadicals.MAX_BULK_SIZE;
 
 	/**
-	 * Specify the default behavior to handle dynamically-mapped fields in the Elasticsearch mapping.
-	 * <p>
-	 * Defaults to {@link Defaults#DYNAMIC_MAPPING}.
-	 * <p>
-	 * In case of dynamic fields with field templates, the value will be ignored,
-	 * since this feature requires a {@link DynamicMapping#TRUE} to operate.
-	 *
-	 * @see DynamicMapping
-	 */
-	public static final String DYNAMIC_MAPPING = INDEXING_PREFIX + IndexingRadicals.DYNAMIC_MAPPING;
-
-	/**
 	 * Configuration property keys for indexing, without the {@link #INDEXING_PREFIX prefix}.
 	 */
 	public static final class IndexingRadicals {
@@ -131,7 +131,6 @@ public final class ElasticsearchIndexSettings {
 		public static final String QUEUE_COUNT = "queue_count";
 		public static final String QUEUE_SIZE = "queue_size";
 		public static final String MAX_BULK_SIZE = "max_bulk_size";
-		public static final String DYNAMIC_MAPPING = "dynamic_mapping";
 	}
 
 	/**
