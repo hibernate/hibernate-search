@@ -19,12 +19,12 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 public class PojoTypeIndexer<I, E> {
 
-	private final PojoWorkSessionContext<?> sessionContext;
+	private final PojoWorkSessionContext sessionContext;
 	private final PojoWorkIndexedTypeContext<I, E> typeContext;
 	private final IndexIndexer delegate;
 
 	public PojoTypeIndexer(PojoWorkIndexedTypeContext<I, E> typeContext,
-			PojoWorkSessionContext<?> sessionContext,
+			PojoWorkSessionContext sessionContext,
 			IndexIndexer delegate) {
 		this.sessionContext = sessionContext;
 		this.typeContext = typeContext;

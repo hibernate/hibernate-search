@@ -23,7 +23,6 @@ import org.hibernate.search.backend.elasticsearch.schema.management.impl.Elastic
 import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexSchemaManager;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.WorkExecutionIndexManagerContext;
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
@@ -182,15 +181,13 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 	}
 
 	@Override
-	public <R> IndexIndexingPlan<R> createIndexingPlan(BackendSessionContext sessionContext,
-			EntityReferenceFactory<R> entityReferenceFactory,
+	public IndexIndexingPlan createIndexingPlan(BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		// The commit strategy is ignored, because Elasticsearch always commits changes to its transaction log.
 		return backendContext.createIndexingPlan(
 				indexingOrchestrator,
 				this,
 				sessionContext,
-				entityReferenceFactory,
 				refreshStrategy
 		);
 	}

@@ -25,13 +25,12 @@ import com.google.gson.JsonObject;
 
 
 
-public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
+public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan {
 
 	private final ElasticsearchWorkBuilderFactory builderFactory;
 	private final ElasticsearchSerialWorkOrchestrator orchestrator;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
 	private final String tenantId;
-	private final EntityReferenceFactory<R> entityReferenceFactory;
 	private final DocumentRefreshStrategy refreshStrategy;
 
 	private final List<SingleDocumentIndexingWork> works = new ArrayList<>();
@@ -40,13 +39,11 @@ public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 			ElasticsearchSerialWorkOrchestrator orchestrator,
 			WorkExecutionIndexManagerContext indexManagerContext,
 			BackendSessionContext sessionContext,
-			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentRefreshStrategy refreshStrategy) {
 		this.builderFactory = builderFactory;
 		this.orchestrator = orchestrator;
 		this.indexManagerContext = indexManagerContext;
 		this.tenantId = sessionContext.tenantIdentifier();
-		this.entityReferenceFactory = entityReferenceFactory;
 		this.refreshStrategy = refreshStrategy;
 	}
 
@@ -79,7 +76,8 @@ public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	}
 
 	@Override
-	public CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport() {
+	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
+			EntityReferenceFactory<R> entityReferenceFactory) {
 		try {
 			ElasticsearchIndexIndexingPlanExecution<R> execution = new ElasticsearchIndexIndexingPlanExecution<>(
 					orchestrator, entityReferenceFactory,

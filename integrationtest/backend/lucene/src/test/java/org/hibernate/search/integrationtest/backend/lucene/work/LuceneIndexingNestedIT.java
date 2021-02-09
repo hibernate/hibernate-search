@@ -56,7 +56,7 @@ public class LuceneIndexingNestedIT {
 		// No multitenancy, which means the backend will use indexWriter.updateDocuments(Term, Iterable) for updates
 		setup( MultiTenancyStrategyName.NONE );
 
-		IndexIndexingPlan<?> plan = index.createIndexingPlan( sessionContext );
+		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 		plan.addOrUpdate( referenceProvider( "1" ), document -> {
 			DocumentElement nested = document.addObject( index.binding().nestedObject.self );
 			nested.addValue( index.binding().nestedObject.field2, "value" );
@@ -74,7 +74,7 @@ public class LuceneIndexingNestedIT {
 		// indexWriter.deleteDocuments(Query) then indexWriter.addDocument for updates
 		setup( MultiTenancyStrategyName.DISCRIMINATOR );
 
-		IndexIndexingPlan<?> plan = index.createIndexingPlan( sessionContext );
+		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 		plan.addOrUpdate( referenceProvider( "1" ), document -> {
 			DocumentElement nested = document.addObject( index.binding().nestedObject.self );
 			nested.addValue( index.binding().nestedObject.field2, "value" );
@@ -91,7 +91,7 @@ public class LuceneIndexingNestedIT {
 		// No multitenancy, which means the backend will use indexWriter.deleteDocuments(Term) for deletion
 		setup( MultiTenancyStrategyName.NONE );
 
-		IndexIndexingPlan<?> plan = index.createIndexingPlan( sessionContext );
+		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 		plan.delete( referenceProvider( "1" ) );
 		plan.execute().join();
 
@@ -104,7 +104,7 @@ public class LuceneIndexingNestedIT {
 		// Multitenancy enabled, which means the backend will use indexWriter.deleteDocuments(Query) for deletion
 		setup( MultiTenancyStrategyName.DISCRIMINATOR );
 
-		IndexIndexingPlan<?> plan = index.createIndexingPlan( sessionContext );
+		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 		plan.delete( referenceProvider( "1" ) );
 		plan.execute().join();
 
@@ -137,7 +137,7 @@ public class LuceneIndexingNestedIT {
 			sessionContext = new StubBackendSessionContext( "someTenantId" );
 		}
 
-		IndexIndexingPlan<?> plan = index.createIndexingPlan( sessionContext );
+		IndexIndexingPlan plan = index.createIndexingPlan( sessionContext );
 		plan.add( referenceProvider( "1" ), document -> {
 			DocumentElement nested = document.addObject( index.binding().nestedObject.self );
 			nested.addValue( index.binding().nestedObject.field1, "value" );

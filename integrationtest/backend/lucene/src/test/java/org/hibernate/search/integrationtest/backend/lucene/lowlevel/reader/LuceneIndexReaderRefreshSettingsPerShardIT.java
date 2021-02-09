@@ -52,7 +52,7 @@ public class LuceneIndexReaderRefreshSettingsPerShardIT extends AbstractSettings
 		// Initially the shards are empty
 		assertThatQuery( query ).hasNoHits();
 
-		IndexIndexingPlan<?> plan = index.createIndexingPlan(
+		IndexIndexingPlan plan = index.createIndexingPlan(
 				new StubBackendSessionContext(),
 				DocumentCommitStrategy.NONE, // This is irrelevant
 				DocumentRefreshStrategy.NONE // The refresh should be executed regardless of this parameter

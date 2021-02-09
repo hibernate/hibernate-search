@@ -162,7 +162,7 @@ public class MultiTenancyBaseIT {
 
 	@Test
 	public void delete_only_deletes_elements_of_the_tenant() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan( tenant2SessionContext );
+		IndexIndexingPlan plan = index.createIndexingPlan( tenant2SessionContext );
 
 		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query( tenant2SessionContext )
@@ -213,7 +213,7 @@ public class MultiTenancyBaseIT {
 
 	@Test
 	public void update_only_updates_elements_of_the_tenant() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan( tenant2SessionContext );
+		IndexIndexingPlan plan = index.createIndexingPlan( tenant2SessionContext );
 
 		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> checkQuery = scope.query( tenant2SessionContext )
@@ -332,7 +332,7 @@ public class MultiTenancyBaseIT {
 	@Test
 	public void not_using_multi_tenancy_for_add_while_enabled_throws_exception() {
 		assertThatThrownBy( () -> {
-			IndexIndexingPlan<?> plan = index.createIndexingPlan( new StubBackendSessionContext() );
+			IndexIndexingPlan plan = index.createIndexingPlan( new StubBackendSessionContext() );
 
 			plan.add( referenceProvider( DOCUMENT_ID_3 ), document -> {
 				document.addValue( index.binding().string, STRING_VALUE_3 );
@@ -353,7 +353,7 @@ public class MultiTenancyBaseIT {
 	@Test
 	public void not_using_multi_tenancy_for_update_while_enabled_throws_exception() {
 		assertThatThrownBy( () -> {
-			IndexIndexingPlan<?> plan = index.createIndexingPlan( new StubBackendSessionContext() );
+			IndexIndexingPlan plan = index.createIndexingPlan( new StubBackendSessionContext() );
 
 			plan.addOrUpdate( referenceProvider( DOCUMENT_ID_2 ), document -> {
 				document.addValue( index.binding().string, UPDATED_STRING );
@@ -374,7 +374,7 @@ public class MultiTenancyBaseIT {
 	@Test
 	public void not_using_multi_tenancy_for_delete_while_enabled_throws_exception() {
 		assertThatThrownBy( () -> {
-			IndexIndexingPlan<?> plan = index.createIndexingPlan( new StubBackendSessionContext() );
+			IndexIndexingPlan plan = index.createIndexingPlan( new StubBackendSessionContext() );
 			plan.delete( referenceProvider( DOCUMENT_ID_1 ) );
 			plan.execute().join();
 		} )
@@ -384,7 +384,7 @@ public class MultiTenancyBaseIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan( tenant1SessionContext );
+		IndexIndexingPlan plan = index.createIndexingPlan( tenant1SessionContext );
 		plan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
 			document.addValue( index.binding().string, STRING_VALUE_1 );
 			document.addValue( index.binding().integer, INTEGER_VALUE_1 );

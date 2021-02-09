@@ -26,19 +26,19 @@ public interface PojoWorkIndexedTypeContext<I, E> extends PojoWorkTypeContext<E>
 
 	IdentifierMappingImplementor<I, E> identifierMapping();
 
-	String toDocumentIdentifier(PojoWorkSessionContext<?> sessionContext, I identifier);
+	String toDocumentIdentifier(PojoWorkSessionContext sessionContext, I identifier);
 
-	PojoWorkRouter createRouter(PojoWorkSessionContext<?> sessionContext, I identifier, Supplier<E> entitySupplier);
+	PojoWorkRouter createRouter(PojoWorkSessionContext sessionContext, I identifier, Supplier<E> entitySupplier);
 
-	PojoDocumentContributor<E> toDocumentContributor(PojoWorkSessionContext<?> sessionContext, I identifier,
+	PojoDocumentContributor<E> toDocumentContributor(PojoWorkSessionContext sessionContext, I identifier,
 			Supplier<E> entitySupplier);
 
 	PojoPathFilter dirtySelfFilter();
 
-	<R> IndexIndexingPlan<R> createIndexingPlan(PojoWorkSessionContext<R> sessionContext,
+	IndexIndexingPlan createIndexingPlan(PojoWorkSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	IndexIndexer createIndexer(PojoWorkSessionContext<?> sessionContext);
+	IndexIndexer createIndexer(PojoWorkSessionContext sessionContext);
 
 	IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext);
 

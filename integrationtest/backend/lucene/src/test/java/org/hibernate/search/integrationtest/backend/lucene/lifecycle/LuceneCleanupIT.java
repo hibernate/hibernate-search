@@ -107,7 +107,7 @@ public class LuceneCleanupIT {
 	}
 
 	private void doStore(int ... ids) {
-		IndexIndexingPlan<?> plan = index.createIndexingPlan(
+		IndexIndexingPlan plan = index.createIndexingPlan(
 				new StubBackendSessionContext(),
 				// Let the commit/refresh intervals do their job
 				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE

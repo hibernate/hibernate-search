@@ -280,7 +280,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public PojoIndexingPlan<EntityReference> currentIndexingPlan(SessionImplementor session,
+	public PojoIndexingPlan currentIndexingPlan(SessionImplementor session,
 			boolean createIfDoesNotExist) {
 		HibernateOrmSearchSession searchSession = HibernateOrmSearchSession.get( this, session, createIfDoesNotExist );
 		if ( searchSession == null ) {

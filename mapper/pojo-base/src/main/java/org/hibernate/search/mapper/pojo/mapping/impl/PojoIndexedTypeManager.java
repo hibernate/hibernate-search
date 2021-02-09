@@ -86,12 +86,12 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<E>
 	}
 
 	@Override
-	public String toDocumentIdentifier(PojoWorkSessionContext<?> sessionContext, I identifier) {
+	public String toDocumentIdentifier(PojoWorkSessionContext sessionContext, I identifier) {
 		return identifierMapping.toDocumentIdentifier( identifier, sessionContext.mappingContext() );
 	}
 
 	@Override
-	public PojoWorkRouter createRouter(PojoWorkSessionContext<?> sessionContext, I identifier,
+	public PojoWorkRouter createRouter(PojoWorkSessionContext sessionContext, I identifier,
 			Supplier<E> entitySupplier) {
 		if ( routingBridgeHolder == null ) {
 			return NoOpDocumentRouter.INSTANCE;
@@ -101,7 +101,7 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<E>
 	}
 
 	@Override
-	public PojoDocumentContributor<E> toDocumentContributor(PojoWorkSessionContext<?> sessionContext, I identifier,
+	public PojoDocumentContributor<E> toDocumentContributor(PojoWorkSessionContext sessionContext, I identifier,
 			Supplier<E> entitySupplier) {
 		return new PojoDocumentContributor<>( entityName, processor, sessionContext, identifier, entitySupplier );
 	}
@@ -117,7 +117,7 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<E>
 	}
 
 	@Override
-	public IndexIndexer createIndexer(PojoWorkSessionContext<?> sessionContext) {
+	public IndexIndexer createIndexer(PojoWorkSessionContext sessionContext) {
 		return indexManager.createIndexer( sessionContext );
 	}
 
@@ -127,9 +127,9 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<E>
 	}
 
 	@Override
-	public <R> IndexIndexingPlan<R> createIndexingPlan(PojoWorkSessionContext<R> sessionContext,
+	public IndexIndexingPlan createIndexingPlan(PojoWorkSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		return indexManager.createIndexingPlan( sessionContext, sessionContext.entityReferenceFactory(),
+		return indexManager.createIndexingPlan( sessionContext,
 				commitStrategy, refreshStrategy );
 	}
 

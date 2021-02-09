@@ -42,7 +42,7 @@ public class LuceneIndexSchemaManagerDropAndCreateIT {
 
 		assertThat( indexExists() ).isTrue();
 
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
+		IndexIndexingPlan plan = index.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), document -> {
 		} );
 		plan.execute().join();

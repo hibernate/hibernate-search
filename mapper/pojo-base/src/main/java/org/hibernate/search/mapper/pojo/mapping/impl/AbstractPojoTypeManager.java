@@ -73,7 +73,7 @@ public class AbstractPojoTypeManager<E>
 	}
 
 	@Override
-	public final Supplier<E> toEntitySupplier(PojoWorkSessionContext<?> sessionContext, Object entity) {
+	public final Supplier<E> toEntitySupplier(PojoWorkSessionContext sessionContext, Object entity) {
 		if ( entity == null ) {
 			return null;
 		}
@@ -82,7 +82,7 @@ public class AbstractPojoTypeManager<E>
 	}
 
 	@Override
-	public final void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoWorkSessionContext<?> sessionContext,
+	public final void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoWorkSessionContext sessionContext,
 			Object identifier, Supplier<E> entitySupplier,
 			PojoImplicitReindexingResolverRootContext context) {
 		try {

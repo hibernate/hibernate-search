@@ -190,7 +190,8 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	public void automaticIndexingSynchronizationStrategy(
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		ConfiguredAutomaticIndexingSynchronizationStrategy.Builder builder =
-				new ConfiguredAutomaticIndexingSynchronizationStrategy.Builder( mappingContext.failureHandler() );
+				new ConfiguredAutomaticIndexingSynchronizationStrategy.Builder( mappingContext.failureHandler(),
+						entityReferenceFactory() );
 		synchronizationStrategy.apply( builder );
 		this.configuredAutomaticIndexingSynchronizationStrategy = builder.build();
 	}
@@ -252,7 +253,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	}
 
 	@Override
-	public PojoIndexingPlan<EntityReference> currentIndexingPlan(boolean createIfDoesNotExist) {
+	public PojoIndexingPlan currentIndexingPlan(boolean createIfDoesNotExist) {
 		HibernateOrmSearchSessionHolder holder =
 				HibernateOrmSearchSessionHolder.get( sessionImplementor, createIfDoesNotExist );
 		if ( holder == null ) {
@@ -268,7 +269,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 			transactionIdentifier = null;
 		}
 
-		PojoIndexingPlan<EntityReference> plan = holder.pojoIndexingPlan( transactionIdentifier );
+		PojoIndexingPlan plan = holder.pojoIndexingPlan( transactionIdentifier );
 		if ( plan != null ) {
 			return plan;
 		}
@@ -309,7 +310,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 		return new HibernateOrmLoadingContext.Builder( mappingContext, typeContextProvider, this );
 	}
 
-	private Synchronization createTransactionWorkQueueSynchronization(PojoIndexingPlan<EntityReference> indexingPlan,
+	private Synchronization createTransactionWorkQueueSynchronization(PojoIndexingPlan indexingPlan,
 			HibernateOrmSearchSessionHolder sessionProperties,
 			Transaction transactionIdentifier,
 			ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy) {

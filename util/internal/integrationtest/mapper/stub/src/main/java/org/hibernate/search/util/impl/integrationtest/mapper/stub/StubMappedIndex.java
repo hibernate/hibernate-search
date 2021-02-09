@@ -118,22 +118,22 @@ public abstract class StubMappedIndex {
 		return new BulkIndexer( delegate(), sessionContext, refresh );
 	}
 
-	public IndexIndexingPlan<StubEntityReference> createIndexingPlan() {
+	public IndexIndexingPlan createIndexingPlan() {
 		return createIndexingPlan( new StubBackendSessionContext() );
 	}
 
-	public IndexIndexingPlan<StubEntityReference> createIndexingPlan(StubBackendSessionContext sessionContext) {
+	public IndexIndexingPlan createIndexingPlan(StubBackendSessionContext sessionContext) {
 		/*
 		 * Use the same defaults as in the ORM mapper for the commit strategy,
 		 * but force refreshes because it's more convenient for tests.
 		 */
-		return delegate().createIndexingPlan( sessionContext, StubEntityReference.FACTORY,
+		return delegate().createIndexingPlan( sessionContext,
 				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE );
 	}
 
-	public IndexIndexingPlan<StubEntityReference> createIndexingPlan(StubBackendSessionContext sessionContext,
+	public IndexIndexingPlan createIndexingPlan(StubBackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		return delegate().createIndexingPlan( sessionContext, StubEntityReference.FACTORY,
+		return delegate().createIndexingPlan( sessionContext,
 				commitStrategy, refreshStrategy );
 	}
 

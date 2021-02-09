@@ -25,12 +25,12 @@ public class PojoIndexerImpl implements PojoIndexer {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoWorkIndexedTypeContextProvider indexedTypeContextProvider;
-	private final PojoWorkSessionContext<?> sessionContext;
+	private final PojoWorkSessionContext sessionContext;
 
 	private final Map<PojoRawTypeIdentifier<?>, PojoTypeIndexer<?, ?>> delegates = new ConcurrentHashMap<>();
 
 	public PojoIndexerImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
-			PojoWorkSessionContext<?> sessionContext) {
+			PojoWorkSessionContext sessionContext) {
 		this.indexedTypeContextProvider = indexedTypeContextProvider;
 		this.sessionContext = sessionContext;
 	}

@@ -15,7 +15,6 @@ import javax.transaction.Synchronization;
 
 import org.hibernate.Transaction;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 
 public class HibernateOrmSearchSessionHolder implements Serializable {
@@ -70,7 +69,7 @@ public class HibernateOrmSearchSessionHolder implements Serializable {
 	// The Hibernate Search data (indexing plans in particular) will be lost in the process,
 	// but that's the best we can do.
 	private transient HibernateOrmSearchSession searchSession;
-	private transient Map<Transaction, PojoIndexingPlan<EntityReference>> planPerTransaction;
+	private transient Map<Transaction, PojoIndexingPlan> planPerTransaction;
 
 	public HibernateOrmSearchSession searchSession() {
 		return searchSession;
@@ -80,11 +79,11 @@ public class HibernateOrmSearchSessionHolder implements Serializable {
 		this.searchSession = searchSession;
 	}
 
-	public PojoIndexingPlan<EntityReference> pojoIndexingPlan(Transaction transaction) {
+	public PojoIndexingPlan pojoIndexingPlan(Transaction transaction) {
 		return planPerTransaction == null ? null : planPerTransaction.get( transaction );
 	}
 
-	public void pojoIndexingPlan(Transaction transaction, PojoIndexingPlan<EntityReference> plan) {
+	public void pojoIndexingPlan(Transaction transaction, PojoIndexingPlan plan) {
 		if ( planPerTransaction == null ) {
 			planPerTransaction = new HashMap<>();
 		}

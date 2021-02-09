@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
@@ -20,17 +21,16 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 /**
  * @param <I> The identifier type for the mapped entity type.
  * @param <E> The entity type mapped to the index.
- * @param <R> The type of entity references returned in the {@link #executeAndReport() failure report}.
  */
-public class PojoIndexedTypeIndexingPlan<I, E, R>
-		extends AbstractPojoTypeIndexingPlan<I, E, PojoIndexedTypeIndexingPlan<I, E, R>.IndexedEntityState> {
+public class PojoIndexedTypeIndexingPlan<I, E>
+		extends AbstractPojoTypeIndexingPlan<I, E, PojoIndexedTypeIndexingPlan<I, E>.IndexedEntityState> {
 
 	private final PojoWorkIndexedTypeContext<I, E> typeContext;
-	private final IndexIndexingPlan<R> delegate;
+	private final IndexIndexingPlan delegate;
 
 	public PojoIndexedTypeIndexingPlan(PojoWorkIndexedTypeContext<I, E> typeContext,
-			PojoWorkSessionContext<?> sessionContext, PojoIndexingPlanImpl<?> root,
-			IndexIndexingPlan<R> delegate) {
+			PojoWorkSessionContext sessionContext, PojoIndexingPlanImpl root,
+			IndexIndexingPlan delegate) {
 		super( sessionContext, root );
 		this.typeContext = typeContext;
 		this.delegate = delegate;
@@ -68,9 +68,10 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 		}
 	}
 
-	CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport() {
+	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
+			EntityReferenceFactory<R> entityReferenceFactory) {
 		process();
-		return delegate.executeAndReport();
+		return delegate.executeAndReport( entityReferenceFactory );
 	}
 
 	@Override

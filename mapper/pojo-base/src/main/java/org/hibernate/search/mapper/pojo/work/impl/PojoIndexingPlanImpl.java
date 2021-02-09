@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
@@ -29,19 +30,19 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindexingCollector {
+public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoReindexingCollector {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoWorkIndexedTypeContextProvider indexedTypeContextProvider;
 	private final PojoWorkContainedTypeContextProvider containedTypeContextProvider;
-	private final PojoWorkSessionContext<R> sessionContext;
+	private final PojoWorkSessionContext sessionContext;
 	private final PojoRuntimeIntrospector introspector;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeIndexingPlan<?, ?, R>> indexedTypeDelegates = new LinkedHashMap<>();
+	private final Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeIndexingPlan<?, ?>> indexedTypeDelegates = new LinkedHashMap<>();
 	private final Map<PojoRawTypeIdentifier<?>, PojoContainedTypeIndexingPlan<?>> containedTypeDelegates = new LinkedHashMap<>();
 
 	private boolean isProcessing = false;
@@ -50,7 +51,7 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 
 	public PojoIndexingPlanImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
 			PojoWorkContainedTypeContextProvider containedTypeContextProvider,
-			PojoWorkSessionContext<R> sessionContext,
+			PojoWorkSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy) {
 		this.indexedTypeContextProvider = indexedTypeContextProvider;
@@ -109,7 +110,7 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 				for ( PojoContainedTypeIndexingPlan<?> delegate : containedTypeDelegates.values() ) {
 					delegate.planLoading();
 				}
-				for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
+				for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : indexedTypeDelegates.values() ) {
 					delegate.planLoading();
 				}
 			}
@@ -120,11 +121,11 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 				delegate.resolveDirty();
 			}
 			// We need to iterate on a "frozen snapshot" of the indexedTypeDelegates values because of HSEARCH-3857
-			List<PojoIndexedTypeIndexingPlan<?, ?, ?>> frozenIndexedTypeDelegates = new ArrayList<>( indexedTypeDelegates.values() );
-			for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : frozenIndexedTypeDelegates ) {
+			List<PojoIndexedTypeIndexingPlan<?, ?>> frozenIndexedTypeDelegates = new ArrayList<>( indexedTypeDelegates.values() );
+			for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : frozenIndexedTypeDelegates ) {
 				delegate.resolveDirty();
 			}
-			for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
+			for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : indexedTypeDelegates.values() ) {
 				delegate.process();
 			}
 		}
@@ -136,12 +137,13 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 	}
 
 	@Override
-	public CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport() {
+	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
+			EntityReferenceFactory<R> entityReferenceFactory) {
 		try {
 			process();
 			List<CompletableFuture<MultiEntityOperationExecutionReport<R>>> futures = new ArrayList<>();
-			for ( PojoIndexedTypeIndexingPlan<?, ?, R> delegate : indexedTypeDelegates.values() ) {
-				futures.add( delegate.executeAndReport() );
+			for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : indexedTypeDelegates.values() ) {
+				futures.add( delegate.executeAndReport( entityReferenceFactory ) );
 			}
 			return MultiEntityOperationExecutionReport.allOf( futures );
 		}
@@ -153,7 +155,7 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 	@Override
 	public void discard() {
 		try {
-			for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
+			for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : indexedTypeDelegates.values() ) {
 				delegate.discard();
 			}
 		}
@@ -164,7 +166,7 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 
 	@Override
 	public void discardNotProcessed() {
-		for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
+		for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : indexedTypeDelegates.values() ) {
 			delegate.discardNotProcessed();
 		}
 	}
@@ -183,7 +185,7 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 							+ " but this entity type is not indexed directly."
 			);
 		}
-		PojoIndexedTypeIndexingPlan<?, ?, ?> delegate = getOrCreateIndexedDelegateForContainedUpdate( typeIdentifier );
+		PojoIndexedTypeIndexingPlan<?, ?> delegate = getOrCreateIndexedDelegateForContainedUpdate( typeIdentifier );
 		delegate.updateBecauseOfContained( containingEntity );
 	}
 
@@ -206,7 +208,7 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> indexedTypeContextOptional =
 				indexedTypeContextProvider.getByExactType( typeIdentifier );
 		if ( indexedTypeContextOptional.isPresent() ) {
-			PojoIndexedTypeIndexingPlan<?, ?, R> delegate = createDelegate( indexedTypeContextOptional.get() );
+			PojoIndexedTypeIndexingPlan<?, ?> delegate = createDelegate( indexedTypeContextOptional.get() );
 			indexedTypeDelegates.put( typeIdentifier, delegate );
 			return delegate;
 		}
@@ -222,8 +224,8 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 		throw log.nonIndexedNorContainedTypeInIndexingPlan( typeIdentifier );
 	}
 
-	private PojoIndexedTypeIndexingPlan<?, ?, ?> getOrCreateIndexedDelegateForContainedUpdate(PojoRawTypeIdentifier<?> typeIdentifier) {
-		PojoIndexedTypeIndexingPlan<?, ?, R> delegate = indexedTypeDelegates.get( typeIdentifier );
+	private PojoIndexedTypeIndexingPlan<?, ?> getOrCreateIndexedDelegateForContainedUpdate(PojoRawTypeIdentifier<?> typeIdentifier) {
+		PojoIndexedTypeIndexingPlan<?, ?> delegate = indexedTypeDelegates.get( typeIdentifier );
 		if ( delegate != null ) {
 			return delegate;
 		}
@@ -250,7 +252,7 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 		return loadingPlan;
 	}
 
-	private PojoIndexedTypeIndexingPlan<?, ?, R> createDelegate(PojoWorkIndexedTypeContext<?, ?> typeContext) {
+	private PojoIndexedTypeIndexingPlan<?, ?> createDelegate(PojoWorkIndexedTypeContext<?, ?> typeContext) {
 		return new PojoIndexedTypeIndexingPlan<>( typeContext, sessionContext, this,
 				typeContext.createIndexingPlan( sessionContext, commitStrategy, refreshStrategy ) );
 	}
