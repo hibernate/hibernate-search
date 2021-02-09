@@ -112,6 +112,8 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 				initialStatus = EntityStatus.ABSENT;
 			}
 			currentStatus = EntityStatus.PRESENT;
+			considerAllDirty = true;
+			dirtyPaths = null;
 		}
 
 		void addOrUpdate(Supplier<E> entitySupplier, String providedRoutingKey) {
