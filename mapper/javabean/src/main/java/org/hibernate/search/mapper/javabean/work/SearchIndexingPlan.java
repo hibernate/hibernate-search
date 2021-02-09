@@ -42,6 +42,22 @@ public interface SearchIndexingPlan {
 	void add(Object providedId, String providedRoutingKey, Object entity);
 
 	/**
+	 * Add an entity to the index, assuming that the entity is absent from the index.
+	 * <p>
+	 * <strong>Note:</strong> depending on the backend, this may lead to errors or duplicate entries in the index
+	 * if the entity was actually already present in the index before this call.
+	 * When in doubt, you should rather use {@link #addOrUpdate(Object, String, Object)} or {@link #addOrUpdate(Object)}.
+	 *
+	 * @param entityClass The class of the entity to add to the index.
+	 * @param providedId A value to extract the document ID from.
+	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
+	 * @param providedRoutingKey The routing key to route the add request to the appropriate index shard.
+	 * Leave {@code null} if sharding is disabled
+	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
+	 */
+	void add(Class<?> entityClass, Object providedId, String providedRoutingKey);
+
+	/**
 	 * Update an entity in the index, or add it if it's absent from the index.
 	 * <p>
 	 * Shorthand for {@code addOrUpdate(null, entity)}; see {@link #addOrUpdate(Object, String, Object)}.
@@ -62,6 +78,18 @@ public interface SearchIndexingPlan {
 	 * @param entity The entity to update in the index.
 	 */
 	void addOrUpdate(Object providedId, String providedRoutingKey, Object entity);
+
+	/**
+	 * Update an entity in the index, or add it if it's absent from the index.
+	 *
+	 * @param entityClass The class of the entity to update in the index.
+	 * @param providedId A value to extract the document ID from.
+	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
+	 * @param providedRoutingKey The routing key to route the addOrUpdate request to the appropriate index shard.
+	 * Leave {@code null} if sharding is disabled
+	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
+	 */
+	void addOrUpdate(Class<?> entityClass, Object providedId, String providedRoutingKey);
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index,

@@ -29,9 +29,19 @@ public enum PojoIndexingOperation {
 		}
 
 		@Override
+		void addTo(SearchIndexingPlan indexingPlan, Object providedId, String providedRoutingKey) {
+			indexingPlan.add( IndexedEntity.class, providedId, providedRoutingKey );
+		}
+
+		@Override
 		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey,
 				IndexedEntity entity) {
 			return indexer.add( providedId, providedRoutingKey, entity );
+		}
+
+		@Override
+		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey) {
+			return indexer.add( IndexedEntity.class, providedId, providedRoutingKey );
 		}
 	},
 	ADD_OR_UPDATE {
@@ -48,9 +58,19 @@ public enum PojoIndexingOperation {
 		}
 
 		@Override
+		void addTo(SearchIndexingPlan indexingPlan, Object providedId, String providedRoutingKey) {
+			indexingPlan.addOrUpdate( IndexedEntity.class, providedId, providedRoutingKey );
+		}
+
+		@Override
 		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey,
 				IndexedEntity entity) {
 			return indexer.addOrUpdate( providedId, providedRoutingKey, entity );
+		}
+
+		@Override
+		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey) {
+			return indexer.addOrUpdate( IndexedEntity.class, providedId, providedRoutingKey );
 		}
 	},
 	DELETE {
@@ -67,27 +87,18 @@ public enum PojoIndexingOperation {
 		}
 
 		@Override
-		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey,
-				IndexedEntity entity) {
-			return indexer.delete( providedId, providedRoutingKey, entity );
-		}
-	},
-	PURGE {
-		@Override
-		void expect(BackendMock.DocumentWorkCallListContext context, String tenantId,
-				String id, String routingKey, String value) {
-			context.delete( b -> addWorkInfo( b, tenantId, id, routingKey ) );
-		}
-
-		@Override
-		void addTo(SearchIndexingPlan indexingPlan, Object providedId, String providedRoutingKey,
-				IndexedEntity entity) {
+		void addTo(SearchIndexingPlan indexingPlan, Object providedId, String providedRoutingKey) {
 			indexingPlan.delete( IndexedEntity.class, providedId, providedRoutingKey );
 		}
 
 		@Override
 		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey,
 				IndexedEntity entity) {
+			return indexer.delete( providedId, providedRoutingKey, entity );
+		}
+
+		@Override
+		CompletionStage<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey) {
 			return indexer.delete( IndexedEntity.class, providedId, providedRoutingKey );
 		}
 	};
@@ -102,12 +113,25 @@ public enum PojoIndexingOperation {
 	abstract void addTo(SearchIndexingPlan indexingPlan, Object providedId, String providedRoutingKey,
 			IndexedEntity entity);
 
+	final void addTo(SearchIndexingPlan indexingPlan, Object providedId) {
+		addTo( indexingPlan, providedId, (String) null );
+	}
+
+	abstract void addTo(SearchIndexingPlan indexingPlan, Object providedId, String providedRoutingKey);
+
 	final CompletionStage<?> execute(SearchIndexer indexer, Object providedId, IndexedEntity entity) {
 		return execute( indexer, providedId, null, entity );
 	}
 
 	abstract CompletionStage<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey,
 			IndexedEntity entity);
+
+	final CompletionStage<?> execute(SearchIndexer indexer, Object providedId) {
+		return execute( indexer, providedId, (String) null );
+	}
+
+	abstract CompletionStage<?> execute(SearchIndexer indexer, Object providedId,
+			String providedRoutingKey);
 
 	static void addWorkInfo(StubDocumentWork.Builder builder, String tenantId,
 			String identifier, String routingKey) {

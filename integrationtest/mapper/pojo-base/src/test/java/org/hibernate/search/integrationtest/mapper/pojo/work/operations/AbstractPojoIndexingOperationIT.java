@@ -7,11 +7,13 @@
 package org.hibernate.search.integrationtest.mapper.pojo.work.operations;
 
 import static org.hibernate.search.integrationtest.mapper.pojo.work.operations.PojoIndexingOperation.ADD;
-import static org.hibernate.search.integrationtest.mapper.pojo.work.operations.PojoIndexingOperation.PURGE;
+import static org.hibernate.search.integrationtest.mapper.pojo.work.operations.PojoIndexingOperation.DELETE;
 import static org.junit.Assume.assumeTrue;
+import static org.mockito.Mockito.when;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -19,6 +21,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.javabean.loading.EntityLoader;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -27,6 +30,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 /**
  * Abstract base for {@link PojoIndexingPlanOperationIT}
@@ -59,6 +67,9 @@ public abstract class AbstractPojoIndexingOperationIT {
 	public final JavaBeanMappingSetupHelper setupHelper =
 			JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+
 	@Parameterized.Parameter(0)
 	public PojoIndexingOperation operation;
 	@Parameterized.Parameter(1)
@@ -71,6 +82,9 @@ public abstract class AbstractPojoIndexingOperationIT {
 	public MyRoutingBinder routingBinder;
 
 	protected SearchMapping mapping;
+
+	@SuppressWarnings("unchecked")
+	protected EntityLoader<IndexedEntity> loaderMock;
 
 	@Before
 	public void setup() {
@@ -91,20 +105,24 @@ public abstract class AbstractPojoIndexingOperationIT {
 		MyRoutingBridge.indexed = true;
 		MyRoutingBridge.previouslyIndexed = true;
 		MyRoutingBridge.previousValues = null;
+
+		loaderMock = Mockito.mock( EntityLoader.class );
 	}
 
 	protected final boolean isAdd() {
 		return ADD.equals( operation );
 	}
 
-	protected final boolean isPurge() {
-		return PURGE.equals( operation );
+	protected final boolean isDelete() {
+		return DELETE.equals( operation );
 	}
 
-	protected final void assumeRoutingBridgeEnabled() {
+	protected abstract boolean isImplicitRoutingEnabled();
+
+	protected final void assumeImplicitRoutingEnabled() {
 		assumeTrue( "This test only makes sense when a routing bridge is configured and "
 				+ "the operation takes the routing bridge into account",
-				routingBinder != null && !isPurge() );
+				isImplicitRoutingEnabled() );
 	}
 
 	protected final SearchSession createSession() {
@@ -112,7 +130,20 @@ public abstract class AbstractPojoIndexingOperationIT {
 				.commitStrategy( commitStrategy )
 				.refreshStrategy( refreshStrategy )
 				.tenantId( tenantId )
+				.loading( o -> o.registerLoader( IndexedEntity.class, loaderMock ) )
 				.build();
+	}
+
+	protected final void expectLoading(Integer ... ids) {
+		List<IndexedEntity> entities = new ArrayList<>();
+		for ( Integer id : ids ) {
+			entities.add( IndexedEntity.of( id ) );
+		}
+		expectLoading( Arrays.asList( ids ), entities );
+	}
+
+	protected final void expectLoading(List<Integer> ids, List<IndexedEntity> entities) {
+		when( loaderMock.load( ids ) ).thenReturn( entities );
 	}
 
 	protected final void expectOperation(CompletableFuture<?> futureFromBackend, int id, String providedRoutingKey, String value) {
@@ -130,8 +161,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 		if ( providedRoutingKey != null ) {
 			expectedRoutingKey = providedRoutingKey;
 		}
-		// We don't apply the routing bridge to purge() operations
-		else if ( routingBinder != null && !isPurge() ) {
+		else if ( isImplicitRoutingEnabled() ) {
 			expectedRoutingKey = MyRoutingBridge.toRoutingKey( tenantId, id, value );
 		}
 		else {

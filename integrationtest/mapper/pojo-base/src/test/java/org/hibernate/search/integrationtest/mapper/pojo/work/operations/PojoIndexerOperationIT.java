@@ -67,8 +67,8 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 
 			expectOperation( futureFromBackend,
 					worksBefore -> {
-						if ( routingBinder != null && !isPurge() && !isAdd() ) {
-							// If a routing bridge is enabled, and for operations other than add and purge,
+						if ( routingBinder != null && !isAdd() ) {
+							// If a routing bridge is enabled, and for operations other than add,
 							// expect a delete for the default route (if different).
 							worksBefore
 									.delete( b -> addWorkInfo( b, tenantId, "42",
@@ -91,7 +91,7 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3108")
 	public void previouslyIndexedWithDifferentRoute() {
-		assumeRoutingBridgeEnabled();
+		assumeImplicitRoutingEnabled();
 
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
@@ -124,7 +124,7 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3108")
 	public void previouslyIndexedWithMultipleRoutes() {
-		assumeRoutingBridgeEnabled();
+		assumeImplicitRoutingEnabled();
 
 		CompletableFuture<?> futureFromBackend = new CompletableFuture<>();
 		try ( SearchSession session = createSession() ) {
@@ -162,7 +162,7 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3108")
 	public void notIndexed_notPreviouslyIndexed() {
-		assumeRoutingBridgeEnabled();
+		assumeImplicitRoutingEnabled();
 
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();
@@ -179,7 +179,7 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3108")
 	public void notIndexed_previouslyIndexedWithDifferentRoute() {
-		assumeRoutingBridgeEnabled();
+		assumeImplicitRoutingEnabled();
 
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();
@@ -203,7 +203,7 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3108")
 	public void notIndexed_previouslyIndexedWithMultipleRoutes() {
-		assumeRoutingBridgeEnabled();
+		assumeImplicitRoutingEnabled();
 
 		try ( SearchSession session = createSession() ) {
 			SearchIndexer indexer = session.indexer();
@@ -267,4 +267,8 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 		}
 	}
 
+	@Override
+	protected boolean isImplicitRoutingEnabled() {
+		return routingBinder != null;
+	}
 }

@@ -68,6 +68,23 @@ public interface SearchIndexer {
 	CompletionStage<?> add(Object providedId, String providedRoutingKey, Object entity);
 
 	/**
+	 * Add an entity to the index, assuming that the entity is absent from the index.
+	 * <p>
+	 * Entities to reindex as a result of this operation will not be resolved.
+	 * <p>
+	 * <strong>Note:</strong> depending on the backend, this may lead to errors or duplicate entries in the index
+	 * if the entity was actually already present in the index before this call.
+	 *
+	 * @param entityClass The class of the entity to add to the index.
+	 * @param providedId A value to extract the document ID from.
+	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
+	 * @param providedRoutingKey The routing key to route the add request to the appropriate index shard.
+	 * Leave {@code null} if sharding is disabled or if you don't use a custom {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
+	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
+	 */
+	CompletionStage<?> add(Class<?> entityClass, Object providedId, String providedRoutingKey);
+
+	/**
 	 * Update an entity in the index, or add it if it's absent from the index.
 	 * <p>
 	 * Entities to reindex as a result of this operation will not be resolved.
@@ -113,6 +130,20 @@ public interface SearchIndexer {
 	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 */
 	CompletionStage<?> addOrUpdate(Object providedId, String providedRoutingKey, Object entity);
+
+	/**
+	 * Update an entity in the index, or add it if it's absent from the index.
+	 * <p>
+	 * Entities to reindex as a result of this operation will not be resolved.
+	 *
+	 * @param entityClass The class of the entity to update in the index.
+	 * @param providedId A value to extract the document ID from.
+	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
+	 * @param providedRoutingKey The routing key to route the addOrUpdate request to the appropriate index shard.
+	 * Leave {@code null} if sharding is disabled or if you don't use a custom {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
+	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
+	 */
+	CompletionStage<?> addOrUpdate(Class<?> entityClass, Object providedId, String providedRoutingKey);
 
 	/**
 	 * Delete an entity from the index.

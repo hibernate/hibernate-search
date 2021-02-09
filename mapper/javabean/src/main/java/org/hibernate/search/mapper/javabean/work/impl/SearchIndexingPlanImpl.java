@@ -40,6 +40,11 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	}
 
 	@Override
+	public void add(Class<?> entityClass, Object providedId, String providedRoutingKey) {
+		delegate.add( getTypeIdentifier( entityClass ), providedId, providedRoutingKey, null );
+	}
+
+	@Override
 	public void addOrUpdate(Object entity) {
 		addOrUpdate( null, null, entity );
 	}
@@ -60,6 +65,12 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 		SearchIndexingPlanTypeContext typeContext = typeContextProvider.forExactType( typeIdentifier );
 		BitSet dirtyPaths = typeContext == null ? null : typeContext.dirtyFilter().filter( dirtyPathsAsStrings );
 		delegate.addOrUpdate( typeIdentifier, providedId, providedRoutingKey, entity, dirtyPaths );
+	}
+
+	@Override
+	public void addOrUpdate(Class<?> entityClass, Object providedId, String providedRoutingKey) {
+		PojoRawTypeIdentifier<?> typeIdentifier = getTypeIdentifier( entityClass );
+		delegate.addOrUpdate( typeIdentifier, providedId, providedRoutingKey, null );
 	}
 
 	@Override
