@@ -93,8 +93,8 @@ public class IndexingFieldTypesIT<F> {
 		for ( int i = 0; i < values.size(); i++ ) {
 			SearchQuery<IdAndValue<F>> query = scope.query()
 					.select( f -> f.composite(
-							(ref, val) -> new IdAndValue<>( ref.id(), val ),
-							f.entityReference(),
+							(id, val) -> new IdAndValue<>( id, val ),
+							f.id( String.class ),
 							f.field( absoluteFieldPath, typeDescriptor.getJavaType() )
 					) )
 					.where( f -> f.matchAll() )

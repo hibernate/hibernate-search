@@ -120,20 +120,23 @@ public class SearchProjectionIT {
 				scope.projection().entityReference().toProjection();
 		SearchProjection<DocumentReference> objectProjection =
 				scope.projection().entity().toProjection();
+		SearchProjection<Object> idProjection =
+				scope.projection().id().toProjection();
 
 		query = scope.query()
 				.select(
 						documentReferenceProjection,
 						entityReferenceProjection,
-						objectProjection
+						objectProjection,
+						idProjection
 				)
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThatQuery( query ).hasListHitsAnyOrder( b -> {
-			b.list( document1Reference, document1Reference, document1Reference );
-			b.list( document2Reference, document2Reference, document2Reference );
-			b.list( document3Reference, document3Reference, document3Reference );
-			b.list( emptyReference, emptyReference, emptyReference );
+			b.list( document1Reference, document1Reference, document1Reference, DOCUMENT_1 );
+			b.list( document2Reference, document2Reference, document2Reference, DOCUMENT_2 );
+			b.list( document3Reference, document3Reference, document3Reference, DOCUMENT_3 );
+			b.list( emptyReference, emptyReference, emptyReference, EMPTY );
 		} );
 	}
 
