@@ -6,18 +6,23 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.impl.Closer;
 
 
 public class PropertyIdentifierMapping<I, E> implements IdentifierMappingImplementor<I, E> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoCaster<? super I> caster;
 	private final ValueReadHandle<I> property;
@@ -48,16 +53,14 @@ public class PropertyIdentifierMapping<I, E> implements IdentifierMappingImpleme
 
 	@Override
 	@SuppressWarnings( "unchecked" ) // We can only cast to the raw type, if I is generic we need an unchecked cast
-	public I getIdentifier(Object providedId) {
-		return (I) caster.cast( providedId );
-	}
-
-	@Override
-	public I getIdentifier(Object providedId, Supplier<? extends E> entitySupplier) {
+	public I getIdentifier(Object providedId, Supplier<? extends E> entitySupplierOrNull) {
 		if ( providedId != null ) {
-			return getIdentifier( providedId );
+			return (I) caster.cast( providedId );
 		}
-		return property.get( entitySupplier.get() );
+		if ( entitySupplierOrNull == null ) {
+			throw log.nullProvidedIdentifierAndEntity();
+		}
+		return property.get( entitySupplierOrNull.get() );
 	}
 
 	@Override

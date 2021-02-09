@@ -139,6 +139,6 @@ public interface SearchIndexingPlan {
 	 * @throws org.hibernate.search.util.common.SearchException If the entity type is not indexed directly
 	 * ({@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed}).
 	 */
-	void purge(Class<?> entityClass, Object providedId, String providedRoutingKey);
+	void delete(Class<?> entityClass, Object providedId, String providedRoutingKey);
 
 }

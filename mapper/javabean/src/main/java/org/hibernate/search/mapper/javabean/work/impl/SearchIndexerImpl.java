@@ -50,8 +50,8 @@ public class SearchIndexerImpl implements SearchIndexer {
 	}
 
 	@Override
-	public CompletionStage<?> purge(Class<?> entityClass, Object providedId, String providedRoutingKey) {
-		return delegate.purge( getTypeIdentifier( entityClass ), providedId, providedRoutingKey,
+	public CompletionStage<?> delete(Class<?> entityClass, Object providedId, String providedRoutingKey) {
+		return delegate.delete( getTypeIdentifier( entityClass ), providedId, providedRoutingKey,
 				commitStrategy, refreshStrategy );
 	}
 

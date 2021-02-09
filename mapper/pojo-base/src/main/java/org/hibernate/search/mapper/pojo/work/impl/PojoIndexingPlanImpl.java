@@ -82,12 +82,6 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 	}
 
 	@Override
-	public void purge(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey) {
-		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegate( typeIdentifier );
-		delegate.purge( providedId, providedRoutingKey );
-	}
-
-	@Override
 	public void process() {
 		if ( isProcessing ) {
 			throw log.recursiveIndexingPlanProcess();

@@ -73,8 +73,8 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	}
 
 	@Override
-	public void purge(Class<?> entityClass, Object providedId, String providedRoutingKey) {
-		delegate.purge( getTypeIdentifier( entityClass ), providedId, providedRoutingKey );
+	public void delete(Class<?> entityClass, Object providedId, String providedRoutingKey) {
+		delegate.delete( getTypeIdentifier( entityClass ), providedId, providedRoutingKey, null );
 	}
 
 	public CompletableFuture<?> execute() {

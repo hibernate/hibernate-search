@@ -88,31 +88,24 @@ public interface PojoIndexingPlan<R> {
 	/**
 	 * Delete an entity from the index.
 	 * <p>
+	 * Entities to reindex as a result of this operation will not be resolved.
+	 * <p>
 	 * No effect on the index if the entity is not in the index.
 	 *
 	 * @param typeIdentifier The identifier of the entity type.
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
-	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
+	 * If the provided ID is {@code null},
+	 * Hibernate Search will attempt to extract the ID from the entity (which must be non-{@code null} in that case).
 	 * @param providedRoutingKey The routing key to route the delete request to the appropriate index shard.
-	 * Leave {@code null} if sharding is disabled
-	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
-	 * @param entity The entity to delete from the index.
+	 * Leave {@code null} if sharding is disabled,
+	 * or if you don't use a custom {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge},
+	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}
+	 * (requires a non-null {@code entity}).
+	 * @param entity The entity to delete from the index. May be {@code null} if {@code providedId} is non-{@code null}.
+	 * @throws IllegalArgumentException If both {@code providedId} and {@code entity} are {@code null}.
 	 */
 	void delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity);
-
-	/**
-	 * Purge an entity from the index.
-	 * <p>
-	 * Entities to reindex as a result of this operation will not be resolved.
-	 * <p>
-	 * No effect on the index if the entity is not in the index.
-	 * @param typeIdentifier The identifier of the entity type.
-	 * @param providedId A value to extract the document ID from.
-	 * @param providedRoutingKey The routing key to route the purge request to the appropriate index shard.
-	 * Leave {@code null} if sharding is disabled or if you don't use a custom {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
-	 */
-	void purge(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey);
 
 	/**
 	 * Extract all data from objects passed to the indexing plan so far,

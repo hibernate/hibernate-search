@@ -101,7 +101,7 @@ public interface PojoIndexer {
 	 * @param refreshStrategy How to handle the refresh.
 	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
 	 */
-	CompletableFuture<?> purge(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey,
+	CompletableFuture<?> delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 }

@@ -178,26 +178,6 @@ public class SearchIndexingPlanBaseIT {
 	}
 
 	@Test
-	public void purgeByEntityClass_invalidClass_contained() {
-		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyName.NONE );
-
-		Class<?> invalidClass = ContainedEntity.class;
-
-		withinTransaction( sessionFactory, session -> {
-			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
-			assertThatThrownBy(
-					() -> indexingPlan.purge( invalidClass, 42, null )
-			)
-					.isInstanceOf( SearchException.class )
-					.hasMessageContainingAll(
-							"Unable to purge entity of type '" + ContainedEntity.class.getName()
-									+ "' with identifier '42': "
-									+ " this type is contained in an indexed type but is not itself indexed."
-					);
-		} );
-	}
-
-	@Test
 	public void purgeByEntityName() {
 		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyName.NONE );
 

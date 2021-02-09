@@ -64,7 +64,7 @@ public class PojoIndexingPlanBaseIT {
 			session.indexingPlan().add( entity1 );
 			session.indexingPlan().addOrUpdate( entity2 );
 			session.indexingPlan().delete( entity3 );
-			session.indexingPlan().purge( IndexedEntity.class, 4, null );
+			session.indexingPlan().delete( IndexedEntity.class, 4, null );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( b -> b

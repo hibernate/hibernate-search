@@ -21,8 +21,6 @@ public interface IdentifierMappingImplementor<I, E> extends IdentifierMapping, A
 	default void close() {
 	}
 
-	I getIdentifier(Object providedId);
-
 	I getIdentifier(Object providedId, Supplier<? extends E> entitySupplier);
 
 	String toDocumentIdentifier(I identifier, BridgeMappingContext context);

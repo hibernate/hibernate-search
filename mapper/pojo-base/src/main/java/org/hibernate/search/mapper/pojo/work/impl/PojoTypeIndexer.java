@@ -110,9 +110,9 @@ public class PojoTypeIndexer<I, E> {
 				(deletePreviousResult, deleteResult) -> deleteResult );
 	}
 
-	CompletableFuture<?> purge(Object providedId, String providedRoutingKey,
+	CompletableFuture<?> delete(Object providedId, String providedRoutingKey,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		I identifier = typeContext.identifierMapping().getIdentifier( providedId );
+		I identifier = typeContext.identifierMapping().getIdentifier( providedId, null );
 		String documentIdentifier = typeContext.toDocumentIdentifier( sessionContext, identifier );
 		DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
 				providedRoutingKey, identifier );
