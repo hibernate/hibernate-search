@@ -57,15 +57,9 @@ public class PojoIndexingPlanBaseIT {
 	@Test
 	public void success() {
 		try ( SearchSession session = mapping.createSession() ) {
-			IndexedEntity entity1 = new IndexedEntity();
-			entity1.id = 1;
-			entity1.value = "val1";
-			IndexedEntity entity2 = new IndexedEntity();
-			entity2.id = 2;
-			entity2.value = "val2";
-			IndexedEntity entity3 = new IndexedEntity();
-			entity3.id = 3;
-			entity3.value = "val3";
+			IndexedEntity entity1 = new IndexedEntity( 1 );
+			IndexedEntity entity2 = new IndexedEntity( 2 );
+			IndexedEntity entity3 = new IndexedEntity( 3 );
 
 			session.indexingPlan().add( entity1 );
 			session.indexingPlan().addOrUpdate( entity2 );
@@ -93,6 +87,83 @@ public class PojoIndexingPlanBaseIT {
 		}
 	}
 
+	/**
+	 * Test the state inside indexing plans.
+	 */
+	@Test
+	public void state() {
+		try ( SearchSession session = mapping.createSession() ) {
+			IndexedEntity entity;
+
+			BackendMock.DocumentWorkCallListContext expectations = backendMock.expectWorks( IndexedEntity.INDEX );
+
+			// add then add
+			entity = new IndexedEntity( 1 );
+			session.indexingPlan().add( entity );
+			session.indexingPlan().add( entity );
+			expectations.add( "1", b -> b.field( "value", "val1" ) );
+
+			// add then delete
+			entity = new IndexedEntity( 2 );
+			session.indexingPlan().add( entity );
+			session.indexingPlan().delete( entity );
+			// No work expected
+
+			// add then update
+			entity = new IndexedEntity( 3 );
+			session.indexingPlan().add( entity );
+			session.indexingPlan().addOrUpdate( entity );
+			expectations.add( "3", b -> b.field( "value", "val3" ) );
+
+			// add then update then delete
+			entity = new IndexedEntity( 4 );
+			session.indexingPlan().add( entity );
+			session.indexingPlan().addOrUpdate( entity );
+			session.indexingPlan().delete( entity );
+			// No work expected
+
+			// update then update
+			entity = new IndexedEntity( 5 );
+			session.indexingPlan().addOrUpdate( entity );
+			session.indexingPlan().addOrUpdate( entity );
+			expectations.addOrUpdate( "5", b -> b.field( "value", "val5" ) );
+
+			// update then delete
+			entity = new IndexedEntity( 6 );
+			session.indexingPlan().addOrUpdate( entity );
+			session.indexingPlan().delete( entity );
+			expectations.delete( "6" );
+
+			// update then delete then add
+			entity = new IndexedEntity( 7 );
+			session.indexingPlan().addOrUpdate( entity );
+			session.indexingPlan().delete( entity );
+			session.indexingPlan().add( entity );
+			expectations.addOrUpdate( "7", b -> b.field( "value", "val7" ) );
+
+			// delete then delete
+			entity = new IndexedEntity( 8 );
+			session.indexingPlan().delete( entity );
+			session.indexingPlan().delete( entity );
+			expectations.delete( "8" );
+
+			// delete then add
+			entity = new IndexedEntity( 9 );
+			session.indexingPlan().delete( entity );
+			session.indexingPlan().add( entity );
+			expectations.addOrUpdate( "9", b -> b.field( "value", "val9" ) );
+
+			// delete then add then update
+			entity = new IndexedEntity( 10 );
+			session.indexingPlan().delete( entity );
+			session.indexingPlan().add( entity );
+			session.indexingPlan().addOrUpdate( entity );
+			expectations.addOrUpdate( "10", b -> b.field( "value", "val10" ) );
+
+			expectations.processedThenExecuted();
+		}
+	}
+
 	@Test
 	public void failure() {
 		RuntimeException simulatedFailure = new RuntimeException( "Indexing failure" );
@@ -101,9 +172,7 @@ public class PojoIndexingPlanBaseIT {
 				CompletableFuture<?> failingFuture = new CompletableFuture<>();
 				failingFuture.completeExceptionally( simulatedFailure );
 
-				IndexedEntity entity1 = new IndexedEntity();
-				entity1.id = 1;
-				entity1.value = "val1";
+				IndexedEntity entity1 = new IndexedEntity( 1 );
 
 				session.indexingPlan().add( entity1 );
 
@@ -131,6 +200,11 @@ public class PojoIndexingPlanBaseIT {
 
 		@GenericField
 		private String value;
+
+		public IndexedEntity(int id) {
+			this.id = id;
+			this.value = "val" + id;
+		}
 
 	}
 }
