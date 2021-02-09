@@ -7,8 +7,13 @@
 package org.hibernate.search.mapper.javabean.loading.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.search.mapper.javabean.loading.EntityLoader;
+import org.hibernate.search.mapper.javabean.loading.LoadingOptions;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
@@ -20,7 +25,10 @@ public final class JavaBeanSearchLoadingContext implements PojoLoadingContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private JavaBeanSearchLoadingContext() {
+	private final Map<PojoRawTypeIdentifier<?>, PojoLoader<?>> loaderByType;
+
+	private JavaBeanSearchLoadingContext(Builder builder) {
+		this.loaderByType = builder.loaderByType == null ? Collections.emptyMap() : builder.loaderByType;
 	}
 
 	@Override
@@ -35,22 +43,45 @@ public final class JavaBeanSearchLoadingContext implements PojoLoadingContext {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public <T> PojoLoader<T> createLoader(Set<PojoRawTypeIdentifier<? extends T>> expectedTypes) {
-		throw log.entityLoadingNotSupported();
+		PojoRawTypeIdentifier<? extends T> type = expectedTypes.iterator().next();
+		PojoLoader<T> loader = (PojoLoader<T>) loaderByType.get( type );
+		if ( loader == null ) {
+			throw log.entityLoaderNotRegistered( type );
+		}
+		return loader;
 	}
 
-	public static final class Builder implements PojoLoadingContextBuilder<Void> {
-		public Builder() {
+	public static final class Builder implements PojoLoadingContextBuilder<LoadingOptions>, LoadingOptions {
+		private final LoadingTypeContextProvider typeContextProvider;
+		private Map<PojoRawTypeIdentifier<?>, PojoLoader<?>> loaderByType;
+
+		public Builder(LoadingTypeContextProvider typeContextProvider) {
+			this.typeContextProvider = typeContextProvider;
 		}
 
 		@Override
-		public Void toAPI() {
-			throw log.entityLoadingNotSupported();
+		public LoadingOptions toAPI() {
+			return this;
+		}
+
+		@Override
+		public <T> LoadingOptions registerLoader(Class<T> type, EntityLoader<T> loader) {
+			LoadingTypeContext<T> typeContext = typeContextProvider.indexedForExactClass( type );
+			if ( typeContext == null ) {
+				throw log.notIndexedEntityType( type );
+			}
+			if ( loaderByType == null ) {
+				loaderByType = new LinkedHashMap<>();
+			}
+			loaderByType.put( typeContext.typeIdentifier(), new JavaBeanLoader<>( loader ) );
+			return this;
 		}
 
 		@Override
 		public PojoLoadingContext build() {
-			return new JavaBeanSearchLoadingContext();
+			return new JavaBeanSearchLoadingContext( this );
 		}
 	}
 }

@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.javabean.log.impl;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
@@ -45,8 +46,8 @@ public interface Log extends BasicLogger {
 	SearchException namedTypesNotSupported(String name);
 
 	@Message(id = ID_OFFSET + 8,
-			value = "Unable to set up entity loading: the JavaBean mapper does not support entity loading.")
-	SearchException entityLoadingNotSupported();
+			value = "Unable to set up entity loading for type '%s', because no entity loader was registered for this type.")
+	SearchException entityLoaderNotRegistered(PojoRawTypeIdentifier<?> typeIdentifier);
 
 	@Message(id = ID_OFFSET + 9, value = "Type '%1$s' is not an entity type, or this entity type is not indexed.")
 	SearchException notIndexedEntityType(@FormatWith(ClassFormatter.class) Class<?> type);

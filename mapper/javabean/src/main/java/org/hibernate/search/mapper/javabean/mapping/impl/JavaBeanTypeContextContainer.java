@@ -12,11 +12,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.mapper.javabean.loading.impl.LoadingTypeContextProvider;
 import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
-class JavaBeanTypeContextContainer implements JavaBeanSearchSessionTypeContextProvider {
+class JavaBeanTypeContextContainer implements JavaBeanSearchSessionTypeContextProvider, LoadingTypeContextProvider {
 
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<PojoRawTypeIdentifier<?>, JavaBeanIndexedTypeContext<?>> indexedTypeContexts = new LinkedHashMap<>();
@@ -49,6 +50,7 @@ class JavaBeanTypeContextContainer implements JavaBeanSearchSessionTypeContextPr
 		return (AbstractJavaBeanTypeContext<E>) typeContexts.get( typeIdentifier );
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public <E> JavaBeanIndexedTypeContext<E> indexedForExactClass(Class<E> clazz) {
 		return (JavaBeanIndexedTypeContext<E>) indexedTypeContextsByClass.get( clazz );
