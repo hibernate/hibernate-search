@@ -97,7 +97,7 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 
 	@Override
 	public P transform(LoadingResult<?, ?> loadingResult, E extractedData, SearchProjectionTransformContext context) {
-		FromDocumentFieldValueConvertContext convertContext = context.getFromDocumentFieldValueConvertContext();
+		FromDocumentFieldValueConvertContext convertContext = context.fromDocumentFieldValueConvertContext();
 		return accumulator.finish( extractedData, converter, convertContext );
 	}
 
