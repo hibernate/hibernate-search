@@ -55,10 +55,10 @@ public class PojoIndexerImpl implements PojoIndexer {
 	}
 
 	@Override
-	public CompletableFuture<?> purge(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+	public CompletableFuture<?> delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
 			String providedRoutingKey,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		return getDelegate( typeIdentifier ).purge( providedId, providedRoutingKey, commitStrategy, refreshStrategy );
+		return getDelegate( typeIdentifier ).delete( providedId, providedRoutingKey, commitStrategy, refreshStrategy );
 	}
 
 	private PojoTypeIndexer<?, ?> getDelegate(PojoRawTypeIdentifier<?> typeIdentifier) {

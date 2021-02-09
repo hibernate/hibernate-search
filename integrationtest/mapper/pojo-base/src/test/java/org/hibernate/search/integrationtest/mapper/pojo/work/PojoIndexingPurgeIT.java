@@ -27,31 +27,31 @@ public class PojoIndexingPurgeIT extends AbstractPojoIndexingOperationIT {
 
 	@Override
 	protected void addTo(SearchIndexingPlan indexingPlan, int id) {
-		indexingPlan.purge( IndexedEntity.class, id, null );
+		indexingPlan.delete( IndexedEntity.class, id, null );
 	}
 
 	@Override
 	protected void addTo(SearchIndexingPlan indexingPlan, Object providedId, int id) {
-		indexingPlan.purge( IndexedEntity.class, providedId, null );
+		indexingPlan.delete( IndexedEntity.class, providedId, null );
 	}
 
 	@Override
 	protected void addTo(SearchIndexingPlan indexingPlan, Object providedId, String providedRoutingKey, int id) {
-		indexingPlan.purge( IndexedEntity.class, providedId, providedRoutingKey );
+		indexingPlan.delete( IndexedEntity.class, providedId, providedRoutingKey );
 	}
 
 	@Override
 	protected CompletionStage<?> execute(SearchIndexer indexer, int id) {
-		return indexer.purge( IndexedEntity.class, id, null );
+		return indexer.delete( IndexedEntity.class, id, null );
 	}
 
 	@Override
 	protected CompletionStage<?> execute(SearchIndexer indexer, Object providedId, int id) {
-		return indexer.purge( IndexedEntity.class, providedId, null );
+		return indexer.delete( IndexedEntity.class, providedId, null );
 	}
 
 	@Override
 	protected CompletionStage<?> execute(SearchIndexer indexer, Object providedId, String providedRoutingKey, int id) {
-		return indexer.purge( IndexedEntity.class, providedId, providedRoutingKey );
+		return indexer.delete( IndexedEntity.class, providedId, providedRoutingKey );
 	}
 }

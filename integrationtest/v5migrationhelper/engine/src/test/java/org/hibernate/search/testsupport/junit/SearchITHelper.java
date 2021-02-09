@@ -204,7 +204,7 @@ public class SearchITHelper {
 				case INDEX:
 					return indexer.addOrUpdate( w.providedId, w.entity );
 				case DELETE:
-					return indexer.purge( w.entityType, w.providedId, null );
+					return indexer.delete( w.entityType, w.providedId, null );
 				default:
 					throw new AssertionFailure( "Unexpected work type: " + w.workType );
 			}

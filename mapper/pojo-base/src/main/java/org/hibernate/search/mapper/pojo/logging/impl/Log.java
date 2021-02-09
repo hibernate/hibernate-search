@@ -381,12 +381,6 @@ public interface Log extends BasicLogger {
 	SearchException cannotResolveContainerExtractorName(String extractorName,
 			@FormatWith(ClassFormatter.class) Class<?> builtinExtractorConstantsClass);
 
-	@Message(id = ID_OFFSET + 55,
-			value = "Unable to purge entity of type '%1$s' with identifier '%2$s': "
-					+ " this type is contained in an indexed type but is not itself indexed."
-	)
-	SearchException cannotPurgeNonIndexedContainedType(PojoRawTypeIdentifier<?> type, Object providedId);
-
 	@Message(id = ID_OFFSET + 58,
 			value = "Incorrect binder implementation: binder '%1$s' did not call context.bridge(...).")
 	SearchException missingBridgeForBinder(Object binder);
@@ -551,5 +545,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 86,
 			value = "Unexpected entity name for entity loading: '%1$s'. Expected one of %2$s.")
 	SearchException unexpectedEntityNameForEntityLoading(String entityName, Collection<String> expectedNames);
+
+	@Message(id = ID_OFFSET + 87, value = "Invalid indexing request:"
+			+ " if the entity is null, the identifier must be provided explicitly." )
+	SearchException nullProvidedIdentifierAndEntity();
 
 }

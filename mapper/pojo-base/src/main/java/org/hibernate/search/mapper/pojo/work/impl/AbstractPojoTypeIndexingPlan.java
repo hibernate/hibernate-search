@@ -51,12 +51,10 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 	}
 
 	void delete(Object providedId, String providedRoutingKey, Object entity) {
-		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
+		Supplier<E> entitySupplier = entity == null ? null : typeContext().toEntitySupplier( sessionContext, entity );
 		I identifier = toIdentifier( providedId, entitySupplier );
 		getState( identifier ).delete( entitySupplier, providedRoutingKey );
 	}
-
-	abstract void purge(Object providedId, String providedRoutingKey);
 
 	void resolveDirty(PojoReindexingCollector containingEntityCollector) {
 		for ( S state : statesPerId.values() ) {

@@ -49,16 +49,11 @@ public class ProvidedIdentifierMapping implements IdentifierMappingImplementor<O
 	}
 
 	@Override
-	public Object getIdentifier(Object providedId) {
+	public Object getIdentifier(Object providedId, Supplier<?> entityProvider) {
 		if ( providedId == null ) {
 			throw log.nullProvidedIdentifier();
 		}
 		return providedId;
-	}
-
-	@Override
-	public Object getIdentifier(Object providedId, Supplier<?> entityProvider) {
-		return getIdentifier( providedId );
 	}
 
 	@Override

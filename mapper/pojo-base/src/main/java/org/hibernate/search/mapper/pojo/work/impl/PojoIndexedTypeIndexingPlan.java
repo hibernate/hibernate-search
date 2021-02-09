@@ -37,12 +37,6 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 		this.delegate = delegate;
 	}
 
-	@Override
-	void purge(Object providedId, String providedRoutingKey) {
-		I identifier = typeContext.identifierMapping().getIdentifier( providedId );
-		getState( identifier ).purge( providedRoutingKey );
-	}
-
 	void updateBecauseOfContained(Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.identifierMapping().getIdentifier( null, entitySupplier );
@@ -148,12 +142,6 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 
 			// Reindexing does not make sense for a deleted entity
 			updatedBecauseOfContained = false;
-		}
-
-		void purge(String providedRoutingKey) {
-			// This is a purge: assume the document exists in order to force deletion.
-			this.initialStatus = EntityStatus.PRESENT;
-			delete( null, providedRoutingKey );
 		}
 
 		void sendCommandsToDelegate() {

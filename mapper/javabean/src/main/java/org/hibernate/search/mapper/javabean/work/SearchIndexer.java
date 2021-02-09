@@ -176,6 +176,6 @@ public interface SearchIndexer {
 	 * Leave {@code null} if sharding is disabled or if you don't use a custom {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
 	 * @return A {@link CompletionStage} reflecting the completion state of the operation.
 	 */
-	CompletionStage<?> purge(Class<?> entityClass, Object providedId, String providedRoutingKey);
+	CompletionStage<?> delete(Class<?> entityClass, Object providedId, String providedRoutingKey);
 
 }
