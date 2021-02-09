@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.integrationtest.mapper.pojo.work.operations.PojoIndexingPlanOperationIT;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
@@ -34,7 +35,7 @@ import org.junit.Test;
  * Test common use cases of (custom) routing bridges.
  * <p>
  * Does not test the effect of routing in depth for all operations; this is tested in
- * {@link org.hibernate.search.integrationtest.mapper.pojo.work.AbstractPojoIndexingOperationIT}.
+ * {@link PojoIndexingPlanOperationIT}.
  */
 @SuppressWarnings("unused")
 @TestForIssue(jiraKey = "HSEARCH-3108")
