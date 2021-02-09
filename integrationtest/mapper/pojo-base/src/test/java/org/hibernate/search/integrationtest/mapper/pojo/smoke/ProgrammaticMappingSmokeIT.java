@@ -506,16 +506,16 @@ public class ProgrammaticMappingSmokeIT {
 							2L,
 							Arrays.asList(
 									"text1",
-									reference( AnnotationMappingSmokeIT.IndexedEntity.INDEX, "0" ),
+									reference( IndexedEntity.INDEX, "0" ),
 									LocalDate.of( 2017, 11, 1 ),
-									reference( AnnotationMappingSmokeIT.IndexedEntity.INDEX, "0" ),
+									reference( IndexedEntity.INDEX, "0" ),
 									"text2"
 							),
 							Arrays.asList(
 									null,
-									reference( AnnotationMappingSmokeIT.YetAnotherIndexedEntity.INDEX, "1" ),
+									reference( YetAnotherIndexedEntity.INDEX, "1" ),
 									LocalDate.of( 2017, 11, 2 ),
-									reference( AnnotationMappingSmokeIT.YetAnotherIndexedEntity.INDEX, "1" ),
+									reference( YetAnotherIndexedEntity.INDEX, "1" ),
 									null
 							)
 					)
