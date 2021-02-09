@@ -550,4 +550,8 @@ public interface Log extends BasicLogger {
 			+ " if the entity is null, the identifier must be provided explicitly." )
 	SearchException nullProvidedIdentifierAndEntity();
 
+	@Message(id = ID_OFFSET + 88, value = "Invalid indexing request:"
+			+ " the add and update operations require a non-null entity." )
+	SearchException nullEntityForIndexerAddOrUpdate();
+
 }

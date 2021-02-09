@@ -36,20 +36,27 @@ public class PojoIndexerImpl implements PojoIndexer {
 	}
 
 	@Override
-	public CompletableFuture<?> add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity,
-			DocumentCommitStrategy commitStrategy,
-			DocumentRefreshStrategy refreshStrategy) {
+	public CompletableFuture<?> add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey,
+			Object entity, DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		if ( entity == null ) {
+			throw log.nullEntityForIndexerAddOrUpdate();
+		}
 		return getDelegate( typeIdentifier ).add( providedId, providedRoutingKey, entity, commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public CompletableFuture<?> addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity,
+	public CompletableFuture<?> addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			String providedRoutingKey, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		if ( entity == null ) {
+			throw log.nullEntityForIndexerAddOrUpdate();
+		}
 		return getDelegate( typeIdentifier ).addOrUpdate( providedId, providedRoutingKey, entity, commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public CompletableFuture<?> delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity,
+	public CompletableFuture<?> delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
+			String providedRoutingKey, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return getDelegate( typeIdentifier ).delete( providedId, providedRoutingKey, entity, commitStrategy, refreshStrategy );
 	}
