@@ -13,6 +13,7 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
  */
 public interface PojoWorkContainedTypeContext<E> extends PojoWorkTypeContext<E> {
 
-	PojoContainedTypeIndexingPlan<E> createIndexingPlan(PojoWorkSessionContext<?> sessionContext);
+	PojoContainedTypeIndexingPlan<E> createIndexingPlan(PojoWorkSessionContext<?> sessionContext,
+			PojoIndexingPlanImpl<?> root);
 
 }
