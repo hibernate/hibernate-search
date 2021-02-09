@@ -67,8 +67,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	@Override
 	public <I> IdProjectionBuilder<I> id(Class<I> identifierType) {
-		// TODO HSEARCH-4142 Support from this backend
-		return null;
+		return new LuceneIdProjection.Builder<>( searchContext, identifierType );
 	}
 
 	@Override

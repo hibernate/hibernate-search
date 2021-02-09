@@ -17,6 +17,7 @@ import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchPr
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionTransformContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContextImpl;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -37,7 +38,8 @@ import org.apache.lucene.search.TopDocs;
  * @param <H> The type of hits in the search result.
  */
 public class LuceneLoadableSearchResult<H> {
-	private final FromDocumentFieldValueConvertContext convertContext;
+	private final FromDocumentFieldValueConvertContext fieldConvertContext;
+	private final FromDocumentIdentifierValueConvertContextImpl identifierConvertContext;
 	private final LuceneSearchProjection<?, H> rootProjection;
 
 	private final SearchResultTotal resultTotal;
@@ -50,13 +52,15 @@ public class LuceneLoadableSearchResult<H> {
 	private final Boolean timedOut;
 	private final TimeoutManager timeoutManager;
 
-	LuceneLoadableSearchResult(FromDocumentFieldValueConvertContext convertContext,
+	LuceneLoadableSearchResult(FromDocumentFieldValueConvertContext fieldConvertContext,
+			FromDocumentIdentifierValueConvertContextImpl identifierConvertContext,
 			LuceneSearchProjection<?, H> rootProjection,
 			SearchResultTotal resultTotal, TopDocs topDocs, List<Object> extractedData,
 			Map<AggregationKey<?>, ?> extractedAggregations,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
 			Duration took, boolean timedOut, TimeoutManager timeoutManager) {
-		this.convertContext = convertContext;
+		this.fieldConvertContext = fieldConvertContext;
+		this.identifierConvertContext = identifierConvertContext;
 		this.rootProjection = rootProjection;
 		this.resultTotal = resultTotal;
 		this.topDocs = topDocs;
@@ -69,7 +73,8 @@ public class LuceneLoadableSearchResult<H> {
 	}
 
 	LuceneSearchResult<H> loadBlocking() {
-		SearchProjectionTransformContext transformContext = new SearchProjectionTransformContext( convertContext );
+		SearchProjectionTransformContext transformContext = new SearchProjectionTransformContext(
+				fieldConvertContext, identifierConvertContext );
 		LoadingResult<?, ?> loadingResult = projectionHitMapper.loadBlocking( timeoutManager.hardDeadlineOrNull() );
 
 		int readIndex = 0;

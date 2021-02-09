@@ -7,19 +7,28 @@
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContextImpl;
 
 public class SearchProjectionTransformContext {
 
 	private final FromDocumentFieldValueConvertContext fromDocumentFieldValueConvertContext;
+	private final FromDocumentIdentifierValueConvertContextImpl fromDocumentIdentifierValueConvertContext;
 
 	private boolean hasFailedLoad = false;
 
-	public SearchProjectionTransformContext(FromDocumentFieldValueConvertContext convertContext) {
-		this.fromDocumentFieldValueConvertContext = convertContext;
+	public SearchProjectionTransformContext(FromDocumentFieldValueConvertContext fieldConvertContext,
+			FromDocumentIdentifierValueConvertContextImpl identifierConvertContext) {
+		this.fromDocumentFieldValueConvertContext = fieldConvertContext;
+		this.fromDocumentIdentifierValueConvertContext = identifierConvertContext;
 	}
 
-	FromDocumentFieldValueConvertContext getFromDocumentFieldValueConvertContext() {
+	FromDocumentFieldValueConvertContext fromDocumentFieldValueConvertContext() {
 		return fromDocumentFieldValueConvertContext;
+	}
+
+	FromDocumentIdentifierValueConvertContext fromDocumentIdentifierValueConvertContext() {
+		return fromDocumentIdentifierValueConvertContext;
 	}
 
 	void reportFailedLoad() {
