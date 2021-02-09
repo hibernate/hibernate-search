@@ -26,6 +26,7 @@ import org.hibernate.search.mapper.javabean.work.impl.SearchIndexerImpl;
 import org.hibernate.search.mapper.javabean.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
@@ -140,6 +141,11 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession<EntityRefer
 			);
 		}
 		return new EntityReferenceImpl( typeContext.typeIdentifier(), typeContext.name(), identifier );
+	}
+
+	@Override
+	public PojoLoadingContext defaultLoadingContext() {
+		return loadingContextBuilder().build();
 	}
 
 	private <T> SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(SearchScopeImpl<T> scope) {

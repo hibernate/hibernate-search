@@ -10,6 +10,7 @@ import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.spi.PojoImplicitReindexingResolverSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorSessionContext;
 
 /**
@@ -25,5 +26,7 @@ public interface PojoWorkSessionContext<R>
 	PojoWorkMappingContext mappingContext();
 
 	EntityReferenceFactory<R> entityReferenceFactory();
+
+	PojoLoadingContext defaultLoadingContext();
 
 }

@@ -19,6 +19,8 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
+import org.hibernate.search.mapper.pojo.loading.impl.PojoLoadingPlan;
+import org.hibernate.search.mapper.pojo.loading.impl.PojoMultiLoaderLoadingPlan;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -43,6 +45,8 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 	private final Map<PojoRawTypeIdentifier<?>, PojoContainedTypeIndexingPlan<?>> containedTypeDelegates = new LinkedHashMap<>();
 
 	private boolean isProcessing = false;
+	private boolean mayRequireLoading = false;
+	private PojoLoadingPlan<Object> loadingPlan = null;
 
 	public PojoIndexingPlanImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
 			PojoWorkContainedTypeContextProvider containedTypeContextProvider,
@@ -60,12 +64,19 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 	@Override
 	public void add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity) {
 		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegate( typeIdentifier );
+		if ( ! mayRequireLoading && entity == null ) {
+			mayRequireLoading = true;
+		}
 		delegate.add( providedId, providedRoutingKey, entity );
 	}
 
 	@Override
-	public void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity) {
+	public void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey,
+			Object entity) {
 		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegate( typeIdentifier );
+		if ( ! mayRequireLoading && entity == null ) {
+			mayRequireLoading = true;
+		}
 		delegate.addOrUpdate( providedId, providedRoutingKey, entity );
 	}
 
@@ -73,11 +84,15 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 	public void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey,
 			Object entity, BitSet dirtyPaths) {
 		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegate( typeIdentifier );
+		if ( ! mayRequireLoading && entity == null ) {
+			mayRequireLoading = true;
+		}
 		delegate.addOrUpdate( providedId, providedRoutingKey, entity, dirtyPaths );
 	}
 
 	@Override
-	public void delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey, Object entity) {
+	public void delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey,
+			Object entity) {
 		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegate( typeIdentifier );
 		delegate.delete( providedId, providedRoutingKey, entity );
 	}
@@ -90,6 +105,17 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 
 		isProcessing = true;
 		try {
+			if ( mayRequireLoading ) {
+				for ( PojoContainedTypeIndexingPlan<?> delegate : containedTypeDelegates.values() ) {
+					delegate.planLoading();
+				}
+				for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
+					delegate.planLoading();
+				}
+			}
+			if ( loadingPlan != null ) {
+				loadingPlan.loadBlocking( null );
+			}
 			for ( PojoContainedTypeIndexingPlan<?> delegate : containedTypeDelegates.values() ) {
 				delegate.resolveDirty();
 			}
@@ -104,6 +130,8 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 		}
 		finally {
 			isProcessing = false;
+			mayRequireLoading = false;
+			loadingPlan = null;
 		}
 	}
 
@@ -215,5 +243,12 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindex
 				"Attempt to reindex an entity of type " + typeIdentifier + " because a contained entity was modified,"
 				+ " but this entity type is not indexed directly."
 		);
+	}
+
+	public PojoLoadingPlan<Object> loadingPlan() {
+		if ( loadingPlan == null ) {
+			loadingPlan = new PojoMultiLoaderLoadingPlan<>( sessionContext.defaultLoadingContext() );
+		}
+		return loadingPlan;
 	}
 }
