@@ -38,8 +38,20 @@ public class SearchIndexerImpl implements SearchIndexer {
 	}
 
 	@Override
+	public CompletionStage<?> add(Class<?> entityClass, Object providedId, String providedRoutingKey) {
+		return delegate.add( getTypeIdentifier( entityClass ), providedId, providedRoutingKey, null,
+				commitStrategy, refreshStrategy );
+	}
+
+	@Override
 	public CompletionStage<?> addOrUpdate(Object providedId, String providedRoutingKey, Object entity) {
 		return delegate.addOrUpdate( getTypeIdentifier( entity ), providedId, providedRoutingKey, entity,
+				commitStrategy, refreshStrategy );
+	}
+
+	@Override
+	public CompletionStage<?> addOrUpdate(Class<?> entityClass, Object providedId, String providedRoutingKey) {
+		return delegate.addOrUpdate( getTypeIdentifier( entityClass ), providedId, providedRoutingKey, null,
 				commitStrategy, refreshStrategy );
 	}
 
