@@ -99,12 +99,11 @@ public class RoutingBridgeRoutingKeyIT {
 		List<Integer> results = new ArrayList<>();
 		withinJPATransaction( entityManagerFactory, entityManager -> Search.session( entityManager )
 				.search( Book.class )
-				.select( f -> f.entityReference() )
+				.select( f -> f.id( Integer.class ) )
 				.where( f -> f.matchAll() )
 				.routing( routingKey )
 				.fetchAllHits()
 				.stream()
-				.map( ref -> (Integer) ref.id() )
 				.forEach( results::add ) );
 		return results;
 	}
