@@ -125,7 +125,7 @@ public class ElasticsearchIndexSchemaManagerDynamicMappingIT {
 				.withIndex( index );
 
 		if ( dynamicMapping != null ) {
-			setupContext.withIndexProperty( index.name(), ElasticsearchIndexSettings.DYNAMIC_MAPPING, dynamicMapping );
+			setupContext.withIndexProperty( index.name(), "dynamic_mapping", dynamicMapping );
 		}
 
 		setupContext.setup();
