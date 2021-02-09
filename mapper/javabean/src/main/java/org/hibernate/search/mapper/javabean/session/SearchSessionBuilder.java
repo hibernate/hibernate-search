@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.mapper.javabean.session;
 
+import java.util.function.Consumer;
+
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.mapper.javabean.loading.LoadingOptions;
 
 public interface SearchSessionBuilder {
 
@@ -29,6 +32,12 @@ public interface SearchSessionBuilder {
 	 * @return {@code this} for method chaining.
 	 */
 	SearchSessionBuilder refreshStrategy(DocumentRefreshStrategy refreshStrategy);
+
+	/**
+	 * @param loadingOptionsContributor The default loading options.
+	 * @return {@code this} for method chaining.
+	 */
+	SearchSessionBuilder loading(Consumer<LoadingOptions> loadingOptionsContributor);
 
 	/**
 	 * @return The resulting session.

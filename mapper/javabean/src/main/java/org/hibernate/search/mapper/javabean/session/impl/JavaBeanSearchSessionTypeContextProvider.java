@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.mapper.javabean.session.impl;
 
+import org.hibernate.search.mapper.javabean.loading.impl.LoadingTypeContextProvider;
 import org.hibernate.search.mapper.javabean.work.impl.SearchIndexingPlanTypeContextProvider;
 
-public interface JavaBeanSearchSessionTypeContextProvider extends SearchIndexingPlanTypeContextProvider {
+public interface JavaBeanSearchSessionTypeContextProvider
+		extends SearchIndexingPlanTypeContextProvider, LoadingTypeContextProvider {
 
 	JavaBeanSessionIndexedTypeContext<?> indexedForEntityName(String indexName);
 

@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.javabean.mapping.impl;
 
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
+import org.hibernate.search.mapper.javabean.loading.impl.LoadingTypeContext;
 import org.hibernate.search.mapper.javabean.scope.impl.JavaBeanScopeIndexedTypeContext;
 import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSessionIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.IdentifierMapping;
@@ -16,7 +17,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 class JavaBeanIndexedTypeContext<E> extends AbstractJavaBeanTypeContext<E>
-		implements JavaBeanScopeIndexedTypeContext<E>, JavaBeanSessionIndexedTypeContext<E> {
+		implements JavaBeanScopeIndexedTypeContext<E>, JavaBeanSessionIndexedTypeContext<E>, LoadingTypeContext<E> {
 	private final IdentifierMapping identifierMapping;
 	private final MappedIndexManager indexManager;
 
