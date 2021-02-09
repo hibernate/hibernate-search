@@ -135,6 +135,36 @@ public class ProjectionDslIT {
 	}
 
 	@Test
+	public void id_object() {
+		withinSearchSession( searchSession -> {
+			// tag::id-object[]
+			List<Object> hits = searchSession.search( Book.class )
+					.select( f -> f.id() )
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 );
+			// end::id-object[]
+			assertThat( hits ).containsExactlyInAnyOrder(
+					BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID
+			);
+		} );
+	}
+
+	@Test
+	public void id_int() {
+		withinSearchSession( searchSession -> {
+			// tag::id-int[]
+			List<Integer> hits = searchSession.search( Book.class )
+					.select( f -> f.id( Integer.class ) )
+					.where( f -> f.matchAll() )
+					.fetchHits( 20 );
+			// end::id-int[]
+			assertThat( hits ).containsExactlyInAnyOrder(
+					BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID
+			);
+		} );
+	}
+
+	@Test
 	public void entity() {
 		withinSearchSession( searchSession -> {
 			// tag::entity[]
