@@ -107,7 +107,7 @@ public class ElasticsearchIndexSchemaManagerDynamicMappingIT {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Invalid value for configuration property 'hibernate.search.backend.indexes.indexName.indexing.dynamic_mapping': 'invalid'"
+						"Invalid value for configuration property 'hibernate.search.backend.indexes.indexName.dynamic_mapping': 'invalid'"
 				)
 				.hasMessageContaining( "Valid values are: [true, false, strict]" );
 	}
