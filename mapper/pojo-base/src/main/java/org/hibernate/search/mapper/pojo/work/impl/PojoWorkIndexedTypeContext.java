@@ -34,6 +34,7 @@ public interface PojoWorkIndexedTypeContext<I, E> extends PojoWorkTypeContext<E>
 	PojoPathFilter dirtySelfFilter();
 
 	<R> PojoIndexedTypeIndexingPlan<I, E, R> createIndexingPlan(PojoWorkSessionContext<R> sessionContext,
+			PojoIndexingPlanImpl<?> root,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 	PojoTypeIndexer<I, E> createIndexer(PojoWorkSessionContext<?> sessionContext);

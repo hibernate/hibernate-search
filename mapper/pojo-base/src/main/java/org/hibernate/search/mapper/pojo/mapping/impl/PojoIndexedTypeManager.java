@@ -27,6 +27,7 @@ import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.work.impl.PojoDocumentContributor;
 import org.hibernate.search.mapper.pojo.work.impl.PojoIndexedTypeIndexingPlan;
+import org.hibernate.search.mapper.pojo.work.impl.PojoIndexingPlanImpl;
 import org.hibernate.search.mapper.pojo.work.impl.PojoTypeIndexer;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkRouter;
@@ -133,9 +134,10 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<E>
 
 	@Override
 	public <R> PojoIndexedTypeIndexingPlan<I, E, R> createIndexingPlan(PojoWorkSessionContext<R> sessionContext,
+			PojoIndexingPlanImpl<?> root,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return new PojoIndexedTypeIndexingPlan<>(
-				this, sessionContext,
+				this, sessionContext, root,
 				indexManager.createIndexingPlan(
 						sessionContext, sessionContext.entityReferenceFactory(),
 						commitStrategy, refreshStrategy

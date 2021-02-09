@@ -18,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
+import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -26,7 +27,7 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
+public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R>, PojoReindexingCollector {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -90,12 +91,12 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 		isProcessing = true;
 		try {
 			for ( PojoContainedTypeIndexingPlan<?> delegate : containedTypeDelegates.values() ) {
-				delegate.resolveDirty( this::updateBecauseOfContained );
+				delegate.resolveDirty();
 			}
 			// We need to iterate on a "frozen snapshot" of the indexedTypeDelegates values because of HSEARCH-3857
 			List<PojoIndexedTypeIndexingPlan<?, ?, ?>> frozenIndexedTypeDelegates = new ArrayList<>( indexedTypeDelegates.values() );
 			for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : frozenIndexedTypeDelegates ) {
-				delegate.resolveDirty( this::updateBecauseOfContained );
+				delegate.resolveDirty();
 			}
 			for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
 				delegate.process();
@@ -140,6 +141,24 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 		}
 	}
 
+	@Override
+	public void markForReindexing(Object containingEntity) {
+		// Note this method won't work when using provided identifiers
+		// Fortunately, all platforms relying on provided identifiers (Infinispan)
+		// also disable reindexing of other entities on updates,
+		// so they won't ever call this method.
+
+		PojoRawTypeIdentifier<?> typeIdentifier = getIntrospector().detectEntityType( containingEntity );
+		if ( typeIdentifier == null ) {
+			throw new AssertionFailure(
+					"Attempt to reindex entity " + containingEntity + " because a contained entity was modified,"
+							+ " but this entity type is not indexed directly."
+			);
+		}
+		PojoIndexedTypeIndexingPlan<?, ?, ?> delegate = getOrCreateIndexedDelegateForContainedUpdate( typeIdentifier );
+		delegate.updateBecauseOfContained( containingEntity );
+	}
+
 	private PojoRuntimeIntrospector getIntrospector() {
 		return introspector;
 	}
@@ -160,7 +179,7 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 				indexedTypeContextProvider.getByExactType( typeIdentifier );
 		if ( indexedTypeContextOptional.isPresent() ) {
 			PojoIndexedTypeIndexingPlan<?, ?, R> delegate = indexedTypeContextOptional.get()
-					.createIndexingPlan( sessionContext, commitStrategy, refreshStrategy );
+					.createIndexingPlan( sessionContext, this, commitStrategy, refreshStrategy );
 			indexedTypeDelegates.put( typeIdentifier, delegate );
 			return delegate;
 		}
@@ -169,7 +188,7 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 					containedTypeContextProvider.getByExactType( typeIdentifier );
 			if ( containedTypeContextOptional.isPresent() ) {
 				PojoContainedTypeIndexingPlan<?> delegate = containedTypeContextOptional.get()
-						.createIndexingPlan( sessionContext );
+						.createIndexingPlan( sessionContext, this );
 				containedTypeDelegates.put( typeIdentifier, delegate );
 				return delegate;
 			}
@@ -187,7 +206,7 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 				indexedTypeContextProvider.getByExactType( typeIdentifier );
 		if ( indexedTypeManagerOptional.isPresent() ) {
 			delegate = indexedTypeManagerOptional.get()
-					.createIndexingPlan( sessionContext, commitStrategy, refreshStrategy );
+					.createIndexingPlan( sessionContext, this, commitStrategy, refreshStrategy );
 			indexedTypeDelegates.put( typeIdentifier, delegate );
 			return delegate;
 		}
@@ -197,22 +216,4 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 				+ " but this entity type is not indexed directly."
 		);
 	}
-
-	private void updateBecauseOfContained(Object containingEntity) {
-		// Note this method won't work when using provided identifiers
-		// Fortunately, all platforms relying on provided identifiers (Infinispan)
-		// also disable reindexing of other entities on updates,
-		// so they won't ever call this method.
-
-		PojoRawTypeIdentifier<?> typeIdentifier = getIntrospector().detectEntityType( containingEntity );
-		if ( typeIdentifier == null ) {
-			throw new AssertionFailure(
-					"Attempt to reindex entity " + containingEntity + " because a contained entity was modified,"
-							+ " but this entity type is not indexed directly."
-			);
-		}
-		PojoIndexedTypeIndexingPlan<?, ?, ?> delegate = getOrCreateIndexedDelegateForContainedUpdate( typeIdentifier );
-		delegate.updateBecauseOfContained( containingEntity );
-	}
-
 }

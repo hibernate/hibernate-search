@@ -14,7 +14,6 @@ import java.util.function.Supplier;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
-import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.route.impl.DocumentRouteImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
@@ -30,9 +29,9 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 	private final IndexIndexingPlan<R> delegate;
 
 	public PojoIndexedTypeIndexingPlan(PojoWorkIndexedTypeContext<I, E> typeContext,
-			PojoWorkSessionContext<?> sessionContext,
+			PojoWorkSessionContext<?> sessionContext, PojoIndexingPlanImpl<?> root,
 			IndexIndexingPlan<R> delegate) {
-		super( sessionContext );
+		super( sessionContext, root );
 		this.typeContext = typeContext;
 		this.delegate = delegate;
 	}
@@ -44,11 +43,11 @@ public class PojoIndexedTypeIndexingPlan<I, E, R>
 	}
 
 	@Override
-	void resolveDirty(PojoReindexingCollector containingEntityCollector) {
+	void resolveDirty() {
 		// We need to iterate on a "frozen snapshot" of the states because of HSEARCH-3857
 		List<IndexedEntityState> frozenIndexingPlansPerId = new ArrayList<>( statesPerId.values() );
 		for ( IndexedEntityState plan : frozenIndexingPlansPerId ) {
-			plan.resolveDirty( containingEntityCollector );
+			plan.resolveDirty();
 		}
 	}
 

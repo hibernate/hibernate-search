@@ -11,6 +11,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeContainedTypeContext;
 import org.hibernate.search.mapper.pojo.work.impl.PojoContainedTypeIndexingPlan;
+import org.hibernate.search.mapper.pojo.work.impl.PojoIndexingPlanImpl;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkContainedTypeContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
@@ -26,10 +27,9 @@ public class PojoContainedTypeManager<E> extends AbstractPojoTypeManager<E>
 	}
 
 	@Override
-	public PojoContainedTypeIndexingPlan<E> createIndexingPlan(PojoWorkSessionContext<?> sessionContext) {
-		return new PojoContainedTypeIndexingPlan<>(
-				this, sessionContext
-		);
+	public PojoContainedTypeIndexingPlan<E> createIndexingPlan(PojoWorkSessionContext<?> sessionContext,
+			PojoIndexingPlanImpl<?> root) {
+		return new PojoContainedTypeIndexingPlan<>( this, sessionContext, root );
 	}
 
 }

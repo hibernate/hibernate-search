@@ -13,7 +13,6 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.spi.PojoImplicitReindexingResolverSessionContext;
-import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 /**
@@ -24,12 +23,14 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeIndexingPlan<I, E, S>.AbstractEntityState> {
 
 	final PojoWorkSessionContext<?> sessionContext;
+	final PojoIndexingPlanImpl<?> root;
 
 	// Use a LinkedHashMap for deterministic iteration
 	final Map<I, S> statesPerId = new LinkedHashMap<>();
 
-	AbstractPojoTypeIndexingPlan(PojoWorkSessionContext<?> sessionContext) {
+	AbstractPojoTypeIndexingPlan(PojoWorkSessionContext<?> sessionContext, PojoIndexingPlanImpl<?> root) {
 		this.sessionContext = sessionContext;
+		this.root = root;
 	}
 
 	void add(Object providedId, String providedRoutingKey, Object entity) {
@@ -45,7 +46,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 	}
 
 	void addOrUpdate(Object providedId, String providedRoutingKey, Object entity, BitSet dirtyPaths) {
-		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
+		Supplier<E> entitySupplier = entity == null ? null : typeContext().toEntitySupplier( sessionContext, entity );
 		I identifier = toIdentifier( providedId, entitySupplier );
 		getState( identifier ).addOrUpdate( entitySupplier, providedRoutingKey, dirtyPaths );
 	}
@@ -56,9 +57,9 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		getState( identifier ).delete( entitySupplier, providedRoutingKey );
 	}
 
-	void resolveDirty(PojoReindexingCollector containingEntityCollector) {
+	void resolveDirty() {
 		for ( S state : statesPerId.values() ) {
-			state.resolveDirty( containingEntityCollector );
+			state.resolveDirty();
 		}
 	}
 
@@ -150,10 +151,10 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			dirtyPaths = null;
 		}
 
-		void resolveDirty(PojoReindexingCollector containingEntityCollector) {
+		void resolveDirty() {
 			if ( shouldResolveToReindex ) {
 				shouldResolveToReindex = false; // Avoid infinite looping
-				typeContext().resolveEntitiesToReindex( containingEntityCollector, sessionContext, identifier,
+				typeContext().resolveEntitiesToReindex( root, sessionContext, identifier,
 						entitySupplier, this );
 			}
 		}
