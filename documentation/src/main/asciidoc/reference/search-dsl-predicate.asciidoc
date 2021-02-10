@@ -547,6 +547,44 @@ but can be <<search-dsl-predicate-common-boost,boosted>>,
 either on a per-field basis with a call to `.boost(...)` just after `.field(...)`/`.fields(...)`
 or for the whole predicate with a call to `.boost(...)` after `.matching(...)`.
 
+[[search-dsl-predicate-regexp]]
+== `regexp`: match a regular expression pattern
+
+The `regexp` predicate matches documents for which a given field contains a word matching the given regular expression.
+
+.Matching a regular expression pattern
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=regexp]
+----
+====
+
+[IMPORTANT]
+====
+The provided regular expressions used in regexp predicates
+will never be normalized or transformed in any way,
+even if a normalizer/analyzer has been defined on the field.
+
+This means that if a normalizer/analyzer has been defined on the field,
+the user needs to be aware about how this normalizer/analyzer processes the data
+in order to provide a meaningful regular expression for using the predicate.
+====
+
+=== Targeting multiple fields
+
+Optionally, the predicate can target multiple fields.
+In that case, the predicate will match documents for which _any_ of the given fields matches.
+
+See <<search-dsl-predicate-common-multiple-fields>>.
+
+=== Other options
+
+* The score of a `regexp` predicate is constant and equal to 1 by default,
+but can be <<search-dsl-predicate-common-boost,boosted>>,
+either on a per-field basis with a call to `.boost(...)` just after `.field(...)`/`.fields(...)`
+or for the whole predicate with a call to `.boost(...)` after `.matching(...)`.
+
 [[search-dsl-predicate-boolean]]
 == `bool`: combine predicates (or/and/...)
 // Search 5 anchors backward compatibility
