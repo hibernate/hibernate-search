@@ -24,6 +24,7 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextMatchPredicate;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextPhrasePredicate;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextRegexpPredicate;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextWildcardPredicate;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSort;
 import org.hibernate.search.engine.backend.types.Aggregable;
@@ -185,6 +186,7 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.Factory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.PHRASE, new ElasticsearchTextPhrasePredicate.Factory() );
 			builder.queryElementFactory( PredicateTypeKeys.WILDCARD, new ElasticsearchTextWildcardPredicate.Factory() );
+			builder.queryElementFactory( PredicateTypeKeys.REGEXP, new ElasticsearchTextRegexpPredicate.Factory() );
 			builder.queryElementFactory( PredicateTypeKeys.SIMPLE_QUERY_STRING,
 					new ElasticsearchSimpleQueryStringPredicateBuilderFieldState.Factory() );
 		}
