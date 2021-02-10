@@ -88,8 +88,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public RegexpPredicateBuilder regexp(String absoluteFieldPath) {
-		// TODO HSEARCH-3884 Support it in this backend
-		return null;
+		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.REGEXP, searchContext );
 	}
 
 	@Override
