@@ -99,6 +99,14 @@ public interface SearchPredicateFactory {
 	WildcardPredicateFieldStep<?> wildcard();
 
 	/**
+	 * Match documents where targeted fields contain a term that matches a given regular expression.
+	 *
+	 * @return The initial step of a DSL where the "regexp" predicate can be defined.
+	 * @see RegexpPredicateFieldStep
+	 */
+	RegexpPredicateFieldStep<?> regexp();
+
+	/**
 	 * Match documents where a {@link ObjectStructure#NESTED nested object} matches a given predicate.
 	 *
 	 * @return The initial step of a DSL where the "nested" predicate can be defined.

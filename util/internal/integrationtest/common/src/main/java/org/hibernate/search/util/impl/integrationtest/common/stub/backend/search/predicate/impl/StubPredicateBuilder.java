@@ -19,6 +19,7 @@ import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.RegexpPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
@@ -37,6 +38,7 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder,
 		RangePredicateBuilder,
 		PhrasePredicateBuilder,
 		WildcardPredicateBuilder,
+		RegexpPredicateBuilder,
 		SimpleQueryStringPredicateBuilder,
 		NestedPredicateBuilder,
 		ExistsPredicateBuilder,
@@ -120,7 +122,8 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder,
 	}
 
 	@Override
-	public void pattern(String wildcardPattern) {
+	public void pattern(String pattern) {
+		// used by both wildcard and regexp predicate
 		// No-op
 	}
 

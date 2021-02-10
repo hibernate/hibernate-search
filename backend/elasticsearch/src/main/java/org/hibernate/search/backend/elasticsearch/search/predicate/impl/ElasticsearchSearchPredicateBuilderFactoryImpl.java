@@ -23,6 +23,7 @@ import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.RegexpPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
@@ -83,6 +84,12 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	@Override
 	public WildcardPredicateBuilder wildcard(String absoluteFieldPath) {
 		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.WILDCARD, searchContext );
+	}
+
+	@Override
+	public RegexpPredicateBuilder regexp(String absoluteFieldPath) {
+		// TODO HSEARCH-3884 Support it in this backend
+		return null;
 	}
 
 	@Override
