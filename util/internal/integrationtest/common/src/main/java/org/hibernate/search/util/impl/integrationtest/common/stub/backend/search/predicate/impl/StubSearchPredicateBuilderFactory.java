@@ -17,6 +17,7 @@ import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.RegexpPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
@@ -66,6 +67,11 @@ public class StubSearchPredicateBuilderFactory
 
 	@Override
 	public WildcardPredicateBuilder wildcard(String absoluteFieldPath) {
+		return new StubPredicateBuilder();
+	}
+
+	@Override
+	public RegexpPredicateBuilder regexp(String absoluteFieldPath) {
 		return new StubPredicateBuilder();
 	}
 

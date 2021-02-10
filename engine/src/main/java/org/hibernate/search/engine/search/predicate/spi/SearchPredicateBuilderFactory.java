@@ -43,6 +43,8 @@ public interface SearchPredicateBuilderFactory<C> {
 
 	WildcardPredicateBuilder wildcard(String absoluteFieldPath);
 
+	RegexpPredicateBuilder regexp(String absoluteFieldPath);
+
 	NestedPredicateBuilder nested(String absoluteFieldPath);
 
 	SimpleQueryStringPredicateBuilder simpleQueryString();

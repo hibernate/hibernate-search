@@ -17,6 +17,7 @@ import org.hibernate.search.engine.search.predicate.dsl.NestedPredicateFieldStep
 import org.hibernate.search.engine.search.predicate.dsl.PhrasePredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldStep;
+import org.hibernate.search.engine.search.predicate.dsl.RegexpPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtensionIfSupportedStep;
@@ -76,6 +77,11 @@ public class DelegatingSearchPredicateFactory implements SearchPredicateFactory 
 	@Override
 	public WildcardPredicateFieldStep<?> wildcard() {
 		return delegate.wildcard();
+	}
+
+	@Override
+	public RegexpPredicateFieldStep<?> regexp() {
+		return delegate.regexp();
 	}
 
 	@Override
