@@ -732,6 +732,21 @@ public class PredicateDslIT {
 	}
 
 	@Test
+	public void regexp() {
+		withinSearchSession( searchSession -> {
+			// tag::regexp[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.regexp().field( "description" )
+							.matching( "r.*t" ) )
+					.fetchHits( 20 );
+			// end::regexp[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK4_ID );
+		} );
+	}
+
+	@Test
 	public void nested() {
 		withinSearchSession( searchSession -> {
 			// tag::nested[]
