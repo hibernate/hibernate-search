@@ -6,9 +6,15 @@
  */
 package org.hibernate.search.engine.backend.types.converter.spi;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
+import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class StringDocumentIdentifierValueConverter implements DocumentIdentifierValueConverter<String> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
 	public String convertToDocument(String value, ToDocumentIdentifierValueConvertContext context) {
@@ -18,6 +24,13 @@ public final class StringDocumentIdentifierValueConverter implements DocumentIde
 	@Override
 	public String convertToDocumentUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
 		return (String) value;
+	}
+
+	@Override
+	public void requiresType(Class<?> requiredType) {
+		if ( !String.class.isAssignableFrom( requiredType ) ) {
+			throw log.wrongRequiredIdentifierType( requiredType, String.class );
+		}
 	}
 
 	@Override

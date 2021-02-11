@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
@@ -15,8 +16,12 @@ import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class PojoIdentifierBridgeDocumentIdentifierValueConverter<I> implements DocumentIdentifierValueConverter<I> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final IdentifierBridge<I> bridge;
 	private final Class<I> expectedValueType;
@@ -40,6 +45,13 @@ public final class PojoIdentifierBridgeDocumentIdentifierValueConverter<I> imple
 	@Override
 	public String convertToDocumentUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
 		return convertToDocument( expectedValueType.cast( value ), context );
+	}
+
+	@Override
+	public void requiresType(Class<?> requiredType) {
+		if ( !expectedValueType.isAssignableFrom( requiredType ) ) {
+			throw log.wrongRequiredIdentifierType( requiredType, expectedValueType );
+		}
 	}
 
 	@Override

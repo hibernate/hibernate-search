@@ -8,6 +8,7 @@ package org.hibernate.search.engine.backend.types.converter.spi;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextExtension;
+import org.hibernate.search.util.common.SearchException;
 
 /**
  * A converter from a source identifier value to a target value that should be used as a document identifier
@@ -38,6 +39,14 @@ public interface DocumentIdentifierValueConverter<I> {
 	 * @return The converted index field value.
 	 */
 	String convertToDocumentUnknown(Object value, ToDocumentIdentifierValueConvertContext context);
+
+	/**
+	 * @param requiredType the required type
+	 * @throws SearchException if the expected actual type is not a subclass of the required type
+	 */
+	default void requiresType(Class<?> requiredType) {
+		// no check by default
+	}
 
 	/**
 	 * @param other Another {@link DocumentIdentifierValueConverter}, never {@code null}.
