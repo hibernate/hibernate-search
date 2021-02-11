@@ -87,10 +87,12 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 NOTE: The entity does not get loaded as part of the projection.
 If you want the actual entity instance, use the <<search-dsl-projection-entity,`entity` projection>>
 
-== `id`: return ids to matched entities
+== `id`: return identifiers of matched entities 
 
-The `id` projection returns the id to the matched entity.
-The API allows to express the expected entity type of the returning ids.
+The `identifier` projection returns the identifier of the matched entity.
+NOTE: If the provided identifier type does not match the type of identifiers for targeted entity types,
+an exception will be thrown.
+See also <<search-dsl-projected-value-type>>.
 
 .Returning ids to matched entities, providing the identity type.
 ====
@@ -99,6 +101,7 @@ The API allows to express the expected entity type of the returning ids.
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=id-int]
 ----
 ====
+You can omit the "identifier type" argument, but then you will get projections of type `Object`:
 
 .Returning ids to matched entities, without providing the identity type.
 ====
@@ -107,9 +110,6 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=id-object]
 ----
 ====
-
-NOTE: If the provided identity type does not match the current returned ids,
-an exception will be thrown.
 
 [[search-dsl-projection-entity]]
 == `entity`: return matched entities
