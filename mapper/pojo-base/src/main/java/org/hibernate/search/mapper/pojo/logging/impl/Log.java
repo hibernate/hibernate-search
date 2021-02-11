@@ -558,4 +558,10 @@ public interface Log extends BasicLogger {
 			value = "Invalid entity name '%1$s' in an indexing event: this entity does not exist or is not indexed.")
 	SearchException nonIndexedTypeInIndexingEvent(String entityName);
 
+	@Message(id = ID_OFFSET + 90, value = "The required identifier type '%1$s'"
+			+ " does not match the actual identifier type '%2$s':"
+			+ " the required identifier must be a superclass of the actual identifier.")
+	SearchException wrongRequiredIdentifierType(@FormatWith(ClassFormatter.class) Class<?> requiredIdentifierType,
+			@FormatWith(ClassFormatter.class) Class<?> actualIdentifierType);
+
 }
