@@ -49,6 +49,9 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 
 	protected abstract C createSetupContext();
 
+	protected void init() {
+	}
+
 	protected abstract void close(R toClose) throws Exception;
 
 	private Statement statement(Statement base, Description description) {
@@ -57,6 +60,7 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 			public void evaluate() throws Throwable {
 				try ( Closer<Exception> closer = new Closer<>() ) {
 					try {
+						init();
 						base.evaluate();
 					}
 					finally {

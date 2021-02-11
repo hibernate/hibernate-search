@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.function.Consumer;
 import javax.persistence.Basic;
@@ -107,6 +108,9 @@ public class AutomaticIndexingBasicIT {
 
 	@Test
 	public void rollback_discardPreparedWorks() {
+		assumeTrue( "This test only makes sense if entities are processed in-session",
+				ormSetupHelper.areEntitiesProcessedInSession() );
+
 		OrmUtils.withinSession( sessionFactory, session -> {
 			Transaction trx = session.beginTransaction();
 			IndexedEntity entity1 = new IndexedEntity();
@@ -124,6 +128,7 @@ public class AutomaticIndexingBasicIT {
 					.created();
 
 			session.flush();
+			// Entities should be processed and works created on flush
 			backendMock.verifyExpectationsMet();
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -292,9 +297,10 @@ public class AutomaticIndexingBasicIT {
 					.created();
 
 			session.flush();
-
-			// Works should be prepared immediately
-			backendMock.verifyExpectationsMet();
+			if ( ormSetupHelper.areEntitiesProcessedInSession() ) {
+				// Entities should be processed and works created on flush
+				backendMock.verifyExpectationsMet();
+			}
 
 			IndexedEntity entity3 = new IndexedEntity( 3, "number3" );
 			IndexedEntity entity4 = new IndexedEntity( 4, "number4" );
@@ -332,9 +338,10 @@ public class AutomaticIndexingBasicIT {
 					.created();
 
 			session.flush();
-
-			// Works should be prepared immediately
-			backendMock.verifyExpectationsMet();
+			if ( ormSetupHelper.areEntitiesProcessedInSession() ) {
+				// Entities should be processed and works created on flush
+				backendMock.verifyExpectationsMet();
+			}
 
 			IndexedEntity entity7 = new IndexedEntity( 7, "number7" );
 			IndexedEntity entity8 = new IndexedEntity( 8, "number8" );

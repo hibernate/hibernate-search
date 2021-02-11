@@ -17,10 +17,19 @@ import java.util.concurrent.CompletableFuture;
 public interface AutomaticIndexingStrategy {
 
 	/**
+	 * Configures automatic indexing.
+	 * <p>
+	 * Called once during bootstrap,
+	 * after backends and index managers were started.
+	 *
+	 * @param context The configuration context.
+	 */
+	void configure(AutomaticIndexingConfigurationContext context);
+
+	/**
 	 * Configures this strategy and starts processing events in the background.
 	 * <p>
-	 * Called by the engine once during bootstrap,
-	 * after backends and index managers were started.
+	 * Called once during bootstrap, after {@link #configure(AutomaticIndexingConfigurationContext)}.
 	 *
 	 * @param context The start context.
 	 * @return A future that completes when the strategy is completely started.
@@ -28,17 +37,10 @@ public interface AutomaticIndexingStrategy {
 	CompletableFuture<?> start(AutomaticIndexingStrategyStartContext context);
 
 	/**
-	 * Configures automatic indexing.
-	 *
-	 * @param context The configuration context.
-	 */
-	void configure(AutomaticIndexingConfigurationContext context);
-
-	/**
 	 * Prepares for {@link #stop()},
 	 * executing any operations that need to be executed before shutdown.
 	 * <p>
-	 * Called by the engine once on shutdown,
+	 * Called once on shutdown,
 	 * before backends and index managers are stopped.
 	 *
 	 * @param context The pre-stop context.
@@ -49,7 +51,7 @@ public interface AutomaticIndexingStrategy {
 	/**
 	 * Stops and releases all resources.
 	 * <p>
-	 * Called by the engine once on shutdown,
+	 * Called once on shutdown,
 	 * after the future returned by {@link #preStop(AutomaticIndexingStrategyPreStopContext)} completed.
 	 */
 	void stop();

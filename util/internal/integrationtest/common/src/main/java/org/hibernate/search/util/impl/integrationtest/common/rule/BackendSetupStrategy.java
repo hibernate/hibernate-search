@@ -40,5 +40,4 @@ public interface BackendSetupStrategy {
 			Map<String, BackendConfiguration> namedBackendConfigurations) {
 		return new ActualBackendSetupStrategy( defaultBackendConfiguration, namedBackendConfigurations );
 	}
-
 }
