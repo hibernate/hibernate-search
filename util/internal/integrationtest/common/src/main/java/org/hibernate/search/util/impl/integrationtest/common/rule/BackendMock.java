@@ -40,9 +40,11 @@ public class BackendMock implements TestRule {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final VerifyingStubBackendBehavior backendBehavior = new VerifyingStubBackendBehavior();
+	private final VerifyingStubBackendBehavior backendBehavior = new VerifyingStubBackendBehavior( this::indexingWorkThreadingExpectations );
 
 	private boolean started = false;
+
+	private BackendWorkThreadingExpectations indexingWorkThreadingExpectations = BackendWorkThreadingExpectations.sync();
 
 	@Override
 	public Statement apply(Statement base, Description description) {
@@ -56,6 +58,7 @@ public class BackendMock implements TestRule {
 				}
 				finally {
 					resetExpectations();
+					indexingWorkThreadingExpectations = BackendWorkThreadingExpectations.sync();
 					started = false;
 				}
 			}
@@ -69,6 +72,14 @@ public class BackendMock implements TestRule {
 
 	public StubBackendFactory factory() {
 		return new StubBackendFactory( backendBehavior );
+	}
+
+	public void indexingWorkThreadingExpectations(BackendWorkThreadingExpectations expectations) {
+		indexingWorkThreadingExpectations = expectations;
+	}
+
+	private BackendWorkThreadingExpectations indexingWorkThreadingExpectations() {
+		return indexingWorkThreadingExpectations;
 	}
 
 	public void resetExpectations() {
@@ -232,7 +243,7 @@ public class BackendMock implements TestRule {
 		return this;
 	}
 
-	private VerifyingStubBackendBehavior backendBehavior() {
+	VerifyingStubBackendBehavior backendBehavior() {
 		if ( !started ) {
 			throw new AssertionFailure( "The backend mock was not configured as a JUnit @Rule/@ClassRule,"
 					+ " or its statement wrapper hasn't started executing yet,"

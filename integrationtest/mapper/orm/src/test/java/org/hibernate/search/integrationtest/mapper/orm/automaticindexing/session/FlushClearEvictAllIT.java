@@ -72,7 +72,10 @@ public class FlushClearEvictAllIT {
 					.add( post.getId().toString(), b -> b.field( "name", "This is a post" ) )
 					.created();
 			entityManager.flush();
-			backendMock.verifyExpectationsMet();
+			if ( ormSetupHelper.areEntitiesProcessedInSession() ) {
+				// Entities should be processed and works created on flush
+				backendMock.verifyExpectationsMet();
+			}
 
 			entityManager.clear();
 			sessionFactory.getCache().evictAll();
@@ -95,8 +98,12 @@ public class FlushClearEvictAllIT {
 			backendMock.expectWorks( Comment.NAME )
 					.add( "2", b -> b.field( "name", "This is a comment" ) )
 					.created();
+
 			entityManager.flush();
-			backendMock.verifyExpectationsMet();
+			if ( ormSetupHelper.areEntitiesProcessedInSession() ) {
+				// Entities should be processed and works created on flush
+				backendMock.verifyExpectationsMet();
+			}
 
 			entityManager.clear();
 			sessionFactory.getCache().evictAll();

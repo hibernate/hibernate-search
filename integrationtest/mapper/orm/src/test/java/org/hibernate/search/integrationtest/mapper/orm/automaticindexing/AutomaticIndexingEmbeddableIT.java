@@ -185,10 +185,17 @@ public class AutomaticIndexingEmbeddableIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.addOrUpdate( "1", b -> b
-							.objectField( "child", b2 -> b2
-									.objectField( "containedEmbeddedList", b3 -> { } )
-									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
-							)
+							.objectField( "child", b2 -> {
+								b2.objectField( "containedEmbeddedList", b3 -> { } );
+								b2.objectField( "containedBidirectionalEmbedded", b3 -> { } );
+								if ( !ormSetupHelper.areEntitiesProcessedInSession() ) {
+									// When running indexing from a different session,
+									// the embeddable will no longer be null but will be an empty embeddable.
+									// Ideally we should use hibernate.create_empty_composites.enabled to avoid that,
+									// but this feature is still experimental: https://hibernate.atlassian.net/browse/HHH-11936
+									b2.objectField( "containedEmbeddedSingle", b3 -> { } );
+								}
+							} )
 					)
 					.createdThenExecuted();
 		} );
@@ -439,10 +446,17 @@ public class AutomaticIndexingEmbeddableIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.addOrUpdate( "1", b -> b
-							.objectField( "child", b2 -> b2
-									.objectField( "containedEmbeddedSingle", b3 -> { } )
-									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
-							)
+							.objectField( "child", b2 -> {
+								b2.objectField( "containedEmbeddedSingle", b3 -> { } );
+								b2.objectField( "containedBidirectionalEmbedded", b3 -> { } );
+								if ( !ormSetupHelper.areEntitiesProcessedInSession() ) {
+									// When running indexing from a different session,
+									// the embeddable will no longer be null but will be an empty embeddable.
+									// Ideally we should use hibernate.create_empty_composites.enabled to avoid that,
+									// but this feature is still experimental: https://hibernate.atlassian.net/browse/HHH-11936
+									b2.objectField( "containedEmbeddedList", b3 -> { } );
+								}
+							} )
 					)
 					.createdThenExecuted();
 		} );
@@ -1169,10 +1183,17 @@ public class AutomaticIndexingEmbeddableIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.addOrUpdate( "1", b -> b
-							.objectField( "child", b2 -> b2
-									.objectField( "containedEmbeddedSingle", b3 -> { } )
-									.objectField( "containedEmbeddedList", b3 -> { } )
-							)
+							.objectField( "child", b2 -> {
+								b2.objectField( "containedEmbeddedSingle", b3 -> { } );
+								b2.objectField( "containedEmbeddedList", b3 -> { } );
+								if ( !ormSetupHelper.areEntitiesProcessedInSession() ) {
+									// When running indexing from a different session,
+									// the embeddable will no longer be null but will be an empty embeddable.
+									// Ideally we should use hibernate.create_empty_composites.enabled to avoid that,
+									// but this feature is still experimental: https://hibernate.atlassian.net/browse/HHH-11936
+									b2.objectField( "containedBidirectionalEmbedded", b3 -> { } );
+								}
+							} )
 					)
 					.createdThenExecuted();
 		} );

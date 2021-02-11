@@ -61,7 +61,10 @@ public class AutomaticIndexingSessionFlushIT {
 					.created();
 
 			session.flush();
-			backendMock.verifyExpectationsMet();
+			if ( ormSetupHelper.areEntitiesProcessedInSession() ) {
+				// Entities should be processed and works created on flush
+				backendMock.verifyExpectationsMet();
+			}
 
 			backendMock.expectWorks( IndexedEntity.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
@@ -86,7 +89,10 @@ public class AutomaticIndexingSessionFlushIT {
 					.setHibernateFlushMode( FlushMode.AUTO )
 					.getResultList();
 
-			backendMock.verifyExpectationsMet();
+			if ( ormSetupHelper.areEntitiesProcessedInSession() ) {
+				// Entities should be processed and works created on flush
+				backendMock.verifyExpectationsMet();
+			}
 
 			assertEquals( 1, resultList.size() );
 

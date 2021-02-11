@@ -43,6 +43,8 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 
 class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
+	private final Supplier<BackendWorkThreadingExpectations> indexingWorkThreadingExpectationsSupplier;
+
 	private final Map<IndexFieldKey, CallBehavior<Void>> indexFieldAddBehaviors = new HashMap<>();
 
 	private final List<ParameterizedCallBehavior<BackendBuildContext, Void>> createBackendBehaviors = new ArrayList<>();
@@ -70,6 +72,10 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	private boolean lenient = false;
 
 	private boolean ignoreSchema = false;
+
+	VerifyingStubBackendBehavior(Supplier<BackendWorkThreadingExpectations> indexingWorkThreadingExpectationsSupplier) {
+		this.indexingWorkThreadingExpectationsSupplier = indexingWorkThreadingExpectationsSupplier;
+	}
 
 	void lenient(boolean lenient) {
 		this.lenient = lenient;
@@ -150,7 +156,8 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		schemaDefinitionCalls.values().forEach( CallQueue::verifyExpectationsMet );
 		indexScaleWorkCalls.values().forEach( CallQueue::verifyExpectationsMet );
 		schemaManagementWorkCall.values().forEach( CallQueue::verifyExpectationsMet );
-		documentWorkCalls.values().forEach( CallQueue::verifyExpectationsMet );
+		indexingWorkThreadingExpectationsSupplier.get().awaitIndexingAssertions(
+				() -> documentWorkCalls.values().forEach( CallQueue::verifyExpectationsMet ) );
 		searchCalls.verifyExpectationsMet();
 		countCalls.verifyExpectationsMet();
 		scrollCalls.verifyExpectationsMet();
@@ -209,6 +216,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	@Override
 	public void createDocumentWork(String indexName, StubDocumentWork work) {
+		indexingWorkThreadingExpectationsSupplier.get().checkCurrentThread( work );
 		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
 		callQueue.verify(
 				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.CREATE, work ),
@@ -219,6 +227,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	@Override
 	public void discardDocumentWork(String indexName, StubDocumentWork work) {
+		indexingWorkThreadingExpectationsSupplier.get().checkCurrentThread( work );
 		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
 		callQueue.verify(
 				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.DISCARD, work ),
@@ -229,6 +238,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	@Override
 	public CompletableFuture<?> executeDocumentWork(String indexName, StubDocumentWork work) {
+		indexingWorkThreadingExpectationsSupplier.get().checkCurrentThread( work );
 		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
 		return callQueue.verify(
 				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work ),
@@ -347,4 +357,5 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 			return Objects.hash( indexName, absoluteFieldPath );
 		}
 	}
+
 }
