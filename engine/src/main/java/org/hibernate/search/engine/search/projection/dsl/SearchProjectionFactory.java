@@ -47,11 +47,6 @@ public interface SearchProjectionFactory<R, E> {
 	/**
 	 * Project to the identifier of the referenced entity,
 	 * i.e. the value of the property marked as {@code @DocumentId}.
-	 * <p>
-	 * The actual type of the reference depends on the mapper used to create the query:
-	 * the ORM mapper will return a the identifier, for example.
-	 * <p>
-	 * Using this method we do not provide any assumption about the type of the identifier.
 	 *
 	 * @return A DSL step where the "id" projection can be defined in more details.
 	 */
@@ -62,13 +57,8 @@ public interface SearchProjectionFactory<R, E> {
 	/**
 	 * Project to the identifier of the referenced entity,
 	 * i.e. the value of the property marked as {@code @DocumentId}.
-	 * <p>
-	 * The actual type of the reference depends on the mapper used to create the query:
-	 * the ORM mapper will return a the identifier, for example.
-	 * <p>
-	 * Using this method we assume that the type of the identifier is a subtype of {@code identifierType}.
 	 *
-	 * @param <I> The resulting type of the identifier
+	 * @param <I> The expected type of the identifier
 	 * @param identifierType The expected type of the identifier
 	 * @return A DSL step where the "id" projection can be defined in more details.
 	 * @throws SearchException if the identifier type doesn't match
