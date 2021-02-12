@@ -98,6 +98,9 @@ public class AutomaticIndexingOutOfTransactionIT {
 		@GenericField
 		private String text;
 
+		protected IndexedEntity() { // For ORM
+		}
+
 		IndexedEntity(int id, String text) {
 			this.id = id;
 			this.text = text;
