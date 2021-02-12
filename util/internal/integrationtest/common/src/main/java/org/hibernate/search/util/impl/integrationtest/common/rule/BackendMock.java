@@ -164,6 +164,11 @@ public class BackendMock implements TestRule {
 		);
 	}
 
+	public DocumentWorkCallListContext expectWorksAnyOrder(String indexName) {
+		// Default to force commit and no refresh, which is what the mapper should use by default
+		return expectWorksAnyOrder( indexName, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
+	}
+
 	public DocumentWorkCallListContext expectWorksAnyOrder(String indexName,
 			DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy) {
