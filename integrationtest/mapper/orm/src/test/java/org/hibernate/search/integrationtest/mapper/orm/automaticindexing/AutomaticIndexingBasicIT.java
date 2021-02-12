@@ -286,11 +286,6 @@ public class AutomaticIndexingBasicIT {
 			session.persist( entity1 );
 			session.persist( entity2 );
 
-			// flush triggers the prepare of the current indexing plan
-			Consumer<StubDocumentNode.Builder> documentFieldConsumer = b -> b
-					.field( "indexedField", "number1" )
-					.field( "noReindexOnUpdateField", null );
-
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", expectedValue( "number1" ) )
 					.add( "2", expectedValue( "number2" ) )
