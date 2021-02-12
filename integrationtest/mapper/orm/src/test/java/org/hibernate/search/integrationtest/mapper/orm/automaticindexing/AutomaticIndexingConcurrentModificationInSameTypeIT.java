@@ -12,12 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -50,70 +44,76 @@ public class AutomaticIndexingConcurrentModificationInSameTypeIT {
 				)
 		);
 
-		sessionFactory = ormSetupHelper.start().withProperty(
-				HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY,
-				AutomaticIndexingStrategyNames.NONE
-		).setup( IndexedEntity.class );
+		sessionFactory = ormSetupHelper.start().setup( IndexedEntity.class );
 
+		backendMock.verifyExpectationsMet();
+
+		// Data initialization
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setName( "edouard" );
+			entity1.setFirstName( "zobocare" );
+
+			IndexedEntity entity2 = new IndexedEntity();
+			entity2.setId( 2 );
+			entity2.setName( "yann" );
+			entity2.setFirstName( "bonduel" );
+
+			IndexedEntity entity3 = new IndexedEntity();
+			entity3.setId( 3 );
+			entity3.setName( "antoine" );
+			entity3.setFirstName( "owl" );
+
+			entity2.setChild( entity1 );
+			entity1.setParent( entity2 );
+
+			session.persist( entity1 );
+			session.persist( entity2 );
+			session.persist( entity3 );
+
+			backendMock.expectWorksAnyOrder( IndexedEntity.INDEX )
+					.add( String.valueOf( 1 ), b -> b
+							.field( "name", "edouard" )
+							.field( "firstName", "zobocare" ) )
+					.add( String.valueOf( 2 ), b -> b
+							.field( "name", "yann" )
+							.field( "firstName", "bonduel" )
+							.objectField( "child", b2 -> b2
+									.field( "name", "edouard" )
+									.field( "firstName", "zobocare" ) ) )
+					.add( String.valueOf( 3 ), b -> b
+							.field( "name", "antoine" )
+							.field( "firstName", "owl" ) )
+					.createdThenExecuted();
+		} );
 		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3857")
 	public void updateTriggeringReindexingOfPreviouslyUnknownEntity() {
-		IndexedEntity entity1 = new IndexedEntity();
-		entity1.setId( 1 );
-		entity1.setName( "edouard" );
-		entity1.setFirstName( "zobocare" );
-
-		IndexedEntity entity2 = new IndexedEntity();
-		entity2.setId( 2 );
-		entity2.setName( "yann" );
-		entity2.setFirstName( "bonduel" );
-
-		IndexedEntity entity3 = new IndexedEntity();
-		entity3.setId( 3 );
-		entity3.setName( "antoine" );
-		entity3.setFirstName( "owl" );
-
-		entity2.setChild( entity1 );
-		entity1.setParent( entity2 );
-
-		// First transaction
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			session.persist( entity1 );
-			session.persist( entity2 );
-			session.persist( entity3 );
-			session.flush();
-			backendMock.verifyExpectationsMet();
-		} );
-
-		// Second transaction
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
-			indexingPlan.addOrUpdate( session.load( IndexedEntity.class, 1 ) );
+			IndexedEntity entity1 = session.load( IndexedEntity.class, 1 );
+			entity1.setName( "updated" );
 			// Add another entity to the indexing plan so that we're not done iterating over all entities
 			// when entity2 is added to the indexing plan due to the change in the child.
-			indexingPlan.addOrUpdate( session.load( IndexedEntity.class, 3 ) );
+			IndexedEntity entity3 = session.load( IndexedEntity.class, 3 );
+			entity3.setName( "updated" );
 
-			backendMock.expectWorksAnyOrder(
-					IndexedEntity.INDEX, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE )
-					.addOrUpdate( entity1.getId().toString(), b -> b
-							.field( "name", entity1.getName() )
-							.field( "firstName", entity1.getFirstName() )
-					)
-					.addOrUpdate( entity2.getId().toString(), b -> b
-							.field( "name", entity2.getName() )
-							.field( "firstName", entity2.getFirstName() )
+			backendMock.expectWorksAnyOrder( IndexedEntity.INDEX )
+					.addOrUpdate( String.valueOf( 1 ), b -> b
+							.field( "name", "updated" )
+							.field( "firstName", "zobocare" ) )
+					.addOrUpdate( String.valueOf( 2 ), b -> b
+							.field( "name", "yann" )
+							.field( "firstName", "bonduel" )
 							.objectField( "child", b2 -> b2
-									.field( "firstName", entity1.getFirstName() )
-									.field( "name", entity1.getName() )
-							)
-					)
-					.addOrUpdate( entity3.getId().toString(), b -> b
-							.field( "name", entity3.getName() )
-							.field( "firstName", entity3.getFirstName() )
-					)
+									.field( "name", "updated" )
+									.field( "firstName", "zobocare" ) ) )
+					.addOrUpdate( String.valueOf( 3 ), b -> b
+							.field( "name", "updated" )
+							.field( "firstName", "owl" ) )
 					.createdThenExecuted();
 		} );
 
