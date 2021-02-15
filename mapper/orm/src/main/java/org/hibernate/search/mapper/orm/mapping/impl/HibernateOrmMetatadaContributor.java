@@ -102,7 +102,11 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 		// Sort the properties before processing for deterministic iteration
 		List<Property> properties = new ArrayList<>();
 		while ( propertyIterator.hasNext() ) {
-			properties.add( (Property) propertyIterator.next() );
+			Property property = (Property) propertyIterator.next();
+			if ( property.isSynthetic() ) {
+				continue;
+			}
+			properties.add( property );
 		}
 		properties.sort( PropertyComparator.INSTANCE );
 

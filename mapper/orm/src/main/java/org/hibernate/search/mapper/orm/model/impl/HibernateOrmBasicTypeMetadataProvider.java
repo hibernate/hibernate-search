@@ -83,6 +83,9 @@ public class HibernateOrmBasicTypeMetadataProvider {
 		}
 		while ( propertyIterator.hasNext() ) {
 			Property property = propertyIterator.next();
+			if ( property.isSynthetic() ) {
+				continue;
+			}
 			collectClassProperty( metadataProviderBuilder, properties, javaClass, property, false );
 		}
 
@@ -103,6 +106,9 @@ public class HibernateOrmBasicTypeMetadataProvider {
 		}
 		while ( propertyIterator.hasNext() ) {
 			Property property = propertyIterator.next();
+			if ( property.isSynthetic() ) {
+				continue;
+			}
 			collectDynamicMapProperty( metadataProviderBuilder, properties, property );
 		}
 
