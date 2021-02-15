@@ -223,6 +223,7 @@
 
     <concept id="hsearch:IntegrationTestArtifacts">
         <requiresConcept refId="hsearch:HibernateSearch" />
+        <requiresConcept refId="hsearch:UtilArtifacts" />
         <description>
             Contributes the :IntegrationTest label to :Maven:Artifact nodes representing integration testing artifacts.
         </description>
@@ -230,8 +231,11 @@
             MATCH
                 (artifact:Maven:Artifact:HibernateSearch)
             WHERE
-                artifact.name =~ ".*-integrationtest-.*"
-                OR artifact.name = "hibernate-search-documentation"
+                NOT artifact:Util
+                AND (
+                    artifact.name =~ ".*-integrationtest-.*"
+                    OR artifact.name = "hibernate-search-documentation"
+                )
             SET
                 artifact:IntegrationTest
             RETURN
