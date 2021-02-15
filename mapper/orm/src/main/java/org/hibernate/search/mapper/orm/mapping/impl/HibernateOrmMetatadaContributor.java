@@ -17,6 +17,7 @@ import java.util.StringTokenizer;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.OneToMany;
+import org.hibernate.mapping.OneToOne;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.hibernate.mapping.Selectable;
@@ -139,10 +140,12 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 				);
 			}
 		}
-		else if ( value instanceof ToOne ) {
-			ToOne toOneValue = (ToOne) value;
+		else if ( value instanceof OneToOne ) {
+			// ManyToOne never carries any useful inverse side information:
+			// either it refers to nothing or to a synthetic property that we're not interested in.
+			// OneToOne, on the other hand, uses ReferencedPropertyName to store the "mappedBy" information.
+			OneToOne toOneValue = (OneToOne) value;
 			String referencedEntityName = toOneValue.getReferencedEntityName();
-			// For *ToOne, the "mappedBy" information is apparently stored in the ReferencedPropertyName
 			String mappedByPath = toOneValue.getReferencedPropertyName();
 			if ( mappedByPath != null && !mappedByPath.isEmpty() ) {
 				collector.collect(
