@@ -52,6 +52,10 @@ public class RoutingBridgeRoutingKeyIT {
 		entityManagerFactory = setupHelper.start()
 				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
 						AutomaticIndexingSynchronizationStrategyNames.READ_SYNC )
+				// This call in testLifecycle to Elasticsearch sever may exceed 30 seconds,
+				// from some machine. This is a server (not Hibernate Search) latency.
+				// E.g: > query parameters {} and 1 objects in payload in 30617ms.
+				.withProperty( "hibernate.search.backend.read_timeout", "60000" )
 				.setup( Book.class );
 	}
 
