@@ -49,8 +49,9 @@ public class SmokeIT {
 				.measurementTime( TimeValue.seconds( 1 ) )
 				.param(
 						"configuration",
-						"",
-						"max_connections_per_route=30"
+						// Overriding read timeout to avoid failures on some super slow machines (Mac?)
+						"read_timeout=120000",
+						"read_timeout=120000&max_connections_per_route=30"
 				)
 				.param( "initialIndexSize", "100" )
 				.param( "batchSize", "10" )
