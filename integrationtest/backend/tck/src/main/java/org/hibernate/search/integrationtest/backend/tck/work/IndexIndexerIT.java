@@ -15,6 +15,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -91,7 +92,9 @@ public class IndexIndexerIT {
 			);
 		}
 		CompletableFuture<?> future = CompletableFuture.allOf( tasks );
-		Awaitility.await().until( future::isDone );
+		// In the case of commitStrategy=force we're going to do 200 almost concurrent commits,
+		// that is very unrealistic use case. So we will use a very large timeout here.
+		Awaitility.await().timeout( 30, TimeUnit.SECONDS ).until( future::isDone );
 		// The operations should succeed.
 		assertThatFuture( future ).isSuccessful();
 
@@ -114,7 +117,9 @@ public class IndexIndexerIT {
 			);
 		}
 		future = CompletableFuture.allOf( tasks );
-		Awaitility.await().until( future::isDone );
+		// In the case of commitStrategy=force we're going to do 200 almost concurrent commits,
+		// that is very unrealistic use case. So we will use a very large timeout here.
+		Awaitility.await().timeout( 30, TimeUnit.SECONDS ).until( future::isDone );
 		// The operations should succeed.
 		assertThatFuture( future ).isSuccessful();
 
@@ -136,7 +141,9 @@ public class IndexIndexerIT {
 			);
 		}
 		future = CompletableFuture.allOf( tasks );
-		Awaitility.await().until( future::isDone );
+		// In the case of commitStrategy=force we're going to do 200 almost concurrent commits,
+		// that is very unrealistic use case. So we will use a very large timeout here.
+		Awaitility.await().timeout( 30, TimeUnit.SECONDS ).until( future::isDone );
 		// The operations should succeed.
 		assertThatFuture( future ).isSuccessful();
 
