@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.batch.jsr352.massindexing;
 
 import static org.junit.Assert.assertEquals;
+import static org.hibernate.search.integrationtest.batch.jsr352.massindexing.AbstractBatchIndexingIT.JOB_TIMEOUT_MS;
 
 import java.io.IOException;
 import java.util.List;
@@ -40,8 +41,6 @@ public class RestartChunkIT {
 	private static final int CHECKPOINT_INTERVAL = 10;
 
 	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();
-
-	private static final int JOB_TIMEOUT_MS = 10_000;
 
 	protected static final long DB_COMP_ROWS = 150;
 

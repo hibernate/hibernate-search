@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.batch.jsr352.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.integrationtest.batch.jsr352.util.JobTestUtil.findIndexedResultsInTenant;
+import static org.hibernate.search.integrationtest.batch.jsr352.massindexing.AbstractBatchIndexingIT.JOB_TIMEOUT_MS;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -44,8 +45,6 @@ public class MassIndexingJobWithMultiTenancyIT {
 	private static final String TARGET_TENANT_ID = "targetTenant";
 
 	private static final String UNUSED_TENANT_ID = "unusedTenant";
-
-	private static final int JOB_TIMEOUT_MS = 10_000;
 
 	private SessionFactory sessionFactory;
 

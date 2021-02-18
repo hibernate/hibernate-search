@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.batch.jsr352.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.integrationtest.batch.jsr352.massindexing.AbstractBatchIndexingIT.JOB_TIMEOUT_MS;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -40,8 +41,6 @@ import org.junit.Test;
 public class MassIndexingJobWithCompositeIdIT {
 
 	private static final String PERSISTENCE_UNIT_NAME = PersistenceUnitTestUtil.getPersistenceUnitName();
-
-	private static final int JOB_TIMEOUT_MS = 30_000;
 
 	private static final LocalDate START = LocalDate.of( 2017, 6, 1 );
 
