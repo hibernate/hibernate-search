@@ -43,7 +43,7 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 	private static final ConfigurationProperty<BeanReference<? extends ElasticsearcAwsCredentialsProvider>> CREDENTIALS_TYPE =
 			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.CREDENTIALS_TYPE )
 					.asBeanReference( ElasticsearcAwsCredentialsProvider.class )
-					.withDefault( BeanReference.of( ElasticsearcAwsCredentialsProvider.class, ElasticsearchAwsCredentialsTypeNames.DEFAULT ) )
+					.withDefault( BeanReference.of( ElasticsearcAwsCredentialsProvider.class, ElasticsearchAwsBackendSettings.Defaults.CREDENTIALS_TYPE ) )
 					.build();
 
 	private static final OptionalConfigurationProperty<String> LEGACY_ACCESS_KEY =
