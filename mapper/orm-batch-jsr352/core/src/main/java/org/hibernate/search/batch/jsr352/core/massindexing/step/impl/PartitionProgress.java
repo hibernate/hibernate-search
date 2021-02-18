@@ -37,24 +37,12 @@ public class PartitionProgress implements Serializable {
 		return entityName;
 	}
 
-	public void setEntityName(String entityName) {
-		this.entityName = entityName;
-	}
-
 	public int getPartitionId() {
 		return partitionId;
 	}
 
-	public void setPartitionId(int partitionId) {
-		this.partitionId = partitionId;
-	}
-
 	public long getWorkDone() {
 		return workDone;
-	}
-
-	public void setWorkDone(long workDone) {
-		this.workDone = workDone;
 	}
 
 	@Override

@@ -59,10 +59,6 @@ enum BucketOrder {
 
 	abstract <F> Comparator<Bucket<F>> toBucketComparatorInternal(Comparator<F> termComparator);
 
-	<F> Comparator<F> toTermComparator(Comparator<F> termAscendingComparator) {
-		return termAscendingComparator;
-	}
-
 	boolean isTermOrderDescending() {
 		return false;
 	}

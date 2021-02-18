@@ -23,10 +23,6 @@ public abstract class LuceneFieldComparatorSource extends FieldComparatorSource 
 		this.filter = filter;
 	}
 
-	public String getNestedDocumentPath() {
-		return nestedDocumentPath;
-	}
-
 	public void setOriginalParentQuery(Query luceneQuery) {
 		this.nestedDocsProvider = new NestedDocsProvider( nestedDocumentPath, luceneQuery, filter );
 	}

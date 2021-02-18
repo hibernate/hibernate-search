@@ -27,18 +27,6 @@ public final class DefaultResourceResolver implements ResourceResolver {
 	}
 
 	@Override
-	public URL locateResource(String name) {
-		try {
-			return aggregatedClassLoader.getResource( name );
-		}
-		catch (Exception ignore) {
-			// Ignore
-		}
-
-		return null;
-	}
-
-	@Override
 	public InputStream locateResourceStream(String name) {
 		try {
 			final InputStream stream = aggregatedClassLoader.getResourceAsStream( name );

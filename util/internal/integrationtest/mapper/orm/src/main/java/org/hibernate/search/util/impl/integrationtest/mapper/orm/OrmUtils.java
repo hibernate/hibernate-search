@@ -53,13 +53,6 @@ public final class OrmUtils {
 		} );
 	}
 
-	public static void withinJPATransaction(EntityManager entityManager, Consumer<EntityTransaction> action) {
-		withinJPATransaction( entityManager, tx -> {
-			action.accept( tx );
-			return null;
-		} );
-	}
-
 	public static <R> R withinTransaction(Session session, Function<Transaction, R> action) {
 		Transaction tx = null;
 		try {

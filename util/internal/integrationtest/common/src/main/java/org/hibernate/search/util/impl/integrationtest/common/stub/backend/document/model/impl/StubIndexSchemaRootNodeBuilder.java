@@ -22,12 +22,12 @@ public class StubIndexSchemaRootNodeBuilder extends AbstractStubIndexSchemaObjec
 	private final StubBackendBehavior backendBehavior;
 	private final String indexName;
 
-	public StubIndexSchemaRootNodeBuilder(StubBackendBehavior backendBehavior, String indexName, String mappedTypeName) {
-		this( backendBehavior, indexName, StubIndexSchemaNode.schema(), mappedTypeName );
+	public StubIndexSchemaRootNodeBuilder(StubBackendBehavior backendBehavior, String indexName) {
+		this( backendBehavior, indexName, StubIndexSchemaNode.schema() );
 	}
 
 	private StubIndexSchemaRootNodeBuilder(StubBackendBehavior backendBehavior, String indexName,
-			StubIndexSchemaNode.Builder builder, String mappedTypeName) {
+			StubIndexSchemaNode.Builder builder) {
 		super( builder );
 		this.backendBehavior = backendBehavior;
 		this.indexName = indexName;

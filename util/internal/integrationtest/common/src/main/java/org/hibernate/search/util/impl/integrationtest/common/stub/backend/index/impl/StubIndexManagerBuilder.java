@@ -26,13 +26,12 @@ public class StubIndexManagerBuilder implements IndexManagerBuilder {
 
 	private boolean closed = false;
 
-	public StubIndexManagerBuilder(StubBackend backend, String name, String mappedTypeName1,
-			String mappedTypeName) {
+	public StubIndexManagerBuilder(StubBackend backend, String name, String mappedTypeName) {
 		StaticCounters.get().increment( INSTANCE_COUNTER_KEY );
 		this.backend = backend;
 		this.name = name;
 		this.mappedTypeName = mappedTypeName;
-		this.schemaRootNodeBuilder = new StubIndexSchemaRootNodeBuilder( backend.getBehavior(), name, mappedTypeName );
+		this.schemaRootNodeBuilder = new StubIndexSchemaRootNodeBuilder( backend.getBehavior(), name );
 	}
 
 	@Override

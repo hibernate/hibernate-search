@@ -21,10 +21,6 @@ public class NormalizedDocRefHit {
 		return builder.build();
 	}
 
-	public static DocumentReference[] of(String typeName, String firstId, String... otherIds) {
-		return of( b -> b.doc( typeName, firstId, otherIds ) );
-	}
-
 	private NormalizedDocRefHit() {
 	}
 

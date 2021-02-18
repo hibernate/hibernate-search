@@ -39,13 +39,6 @@ public final class DslExtensionState<R> {
 
 	private List<Object> unsupportedExtensions;
 
-	public <E> void ifSupported(Object extension, Optional<E> extendedContextOptional, Consumer<E> extendedContextConsumer) {
-		ifSupported( extension, extendedContextOptional, c -> {
-			extendedContextConsumer.accept( c );
-			return null;
-		} );
-	}
-
 	public <E> void ifSupported(Object extension, Optional<E> extendedContextOptional,
 			Function<E, ? extends R> extendedContextFunction) {
 		if ( appliedOrElse ) {

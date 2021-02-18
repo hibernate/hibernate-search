@@ -224,11 +224,6 @@ class IndexManagerBuildingStateHolder {
 		}
 
 		@Override
-		public String getIndexName() {
-			return indexName;
-		}
-
-		@Override
 		public IndexSchemaRootNodeBuilder getSchemaRootNodeBuilder() {
 			return schemaRootNodeBuilder;
 		}

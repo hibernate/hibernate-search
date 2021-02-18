@@ -34,20 +34,12 @@ public class PartitionBound {
 		return indexScope;
 	}
 
-	public Class<?> getEntityType() {
-		return entityType;
-	}
-
 	public String getEntityName() {
 		return entityType.getName();
 	}
 
 	public Object getLowerBound() {
 		return lowerBound;
-	}
-
-	public void setLowerBound(Object lowerBound) {
-		this.lowerBound = lowerBound;
 	}
 
 	public Object getUpperBound() {

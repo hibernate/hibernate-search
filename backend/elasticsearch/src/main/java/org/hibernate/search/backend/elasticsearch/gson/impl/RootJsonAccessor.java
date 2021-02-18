@@ -68,9 +68,4 @@ class RootJsonAccessor implements JsonCompositeAccessor<JsonElement> {
 	public String toString() {
 		return "root";
 	}
-
-	@Override
-	public String getStaticAbsolutePath() {
-		return null;
-	}
 }

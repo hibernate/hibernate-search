@@ -171,10 +171,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 13, value = "Mass indexing received interrupt signal. The index is left in an unknown state!")
 	SearchException massIndexingThreadInterrupted(@Cause InterruptedException e);
 
-	@Message(id = ID_OFFSET + 15,
-			value = "Invalid reflection strategy name: '%1$s'. Valid names are: %2$s.")
-	SearchException invalidReflectionStrategyName(String invalidRepresentation, List<String> validRepresentations);
-
 	@Message(id = ID_OFFSET + 16, value = "Unable to access Hibernate ORM session: %1$s" )
 	SearchException hibernateSessionAccessError(String causeMessage, @Cause IllegalStateException cause);
 

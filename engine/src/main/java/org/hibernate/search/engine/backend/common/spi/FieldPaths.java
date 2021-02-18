@@ -55,10 +55,6 @@ public class FieldPaths {
 		return compose( absoluteParentPath, prefix( prefix, relativeFieldPathGlob ) );
 	}
 
-	public static String absolutize(String absoluteParentPath, String prefix, String relativeFieldName) {
-		return compose( absoluteParentPath, prefix( prefix, relativeFieldName ) );
-	}
-
 	public static RelativizedPath relativize(String absolutePath) {
 		int lastSeparatorIndex = absolutePath.lastIndexOf( PATH_SEPARATOR );
 		if ( lastSeparatorIndex < 0 ) {

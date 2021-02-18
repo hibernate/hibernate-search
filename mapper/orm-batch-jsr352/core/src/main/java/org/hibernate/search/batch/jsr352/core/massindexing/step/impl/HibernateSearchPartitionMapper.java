@@ -208,7 +208,7 @@ public class HibernateSearchPartitionMapper implements PartitionMapper {
 		Class<?> javaClass = entityTypeDescriptor.getJavaClass();
 		List<PartitionBound> partitionUnits = new ArrayList<>();
 
-		Object lowerID = null;
+		Object lowerID;
 		Object upperID = null;
 
 		CriteriaBuilder builder = emf.getCriteriaBuilder();

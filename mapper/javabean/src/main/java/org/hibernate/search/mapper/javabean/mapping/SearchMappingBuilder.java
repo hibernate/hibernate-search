@@ -155,7 +155,7 @@ public final class SearchMappingBuilder {
 		BEAN_PROVIDER.get( propertySource ).ifPresent( integrationBuilder::beanManagerBeanProvider );
 
 		SearchIntegrationPartialBuildState integrationPartialBuildState = integrationBuilder.prepareBuild();
-		SearchIntegration integration = null;
+		SearchIntegration integration;
 		SearchMapping mapping;
 		try {
 			SearchIntegrationFinalizer finalizer =

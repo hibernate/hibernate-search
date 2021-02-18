@@ -65,32 +65,7 @@ public class ClassLoaderHelper {
 	}
 
 	/**
-	 * Creates an instance of target class
-	 *
-	 * @param <T> the type of targetSuperType: defines the return type
-	 * @param targetSuperType the created instance will be checked to be assignable to this type
-	 * @param classToLoad the class to be instantiated
-	 *
-	 * @return a new instance of classToLoad
-	 *
-	 * @throws SearchException wrapping other error types with a proper error message for all kind of problems, like
-	 * missing proper constructor, wrong type, securitymanager errors.
-	 */
-	public static <T> T instanceFromClass(Class<T> targetSuperType, Class<?> classToLoad) {
-		final Object instance;
-		try {
-			instance = callNoArgConstructor( classToLoad );
-		}
-		catch (IllegalAccessException | InvocationTargetException | InstantiationException | RuntimeException e) {
-			throw log.unableToInstantiateClass( classToLoad.getName(), Throwables.getFirstNonNullMessage( e ), e );
-		}
-		return verifySuperTypeCompatibility( targetSuperType, instance, classToLoad );
-	}
-
-	/**
-	 * Creates an instance of target class. Similar to {@link #instanceFromClass(Class, Class)} but not checking
-	 * the created instance will be of any specific type: using {@link #instanceFromClass(Class, Class)} should
-	 * be preferred whenever possible.
+	 * Creates an instance of target class.
 	 *
 	 * @param <T> the type of targetSuperType: defines the return type
 	 * @param classToLoad the class to be instantiated

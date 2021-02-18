@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.impl;
 
-import java.sql.Connection;
-
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
 import org.hibernate.engine.jdbc.spi.JdbcServices;
@@ -15,7 +13,6 @@ import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
 import org.hibernate.engine.jdbc.spi.SqlStatementLogger;
 import org.hibernate.resource.transaction.backend.jdbc.internal.DdlTransactionIsolatorNonJtaImpl;
 import org.hibernate.service.ServiceRegistry;
-import org.hibernate.tool.schema.internal.exec.JdbcConnectionAccessProvidedConnectionImpl;
 import org.hibernate.tool.schema.internal.exec.JdbcContext;
 
 /**
@@ -27,10 +24,6 @@ import org.hibernate.tool.schema.internal.exec.JdbcContext;
  * @author Steve Ebersole
  */
 final class DdlTransactionIsolatorTestingImpl extends DdlTransactionIsolatorNonJtaImpl {
-
-	public static JdbcConnectionAccess createJdbcConnectionAccess(Connection jdbcConnection) {
-		return new JdbcConnectionAccessProvidedConnectionImpl( jdbcConnection );
-	}
 
 	public DdlTransactionIsolatorTestingImpl(ServiceRegistry serviceRegistry,
 			JdbcConnectionAccess jdbcConnectionAccess) {

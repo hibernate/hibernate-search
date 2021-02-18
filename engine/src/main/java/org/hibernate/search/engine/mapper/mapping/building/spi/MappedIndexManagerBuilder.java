@@ -17,8 +17,6 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
  */
 public interface MappedIndexManagerBuilder {
 
-	String indexName();
-
 	IndexedEntityBindingContext rootBindingContext();
 
 	MappedIndexManager build();

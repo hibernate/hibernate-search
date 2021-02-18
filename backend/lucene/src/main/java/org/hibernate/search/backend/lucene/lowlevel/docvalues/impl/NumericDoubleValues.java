@@ -44,14 +44,6 @@ public abstract class NumericDoubleValues extends DoubleValues {
 		return new RawNumericDocValues( v -> (long) Float.floatToRawIntBits( (float) v ) );
 	}
 
-	/**
-	 * Returns numeric docvalues view of raw long bits
-	 * @return numeric
-	 */
-	public NumericDocValues getRawLongValues() {
-		return new RawNumericDocValues( v -> (long) v );
-	}
-
 	public static NumericDoubleValues fromField(NumericDocValues values, LongToDoubleFunction decoder) {
 		return new FieldNumericDoubleValues( values, decoder );
 	}

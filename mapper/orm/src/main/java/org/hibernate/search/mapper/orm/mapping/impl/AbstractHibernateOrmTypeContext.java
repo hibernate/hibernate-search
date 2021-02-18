@@ -10,15 +10,13 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContext;
-import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeTypeContext;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContext;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 abstract class AbstractHibernateOrmTypeContext<E>
-		implements HibernateOrmScopeTypeContext<E>, HibernateOrmListenerTypeContext,
-				HibernateOrmSessionTypeContext<E> {
+		implements HibernateOrmListenerTypeContext, HibernateOrmSessionTypeContext<E> {
 
 	private final PojoRawTypeIdentifier<E> typeIdentifier;
 	private final String jpaEntityName;

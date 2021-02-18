@@ -54,12 +54,6 @@ public final class FailureReportUtils {
 		};
 	}
 
-	public static Consumer<Throwable> hasCauseWithContext(EventContext first, EventContext ... others) {
-		Consumer<Throwable> delegate = hasContext( first, others );
-		return e -> delegate.accept( e.getCause() );
-
-	}
-
 	public static FailureReportPatternBuilder buildFailureReportPattern() {
 		return new FailureReportPatternBuilder();
 	}

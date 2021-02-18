@@ -80,6 +80,6 @@ public class StubBackend implements BackendImplementor, Backend {
 	public IndexManagerBuilder createIndexManagerBuilder(String indexName,
 			String mappedTypeName, boolean isMultiTenancyEnabled, BackendBuildContext context,
 			ConfigurationPropertySource propertySource) {
-		return new StubIndexManagerBuilder( this, indexName, mappedTypeName, mappedTypeName );
+		return new StubIndexManagerBuilder( this, indexName, mappedTypeName );
 	}
 }

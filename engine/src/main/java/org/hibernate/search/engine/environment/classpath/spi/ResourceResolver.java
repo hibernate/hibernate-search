@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.environment.classpath.spi;
 
 import java.io.InputStream;
-import java.net.URL;
 
 /**
  * A resolver of Java resources.
@@ -16,15 +15,6 @@ import java.net.URL;
  * @author Hardy Ferentschik
  */
 public interface ResourceResolver {
-
-	/**
-	 * Locate a resource by name (classpath lookup).
-	 *
-	 * @param name The resource name.
-	 *
-	 * @return The located URL; may return {@code null} to indicate the resource was not found
-	 */
-	URL locateResource(String name);
 
 	/**
 	 * Locate a resource by name (classpath lookup) and get its stream.

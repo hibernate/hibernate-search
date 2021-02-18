@@ -99,7 +99,4 @@ public interface EngineEventContextMessages {
 	@Message(value = "token filter '%1$s'")
 	String tokenFilter(String name);
 
-	@Message(value = "attribute '%1$s'")
-	String attribute(String name);
-
 }

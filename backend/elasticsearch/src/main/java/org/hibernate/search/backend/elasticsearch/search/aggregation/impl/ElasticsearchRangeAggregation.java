@@ -53,7 +53,7 @@ public class ElasticsearchRangeAggregation<F, K>
 	}
 
 	@Override
-	protected void doRequest(AggregationRequestContext context, JsonObject outerObject, JsonObject innerObject) {
+	protected void doRequest(JsonObject outerObject, JsonObject innerObject) {
 		outerObject.add( "range", innerObject );
 		innerObject.addProperty( "field", absoluteFieldPath );
 		innerObject.addProperty( "keyed", true );
@@ -61,8 +61,7 @@ public class ElasticsearchRangeAggregation<F, K>
 	}
 
 	@Override
-	protected Map<Range<K>, Long> doExtract(AggregationExtractContext context, JsonObject outerObject,
-			JsonElement buckets) {
+	protected Map<Range<K>, Long> doExtract(AggregationExtractContext context, JsonElement buckets) {
 		JsonObject bucketMap = buckets.getAsJsonObject();
 		Map<Range<K>, Long> result = CollectionHelper.newLinkedHashMap( rangesJson.size() );
 		for ( int i = 0; i < rangesJson.size(); i++ ) {

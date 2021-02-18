@@ -30,11 +30,10 @@ public interface PojoMapperDelegate<MPBS> {
 	 * @param rawTypeModel The raw type model for an indexed entity type,
 	 * i.e. a type mapped to an index directly.
 	 * @param entityName The name of the entity type.
-	 * @param indexName The name of the index mapped to this type.
 	 * @return A collector of extended mapping information.
 	 */
 	<E> PojoIndexedTypeExtendedMappingCollector createIndexedTypeExtendedMappingCollector(
-			PojoRawTypeModel<E> rawTypeModel, String entityName, String indexName);
+			PojoRawTypeModel<E> rawTypeModel, String entityName);
 
 	/**
 	 * @param rawTypeModel The raw type model for a contained entity type,

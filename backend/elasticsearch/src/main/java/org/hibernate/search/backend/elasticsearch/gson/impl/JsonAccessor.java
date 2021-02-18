@@ -94,12 +94,6 @@ public interface JsonAccessor<T> {
 	 */
 	T getOrCreate(JsonObject root, Supplier<? extends T> newValueSupplier);
 
-	/**
-	 * @return The absolute path representing this accessor, excluding runtime details such as array indices or types.
-	 * {@code null} for the root accessor.
-	 */
-	String getStaticAbsolutePath();
-
 	static JsonObjectAccessor root() {
 		return RootJsonAccessor.INSTANCE;
 	}

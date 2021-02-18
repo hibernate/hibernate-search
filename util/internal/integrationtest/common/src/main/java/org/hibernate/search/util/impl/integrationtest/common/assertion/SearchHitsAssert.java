@@ -15,7 +15,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
 
 import org.assertj.core.api.ListAssert;
@@ -33,10 +32,6 @@ public class SearchHitsAssert<H> {
 
 	private SearchHitsAssert(List<? extends H> actual) {
 		this.actual = actual;
-	}
-
-	public SearchHitsAssert<H> fromQuery(SearchQuery<?> query) {
-		return as( "Hits of " + query.toString() );
 	}
 
 	public SearchHitsAssert<H> as(String description) {

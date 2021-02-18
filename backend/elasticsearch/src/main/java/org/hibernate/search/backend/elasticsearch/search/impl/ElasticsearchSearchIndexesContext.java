@@ -29,6 +29,4 @@ public interface ElasticsearchSearchIndexesContext {
 
 	ElasticsearchSearchFieldContext field(String absoluteFieldPath);
 
-	boolean hasSchemaObjectNodeComponent(String absoluteFieldPath);
-
 }

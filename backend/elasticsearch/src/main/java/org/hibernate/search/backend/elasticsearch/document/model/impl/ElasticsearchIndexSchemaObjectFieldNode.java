@@ -139,8 +139,4 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 		return null;
 	}
 
-	public ObjectStructure structure() {
-		return structure;
-	}
-
 }

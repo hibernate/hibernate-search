@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.orm.bootstrap.impl;
 
 import java.io.InputStream;
-import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -60,15 +59,6 @@ final class HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver
 		catch (ClassLoadingException | LinkageError e) {
 			return internalClassResolver.classForName( className );
 		}
-	}
-
-	@Override
-	public URL locateResource(String name) {
-		URL url = hibernateClassLoaderService.locateResource( name );
-		if ( url == null ) {
-			url = internalResourceResolver.locateResource( name );
-		}
-		return url;
 	}
 
 	@Override

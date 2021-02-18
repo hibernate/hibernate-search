@@ -11,7 +11,6 @@ import java.math.BigInteger;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -62,28 +61,6 @@ public final class JsonElementTypes {
 		@Override
 		public String toString() {
 			return JsonArray.class.getSimpleName();
-		}
-	};
-
-	public static final JsonElementType<JsonPrimitive> PRIMITIVE = new JsonElementType<JsonPrimitive>() {
-		@Override
-		protected JsonPrimitive nullUnsafeFromElement(JsonElement element) {
-			return element.isJsonNull() ? null : element.getAsJsonPrimitive();
-		}
-
-		@Override
-		protected JsonElement nullUnsafeToElement(JsonPrimitive value) {
-			return value;
-		}
-
-		@Override
-		protected boolean nullUnsafeIsInstance(JsonElement element) {
-			return element.isJsonPrimitive();
-		}
-
-		@Override
-		public String toString() {
-			return JsonPrimitive.class.getSimpleName();
 		}
 	};
 
@@ -253,25 +230,4 @@ public final class JsonElementTypes {
 		}
 	};
 
-	public static final JsonElementType<JsonNull> NULL = new JsonElementType<JsonNull>() {
-		@Override
-		protected JsonNull nullUnsafeFromElement(JsonElement element) {
-			return element.getAsJsonNull();
-		}
-
-		@Override
-		protected JsonElement nullUnsafeToElement(JsonNull element) {
-			return element;
-		}
-
-		@Override
-		protected boolean nullUnsafeIsInstance(JsonElement element) {
-			return element.isJsonNull();
-		}
-
-		@Override
-		public String toString() {
-			return JsonNull.class.getSimpleName();
-		}
-	};
 }

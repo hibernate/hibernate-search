@@ -29,10 +29,6 @@ public class HibernateOrmSearchSessionHolder implements Serializable {
 		return holderPerClosedSessionTransaction.size();
 	}
 
-	public static HibernateOrmSearchSessionHolder get(SessionImplementor session) {
-		return get( session, true );
-	}
-
 	public static HibernateOrmSearchSessionHolder get(SessionImplementor session, boolean createIfMissing) {
 		HibernateOrmSearchSessionHolder holder = (HibernateOrmSearchSessionHolder)
 				session.getProperties().get( SESSION_PROPERTY_KEY );

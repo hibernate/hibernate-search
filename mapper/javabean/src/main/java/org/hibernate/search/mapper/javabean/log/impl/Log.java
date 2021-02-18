@@ -7,12 +7,11 @@
 
 package org.hibernate.search.mapper.javabean.log.impl;
 
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
+import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;
@@ -29,13 +28,6 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 3, value = "Unable to retrieve type model for class '%1$s'.")
 	SearchException errorRetrievingTypeModel(@FormatWith(ClassFormatter.class) Class<?> clazz, @Cause Exception cause);
-
-	@Message(id = ID_OFFSET + 5,
-			value = "Unable to load the entity instance corresponding to document '%1$s':"
-					+ " the JavaBean mapper does not support entity loading."
-					+ " There is probably an entity projection in the query definition: it should be removed."
-	)
-	SearchException cannotLoadEntity(DocumentReference reference);
 
 	@Message(id = ID_OFFSET + 6, value = "Multiple entity types configured with the same name '%1$s': '%2$s', '%3$s'")
 	SearchException multipleEntityTypesWithSameName(String entityName, Class<?> previousType, Class<?> type);

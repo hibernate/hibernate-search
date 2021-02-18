@@ -335,10 +335,6 @@ public interface Log extends BasicLogger {
 	String failedToResolveBeanUsingBeanManager(String exceptionMessage);
 
 	// No ID here: this message is always embedded in one of the two exceptions above
-	@Message(value = "Failed to resolve bean from bean manager (assuming the name is a class name) with exception: %1$s")
-	String failedToResolveBeanUsingBeanManagerAssumingClassName(String exceptionMessage);
-
-	// No ID here: this message is always embedded in one of the two exceptions above
 	@Message(value = "Failed to resolve bean using reflection with exception: %1$s")
 	String failedToResolveBeanUsingReflection(String exceptionMessage);
 

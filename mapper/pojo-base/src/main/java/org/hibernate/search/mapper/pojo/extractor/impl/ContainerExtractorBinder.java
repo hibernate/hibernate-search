@@ -296,11 +296,9 @@ public class ContainerExtractorBinder {
 	private static class ExtractorResolutionState<C> {
 
 		private final List<String> extractorNames = new ArrayList<>();
-		private final PojoGenericTypeModel<C> sourceType;
 		private PojoGenericTypeModel<?> extractedType;
 
 		ExtractorResolutionState(PojoGenericTypeModel<C> sourceType) {
-			this.sourceType = sourceType;
 			this.extractedType = sourceType;
 		}
 
@@ -311,7 +309,6 @@ public class ContainerExtractorBinder {
 
 		BoundContainerExtractorPath<C, ?> build() {
 			return new BoundContainerExtractorPath<>(
-					sourceType,
 					ContainerExtractorPath.explicitExtractors( extractorNames ),
 					extractedType
 			);
