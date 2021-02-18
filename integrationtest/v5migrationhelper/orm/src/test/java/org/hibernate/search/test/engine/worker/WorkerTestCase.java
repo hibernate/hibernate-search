@@ -57,7 +57,8 @@ public abstract class WorkerTestCase extends SearchTestBase {
 				numberOfThreads,
 				i -> ( i % 2 == 0 ) ? work : reverseWork
 			)
-				.setTimeout( 1, TimeUnit.MINUTES )
+				// in some machine (e.g. Mac) this call may take more than 2 minutes
+				.setTimeout( 3, TimeUnit.MINUTES )
 				.execute();
 
 		System.out.println(
