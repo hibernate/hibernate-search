@@ -125,6 +125,10 @@ public class SearchIntegrationImpl implements SearchIntegration {
 				(failureCollector, name) -> failureCollector.withContext( EventContexts.fromIndexName( name ) ) );
 
 		// Stop backends
+		stopAllSafelyInParallel( backends,
+				(backend, contextualFailureCollector) -> backend.preStop(),
+				rootFailureCollector,
+				(failureCollector, name) -> failureCollector.withContext( EventContexts.fromBackendName( name ) ) );
 		stopAllSafely( backends,
 				(backend, contextualFailureCollector) -> backend.stop(),
 				rootFailureCollector,

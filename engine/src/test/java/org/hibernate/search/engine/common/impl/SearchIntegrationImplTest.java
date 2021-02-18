@@ -9,6 +9,7 @@ package org.hibernate.search.engine.common.impl;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.LinkedHashMap;
@@ -102,12 +103,18 @@ public class SearchIntegrationImplTest {
 		when( mapping2Mock.preStop( any() ) ).thenReturn( CompletableFuture.completedFuture( null ) );
 		when( indexManager1Mock.preStop() ).thenReturn( CompletableFuture.completedFuture( null ) );
 		when( indexManager2Mock.preStop() ).thenReturn( CompletableFuture.completedFuture( null ) );
+		when( backend1Mock.preStop() ).thenReturn( CompletableFuture.completedFuture( null ) );
+		when( backend2Mock.preStop() ).thenReturn( CompletableFuture.completedFuture( null ) );
 
 		searchIntegration.close();
 
-		InOrder inOrder = Mockito.inOrder( mapping1Mock, mapping2Mock, indexManager1Mock, indexManager2Mock,
+		Object[] mocks = {
+				mapping1Mock, mapping2Mock, indexManager1Mock, indexManager2Mock,
 				backend1Mock, backend2Mock, threadPoolProviderMock, failureHandlerHolderMock, beanProviderMock,
-				engineThreadsMock, timingSourceMock );
+				engineThreadsMock, timingSourceMock
+		};
+
+		InOrder inOrder = Mockito.inOrder( mocks );
 
 		// Mappings must be closed first
 		inOrder.verify( mapping1Mock ).preStop( any() );
@@ -122,6 +129,8 @@ public class SearchIntegrationImplTest {
 		inOrder.verify( indexManager2Mock ).stop();
 
 		// Then backends
+		inOrder.verify( backend1Mock ).preStop();
+		inOrder.verify( backend2Mock ).preStop();
 		inOrder.verify( backend1Mock ).stop();
 		inOrder.verify( backend2Mock ).stop();
 
@@ -131,6 +140,8 @@ public class SearchIntegrationImplTest {
 		inOrder.verify( beanProviderMock ).close();
 		inOrder.verify( engineThreadsMock ).onStop();
 		inOrder.verify( timingSourceMock ).stop();
+
+		verifyNoMoreInteractions( mocks );
 	}
 
 	@Test
@@ -145,6 +156,8 @@ public class SearchIntegrationImplTest {
 		doThrow( exception( "indexManager1 stop failure" ) ).when( indexManager1Mock ).stop();
 		doThrow( exception( "indexManager2 stop failure" ) ).when( indexManager2Mock ).stop();
 
+		when( backend1Mock.preStop() ).thenReturn( failedFuture( "backend1 preStop failure" ) );
+		when( backend2Mock.preStop() ).thenThrow( exception( "backend2 preStop failure" ) );
 		doThrow( exception( "backend1 stop failure" ) ).when( backend1Mock ).stop();
 		doThrow( exception( "backend2 stop failure" ) ).when( backend2Mock ).stop();
 
@@ -154,8 +167,8 @@ public class SearchIntegrationImplTest {
 				.hasMessageFindingMatch( "mapping 'mapping2':.*\n.*failures:.*\n.*mapping2 preStop failure\n.*mapping2 stop failure" )
 				.hasMessageFindingMatch( "index 'index1':.*\n.*failures:.*\n.*indexManager1 preStop failure\n.*indexManager1 stop failure" )
 				.hasMessageFindingMatch( "index 'index2':.*\n.*failures:.*\n.*indexManager2 preStop failure\n.*indexManager2 stop failure" )
-				.hasMessageFindingMatch( "backend 'backend1':.*\n.*failures:.*\n.*backend1 stop failure" )
-				.hasMessageFindingMatch( "backend 'backend2':.*\n.*failures:.*\n.*backend2 stop failure" );
+				.hasMessageFindingMatch( "backend 'backend1':.*\n.*failures:.*\n.*backend1 preStop failure\n.*backend1 stop failure" )
+				.hasMessageFindingMatch( "backend 'backend2':.*\n.*failures:.*\n.*backend2 preStop failure\n.*backend2 stop failure" );
 	}
 
 	private static MappingKey<?, ?> mappingKey(String name) {
