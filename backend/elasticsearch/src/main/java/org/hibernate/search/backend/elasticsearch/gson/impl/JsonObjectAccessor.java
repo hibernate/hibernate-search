@@ -12,6 +12,4 @@ public interface JsonObjectAccessor extends JsonAccessor<JsonObject> {
 
 	UnknownTypeJsonAccessor property(String propertyName);
 
-	UnknownTypeJsonAccessor path(String dotSeparatedPath);
-
 }

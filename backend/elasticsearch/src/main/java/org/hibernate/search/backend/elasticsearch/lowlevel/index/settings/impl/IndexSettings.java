@@ -49,10 +49,6 @@ public class IndexSettings {
 		return extraAttributes;
 	}
 
-	public boolean isEmpty() {
-		return ( analysis == null || analysis.isEmpty() ) && ( extraAttributes == null || extraAttributes.isEmpty() );
-	}
-
 	@Override
 	public String toString() {
 		return new GsonBuilder().setPrettyPrinting().create().toJson( this );

@@ -30,10 +30,6 @@ public abstract class AbstractSortThenStep implements SortThenStep {
 		return selfDslContext().toSort();
 	}
 
-	protected SearchSortDslContext<?, ?> dslContext() {
-		return parentDslContext;
-	}
-
 	private SearchSortDslContext<?, ?> selfDslContext() {
 		/*
 		 * Postpone the call of build() as long as possible,

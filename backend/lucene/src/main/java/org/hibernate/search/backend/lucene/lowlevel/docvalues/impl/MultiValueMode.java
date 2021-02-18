@@ -257,7 +257,7 @@ public enum MultiValueMode {
 		@Override
 		long pick(SortedNumericDocValues values) throws IOException {
 			final int valueCount = values.docValueCount();
-			long result = 0;
+			long result;
 			for ( int i = 0; i < ( valueCount - 1 ) / 2; ++i ) {
 				values.nextValue();
 			}
@@ -273,7 +273,7 @@ public enum MultiValueMode {
 		@Override
 		double pick(SortedNumericDoubleDocValues values) throws IOException {
 			final int valueCount = values.docValueCount();
-			double result = 0;
+			double result;
 			for ( int i = 0; i < ( valueCount - 1 ) / 2; ++i ) {
 				values.nextValue();
 			}

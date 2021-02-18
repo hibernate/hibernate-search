@@ -206,11 +206,8 @@ public class ConfigurationPropertyBeanReferenceTest {
 		BeanHolder<StubBean> expected1AsStubBean = BeanHolder.of( new StubBeanImpl1() );
 		BeanHolder<StubBeanImpl2> expected2 = BeanHolder.of( new StubBeanImpl2() );
 		BeanHolder<StubBean> expected2AsStubBean = BeanHolder.of( new StubBeanImpl2() );
-		BeanHolder<StubBeanImpl2> expected3 = BeanHolder.of( new StubBeanImpl2() );
 		BeanHolder<StubBean> expected3AsStubBean = BeanHolder.of( new StubBeanImpl2() );
-		BeanHolder<StubBeanImpl2> expected4 = BeanHolder.of( new StubBeanImpl2() );
 		BeanHolder<StubBean> expected4AsStubBean = BeanHolder.of( new StubBeanImpl2() );
-		BeanHolder<StubBeanImpl2> expected5 = BeanHolder.of( new StubBeanImpl2() );
 		BeanHolder<StubBean> expected5AsStubBean = BeanHolder.of( new StubBeanImpl2() );
 		Optional<BeanHolder<List<StubBean>>> result;
 

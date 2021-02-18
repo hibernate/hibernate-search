@@ -22,10 +22,6 @@ public class LuceneResult {
 		this.score = score;
 	}
 
-	public String getStringValue(String fieldName) {
-		return document.get( fieldName );
-	}
-
 	public Document getDocument() {
 		return document;
 	}

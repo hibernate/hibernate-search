@@ -357,7 +357,7 @@ public class SearchQueryFetchIT {
 						document -> {
 							// Ensure strictly decreasing score for tests relying on score sort,
 							// at least for the first three documents.
-							String text = null;
+							String text;
 							switch ( i ) {
 								case 0:
 									text = "leastimportantword lessimportantword mostimportantword";

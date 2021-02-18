@@ -35,23 +35,5 @@ abstract class AbstractNonRootJsonAccessor<P extends JsonElement, T> implements 
 
 	protected abstract void appendRuntimeRelativePath(StringBuilder path);
 
-	@Override
-	public String getStaticAbsolutePath() {
-		StringBuilder path = new StringBuilder();
-		boolean isFirst;
-
-		if ( parentAccessor == RootJsonAccessor.INSTANCE ) {
-			isFirst = true;
-		}
-		else {
-			isFirst = false;
-			path.append( parentAccessor.getStaticAbsolutePath() );
-		}
-
-		appendStaticRelativePath( path, isFirst );
-
-		return path.toString();
-	}
-
 	protected abstract void appendStaticRelativePath(StringBuilder path, boolean first);
 }

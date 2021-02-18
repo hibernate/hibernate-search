@@ -97,10 +97,6 @@ public class LuceneParallelWorkOrchestratorImpl
 				result.completeExceptionally( e );
 			}
 		}
-
-		public CompletableFuture<T> getResult() {
-			return result;
-		}
 	}
 
 }

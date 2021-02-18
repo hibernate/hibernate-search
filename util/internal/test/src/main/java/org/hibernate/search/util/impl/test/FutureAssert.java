@@ -121,9 +121,8 @@ public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Futur
 	}
 
 	public AbstractThrowableAssert<?, Throwable> getFailure() {
-		Object result = null;
 		try {
-			result = getNow();
+			Object result = getNow();
 			failWithMessage( "future <%s> should have failed, but instead it succeeded with result <%s>", actual, result );
 		}
 		catch (TimeoutException e) {
@@ -140,9 +139,8 @@ public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Futur
 	}
 
 	public FutureAssert<T> isCancelled() {
-		Object result;
 		try {
-			result = getNow();
+			Object result = getNow();
 			failWithMessage( "future <%s> should have been cancelled, but instead it succeeded with result <%s>", actual, result );
 		}
 		catch (TimeoutException e) {

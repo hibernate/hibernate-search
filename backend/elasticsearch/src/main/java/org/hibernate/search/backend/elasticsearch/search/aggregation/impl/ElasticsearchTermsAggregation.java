@@ -50,7 +50,7 @@ public class ElasticsearchTermsAggregation<F, K>
 	}
 
 	@Override
-	protected void doRequest(AggregationRequestContext context, JsonObject outerObject, JsonObject innerObject) {
+	protected void doRequest(JsonObject outerObject, JsonObject innerObject) {
 		outerObject.add( "terms", innerObject );
 		innerObject.addProperty( "field", absoluteFieldPath );
 		if ( order != null ) {
@@ -61,7 +61,7 @@ public class ElasticsearchTermsAggregation<F, K>
 	}
 
 	@Override
-	protected Map<K, Long> doExtract(AggregationExtractContext context, JsonObject outerObject, JsonElement buckets) {
+	protected Map<K, Long> doExtract(AggregationExtractContext context, JsonElement buckets) {
 		JsonArray bucketArray = buckets.getAsJsonArray();
 		Map<K, Long> result = CollectionHelper.newLinkedHashMap( bucketArray.size() );
 		FromDocumentFieldValueConvertContext convertContext = context.getConvertContext();

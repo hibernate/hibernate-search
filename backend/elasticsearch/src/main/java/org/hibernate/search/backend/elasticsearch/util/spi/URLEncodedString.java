@@ -13,8 +13,6 @@ import java.nio.charset.StandardCharsets;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Contracts;
 
-import com.google.gson.JsonElement;
-
 /**
  * To avoid re-encoding strings into URLs we have several opportunities
  * to reuse them and compose them more efficiently.
@@ -27,7 +25,6 @@ public final class URLEncodedString {
 	/**
 	 * Do not invoke directly.
 	 * @see #fromString(String)
-	 * @see #fromJSon(JsonElement)
 	 * @param string the original string to be encoded.
 	 */
 	private URLEncodedString(String string) {
@@ -70,11 +67,6 @@ public final class URLEncodedString {
 	public static URLEncodedString fromString(String string) {
 		Contracts.assertNotNull( string, "string" );
 		return new URLEncodedString( string );
-	}
-
-	public static URLEncodedString fromJSon(JsonElement jsonElement) {
-		Contracts.assertNotNull( jsonElement, "jsonElement" );
-		return fromString( jsonElement.getAsString() );
 	}
 
 }

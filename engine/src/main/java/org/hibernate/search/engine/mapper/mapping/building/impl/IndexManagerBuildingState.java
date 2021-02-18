@@ -12,8 +12,6 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 
 public interface IndexManagerBuildingState {
 
-	String getIndexName();
-
 	IndexSchemaRootNodeBuilder getSchemaRootNodeBuilder();
 
 	IndexManagerImplementor build();

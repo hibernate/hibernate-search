@@ -122,11 +122,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 			return this;
 		}
 
-		public IndexClient close() {
-			TestElasticsearchClient.this.closeIndex( primaryIndexName );
-			return this;
-		}
-
 		public IndexClient ensureDoesNotExist() {
 			TestElasticsearchClient.this.ensureIndexDoesNotExist( primaryIndexName );
 			return this;
@@ -174,16 +169,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 
 		public String getMapping() {
 			return TestElasticsearchClient.this.getMapping( indexClient.primaryIndexName );
-		}
-
-		public TypeClient index(URLEncodedString id, String jsonDocument) {
-			URLEncodedString indexName = indexClient.primaryIndexName;
-			TestElasticsearchClient.this.index( indexName, id, jsonDocument );
-			return this;
-		}
-
-		public DocumentClient document(String id) {
-			return new DocumentClient( this, id );
 		}
 	}
 
@@ -252,26 +237,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 					TestElasticsearchClient.this.createRemoveAliasAction( oldIndexPrimaryName, alias ),
 					TestElasticsearchClient.this.createAddAliasAction( newIndexPrimaryName, alias, aliasAttributes )
 			);
-		}
-	}
-
-	public class DocumentClient {
-
-		private final TypeClient typeClient;
-
-		private final URLEncodedString id;
-
-		public DocumentClient(TypeClient typeClient, String id) {
-			this.typeClient = typeClient;
-			this.id = URLEncodedString.fromString( id );
-		}
-
-		public JsonObject getSource() {
-			return TestElasticsearchClient.this.getDocumentSource( typeClient.indexClient.primaryIndexName, id );
-		}
-
-		public JsonElement getStoredField(String fieldName) {
-			return TestElasticsearchClient.this.getDocumentField( typeClient.indexClient.primaryIndexName, id, fieldName );
 		}
 	}
 

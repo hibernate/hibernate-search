@@ -27,10 +27,6 @@ public abstract class AbstractLuceneIndexSchemaFieldTemplate<N extends AbstractL
 		this.multiValued = multiValued;
 	}
 
-	public IndexFieldInclusion getInclusion() {
-		return inclusion;
-	}
-
 	N createNodeIfMatching(LuceneIndexModel model, String absolutePath) {
 		if ( !absolutePathGlob.matches( absolutePath ) ) {
 			return null;

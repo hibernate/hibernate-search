@@ -188,13 +188,13 @@ class LongMultiValueRangeCounter {
 		if ( start == end - 1 ) {
 			// leaf
 			InclusiveRange range = elementaryIntervals.get( start );
-			return new LongRangeNode( range.start, range.end, null, null, start );
+			return new LongRangeNode( range.start, range.end, null, null );
 		}
 		else {
 			int mid = (start + end) >>> 1;
 			LongRangeNode left = split( start, mid, elementaryIntervals );
 			LongRangeNode right = split( mid, end, elementaryIntervals );
-			return new LongRangeNode( left.start, right.end, left, right, -1 );
+			return new LongRangeNode( left.start, right.end, left, right );
 		}
 	}
 
@@ -223,20 +223,15 @@ class LongMultiValueRangeCounter {
 		final long start;
 		final long end;
 
-		// If we are a leaf, the index into elementary ranges that
-		// we point to:
-		final int leafIndex;
-
 		// Which range indices to output when a query goes
 		// through this node:
 		List<Integer> outputs;
 
-		public LongRangeNode(long start, long end, LongRangeNode left, LongRangeNode right, int leafIndex) {
+		public LongRangeNode(long start, long end, LongRangeNode left, LongRangeNode right) {
 			this.start = start;
 			this.end = end;
 			this.left = left;
 			this.right = right;
-			this.leafIndex = leafIndex;
 		}
 
 		@Override

@@ -8,11 +8,9 @@ package org.hibernate.search.engine.cfg.spi;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import org.hibernate.search.engine.cfg.impl.EmptyConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.FallbackConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.impl.ListeningConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.MapConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.MaskedConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.OverriddenConfigurationPropertySource;
@@ -90,15 +88,6 @@ public interface ConfigurationPropertySource {
 	 */
 	default ConfigurationPropertySource withOverride(ConfigurationPropertySource override) {
 		return new OverriddenConfigurationPropertySource( this, override );
-	}
-
-	/**
-	 * @param listener A listener that will get called every time {@link #get(String)} returns a non-empty {@link Optional}.
-	 * Typically used for logging.
-	 * @return A source containing the same properties as this source, but prefixed with the given prefix plus ".".
-	 */
-	default ConfigurationPropertySource onGet(Consumer<String> listener) {
-		return new ListeningConfigurationPropertySource( this, listener );
 	}
 
 	/**

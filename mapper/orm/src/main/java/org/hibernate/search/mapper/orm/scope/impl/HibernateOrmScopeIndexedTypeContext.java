@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
  * @param <E> The entity type mapped to the index.
  */
 public interface HibernateOrmScopeIndexedTypeContext<E>
-		extends SearchIndexedEntity<E>, HibernateOrmScopeTypeContext<E>, LoadingIndexedTypeContext<E>,
+		extends SearchIndexedEntity<E>, LoadingIndexedTypeContext<E>,
 				HibernateOrmMassIndexingIndexedTypeContext<E> {
 
 	@Override

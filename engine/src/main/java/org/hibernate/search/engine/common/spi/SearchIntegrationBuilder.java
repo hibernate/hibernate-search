@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.common.spi;
 
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
@@ -17,8 +16,6 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBui
 
 
 public interface SearchIntegrationBuilder {
-
-	ConfigurationPropertySource maskedPropertySource();
 
 	SearchIntegrationBuilder classResolver(ClassResolver classResolver);
 

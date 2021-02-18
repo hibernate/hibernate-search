@@ -9,7 +9,6 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
-import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
 import org.hibernate.search.backend.lucene.work.impl.IndexingWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchedWorkProcessor;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -56,16 +55,6 @@ public class LuceneBatchedWorkProcessor implements BatchedWorkProcessor {
 		catch (RuntimeException e) {
 			indexAccessor.cleanUpAfterFailure( e, "Commit after completion of all remaining index works" );
 			// The exception was reported to the failure handler, no need to propagate it.
-		}
-	}
-
-	public <T> T submit(IndexManagementWork<T> work) {
-		try {
-			return work.execute( context );
-		}
-		catch (RuntimeException e) {
-			indexAccessor.cleanUpAfterFailure( e, work.getInfo() );
-			throw e;
 		}
 	}
 

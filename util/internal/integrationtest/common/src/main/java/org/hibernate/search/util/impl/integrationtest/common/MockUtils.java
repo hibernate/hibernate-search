@@ -9,7 +9,6 @@ package org.hibernate.search.util.impl.integrationtest.common;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalize;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -56,21 +55,6 @@ public final class MockUtils {
 			@Override
 			public String toString() {
 				return String.valueOf( normalizedExpected );
-			}
-		} );
-	}
-
-	public static <T, C extends Collection<T>> C collectionAnyOrderMatcher(C expected) {
-		return ArgumentMatchers.argThat( new ArgumentMatcher<C>() {
-			@Override
-			public boolean matches(C argument) {
-				return argument.size() == expected.size()
-						&& argument.containsAll( expected ) && expected.containsAll( argument );
-			}
-
-			@Override
-			public String toString() {
-				return expected + " (in any order)";
 			}
 		} );
 	}

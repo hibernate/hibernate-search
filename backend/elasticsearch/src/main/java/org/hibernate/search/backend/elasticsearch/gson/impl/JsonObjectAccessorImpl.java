@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.gson.impl;
 
-import java.util.regex.Pattern;
-
 import org.hibernate.search.util.common.impl.Contracts;
 
 import com.google.gson.JsonElement;
@@ -20,8 +18,6 @@ import com.google.gson.JsonObject;
  */
 public class JsonObjectAccessorImpl extends AbstractTypingJsonAccessor<JsonObject>
 		implements JsonObjectAccessor, JsonCompositeAccessor<JsonObject> {
-
-	private static final Pattern DOT_REGEX = Pattern.compile( "\\." );
 
 	public JsonObjectAccessorImpl(JsonAccessor<JsonElement> parent) {
 		super( parent );
@@ -41,21 +37,5 @@ public class JsonObjectAccessorImpl extends AbstractTypingJsonAccessor<JsonObjec
 	public UnknownTypeJsonAccessor property(String propertyName) {
 		Contracts.assertNotNullNorEmpty( propertyName, "propertyName" );
 		return new ObjectPropertyJsonAccessor( this, propertyName );
-	}
-
-	@Override
-	public UnknownTypeJsonAccessor path(String dotSeparatedPath) {
-		Contracts.assertNotNullNorEmpty( dotSeparatedPath, "dotSeparatedPath" );
-
-		String[] components = DOT_REGEX.split( dotSeparatedPath );
-		String leaf = components[components.length - 1];
-
-		JsonObjectAccessor parent = this;
-
-		for ( int i = 0; i < components.length - 1; i++ ) {
-			parent = parent.property( components[i] ).asObject();
-		}
-
-		return parent.property( leaf );
 	}
 }

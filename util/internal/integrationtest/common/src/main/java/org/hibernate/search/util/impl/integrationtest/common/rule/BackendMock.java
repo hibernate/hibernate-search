@@ -263,11 +263,6 @@ public class BackendMock implements TestRule {
 		return expectScroll( indexNames, contributor, StubSearchWork.ResultType.PROJECTIONS, chunkSize );
 	}
 
-	public BackendMock expectScrollProjection(Collection<String> indexNames, int chunkSize,
-			Consumer<StubSearchWork.Builder> contributor) {
-		return expectScroll( indexNames, contributor, StubSearchWork.ResultType.PROJECTIONS, chunkSize );
-	}
-
 	private BackendMock expectScroll(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
 			StubSearchWork.ResultType resultType, int chunkSize) {
 		CallQueue<ScrollWorkCall<?>> callQueue = backendBehavior().getScrollCalls();

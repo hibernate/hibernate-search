@@ -25,8 +25,6 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSerialWorkOr
  */
 public interface WorkExecutionIndexManagerContext {
 
-	String indexName();
-
 	String mappedTypeName();
 
 	LuceneSerialWorkOrchestrator indexingOrchestrator(String documentId, String routingKey);

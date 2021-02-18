@@ -36,7 +36,6 @@ class HibernateOrmTypeContextContainer
 	private final Map<PojoRawTypeIdentifier<?>, HibernateOrmIndexedTypeContext<?>> indexedTypeContexts = new LinkedHashMap<>();
 	private final Map<String, HibernateOrmIndexedTypeContext<?>> indexedTypeContextsByHibernateOrmEntityName = new LinkedHashMap<>();
 	private final Map<String, HibernateOrmIndexedTypeContext<?>> indexedTypeContextsByJpaEntityName = new LinkedHashMap<>();
-	private final Map<PojoRawTypeIdentifier<?>, HibernateOrmContainedTypeContext<?>> containedTypeContexts = new LinkedHashMap<>();
 	private final Map<String, HibernateOrmContainedTypeContext<?>> containedTypeContextsByHibernateOrmEntityName = new LinkedHashMap<>();
 
 	private final HibernateOrmRawTypeIdentifierResolver typeIdentifierResolver;
@@ -51,8 +50,6 @@ class HibernateOrmTypeContextContainer
 		}
 		for ( HibernateOrmContainedTypeContext.Builder<?> contextBuilder : builder.containedTypeContextBuilders ) {
 			HibernateOrmContainedTypeContext<?> containedTypeContext = contextBuilder.build( sessionFactory );
-			PojoRawTypeIdentifier<?> typeIdentifier = containedTypeContext.typeIdentifier();
-			containedTypeContexts.put( typeIdentifier, containedTypeContext );
 			containedTypeContextsByHibernateOrmEntityName.put( containedTypeContext.hibernateOrmEntityName(), containedTypeContext );
 		}
 
@@ -68,12 +65,6 @@ class HibernateOrmTypeContextContainer
 	@Override
 	public HibernateOrmIndexedTypeContext<?> indexedForJpaEntityName(String indexName) {
 		return indexedTypeContextsByJpaEntityName.get( indexName );
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <E> HibernateOrmContainedTypeContext<E> containedForExactType(PojoRawTypeIdentifier<E> typeIdentifier) {
-		return (HibernateOrmContainedTypeContext<E>) containedTypeContexts.get( typeIdentifier );
 	}
 
 	@Override

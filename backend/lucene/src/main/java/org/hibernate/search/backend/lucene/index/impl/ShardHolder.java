@@ -105,11 +105,6 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 	}
 
 	@Override
-	public String indexName() {
-		return model.hibernateSearchName();
-	}
-
-	@Override
 	public String mappedTypeName() {
 		return model.mappedTypeName();
 	}

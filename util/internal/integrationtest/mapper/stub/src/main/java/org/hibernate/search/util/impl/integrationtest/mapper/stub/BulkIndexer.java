@@ -72,13 +72,6 @@ public class BulkIndexer {
 		return this;
 	}
 
-	public BulkIndexer add(StubDocumentProvider ... documentProviders) {
-		for ( StubDocumentProvider documentProvider : documentProviders ) {
-			add( documentProvider );
-		}
-		return this;
-	}
-
 	public <T> BulkIndexer add(IndexFieldReference<T> fieldReference,
 			Consumer<SingleFieldDocumentBuilder<T>> valueContributor) {
 		valueContributor.accept( new SingleFieldDocumentBuilder<T>() {
@@ -92,13 +85,6 @@ public class BulkIndexer {
 				add( documentProvider( documentId, document -> document.addValue( fieldReference, fieldValue ) ) );
 			}
 		} );
-		return this;
-	}
-
-	public BulkIndexer add(Iterable<? extends StubDocumentProvider> documentProviders) {
-		for ( StubDocumentProvider documentProvider : documentProviders ) {
-			add( documentProvider );
-		}
 		return this;
 	}
 

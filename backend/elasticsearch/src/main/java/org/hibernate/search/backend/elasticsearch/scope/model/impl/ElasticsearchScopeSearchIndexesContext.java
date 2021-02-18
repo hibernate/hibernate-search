@@ -101,21 +101,6 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 		return resultOrNull;
 	}
 
-	@Override
-	public boolean hasSchemaObjectNodeComponent(String absoluteFieldPath) {
-		for ( ElasticsearchIndexModel indexModel : indexModels ) {
-			AbstractElasticsearchIndexSchemaFieldNode field = indexModel.fieldOrNull( absoluteFieldPath );
-			// Even if we have an inconsistency with the Lucene backend,
-			// we decide to be very lenient here,
-			// allowing ALL the model incompatibilities Elasticsearch allows.
-			if ( field != null && field.isObjectField() ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	private EventContext indexesEventContext() {
 		return EventContexts.fromIndexNames( hibernateSearchIndexNames() );
 	}

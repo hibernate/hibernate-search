@@ -26,23 +26,16 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 public class BoundContainerExtractorPath<C, V> {
 	public static <V> BoundContainerExtractorPath<V, V> noExtractors(PojoGenericTypeModel<V> sourceType) {
 		return new BoundContainerExtractorPath<>(
-				sourceType, ContainerExtractorPath.noExtractors(), sourceType
+				ContainerExtractorPath.noExtractors(), sourceType
 		);
 	}
 
-	private final PojoGenericTypeModel<C> sourceType;
 	private final ContainerExtractorPath extractorPath;
 	private final PojoGenericTypeModel<V> extractedType;
 
-	BoundContainerExtractorPath(PojoGenericTypeModel<C> sourceType, ContainerExtractorPath extractorPath,
-			PojoGenericTypeModel<V> extractedType) {
-		this.sourceType = sourceType;
+	BoundContainerExtractorPath(ContainerExtractorPath extractorPath, PojoGenericTypeModel<V> extractedType) {
 		this.extractorPath = extractorPath;
 		this.extractedType = extractedType;
-	}
-
-	public PojoGenericTypeModel<C> getSourceType() {
-		return sourceType;
 	}
 
 	public ContainerExtractorPath getExtractorPath() {

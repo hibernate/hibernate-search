@@ -23,11 +23,6 @@ public class SearchHitAssert<H> {
 		this.actual = actual;
 	}
 
-	public SearchHitAssert<H> as(String description) {
-		this.description = description;
-		return this;
-	}
-
 	public void isDocRefHit(String typeName, String id, String... orIds) {
 		Set<DocumentReference> references = new HashSet<>();
 		references.add( NormalizationUtils.reference( typeName, id ) );
