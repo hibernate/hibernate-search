@@ -41,6 +41,8 @@ public abstract class AbstractBatchIndexingIT {
 	// We have three data templates per entity type (see setup)
 	protected static final int INSTANCE_PER_ENTITY_TYPE = INSTANCES_PER_DATA_TEMPLATE * 3;
 
+	static final int JOB_TIMEOUT_MS = 30_000;
+
 	protected JobOperator jobOperator;
 	protected EntityManagerFactory emf;
 

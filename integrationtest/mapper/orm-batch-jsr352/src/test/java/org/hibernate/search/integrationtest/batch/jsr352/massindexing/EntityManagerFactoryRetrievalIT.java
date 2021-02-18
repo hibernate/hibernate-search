@@ -30,8 +30,6 @@ public class EntityManagerFactoryRetrievalIT extends AbstractBatchIndexingIT {
 
 	private static final String SESSION_FACTORY_NAME = "primary_session_factory";
 
-	private static final int JOB_TIMEOUT_MS = 10_000;
-
 	@Test
 	public void defaultNamespace() throws Exception {
 		List<Company> companies = JobTestUtil.findIndexedResults( emf, Company.class, "name", "Google" );
