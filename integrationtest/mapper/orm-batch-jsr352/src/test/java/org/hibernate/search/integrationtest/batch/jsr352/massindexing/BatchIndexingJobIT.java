@@ -45,8 +45,6 @@ public class BatchIndexingJobIT extends AbstractBatchIndexingIT {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final int JOB_TIMEOUT_MS = 30_000;
-
 	/*
 	 * Make sure to have more than one checkpoint,
 	 * because we had errors related to that in the past.
