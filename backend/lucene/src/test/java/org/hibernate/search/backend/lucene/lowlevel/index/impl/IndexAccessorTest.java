@@ -13,7 +13,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderProvider;
@@ -28,6 +30,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.store.Directory;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -45,6 +48,8 @@ public class IndexAccessorTest {
 	@Mock
 	private DirectoryHolder directoryHolderMock;
 	@Mock
+	private Directory directoryMock;
+	@Mock
 	private IndexReaderProvider indexReaderProviderMock;
 	@Mock
 	private IndexWriterProvider indexWriterProviderMock;
@@ -60,6 +65,7 @@ public class IndexAccessorTest {
 		accessor = new IndexAccessorImpl( indexEventContext, directoryHolderMock,
 				indexWriterProviderMock, indexReaderProviderMock );
 		accessor.start();
+		verify( directoryHolderMock ).start();
 	}
 
 	@After
@@ -202,8 +208,43 @@ public class IndexAccessorTest {
 		verifyNoOtherIndexInteractions();
 	}
 
+	@Test
+	public void ccomputeSizeInBytes() throws IOException {
+		when( directoryHolderMock.get() ).thenReturn( directoryMock );
+		when( directoryMock.listAll() )
+				.thenReturn( new String[] { "file0", "file1", "file2", "file3.cfr", "file4.dv" } );
+		when( directoryMock.fileLength( "file0" ) ).thenReturn( 32L );
+		when( directoryMock.fileLength( "file1" ) ).thenReturn( 489L );
+		when( directoryMock.fileLength( "file2" ) ).thenReturn( 8654L );
+		when( directoryMock.fileLength( "file3.cfr" ) ).thenReturn( 0L );
+		when( directoryMock.fileLength( "file4.dv" ) ).thenReturn( 42L );
+
+		assertThat( accessor.computeSizeInBytes() ).isEqualTo( 9217L );
+
+		verifyNoOtherIndexInteractions();
+	}
+
+	@Test
+	public void computeSizeInBytes_concurrentDeletion() throws IOException {
+		when( directoryHolderMock.get() ).thenReturn( directoryMock );
+		when( directoryMock.listAll() )
+				.thenReturn( new String[] { "file0", "file1NoSuchFile", "file2", "file3FileNotFound.cfr", "file4.dv" } );
+		when( directoryMock.fileLength( "file0" ) ).thenReturn( 32L );
+		when( directoryMock.fileLength( "file1NoSuchFile" ) )
+				.thenThrow( new NoSuchFileException( "should be ignored" ) );
+		when( directoryMock.fileLength( "file2" ) ).thenReturn( 8654L );
+		when( directoryMock.fileLength( "file3FileNotFound.cfr" ) )
+				.thenThrow( new FileNotFoundException( "should be ignored" ) );
+		when( directoryMock.fileLength( "file4.dv" ) ).thenReturn( 42L );
+
+		assertThat( accessor.computeSizeInBytes() ).isEqualTo( 8728L );
+
+		verifyNoOtherIndexInteractions();
+	}
+
 	private void verifyNoOtherIndexInteractions() {
-		verifyNoMoreInteractions( indexWriterProviderMock, indexWriterDelegatorMock,
+		verifyNoMoreInteractions( directoryHolderMock, directoryMock,
+				indexWriterProviderMock, indexWriterDelegatorMock,
 				indexReaderProviderMock, indexReaderMock );
 	}
 
