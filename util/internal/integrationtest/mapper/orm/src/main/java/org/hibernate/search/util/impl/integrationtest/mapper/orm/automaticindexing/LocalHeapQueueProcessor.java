@@ -53,7 +53,13 @@ public class LocalHeapQueueProcessor implements BatchedWorkProcessor {
 
 	@Override
 	public CompletableFuture<?> endBatch() {
-		return plan.executeAndReport().thenAccept( this::processReport );
+		return plan.executeAndReport().thenAccept( this::processReport )
+				.whenComplete( (ignored1, ignored2) -> {
+					// Make sure the next batch actually loads entities from the database:
+					// if it relied on the first-level cache from a previous batch,
+					// it could end up indexing out-of-date data.
+					session.clear();
+				} );
 	}
 
 	private void processReport(MultiEntityOperationExecutionReport<EntityReference> report) {
