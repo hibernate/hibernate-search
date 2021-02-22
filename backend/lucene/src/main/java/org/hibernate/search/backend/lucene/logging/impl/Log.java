@@ -22,7 +22,7 @@ import org.apache.lucene.util.Version;
 
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.logging.spi.AggregationKeyFormatter;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -331,8 +331,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 68,
 			value = "Inconsistent configuration for the identifier in a search query across multiple indexes: converter differs: '%1$s' vs. '%2$s'.")
-	SearchException inconsistentConfigurationForIdentifierForSearch(ToDocumentIdentifierValueConverter<?> component1,
-			ToDocumentIdentifierValueConverter<?> component2, @Param EventContext context);
+	SearchException inconsistentConfigurationForIdentifierForSearch(DocumentIdentifierValueConverter<?> component1,
+			DocumentIdentifierValueConverter<?> component2, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 69,
 			value = "Unable to explain search query: %1$s")

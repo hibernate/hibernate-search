@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl;
 
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
@@ -44,7 +44,7 @@ public class StubIndexSchemaRootNodeBuilder extends AbstractStubIndexSchemaObjec
 	}
 
 	@Override
-	public void idDslConverter(ToDocumentIdentifierValueConverter<?> idConverter) {
+	public void idDslConverter(DocumentIdentifierValueConverter<?> idConverter) {
 		builder.idDslConverter( idConverter );
 	}
 

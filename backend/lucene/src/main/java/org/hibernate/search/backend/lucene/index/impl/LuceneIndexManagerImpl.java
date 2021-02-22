@@ -20,7 +20,7 @@ import org.hibernate.search.backend.lucene.schema.management.impl.LuceneIndexSch
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexManagerContext;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
@@ -156,7 +156,7 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public ToDocumentIdentifierValueConverter<?> idDslConverter() {
+	public DocumentIdentifierValueConverter<?> idDslConverter() {
 		return model.idDslConverter();
 	}
 

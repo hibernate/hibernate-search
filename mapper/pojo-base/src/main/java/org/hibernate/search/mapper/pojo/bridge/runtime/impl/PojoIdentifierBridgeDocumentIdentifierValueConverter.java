@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextExtension;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
@@ -16,12 +16,12 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
 
-public final class PojoIdentifierBridgeToDocumentIdentifierValueConverter<I> implements ToDocumentIdentifierValueConverter<I> {
+public final class PojoIdentifierBridgeDocumentIdentifierValueConverter<I> implements DocumentIdentifierValueConverter<I> {
 
 	private final IdentifierBridge<I> bridge;
 	private final Class<I> expectedValueType;
 
-	public PojoIdentifierBridgeToDocumentIdentifierValueConverter(IdentifierBridge<I> bridge, Class<I> expectedValueType) {
+	public PojoIdentifierBridgeDocumentIdentifierValueConverter(IdentifierBridge<I> bridge, Class<I> expectedValueType) {
 		this.bridge = bridge;
 		this.expectedValueType = expectedValueType;
 	}
@@ -32,23 +32,23 @@ public final class PojoIdentifierBridgeToDocumentIdentifierValueConverter<I> imp
 	}
 
 	@Override
-	public String convert(I value, ToDocumentIdentifierValueConvertContext context) {
+	public String convertToDocument(I value, ToDocumentIdentifierValueConvertContext context) {
 		IdentifierBridgeToDocumentIdentifierContext extension = context.extension( PojoIdentifierBridgeContextExtension.INSTANCE );
 		return bridge.toDocumentIdentifier( value, extension );
 	}
 
 	@Override
-	public String convertUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
-		return convert( expectedValueType.cast( value ), context );
+	public String convertToDocumentUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
+		return convertToDocument( expectedValueType.cast( value ), context );
 	}
 
 	@Override
-	public boolean isCompatibleWith(ToDocumentIdentifierValueConverter<?> other) {
+	public boolean isCompatibleWith(DocumentIdentifierValueConverter<?> other) {
 		if ( other == null || !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
-		PojoIdentifierBridgeToDocumentIdentifierValueConverter<?> castedOther =
-				(PojoIdentifierBridgeToDocumentIdentifierValueConverter<?>) other;
+		PojoIdentifierBridgeDocumentIdentifierValueConverter<?> castedOther =
+				(PojoIdentifierBridgeDocumentIdentifierValueConverter<?>) other;
 		return expectedValueType.equals( castedOther.expectedValueType )
 				&& bridge.isCompatibleWith( castedOther.bridge );
 	}

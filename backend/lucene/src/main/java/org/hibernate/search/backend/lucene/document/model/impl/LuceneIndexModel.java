@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -34,7 +34,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 
 	private final String mappedTypeName;
 
-	private final ToDocumentIdentifierValueConverter<?> idDslConverter;
+	private final DocumentIdentifierValueConverter<?> idDslConverter;
 
 	private final LuceneIndexSchemaObjectNode rootNode;
 	private final Map<String, AbstractLuceneIndexSchemaFieldNode> staticFields;
@@ -49,7 +49,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 
 	public LuceneIndexModel(String indexName,
 			String mappedTypeName,
-			ToDocumentIdentifierValueConverter<?> idDslConverter,
+			DocumentIdentifierValueConverter<?> idDslConverter,
 			LuceneIndexSchemaObjectNode rootNode,
 			Map<String, AbstractLuceneIndexSchemaFieldNode> staticFields,
 			List<AbstractLuceneIndexSchemaFieldTemplate<?>> fieldTemplates,
@@ -112,7 +112,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 		return EventContexts.fromIndexName( indexName );
 	}
 
-	public ToDocumentIdentifierValueConverter<?> idDslConverter() {
+	public DocumentIdentifierValueConverter<?> idDslConverter() {
 		return idDslConverter;
 	}
 

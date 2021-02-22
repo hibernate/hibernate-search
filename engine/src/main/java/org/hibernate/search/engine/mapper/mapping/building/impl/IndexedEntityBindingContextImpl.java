@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingMapperContext;
 
@@ -25,7 +25,7 @@ public class IndexedEntityBindingContextImpl extends AbstractIndexBindingContext
 	}
 
 	@Override
-	public void idDslConverter(ToDocumentIdentifierValueConverter<?> idConverter) {
+	public void idDslConverter(DocumentIdentifierValueConverter<?> idConverter) {
 		indexSchemaObjectNodeBuilder.idDslConverter( idConverter );
 	}
 

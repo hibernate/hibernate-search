@@ -10,11 +10,12 @@ import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumen
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextExtension;
 
 /**
- * A converter from a source identifier value to a target value that should be used as a document identifier.
+ * A converter from a source identifier value to a target value that should be used as a document identifier
+ * and back to the source identifier from the document identifier.
  *
  * @param <I> The type of source identifier values.
  */
-public interface ToDocumentIdentifierValueConverter<I> {
+public interface DocumentIdentifierValueConverter<I> {
 
 	/**
 	 * @param value The source value to convert.
@@ -23,7 +24,7 @@ public interface ToDocumentIdentifierValueConverter<I> {
 	 * to a more useful type, giving access to such things as a Hibernate ORM SessionFactory (if using the Hibernate ORM mapper).
 	 * @return The converted index field value.
 	 */
-	String convert(I value, ToDocumentIdentifierValueConvertContext context);
+	String convertToDocument(I value, ToDocumentIdentifierValueConvertContext context);
 
 	/**
 	 * Convert an input value of unknown type that may not have the required type {@code I}.
@@ -36,15 +37,15 @@ public interface ToDocumentIdentifierValueConverter<I> {
 	 * to a more useful type, giving access to such things as a Hibernate ORM SessionFactory (if using the Hibernate ORM mapper).
 	 * @return The converted index field value.
 	 */
-	String convertUnknown(Object value, ToDocumentIdentifierValueConvertContext context);
+	String convertToDocumentUnknown(Object value, ToDocumentIdentifierValueConvertContext context);
 
 	/**
-	 * @param other Another {@link ToDocumentIdentifierValueConverter}, never {@code null}.
+	 * @param other Another {@link DocumentIdentifierValueConverter}, never {@code null}.
 	 * @return {@code true} if the given object behaves exactly the same as this object, i.e. its
-	 * {@link #convertUnknown(Object, ToDocumentIdentifierValueConvertContext)} method is guaranteed to always return the
+	 * {@link #convertToDocumentUnknown(Object, ToDocumentIdentifierValueConvertContext)} method is guaranteed to always return the
 	 * same value as this object's when given the same input. {@code false} otherwise, or when in doubt.
 	 */
-	default boolean isCompatibleWith(ToDocumentIdentifierValueConverter<?> other) {
+	default boolean isCompatibleWith(DocumentIdentifierValueConverter<?> other) {
 		return equals( other );
 	}
 

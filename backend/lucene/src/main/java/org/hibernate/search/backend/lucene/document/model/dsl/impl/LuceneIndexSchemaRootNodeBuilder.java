@@ -28,8 +28,8 @@ import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactory
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIndexFieldTypeFactoryImpl;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.StringDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -42,7 +42,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 	private final String mappedTypeName;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
-	private ToDocumentIdentifierValueConverter<?> idDslConverter;
+	private DocumentIdentifierValueConverter<?> idDslConverter;
 
 	public LuceneIndexSchemaRootNodeBuilder(EventContext indexEventContext,
 			String mappedTypeName, LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry) {
@@ -67,7 +67,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	@Override
-	public void idDslConverter(ToDocumentIdentifierValueConverter<?> idDslConverter) {
+	public void idDslConverter(DocumentIdentifierValueConverter<?> idDslConverter) {
 		this.idDslConverter = idDslConverter;
 	}
 
@@ -124,7 +124,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 		return new LuceneIndexModel(
 				indexName,
 				mappedTypeName,
-				idDslConverter == null ? new StringToDocumentIdentifierValueConverter() : idDslConverter,
+				idDslConverter == null ? new StringDocumentIdentifierValueConverter() : idDslConverter,
 				rootNode, staticFields, fieldTemplates, namedPredicateNodes, hasNestedDocument[0]
 		);
 	}

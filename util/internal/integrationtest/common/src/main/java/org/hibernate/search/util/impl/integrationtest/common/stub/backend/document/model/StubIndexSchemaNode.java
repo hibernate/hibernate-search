@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.TermVector;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -65,7 +65,7 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 	 * to make it easier to define nodes that should be matched.
 	 */
 	private final StubFieldConverter<?> converter;
-	private final ToDocumentIdentifierValueConverter<?> idDslConverter;
+	private final DocumentIdentifierValueConverter<?> idDslConverter;
 
 	private StubIndexSchemaNode(Builder builder) {
 		super( builder );
@@ -73,7 +73,7 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 		this.idDslConverter = builder.idDslConverter;
 	}
 
-	public ToDocumentIdentifierValueConverter<?> getIdDslConverter() {
+	public DocumentIdentifierValueConverter<?> getIdDslConverter() {
 		return idDslConverter;
 	}
 
@@ -83,7 +83,7 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 
 	public static class Builder extends AbstractBuilder<StubIndexSchemaNode> implements IndexSchemaBuildContext {
 		private StubFieldConverter<?> converter;
-		private ToDocumentIdentifierValueConverter<?> idDslConverter;
+		private DocumentIdentifierValueConverter<?> idDslConverter;
 
 		private Builder(Builder parent, String relativeFieldName, Type type) {
 			super( parent, relativeFieldName );
@@ -155,7 +155,7 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 			return this;
 		}
 
-		public Builder idDslConverter(ToDocumentIdentifierValueConverter<?> idDslConverter) {
+		public Builder idDslConverter(DocumentIdentifierValueConverter<?> idDslConverter) {
 			this.idDslConverter = idDslConverter;
 			return this;
 		}

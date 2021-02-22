@@ -31,7 +31,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExplainResult;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
@@ -275,10 +275,10 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	}
 
 	private URLEncodedString toElasticsearchId(ElasticsearchSearchIndexContext index, Object id) {
-		ToDocumentIdentifierValueConverter<?> converter = index.idDslConverter();
+		DocumentIdentifierValueConverter<?> converter = index.idDslConverter();
 		ToDocumentIdentifierValueConvertContext convertContext =
 				searchContext.toDocumentIdentifierValueConvertContext();
-		String documentId = converter.convertUnknown( id, convertContext );
+		String documentId = converter.convertToDocumentUnknown( id, convertContext );
 		return URLEncodedString.fromString( searchContext.documentIdHelper()
 				.toElasticsearchId( sessionContext.tenantIdentifier(), documentId ) );
 	}

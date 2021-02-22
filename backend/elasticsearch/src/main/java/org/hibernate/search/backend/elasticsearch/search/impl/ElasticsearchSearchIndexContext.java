@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 
 /**
  * Information about an index targeted by search,
@@ -19,5 +19,5 @@ public interface ElasticsearchSearchIndexContext {
 
 	String mappedTypeName();
 
-	ToDocumentIdentifierValueConverter<?> idDslConverter();
+	DocumentIdentifierValueConverter<?> idDslConverter();
 }

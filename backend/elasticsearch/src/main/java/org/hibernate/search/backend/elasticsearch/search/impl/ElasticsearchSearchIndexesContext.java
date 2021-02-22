@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNamedPredicateNode;
 
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
 
 /**
@@ -26,7 +26,7 @@ public interface ElasticsearchSearchIndexesContext {
 
 	Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex();
 
-	ToDocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
+	DocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
 
 	ElasticsearchSearchFieldContext field(String absoluteFieldPath);
 

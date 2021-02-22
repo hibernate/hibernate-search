@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.PropertyTypeDescriptor;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
@@ -138,15 +138,15 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 	public void dslToIndexConverter() {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
-		ToDocumentIdentifierValueConverter<I> dslToIndexConverter =
-				(ToDocumentIdentifierValueConverter<I>) rootSchemaNode.getIdDslConverter();
+		DocumentIdentifierValueConverter<I> dslToIndexConverter =
+				(DocumentIdentifierValueConverter<I>) rootSchemaNode.getIdDslConverter();
 		ToDocumentIdentifierValueConvertContextImpl convertContext =
 				new ToDocumentIdentifierValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
 
 		// The overriden default bridge must be used by the DSL converter
-		assertThat( dslToIndexConverter.convert( getEntityIdentifierValue(), convertContext ) )
+		assertThat( dslToIndexConverter.convertToDocument( getEntityIdentifierValue(), convertContext ) )
 				.isEqualTo( getDocumentIdentifierValue() );
-		assertThat( dslToIndexConverter.convertUnknown( getEntityIdentifierValue(), convertContext ) )
+		assertThat( dslToIndexConverter.convertToDocumentUnknown( getEntityIdentifierValue(), convertContext ) )
 				.isEqualTo( getDocumentIdentifierValue() );
 	}
 

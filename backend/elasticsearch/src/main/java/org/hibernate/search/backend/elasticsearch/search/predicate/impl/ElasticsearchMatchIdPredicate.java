@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
@@ -92,11 +92,11 @@ public class ElasticsearchMatchIdPredicate extends AbstractElasticsearchPredicat
 
 		@Override
 		public void value(Object value, ValueConvert valueConvert) {
-			ToDocumentIdentifierValueConverter<?> dslToDocumentIdConverter =
+			DocumentIdentifierValueConverter<?> dslToDocumentIdConverter =
 					searchContext.indexes().idDslConverter( valueConvert );
 			ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext =
 					searchContext.toDocumentIdentifierValueConvertContext();
-			values.add( dslToDocumentIdConverter.convertUnknown( value, toDocumentIdentifierValueConvertContext ) );
+			values.add( dslToDocumentIdConverter.convertToDocumentUnknown( value, toDocumentIdentifierValueConvertContext ) );
 		}
 
 		@Override

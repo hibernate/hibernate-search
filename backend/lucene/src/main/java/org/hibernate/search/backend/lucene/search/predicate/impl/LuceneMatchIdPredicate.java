@@ -12,7 +12,7 @@ import java.util.List;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
@@ -61,11 +61,11 @@ public class LuceneMatchIdPredicate extends AbstractLuceneSearchPredicate {
 
 		@Override
 		public void value(Object value, ValueConvert valueConvert) {
-			ToDocumentIdentifierValueConverter<?> dslToDocumentIdConverter =
+			DocumentIdentifierValueConverter<?> dslToDocumentIdConverter =
 					searchContext.indexes().idDslConverter( valueConvert );
 			ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext =
 					searchContext.toDocumentIdentifierValueConvertContext();
-			values.add( dslToDocumentIdConverter.convertUnknown( value, toDocumentIdentifierValueConvertContext ) );
+			values.add( dslToDocumentIdConverter.convertToDocumentUnknown( value, toDocumentIdentifierValueConvertContext ) );
 		}
 
 		@Override

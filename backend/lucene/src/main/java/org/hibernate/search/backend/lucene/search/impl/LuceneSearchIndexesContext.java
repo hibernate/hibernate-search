@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNamedPredicateNode;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
 
 public interface LuceneSearchIndexesContext {
@@ -22,7 +22,7 @@ public interface LuceneSearchIndexesContext {
 
 	Set<String> indexNames();
 
-	ToDocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
+	DocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
 
 	LuceneSearchFieldContext field(String absoluteFieldPath);
 

@@ -24,8 +24,8 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchVal
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
-import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.StringDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.util.common.SearchException;
@@ -36,8 +36,8 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final StringToDocumentIdentifierValueConverter RAW_ID_CONVERTER =
-			new StringToDocumentIdentifierValueConverter();
+	private static final StringDocumentIdentifierValueConverter RAW_ID_CONVERTER =
+			new StringDocumentIdentifierValueConverter();
 
 	private final Map<String, LuceneScopeIndexManagerContext> mappedTypeNameToIndex;
 	private final Set<String> indexNames;
@@ -68,13 +68,13 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 	}
 
 	@Override
-	public ToDocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert) {
+	public DocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert) {
 		if ( ValueConvert.NO.equals( valueConvert ) ) {
 			return RAW_ID_CONVERTER;
 		}
-		ToDocumentIdentifierValueConverter<?> converter = null;
+		DocumentIdentifierValueConverter<?> converter = null;
 		for ( LuceneScopeIndexManagerContext index : elements() ) {
-			ToDocumentIdentifierValueConverter<?> converterForIndex = index.model().idDslConverter();
+			DocumentIdentifierValueConverter<?> converterForIndex = index.model().idDslConverter();
 			if ( converter == null ) {
 				converter = converterForIndex;
 			}
