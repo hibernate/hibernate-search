@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Optional;
 
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
@@ -195,6 +196,11 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 
 		@Override
 		public String convertToDocumentUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Object convertToSource(String documentId, FromDocumentIdentifierValueConvertContext context) {
 			throw new UnsupportedOperationException();
 		}
 

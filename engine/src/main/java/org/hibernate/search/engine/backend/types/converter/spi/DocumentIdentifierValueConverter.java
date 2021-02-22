@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.backend.types.converter.spi;
 
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContextExtension;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextExtension;
 import org.hibernate.search.util.common.SearchException;
@@ -47,6 +49,14 @@ public interface DocumentIdentifierValueConverter<I> {
 	default void requiresType(Class<?> requiredType) {
 		// no check by default
 	}
+
+	/**
+	 * @param documentId The document identifier to convert.
+	 * @param context A context that can be
+	 * {@link FromDocumentIdentifierValueConvertContext#extension(FromDocumentIdentifierValueConvertContextExtension) extended}
+	 * @return The original source identifier value.
+	 */
+	I convertToSource(String documentId, FromDocumentIdentifierValueConvertContext context);
 
 	/**
 	 * @param other Another {@link DocumentIdentifierValueConverter}, never {@code null}.
