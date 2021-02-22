@@ -10,6 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 
 import java.util.Arrays;
 
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -40,6 +41,11 @@ public class MatchIdPredicateConverterIT {
 		@Override
 		public String convertToDocumentUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
 			return convertToDocument( (Integer) value, context );
+		}
+
+		@Override
+		public Integer convertToSource(String documentId, FromDocumentIdentifierValueConvertContext context) {
+			throw new UnsupportedOperationException( "Should not be called" );
 		}
 	};
 

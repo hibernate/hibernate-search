@@ -8,6 +8,7 @@ package org.hibernate.search.engine.backend.types.converter.spi;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -28,9 +29,14 @@ public final class StringDocumentIdentifierValueConverter implements DocumentIde
 
 	@Override
 	public void requiresType(Class<?> requiredType) {
-		if ( !String.class.isAssignableFrom( requiredType ) ) {
+		if ( !requiredType.isAssignableFrom( String.class ) ) {
 			throw log.wrongRequiredIdentifierType( requiredType, String.class );
 		}
+	}
+
+	@Override
+	public String convertToSource(String documentId, FromDocumentIdentifierValueConvertContext context) {
+		return documentId;
 	}
 
 	@Override

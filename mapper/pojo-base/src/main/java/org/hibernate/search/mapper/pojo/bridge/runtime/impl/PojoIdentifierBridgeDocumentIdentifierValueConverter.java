@@ -9,13 +9,18 @@ package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContextExtension;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextExtension;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -38,7 +43,7 @@ public final class PojoIdentifierBridgeDocumentIdentifierValueConverter<I> imple
 
 	@Override
 	public String convertToDocument(I value, ToDocumentIdentifierValueConvertContext context) {
-		IdentifierBridgeToDocumentIdentifierContext extension = context.extension( PojoIdentifierBridgeContextExtension.INSTANCE );
+		IdentifierBridgeToDocumentIdentifierContext extension = context.extension( PojoToDocumentIdentifierBridgeContextExtension.INSTANCE );
 		return bridge.toDocumentIdentifier( value, extension );
 	}
 
@@ -49,9 +54,17 @@ public final class PojoIdentifierBridgeDocumentIdentifierValueConverter<I> imple
 
 	@Override
 	public void requiresType(Class<?> requiredType) {
-		if ( !expectedValueType.isAssignableFrom( requiredType ) ) {
+		if ( !requiredType.isAssignableFrom( expectedValueType ) ) {
 			throw log.wrongRequiredIdentifierType( requiredType, expectedValueType );
 		}
+	}
+
+	@Override
+	public I convertToSource(String documentId, FromDocumentIdentifierValueConvertContext context) {
+		IdentifierBridgeFromDocumentIdentifierContext identifierContext = context.extension(
+				PojoFromDocumentIdentifierBridgeContextExtension.INSTANCE );
+
+		return bridge.fromDocumentIdentifier( documentId, identifierContext );
 	}
 
 	@Override
@@ -65,9 +78,9 @@ public final class PojoIdentifierBridgeDocumentIdentifierValueConverter<I> imple
 				&& bridge.isCompatibleWith( castedOther.bridge );
 	}
 
-	private static class PojoIdentifierBridgeContextExtension
+	private static class PojoToDocumentIdentifierBridgeContextExtension
 			implements ToDocumentIdentifierValueConvertContextExtension<IdentifierBridgeToDocumentIdentifierContext> {
-		private static final PojoIdentifierBridgeContextExtension INSTANCE = new PojoIdentifierBridgeContextExtension();
+		private static final PojoToDocumentIdentifierBridgeContextExtension INSTANCE = new PojoToDocumentIdentifierBridgeContextExtension();
 
 		@Override
 		public Optional<IdentifierBridgeToDocumentIdentifierContext> extendOptional(
@@ -80,6 +93,22 @@ public final class PojoIdentifierBridgeDocumentIdentifierValueConverter<I> imple
 			else {
 				return Optional.empty();
 			}
+		}
+	}
+
+	private static class PojoFromDocumentIdentifierBridgeContextExtension
+			implements FromDocumentIdentifierValueConvertContextExtension<IdentifierBridgeFromDocumentIdentifierContext> {
+		private static final PojoFromDocumentIdentifierBridgeContextExtension INSTANCE = new PojoFromDocumentIdentifierBridgeContextExtension();
+
+		@Override
+		public Optional<IdentifierBridgeFromDocumentIdentifierContext> extendOptional(
+				FromDocumentIdentifierValueConvertContext original,
+				BackendSessionContext sessionContext) {
+			if ( sessionContext instanceof BridgeSessionContext ) {
+				BridgeSessionContext pojoSessionContext = (BridgeSessionContext) sessionContext;
+				return Optional.of( pojoSessionContext.identifierBridgeFromDocumentIdentifierContext() );
+			}
+			return Optional.empty();
 		}
 	}
 }
