@@ -24,7 +24,7 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -39,7 +39,7 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 	private final IndexSettings customIndexSettings;
 	private final RootTypeMapping mapping;
 
-	private final ToDocumentIdentifierValueConverter<?> idDslConverter;
+	private final DocumentIdentifierValueConverter<?> idDslConverter;
 	private final ElasticsearchIndexSchemaObjectNode rootNode;
 	private final Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticFields;
 	private final List<IndexFieldDescriptor> includedStaticFields;
@@ -50,7 +50,7 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 	public ElasticsearchIndexModel(IndexNames names,
 			String mappedTypeName,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, IndexSettings customIndexSettings,
-			RootTypeMapping mapping, ToDocumentIdentifierValueConverter<?> idDslConverter,
+			RootTypeMapping mapping, DocumentIdentifierValueConverter<?> idDslConverter,
 			ElasticsearchIndexSchemaObjectNode rootNode,
 			Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticFields,
 			List<AbstractElasticsearchIndexSchemaFieldTemplate<?>> fieldTemplates,
@@ -87,7 +87,7 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 	}
 
 	@Override
-	public ToDocumentIdentifierValueConverter<?> idDslConverter() {
+	public DocumentIdentifierValueConverter<?> idDslConverter() {
 		return idDslConverter;
 	}
 

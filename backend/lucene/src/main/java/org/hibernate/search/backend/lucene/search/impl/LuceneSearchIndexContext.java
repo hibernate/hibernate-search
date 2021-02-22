@@ -7,10 +7,10 @@
 package org.hibernate.search.backend.lucene.search.impl;
 
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 
 public interface LuceneSearchIndexContext extends ReadIndexManagerContext {
 
-	ToDocumentIdentifierValueConverter<?> idDslConverter();
+	DocumentIdentifierValueConverter<?> idDslConverter();
 
 }

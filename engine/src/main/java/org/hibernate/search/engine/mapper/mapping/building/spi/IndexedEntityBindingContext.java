@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 
 /**
  * The binding context associated to the root node in the entity tree.
@@ -27,6 +27,6 @@ public interface IndexedEntityBindingContext extends IndexBindingContext {
 	 *
 	 * @param idConverter The ID converter to use in the predicate DSL.
 	 */
-	void idDslConverter(ToDocumentIdentifierValueConverter<?> idConverter);
+	void idDslConverter(DocumentIdentifierValueConverter<?> idConverter);
 
 }

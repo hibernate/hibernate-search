@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl.spi;
 
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 
@@ -21,5 +21,5 @@ public interface IndexSchemaRootNodeBuilder extends IndexSchemaObjectNodeBuilder
 	 */
 	void explicitRouting();
 
-	void idDslConverter(ToDocumentIdentifierValueConverter<?> idConverter);
+	void idDslConverter(DocumentIdentifierValueConverter<?> idConverter);
 }

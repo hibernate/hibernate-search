@@ -33,8 +33,8 @@ import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.StringDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -54,7 +54,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	private final DynamicType defaultDynamicType;
 
 	private RoutingType routing = null;
-	private ToDocumentIdentifierValueConverter<?> idDslConverter;
+	private DocumentIdentifierValueConverter<?> idDslConverter;
 
 	public ElasticsearchIndexSchemaRootNodeBuilder(ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
 			EventContext indexEventContext,
@@ -87,7 +87,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	}
 
 	@Override
-	public void idDslConverter(ToDocumentIdentifierValueConverter<?> idDslConverter) {
+	public void idDslConverter(DocumentIdentifierValueConverter<?> idDslConverter) {
 		this.idDslConverter = idDslConverter;
 	}
 
@@ -152,7 +152,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 				mappedTypeName,
 				analysisDefinitionRegistry, customIndexSettings,
 				mapping,
-				idDslConverter == null ? new StringToDocumentIdentifierValueConverter() : idDslConverter,
+				idDslConverter == null ? new StringDocumentIdentifierValueConverter() : idDslConverter,
 				rootNode, staticFields, fieldTemplates, namedPredicateNodes
 		);
 	}

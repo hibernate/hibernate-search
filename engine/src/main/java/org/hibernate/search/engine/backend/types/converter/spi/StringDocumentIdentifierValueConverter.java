@@ -8,20 +8,20 @@ package org.hibernate.search.engine.backend.types.converter.spi;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 
-public final class StringToDocumentIdentifierValueConverter implements ToDocumentIdentifierValueConverter<String> {
+public final class StringDocumentIdentifierValueConverter implements DocumentIdentifierValueConverter<String> {
 
 	@Override
-	public String convert(String value, ToDocumentIdentifierValueConvertContext context) {
+	public String convertToDocument(String value, ToDocumentIdentifierValueConvertContext context) {
 		return value;
 	}
 
 	@Override
-	public String convertUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
+	public String convertToDocumentUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
 		return (String) value;
 	}
 
 	@Override
-	public boolean isCompatibleWith(ToDocumentIdentifierValueConverter<?> other) {
+	public boolean isCompatibleWith(DocumentIdentifierValueConverter<?> other) {
 		return getClass().equals( other.getClass() );
 	}
 }

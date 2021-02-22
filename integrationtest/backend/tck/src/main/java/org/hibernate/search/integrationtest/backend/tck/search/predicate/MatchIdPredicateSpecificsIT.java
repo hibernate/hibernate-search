@@ -12,7 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import java.util.Arrays;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -146,14 +146,14 @@ public class MatchIdPredicateSpecificsIT {
 		mainIndexer.join( compatibleIdConverterIndexer, incompatibleIdConverterIndexer );
 	}
 
-	private static class IncompatibleIdConverter implements ToDocumentIdentifierValueConverter<String> {
+	private static class IncompatibleIdConverter implements DocumentIdentifierValueConverter<String> {
 		@Override
-		public String convert(String value, ToDocumentIdentifierValueConvertContext context) {
+		public String convertToDocument(String value, ToDocumentIdentifierValueConvertContext context) {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
 
 		@Override
-		public String convertUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
+		public String convertToDocumentUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
 	}

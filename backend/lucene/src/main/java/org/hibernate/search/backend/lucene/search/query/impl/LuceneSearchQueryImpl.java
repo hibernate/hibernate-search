@@ -23,7 +23,7 @@ import org.hibernate.search.backend.lucene.search.query.LuceneSearchScroll;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.backend.lucene.work.impl.ReadWork;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
@@ -221,9 +221,9 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	}
 
 	private String toDocumentId(LuceneSearchIndexContext index, Object id) {
-		ToDocumentIdentifierValueConverter<?> converter = index.idDslConverter();
+		DocumentIdentifierValueConverter<?> converter = index.idDslConverter();
 		ToDocumentIdentifierValueConvertContext convertContext =
 				searchContext.toDocumentIdentifierValueConvertContext();
-		return converter.convertUnknown( id, convertContext );
+		return converter.convertToDocumentUnknown( id, convertContext );
 	}
 }

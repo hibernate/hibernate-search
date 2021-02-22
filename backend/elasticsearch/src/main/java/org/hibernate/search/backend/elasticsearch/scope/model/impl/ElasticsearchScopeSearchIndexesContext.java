@@ -24,8 +24,8 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMulti
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
-import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.StringDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.util.common.SearchException;
@@ -36,8 +36,8 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final StringToDocumentIdentifierValueConverter RAW_ID_CONVERTER =
-			new StringToDocumentIdentifierValueConverter();
+	private static final StringDocumentIdentifierValueConverter RAW_ID_CONVERTER =
+			new StringDocumentIdentifierValueConverter();
 
 	private final Set<ElasticsearchIndexModel> indexModels;
 	private final Set<String> hibernateSearchIndexNames;
@@ -70,13 +70,13 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 	}
 
 	@Override
-	public ToDocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert) {
+	public DocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert) {
 		if ( ValueConvert.NO.equals( valueConvert ) ) {
 			return RAW_ID_CONVERTER;
 		}
-		ToDocumentIdentifierValueConverter<?> converter = null;
+		DocumentIdentifierValueConverter<?> converter = null;
 		for ( ElasticsearchIndexModel indexModel : indexModels ) {
-			ToDocumentIdentifierValueConverter<?> converterForIndex = indexModel.idDslConverter();
+			DocumentIdentifierValueConverter<?> converterForIndex = indexModel.idDslConverter();
 			if ( converter == null ) {
 				converter = converterForIndex;
 			}

@@ -10,7 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 
 import java.util.Arrays;
 
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
@@ -31,15 +31,15 @@ public class MatchIdPredicateConverterIT {
 	private static final String DOCUMENT_2 = "document2";
 	private static final String DOCUMENT_3 = "document3";
 
-	private static final ToDocumentIdentifierValueConverter<Integer> ID_CONVERTER = new ToDocumentIdentifierValueConverter<Integer>() {
+	private static final DocumentIdentifierValueConverter<Integer> ID_CONVERTER = new DocumentIdentifierValueConverter<Integer>() {
 		@Override
-		public String convert(Integer value, ToDocumentIdentifierValueConvertContext context) {
+		public String convertToDocument(Integer value, ToDocumentIdentifierValueConvertContext context) {
 			return "document" + value;
 		}
 
 		@Override
-		public String convertUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
-			return convert( (Integer) value, context );
+		public String convertToDocumentUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
+			return convertToDocument( (Integer) value, context );
 		}
 	};
 

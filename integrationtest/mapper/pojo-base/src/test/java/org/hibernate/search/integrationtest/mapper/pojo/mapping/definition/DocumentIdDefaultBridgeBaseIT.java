@@ -17,7 +17,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.PropertyTypeDescriptor;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
@@ -151,9 +151,9 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 	public void dslToIndexConverter() {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
-		ToDocumentIdentifierValueConverter<I> dslToIndexConverter =
-				(ToDocumentIdentifierValueConverter<I>) index1RootSchemaNode.getIdDslConverter();
-		ToDocumentIdentifierValueConverter<?> compatibleDslToIndexConverter =
+		DocumentIdentifierValueConverter<I> dslToIndexConverter =
+				(DocumentIdentifierValueConverter<I>) index1RootSchemaNode.getIdDslConverter();
+		DocumentIdentifierValueConverter<?> compatibleDslToIndexConverter =
 				index2RootSchemaNode.getIdDslConverter();
 		ToDocumentIdentifierValueConvertContextImpl convertContext =
 				new ToDocumentIdentifierValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
@@ -161,7 +161,7 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 		// isCompatibleWith must return true when appropriate
 		assertThat( dslToIndexConverter.isCompatibleWith( dslToIndexConverter ) ).isTrue();
 		assertThat( dslToIndexConverter.isCompatibleWith( compatibleDslToIndexConverter ) ).isTrue();
-		assertThat( dslToIndexConverter.isCompatibleWith( new IncompatibleToDocumentIdentifierValueConverter() ) )
+		assertThat( dslToIndexConverter.isCompatibleWith( new IncompatibleDocumentIdentifierValueConverter() ) )
 				.isFalse();
 
 		// convert and convertUnknown must behave appropriately on valid input
@@ -169,37 +169,37 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 		for ( I entityIdentifierValue : expectations.getEntityIdentifierValues() ) {
 			String documentIdentifierValue = documentIdentifierIterator.next();
 			assertThat(
-					dslToIndexConverter.convert( entityIdentifierValue, convertContext )
+					dslToIndexConverter.convertToDocument( entityIdentifierValue, convertContext )
 			)
 					.isEqualTo( documentIdentifierValue );
 			assertThat(
-					dslToIndexConverter.convertUnknown( entityIdentifierValue, convertContext )
+					dslToIndexConverter.convertToDocumentUnknown( entityIdentifierValue, convertContext )
 			)
 					.isEqualTo( documentIdentifierValue );
 		}
 
 		// convertUnknown must throw a runtime exception on invalid input
 		assertThatThrownBy(
-				() -> dslToIndexConverter.convertUnknown( new Object(), convertContext ),
+				() -> dslToIndexConverter.convertToDocumentUnknown( new Object(), convertContext ),
 				"convertUnknown on invalid input"
 		)
 				.isInstanceOf( RuntimeException.class );
 	}
 
-	private static class IncompatibleToDocumentIdentifierValueConverter
-			implements ToDocumentIdentifierValueConverter<Object> {
+	private static class IncompatibleDocumentIdentifierValueConverter
+			implements DocumentIdentifierValueConverter<Object> {
 		@Override
-		public String convert(Object value, ToDocumentIdentifierValueConvertContext context) {
+		public String convertToDocument(Object value, ToDocumentIdentifierValueConvertContext context) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public String convertUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
+		public String convertToDocumentUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public boolean isCompatibleWith(ToDocumentIdentifierValueConverter<?> other) {
+		public boolean isCompatibleWith(DocumentIdentifierValueConverter<?> other) {
 			throw new UnsupportedOperationException();
 		}
 	}
