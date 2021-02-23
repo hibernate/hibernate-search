@@ -73,7 +73,6 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 
 	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
 			EntityReferenceFactory<R> entityReferenceFactory) {
-		process();
 		return delegate.executeAndReport( entityReferenceFactory );
 	}
 
