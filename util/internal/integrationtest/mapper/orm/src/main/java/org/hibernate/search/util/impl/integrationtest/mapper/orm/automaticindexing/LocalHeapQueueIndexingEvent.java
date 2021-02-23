@@ -29,6 +29,16 @@ public class LocalHeapQueueIndexingEvent implements BatchedWork<LocalHeapQueuePr
 	}
 
 	@Override
+	public String toString() {
+		return "LocalHeapQueueIndexingEvent{" +
+				"eventType=" + eventType +
+				", entityName='" + entityName + '\'' +
+				", identifier=" + identifier +
+				", future=" + future +
+				'}';
+	}
+
+	@Override
 	public void submitTo(LocalHeapQueueProcessor processor) {
 		processor.process( this );
 	}
