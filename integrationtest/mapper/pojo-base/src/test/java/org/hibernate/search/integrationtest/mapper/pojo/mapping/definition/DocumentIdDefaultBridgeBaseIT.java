@@ -112,7 +112,7 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 	}
 
 	@Test
-	public void projection() {
+	public void projection_entityReference() {
 		try ( SearchSession session = mapping.createSession() ) {
 			Iterator<I> entityIdentifierIterator = expectations.getEntityIdentifierValues().iterator();
 			for ( String documentIdentifierValue : expectations.getDocumentIdentifierValues() ) {
@@ -142,6 +142,38 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 								DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,
 								entityIdentifierValue
 						) );
+			}
+			backendMock.verifyExpectationsMet();
+		}
+	}
+
+	@Test
+	public void projection_id() {
+		try ( SearchSession session = mapping.createSession() ) {
+			Iterator<I> entityIdentifierIterator = expectations.getEntityIdentifierValues().iterator();
+			for ( String documentIdentifierValue : expectations.getDocumentIdentifierValues() ) {
+				I entityIdentifierValue = entityIdentifierIterator.next();
+				backendMock.expectSearchIds(
+						Collections.singletonList(
+								DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME ),
+						b -> {
+						},
+						StubSearchWorkBehavior.of(
+								1L,
+								StubBackendUtils.reference(
+										DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,
+										documentIdentifierValue
+								)
+						)
+				);
+
+				SearchQuery<Object> query = session.search( expectations.getTypeWithIdentifierBridge1() )
+						.select( f -> f.id() )
+						.where( f -> f.matchAll() )
+						.toQuery();
+
+				assertThat( query.fetchAll().hits() )
+						.containsExactly( entityIdentifierValue );
 			}
 			backendMock.verifyExpectationsMet();
 		}

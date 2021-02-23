@@ -191,6 +191,11 @@ public class BackendMock implements TestRule {
 		return expectSearch( indexNames, contributor, StubSearchWork.ResultType.REFERENCES, behavior );
 	}
 
+	public BackendMock expectSearchIds(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
+			StubSearchWorkBehavior<DocumentReference> behavior) {
+		return expectSearch( indexNames, contributor, StubSearchWork.ResultType.PROJECTIONS, behavior );
+	}
+
 	public BackendMock expectSearchObjects(String indexName, StubSearchWorkBehavior<DocumentReference> behavior) {
 		return expectSearch( Collections.singleton( indexName ), ignored -> { },
 				StubSearchWork.ResultType.OBJECTS, behavior );
