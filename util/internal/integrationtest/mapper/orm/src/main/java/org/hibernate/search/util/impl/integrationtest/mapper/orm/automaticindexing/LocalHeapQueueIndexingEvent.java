@@ -6,17 +6,21 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm.automaticindexing;
 
-import java.util.concurrent.CompletableFuture;
+import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
+import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class LocalHeapQueueIndexingEvent implements BatchedWork<LocalHeapQueueProcessor> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	final Type eventType;
 	final String entityName;
 	final transient Object identifier;
 	final String serializedId;
 	final byte[] routes;
-	final CompletableFuture<?> future;
 
 	public LocalHeapQueueIndexingEvent(Type eventType, String entityName, Object identifier, String serializedId,
 			byte[] routes) {
@@ -25,7 +29,6 @@ public class LocalHeapQueueIndexingEvent implements BatchedWork<LocalHeapQueuePr
 		this.identifier = identifier;
 		this.serializedId = serializedId;
 		this.routes = routes;
-		future = new CompletableFuture<>();
 	}
 
 	@Override
@@ -34,7 +37,6 @@ public class LocalHeapQueueIndexingEvent implements BatchedWork<LocalHeapQueuePr
 				"eventType=" + eventType +
 				", entityName='" + entityName + '\'' +
 				", identifier=" + identifier +
-				", future=" + future +
 				'}';
 	}
 
@@ -45,8 +47,9 @@ public class LocalHeapQueueIndexingEvent implements BatchedWork<LocalHeapQueuePr
 
 	@Override
 	public void markAsFailed(Throwable t) {
-		future.completeExceptionally( t );
-		// We don't care about feedback
+		// In a real implementation we would put this event back into a queue, to re-try later.
+		// But here it's just for testing.
+		log.errorf( "Failed to process event '%s'", this, t );
 	}
 
 	public enum Type {
