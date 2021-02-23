@@ -104,7 +104,7 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 	}
 
 	@Test
-	public void projection() {
+	public void projection_entityReference() {
 		try ( SearchSession session = mapping.createSession() ) {
 			backendMock.expectSearchReferences(
 					Collections.singletonList( DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME ),
@@ -129,6 +129,32 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 							DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,
 							getEntityIdentifierValue()
 					) );
+			backendMock.verifyExpectationsMet();
+		}
+	}
+
+	@Test
+	public void projection_id() {
+		try ( SearchSession session = mapping.createSession() ) {
+			backendMock.expectSearchIds(
+					Collections.singletonList( DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME ),
+					b -> { },
+					StubSearchWorkBehavior.of(
+							1L,
+							StubBackendUtils.reference(
+									DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,
+									getDocumentIdentifierValue()
+							)
+					)
+			);
+
+			SearchQuery<Object> query = session.search( expectations.getTypeWithIdentifierBridge1() )
+					.select( f -> f.id() )
+					.where( f -> f.matchAll() )
+					.toQuery();
+
+			assertThat( query.fetchAll().hits() )
+					.containsExactly( getEntityIdentifierValue() );
 			backendMock.verifyExpectationsMet();
 		}
 	}
