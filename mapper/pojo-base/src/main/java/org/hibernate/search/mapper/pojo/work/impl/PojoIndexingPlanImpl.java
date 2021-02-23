@@ -171,11 +171,18 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoReindexingCol
 			EntityReferenceFactory<R> entityReferenceFactory) {
 		try {
 			process();
-			List<CompletableFuture<MultiEntityOperationExecutionReport<R>>> futures = new ArrayList<>();
-			for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : indexedTypeDelegates.values() ) {
-				futures.add( delegate.executeAndReport( entityReferenceFactory ) );
+			if ( sink != null ) {
+				// All types have the same delegate
+				return sink.sendAndReport( entityReferenceFactory );
 			}
-			return MultiEntityOperationExecutionReport.allOf( futures );
+			else {
+				List<CompletableFuture<MultiEntityOperationExecutionReport<R>>> futures = new ArrayList<>();
+				// Each type has its own delegate
+				for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : indexedTypeDelegates.values() ) {
+					futures.add( delegate.executeAndReport( entityReferenceFactory ) );
+				}
+				return MultiEntityOperationExecutionReport.allOf( futures );
+			}
 		}
 		finally {
 			indexedTypeDelegates.clear();
