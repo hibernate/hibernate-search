@@ -1,6 +1,20 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.2.Final (23-02-2021)
+-------------------------
+
+** Bug
+    * HSEARCH-4161 LuceneIndexManager.computeSizeInBytes() may fail if a file is deleted while computing size
+    * HSEARCH-4159 Hibernate Search doesn't properly execute the backend's preStop() operation on shutdown
+    * HSEARCH-4156 Hibernate Search incorrectly adds synthetic Hibernate ORM properties to the metamodel, ultimately leading to a bootstrap failure
+    * HSEARCH-4155 Deleting then re-inserting the same entity in a transaction does not result in an update
+    * HSEARCH-4152 "hibernate.search.backend.dynamic_mapping" is ignored
+    * HSEARCH-4117 "AssertionFailure: Unexpected duplicate key" when an entity has two getters for the same property
+
+** Task
+    * HSEARCH-4154 Upgrade to Hibernate ORM 5.4.28.Final
+
 6.0.1.Final (08-02-2021)
 -------------------------
 
