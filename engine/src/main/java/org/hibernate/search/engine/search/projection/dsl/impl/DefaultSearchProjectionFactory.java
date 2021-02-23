@@ -61,6 +61,7 @@ public class DefaultSearchProjectionFactory<R, E> implements SearchProjectionFac
 
 	@Override
 	public <I> IdProjectionOptionsStep<?, I> id(Class<I> identifierType) {
+		Contracts.assertNotNull( identifierType, "identifierType" );
 		return new IdProjectionOptionsStepImpl( dslContext, identifierType );
 	}
 
