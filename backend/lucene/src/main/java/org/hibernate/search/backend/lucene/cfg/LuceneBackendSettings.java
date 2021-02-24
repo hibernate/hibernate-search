@@ -66,6 +66,18 @@ public final class LuceneBackendSettings {
 	public static final String ANALYSIS_CONFIGURER = "analysis.configurer";
 
 	/**
+	 * The analysis configurer to use.
+	 * <p>
+	 * Expects a reference to a bean of type {@link LuceneAnalysisConfigurer}.
+	 * <p>
+	 * Defaults to no value.
+	 *
+	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
+	 * which includes a description of the "bean reference" properties and accepted values.
+	 */
+	public static final String QUERY_CACHING_CONFIGURER = "caching.configurer";
+
+	/**
 	 * The size of the thread pool assigned to the backend.
 	 * <p>
 	 * Expects a strictly positive integer value,
