@@ -563,11 +563,12 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 [IMPORTANT]
 ====
 The provided regular expressions used in regexp predicates
-will never be normalized or transformed in any way,
-even if a normalizer/analyzer has been defined on the field.
+may be normalized or not, it depends on the backend, if a normalizer has been defined on the field.
+The same will never be tokenized
+even if a analyzer with a proper tokenizer has been defined on the field.
 
 This means that if a normalizer/analyzer has been defined on the field,
-the user needs to be aware about how this normalizer/analyzer processes the data
+the user sometimes needs to be aware about how this normalizer/analyzer processes the data
 in order to provide a meaningful regular expression for using the predicate.
 ====
 
