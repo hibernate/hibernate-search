@@ -30,6 +30,9 @@ import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Query;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNamedPredicateNode;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 
 
 public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPredicateBuilderFactory {
@@ -78,6 +81,12 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	@Override
 	public PhrasePredicateBuilder phrase(String absoluteFieldPath) {
 		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.PHRASE, searchContext );
+	}
+
+	@Override
+	public NamedPredicateBuilder named(SearchPredicateFactory namedPredicateFactory, String name) {
+		LuceneIndexSchemaNamedPredicateNode namedPredicate = indexes.namedPredicate( name );
+		return new LuceneNamedPredicate.Builder( searchContext, namedPredicateFactory, namedPredicate );
 	}
 
 	@Override

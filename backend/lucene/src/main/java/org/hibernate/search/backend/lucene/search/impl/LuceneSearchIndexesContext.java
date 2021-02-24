@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNamedPredicateNode;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
 
@@ -24,6 +25,8 @@ public interface LuceneSearchIndexesContext {
 	ToDocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
 
 	LuceneSearchFieldContext field(String absoluteFieldPath);
+
+	LuceneIndexSchemaNamedPredicateNode namedPredicate(String absoluteNamedPredicatePath);
 
 	boolean hasNestedDocuments();
 

@@ -23,6 +23,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryEx
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.SpatialPredicateInitialStep;
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldStep;
+import org.hibernate.search.engine.search.predicate.dsl.NamedPredicateOptionsStep;
 
 /**
  * A delegating {@link SearchPredicateFactory}.
@@ -95,6 +96,11 @@ public class DelegatingSearchPredicateFactory implements SearchPredicateFactory 
 	@Override
 	public SpatialPredicateInitialStep spatial() {
 		return delegate.spatial();
+	}
+
+	@Override
+	public NamedPredicateOptionsStep named(String name) {
+		return delegate.named( name );
 	}
 
 	@Override

@@ -21,4 +21,5 @@ public interface ElasticsearchIndexSchemaNodeCollector {
 
 	void collect(NamedDynamicTemplate templateForMapping);
 
+	void collect(String absoluteNamedPredicatePath, ElasticsearchIndexSchemaNamedPredicateNode node);
 }

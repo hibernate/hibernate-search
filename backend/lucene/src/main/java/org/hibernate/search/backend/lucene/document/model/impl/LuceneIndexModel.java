@@ -40,6 +40,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 	private final Map<String, AbstractLuceneIndexSchemaFieldNode> staticFields;
 	private final List<IndexFieldDescriptor> includedStaticFields;
 	private final List<AbstractLuceneIndexSchemaFieldTemplate<?>> fieldTemplates;
+	private final Map<String, LuceneIndexSchemaNamedPredicateNode> namedPredicateNodes;
 	private final boolean hasNestedDocuments;
 	private final ConcurrentMap<String, AbstractLuceneIndexSchemaFieldNode> dynamicFieldsCache = new ConcurrentHashMap<>();
 
@@ -52,6 +53,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 			LuceneIndexSchemaObjectNode rootNode,
 			Map<String, AbstractLuceneIndexSchemaFieldNode> staticFields,
 			List<AbstractLuceneIndexSchemaFieldTemplate<?>> fieldTemplates,
+			Map<String, LuceneIndexSchemaNamedPredicateNode> namedPredicateNodes,
 			boolean hasNestedDocuments) {
 		this.indexName = indexName;
 		this.mappedTypeName = mappedTypeName;
@@ -64,6 +66,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 		this.indexingAnalyzer = new IndexingScopedAnalyzer();
 		this.searchAnalyzer = new SearchScopedAnalyzer();
 		this.fieldTemplates = fieldTemplates;
+		this.namedPredicateNodes = namedPredicateNodes;
 		this.hasNestedDocuments = hasNestedDocuments;
 	}
 
@@ -123,6 +126,10 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 
 	public Analyzer getSearchAnalyzer() {
 		return searchAnalyzer;
+	}
+
+	public LuceneIndexSchemaNamedPredicateNode namedPredicateNode(String absoluteNamedPredicateName) {
+		return namedPredicateNodes.get( absoluteNamedPredicateName );
 	}
 
 	@Override

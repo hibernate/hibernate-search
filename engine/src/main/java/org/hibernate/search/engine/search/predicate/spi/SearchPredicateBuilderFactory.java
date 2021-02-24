@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.predicate.spi;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 /**
  * A factory for search predicate builders.
@@ -53,4 +54,6 @@ public interface SearchPredicateBuilderFactory<C> {
 	SpatialWithinPolygonPredicateBuilder spatialWithinPolygon(String absoluteFieldPath);
 
 	SpatialWithinBoundingBoxPredicateBuilder spatialWithinBoundingBox(String absoluteFieldPath);
+
+	NamedPredicateBuilder named(SearchPredicateFactory namedPredicateFactory, String name);
 }

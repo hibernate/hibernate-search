@@ -636,4 +636,18 @@ public interface Log extends BasicLogger {
 			value = "Unable to create instance of analysis component '%1$s': %2$s")
 	SearchException unableToCreateAnalysisComponent(@FormatWith(ClassFormatter.class) Class<?> type, String causeMessage,
 			@Cause Exception cause);
+
+	@Message(id = ID_OFFSET + 143,
+			value = "The index schema named predicate '%1$s' was added twice.")
+	SearchException indexSchemaNamedPredicateNameConflict(String relativeFilterName,
+			@Param EventContext context);
+
+	@Message(id = ID_OFFSET + 144,
+
+		value = "Multiple conflicting models for named predicate definition name '%1$s'.")
+	SearchException conflictingNamedPredicateModel(String name, @Param EventContext context);
+
+	@Message(id = ID_OFFSET + 145,
+		value = "Unknown nmaed predicate definition '%1$s'.")
+	SearchException unknownNamedPredicateForSearch(String name, @Param EventContext context);
 }

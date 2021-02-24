@@ -14,8 +14,10 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusio
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
+import org.hibernate.search.engine.search.predicate.factories.NamedPredicateFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.impl.StubIndexFieldType;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
 
 abstract class AbstractStubIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder {
 
@@ -54,6 +56,18 @@ abstract class AbstractStubIndexSchemaObjectNodeBuilder implements IndexSchemaOb
 			builder.child( childBuilder );
 		}
 		return new StubIndexSchemaObjectFieldNodeBuilder( this, childBuilder, inclusion );
+	}
+
+	@Override
+	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String relativeNamedPredicateName,
+		IndexFieldInclusion inclusion, NamedPredicateFactory factory) {
+		StubIndexSchemaNode.Builder childBuilder =
+				StubIndexSchemaNode.namedPredicate( builder, relativeNamedPredicateName )
+					.namedPredicateFactory( factory );
+		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+			builder.child( childBuilder );
+		}
+		return new StubIndexSchemaNamedPredicateBuilder( childBuilder, true );
 	}
 
 	@Override

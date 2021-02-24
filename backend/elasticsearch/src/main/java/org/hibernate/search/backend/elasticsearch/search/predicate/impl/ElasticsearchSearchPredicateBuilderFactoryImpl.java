@@ -31,6 +31,9 @@ import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNamedPredicateNode;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 
 public class ElasticsearchSearchPredicateBuilderFactoryImpl implements ElasticsearchSearchPredicateBuilderFactory {
 
@@ -141,5 +144,11 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	@Override
 	public ElasticsearchSearchPredicate fromJson(String jsonString) {
 		return fromJson( searchContext.userFacingGson().fromJson( jsonString, JsonObject.class ) );
+	}
+
+	@Override
+	public NamedPredicateBuilder named(SearchPredicateFactory predicateFactory, String name) {
+		ElasticsearchIndexSchemaNamedPredicateNode namedPredicate = indexes.namedPredicate( name );
+		return new ElasticsearchNamedPredicate.Builder( searchContext, predicateFactory, namedPredicate );
 	}
 }

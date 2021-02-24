@@ -13,6 +13,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
@@ -42,7 +43,8 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder,
 		ExistsPredicateBuilder,
 		SpatialWithinCirclePredicateBuilder,
 		SpatialWithinPolygonPredicateBuilder,
-		SpatialWithinBoundingBoxPredicateBuilder {
+		SpatialWithinBoundingBoxPredicateBuilder,
+		NamedPredicateBuilder {
 
 	@Override
 	public SearchPredicate build() {
@@ -168,6 +170,11 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder,
 	public void nested(SearchPredicate nestedPredicate) {
 		// No-op, just check the type
 		StubSearchPredicate.from( nestedPredicate );
+	}
+
+	@Override
+	public void param(String name, Object value) {
+		// No-op, just simulates a call on this object
 	}
 
 	@Override

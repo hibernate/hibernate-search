@@ -14,6 +14,7 @@ import org.hibernate.search.engine.search.predicate.dsl.ExistsPredicateFieldStep
 import org.hibernate.search.engine.search.predicate.dsl.MatchAllPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchIdPredicateMatchingStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldStep;
+import org.hibernate.search.engine.search.predicate.dsl.NamedPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.NestedPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.PhrasePredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldStep;
@@ -95,6 +96,11 @@ public class DefaultSearchPredicateFactory implements SearchPredicateFactory {
 	@Override
 	public SpatialPredicateInitialStep spatial() {
 		return new SpatialPredicateInitialStepImpl( dslContext );
+	}
+
+	@Override
+	public NamedPredicateOptionsStep named(String name) {
+		return new NamedPredicateOptionsStepImpl( this, dslContext, name );
 	}
 
 	@Override
