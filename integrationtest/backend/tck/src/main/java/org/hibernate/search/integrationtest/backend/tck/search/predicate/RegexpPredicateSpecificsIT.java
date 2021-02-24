@@ -18,6 +18,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.Analyz
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.NormalizedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -81,9 +82,16 @@ public class RegexpPredicateSpecificsIT {
 		Function<String, SearchQueryFinalStep<DocumentReference>> createQuery = queryString -> scope.query()
 				.where( f -> f.regexp().field( absoluteFieldPath ).matching( queryString ) );
 
-		assertThatQuery( createQuery.apply( "Hibernate.*" ) ).hasNoHits();
+		if ( TckConfiguration.get().getBackendFeatures().regexpExpressionIsNormalized() ) {
+			assertThatQuery( createQuery.apply( "Hibernate.*" ) ).hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+			assertThatQuery( createQuery.apply( "hibernate search.*" ) ).hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+		}
+		else {
+			assertThatQuery( createQuery.apply( "Hibernate.*" ) ).hasNoHits();
+			assertThatQuery( createQuery.apply( "Hibernate Search.*" ) ).hasNoHits();
+		}
+
 		assertThatQuery( createQuery.apply( "hibernate.*" ) ).hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
-		assertThatQuery( createQuery.apply( "Hibernate Search.*" ) ).hasNoHits();
 		assertThatQuery( createQuery.apply( "hibernate search.*" ) ).hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 		assertThatQuery( createQuery.apply( "search.*" ) ).hasNoHits();
 		assertThatQuery( createQuery.apply( ".*search" ) ).hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );

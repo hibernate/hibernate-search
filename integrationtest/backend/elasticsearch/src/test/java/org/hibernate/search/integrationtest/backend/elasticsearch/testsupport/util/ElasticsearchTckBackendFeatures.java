@@ -142,4 +142,11 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		// that is used for distance computation.
 		return false;
 	}
+
+	@Override
+	public boolean regexpExpressionIsNormalized() {
+		// Surprisingly it is!
+		// See *.tck.search.predicate.RegexpPredicateSpecificsIT#normalizedField
+		return true;
+	}
 }
