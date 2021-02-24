@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.text.ParseException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -39,8 +40,9 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.util.Version;
-
-
+import org.hibernate.search.backend.lucene.cache.QueryCachingConfigurationContext;
+import org.hibernate.search.backend.lucene.cache.QueryCachingConfigurer;
+import org.hibernate.search.backend.lucene.cache.impl.LuceneQueryCachingContext;
 
 public class LuceneBackendFactory implements BackendFactory {
 
@@ -62,6 +64,11 @@ public class LuceneBackendFactory implements BackendFactory {
 					.asBeanReference( LuceneAnalysisConfigurer.class )
 					.build();
 
+	private static final OptionalConfigurationProperty<BeanReference<? extends QueryCachingConfigurer>> QUERY_CACHING_CONFIGURER
+			= ConfigurationProperty.forKey( LuceneBackendSettings.QUERY_CACHING_CONFIGURER )
+					.asBeanReference( QueryCachingConfigurer.class )
+					.build();
+
 	@Override
 	public BackendImplementor create(EventContext eventContext, BackendBuildContext buildContext,
 			ConfigurationPropertySource propertySource) {
@@ -78,11 +85,17 @@ public class LuceneBackendFactory implements BackendFactory {
 					buildContext, propertySource, luceneVersion
 			);
 
+			LuceneQueryCachingContext cachingContext
+					= new LuceneQueryCachingContext( luceneVersion );
+
+			configureQueryCache( buildContext, propertySource, cachingContext );
+
 			return new LuceneBackendImpl(
 					eventContext,
 					backendThreads,
 					new LuceneWorkFactoryImpl( multiTenancyStrategy ),
 					analysisDefinitionRegistry,
+					cachingContext,
 					multiTenancyStrategy,
 					buildContext.timingSource(),
 					buildContext.failureHandler()
@@ -157,6 +170,31 @@ public class LuceneBackendFactory implements BackendFactory {
 		}
 		catch (Exception e) {
 			throw log.unableToApplyAnalysisConfiguration( e.getMessage(), e );
+		}
+	}
+
+	private void configureQueryCache(
+			BackendBuildContext buildContext, ConfigurationPropertySource propertySource,
+			QueryCachingConfigurationContext context) {
+		try {
+			final BeanResolver beanResolver = buildContext.beanResolver();
+			try ( BeanHolder<List<QueryCachingConfigurer>> implicitConfigurersHolder =
+					beanResolver.resolve( beanResolver.allConfiguredForRole( QueryCachingConfigurer.class ) ) ) {
+				for ( QueryCachingConfigurer configurer : implicitConfigurersHolder.get() ) {
+					configurer.configure( context );
+				}
+			}
+
+			// Apply the user-provided query cache configurer if necessary
+			QUERY_CACHING_CONFIGURER.getAndMap( propertySource, beanResolver::resolve )
+					.ifPresent( holder -> {
+						try ( BeanHolder<? extends QueryCachingConfigurer> configurerHolder = holder ) {
+							configurerHolder.get().configure( context );
+						}
+					} );
+		}
+		catch (Exception e) {
+			throw log.unableToApplyQueryCacheConfiguration( e.getMessage(), e );
 		}
 	}
 

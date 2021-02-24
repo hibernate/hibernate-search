@@ -650,4 +650,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 145,
 		value = "Unknown nmaed predicate definition '%1$s'.")
 	SearchException unknownNamedPredicateForSearch(String name, @Param EventContext context);
+
+	@Message(id = ID_OFFSET + 146,
+			value = "Unable to apply query caching configuration: %1$s")
+	SearchException unableToApplyQueryCacheConfiguration(String errorMessage, @Cause Exception e);
 }

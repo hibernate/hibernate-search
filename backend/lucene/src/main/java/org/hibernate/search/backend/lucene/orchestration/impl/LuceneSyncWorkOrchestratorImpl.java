@@ -27,6 +27,7 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.similarities.Similarity;
+import org.hibernate.search.backend.lucene.cache.impl.LuceneQueryCachingContext;
 
 public class LuceneSyncWorkOrchestratorImpl
 		extends AbstractWorkOrchestrator<LuceneSyncWorkOrchestratorImpl.WorkExecution<?>>
@@ -35,11 +36,14 @@ public class LuceneSyncWorkOrchestratorImpl
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Similarity similarity;
+	private final LuceneQueryCachingContext cachingContext;
 
-	public LuceneSyncWorkOrchestratorImpl(String name, Similarity similarity) {
+	public LuceneSyncWorkOrchestratorImpl(String name, Similarity similarity,
+			LuceneQueryCachingContext cachingContext) {
 		super( name );
 		this.similarity = similarity;
 		start( null ); // Nothing to start, just force the superclass to go to the right state.
+		this.cachingContext = cachingContext;
 	}
 
 	@Override
@@ -47,7 +51,7 @@ public class LuceneSyncWorkOrchestratorImpl
 			Set<String> routingKeys, ReadWork<T> work,
 			HibernateSearchMultiReader indexReader) {
 		WorkExecution<T> workExecution = new WorkExecution<>(
-				similarity, indexNames, indexManagerContexts, routingKeys, work, indexReader
+				similarity, indexNames, indexManagerContexts, routingKeys, work, indexReader, cachingContext
 		);
 		Throwable throwable = null;
 		try {
@@ -99,13 +103,15 @@ public class LuceneSyncWorkOrchestratorImpl
 		private final HibernateSearchMultiReader indexReader;
 		private final ReadWork<T> work;
 		private final boolean closeIndexReader;
+		private final LuceneQueryCachingContext cachingContext;
 
 		private T result;
 
 		WorkExecution(Similarity similarity, Set<String> indexNames,
 				Collection<? extends ReadIndexManagerContext> indexManagerContexts,
 				Set<String> routingKeys, ReadWork<T> work,
-				HibernateSearchMultiReader indexReader) {
+				HibernateSearchMultiReader indexReader,
+				LuceneQueryCachingContext cachingContext) {
 			this.similarity = similarity;
 			this.indexNames = indexNames;
 			this.work = work;
@@ -118,12 +124,17 @@ public class LuceneSyncWorkOrchestratorImpl
 				this.indexReader = indexReader;
 				this.closeIndexReader = false;
 			}
+			this.cachingContext = cachingContext;
 		}
 
 		@Override
 		public IndexSearcher createSearcher() {
 			IndexSearcher searcher = new IndexSearcher( indexReader );
 			searcher.setSimilarity( similarity );
+
+			cachingContext.queryCache().ifPresent( searcher::setQueryCache );
+			cachingContext.queryCachingPolicy().ifPresent( searcher::setQueryCachingPolicy );
+
 			return searcher;
 		}
 
