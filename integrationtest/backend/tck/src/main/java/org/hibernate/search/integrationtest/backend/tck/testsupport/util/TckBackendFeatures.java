@@ -78,4 +78,8 @@ public class TckBackendFeatures {
 	public boolean geoDistanceSortingSupportsConfigurableMissingValues() {
 		return true;
 	}
+
+	public boolean regexpExpressionIsNormalized() {
+		return false;
+	}
 }
