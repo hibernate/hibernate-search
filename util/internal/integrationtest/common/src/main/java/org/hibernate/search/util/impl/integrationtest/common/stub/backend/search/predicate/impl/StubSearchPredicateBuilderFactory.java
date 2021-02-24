@@ -7,10 +7,12 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
@@ -94,6 +96,11 @@ public class StubSearchPredicateBuilderFactory
 
 	@Override
 	public NestedPredicateBuilder nested(String absoluteFieldPath) {
+		return new StubPredicateBuilder();
+	}
+
+	@Override
+	public NamedPredicateBuilder named(SearchPredicateFactory namedPredicateFactory, String name) {
 		return new StubPredicateBuilder();
 	}
 }

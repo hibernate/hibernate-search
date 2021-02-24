@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.impl;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNamedPredicateNode;
 
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -29,4 +30,5 @@ public interface ElasticsearchSearchIndexesContext {
 
 	ElasticsearchSearchFieldContext field(String absoluteFieldPath);
 
+	ElasticsearchIndexSchemaNamedPredicateNode namedPredicate(String absoluteNamedPredicatePath);
 }

@@ -18,6 +18,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.predicate.factories.NamedPredicateFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl.StubFieldConverter;
@@ -27,6 +28,7 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 	private enum Type {
 		ROOT,
 		OBJECT_FIELD,
+		NAMED_PREDICATE,
 		NON_OBJECT_FIELD,
 		OBJECT_FIELD_TEMPLATE,
 		NON_OBJECT_FIELD_TEMPLATE
@@ -52,6 +54,10 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 
 	public static Builder fieldTemplate(Builder parent, String templateName) {
 		return new Builder( parent, templateName, Type.NON_OBJECT_FIELD_TEMPLATE );
+	}
+
+	public static Builder namedPredicate(Builder parent, String relativeNamedPredicateName) {
+		return new Builder( parent, relativeNamedPredicateName, Type.NAMED_PREDICATE );
 	}
 
 	/*
@@ -96,7 +102,14 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 
 		public Builder field(String relativeFieldName, Class<?> inputType, Consumer<Builder> contributor) {
 			Builder builder = StubIndexSchemaNode.field( this, relativeFieldName )
-					.inputType( inputType );
+				.inputType( inputType );
+			contributor.accept( builder );
+			child( builder );
+			return this;
+		}
+
+		public Builder namedPredicate(String relativeNamedPredicateName, Consumer<Builder> contributor) {
+			Builder builder = StubIndexSchemaNode.namedPredicate( this, relativeNamedPredicateName );
 			contributor.accept( builder );
 			child( builder );
 			return this;
@@ -159,6 +172,11 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 
 		public Builder multiValued(boolean multiValued) {
 			attribute( "multiValued", multiValued );
+			return this;
+		}
+
+		public Builder namedPredicateFactory(NamedPredicateFactory factory) {
+			attribute( "factory", factory );
 			return this;
 		}
 

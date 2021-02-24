@@ -391,4 +391,14 @@ public interface Log extends BasicLogger {
 			+ " Otherwise, use a valid bean retrieval prefix among the following: %3$s.")
 	BeanNotFoundException invalidBeanRetrieval(String beanReference, String invalidPrefix,
 			List<String> validPrefixes, @Cause Exception e);
+	@Message(id = ID_OFFSET + 93,
+		value = "Named predicate name '%1$s' is invalid: field names cannot be null or empty.")
+	SearchException relativeNamedPredicateNameCannotBeNullOrEmpty(String relativeNamedPredicateName,
+		@Param EventContext context);
+
+	@Message(id = ID_OFFSET + 94,
+		value = "Named predicate name '%1$s' is invalid: field names cannot contain a dot ('.')."
+		+ " Remove the dot from your named predicate name.")
+	SearchException relativeNamedPredicateNameCannotContainDot(String relativeNamedPredicateName,
+		@Param EventContext context);
 }

@@ -139,6 +139,15 @@ public interface SearchPredicateFactory {
 	SpatialPredicateInitialStep spatial();
 
 	/**
+	 * Match documents if they match a combination of defined named predicate clauses.
+	 *
+	 * @param name the name of definied named predicate
+	 * @return The initial step of a DSL where named predicate predicates can be defined.
+	 * @see NamedPredicateOptionsStep
+	 */
+	NamedPredicateOptionsStep named(String name);
+
+	/**
 	 * Extend the current factory with the given extension,
 	 * resulting in an extended factory offering different types of predicates.
 	 *

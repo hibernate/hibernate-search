@@ -18,6 +18,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractEl
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldTemplate;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNamedPredicateNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldTemplate;
@@ -108,6 +109,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 
 		Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticFields = new HashMap<>();
 		List<AbstractElasticsearchIndexSchemaFieldTemplate<?>> fieldTemplates = new ArrayList<>();
+		final Map<String, ElasticsearchIndexSchemaNamedPredicateNode> namedPredicateNodes = new HashMap<>();
 
 		ElasticsearchIndexSchemaNodeCollector collector = new ElasticsearchIndexSchemaNodeCollector() {
 			@Override
@@ -134,6 +136,11 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 			public void collect(NamedDynamicTemplate templateForMapping) {
 				mapping.addDynamicTemplate( templateForMapping );
 			}
+
+			@Override
+			public void collect(String absoluteNamedPredicatePath, ElasticsearchIndexSchemaNamedPredicateNode node) {
+				namedPredicateNodes.put( absoluteNamedPredicatePath, node );
+			}
 		};
 
 		Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByName = new TreeMap<>();
@@ -146,7 +153,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 				analysisDefinitionRegistry, customIndexSettings,
 				mapping,
 				idDslConverter == null ? new StringToDocumentIdentifierValueConverter() : idDslConverter,
-				rootNode, staticFields, fieldTemplates
+				rootNode, staticFields, fieldTemplates, namedPredicateNodes
 		);
 	}
 
