@@ -76,7 +76,7 @@ public final class LuceneBackendSettings {
 	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
 	 * which includes a description of the "bean reference" properties and accepted values.
 	 */
-	public static final String QUERY_CACHING_CONFIGURER = "caching.configurer";
+	public static final String QUERY_CACHING_CONFIGURER = "query.caching.configurer";
 
 	/**
 	 * The size of the thread pool assigned to the backend.
