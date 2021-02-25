@@ -44,7 +44,7 @@ public class LuceneQueryCacheConfigurerIT {
 
 	@Test
 	public void error_failingQueryCacheConfigurer() {
-		setup( FailingQueryCasheConfigurer.class.getName() );
+		setup( FailingQueryCacheConfigurer.class.getName() );
 		initData( 10 );
 
 		StubMappingScope scope = index.createScope();
@@ -57,8 +57,8 @@ public class LuceneQueryCacheConfigurerIT {
 				.isInstanceOf( SimulatedFailure.class );
 	}
 
-	public static class FailingQueryCasheConfigurer implements QueryCachingConfigurer {
-		private static final String FAILURE_MESSAGE = "Simulated failure for " + FailingQueryCasheConfigurer.class.getName();
+	public static class FailingQueryCacheConfigurer implements QueryCachingConfigurer {
+		private static final String FAILURE_MESSAGE = "Simulated failure for " + FailingQueryCacheConfigurer.class.getName();
 
 		@Override
 		public void configure(QueryCachingConfigurationContext context) {
@@ -69,7 +69,7 @@ public class LuceneQueryCacheConfigurerIT {
 
 	@Test
 	public void error_failingQueryCachingPolicyConfigurer() {
-		setup( FailingCashePolicyExceptionQueryCacheConfigurer.class.getName() );
+		setup( FailingCachePolicyExceptionQueryCacheConfigurer.class.getName() );
 		initData( 10 );
 
 		StubMappingScope scope = index.createScope();
@@ -82,8 +82,8 @@ public class LuceneQueryCacheConfigurerIT {
 				.isInstanceOf( SimulatedFailure.class );
 	}
 
-	public static class FailingCashePolicyExceptionQueryCacheConfigurer implements QueryCachingConfigurer {
-		private static final String FAILURE_MESSAGE = "Simulated failure for " + FailingCashePolicyExceptionQueryCacheConfigurer.class.getName();
+	public static class FailingCachePolicyExceptionQueryCacheConfigurer implements QueryCachingConfigurer {
+		private static final String FAILURE_MESSAGE = "Simulated failure for " + FailingCachePolicyExceptionQueryCacheConfigurer.class.getName();
 
 		@Override
 		public void configure(QueryCachingConfigurationContext context) {
