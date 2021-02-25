@@ -560,16 +560,60 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
-[IMPORTANT]
-====
-The provided regular expressions used in regexp predicates
-may be normalized or not, it depends on the backend, if a normalizer has been defined on the field.
-The same will never be tokenized
-even if a analyzer with a proper tokenizer has been defined on the field.
+=== Regexp predicates and analysis
 
-This means that if a normalizer/analyzer has been defined on the field,
-the user sometimes needs to be aware about how this normalizer/analyzer processes the data
-in order to provide a meaningful regular expression for using the predicate.
+NOTE: For an introduction to analysis and how to configure it,
+refer to the <<concepts-analysis>> section.
+
+The behavior of regexp predicates on analyzed/normalized fields is a bit complex,
+so here is a summary of how it works.
+
+Regexps must match **the entirety** of analyzed/normalized tokens::
+For a field that is lowercased and tokenized on spaces (using an analyzer), the regexp `robots?`:
+* will match `Robot`: the indexed token `robot` matches.
+* will match `I love robots`: the indexed token `robots` matches.
+* will **not* match `Mr. Roboto`: the indexed token `roboto` does not match.
++
+For a field that is lowercased but not tokenized (using a normalizer), the regexp `robots?`:
+* will match `Robot`: the indexed token `robot` matches.
+* will **not** match `I love robots`: the indexed token `i love robots` does not match.
+* will **not* match `Mr. Roboto`: the indexed token `mr. roboto` does not match.
+
+Regexps are never tokenized, even if fields are::
+Beware of spaces in regexps, in particular.
++
+For a field that is tokenized on spaces (using an analyzer), the regexp `.*love .* robots?` will never match anything, because it requires a space inside the token and indexed tokens don't contain any (since tokenization happens on spaces).
++
+For a field that is lowercased, but not tokenized (using a normalizer), the regexp `.*love .* robots?`:
+* will match `I love robots`, which was indexed as `i love robots`.
+* will match `I love my Robot`, which was indexed as `i love my robot`.
+* will **not** match `I love Mr. Roboto`, which was indexed as `i love mr. roboto`: `roboto` doesn't match `robots?`.
+
+With the Lucene backend, regexps are never analyzed nor normalized::
+For a field that is lowercased and tokenized on spaces:
+* the regexp `Robots?` will **not** be normalized and will never match anything, because it requires an uppercase letter and indexed tokens don't contain any (since they are lowercased).
+* the regexp `[Rr]obots?` will **not** be normalized but will match `I love Robots`: the indexed token `robots` matches.
+* the regexp `love .* robots?` will **not** be normalized and will match `I love my Robot` as well as `I love robots`, but not `Robots love me`.
+
+With the Elasticsearch backend, **regexps are normalized**, but **only for normalized fields**::
+For a field that is lowercased, but not tokenized (using a normalizer):
+* the regexp `Robots?` will be normalized to `robots?` and will match `I love robots`: the indexed token `robots` matches.
+* the regexp `[Rr]obots?` will be normalized to `[rr]obots?` and will match `I love Robots`: the indexed token `robots` matches.
+* the regexp `love .* robots?` will match `I love my Robot` as well as `I love robots`, but not `Robots love me`.
++
+However, **that's not true for an analyzed field**!
+For a field that is lowercased and tokenized on spaces (using an analyzer):
+* the regexp `Robots?` will **not** be normalized and will never match anything, because it requires an uppercase letter and indexed tokens don't contain any (since they are lowercased).
+* the regexp `[Rr]obots?` will **not** be normalized but will match `I love Robots`: the indexed token `robots` matches.
+* the regexp `love .* robots?` will **not** be normalized and will match `I love my Robot` as well as `I love robots`, but not `Robots love me`.
+
+[WARNING]
+====
+With the Elasticsearch backend, normalizers can interfere with regexp meta-characters
+and completely change the meaning of a regexp.
+
+For example, for a field whose normalizer replaces the characters `*` and `?` with `_`,
+the regexp `Robots?` will be normalized to `Robots_` and will probably never match anything.
 ====
 
 === Targeting multiple fields
