@@ -82,7 +82,7 @@ public class MassIndexingEmbeddedIdIT {
 
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
-			backendMock.expectWorksAnyOrder(
+			backendMock.expectWorks(
 					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( book1.getIdentity().toString(), b -> b

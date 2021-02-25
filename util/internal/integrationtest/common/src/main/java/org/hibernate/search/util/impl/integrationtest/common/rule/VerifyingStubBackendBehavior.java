@@ -57,7 +57,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	private final Map<String, CallQueue<SchemaManagementWorkCall>> schemaManagementWorkCall = new HashMap<>();
 
-	private final Map<String, CallQueue<DocumentWorkCall>> documentWorkCalls = new HashMap<>();
+	private final Map<DocumentKey, CallQueue<DocumentWorkCall>> documentWorkCalls = new HashMap<>();
 
 	private final CallQueue<SearchWorkCall<?>> searchCalls = new CallQueue<>();
 
@@ -105,8 +105,8 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		return schemaManagementWorkCall.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
 	}
 
-	CallQueue<DocumentWorkCall> getDocumentWorkCalls(String indexName) {
-		return documentWorkCalls.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
+	CallQueue<DocumentWorkCall> getDocumentWorkCalls(DocumentKey documentKey) {
+		return documentWorkCalls.computeIfAbsent( documentKey, ignored -> new CallQueue<>() );
 	}
 
 	CallQueue<IndexScaleWorkCall> getIndexScaleWorkCalls(String indexName) {
@@ -217,34 +217,28 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	@Override
 	public void createDocumentWork(String indexName, StubDocumentWork work) {
 		indexingWorkThreadingExpectationsSupplier.get().checkCurrentThread( work );
-		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
-		callQueue.verify(
-				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.CREATE, work ),
-				DocumentWorkCall::verify,
-				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
-		);
+		DocumentWorkCall call = new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.CREATE, work );
+		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( call.documentKey() );
+		callQueue.verify( call, DocumentWorkCall::verify,
+				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) ) );
 	}
 
 	@Override
 	public void discardDocumentWork(String indexName, StubDocumentWork work) {
 		indexingWorkThreadingExpectationsSupplier.get().checkCurrentThread( work );
-		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
-		callQueue.verify(
-				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.DISCARD, work ),
-				DocumentWorkCall::verify,
-				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
-		);
+		DocumentWorkCall call = new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.DISCARD, work );
+		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( call.documentKey() );
+		callQueue.verify( call, DocumentWorkCall::verify,
+				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) ) );
 	}
 
 	@Override
 	public CompletableFuture<?> executeDocumentWork(String indexName, StubDocumentWork work) {
 		indexingWorkThreadingExpectationsSupplier.get().checkCurrentThread( work );
-		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
-		return callQueue.verify(
-				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work ),
-				DocumentWorkCall::verify,
-				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
-		);
+		DocumentWorkCall call = new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work );
+		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( call.documentKey() );
+		return callQueue.verify( call, DocumentWorkCall::verify,
+				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) ) );
 	}
 
 	@Override

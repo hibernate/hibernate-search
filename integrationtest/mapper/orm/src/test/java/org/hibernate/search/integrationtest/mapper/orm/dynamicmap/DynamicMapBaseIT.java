@@ -238,7 +238,7 @@ public class DynamicMapBaseIT {
 
 			for ( int i = 0; i < 100; i++ ) {
 				int id = i;
-				backendMock.expectWorksAnyOrder( INDEX1_NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+				backendMock.expectWorks( INDEX1_NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 						.add( String.valueOf( id ), b -> b.field( "title","Hyperion " + id ) )
 						.createdThenExecuted();
 			}

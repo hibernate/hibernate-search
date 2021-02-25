@@ -80,7 +80,7 @@ public class MassIndexingComplexHierarchyIT {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
 
-			backendMock.expectWorksAnyOrder( H1_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+			backendMock.expectWorks( H1_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "3", b -> b.field( "rootText", "text3" )
 							.field( "bText", "text3" ) )
 					.createdThenExecuted();
@@ -108,7 +108,7 @@ public class MassIndexingComplexHierarchyIT {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H1_B_Indexed.class );
 
-			backendMock.expectWorksAnyOrder( H1_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+			backendMock.expectWorks( H1_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "3", b -> b.field( "rootText", "text3" )
 							.field( "bText", "text3" ) )
 					.createdThenExecuted();
@@ -136,15 +136,15 @@ public class MassIndexingComplexHierarchyIT {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );
 
-			backendMock.expectWorksAnyOrder( H2_Root_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+			backendMock.expectWorks( H2_Root_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "1", b -> b.field( "rootText", "text1" ) )
 					.createdThenExecuted();
-			backendMock.expectWorksAnyOrder( H2_A_C_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+			backendMock.expectWorks( H2_A_C_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "3", b -> b.field( "rootText", "text3" )
 							.field( "aText", "text3" )
 							.field( "cText", "text3" ) )
 					.createdThenExecuted();
-			backendMock.expectWorksAnyOrder( H2_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+			backendMock.expectWorks( H2_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "4", b -> b.field( "rootText", "text4" )
 							.field( "bText", "text4" ) )
 					.createdThenExecuted();
@@ -182,7 +182,7 @@ public class MassIndexingComplexHierarchyIT {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H2_B_Indexed.class );
 
-			backendMock.expectWorksAnyOrder( H2_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+			backendMock.expectWorks( H2_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "4", b -> b.field( "rootText", "text4" )
 							.field( "bText", "text4" ) )
 					.createdThenExecuted();

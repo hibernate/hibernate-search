@@ -72,7 +72,7 @@ public class AutomaticIndexingConcurrentModificationInSameTypeIT {
 			session.persist( entity2 );
 			session.persist( entity3 );
 
-			backendMock.expectWorksAnyOrder( IndexedEntity.INDEX )
+			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( String.valueOf( 1 ), b -> b
 							.field( "name", "edouard" )
 							.field( "firstName", "zobocare" ) )
@@ -101,7 +101,7 @@ public class AutomaticIndexingConcurrentModificationInSameTypeIT {
 			IndexedEntity entity3 = session.load( IndexedEntity.class, 3 );
 			entity3.setName( "updated" );
 
-			backendMock.expectWorksAnyOrder( IndexedEntity.INDEX )
+			backendMock.expectWorks( IndexedEntity.INDEX )
 					.addOrUpdate( String.valueOf( 1 ), b -> b
 							.field( "name", "updated" )
 							.field( "firstName", "zobocare" ) )

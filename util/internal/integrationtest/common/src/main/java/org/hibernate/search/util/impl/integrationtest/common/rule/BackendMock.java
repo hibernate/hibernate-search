@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
@@ -167,27 +168,9 @@ public class BackendMock implements TestRule {
 
 	public DocumentWorkCallListContext expectWorks(String indexName, String tenantId,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		CallQueue<DocumentWorkCall> callQueue = backendBehavior().getDocumentWorkCalls( indexName );
 		return new DocumentWorkCallListContext(
 				indexName, tenantId,
-				commitStrategy, refreshStrategy,
-				callQueue::expectInOrder
-		);
-	}
-
-	public DocumentWorkCallListContext expectWorksAnyOrder(String indexName) {
-		// Default to force commit and no refresh, which is what the mapper should use by default
-		return expectWorksAnyOrder( indexName, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
-	}
-
-	public DocumentWorkCallListContext expectWorksAnyOrder(String indexName,
-			DocumentCommitStrategy commitStrategy,
-			DocumentRefreshStrategy refreshStrategy) {
-		CallQueue<DocumentWorkCall> callQueue = backendBehavior().getDocumentWorkCalls( indexName );
-		return new DocumentWorkCallListContext(
-				indexName, null,
-				commitStrategy, refreshStrategy,
-				callQueue::expectOutOfOrder
+				commitStrategy, refreshStrategy
 		);
 	}
 
@@ -311,23 +294,20 @@ public class BackendMock implements TestRule {
 		}
 	}
 
-	public static class DocumentWorkCallListContext {
+	public class DocumentWorkCallListContext {
 		private final String indexName;
 		private final String tenantId;
 		private final DocumentCommitStrategy commitStrategyForDocumentWorks;
 		private final DocumentRefreshStrategy refreshStrategyForDocumentWorks;
-		private final Consumer<DocumentWorkCall> expectationConsumer;
 		private final List<StubDocumentWork> works = new ArrayList<>();
 
 		private DocumentWorkCallListContext(String indexName, String tenantId,
 				DocumentCommitStrategy commitStrategyForDocumentWorks,
-				DocumentRefreshStrategy refreshStrategyForDocumentWorks,
-				Consumer<DocumentWorkCall> expectationConsumer) {
+				DocumentRefreshStrategy refreshStrategyForDocumentWorks) {
 			this.indexName = indexName;
 			this.tenantId = tenantId;
 			this.commitStrategyForDocumentWorks = commitStrategyForDocumentWorks;
 			this.refreshStrategyForDocumentWorks = refreshStrategyForDocumentWorks;
-			this.expectationConsumer = expectationConsumer;
 		}
 
 		public DocumentWorkCallListContext add(Consumer<StubDocumentWork.Builder> contributor) {
@@ -382,12 +362,13 @@ public class BackendMock implements TestRule {
 		public DocumentWorkCallListContext createdThenExecuted(CompletableFuture<?> future) {
 			log.debugf( "Expecting %d works to be created, then executed", works.size() );
 			// First expect all works to be created, then expect all works to be executed
-			works.stream()
-					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.CREATE, work ) )
-					.forEach( expectationConsumer );
-			works.stream()
-					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work, future ) )
-					.forEach( expectationConsumer );
+			Stream.concat(
+					works.stream()
+							.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.CREATE, work ) ),
+					works.stream()
+							.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work, future ) )
+			)
+					.forEach( call -> expect( call ) );
 			works.clear();
 			return this;
 		}
@@ -400,7 +381,7 @@ public class BackendMock implements TestRule {
 			log.debugf( "Expecting %d works to be created", works.size() );
 			works.stream()
 					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.CREATE, work ) )
-					.forEach( expectationConsumer );
+					.forEach( this::expect );
 			return this;
 		}
 
@@ -408,7 +389,7 @@ public class BackendMock implements TestRule {
 			log.debugf( "Expecting %d works to be executed", works.size() );
 			works.stream()
 					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work, future ) )
-					.forEach( expectationConsumer );
+					.forEach( this::expect );
 			works.clear();
 			return this;
 		}
@@ -421,8 +402,12 @@ public class BackendMock implements TestRule {
 			log.debugf( "Expecting %d works to be discarded", works.size() );
 			works.stream()
 					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.DISCARD, work ) )
-					.forEach( expectationConsumer );
+					.forEach( this::expect );
 			return this;
+		}
+
+		private void expect(DocumentWorkCall call) {
+			backendBehavior().getDocumentWorkCalls( call.documentKey() ).expectInOrder( call );
 		}
 	}
 

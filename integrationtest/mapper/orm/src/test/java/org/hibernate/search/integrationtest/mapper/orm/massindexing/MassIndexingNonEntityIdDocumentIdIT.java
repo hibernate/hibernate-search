@@ -74,7 +74,7 @@ public class MassIndexingNonEntityIdDocumentIdIT {
 
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
-			backendMock.expectWorksAnyOrder(
+			backendMock.expectWorks(
 					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( "41", b -> b
