@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingSt
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategyStartContext;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.impl.test.SerializationUtils;
+import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
 public class LocalHeapQueueAutomaticIndexingStrategy implements AutomaticIndexingStrategy {
 
