@@ -66,7 +66,7 @@ public class MassIndexingMonitorIT {
 
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
-			backendMock.expectWorksAnyOrder(
+			backendMock.expectWorks(
 					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( "1", b -> b
@@ -78,7 +78,7 @@ public class MassIndexingMonitorIT {
 							.field( "author", AUTHOR_3 )
 					)
 					.createdThenExecuted();
-			backendMock.expectWorksAnyOrder(
+			backendMock.expectWorks(
 					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( "2", b -> b

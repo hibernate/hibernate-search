@@ -384,7 +384,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		return () -> {
 			switch ( workTwoExecutionExpectation ) {
 				case SUCCEED:
-					backendMock.expectWorksAnyOrder(
+					backendMock.expectWorks(
 							Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 					)
 							.add( "1", b -> b
@@ -404,7 +404,7 @@ public abstract class AbstractMassIndexingErrorIT {
 				case ERROR:
 					CompletableFuture<?> failingFuture = new CompletableFuture<>();
 					failingFuture.completeExceptionally( new SimulatedError( "Indexing error" ) );
-					backendMock.expectWorksAnyOrder(
+					backendMock.expectWorks(
 							Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 					)
 							.add( "1", b -> b
@@ -416,7 +416,7 @@ public abstract class AbstractMassIndexingErrorIT {
 									.field( "author", AUTHOR_3 )
 							)
 							.createdThenExecuted();
-					backendMock.expectWorksAnyOrder(
+					backendMock.expectWorks(
 							Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 					)
 							.add( "2", b -> b
@@ -426,7 +426,7 @@ public abstract class AbstractMassIndexingErrorIT {
 							.createdThenExecuted( failingFuture );
 					break;
 				case STOP:
-					backendMock.expectWorksAnyOrder(
+					backendMock.expectWorks(
 							Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 					)
 							.add( "1", b -> b

@@ -135,7 +135,7 @@ public class MassIndexingInterruptionIT {
 				.purge()
 				.mergeSegments();
 
-		backendMock.expectWorksAnyOrder(
+		backendMock.expectWorks(
 				Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 		)
 				.add( "1", b -> b
