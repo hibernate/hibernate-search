@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.impl.test.SerializationUtils;
+import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
 public class LocalHeapQueueProcessor implements BatchedWorkProcessor {
 
