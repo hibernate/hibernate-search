@@ -121,7 +121,7 @@ public class LocalHeapQueueProcessor implements BatchedWorkProcessor {
 			List<EntityReference> failingEntityReferences) {
 		// In a real implementation we would put these references in a queue, to re-try later.
 		// But here it's just for testing.
-		log.errorf( "Failed to reindex entities '%s'", failingEntityReferences, throwable );
+		log.errorf( throwable, "Failed to reindex entities '%s'", failingEntityReferences );
 	}
 
 	@Override

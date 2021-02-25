@@ -49,7 +49,7 @@ public class LocalHeapQueueIndexingEvent implements BatchedWork<LocalHeapQueuePr
 	public void markAsFailed(Throwable t) {
 		// In a real implementation we would put this event back into a queue, to re-try later.
 		// But here it's just for testing.
-		log.errorf( "Failed to process event '%s'", this, t );
+		log.errorf( t, "Failed to process event '%s'", this );
 	}
 
 	public enum Type {
