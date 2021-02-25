@@ -99,7 +99,7 @@ public class AutomaticIndexingConcurrentModificationInDifferentTypeIT {
 			// when ParentEntity is added to the indexing plan due to the change in the child.
 			indexingPlan.addOrUpdate( session.load( OtherEntity.class, 3 ) );
 
-			backendMock.expectWorksAnyOrder(
+			backendMock.expectWorks(
 					ParentEntity.NAME, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE
 			)
 					.addOrUpdate( entity2.getId().toString(), b -> b
@@ -109,14 +109,14 @@ public class AutomaticIndexingConcurrentModificationInDifferentTypeIT {
 							)
 					)
 					.createdThenExecuted();
-			backendMock.expectWorksAnyOrder(
+			backendMock.expectWorks(
 					ChildEntity.NAME, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE
 			)
 					.addOrUpdate( entity1.getId().toString(), b -> b
 							.field( "name", entity1.getName() )
 					)
 					.createdThenExecuted();
-			backendMock.expectWorksAnyOrder(
+			backendMock.expectWorks(
 					OtherEntity.NAME, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE
 			)
 					.addOrUpdate( entity3.getId().toString(), b -> b

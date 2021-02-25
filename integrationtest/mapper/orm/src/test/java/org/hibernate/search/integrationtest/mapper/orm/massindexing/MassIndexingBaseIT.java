@@ -76,7 +76,7 @@ public class MassIndexingBaseIT {
 
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
-			backendMock.expectWorksAnyOrder(
+			backendMock.expectWorks(
 					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( "1", b -> b
@@ -121,7 +121,7 @@ public class MassIndexingBaseIT {
 
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
-			backendMock.expectWorksAnyOrder(
+			backendMock.expectWorks(
 					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( "1", b -> b
@@ -169,7 +169,7 @@ public class MassIndexingBaseIT {
 
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
-			backendMock.expectWorksAnyOrder(
+			backendMock.expectWorks(
 					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( "1", b -> b
@@ -215,7 +215,7 @@ public class MassIndexingBaseIT {
 
 		// add operations on indexes can follow any random order,
 		// since they are executed by different threads
-		backendMock.expectWorksAnyOrder(
+		backendMock.expectWorks(
 				Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 		)
 				.add( "1", b -> b

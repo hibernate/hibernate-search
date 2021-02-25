@@ -62,7 +62,7 @@ public class MassIndexingPrimitiveIdIT {
 
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
-			backendMock.expectWorksAnyOrder(
+			backendMock.expectWorks(
 					EntityWithPrimitiveId.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 			)
 					.add( "1", b -> { } )
