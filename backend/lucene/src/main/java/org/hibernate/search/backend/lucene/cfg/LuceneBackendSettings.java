@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.cfg;
 
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
+import org.hibernate.search.backend.lucene.cache.QueryCachingConfigurer;
 import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName;
 
 import org.apache.lucene.util.Version;
@@ -66,9 +67,9 @@ public final class LuceneBackendSettings {
 	public static final String ANALYSIS_CONFIGURER = "analysis.configurer";
 
 	/**
-	 * The analysis configurer to use.
+	 * The query caching configurer to use.
 	 * <p>
-	 * Expects a reference to a bean of type {@link LuceneAnalysisConfigurer}.
+	 * Expects a reference to a bean of type {@link QueryCachingConfigurer}.
 	 * <p>
 	 * Defaults to no value.
 	 *
