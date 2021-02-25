@@ -96,7 +96,7 @@ public class AutomaticIndexingConcurrentModificationInSameTypeIT {
 			// when entity2 is added to the indexing plan due to the change in the child.
 			indexingPlan.addOrUpdate( session.load( IndexedEntity.class, 3 ) );
 
-			backendMock.expectWorksAnyOrder(
+			backendMock.expectWorks(
 					IndexedEntity.INDEX, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE )
 					.addOrUpdate( entity1.getId().toString(), b -> b
 							.field( "name", entity1.getName() )

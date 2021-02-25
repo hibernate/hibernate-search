@@ -35,29 +35,29 @@ class DocumentWorkCall extends Call<DocumentWorkCall> {
 		DISCARD
 	}
 
-	private final String indexName;
+	private final DocumentKey documentKey;
 	private final WorkPhase phase;
 	private final StubDocumentWork work;
 	private final CompletableFuture<?> completableFuture;
 
 	DocumentWorkCall(String indexName, WorkPhase phase, StubDocumentWork work,
 			CompletableFuture<?> completableFuture) {
-		this.indexName = indexName;
+		this.documentKey = new DocumentKey( indexName, work.getTenantIdentifier(), work.getIdentifier() );
 		this.phase = phase;
 		this.work = work;
 		this.completableFuture = completableFuture;
 	}
 
 	DocumentWorkCall(String indexName, WorkPhase phase, StubDocumentWork work) {
-		this.indexName = indexName;
-		this.phase = phase;
-		this.work = work;
-		this.completableFuture = null;
+		this( indexName, phase, work, null );
+	}
+
+	public DocumentKey documentKey() {
+		return documentKey;
 	}
 
 	public CallBehavior<CompletableFuture<?>> verify(DocumentWorkCall actualCall) {
-		String whenThisWorkWasExpected = "when a " + phase + " call for a document work on index '" + indexName
-				+ "', identifier '" + work.getIdentifier() + "' was expected";
+		String whenThisWorkWasExpected = "when a " + phase + " call for a work on document '" + documentKey + "' was expected";
 		if ( !Objects.equals( phase, actualCall.phase ) ) {
 			fail( "Incorrect work phase " + whenThisWorkWasExpected + ".\n\tExpected: "
 					+ phase + ", actual: " + actualCall.phase
@@ -72,14 +72,11 @@ class DocumentWorkCall extends Call<DocumentWorkCall> {
 	@Override
 	protected boolean isSimilarTo(DocumentWorkCall other) {
 		return Objects.equals( phase, other.phase )
-				&& Objects.equals( indexName, other.indexName )
-				&& Objects.equals( work.getTenantIdentifier(), other.work.getTenantIdentifier() )
-				&& Objects.equals( work.getIdentifier(), other.work.getIdentifier() );
+				&& Objects.equals( documentKey, other.documentKey );
 	}
 
 	@Override
 	public String toString() {
-		return phase + " call for a work on index '" + indexName + "', identifier '" + work.getIdentifier()
-				+ "'; work = " + work;
+		return phase + " call for a work on document '" + documentKey + "'";
 	}
 }
