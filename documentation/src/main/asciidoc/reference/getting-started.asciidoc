@@ -33,6 +33,16 @@ https://hibernate.org/search/releases/#compatibility-matrix[compatibility matrix
 The https://hibernate.org/community/compatibility-policy/[compatibility policy] may also be of interest.
 ====
 
+[NOTE]
+.Elasticsearch 7.11+ licensing
+====
+While Elasticsearch up to 7.10 was distributed under the Apache License 2.0,
+be aware that Elasticsearch 7.11 and later are distributed under the Elastic License and the SSPL,
+which are https://opensource.org/node/1099[not considered open-source by the Open Source Initiative].
+
+Only the low-level Java REST client, which Hibernate Search depends on, remains open-source.
+====
+
 [[getting-started-migrating]]
 == Migration notes
 
