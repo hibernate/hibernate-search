@@ -12,6 +12,8 @@ import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
 
+import com.google.gson.JsonPrimitive;
+
 /**
  * Information about the type of a value (non-object) field targeted by search,
  * be it in a projection, a predicate, a sort, ...
@@ -19,6 +21,8 @@ import org.hibernate.search.engine.search.common.ValueConvert;
  * @param <F> The indexed field value type.
  */
 public interface ElasticsearchSearchValueFieldTypeContext<F> {
+
+	JsonPrimitive elasticsearchTypeAsJson();
 
 	DslConverter<?, F> dslConverter();
 
