@@ -20,6 +20,8 @@ class ElasticsearchNestedPredicate extends AbstractElasticsearchSingleFieldPredi
 
 	private static final JsonAccessor<String> PATH_ACCESSOR = JsonAccessor.root().property( "path" ).asString();
 	private static final JsonAccessor<JsonObject> QUERY_ACCESSOR = JsonAccessor.root().property( "query" ).asObject();
+	private static final JsonAccessor<Boolean> IGNORE_UNMAPPED_ACCESSOR =
+			JsonAccessor.root().property( "ignore_unmapped" ).asBoolean();
 
 	private final ElasticsearchSearchPredicate nestedPredicate;
 
@@ -35,7 +37,13 @@ class ElasticsearchNestedPredicate extends AbstractElasticsearchSingleFieldPredi
 
 		PATH_ACCESSOR.set( innerObject, absoluteFieldPath );
 		QUERY_ACCESSOR.set( innerObject, nestedPredicate.toJsonQuery( nestedContext ) );
+		if ( indexNames().size() > 1 ) {
+			// There are multiple target indexes; some of them may not declare the nested field.
+			// Instruct ES to behave as if the nested field had no value in that case.
+			IGNORE_UNMAPPED_ACCESSOR.set( innerObject, true );
+		}
 		outerObject.add( "nested", innerObject );
+
 		return outerObject;
 	}
 
