@@ -28,4 +28,12 @@ public class Elasticsearch60SearchSyntax extends Elasticsearch64SearchSyntax {
 		// So we just don't specify a format.
 		DOCVALUE_FIELDS_ACCESSOR.addElementIfAbsent( requestBody, fieldName );
 	}
+
+	@Override
+	public void requestGeoDistanceSortIgnoreUnmapped(JsonObject innerObject) {
+		// Support for ignore_unmapped in geo_distance sorts added in 6.4:
+		// https://github.com/elastic/elasticsearch/pull/31153
+		// In 6.3 and below, we just can't ignore unmapped fields,
+		// which means sorts will fail when the geo_point field is not present in all indexes.
+	}
 }
