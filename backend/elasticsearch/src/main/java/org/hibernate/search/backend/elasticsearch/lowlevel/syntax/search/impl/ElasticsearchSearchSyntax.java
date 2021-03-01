@@ -19,4 +19,6 @@ public interface ElasticsearchSearchSyntax {
 
 	void requestNestedSort(List<String> nestedPathHierarchy, JsonObject innerObject, JsonObject filterOrNull);
 
+	void requestGeoDistanceSortIgnoreUnmapped(JsonObject innerObject);
+
 }
