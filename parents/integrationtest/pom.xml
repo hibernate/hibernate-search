@@ -313,7 +313,7 @@
         <profile>
             <id>elasticsearch-5.6</id>
             <properties>
-                <test.elasticsearch.connection.version>5.6.16</test.elasticsearch.connection.version>
+                <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-5.6}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch5TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
@@ -337,7 +337,7 @@
         <profile>
             <id>elasticsearch-6.0</id>
             <properties>
-                <test.elasticsearch.connection.version>6.2.4</test.elasticsearch.connection.version>
+                <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-6.2}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch60TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
@@ -361,7 +361,7 @@
         <profile>
             <id>elasticsearch-6.3</id>
             <properties>
-                <test.elasticsearch.connection.version>6.3.2</test.elasticsearch.connection.version>
+                <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-6.3}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch63TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
@@ -385,7 +385,7 @@
         <profile>
             <id>elasticsearch-6.4</id>
             <properties>
-                <test.elasticsearch.connection.version>6.6.2</test.elasticsearch.connection.version>
+                <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-6.6}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch64TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
@@ -409,7 +409,7 @@
         <profile>
             <id>elasticsearch-6.7</id>
             <properties>
-                <test.elasticsearch.connection.version>6.8.9</test.elasticsearch.connection.version>
+                <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-6.8}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch67TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
@@ -433,7 +433,7 @@
         <profile>
             <id>elasticsearch-7.0</id>
             <properties>
-                <test.elasticsearch.connection.version>7.2.1</test.elasticsearch.connection.version>
+                <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.2}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch70TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
@@ -457,7 +457,7 @@
         <profile>
             <id>elasticsearch-7.3</id>
             <properties>
-                <test.elasticsearch.connection.version>7.6.2</test.elasticsearch.connection.version>
+                <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.6}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch73TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
@@ -481,7 +481,7 @@
         <profile>
             <id>elasticsearch-7.7</id>
             <properties>
-                <test.elasticsearch.connection.version>7.7.1</test.elasticsearch.connection.version>
+                <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.7}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch77TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
@@ -505,7 +505,7 @@
         <profile>
             <id>elasticsearch-7.8</id>
             <properties>
-                <test.elasticsearch.connection.version>7.9.3</test.elasticsearch.connection.version>
+                <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.9}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch78TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
@@ -535,7 +535,7 @@
                 </property>
             </activation>
             <properties>
-                <test.elasticsearch.connection.version>${version.org.elasticsearch.main}</test.elasticsearch.connection.version>
+                <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.10}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch710TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
