@@ -125,7 +125,7 @@ public class ElasticsearchBootstrapIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.defaultBackendContext()
-						.failure( "Invalid value for configuration property 'hibernate.search.backend.version': '7'",
+						.failure( "Invalid value for configuration property 'hibernate.search.backend.version': '" + versionWithMajorOnly + "'",
 								"Missing or imprecise Elasticsearch version",
 								"when configuration property 'hibernate.search.backend.version_check.enabled' is set to 'false'",
 								"the version is mandatory and must be at least as precise as 'x.y', where 'x' and 'y' are integers" )
