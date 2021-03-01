@@ -13,8 +13,6 @@ import java.util.Properties;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
-import org.hibernate.search.backend.elasticsearch.multitenancy.MultiTenancyStrategyName;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.IndexSettings;
@@ -30,17 +28,6 @@ public class ElasticsearchConfigurationIT {
 		// backend configuration
 		config.put( BackendSettings.backendKey( ElasticsearchBackendSettings.HOSTS ), "127.0.0.1:9200" );
 		config.put( BackendSettings.backendKey( ElasticsearchBackendSettings.PROTOCOL ), "http" );
-		config.put(
-				BackendSettings.backendKey( ElasticsearchBackendSettings.MULTI_TENANCY_STRATEGY ),
-				MultiTenancyStrategyName.DISCRIMINATOR.externalRepresentation()
-		);
-		config.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION ), "7.10" );
-		config.put(
-				BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION_CHECK_ENABLED ), "false" );
-		config.put(
-				BackendSettings.backendKey( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS ),
-				IndexStatus.YELLOW.externalRepresentation()
-		);
 		// index configuration
 		config.put(
 				IndexSettings.indexKey( "myIndex", ElasticsearchIndexSettings.INDEXING_MAX_BULK_SIZE ),
@@ -63,10 +50,6 @@ public class ElasticsearchConfigurationIT {
 				.containsOnly(
 						entry( "hibernate.search.backend.hosts", "127.0.0.1:9200" ),
 						entry( "hibernate.search.backend.protocol", "http" ),
-						entry( "hibernate.search.backend.multi_tenancy.strategy", "discriminator" ),
-						entry( "hibernate.search.backend.version", "7.10" ),
-						entry( "hibernate.search.backend.version_check.enabled", "false" ),
-						entry( "hibernate.search.backend.schema_management.minimal_required_status", "yellow" ),
 						entry( "hibernate.search.backend.indexes.myIndex.indexing.max_bulk_size", 20 ),
 						entry( "hibernate.search.automatic_indexing.synchronization.strategy", "async" ),
 						entry( "hibernate.search.background_failure_handler", "myFailureHandler" )
