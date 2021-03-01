@@ -74,4 +74,20 @@ public class TckBackendFeatures {
 	public boolean supportsExistsForFieldWithoutDocValues(Class<?> fieldType) {
 		return true;
 	}
+
+	public boolean supportsDistanceSortWhenFieldMissingInSomeTargetIndexes() {
+		return true;
+	}
+
+	public boolean supportsDistanceSortWhenNestedFieldMissingInSomeTargetIndexes() {
+		return true;
+	}
+
+	public boolean supportsFieldSortWhenFieldMissingInSomeTargetIndexes(Class<?> fieldType) {
+		return true;
+	}
+
+	public boolean supportsFieldSortWhenNestedFieldMissingInSomeTargetIndexes() {
+		return true;
+	}
 }

@@ -132,4 +132,40 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		}
 		return true;
 	}
+
+	@Override
+	public boolean supportsDistanceSortWhenFieldMissingInSomeTargetIndexes() {
+		// Not supported in older versions of Elasticsearch
+		return dialect.supportsIgnoreUnmappedForGeoPointField();
+	}
+
+	@Override
+	public boolean supportsDistanceSortWhenNestedFieldMissingInSomeTargetIndexes() {
+		// Even with ignore_unmapped: true,
+		// the distance sort will fail if the nested field doesn't exist in one index.
+		// Elasticsearch complains it cannot find the nested field
+		// ("[nested] failed to find nested object under path [nested]"),
+		// but we don't have any way to tell it to ignore this.
+		// See https://hibernate.atlassian.net/browse/HSEARCH-4179
+		return false;
+	}
+
+	@Override
+	public boolean supportsFieldSortWhenFieldMissingInSomeTargetIndexes(Class<?> fieldType) {
+		if ( BigInteger.class.equals( fieldType ) || BigDecimal.class.equals( fieldType ) ) {
+			// We cannot use unmapped_type for scaled floats:
+			// Elasticsearch complains it needs a scaling factor, but we don't have any way to provide it.
+			// See https://hibernate.atlassian.net/browse/HSEARCH-4176
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+
+	@Override
+	public boolean supportsFieldSortWhenNestedFieldMissingInSomeTargetIndexes() {
+		// Not supported in older versions of Elasticsearch
+		return dialect.ignoresFieldSortWhenNestedFieldMissing();
+	}
 }
