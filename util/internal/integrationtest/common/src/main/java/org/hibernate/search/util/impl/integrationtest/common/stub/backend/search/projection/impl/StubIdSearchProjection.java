@@ -44,7 +44,7 @@ public class StubIdSearchProjection<I> implements StubSearchProjection<I> {
 
 		public Builder(DocumentIdentifierValueConverter<?> identifierValueConverter, Class<I> identifierType) {
 			// check expected identifier type:
-			identifierValueConverter.requiresType( identifierType );
+			identifierValueConverter.checkSourceTypeAssignableTo( identifierType );
 			@SuppressWarnings("uncheked") // just checked
 			DocumentIdentifierValueConverter<? extends I> casted = (DocumentIdentifierValueConverter<? extends I>) identifierValueConverter;
 

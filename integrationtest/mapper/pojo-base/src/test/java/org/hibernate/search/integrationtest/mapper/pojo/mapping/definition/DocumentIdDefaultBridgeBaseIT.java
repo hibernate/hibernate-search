@@ -232,6 +232,11 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 		}
 
 		@Override
+		public void checkSourceTypeAssignableTo(Class<?> requiredType) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
 		public Object convertToSource(String documentId, FromDocumentIdentifierValueConvertContext context) {
 			throw new UnsupportedOperationException();
 		}

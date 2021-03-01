@@ -28,7 +28,7 @@ public final class StringDocumentIdentifierValueConverter implements DocumentIde
 	}
 
 	@Override
-	public void requiresType(Class<?> requiredType) {
+	public void checkSourceTypeAssignableTo(Class<?> requiredType) {
 		if ( !requiredType.isAssignableFrom( String.class ) ) {
 			throw log.wrongRequiredIdentifierType( requiredType, String.class );
 		}
