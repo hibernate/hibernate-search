@@ -67,6 +67,7 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 
 	private static final String COMPATIBLE_INDEX_DOCUMENT_1 = "compatible_1";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
+	private static final String MISSING_FIELD_INDEX_DOCUMENT_1 = "missing_field_1";
 
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -77,13 +78,15 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 			SimpleMappedIndex.of( CompatibleIndexBinding::new ).name( "compatible" );
 	private static final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex =
 			SimpleMappedIndex.of( RawFieldCompatibleIndexBinding::new ).name( "rawFieldCompatible" );
+	private static final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex =
+			SimpleMappedIndex.of( MissingFieldIndexBinding::new ).name( "missingField" );
 	private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
 			SimpleMappedIndex.of( IncompatibleIndexBinding::new ).name( "incompatible" );
 
 	@BeforeClass
 	public static void setup() {
 		setupHelper.start()
-				.withIndexes( mainIndex, compatibleIndex, rawFieldCompatibleIndex, incompatibleIndex )
+				.withIndexes( mainIndex, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex, incompatibleIndex )
 				.setup();
 
 		initData();
@@ -362,6 +365,46 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4173")
+	public void multiIndex_withMissingFieldIndex_projectionConverterEnabled() {
+		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
+
+		String fieldPath = getFieldWithConverterPath();
+
+		assertThatQuery( scope.query()
+				.select( f -> f.field( fieldPath, ValueWrapper.class ) )
+				.where( f -> f.matchAll() )
+				.toQuery() )
+				.hasHitsAnyOrder(
+						new ValueWrapper<F>( getFieldValue( 1 ) ),
+						new ValueWrapper<F>( getFieldValue( 2 ) ),
+						new ValueWrapper<F>( getFieldValue( 3 ) ),
+						new ValueWrapper<F>( null ), // Empty document
+						new ValueWrapper<F>( null ) // From the "missing field" index
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4173")
+	public void multiIndex_withMissingFieldIndex_projectionConverterDisabled() {
+		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
+
+		String fieldPath = getFieldWithConverterPath();
+
+		assertThatQuery( scope.query()
+				.select( f -> f.field( fieldPath, fieldType.getJavaType(), ValueConvert.NO ) )
+				.where( f -> f.matchAll() )
+				.toQuery() )
+				.hasHitsAnyOrder(
+						getFieldValue( 1 ),
+						getFieldValue( 2 ),
+						getFieldValue( 3 ),
+						null, // Empty document
+						null // From the "missing field" index
+				);
+	}
+
+	@Test
 	public void multiIndex_withIncompatibleIndex_projectionConverterEnabled() {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
@@ -459,7 +502,9 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 				.add( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1,
 						document -> rawFieldCompatibleIndex.binding().fieldWithConverterModels
 							.forEach( f -> addFieldValue( document, f, 1 ) ) );
-		mainIndexer.join( compatibleIndexer, rawFieldCompatibleIndexer );
+		BulkIndexer missingFieldIndexer = missingFieldIndex.bulkIndexer()
+				.add( MISSING_FIELD_INDEX_DOCUMENT_1, document -> { } );
+		mainIndexer.join( compatibleIndexer, rawFieldCompatibleIndexer, missingFieldIndexer );
 	}
 
 	private static class IndexBinding {
@@ -563,6 +608,11 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 			public ValueWrapper convert(Object value, FromDocumentFieldValueConvertContext context) {
 				return null;
 			}
+		}
+	}
+
+	private static class MissingFieldIndexBinding {
+		MissingFieldIndexBinding(IndexSchemaElement root) {
 		}
 	}
 
