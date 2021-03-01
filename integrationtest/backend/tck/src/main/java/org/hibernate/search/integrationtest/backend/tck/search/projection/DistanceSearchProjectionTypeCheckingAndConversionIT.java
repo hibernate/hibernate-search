@@ -55,6 +55,7 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 
 	private static final String COMPATIBLE_INDEX_DOCUMENT_1 = "compatible_1";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
+	private static final String MISSING_FIELD_INDEX_DOCUMENT_1 = "missing_field_1";
 
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -65,13 +66,15 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 			SimpleMappedIndex.of( CompatibleIndexBinding::new ).name( "compatible" );
 	private static final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex =
 			SimpleMappedIndex.of( RawFieldCompatibleIndexBinding::new ).name( "rawFieldCompatible" );
+	private static final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex =
+			SimpleMappedIndex.of( MissingFieldIndexBinding::new ).name( "missingField" );
 	private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
 			SimpleMappedIndex.of( IncompatibleIndexBinding::new ).name( "incompatible" );
 
 	@BeforeClass
 	public static void setup() {
 		setupHelper.start()
-				.withIndexes( mainIndex, compatibleIndex, rawFieldCompatibleIndex, incompatibleIndex )
+				.withIndexes( mainIndex, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex, incompatibleIndex )
 				.setup();
 
 		initData();
@@ -204,6 +207,26 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4173")
+	public void multiIndex_withMissingFieldIndex() {
+		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
+
+		assertThatQuery( scope.query()
+				.select( f -> f.distance( getFieldWithConverterPath(), CENTER_POINT_1 ) )
+				.where( f -> f.matchAll() )
+				.toQuery() )
+				.hits().asIs()
+				.usingElementComparator( TestComparators.APPROX_M_COMPARATOR )
+				.containsExactlyInAnyOrder(
+						getFieldDistance( 1 ),
+						getFieldDistance( 2 ),
+						getFieldDistance( 3 ),
+						null, // Empty document
+						null // From the "missing field" index
+				);
+	}
+
+	@Test
 	public void multiIndex_withIncompatibleIndex() {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
@@ -284,7 +307,9 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 		BulkIndexer rawFieldCompatibleIndexer = rawFieldCompatibleIndex.bulkIndexer()
 				.add( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1,
 						document -> addFieldValue( document, rawFieldCompatibleIndex.binding().fieldWithConverterModel, 1 ) );
-		mainIndexer.join( compatibleIndexer, rawFieldCompatibleIndexer );
+		BulkIndexer missingFieldIndexer = missingFieldIndex.bulkIndexer()
+				.add( MISSING_FIELD_INDEX_DOCUMENT_1, document -> { } );
+		mainIndexer.join( compatibleIndexer, rawFieldCompatibleIndexer, missingFieldIndexer );
 	}
 
 	private static class IndexBinding {
@@ -386,6 +411,11 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 			public ValueWrapper convert(Object value, FromDocumentFieldValueConvertContext context) {
 				return null;
 			}
+		}
+	}
+
+	private static class MissingFieldIndexBinding {
+		MissingFieldIndexBinding(IndexSchemaElement root) {
 		}
 	}
 
