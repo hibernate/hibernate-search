@@ -26,6 +26,8 @@ public class Elasticsearch7SearchSyntax implements ElasticsearchSearchSyntax {
 	private static final JsonAccessor<JsonElement> NESTED_ACCESSOR = JsonAccessor.root().property( "nested" );
 	private static final JsonAccessor<JsonElement> PATH_ACCESSOR = JsonAccessor.root().property( "path" );
 	private static final JsonAccessor<JsonElement> FILTER_ACCESSOR = JsonAccessor.root().property( "filter" );
+	private static final JsonAccessor<Boolean> IGNORE_UNMAPPED_ACCESSOR =
+			JsonAccessor.root().property( "ignore_unmapped" ).asBoolean();
 
 	@Override
 	public String getTermAggregationOrderByTermToken() {
@@ -54,5 +56,10 @@ public class Elasticsearch7SearchSyntax implements ElasticsearchSearchSyntax {
 			// the new api requires a recursion on the path hierarchy
 			nextNestedObjectTarget = nestedObject;
 		}
+	}
+
+	@Override
+	public void requestGeoDistanceSortIgnoreUnmapped(JsonObject innerObject) {
+		IGNORE_UNMAPPED_ACCESSOR.set( innerObject, true );
 	}
 }

@@ -40,7 +40,7 @@ abstract class AbstractElasticsearchDocumentValueSort extends AbstractElasticsea
 
 	protected final String absoluteFieldPath;
 	protected final List<String> nestedPathHierarchy;
-	private final ElasticsearchSearchSyntax searchSyntax;
+	protected final ElasticsearchSearchSyntax searchSyntax;
 
 	private final JsonPrimitive mode;
 	private final ElasticsearchSearchPredicate filter;
