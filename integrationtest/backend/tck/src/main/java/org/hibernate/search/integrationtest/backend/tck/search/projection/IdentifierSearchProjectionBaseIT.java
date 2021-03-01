@@ -11,7 +11,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -46,6 +48,9 @@ public class IdentifierSearchProjectionBaseIT {
 	private final String[] ids = new String[7];
 	private final String[] names = new String[7];
 	private final List<String>[] duplicates = new List[7];
+
+	private final String[] compatibleIndexIds = new String[3];
+	private final String[] compatibleIndexNames = new String[3];
 
 	public IdentifierSearchProjectionBaseIT() {
 		initValues();
@@ -127,7 +132,11 @@ public class IdentifierSearchProjectionBaseIT {
 				.toQuery();
 
 		List<String> result = query.fetchHits( 30 );
-		assertThat( result ).containsExactlyInAnyOrder( ids );
+
+		String[] allIds = Stream.concat( Arrays.stream( ids ), Arrays.stream( compatibleIndexIds ) )
+				.toArray( String[]::new );
+
+		assertThat( result ).containsExactlyInAnyOrder( allIds );
 	}
 
 	@Test
@@ -164,6 +173,11 @@ public class IdentifierSearchProjectionBaseIT {
 			duplicated.add( ids[i] );
 			duplicates[i] = duplicated;
 		}
+		for ( int i = 0; i < 3; i++ ) {
+			int suffix = i + 8;
+			compatibleIndexIds[i] = "ID-" + suffix;
+			compatibleIndexNames[i] = "my-name-" + suffix;
+		}
 	}
 
 	private void initData() {
@@ -171,6 +185,12 @@ public class IdentifierSearchProjectionBaseIT {
 				.add( 7, i -> documentProvider(
 						ids[i],
 						document -> document.addValue( index.binding().name, names[i] )
+				) )
+				.join();
+		compatibleIndex.bulkIndexer()
+				.add( 3, i -> documentProvider(
+						compatibleIndexIds[i],
+						document -> document.addValue( compatibleIndex.binding().name, compatibleIndexNames[i] )
 				) )
 				.join();
 	}
