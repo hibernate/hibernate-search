@@ -204,7 +204,7 @@ The following profiles are available:
  * `elasticsearch-7.7` for 7.7
  * `elasticsearch-7.8` for 7.8 to 7.9
  * `elasticsearch-7.10` for 7.10 (the default)
- * `elasticsearch-7.11` for 7.11+
+ * `elasticsearch-7.11` for 7.11+ ([not open-source](https://opensource.org/node/1099))
 
 A list of available versions for `test.elasticsearch.connection.version` can be found on
 [Maven Central](https://search.maven.org/search?q=g:org.elasticsearch%20AND%20a:elasticsearch&core=gav).
