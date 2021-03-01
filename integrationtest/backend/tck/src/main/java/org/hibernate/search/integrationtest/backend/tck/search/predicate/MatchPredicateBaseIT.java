@@ -57,7 +57,8 @@ public class MatchPredicateBaseIT {
 						SearchableIT.searchableYesIndex, SearchableIT.searchableNoIndex,
 						ArgumentCheckingIT.index,
 						TypeCheckingAndConversionIT.index, TypeCheckingAndConversionIT.compatibleIndex,
-						TypeCheckingAndConversionIT.rawFieldCompatibleIndex, TypeCheckingAndConversionIT.incompatibleIndex,
+						TypeCheckingAndConversionIT.rawFieldCompatibleIndex, TypeCheckingAndConversionIT.missingFieldIndex,
+						TypeCheckingAndConversionIT.incompatibleIndex,
 						ScaleCheckingIT.index, ScaleCheckingIT.compatibleIndex, ScaleCheckingIT.incompatibleIndex
 				)
 				.setup();
@@ -84,9 +85,11 @@ public class MatchPredicateBaseIT {
 		final BulkIndexer typeCheckingMainIndexer = TypeCheckingAndConversionIT.index.bulkIndexer();
 		final BulkIndexer typeCheckingCompatibleIndexer = TypeCheckingAndConversionIT.compatibleIndex.bulkIndexer();
 		final BulkIndexer typeCheckingRawFieldCompatibleIndexer = TypeCheckingAndConversionIT.rawFieldCompatibleIndex.bulkIndexer();
+		final BulkIndexer typeCheckingMissingFieldIndexer = TypeCheckingAndConversionIT.missingFieldIndex.bulkIndexer();
 		TypeCheckingAndConversionIT.dataSets.forEach( d -> d.contribute( TypeCheckingAndConversionIT.index, typeCheckingMainIndexer,
 				TypeCheckingAndConversionIT.compatibleIndex, typeCheckingCompatibleIndexer,
-				TypeCheckingAndConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer ) );
+				TypeCheckingAndConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer,
+				TypeCheckingAndConversionIT.missingFieldIndex, typeCheckingMissingFieldIndexer ) );
 
 		final BulkIndexer scaleCheckingMainIndexer = ScaleCheckingIT.index.bulkIndexer();
 		final BulkIndexer scaleCheckingCompatibleIndexer = ScaleCheckingIT.compatibleIndex.bulkIndexer();
@@ -97,7 +100,8 @@ public class MatchPredicateBaseIT {
 				multiFieldIndexer, nestingIndexer,
 				analysisMainIndexIndexer, analysisCompatibleIndexIndexer, analysisIncompatibleIndexIndexer,
 				scoreIndexer,
-				typeCheckingMainIndexer, typeCheckingCompatibleIndexer, typeCheckingRawFieldCompatibleIndexer,
+				typeCheckingMainIndexer, typeCheckingCompatibleIndexer,
+				typeCheckingRawFieldCompatibleIndexer, typeCheckingMissingFieldIndexer,
 				scaleCheckingMainIndexer, scaleCheckingCompatibleIndexer
 		);
 	}
@@ -462,6 +466,9 @@ public class MatchPredicateBaseIT {
 		private static final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex =
 				SimpleMappedIndex.of( root -> new RawFieldCompatibleIndexBinding( root, supportedFieldTypes ) )
 						.name( "typeChecking_rawFieldCompatible" );
+		private static final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex =
+				SimpleMappedIndex.of( root -> new MissingFieldIndexBinding( root, supportedFieldTypes ) )
+						.name( "typeChecking_missingField" );
 		private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
 				SimpleMappedIndex.of( root -> new IncompatibleIndexBinding( root, supportedFieldTypes ) )
 						.name( "typeChecking_incompatible" );
@@ -472,7 +479,7 @@ public class MatchPredicateBaseIT {
 		}
 
 		public TypeCheckingAndConversionIT(DataSet<F, MatchPredicateTestValues<F>> dataSet) {
-			super( index, compatibleIndex, rawFieldCompatibleIndex, incompatibleIndex, dataSet );
+			super( index, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex, incompatibleIndex, dataSet );
 		}
 
 		@Override
