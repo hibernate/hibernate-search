@@ -21,6 +21,8 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
+import com.google.gson.JsonPrimitive;
+
 public class ElasticsearchMultiIndexSearchValueFieldContext<F>
 		implements ElasticsearchSearchValueFieldContext<F>, ElasticsearchSearchValueFieldTypeContext<F> {
 
@@ -96,6 +98,12 @@ public class ElasticsearchMultiIndexSearchValueFieldContext<F>
 			throw log.cannotUseQueryElementForField( absolutePath(), key.toString(), eventContext() );
 		}
 		return factory.create( searchContext, this );
+	}
+
+	@Override
+	public JsonPrimitive elasticsearchTypeAsJson() {
+		return getFromTypeIfCompatible( ElasticsearchSearchValueFieldTypeContext::elasticsearchTypeAsJson, Object::equals,
+				"elasticsearchType" );
 	}
 
 	@Override

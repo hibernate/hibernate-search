@@ -11,6 +11,7 @@ import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
@@ -34,18 +35,35 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 	private static final JsonAccessor<JsonElement> MISSING_ACCESSOR = JsonAccessor.root().property( "missing" );
 	private static final JsonPrimitive MISSING_FIRST_KEYWORD_JSON = new JsonPrimitive( "_first" );
 	private static final JsonPrimitive MISSING_LAST_KEYWORD_JSON = new JsonPrimitive( "_last" );
+	private static final JsonAccessor<JsonElement> UNMAPPED_TYPE = JsonAccessor.root().property( "unmapped_type" );
 
 	private final JsonElement missing;
+	private final JsonPrimitive unmappedType;
 
 	private ElasticsearchStandardFieldSort(Builder<?> builder) {
 		super( builder );
 		missing = builder.missing;
+		if ( indexNames().size() > 1 ) {
+			unmappedType = builder.field.type().elasticsearchTypeAsJson();
+		}
+		else {
+			unmappedType = null;
+		}
 	}
 
 	@Override
 	public void doToJsonSorts(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
 		if ( missing != null ) {
 			MISSING_ACCESSOR.set( innerObject, missing );
+		}
+
+		// We cannot use unmapped_type for scaled floats:
+		// Elasticsearch complains it needs a scaling factor, but we don't have any way to provide it.
+		// See https://hibernate.atlassian.net/browse/HSEARCH-4176
+		if ( unmappedType != null && !DataTypes.SCALED_FLOAT.equals( unmappedType.getAsString() ) ) {
+			// There are multiple target indexes; some of them may not declare the field.
+			// Instruct ES to behave as if the field had no value in that case.
+			UNMAPPED_TYPE.set( innerObject, unmappedType );
 		}
 
 		if ( innerObject.size() == 0 ) {
