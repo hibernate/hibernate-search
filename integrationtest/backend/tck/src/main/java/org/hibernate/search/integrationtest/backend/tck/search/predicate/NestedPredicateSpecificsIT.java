@@ -16,10 +16,13 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -29,6 +32,8 @@ public class NestedPredicateSpecificsIT {
 
 	private static final String DOCUMENT_1 = "nestedQueryShouldMatchId";
 	private static final String DOCUMENT_2 = "nonNestedQueryShouldMatchId";
+
+	private static final String MISSING_FIELD_INDEX_DOCUMENT_1 = "missingFieldIndex_1";
 
 	private static final String MATCHING_STRING = "matchingWord";
 	private static final String MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 = "firstMatchingWord";
@@ -45,18 +50,20 @@ public class NestedPredicateSpecificsIT {
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
+	private static final SimpleMappedIndex<IndexBinding> mainIndex = SimpleMappedIndex.of( IndexBinding::new );
+	private static final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex =
+			SimpleMappedIndex.of( MissingFieldIndexBinding::new ).name( "missingField" );
 
 	@BeforeClass
 	public static void setup() {
-		setupHelper.start().withIndex( index ).setup();
+		setupHelper.start().withIndexes( mainIndex, missingFieldIndex ).setup();
 
 		initData();
 	}
 
 	@Test
 	public void search_nestedOnTwoLevels() {
-		assertThatQuery( index.query()
+		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.bool()
 								// This is referred to as "condition 1" in the data initialization method
@@ -87,13 +94,13 @@ public class NestedPredicateSpecificsIT {
 								)
 						)
 				) )
-				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 )
 				.hasTotalHitCount( 1 );
 	}
 
 	@Test
 	public void search_nestedOnTwoLevels_onlySecondLevel() {
-		assertThatQuery( index.query()
+		assertThatQuery( mainIndex.query()
 				.where( f -> f.bool()
 						// This is referred to as "condition 1" in the data initialization method
 						.must( f.nested().objectField( "nestedObject.nestedObject" )
@@ -122,13 +129,13 @@ public class NestedPredicateSpecificsIT {
 								)
 						)
 				) )
-				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1, DOCUMENT_2 )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_2 )
 				.hasTotalHitCount( 2 );
 	}
 
 	@Test
 	public void search_nestedOnTwoLevels_conditionOnFirstLevel() {
-		assertThatQuery( index.query()
+		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.bool()
 								.must( f.match()
@@ -150,13 +157,13 @@ public class NestedPredicateSpecificsIT {
 								)
 						)
 				) )
-				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_2 )
 				.hasTotalHitCount( 1 );
 	}
 
 	@Test
 	public void search_nestedOnTwoLevels_separatePredicates() {
-		StubMappingScope scope = index.createScope();
+		StubMappingScope scope = mainIndex.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().nested().objectField( "nestedObject.nestedObject" )
 				.nest( f -> f.bool()
@@ -191,7 +198,7 @@ public class NestedPredicateSpecificsIT {
 								.must( predicate2 )
 						)
 				) )
-				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 )
 				.hasTotalHitCount( 1 );
 	}
 
@@ -200,7 +207,7 @@ public class NestedPredicateSpecificsIT {
 		String objectFieldPath = "nestedObject";
 		String fieldInParentPath = "string";
 
-		assertThatThrownBy( () -> index.query()
+		assertThatThrownBy( () -> mainIndex.query()
 				.where( f -> f.nested().objectField( objectFieldPath )
 						.nest( f.bool()
 								.must( f.match()
@@ -226,7 +233,7 @@ public class NestedPredicateSpecificsIT {
 		String objectFieldPath = "nestedObject";
 		String fieldInSiblingPath = "nestedObject2.string";
 
-		assertThatThrownBy( () -> index.query()
+		assertThatThrownBy( () -> mainIndex.query()
 				.where( f -> f.nested().objectField( objectFieldPath )
 						.nest( f.bool()
 								.must( f.match()
@@ -247,15 +254,75 @@ public class NestedPredicateSpecificsIT {
 								+ " are allowed here." );
 	}
 
+	/**
+	 * Test that no failure occurs when a nested predicate targets a nested field
+	 * that only exists in one of the targeted indexes.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4173")
+	public void multiIndex_missingNestedField() {
+		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
+		SearchPredicateFactory f = scope.predicate();
+		SearchPredicate nestedPredicate = f.nested().objectField( "nestedObject" )
+				.nest( f.bool()
+						// This is referred to as "condition 1" in the data initialization method
+						.must( f.nested().objectField( "nestedObject.nestedObject" )
+								.nest( f.bool()
+										.must( f.match()
+												.field( "nestedObject.nestedObject.field1" )
+												.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 )
+										)
+										.must( f.match()
+												.field( "nestedObject.nestedObject.field2" )
+												.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 )
+										)
+								)
+						)
+						// This is referred to as "condition 2" in the data initialization method
+						.must( f.nested().objectField( "nestedObject.nestedObject" )
+								.nest( f.bool()
+										.must( f.match()
+												.field( "nestedObject.nestedObject.field1" )
+												.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 )
+										)
+										.must( f.match()
+												.field( "nestedObject.nestedObject.field2" )
+												.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 )
+										)
+								)
+						)
+				)
+				.toPredicate();
+
+		// The "nested" predicate should not match anything in missingFieldIndex
+		assertThatQuery( mainIndex.createScope( missingFieldIndex ).query()
+				.where( nestedPredicate ) )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 )
+				.hasTotalHitCount( 1 );
+
+		// ... but it should not prevent the query from executing either:
+		// if the "nested" predicate is optional, it should be ignored for missingFieldIndex.
+		assertThatQuery( mainIndex.createScope( missingFieldIndex ).query()
+				.where( f.bool()
+						.should( nestedPredicate )
+						.should( f.id().matching( MISSING_FIELD_INDEX_DOCUMENT_1 ) )
+						.toPredicate() ) )
+				.hasDocRefHitsAnyOrder( c -> c
+						.doc( mainIndex.typeName(), DOCUMENT_1 )
+						.doc( missingFieldIndex.typeName(), MISSING_FIELD_INDEX_DOCUMENT_1 ) )
+				.hasTotalHitCount( 2 );
+	}
+
 	private static void initData() {
-		index.bulkIndexer()
+		BulkIndexer mainIndexIndexer = mainIndex.bulkIndexer();
+		mainIndexIndexer
 				.add( DOCUMENT_1, document -> {
 					ObjectMapping level1;
 					SecondLevelObjectMapping level2;
 					DocumentElement object;
 					DocumentElement secondLevelObject;
 
-					level1 = index.binding().nestedObject;
+					level1 = mainIndex.binding().nestedObject;
 					level2 = level1.nestedObject;
 
 					object = document.addObject( level1.self );
@@ -286,7 +353,7 @@ public class NestedPredicateSpecificsIT {
 					object.addNullObject( level2.self );
 				} )
 				.add( DOCUMENT_2, document -> {
-					ObjectMapping level1 = index.binding().nestedObject;
+					ObjectMapping level1 = mainIndex.binding().nestedObject;
 					DocumentElement object = document.addObject( level1.self );
 					SecondLevelObjectMapping level2 = level1.nestedObject;
 					DocumentElement secondLevelObject = object.addObject( level2.self );
@@ -317,7 +384,7 @@ public class NestedPredicateSpecificsIT {
 					object = document.addObject( level1.self );
 				} )
 				.add( "neverMatching", document -> {
-					ObjectMapping level1 = index.binding().nestedObject;
+					ObjectMapping level1 = mainIndex.binding().nestedObject;
 					SecondLevelObjectMapping level2 = level1.nestedObject;
 
 					DocumentElement object = document.addObject( level1.self );
@@ -356,8 +423,12 @@ public class NestedPredicateSpecificsIT {
 					secondLevelObject.addValue( level2.field1, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
 					secondLevelObject.addValue( level2.field2, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
 				} )
-				.add( "empty", document -> { } )
-				.join();
+				.add( "empty", document -> { } );
+
+		BulkIndexer missingFieldIndexIndexer = missingFieldIndex.bulkIndexer();
+		missingFieldIndexIndexer.add( MISSING_FIELD_INDEX_DOCUMENT_1, document -> { } );
+
+		mainIndexIndexer.join( missingFieldIndexIndexer );
 	}
 
 	private static class IndexBinding {
@@ -374,6 +445,11 @@ public class NestedPredicateSpecificsIT {
 			IndexSchemaObjectField nestedObject2Field = root.objectField( "nestedObject2", ObjectStructure.NESTED )
 					.multiValued();
 			nestedObject2 = new ObjectMapping( nestedObject2Field );
+		}
+	}
+
+	private static class MissingFieldIndexBinding {
+		MissingFieldIndexBinding(IndexSchemaElement root) {
 		}
 	}
 
