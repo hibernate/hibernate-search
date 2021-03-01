@@ -55,7 +55,8 @@ public class SpatialWithinPolygonPredicateBaseIT {
 						SearchableIT.searchableYesIndex, SearchableIT.searchableNoIndex,
 						ArgumentCheckingIT.index,
 						TypeCheckingNoConversionIT.index, TypeCheckingNoConversionIT.compatibleIndex,
-						TypeCheckingNoConversionIT.rawFieldCompatibleIndex, TypeCheckingNoConversionIT.incompatibleIndex
+						TypeCheckingNoConversionIT.rawFieldCompatibleIndex, TypeCheckingNoConversionIT.missingFieldIndex,
+						TypeCheckingNoConversionIT.incompatibleIndex
 				)
 				.setup();
 
@@ -74,14 +75,17 @@ public class SpatialWithinPolygonPredicateBaseIT {
 		final BulkIndexer typeCheckingMainIndexer = TypeCheckingNoConversionIT.index.bulkIndexer();
 		final BulkIndexer typeCheckingCompatibleIndexer = TypeCheckingNoConversionIT.compatibleIndex.bulkIndexer();
 		final BulkIndexer typeCheckingRawFieldCompatibleIndexer = TypeCheckingNoConversionIT.rawFieldCompatibleIndex.bulkIndexer();
+		final BulkIndexer typeCheckingMissingFieldIndexer = TypeCheckingNoConversionIT.missingFieldIndex.bulkIndexer();
 		TypeCheckingNoConversionIT.dataSet.contribute( TypeCheckingNoConversionIT.index, typeCheckingMainIndexer,
 				TypeCheckingNoConversionIT.compatibleIndex, typeCheckingCompatibleIndexer,
-				TypeCheckingNoConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer );
+				TypeCheckingNoConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer,
+				TypeCheckingNoConversionIT.missingFieldIndex, typeCheckingMissingFieldIndexer );
 
 		singleFieldIndexer.join(
 				multiFieldIndexer, nestingIndexer,
 				scoreIndexer,
-				typeCheckingMainIndexer, typeCheckingCompatibleIndexer, typeCheckingRawFieldCompatibleIndexer
+				typeCheckingMainIndexer, typeCheckingCompatibleIndexer,
+				typeCheckingRawFieldCompatibleIndexer, typeCheckingMissingFieldIndexer
 		);
 	}
 
@@ -336,12 +340,15 @@ public class SpatialWithinPolygonPredicateBaseIT {
 		private static final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex =
 				SimpleMappedIndex.of( root -> new RawFieldCompatibleIndexBinding( root, supportedFieldTypes ) )
 						.name( "typeChecking_rawFieldCompatible" );
+		private static final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex =
+				SimpleMappedIndex.of( root -> new MissingFieldIndexBinding( root, supportedFieldTypes ) )
+						.name( "typeChecking_missingField" );
 		private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
 				SimpleMappedIndex.of( root -> new IncompatibleIndexBinding( root, supportedFieldTypes ) )
 						.name( "typeChecking_incompatible" );
 
 		public TypeCheckingNoConversionIT() {
-			super( index, compatibleIndex, rawFieldCompatibleIndex, incompatibleIndex, dataSet );
+			super( index, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex, incompatibleIndex, dataSet );
 		}
 
 		@Override
