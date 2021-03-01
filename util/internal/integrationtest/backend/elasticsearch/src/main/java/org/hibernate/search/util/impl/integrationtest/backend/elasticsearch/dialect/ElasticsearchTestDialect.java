@@ -76,4 +76,9 @@ public interface ElasticsearchTestDialect {
 	boolean supportsSkipOrLimitingTotalHitCount();
 
 	boolean hasBugForExistsOnNullGeoPointFieldWithoutDocValues();
+
+	boolean supportsIgnoreUnmappedForGeoPointField();
+
+	boolean ignoresFieldSortWhenNestedFieldMissing();
+
 }
