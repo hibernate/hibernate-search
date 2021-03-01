@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.bootstrap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
@@ -101,13 +102,16 @@ public class ElasticsearchBootstrapIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3841")
 	public void explicitProtocolDialect_noVersionCheck_incompleteVersion() {
+		ElasticsearchVersion clusterVersion = ElasticsearchVersion.of( ElasticsearchTestDialect.getClusterVersion() );
+		String versionWithMajorOnly = String.valueOf( clusterVersion.major() );
+
 		assertThatThrownBy(
 				() -> setupHelper.start()
 						.withBackendProperty(
 								ElasticsearchBackendSettings.VERSION_CHECK_ENABLED, false
 						)
 						.withBackendProperty(
-								ElasticsearchBackendSettings.VERSION, "7"
+								ElasticsearchBackendSettings.VERSION, versionWithMajorOnly
 						)
 						.withBackendProperty(
 								ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
@@ -135,12 +139,16 @@ public class ElasticsearchBootstrapIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3841")
 	public void explicitProtocolDialect_noVersionCheck_completeVersion() {
+		ElasticsearchVersion clusterVersion = ElasticsearchVersion.of( ElasticsearchTestDialect.getClusterVersion() );
+		String versionWithMajorAndMinorOnly = String.valueOf( clusterVersion.major() )
+				+ "." + String.valueOf( clusterVersion.minor().getAsInt() );
+
 		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start()
 				.withBackendProperty(
 						ElasticsearchBackendSettings.VERSION_CHECK_ENABLED, false
 				)
 				.withBackendProperty(
-						ElasticsearchBackendSettings.VERSION, "7.10"
+						ElasticsearchBackendSettings.VERSION, versionWithMajorAndMinorOnly
 				)
 				.withBackendProperty(
 						ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
