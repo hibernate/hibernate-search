@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldTypeContext;
@@ -24,9 +25,12 @@ import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDo
 import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
+import com.google.gson.JsonPrimitive;
+
 public class ElasticsearchIndexValueFieldType<F>
 		implements IndexValueFieldTypeDescriptor, IndexFieldType<F>, ElasticsearchSearchValueFieldTypeContext<F> {
 	private final Class<F> valueType;
+	private final JsonPrimitive elasticsearchTypeAsJson;
 	private final DslConverter<F, F> rawDslConverter;
 	private final ProjectionConverter<F, F> rawProjectionConverter;
 
@@ -49,6 +53,7 @@ public class ElasticsearchIndexValueFieldType<F>
 
 	public ElasticsearchIndexValueFieldType(Builder<F> builder) {
 		this.valueType = builder.valueType;
+		this.elasticsearchTypeAsJson = builder.elasticsearchTypeAsJson();
 		this.rawDslConverter = builder.rawDslConverter;
 		this.rawProjectionConverter = builder.rawProjectionConverter;
 		this.codec = builder.codec;
@@ -76,6 +81,11 @@ public class ElasticsearchIndexValueFieldType<F>
 	@Override
 	public Class<F> valueClass() {
 		return valueType;
+	}
+
+	@Override
+	public JsonPrimitive elasticsearchTypeAsJson() {
+		return elasticsearchTypeAsJson;
 	}
 
 	public ElasticsearchFieldCodec<F> codec() {
@@ -252,6 +262,15 @@ public class ElasticsearchIndexValueFieldType<F>
 
 		public ElasticsearchIndexValueFieldType<F> build() {
 			return new ElasticsearchIndexValueFieldType<>( this );
+		}
+
+		private JsonPrimitive elasticsearchTypeAsJson() {
+			String typeName = mapping.getType();
+			if ( typeName == null ) {
+				// Can happen with user-provided mappings
+				typeName = DataTypes.OBJECT;
+			}
+			return new JsonPrimitive( typeName );
 		}
 	}
 }
