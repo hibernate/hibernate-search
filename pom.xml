@@ -198,7 +198,7 @@
 
         <!-- >>> Elasticsearch -->
         <!-- The version of the Elasticsearch client used by Hibernate Search, independently from the version of the remote cluster -->
-        <version.org.elasticsearch.client>${version.org.elasticsearch.latest-7.10}</version.org.elasticsearch.client>
+        <version.org.elasticsearch.client>${version.org.elasticsearch.latest-7.11}</version.org.elasticsearch.client>
         <!-- The main compatible version, advertised by default. Used in documentation links and as the default when testing. -->
         <!-- When updating the following version you will likely need to update the test profiles as well,
              to make sure the corresponding profile (e.g. elasticsearch-7.10) becomes the default. -->
@@ -209,6 +209,7 @@
         <!-- The versions of Elasticsearch that may work, but are not given priority for bugfixes and new features -->
         <version.org.elasticsearch.compatible.not-regularly-tested.text>6.0 or 7.0</version.org.elasticsearch.compatible.not-regularly-tested.text>
         <!-- The latest micro of each Elasticsearch branch -->
+        <version.org.elasticsearch.latest-7.11>7.11.1</version.org.elasticsearch.latest-7.11>
         <version.org.elasticsearch.latest-7.10>7.10.0</version.org.elasticsearch.latest-7.10>
         <version.org.elasticsearch.latest-7.9>7.9.3</version.org.elasticsearch.latest-7.9>
         <version.org.elasticsearch.latest-7.7>7.7.1</version.org.elasticsearch.latest-7.7>
