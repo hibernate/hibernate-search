@@ -82,4 +82,20 @@ public class TckBackendFeatures {
 	public boolean regexpExpressionIsNormalized() {
 		return false;
 	}
+
+	public boolean supportsDistanceSortWhenFieldMissingInSomeTargetIndexes() {
+		return true;
+	}
+
+	public boolean supportsDistanceSortWhenNestedFieldMissingInSomeTargetIndexes() {
+		return true;
+	}
+
+	public boolean supportsFieldSortWhenFieldMissingInSomeTargetIndexes(Class<?> fieldType) {
+		return true;
+	}
+
+	public boolean supportsFieldSortWhenNestedFieldMissingInSomeTargetIndexes() {
+		return true;
+	}
 }

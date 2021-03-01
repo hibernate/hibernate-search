@@ -8,6 +8,13 @@ package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dia
 
 public class Elasticsearch67TestDialect extends Elasticsearch68TestDialect {
 
-	// TODO HSEARCH-4173 add behavior specific to 6.7 here
+	@Override
+	public boolean ignoresFieldSortWhenNestedFieldMissing() {
+		// Support for ignoring field sorts when a nested field is missing was added in 6.8.1/7.1.2:
+		// https://github.com/elastic/elasticsearch/pull/42451
+		// In 6.8.0 and below, we just can't ignore unmapped nested fields in field sorts,
+		// which means sorts will fail when the nested field is not present in all indexes.
+		return false;
+	}
 
 }

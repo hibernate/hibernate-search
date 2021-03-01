@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
 
 @SuppressWarnings("deprecation") // We use Paths.DOC on purpose
 public class Elasticsearch68TestDialect extends Elasticsearch70TestDialect {
@@ -49,5 +50,14 @@ public class Elasticsearch68TestDialect extends Elasticsearch70TestDialect {
 	@Override
 	public boolean supportsSkipOrLimitingTotalHitCount() {
 		return false;
+	}
+
+	@Override
+	public boolean ignoresFieldSortWhenNestedFieldMissing() {
+		// AWS apparently didn't apply this patch, which solves the problem in 6.8.1/7.1.2,
+		// to their 6.8 branch:
+		// https://github.com/elastic/elasticsearch/pull/42451
+		return !ElasticsearchTestHostConnectionConfiguration.get().isAws()
+				&& super.ignoresFieldSortWhenNestedFieldMissing();
 	}
 }

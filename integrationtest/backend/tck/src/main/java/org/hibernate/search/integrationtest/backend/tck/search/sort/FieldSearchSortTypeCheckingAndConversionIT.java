@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +18,11 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.Aggregable;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
@@ -41,6 +45,7 @@ import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -77,6 +82,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 
 	private static final String COMPATIBLE_INDEX_DOCUMENT_1 = "compatible_1";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
+	private static final String MISSING_FIELD_INDEX_DOCUMENT_1 = "missing_field_1";
 
 	private static final int BEFORE_DOCUMENT_1_ORDINAL = 0;
 	private static final int DOCUMENT_1_ORDINAL = 1;
@@ -95,13 +101,15 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 			SimpleMappedIndex.of( CompatibleIndexBinding::new ).name( "compatible" );
 	private static final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex =
 			SimpleMappedIndex.of( RawFieldCompatibleIndexBinding::new ).name( "rawFieldCompatible" );
+	private static final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex =
+			SimpleMappedIndex.of( MissingFieldIndexBinding::new ).name( "missingField" );
 	private static final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
 			SimpleMappedIndex.of( IncompatibleIndexBinding::new ).name( "incompatible" );
 
 	@BeforeClass
 	public static void setup() {
 		setupHelper.start()
-				.withIndexes( mainIndex, compatibleIndex, rawFieldCompatibleIndex, incompatibleIndex )
+				.withIndexes( mainIndex, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex, incompatibleIndex )
 				.setup();
 
 		initData();
@@ -287,6 +295,110 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4173")
+	public void multiIndex_withMissingFieldIndex_dslConverterEnabled() {
+		assumeTrue(
+				"This backend doesn't support sorts on a field of type '" + fieldTypeDescriptor
+						+ "' that is missing from some of the target indexes.",
+				TckConfiguration.get().getBackendFeatures()
+						.supportsFieldSortWhenFieldMissingInSomeTargetIndexes( fieldTypeDescriptor.getJavaType() )
+		);
+
+		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
+
+		SearchQuery<DocumentReference> query;
+		String fieldPath = getFieldPath();
+
+		query = matchNonEmptyQuery( f -> f.field( fieldPath ).asc().missing()
+				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ), scope );
+
+		/*
+		 * Not testing the ordering of results here because it's not what we are interested in:
+		 * we just want to check that fields are correctly detected as compatible,
+		 * that no exception is thrown and that the query is correctly executed on all indexes
+		 * with no silent error (HSEARCH-4173).
+		 */
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( b -> {
+			b.doc( missingFieldIndex.typeName(), MISSING_FIELD_INDEX_DOCUMENT_1 );
+			b.doc( mainIndex.typeName(), DOCUMENT_1 );
+			b.doc( mainIndex.typeName(), DOCUMENT_2 );
+			b.doc( mainIndex.typeName(), DOCUMENT_3 );
+		} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4173")
+	public void multiIndex_withMissingFieldIndex_dslConverterDisabled() {
+		assumeTrue(
+				"This backend doesn't support sorts on a field of type '" + fieldTypeDescriptor
+						+ "' that is missing from some of the target indexes.",
+				TckConfiguration.get().getBackendFeatures()
+						.supportsFieldSortWhenFieldMissingInSomeTargetIndexes( fieldTypeDescriptor.getJavaType() )
+		);
+
+		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
+
+		SearchQuery<DocumentReference> query;
+		String fieldPath = getFieldPath();
+
+		query = matchNonEmptyQuery( f -> f.field( fieldPath ).asc().missing()
+				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ), ValueConvert.NO ), scope );
+
+		/*
+		 * Not testing the ordering of results here because it's not what we are interested in:
+		 * we just want to check that fields are correctly detected as compatible,
+		 * that no exception is thrown and that the query is correctly executed on all indexes
+		 * with no silent error (HSEARCH-4173).
+		 */
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( b -> {
+			b.doc( missingFieldIndex.typeName(), MISSING_FIELD_INDEX_DOCUMENT_1 );
+			b.doc( mainIndex.typeName(), DOCUMENT_1 );
+			b.doc( mainIndex.typeName(), DOCUMENT_2 );
+			b.doc( mainIndex.typeName(), DOCUMENT_3 );
+		} );
+	}
+
+	/**
+	 * Test the behavior when even the <strong>parent</strong> field of the field to sort on is missing,
+	 * and that parent field is <strong>nested</strong> in the main index.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4173")
+	public void multiIndex_withMissingFieldIndex_nested() {
+		assumeTrue(
+				"This backend doesn't support sorts on a field of type '" + fieldTypeDescriptor
+						+ "' that is missing from some of the target indexes.",
+				TckConfiguration.get().getBackendFeatures()
+						.supportsFieldSortWhenFieldMissingInSomeTargetIndexes( fieldTypeDescriptor.getJavaType() )
+		);
+		assumeTrue(
+				"This backend doesn't support field sorts on a nested field that is missing from some of the target indexes.",
+				TckConfiguration.get().getBackendFeatures().supportsFieldSortWhenNestedFieldMissingInSomeTargetIndexes()
+		);
+
+		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
+
+		SearchQuery<DocumentReference> query;
+		String fieldPath = getFieldInNestedPath();
+
+		query = matchNonEmptyQuery( f -> f.field( fieldPath ).asc().missing()
+				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ), scope );
+
+		/*
+		 * Not testing the ordering of results here because it's not what we are interested in:
+		 * we just want to check that fields are correctly detected as compatible,
+		 * that no exception is thrown and that the query is correctly executed on all indexes
+		 * with no silent error (HSEARCH-4173).
+		 */
+		assertThatQuery( query ).hasDocRefHitsAnyOrder( b -> {
+			b.doc( missingFieldIndex.typeName(), MISSING_FIELD_INDEX_DOCUMENT_1 );
+			b.doc( mainIndex.typeName(), DOCUMENT_1 );
+			b.doc( mainIndex.typeName(), DOCUMENT_2 );
+			b.doc( mainIndex.typeName(), DOCUMENT_3 );
+		} );
+	}
+
+	@Test
 	public void multiIndex_withIncompatibleIndex_dslConverterEnabled() {
 		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
@@ -341,8 +453,21 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 				.toQuery();
 	}
 
+	private SearchQuery<DocumentReference> matchNonEmptyQuery(
+			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
+		return scope.query()
+				.where( f -> f.matchAll().except( f.id().matching( EMPTY ) ) )
+				.sort( sortContributor )
+				.toQuery();
+	}
+
 	private String getFieldPath() {
 		return mainIndex.binding().fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
+	}
+
+	private String getFieldInNestedPath() {
+		return mainIndex.binding().nested.relativeFieldName
+				+ '.' + mainIndex.binding().nested.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
 	}
 
 	private String getFieldWithDslConverterPath() {
@@ -356,6 +481,10 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 	private static void initDocument(IndexBinding indexBinding, DocumentElement document, Integer ordinal) {
 		indexBinding.fieldModels.forEach( fieldModel -> addValue( fieldModel, document, ordinal ) );
 		indexBinding.fieldWithDslConverterModels.forEach( fieldModel -> addValue( fieldModel, document, ordinal ) );
+
+		DocumentElement nested = document.addObject( indexBinding.nested.self );
+		indexBinding.nested.fieldModels.forEach( fieldModel -> addValue( fieldModel, nested, ordinal ) );
+		indexBinding.nested.fieldWithDslConverterModels.forEach( fieldModel -> addValue( fieldModel, nested, ordinal ) );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -398,19 +527,17 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		BulkIndexer rawFieldCompatibleIndexer = rawFieldCompatibleIndex.bulkIndexer()
 				.add( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1,
 						document -> initDocument( rawFieldCompatibleIndex.binding(), document, DOCUMENT_1_ORDINAL ) );
-		mainIndexer.join( compatibleIndexer, rawFieldCompatibleIndexer );
+		BulkIndexer missingFieldIndexer = missingFieldIndex.bulkIndexer()
+				.add( MISSING_FIELD_INDEX_DOCUMENT_1, document -> { } );
+		mainIndexer.join( compatibleIndexer, rawFieldCompatibleIndexer, missingFieldIndexer );
 	}
 
-	private static class IndexBinding {
+	private static class AbstractObjectMapping {
 		final SimpleFieldModelsByType fieldModels;
 		final SimpleFieldModelsByType fieldWithDslConverterModels;
 		final SimpleFieldModelsByType nonSortableFieldModels;
 
-		IndexBinding(IndexSchemaElement root) {
-			this( root, ignored -> { } );
-		}
-
-		IndexBinding(IndexSchemaElement root,
+		AbstractObjectMapping(IndexSchemaElement root,
 				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
 			fieldModels = SimpleFieldModelsByType.mapAll(
 					supportedFieldTypes,
@@ -428,6 +555,40 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 					c -> c.sortable( Sortable.YES ),
 					additionalConfiguration.andThen( c -> c.sortable( Sortable.NO ) )
 			);
+		}
+	}
+
+	private static class IndexBinding extends AbstractObjectMapping {
+		final FirstLevelObjectMapping nested;
+
+		IndexBinding(IndexSchemaElement root) {
+			this( root, ignored -> { } );
+		}
+
+		IndexBinding(IndexSchemaElement root,
+				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
+			super( root, additionalConfiguration );
+			nested = FirstLevelObjectMapping.create( root, "nested", ObjectStructure.NESTED,
+					additionalConfiguration );
+		}
+	}
+
+	private static class FirstLevelObjectMapping extends AbstractObjectMapping {
+		final String relativeFieldName;
+		final IndexObjectFieldReference self;
+
+		public static FirstLevelObjectMapping create(IndexSchemaElement parent, String relativeFieldName,
+				ObjectStructure structure,
+				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, structure );
+			return new FirstLevelObjectMapping( relativeFieldName, objectField, additionalConfiguration );
+		}
+
+		private FirstLevelObjectMapping(String relativeFieldName, IndexSchemaObjectField objectField,
+				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
+			super( objectField, additionalConfiguration );
+			this.relativeFieldName = relativeFieldName;
+			self = objectField.toReference();
 		}
 	}
 
@@ -469,6 +630,11 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 			 * but with an incompatible DSL converter.
 			 */
 			super( root, c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ) );
+		}
+	}
+
+	private static class MissingFieldIndexBinding {
+		MissingFieldIndexBinding(IndexSchemaElement root) {
 		}
 	}
 
