@@ -90,9 +90,6 @@ If you want the actual entity instance, use the <<search-dsl-projection-entity,`
 == `id`: return identifiers of matched entities 
 
 The `identifier` projection returns the identifier of the matched entity.
-NOTE: If the provided identifier type does not match the type of identifiers for targeted entity types,
-an exception will be thrown.
-See also <<search-dsl-projected-value-type>>.
 
 .Returning ids to matched entities, providing the identity type.
 ====
@@ -101,6 +98,9 @@ See also <<search-dsl-projected-value-type>>.
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=id-int]
 ----
 ====
+If the provided identifier type does not match the type of identifiers for targeted entity types,
+an exception will be thrown. See also <<search-dsl-projected-value-type>>. 
+
 You can omit the "identifier type" argument, but then you will get projections of type `Object`:
 
 .Returning ids to matched entities, without providing the identity type.

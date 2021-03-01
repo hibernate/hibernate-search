@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,6 @@ import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifie
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
@@ -167,13 +167,12 @@ public class IdentifierSearchProjectionBaseIT {
 	}
 
 	private void initData() {
-		BulkIndexer indexer = index.bulkIndexer();
-		for ( int i = 0; i < 7; i++ ) {
-			int finalI = i;
-			indexer.add( ids[i], f -> f.addValue( index.binding().name, names[finalI] ) );
-		}
-
-		indexer.join();
+		index.bulkIndexer()
+				.add( 7, i -> documentProvider(
+						ids[i],
+						document -> document.addValue( index.binding().name, names[i] )
+				) )
+				.join();
 	}
 
 	private static class IndexBinding {
