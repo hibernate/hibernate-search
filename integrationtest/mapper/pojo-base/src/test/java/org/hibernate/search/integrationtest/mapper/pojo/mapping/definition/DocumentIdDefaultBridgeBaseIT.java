@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
@@ -217,6 +218,28 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 				"convertUnknown on invalid input"
 		)
 				.isInstanceOf( RuntimeException.class );
+	}
+
+	// Test behavior that backends expect from our bridges when using the identifier projections
+	@Test
+	public void convertToSource() {
+		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
+		@SuppressWarnings("unchecked")
+		DocumentIdentifierValueConverter<I> documentIdentifierValueConverter =
+				(DocumentIdentifierValueConverter<I>) index1RootSchemaNode.getIdDslConverter();
+
+		// convert must behave appropriately on valid input
+		try ( SearchSession searchSession = mapping.createSession() ) {
+			FromDocumentIdentifierValueConvertContextImpl convertContext =
+					new FromDocumentIdentifierValueConvertContextImpl(
+							BridgeTestUtils.toBackendSessionContext( searchSession ) );
+
+			Iterator<I> entityIdentifierIterator = expectations.getEntityIdentifierValues().iterator();
+			for ( String documentId : expectations.getDocumentIdentifierValues() ) {
+				assertThat( documentIdentifierValueConverter.convertToSource( documentId, convertContext ) )
+						.isEqualTo( entityIdentifierIterator.next() );
+			}
+		}
 	}
 
 	private static class IncompatibleDocumentIdentifierValueConverter
