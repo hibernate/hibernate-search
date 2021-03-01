@@ -197,17 +197,28 @@
         <javadoc.org.apache.lucene.queryparser.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/queryparser/</javadoc.org.apache.lucene.queryparser.url>
 
         <!-- >>> Elasticsearch -->
-        <!-- When updating the following versions you will likely need to update the
-             matching test profile as well, e.g. elasticsearch-6.0 for the 6.0+ series -->
-        <!-- The main version of Elasticsearch targeted by Hibernate Search, tested in the default profile -->
-        <version.org.elasticsearch.main>7.10.0</version.org.elasticsearch.main>
-        <!-- The versions of Elasticsearch advertised as compatible with Hibernate Search -->
-        <version.org.elasticsearch.compatible.text>5.6, 6.8 or 7.10</version.org.elasticsearch.compatible.text>
-        <!-- The versions of Elasticsearch that may work, but are not given priority for bugfixes and new features -->
-        <version.org.elasticsearch.compatible.potentially.text>6.0 or 7.0</version.org.elasticsearch.compatible.potentially.text>
         <!-- The version of the Elasticsearch client used by Hibernate Search, independently from the version of the remote cluster -->
-        <version.org.elasticsearch.client>${version.org.elasticsearch.main}</version.org.elasticsearch.client>
-        <documentation.org.elasticsearch.url>https://www.elastic.co/guide/en/elasticsearch/reference/${parsed-version.org.elasticsearch.main.majorVersion}.${parsed-version.org.elasticsearch.main.minorVersion}</documentation.org.elasticsearch.url>
+        <version.org.elasticsearch.client>${version.org.elasticsearch.latest-7.10}</version.org.elasticsearch.client>
+        <!-- The main compatible version, advertised by default. Used in documentation links and as the default when testing. -->
+        <!-- When updating the following version you will likely need to update the test profiles as well,
+             to make sure the corresponding profile (e.g. elasticsearch-7.10) becomes the default. -->
+        <version.org.elasticsearch.compatible.main>${version.org.elasticsearch.latest-7.10}</version.org.elasticsearch.compatible.main>
+        <documentation.org.elasticsearch.url>https://www.elastic.co/guide/en/elasticsearch/reference/${parsed-version.org.elasticsearch.compatible.main.majorVersion}.${parsed-version.org.elasticsearch.compatible.main.minorVersion}</documentation.org.elasticsearch.url>
+        <!-- The versions of Elasticsearch advertised as compatible with Hibernate Search -->
+        <version.org.elasticsearch.compatible.regularly-tested.text>5.6, 6.8 or 7.10</version.org.elasticsearch.compatible.regularly-tested.text>
+        <!-- The versions of Elasticsearch that may work, but are not given priority for bugfixes and new features -->
+        <version.org.elasticsearch.compatible.not-regularly-tested.text>6.0 or 7.0</version.org.elasticsearch.compatible.not-regularly-tested.text>
+        <!-- The latest micro of each Elasticsearch branch -->
+        <version.org.elasticsearch.latest-7.10>7.10.0</version.org.elasticsearch.latest-7.10>
+        <version.org.elasticsearch.latest-7.9>7.9.3</version.org.elasticsearch.latest-7.9>
+        <version.org.elasticsearch.latest-7.7>7.7.1</version.org.elasticsearch.latest-7.7>
+        <version.org.elasticsearch.latest-7.6>7.6.2</version.org.elasticsearch.latest-7.6>
+        <version.org.elasticsearch.latest-7.2>7.2.1</version.org.elasticsearch.latest-7.2>
+        <version.org.elasticsearch.latest-6.8>6.8.9</version.org.elasticsearch.latest-6.8>
+        <version.org.elasticsearch.latest-6.6>6.6.2</version.org.elasticsearch.latest-6.6>
+        <version.org.elasticsearch.latest-6.3>6.3.2</version.org.elasticsearch.latest-6.3>
+        <version.org.elasticsearch.latest-6.2>6.2.4</version.org.elasticsearch.latest-6.2>
+        <version.org.elasticsearch.latest-5.6>5.6.16</version.org.elasticsearch.latest-5.6>
         <version.com.google.code.gson>2.8.5</version.com.google.code.gson>
         <version.software.amazon.awssdk>2.14.18</version.software.amazon.awssdk>
         <!-- Jackson: used by the Elasticsearch REST client, the AWS SDK and in tests (wiremock, ...) -->
@@ -1064,13 +1075,13 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>parse-elasticsearch-main-version</id>
+                        <id>parse-elasticsearch-main-compatible-version</id>
                         <goals>
                             <goal>parse-version</goal>
                         </goals>
                         <configuration>
-                            <propertyPrefix>parsed-version.org.elasticsearch.main</propertyPrefix>
-                            <versionString>${version.org.elasticsearch.main}</versionString>
+                            <propertyPrefix>parsed-version.org.elasticsearch.compatible.main</propertyPrefix>
+                            <versionString>${version.org.elasticsearch.compatible.main}</versionString>
                         </configuration>
                     </execution>
                     <execution>
