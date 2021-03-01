@@ -31,6 +31,7 @@ import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Test;
 
@@ -39,17 +40,20 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 	private final SimpleMappedIndex<IndexBinding> index;
 	private final SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex;
 	private final SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex;
+	private final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex;
 	private final SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex;
 	protected final DataSet<?, V> dataSet;
 
 	protected AbstractPredicateTypeCheckingNoConversionIT(SimpleMappedIndex<IndexBinding> index,
 			SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex,
 			SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex,
 			DataSet<?, V> dataSet) {
 		this.index = index;
 		this.compatibleIndex = compatibleIndex;
 		this.rawFieldCompatibleIndex = rawFieldCompatibleIndex;
+		this.missingFieldIndex = missingFieldIndex;
 		this.incompatibleIndex = incompatibleIndex;
 		this.dataSet = dataSet;
 	}
@@ -104,6 +108,35 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 					b.doc( index.typeName(), dataSet.docId( 0 ) );
 					b.doc( rawFieldCompatibleIndex.typeName(), dataSet.docId( 0 ) );
 				} );
+	}
+
+	/**
+	 * Test that no failure occurs when a predicate targets a field
+	 * that only exists in one of the targeted indexes.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4173")
+	public void multiIndex_withMissingFieldIndex() {
+		StubMappingScope scope = index.createScope( missingFieldIndex );
+
+		// The predicate should not match anything in missingFieldIndex
+		assertThatQuery( scope.query()
+				.where( f -> predicate( f, defaultDslConverterField0Path(), 0 ) )
+				.routing( dataSet.routingKey ) )
+				.hasDocRefHitsAnyOrder( b -> {
+					b.doc( index.typeName(), dataSet.docId( 0 ) );
+				} );
+
+		// ... but it should not prevent the query from executing either:
+		// if the predicate is optional, it should be ignored for missingFieldIndex.
+		assertThatQuery( scope.query()
+				.where( f -> f.bool()
+						.should( predicate( f, defaultDslConverterField0Path(), 0 ) )
+						.should( f.id().matching( dataSet.docId( DataSet.MISSING_FIELD_INDEX_DOC_ORDINAL ) ) ) ) )
+				.hasDocRefHitsAnyOrder( c -> c
+						.doc( index.typeName(), dataSet.docId( 0 ) )
+						.doc( missingFieldIndex.typeName(), dataSet.docId( DataSet.MISSING_FIELD_INDEX_DOC_ORDINAL ) ) )
+				.hasTotalHitCount( 2 );
 	}
 
 	// Fields with a different type *are* a problem, though.
@@ -216,6 +249,11 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 		}
 	}
 
+	public static class MissingFieldIndexBinding {
+		public MissingFieldIndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+		}
+	}
+
 	public static final class IncompatibleIndexBinding {
 		public IncompatibleIndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
 			fieldTypes.forEach( fieldType ->
@@ -235,19 +273,23 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 
 	public static final class DataSet<F, V extends AbstractPredicateTestValues<F>>
 			extends AbstractPerFieldTypePredicateDataSet<F, V> {
+		public static final int MISSING_FIELD_INDEX_DOC_ORDINAL = 100;
+
 		public DataSet(V values) {
 			super( values );
 		}
 
 		public void contribute(SimpleMappedIndex<IndexBinding> mainIndex, BulkIndexer mainIndexer,
 				SimpleMappedIndex<CompatibleIndexBinding> compatibleIndex, BulkIndexer compatibleIndexer,
-				SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex, BulkIndexer rawFieldCompatibleIndexer) {
+				SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex, BulkIndexer rawFieldCompatibleIndexer,
+				SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex, BulkIndexer missingFieldIndexer) {
 			mainIndexer.add( docId( 0 ), routingKey,
 					document -> initDocument( mainIndex, document, values.fieldValue( 0 ) ) );
 			compatibleIndexer.add( docId( 0 ), routingKey,
 					document -> initCompatibleDocument( compatibleIndex, document, values.fieldValue( 0 ) ) );
 			rawFieldCompatibleIndexer.add( docId( 0 ), routingKey,
 					document -> initRawFieldCompatibleDocument( rawFieldCompatibleIndex, document, values.fieldValue( 0 ) ) );
+			missingFieldIndexer.add( docId( MISSING_FIELD_INDEX_DOC_ORDINAL ), routingKey, document -> { } );
 
 			if ( values.size() > 1 ) {
 				mainIndexer.add( docId( 1 ), routingKey,
