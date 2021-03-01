@@ -242,10 +242,13 @@ stage('Configure') {
 					new EsLocalBuildEnvironment(versionRange: '[7.8,7.10)', mavenProfile: 'elasticsearch-7.8',
 							jdkTool: 'OpenJDK 11 Latest',
 							condition: TestCondition.AFTER_MERGE),
-					new EsLocalBuildEnvironment(versionRange: '[7.10,7.x)', mavenProfile: 'elasticsearch-7.10',
+					new EsLocalBuildEnvironment(versionRange: '[7.10,7.11)', mavenProfile: 'elasticsearch-7.10',
 							jdkTool: 'OpenJDK 11 Latest',
 							condition: TestCondition.BEFORE_MERGE,
-							isDefault: true)
+							isDefault: true),
+					new EsLocalBuildEnvironment(versionRange: '[7.11,7.x)', mavenProfile: 'elasticsearch-7.11',
+							jdkTool: 'OpenJDK 11 Latest',
+							condition: TestCondition.AFTER_MERGE)
 			],
 			// Note that each of these environments will only be tested if the appropriate
 			// environment variable with the AWS ES Service URL is defined in CI.

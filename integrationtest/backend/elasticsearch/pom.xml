@@ -220,7 +220,7 @@
             </properties>
         </profile>
 
-        <!-- Elasticsearch 7.10+ test environment (default) -->
+        <!-- Elasticsearch 7.10 test environment (default) -->
         <profile>
             <id>elasticsearch-7.10</id>
             <activation>
@@ -230,6 +230,16 @@
                     <name>!test.elasticsearch.connection.version</name>
                 </property>
             </activation>
+            <properties>
+                <failsafe.excludedGroups.elasticsearch.version>
+                    <!-- Nothing here -->
+                </failsafe.excludedGroups.elasticsearch.version>
+            </properties>
+        </profile>
+
+        <!-- Elasticsearch 7.11+ test environment -->
+        <profile>
+            <id>elasticsearch-7.11</id>
             <properties>
                 <failsafe.excludedGroups.elasticsearch.version>
                     <!-- Nothing here -->
