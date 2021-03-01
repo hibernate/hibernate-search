@@ -161,4 +161,14 @@ public class Elasticsearch710TestDialect implements ElasticsearchTestDialect {
 	public boolean hasBugForExistsOnNullGeoPointFieldWithoutDocValues() {
 		return true;
 	}
+
+	@Override
+	public boolean supportsIgnoreUnmappedForGeoPointField() {
+		return true;
+	}
+
+	@Override
+	public boolean ignoresFieldSortWhenNestedFieldMissing() {
+		return true;
+	}
 }
