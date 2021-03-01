@@ -61,7 +61,7 @@ public class LuceneIdProjection<I> extends AbstractLuceneProjection<String, I> {
 					.idDslConverter( ValueConvert.YES );
 
 			// check expected identifier type:
-			identifierValueConverter.requiresType( identifierType );
+			identifierValueConverter.checkSourceTypeAssignableTo( identifierType );
 			@SuppressWarnings("uncheked") // just checked
 			DocumentIdentifierValueConverter<? extends I> casted = (DocumentIdentifierValueConverter<? extends I>) identifierValueConverter;
 

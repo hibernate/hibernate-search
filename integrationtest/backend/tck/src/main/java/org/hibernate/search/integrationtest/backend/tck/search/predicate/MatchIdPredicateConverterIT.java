@@ -44,6 +44,11 @@ public class MatchIdPredicateConverterIT {
 		}
 
 		@Override
+		public void checkSourceTypeAssignableTo(Class<?> requiredType) {
+			throw new UnsupportedOperationException( "Should not be called" );
+		}
+
+		@Override
 		public Integer convertToSource(String documentId, FromDocumentIdentifierValueConvertContext context) {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}

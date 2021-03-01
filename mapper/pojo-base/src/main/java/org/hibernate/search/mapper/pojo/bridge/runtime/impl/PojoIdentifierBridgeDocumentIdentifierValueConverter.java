@@ -53,7 +53,7 @@ public final class PojoIdentifierBridgeDocumentIdentifierValueConverter<I> imple
 	}
 
 	@Override
-	public void requiresType(Class<?> requiredType) {
+	public void checkSourceTypeAssignableTo(Class<?> requiredType) {
 		if ( !requiredType.isAssignableFrom( expectedValueType ) ) {
 			throw log.wrongRequiredIdentifierType( requiredType, expectedValueType );
 		}

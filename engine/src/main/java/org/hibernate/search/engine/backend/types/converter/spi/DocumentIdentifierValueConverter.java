@@ -46,9 +46,7 @@ public interface DocumentIdentifierValueConverter<I> {
 	 * @param requiredType the required type
 	 * @throws SearchException if the expected actual type is not a subclass of the required type
 	 */
-	default void requiresType(Class<?> requiredType) {
-		// no check by default
-	}
+	void checkSourceTypeAssignableTo(Class<?> requiredType);
 
 	/**
 	 * @param documentId The document identifier to convert.
