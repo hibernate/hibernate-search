@@ -220,7 +220,12 @@ stage('Configure') {
 					new EsLocalBuildEnvironment(versionRange: '[6.4,6.7)', mavenProfile: 'elasticsearch-6.4',
 							jdkTool: 'OpenJDK 8 Latest',
 							condition: TestCondition.AFTER_MERGE),
-					new EsLocalBuildEnvironment(versionRange: '[6.7,7.0)', mavenProfile: 'elasticsearch-6.7',
+					// Not testing 6.7 to make the build quicker.
+					// The only difference with 6.8+ is a bug in field sorts that is already present in earlier versions.
+					new EsLocalBuildEnvironment(versionRange: '[6.7,6.8)', mavenProfile: 'elasticsearch-6.7',
+							jdkTool: 'OpenJDK 8 Latest',
+							condition: TestCondition.ON_DEMAND),
+					new EsLocalBuildEnvironment(versionRange: '[6.8,7.0)', mavenProfile: 'elasticsearch-6.8',
 							jdkTool: 'OpenJDK 8 Latest',
 							condition: TestCondition.AFTER_MERGE),
 					// Not testing 7.0/7.1/7.2 to make the build quicker.
@@ -268,7 +273,7 @@ stage('Configure') {
 							condition: TestCondition.AFTER_MERGE),
 					new EsAwsBuildEnvironment(version: '6.7', mavenProfile: 'elasticsearch-6.7',
 							condition: TestCondition.AFTER_MERGE),
-					new EsAwsBuildEnvironment(version: '6.8', mavenProfile: 'elasticsearch-6.7',
+					new EsAwsBuildEnvironment(version: '6.8', mavenProfile: 'elasticsearch-6.8',
 							condition: TestCondition.AFTER_MERGE),
 					new EsAwsBuildEnvironment(version: '7.1', mavenProfile: 'elasticsearch-7.0',
 							condition: TestCondition.AFTER_MERGE),
