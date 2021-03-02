@@ -198,7 +198,8 @@ The following profiles are available:
  * `elasticsearch-6.0` for 6.0.x to 6.2.x
  * `elasticsearch-6.3` for 6.3.x
  * `elasticsearch-6.4` for 6.4.x to 6.6.x
- * `elasticsearch-6.7` for 6.7 and later 6.x
+ * `elasticsearch-6.7` for 6.7.x
+ * `elasticsearch-6.8` for 6.8 and later 6.x
  * `elasticsearch-7.0` for 7.0 to 7.2
  * `elasticsearch-7.3` for 7.3 to 7.6
  * `elasticsearch-7.7` for 7.7

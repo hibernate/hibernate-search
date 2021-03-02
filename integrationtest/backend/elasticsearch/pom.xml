@@ -170,9 +170,19 @@
             </properties>
         </profile>
 
-        <!-- Elasticsearch 6.7 to 6.8 test environment -->
+        <!-- Elasticsearch 6.7 test environment -->
         <profile>
             <id>elasticsearch-6.7</id>
+            <properties>
+                <failsafe.excludedGroups.elasticsearch.version>
+                    <!-- Nothing here -->
+                </failsafe.excludedGroups.elasticsearch.version>
+            </properties>
+        </profile>
+
+        <!-- Elasticsearch 6.8 test environment -->
+        <profile>
+            <id>elasticsearch-6.8</id>
             <properties>
                 <failsafe.excludedGroups.elasticsearch.version>
                     <!-- Nothing here -->
