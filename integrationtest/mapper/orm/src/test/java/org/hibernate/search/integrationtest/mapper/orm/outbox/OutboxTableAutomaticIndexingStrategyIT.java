@@ -10,22 +10,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.ENTITY_ID_PROPERTY_NAME;
 import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.ENTITY_NAME_PROPERTY_NAME;
 import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.OUTBOX_ENTITY_NAME;
-import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.ROUTING_KEY_PROPERTY_NAME;
+import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.ROUTE_PROPERTY_NAME;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.metamodel.EntityType;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
-import org.hibernate.search.util.common.serializzation.spi.SerializationUtils;
+import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
@@ -34,7 +34,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class OutboxSyntheticEntityMappingIT {
+public class OutboxTableAutomaticIndexingStrategyIT {
 
 	private static final String INDEX_NAME = "IndexedEntity";
 
@@ -63,54 +63,42 @@ public class OutboxSyntheticEntityMappingIT {
 						}
 				)
 				.withProperty( HibernateOrmMapperSettings.FILL_OUTBOX_TABLE, true )
+				.withProperty(
+						"hibernate.search.automatic_indexing.strategy",
+						"org.hibernate.search.mapper.orm.outbox.impl.OutboxTableAutomaticIndexingStrategy"
+				)
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
-	public void index_workingAsUsual() {
+	public void test() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity indexedPojo = new IndexedEntity( 1, "Using some text here" );
 			session.save( indexedPojo );
-
-			backendMock.expectWorks( IndexedEntity.class.getSimpleName() ).add( "1", b -> b
-					.field( "text", "Using some text here" )
-			).createdThenExecuted();
-		} );
-	}
-
-	@Test
-	public void saveAndLoadOutboxSyntheticEntity() {
-		EntityType<?> entityType = sessionFactory.getMetamodel().getEntities().iterator().next();
-		String entityName = entityType.getName();
-		AtomicInteger id = new AtomicInteger();
-
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			HashMap<String, Object> entityData = new HashMap<>();
-			entityData.put( ENTITY_NAME_PROPERTY_NAME, entityName );
-			entityData.put( ENTITY_ID_PROPERTY_NAME, "739" );
-			entityData.put( ROUTING_KEY_PROPERTY_NAME, SerializationUtils.serialize( "fake-routing-key" ) );
-
-			session.save( OUTBOX_ENTITY_NAME, entityData );
-
-			@SuppressWarnings("unchecked") // this field is defined as integer
-			Integer generatedId = (Integer) entityData.get( "id" );
-
-			id.set( generatedId );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			@SuppressWarnings("unchecked") // synthetic entities are loaded as map
-			Map<String, Object> load = (Map<String, Object>) session.load( OUTBOX_ENTITY_NAME, id.get() );
-			assertThat( load ).isNotNull();
+			Query<Map> query = session.createQuery( "select e from " + OUTBOX_ENTITY_NAME + " e", Map.class );
 
-			assertThat( load ).containsEntry( ENTITY_NAME_PROPERTY_NAME, entityName );
-			assertThat( load ).containsEntry( ENTITY_ID_PROPERTY_NAME, "739" );
-			assertThat( load ).containsEntry( ROUTING_KEY_PROPERTY_NAME, SerializationUtils.serialize( "fake-routing-key" ) );
+			List<Map> list = query.list();
+			assertThat( list ).hasSize( 1 );
+
+			Map<String, Object> load = list.get( 0 );
+			assertThat( load ).containsEntry( ENTITY_NAME_PROPERTY_NAME, "IndexedEntity" );
+			assertThat( load ).containsEntry( ENTITY_ID_PROPERTY_NAME, "1" );
+
+			byte[] serializedRoutingKeys = (byte[]) load.get( ROUTE_PROPERTY_NAME );
+			DocumentRoutesDescriptor routesDescriptor = SerializationUtils.deserialize(
+					DocumentRoutesDescriptor.class, serializedRoutingKeys );
+
+			assertThat( routesDescriptor ).isNotNull();
+			assertThat( routesDescriptor.currentRoute().routingKey() ).isNull();
+			assertThat( routesDescriptor.previousRoutes() ).isEmpty();
 		} );
 	}
 
-	@Entity
+	@Entity(name = "IndexedEntity")
 	public static class IndexedEntity {
 
 		@Id
