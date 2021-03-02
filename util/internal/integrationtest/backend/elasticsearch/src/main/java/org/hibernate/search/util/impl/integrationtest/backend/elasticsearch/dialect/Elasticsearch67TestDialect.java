@@ -6,48 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+public class Elasticsearch67TestDialect extends Elasticsearch68TestDialect {
 
-import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+	// TODO HSEARCH-4173 add behavior specific to 6.7 here
 
-@SuppressWarnings("deprecation") // We use Paths.DOC on purpose
-public class Elasticsearch67TestDialect extends Elasticsearch70TestDialect {
-
-	@Override
-	public boolean isEmptyMappingPossible() {
-		return true;
-	}
-
-	@Override
-	public URLEncodedString getTypeKeywordForNonMappingApi() {
-		return Paths.DOC;
-	}
-
-	@Override
-	public Optional<URLEncodedString> getTypeNameForMappingAndBulkApi() {
-		return Optional.of( Paths.DOC );
-	}
-
-	@Override
-	public Boolean getIncludeTypeNameParameterForMappingApi() {
-		return true;
-	}
-
-	@Override
-	public List<String> getAllLocalDateDefaultMappingFormats() {
-		return Arrays.asList( "yyyy-MM-dd", "yyyyyyyyy-MM-dd" );
-	}
-
-	@Override
-	public boolean zonedDateTimeDocValueHasUTCZoneId() {
-		return true;
-	}
-
-	@Override
-	public boolean supportsSkipOrLimitingTotalHitCount() {
-		return false;
-	}
 }
