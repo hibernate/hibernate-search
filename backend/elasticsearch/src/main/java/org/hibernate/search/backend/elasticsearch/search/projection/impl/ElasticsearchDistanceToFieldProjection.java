@@ -51,12 +51,14 @@ public class ElasticsearchDistanceToFieldProjection<E, P> extends AbstractElasti
 	private static final Pattern NON_DIGITS_PATTERN = Pattern.compile( "\\D" );
 
 	private static final String DISTANCE_PROJECTION_SCRIPT =
-		// Use ".size() != 0" to check whether this field has a value. ".value != null" won't work on ES7+
-		" if (doc[params.fieldPath].size() != 0) {" +
-			" return doc[params.fieldPath].arcDistance(params.lat, params.lon);" +
-		" } else {" +
-			" return null;" +
-		" }";
+			// Check whether the field exists first with "containsKey";
+			// in a multi-index search, it may not exist for all indexes.
+			// Use ".size() != 0" to check whether this field has a value. ".value != null" won't work on ES7+
+			" if (doc.containsKey(params.fieldPath) && doc[params.fieldPath].size() != 0) {" +
+				" return doc[params.fieldPath].arcDistance(params.lat, params.lon);" +
+			" } else {" +
+				" return null;" +
+			" }";
 
 	private final String absoluteFieldPath;
 	private final boolean multiValued;
