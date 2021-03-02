@@ -62,7 +62,6 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 							indexedEntityMapping.property( "text" ).fullTextField();
 						}
 				)
-				.withProperty( HibernateOrmMapperSettings.FILL_OUTBOX_TABLE, true )
 				.withProperty(
 						"hibernate.search.automatic_indexing.strategy",
 						"org.hibernate.search.mapper.orm.outbox.impl.OutboxTableAutomaticIndexingStrategy"
