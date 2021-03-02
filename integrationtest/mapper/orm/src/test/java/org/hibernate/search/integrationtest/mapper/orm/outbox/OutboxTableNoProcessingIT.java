@@ -33,7 +33,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class OutboxTableAutomaticIndexingStrategyIT {
+public class OutboxTableNoProcessingIT {
 
 	private static final String INDEX_NAME = "IndexedEntity";
 	private static final String ANOTHER_INDEX_NAME = "AnotherIndexedEntity";
@@ -85,6 +85,7 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 						}
 				)
 				.withProperty( "hibernate.search.automatic_indexing.strategy", "outbox-polling" )
+				.withProperty( "hibernate.search.automatic_indexing.process_outbox_table", "false" )
 				.setup( IndexedEntity.class, AnotherIndexedEntity.class, RoutedIndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
