@@ -1524,8 +1524,8 @@
                     <configuration>
                         <!-- Location is relative to the classpath -->
                         <configLocation>checkstyle.xml</configLocation>
-                        <consoleOutput>true</consoleOutput>
-                        <failsOnError>true</failsOnError>
+                        <logViolationsToConsole>true</logViolationsToConsole>
+                        <failOnViolation>true</failOnViolation>
                         <violationSeverity>error</violationSeverity>
                         <includeTestResources>true</includeTestResources>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
