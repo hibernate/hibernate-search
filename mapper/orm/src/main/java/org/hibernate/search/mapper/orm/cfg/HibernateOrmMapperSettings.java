@@ -84,6 +84,20 @@ public final class HibernateOrmMapperSettings {
 	public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = PREFIX + Radicals.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK;
 
 	/**
+	 * Valid only when {@link #AUTOMATIC_INDEXING_STRATEGY} is
+	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING}.
+	 * <p>
+	 * Whether the all relevant indexing events present on the outbox table should be processed and deleted from
+	 * the same table by background processes.
+	 * <p>
+	 * Expects a Boolean value such as {@code true} or {@code false},
+	 * or a string that can be parsed to such Boolean value.
+	 * <p>
+	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE}.
+	 */
+	public static final String AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE = PREFIX + Radicals.AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE;
+
+	/**
 	 * The strategy to use when loading entities during the execution of a search query.
 	 * <p>
 	 * Expects a {@link EntityLoadingCacheLookupStrategy} value, or a String representation of such value.
@@ -153,6 +167,8 @@ public final class HibernateOrmMapperSettings {
 		public static final String AUTOMATIC_INDEXING_STRATEGY = AUTOMATIC_INDEXING_PREFIX + "strategy";
 		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = AUTOMATIC_INDEXING_PREFIX + "synchronization.strategy";
 		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = AUTOMATIC_INDEXING_PREFIX + "enable_dirty_check";
+		public static final String PROCESS_OUTBOX_TABLE = "process_outbox_table";
+		public static final String AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE = AUTOMATIC_INDEXING_PREFIX + PROCESS_OUTBOX_TABLE;
 		public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = "query.loading.cache_lookup.strategy";
 		public static final String QUERY_LOADING_FETCH_SIZE = "query.loading.fetch_size";
 		public static final String MAPPING_PROCESS_ANNOTATIONS = "mapping.process_annotations";
@@ -174,6 +190,7 @@ public final class HibernateOrmMapperSettings {
 		public static final BeanReference<AutomaticIndexingSynchronizationStrategy> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
 				BeanReference.of( AutomaticIndexingSynchronizationStrategy.class, "write-sync" );
 		public static final boolean AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = true;
+		public static final boolean AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE = true;
 		public static final EntityLoadingCacheLookupStrategy QUERY_LOADING_CACHE_LOOKUP_STRATEGY =
 				EntityLoadingCacheLookupStrategy.SKIP;
 		public static final int QUERY_LOADING_FETCH_SIZE = 100;
