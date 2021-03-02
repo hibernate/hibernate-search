@@ -25,7 +25,10 @@ import com.google.gson.JsonObject;
 
 public class ElasticsearchGeoPointSpatialWithinPolygonPredicate extends AbstractElasticsearchSingleFieldPredicate {
 
-	private static final JsonObjectAccessor GEO_POLYGON_ACCESSOR = JsonAccessor.root().property( "geo_polygon" ).asObject();
+	private static final JsonObjectAccessor GEO_POLYGON_ACCESSOR =
+			JsonAccessor.root().property( "geo_polygon" ).asObject();
+	private static final JsonAccessor<Boolean> IGNORE_UNMAPPED_ACCESSOR =
+			JsonAccessor.root().property( "ignore_unmapped" ).asBoolean();
 
 	private static final String POINTS_PROPERTY_NAME = "points";
 
@@ -50,6 +53,13 @@ public class ElasticsearchGeoPointSpatialWithinPolygonPredicate extends Abstract
 		pointsObject.add( POINTS_PROPERTY_NAME, pointsArray );
 
 		innerObject.add( absoluteFieldPath, pointsObject );
+
+		if ( indexNames().size() > 1 ) {
+			// There are multiple target indexes; some of them may not declare the field.
+			// Instruct ES to behave as if the field had no value in that case.
+			IGNORE_UNMAPPED_ACCESSOR.set( innerObject, true );
+		}
+
 		GEO_POLYGON_ACCESSOR.set( outerObject, innerObject );
 		return outerObject;
 	}
