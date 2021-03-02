@@ -38,6 +38,13 @@ public final class DocumentRouteDescriptor implements Serializable {
 		return Objects.hash( routingKey );
 	}
 
+	@Override
+	public String toString() {
+		return "DocumentRouteDescriptor{" +
+				"routingKey='" + routingKey + '\'' +
+				'}';
+	}
+
 	public String routingKey() {
 		return routingKey;
 	}
