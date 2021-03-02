@@ -140,17 +140,6 @@ public final class HibernateOrmMapperSettings {
 	public static final String SCHEMA_MANAGEMENT_STRATEGY = PREFIX + Radicals.SCHEMA_MANAGEMENT_STRATEGY;
 
 	/**
-	 * Whether the outbox table should be filled with the all relevant indexing events,
-	 * for future/deferred processing.
-	 * <p>
-	 * Expects a Boolean value such as {@code true} or {@code false},
-	 * or a string that can be parsed to such Boolean value.
-	 * <p>
-	 * Defaults to {@link Defaults#FILL_OUTBOX_TABLE}.
-	 */
-	public static final String FILL_OUTBOX_TABLE = PREFIX + Radicals.FILL_OUTBOX_TABLE;
-
-	/**
 	 * Configuration property keys without the {@link #PREFIX prefix}.
 	 */
 	public static final class Radicals {
@@ -169,7 +158,6 @@ public final class HibernateOrmMapperSettings {
 		public static final String MAPPING_PROCESS_ANNOTATIONS = "mapping.process_annotations";
 		public static final String MAPPING_CONFIGURER = "mapping.configurer";
 		public static final String SCHEMA_MANAGEMENT_STRATEGY = "schema_management.strategy";
-		public static final String FILL_OUTBOX_TABLE = "fill_outbox_table";
 	}
 
 	/**
@@ -191,7 +179,6 @@ public final class HibernateOrmMapperSettings {
 		public static final int QUERY_LOADING_FETCH_SIZE = 100;
 		public static final boolean MAPPING_PROCESS_ANNOTATIONS = true;
 		public static final SchemaManagementStrategyName SCHEMA_MANAGEMENT_STRATEGY = SchemaManagementStrategyName.CREATE_OR_VALIDATE;
-		public static final boolean FILL_OUTBOX_TABLE = false;
 	}
 
 }
