@@ -24,9 +24,12 @@ import com.google.gson.JsonObject;
 
 public class ElasticsearchGeoPointSpatialWithinCirclePredicate extends AbstractElasticsearchSingleFieldPredicate {
 
-	private static final JsonObjectAccessor GEO_DISTANCE_ACCESSOR = JsonAccessor.root().property( "geo_distance" ).asObject();
-
-	private static final JsonAccessor<Double> DISTANCE_ACCESSOR = JsonAccessor.root().property( "distance" ).asDouble();
+	private static final JsonObjectAccessor GEO_DISTANCE_ACCESSOR =
+			JsonAccessor.root().property( "geo_distance" ).asObject();
+	private static final JsonAccessor<Double> DISTANCE_ACCESSOR =
+			JsonAccessor.root().property( "distance" ).asDouble();
+	private static final JsonAccessor<Boolean> IGNORE_UNMAPPED_ACCESSOR =
+			JsonAccessor.root().property( "ignore_unmapped" ).asBoolean();
 
 	private final double distanceInMeters;
 	private final JsonElement center;
@@ -42,6 +45,12 @@ public class ElasticsearchGeoPointSpatialWithinCirclePredicate extends AbstractE
 			JsonObject innerObject) {
 		DISTANCE_ACCESSOR.set( innerObject, distanceInMeters );
 		innerObject.add( absoluteFieldPath, center );
+
+		if ( indexNames().size() > 1 ) {
+			// There are multiple target indexes; some of them may not declare the field.
+			// Instruct ES to behave as if the field had no value in that case.
+			IGNORE_UNMAPPED_ACCESSOR.set( innerObject, true );
+		}
 
 		GEO_DISTANCE_ACCESSOR.set( outerObject, innerObject );
 		return outerObject;

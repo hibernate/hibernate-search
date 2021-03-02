@@ -24,7 +24,10 @@ import com.google.gson.JsonObject;
 
 public class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicate extends AbstractElasticsearchSingleFieldPredicate {
 
-	private static final JsonObjectAccessor GEO_BOUNDING_BOX_ACCESSOR = JsonAccessor.root().property( "geo_bounding_box" ).asObject();
+	private static final JsonObjectAccessor GEO_BOUNDING_BOX_ACCESSOR =
+			JsonAccessor.root().property( "geo_bounding_box" ).asObject();
+	private static final JsonAccessor<Boolean> IGNORE_UNMAPPED_ACCESSOR =
+			JsonAccessor.root().property( "ignore_unmapped" ).asBoolean();
 
 	private static final String TOP_LEFT_PROPERTY_NAME = "top_left";
 	private static final String BOTTOM_RIGHT_PROPERTY_NAME = "bottom_right";
@@ -46,6 +49,12 @@ public class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicate extends Abst
 		boundingBoxObject.add( BOTTOM_RIGHT_PROPERTY_NAME, bottomRight );
 
 		innerObject.add( absoluteFieldPath, boundingBoxObject );
+
+		if ( indexNames().size() > 1 ) {
+			// There are multiple target indexes; some of them may not declare the field.
+			// Instruct ES to behave as if the field had no value in that case.
+			IGNORE_UNMAPPED_ACCESSOR.set( innerObject, true );
+		}
 
 		GEO_BOUNDING_BOX_ACCESSOR.set( outerObject, innerObject );
 		return outerObject;
