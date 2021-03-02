@@ -12,18 +12,21 @@ import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMa
 import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.OUTBOX_ENTITY_NAME;
 import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.ROUTE_PROPERTY_NAME;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
+import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -37,6 +40,7 @@ import org.junit.Test;
 public class OutboxTableAutomaticIndexingStrategyIT {
 
 	private static final String INDEX_NAME = "IndexedEntity";
+	private static final String ANOTHER_INDEX_NAME = "AnotherIndexedEntity";
 
 	@Rule
 	public BackendMock backendMock = new BackendMock();
@@ -49,7 +53,17 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 	@Before
 	public void setup() {
 		backendMock.expectSchema(
-				INDEX_NAME, b -> b.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) ) );
+				INDEX_NAME,
+				b -> b.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
+		);
+		backendMock.expectSchema(
+				ANOTHER_INDEX_NAME,
+				b -> b.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
+		);
+		backendMock.expectSchema(
+				RoutedIndexedEntity.INDEX_NAME,
+				b -> b.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
+		);
 
 		sessionFactory = ormSetupHelper.start()
 				.withProperty(
@@ -60,51 +74,168 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 							indexedEntityMapping.indexed().index( INDEX_NAME );
 							indexedEntityMapping.property( "id" ).documentId();
 							indexedEntityMapping.property( "text" ).fullTextField();
+
+							TypeMappingStep anotherIndexedEntityMapping = mapping.type( AnotherIndexedEntity.class );
+							anotherIndexedEntityMapping.indexed().index( ANOTHER_INDEX_NAME );
+							anotherIndexedEntityMapping.property( "id" ).documentId();
+							anotherIndexedEntityMapping.property( "text" ).fullTextField();
+
+							TypeMappingStep routedIndexedEntityMapping = mapping.type( RoutedIndexedEntity.class );
+							routedIndexedEntityMapping.indexed()
+									.index( RoutedIndexedEntity.INDEX_NAME )
+									.routingBinder( new CustomRoutingBridge.CustomRoutingBinder() );
+							routedIndexedEntityMapping.property( "id" ).documentId();
+							routedIndexedEntityMapping.property( "text" ).fullTextField();
 						}
 				)
 				.withProperty(
 						"hibernate.search.automatic_indexing.strategy",
 						"org.hibernate.search.mapper.orm.outbox.impl.OutboxTableAutomaticIndexingStrategy"
 				)
-				.setup( IndexedEntity.class );
+				.setup( IndexedEntity.class, AnotherIndexedEntity.class, RoutedIndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
-	public void test() {
+	public void insertUpdateDelete() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity indexedPojo = new IndexedEntity( 1, "Using some text here" );
 			session.save( indexedPojo );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			Query<Map> query = session.createQuery( "select e from " + OUTBOX_ENTITY_NAME + " e", Map.class );
+			List<Map> outboxEntries = findOutboxEntries( session );
 
-			List<Map> list = query.list();
-			assertThat( list ).hasSize( 1 );
+			assertThat( outboxEntries ).hasSize( 1 );
+			verifyOutboxEntry( outboxEntries.get( 0 ), INDEX_NAME, "1", null );
+		} );
 
-			Map<String, Object> load = list.get( 0 );
-			assertThat( load ).containsEntry( ENTITY_NAME_PROPERTY_NAME, "IndexedEntity" );
-			assertThat( load ).containsEntry( ENTITY_ID_PROPERTY_NAME, "1" );
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity = session.load( IndexedEntity.class, 1 );
+			entity.setText( "Change the test of this entity!" );
+		} );
 
-			byte[] serializedRoutingKeys = (byte[]) load.get( ROUTE_PROPERTY_NAME );
-			DocumentRoutesDescriptor routesDescriptor = SerializationUtils.deserialize(
-					DocumentRoutesDescriptor.class, serializedRoutingKeys );
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			List<Map> outboxEntries = findOutboxEntries( session );
 
-			assertThat( routesDescriptor ).isNotNull();
-			assertThat( routesDescriptor.currentRoute().routingKey() ).isNull();
-			assertThat( routesDescriptor.previousRoutes() ).isEmpty();
+			assertThat( outboxEntries ).hasSize( 2 );
+			verifyOutboxEntry( outboxEntries.get( 1 ), INDEX_NAME, "1", null );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity = session.load( IndexedEntity.class, 1 );
+			session.delete( entity );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			List<Map> outboxEntries = findOutboxEntries( session );
+
+			assertThat( outboxEntries ).hasSize( 3 );
+			verifyOutboxEntry( outboxEntries.get( 2 ), INDEX_NAME, "1", null );
 		} );
 	}
 
-	@Entity(name = "IndexedEntity")
+	@Test
+	public void multipleInstances() {
+		for ( int i = 1; i <= 7; i++ ) {
+			IndexedEntity indexedPojo = new IndexedEntity( i, "Using some text here" );
+			OrmUtils.withinTransaction( sessionFactory, session -> {
+				session.save( indexedPojo );
+			} );
+		}
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			List<Map> outboxEntries = findOutboxEntries( session );
+
+			assertThat( outboxEntries ).hasSize( 7 );
+			for ( int i = 0; i < 7; i++ ) {
+				verifyOutboxEntry( outboxEntries.get( i ), INDEX_NAME, ( i + 1 ) + "", null );
+			}
+		} );
+	}
+
+	@Test
+	public void multipleTypes() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity indexedPojo = new IndexedEntity( 1, "Using some text here" );
+			session.save( indexedPojo );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			AnotherIndexedEntity indexedPojo = new AnotherIndexedEntity( 1, "Using some text here" );
+			session.save( indexedPojo );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			List<Map> outboxEntries = findOutboxEntries( session );
+
+			assertThat( outboxEntries ).hasSize( 2 );
+			verifyOutboxEntry( outboxEntries.get( 0 ), INDEX_NAME, "1", null );
+			verifyOutboxEntry( outboxEntries.get( 1 ), ANOTHER_INDEX_NAME, "1", null );
+		} );
+	}
+
+	@Test
+	public void routingKeys() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			RoutedIndexedEntity indexedPojo = new RoutedIndexedEntity( 1, "Using some text here" );
+			session.save( indexedPojo );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			List<Map> outboxEntries = findOutboxEntries( session );
+
+			assertThat( outboxEntries ).hasSize( 1 );
+			verifyOutboxEntry(
+					outboxEntries.get( 0 ), RoutedIndexedEntity.INDEX_NAME, "1", "1" );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			RoutedIndexedEntity entity = session.load( RoutedIndexedEntity.class, 1 );
+			entity.setText( "Change the test of this entity!" );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			List<Map> outboxEntries = findOutboxEntries( session );
+
+			assertThat( outboxEntries ).hasSize( 2 );
+			verifyOutboxEntry(
+					outboxEntries.get( 1 ), RoutedIndexedEntity.INDEX_NAME, "1", "4",
+					"0", "1", "2", "3", "5", "6" ); // previous routing keys
+		} );
+	}
+
+	private List<Map> findOutboxEntries(Session session) {
+		return session.createQuery( "select e from " + OUTBOX_ENTITY_NAME + " e order by id", Map.class ).list();
+	}
+
+	private void verifyOutboxEntry(Map<String, Object> outboxEntry, String entityName, String entityId,
+			String currentRoute, String ... previousRoutes) {
+		assertThat( outboxEntry ).containsEntry( ENTITY_NAME_PROPERTY_NAME, entityName );
+		assertThat( outboxEntry ).containsEntry( ENTITY_ID_PROPERTY_NAME, entityId );
+
+		byte[] serializedRoutingKeys = (byte[]) outboxEntry.get( ROUTE_PROPERTY_NAME );
+		DocumentRoutesDescriptor routesDescriptor = SerializationUtils.deserialize(
+				DocumentRoutesDescriptor.class, serializedRoutingKeys );
+
+		assertThat( routesDescriptor ).isNotNull();
+		assertThat( routesDescriptor.currentRoute().routingKey() ).isEqualTo( currentRoute );
+
+		List<DocumentRouteDescriptor> descriptors = Arrays.stream( previousRoutes )
+				.map( routingKey -> DocumentRouteDescriptor.of( routingKey ) )
+				.collect( Collectors.toList() );
+
+		assertThat( routesDescriptor.previousRoutes() ).isEqualTo( descriptors );
+	}
+
+	@Entity(name = INDEX_NAME)
 	public static class IndexedEntity {
 
 		@Id
 		private Integer id;
 		private String text;
 
-		private IndexedEntity() {
+		public IndexedEntity() {
 		}
 
 		public IndexedEntity(Integer id, String text) {
@@ -118,6 +249,38 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 
 		public String getText() {
 			return text;
+		}
+
+		public void setText(String text) {
+			this.text = text;
+		}
+	}
+
+	@Entity(name = ANOTHER_INDEX_NAME)
+	public static class AnotherIndexedEntity {
+
+		@Id
+		private Integer id;
+		private String text;
+
+		public AnotherIndexedEntity() {
+		}
+
+		public AnotherIndexedEntity(Integer id, String text) {
+			this.id = id;
+			this.text = text;
+		}
+
+		public Integer getId() {
+			return id;
+		}
+
+		public String getText() {
+			return text;
+		}
+
+		public void setText(String text) {
+			this.text = text;
 		}
 	}
 }
