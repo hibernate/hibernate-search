@@ -37,6 +37,7 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 	public static final String ENTITY_NAME_PROPERTY_NAME = "entityName";
 	public static final String ENTITY_ID_PROPERTY_NAME = "entityId";
 	public static final String ROUTE_PROPERTY_NAME = "route";
+	public static final String EVENT_TYPE_PROPERTY_NAME = "eventType";
 
 	private static final String OUTBOX_TABLE_NAME = "HIBERNATE_SEARCH_OUTBOX_TABLE";
 	private static final String OUTBOX_ENTITY_DEFINITION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
@@ -54,6 +55,7 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 			"        <property name=\"" + ENTITY_NAME_PROPERTY_NAME + "\" column=\"ENTITY_NAME\" type=\"string\" />\n" +
 			"        <property name=\"" + ENTITY_ID_PROPERTY_NAME + "\" column=\"ENTITY_ID\" type=\"string\" />\n" +
 			"        <property name=\"" + ROUTE_PROPERTY_NAME + "\" column=\"ROUTE\" type=\"binary\" length=\"8192\" />\n" +
+			"		 <property name=\"" + EVENT_TYPE_PROPERTY_NAME + "\" column=\"EVENT_TYPE\" type=\"integer\" />\n" +
 			"    </class>\n" +
 			"</hibernate-mapping>\n";
 

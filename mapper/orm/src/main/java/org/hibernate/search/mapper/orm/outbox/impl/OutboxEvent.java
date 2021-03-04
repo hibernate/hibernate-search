@@ -14,14 +14,24 @@ import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
 public final class OutboxEvent {
 
+	public enum Type {
+		ADD, ADD_OR_UPDATE, DELETE
+	}
+
+	private final Type type;
 	private final String entityName;
 	private final String serializedId;
 	private final byte[] serializedRoutes;
 
-	public OutboxEvent(String entityName, String serializedId, DocumentRoutesDescriptor routesDescriptor) {
+	public OutboxEvent(Type type, String entityName, String serializedId, DocumentRoutesDescriptor routesDescriptor) {
+		this.type = type;
 		this.entityName = entityName;
 		this.serializedId = serializedId;
 		this.serializedRoutes = SerializationUtils.serialize( routesDescriptor );
+	}
+
+	public Type getType() {
+		return type;
 	}
 
 	public String getEntityName() {
@@ -45,13 +55,13 @@ public final class OutboxEvent {
 			return false;
 		}
 		OutboxEvent that = (OutboxEvent) o;
-		return Objects.equals( entityName, that.entityName ) && Objects.equals(
+		return type == that.type && Objects.equals( entityName, that.entityName ) && Objects.equals(
 				serializedId, that.serializedId ) && Arrays.equals( serializedRoutes, that.serializedRoutes );
 	}
 
 	@Override
 	public int hashCode() {
-		int result = Objects.hash( entityName, serializedId );
+		int result = Objects.hash( type, entityName, serializedId );
 		result = 31 * result + Arrays.hashCode( serializedRoutes );
 		return result;
 	}
@@ -59,9 +69,9 @@ public final class OutboxEvent {
 	@Override
 	public String toString() {
 		return "OutboxEvent{" +
-				"entityName='" + entityName + '\'' +
+				"type=" + type +
+				", entityName='" + entityName + '\'' +
 				", serializedId='" + serializedId + '\'' +
-				", serializedRoutes=" + Arrays.toString( serializedRoutes ) +
 				'}';
 	}
 }
