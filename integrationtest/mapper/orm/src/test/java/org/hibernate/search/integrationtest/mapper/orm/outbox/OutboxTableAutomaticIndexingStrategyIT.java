@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.outbox;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.ENTITY_ID_PROPERTY_NAME;
 import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.ENTITY_NAME_PROPERTY_NAME;
+import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.EVENT_TYPE_PROPERTY_NAME;
 import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.OUTBOX_ENTITY_NAME;
 import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.ROUTE_PROPERTY_NAME;
 
@@ -24,6 +25,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
+import org.hibernate.search.mapper.orm.outbox.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
@@ -107,7 +109,7 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 			List<Map> outboxEntries = findOutboxEntries( session );
 
 			assertThat( outboxEntries ).hasSize( 1 );
-			verifyOutboxEntry( outboxEntries.get( 0 ), INDEX_NAME, "1", null );
+			verifyOutboxEntry( outboxEntries.get( 0 ), INDEX_NAME, "1", OutboxEvent.Type.ADD, null );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -119,7 +121,7 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 			List<Map> outboxEntries = findOutboxEntries( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
-			verifyOutboxEntry( outboxEntries.get( 1 ), INDEX_NAME, "1", null );
+			verifyOutboxEntry( outboxEntries.get( 1 ), INDEX_NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE, null );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -131,7 +133,7 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 			List<Map> outboxEntries = findOutboxEntries( session );
 
 			assertThat( outboxEntries ).hasSize( 3 );
-			verifyOutboxEntry( outboxEntries.get( 2 ), INDEX_NAME, "1", null );
+			verifyOutboxEntry( outboxEntries.get( 2 ), INDEX_NAME, "1", OutboxEvent.Type.DELETE, null );
 		} );
 	}
 
@@ -149,7 +151,7 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 
 			assertThat( outboxEntries ).hasSize( 7 );
 			for ( int i = 0; i < 7; i++ ) {
-				verifyOutboxEntry( outboxEntries.get( i ), INDEX_NAME, ( i + 1 ) + "", null );
+				verifyOutboxEntry( outboxEntries.get( i ), INDEX_NAME, ( i + 1 ) + "", OutboxEvent.Type.ADD, null );
 			}
 		} );
 	}
@@ -170,8 +172,8 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 			List<Map> outboxEntries = findOutboxEntries( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
-			verifyOutboxEntry( outboxEntries.get( 0 ), INDEX_NAME, "1", null );
-			verifyOutboxEntry( outboxEntries.get( 1 ), ANOTHER_INDEX_NAME, "1", null );
+			verifyOutboxEntry( outboxEntries.get( 0 ), INDEX_NAME, "1", OutboxEvent.Type.ADD, null );
+			verifyOutboxEntry( outboxEntries.get( 1 ), ANOTHER_INDEX_NAME, "1", OutboxEvent.Type.ADD, null );
 		} );
 	}
 
@@ -189,7 +191,7 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 
 			assertThat( outboxEntries ).hasSize( 1 );
 			verifyOutboxEntry(
-					outboxEntries.get( 0 ), RoutedIndexedEntity.INDEX_NAME, "1", "Blue" );
+					outboxEntries.get( 0 ), RoutedIndexedEntity.INDEX_NAME, "1", OutboxEvent.Type.ADD, "Blue" );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -203,7 +205,7 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 
 			assertThat( outboxEntries ).hasSize( 2 );
 			verifyOutboxEntry(
-					outboxEntries.get( 1 ), RoutedIndexedEntity.INDEX_NAME, "1", "Red",
+					outboxEntries.get( 1 ), RoutedIndexedEntity.INDEX_NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE, "Red",
 					"Blue", "Green", "Yellow", "White" ); // previous routing keys
 		} );
 	}
@@ -213,9 +215,10 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 	}
 
 	private void verifyOutboxEntry(Map<String, Object> outboxEntry, String entityName, String entityId,
-			String currentRoute, String ... previousRoutes) {
+			OutboxEvent.Type type, String currentRoute, String... previousRoutes) {
 		assertThat( outboxEntry ).containsEntry( ENTITY_NAME_PROPERTY_NAME, entityName );
 		assertThat( outboxEntry ).containsEntry( ENTITY_ID_PROPERTY_NAME, entityId );
+		assertThat( outboxEntry ).containsEntry( EVENT_TYPE_PROPERTY_NAME, type.ordinal() );
 
 		byte[] serializedRoutingKeys = (byte[]) outboxEntry.get( ROUTE_PROPERTY_NAME );
 		DocumentRoutesDescriptor routesDescriptor = SerializationUtils.deserialize(
