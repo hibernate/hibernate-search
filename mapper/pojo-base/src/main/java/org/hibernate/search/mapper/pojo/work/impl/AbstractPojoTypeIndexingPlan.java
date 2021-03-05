@@ -174,6 +174,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 				loadingOrdinal = root.loadingPlan().planLoading( typeContext().typeIdentifier(), identifier );
 			}
 		}
+
 		void resolveDirty() {
 			if ( shouldResolveToReindex ) {
 				shouldResolveToReindex = false; // Avoid infinite looping
@@ -211,6 +212,6 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 	protected enum EntityStatus {
 		UNKNOWN,
 		PRESENT,
-		ABSENT;
+		ABSENT
 	}
 }
