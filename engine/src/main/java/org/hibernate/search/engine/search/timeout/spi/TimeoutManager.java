@@ -153,7 +153,7 @@ public class TimeoutManager {
 	 * @return high precision duration of took time.
 	 */
 	public Duration tookTime() {
-		return Duration.ofMillis( timingSource.nanoTime() - nanoTimeStart );
+		return Duration.ofNanos( timingSource.nanoTime() - nanoTimeStart );
 	}
 
 	protected long elapsedTimeEstimateMillis() {
