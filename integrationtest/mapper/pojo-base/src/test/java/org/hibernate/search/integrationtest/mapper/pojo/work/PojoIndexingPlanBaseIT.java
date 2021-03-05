@@ -22,9 +22,13 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.mapper.javabean.loading.EntityLoader;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 
@@ -61,10 +65,12 @@ public class PojoIndexingPlanBaseIT {
 	public void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
 				.field( "value", String.class )
+				.objectField( "contained", b2 -> b2
+						.field( "value", String.class ) )
 		);
 
 		mapping = setupHelper.start()
-				.setup( IndexedEntity.class );
+				.setup( IndexedEntity.class, ContainedEntity.class );
 
 		backendMock.verifyExpectationsMet();
 	}
@@ -177,6 +183,79 @@ public class PojoIndexingPlanBaseIT {
 
 			expectations.createdThenExecuted();
 		}
+	}
+
+	@Test
+	public void dirtyPaths_root() {
+		IndexedEntity indexed = new IndexedEntity( 1 );
+
+		// Update with relevant dirty path
+		try ( SearchSession session = mapping.createSession() ) {
+			session.indexingPlan().addOrUpdate( indexed, "value" );
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.addOrUpdate( "1", b -> b.field( "value", "val1" ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		// Update with irrelevant dirty path
+		try ( SearchSession session = mapping.createSession() ) {
+			session.indexingPlan().addOrUpdate( indexed, "notIndexed" );
+		}
+		backendMock.verifyExpectationsMet();
+
+		// Update with a mix of relevant and irrelevant dirty paths
+		try ( SearchSession session = mapping.createSession() ) {
+			session.indexingPlan().addOrUpdate( indexed, "value", "notIndexed" );
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.addOrUpdate( "1", b -> b.field( "value", "val1" ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void dirtyPaths_contained() {
+		IndexedEntity indexed = new IndexedEntity( 1 );
+		ContainedEntity contained = new ContainedEntity( 2 );
+		indexed.contained = contained;
+		contained.containing = indexed;
+
+		// Update with relevant dirty path
+		try ( SearchSession session = mapping.createSession() ) {
+			contained.value = "val3";
+			session.indexingPlan().addOrUpdate( 2, null, contained, "value" );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.addOrUpdate( "1", b -> b
+							.field( "value", "val1" )
+							.objectField( "contained", b2 -> b2
+									.field( "value", "val3" ) ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		// Update with irrelevant dirty path
+		try ( SearchSession session = mapping.createSession() ) {
+			contained.notIndexed = "foo";
+			session.indexingPlan().addOrUpdate( 2, null, contained, "notIndexed" );
+		}
+		backendMock.verifyExpectationsMet();
+
+		// Update with a mix of relevant and irrelevant dirty paths
+		try ( SearchSession session = mapping.createSession() ) {
+			contained.value = "val4";
+			contained.notIndexed = "bar";
+			session.indexingPlan().addOrUpdate( 2, null, contained, "value", "notIndexed" );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.addOrUpdate( "1", b -> b
+							.field( "value", "val1" )
+							.objectField( "contained", b2 -> b2
+									.field( "value", "val4" ) ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
 	}
 
 	/**
@@ -359,8 +438,29 @@ public class PojoIndexingPlanBaseIT {
 		@GenericField
 		private String value;
 
+		private String notIndexed;
+
+		@IndexedEmbedded
+		private ContainedEntity contained;
+
 		public IndexedEntity(int id) {
 			this.id = id;
+			this.value = "val" + id;
+		}
+
+	}
+
+	public static final class ContainedEntity {
+
+		@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "contained")))
+		private IndexedEntity containing;
+
+		@GenericField
+		private String value;
+
+		private String notIndexed;
+
+		public ContainedEntity(int id) {
 			this.value = "val" + id;
 		}
 
