@@ -33,8 +33,8 @@ public abstract class PojoImplicitReindexingResolverNode<T> implements AutoClose
 	 *  @param collector A collector for entities that should be reindexed.
 	 * @param dirty A value that is dirty to some extent.
 	 * @param context The set of dirty paths in the object passed to the root reindexing resolver
- * (resolvers may delegate to other resolvers, but they will always pass the same dirtiness state to delegates).
- * {@code null} can be passed to mean "no information", in which case all paths are considered dirty.
+	 * (resolvers may delegate to other resolvers, but they will always pass the same dirtiness state to delegates).
+	 * {@code null} can be passed to mean "no information", in which case all paths are considered dirty.
 	 */
 	public abstract void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			T dirty, PojoImplicitReindexingResolverRootContext context);
