@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.automaticindexing.impl;
 
-import java.util.BitSet;
-
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
@@ -48,9 +46,7 @@ public class PojoImplicitReindexingResolverDirtinessFilterNode<T> extends PojoIm
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			T dirty, PojoImplicitReindexingResolverRootContext context) {
-		BitSet dirtinessState = context.dirtinessState();
-		// See method javadoc: null means we must consider all paths as dirty
-		if ( dirtinessState == null || dirtyPathFilter.test( dirtinessState ) ) {
+		if ( context.isDirty( dirtyPathFilter ) ) {
 			nested.resolveEntitiesToReindex( collector, dirty, context );
 		}
 	}

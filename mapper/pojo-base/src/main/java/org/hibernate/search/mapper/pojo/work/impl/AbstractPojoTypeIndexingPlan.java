@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.spi.PojoImplicitReindexingResolverSessionContext;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
@@ -102,9 +103,9 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		EntityStatus initialStatus = EntityStatus.UNKNOWN;
 		EntityStatus currentStatus = EntityStatus.UNKNOWN;
 
-		boolean shouldResolveToReindex;
-		boolean considerAllDirty;
-		BitSet dirtyPaths;
+		private boolean shouldResolveToReindex;
+		private boolean considerAllDirty;
+		private BitSet dirtyPaths;
 
 		AbstractEntityState(I identifier) {
 			this.identifier = identifier;
@@ -116,8 +117,8 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		}
 
 		@Override
-		public BitSet dirtinessState() {
-			return dirtyPaths;
+		public boolean isDirty(PojoPathFilter filter) {
+			return considerAllDirty || dirtyPaths != null && filter.test( dirtyPaths );
 		}
 
 		void add(Supplier<E> entitySupplier) {
