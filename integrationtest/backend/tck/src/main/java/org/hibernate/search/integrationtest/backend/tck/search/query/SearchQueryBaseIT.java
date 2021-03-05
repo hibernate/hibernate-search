@@ -11,10 +11,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatResult;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assume.assumeTrue;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -39,6 +39,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubLoadingContext;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -68,14 +69,15 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4183")
 	public void tookAndTimedOut() {
 		SearchQuery<DocumentReference> query = matchAllSortedByScoreQuery()
 				.toQuery();
 
 		SearchResult<DocumentReference> result = query.fetchAll();
 
-		assertNotNull( result.took() );
-		assertFalse( result.timedOut() );
+		assertThat( result.took() ).isBetween( Duration.ZERO, Duration.of( 1, ChronoUnit.MINUTES ) );
+		assertThat( result.timedOut() ).isFalse();
 	}
 
 	@Test
