@@ -7,15 +7,9 @@
 package org.hibernate.search.integrationtest.mapper.orm.outbox;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.ENTITY_ID_PROPERTY_NAME;
-import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.ENTITY_NAME_PROPERTY_NAME;
-import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.EVENT_TYPE_PROPERTY_NAME;
-import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.OUTBOX_ENTITY_NAME;
-import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.ROUTE_PROPERTY_NAME;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -106,7 +100,7 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			List<Map> outboxEntries = findOutboxEntries( session );
+			List<OutboxEvent> outboxEntries = findOutboxEntries( session );
 
 			assertThat( outboxEntries ).hasSize( 1 );
 			verifyOutboxEntry( outboxEntries.get( 0 ), INDEX_NAME, "1", OutboxEvent.Type.ADD, null );
@@ -118,7 +112,7 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			List<Map> outboxEntries = findOutboxEntries( session );
+			List<OutboxEvent> outboxEntries = findOutboxEntries( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
 			verifyOutboxEntry( outboxEntries.get( 1 ), INDEX_NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE, null );
@@ -130,7 +124,7 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			List<Map> outboxEntries = findOutboxEntries( session );
+			List<OutboxEvent> outboxEntries = findOutboxEntries( session );
 
 			assertThat( outboxEntries ).hasSize( 3 );
 			verifyOutboxEntry( outboxEntries.get( 2 ), INDEX_NAME, "1", OutboxEvent.Type.DELETE, null );
@@ -147,7 +141,7 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 		}
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			List<Map> outboxEntries = findOutboxEntries( session );
+			List<OutboxEvent> outboxEntries = findOutboxEntries( session );
 
 			assertThat( outboxEntries ).hasSize( 7 );
 			for ( int i = 0; i < 7; i++ ) {
@@ -169,7 +163,7 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			List<Map> outboxEntries = findOutboxEntries( session );
+			List<OutboxEvent> outboxEntries = findOutboxEntries( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
 			verifyOutboxEntry( outboxEntries.get( 0 ), INDEX_NAME, "1", OutboxEvent.Type.ADD, null );
@@ -187,7 +181,7 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			List<Map> outboxEntries = findOutboxEntries( session );
+			List<OutboxEvent> outboxEntries = findOutboxEntries( session );
 
 			assertThat( outboxEntries ).hasSize( 1 );
 			verifyOutboxEntry(
@@ -201,7 +195,7 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			List<Map> outboxEntries = findOutboxEntries( session );
+			List<OutboxEvent> outboxEntries = findOutboxEntries( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
 			verifyOutboxEntry(
@@ -210,17 +204,17 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 		} );
 	}
 
-	private List<Map> findOutboxEntries(Session session) {
-		return session.createQuery( "select e from " + OUTBOX_ENTITY_NAME + " e order by id", Map.class ).list();
+	private List<OutboxEvent> findOutboxEntries(Session session) {
+		return session.createQuery( "select e from OutboxEvent e order by id", OutboxEvent.class ).list();
 	}
 
-	private void verifyOutboxEntry(Map<String, Object> outboxEntry, String entityName, String entityId,
+	private void verifyOutboxEntry(OutboxEvent outboxEvent, String entityName, String serializedId,
 			OutboxEvent.Type type, String currentRoute, String... previousRoutes) {
-		assertThat( outboxEntry ).containsEntry( ENTITY_NAME_PROPERTY_NAME, entityName );
-		assertThat( outboxEntry ).containsEntry( ENTITY_ID_PROPERTY_NAME, entityId );
-		assertThat( outboxEntry ).containsEntry( EVENT_TYPE_PROPERTY_NAME, type.ordinal() );
+		assertThat( outboxEvent.getEntityName() ).isEqualTo( entityName );
+		assertThat( outboxEvent.getSerializedId() ).isEqualTo( serializedId );
+		assertThat( outboxEvent.getType() ).isEqualTo( type );
 
-		byte[] serializedRoutingKeys = (byte[]) outboxEntry.get( ROUTE_PROPERTY_NAME );
+		byte[] serializedRoutingKeys = outboxEvent.getSerializedRoutes();
 		DocumentRoutesDescriptor routesDescriptor = SerializationUtils.deserialize(
 				DocumentRoutesDescriptor.class, serializedRoutingKeys );
 

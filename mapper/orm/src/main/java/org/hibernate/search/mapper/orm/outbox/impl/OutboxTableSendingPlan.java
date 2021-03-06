@@ -6,14 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.outbox.impl;
 
-import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.ENTITY_ID_PROPERTY_NAME;
-import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.ENTITY_NAME_PROPERTY_NAME;
-import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.EVENT_TYPE_PROPERTY_NAME;
-import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.OUTBOX_ENTITY_NAME;
-import static org.hibernate.search.mapper.orm.outbox.impl.OutboxAdditionalJaxbMappingProducer.ROUTE_PROPERTY_NAME;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -59,13 +52,7 @@ public class OutboxTableSendingPlan implements AutomaticIndexingQueueEventSendin
 		MultiEntityOperationExecutionReport.Builder<R> builder = MultiEntityOperationExecutionReport.builder();
 		for ( OutboxEvent event : events ) {
 			try {
-				HashMap<String, Object> entityData = new HashMap<>();
-				entityData.put( ENTITY_NAME_PROPERTY_NAME, event.getEntityName() );
-				entityData.put( ENTITY_ID_PROPERTY_NAME, event.getSerializedId() );
-				entityData.put( ROUTE_PROPERTY_NAME, event.getSerializedRoutes() );
-				entityData.put( EVENT_TYPE_PROPERTY_NAME, event.getType().ordinal() );
-
-				session.persist( OUTBOX_ENTITY_NAME, entityData );
+				session.persist( event );
 			}
 			catch (RuntimeException e) {
 				builder.throwable( e );

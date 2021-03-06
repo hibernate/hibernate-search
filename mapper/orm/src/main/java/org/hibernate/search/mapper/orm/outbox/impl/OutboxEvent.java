@@ -18,32 +18,60 @@ public final class OutboxEvent {
 		ADD, ADD_OR_UPDATE, DELETE
 	}
 
-	private final Type type;
-	private final String entityName;
-	private final String serializedId;
-	private final byte[] serializedRoutes;
+	private Integer id;
+	private String entityName;
+	private String serializedId;
+	private byte[] serializedRoutes;
+	private Type type;
+
+	public OutboxEvent() {
+	}
 
 	public OutboxEvent(Type type, String entityName, String serializedId, DocumentRoutesDescriptor routesDescriptor) {
-		this.type = type;
 		this.entityName = entityName;
 		this.serializedId = serializedId;
 		this.serializedRoutes = SerializationUtils.serialize( routesDescriptor );
+		this.type = type;
 	}
 
-	public Type getType() {
-		return type;
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	public String getEntityName() {
 		return entityName;
 	}
 
+	public void setEntityName(String entityName) {
+		this.entityName = entityName;
+	}
+
 	public String getSerializedId() {
 		return serializedId;
 	}
 
+	public void setSerializedId(String serializedId) {
+		this.serializedId = serializedId;
+	}
+
 	public byte[] getSerializedRoutes() {
 		return serializedRoutes;
+	}
+
+	public void setSerializedRoutes(byte[] serializedRoutes) {
+		this.serializedRoutes = serializedRoutes;
+	}
+
+	public Type getType() {
+		return type;
+	}
+
+	public void setType(Type type) {
+		this.type = type;
 	}
 
 	@Override
