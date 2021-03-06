@@ -27,18 +27,18 @@ public class OutboxTableSendingPlan implements AutomaticIndexingQueueEventSendin
 
 	@Override
 	public void add(String entityName, Object identifier, String serializedId, DocumentRoutesDescriptor routes) {
-		events.add( new OutboxEvent( OutboxEvent.Type.ADD, entityName, serializedId, routes ) );
+		events.add( new OutboxEvent( entityName, serializedId, routes, OutboxEvent.Type.ADD, identifier ) );
 	}
 
 	@Override
 	public void addOrUpdate(String entityName, Object identifier, String serializedId,
 			DocumentRoutesDescriptor routes) {
-		events.add( new OutboxEvent( OutboxEvent.Type.ADD_OR_UPDATE, entityName, serializedId, routes ) );
+		events.add( new OutboxEvent( entityName, serializedId, routes, OutboxEvent.Type.ADD_OR_UPDATE, identifier ) );
 	}
 
 	@Override
 	public void delete(String entityName, Object identifier, String serializedId, DocumentRoutesDescriptor routes) {
-		events.add( new OutboxEvent( OutboxEvent.Type.DELETE, entityName, serializedId, routes ) );
+		events.add( new OutboxEvent( entityName, serializedId, routes, OutboxEvent.Type.DELETE, identifier ) );
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class OutboxTableSendingPlan implements AutomaticIndexingQueueEventSendin
 			catch (RuntimeException e) {
 				builder.throwable( e );
 				builder.failingEntityReference(
-						entityReferenceFactory, event.getEntityName(), event.getSerializedId() );
+						entityReferenceFactory, event.getEntityName(), event.getIdentifier() );
 			}
 		}
 		session.flush();

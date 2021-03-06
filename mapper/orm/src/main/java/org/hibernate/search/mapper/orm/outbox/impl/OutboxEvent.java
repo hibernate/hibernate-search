@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.outbox.impl;
 
 import java.util.Arrays;
 import java.util.Objects;
+import javax.persistence.Transient;
 
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
@@ -24,14 +25,19 @@ public final class OutboxEvent {
 	private byte[] serializedRoutes;
 	private Type type;
 
+	@Transient
+	private Object identifier;
+
 	public OutboxEvent() {
 	}
 
-	public OutboxEvent(Type type, String entityName, String serializedId, DocumentRoutesDescriptor routesDescriptor) {
+	public OutboxEvent(String entityName, String serializedId, DocumentRoutesDescriptor routesDescriptor, Type type,
+			Object identifier) {
 		this.entityName = entityName;
 		this.serializedId = serializedId;
 		this.serializedRoutes = SerializationUtils.serialize( routesDescriptor );
 		this.type = type;
+		this.identifier = identifier;
 	}
 
 	public Integer getId() {
@@ -72,6 +78,14 @@ public final class OutboxEvent {
 
 	public void setType(Type type) {
 		this.type = type;
+	}
+
+	public Object getIdentifier() {
+		return identifier;
+	}
+
+	public void setIdentifier(Object identifier) {
+		this.identifier = identifier;
 	}
 
 	@Override
