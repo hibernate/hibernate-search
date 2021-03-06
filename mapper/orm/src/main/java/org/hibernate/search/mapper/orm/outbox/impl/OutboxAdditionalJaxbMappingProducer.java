@@ -33,31 +33,30 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static final String OUTBOX_ENTITY_NAME = "HibernateSearchOutboxEntity";
-	public static final String ENTITY_NAME_PROPERTY_NAME = "entityName";
-	public static final String ENTITY_ID_PROPERTY_NAME = "entityId";
-	public static final String ROUTE_PROPERTY_NAME = "route";
-	public static final String EVENT_TYPE_PROPERTY_NAME = "eventType";
-
 	private static final String OUTBOX_TABLE_NAME = "HIBERNATE_SEARCH_OUTBOX_TABLE";
+
 	private static final String OUTBOX_ENTITY_DEFINITION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-			"\n" +
-			"<hibernate-mapping>\n" +
-			"    <class entity-name=\"" + OUTBOX_ENTITY_NAME + "\" table=\"" + OUTBOX_TABLE_NAME + "\">\n" +
-			"        <id name=\"id\" column=\"ID\" type=\"integer\">\n" +
-			"            <generator class=\"org.hibernate.id.enhanced.SequenceStyleGenerator\">\n" +
-			"                <param name=\"sequence_name\">" + OUTBOX_TABLE_NAME + "_GENERATOR</param>\n" +
-			"                <param name=\"table_name\">" + OUTBOX_TABLE_NAME + "_GENERATOR</param>\n" +
-			"                <param name=\"initial_value\">1</param>\n" +
-			"                <param name=\"increment_size\">1</param>\n" +
-			"            </generator>\n\r" +
-			"        </id>\n\r" +
-			"        <property name=\"" + ENTITY_NAME_PROPERTY_NAME + "\" column=\"ENTITY_NAME\" type=\"string\" />\n" +
-			"        <property name=\"" + ENTITY_ID_PROPERTY_NAME + "\" column=\"ENTITY_ID\" type=\"string\" />\n" +
-			"        <property name=\"" + ROUTE_PROPERTY_NAME + "\" column=\"ROUTE\" type=\"binary\" length=\"8192\" />\n" +
-			"		 <property name=\"" + EVENT_TYPE_PROPERTY_NAME + "\" column=\"EVENT_TYPE\" type=\"integer\" />\n" +
-			"    </class>\n" +
-			"</hibernate-mapping>\n";
+	"\n" +
+	"<hibernate-mapping>\n" +
+	"    <class name=\"" + OutboxEvent.class.getName() + "\" table=\"" + OUTBOX_TABLE_NAME + "\">\n" +
+	"        <id name=\"id\" column=\"ID\" type=\"integer\">\n" +
+	"            <generator class=\"org.hibernate.id.enhanced.SequenceStyleGenerator\">\n" +
+	"                <param name=\"sequence_name\">" + OUTBOX_TABLE_NAME + "_GENERATOR</param>\n" +
+	"                <param name=\"table_name\">" + OUTBOX_TABLE_NAME + "_GENERATOR</param>\n" +
+	"                <param name=\"initial_value\">1</param>\n" +
+	"                <param name=\"increment_size\">1</param>\n" +
+	"            </generator>\n\r" +
+	"        </id>\n\r" +
+	"        <property name=\"entityName\" type=\"string\" />\n" +
+	"        <property name=\"serializedId\" type=\"string\" />\n" +
+	"        <property name=\"serializedRoutes\" type=\"binary\" length=\"8192\" />\n" +
+	"		 <property name=\"type\" >\n" +
+	" 			 <type name=\"org.hibernate.type.EnumType\">\n" +
+	" 				 <param name=\"enumClass\">" + OutboxEvent.Type.class.getName() + "</param>\n" +
+	" 			 </type>\n" +
+	"		 </property>\n" +
+	"    </class>\n" +
+	"</hibernate-mapping>\n";
 
 	@Override
 	public Collection<MappingDocument> produceAdditionalMappings(final MetadataImplementor metadata,
