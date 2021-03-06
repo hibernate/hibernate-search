@@ -27,4 +27,10 @@ public final class AutomaticIndexingStrategyNames {
 	 */
 	public static final String SESSION = "session";
 
+	/**
+	 * When entities are modified in the Hibernate ORM session, indexing events are stored in the Outbox table.
+	 * At the same time a background thread uses the table to update the indexes.
+	 */
+	public static final String OUTBOX_POLLING = "outbox-polling";
+
 }
