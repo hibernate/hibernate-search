@@ -178,7 +178,9 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 	@Test
 	public void routingKeys() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			RoutedIndexedEntity indexedPojo = new RoutedIndexedEntity( 1, "Using some text here" );
+			RoutedIndexedEntity indexedPojo = new RoutedIndexedEntity( 1, "Using some text here",
+					RoutedIndexedEntity.Color.Blue
+			);
 			session.save( indexedPojo );
 		} );
 
@@ -187,12 +189,13 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 
 			assertThat( outboxEntries ).hasSize( 1 );
 			verifyOutboxEntry(
-					outboxEntries.get( 0 ), RoutedIndexedEntity.INDEX_NAME, "1", "1" );
+					outboxEntries.get( 0 ), RoutedIndexedEntity.INDEX_NAME, "1", "Blue" );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			RoutedIndexedEntity entity = session.load( RoutedIndexedEntity.class, 1 );
 			entity.setText( "Change the test of this entity!" );
+			entity.setColor( RoutedIndexedEntity.Color.Red );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -200,8 +203,8 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 
 			assertThat( outboxEntries ).hasSize( 2 );
 			verifyOutboxEntry(
-					outboxEntries.get( 1 ), RoutedIndexedEntity.INDEX_NAME, "1", "4",
-					"0", "1", "2", "3", "5", "6" ); // previous routing keys
+					outboxEntries.get( 1 ), RoutedIndexedEntity.INDEX_NAME, "1", "Red",
+					"Blue", "Green", "Yellow", "White" ); // previous routing keys
 		} );
 	}
 
