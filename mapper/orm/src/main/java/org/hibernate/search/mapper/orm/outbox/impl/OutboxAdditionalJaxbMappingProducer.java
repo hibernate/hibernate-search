@@ -21,6 +21,7 @@ import org.hibernate.boot.model.source.internal.hbm.MappingDocument;
 import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.engine.config.spi.ConfigurationService;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -65,8 +66,8 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 		ConfigurationService service = serviceRegistry.getService( ConfigurationService.class );
 
 		Object customIndexingStrategy = service.getSettings().get( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY );
-		if ( customIndexingStrategy == null || !OutboxTableAutomaticIndexingStrategy.class.getName().equals(
-				customIndexingStrategy ) ) {
+		if ( customIndexingStrategy == null ||
+				!AutomaticIndexingStrategyNames.OUTBOX_POLLING.equals( customIndexingStrategy ) ) {
 			return Collections.emptyList();
 		}
 

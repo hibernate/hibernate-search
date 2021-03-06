@@ -84,10 +84,7 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 							routedIndexedEntityMapping.property( "text" ).fullTextField();
 						}
 				)
-				.withProperty(
-						"hibernate.search.automatic_indexing.strategy",
-						"org.hibernate.search.mapper.orm.outbox.impl.OutboxTableAutomaticIndexingStrategy"
-				)
+				.withProperty( "hibernate.search.automatic_indexing.strategy", "outbox-polling" )
 				.setup( IndexedEntity.class, AnotherIndexedEntity.class, RoutedIndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
