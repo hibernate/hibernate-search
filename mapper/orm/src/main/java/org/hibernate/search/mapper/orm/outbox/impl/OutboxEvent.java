@@ -20,24 +20,25 @@ public final class OutboxEvent {
 	}
 
 	private Integer id;
-	private String entityName;
-	private String serializedId;
-	private byte[] serializedRoutes;
 	private Type type;
 
+	private String entityName;
+	private String entityId;
+	private byte[] documentRoutes;
 	@Transient
-	private Object identifier;
+	private Object originalEntityId;
 
 	public OutboxEvent() {
 	}
 
-	public OutboxEvent(String entityName, String serializedId, DocumentRoutesDescriptor routesDescriptor, Type type,
-			Object identifier) {
-		this.entityName = entityName;
-		this.serializedId = serializedId;
-		this.serializedRoutes = SerializationUtils.serialize( routesDescriptor );
+	public OutboxEvent(
+			Type type, String entityName, String entityId, DocumentRoutesDescriptor documentRoutesDescriptor,
+			Object originalEntityId) {
 		this.type = type;
-		this.identifier = identifier;
+		this.entityName = entityName;
+		this.entityId = entityId;
+		this.documentRoutes = SerializationUtils.serialize( documentRoutesDescriptor );
+		this.originalEntityId = originalEntityId;
 	}
 
 	public Integer getId() {
@@ -48,30 +49,6 @@ public final class OutboxEvent {
 		this.id = id;
 	}
 
-	public String getEntityName() {
-		return entityName;
-	}
-
-	public void setEntityName(String entityName) {
-		this.entityName = entityName;
-	}
-
-	public String getSerializedId() {
-		return serializedId;
-	}
-
-	public void setSerializedId(String serializedId) {
-		this.serializedId = serializedId;
-	}
-
-	public byte[] getSerializedRoutes() {
-		return serializedRoutes;
-	}
-
-	public void setSerializedRoutes(byte[] serializedRoutes) {
-		this.serializedRoutes = serializedRoutes;
-	}
-
 	public Type getType() {
 		return type;
 	}
@@ -80,12 +57,36 @@ public final class OutboxEvent {
 		this.type = type;
 	}
 
-	public Object getIdentifier() {
-		return identifier;
+	public String getEntityName() {
+		return entityName;
 	}
 
-	public void setIdentifier(Object identifier) {
-		this.identifier = identifier;
+	public void setEntityName(String entityName) {
+		this.entityName = entityName;
+	}
+
+	public String getEntityId() {
+		return entityId;
+	}
+
+	public void setEntityId(String entityId) {
+		this.entityId = entityId;
+	}
+
+	public byte[] getDocumentRoutes() {
+		return documentRoutes;
+	}
+
+	public void setDocumentRoutes(byte[] documentRoutes) {
+		this.documentRoutes = documentRoutes;
+	}
+
+	public Object getOriginalEntityId() {
+		return originalEntityId;
+	}
+
+	public void setOriginalEntityId(Object originalEntityId) {
+		this.originalEntityId = originalEntityId;
 	}
 
 	@Override
@@ -96,15 +97,15 @@ public final class OutboxEvent {
 		if ( o == null || getClass() != o.getClass() ) {
 			return false;
 		}
-		OutboxEvent that = (OutboxEvent) o;
-		return type == that.type && Objects.equals( entityName, that.entityName ) && Objects.equals(
-				serializedId, that.serializedId ) && Arrays.equals( serializedRoutes, that.serializedRoutes );
+		OutboxEvent event = (OutboxEvent) o;
+		return type == event.type && Objects.equals( entityName, event.entityName ) && Objects.equals(
+				entityId, event.entityId ) && Arrays.equals( documentRoutes, event.documentRoutes );
 	}
 
 	@Override
 	public int hashCode() {
-		int result = Objects.hash( type, entityName, serializedId );
-		result = 31 * result + Arrays.hashCode( serializedRoutes );
+		int result = Objects.hash( type, entityName, entityId );
+		result = 31 * result + Arrays.hashCode( documentRoutes );
 		return result;
 	}
 
@@ -113,7 +114,7 @@ public final class OutboxEvent {
 		return "OutboxEvent{" +
 				"type=" + type +
 				", entityName='" + entityName + '\'' +
-				", serializedId='" + serializedId + '\'' +
+				", entityId='" + entityId + '\'' +
 				'}';
 	}
 }
