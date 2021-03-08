@@ -205,15 +205,15 @@ public class OutboxTableAutomaticIndexingStrategyIT {
 		return session.createQuery( "select e from OutboxEvent e order by id", OutboxEvent.class ).list();
 	}
 
-	private void verifyOutboxEntry(OutboxEvent outboxEvent, String entityName, String serializedId,
+	private void verifyOutboxEntry(OutboxEvent outboxEvent, String entityName, String entityId,
 			OutboxEvent.Type type, String currentRoute, String... previousRoutes) {
 		assertThat( outboxEvent.getEntityName() ).isEqualTo( entityName );
-		assertThat( outboxEvent.getSerializedId() ).isEqualTo( serializedId );
+		assertThat( outboxEvent.getEntityId() ).isEqualTo( entityId );
 		assertThat( outboxEvent.getType() ).isEqualTo( type );
 
-		byte[] serializedRoutingKeys = outboxEvent.getSerializedRoutes();
+		byte[] documentRoutes = outboxEvent.getDocumentRoutes();
 		DocumentRoutesDescriptor routesDescriptor = SerializationUtils.deserialize(
-				DocumentRoutesDescriptor.class, serializedRoutingKeys );
+				DocumentRoutesDescriptor.class, documentRoutes );
 
 		assertThat( routesDescriptor ).isNotNull();
 		assertThat( routesDescriptor.currentRoute().routingKey() ).isEqualTo( currentRoute );

@@ -49,8 +49,8 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 	"            </generator>\n\r" +
 	"        </id>\n\r" +
 	"        <property name=\"entityName\" type=\"string\" />\n" +
-	"        <property name=\"serializedId\" type=\"string\" />\n" +
-	"        <property name=\"serializedRoutes\" type=\"binary\" length=\"8192\" />\n" +
+	"        <property name=\"entityId\" type=\"string\" />\n" +
+	"        <property name=\"documentRoutes\" type=\"binary\" length=\"8192\" />\n" +
 	"		 <property name=\"type\" >\n" +
 	" 			 <type name=\"org.hibernate.type.EnumType\">\n" +
 	" 				 <param name=\"enumClass\">" + OutboxEvent.Type.class.getName() + "</param>\n" +
