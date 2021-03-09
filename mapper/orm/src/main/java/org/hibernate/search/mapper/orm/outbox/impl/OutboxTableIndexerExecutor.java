@@ -9,22 +9,16 @@ package org.hibernate.search.mapper.orm.outbox.impl;
 import static org.hibernate.search.mapper.orm.common.impl.TransactionUtils.withinTransaction;
 
 import java.lang.invoke.MethodHandles;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
-import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventProcessingPlan;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
 public class OutboxTableIndexerExecutor {
 
@@ -32,7 +26,6 @@ public class OutboxTableIndexerExecutor {
 	private static final int MAX_BATCH_SIZE = 50;
 
 	private final AutomaticIndexingMappingContext mapping;
-	private final Set<Integer> ids = new HashSet<>();
 	private final ScheduledExecutorService executor;
 
 	public OutboxTableIndexerExecutor(AutomaticIndexingMappingContext mapping,
@@ -62,63 +55,14 @@ public class OutboxTableIndexerExecutor {
 			List<OutboxEvent> events = findOutboxEntries( session );
 
 			while ( !events.isEmpty() ) {
-				AutomaticIndexingQueueEventProcessingPlan plan = mapping.createIndexingQueueEventProcessingPlan(
-						session );
+				OutboxEventProcessing<OutboxEvent> eventProcessing = new OutboxEventProcessing<>(
+						mapping, session, events );
 
-				events = findOutboxEntries( session );
-				for ( OutboxEvent event : events ) {
-					DocumentRoutesDescriptor routes = getRoutes( event );
-
-					switch ( event.getType() ) {
-						case ADD:
-							plan.add( event.getEntityName(), event.getEntityId(), routes );
-							break;
-						case ADD_OR_UPDATE:
-							plan.addOrUpdate( event.getEntityName(), event.getEntityId(), routes );
-							break;
-						case DELETE:
-							plan.delete( event.getEntityName(), event.getEntityId(), routes );
-							break;
-					}
-					ids.add( event.getId() );
-				}
-
-				AtomicBoolean fail = new AtomicBoolean( false );
+				// TODO HSEARCH-4134 handle the failures
+				List<Integer> ids = eventProcessing.processEvents();
 
 				try {
-					List<OutboxEvent> finalEvents = events;
-					plan.executeAndReport().whenComplete( (report, throwable) -> {
-						if ( throwable != null ) {
-							for ( OutboxEvent event : finalEvents ) {
-								log.errorf( throwable, "Failed to process event '%s'", event );
-							}
-
-							fail.set( true );
-						}
-						else if ( report.throwable().isPresent() ) {
-							log.errorf(
-									report.throwable().get(), "Failed to reindex entities '%s'",
-									report.failingEntityReferences()
-							);
-
-							fail.set( true );
-						}
-					} ).get();
-				}
-				catch (Throwable throwable) {
-					for ( OutboxEvent event : events ) {
-						log.errorf( throwable, "Failed to process event '%s'", event );
-					}
-
-					fail.set( true );
-				}
-
-				if ( fail.get() ) {
-					return; // retry the batch in the next execution
-				}
-
-				try {
-					deleteOutboxEntities( session );
+					deleteOutboxEntities( session, ids );
 				}
 				catch (Throwable throwable) {
 					log.errorf( throwable, "Failed to delete outbox events from the outbox table" );
@@ -129,17 +73,13 @@ public class OutboxTableIndexerExecutor {
 		}
 	}
 
-	private static DocumentRoutesDescriptor getRoutes(OutboxEvent event) {
-		return SerializationUtils.deserialize( DocumentRoutesDescriptor.class, event.getDocumentRoutes() );
-	}
-
-	private List<OutboxEvent> findOutboxEntries(Session session) {
+	private static List<OutboxEvent> findOutboxEntries(Session session) {
 		Query<OutboxEvent> query = session.createQuery( "select e from OutboxEvent e order by id", OutboxEvent.class );
 		query.setMaxResults( MAX_BATCH_SIZE );
 		return query.list();
 	}
 
-	private int deleteOutboxEntities(Session session) {
+	private static int deleteOutboxEntities(Session session, List<Integer> ids) {
 		return withinTransaction( session, () -> {
 			Query query = session.createQuery( "delete from OutboxEvent e where e.id in :ids" );
 			query.setParameter( "ids", ids );
