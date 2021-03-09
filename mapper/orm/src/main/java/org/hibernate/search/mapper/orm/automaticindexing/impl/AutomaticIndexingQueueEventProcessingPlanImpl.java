@@ -45,4 +45,9 @@ public class AutomaticIndexingQueueEventProcessingPlanImpl implements AutomaticI
 	public CompletableFuture<MultiEntityOperationExecutionReport<EntityReference>> executeAndReport() {
 		return delegate.executeAndReport( entityReferenceFactory );
 	}
+
+	@Override
+	public String toSerializedId(String entityName, Object identifier) {
+		return delegate.toSerializedId( entityName, identifier );
+	}
 }

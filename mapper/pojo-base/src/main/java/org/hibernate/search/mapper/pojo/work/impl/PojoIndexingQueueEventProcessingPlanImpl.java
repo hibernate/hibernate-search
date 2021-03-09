@@ -12,6 +12,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
@@ -59,6 +60,14 @@ public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndex
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
 			EntityReferenceFactory<R> entityReferenceFactory) {
 		return delegate.executeAndReport( entityReferenceFactory );
+	}
+
+	@Override
+	public <I> String toSerializedId(String entityName, I identifier) {
+		@SuppressWarnings("unchecked") // the provided identifier is supposed to have the right type
+		IdentifierMappingImplementor<I, ?> identifierMapping =
+				(IdentifierMappingImplementor<I, ?>) typeContext( entityName ).identifierMapping();
+		return identifierMapping.toDocumentIdentifier( identifier, sessionContext.mappingContext() );
 	}
 
 	private PojoWorkIndexedTypeContext<?, ?> typeContext(String entityName) {

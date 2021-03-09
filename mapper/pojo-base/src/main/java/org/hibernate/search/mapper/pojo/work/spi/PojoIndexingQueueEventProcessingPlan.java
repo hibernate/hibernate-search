@@ -55,4 +55,15 @@ public interface PojoIndexingQueueEventProcessingPlan {
 	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
 			EntityReferenceFactory<R> entityReferenceFactory);
 
+	/**
+	 * Convert the identifier to its serialized form.
+	 * The identifier type must be the one used by the entity having name {@code entityName}.
+	 *
+	 * @param entityName The name of the entity
+	 * @param identifier The provided identifier
+	 * @param <I> The type of the identifier of the entity
+	 * @return The serialized for of the provided identifier
+	 */
+	<I> String toSerializedId(String entityName, I identifier);
+
 }
