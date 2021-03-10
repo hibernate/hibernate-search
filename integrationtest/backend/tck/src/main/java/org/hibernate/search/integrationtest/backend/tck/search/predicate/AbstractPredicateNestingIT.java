@@ -20,74 +20,110 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Test;
 
 public abstract class AbstractPredicateNestingIT {
 
-	private final SimpleMappedIndex<IndexBinding> index;
+	static final int MISSING_FIELD_INDEX_DOC_ORDINAL = 42;
+
+	private final SimpleMappedIndex<IndexBinding> mainIndex;
+	private final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex;
 	private final IndexBinding binding;
 	private final AbstractPredicateDataSet dataSet;
 
-	public AbstractPredicateNestingIT(SimpleMappedIndex<IndexBinding> index, AbstractPredicateDataSet dataSet) {
-		this.index = index;
-		this.binding = index.binding();
+	public AbstractPredicateNestingIT(SimpleMappedIndex<IndexBinding> mainIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
+			AbstractPredicateDataSet dataSet) {
+		this.mainIndex = mainIndex;
+		this.missingFieldIndex = missingFieldIndex;
+		this.binding = mainIndex.binding();
 		this.dataSet = dataSet;
 	}
 
 	@Test
 	public void nestedX2_explicit() {
-		assertThatQuery( index.query()
+		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested().objectField( binding.nested.absolutePath )
 						.nest( f.nested().objectField( binding.nested.nested.absolutePath )
 								.nest( predicate( f, binding.nested.nested, 0 ) )
 						) )
 				.routing( dataSet.routingKey ) )
-				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
 	}
 
 	@Test
 	public void nestedX2_implicit() {
-		assertThatQuery( index.query()
+		assertThatQuery( mainIndex.query()
 				.where( f -> predicate( f, binding.nested.nested, 0 ) )
 				.routing( dataSet.routingKey ) )
-				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
 	}
 
 	@Test
 	public void nestedX2_explicit_implicit() {
-		assertThatQuery( index.query()
+		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested().objectField( binding.nested.absolutePath )
 						.nest( predicate( f, binding.nested.nested, 0 ) ) )
 				.routing( dataSet.routingKey ) )
-				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
 	}
 
 	@Test
 	public void nestedX3_explicitX2_implicit() {
-		assertThatQuery( index.query()
+		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested().objectField( binding.nested.absolutePath )
 						.nest( f.nested().objectField( binding.nested.nested.absolutePath )
 								.nest( predicate( f, binding.nested.nested.nested, 0 ) ) ) )
 				.routing( dataSet.routingKey ) )
-				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
 	}
 
 	@Test
 	public void nestedX3_explicit_implicitX2() {
-		assertThatQuery( index.query()
+		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested().objectField( binding.nested.absolutePath )
 						.nest( predicate( f, binding.nested.nested.nested, 0 ) ) )
 				.routing( dataSet.routingKey ) )
-				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
 	}
 
 	@Test
 	public void nestedFlattenedNested_implicit() {
-		assertThatQuery( index.query()
-				.where( f -> predicate( f, index.binding().nested.flattened.nested, 0 ) )
+		assertThatQuery( mainIndex.query()
+				.where( f -> predicate( f, mainIndex.binding().nested.flattened.nested, 0 ) )
 				.routing( dataSet.routingKey ) )
-				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.docId( 0 ) );
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
+	}
+
+	/**
+	 * Test that no failure occurs when an implicit nested predicate targets a nested field
+	 * that only exists in one of the targeted indexes.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4173")
+	public void multiIndex_missingNestedField_implicit() {
+		StubMappingScope scope = mainIndex.createScope( missingFieldIndex );
+
+		// The "nested" predicate should not match anything in missingFieldIndex
+		assertThatQuery( scope.query()
+				.where( f -> predicate( f, binding.nested.nested, 0 ) )
+				.routing( dataSet.routingKey ) )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
+
+		// ... but it should not prevent the query from executing either:
+		// if the "nested" predicate is optional, it should be ignored for missingFieldIndex.
+		assertThatQuery( scope.query()
+				.where( f -> f.bool()
+						.should( predicate( f, binding.nested.nested, 0 ) )
+						.should( f.id().matching( dataSet.docId( MISSING_FIELD_INDEX_DOC_ORDINAL ) ) ) )
+				.routing( dataSet.routingKey ) )
+				.hasDocRefHitsAnyOrder( c -> c
+						.doc( mainIndex.typeName(), dataSet.docId( 0 ) )
+						.doc( missingFieldIndex.typeName(), dataSet.docId( MISSING_FIELD_INDEX_DOC_ORDINAL ) ) )
+				.hasTotalHitCount( 2 );
 	}
 
 	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding,
@@ -159,6 +195,15 @@ public abstract class AbstractPredicateNestingIT {
 		protected <F> void addValue(DocumentElement object, AbstractObjectBinding binding,
 				FieldTypeDescriptor<F> fieldType, F fieldValue) {
 			object.addValue( binding.field.get( fieldType ).reference, fieldValue );
+		}
+	}
+
+	static class MissingFieldIndexBinding {
+
+		MissingFieldIndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
+		}
+
+		protected void initDocument() {
 		}
 	}
 

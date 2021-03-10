@@ -47,17 +47,19 @@ public class ExistsPredicateObjectsBaseIT {
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						NestingIT.index, ScoreIT.index
+						NestingIT.mainIndex, NestingIT.missingFieldIndex,
+						ScoreIT.index
 				)
 				.setup();
 
-		final BulkIndexer nestingIndexer = NestingIT.index.bulkIndexer();
-		NestingIT.dataSets.forEach( d -> d.contribute( nestingIndexer ) );
+		final BulkIndexer nestingMainIndexer = NestingIT.mainIndex.bulkIndexer();
+		final BulkIndexer nestingMissingFieldIndexer = NestingIT.missingFieldIndex.bulkIndexer();
+		NestingIT.dataSets.forEach( d -> d.contribute( nestingMainIndexer, nestingMissingFieldIndexer ) );
 
 		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
 		ScoreIT.dataSets.forEach( d -> d.contribute( scoreIndexer ) );
 
-		nestingIndexer.join( scoreIndexer );
+		nestingMainIndexer.join( nestingMissingFieldIndexer, scoreIndexer );
 	}
 
 	@Test
@@ -77,9 +79,13 @@ public class ExistsPredicateObjectsBaseIT {
 			}
 		}
 
-		private static final SimpleMappedIndex<IndexBinding> index =
+		private static final SimpleMappedIndex<IndexBinding> mainIndex =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, Collections.singletonList( innerFieldType ) ) )
 						.name( "nesting" );
+
+		private static final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex =
+				SimpleMappedIndex.of( root -> new MissingFieldIndexBinding( root, Collections.singletonList( innerFieldType ) ) )
+						.name( "nesting_missingField" );
 
 		@Parameterized.Parameters(name = "{0}")
 		public static List<Object[]> parameters() {
@@ -89,7 +95,7 @@ public class ExistsPredicateObjectsBaseIT {
 		private final DataSet dataSet;
 
 		public NestingIT(DataSet dataSet) {
-			super( index, dataSet );
+			super( mainIndex, missingFieldIndex, dataSet );
 			this.dataSet = dataSet;
 		}
 
@@ -121,10 +127,12 @@ public class ExistsPredicateObjectsBaseIT {
 				this.structure = structure;
 			}
 
-			public void contribute(BulkIndexer scoreIndexer) {
-				scoreIndexer.add( docId( 0 ), routingKey, document -> index.binding()
+			public void contribute(BulkIndexer mainIndexer, BulkIndexer missingFieldIndexer) {
+				mainIndexer.add( docId( 0 ), routingKey, document -> mainIndex.binding()
 						.initDocument( document, innerFieldType, "irrelevant" ) );
-				scoreIndexer.add( docId( 1 ), routingKey, document -> { } );
+				mainIndexer.add( docId( 1 ), routingKey, document -> { } );
+				missingFieldIndexer.add( docId( MISSING_FIELD_INDEX_DOC_ORDINAL ), routingKey,
+						document -> missingFieldIndex.binding().initDocument() );
 			}
 		}
 	}

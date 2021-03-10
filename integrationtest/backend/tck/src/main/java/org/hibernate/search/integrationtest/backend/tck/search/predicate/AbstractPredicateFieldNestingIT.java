@@ -16,8 +16,9 @@ public abstract class AbstractPredicateFieldNestingIT<V extends AbstractPredicat
 
 	protected final DataSet<?, V> dataSet;
 
-	public AbstractPredicateFieldNestingIT(SimpleMappedIndex<IndexBinding> index, DataSet<?, V> dataSet) {
-		super( index, dataSet );
+	public AbstractPredicateFieldNestingIT(SimpleMappedIndex<IndexBinding> mainIndex,
+			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex, DataSet<?, V> dataSet) {
+		super( mainIndex, missingFieldIndex, dataSet );
 		this.dataSet = dataSet;
 	}
 
@@ -35,12 +36,16 @@ public abstract class AbstractPredicateFieldNestingIT<V extends AbstractPredicat
 			super( values );
 		}
 
-		public void contribute(SimpleMappedIndex<IndexBinding> index, BulkIndexer indexer) {
+		public void contribute(SimpleMappedIndex<IndexBinding> mainIndex, BulkIndexer mainIndexer,
+				SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex, BulkIndexer missingFieldIndexer) {
 			F fieldValue = values.fieldValue( 0 );
-			indexer.add( docId( 0 ), routingKey,
-					document -> index.binding().initDocument( document, fieldType, fieldValue ) );
+			mainIndexer.add( docId( 0 ), routingKey,
+					document -> mainIndex.binding().initDocument( document, fieldType, fieldValue ) );
 			// Also add an empty document that shouldn't match
-			indexer.add( docId( 1 ), routingKey, document -> { } );
+			mainIndexer.add( docId( 1 ), routingKey, document -> { } );
+
+			missingFieldIndexer.add( docId( MISSING_FIELD_INDEX_DOC_ORDINAL ), routingKey,
+					document -> missingFieldIndex.binding().initDocument() );
 		}
 	}
 }

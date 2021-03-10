@@ -48,7 +48,8 @@ public class RegexpPredicateBaseIT {
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						SingleFieldIT.index, MultiFieldIT.index, NestingIT.index,
+						SingleFieldIT.index, MultiFieldIT.index,
+						NestingIT.mainIndex, NestingIT.missingFieldIndex,
 						ScoreIT.index,
 						InvalidFieldIT.index, UnsupportedTypeIT.index,
 						SearchableIT.searchableYesIndex, SearchableIT.searchableNoIndex,
@@ -65,8 +66,10 @@ public class RegexpPredicateBaseIT {
 		final BulkIndexer multiFieldIndexer = MultiFieldIT.index.bulkIndexer();
 		MultiFieldIT.dataSets.forEach( d -> d.contribute( MultiFieldIT.index, multiFieldIndexer ) );
 
-		final BulkIndexer nestingIndexer = NestingIT.index.bulkIndexer();
-		NestingIT.dataSets.forEach( d -> d.contribute( NestingIT.index, nestingIndexer ) );
+		final BulkIndexer nestingMainIndexer = NestingIT.mainIndex.bulkIndexer();
+		final BulkIndexer nestingMissingFieldIndexer = NestingIT.missingFieldIndex.bulkIndexer();
+		NestingIT.dataSets.forEach( d -> d.contribute( NestingIT.mainIndex, nestingMainIndexer,
+				NestingIT.missingFieldIndex, nestingMissingFieldIndexer ) );
 
 		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
 		ScoreIT.dataSets.forEach( d -> d.contribute( ScoreIT.index, scoreIndexer ) );
@@ -81,7 +84,7 @@ public class RegexpPredicateBaseIT {
 				TypeCheckingNoConversionIT.missingFieldIndex, typeCheckingMissingFieldIndexer ) );
 
 		singleFieldIndexer.join(
-				multiFieldIndexer, nestingIndexer,
+				multiFieldIndexer, nestingMainIndexer, nestingMissingFieldIndexer,
 				scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer,
 				typeCheckingRawFieldCompatibleIndexer, typeCheckingMissingFieldIndexer
@@ -185,9 +188,13 @@ public class RegexpPredicateBaseIT {
 			}
 		}
 
-		private static final SimpleMappedIndex<IndexBinding> index =
+		private static final SimpleMappedIndex<IndexBinding> mainIndex =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "nesting" );
+
+		private static final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex =
+				SimpleMappedIndex.of( root -> new MissingFieldIndexBinding( root, supportedFieldTypes ) )
+						.name( "nesting_missingField" );
 
 		@Parameterized.Parameters(name = "{0}")
 		public static List<Object[]> parameters() {
@@ -195,7 +202,7 @@ public class RegexpPredicateBaseIT {
 		}
 
 		public NestingIT(DataSet<String, RegexpPredicateTestValues> dataSet) {
-			super( index, dataSet );
+			super( mainIndex, missingFieldIndex, dataSet );
 		}
 
 		@Override
