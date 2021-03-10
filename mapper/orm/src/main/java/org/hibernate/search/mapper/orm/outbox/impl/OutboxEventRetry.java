@@ -8,33 +8,24 @@ package org.hibernate.search.mapper.orm.outbox.impl;
 
 import java.util.Arrays;
 import java.util.Objects;
-import javax.persistence.Transient;
 
-import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
-import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
-
-public final class OutboxEvent implements OutboxEventBase {
+public class OutboxEventRetry implements OutboxEventBase {
 
 	private Integer id;
-	private Type type;
 
 	private String entityName;
 	private String entityId;
 	private byte[] documentRoutes;
-	@Transient
-	private Object originalEntityId;
 
-	public OutboxEvent() {
+	private int retries = 0;
+
+	public OutboxEventRetry() {
 	}
 
-	public OutboxEvent(
-			Type type, String entityName, String entityId, DocumentRoutesDescriptor documentRoutesDescriptor,
-			Object originalEntityId) {
-		this.type = type;
-		this.entityName = entityName;
-		this.entityId = entityId;
-		this.documentRoutes = SerializationUtils.serialize( documentRoutesDescriptor );
-		this.originalEntityId = originalEntityId;
+	public OutboxEventRetry(OutboxEventReference eventReference, byte[] documentRoutes) {
+		this.entityName = eventReference.getEntityName();
+		this.entityId = eventReference.getEntityId();
+		this.documentRoutes = documentRoutes;
 	}
 
 	@Override
@@ -42,17 +33,13 @@ public final class OutboxEvent implements OutboxEventBase {
 		return id;
 	}
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
 	@Override
 	public Type getType() {
-		return type;
+		return Type.ADD_OR_UPDATE;
 	}
 
-	public void setType(Type type) {
-		this.type = type;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	@Override
@@ -82,12 +69,12 @@ public final class OutboxEvent implements OutboxEventBase {
 		this.documentRoutes = documentRoutes;
 	}
 
-	public Object getOriginalEntityId() {
-		return originalEntityId;
+	public int getRetries() {
+		return retries;
 	}
 
-	public void setOriginalEntityId(Object originalEntityId) {
-		this.originalEntityId = originalEntityId;
+	public void setRetries(int retries) {
+		this.retries = retries;
 	}
 
 	@Override
@@ -98,24 +85,26 @@ public final class OutboxEvent implements OutboxEventBase {
 		if ( o == null || getClass() != o.getClass() ) {
 			return false;
 		}
-		OutboxEvent event = (OutboxEvent) o;
-		return type == event.type && Objects.equals( entityName, event.entityName ) && Objects.equals(
-				entityId, event.entityId ) && Arrays.equals( documentRoutes, event.documentRoutes );
+		OutboxEventRetry that = (OutboxEventRetry) o;
+		return Objects.equals( entityName, that.entityName ) && Objects.equals(
+				entityId, that.entityId ) && Arrays.equals( documentRoutes, that.documentRoutes );
 	}
 
 	@Override
 	public int hashCode() {
-		int result = Objects.hash( type, entityName, entityId );
+		int result = Objects.hash( entityName, entityId );
 		result = 31 * result + Arrays.hashCode( documentRoutes );
 		return result;
 	}
 
 	@Override
 	public String toString() {
-		return "OutboxEvent{" +
-				"type=" + type +
+		return "OutboxEventRetry{" +
+				"id=" + id +
 				", entityName='" + entityName + '\'' +
 				", entityId='" + entityId + '\'' +
+				", documentRoutes=" + Arrays.toString( documentRoutes ) +
+				", retries=" + retries +
 				'}';
 	}
 }
