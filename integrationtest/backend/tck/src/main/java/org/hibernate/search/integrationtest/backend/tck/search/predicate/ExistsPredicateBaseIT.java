@@ -39,7 +39,8 @@ public class ExistsPredicateBaseIT {
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						NestingIT.index, SingleFieldIT.index,
+						SingleFieldIT.index,
+						NestingIT.mainIndex, NestingIT.missingFieldIndex,
 						ScoreIT.index,
 						InvalidFieldIT.index,
 						SearchableIT.searchableYesIndex, SearchableIT.searchableNoIndex,
@@ -53,8 +54,10 @@ public class ExistsPredicateBaseIT {
 		final BulkIndexer singleFieldIndexer = SingleFieldIT.index.bulkIndexer();
 		SingleFieldIT.dataSets.forEach( d -> d.contribute( SingleFieldIT.index, singleFieldIndexer ) );
 
-		final BulkIndexer nestingIndexer = NestingIT.index.bulkIndexer();
-		NestingIT.dataSets.forEach( d -> d.contribute( NestingIT.index, nestingIndexer ) );
+		final BulkIndexer nestingMainIndexer = NestingIT.mainIndex.bulkIndexer();
+		final BulkIndexer nestingMissingFieldIndexer = NestingIT.missingFieldIndex.bulkIndexer();
+		NestingIT.dataSets.forEach( d -> d.contribute( NestingIT.mainIndex, nestingMainIndexer,
+				NestingIT.missingFieldIndex, nestingMissingFieldIndexer ) );
 
 		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
 		ScoreIT.dataSets.forEach( d -> d.contribute( scoreIndexer ) );
@@ -74,7 +77,7 @@ public class ExistsPredicateBaseIT {
 				ScaleCheckingIT.compatibleIndex, scaleCheckingCompatibleIndexer );
 
 		singleFieldIndexer.join(
-				nestingIndexer, scoreIndexer,
+				nestingMainIndexer, nestingMissingFieldIndexer, scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer,
 				typeCheckingRawFieldCompatibleIndexer, typeCheckingMissingFieldIndexer,
 				scaleCheckingMainIndexer, scaleCheckingCompatibleIndexer
@@ -226,9 +229,13 @@ public class ExistsPredicateBaseIT {
 			}
 		}
 
-		private static final SimpleMappedIndex<IndexBinding> index =
+		private static final SimpleMappedIndex<IndexBinding> mainIndex =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "nesting" );
+
+		private static final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex =
+				SimpleMappedIndex.of( root -> new MissingFieldIndexBinding( root, supportedFieldTypes ) )
+						.name( "nesting_missingField" );
 
 		@Parameterized.Parameters(name = "{0}")
 		public static List<Object[]> parameters() {
@@ -236,7 +243,7 @@ public class ExistsPredicateBaseIT {
 		}
 
 		public NestingIT(DataSet<F, ExistsPredicateTestValues<F>> dataSet) {
-			super( index, dataSet );
+			super( mainIndex, missingFieldIndex, dataSet );
 		}
 
 		@Override
