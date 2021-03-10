@@ -50,7 +50,8 @@ public class SpatialWithinCirclePredicateBaseIT {
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						SingleFieldIT.index, MultiFieldIT.index, NestingIT.index,
+						SingleFieldIT.index, MultiFieldIT.index,
+						NestingIT.mainIndex, NestingIT.missingFieldIndex,
 						ScoreIT.index,
 						InvalidFieldIT.index, UnsupportedTypeIT.index,
 						SearchableIT.searchableYesIndex, SearchableIT.searchableNoIndex,
@@ -67,8 +68,10 @@ public class SpatialWithinCirclePredicateBaseIT {
 		final BulkIndexer multiFieldIndexer = MultiFieldIT.index.bulkIndexer();
 		MultiFieldIT.dataSet.contribute( MultiFieldIT.index, multiFieldIndexer );
 
-		final BulkIndexer nestingIndexer = NestingIT.index.bulkIndexer();
-		NestingIT.dataSet.contribute( NestingIT.index, nestingIndexer );
+		final BulkIndexer nestingMainIndexer = NestingIT.mainIndex.bulkIndexer();
+		final BulkIndexer nestingMissingFieldIndexer = NestingIT.missingFieldIndex.bulkIndexer();
+		NestingIT.dataSet.contribute( NestingIT.mainIndex, nestingMainIndexer,
+				NestingIT.missingFieldIndex, nestingMissingFieldIndexer );
 
 		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
 		ScoreIT.dataSet.contribute( ScoreIT.index, scoreIndexer );
@@ -83,7 +86,7 @@ public class SpatialWithinCirclePredicateBaseIT {
 				TypeCheckingNoConversionIT.missingFieldIndex, typeCheckingMissingFieldIndexer );
 
 		singleFieldIndexer.join(
-				multiFieldIndexer, nestingIndexer,
+				multiFieldIndexer, nestingMainIndexer, nestingMissingFieldIndexer,
 				scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer,
 				typeCheckingRawFieldCompatibleIndexer, typeCheckingMissingFieldIndexer
@@ -157,12 +160,16 @@ public class SpatialWithinCirclePredicateBaseIT {
 		private static final DataSet<GeoPoint, SpatialWithinCirclePredicateTestValues> dataSet =
 				new DataSet<>( testValues() );
 
-		private static final SimpleMappedIndex<IndexBinding> index =
+		private static final SimpleMappedIndex<IndexBinding> mainIndex =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "nesting" );
 
+		private static final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex =
+				SimpleMappedIndex.of( root -> new MissingFieldIndexBinding( root, supportedFieldTypes ) )
+						.name( "nesting_missingField" );
+
 		public NestingIT() {
-			super( index, dataSet );
+			super( mainIndex, missingFieldIndex, dataSet );
 		}
 
 		@Override
