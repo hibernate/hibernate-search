@@ -50,7 +50,8 @@ public class MatchPredicateBaseIT {
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						SingleFieldIT.index, MultiFieldIT.index, NestingIT.index,
+						SingleFieldIT.index, MultiFieldIT.index,
+						NestingIT.mainIndex, NestingIT.missingFieldIndex,
 						AnalysisIT.index, AnalysisIT.compatibleIndex, AnalysisIT.incompatibleIndex,
 						ScoreIT.index,
 						InvalidFieldIT.index, UnsupportedTypeIT.index,
@@ -69,8 +70,10 @@ public class MatchPredicateBaseIT {
 		final BulkIndexer multiFieldIndexer = MultiFieldIT.index.bulkIndexer();
 		MultiFieldIT.dataSets.forEach( d -> d.contribute( MultiFieldIT.index, multiFieldIndexer ) );
 
-		final BulkIndexer nestingIndexer = NestingIT.index.bulkIndexer();
-		NestingIT.dataSets.forEach( d -> d.contribute( NestingIT.index, nestingIndexer ) );
+		final BulkIndexer nestingMainIndexer = NestingIT.mainIndex.bulkIndexer();
+		final BulkIndexer nestingMissingFieldIndexer = NestingIT.missingFieldIndex.bulkIndexer();
+		NestingIT.dataSets.forEach( d -> d.contribute( NestingIT.mainIndex, nestingMainIndexer,
+				NestingIT.missingFieldIndex, nestingMissingFieldIndexer ) );
 
 		final BulkIndexer analysisMainIndexIndexer = AnalysisIT.index.bulkIndexer();
 		final BulkIndexer analysisCompatibleIndexIndexer = AnalysisIT.compatibleIndex.bulkIndexer();
@@ -97,7 +100,7 @@ public class MatchPredicateBaseIT {
 				ScaleCheckingIT.compatibleIndex, scaleCheckingCompatibleIndexer );
 
 		singleFieldIndexer.join(
-				multiFieldIndexer, nestingIndexer,
+				multiFieldIndexer, nestingMainIndexer, nestingMissingFieldIndexer,
 				analysisMainIndexIndexer, analysisCompatibleIndexIndexer, analysisIncompatibleIndexIndexer,
 				scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer,
@@ -203,9 +206,13 @@ public class MatchPredicateBaseIT {
 			}
 		}
 
-		private static final SimpleMappedIndex<IndexBinding> index =
+		private static final SimpleMappedIndex<IndexBinding> mainIndex =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
 						.name( "nesting" );
+
+		private static final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex =
+				SimpleMappedIndex.of( root -> new MissingFieldIndexBinding( root, supportedFieldTypes ) )
+						.name( "nesting_missingField" );
 
 		@Parameterized.Parameters(name = "{0}")
 		public static List<Object[]> parameters() {
@@ -213,7 +220,7 @@ public class MatchPredicateBaseIT {
 		}
 
 		public NestingIT(DataSet<F, MatchPredicateTestValues<F>> dataSet) {
-			super( index, dataSet );
+			super( mainIndex, missingFieldIndex, dataSet );
 		}
 
 		@Override

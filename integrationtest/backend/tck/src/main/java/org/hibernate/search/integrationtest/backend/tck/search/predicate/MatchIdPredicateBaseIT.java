@@ -31,17 +31,19 @@ public class MatchIdPredicateBaseIT {
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						NestingIT.index, ScoreIT.index
+						NestingIT.mainIndex, NestingIT.missingFieldIndex,
+						ScoreIT.index
 				)
 				.setup();
 
-		final BulkIndexer nestingIndexer = NestingIT.index.bulkIndexer();
-		NestingIT.dataSet.contribute( nestingIndexer );
+		final BulkIndexer nestingMainIndexer = NestingIT.mainIndex.bulkIndexer();
+		final BulkIndexer nestingMissingFieldIndexer = NestingIT.missingFieldIndex.bulkIndexer();
+		NestingIT.dataSet.contribute( nestingMainIndexer, nestingMissingFieldIndexer );
 
 		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
 		ScoreIT.dataSet.contribute( scoreIndexer );
 
-		nestingIndexer.join( scoreIndexer );
+		nestingMainIndexer.join( nestingMissingFieldIndexer, scoreIndexer );
 	}
 
 	@Test
@@ -52,12 +54,16 @@ public class MatchIdPredicateBaseIT {
 	public static class NestingIT extends AbstractPredicateNestingIT {
 		private static final DataSet dataSet = new DataSet();
 
-		private static final SimpleMappedIndex<IndexBinding> index =
+		private static final SimpleMappedIndex<IndexBinding> mainIndex =
 				SimpleMappedIndex.of( root -> new IndexBinding( root, FieldTypeDescriptor.getAll() ) )
 						.name( "nesting" );
 
+		private static final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex =
+				SimpleMappedIndex.of( root -> new MissingFieldIndexBinding( root, FieldTypeDescriptor.getAll() ) )
+						.name( "nesting_missingField" );
+
 		public NestingIT() {
-			super( index, dataSet );
+			super( mainIndex, missingFieldIndex, dataSet );
 		}
 
 		@Override
@@ -71,11 +77,13 @@ public class MatchIdPredicateBaseIT {
 				super( "singleRoutingKey" );
 			}
 
-			public void contribute(BulkIndexer scoreIndexer) {
-				scoreIndexer.add( docId( 0 ), routingKey, document -> index.binding()
+			public void contribute(BulkIndexer mainIndexer, BulkIndexer missingFieldIndexer) {
+				mainIndexer.add( docId( 0 ), routingKey, document -> mainIndex.binding()
 						.initDocument( document, AnalyzedStringFieldTypeDescriptor.INSTANCE, "irrelevant" ) );
-				scoreIndexer.add( docId( 1 ), routingKey, document -> index.binding()
+				mainIndexer.add( docId( 1 ), routingKey, document -> mainIndex.binding()
 						.initDocument( document, AnalyzedStringFieldTypeDescriptor.INSTANCE, "irrelevant" ) );
+				missingFieldIndexer.add( docId( MISSING_FIELD_INDEX_DOC_ORDINAL ), routingKey,
+						document -> missingFieldIndex.binding().initDocument() );
 			}
 		}
 	}
