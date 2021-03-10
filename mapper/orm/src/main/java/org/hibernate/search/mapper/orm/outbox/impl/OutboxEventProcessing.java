@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.Session;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
@@ -52,6 +54,10 @@ public class OutboxEventProcessing<Event extends OutboxEventBase> {
 
 	public Map<OutboxEventReference, List<Event>> getFailedEvents() {
 		return failedEvents;
+	}
+
+	public Set<Event> getFailedEventsSet() {
+		return failedEvents.values().stream().flatMap( events -> events.stream() ).collect( Collectors.toSet() );
 	}
 
 	private void addEventsToThePlan() {

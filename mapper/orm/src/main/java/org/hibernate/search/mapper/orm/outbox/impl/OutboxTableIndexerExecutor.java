@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -30,6 +31,8 @@ public class OutboxTableIndexerExecutor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private static final int MAX_BATCH_SIZE = 50;
+	private static final int MAX_RETRIALS_LOADED_AT_EACH_TIME = 5000;
+	private static final int MAX_RETRIES = 3;
 
 	private final AutomaticIndexingMappingContext mapping;
 	private final ScheduledExecutorService executor;
@@ -58,35 +61,93 @@ public class OutboxTableIndexerExecutor {
 
 	private void run() {
 		try ( Session session = mapping.sessionFactory().openSession() ) {
-			List<OutboxEvent> events = findOutboxEntries( session );
-
-			while ( !events.isEmpty() ) {
-				OutboxEventProcessing<OutboxEvent> eventProcessing = new OutboxEventProcessing<>(
-						mapping, session, events );
-				List<Integer> ids = eventProcessing.processEvents();
-
-				try {
-					createNewOutboxRetrials( session, eventProcessing.getFailedEvents() );
-				}
-				catch (Throwable throwable) {
-					log.errorf( throwable, "Failed to store outbox events for future retrials" );
-				}
-
-				try {
-					deleteOutboxEntities( session, ids );
-				}
-				catch (Throwable throwable) {
-					log.errorf( throwable, "Failed to delete outbox events from the outbox table" );
-				}
-
-				events = findOutboxEntries( session );
-			}
+			processOutboxRetrialsEntities( session );
+		}
+		try ( Session session = mapping.sessionFactory().openSession() ) {
+			processOutboxEntities( session );
 		}
 	}
 
-	private static List<OutboxEvent> findOutboxEntries(Session session) {
+	private void processOutboxEntities(Session session) {
+		List<OutboxEvent> events = findOutboxEntities( session );
+
+		while ( !events.isEmpty() ) {
+			OutboxEventProcessing<OutboxEvent> eventProcessing = new OutboxEventProcessing<>(
+					mapping, session, events );
+			List<Integer> ids = eventProcessing.processEvents();
+
+			try {
+				createNewOutboxRetrials( session, eventProcessing.getFailedEvents() );
+			}
+			catch (Throwable throwable) {
+				log.errorf( throwable, "Failed to store outbox events for future retrials" );
+			}
+
+			try {
+				deleteOutboxEntities( session, ids );
+			}
+			catch (Throwable throwable) {
+				log.errorf( throwable, "Failed to delete outbox events from the outbox table" );
+			}
+
+			events = findOutboxEntities( session );
+		}
+	}
+
+	private void processOutboxRetrialsEntities(Session session) {
+		List<OutboxEventRetry> allEvents = findOutboxRetrialsEntities( session );
+
+		int from = 0;
+		int to = Math.min( from + MAX_BATCH_SIZE, allEvents.size() );
+
+		while ( from < allEvents.size() ) {
+			List<OutboxEventRetry> events = allEvents.subList( from, to );
+
+			OutboxEventProcessing<OutboxEventRetry> eventProcessing = new OutboxEventProcessing<>(
+					mapping, session, events );
+			eventProcessing.processEvents();
+			Set<OutboxEventRetry> failedEvents = eventProcessing.getFailedEventsSet();
+
+			try {
+				for ( OutboxEventRetry event : events ) {
+					updateEventState( session, failedEvents, event );
+				}
+			}
+			catch (Throwable throwable) {
+				log.errorf( throwable, "Failed to process the outbox entities retrials" );
+			}
+
+			from += MAX_BATCH_SIZE;
+			to = Math.min( from + MAX_BATCH_SIZE, allEvents.size() );
+		}
+	}
+
+	private void updateEventState(Session session, Set<OutboxEventRetry> failedEvents, OutboxEventRetry event) {
+		if ( !failedEvents.contains( event ) ) {
+			// processed:
+			session.delete( event );
+			return;
+		}
+
+		if ( event.getRetries() > MAX_RETRIES ) {
+			log.warnf( "Max '%s' retries exhausted to process the event '%s'", MAX_RETRIES, event );
+			session.delete( event );
+			return;
+		}
+
+		event.setRetries( event.getRetries() + 1 );
+		session.update( event );
+	}
+
+	private static List<OutboxEvent> findOutboxEntities(Session session) {
 		Query<OutboxEvent> query = session.createQuery( "select e from OutboxEvent e order by id", OutboxEvent.class );
 		query.setMaxResults( MAX_BATCH_SIZE );
+		return query.list();
+	}
+
+	private static List<OutboxEventRetry> findOutboxRetrialsEntities(Session session) {
+		Query<OutboxEventRetry> query = session.createQuery( "select e from OutboxEventRetry e order by id", OutboxEventRetry.class );
+		query.setMaxResults( MAX_RETRIALS_LOADED_AT_EACH_TIME );
 		return query.list();
 	}
 
