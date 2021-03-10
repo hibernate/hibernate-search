@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
@@ -35,16 +36,22 @@ class ElasticsearchNestedPredicate extends AbstractElasticsearchSingleFieldPredi
 			JsonObject innerObject) {
 		PredicateRequestContext nestedContext = context.withNestedPath( absoluteFieldPath );
 
+		wrap( indexNames(), absoluteFieldPath, outerObject, innerObject,
+				nestedPredicate.toJsonQuery( nestedContext ) );
+
+		return outerObject;
+	}
+
+	static void wrap(Set<String> indexNames, String absoluteFieldPath,
+			JsonObject outerObject, JsonObject innerObject, JsonObject toWrap) {
 		PATH_ACCESSOR.set( innerObject, absoluteFieldPath );
-		QUERY_ACCESSOR.set( innerObject, nestedPredicate.toJsonQuery( nestedContext ) );
-		if ( indexNames().size() > 1 ) {
+		QUERY_ACCESSOR.set( innerObject, toWrap );
+		if ( indexNames.size() > 1 ) {
 			// There are multiple target indexes; some of them may not declare the nested field.
 			// Instruct ES to behave as if the nested field had no value in that case.
 			IGNORE_UNMAPPED_ACCESSOR.set( innerObject, true );
 		}
 		outerObject.add( "nested", innerObject );
-
-		return outerObject;
 	}
 
 	static class Builder extends AbstractBuilder implements NestedPredicateBuilder {
