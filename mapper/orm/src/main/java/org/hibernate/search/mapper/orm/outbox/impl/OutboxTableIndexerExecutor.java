@@ -30,21 +30,24 @@ import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 public class OutboxTableIndexerExecutor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-	private static final int MAX_BATCH_SIZE = 50;
 	private static final int MAX_RETRIALS_LOADED_AT_EACH_TIME = 5000;
 	private static final int MAX_RETRIES = 3;
 
 	private final AutomaticIndexingMappingContext mapping;
 	private final ScheduledExecutorService executor;
+	private final int pollingInterval;
+	private final int batchSize;
 
-	public OutboxTableIndexerExecutor(AutomaticIndexingMappingContext mapping,
-			ScheduledExecutorService executor) {
+	public OutboxTableIndexerExecutor(AutomaticIndexingMappingContext mapping, ScheduledExecutorService executor,
+			int pollingInterval, int batchSize) {
 		this.mapping = mapping;
 		this.executor = executor;
+		this.pollingInterval = pollingInterval;
+		this.batchSize = batchSize;
 	}
 
 	public void start() {
-		executor.scheduleAtFixedRate( this::run, 0, 8, TimeUnit.MILLISECONDS );
+		executor.scheduleAtFixedRate( this::run, 0, pollingInterval, TimeUnit.MILLISECONDS );
 	}
 
 	public CompletableFuture<?> stop() {
@@ -98,7 +101,7 @@ public class OutboxTableIndexerExecutor {
 		List<OutboxEventRetry> allEvents = findOutboxRetrialsEntities( session );
 
 		int from = 0;
-		int to = Math.min( from + MAX_BATCH_SIZE, allEvents.size() );
+		int to = Math.min( from + batchSize, allEvents.size() );
 
 		while ( from < allEvents.size() ) {
 			List<OutboxEventRetry> events = allEvents.subList( from, to );
@@ -117,8 +120,8 @@ public class OutboxTableIndexerExecutor {
 				log.errorf( throwable, "Failed to process the outbox entities retrials" );
 			}
 
-			from += MAX_BATCH_SIZE;
-			to = Math.min( from + MAX_BATCH_SIZE, allEvents.size() );
+			from += batchSize;
+			to = Math.min( from + batchSize, allEvents.size() );
 		}
 	}
 
@@ -139,14 +142,15 @@ public class OutboxTableIndexerExecutor {
 		session.update( event );
 	}
 
-	private static List<OutboxEvent> findOutboxEntities(Session session) {
+	private List<OutboxEvent> findOutboxEntities(Session session) {
 		Query<OutboxEvent> query = session.createQuery( "select e from OutboxEvent e order by id", OutboxEvent.class );
-		query.setMaxResults( MAX_BATCH_SIZE );
+		query.setMaxResults( batchSize );
 		return query.list();
 	}
 
 	private static List<OutboxEventRetry> findOutboxRetrialsEntities(Session session) {
-		Query<OutboxEventRetry> query = session.createQuery( "select e from OutboxEventRetry e order by id", OutboxEventRetry.class );
+		Query<OutboxEventRetry> query = session.createQuery(
+				"select e from OutboxEventRetry e order by id", OutboxEventRetry.class );
 		query.setMaxResults( MAX_RETRIALS_LOADED_AT_EACH_TIME );
 		return query.list();
 	}

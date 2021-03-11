@@ -98,6 +98,28 @@ public final class HibernateOrmMapperSettings {
 	public static final String AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE = PREFIX + Radicals.AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE;
 
 	/**
+	 * Valid only when {@link #AUTOMATIC_INDEXING_STRATEGY} is
+	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING} and
+	 * {@link #AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE} is {@code true}.
+	 * <p>
+	 * The polling interval in milliseconds to process in background the outbox events of the outbox table.
+	 * <p>
+	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_POLLING_INTERVAL}.
+	 */
+	public static final String AUTOMATIC_INDEXING_POLLING_INTERVAL = PREFIX + Radicals.AUTOMATIC_INDEXING_POLLING_INTERVAL;
+
+	/**
+	 * Valid only when {@link #AUTOMATIC_INDEXING_STRATEGY} is
+	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING} and
+	 * {@link #AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE} is {@code true}.
+	 * <p>
+	 * The batch size to use in the processing of the outbox events of the outbox table.
+	 * <p>
+	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_BATCH_SIZE}.
+	 */
+	public static final String AUTOMATIC_INDEXING_BATCH_SIZE = PREFIX + Radicals.AUTOMATIC_INDEXING_BATCH_SIZE;
+
+	/**
 	 * The strategy to use when loading entities during the execution of a search query.
 	 * <p>
 	 * Expects a {@link EntityLoadingCacheLookupStrategy} value, or a String representation of such value.
@@ -168,7 +190,11 @@ public final class HibernateOrmMapperSettings {
 		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = AUTOMATIC_INDEXING_PREFIX + "synchronization.strategy";
 		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = AUTOMATIC_INDEXING_PREFIX + "enable_dirty_check";
 		public static final String PROCESS_OUTBOX_TABLE = "process_outbox_table";
+		public static final String POLLING_INTERVAL = "polling_interval";
+		public static final String BATCH_SIZE = "batch_size";
 		public static final String AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE = AUTOMATIC_INDEXING_PREFIX + PROCESS_OUTBOX_TABLE;
+		public static final String AUTOMATIC_INDEXING_POLLING_INTERVAL = AUTOMATIC_INDEXING_PREFIX + POLLING_INTERVAL;
+		public static final String AUTOMATIC_INDEXING_BATCH_SIZE = AUTOMATIC_INDEXING_PREFIX + BATCH_SIZE;
 		public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = "query.loading.cache_lookup.strategy";
 		public static final String QUERY_LOADING_FETCH_SIZE = "query.loading.fetch_size";
 		public static final String MAPPING_PROCESS_ANNOTATIONS = "mapping.process_annotations";
@@ -191,6 +217,8 @@ public final class HibernateOrmMapperSettings {
 				BeanReference.of( AutomaticIndexingSynchronizationStrategy.class, "write-sync" );
 		public static final boolean AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = true;
 		public static final boolean AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE = true;
+		public static final int AUTOMATIC_INDEXING_POLLING_INTERVAL = 8;
+		public static final int AUTOMATIC_INDEXING_BATCH_SIZE = 50;
 		public static final EntityLoadingCacheLookupStrategy QUERY_LOADING_CACHE_LOOKUP_STRATEGY =
 				EntityLoadingCacheLookupStrategy.SKIP;
 		public static final int QUERY_LOADING_FETCH_SIZE = 100;

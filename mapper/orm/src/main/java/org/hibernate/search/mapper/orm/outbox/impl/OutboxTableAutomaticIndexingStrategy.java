@@ -24,10 +24,22 @@ public class OutboxTableAutomaticIndexingStrategy implements AutomaticIndexingSt
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ConfigurationProperty<Boolean> PROCESS_OUTBOX_TABLE =
+	private static final ConfigurationProperty<Boolean> AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.PROCESS_OUTBOX_TABLE )
 					.asBoolean()
 					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE )
+					.build();
+
+	private static final ConfigurationProperty<Integer> AUTOMATIC_INDEXING_POLLING_INTERVAL =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.POLLING_INTERVAL )
+					.asInteger()
+					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_POLLING_INTERVAL )
+					.build();
+
+	private static final ConfigurationProperty<Integer> AUTOMATIC_INDEXING_BATCH_SIZE =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.BATCH_SIZE )
+					.asInteger()
+					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_BATCH_SIZE )
 					.build();
 
 	private static final String NAME = "Outbox table automatic indexing";
@@ -42,14 +54,17 @@ public class OutboxTableAutomaticIndexingStrategy implements AutomaticIndexingSt
 
 	@Override
 	public CompletableFuture<?> start(AutomaticIndexingStrategyStartContext context) {
-		if ( !PROCESS_OUTBOX_TABLE.get( context.configurationPropertySource() ) ) {
+		if ( !AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE.get( context.configurationPropertySource() ) ) {
 			log.debug( "The outbox table processing is disabled through configuration properties." );
 			// Nothing to do
 			return CompletableFuture.completedFuture( null );
 		}
 
+		int pollingInterval = AUTOMATIC_INDEXING_POLLING_INTERVAL.get( context.configurationPropertySource() );
+		int batchSize = AUTOMATIC_INDEXING_BATCH_SIZE.get( context.configurationPropertySource() );
+
 		scheduledExecutor = context.threadPoolProvider().newScheduledExecutor( 1, NAME );
-		executor = new OutboxTableIndexerExecutor( context.mapping(), scheduledExecutor );
+		executor = new OutboxTableIndexerExecutor( context.mapping(), scheduledExecutor, pollingInterval, batchSize );
 		executor.start();
 		return CompletableFuture.completedFuture( null );
 	}
