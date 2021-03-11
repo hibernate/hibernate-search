@@ -75,7 +75,7 @@ public class DocumentIdBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
-						.failure( "No default identifier bridge implementation for type 'java.lang.Enum'",
+						.failure( "No default identifier bridge implementation for type 'java.lang.Enum (java.lang.Enum<E>)'",
 								"Use a custom bridge" )
 						.build()
 				);

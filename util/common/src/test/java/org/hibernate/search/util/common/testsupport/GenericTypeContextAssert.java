@@ -23,13 +23,13 @@ public abstract class GenericTypeContextAssert {
 
 	public abstract GenericTypeContext getTypeContext();
 
-	public GenericTypeContextAssert resolveTypeTo(TypeCapture<?> expected) {
-		return resolveTypeTo( expected.getType() );
+	public GenericTypeContextAssert hasRawType(Class<?> expected) {
+		assertThat( getTypeContext().rawType() ).isEqualTo( expected );
+		return this;
 	}
 
-	public GenericTypeContextAssert resolveTypeTo(Type expected) {
-		assertThat( getTypeContext().getResolvedType() )
-				.isEqualTo( expected );
+	public GenericTypeContextAssert hasName(String expected) {
+		assertThat( getTypeContext().name() ).isEqualTo( expected );
 		return this;
 	}
 

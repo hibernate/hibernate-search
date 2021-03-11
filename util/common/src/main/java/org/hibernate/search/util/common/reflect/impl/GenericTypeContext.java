@@ -86,11 +86,38 @@ public final class GenericTypeContext {
 		return getClass().getName() + "[" + resolvedType.getTypeName() + ", " + declaringContext + "]";
 	}
 
-	public Type getResolvedType() {
-		return resolvedType;
+	public Class<?> rawType() {
+		return ReflectionUtils.getRawType( resolvedType );
 	}
 
-	public GenericTypeContext getDeclaringContext() {
+	public String name() {
+		Class<?> rawType = rawType();
+		TypeVariable<? extends Class<?>>[] typeParameters = rawType.getTypeParameters();
+		if ( typeParameters.length == 0 ) {
+			return resolvedType.getTypeName();
+		}
+
+		StringBuilder builder = new StringBuilder( rawType.getTypeName() );
+		builder.append( '<' );
+		for ( int i = 0; i < typeParameters.length; i++ ) {
+			if ( i > 0 ) {
+				builder.append( ',' );
+			}
+			builder.append( resolveTypeArgument( rawType, i ).orElse( typeParameters[i] ).getTypeName() );
+		}
+		builder.append( '>' );
+
+		if ( resolvedType.getTypeName().equals( builder.toString() ) ) {
+			return resolvedType.getTypeName();
+		}
+
+		builder.insert( 0, resolvedType.getTypeName() + " (" );
+		builder.append( ")" );
+
+		return builder.toString();
+	}
+
+	public GenericTypeContext declaringContext() {
 		return declaringContext;
 	}
 
@@ -118,7 +145,7 @@ public final class GenericTypeContext {
 	}
 
 	public Optional<Type> resolveArrayElementType() {
-		return ReflectionUtils.getArrayElementType( getResolvedType() )
+		return ReflectionUtils.getArrayElementType( resolvedType )
 				.map( this::resolveType );
 	}
 
