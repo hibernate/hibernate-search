@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outboxtable;
 
+import java.util.concurrent.CompletableFuture;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -133,6 +134,228 @@ public class OutboxTableAutomaticIndexingStrategyEdgeIT {
 		}
 	}
 
+	@Test
+	public void backendFailure() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setIndexedField( "initialValue" );
+			session.persist( entity1 );
+
+			IndexedEntity entity2 = new IndexedEntity();
+			entity2.setId( 2 );
+			entity2.setIndexedField( "initialValue" );
+			session.persist( entity2 );
+
+			IndexedEntity entity3 = new IndexedEntity();
+			entity3.setId( 3 );
+			entity3.setIndexedField( "initialValue" );
+			session.persist( entity3 );
+
+			CompletableFuture<?> failingFuture = new CompletableFuture<>();
+			failingFuture.completeExceptionally( new SimulatedFailure( "Indexing work #2 failed!" ) );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.add( "3", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.createdThenExecuted();
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "2", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.createdThenExecuted( failingFuture );
+
+			// retry:
+			// all retries have addOrUpdate as type
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.addOrUpdate( "2", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.createdThenExecuted();
+
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void backendFailure_twoFailuresOfTheSameIndexingWork() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setIndexedField( "initialValue" );
+			session.persist( entity1 );
+
+			IndexedEntity entity2 = new IndexedEntity();
+			entity2.setId( 2 );
+			entity2.setIndexedField( "initialValue" );
+			session.persist( entity2 );
+
+			IndexedEntity entity3 = new IndexedEntity();
+			entity3.setId( 3 );
+			entity3.setIndexedField( "initialValue" );
+			session.persist( entity3 );
+
+			CompletableFuture<?> failingFuture = new CompletableFuture<>();
+			failingFuture.completeExceptionally( new SimulatedFailure( "Indexing work #2 failed!" ) );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.add( "3", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.createdThenExecuted();
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "2", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.createdThenExecuted( failingFuture );
+
+			// retry:
+			// all retries have addOrUpdate as type
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.addOrUpdate( "2", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.createdThenExecuted( failingFuture );
+
+			// finally it works:
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.addOrUpdate( "2", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.createdThenExecuted();
+
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void backendFailure_threeFailuresOfTheSameIndexingWork() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setIndexedField( "initialValue" );
+			session.persist( entity1 );
+
+			IndexedEntity entity2 = new IndexedEntity();
+			entity2.setId( 2 );
+			entity2.setIndexedField( "initialValue" );
+			session.persist( entity2 );
+
+			IndexedEntity entity3 = new IndexedEntity();
+			entity3.setId( 3 );
+			entity3.setIndexedField( "initialValue" );
+			session.persist( entity3 );
+
+			CompletableFuture<?> failingFuture = new CompletableFuture<>();
+			failingFuture.completeExceptionally( new SimulatedFailure( "Indexing work #2 failed!" ) );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.add( "3", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.createdThenExecuted();
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "2", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.createdThenExecuted( failingFuture );
+
+			// retry:
+			// all retries have addOrUpdate as type
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.addOrUpdate( "2", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.createdThenExecuted( failingFuture );
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.addOrUpdate( "2", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.createdThenExecuted( failingFuture );
+
+			// finally it works:
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.addOrUpdate( "2", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.createdThenExecuted();
+
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void backendFailure_numberOfTrialsExhausted() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setIndexedField( "initialValue" );
+			session.persist( entity1 );
+
+			IndexedEntity entity2 = new IndexedEntity();
+			entity2.setId( 2 );
+			entity2.setIndexedField( "initialValue" );
+			session.persist( entity2 );
+
+			IndexedEntity entity3 = new IndexedEntity();
+			entity3.setId( 3 );
+			entity3.setIndexedField( "initialValue" );
+			session.persist( entity3 );
+
+			CompletableFuture<?> failingFuture = new CompletableFuture<>();
+			failingFuture.completeExceptionally( new SimulatedFailure( "Indexing work #2 failed!" ) );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.add( "3", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.createdThenExecuted();
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "2", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.createdThenExecuted( failingFuture );
+
+			// retry:
+			// all retries have addOrUpdate as type
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.addOrUpdate( "2", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.createdThenExecuted( failingFuture );
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.addOrUpdate( "2", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.createdThenExecuted( failingFuture );
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.addOrUpdate( "2", b -> b
+							.field( "indexedField", "initialValue" )
+					)
+					.createdThenExecuted( failingFuture );
+
+			// no more retry
+		} );
+		backendMock.verifyExpectationsMet();
+	}
+
 	@Entity(name = "indexed")
 	@Indexed(index = IndexedEntity.INDEX)
 	public static class IndexedEntity {
@@ -168,6 +391,12 @@ public class OutboxTableAutomaticIndexingStrategyEdgeIT {
 
 		public void setIndexedField(String indexedField) {
 			this.indexedField = indexedField;
+		}
+	}
+
+	private static class SimulatedFailure extends RuntimeException {
+		SimulatedFailure(String message) {
+			super( message );
 		}
 	}
 }
