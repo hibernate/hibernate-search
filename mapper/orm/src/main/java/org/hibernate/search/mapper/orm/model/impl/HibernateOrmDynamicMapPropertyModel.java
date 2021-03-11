@@ -54,7 +54,7 @@ class HibernateOrmDynamicMapPropertyModel<T> implements PojoPropertyModel<T> {
 	public PojoGenericTypeModel<T> typeModel() {
 		if ( typeModel == null ) {
 			try {
-				typeModel = ormPropertyMetadata.getTypeModelFactory().create( introspector );
+				typeModel = (PojoGenericTypeModel<T>) ormPropertyMetadata.getTypeModelFactory().create( introspector );
 			}
 			catch (RuntimeException e) {
 				throw log.errorRetrievingPropertyTypeModel( name(), holderTypeModel, e.getMessage(), e );

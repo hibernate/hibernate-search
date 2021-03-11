@@ -139,7 +139,7 @@ public class HibernateOrmBasicTypeMetadataProvider {
 			Map<String, HibernateOrmBasicDynamicMapPropertyMetadata> collectedProperties,
 			Property property) {
 		// This also recurses and collects embedded types
-		HibernateOrmGenericTypeModelFactory typeModelFactory =
+		HibernateOrmGenericTypeModelFactory<?> typeModelFactory =
 				collectValue( metadataProviderBuilder, property.getValue() );
 		collectedProperties.put(
 				property.getName(),
@@ -147,7 +147,7 @@ public class HibernateOrmBasicTypeMetadataProvider {
 		);
 	}
 
-	private static HibernateOrmGenericTypeModelFactory collectValue(Builder metadataProviderBuilder, Value value) {
+	private static HibernateOrmGenericTypeModelFactory<?> collectValue(Builder metadataProviderBuilder, Value value) {
 		if ( value instanceof Component ) {
 			return collectEmbedded( metadataProviderBuilder, (Component) value );
 		}
