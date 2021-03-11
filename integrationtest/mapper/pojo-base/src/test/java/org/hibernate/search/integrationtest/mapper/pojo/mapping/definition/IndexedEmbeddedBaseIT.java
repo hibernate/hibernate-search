@@ -931,6 +931,58 @@ public class IndexedEmbeddedBaseIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4148")
+	public void targetType_preserveGenericTypeContext() {
+		abstract class IndexedEmbeddedLevel1<T> {
+			public abstract T getLevel1Property();
+			public abstract void setLevel1Property(T level1Property);
+		}
+		class IndexedEmbeddedLevel1Impl<T> extends IndexedEmbeddedLevel1<T> {
+			T level1Property;
+			@Override
+			@GenericField
+			public T getLevel1Property() {
+				return level1Property;
+			}
+			@Override
+			public void setLevel1Property(T level1Property) {
+				this.level1Property = level1Property;
+			}
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@IndexedEmbedded(includeDepth = 1, targetType = IndexedEmbeddedLevel1Impl.class)
+			IndexedEmbeddedLevel1<String> level1;
+			public IndexedEntity(int id, String level1Value) {
+				this.id = id;
+				this.level1 = new IndexedEmbeddedLevel1Impl<>();
+				this.level1.setLevel1Property( level1Value );
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "level1", b2 -> b2
+						.field( "level1Property", String.class )
+				)
+		);
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
+				.setup();
+		backendMock.verifyExpectationsMet();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> new IndexedEntity( id, "level1Value" ),
+				document -> document.objectField( "level1", b2 -> b2
+						.field( "level1Property", "level1Value" )
+				)
+		);
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3071")
 	public void includeEmbeddedObjectId() {
 		class IndexedEmbeddedLevel1 {
