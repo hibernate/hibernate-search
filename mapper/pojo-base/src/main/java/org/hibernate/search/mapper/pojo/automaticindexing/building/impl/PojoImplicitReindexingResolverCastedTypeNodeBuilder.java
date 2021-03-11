@@ -29,7 +29,7 @@ class PojoImplicitReindexingResolverCastedTypeNodeBuilder<T, U>
 	@Override
 	PojoImplicitReindexingResolverNode<T> doBuild(PojoImplicitReindexingResolverNode<? super U> nestedNode) {
 		return new PojoImplicitReindexingResolverCastedTypeNode<>(
-				getModelPath().getTypeModel().caster(), nestedNode
+				getModelPath().getTypeModel().rawType().caster(), nestedNode
 		);
 	}
 }

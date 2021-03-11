@@ -24,10 +24,10 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  */
 public class PojoImplicitReindexingResolverCastedTypeNode<T, U> extends PojoImplicitReindexingResolverNode<T> {
 
-	private final PojoCaster<U> caster;
+	private final PojoCaster<? super U> caster;
 	private final PojoImplicitReindexingResolverNode<? super U> nested;
 
-	public PojoImplicitReindexingResolverCastedTypeNode(PojoCaster<U> caster,
+	public PojoImplicitReindexingResolverCastedTypeNode(PojoCaster<? super U> caster,
 			PojoImplicitReindexingResolverNode<? super U> nested) {
 		this.caster = caster;
 		this.nested = nested;
@@ -50,7 +50,9 @@ public class PojoImplicitReindexingResolverCastedTypeNode<T, U> extends PojoImpl
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			T dirty, PojoImplicitReindexingResolverRootContext context) {
-		U castedDirty = caster.castOrNull( context.sessionContext().runtimeIntrospector().unproxy( dirty ) );
+		// The caster can only cast to the raw type, beyond that we have to use an unchecked cast.
+		@SuppressWarnings("unchecked")
+		U castedDirty = (U) caster.castOrNull( context.sessionContext().runtimeIntrospector().unproxy( dirty ) );
 		if ( castedDirty != null ) {
 			nested.resolveEntitiesToReindex( collector, castedDirty, context );
 		}

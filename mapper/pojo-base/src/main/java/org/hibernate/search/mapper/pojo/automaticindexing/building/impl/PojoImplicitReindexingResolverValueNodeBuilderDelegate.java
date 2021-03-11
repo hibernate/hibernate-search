@@ -143,13 +143,13 @@ class PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> {
 	}
 
 	@SuppressWarnings("unchecked") // We know builders have this exact type, by construction
-	private <U> PojoImplicitReindexingResolverCastedTypeNodeBuilder<V, U> getOrCreateCastedTypeNodeBuilder(
+	private <U> PojoImplicitReindexingResolverCastedTypeNodeBuilder<V, ? extends U> getOrCreateCastedTypeNodeBuilder(
 			PojoRawTypeModel<U> targetTypeModel) {
-		return (PojoImplicitReindexingResolverCastedTypeNodeBuilder<V, U>)
+		return (PojoImplicitReindexingResolverCastedTypeNodeBuilder<V, ? extends U>)
 				castedTypeNodeBuilders.computeIfAbsent( targetTypeModel, this::createCastedTypeNodeBuilder );
 	}
 
-	private <U> PojoImplicitReindexingResolverCastedTypeNodeBuilder<V, U> createCastedTypeNodeBuilder(
+	private <U> PojoImplicitReindexingResolverCastedTypeNodeBuilder<V, ? extends U> createCastedTypeNodeBuilder(
 			PojoRawTypeModel<U> targetTypeModel) {
 		checkNotFrozen();
 		return new PojoImplicitReindexingResolverCastedTypeNodeBuilder<>(

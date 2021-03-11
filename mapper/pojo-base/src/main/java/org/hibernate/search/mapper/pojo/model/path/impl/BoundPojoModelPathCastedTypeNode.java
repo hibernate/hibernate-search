@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.model.path.impl;
 
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**
  * @param <T> The type represented by the parent node, whose values are casted to {@link U}.
@@ -15,9 +15,9 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 public class BoundPojoModelPathCastedTypeNode<T, U> extends BoundPojoModelPathTypeNode<U> {
 
 	private final BoundPojoModelPathValueNode<?, ?, T> parent;
-	private final PojoRawTypeModel<U> typeModel;
+	private final PojoTypeModel<U> typeModel;
 
-	BoundPojoModelPathCastedTypeNode(BoundPojoModelPathValueNode<?, ?, T> parent, PojoRawTypeModel<U> typeModel) {
+	BoundPojoModelPathCastedTypeNode(BoundPojoModelPathValueNode<?, ?, T> parent, PojoTypeModel<U> typeModel) {
 		this.parent = parent;
 		this.typeModel = typeModel;
 	}
@@ -28,7 +28,7 @@ public class BoundPojoModelPathCastedTypeNode<T, U> extends BoundPojoModelPathTy
 	}
 
 	@Override
-	public PojoRawTypeModel<U> getTypeModel() {
+	public PojoTypeModel<U> getTypeModel() {
 		return typeModel;
 	}
 
