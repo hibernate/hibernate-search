@@ -433,13 +433,15 @@ public class GenericTypeContextTest {
 		GenericTypeContext propertyInGenericSubClassContext =
 				new GenericTypeContext( genericSubClassContext, propertyType );
 		assertThatTypeContext( propertyInGenericSubClassContext )
-				.resolveTypeTo( GenericSubClass.class.getTypeParameters()[0] )
+				.hasRawType( List.class )
+				.hasName( "V (java.util.List<java.lang.String>)" )
 				.resolveTypeArgumentTo( String.class, List.class, 0 )
 				.resolveTypeArgumentToEmpty( ArrayList.class, 0 );
 
 		GenericTypeContext propertyInTypeSettingContext = new GenericTypeContext( typeSettingContext, propertyType );
 		assertThatTypeContext( propertyInTypeSettingContext )
-				.resolveTypeTo( new TypeCapture<ArrayList<String>>() { } )
+				.hasRawType( ArrayList.class )
+				.hasName( "java.util.ArrayList<java.lang.String>" )
 				.resolveTypeArgumentTo( String.class, List.class, 0 )
 				.resolveTypeArgumentTo( String.class, ArrayList.class, 0 );
 	}

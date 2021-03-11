@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
-import org.hibernate.search.util.common.reflect.impl.ReflectionUtils;
 
 /**
  * An implementation of {@link PojoGenericTypeModel} that takes advantage of the context
@@ -100,16 +99,14 @@ public final class GenericContextAwarePojoGenericTypeModel<T>
 
 	@SuppressWarnings("unchecked") // Can't do better here, this code is all about reflection
 	private GenericContextAwarePojoGenericTypeModel(Helper helper, GenericTypeContext genericTypeContext) {
-		super( helper.rawTypeModel(
-				(Class<? super T>) ReflectionUtils.getRawType( genericTypeContext.getResolvedType() )
-		) );
+		super( helper.rawTypeModel( (Class<? super T>) genericTypeContext.rawType() ) );
 		this.helper = helper;
 		this.genericTypeContext = genericTypeContext;
 	}
 
 	@Override
 	public String name() {
-		return genericTypeContext.getResolvedType().getTypeName();
+		return genericTypeContext.name();
 	}
 
 	@Override
@@ -121,7 +118,7 @@ public final class GenericContextAwarePojoGenericTypeModel<T>
 	public Optional<PojoGenericTypeModel<?>> typeArgument(Class<?> rawSuperType, int typeParameterIndex) {
 		return genericTypeContext.resolveTypeArgument( rawSuperType, typeParameterIndex )
 				.map( type -> new GenericContextAwarePojoGenericTypeModel<>(
-						helper, new GenericTypeContext( genericTypeContext.getDeclaringContext(), type )
+						helper, new GenericTypeContext( genericTypeContext.declaringContext(), type )
 				) );
 	}
 
@@ -129,7 +126,7 @@ public final class GenericContextAwarePojoGenericTypeModel<T>
 	public Optional<PojoGenericTypeModel<?>> arrayElementType() {
 		return genericTypeContext.resolveArrayElementType()
 				.map( type -> new GenericContextAwarePojoGenericTypeModel<>(
-						helper, new GenericTypeContext( genericTypeContext.getDeclaringContext(), type )
+						helper, new GenericTypeContext( genericTypeContext.declaringContext(), type )
 				) );
 	}
 
