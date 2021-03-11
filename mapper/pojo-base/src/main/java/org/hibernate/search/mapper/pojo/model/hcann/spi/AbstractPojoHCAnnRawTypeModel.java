@@ -18,7 +18,9 @@ import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.AbstractPojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
+import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 public abstract class AbstractPojoHCAnnRawTypeModel<T, I extends AbstractPojoHCAnnBootstrapIntrospector>
 		extends AbstractPojoRawTypeModel<T, I> {
@@ -50,6 +52,18 @@ public abstract class AbstractPojoHCAnnRawTypeModel<T, I extends AbstractPojoHCA
 	@Override
 	public Stream<Annotation> annotations() {
 		return introspector.annotations( xClass );
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public PojoTypeModel<? extends T> cast(PojoGenericTypeModel<?> other) {
+		if ( other.rawType().isSubTypeOf( this ) ) {
+			// Redundant cast; no need to create a new type.
+			return (PojoTypeModel<? extends T>) other;
+		}
+		else {
+			return other.castTo( typeIdentifier.javaClass() ).orElse( this );
+		}
 	}
 
 	@Override

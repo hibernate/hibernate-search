@@ -115,6 +115,12 @@ public final class GenericContextAwarePojoGenericTypeModel<T>
 	}
 
 	@Override
+	public <U> Optional<PojoTypeModel<? extends U>> castTo(Class<U> target) {
+		return Optional.of( new GenericContextAwarePojoGenericTypeModel<U>( helper,
+				genericTypeContext.castTo( target ) ) );
+	}
+
+	@Override
 	public Optional<PojoGenericTypeModel<?>> typeArgument(Class<?> rawSuperType, int typeParameterIndex) {
 		return genericTypeContext.resolveTypeArgument( rawSuperType, typeParameterIndex )
 				.map( type -> new GenericContextAwarePojoGenericTypeModel<>(

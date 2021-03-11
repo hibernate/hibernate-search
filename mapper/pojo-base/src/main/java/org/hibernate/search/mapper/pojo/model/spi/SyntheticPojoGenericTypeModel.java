@@ -73,6 +73,12 @@ public final class SyntheticPojoGenericTypeModel<T> extends AbstractPojoGenericT
 	}
 
 	@Override
+	public <U> Optional<PojoTypeModel<? extends U>> castTo(Class<U> target) {
+		// Cannot cast synthetic types.
+		return Optional.empty();
+	}
+
+	@Override
 	public Optional<PojoGenericTypeModel<?>> arrayElementType() {
 		return Optional.ofNullable( arrayElementType );
 	}

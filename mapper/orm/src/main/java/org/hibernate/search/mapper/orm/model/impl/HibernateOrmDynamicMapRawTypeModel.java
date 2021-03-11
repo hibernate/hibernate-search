@@ -12,9 +12,12 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.AbstractPojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
+@SuppressWarnings("rawtypes")
 public class HibernateOrmDynamicMapRawTypeModel
 		extends AbstractPojoRawTypeModel<Map, HibernateOrmBootstrapIntrospector> {
 
@@ -57,6 +60,20 @@ public class HibernateOrmDynamicMapRawTypeModel
 	@Override
 	public Stream<Annotation> annotations() {
 		return Stream.empty();
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public PojoTypeModel<? extends Map> cast(PojoGenericTypeModel<?> other) {
+		if ( other.rawType().isSubTypeOf( this ) ) {
+			// Redundant cast; no need to create a new type.
+			return (PojoTypeModel<? extends Map>) other;
+		}
+		else {
+			// There is no generic type information to retain for dynamic-map types; we can just return this.
+			// Also, calling other.castTo(...) would mean losing the type name, and we definitely don't want that.
+			return this;
+		}
 	}
 
 	@Override

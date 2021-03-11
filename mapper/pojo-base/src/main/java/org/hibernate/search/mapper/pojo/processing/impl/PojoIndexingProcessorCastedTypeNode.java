@@ -25,11 +25,11 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  */
 public class PojoIndexingProcessorCastedTypeNode<T, U> extends PojoIndexingProcessor<T> {
 
-	private final PojoCaster<U> caster;
+	private final PojoCaster<? super U> caster;
 	private final Iterable<IndexObjectFieldReference> parentIndexObjectReferences;
 	private final PojoIndexingProcessor<? super U> nested;
 
-	public PojoIndexingProcessorCastedTypeNode(PojoCaster<U> caster,
+	public PojoIndexingProcessorCastedTypeNode(PojoCaster<? super U> caster,
 			Iterable<IndexObjectFieldReference> parentIndexObjectReferences,
 			PojoIndexingProcessor<? super U> nested) {
 		this.caster = caster;
@@ -55,7 +55,9 @@ public class PojoIndexingProcessorCastedTypeNode<T, U> extends PojoIndexingProce
 		if ( source == null ) {
 			return;
 		}
-		U castedSource = caster.cast( sessionContext.runtimeIntrospector().unproxy( source ) );
+		// The caster can only cast to the raw type, beyond that we have to use an unchecked cast.
+		@SuppressWarnings("unchecked")
+		U castedSource = (U) caster.cast( sessionContext.runtimeIntrospector().unproxy( source ) );
 		DocumentElement parentObject = target;
 		for ( IndexObjectFieldReference objectFieldReference : parentIndexObjectReferences ) {
 			parentObject = parentObject.addObject( objectFieldReference );
