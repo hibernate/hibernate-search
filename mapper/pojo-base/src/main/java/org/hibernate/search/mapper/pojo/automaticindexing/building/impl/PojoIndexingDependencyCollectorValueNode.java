@@ -129,12 +129,6 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 	}
 
 	void doCollectDependency(PojoIndexingDependencyCollectorValueNode<?, ?> initialNodeCollectingDependency) {
-		// See the handling of derived properties below to get an idea of
-		// what "reindexOnUpdateFromDerivedProperty" is for:
-		// essentially it allows marking a derived property with ReindexOnUpdate.SHALLOW
-		// so that, in the context of that derived property,
-		// the properties it's derived from are handled as SHALLOW,
-		// i.e. we only collect dependency up to entity boundaries.
 		ReindexOnUpdate composedReindexOnUpdate = initialNodeCollectingDependency == null ? reindexOnUpdate
 				: initialNodeCollectingDependency.composeReindexOnUpdate( lastEntityNode(), reindexOnUpdate );
 		if ( ReindexOnUpdate.NO.equals( composedReindexOnUpdate ) ) {
