@@ -11,6 +11,7 @@ import static org.junit.Assert.fail;
 
 import java.lang.reflect.Type;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
 import org.hibernate.search.util.impl.test.reflect.TypeCapture;
@@ -115,6 +116,11 @@ public abstract class GenericTypeContextAssert {
 					.contains( "only declares " )
 					.contains( " type parameter(s)" );
 		}
+		return this;
+	}
+
+	public GenericTypeContextAssert castTo(Class<?> target, Consumer<GenericTypeContextAssert> assertions) {
+		assertions.accept( new SimpleGenericTypeContextAssert( getTypeContext().castTo( target ) ) );
 		return this;
 	}
 

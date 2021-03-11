@@ -65,10 +65,14 @@ public final class GenericTypeContext {
 	private final Map<TypeVariable<?>, Type> typeMappings;
 
 	public GenericTypeContext(Type type) {
-		this( null, type );
+		this( null, null, type );
 	}
 
 	public GenericTypeContext(GenericTypeContext declaringContext, Type type) {
+		this( declaringContext, null, type );
+	}
+
+	public GenericTypeContext(GenericTypeContext declaringContext, GenericTypeContext castBase, Type type) {
 		Contracts.assertNotNull( type, "type" );
 		if ( declaringContext != null ) {
 			this.resolvedType = declaringContext.resolveType( type );
@@ -79,6 +83,9 @@ public final class GenericTypeContext {
 		this.declaringContext = declaringContext;
 		this.typeMappings = new HashMap<>();
 		populateTypeMappings( typeMappings, resolvedType );
+		if ( castBase != null ) {
+			inferTypeMappingsFromCastBase( typeMappings, castBase );
+		}
 	}
 
 	@Override
@@ -119,6 +126,10 @@ public final class GenericTypeContext {
 
 	public GenericTypeContext declaringContext() {
 		return declaringContext;
+	}
+
+	public GenericTypeContext castTo(Class<?> target) {
+		return new GenericTypeContext( declaringContext, this, target );
 	}
 
 	public Optional<Type> resolveTypeArgument(Class<?> rawSuperType, int typeParameterIndex) {
@@ -189,7 +200,7 @@ public final class GenericTypeContext {
 		}
 	}
 
-	private void populateTypeMappings(Map<TypeVariable<?>, Type> mappings, Type type) {
+	private static void populateTypeMappings(Map<TypeVariable<?>, Type> mappings, Type type) {
 		if ( type instanceof TypeVariable ) {
 			for ( Type upperBound : ( (TypeVariable<?>) type ).getBounds() ) {
 				populateTypeMappings( mappings, upperBound );
@@ -231,6 +242,38 @@ public final class GenericTypeContext {
 		}
 		else {
 			throw new AssertionFailure( "Unexpected java.lang.reflect.Type type: " + type.getClass() );
+		}
+	}
+
+	// Try to infer subclass type variables from the castBase
+	// E.g. if we are creating List<T>, casted from Iterable<Integer>, we can infer that T = Integer.
+	// Similarly, if we are creating Iterable<T>, casted from List<Integer>, we can infer that T = Integer.
+	private static void inferTypeMappingsFromCastBase(Map<TypeVariable<?>, Type> typeMappings, GenericTypeContext castBase) {
+		for ( Map.Entry<TypeVariable<?>, Type> baseMapping : castBase.typeMappings.entrySet() ) {
+			TypeVariable<?> baseVariable = baseMapping.getKey();
+			Type baseVariableValue = castBase.resolveType( baseVariable );
+			if ( baseVariableValue instanceof TypeVariable ) {
+				// We don't know the value of that variable in the base; not useful.
+				continue;
+			}
+			Type baseVariableValueInThis = typeMappings.get( baseVariable );
+			if ( baseVariableValueInThis instanceof TypeVariable ) {
+				// The variable was set to another variable in a subtype
+				// Let's try to set that other variable
+				TypeVariable<?> subTypeVariable = (TypeVariable<?>) baseVariableValueInThis;
+				Type subTypeVariableValueInThis = typeMappings.get( subTypeVariable );
+				while ( subTypeVariableValueInThis instanceof TypeVariable
+						&& !subTypeVariable.equals( subTypeVariableValueInThis ) ) {
+					subTypeVariable = (TypeVariable<?>) subTypeVariableValueInThis;
+					subTypeVariableValueInThis = typeMappings.get( subTypeVariable );
+				}
+				if ( subTypeVariable.equals( subTypeVariableValueInThis ) ) {
+					// We successfully inferred the value.
+					typeMappings.put( subTypeVariable, baseVariableValue );
+				}
+				// else: the variable is already set in this,
+				// either to the same value as in base (valid cast) or to another value (invalid cast).
+			}
 		}
 	}
 

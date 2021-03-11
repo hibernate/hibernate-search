@@ -34,20 +34,85 @@ public class GenericTypeContextTest {
 				.resolveTypeArgumentToEmpty( Collection.class, 0 )
 				.resolveTypeArgumentToEmpty( List.class, 0 )
 				.resolveTypeArgumentToEmpty( Map.class, 0 )
-				.resolveTypeArgumentToEmpty( Map.class, 1 );
+				.resolveTypeArgumentToEmpty( Map.class, 1 )
+				.castTo( Iterable.class, actual -> actual
+						.hasRawType( Iterable.class )
+						.hasName( "java.lang.Iterable (java.lang.Iterable<" + CustomType.class.getName() + ">)" )
+						.resolveTypeArgumentTo( CustomType.class, Iterable.class, 0 )
+						.resolveTypeArgumentToEmpty( Collection.class, 0 ) )
+				.castTo( Collection.class, actual -> actual
+						.hasRawType( Collection.class )
+						.hasName( "java.util.Collection (java.util.Collection<" + CustomType.class.getName() + ">)" )
+						.resolveTypeArgumentTo( CustomType.class, Iterable.class, 0 )
+						.resolveTypeArgumentTo( CustomType.class, Collection.class, 0 )
+						.resolveTypeArgumentToEmpty( List.class, 0 ) )
+				.castTo( List.class, actual -> actual
+						.hasRawType( List.class )
+						.hasName( "java.util.List (java.util.List<" + CustomType.class.getName() + ">)" )
+						.resolveTypeArgumentTo( CustomType.class, Iterable.class, 0 )
+						.resolveTypeArgumentTo( CustomType.class, Collection.class, 0 )
+						.resolveTypeArgumentTo( CustomType.class, List.class, 0 )
+						.resolveTypeArgumentToEmpty( Map.class, 0 ) );
 		new GenericTypeContextAssert.AssertWithType<Collection<CustomType>>() {
 		}
 				.resolveTypeArgumentTo( CustomType.class, Iterable.class, 0 )
 				.resolveTypeArgumentTo( CustomType.class, Collection.class, 0 )
 				.resolveTypeArgumentToEmpty( Map.class, 0 )
-				.resolveTypeArgumentToEmpty( Map.class, 1 );
+				.resolveTypeArgumentToEmpty( Map.class, 1 )
+				.castTo( Iterable.class, actual -> actual
+						.hasRawType( Iterable.class )
+						.hasName( "java.lang.Iterable (java.lang.Iterable<" + CustomType.class.getName() + ">)" )
+						.resolveTypeArgumentTo( CustomType.class, Iterable.class, 0 )
+						.resolveTypeArgumentToEmpty( Collection.class, 0 ) )
+				.castTo( Collection.class, actual -> actual
+						.hasRawType( Collection.class )
+						.hasName( "java.util.Collection (java.util.Collection<" + CustomType.class.getName() + ">)" )
+						.resolveTypeArgumentTo( CustomType.class, Iterable.class, 0 )
+						.resolveTypeArgumentTo( CustomType.class, Collection.class, 0 )
+						.resolveTypeArgumentToEmpty( List.class, 0 ) )
+				.castTo( List.class, actual -> actual
+						.hasRawType( List.class )
+						.hasName( "java.util.List (java.util.List<" + CustomType.class.getName() + ">)" )
+						.resolveTypeArgumentTo( CustomType.class, Iterable.class, 0 )
+						.resolveTypeArgumentTo( CustomType.class, Collection.class, 0 )
+						.resolveTypeArgumentTo( CustomType.class, List.class, 0 )
+						.resolveTypeArgumentToEmpty( Map.class, 0 ) );
 		new GenericTypeContextAssert.AssertWithType<List<CustomType>>() {
 		}
 				.resolveTypeArgumentTo( CustomType.class, Iterable.class, 0 )
 				.resolveTypeArgumentTo( CustomType.class, Collection.class, 0 )
 				.resolveTypeArgumentTo( CustomType.class, List.class, 0 )
 				.resolveTypeArgumentToEmpty( Map.class, 0 )
-				.resolveTypeArgumentToEmpty( Map.class, 1 );
+				.resolveTypeArgumentToEmpty( Map.class, 1 )
+				.castTo( Iterable.class, actual -> actual
+						.hasRawType( Iterable.class )
+						.hasName( "java.lang.Iterable (java.lang.Iterable<" + CustomType.class.getName() + ">)" )
+						.resolveTypeArgumentTo( CustomType.class, Iterable.class, 0 )
+						.resolveTypeArgumentToEmpty( Collection.class, 0 )
+						.resolveTypeArgumentToEmpty( ArrayList.class, 0 ) )
+				.castTo( Collection.class, actual -> actual
+						.hasRawType( Collection.class )
+						.hasName( "java.util.Collection (java.util.Collection<" + CustomType.class.getName() + ">)" )
+						.resolveTypeArgumentTo( CustomType.class, Iterable.class, 0 )
+						.resolveTypeArgumentTo( CustomType.class, Collection.class, 0 )
+						.resolveTypeArgumentToEmpty( List.class, 0 )
+						.resolveTypeArgumentToEmpty( ArrayList.class, 0 ) )
+				.castTo( List.class, actual -> actual
+						.hasRawType( List.class )
+						.hasName( "java.util.List (java.util.List<" + CustomType.class.getName() + ">)" )
+						.resolveTypeArgumentTo( CustomType.class, Iterable.class, 0 )
+						.resolveTypeArgumentTo( CustomType.class, Collection.class, 0 )
+						.resolveTypeArgumentTo( CustomType.class, List.class, 0 )
+						.resolveTypeArgumentToEmpty( ArrayList.class, 0 )
+						.resolveTypeArgumentToEmpty( Map.class, 0 ) )
+				.castTo( ArrayList.class, actual -> actual
+						.hasRawType( ArrayList.class )
+						.hasName( "java.util.ArrayList (java.util.ArrayList<" + CustomType.class.getName() + ">)" )
+						.resolveTypeArgumentTo( CustomType.class, Iterable.class, 0 )
+						.resolveTypeArgumentTo( CustomType.class, Collection.class, 0 )
+						.resolveTypeArgumentTo( CustomType.class, List.class, 0 )
+						.resolveTypeArgumentTo( CustomType.class, ArrayList.class, 0 )
+						.resolveTypeArgumentToEmpty( Map.class, 0 ) );
 		new GenericTypeContextAssert.AssertWithType<ArrayList<CustomType>>() {
 		}
 				.resolveTypeArgumentTo( CustomType.class, Iterable.class, 0 )
@@ -90,12 +155,17 @@ public class GenericTypeContextTest {
 	public void genericArgument() {
 		new GenericTypeContextAssert.AssertWithType<Iterable<CustomGenericType<String, Integer>>>() {
 		}
-				.resolveTypeArgumentTo( new TypeCapture<CustomGenericType<String, Integer>>() {
-				}, Iterable.class, 0 )
+				.resolveTypeArgumentTo( new TypeCapture<CustomGenericType<String, Integer>>() { },
+						Iterable.class, 0 )
 				.resolveTypeArgumentToEmpty( Collection.class, 0 )
 				.resolveTypeArgumentToEmpty( List.class, 0 )
 				.resolveTypeArgumentToEmpty( Map.class, 0 )
-				.resolveTypeArgumentToEmpty( Map.class, 1 );
+				.resolveTypeArgumentToEmpty( Map.class, 1 )
+				.castTo( Collection.class, actual -> actual
+						.hasRawType( Collection.class )
+						.resolveTypeArgumentTo( new TypeCapture<CustomGenericType<String, Integer>>() { },
+								Collection.class, 0 )
+						.resolveTypeArgumentToEmpty( List.class, 0 ) );
 	}
 
 	@Test
@@ -111,7 +181,15 @@ public class GenericTypeContextTest {
 						Collection.class.getTypeParameters()[0],
 						Collection.class, 0
 				)
-				.resolveTypeArgumentToEmpty( List.class, 0 );
+				.resolveTypeArgumentToEmpty( List.class, 0 )
+				.castTo( List.class, actual -> actual
+						.hasRawType( List.class )
+						.resolveTypeArgumentTo( List.class.getTypeParameters()[0],
+								Iterable.class, 0 )
+						.resolveTypeArgumentTo( List.class.getTypeParameters()[0],
+								Collection.class, 0 )
+						.resolveTypeArgumentTo( List.class.getTypeParameters()[0],
+								List.class, 0 ) );
 	}
 
 	@Test
@@ -122,7 +200,17 @@ public class GenericTypeContextTest {
 				.resolveTypeArgumentTo(
 						CustomBoundedGenericInterface.class.getTypeParameters()[0],
 						CustomBoundedGenericInterface.class, 0
-				);
+				)
+				.castTo( CustomBoundedGenericType.class, actual -> actual
+						.hasRawType( CustomBoundedGenericType.class )
+						.resolveTypeArgumentTo(
+								CustomBoundedGenericType.class.getTypeParameters()[0],
+								CustomBoundedGenericInterface.class, 0
+						)
+						.resolveTypeArgumentTo(
+								CustomBoundedGenericType.class.getTypeParameters()[0],
+								CustomBoundedGenericInterface.class, 0
+						) );
 	}
 
 	@Test
