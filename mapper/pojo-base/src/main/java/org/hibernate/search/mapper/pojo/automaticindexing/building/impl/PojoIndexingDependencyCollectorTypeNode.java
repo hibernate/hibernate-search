@@ -47,22 +47,17 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 
 	PojoIndexingDependencyCollectorTypeNode(PojoRawTypeModel<T> typeModel,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
-		super( buildingHelper );
-		this.parentNode = null;
-		this.modelPathFromCurrentNode = BoundPojoModelPath.root( typeModel );
-		this.lastEntityNode = this;
-		this.modelPathFromLastEntityNode = modelPathFromCurrentNode;
-		this.reindexOnUpdate = buildingHelper.getDefaultReindexOnUpdate();
+		this( null, BoundPojoModelPath.root( typeModel ), buildingHelper );
 	}
 
-	PojoIndexingDependencyCollectorTypeNode(PojoIndexingDependencyCollectorValueNode<?, ?> parentNode,
+	PojoIndexingDependencyCollectorTypeNode(AbstractPojoIndexingDependencyCollectorValueNode parentNode,
 			BoundPojoModelPathTypeNode<T> modelPathFromLastEntityNode,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
 		this.parentNode = parentNode;
 		PojoTypeModel<T> typeModel = modelPathFromLastEntityNode.getTypeModel();
 		this.modelPathFromCurrentNode = BoundPojoModelPath.root( typeModel );
-		if ( buildingHelper.isEntity( typeModel.rawType() ) ) {
+		if ( parentNode == null || buildingHelper.isEntity( typeModel.rawType() ) ) {
 			this.lastEntityNode = this;
 			this.modelPathFromLastEntityNode = modelPathFromCurrentNode;
 		}
@@ -70,18 +65,8 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 			this.lastEntityNode = parentNode.lastEntityNode();
 			this.modelPathFromLastEntityNode = modelPathFromLastEntityNode;
 		}
-		this.reindexOnUpdate = parentNode.composeReindexOnUpdate( lastEntityNode, null );
-	}
-
-	PojoIndexingDependencyCollectorTypeNode(PojoIndexingDependencyCollectorDisjointValueNode<T> parentNode,
-			PojoRawTypeModel<T> typeModel,
-			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
-		super( buildingHelper );
-		this.parentNode = parentNode;
-		this.modelPathFromCurrentNode = BoundPojoModelPath.root( typeModel );
-		this.lastEntityNode = this;
-		this.modelPathFromLastEntityNode = modelPathFromCurrentNode;
-		this.reindexOnUpdate = parentNode.composeReindexOnUpdate( lastEntityNode, null );
+		this.reindexOnUpdate = parentNode != null ? parentNode.composeReindexOnUpdate( lastEntityNode, null )
+				: buildingHelper.getDefaultReindexOnUpdate();
 	}
 
 	/*

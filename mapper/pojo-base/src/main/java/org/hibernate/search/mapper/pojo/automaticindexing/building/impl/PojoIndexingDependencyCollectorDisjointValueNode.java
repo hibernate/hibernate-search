@@ -13,6 +13,7 @@ import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathBinder;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
@@ -58,11 +59,8 @@ public class PojoIndexingDependencyCollectorDisjointValueNode<V>
 	}
 
 	public PojoIndexingDependencyCollectorTypeNode<?> type() {
-		return new PojoIndexingDependencyCollectorTypeNode<>(
-				this,
-				inverseSideEntityTypeModel,
-				buildingHelper
-		);
+		return new PojoIndexingDependencyCollectorTypeNode<>( this,
+				BoundPojoModelPath.root( inverseSideEntityTypeModel ), buildingHelper );
 	}
 
 	@Override
