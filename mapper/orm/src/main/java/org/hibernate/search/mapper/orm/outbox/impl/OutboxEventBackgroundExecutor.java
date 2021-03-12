@@ -27,9 +27,10 @@ import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
-public class OutboxTableIndexerExecutor {
+public class OutboxEventBackgroundExecutor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private static final int MAX_RETRIALS_LOADED_AT_EACH_TIME = 5000;
 	private static final int MAX_RETRIES = 3;
 
@@ -38,7 +39,7 @@ public class OutboxTableIndexerExecutor {
 	private final int pollingInterval;
 	private final int batchSize;
 
-	public OutboxTableIndexerExecutor(AutomaticIndexingMappingContext mapping, ScheduledExecutorService executor,
+	public OutboxEventBackgroundExecutor(AutomaticIndexingMappingContext mapping, ScheduledExecutorService executor,
 			int pollingInterval, int batchSize) {
 		this.mapping = mapping;
 		this.executor = executor;
@@ -64,7 +65,7 @@ public class OutboxTableIndexerExecutor {
 
 	private void run() {
 		if ( mapping.sessionFactory().isClosed() ) {
-			log.infof( "Session factory is closed. Probably Hibernate Search is shutting down..." );
+			log.sessionFactoryIsClosedOnOutboxProcessing();
 			return;
 		}
 		try ( Session session = mapping.sessionFactory().openSession() ) {
@@ -72,13 +73,13 @@ public class OutboxTableIndexerExecutor {
 				processOutboxRetrialsEntities( session );
 			}
 			catch (Throwable throwable) {
-				log.errorf( throwable, "There are some failure on processing outbox retrials entities" );
+				log.failureOnProcessingOutboxRetrials();
 			}
 			try {
 				processOutboxEntities( session );
 			}
 			catch (Throwable throwable) {
-				log.errorf( throwable, "There are some failure on processing outbox entities" );
+				log.failureOnProcessingOutbox();
 			}
 		}
 	}
@@ -95,14 +96,14 @@ public class OutboxTableIndexerExecutor {
 				createNewOutboxRetrials( session, eventProcessing.getFailedEvents() );
 			}
 			catch (Throwable throwable) {
-				log.errorf( throwable, "Failed to store outbox events for future retrials" );
+				log.failureOnSaveOutboxRetrials();
 			}
 
 			try {
 				deleteOutboxEntities( session, ids );
 			}
 			catch (Throwable throwable) {
-				log.errorf( throwable, "Failed to delete outbox events from the outbox table" );
+				log.failureOnDeleteOutbox();
 			}
 
 			events = findOutboxEntities( session );
@@ -129,7 +130,7 @@ public class OutboxTableIndexerExecutor {
 				}
 			}
 			catch (Throwable throwable) {
-				log.errorf( throwable, "Failed to process the outbox entities retrials" );
+				log.failureOnUpdateOutboxRetrials();
 			}
 
 			from += batchSize;
@@ -145,7 +146,7 @@ public class OutboxTableIndexerExecutor {
 		}
 
 		if ( event.getRetries() > MAX_RETRIES ) {
-			log.warnf( "Max '%s' retries exhausted to process the event '%s'", MAX_RETRIES, event );
+			log.maxOutboxRetriesExhausted( MAX_RETRIES, event );
 			session.delete( event );
 			return;
 		}

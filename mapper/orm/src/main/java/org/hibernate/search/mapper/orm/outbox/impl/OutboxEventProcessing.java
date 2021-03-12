@@ -109,17 +109,14 @@ public class OutboxEventProcessing<Event extends OutboxEventBase> {
 			failedEvents.put( outboxEventReference, eventsMap.get( outboxEventReference ) );
 		}
 
-		log.errorf(
-					report.throwable().get(), "Failed to reindex entities '%s'",
-					report.failingEntityReferences()
-			);
+		log.failureToReindexOutboxEntities( report.failingEntityReferences(), report.throwable().get() );
 	}
 
 	private void reportAllEventsFailure(Throwable throwable, Map<OutboxEventReference, List<Event>> eventsMap) {
 		failedEvents.putAll( eventsMap );
 		for ( List<Event> events : eventsMap.values() ) {
 			for ( Event event : events ) {
-				log.errorf( throwable, "Failed to process event '%s'", event );
+				log.failureOnProcessingOutboxEvent( event, throwable );
 			}
 		}
 	}

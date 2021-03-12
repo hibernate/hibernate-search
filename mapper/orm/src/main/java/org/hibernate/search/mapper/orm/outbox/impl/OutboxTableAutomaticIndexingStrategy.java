@@ -45,7 +45,7 @@ public class OutboxTableAutomaticIndexingStrategy implements AutomaticIndexingSt
 	private static final String NAME = "Outbox table automatic indexing";
 
 	private ScheduledExecutorService scheduledExecutor;
-	private volatile OutboxTableIndexerExecutor executor;
+	private volatile OutboxEventBackgroundExecutor executor;
 
 	@Override
 	public void configure(AutomaticIndexingConfigurationContext context) {
@@ -64,7 +64,7 @@ public class OutboxTableAutomaticIndexingStrategy implements AutomaticIndexingSt
 		int batchSize = AUTOMATIC_INDEXING_BATCH_SIZE.get( context.configurationPropertySource() );
 
 		scheduledExecutor = context.threadPoolProvider().newScheduledExecutor( 1, NAME );
-		executor = new OutboxTableIndexerExecutor( context.mapping(), scheduledExecutor, pollingInterval, batchSize );
+		executor = new OutboxEventBackgroundExecutor( context.mapping(), scheduledExecutor, pollingInterval, batchSize );
 		executor.start();
 		return CompletableFuture.completedFuture( null );
 	}
@@ -81,7 +81,7 @@ public class OutboxTableAutomaticIndexingStrategy implements AutomaticIndexingSt
 	@Override
 	public void stop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( OutboxTableIndexerExecutor::stop, executor );
+			closer.push( OutboxEventBackgroundExecutor::stop, executor );
 			closer.push( ScheduledExecutorService::shutdownNow, scheduledExecutor );
 		}
 	}
