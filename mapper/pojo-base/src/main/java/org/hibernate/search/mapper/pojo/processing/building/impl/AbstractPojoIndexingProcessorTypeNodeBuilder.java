@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorValueNode;
+import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.AbstractPojoIndexingDependencyCollectorDirectValueNode;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundTypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
@@ -85,7 +85,8 @@ public abstract class AbstractPojoIndexingProcessorTypeNodeBuilder<T, U> extends
 		}
 	}
 
-	public Optional<PojoIndexingProcessor<T>> build(PojoIndexingDependencyCollectorValueNode<?, T> valueDependencyCollector) {
+	public Optional<PojoIndexingProcessor<T>> build(
+			AbstractPojoIndexingDependencyCollectorDirectValueNode<?, T> valueDependencyCollector) {
 		return build( toType( valueDependencyCollector ) );
 	}
 
@@ -103,7 +104,7 @@ public abstract class AbstractPojoIndexingProcessorTypeNodeBuilder<T, U> extends
 	abstract BoundPojoModelPathTypeNode<U> getModelPath();
 
 	protected abstract PojoIndexingDependencyCollectorTypeNode<U> toType(
-			PojoIndexingDependencyCollectorValueNode<?, T> valueDependencyCollector);
+			AbstractPojoIndexingDependencyCollectorDirectValueNode<?, T> valueDependencyCollector);
 
 	protected abstract PojoIndexingProcessor<T> doBuild(
 			Collection<IndexObjectFieldReference> parentIndexObjectReferences,

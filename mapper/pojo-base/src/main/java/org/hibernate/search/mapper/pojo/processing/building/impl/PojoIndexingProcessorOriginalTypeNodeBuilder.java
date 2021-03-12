@@ -11,7 +11,7 @@ import java.util.Collection;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorValueNode;
+import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.AbstractPojoIndexingDependencyCollectorDirectValueNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
@@ -42,7 +42,7 @@ public class PojoIndexingProcessorOriginalTypeNodeBuilder<T> extends AbstractPoj
 
 	@Override
 	protected PojoIndexingDependencyCollectorTypeNode<T> toType(
-			PojoIndexingDependencyCollectorValueNode<?, T> valueDependencyCollector) {
+			AbstractPojoIndexingDependencyCollectorDirectValueNode<?, T> valueDependencyCollector) {
 		return valueDependencyCollector.type();
 	}
 

@@ -25,7 +25,7 @@ public class BoundPojoModelPathValueNode<T, P, V> extends BoundPojoModelPath {
 	private BoundPojoModelPathOriginalTypeNode<V> elementTypePathNode;
 
 	BoundPojoModelPathValueNode(BoundPojoModelPathPropertyNode<T, P> parent,
-			BoundContainerExtractorPath<P, V> boundExtractorPath) {
+			BoundContainerExtractorPath<? super P, V> boundExtractorPath) {
 		this.parent = parent;
 		this.boundExtractorPath = boundExtractorPath;
 	}

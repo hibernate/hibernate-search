@@ -16,7 +16,7 @@ public abstract class PojoIndexingDependencyCollectorNode {
 		return new Walker( null );
 	}
 
-	static Walker walker(PojoIndexingDependencyCollectorValueNode<?, ?> initialNodeCollectingDependency) {
+	static Walker walker(PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?> initialNodeCollectingDependency) {
 		return new Walker( initialNodeCollectingDependency );
 	}
 
@@ -61,11 +61,11 @@ public abstract class PojoIndexingDependencyCollectorNode {
 	static class Walker implements PojoModelPathWalker<
 			PojoIndexingDependencyCollectorTypeNode<?>,
 			PojoIndexingDependencyCollectorPropertyNode<?, ?>,
-			PojoIndexingDependencyCollectorValueNode<?, ?>
+			AbstractPojoIndexingDependencyCollectorDirectValueNode<?, ?>
 			> {
-		private final PojoIndexingDependencyCollectorValueNode<?, ?> initialNodeCollectingDependency;
+		private final PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?> initialNodeCollectingDependency;
 
-		Walker(PojoIndexingDependencyCollectorValueNode<?, ?> initialNodeCollectingDependency) {
+		Walker(PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?> initialNodeCollectingDependency) {
 			this.initialNodeCollectingDependency = initialNodeCollectingDependency;
 		}
 
@@ -76,17 +76,17 @@ public abstract class PojoIndexingDependencyCollectorNode {
 		}
 
 		@Override
-		public PojoIndexingDependencyCollectorValueNode<?, ?> value(
+		public AbstractPojoIndexingDependencyCollectorDirectValueNode<?, ?> value(
 				PojoIndexingDependencyCollectorPropertyNode<?, ?> propertyNode,
 				ContainerExtractorPath extractorPath) {
-			PojoIndexingDependencyCollectorValueNode<?, ?> node = propertyNode.value( extractorPath );
+			AbstractPojoIndexingDependencyCollectorDirectValueNode<?, ?> node = propertyNode.value( extractorPath );
 			node.doCollectDependency( initialNodeCollectingDependency );
 			return node;
 		}
 
 		@Override
 		public PojoIndexingDependencyCollectorTypeNode<?> type(
-				PojoIndexingDependencyCollectorValueNode<?, ?> valueNode) {
+				AbstractPojoIndexingDependencyCollectorDirectValueNode<?, ?> valueNode) {
 			return valueNode.type();
 		}
 	}

@@ -14,7 +14,7 @@ import java.util.Map;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorValueNode;
+import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.AbstractPojoIndexingDependencyCollectorDirectValueNode;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
@@ -83,7 +83,7 @@ public class PojoPropertyIndexingDependencyConfigurationContextImpl<P> extends A
 		for ( Map.Entry<ContainerExtractorPath, ValueDependencyContext> entry : valueDependencyContexts.entrySet() ) {
 			ContainerExtractorPath extractorPathFromBridgedElement = entry.getKey();
 
-			PojoIndexingDependencyCollectorValueNode<?, ?> dependencyCollectorValueNode =
+			AbstractPojoIndexingDependencyCollectorDirectValueNode<?, ?> dependencyCollectorValueNode =
 					dependencyCollector.value( extractorPathFromBridgedElement );
 
 			// Always declare the extracted value as a dependency.
@@ -104,7 +104,8 @@ public class PojoPropertyIndexingDependencyConfigurationContextImpl<P> extends A
 			valueTypePath = valuePath.type();
 		}
 
-		public void contributeDependencies(PojoIndexingDependencyCollectorValueNode<?, ?> dependencyCollectorValueNode) {
+		public void contributeDependencies(
+				AbstractPojoIndexingDependencyCollectorDirectValueNode<?, ?> dependencyCollectorValueNode) {
 			PojoIndexingDependencyCollectorTypeNode<?> dependencyCollectorTypeNode =
 					dependencyCollectorValueNode.type();
 			for ( PojoModelPathValueNode pathFromExtractedBridgedElementToUsedValue : usedPaths ) {

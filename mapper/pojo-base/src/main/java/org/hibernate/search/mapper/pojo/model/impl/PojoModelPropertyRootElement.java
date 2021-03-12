@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorPropertyNode;
-import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorValueNode;
+import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.AbstractPojoIndexingDependencyCollectorDirectValueNode;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
@@ -50,7 +50,7 @@ public class PojoModelPropertyRootElement<P> extends AbstractPojoModelCompositeE
 
 	public void contributeDependencies(PojoIndexingDependencyCollectorPropertyNode<?, P> dependencyCollector) {
 		if ( hasAccessor() ) {
-			PojoIndexingDependencyCollectorValueNode<P, P> collectorValueNode =
+			AbstractPojoIndexingDependencyCollectorDirectValueNode<P, P> collectorValueNode =
 					dependencyCollector.value( modelPath.getBoundExtractorPath() );
 			collectorValueNode.collectDependency();
 			contributePropertyDependencies( collectorValueNode.type() );

@@ -11,7 +11,7 @@ import java.util.Collection;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorValueNode;
+import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.AbstractPojoIndexingDependencyCollectorDirectValueNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathCastedTypeNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
@@ -44,7 +44,7 @@ public class PojoIndexingProcessorCastedTypeNodeBuilder<T, U> extends AbstractPo
 	@Override
 	@SuppressWarnings("unchecked")
 	protected PojoIndexingDependencyCollectorTypeNode<U> toType(
-			PojoIndexingDependencyCollectorValueNode<?, T> valueDependencyCollector) {
+			AbstractPojoIndexingDependencyCollectorDirectValueNode<?, T> valueDependencyCollector) {
 		// By construction, the casted type should be the same as U
 		return (PojoIndexingDependencyCollectorTypeNode<U>)
 				valueDependencyCollector.castedType( getModelPath().getTypeModel().rawType() );
