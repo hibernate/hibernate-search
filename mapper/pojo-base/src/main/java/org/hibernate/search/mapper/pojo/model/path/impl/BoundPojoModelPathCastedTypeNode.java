@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.model.path.impl;
 
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**
@@ -30,6 +31,11 @@ public class BoundPojoModelPathCastedTypeNode<T, U> extends BoundPojoModelPathTy
 	@Override
 	public PojoTypeModel<U> getTypeModel() {
 		return typeModel;
+	}
+
+	@Override
+	public <U2> BoundPojoModelPathCastedTypeNode<T, ? extends U2> castTo(PojoRawTypeModel<U2> typeModel) {
+		return new BoundPojoModelPathCastedTypeNode<>( getParent(), typeModel.cast( getTypeModel() ) );
 	}
 
 	@Override

@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.model.path.impl;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
 /**
@@ -47,6 +48,11 @@ public abstract class BoundPojoModelPathTypeNode<T> extends BoundPojoModelPath {
 		appendPath( builder );
 		return builder.toValuePathOrNull();
 	}
+
+	/**
+	 * @return A sibling path node representing this type, cast to the given type.
+	 */
+	public abstract <U> BoundPojoModelPathCastedTypeNode<?, ? extends U> castTo(PojoRawTypeModel<U> typeModel);
 
 	@Override
 	void appendSelfPath(PojoModelPath.Builder builder) {

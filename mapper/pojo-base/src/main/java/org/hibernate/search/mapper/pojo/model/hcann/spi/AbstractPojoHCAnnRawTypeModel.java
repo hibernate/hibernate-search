@@ -18,7 +18,6 @@ import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.AbstractPojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
@@ -56,7 +55,7 @@ public abstract class AbstractPojoHCAnnRawTypeModel<T, I extends AbstractPojoHCA
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public PojoTypeModel<? extends T> cast(PojoGenericTypeModel<?> other) {
+	public PojoTypeModel<? extends T> cast(PojoTypeModel<?> other) {
 		if ( other.rawType().isSubTypeOf( this ) ) {
 			// Redundant cast; no need to create a new type.
 			return (PojoTypeModel<? extends T>) other;

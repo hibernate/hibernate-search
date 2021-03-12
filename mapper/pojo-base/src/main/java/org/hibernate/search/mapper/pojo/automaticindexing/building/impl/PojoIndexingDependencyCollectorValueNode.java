@@ -106,7 +106,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 	public <U> PojoIndexingDependencyCollectorTypeNode<? extends U> castedType(PojoRawTypeModel<U> typeModel) {
 		return new PojoIndexingDependencyCollectorTypeNode<>(
 				this,
-				modelPathFromLastEntityNode.castedType( typeModel ),
+				modelPathFromLastEntityNode.type().castTo( typeModel ),
 				buildingHelper
 		);
 	}

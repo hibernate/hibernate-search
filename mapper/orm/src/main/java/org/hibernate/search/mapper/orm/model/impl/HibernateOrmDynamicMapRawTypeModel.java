@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.AbstractPojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
@@ -64,7 +63,7 @@ public class HibernateOrmDynamicMapRawTypeModel
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public PojoTypeModel<? extends Map> cast(PojoGenericTypeModel<?> other) {
+	public PojoTypeModel<? extends Map> cast(PojoTypeModel<?> other) {
 		if ( other.rawType().isSubTypeOf( this ) ) {
 			// Redundant cast; no need to create a new type.
 			return (PojoTypeModel<? extends Map>) other;
