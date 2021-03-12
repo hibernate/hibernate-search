@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 public class BoundPojoModelPathValueNode<T, P, V> extends BoundPojoModelPath {
 
 	private final BoundPojoModelPathPropertyNode<T, P> parent;
-	private final BoundContainerExtractorPath<P, V> boundExtractorPath;
+	private final BoundContainerExtractorPath<? super P, V> boundExtractorPath;
 	private BoundPojoModelPathOriginalTypeNode<V> elementTypePathNode;
 
 	BoundPojoModelPathValueNode(BoundPojoModelPathPropertyNode<T, P> parent,
@@ -69,7 +69,7 @@ public class BoundPojoModelPathValueNode<T, P, V> extends BoundPojoModelPath {
 	/**
 	 * @return The bound extractor path from the parent property to this value.
 	 */
-	public BoundContainerExtractorPath<P, V> getBoundExtractorPath() {
+	public BoundContainerExtractorPath<? super P, V> getBoundExtractorPath() {
 		return boundExtractorPath;
 	}
 

@@ -38,7 +38,7 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends PojoIndex
 	}
 
 	public <V> PojoIndexingDependencyCollectorValueNode<P, V> value(
-			BoundContainerExtractorPath<P, V> boundExtractorPath) {
+			BoundContainerExtractorPath<? super P, V> boundExtractorPath) {
 		return new PojoIndexingDependencyCollectorValueNode<>(
 				this,
 				modelPathFromParentNode.value( boundExtractorPath ),
