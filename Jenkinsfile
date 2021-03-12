@@ -184,7 +184,7 @@ stage('Configure') {
 							condition: TestCondition.BEFORE_MERGE,
 							isDefault: true),
 					new JdkBuildEnvironment(version: '14', buildJdkTool: 'OpenJDK 14 Latest',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new JdkBuildEnvironment(version: '15', buildJdkTool: 'OpenJDK 15 Latest',
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '16', buildJdkTool: 'OpenJDK 16 Latest',
