@@ -14,7 +14,7 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathProper
 /**
  * A node representing a property in a dependency collector.
  *
- * @see PojoIndexingDependencyCollectorValueNode
+ * @see AbstractPojoIndexingDependencyCollectorDirectValueNode
  *
  * @param <P> The property type
  */
@@ -37,9 +37,9 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends PojoIndex
 		this.modelPathFromLastEntityNode = modelPathFromLastEntityNode;
 	}
 
-	public <V> PojoIndexingDependencyCollectorValueNode<P, V> value(
+	public <V> AbstractPojoIndexingDependencyCollectorDirectValueNode<P, V> value(
 			BoundContainerExtractorPath<? super P, V> boundExtractorPath) {
-		return new PojoIndexingDependencyCollectorValueNode<>(
+		return PojoIndexingDependencyCollectorPolymorphicDirectValueNode.create(
 				this,
 				modelPathFromParentNode.value( boundExtractorPath ),
 				modelPathFromLastEntityNode.value( boundExtractorPath ),
@@ -47,7 +47,7 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends PojoIndex
 		);
 	}
 
-	public PojoIndexingDependencyCollectorValueNode<P, ?> value(
+	public AbstractPojoIndexingDependencyCollectorDirectValueNode<P, ?> value(
 			ContainerExtractorPath extractorPath) {
 		BoundContainerExtractorPath<P, ?> boundExtractorPath =
 				buildingHelper.extractorBinder().bindPath(
@@ -55,6 +55,16 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends PojoIndex
 						extractorPath
 				);
 		return value( boundExtractorPath );
+	}
+
+	<V> PojoIndexingDependencyCollectorMonomorphicDirectValueNode<P, V> monomorphicValue(
+			BoundContainerExtractorPath<? super P, V> boundExtractorPath) {
+		return PojoIndexingDependencyCollectorMonomorphicDirectValueNode.create(
+				this,
+				modelPathFromParentNode.value( boundExtractorPath ),
+				modelPathFromLastEntityNode.value( boundExtractorPath ),
+				buildingHelper
+		);
 	}
 
 	@Override
@@ -69,5 +79,9 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends PojoIndex
 
 	PojoIndexingDependencyCollectorTypeNode<T> parentNode() {
 		return parentNode;
+	}
+
+	BoundPojoModelPathPropertyNode<T, P> modelPathFromParentNode() {
+		return modelPathFromParentNode;
 	}
 }

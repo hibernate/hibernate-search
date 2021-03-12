@@ -21,7 +21,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBi
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorPropertyNode;
-import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorValueNode;
+import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.AbstractPojoIndexingDependencyCollectorDirectValueNode;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundValueBridge;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
@@ -172,7 +172,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 
 	private Collection<PojoIndexingProcessor<? super V>> doBuild(
 			PojoIndexingDependencyCollectorPropertyNode<?, P> parentDependencyCollector) {
-		PojoIndexingDependencyCollectorValueNode<P, V> valueDependencyCollector =
+		AbstractPojoIndexingDependencyCollectorDirectValueNode<P, V> valueDependencyCollector =
 				parentDependencyCollector.value( modelPath.getBoundExtractorPath() );
 
 		Collection<PojoIndexingProcessor<? super V>> immutableNestedNodes =

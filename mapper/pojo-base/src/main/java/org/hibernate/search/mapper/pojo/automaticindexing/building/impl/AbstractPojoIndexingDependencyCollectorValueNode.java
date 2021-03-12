@@ -16,6 +16,8 @@ abstract class AbstractPojoIndexingDependencyCollectorValueNode extends PojoInde
 		super( buildingHelper );
 	}
 
+	public abstract PojoIndexingDependencyCollectorTypeNode<?> type();
+
 	abstract void collectDependency(BoundPojoModelPathValueNode<?, ?, ?> dirtyPathFromEntityType);
 
 	/**

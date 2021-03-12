@@ -11,16 +11,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverNode;
+import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.binding.impl.PojoModelPathBinder;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
-import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
-import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
@@ -44,57 +44,36 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *     </li>
  * </ul>
  *
- * @see PojoIndexingDependencyCollectorTypeNode
- *
  * @param <P> The property type
  * @param <V> The extracted value type
+ *
+ * @see PojoIndexingDependencyCollectorTypeNode
  */
-public class PojoIndexingDependencyCollectorValueNode<P, V>
+public abstract class AbstractPojoIndexingDependencyCollectorDirectValueNode<P, V>
 		extends AbstractPojoIndexingDependencyCollectorValueNode {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoIndexingDependencyCollectorPropertyNode<?, P> parentNode;
-	/**
-	 * The path to this node from the last type node, i.e. from the node
-	 * representing the type holding the property from which this value is extracted.
-	 */
-	private final BoundPojoModelPathValueNode<?, P, V> modelPathFromLastTypeNode;
-	private final PojoModelPathValueNode unboundModelPathFromLastTypeNode;
-	private final BoundPojoModelPathValueNode<?, P, V> modelPathFromLastEntityNode;
+	final PojoIndexingDependencyCollectorPropertyNode<?, P> parentNode;
+	final BoundPojoModelPathValueNode<?, P, V> modelPathFromLastEntityNode;
 
-	private final ReindexOnUpdate reindexOnUpdate;
-	private final Set<PojoModelPathValueNode> derivedFrom;
+	final Metadata metadata;
 
 	// First key: inverse side entity type, second key: original side concrete entity type
 	private final Map<PojoRawTypeModel<?>, Map<PojoRawTypeModel<?>, PojoModelPathValueNode>> inverseAssociationPathCache =
 			new HashMap<>();
 
-	PojoIndexingDependencyCollectorValueNode(PojoIndexingDependencyCollectorPropertyNode<?, P> parentNode,
-			BoundPojoModelPathValueNode<?, P, V> modelPathFromLastTypeNode,
+	AbstractPojoIndexingDependencyCollectorDirectValueNode(PojoIndexingDependencyCollectorPropertyNode<?, P> parentNode,
 			BoundPojoModelPathValueNode<?, P, V> modelPathFromLastEntityNode,
+			Metadata metadata,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
 		this.parentNode = parentNode;
-		this.modelPathFromLastTypeNode = modelPathFromLastTypeNode;
-		// The path is used for comparisons (equals), so we need it unbound
-		this.unboundModelPathFromLastTypeNode = modelPathFromLastTypeNode.toUnboundPath();
 		this.modelPathFromLastEntityNode = modelPathFromLastEntityNode;
-
-		BoundPojoModelPathValueNode<?, P, V> modelPathValueNode = modelPathFromLastTypeNode;
-		BoundPojoModelPathPropertyNode<?, P> modelPathPropertyNode = modelPathFromLastTypeNode.getParent();
-		BoundPojoModelPathTypeNode<?> modelPathTypeNode = modelPathPropertyNode.getParent();
-		ReindexOnUpdate metadataReindexOnUpdateOrNull = buildingHelper.getMetadataReindexOnUpdateOrNull(
-				modelPathTypeNode.getTypeModel(), modelPathPropertyNode.getPropertyModel().name(),
-				modelPathValueNode.getExtractorPath() );
-		this.reindexOnUpdate = parentNode.composeReindexOnUpdate( lastEntityNode(), metadataReindexOnUpdateOrNull );
-		this.derivedFrom = buildingHelper.getMetadataDerivedFrom(
-				modelPathTypeNode.getTypeModel(),
-				modelPathPropertyNode.getPropertyModel().name(),
-				modelPathValueNode.getExtractorPath()
-		);
+		this.metadata = metadata;
 	}
 
+	@Override
 	public PojoIndexingDependencyCollectorTypeNode<V> type() {
 		return new PojoIndexingDependencyCollectorTypeNode<>(
 				this,
@@ -111,89 +90,23 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 		);
 	}
 
-	public void collectDependency() {
-		doCollectDependency( null );
-	}
+	public abstract void collectDependency();
+
+	abstract void doCollectDependency(
+			PojoIndexingDependencyCollectorMonomorphicDirectValueNode<?, ?> initialNodeCollectingDependency);
 
 	@Override
-	void collectDependency(BoundPojoModelPathValueNode<?, ?, ?> dirtyPathFromEntityType) {
-		if ( derivedFrom.isEmpty() ) {
-			parentNode.parentNode().collectDependency( dirtyPathFromEntityType );
-		}
-		else {
-			// This value is derived from other properties.
-			// Any part of this value is assumed to be derived from the same properties:
-			// we don't care about which part in particular.
-			collectDependency();
-		}
-	}
-
-	void doCollectDependency(PojoIndexingDependencyCollectorValueNode<?, ?> initialNodeCollectingDependency) {
-		ReindexOnUpdate composedReindexOnUpdate = initialNodeCollectingDependency == null ? reindexOnUpdate
-				: initialNodeCollectingDependency.composeReindexOnUpdate( lastEntityNode(), reindexOnUpdate );
-		if ( ReindexOnUpdate.NO.equals( composedReindexOnUpdate ) ) {
-			// Updates are ignored
-			return;
-		}
-
-		if ( initialNodeCollectingDependency != null ) {
-			if ( initialNodeCollectingDependency.unboundModelPathFromLastTypeNode.equals( unboundModelPathFromLastTypeNode ) ) {
-				/*
-				 * We found a cycle in the derived from dependencies.
-				 * This can happen for example if:
-				 * - property "foo" on type A is marked as derived from itself
-				 * - property "foo" on type A is marked as derived from property "bar" on type B,
-				 *   which is marked as derived from property "foo" on type "A".
-				 * Even if such a dependency might work in practice at runtime,
-				 * for example because the link A => B never leads to a B that refers to the same A,
-				 * even indirectly,
-				 * we cannot support it here because we need to model dependencies as a static tree,
-				 * which in such case would have an infinite depth.
- 				 */
-				throw log.infiniteRecursionForDerivedFrom(
-						modelPathFromLastTypeNode.getRootType().rawType(),
-						modelPathFromLastTypeNode.toUnboundPath()
-				);
-			}
-		}
-		else {
-			initialNodeCollectingDependency = this;
-		}
-
-		if ( derivedFrom.isEmpty() ) {
-			parentNode.parentNode().collectDependency( this.modelPathFromLastEntityNode );
-		}
-		else {
-			/*
-			 * The value represented by this node is derived from other, base values.
-			 * If we rely on the value represented by this node when indexing,
-			 * then we indirectly rely on these base values.
-			 *
-			 * We don't just call lastEntityNode.collectDependency() for each path to the base values,
-			 * because the paths may cross the entity boundaries, meaning they may have a prefix
-			 * leading to a different entity, and a suffix leading to the value we rely on.
-			 * This means we must go through the dependency collector tree to properly resolve
-			 * the entities that should trigger reindexing of our root entity when they change.
-			 */
-			PojoIndexingDependencyCollectorTypeNode<?> lastTypeNode = parentNode.parentNode();
-			for ( PojoModelPathValueNode path : derivedFrom ) {
-				PojoModelPathBinder.bind(
-						lastTypeNode, path,
-						PojoIndexingDependencyCollectorNode.walker( initialNodeCollectingDependency )
-				);
-			}
-		}
-	}
-
-	@Override
-	PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode() {
+	final PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode() {
 		return parentNode.lastEntityNode();
 	}
 
 	@Override
-	ReindexOnUpdate reindexOnUpdate() {
-		return reindexOnUpdate;
+	final ReindexOnUpdate reindexOnUpdate() {
+		return metadata.reindexOnUpdate;
 	}
+
+	@Override
+	abstract void collectDependency(BoundPojoModelPathValueNode<?, ?, ?> dirtyPathFromEntityType);
 
 	@Override
 	void markForReindexing(AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> inverseSideEntityTypeNodeBuilder,
@@ -226,7 +139,8 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 		PojoRawTypeModel<?> inverseSideRawEntityType = inverseSideEntityType.rawType();
 
 		// Cache the inverse association path, as we may compute it many times, which may be costly
-		Map<PojoRawTypeModel<?>, PojoModelPathValueNode> result = inverseAssociationPathCache.get( inverseSideRawEntityType );
+		Map<PojoRawTypeModel<?>, PojoModelPathValueNode> result = inverseAssociationPathCache.get(
+				inverseSideRawEntityType );
 		if ( result == null ) {
 			if ( !inverseAssociationPathCache.containsKey( inverseSideRawEntityType ) ) {
 				PojoTypeModel<?> originalSideEntityType = lastEntityNode().typeModel();
@@ -263,7 +177,8 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 		return result;
 	}
 
-	private void markForReindexingUsingAssociationInverseSideWithOriginalSideConcreteType(PojoTypeModel<?> originalSideConcreteEntityType,
+	private void markForReindexingUsingAssociationInverseSideWithOriginalSideConcreteType(
+			PojoTypeModel<?> originalSideConcreteEntityType,
 			AbstractPojoImplicitReindexingResolverTypeNodeBuilder<?, ?> typeNodeBuilder,
 			PojoModelPathValueNode inverseAssociationPath,
 			BoundPojoModelPathValueNode<?, ?, ?> dependencyPathFromInverseSideEntityTypeNode) {
@@ -310,4 +225,49 @@ public class PojoIndexingDependencyCollectorValueNode<P, V>
 		);
 	}
 
+	protected static final class Metadata {
+		static Metadata create(PojoImplicitReindexingResolverBuildingHelper buildingHelper,
+				PojoIndexingDependencyCollectorPropertyNode<?, ?> parentNode,
+				ContainerExtractorPath containerExtractorPath) {
+			PojoTypeModel<?> holderType = parentNode.parentNode().typeModel();
+			String propertyName = parentNode.modelPathFromParentNode().getPropertyModel().name();
+
+			ReindexOnUpdate metadataReindexOnUpdateOrNull = buildingHelper.getMetadataReindexOnUpdateOrNull(
+					holderType, propertyName, containerExtractorPath );
+
+			PojoIndexingDependencyCollectorTypeNode<?> lastEntityNode = parentNode.lastEntityNode();
+			ReindexOnUpdate reindexOnUpdate =
+					parentNode.composeReindexOnUpdate( lastEntityNode, metadataReindexOnUpdateOrNull );
+
+			Set<PojoModelPathValueNode> derivedFrom = buildingHelper.getMetadataDerivedFrom(
+					holderType, propertyName, containerExtractorPath );
+
+			return new Metadata( reindexOnUpdate, derivedFrom );
+		}
+
+		final ReindexOnUpdate reindexOnUpdate;
+		final Set<PojoModelPathValueNode> derivedFrom;
+
+		private Metadata(ReindexOnUpdate reindexOnUpdate, Set<PojoModelPathValueNode> derivedFrom) {
+			this.derivedFrom = derivedFrom;
+			this.reindexOnUpdate = reindexOnUpdate;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if ( this == o ) {
+				return true;
+			}
+			if ( o == null || getClass() != o.getClass() ) {
+				return false;
+			}
+			Metadata metadata = (Metadata) o;
+			return reindexOnUpdate == metadata.reindexOnUpdate && Objects.equals( derivedFrom, metadata.derivedFrom );
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash( reindexOnUpdate, derivedFrom );
+		}
+	}
 }

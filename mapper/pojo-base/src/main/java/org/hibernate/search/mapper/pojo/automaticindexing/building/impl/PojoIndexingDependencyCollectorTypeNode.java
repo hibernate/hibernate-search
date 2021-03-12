@@ -7,11 +7,15 @@
 package org.hibernate.search.mapper.pojo.automaticindexing.building.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathCastedTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
@@ -23,7 +27,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * A node representing a type in a dependency collector.
  *
- * @see PojoIndexingDependencyCollectorValueNode
+ * @see AbstractPojoIndexingDependencyCollectorDirectValueNode
  *
  * @param <T> The represented type
  */
@@ -226,5 +230,34 @@ public class PojoIndexingDependencyCollectorTypeNode<T> extends PojoIndexingDepe
 
 	PojoTypeModel<T> typeModel() {
 		return modelPathFromLastEntityNode.getTypeModel();
+	}
+
+	List<PojoIndexingDependencyCollectorTypeNode<? extends T>> polymorphic() {
+		if (
+			// No need for polymorphism on the root type:
+			// indexing/reindexing always works on actual instance types at the root.
+			// E.g. if there is a hierarchy of contained types, we'll have one reindexing resolver for each
+			// concrete type in the hierarchy.
+			parentNode == null
+			// For non-entity types, we have no idea what all the concrete subtypes are,
+			// so we cannot handle polymorphism.
+			|| lastEntityNode != this ) {
+			return Collections.singletonList( this );
+		}
+
+		PojoRawTypeModel<? super T> superTypeModel = typeModel().rawType();
+		List<PojoIndexingDependencyCollectorTypeNode<? extends T>> result = new ArrayList<>();
+		for ( PojoRawTypeModel<?> concreteSubType :
+				buildingHelper.getConcreteEntitySubTypesForEntitySuperType( superTypeModel ) ) {
+			result.add( castToRawSubType( concreteSubType ) );
+		}
+		return result;
+	}
+
+	@SuppressWarnings("unchecked") // Casting a raw or generic type to a raw subtype always results in a subtype (generic or not)
+	private PojoIndexingDependencyCollectorTypeNode<? extends T> castToRawSubType(PojoRawTypeModel<?> concreteSubType) {
+		return new PojoIndexingDependencyCollectorTypeNode<>( parentNode,
+				(BoundPojoModelPathCastedTypeNode<?, ? extends T>) modelPathFromLastEntityNode.castTo( concreteSubType ),
+				buildingHelper );
 	}
 }

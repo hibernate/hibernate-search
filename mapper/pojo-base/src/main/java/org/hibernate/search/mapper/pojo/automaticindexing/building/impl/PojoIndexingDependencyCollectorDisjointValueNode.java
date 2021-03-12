@@ -58,6 +58,7 @@ public class PojoIndexingDependencyCollectorDisjointValueNode<V>
 		}
 	}
 
+	@Override
 	public PojoIndexingDependencyCollectorTypeNode<?> type() {
 		return new PojoIndexingDependencyCollectorTypeNode<>( this,
 				BoundPojoModelPath.root( inverseSideEntityTypeModel ), buildingHelper );
