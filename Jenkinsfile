@@ -172,7 +172,7 @@ stage('Configure') {
 					new JdkBuildEnvironment(version: '13', tool: 'OpenJDK 13 Latest',
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '14', tool: 'OpenJDK 14 Latest',
-							condition: TestCondition.AFTER_MERGE),
+							condition: TestCondition.ON_DEMAND),
 					new JdkBuildEnvironment(version: '15', tool: 'OpenJDK 15 Latest',
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '16', tool: 'OpenJDK 16 Latest',
