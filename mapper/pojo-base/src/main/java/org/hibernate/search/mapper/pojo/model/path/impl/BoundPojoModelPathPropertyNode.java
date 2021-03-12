@@ -47,7 +47,7 @@ public class BoundPojoModelPathPropertyNode<T, P> extends BoundPojoModelPath {
 		return value( BoundContainerExtractorPath.noExtractors( propertyModel.typeModel() ) );
 	}
 
-	public <V> BoundPojoModelPathValueNode<T, P, V> value(BoundContainerExtractorPath<P, V> extractorPath) {
+	public <V> BoundPojoModelPathValueNode<T, P, V> value(BoundContainerExtractorPath<? super P, V> extractorPath) {
 		return new BoundPojoModelPathValueNode<>( this, extractorPath );
 	}
 
