@@ -21,6 +21,8 @@ import org.hibernate.mapping.Value;
 import org.hibernate.resource.beans.container.spi.BeanContainer;
 import org.hibernate.search.engine.environment.bean.spi.BeanNotFoundException;
 import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.mapper.orm.outbox.impl.OutboxEventBase;
+import org.hibernate.search.mapper.orm.outbox.impl.OutboxEventRetry;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
@@ -293,5 +295,42 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET + 43, value = "Outbox-generated entity mapping: %1$s")
 	void outboxGeneratedEntityMapping(String xmlMappingDefinition);
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET + 44, value = "Session factory is closed. Probably Hibernate Search is shutting down.")
+	void sessionFactoryIsClosedOnOutboxProcessing();
+
+	@LogMessage(level = ERROR)
+	@Message(id = ID_OFFSET + 45, value = "There are some failure on processing outbox retrials entities.")
+	void failureOnProcessingOutboxRetrials();
+
+	@LogMessage(level = ERROR)
+	@Message(id = ID_OFFSET + 46, value = "There are some failure on processing outbox entities.")
+	void failureOnProcessingOutbox();
+
+	@LogMessage(level = ERROR)
+	@Message(id = ID_OFFSET + 47, value = "There are some failure on saving outbox retrials entities.")
+	void failureOnSaveOutboxRetrials();
+
+	@LogMessage(level = ERROR)
+	@Message(id = ID_OFFSET + 48, value = "There are some failure on delete outbox entities.")
+	void failureOnDeleteOutbox();
+
+	@LogMessage(level = ERROR)
+	@Message(id = ID_OFFSET + 49, value = "There are some failure on update outbox retrials entities.")
+	void failureOnUpdateOutboxRetrials();
+
+	@LogMessage(level = WARN)
+	@Message(id = ID_OFFSET + 50, value = "Max '%1$s' retries exhausted to process the event '%2$s'." +
+			" The event will be lost forever.")
+	void maxOutboxRetriesExhausted(int maxRetries, OutboxEventRetry event);
+
+	@LogMessage(level = ERROR)
+	@Message(id = ID_OFFSET + 51, value = "Processing of an outbox event failed. Outbox event: '%1$s'.")
+	void failureOnProcessingOutboxEvent(OutboxEventBase event, @Cause Throwable t);
+
+	@LogMessage(level = ERROR)
+	@Message(id = ID_OFFSET + 52, value = "Reindex of outbox entities failed. Outbox entities : '%1$s'.")
+	void failureToReindexOutboxEntities(List<EntityReference> entities, @Cause Throwable t);
 
 }
