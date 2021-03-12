@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -97,6 +98,13 @@ public abstract class AbstractPojoRawTypeModel<T, I extends PojoBootstrapIntrosp
 	@Override
 	public final PojoCaster<T> caster() {
 		return caster;
+	}
+
+	@Override
+	public <U> Optional<PojoTypeModel<? extends U>> castTo(Class<U> target) {
+		// Let the caller decide of the result:
+		// we don't have any generics information to add to the resulting type.
+		return Optional.empty();
 	}
 
 	protected abstract Stream<String> declaredPropertyNames();

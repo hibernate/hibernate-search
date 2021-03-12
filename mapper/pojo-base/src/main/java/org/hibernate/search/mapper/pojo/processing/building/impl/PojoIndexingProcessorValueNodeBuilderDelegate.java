@@ -121,7 +121,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 		}
 		else {
 			PojoRawTypeModel<?> targetTypeModel = mappingHelper.introspector().typeModel( targetType );
-			BoundPojoModelPathCastedTypeNode<V, ?> typeModelPath = modelPath.castedType( targetTypeModel );
+			BoundPojoModelPathCastedTypeNode<V, ?> typeModelPath = modelPath.type().castTo( targetTypeModel );
 			identityMappingCollector = new PojoIndexedEmbeddedIdentityMappingCollector<>(
 					typeModelPath.getTypeModel().rawType(), mappingHelper );
 			nestedProcessorBuilder = new PojoIndexingProcessorCastedTypeNodeBuilder<>(

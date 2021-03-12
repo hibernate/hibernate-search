@@ -153,7 +153,7 @@ class PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> {
 			PojoRawTypeModel<U> targetTypeModel) {
 		checkNotFrozen();
 		return new PojoImplicitReindexingResolverCastedTypeNodeBuilder<>(
-				modelPath.castedType( targetTypeModel ), buildingHelper
+				modelPath.type().castTo( targetTypeModel ), buildingHelper
 		);
 	}
 

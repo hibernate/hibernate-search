@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.model.spi;
 
+import java.util.Optional;
+
 /**
  * A model representing a POJO type: its structure (properties and their type),
  * its name, ...
@@ -35,4 +37,15 @@ public interface PojoTypeModel<T> {
 	PojoRawTypeModel<? super T> rawType();
 
 	PojoPropertyModel<?> property(String propertyName);
+
+	/**
+	 * @param target The type to cast to.
+	 * @param <U> The type to cast to.
+	 * @return A new type model, representing the current type cast to the given type,
+	 * or {@link Optional#empty()} if casting is not supported.
+	 * The type model will retain as much contextual type information as possible (type arguments, ...),
+	 * so casting {@code List<Integer>} to {@code Collection} for example would return {@code Collection<Integer>}.
+	 */
+	<U> Optional<PojoTypeModel<? extends U>> castTo(Class<U> target);
+
 }

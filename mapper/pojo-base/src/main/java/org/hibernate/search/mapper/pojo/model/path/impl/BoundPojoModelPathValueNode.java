@@ -10,7 +10,6 @@ import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPa
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
@@ -61,13 +60,6 @@ public class BoundPojoModelPathValueNode<T, P, V> extends BoundPojoModelPath {
 			);
 		}
 		return elementTypePathNode;
-	}
-
-	/**
-	 * @return A child path node representing values represented by this node, casted to the given type.
-	 */
-	public <U> BoundPojoModelPathCastedTypeNode<V, ? extends U> castedType(PojoRawTypeModel<U> typeModel) {
-		return new BoundPojoModelPathCastedTypeNode<>( this, typeModel.cast( getTypeModel() ) );
 	}
 
 	public PojoGenericTypeModel<V> getTypeModel() {

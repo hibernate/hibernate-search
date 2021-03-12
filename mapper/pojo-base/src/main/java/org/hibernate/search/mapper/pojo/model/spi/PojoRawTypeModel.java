@@ -65,7 +65,7 @@ public interface PojoRawTypeModel<T> extends PojoTypeModel<T>, MappableTypeModel
 	 * will retain as much contextual type information as possible (type arguments, ...),
 	 * so casting {@code List<Integer>} to {@code Collection} for example would return {@code Collection<Integer>}.
 	 */
-	PojoTypeModel<? extends T> cast(PojoGenericTypeModel<?> other);
+	PojoTypeModel<? extends T> cast(PojoTypeModel<?> other);
 
 	PojoCaster<T> caster();
 
