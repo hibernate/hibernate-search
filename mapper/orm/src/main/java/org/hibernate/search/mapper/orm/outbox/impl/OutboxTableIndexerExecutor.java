@@ -63,11 +63,23 @@ public class OutboxTableIndexerExecutor {
 	}
 
 	private void run() {
-		try ( Session session = mapping.sessionFactory().openSession() ) {
-			processOutboxRetrialsEntities( session );
+		if ( mapping.sessionFactory().isClosed() ) {
+			log.infof( "Session factory is closed. Probably Hibernate Search is shutting down..." );
+			return;
 		}
 		try ( Session session = mapping.sessionFactory().openSession() ) {
-			processOutboxEntities( session );
+			try {
+				processOutboxRetrialsEntities( session );
+			}
+			catch (Throwable throwable) {
+				log.errorf( throwable, "There are some failure on processing outbox retrials entities" );
+			}
+			try {
+				processOutboxEntities( session );
+			}
+			catch (Throwable throwable) {
+				log.errorf( throwable, "There are some failure on processing outbox entities" );
+			}
 		}
 	}
 
