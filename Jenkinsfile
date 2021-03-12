@@ -602,6 +602,7 @@ class CompilerBuildEnvironment extends BuildEnvironment {
 class DatabaseBuildEnvironment extends BuildEnvironment {
 	String dbName
 	String mavenProfile
+	@Override
 	String getTag() { "database-$dbName" }
 }
 
@@ -609,6 +610,7 @@ class EsLocalBuildEnvironment extends BuildEnvironment {
 	String versionRange
 	String version
 	String mavenProfile
+	@Override
 	String getTag() { "elasticsearch-local-$versionRange${version ? "-as-$version" : ''}" }
 }
 
@@ -617,6 +619,7 @@ class EsAwsBuildEnvironment extends BuildEnvironment {
 	String mavenProfile
 	String endpointUrl = null
 	String awsRegion = null
+	@Override
 	String getTag() { "elasticsearch-aws-$version" }
 	String getNameEmbeddableVersion() {
 		version.replaceAll('\\.', '')
