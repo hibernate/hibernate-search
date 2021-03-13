@@ -107,6 +107,14 @@ public interface SearchPredicateFactory {
 	RegexpPredicateFieldStep<?> regexp();
 
 	/**
+	 * Match documents where targeted fields contain a term that matches some terms of a given series of terms.
+	 *
+	 * @return The initial step of a DSL where the "terms" predicate can be defined.
+	 * @see TermsPredicateFieldStep
+	 */
+	TermsPredicateFieldStep<?> terms();
+
+	/**
 	 * Match documents where a {@link ObjectStructure#NESTED nested object} matches a given predicate.
 	 *
 	 * @return The initial step of a DSL where the "nested" predicate can be defined.

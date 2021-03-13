@@ -25,6 +25,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryEx
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.SpatialPredicateInitialStep;
+import org.hibernate.search.engine.search.predicate.dsl.TermsPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
@@ -82,6 +83,12 @@ public class DefaultSearchPredicateFactory implements SearchPredicateFactory {
 	@Override
 	public RegexpPredicateFieldStep<?> regexp() {
 		return new RegexpPredicateFieldStepImpl( dslContext );
+	}
+
+	@Override
+	public TermsPredicateFieldStep<?> terms() {
+		// TODO HSEARCH-2589 Implement the predicate
+		return null;
 	}
 
 	@Override
