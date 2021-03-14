@@ -25,6 +25,7 @@ import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredica
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.TermsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
@@ -40,6 +41,7 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder,
 		PhrasePredicateBuilder,
 		WildcardPredicateBuilder,
 		RegexpPredicateBuilder,
+		TermsPredicateBuilder,
 		SimpleQueryStringPredicateBuilder,
 		NestedPredicateBuilder,
 		ExistsPredicateBuilder,
@@ -126,6 +128,16 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder,
 	@Override
 	public void pattern(String pattern) {
 		// used by both wildcard and regexp predicate
+		// No-op
+	}
+
+	@Override
+	public void matchingAny(Object term, Object... terms) {
+		// No-op
+	}
+
+	@Override
+	public void matchingAll(Object term, Object... terms) {
 		// No-op
 	}
 
