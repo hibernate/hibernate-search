@@ -13,14 +13,16 @@ package org.hibernate.search.mapper.orm.massindexing;
  * it is often necessary to monitor its progress.
  * The default, built-in monitor logs progress periodically at the INFO level,
  * but a custom monitor can be set by implementing this interface
- * and passing an instance to {@link org.hibernate.search.mapper.orm.massindexing.MassIndexer#monitor(MassIndexingMonitor)}.
+ * and passing an instance to {@link MassIndexer#monitor(org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor)}.
  * <p>
  * Implementations must be threadsafe.
  *
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
+ * @deprecated move to {@link org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor}.
  */
-public interface MassIndexingMonitor {
+@Deprecated
+public interface MassIndexingMonitor extends org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor {
 
 	/**
 	 * Notify the monitor that {@code increment} more documents have been added to the index.
@@ -36,7 +38,10 @@ public interface MassIndexingMonitor {
 	 * This method can be invoked from several threads thus implementors are required to be thread-safe.
 	 *
 	 * @param increment additional number of documents built
+	 * @deprecated move to {@link org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor#documentsAdded(long)}.
 	 */
+	@Override
+	@Deprecated
 	void documentsAdded(long increment);
 
 	/**
@@ -53,7 +58,10 @@ public interface MassIndexingMonitor {
 	 * This method can be invoked from several threads thus implementors are required to be thread-safe.
 	 *
 	 * @param increment additional number of documents built
+	 * @deprecated move to {@link org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor#documentsBuilt(long)}.
 	 */
+	@Override
+	@Deprecated
 	void documentsBuilt(long increment);
 
 	/**
@@ -70,7 +78,10 @@ public interface MassIndexingMonitor {
 	 * This method can be invoked from several threads thus implementors are required to be thread-safe.
 	 *
 	 * @param increment additional number of entities loaded from database
+	 * @deprecated move to {@link org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor#entitiesLoaded(long)}.
 	 */
+	@Override
+	@Deprecated
 	void entitiesLoaded(long increment);
 
 	/**
@@ -90,11 +101,17 @@ public interface MassIndexingMonitor {
 	 * This method can be invoked from several threads thus implementors are required to be thread-safe.
 	 *
 	 * @param increment additional number of entities that will be indexed
+	 * @deprecated move to {@link org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor#addToTotalCount(long)}.
 	 */
+	@Override
+	@Deprecated
 	void addToTotalCount(long increment);
 
 	/**
 	 * Notify the monitor that indexing is complete.
+	 * @deprecated move to {@link org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor#indexingCompleted()}.
 	 */
+	@Override
+	@Deprecated
 	void indexingCompleted();
 }

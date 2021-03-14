@@ -10,9 +10,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import org.hibernate.search.mapper.orm.massindexing.MassIndexingEntityFailureContext;
-import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureContext;
-import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEntityFailureContext;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureContext;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.util.common.SearchException;
 
 import org.assertj.core.api.InstanceOfAssertFactories;

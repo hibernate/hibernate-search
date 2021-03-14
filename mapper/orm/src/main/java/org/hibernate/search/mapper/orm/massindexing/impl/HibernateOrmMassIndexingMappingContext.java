@@ -10,21 +10,19 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
-import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
+import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
+import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingMappingContext;
 
-public interface HibernateOrmMassIndexingMappingContext {
+public interface HibernateOrmMassIndexingMappingContext extends MassIndexingMappingContext {
 
 	SessionFactoryImplementor sessionFactory();
 
-	ThreadPoolProvider threadPoolProvider();
-
-	FailureHandler failureHandler();
-
+	@Override
 	EntityReferenceFactory<EntityReference> entityReferenceFactory();
 
 	HibernateOrmScopeSessionContext sessionContext(EntityManager entityManager);
 
+	HibernateOrmSessionTypeContextProvider typeContextProvider();
 }

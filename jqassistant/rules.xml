@@ -527,6 +527,7 @@
     </constraint>
 
     <constraint id="hsearch:TypesExtendingTypeFromAnotherModuleMustHaveModuleSpecificKeywordInName">
+        <requiresConcept refId="java:Deprecated" />
         <requiresConcept refId="hsearch:TypeMetadata" />
         <requiresConcept refId="hsearch:Anonymous" />
         <requiresConcept refId="hsearch:Generated" />
@@ -539,6 +540,8 @@
             This allows to more easily understand which module a given type comes from.
             Exceptions are allowed when:
             - the misnamed type is an anonymous type or a generated type;
+            - or the misnamed type is deprecated;
+            - or the implemented type is deprecated;
             - or the misnamed type is an inner/nested type whose name ends with ".*Builder"
             and its surrounding type does use the module-specific keyword;
             - or the implemented type is in a util module,
@@ -555,6 +558,8 @@
                 AND NOT misnamedType.nameWithoutContainingTypeName =~ ("^(Abstract)?\\Q" + misnamedTypeArtifact.moduleSpecificKeyword + "\\E.*")
                 // Exceptions
                 AND NOT misnamedType:Anonymous
+                AND NOT misnamedType:Deprecated
+                AND NOT externalParentType:Deprecated
                 AND NOT misnamedType:Generated
                 AND NOT (
                         misnamedType.nameWithoutContainingTypeName ENDS WITH "Builder"

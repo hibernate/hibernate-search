@@ -10,10 +10,11 @@ import java.util.Collection;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
+import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexingMappingContext;
 import org.hibernate.search.mapper.javabean.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionMappingContext;
 
-public interface JavaBeanSearchSessionMappingContext extends PojoSearchSessionMappingContext {
+public interface JavaBeanSearchSessionMappingContext extends PojoSearchSessionMappingContext, JavaBeanMassIndexingMappingContext {
 
 	@Override
 	EntityReferenceFactory<EntityReference> entityReferenceFactory();

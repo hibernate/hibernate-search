@@ -16,7 +16,6 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
-import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
@@ -24,6 +23,7 @@ import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsSt
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
+import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 
 /**
  * A lazily initializing {@link SearchSession}.

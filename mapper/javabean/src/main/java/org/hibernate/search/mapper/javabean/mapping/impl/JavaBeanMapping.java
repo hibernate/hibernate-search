@@ -13,13 +13,17 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.javabean.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexingSessionContext;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
@@ -61,8 +65,8 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 
 	@Override
 	public EntityReference createEntityReference(String typeName, Object identifier) {
-		JavaBeanSessionIndexedTypeContext<?> typeContext =
-				typeContextContainer.indexedForEntityName( typeName );
+		JavaBeanSessionIndexedTypeContext<?> typeContext
+				= typeContextContainer.indexedForEntityName( typeName );
 		if ( typeContext == null ) {
 			throw new AssertionFailure(
 					"Type name " + typeName + " refers to an unknown type"
@@ -134,5 +138,25 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 		return new JavaBeanSearchSession.Builder(
 				this, typeContextContainer
 		);
+	}
+
+	@Override
+	public ThreadPoolProvider threadPoolProvider() {
+		return delegate().threadPoolProvider();
+	}
+
+	@Override
+	public FailureHandler failureHandler() {
+		return delegate().failureHandler();
+	}
+
+	@Override
+	public JavaBeanMassIndexingSessionContext sessionContext() {
+		return (JavaBeanMassIndexingSessionContext) createSession();
+	}
+
+	@Override
+	public DetachedBackendSessionContext detachedBackendSessionContext(String tenantId) {
+		return DetachedBackendSessionContext.of( this, tenantId );
 	}
 }

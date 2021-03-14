@@ -36,6 +36,9 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
+import static org.jboss.logging.Logger.Level.DEBUG;
+import static org.jboss.logging.Logger.Level.ERROR;
+import static org.jboss.logging.Logger.Level.INFO;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
@@ -563,5 +566,75 @@ public interface Log extends BasicLogger {
 			+ " the required identifier must be a superclass of the actual identifier.")
 	SearchException wrongRequiredIdentifierType(@FormatWith(ClassFormatter.class) Class<?> requiredIdentifierType,
 			@FormatWith(ClassFormatter.class) Class<?> actualIdentifierType);
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET + 91, value = "Mass indexing is going to index %d entities.")
+	void indexingEntities(long count);
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET + 92, value = "Mass indexing complete. Indexed %1$d entities.")
+	void indexingEntitiesCompleted(long nbrOfEntities);
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET + 93, value = "Mass indexing progress: indexed %1$d entities in %2$d ms.")
+	void indexingProgressRaw(long doneCount, long elapsedMs);
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET + 94, value = "Mass indexing progress: %2$.2f%% [%1$f documents/second].")
+	void indexingProgressStats(float estimateSpeed, float estimatePercentileComplete);
+
+	@LogMessage(level = ERROR)
+	@Message(id = ID_OFFSET + 95, value = "Mass indexing received interrupt signal: aborting.")
+	void interruptedBatchIndexing();
+
+	@LogMessage(level = ERROR)
+	@Message(id = ID_OFFSET + 96, value = "Transaction rollback failure: %1$s")
+	void errorRollingBackTransaction(String message, @Cause Exception e1);
+
+	/*
+	 * This is not an exception factory nor a logging statement.
+	 * The returned string is passed to the FailureHandler,
+	 * which is not necessarily using a logger but we still
+	 * want to internationalize the message.
+	 */
+	@Message(value = "MassIndexer operation")
+	String massIndexerOperation();
+
+	@Message(value = "Indexing instance of entity '%s' during mass indexing")
+	String massIndexerIndexingInstance(String entityName);
+
+	@Message(value = "Fetching identifiers of entities to index for entity '%s' during mass indexing")
+	String massIndexerFetchingIds(String entityName);
+
+	@Message(value = "Loading and extracting entity data for entity '%s' during mass indexing")
+	String massIndexingLoadingAndExtractingEntityData(String entityName);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET + 97, value = "Default automatic indexing synchronization strategy set to '%s'.")
+	void defaultAutomaticIndexingSynchronizationStrategy(Object strategy);
+
+	@Message(id = ID_OFFSET + 98, value = "No transaction active while indexing entity '%1$s'. Consider increasing the connection time-out.")
+	SearchException transactionNotActiveWhileProducingIdsForBatchIndexing(String entityName);
+
+	@Message(id = ID_OFFSET + 99, value = "Multiple batching index loader assigned to the same process type: %1$s.")
+	SearchException multipleBatchingDocumentIndexing(String entityName);
+
+	@Message(id = ID_OFFSET + 100, value = "Unable to handle mass indexing proccess: %1$s")
+	SearchException massIndexingInterceptionHandlingException(String causeMessage, @Cause Throwable cause);
+
+	@Message(id = ID_OFFSET + 101, value = "%1$s entities could not be indexed. See the logs for details."
+			+ " First failure on entity '%2$s': %3$s")
+	SearchException massIndexingEntityFailures(long finalFailureCount,
+			Object firstFailureEntity, String firstFailureMessage,
+			@Cause Throwable firstFailure);
+
+	@LogMessage(level = Logger.Level.ERROR)
+	@Message(id = ID_OFFSET + 102,
+			value = "The mass indexing failure handler threw an exception while handling a previous failure."
+			+ " The failure may not have been reported.")
+	void failureInMassIndexingFailureHandler(@Cause Throwable t);
+
+	@Message(id = ID_OFFSET + 103, value = "Mass indexing received interrupt signal. The index is left in an unknown state!")
+	SearchException massIndexingThreadInterrupted(@Cause InterruptedException e);
 
 }

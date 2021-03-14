@@ -37,6 +37,11 @@ class JavaBeanIndexedTypeContext<E> extends AbstractJavaBeanTypeContext<E>
 		return indexManager.toAPI();
 	}
 
+	@Override
+	public String entityName() {
+		return name();
+	}
+
 	static class Builder<E> extends AbstractBuilder<E> implements PojoIndexedTypeExtendedMappingCollector {
 		private IdentifierMapping identifierMapping;
 		private MappedIndexManager indexManager;

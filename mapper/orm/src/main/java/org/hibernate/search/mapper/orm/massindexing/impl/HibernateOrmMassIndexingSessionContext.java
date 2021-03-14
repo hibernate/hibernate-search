@@ -7,15 +7,10 @@
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
+import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingSessionContext;
 
-public interface HibernateOrmMassIndexingSessionContext {
+public interface HibernateOrmMassIndexingSessionContext extends MassIndexingSessionContext {
 
 	SessionImplementor session();
-
-	PojoIndexer createIndexer();
-
-	PojoRuntimeIntrospector runtimeIntrospector();
 
 }

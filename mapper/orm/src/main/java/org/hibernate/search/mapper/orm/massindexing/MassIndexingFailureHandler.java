@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.mapper.orm.massindexing;
 
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEntityFailureContext;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureContext;
+
 /**
  * A handler for failures occurring during mass indexing.
  * <p>
@@ -16,8 +19,10 @@ package org.hibernate.search.mapper.orm.massindexing;
  * by configuring the mass indexer.
  * <p>
  * Handlers can be called from multiple threads simultaneously: implementations must be thread-safe.
+ * @deprecated move to {@link org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler}.
  */
-public interface MassIndexingFailureHandler {
+@Deprecated
+public interface MassIndexingFailureHandler extends org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler {
 
 	/**
 	 * Handle a generic failure.
@@ -29,7 +34,10 @@ public interface MassIndexingFailureHandler {
 	 * Any error or exception thrown by this method will be caught by Hibernate Search and logged.
 	 *
 	 * @param context Contextual information about the failure (throwable, operation, ...)
+	 * @deprecated move to {@link org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler#handle(MassIndexingFailureContext)}.
 	 */
+	@Deprecated
+	@Override
 	void handle(MassIndexingFailureContext context);
 
 	/**
@@ -42,7 +50,10 @@ public interface MassIndexingFailureHandler {
 	 * Any error or exception thrown by this method will be caught by Hibernate Search and logged.
 	 *
 	 * @param context Contextual information about the failure (throwable, operation, ...)
+	 * @deprecated move to {@link org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler#handle(MassIndexingEntityFailureContext)}.
 	 */
+	@Deprecated
+	@Override
 	default void handle(MassIndexingEntityFailureContext context) {
 		handle( (MassIndexingFailureContext) context );
 	}

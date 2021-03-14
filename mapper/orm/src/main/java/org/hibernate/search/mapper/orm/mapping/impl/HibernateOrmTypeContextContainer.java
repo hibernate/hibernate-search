@@ -68,6 +68,11 @@ class HibernateOrmTypeContextContainer
 	}
 
 	@Override
+	public HibernateOrmIndexedTypeContext<?> indexedForEntityName(String indexName) {
+		return indexedTypeContextsByJpaEntityName.get( indexName );
+	}
+
+	@Override
 	public AbstractHibernateOrmTypeContext<?> forHibernateOrmEntityName(String hibernateOrmEntityName) {
 		AbstractHibernateOrmTypeContext<?> result =
 				indexedTypeContextsByHibernateOrmEntityName.get( hibernateOrmEntityName );

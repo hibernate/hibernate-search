@@ -7,7 +7,7 @@
 package org.hibernate.search.massindexing.impl;
 
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.mapper.orm.massindexing.MassIndexingMonitor;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
 
 public class V5MigrationMassIndexerProgressMonitorAdapter implements MassIndexingMonitor {
 	private final MassIndexerProgressMonitor delegate;
