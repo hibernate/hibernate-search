@@ -74,6 +74,11 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	}
 
 	@Override
+	public Query createSetQuery(String absoluteFieldPath, Collection<Double> values) {
+		return DoublePoint.newSetQuery( absoluteFieldPath, values );
+	}
+
+	@Override
 	public Double sortedDocValueToTerm(long longValue) {
 		return NumericUtils.sortableLongToDouble( longValue );
 	}

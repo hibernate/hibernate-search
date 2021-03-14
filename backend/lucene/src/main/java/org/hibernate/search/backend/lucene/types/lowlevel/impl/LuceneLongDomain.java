@@ -73,6 +73,11 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 	}
 
 	@Override
+	public Query createSetQuery(String absoluteFieldPath, Collection<Long> values) {
+		return LongPoint.newSetQuery( absoluteFieldPath, values );
+	}
+
+	@Override
 	public Long sortedDocValueToTerm(long longValue) {
 		return longValue;
 	}

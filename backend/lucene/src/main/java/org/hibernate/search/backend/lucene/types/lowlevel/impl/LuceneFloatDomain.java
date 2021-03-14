@@ -74,6 +74,11 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	}
 
 	@Override
+	public Query createSetQuery(String absoluteFieldPath, Collection<Float> values) {
+		return FloatPoint.newSetQuery( absoluteFieldPath, values );
+	}
+
+	@Override
 	public Float sortedDocValueToTerm(long longValue) {
 		return NumericUtils.sortableIntToFloat( (int) longValue );
 	}

@@ -73,6 +73,11 @@ public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 	}
 
 	@Override
+	public Query createSetQuery(String absoluteFieldPath, Collection<Integer> values) {
+		return IntPoint.newSetQuery( absoluteFieldPath, values );
+	}
+
+	@Override
 	public Integer sortedDocValueToTerm(long longValue) {
 		return (int) longValue;
 	}
