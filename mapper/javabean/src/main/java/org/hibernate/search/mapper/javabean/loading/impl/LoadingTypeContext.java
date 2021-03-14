@@ -6,10 +6,14 @@
  */
 package org.hibernate.search.mapper.javabean.loading.impl;
 
+import org.hibernate.search.mapper.pojo.bridge.runtime.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface LoadingTypeContext<E> {
 
 	PojoRawTypeIdentifier<E> typeIdentifier();
 
+	String entityName();
+
+	IdentifierMapping identifierMapping();
 }

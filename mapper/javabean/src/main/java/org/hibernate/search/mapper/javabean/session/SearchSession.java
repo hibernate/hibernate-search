@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.javabean.session;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -14,6 +15,7 @@ import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.work.SearchIndexer;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
+import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
 
 public interface SearchSession extends AutoCloseable {
 
@@ -23,6 +25,37 @@ public interface SearchSession extends AutoCloseable {
 	 */
 	@Override
 	void close();
+
+	/**
+	 * Creates a {@link MassIndexer} to rebuild the indexes of all indexed entity types.
+	 * <p>
+	 * {@link MassIndexer} instances cannot be reused.
+	 *
+	 * @return The created mass indexer.
+	 */
+	default MassIndexer massIndexer() {
+		return massIndexer( Object.class );
+	}
+
+	/**
+	 * Creates a {@link MassIndexer} to rebuild the indexes mapped to the given types, or to any of their sub-types.
+	 * <p>
+	 * {@link MassIndexer} instances cannot be reused.
+	 *
+	 * @param types An array of indexed types, or supertypes of all indexed types that will be targeted by the workspace.
+	 * @return The created mass indexer.
+	 */
+	default MassIndexer massIndexer(Class<?>... types) {
+		return massIndexer( Arrays.asList( types ) );
+	}
+
+	/**
+	 * Creates a {@link MassIndexer} to rebuild the indexes mapped to the given types, or to any of their sub-types.
+	 *
+	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the workspace.
+	 * @return A {@link MassIndexer}.
+	 */
+	MassIndexer massIndexer(Collection<? extends Class<?>> types);
 
 	/**
 	 * Initiate the building of a search query.

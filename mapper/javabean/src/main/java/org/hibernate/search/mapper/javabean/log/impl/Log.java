@@ -14,8 +14,11 @@ import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.BasicLogger;
+import static org.jboss.logging.Logger.Level.ERROR;
+import static org.jboss.logging.Logger.Level.WARN;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
+import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.ValidIdRange;
@@ -50,5 +53,23 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 11,
 			value = "Invalid String value for the bean provider: '%s'. The bean provider must be an instance of '%s'.")
 	SearchException invalidStringForBeanProvider(String value, Class<BeanProvider> expectedType);
+
+	@Message(id = ID_OFFSET + 12,
+			value = "Unable to set up index loading for type '%s', because no index loader was registered for this type.")
+	SearchException indexLoaderNotRegistered(PojoRawTypeIdentifier<?> typeIdentifier);
+
+	@LogMessage(level = WARN)
+	@Message(id = ID_OFFSET + 13, value = "Unable to guess the transaction status: not starting a JTA transaction.")
+	void cannotGuessTransactionStatus(@Cause Exception e);
+
+	@Message(id = ID_OFFSET + 14, value = "Unable to handle transaction: %1$s")
+	SearchException massIndexingTransactionHandlingException(String causeMessage, @Cause Throwable cause);
+
+	@LogMessage(level = ERROR)
+	@Message(id = ID_OFFSET + 15, value = "Transaction rollback failure: %1$s")
+	void errorRollingBackTransaction(String message, @Cause Exception e1);
+
+	@Message(id = ID_OFFSET + 16, value = "No context active while indexing entity '%1$s'. Consider increasing the connection time-out.")
+	SearchException contextNotActiveWhileProducingIdsForBatchIndexing(String entityName);
 
 }

@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.javabean.scope.impl;
 
 import org.hibernate.search.mapper.javabean.entity.SearchIndexedEntity;
+import org.hibernate.search.mapper.javabean.loading.impl.LoadingTypeContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
 /**
@@ -17,6 +18,6 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
  * @param <E> The entity type mapped to the index.
  */
 public interface JavaBeanScopeIndexedTypeContext<E>
-		extends SearchIndexedEntity<E> {
+		extends SearchIndexedEntity<E>, LoadingTypeContext<E> {
 
 }

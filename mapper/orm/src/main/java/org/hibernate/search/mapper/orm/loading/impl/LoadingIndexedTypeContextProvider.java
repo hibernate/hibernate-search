@@ -12,4 +12,6 @@ public interface LoadingIndexedTypeContextProvider {
 
 	<E> LoadingIndexedTypeContext<E> indexedForExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 
+	<E> LoadingIndexedTypeContext<E> indexedForEntityName(String indexName);
+
 }

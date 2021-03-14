@@ -36,7 +36,7 @@ public class PojoTypeIndexer<I, E> {
 	CompletableFuture<?> add(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
-		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
+		I identifier = typeContext.identifierMapping().identifier( providedId, entitySupplier );
 
 		DocumentRouteDescriptor currentRoute = typeContext.router()
 				.currentRoute( identifier, entitySupplier, providedRoutes, sessionContext );
@@ -58,7 +58,7 @@ public class PojoTypeIndexer<I, E> {
 	CompletableFuture<?> addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
-		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
+		I identifier = typeContext.identifierMapping().identifier( providedId, entitySupplier );
 
 		DocumentRoutesDescriptor routes = typeContext.router()
 				.routes( identifier, entitySupplier, providedRoutes, sessionContext );
@@ -89,7 +89,7 @@ public class PojoTypeIndexer<I, E> {
 	CompletableFuture<?> delete(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
-		I identifier = typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
+		I identifier = typeContext.identifierMapping().identifier( providedId, entitySupplier );
 
 		DocumentRoutesDescriptor routes = typeContext.router()
 				.routes( identifier, entitySupplier, providedRoutes, sessionContext );
@@ -112,7 +112,7 @@ public class PojoTypeIndexer<I, E> {
 
 	CompletableFuture<?> delete(Object providedId, DocumentRoutesDescriptor providedRoutes,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		I identifier = typeContext.identifierMapping().getIdentifier( providedId, null );
+		I identifier = typeContext.identifierMapping().identifier( providedId, null );
 
 		// Purge: entity is not available and we can't route according to its state.
 		// We can use the provided routing keys, though, which is what the no-op router does.

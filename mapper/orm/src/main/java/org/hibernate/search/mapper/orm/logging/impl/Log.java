@@ -68,22 +68,6 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET_LEGACY_ENGINE = MessageConstants.ENGINE_ID_RANGE_MIN;
 
 	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 27, value = "Mass indexing is going to index %d entities.")
-	void indexingEntities(long count);
-
-	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 28, value = "Mass indexing complete. Indexed %1$d entities.")
-	void indexingEntitiesCompleted(long nbrOfEntities);
-
-	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 30, value = "Mass indexing progress: indexed %1$d entities in %2$d ms.")
-	void indexingProgressRaw(long doneCount, long elapsedMs);
-
-	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 31, value = "Mass indexing progress: %2$.2f%% [%1$f documents/second].")
-	void indexingProgressStats(float estimateSpeed, float estimatePercentileComplete);
-
-	@LogMessage(level = INFO)
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 34, value = "Hibernate Search version %1$s")
 	void version(String versionString);
 
@@ -96,34 +80,8 @@ public interface Log extends BasicLogger {
 	void unableToCloseSearcherInScrollableResult(@Cause Exception e);
 
 	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 62, value = "Mass indexing received interrupt signal: aborting.")
-	void interruptedBatchIndexing();
-
-	@LogMessage(level = ERROR)
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 65, value = "Transaction rollback failure: %1$s")
 	void errorRollingBackTransaction(String message, @Cause Exception e1);
-
-	/*
-	 * This is not an exception factory nor a logging statement.
-	 * The returned string is passed to the FailureHandler,
-	 * which is not necessarily using a logger but we still
-	 * want to internationalize the message.
-	 */
-	@Message(value = "MassIndexer operation")
-	String massIndexerOperation();
-
-	@Message(value = "Indexing instance of entity '%s' during mass indexing")
-	String massIndexerIndexingInstance(String entityName);
-
-	@Message(value = "Fetching identifiers of entities to index for entity '%s' during mass indexing")
-	String massIndexerFetchingIds(String entityName);
-
-	@Message(value = "Loading and extracting entity data for entity '%s' during mass indexing")
-	String massIndexingLoadingAndExtractingEntityData(String entityName);
-
-	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 235, value = "Default automatic indexing synchronization strategy set to '%s'." )
-	void defaultAutomaticIndexingSynchronizationStrategy(Object strategy);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 276, value = "No transaction active while indexing entity '%1$s'. Consider increasing the connection time-out.")
 	SearchException transactionNotActiveWhileProducingIdsForBatchIndexing(String entityName);
@@ -168,9 +126,6 @@ public interface Log extends BasicLogger {
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> parentTypeModel,
 			String causeMessage, @Cause Exception cause);
 
-	@Message(id = ID_OFFSET + 13, value = "Mass indexing received interrupt signal. The index is left in an unknown state!")
-	SearchException massIndexingThreadInterrupted(@Cause InterruptedException e);
-
 	@Message(id = ID_OFFSET + 16, value = "Unable to access Hibernate ORM session: %1$s" )
 	SearchException hibernateSessionAccessError(String causeMessage, @Cause IllegalStateException cause);
 
@@ -214,12 +169,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 25, value = "Unable to handle transaction: %1$s")
 	SearchException massIndexingTransactionHandlingException(String causeMessage, @Cause Throwable cause);
 
-	@Message(id = ID_OFFSET + 26, value = "%1$s entities could not be indexed. See the logs for details."
-			+ " First failure on entity '%2$s': %3$s")
-	SearchException massIndexingEntityFailures(long finalFailureCount,
-			EntityReference firstFailureEntity, String firstFailureMessage,
-			@Cause Throwable firstFailure);
-
 	@Message(id = ID_OFFSET + 27,
 			value = "Unknown type: '%1$s'. Available named types: %2$s."
 					+ " For entity types, the correct type name is the entity name."
@@ -242,12 +191,6 @@ public interface Log extends BasicLogger {
 	SearchException invalidEntitySuperType(String entityName,
 			@FormatWith(ClassFormatter.class) Class<?> expectedSuperType,
 			@FormatWith(ClassFormatter.class) Class<?> actualJavaType);
-
-	@LogMessage(level = Logger.Level.ERROR)
-	@Message(id = ID_OFFSET + 31,
-			value = "The mass indexing failure handler threw an exception while handling a previous failure."
-					+ " The failure may not have been reported.")
-	void failureInMassIndexingFailureHandler(@Cause Throwable t);
 
 	@Message(id = ID_OFFSET + 32, value = "Invalid schema management strategy name: '%1$s'."
 			+ " Valid names are: %2$s.")

@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
 import static org.mockito.Mockito.verifyNoInteractions;
 
-import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 
 import org.mockito.Mock;
 

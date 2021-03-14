@@ -27,15 +27,18 @@ import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.javabean.work.impl.SearchIndexerImpl;
 import org.hibernate.search.mapper.javabean.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
+import org.hibernate.search.mapper.javabean.loading.impl.JavaBeanLoadingContextBuilder;
+import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexingSessionContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
 
 public class JavaBeanSearchSession extends AbstractPojoSearchSession
-		implements SearchSession, DocumentReferenceConverter<EntityReference> {
+		implements SearchSession, JavaBeanMassIndexingSessionContext, DocumentReferenceConverter<EntityReference> {
 
 	private final JavaBeanSearchSessionMappingContext mappingContext;
 	private final JavaBeanSearchSessionTypeContextProvider typeContextProvider;
@@ -68,8 +71,18 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
+	public MassIndexer massIndexer(Collection<? extends Class<?>> types) {
+		return scope( types ).massIndexer( this );
+	}
+
+	@Override
 	public String tenantIdentifier() {
 		return tenantId;
+	}
+
+	@Override
+	public PojoIndexer createIndexer() {
+		return mappingContext.createIndexer( this );
 	}
 
 	@Override
@@ -135,12 +148,17 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 		return loadingContextBuilder().build();
 	}
 
+	@Override
+	public JavaBeanSearchSessionMappingContext mappingContext() {
+		return mappingContext;
+	}
+
 	private <T> SearchQuerySelectStep<?, EntityReference, T, ?, ?, ?> search(SearchScopeImpl<T> scope) {
 		return scope.search( this, this, loadingContextBuilder() );
 	}
 
-	private PojoLoadingContextBuilder<?> loadingContextBuilder() {
-		JavaBeanSearchLoadingContext.Builder builder = new JavaBeanSearchLoadingContext.Builder( typeContextProvider );
+	public JavaBeanLoadingContextBuilder loadingContextBuilder() {
+		JavaBeanSearchLoadingContext.Builder builder = new JavaBeanSearchLoadingContext.Builder( typeContextProvider, mappingContext );
 		if ( loadingOptionsContributor != null ) {
 			loadingOptionsContributor.accept( builder );
 		}

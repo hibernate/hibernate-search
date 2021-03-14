@@ -6,8 +6,17 @@
  */
 package org.hibernate.search.mapper.javabean.loading;
 
+import org.hibernate.search.mapper.javabean.massindexing.loader.JavaBeanIndexingOptions;
+import org.hibernate.search.mapper.pojo.loading.LoadingInterceptor;
+import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingStrategy;
+
 public interface LoadingOptions {
 
 	<T> LoadingOptions registerLoader(Class<T> type, EntityLoader<T> loader);
 
+	<T> void massIndexingLoadingStrategy(Class<T> type, MassIndexingEntityLoadingStrategy<T, JavaBeanIndexingOptions> loadingStrategy);
+
+	void identifierInterceptor(LoadingInterceptor<JavaBeanIndexingOptions> interceptor);
+
+	void documentInterceptor(LoadingInterceptor<JavaBeanIndexingOptions> interceptor);
 }
