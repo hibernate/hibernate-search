@@ -97,8 +97,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public TermsPredicateBuilder terms(String absoluteFieldPath) {
-		// TODO HSEARCH-4134 Implement it in this backend
-		return null;
+		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.TERMS, searchContext );
 	}
 
 	@Override

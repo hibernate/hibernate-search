@@ -16,6 +16,7 @@ import org.hibernate.search.engine.search.predicate.spi.RegexpPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.TermsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 
 public final class PredicateTypeKeys {
@@ -29,6 +30,7 @@ public final class PredicateTypeKeys {
 	public static final SearchQueryElementTypeKey<PhrasePredicateBuilder> PHRASE = key( "phrase" );
 	public static final SearchQueryElementTypeKey<WildcardPredicateBuilder> WILDCARD = key( "wildcard" );
 	public static final SearchQueryElementTypeKey<RegexpPredicateBuilder> REGEXP = key( "regexp" );
+	public static final SearchQueryElementTypeKey<TermsPredicateBuilder> TERMS = key( "terms" );
 	public static final SearchQueryElementTypeKey<ElasticsearchSimpleQueryStringPredicateBuilderFieldState> SIMPLE_QUERY_STRING =
 			key( "simple-query-string" );
 	public static final SearchQueryElementTypeKey<SpatialWithinCirclePredicateBuilder> SPATIAL_WITHIN_CIRCLE =
