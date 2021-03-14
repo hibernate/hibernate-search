@@ -36,6 +36,8 @@ public interface LuceneNumericDomain<E extends Number> {
 
 	Query createRangeQuery(String absoluteFieldPath, E lowerLimit, E upperLimit);
 
+	Query createSetQuery(String absoluteFieldPath, Collection<E> values);
+
 	E sortedDocValueToTerm(long longValue);
 
 	Facets createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
