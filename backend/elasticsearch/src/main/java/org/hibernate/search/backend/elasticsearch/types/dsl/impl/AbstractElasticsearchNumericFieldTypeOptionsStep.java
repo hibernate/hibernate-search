@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.Project
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.SortTypeKeys;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardMatchPredicate;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTermsPredicate;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSort;
 
 abstract class AbstractElasticsearchNumericFieldTypeOptionsStep<S extends AbstractElasticsearchNumericFieldTypeOptionsStep<?, F>, F>
@@ -38,6 +39,7 @@ abstract class AbstractElasticsearchNumericFieldTypeOptionsStep<S extends Abstra
 					new ElasticsearchStandardMatchPredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.RANGE, new ElasticsearchRangePredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.Factory<>() );
+			builder.queryElementFactory( PredicateTypeKeys.TERMS, new ElasticsearchTermsPredicate.Factory<>( codec ) );
 		}
 
 		if ( resolvedSortable ) {
