@@ -78,8 +78,7 @@ public class StubSearchPredicateBuilderFactory
 
 	@Override
 	public TermsPredicateBuilder terms(String absoluteFieldPath) {
-		// TODO HSEARCH-4134 Implement it in this backend
-		return null;
+		return new StubPredicateBuilder();
 	}
 
 	@Override
