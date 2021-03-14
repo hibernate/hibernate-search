@@ -87,8 +87,7 @@ public class DefaultSearchPredicateFactory implements SearchPredicateFactory {
 
 	@Override
 	public TermsPredicateFieldStep<?> terms() {
-		// TODO HSEARCH-2589 Implement the predicate
-		return null;
+		return new TermsPredicateFieldStepImpl( dslContext );
 	}
 
 	@Override
