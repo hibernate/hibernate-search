@@ -27,6 +27,7 @@ import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredica
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.TermsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -98,6 +99,12 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	@Override
 	public RegexpPredicateBuilder regexp(String absoluteFieldPath) {
 		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.REGEXP, searchContext );
+	}
+
+	@Override
+	public TermsPredicateBuilder terms(String absoluteFieldPath) {
+		// TODO HSEARCH-4134 Implement it in this backend
+		return null;
 	}
 
 	@Override

@@ -45,6 +45,8 @@ public interface SearchPredicateBuilderFactory<C> {
 
 	RegexpPredicateBuilder regexp(String absoluteFieldPath);
 
+	TermsPredicateBuilder terms(String absoluteFieldPath);
+
 	NestedPredicateBuilder nested(String absoluteFieldPath);
 
 	SimpleQueryStringPredicateBuilder simpleQueryString();
