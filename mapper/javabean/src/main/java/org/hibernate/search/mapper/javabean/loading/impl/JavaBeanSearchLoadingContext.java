@@ -100,6 +100,14 @@ public final class JavaBeanSearchLoadingContext implements PojoLoadingContext, M
 	}
 
 	@Override
+	public boolean testIndexedEntity(MassIndexingSessionContext sessionContext,
+			PojoRawTypeIdentifier<?> commonSuperType, Object entity) {
+		PojoRawTypeIdentifier targetType = sessionContext.runtimeIntrospector().detectEntityType( entity );
+		LoadingTypeContext typeContext = typeContextProvider.indexedForExactType( targetType );
+		return typeContext != null;
+	}
+
+	@Override
 	public Object extractReferenceOrSuppress(MassIndexingSessionContext sessionContext,
 			PojoRawTypeIdentifier<?> commonSuperType, Object entity, Throwable throwable) {
 		String entityName = entityName( commonSuperType );
@@ -158,27 +166,25 @@ public final class JavaBeanSearchLoadingContext implements PojoLoadingContext, M
 		@Override
 		public <T> LoadingOptions registerLoader(Class<T> type, EntityLoader<T> loader) {
 			LoadingTypeContext<T> typeContext = typeContextProvider.indexedForExactClass( type );
-			if ( typeContext == null ) {
-				throw log.notIndexedEntityType( type );
-			}
+			PojoRawTypeIdentifier<T> typeIdentifier = typeContext != null
+					? typeContext.typeIdentifier() : PojoRawTypeIdentifier.of( type );
 			if ( loaderByType == null ) {
 				loaderByType = new LinkedHashMap<>();
 			}
-			loaderByType.put( typeContext.typeIdentifier(), new JavaBeanLoader<>( loader ) );
+			loaderByType.put( typeIdentifier, new JavaBeanLoader<>( loader ) );
 			return this;
 		}
 
 		@Override
 		public <T> void massIndexingLoadingStrategy(Class<T> type, MassIndexingEntityLoadingStrategy<T, JavaBeanIndexingOptions> loadingStrategy) {
 			LoadingTypeContext<T> typeContext = typeContextProvider.indexedForExactClass( type );
-			if ( typeContext == null ) {
-				throw log.notIndexedEntityType( type );
-			}
+			PojoRawTypeIdentifier<T> typeIdentifier = typeContext != null
+					? typeContext.typeIdentifier() : PojoRawTypeIdentifier.of( type );
 			if ( indexeStrategyByType == null ) {
 				indexeStrategyByType = new LinkedHashMap<>();
 			}
 
-			indexeStrategyByType.put( typeContext.typeIdentifier(), loadingStrategy );
+			indexeStrategyByType.put( typeIdentifier, loadingStrategy );
 		}
 
 		@Override

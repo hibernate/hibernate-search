@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.javabean.massindexing.loader.JavaBeanIndexingOptions;
@@ -29,7 +28,7 @@ public class JavaBeanCollectionIndexingStrategy<E> implements MassIndexingEntity
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Collection<E> source;
-	private final Map<Object, E> map = new ConcurrentHashMap<>();
+	private Map<Object, E> cache;
 	private final EntityLoadingTypeGroup typeGroup;
 
 	public JavaBeanCollectionIndexingStrategy(Collection<E> source, EntityLoadingTypeGroup typeGroup) {
@@ -44,12 +43,17 @@ public class JavaBeanCollectionIndexingStrategy<E> implements MassIndexingEntity
 
 	@Override
 	public EntityIdentifierScroll createIdentifierScroll(MassIndexingThreadContext<JavaBeanIndexingOptions> context, Set<Class<? extends E>> includedTypes) throws InterruptedException {
-		Iterator<E> iterator = source.iterator();
+		cache = source.stream()
+				.filter( e -> context.commonSuperType().isAssignableFrom( e.getClass() ) )
+				.filter( context::indexed )
+				.collect( Collectors.toMap( context::entityIdentifier, e -> e ) );
+
+		Iterator<?> iterator = cache.keySet().iterator();
 
 		return new EntityIdentifierScroll() {
 			@Override
 			public long totalCount() {
-				return source.size();
+				return cache.size();
 			}
 
 			@Override
@@ -58,11 +62,7 @@ public class JavaBeanCollectionIndexingStrategy<E> implements MassIndexingEntity
 
 				List<Object> destination = new ArrayList<>( batchSize );
 				while ( iterator.hasNext() ) {
-					E entity = iterator.next();
-					Object identifier = context.entityIdentifier( iterator.next() );
-					map.put( identifier, entity );
-
-					destination.add( identifier );
+					destination.add( iterator.next() );
 					if ( !context.active() ) {
 						throw log.contextNotActiveWhileProducingIdsForBatchIndexing( context.includedEntityNames() );
 					}
@@ -80,8 +80,7 @@ public class JavaBeanCollectionIndexingStrategy<E> implements MassIndexingEntity
 	@Override
 	public EntityLoader<E> createLoader(MassIndexingThreadContext<JavaBeanIndexingOptions> context, Set<Class<? extends E>> includedTypes) throws InterruptedException {
 		return (identifiers) -> {
-			List<E> found = identifiers.stream().map( map::get ).collect( Collectors.toList() );
-			identifiers.forEach( map::remove );
+			List<E> found = identifiers.stream().map( cache::get ).collect( Collectors.toList() );
 			return found;
 		};
 	}

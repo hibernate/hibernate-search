@@ -48,6 +48,12 @@ public class PojoMassIndexingThreadContext implements MassIndexingThreadContext 
 	}
 
 	@Override
+	public boolean indexed(Object entity) {
+		MassIndexingSessionContext sessionContext = (MassIndexingSessionContext) context( MassIndexingSessionContext.class );
+		return typeGroup.testIndexingEntity( sessionContext, entity );
+	}
+
+	@Override
 	public Class commonSuperType() {
 		return typeGroup.commonSuperType().javaClass();
 	}
