@@ -26,6 +26,7 @@ import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextMatchP
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextPhrasePredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextRangePredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextRegexpPredicate;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextTermsPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextWildcardPredicate;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneStandardFieldSort;
 import org.hibernate.search.engine.backend.types.Norms;
@@ -168,6 +169,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 			builder.searchable( true );
 			builder.queryElementFactory( PredicateTypeKeys.MATCH, new LuceneTextMatchPredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.RANGE, new LuceneTextRangePredicate.Factory<>( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.TERMS, new LuceneTextTermsPredicate.Factory<>( codec ) );
 			if ( resolvedNorms ) {
 				builder.queryElementFactory( PredicateTypeKeys.EXISTS, new LuceneExistsPredicate.NormsBasedFactory() );
 			}

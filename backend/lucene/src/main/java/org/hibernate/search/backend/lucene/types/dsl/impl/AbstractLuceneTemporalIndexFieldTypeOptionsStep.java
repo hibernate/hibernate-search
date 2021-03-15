@@ -23,6 +23,7 @@ import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneExistsPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericMatchPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericRangePredicate;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericTermsPredicate;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneStandardFieldSort;
 import org.hibernate.search.engine.backend.types.Sortable;
 
@@ -62,6 +63,7 @@ abstract class AbstractLuceneTemporalIndexFieldTypeOptionsStep<
 			builder.searchable( true );
 			builder.queryElementFactory( PredicateTypeKeys.MATCH, new LuceneNumericMatchPredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.RANGE, new LuceneNumericRangePredicate.Factory<>( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.TERMS, new LuceneNumericTermsPredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.EXISTS,
 					DocValues.ENABLED.equals( docValues ) ? new LuceneExistsPredicate.DocValuesBasedFactory<>()
 							: new LuceneExistsPredicate.DefaultFactory<>() );
