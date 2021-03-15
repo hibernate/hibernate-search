@@ -48,7 +48,14 @@ public class OutboxEventBackgroundExecutor {
 	}
 
 	public void start() {
-		executor.scheduleAtFixedRate( this::run, 0, pollingInterval, TimeUnit.MILLISECONDS );
+		executor.scheduleAtFixedRate( () -> {
+			try {
+				run();
+			}
+			catch (Throwable throwable) {
+				log.failureOnOutboxBackgroundProcessing( throwable );
+			}
+		}, 0, pollingInterval, TimeUnit.MILLISECONDS );
 	}
 
 	public CompletableFuture<?> stop() {
