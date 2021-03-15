@@ -333,4 +333,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 52, value = "Reindex of outbox entities failed. Outbox entities : '%1$s'.")
 	void failureToReindexOutboxEntities(List<EntityReference> entities, @Cause Throwable t);
 
+	@LogMessage(level = ERROR)
+	@Message(id = ID_OFFSET + 53, value = "There are some failure on the background process of outbox entities.")
+	void failureOnOutboxBackgroundProcessing(@Cause Throwable t);
+
 }
