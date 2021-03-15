@@ -134,6 +134,10 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 		return indexingContext.entityIdentifier( sessionContext, commonSuperType, entity );
 	}
 
+	boolean testIndexingEntity(MassIndexingSessionContext sessionContext, Object entity) {
+		return indexingContext.testIndexedEntity( sessionContext, commonSuperType, entity );
+	}
+
 	/**
 	 * Merge this group with the other group if
 	 * the other group uses the same loading strategy and

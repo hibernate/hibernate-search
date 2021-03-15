@@ -54,6 +54,12 @@ public interface MassIndexingThreadContext<O> {
 	Object entityIdentifier(Object entity);
 
 	/**
+	 * @param entity the loaded entity
+	 * @return A true if entity is indexed.
+	 */
+	boolean indexed(Object entity);
+
+	/**
 	 * Get the entity names indexing process,
 	 *
 	 * @return the entity names by separated comma list.

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.javabean.session.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -28,6 +29,7 @@ import org.hibernate.search.mapper.javabean.work.impl.SearchIndexerImpl;
 import org.hibernate.search.mapper.javabean.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.javabean.loading.impl.JavaBeanLoadingContextBuilder;
+import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexingSessionContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -36,9 +38,12 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class JavaBeanSearchSession extends AbstractPojoSearchSession
 		implements SearchSession, JavaBeanMassIndexingSessionContext, DocumentReferenceConverter<EntityReference> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final JavaBeanSearchSessionMappingContext mappingContext;
 	private final JavaBeanSearchSessionTypeContextProvider typeContextProvider;
@@ -51,6 +56,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 
 	private SearchIndexingPlanImpl indexingPlan;
 	private SearchIndexer indexer;
+	private boolean active = true;
 
 	private JavaBeanSearchSession(Builder builder) {
 		super( builder.mappingContext );
@@ -62,16 +68,24 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 		this.loadingOptionsContributor = builder.loadingOptionsContributor;
 	}
 
+	private void chackActiveAndThrow() {
+		if ( !active ) {
+			throw log.hibernateSessionAccessError( "is closed" );
+		}
+	}
+
 	@Override
 	public void close() {
 		if ( indexingPlan != null ) {
 			CompletableFuture<?> future = indexingPlan.execute();
 			Futures.unwrappedExceptionJoin( future );
 		}
+		active = false;
 	}
 
 	@Override
 	public MassIndexer massIndexer(Collection<? extends Class<?>> types) {
+		chackActiveAndThrow();
 		return scope( types ).massIndexer( this );
 	}
 

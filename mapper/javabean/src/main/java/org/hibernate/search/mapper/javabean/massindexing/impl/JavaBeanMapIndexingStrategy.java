@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
@@ -41,11 +42,15 @@ public class JavaBeanMapIndexingStrategy<E> implements MassIndexingEntityLoading
 
 	@Override
 	public EntityIdentifierScroll createIdentifierScroll(MassIndexingThreadContext<JavaBeanIndexingOptions> context, Set<Class<? extends E>> includedTypes) throws InterruptedException {
-		Iterator<?> iterator = source.keySet().iterator();
+		Set<?> identifiers = source.entrySet().stream()
+				.filter( ent -> context.commonSuperType().isAssignableFrom( ent.getValue().getClass() ) )
+				.filter( ent -> context.indexed( ent.getValue() ) )
+				.map( Entry::getKey ).collect( Collectors.toSet() );
+		Iterator<?> iterator = identifiers.iterator();
 		return new EntityIdentifierScroll() {
 			@Override
 			public long totalCount() {
-				return source.size();
+				return identifiers.size();
 			}
 
 			@Override
@@ -54,9 +59,7 @@ public class JavaBeanMapIndexingStrategy<E> implements MassIndexingEntityLoading
 
 				List<Object> destination = new ArrayList<>( batchSize );
 				while ( iterator.hasNext() ) {
-					Object identifier = iterator.next();
-
-					destination.add( identifier );
+					destination.add( iterator.next() );
 					if ( !context.active() ) {
 						throw log.contextNotActiveWhileProducingIdsForBatchIndexing( context.includedEntityNames() );
 					}
