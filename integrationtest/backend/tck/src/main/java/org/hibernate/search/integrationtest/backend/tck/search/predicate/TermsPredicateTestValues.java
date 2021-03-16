@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
+import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Locale;
 
@@ -54,5 +55,15 @@ public final class TermsPredicateTestValues<F> extends AbstractPredicateTestValu
 
 	public boolean providesNonMatchingArgs() {
 		return !nonMatchingValues.isEmpty();
+	}
+
+	public int nonMatchingArgsSize() {
+		return nonMatchingValues.size();
+	}
+
+	@SuppressWarnings("unchecked") // the type is preserved
+	public F[] createArray(int size) {
+		F[] result = (F[]) Array.newInstance( fieldType.getJavaType(), size );
+		return result;
 	}
 }
