@@ -49,6 +49,7 @@ public class TermsPredicateBaseIT {
 		setupHelper.start()
 				.withIndexes(
 						SingleFieldIT.index, MultiFieldIT.index,
+						MultipleArgumentIT.index,
 						NestingIT.mainIndex, NestingIT.missingFieldIndex,
 						ScoreIT.index,
 						InvalidFieldIT.index, UnsupportedTypeIT.index,
@@ -67,6 +68,9 @@ public class TermsPredicateBaseIT {
 
 		final BulkIndexer multiFieldIndexer = MultiFieldIT.index.bulkIndexer();
 		MultiFieldIT.dataSets.forEach( d -> d.contribute( MultiFieldIT.index, multiFieldIndexer ) );
+
+		final BulkIndexer multipleArgumentIndexer = MultipleArgumentIT.index.bulkIndexer();
+		MultipleArgumentIT.dataSets.forEach( d -> d.contribute( MultipleArgumentIT.index, multipleArgumentIndexer ) );
 
 		final BulkIndexer nestingMainIndexer = NestingIT.mainIndex.bulkIndexer();
 		final BulkIndexer nestingMissingFieldIndexer = NestingIT.missingFieldIndex.bulkIndexer();
@@ -96,7 +100,7 @@ public class TermsPredicateBaseIT {
 		);
 
 		singleFieldIndexer.join(
-				multiFieldIndexer, nestingMainIndexer, nestingMissingFieldIndexer,
+				multiFieldIndexer, multipleArgumentIndexer, nestingMainIndexer, nestingMissingFieldIndexer,
 				scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer,
 				typeCheckingRawFieldCompatibleIndexer, typeCheckingMissingFieldIndexer,
@@ -141,6 +145,44 @@ public class TermsPredicateBaseIT {
 
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
+			return f.terms().field( fieldPath ).matchingAny( dataSet.values.matchingArg( matchingDocOrdinal ) );
+		}
+	}
+
+	@RunWith(Parameterized.class)
+	public static class MultipleArgumentIT<F> extends AbstractPredicateSingleFieldIT<TermsPredicateTestValues<F>> {
+		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
+		private static final List<Object[]> parameters = new ArrayList<>();
+
+		static {
+			for ( FieldTypeDescriptor<?> fieldType : supportedFieldTypes ) {
+				DataSet<?, ?> dataSet = new DataSet<>( testValues( fieldType ) );
+				dataSets.add( dataSet );
+				parameters.add( new Object[] { dataSet } );
+			}
+		}
+
+		private static final SimpleMappedIndex<IndexBinding> index =
+				SimpleMappedIndex.of( root -> new IndexBinding( root, supportedFieldTypes ) )
+						.name( "multipleArgumentField" );
+
+		@Parameterized.Parameters(name = "{0}")
+		public static List<Object[]> parameters() {
+			return parameters;
+		}
+
+		public MultipleArgumentIT(DataSet<F, TermsPredicateTestValues<F>> dataSet) {
+			super( index, dataSet );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
+			if ( dataSet.values.providesNonMatchingArgs() ) {
+				return f.terms().field( fieldPath ).matchingAny( dataSet.values.nonMatchingArg( 0 ),
+						dataSet.values.matchingArg( matchingDocOrdinal ), dataSet.values.nonMatchingArg( 1 ),
+						dataSet.values.nonMatchingArg( 2 ), dataSet.values.nonMatchingArg( 3 ) );
+			}
+
 			return f.terms().field( fieldPath ).matchingAny( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 	}
