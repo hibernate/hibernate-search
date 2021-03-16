@@ -97,6 +97,16 @@ public class OffsetTimeFieldTypeDescriptor extends FieldTypeDescriptor<OffsetTim
 	}
 
 	@Override
+	protected List<OffsetTime> createNonMatchingValues() {
+		return Arrays.asList(
+				LocalTime.of( 7, 4, 0, 0 ).atOffset( ZoneOffset.ofHours( 10 ) ),
+				LocalTime.of( 7, 0, 0, 0 ).atOffset( ZoneOffset.ofHours( 2 ) ),
+				LocalTime.of( 7, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( -2 ) ),
+				LocalTime.of( 7, 0, 23, 0 ).atOffset( ZoneOffset.ofHours( 0 ) )
+		);
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<OffsetTime>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				LocalTime.of( 0, 0, 0 ).atOffset( ZoneOffset.UTC ),

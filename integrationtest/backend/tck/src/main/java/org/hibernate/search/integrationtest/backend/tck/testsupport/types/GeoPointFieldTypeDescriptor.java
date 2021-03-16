@@ -66,6 +66,16 @@ public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
 	}
 
 	@Override
+	protected List<GeoPoint> createNonMatchingValues() {
+		return Arrays.asList(
+				GeoPoint.of( 739, 739 ),
+				GeoPoint.of( 739, -739 ),
+				GeoPoint.of( -739, 739 ),
+				GeoPoint.of( -739, -739 )
+		);
+	}
+
+	@Override
 	public boolean isFieldSortSupported() {
 		return false;
 	}

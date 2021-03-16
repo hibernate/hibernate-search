@@ -87,6 +87,19 @@ public class MonthDayFieldTypeDescriptor extends FieldTypeDescriptor<MonthDay> {
 	}
 
 	@Override
+	protected List<MonthDay> createNonMatchingValues() {
+		List<MonthDay> values = new ArrayList<>();
+		Collections.addAll(
+				values,
+				MonthDay.of( Month.JANUARY, 7 ),
+				MonthDay.of( Month.FEBRUARY, 7 ),
+				MonthDay.of( Month.NOVEMBER, 7 ),
+				MonthDay.of( Month.DECEMBER, 7 )
+		);
+		return values;
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<MonthDay>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				MonthDay.of( Month.JANUARY, 1 ),

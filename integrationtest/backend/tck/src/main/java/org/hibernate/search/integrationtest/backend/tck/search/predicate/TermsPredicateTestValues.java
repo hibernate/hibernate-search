@@ -15,15 +15,22 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.Normal
 
 public final class TermsPredicateTestValues<F> extends AbstractPredicateTestValues<F> {
 	private final List<F> values;
+	private final List<F> nonMatchingValues;
 
 	public TermsPredicateTestValues(FieldTypeDescriptor<F> fieldType) {
 		super( fieldType );
 		this.values = fieldType.getAscendingUniqueTermValues().getSingle();
+		this.nonMatchingValues = fieldType.getNonMatchingValues();
 	}
 
 	@Override
 	public F fieldValue(int docOrdinal) {
 		return values.get( docOrdinal );
+	}
+
+	@Override
+	public int size() {
+		return values.size();
 	}
 
 	@SuppressWarnings("unchecked") // F == String for analyzed|normalized fields
@@ -36,8 +43,16 @@ public final class TermsPredicateTestValues<F> extends AbstractPredicateTestValu
 		return valueToMatch;
 	}
 
-	@Override
-	public int size() {
-		return values.size();
+	public F nonMatchingArg(int ordinal) {
+		if ( nonMatchingValues.isEmpty() ) {
+			return null;
+		}
+
+		int index = ordinal % nonMatchingValues.size();
+		return nonMatchingValues.get( index );
+	}
+
+	public boolean providesNonMatchingArgs() {
+		return !nonMatchingValues.isEmpty();
 	}
 }

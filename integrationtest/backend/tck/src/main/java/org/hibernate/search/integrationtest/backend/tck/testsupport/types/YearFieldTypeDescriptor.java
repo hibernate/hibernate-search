@@ -85,6 +85,13 @@ public class YearFieldTypeDescriptor extends FieldTypeDescriptor<Year> {
 	}
 
 	@Override
+	protected List<Year> createNonMatchingValues() {
+		return Arrays.asList(
+				Year.of( 2720 ), Year.of( 2621 ), Year.of( 2522 ), Year.of( 2423 )
+		);
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<Year>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				Year.of( 1970 ), Year.of( 4302 )

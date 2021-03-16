@@ -94,6 +94,16 @@ public class LocalDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalD
 	}
 
 	@Override
+	protected List<LocalDateTime> createNonMatchingValues() {
+		return Arrays.asList(
+				LocalDateTime.of( 2099, 1, 1, 0, 0, 0, 0 ),
+				LocalDateTime.of( 2200, 1, 1, 0, 0, 0, 0 ),
+				LocalDateTime.of( 728, 5, 13, 10, 15, 30, 0 ),
+				LocalDateTime.of( -28, 7, 7, 11, 15, 30, 555_000_000 )
+		);
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<LocalDateTime>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				LocalDateTime.of( 1970, 1, 1, 0, 0, 0 ),

@@ -70,6 +70,8 @@ public abstract class FieldTypeDescriptor<F> {
 
 	private final List<F> uniquelyMatchableValues = Collections.unmodifiableList( createUniquelyMatchableValues() );
 
+	private final List<F> nonMatchingValues = Collections.unmodifiableList( createNonMatchingValues() );
+
 	protected FieldTypeDescriptor(Class<F> javaType) {
 		this( javaType, javaType.getSimpleName() );
 	}
@@ -140,6 +142,12 @@ public abstract class FieldTypeDescriptor<F> {
 	}
 
 	protected abstract List<F> createUniquelyMatchableValues();
+
+	public final List<F> getNonMatchingValues() {
+		return nonMatchingValues;
+	}
+
+	protected abstract List<F> createNonMatchingValues();
 
 	public boolean isFieldSortSupported() {
 		// Assume supported by default: this way, we'll get test failures if we forget to override this method.

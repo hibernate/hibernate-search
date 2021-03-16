@@ -77,6 +77,13 @@ public class ShortFieldTypeDescriptor extends FieldTypeDescriptor<Short> {
 	}
 
 	@Override
+	protected List<Short> createNonMatchingValues() {
+		return Arrays.asList(
+				(short) -99, (short) 2, (short) 99, (short) 10002
+		);
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<Short>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				(short) 0, (short) 67

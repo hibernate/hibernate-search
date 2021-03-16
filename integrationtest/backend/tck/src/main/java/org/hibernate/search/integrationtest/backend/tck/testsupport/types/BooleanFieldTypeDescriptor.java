@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,6 +68,11 @@ public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
 				true,
 				false
 		);
+	}
+
+	@Override
+	protected List<Boolean> createNonMatchingValues() {
+		return Collections.EMPTY_LIST;
 	}
 
 	@Override

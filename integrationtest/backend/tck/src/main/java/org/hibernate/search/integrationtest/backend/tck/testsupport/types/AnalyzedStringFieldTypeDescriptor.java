@@ -98,6 +98,15 @@ public class AnalyzedStringFieldTypeDescriptor extends FieldTypeDescriptor<Strin
 	}
 
 	@Override
+	protected List<String> createNonMatchingValues() {
+		return Arrays.asList(
+				"notmatchingitem1",
+				"abracadabravv7",
+				"makethisnotmatchable"
+		);
+	}
+
+	@Override
 	public boolean isFieldSortSupported() {
 		return false;
 	}

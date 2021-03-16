@@ -77,6 +77,13 @@ public class FloatFieldTypeDescriptor extends FieldTypeDescriptor<Float> {
 	}
 
 	@Override
+	protected List<Float> createNonMatchingValues() {
+		return Arrays.asList(
+				123.12312312f, 0.7939397f, 739739.22121f, 92828212.12f
+		);
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<Float>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				0.0f, 67.0f

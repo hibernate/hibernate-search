@@ -77,6 +77,13 @@ public class DoubleFieldTypeDescriptor extends FieldTypeDescriptor<Double> {
 	}
 
 	@Override
+	protected List<Double> createNonMatchingValues() {
+		return Arrays.asList(
+				123.12312312d, 0.7939397d, 739739.22121d, 92828212.12d
+		);
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<Double>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				0.0, 42.1

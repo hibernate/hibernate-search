@@ -102,6 +102,17 @@ public class OffsetDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<Offse
 		return uniqueTimestampValues;
 	}
 
+	@Override
+	protected List<OffsetDateTime> createNonMatchingValues() {
+		List<OffsetDateTime> values = new ArrayList<>();
+		for ( LocalDateTime localDateTime : LocalDateTimeFieldTypeDescriptor.INSTANCE.getNonMatchingValues() ) {
+			for ( ZoneOffset offset : createIndexableOffsetList() ) {
+				values.add( localDateTime.atOffset( offset ) );
+			}
+		}
+		return values;
+	}
+
 	List<ZoneOffset> createIndexableOffsetList() {
 		return Arrays.asList(
 				ZoneOffset.UTC,

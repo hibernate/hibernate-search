@@ -72,7 +72,7 @@ public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecima
 						BigDecimal.ZERO,
 						BigDecimal.ONE,
 						BigDecimal.TEN,
-						nextUp( BigDecimal.ONE ) ,
+						nextUp( BigDecimal.ONE ),
 						nextDown( BigDecimal.ONE ),
 						BigDecimal.valueOf( 42.42 ),
 						BigDecimal.valueOf( 1584514514.000000184 ),
@@ -91,12 +91,20 @@ public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecima
 				BigDecimal.ZERO,
 				BigDecimal.ONE,
 				BigDecimal.TEN,
-				nextUp( BigDecimal.ONE ) ,
+				nextUp( BigDecimal.ONE ),
 				nextDown( BigDecimal.ONE ),
 				BigDecimal.valueOf( 42.42 ),
 				BigDecimal.valueOf( 1584514514.000000184 ),
 				scaled( Long.MAX_VALUE ),
 				scaled( Long.MIN_VALUE )
+		);
+	}
+
+	@Override
+	protected List<BigDecimal> createNonMatchingValues() {
+		return Arrays.asList(
+				BigDecimal.valueOf( 123.12312312 ), BigDecimal.valueOf( 0.7939397 ), BigDecimal.valueOf( 739739.22121 ),
+				BigDecimal.valueOf( 92828212.12 )
 		);
 	}
 
