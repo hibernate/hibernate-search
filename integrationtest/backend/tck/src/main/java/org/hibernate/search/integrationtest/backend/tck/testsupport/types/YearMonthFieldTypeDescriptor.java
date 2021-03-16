@@ -78,6 +78,17 @@ public class YearMonthFieldTypeDescriptor extends FieldTypeDescriptor<YearMonth>
 	}
 
 	@Override
+	protected List<YearMonth> createNonMatchingValues() {
+		List<YearMonth> values = new ArrayList<>();
+		for ( Year year : YearFieldTypeDescriptor.INSTANCE.getNonMatchingValues() ) {
+			for ( Month month : Month.values() ) {
+				values.add( year.atMonth( month ) );
+			}
+		}
+		return values;
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<YearMonth>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				YearMonth.of( 0, Month.JANUARY ),

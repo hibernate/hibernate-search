@@ -97,6 +97,15 @@ public class NormalizedStringFieldTypeDescriptor extends FieldTypeDescriptor<Str
 	}
 
 	@Override
+	protected List<String> createNonMatchingValues() {
+		return Arrays.asList(
+				" notmatchingitem1 ",
+				"abracadabravv7",
+				"    makethisnotmatchable   "
+		);
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<String>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				"", "Aaron"

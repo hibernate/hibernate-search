@@ -70,6 +70,14 @@ public class IntegerFieldTypeDescriptor extends FieldTypeDescriptor<Integer> {
 	}
 
 	@Override
+	protected List<Integer> createNonMatchingValues() {
+		return Arrays.asList(
+				12_312_312, 7_939_397,
+				73_973_922, 9_282_821
+		);
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<Integer>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				0, 12

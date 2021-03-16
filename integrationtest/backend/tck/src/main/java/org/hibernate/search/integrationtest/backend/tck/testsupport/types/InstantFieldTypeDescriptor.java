@@ -80,6 +80,16 @@ public class InstantFieldTypeDescriptor extends FieldTypeDescriptor<Instant> {
 	}
 
 	@Override
+	protected List<Instant> createNonMatchingValues() {
+		Set<Instant> values = new LinkedHashSet<>();
+		for ( LocalDateTime localDateTime : LocalDateTimeFieldTypeDescriptor.INSTANCE.getNonMatchingValues() ) {
+			values.add( localDateTime.atOffset( ZoneOffset.UTC ).toInstant() );
+		}
+		values.add( Instant.EPOCH );
+		return new ArrayList<>( values );
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<Instant>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				Instant.EPOCH, Instant.parse( "2018-02-01T10:15:30.00Z" )

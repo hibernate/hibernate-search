@@ -71,6 +71,13 @@ public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 	}
 
 	@Override
+	protected List<Long> createNonMatchingValues() {
+		return Arrays.asList(
+				12_312_312_312L, 7_939_397L, 73_973_922_121L, 9_282_821_212L
+		);
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<Long>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				0L, 67L

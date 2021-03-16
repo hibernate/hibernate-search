@@ -133,6 +133,17 @@ public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedD
 		return uniqueTimestampValues;
 	}
 
+	@Override
+	protected List<ZonedDateTime> createNonMatchingValues() {
+		List<ZonedDateTime> values = new ArrayList<>();
+		for ( LocalDateTime localDateTime : LocalDateTimeFieldTypeDescriptor.INSTANCE.getNonMatchingValues() ) {
+			for ( ZoneId zoneId : createIndexableZoneIdList() ) {
+				values.add( localDateTime.atZone( zoneId ) );
+			}
+		}
+		return values;
+	}
+
 	private List<ZoneId> createIndexableZoneIdList() {
 		return Arrays.asList(
 				ZoneId.of( "UTC" ),

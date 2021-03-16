@@ -103,6 +103,14 @@ public class BigIntegerFieldTypeDescriptor extends FieldTypeDescriptor<BigIntege
 	}
 
 	@Override
+	protected List<BigInteger> createNonMatchingValues() {
+		return Arrays.asList(
+				BigInteger.valueOf( 12_312_312_312L ), BigInteger.valueOf( 7_939_397 ),
+				BigInteger.valueOf( 73_973_922_121L ), BigInteger.valueOf( 9_282_821_212L )
+		);
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<BigInteger>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				BigInteger.TEN, BigInteger.valueOf( 6700 )

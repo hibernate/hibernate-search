@@ -77,6 +77,14 @@ public class ByteFieldTypeDescriptor extends FieldTypeDescriptor<Byte> {
 	}
 
 	@Override
+	protected List<Byte> createNonMatchingValues() {
+		return Arrays.asList(
+				Byte.MIN_VALUE, Byte.MAX_VALUE,
+				(byte) -99, (byte) 2, (byte) 99, (byte) 100
+		);
+	}
+
+	@Override
 	public Optional<IndexNullAsMatchPredicateExpectactions<Byte>> getIndexNullAsMatchPredicateExpectations() {
 		return Optional.of( new IndexNullAsMatchPredicateExpectactions<>(
 				(byte) 0, (byte) 42
