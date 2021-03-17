@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.cfg.spi;
 
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 
 public final class HibernateOrmMapperSpiSettings {
@@ -18,6 +19,23 @@ public final class HibernateOrmMapperSpiSettings {
 	public static final String INTEGRATION_PARTIAL_BUILD_STATE =
 			PREFIX + Radicals.INTEGRATION_PARTIAL_BUILD_STATE;
 
+	public static final String AUTOMATIC_INDEXING_PREFIX = PREFIX + "automatic_indexing.";
+
+	/**
+	 * Whether outbox events should be processed ({@code true})
+	 * or left to accumulate without processing them ({@code false}).
+	 * <p>
+	 * Only available when {@link HibernateOrmMapperSettings#AUTOMATIC_INDEXING_STRATEGY} is
+	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING}.
+	 * <p>
+	 * Expects a Boolean value such as {@code true} or {@code false},
+	 * or a string that can be parsed to such Boolean value.
+	 * <p>
+	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE}.
+	 */
+	public static final String AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE = AUTOMATIC_INDEXING_PREFIX
+			+ AutomaticIndexingRadicals.PROCESS_OUTBOX_TABLE;
+
 	public static class Radicals {
 
 		private Radicals() {
@@ -27,12 +45,26 @@ public final class HibernateOrmMapperSpiSettings {
 	}
 
 	/**
+	 * Configuration property keys without the {@link #AUTOMATIC_INDEXING_PREFIX prefix}.
+	 */
+	public static final class AutomaticIndexingRadicals {
+
+		private AutomaticIndexingRadicals() {
+		}
+
+		public static final String PROCESS_OUTBOX_TABLE = "process_outbox_table";
+	}
+
+	/**
 	 * Default values for the different settings if no values are given.
 	 */
 	public static final class Defaults {
 
 		private Defaults() {
 		}
+
+		public static final boolean AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE = true;
+
 	}
 
 }

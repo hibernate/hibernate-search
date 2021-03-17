@@ -11,6 +11,7 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategy;
+import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
@@ -84,25 +85,11 @@ public final class HibernateOrmMapperSettings {
 	public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = PREFIX + Radicals.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK;
 
 	/**
-	 * Whether outbox events should be processed ({@code true})
-	 * or left to accumulate without processing them ({@code false}).
-	 * <p>
-	 * Only available when {@link #AUTOMATIC_INDEXING_STRATEGY} is
-	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING}.
-	 * <p>
-	 * Expects a Boolean value such as {@code true} or {@code false},
-	 * or a string that can be parsed to such Boolean value.
-	 * <p>
-	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE}.
-	 */
-	public static final String AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE = PREFIX + Radicals.AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE;
-
-	/**
 	 * The polling interval for the outbox events table, in milliseconds.
 	 * <p>
 	 * Only available when {@link #AUTOMATIC_INDEXING_STRATEGY} is
 	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING} and
-	 * {@link #AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE} is {@code true}.
+	 * {@link HibernateOrmMapperSpiSettings#AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE} is {@code true}.
 	 * <p>
 	 * Hibernate Search will wait that long before polling again if the last polling didn't return any event:
 	 * <ul>
@@ -122,7 +109,7 @@ public final class HibernateOrmMapperSettings {
 	 * <p>
 	 * Only available when {@link #AUTOMATIC_INDEXING_STRATEGY} is
 	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING} and
-	 * {@link #AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE} is {@code true}.
+	 * {@link HibernateOrmMapperSpiSettings#AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE} is {@code true}.
 	 * <p>
 	 * Expects a positive Integer value, such as {@code 50},
 	 * or a String that can be parsed into such Integer value.
@@ -201,7 +188,6 @@ public final class HibernateOrmMapperSettings {
 		public static final String AUTOMATIC_INDEXING_STRATEGY = AUTOMATIC_INDEXING_PREFIX + "strategy";
 		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = AUTOMATIC_INDEXING_PREFIX + "synchronization.strategy";
 		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = AUTOMATIC_INDEXING_PREFIX + "enable_dirty_check";
-		public static final String AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.PROCESS_OUTBOX_TABLE;
 		public static final String AUTOMATIC_INDEXING_POLLING_INTERVAL = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.POLLING_INTERVAL;
 		public static final String AUTOMATIC_INDEXING_BATCH_SIZE = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.BATCH_SIZE;
 		public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = "query.loading.cache_lookup.strategy";
@@ -219,7 +205,6 @@ public final class HibernateOrmMapperSettings {
 		private AutomaticIndexingRadicals() {
 		}
 
-		public static final String PROCESS_OUTBOX_TABLE = "process_outbox_table";
 		public static final String POLLING_INTERVAL = "polling_interval";
 		public static final String BATCH_SIZE = "batch_size";
 	}
@@ -238,7 +223,6 @@ public final class HibernateOrmMapperSettings {
 		public static final BeanReference<AutomaticIndexingSynchronizationStrategy> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
 				BeanReference.of( AutomaticIndexingSynchronizationStrategy.class, "write-sync" );
 		public static final boolean AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = true;
-		public static final boolean AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE = true;
 		public static final int AUTOMATIC_INDEXING_POLLING_INTERVAL = 8;
 		public static final int AUTOMATIC_INDEXING_BATCH_SIZE = 50;
 		public static final EntityLoadingCacheLookupStrategy QUERY_LOADING_CACHE_LOOKUP_STRATEGY =
