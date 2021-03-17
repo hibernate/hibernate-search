@@ -59,7 +59,7 @@ org.hibernate.internal.**
 org.hibernate.**.internal.**
 
 ################################################################################################################
-@defaultMessage MethodHandles do not work on GraalVM. Make sure to expose configuration options so that integrators can force the use of java.reflect instead. Once it's done, add your class to the forbiddenApis whitelist.
+@defaultMessage MethodHandles do not work on GraalVM. Make sure to expose configuration options so that integrators can force the use of java.reflect instead. Once it's done, add your class to the forbiddenApis allowlist.
 java.lang.invoke.MethodHandles$Lookup#in(java.lang.Class)
 java.lang.invoke.MethodHandles$Lookup#findVirtual(java.lang.Class, java.lang.String, java.lang.invoke.MethodType)
 java.lang.invoke.MethodHandles$Lookup#findConstructor(java.lang.Class, java.lang.invoke.MethodType)
