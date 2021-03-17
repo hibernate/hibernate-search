@@ -19,7 +19,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * <ul>
  *     <li>Elasticsearch index names follow the format used by Elasticsearch's Rollover API: {@code <hsearchname>-<6 digits>}.
  *     See {@code <target-index>} here:
- *     https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-rollover-index.html#rollover-index-api-path-params
+ *     https://www.elastic.co/guide/en/elasticsearch/reference/7.10/indices-rollover-index.html#rollover-index-api-path-params
  *     </li>
  *     <li>The write alias is {@code <hsearchname>-write}.
  *     <li>The read alias is {@code <hsearchname>-read}.
