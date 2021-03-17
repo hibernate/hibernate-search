@@ -151,11 +151,11 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
 @Field final String MAVEN_TOOL = 'Apache Maven 3.6'
 
 // Default node pattern, to be used for resource-intensive stages.
-// Should not include the master node.
-@Field final String NODE_PATTERN_BASE = 'Slave'
+// Should not include the controller node.
+@Field final String NODE_PATTERN_BASE = 'Worker'
 // Quick-use node pattern, to be used for very light, quick, and environment-independent stages,
-// such as sending a notification. May include the master node in particular.
-@Field final String QUICK_USE_NODE_PATTERN = 'Master||Slave'
+// such as sending a notification. May include the controller node in particular.
+@Field final String QUICK_USE_NODE_PATTERN = 'Controller||Worker'
 
 @Field AlternativeMultiMap<BuildEnvironment> environments
 @Field JobHelper helper
