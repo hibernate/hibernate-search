@@ -25,19 +25,19 @@ public class OutboxTableAutomaticIndexingStrategy implements AutomaticIndexingSt
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<Boolean> AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.PROCESS_OUTBOX_TABLE )
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AutomaticIndexingRadicals.PROCESS_OUTBOX_TABLE )
 					.asBoolean()
 					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE )
 					.build();
 
 	private static final ConfigurationProperty<Integer> AUTOMATIC_INDEXING_POLLING_INTERVAL =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.POLLING_INTERVAL )
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AutomaticIndexingRadicals.POLLING_INTERVAL )
 					.asInteger()
 					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_POLLING_INTERVAL )
 					.build();
 
 	private static final ConfigurationProperty<Integer> AUTOMATIC_INDEXING_BATCH_SIZE =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.BATCH_SIZE )
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AutomaticIndexingRadicals.BATCH_SIZE )
 					.asInteger()
 					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_BATCH_SIZE )
 					.build();

@@ -201,17 +201,27 @@ public final class HibernateOrmMapperSettings {
 		public static final String AUTOMATIC_INDEXING_STRATEGY = AUTOMATIC_INDEXING_PREFIX + "strategy";
 		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = AUTOMATIC_INDEXING_PREFIX + "synchronization.strategy";
 		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = AUTOMATIC_INDEXING_PREFIX + "enable_dirty_check";
-		public static final String PROCESS_OUTBOX_TABLE = "process_outbox_table";
-		public static final String POLLING_INTERVAL = "polling_interval";
-		public static final String BATCH_SIZE = "batch_size";
-		public static final String AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE = AUTOMATIC_INDEXING_PREFIX + PROCESS_OUTBOX_TABLE;
-		public static final String AUTOMATIC_INDEXING_POLLING_INTERVAL = AUTOMATIC_INDEXING_PREFIX + POLLING_INTERVAL;
-		public static final String AUTOMATIC_INDEXING_BATCH_SIZE = AUTOMATIC_INDEXING_PREFIX + BATCH_SIZE;
+		public static final String AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.PROCESS_OUTBOX_TABLE;
+		public static final String AUTOMATIC_INDEXING_POLLING_INTERVAL = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.POLLING_INTERVAL;
+		public static final String AUTOMATIC_INDEXING_BATCH_SIZE = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.BATCH_SIZE;
 		public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = "query.loading.cache_lookup.strategy";
 		public static final String QUERY_LOADING_FETCH_SIZE = "query.loading.fetch_size";
 		public static final String MAPPING_PROCESS_ANNOTATIONS = "mapping.process_annotations";
 		public static final String MAPPING_CONFIGURER = "mapping.configurer";
 		public static final String SCHEMA_MANAGEMENT_STRATEGY = "schema_management.strategy";
+	}
+
+	/**
+	 * Configuration property keys without the {@link #PREFIX prefix} + {@link Radicals#AUTOMATIC_INDEXING_PREFIX}.
+	 */
+	public static final class AutomaticIndexingRadicals {
+
+		private AutomaticIndexingRadicals() {
+		}
+
+		public static final String PROCESS_OUTBOX_TABLE = "process_outbox_table";
+		public static final String POLLING_INTERVAL = "polling_interval";
+		public static final String BATCH_SIZE = "batch_size";
 	}
 
 	/**
