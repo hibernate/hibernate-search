@@ -19,8 +19,8 @@ import org.hibernate.jenkins.pipeline.helpers.job.JobHelper
 // Performance node pattern, to be used for stages involving performance tests.
 @Field final String PERFORMANCE_NODE_PATTERN = 'Performance'
 // Quick-use node pattern, to be used for very light, quick, and environment-independent stages,
-// such as sending a notification. May include the master node in particular.
-@Field final String QUICK_USE_NODE_PATTERN = 'Master||Slave||Performance'
+// such as sending a notification. May include the controller node in particular.
+@Field final String QUICK_USE_NODE_PATTERN = 'Controller||Worker||Performance'
 
 @Field JobHelper helper
 
