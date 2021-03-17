@@ -16,6 +16,7 @@ import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingSt
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategyPreStopContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategyStartContext;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -25,9 +26,9 @@ public class OutboxTableAutomaticIndexingStrategy implements AutomaticIndexingSt
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<Boolean> AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.AutomaticIndexingRadicals.PROCESS_OUTBOX_TABLE )
+			ConfigurationProperty.forKey( HibernateOrmMapperSpiSettings.AutomaticIndexingRadicals.PROCESS_OUTBOX_TABLE )
 					.asBoolean()
-					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE )
+					.withDefault( HibernateOrmMapperSpiSettings.Defaults.AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE )
 					.build();
 
 	private static final ConfigurationProperty<Integer> AUTOMATIC_INDEXING_POLLING_INTERVAL =
