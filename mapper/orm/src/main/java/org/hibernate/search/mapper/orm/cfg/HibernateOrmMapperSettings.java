@@ -84,11 +84,11 @@ public final class HibernateOrmMapperSettings {
 	public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = PREFIX + Radicals.AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK;
 
 	/**
-	 * Valid only when {@link #AUTOMATIC_INDEXING_STRATEGY} is
-	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING}.
+	 * Whether outbox events should be processed ({@code true})
+	 * or left to accumulate without processing them ({@code false}).
 	 * <p>
-	 * Whether the all relevant indexing events present on the outbox table should be processed and deleted from
-	 * the same table by background processes.
+	 * Only available when {@link #AUTOMATIC_INDEXING_STRATEGY} is
+	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING}.
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
 	 * or a string that can be parsed to such Boolean value.
@@ -98,22 +98,34 @@ public final class HibernateOrmMapperSettings {
 	public static final String AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE = PREFIX + Radicals.AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE;
 
 	/**
-	 * Valid only when {@link #AUTOMATIC_INDEXING_STRATEGY} is
+	 * The polling interval for the outbox events table, in milliseconds.
+	 * <p>
+	 * Only available when {@link #AUTOMATIC_INDEXING_STRATEGY} is
 	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING} and
 	 * {@link #AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE} is {@code true}.
 	 * <p>
-	 * The polling interval in milliseconds to process in background the outbox events of the outbox table.
+	 * Hibernate Search will wait that long before polling again if the last polling didn't return any event:
+	 * <ul>
+	 *   <li>High values mean higher latency between DB changes and indexing, but less stress on the database when there are no events to process.</li>
+	 *   <li>Low values mean lower latency between DB changes and indexing, but more stress on the database when there are no events to process.</li>
+	 * </ul>
+	 * <p>
+	 * Expects a positive Integer value in milliseconds, such as {@code 1000},
+	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_POLLING_INTERVAL}.
 	 */
 	public static final String AUTOMATIC_INDEXING_POLLING_INTERVAL = PREFIX + Radicals.AUTOMATIC_INDEXING_POLLING_INTERVAL;
 
 	/**
-	 * Valid only when {@link #AUTOMATIC_INDEXING_STRATEGY} is
+	 * How many outbox events to process in the same transaction.
+	 * <p>
+	 * Only available when {@link #AUTOMATIC_INDEXING_STRATEGY} is
 	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING} and
 	 * {@link #AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE} is {@code true}.
 	 * <p>
-	 * The batch size to use in the processing of the outbox events of the outbox table.
+	 * Expects a positive Integer value, such as {@code 50},
+	 * or a String that can be parsed into such Integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_BATCH_SIZE}.
 	 */

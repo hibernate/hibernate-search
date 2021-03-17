@@ -297,7 +297,7 @@ public interface Log extends BasicLogger {
 	void outboxGeneratedEntityMapping(String xmlMappingDefinition);
 
 	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET + 44, value = "Session factory is closed. Probably Hibernate Search is shutting down.")
+	@Message(id = ID_OFFSET + 44, value = "Session factory is closed. Hibernate Search is probably shutting down.")
 	void sessionFactoryIsClosedOnOutboxProcessing();
 
 	@LogMessage(level = ERROR)
