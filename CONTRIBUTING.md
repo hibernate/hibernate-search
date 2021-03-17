@@ -48,10 +48,10 @@ As discussed in the linked page, this also includes:
 
 Create a "topic" branch on which you will work.  The convention is to name the branch
 using the JIRA issue key.  If there is not already a JIRA issue covering the work you
-want to do, create one.  Assuming you will be working from the master branch and working
+want to do, create one.  Assuming you will be working from the main branch and working
 on the JIRA HSEARCH-123:
 ```bash
-git checkout -b HSEARCH-123 master
+git checkout -b HSEARCH-123 main
 ```
 
 ### Formatting rules and style conventions
@@ -101,9 +101,9 @@ Add the original Hibernate Search repository as a remote repository called upstr
 git remote add upstream https://github.com/hibernate/hibernate-search.git
 ```
 
-If you want to rebase your branch on top of the master branch, you can use the following git command:
+If you want to rebase your branch on top of the main branch, you can use the following git command:
 ```bash
-git pull --rebase upstream master
+git pull --rebase upstream main
 ```
 
 ### Submit

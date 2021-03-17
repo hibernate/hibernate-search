@@ -58,7 +58,7 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
  *
  * This job includes two deployment modes:
  *
- * - A deployment of snapshot artifacts for every non-PR build on "primary" branches (master and maintenance branches).
+ * - A deployment of snapshot artifacts for every non-PR build on "primary" branches (main and maintenance branches).
  * - A full release when starting the job with specific parameters.
  *
  * In the first case, the name of a Maven settings file must be provided in the job configuration file
@@ -729,12 +729,12 @@ stage('Deploy') {
 
 enum TestCondition {
 	// For environments that are expected to work correctly
-	// before merging into master or maintenance branches.
-	// Tested on master and maintenance branches, on feature branches, and for PRs.
+	// before merging into main or maintenance branches.
+	// Tested on main and maintenance branches, on feature branches, and for PRs.
 	BEFORE_MERGE,
 	// For environments that are expected to work correctly,
 	// but are considered too resource-intensive to test them on pull requests.
-	// Tested on master and maintenance branches only.
+	// Tested on main and maintenance branches only.
 	// Not tested on feature branches or PRs.
 	AFTER_MERGE,
 	// For environments that may not work correctly.
