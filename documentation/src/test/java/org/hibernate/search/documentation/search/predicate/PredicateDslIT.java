@@ -747,6 +747,36 @@ public class PredicateDslIT {
 	}
 
 	@Test
+	public void terms_any() {
+		withinSearchSession( searchSession -> {
+			// tag::terms-any[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.terms().field( "genre" )
+							.matchingAny( Genre.CRIME_FICTION, Genre.SCIENCE_FICTION ) )
+					.fetchHits( 20 );
+			// end::terms-any[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID, BOOK4_ID );
+		} );
+	}
+
+	@Test
+	public void terms_all() {
+		withinSearchSession( searchSession -> {
+			// tag::terms-all[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.terms().field( "description" )
+							.matchingAll( "robot", "cab" ) )
+					.fetchHits( 20 );
+			// end::terms-all[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK4_ID );
+		} );
+	}
+
+	@Test
 	public void nested() {
 		withinSearchSession( searchSession -> {
 			// tag::nested[]

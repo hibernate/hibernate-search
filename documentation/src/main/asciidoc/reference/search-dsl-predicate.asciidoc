@@ -630,6 +630,57 @@ but can be <<search-dsl-predicate-common-boost,boosted>>,
 either on a per-field basis with a call to `.boost(...)` just after `.field(...)`/`.fields(...)`
 or for the whole predicate with a call to `.boost(...)` after `.matching(...)`.
 
+[[search-dsl-predicate-terms]]
+== `terms`: match a series of term
+
+The `terms` predicate matches documents for which a given field contains some terms, any or all of them.
+
+With `matchingAny` we require that at least one of the provided terms matches.
+That is equivalent to having an <<search-dsl-predicate-boolean-or>> applied to the series of single-term predicates.
+
+.Matching any of the provided terms
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=terms-any]
+----
+====
+
+With `matchingAll` we require that all of the provided terms match.
+That is equivalent to having an <<search-dsl-predicate-boolean-and>> applied to the series of single-term predicates.
+
+.Matching all of the provided terms
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=terms-any]
+----
+====
+
+=== Terms predicates and analysis
+
+NOTE: For an introduction to analysis and how to configure it,
+refer to the <<concepts-analysis>> section.
+
+Differently from other predicates, the provided terms arguments to `matchAny` or `matchAll`
+are never analyzed nor normalized.
+This means that in order to match the related documents,
+we need to provide the terms as they were written to the indexes.
+
+=== Targeting multiple fields
+
+Optionally, the predicate can target multiple fields.
+In that case, the predicate will match documents for which _any_ of the given fields matches.
+
+See <<search-dsl-predicate-common-multiple-fields>>.
+
+=== Other options
+
+* The score of a `terms` predicate is constant and equal to 1 by default,
+but can be <<search-dsl-predicate-common-boost,boosted>>,
+either on a per-field basis with a call to `.boost(...)` just after `.field(...)`/`.fields(...)`
+or for the whole predicate with a call to `.boost(...)` after `.matchingAny(...)` or `.matchingAll(...)`.
+
 [[search-dsl-predicate-boolean]]
 == `bool`: combine predicates (or/and/...)
 // Search 5 anchors backward compatibility
