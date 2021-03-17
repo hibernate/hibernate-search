@@ -604,7 +604,7 @@ When querying, you will probably want to know more about
 
 You can also have a look at sample applications:
 
-* The link:https://github.com/quarkusio/quarkus-quickstarts/tree/master/hibernate-search-elasticsearch-quickstart[Quarkus quickstart],
+* The link:https://github.com/quarkusio/quarkus-quickstarts/tree/main/hibernate-search-orm-elasticsearch-quickstart[Quarkus quickstart],
 a sample application using Hibernate Search with the [Quarkus](https://quarkus.io/) framework.
 * The link:https://github.com/hibernate/hibernate-search/tree/main/integrationtest/showcase/library["Library" showcase],
 a sample application using Hibernate Search with the [Spring Boot](https://spring.io/projects/spring-boot) framework.
