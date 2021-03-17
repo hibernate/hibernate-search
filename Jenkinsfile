@@ -178,7 +178,8 @@ stage('Configure') {
 					new JdkBuildEnvironment(version: '16', tool: 'OpenJDK 16 Latest',
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(version: '17', tool: 'OpenJDK 17 Latest',
-							condition: TestCondition.AFTER_MERGE)
+							// Byteman doesn't support JDK17 yet.
+							condition: TestCondition.ON_DEMAND)
 			],
 			compiler: [
 					new CompilerBuildEnvironment(name: 'eclipse', mavenProfile: 'compiler-eclipse',
