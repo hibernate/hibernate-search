@@ -300,41 +300,17 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 44, value = "Session factory is closed. Hibernate Search is probably shutting down.")
 	void sessionFactoryIsClosedOnOutboxProcessing();
 
-	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET + 45, value = "There are some failure on processing outbox retrials entities.")
-	void failureOnProcessingOutboxRetrials();
-
-	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET + 46, value = "There are some failure on processing outbox entities.")
-	void failureOnProcessingOutbox();
-
-	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET + 47, value = "There are some failure on saving outbox retrials entities.")
-	void failureOnSaveOutboxRetrials();
-
-	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET + 48, value = "There are some failure on delete outbox entities.")
-	void failureOnDeleteOutbox();
-
-	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET + 49, value = "There are some failure on update outbox retrials entities.")
-	void failureOnUpdateOutboxRetrials();
-
 	@LogMessage(level = WARN)
-	@Message(id = ID_OFFSET + 50, value = "Max '%1$s' retries exhausted to process the event '%2$s'." +
+	@Message(id = ID_OFFSET + 45, value = "Max '%1$s' retries exhausted to process the event '%2$s'." +
 			" The event will be lost forever.")
 	void maxOutboxRetriesExhausted(int maxRetries, OutboxEventRetry event);
 
 	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET + 51, value = "Processing of an outbox event failed. Outbox event: '%1$s'.")
+	@Message(id = ID_OFFSET + 46, value = "Processing of an outbox event failed. Outbox event: '%1$s'.")
 	void failureOnProcessingOutboxEvent(OutboxEventBase event, @Cause Throwable t);
 
 	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET + 52, value = "Reindex of outbox entities failed. Outbox entities : '%1$s'.")
+	@Message(id = ID_OFFSET + 47, value = "Reindex of outbox entities failed. Outbox entities : '%1$s'.")
 	void failureToReindexOutboxEntities(List<EntityReference> entities, @Cause Throwable t);
-
-	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET + 53, value = "There are some failure on the background process of outbox entities.")
-	void failureOnOutboxBackgroundProcessing(@Cause Throwable t);
 
 }

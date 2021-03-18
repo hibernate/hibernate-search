@@ -43,7 +43,7 @@ public class OutboxTableAutomaticIndexingStrategy implements AutomaticIndexingSt
 					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_BATCH_SIZE )
 					.build();
 
-	private static final String NAME = "Outbox table automatic indexing";
+	public static final String NAME = "Outbox table automatic indexing";
 
 	private ScheduledExecutorService scheduledExecutor;
 	private volatile OutboxEventBackgroundExecutor executor;
@@ -65,7 +65,8 @@ public class OutboxTableAutomaticIndexingStrategy implements AutomaticIndexingSt
 		int batchSize = AUTOMATIC_INDEXING_BATCH_SIZE.get( context.configurationPropertySource() );
 
 		scheduledExecutor = context.threadPoolProvider().newScheduledExecutor( 1, NAME );
-		executor = new OutboxEventBackgroundExecutor( context.mapping(), scheduledExecutor, pollingInterval, batchSize );
+		executor = new OutboxEventBackgroundExecutor( context.mapping(), scheduledExecutor,
+				pollingInterval, batchSize );
 		executor.start();
 		return CompletableFuture.completedFuture( null );
 	}
@@ -76,7 +77,7 @@ public class OutboxTableAutomaticIndexingStrategy implements AutomaticIndexingSt
 			// Nothing to do
 			return CompletableFuture.completedFuture( null );
 		}
-		return executor.stop();
+		return executor.completion();
 	}
 
 	@Override
