@@ -15,11 +15,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.hibernate.search.engine.backend.orchestration.spi.SingletonTask;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
@@ -30,123 +33,126 @@ import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 public class OutboxEventBackgroundExecutor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private static final int MAX_RETRIALS_LOADED_AT_EACH_TIME = 5000;
 	private static final int MAX_RETRIES = 3;
 
+	private enum Status {
+		STOPPED,
+		STARTED
+	}
+
 	private final AutomaticIndexingMappingContext mapping;
-	private final ScheduledExecutorService executor;
 	private final int pollingInterval;
 	private final int batchSize;
+	private final AtomicReference<Status> status = new AtomicReference<>( Status.STOPPED );
+	private final SingletonTask processingTask;
 
 	public OutboxEventBackgroundExecutor(AutomaticIndexingMappingContext mapping, ScheduledExecutorService executor,
 			int pollingInterval, int batchSize) {
 		this.mapping = mapping;
-		this.executor = executor;
 		this.pollingInterval = pollingInterval;
 		this.batchSize = batchSize;
+
+		processingTask = new SingletonTask(
+				"Delayed commit for " + OutboxTableAutomaticIndexingStrategy.NAME,
+				new HibernateOrmOutboxWorker(),
+				new HibernateOrmOutboxScheduler( executor ),
+				mapping.failureHandler()
+		);
 	}
 
 	public void start() {
-		executor.scheduleAtFixedRate( () -> {
-			try {
-				run();
-			}
-			catch (Throwable throwable) {
-				log.failureOnOutboxBackgroundProcessing( throwable );
-			}
-		}, 0, pollingInterval, TimeUnit.MILLISECONDS );
+		status.set( Status.STARTED );
+		processingTask.ensureScheduled();
 	}
 
-	public CompletableFuture<?> stop() {
-		executor.shutdown();
-		try {
-			executor.awaitTermination( 1, TimeUnit.HOURS );
-		}
-		catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			throw new RuntimeException( e );
-		}
-		return CompletableFuture.completedFuture( null );
+	public CompletableFuture<?> completion() {
+		status.set( Status.STOPPED );
+		return processingTask.completion();
 	}
 
-	private void run() {
-		if ( mapping.sessionFactory().isClosed() ) {
-			log.sessionFactoryIsClosedOnOutboxProcessing();
-			return;
-		}
-		try ( Session session = mapping.sessionFactory().openSession() ) {
-			try {
-				processOutboxRetrialsEntities( session );
-			}
-			catch (Throwable throwable) {
-				log.failureOnProcessingOutboxRetrials();
-			}
-			try {
-				processOutboxEntities( session );
-			}
-			catch (Throwable throwable) {
-				log.failureOnProcessingOutbox();
-			}
-		}
+	public void stop() {
+		processingTask.stop();
 	}
 
-	private void processOutboxEntities(Session session) {
-		List<OutboxEvent> events = findOutboxEntities( session );
+	private class HibernateOrmOutboxWorker implements SingletonTask.Worker {
 
-		while ( !events.isEmpty() ) {
-			OutboxEventProcessing<OutboxEvent> eventProcessing = new OutboxEventProcessing<>(
-					mapping, session, events );
-			List<Integer> ids = eventProcessing.processEvents();
-
-			try {
-				createNewOutboxRetrials( session, eventProcessing.getFailedEvents() );
-			}
-			catch (Throwable throwable) {
-				log.failureOnSaveOutboxRetrials();
+		@Override
+		public CompletableFuture<?> work() {
+			if ( mapping.sessionFactory().isClosed() ) {
+				log.sessionFactoryIsClosedOnOutboxProcessing();
+				return CompletableFuture.completedFuture( null );
 			}
 
-			try {
-				deleteOutboxEntities( session, ids );
-			}
-			catch (Throwable throwable) {
-				log.failureOnDeleteOutbox();
-			}
-
-			events = findOutboxEntities( session );
-		}
-	}
-
-	private void processOutboxRetrialsEntities(Session session) {
-		List<OutboxEventRetry> allEvents = findOutboxRetrialsEntities( session );
-
-		int from = 0;
-		int to = Math.min( from + batchSize, allEvents.size() );
-
-		while ( from < allEvents.size() ) {
-			List<OutboxEventRetry> events = allEvents.subList( from, to );
-
-			OutboxEventProcessing<OutboxEventRetry> eventProcessing = new OutboxEventProcessing<>(
-					mapping, session, events );
-			eventProcessing.processEvents();
-			Set<OutboxEventRetry> failedEvents = eventProcessing.getFailedEventsSet();
-
-			try {
-				for ( OutboxEventRetry event : events ) {
-					updateEventState( session, failedEvents, event );
+			try ( Session session = mapping.sessionFactory().openSession() ) {
+				// TODO HSEARCH-4194 Guarantee a minimum delay on processing retries of outbox events
+				List<OutboxEventRetry> outboxRetries = findOutboxRetries( session );
+				if ( !outboxRetries.isEmpty() ) {
+					// Process the event retries
+					OutboxEventProcessingPlan<OutboxEventRetry> eventProcessing = new OutboxEventProcessingPlan<>(
+							mapping, session, outboxRetries );
+					eventProcessing.processEvents();
+					Set<OutboxEventRetry> failedEvents = eventProcessing.getFailedEventsSet();
+					for ( OutboxEventRetry event : outboxRetries ) {
+						deleteOrUpdateOutboxRetries( session, event, !failedEvents.contains( event ) );
+					}
 				}
-			}
-			catch (Throwable throwable) {
-				log.failureOnUpdateOutboxRetrials();
-			}
 
-			from += batchSize;
-			to = Math.min( from + batchSize, allEvents.size() );
+				List<OutboxEvent> outboxes = findOutboxes( session );
+				if ( outboxes.isEmpty() ) {
+					// Nothing to do, try again later (complete() will be called, re-scheduling the polling for later)
+					return CompletableFuture.completedFuture( null );
+				}
+
+				// There are events to process
+				// Make sure we will process the next batch ASAP
+				// Since the worker is already working,
+				// calling ensureScheduled() will lead to immediate re-execution right after we're done
+				processingTask.ensureScheduled();
+
+				// Process the events
+				OutboxEventProcessingPlan<OutboxEvent> eventProcessing = new OutboxEventProcessingPlan<>(
+						mapping, session, outboxes );
+				List<Integer> ids = eventProcessing.processEvents();
+				createOutboxRetries( session, eventProcessing.getFailedEvents() );
+				deleteOutboxes( session, ids );
+
+				return CompletableFuture.completedFuture( null );
+			}
+		}
+
+		@Override
+		public void complete() {
+			if ( status.get() == Status.STARTED ) {
+				// Make sure we poll again in a few seconds
+				// Since the worker is no longer working,
+				// calling ensureScheduled() will lead to delayed re-execution
+				processingTask.ensureScheduled();
+			}
 		}
 	}
 
-	private void updateEventState(Session session, Set<OutboxEventRetry> failedEvents, OutboxEventRetry event) {
-		if ( !failedEvents.contains( event ) ) {
+	private class HibernateOrmOutboxScheduler implements SingletonTask.Scheduler {
+		private final ScheduledExecutorService delegate;
+
+		private HibernateOrmOutboxScheduler(ScheduledExecutorService delegate) {
+			this.delegate = delegate;
+		}
+
+		@Override
+		public Future<?> schedule(Runnable runnable) {
+			return delegate.schedule( runnable, pollingInterval, TimeUnit.MILLISECONDS );
+		}
+	}
+
+	private List<OutboxEventRetry> findOutboxRetries(Session session) {
+		Query<OutboxEventRetry> query = session.createQuery(
+				"select e from OutboxEventRetry e order by id", OutboxEventRetry.class );
+		query.setMaxResults( batchSize );
+		return query.list();
+	}
+
+	private void deleteOrUpdateOutboxRetries(Session session, OutboxEventRetry event, boolean processed) {
+		if ( processed ) {
 			// processed:
 			session.delete( event );
 			return;
@@ -162,32 +168,13 @@ public class OutboxEventBackgroundExecutor {
 		session.update( event );
 	}
 
-	private List<OutboxEvent> findOutboxEntities(Session session) {
+	private List<OutboxEvent> findOutboxes(Session session) {
 		Query<OutboxEvent> query = session.createQuery( "select e from OutboxEvent e order by id", OutboxEvent.class );
 		query.setMaxResults( batchSize );
 		return query.list();
 	}
 
-	private static List<OutboxEventRetry> findOutboxRetrialsEntities(Session session) {
-		Query<OutboxEventRetry> query = session.createQuery(
-				"select e from OutboxEventRetry e order by id", OutboxEventRetry.class );
-		query.setMaxResults( MAX_RETRIALS_LOADED_AT_EACH_TIME );
-		return query.list();
-	}
-
-	private static int deleteOutboxEntities(Session session, List<Integer> ids) {
-		return withinTransaction( session, () -> {
-			Query query = session.createQuery( "delete from OutboxEvent e where e.id in :ids" );
-			query.setParameter( "ids", ids );
-			int update = query.executeUpdate();
-
-			session.flush();
-			session.clear();
-			return update;
-		} );
-	}
-
-	private static int createNewOutboxRetrials(Session session,
+	private static int createOutboxRetries(Session session,
 			Map<OutboxEventReference, List<OutboxEvent>> failedEvents) {
 		return withinTransaction( session, () -> {
 			for ( Map.Entry<OutboxEventReference, List<OutboxEvent>> entry : failedEvents.entrySet() ) {
@@ -197,6 +184,18 @@ public class OutboxEventBackgroundExecutor {
 			}
 
 			return 0;
+		} );
+	}
+
+	private static int deleteOutboxes(Session session, List<Integer> ids) {
+		return withinTransaction( session, () -> {
+			Query<?> query = session.createQuery( "delete from OutboxEvent e where e.id in :ids" );
+			query.setParameter( "ids", ids );
+			int update = query.executeUpdate();
+
+			session.flush();
+			session.clear();
+			return update;
 		} );
 	}
 

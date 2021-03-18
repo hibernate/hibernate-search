@@ -25,7 +25,7 @@ import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
-public class OutboxEventProcessing<Event extends OutboxEventBase> {
+public class OutboxEventProcessingPlan<Event extends OutboxEventBase> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -34,7 +34,7 @@ public class OutboxEventProcessing<Event extends OutboxEventBase> {
 	private final Map<OutboxEventReference, List<Event>> failedEvents = new HashMap<>();
 	private final List<Integer> eventsIds;
 
-	public OutboxEventProcessing(AutomaticIndexingMappingContext mapping, Session session, List<Event> events) {
+	public OutboxEventProcessingPlan(AutomaticIndexingMappingContext mapping, Session session, List<Event> events) {
 		this.processingPlan = mapping.createIndexingQueueEventProcessingPlan( session );
 		this.events = events;
 		this.eventsIds = new ArrayList<>( events.size() );
