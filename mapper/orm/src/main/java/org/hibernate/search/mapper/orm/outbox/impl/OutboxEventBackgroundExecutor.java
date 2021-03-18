@@ -84,39 +84,43 @@ public class OutboxEventBackgroundExecutor {
 			}
 
 			try ( Session session = mapping.sessionFactory().openSession() ) {
-				// TODO HSEARCH-4194 Guarantee a minimum delay on processing retries of outbox events
-				List<OutboxEventRetry> outboxRetries = findOutboxRetries( session );
-				if ( !outboxRetries.isEmpty() ) {
-					// Process the event retries
-					OutboxEventProcessingPlan<OutboxEventRetry> eventProcessing = new OutboxEventProcessingPlan<>(
-							mapping, session, outboxRetries );
-					eventProcessing.processEvents();
-					Set<OutboxEventRetry> failedEvents = eventProcessing.getFailedEventsSet();
-					for ( OutboxEventRetry event : outboxRetries ) {
-						deleteOrUpdateOutboxRetries( session, event, !failedEvents.contains( event ) );
+				withinTransaction( session, () -> {
+					// TODO HSEARCH-4194 Guarantee a minimum delay on processing retries of outbox events
+					List<OutboxEventRetry> outboxRetries = findOutboxRetries( session );
+					if ( !outboxRetries.isEmpty() ) {
+						// Process the event retries
+						OutboxEventProcessingPlan<OutboxEventRetry> eventProcessing = new OutboxEventProcessingPlan<>(
+								mapping, session, outboxRetries );
+						eventProcessing.processEvents();
+						Set<OutboxEventRetry> failedEvents = eventProcessing.getFailedEventsSet();
+						for ( OutboxEventRetry event : outboxRetries ) {
+							deleteOrUpdateOutboxRetries( session, event, !failedEvents.contains( event ) );
+						}
 					}
-				}
+				} );
 
-				List<OutboxEvent> outboxes = findOutboxes( session );
-				if ( outboxes.isEmpty() ) {
-					// Nothing to do, try again later (complete() will be called, re-scheduling the polling for later)
+				return withinTransaction( session, () -> {
+					List<OutboxEvent> outboxes = findOutboxes( session );
+					if ( outboxes.isEmpty() ) {
+						// Nothing to do, try again later (complete() will be called, re-scheduling the polling for later)
+						return CompletableFuture.completedFuture( null );
+					}
+
+					// There are events to process
+					// Make sure we will process the next batch ASAP
+					// Since the worker is already working,
+					// calling ensureScheduled() will lead to immediate re-execution right after we're done
+					processingTask.ensureScheduled();
+
+					// Process the events
+					OutboxEventProcessingPlan<OutboxEvent> eventProcessing = new OutboxEventProcessingPlan<>(
+							mapping, session, outboxes );
+					List<Integer> ids = eventProcessing.processEvents();
+					createOutboxRetries( session, eventProcessing.getFailedEvents() );
+					deleteOutboxes( session, ids );
+
 					return CompletableFuture.completedFuture( null );
-				}
-
-				// There are events to process
-				// Make sure we will process the next batch ASAP
-				// Since the worker is already working,
-				// calling ensureScheduled() will lead to immediate re-execution right after we're done
-				processingTask.ensureScheduled();
-
-				// Process the events
-				OutboxEventProcessingPlan<OutboxEvent> eventProcessing = new OutboxEventProcessingPlan<>(
-						mapping, session, outboxes );
-				List<Integer> ids = eventProcessing.processEvents();
-				createOutboxRetries( session, eventProcessing.getFailedEvents() );
-				deleteOutboxes( session, ids );
-
-				return CompletableFuture.completedFuture( null );
+				} );
 			}
 		}
 
@@ -174,29 +178,22 @@ public class OutboxEventBackgroundExecutor {
 		return query.list();
 	}
 
-	private static int createOutboxRetries(Session session,
+	private static void createOutboxRetries(Session session,
 			Map<OutboxEventReference, List<OutboxEvent>> failedEvents) {
-		return withinTransaction( session, () -> {
-			for ( Map.Entry<OutboxEventReference, List<OutboxEvent>> entry : failedEvents.entrySet() ) {
-				OutboxEventRetry eventRetry = new OutboxEventRetry(
-						entry.getKey(), mergeDocumentRoutes( entry.getValue() ) );
-				session.persist( eventRetry );
-			}
-
-			return 0;
-		} );
+		for ( Map.Entry<OutboxEventReference, List<OutboxEvent>> entry : failedEvents.entrySet() ) {
+			OutboxEventRetry eventRetry = new OutboxEventRetry(
+					entry.getKey(), mergeDocumentRoutes( entry.getValue() ) );
+			session.persist( eventRetry );
+		}
 	}
 
-	private static int deleteOutboxes(Session session, List<Integer> ids) {
-		return withinTransaction( session, () -> {
-			Query<?> query = session.createQuery( "delete from OutboxEvent e where e.id in :ids" );
-			query.setParameter( "ids", ids );
-			int update = query.executeUpdate();
+	private static void deleteOutboxes(Session session, List<Integer> ids) {
+		Query<?> query = session.createQuery( "delete from OutboxEvent e where e.id in :ids" );
+		query.setParameter( "ids", ids );
+		query.executeUpdate();
 
-			session.flush();
-			session.clear();
-			return update;
-		} );
+		session.flush();
+		session.clear();
 	}
 
 	public static byte[] mergeDocumentRoutes(List<OutboxEvent> events) {
