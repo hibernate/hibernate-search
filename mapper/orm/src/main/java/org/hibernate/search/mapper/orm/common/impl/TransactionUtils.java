@@ -16,6 +16,13 @@ public final class TransactionUtils {
 	private TransactionUtils() {
 	}
 
+	public static void withinTransaction(Session session, Runnable action) {
+		withinTransaction( session, () -> {
+			action.run();
+			return null;
+		} );
+	}
+
 	public static <R> R withinTransaction(Session session, Supplier<R> action) {
 		Transaction tx = null;
 		try {
