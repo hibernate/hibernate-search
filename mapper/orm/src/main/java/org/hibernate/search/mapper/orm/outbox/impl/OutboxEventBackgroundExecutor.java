@@ -165,7 +165,7 @@ public class OutboxEventBackgroundExecutor {
 			return;
 		}
 
-		if ( event.getRetries() > MAX_RETRIES ) {
+		if ( event.getRetries() >= MAX_RETRIES - 1 ) {
 			EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
 			builder.throwable( new MaxRetryException( "Max '" + MAX_RETRIES +
 					"' retries exhausted to process the event. Event will be lost." ) );
