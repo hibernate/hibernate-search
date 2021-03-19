@@ -10,12 +10,13 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
+import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingStrategy;
 
 /**
  * @param <E> The entity type.
  * @param <I> The identifier type.
  */
-public interface EntityLoadingStrategy<E, I> {
+public interface HibernateOrmEntityLoadingStrategy<E, I> extends MassIndexingEntityLoadingStrategy<E, HibernateOrmMassIndexingOptions> {
 
 	/**
 	 * @param obj Another strategy
@@ -23,18 +24,17 @@ public interface EntityLoadingStrategy<E, I> {
 	 * able to target the exact same entity types.
 	 * {@code false} otherwise or when unsure.
 	 */
+	@Override
 	boolean equals(Object obj);
 
 	/*
 	 * Hashcode must be overridden to be consistent with equals.
 	 */
+	@Override
 	int hashCode();
 
 	<E2> PojoLoader<E2> createLoader(Set<LoadingIndexedTypeContext<? extends E2>> targetEntityTypeContexts,
 			LoadingSessionContext sessionContext, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions);
-
-	HibernateOrmQueryLoader<E, I> createLoader(
-			Set<? extends LoadingIndexedTypeContext<? extends E>> targetEntityTypeContexts);
 
 }

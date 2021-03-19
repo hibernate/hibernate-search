@@ -9,15 +9,13 @@ package org.hibernate.search.mapper.orm.loading.impl;
 import java.util.ArrayList;
 import java.util.List;
 import org.hibernate.Session;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.persister.entity.EntityPersister;
-import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingDocumentProducerInterceptor;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingIdentifierProducerInterceptor;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingMappingContext;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingSessionContext;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.loading.LoadingInterceptor;
+import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingStrategy;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingContext;
@@ -43,19 +41,10 @@ public final class HibernateOrmMassIndexingContext implements MassIndexingContex
 	}
 
 	@Override
-	public <T> HibernateOrmJpaMassIndexingTypeLoadingStrategy<T> createIndexLoadingStrategy(
+	public <T> MassIndexingEntityLoadingStrategy<T, HibernateOrmMassIndexingOptions> createIndexLoadingStrategy(
 			PojoRawTypeIdentifier<? extends T> expectedType) {
-		SessionFactoryImplementor sessionFactory = mappingContext.sessionFactory();
-
 		LoadingIndexedTypeContext<? extends T> typeContext = typeContextProvider.indexedForExactType( expectedType );
-		EntityPersister entityPersister = typeContext.entityPersister();
-
-		EntityPersister rootEntityPersister = HibernateOrmUtils.toRootEntityType( sessionFactory, entityPersister );
-		TypeQueryFactory<T, ?> queryFactory = (TypeQueryFactory<T, ?>) TypeQueryFactory.create( sessionFactory, rootEntityPersister,
-				entityPersister.getIdentifierPropertyName() );
-		return new HibernateOrmJpaMassIndexingTypeLoadingStrategy<>(
-				typeContextProvider, sessionFactory,
-				rootEntityPersister, queryFactory );
+		return (MassIndexingEntityLoadingStrategy<T, HibernateOrmMassIndexingOptions>) typeContext.loadingStrategy();
 	}
 
 	@Override
