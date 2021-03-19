@@ -97,8 +97,7 @@ public class HibernateOrmMassIndexingIdentifierProducerInterceptor implements Lo
 				transaction.begin();
 			}
 			try {
-				ictx.active( sharedSession::isTransactionInProgress );
-				ictx.contextData().put( SharedSessionContractImplementor.class, session );
+				ictx.context( SharedSessionContractImplementor.class, session );
 				ictx.proceed( LoadingNextInvocation::proceed );
 			}
 			finally {

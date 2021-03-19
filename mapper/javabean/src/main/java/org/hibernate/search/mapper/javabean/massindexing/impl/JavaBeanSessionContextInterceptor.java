@@ -15,7 +15,7 @@ public class JavaBeanSessionContextInterceptor implements LoadingInterceptor<Jav
 
 	private final JavaBeanMassIndexingMappingContext mappingContext;
 
-	public static LoadingInterceptor of(JavaBeanMassIndexingMappingContext mappingContext) {
+	public static LoadingInterceptor<JavaBeanIndexingOptions> of(JavaBeanMassIndexingMappingContext mappingContext) {
 		return new JavaBeanSessionContextInterceptor( mappingContext );
 	}
 
@@ -26,7 +26,7 @@ public class JavaBeanSessionContextInterceptor implements LoadingInterceptor<Jav
 	@Override
 	public void intercept(LoadingInvocationContext<JavaBeanIndexingOptions> ictx) throws Exception {
 		MassIndexingSessionContext sessionContext = mappingContext.sessionContext();
-		ictx.contextData().put( MassIndexingSessionContext.class, sessionContext );
+		ictx.context( MassIndexingSessionContext.class, sessionContext );
 		ictx.proceed();
 	}
 }

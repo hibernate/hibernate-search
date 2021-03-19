@@ -36,14 +36,14 @@ public class PojoMassIndexingBatchIndexingWorkspace extends PojoMassIndexingFail
 
 	private final List<CompletableFuture<?>> identifierProducingFutures = new ArrayList<>();
 	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
-	private final MassIndexingContext indexingContext;
+	private final MassIndexingContext<?> indexingContext;
 	private final MassIndexingMappingContext mappingContext;
 	private final PojoMassIndexingTypeProcessor typeProcessor;
 	private final PojoMassIndexingIndexedTypeGroup<?> typeGroup;
 	private final String threadNamePrefix;
 
 	PojoMassIndexingBatchIndexingWorkspace(MassIndexingOptions indexingOptions,
-			MassIndexingContext indexingContext,
+			MassIndexingContext<?> indexingContext,
 			MassIndexingMappingContext mappingContext,
 			PojoMassIndexingNotifier notifier,
 			PojoMassIndexingIndexedTypeGroup<?> typeGroup,
@@ -79,7 +79,7 @@ public class PojoMassIndexingBatchIndexingWorkspace extends PojoMassIndexingFail
 		Futures.unwrappedExceptionGet(
 				CompletableFuture.allOf( indexingFutures.toArray( new CompletableFuture[0] ) )
 		);
-		log.debugf( "Indexing for %s is done", typeGroup.includedEntityNames() );
+		log.debugf( "Indexing for %s is done", typeGroup.notifiedGroupName() );
 	}
 
 	@Override
@@ -111,7 +111,7 @@ public class PojoMassIndexingBatchIndexingWorkspace extends PojoMassIndexingFail
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
 		final ThreadPoolExecutor identifierProducingExecutor = mappingContext.threadPoolProvider().newFixedThreadPool(
 				1,
-				threadNamePrefix + typeGroup.includedEntityNames() + " - ID loading"
+				threadNamePrefix + typeGroup.notifiedGroupName() + " - ID loading"
 		);
 		try {
 			identifierProducingFutures.add( Futures.runAsync( primaryKeyOutputter, identifierProducingExecutor ) );
@@ -129,7 +129,7 @@ public class PojoMassIndexingBatchIndexingWorkspace extends PojoMassIndexingFail
 				typeProcessor.documentProducer() );
 		final ThreadPoolExecutor indexingExecutor = mappingContext.threadPoolProvider().newFixedThreadPool(
 				documentBuilderThreads,
-				threadNamePrefix + typeGroup.includedEntityNames() + " - Entity loading"
+				threadNamePrefix + typeGroup.notifiedGroupName() + " - Entity loading"
 		);
 		try {
 			for ( int i = 0; i < documentBuilderThreads; i++ ) {

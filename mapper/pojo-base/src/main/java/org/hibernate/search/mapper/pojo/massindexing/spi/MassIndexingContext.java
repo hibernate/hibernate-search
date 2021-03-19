@@ -9,14 +9,13 @@ package org.hibernate.search.mapper.pojo.massindexing.spi;
 import java.util.List;
 import org.hibernate.search.mapper.pojo.loading.LoadingInterceptor;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingStrategy;
-import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingOptions;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 /**
  * Contextual information about a mass indexing proccess.
  * @param <O> The options for mass indexing proccess.
  */
-public interface MassIndexingContext<O extends MassIndexingOptions> {
+public interface MassIndexingContext<O> {
 
 	/**
 	 * @param type The type of entities that will have to be indexed.
@@ -33,7 +32,7 @@ public interface MassIndexingContext<O extends MassIndexingOptions> {
 	 * @return A index loader.
 	 * @see MassIndexingContext
 	 */
-	<T> MassIndexingEntityLoadingStrategy<? super T, O> createIndexLoadingStrategy(PojoRawTypeIdentifier<? extends T> expectedType);
+	<T> MassIndexingEntityLoadingStrategy<T, O> createIndexLoadingStrategy(PojoRawTypeIdentifier<? extends T> expectedType);
 
 	/**
 	 * @param entityType The type of loaded object.
@@ -43,40 +42,19 @@ public interface MassIndexingContext<O extends MassIndexingOptions> {
 
 	/**
 	 * @param sessionContext the session context
-	 * @param commonSuperType The super type of loaded objects.
-	 * @param entity the loaded entity
-	 * @return A true is entity is testIndexedEntity type.
-	 */
-	boolean testIndexedEntity(MassIndexingSessionContext sessionContext,
-			PojoRawTypeIdentifier<?> commonSuperType, Object entity);
-
-	/**
-	 * @param sessionContext the session context
-	 * @param commonSuperType The super type of loaded objects.
 	 * @param entity the loaded entity
 	 * @return A entity name of entity type.
 	 */
-	Object entityIdentifier(MassIndexingSessionContext sessionContext,
-			PojoRawTypeIdentifier<?> commonSuperType, Object entity);
-
-	/**
-	 * @param sessionContext the session context
-	 * @param commonSuperType The super type of loaded objects.
-	 * @param entity the entity
-	 * @param throwable the throwable
-	 * @return A object entity reference.
-	 */
-	Object extractReferenceOrSuppress(MassIndexingSessionContext sessionContext,
-			PojoRawTypeIdentifier<?> commonSuperType, Object entity, Throwable throwable);
+	Object entityIdentifier(MassIndexingSessionContext sessionContext, Object entity);
 
 	/**
 	 * @return A list {@link LoadingInterceptor} of entityIdentifier interceptors.
 	 */
-	List<LoadingInterceptor> identifierInterceptors();
+	List<LoadingInterceptor<?>> identifierInterceptors();
 
 	/**
 	 * @return A list {@link LoadingInterceptor} of entity interceptors.
 	 */
-	List<LoadingInterceptor> documentInterceptors();
+	List<LoadingInterceptor<?>> documentInterceptors();
 
 }

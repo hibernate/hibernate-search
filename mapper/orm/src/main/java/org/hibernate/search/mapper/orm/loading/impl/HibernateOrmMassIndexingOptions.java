@@ -7,9 +7,8 @@
 package org.hibernate.search.mapper.orm.loading.impl;
 
 import org.hibernate.CacheMode;
-import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingOptions;
 
-public interface HibernateOrmMassIndexingOptions extends MassIndexingOptions {
+public interface HibernateOrmMassIndexingOptions {
 
 	/**
 	 * @return the transaction timeout
@@ -20,4 +19,30 @@ public interface HibernateOrmMassIndexingOptions extends MassIndexingOptions {
 	 * @return the {@link CacheMode}
 	 */
 	CacheMode cacheMode();
+
+	/**
+	 * @return the thread name prefix.
+	 */
+	String threadNamePrefix();
+
+	/**
+	 * @return the tenant identifier.
+	 */
+	String tenantIdentifier();
+
+	/**
+	 * @return the batch size used to load the root entities.
+	 */
+	int batchSize();
+
+	/**
+	 * @return the objects limit used to load the root entities.
+	 */
+	long objectsLimit();
+
+	/**
+	 * @return fetch size used to load the root entities.
+	 */
+	int fetchSize();
+
 }

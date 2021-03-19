@@ -14,17 +14,16 @@ import java.util.Map;
 import org.hibernate.search.mapper.pojo.loading.LoadingInterceptor;
 import org.hibernate.search.mapper.pojo.intercepting.LoadingInvocationContext;
 import org.hibernate.search.mapper.pojo.intercepting.LoadingInvocationInterceptor;
-import org.hibernate.search.mapper.pojo.intercepting.LoadingProcessActivePredicate;
 
 public class PojoInterceptingHandler<C> {
 
 	private final C loadingContext;
 	private final String tenantId;
-	private final List<LoadingInterceptor> interceptors;
+	private final List<LoadingInterceptor<C>> interceptors;
 	private final PojoInterceptingInvoker loadingProcess;
 
 	public PojoInterceptingHandler(C loadingContext, String tenantId,
-			List<LoadingInterceptor> interceptors,
+			List<LoadingInterceptor<C>> interceptors,
 			PojoInterceptingInvoker loadingProcess) {
 		this.loadingContext = loadingContext;
 		this.tenantId = tenantId;
@@ -33,10 +32,10 @@ public class PojoInterceptingHandler<C> {
 	}
 
 	public void invoke() throws Exception {
-		Iterator<LoadingInterceptor> iterator = interceptors.iterator();
-		List<LoadingInvocationInterceptor> handlers = new ArrayList();
+		Iterator<LoadingInterceptor<C>> iterator = interceptors.iterator();
+		List<LoadingInvocationInterceptor> handlers = new ArrayList<>();
 
-		LoadingInvocationContext ictx = new PojoInvocationContext( (nctx, next) -> {
+		LoadingInvocationContext<C> ictx = new PojoInvocationContext( (nctx, next) -> {
 			if ( next != null ) {
 				handlers.add( next );
 			}
@@ -70,9 +69,8 @@ public class PojoInterceptingHandler<C> {
 	}
 
 	private class PojoInvocationContext implements LoadingInvocationContext<C> {
-		Map<Object, Object> contextData = new HashMap<>();
+		Map<Class<?>, Object> contextData = new HashMap<>();
 		InvokationContextConsumer consumer;
-		private LoadingProcessActivePredicate active = () -> !Thread.interrupted();
 
 		public PojoInvocationContext(InvokationContextConsumer consumer) {
 			this.consumer = consumer;
@@ -89,18 +87,13 @@ public class PojoInterceptingHandler<C> {
 		}
 
 		@Override
-		public void active(LoadingProcessActivePredicate active) {
-			this.active = this.active.and( active );
+		public <T> T context(Class<T> contextType) {
+			return (T) contextData.get( contextType );
 		}
 
 		@Override
-		public LoadingProcessActivePredicate active() {
-			return active;
-		}
-
-		@Override
-		public Map<Object, Object> contextData() {
-			return contextData;
+		public <T> void context(Class<T> contextType, T context) {
+			contextData.put( contextType, context );
 		}
 
 		@Override
@@ -114,8 +107,8 @@ public class PojoInterceptingHandler<C> {
 		}
 	}
 
-	interface InvokationContextConsumer {
-		void invoke(LoadingInvocationContext nctx, LoadingInvocationInterceptor next) throws Exception;
+	interface InvokationContextConsumer<C> {
+		void invoke(LoadingInvocationContext<C> nctx, LoadingInvocationInterceptor next) throws Exception;
 	}
 
 }

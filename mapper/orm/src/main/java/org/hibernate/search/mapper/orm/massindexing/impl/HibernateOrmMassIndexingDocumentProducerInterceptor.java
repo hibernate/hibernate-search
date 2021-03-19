@@ -67,11 +67,11 @@ public class HibernateOrmMassIndexingDocumentProducerInterceptor implements Load
 			upperSession.setDefaultReadOnly( true );
 
 			HibernateOrmScopeSessionContext sessionContext = mappingContext.sessionContext( upperSession );
-			ictx.contextData().put( MassIndexingSessionContext.class, sessionContext );
+			ictx.context( MassIndexingSessionContext.class, sessionContext );
 
 			ictx.proceed( next -> {
 				SessionImplementor session = sessionContext.session();
-				ictx.contextData().put( SessionImplementor.class, session );
+				ictx.context( SessionImplementor.class, session );
 				try {
 					beginTransaction( session, transactionTimeout );
 					next.proceed();

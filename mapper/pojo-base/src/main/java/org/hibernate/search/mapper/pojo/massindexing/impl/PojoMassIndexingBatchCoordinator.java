@@ -39,7 +39,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	private final PojoScopeWorkspace scopeWorkspace;
 
 	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
-	private final MassIndexingContext indexingContext;
+	private final MassIndexingContext<?> indexingContext;
 	private final MassIndexingMappingContext mappingContext;
 	private final int typesToIndexInParallel;
 	private final int documentBuilderThreads;
@@ -49,7 +49,7 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	private final boolean mergeSegmentsAfterPurge;
 
 	public PojoMassIndexingBatchCoordinator(MassIndexingOptions indexingOptions,
-			MassIndexingContext indexingContext,
+			MassIndexingContext<?> indexingContext,
 			MassIndexingMappingContext mappingContext,
 			PojoMassIndexingNotifier notifier,
 			List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex,

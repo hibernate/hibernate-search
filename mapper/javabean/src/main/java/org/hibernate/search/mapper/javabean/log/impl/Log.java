@@ -69,8 +69,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 15, value = "Transaction rollback failure: %1$s")
 	void errorRollingBackTransaction(String message, @Cause Exception e1);
 
-	@Message(id = ID_OFFSET + 16, value = "No context active while indexing entity '%1$s'. Consider increasing the connection time-out.")
-	SearchException contextNotActiveWhileProducingIdsForBatchIndexing(String entityName);
+	@Message(id = ID_OFFSET + 16, value = "Context is interrupted while indexing entity '%1$s'. Consider increasing the connection time-out.")
+	SearchException contextInterruptedWhileProducingIdsForBatchIndexing(String entityName);
 
 	@Message(id = ID_OFFSET + 17, value = "Unable to access search session: %1$s" )
 	SearchException hibernateSessionAccessError(String causeMessage);

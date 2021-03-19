@@ -23,5 +23,5 @@ public interface MassIndexingContextBuilder<LOS> {
 	/**
 	 * @return The configured loading context.
 	 */
-	MassIndexingContext build();
+	MassIndexingContext<?> build();
 }

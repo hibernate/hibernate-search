@@ -8,9 +8,8 @@ package org.hibernate.search.mapper.pojo.intercepting;
 
 /**
  * Next invocation.
- * @param <C> The contextural loading information
  */
-public interface LoadingNextInvocation<C> {
+public interface LoadingNextInvocation {
 
 	/**
 	 * Proced to the next interceptor in the interceptor chain.For

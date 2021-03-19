@@ -6,12 +6,10 @@
  */
 package org.hibernate.search.mapper.javabean.massindexing.loader;
 
-import java.util.Collection;
 import java.util.Map;
-import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanCollectionIndexingStrategy;
 import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMapIndexingStrategy;
-import org.hibernate.search.mapper.pojo.loading.EntityLoadingTypeGroup;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingStrategy;
+import org.hibernate.search.mapper.pojo.loading.EntityLoadingTypeGroupStrategy;
 
 public class JavaBeanIndexingStrategies {
 
@@ -19,21 +17,11 @@ public class JavaBeanIndexingStrategies {
 	}
 
 	public static <T> MassIndexingEntityLoadingStrategy<T, JavaBeanIndexingOptions> from(Map<?, T> map) {
-		return JavaBeanIndexingStrategies.from( map, EntityLoadingTypeGroup.asIstanceOf() );
+		return JavaBeanIndexingStrategies.from( map, EntityLoadingTypeGroupStrategy.byJavaTypeHierarchy() );
 	}
 
 	public static <T> MassIndexingEntityLoadingStrategy<T, JavaBeanIndexingOptions> from(Map<?, T> map,
-			EntityLoadingTypeGroup group) {
-		return new JavaBeanMapIndexingStrategy( map, group );
+			EntityLoadingTypeGroupStrategy group) {
+		return new JavaBeanMapIndexingStrategy<>( map, group );
 	}
-
-	public static <T> MassIndexingEntityLoadingStrategy<T, JavaBeanIndexingOptions> from(Collection<T> collection) {
-		return JavaBeanIndexingStrategies.from( collection, EntityLoadingTypeGroup.asIstanceOf() );
-	}
-
-	public static <T> MassIndexingEntityLoadingStrategy<T, JavaBeanIndexingOptions> from(Collection<T> collection,
-			EntityLoadingTypeGroup group) {
-		return new JavaBeanCollectionIndexingStrategy( collection, group );
-	}
-
 }
