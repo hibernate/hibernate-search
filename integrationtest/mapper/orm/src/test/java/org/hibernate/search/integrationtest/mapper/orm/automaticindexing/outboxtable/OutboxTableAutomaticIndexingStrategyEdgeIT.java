@@ -6,13 +6,24 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outboxtable;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
+import org.hibernate.search.engine.reporting.FailureContext;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
+import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.mapper.orm.outbox.impl.OutboxEventBackgroundExecutor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -38,6 +49,7 @@ public class OutboxTableAutomaticIndexingStrategyEdgeIT {
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	private SessionFactory sessionFactory;
+	private TestFailureHandler failureHandler;
 
 	@BeforeClass
 	public static void beforeAll() {
@@ -54,7 +66,9 @@ public class OutboxTableAutomaticIndexingStrategyEdgeIT {
 	@Before
 	public void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b.field( "indexedField", String.class ) );
+		failureHandler = new TestFailureHandler();
 		sessionFactory = ormSetupHelper.start()
+				.withProperty( "hibernate.search.background_failure_handler", failureHandler )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
@@ -104,6 +118,9 @@ public class OutboxTableAutomaticIndexingStrategyEdgeIT {
 					.createdThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
+
+		assertThat( failureHandler.genericFailures ).isEmpty();
+		assertThat( failureHandler.entityFailures ).isEmpty();
 	}
 
 	@Test
@@ -132,6 +149,9 @@ public class OutboxTableAutomaticIndexingStrategyEdgeIT {
 			} );
 			backendMock.verifyExpectationsMet();
 		}
+
+		assertThat( failureHandler.genericFailures ).isEmpty();
+		assertThat( failureHandler.entityFailures ).isEmpty();
 	}
 
 	@Test
@@ -180,6 +200,14 @@ public class OutboxTableAutomaticIndexingStrategyEdgeIT {
 
 		} );
 		backendMock.verifyExpectationsMet();
+
+		assertThat( failureHandler.genericFailures ).isEmpty();
+
+		List<EntityIndexingFailureContext> entityFailures = failureHandler.entityFailures.get( 2 );
+		assertThat( entityFailures ).hasSize( 1 );
+
+		EntityIndexingFailureContext entityFailure = entityFailures.get( 0 );
+		checkId2EntityEventFailure( entityFailure );
 	}
 
 	@Test
@@ -235,6 +263,17 @@ public class OutboxTableAutomaticIndexingStrategyEdgeIT {
 
 		} );
 		backendMock.verifyExpectationsMet();
+
+		assertThat( failureHandler.genericFailures ).isEmpty();
+
+		List<EntityIndexingFailureContext> entityFailures = failureHandler.entityFailures.get( 2 );
+		assertThat( entityFailures ).hasSize( 2 );
+
+		EntityIndexingFailureContext entityFailure = entityFailures.get( 0 );
+		checkId2EntityEventFailure( entityFailure );
+
+		entityFailure = entityFailures.get( 1 );
+		checkId2EntityEventFailure( entityFailure );
 	}
 
 	@Test
@@ -295,6 +334,16 @@ public class OutboxTableAutomaticIndexingStrategyEdgeIT {
 
 		} );
 		backendMock.verifyExpectationsMet();
+
+		assertThat( failureHandler.genericFailures ).isEmpty();
+
+		List<EntityIndexingFailureContext> entityFailures = failureHandler.entityFailures.get( 2 );
+		assertThat( entityFailures ).hasSize( 3 );
+
+		for ( int i = 0; i < 3; i++ ) {
+			EntityIndexingFailureContext entityFailure = entityFailures.get( i );
+			checkId2EntityEventFailure( entityFailure );
+		}
 	}
 
 	@Test
@@ -354,6 +403,39 @@ public class OutboxTableAutomaticIndexingStrategyEdgeIT {
 			// no more retry
 		} );
 		backendMock.verifyExpectationsMet();
+
+		assertThat( failureHandler.genericFailures ).isEmpty();
+
+		List<EntityIndexingFailureContext> entityFailures = failureHandler.entityFailures.get( 2 );
+		assertThat( entityFailures ).hasSize( 5 );
+
+		for ( int i = 0; i < 4; i++ ) {
+			EntityIndexingFailureContext entityFailure = entityFailures.get( i );
+			checkId2EntityEventFailure( entityFailure );
+		}
+
+		EntityIndexingFailureContext entityFailure = entityFailures.get( 4 );
+		assertThat( entityFailure.failingOperation() ).isEqualTo( "Processing an outbox event." );
+		assertThat( entityFailure.throwable() )
+				.isInstanceOf( OutboxEventBackgroundExecutor.MaxRetryException.class )
+				.hasMessageContaining( "Max '3' retries exhausted to process the event. Event will be lost." );
+		hasOneReference( entityFailure.entityReferences(), "indexed", 2 );
+	}
+
+	private void checkId2EntityEventFailure(EntityIndexingFailureContext entityFailure) {
+		assertThat( entityFailure.failingOperation() ).isEqualTo( "Processing an outbox event." );
+		assertThat( entityFailure.throwable() )
+				.isInstanceOf( SimulatedFailure.class )
+				.hasMessageContaining( "Indexing work #2 failed!" );
+		hasOneReference( entityFailure.entityReferences(), "indexed", 2 );
+	}
+
+	@SuppressWarnings( "unchecked" )
+	private void hasOneReference(List<Object> entityReferences, String entityName, Object id) {
+		assertThat( entityReferences ).hasSize( 1 );
+		EntityReference entityReference = (EntityReference) entityReferences.get( 0 );
+		assertThat( entityReference.name() ).isEqualTo( entityName );
+		assertThat( entityReference.id() ).isEqualTo( id );
 	}
 
 	@Entity(name = "indexed")
@@ -399,4 +481,28 @@ public class OutboxTableAutomaticIndexingStrategyEdgeIT {
 			super( message );
 		}
 	}
+
+	private static class TestFailureHandler implements FailureHandler {
+
+		private List<FailureContext> genericFailures = new ArrayList<>();
+		private Map<Integer, List<EntityIndexingFailureContext>> entityFailures = new HashMap<>();
+
+		@Override
+		public void handle(FailureContext context) {
+			genericFailures.add( context );
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public void handle(EntityIndexingFailureContext context) {
+			for ( Object item : context.entityReferences() ) {
+				EntityReference entityReference = (EntityReference) item;
+				Integer id = (Integer) entityReference.id();
+
+				entityFailures.computeIfAbsent( id, key -> new ArrayList<>() );
+				entityFailures.get( id ).add( context );
+			}
+		}
+	}
+
 }
