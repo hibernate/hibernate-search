@@ -56,10 +56,19 @@ public interface AutomaticIndexingQueueEventProcessingPlan {
 	 * Convert the identifier to its serialized form.
 	 * The identifier type must be the one used by the entity having name {@code entityName}.
 	 *
-	 * @param entityName The name of the entity
-	 * @param identifier The provided identifier
-	 * @return The serialized for of the provided identifier
+	 * @param entityName The name of the entity.
+	 * @param identifier The provided identifier.
+	 * @return The serialized for of the provided identifier.
 	 */
 	String toSerializedId(String entityName, Object identifier);
+
+	/**
+	 * Supply the {@link EntityReference} for the provided arguments.
+	 *
+	 * @param entityName The name of the entity.
+	 * @param serializedId The serialized entity identifier.
+	 * @return The entity reference.
+	 */
+	EntityReference entityReference(String entityName, String serializedId);
 
 }

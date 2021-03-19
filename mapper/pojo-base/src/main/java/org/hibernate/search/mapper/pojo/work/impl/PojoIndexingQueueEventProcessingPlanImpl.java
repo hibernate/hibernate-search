@@ -70,6 +70,15 @@ public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndex
 		return identifierMapping.toDocumentIdentifier( identifier, sessionContext.mappingContext() );
 	}
 
+	@Override
+	public EntityReferenceInfo entityReference(String entityName, String serializedId) {
+		PojoWorkIndexedTypeContext<?, ?> typeContext = typeContext( entityName );
+		Class<?> javaClass = typeContext.typeIdentifier().javaClass();
+		Object id = typeContext.identifierMapping().fromDocumentIdentifier( serializedId, sessionContext );
+
+		return new EntityReferenceInfo( javaClass, entityName, id );
+	}
+
 	private PojoWorkIndexedTypeContext<?, ?> typeContext(String entityName) {
 		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> optional = typeContextProvider.forEntityName( entityName );
 		if ( !optional.isPresent() ) {

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.outbox.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,31 +15,31 @@ import java.util.stream.Collectors;
 
 import org.hibernate.Session;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
+import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventProcessingPlan;
 import org.hibernate.search.mapper.orm.common.EntityReference;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
 public class OutboxEventProcessingPlan<Event extends OutboxEventBase> {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	private final AutomaticIndexingQueueEventProcessingPlan processingPlan;
+	private final FailureHandler failureHandler;
 	private final List<Event> events;
 	private final Map<OutboxEventReference, List<Event>> failedEvents = new HashMap<>();
 	private final List<Integer> eventsIds;
 
 	public OutboxEventProcessingPlan(AutomaticIndexingMappingContext mapping, Session session, List<Event> events) {
 		this.processingPlan = mapping.createIndexingQueueEventProcessingPlan( session );
+		this.failureHandler = mapping.failureHandler();
 		this.events = events;
 		this.eventsIds = new ArrayList<>( events.size() );
 	}
 
-	public List<Integer> processEvents() {
+	List<Integer> processEvents() {
 		try {
 			addEventsToThePlan();
 			reportBackendResult( Futures.unwrappedExceptionGet( processingPlan.executeAndReport() ) );
@@ -52,12 +51,16 @@ public class OutboxEventProcessingPlan<Event extends OutboxEventBase> {
 		return eventsIds;
 	}
 
-	public Map<OutboxEventReference, List<Event>> getFailedEvents() {
+	Map<OutboxEventReference, List<Event>> getFailedEvents() {
 		return failedEvents;
 	}
 
-	public Set<Event> getFailedEventsSet() {
+	Set<Event> getFailedEventsSet() {
 		return failedEvents.values().stream().flatMap( events -> events.stream() ).collect( Collectors.toSet() );
+	}
+
+	EntityReference entityReference(Event event) {
+		return processingPlan.entityReference( event.getEntityName(), event.getEntityId() );
 	}
 
 	private void addEventsToThePlan() {
@@ -106,17 +109,25 @@ public class OutboxEventProcessingPlan<Event extends OutboxEventBase> {
 					processingPlan.toSerializedId( entityReference.name(), entityReference.id() )
 			);
 
+			EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
+			builder.throwable( report.throwable().get() );
+			builder.failingOperation( "Processing an outbox event." );
+			builder.entityReference( entityReference );
+			failureHandler.handle( builder.build() );
+
 			failedEvents.put( outboxEventReference, eventsMap.get( outboxEventReference ) );
 		}
-
-		log.failureToReindexOutboxEntities( report.failingEntityReferences(), report.throwable().get() );
 	}
 
 	private void reportAllEventsFailure(Throwable throwable, Map<OutboxEventReference, List<Event>> eventsMap) {
 		failedEvents.putAll( eventsMap );
 		for ( List<Event> events : eventsMap.values() ) {
 			for ( Event event : events ) {
-				log.failureOnProcessingOutboxEvent( event, throwable );
+				EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
+				builder.throwable( throwable );
+				builder.failingOperation( "Processing an outbox event." );
+				builder.entityReference( entityReference( event ) );
+				failureHandler.handle( builder.build() );
 			}
 		}
 	}
