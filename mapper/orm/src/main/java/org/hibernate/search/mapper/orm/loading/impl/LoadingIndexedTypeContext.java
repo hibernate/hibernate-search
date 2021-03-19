@@ -23,6 +23,6 @@ public interface LoadingIndexedTypeContext<E> {
 	 */
 	EntityPersister entityPersister();
 
-	EntityLoadingStrategy<? super E, ?> loadingStrategy();
+	HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy();
 
 }

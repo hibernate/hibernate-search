@@ -34,7 +34,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.mapper.pojo.loading.EntityLoadingTypeGroupStrategy;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingTypeGroup;
 
-public class HibernateOrmJpaMassIndexingTypeLoadingStrategy<E> implements
+public abstract class AbstractHibernateOrmLoadingStrategy<E> implements
 		MassIndexingEntityLoadingStrategy<E, HibernateOrmMassIndexingOptions> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -46,7 +46,7 @@ public class HibernateOrmJpaMassIndexingTypeLoadingStrategy<E> implements
 	private final EntityPersister rootEntityPersister;
 	private final TypeQueryFactory<E, ?> queryFactory;
 
-	HibernateOrmJpaMassIndexingTypeLoadingStrategy(
+	AbstractHibernateOrmLoadingStrategy(
 			HibernateOrmSessionTypeContextProvider typeContextContainer,
 			SessionFactoryImplementor sessionFactory,
 			EntityPersister rootEntityPersister, TypeQueryFactory<E, ?> queryFactory) {
@@ -76,7 +76,7 @@ public class HibernateOrmJpaMassIndexingTypeLoadingStrategy<E> implements
 		};
 	}
 
-	public HibernateOrmQueryLoader<E, ?> createQueryLoader(
+	protected HibernateOrmQueryLoader<E, ?> createQueryLoader(
 			Set<Class<? extends E>> targetEntityTypes) {
 		Set<Class<? extends E>> includedTypesFilter;
 		if ( HibernateOrmUtils.targetsAllConcreteSubTypes( sessionFactory, rootEntityPersister,

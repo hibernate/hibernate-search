@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,25 +16,28 @@ import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
 
-public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> implements EntityLoadingStrategy<E, I> {
+public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> extends AbstractHibernateOrmLoadingStrategy<E>
+		implements HibernateOrmEntityLoadingStrategy<E, I> {
 
-	public static EntityLoadingStrategy<?, ?> create(SessionFactoryImplementor sessionFactory,
+	public static HibernateOrmEntityLoadingStrategy<?, ?> create(SessionFactoryImplementor sessionFactory,
+			HibernateOrmSessionTypeContextProvider typeContextContainer,
 			EntityPersister entityPersister) {
 		EntityPersister rootEntityPersister = HibernateOrmUtils.toRootEntityType( sessionFactory, entityPersister );
 		TypeQueryFactory<?, ?> queryFactory = TypeQueryFactory.create( sessionFactory, rootEntityPersister,
 				entityPersister.getIdentifierPropertyName() );
-		return new HibernateOrmEntityIdEntityLoadingStrategy<>( sessionFactory, rootEntityPersister, queryFactory );
+		return new HibernateOrmEntityIdEntityLoadingStrategy<>( sessionFactory, typeContextContainer, rootEntityPersister, queryFactory );
 	}
 
-	private final SessionFactoryImplementor sessionFactory;
 	private final EntityPersister rootEntityPersister;
 	private final TypeQueryFactory<E, I> queryFactory;
 
 	HibernateOrmEntityIdEntityLoadingStrategy(SessionFactoryImplementor sessionFactory,
+			HibernateOrmSessionTypeContextProvider typeContextContainer,
 			EntityPersister rootEntityPersister, TypeQueryFactory<E, I> queryFactory) {
-		this.sessionFactory = sessionFactory;
+		super( typeContextContainer, sessionFactory, rootEntityPersister, queryFactory );
 		this.rootEntityPersister = rootEntityPersister;
 		this.queryFactory = queryFactory;
 	}
@@ -97,24 +98,6 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> implements EntityLo
 				loadingOptions );
 
 		return result;
-	}
-
-	@Override
-	public HibernateOrmQueryLoader<E, I> createLoader(
-			Set<? extends LoadingIndexedTypeContext<? extends E>> targetEntityTypeContexts) {
-		Set<Class<? extends E>> includedTypesFilter;
-		if ( HibernateOrmUtils.targetsAllConcreteSubTypes( sessionFactory, rootEntityPersister,
-				targetEntityTypeContexts ) ) {
-			// All concrete types are included, no need to filter by type.
-			includedTypesFilter = Collections.emptySet();
-		}
-		else {
-			includedTypesFilter = new HashSet<>( targetEntityTypeContexts.size() );
-			for ( LoadingIndexedTypeContext<? extends E> includedType : targetEntityTypeContexts ) {
-				includedTypesFilter.add( includedType.typeIdentifier().javaClass() );
-			}
-		}
-		return new HibernateOrmQueryLoader<>( queryFactory, includedTypesFilter );
 	}
 
 	private PojoLoader<?> doCreate(EntityPersister entityPersister,
@@ -185,8 +168,8 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> implements EntityLo
 	private AssertionFailure invalidTypeException(EntityPersister otherEntityPersister) {
 		throw new AssertionFailure(
 				"The targeted entity type is not a subclass of the expected root entity type."
-						+ " Expected root entity name: " + rootEntityPersister.getEntityName()
-						+ " Targeted entity name: " + otherEntityPersister.getEntityName()
+				+ " Expected root entity name: " + rootEntityPersister.getEntityName()
+				+ " Targeted entity name: " + otherEntityPersister.getEntityName()
 		);
 	}
 
@@ -194,9 +177,9 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> implements EntityLo
 			Set<? extends LoadingIndexedTypeContext<?>> targetEntityTypeContexts) {
 		return new AssertionFailure(
 				"Some types among the targeted entity types are not subclasses of the expected root entity type."
-						+ " Expected entity name: " + rootEntityPersister.getEntityName()
-						+ " Targeted entity names: "
-						+ targetEntityTypeContexts.stream()
+				+ " Expected entity name: " + rootEntityPersister.getEntityName()
+				+ " Targeted entity names: "
+				+ targetEntityTypeContexts.stream()
 						.map( LoadingIndexedTypeContext::entityPersister )
 						.map( EntityPersister::getEntityName )
 						.collect( Collectors.toList() )

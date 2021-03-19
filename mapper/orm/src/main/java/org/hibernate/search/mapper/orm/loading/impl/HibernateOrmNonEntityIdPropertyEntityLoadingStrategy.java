@@ -7,49 +7,51 @@
 package org.hibernate.search.mapper.orm.loading.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.persister.entity.EntityPersister;
-import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
-public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> implements EntityLoadingStrategy<E, I> {
+public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> extends AbstractHibernateOrmLoadingStrategy<E>
+		implements HibernateOrmEntityLoadingStrategy<E, I> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static <I> EntityLoadingStrategy<?, ?> create(SessionFactoryImplementor sessionFactory,
+	public static <I> HibernateOrmEntityLoadingStrategy<?, ?> create(SessionFactoryImplementor sessionFactory,
+			HibernateOrmSessionTypeContextProvider typeContextContainer,
 			EntityPersister entityPersister,
 			String documentIdSourcePropertyName, ValueReadHandle<I> documentIdSourceHandle) {
 		// By contract, the documentIdSourceHandle and the documentIdSourcePropertyName refer to the same property,
 		// whose type is I.
 		@SuppressWarnings("unchecked")
-		TypeQueryFactory<?, I> queryFactory = (TypeQueryFactory<?, I>)
-				TypeQueryFactory.create( sessionFactory, entityPersister, documentIdSourcePropertyName );
-		return new HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<>( sessionFactory, entityPersister, queryFactory,
+		TypeQueryFactory<?, I> queryFactory = (TypeQueryFactory<?, I>) TypeQueryFactory.create( sessionFactory,
+				entityPersister, documentIdSourcePropertyName );
+		return new HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<>( sessionFactory,
+				typeContextContainer, entityPersister, queryFactory,
 				documentIdSourcePropertyName, documentIdSourceHandle );
 	}
 
-	private final SessionFactoryImplementor sessionFactory;
 	private final EntityPersister entityPersister;
 	private final TypeQueryFactory<E, I> queryFactory;
 	private final String documentIdSourcePropertyName;
 	private final ValueReadHandle<?> documentIdSourceHandle;
 
 	private HibernateOrmNonEntityIdPropertyEntityLoadingStrategy(SessionFactoryImplementor sessionFactory,
+			HibernateOrmSessionTypeContextProvider typeContextContainer,
 			EntityPersister entityPersister,
 			TypeQueryFactory<E, I> queryFactory,
 			String documentIdSourcePropertyName,
 			ValueReadHandle<I> documentIdSourceHandle) {
-		this.sessionFactory = sessionFactory;
+		super( typeContextContainer, sessionFactory, entityPersister, queryFactory );
 		this.entityPersister = entityPersister;
 		this.queryFactory = queryFactory;
 		this.documentIdSourcePropertyName = documentIdSourcePropertyName;
@@ -73,29 +75,6 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> implemen
 	@Override
 	public int hashCode() {
 		return Objects.hash( entityPersister, documentIdSourcePropertyName, documentIdSourceHandle );
-	}
-
-
-	@Override
-	public HibernateOrmQueryLoader<E, I> createLoader(
-			Set<? extends LoadingIndexedTypeContext<? extends E>> targetEntityTypeContexts) {
-		if ( targetEntityTypeContexts.size() != 1 ) {
-			throw multipleTypesException( targetEntityTypeContexts );
-		}
-		LoadingIndexedTypeContext<? extends E> targetEntityTypeContext = targetEntityTypeContexts.iterator().next();
-		if ( !entityPersister.equals( targetEntityTypeContext.entityPersister() ) ) {
-			throw invalidTypeException( targetEntityTypeContext.entityPersister() );
-		}
-
-		Set<Class<? extends E>> includedTypesFilter;
-		if ( HibernateOrmUtils.targetsAllConcreteSubTypes( sessionFactory, entityPersister, targetEntityTypeContexts ) ) {
-			// All concrete types are included, no need to filter by type.
-			includedTypesFilter = Collections.emptySet();
-		}
-		else {
-			includedTypesFilter = Collections.singleton( targetEntityTypeContext.typeIdentifier().javaClass() );
-		}
-		return new HibernateOrmQueryLoader<>( queryFactory, includedTypesFilter );
 	}
 
 	@Override
