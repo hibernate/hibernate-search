@@ -47,7 +47,7 @@ public final class BackendWorkThreadingExpectations {
 		else {
 			await().pollDelay( Duration.ZERO )
 					.pollInterval( iterative( duration -> duration.multipliedBy( 2 ), Duration.ofMillis( 5 ) ) )
-					.atMost( Duration.ofSeconds( 5 ) )
+					.atMost( Duration.ofSeconds( 15 ) )
 					.untilAsserted( assertions );
 		}
 	}
