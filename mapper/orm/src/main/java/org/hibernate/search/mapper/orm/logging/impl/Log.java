@@ -21,8 +21,6 @@ import org.hibernate.mapping.Value;
 import org.hibernate.resource.beans.container.spi.BeanContainer;
 import org.hibernate.search.engine.environment.bean.spi.BeanNotFoundException;
 import org.hibernate.search.mapper.orm.common.EntityReference;
-import org.hibernate.search.mapper.orm.outbox.impl.OutboxEventBase;
-import org.hibernate.search.mapper.orm.outbox.impl.OutboxEventRetry;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
@@ -299,18 +297,5 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = INFO)
 	@Message(id = ID_OFFSET + 44, value = "Session factory is closed. Hibernate Search is probably shutting down.")
 	void sessionFactoryIsClosedOnOutboxProcessing();
-
-	@LogMessage(level = WARN)
-	@Message(id = ID_OFFSET + 45, value = "Max '%1$s' retries exhausted to process the event '%2$s'." +
-			" The event will be lost forever.")
-	void maxOutboxRetriesExhausted(int maxRetries, OutboxEventRetry event);
-
-	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET + 46, value = "Processing of an outbox event failed. Outbox event: '%1$s'.")
-	void failureOnProcessingOutboxEvent(OutboxEventBase event, @Cause Throwable t);
-
-	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET + 47, value = "Reindex of outbox entities failed. Outbox entities : '%1$s'.")
-	void failureToReindexOutboxEntities(List<EntityReference> entities, @Cause Throwable t);
 
 }

@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -23,6 +22,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.hibernate.search.engine.backend.orchestration.spi.SingletonTask;
+import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
@@ -44,6 +45,7 @@ public class OutboxEventBackgroundExecutor {
 	private final int pollingInterval;
 	private final int batchSize;
 	private final AtomicReference<Status> status = new AtomicReference<>( Status.STOPPED );
+	private final FailureHandler failureHandler;
 	private final SingletonTask processingTask;
 
 	public OutboxEventBackgroundExecutor(AutomaticIndexingMappingContext mapping, ScheduledExecutorService executor,
@@ -52,11 +54,12 @@ public class OutboxEventBackgroundExecutor {
 		this.pollingInterval = pollingInterval;
 		this.batchSize = batchSize;
 
+		failureHandler = mapping.failureHandler();
 		processingTask = new SingletonTask(
 				"Delayed commit for " + OutboxTableAutomaticIndexingStrategy.NAME,
 				new HibernateOrmOutboxWorker(),
 				new HibernateOrmOutboxScheduler( executor ),
-				mapping.failureHandler()
+				failureHandler
 		);
 	}
 
@@ -92,9 +95,8 @@ public class OutboxEventBackgroundExecutor {
 						OutboxEventProcessingPlan<OutboxEventRetry> eventProcessing = new OutboxEventProcessingPlan<>(
 								mapping, session, outboxRetries );
 						eventProcessing.processEvents();
-						Set<OutboxEventRetry> failedEvents = eventProcessing.getFailedEventsSet();
 						for ( OutboxEventRetry event : outboxRetries ) {
-							deleteOrUpdateOutboxRetries( session, event, !failedEvents.contains( event ) );
+							deleteOrUpdateOutboxRetries( session, event, eventProcessing );
 						}
 					}
 				} );
@@ -155,15 +157,22 @@ public class OutboxEventBackgroundExecutor {
 		return query.list();
 	}
 
-	private void deleteOrUpdateOutboxRetries(Session session, OutboxEventRetry event, boolean processed) {
-		if ( processed ) {
+	private void deleteOrUpdateOutboxRetries(Session session, OutboxEventRetry event,
+			OutboxEventProcessingPlan<OutboxEventRetry> processingPlan) {
+		if ( !processingPlan.getFailedEventsSet().contains( event ) ) {
 			// processed:
 			session.delete( event );
 			return;
 		}
 
 		if ( event.getRetries() > MAX_RETRIES ) {
-			log.maxOutboxRetriesExhausted( MAX_RETRIES, event );
+			EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
+			builder.throwable( new MaxRetryException( "Max '" + MAX_RETRIES +
+					"' retries exhausted to process the event. Event will be lost." ) );
+			builder.failingOperation( "Processing an outbox event." );
+			builder.entityReference( processingPlan.entityReference( event ) );
+			failureHandler.handle( builder.build() );
+
 			session.delete( event );
 			return;
 		}
@@ -196,7 +205,7 @@ public class OutboxEventBackgroundExecutor {
 		session.clear();
 	}
 
-	public static byte[] mergeDocumentRoutes(List<OutboxEvent> events) {
+	private static byte[] mergeDocumentRoutes(List<OutboxEvent> events) {
 		if ( events.isEmpty() ) {
 			return null;
 		}
@@ -220,6 +229,12 @@ public class OutboxEventBackgroundExecutor {
 		}
 
 		return SerializationUtils.serialize( DocumentRoutesDescriptor.of( currentRoute, previousRoutes ) );
+	}
+
+	public static final class MaxRetryException extends Exception {
+		public MaxRetryException(String message) {
+			super( message );
+		}
 	}
 }
 

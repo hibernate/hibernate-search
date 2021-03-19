@@ -12,6 +12,7 @@ import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventProcessingPlan;
 import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
 
@@ -49,5 +50,13 @@ public class AutomaticIndexingQueueEventProcessingPlanImpl implements AutomaticI
 	@Override
 	public String toSerializedId(String entityName, Object identifier) {
 		return delegate.toSerializedId( entityName, identifier );
+	}
+
+	@Override
+	public EntityReference entityReference(String entityName, String serializedId) {
+		PojoIndexingQueueEventProcessingPlan.EntityReferenceInfo refInfo =
+				delegate.entityReference( entityName, serializedId );
+
+		return EntityReferenceImpl.withName( refInfo.javaClass(), refInfo.entityName(), refInfo.id() );
 	}
 }
