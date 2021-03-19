@@ -25,8 +25,7 @@ public interface EntityLoader<E> extends AutoCloseable {
 	List<E> load(List<?> identifiers);
 
 	/**
-	 * Closes this resource, relinquishing any underlying resources.
-	 * This method is invoked automatically on objects managed by the
+	 * Closes this {@link EntityLoader}.
 	 */
 	@Override
 	default void close() {

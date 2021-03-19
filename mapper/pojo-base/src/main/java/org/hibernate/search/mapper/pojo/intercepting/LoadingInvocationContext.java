@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.intercepting;
 
-import java.util.Map;
-
 /**
  * Exposes contextual information about the intercepted invocation and
  * operations that enable interceptor methods to control the behavior
@@ -27,27 +25,24 @@ public interface LoadingInvocationContext<O> {
 	String tenantId();
 
 	/**
-	 * Evaluates this predicate on the intercepting process.
-	 *
-	 * @param active a predicate that will be test intercepting active process
-	 */
-	void active(LoadingProcessActivePredicate active);
-
-	/**
-	 * Return this predicate on the intercepting process.
-	 *
-	 * @return a predicate that will be test intercepting active process
-	 */
-	LoadingProcessActivePredicate active();
-
-	/**
 	 * Enables an interceptor to retrieve or update the data associated with the invocation by another interceptor.
 	 *
+	 * @param <T> a return context type
+	 * @param contextType a type of context.
 	 * @return the context data associated with this invocation or
 	 * lifecycle callback. If there is no context data, an
 	 * empty {@code Map<String,Object>} object will be returned.
 	 */
-	Map<Object, Object> contextData();
+	<T> T context(Class<T> contextType);
+
+	/**
+	 * Enables an interceptor to retrieve or update the data associated with the invocation by another interceptor.
+	 *
+	 * @param <T> a type of context
+	 * @param contextType a type key of context
+	 * @param context a context instance
+	 */
+	<T> void context(Class<T> contextType, T context);
 
 	/**
 	 * Invoke to the next interceptor in the interceptor chain.For mass options interceptor methods, the invocation of

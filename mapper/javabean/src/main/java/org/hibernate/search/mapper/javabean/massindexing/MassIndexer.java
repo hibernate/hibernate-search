@@ -142,21 +142,6 @@ public interface MassIndexer {
 	MassIndexer idFetchSize(int idFetchSize);
 
 	/**
-	 * Timeout of transactions for loading ids and entities to be re-indexed.
-	 * <p>
-	 * Specify a timeout which is long enough to
-	 * load and index all entities of the type with the most instances, taking into account the configured batch size
-	 * and number of threads to load objects.
-	 * <p>
-	 * Only supported in JTA-compatible environments.
-	 *
-	 * @param timeoutInSeconds the transaction timeout in seconds; If no value is given, the global default timeout of
-	 * the JTA environment applies.
-	 * @return {@code this} for method chaining
-	 */
-	MassIndexer transactionTimeout(int timeoutInSeconds);
-
-	/**
 	 * Sets the {@link MassIndexingMonitor}.
 	 * <p>
 	 * The default monitor just logs the progress.

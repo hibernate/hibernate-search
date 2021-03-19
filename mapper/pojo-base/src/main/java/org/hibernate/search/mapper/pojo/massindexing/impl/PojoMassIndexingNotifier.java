@@ -68,7 +68,7 @@ public class PojoMassIndexingNotifier {
 		MassIndexingEntityFailureContext.Builder contextBuilder = MassIndexingEntityFailureContext.builder();
 		contextBuilder.throwable( exception );
 		// Add minimal information here, but information we're sure we can get
-		contextBuilder.failingOperation( log.massIndexerIndexingInstance( typeGroup.includedEntityNames() ) );
+		contextBuilder.failingOperation( log.massIndexerIndexingInstance( typeGroup.notifiedGroupName() ) );
 		// Add more information here, but information that may not be available if the session completely broke down
 		// (we're being extra careful here because we don't want to throw an exception while handling and exception)
 		Object entityReference = extractReferenceOrSuppress( typeGroup, sessionContext, entity, exception );

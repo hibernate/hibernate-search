@@ -30,13 +30,13 @@ class PojoMassIndexingTypeProcessor {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoMassIndexingNotifier notifier;
-	private final PojoMassIndexingIndexedTypeGroup typeGroup;
+	private final PojoMassIndexingIndexedTypeGroup<?> typeGroup;
 
 	private final PojoProducerConsumerQueue<List<?>> primaryKeyStream;
 
 	public PojoMassIndexingTypeProcessor(
 			PojoMassIndexingNotifier notifier,
-			PojoMassIndexingIndexedTypeGroup typeGroup) {
+			PojoMassIndexingIndexedTypeGroup<?> typeGroup) {
 		this.notifier = notifier;
 		this.typeGroup = typeGroup;
 
@@ -55,7 +55,7 @@ class PojoMassIndexingTypeProcessor {
 				Thread.currentThread().interrupt();
 			}
 			catch (Exception exception) {
-				notifier.notifyRunnableFailure( exception, log.massIndexerFetchingIds( typeGroup.includedEntityNames() ) );
+				notifier.notifyRunnableFailure( exception, log.massIndexerFetchingIds( typeGroup.notifiedGroupName() ) );
 			}
 			finally {
 				primaryKeyStream.producerStopping();
@@ -73,16 +73,17 @@ class PojoMassIndexingTypeProcessor {
 			catch (Exception exception) {
 				notifier.notifyRunnableFailure(
 						exception,
-						log.massIndexingLoadingAndExtractingEntityData( typeGroup.includedEntityNames() )
+						log.massIndexingLoadingAndExtractingEntityData( typeGroup.notifiedGroupName() )
 				);
 			}
 			log.trace( "finished" );
 		};
 	}
 
-	private void loadAllIdentifiers(LoadingInvocationContext ictx) throws InterruptedException {
+	private void loadAllIdentifiers(LoadingInvocationContext<?> ictx) throws InterruptedException {
+		MassIndexingSessionContext sessionContext = (MassIndexingSessionContext) ictx.context( MassIndexingSessionContext.class );
 		try ( EntityIdentifierScroll identifierScroll = typeGroup
-				.createIdentifierScroll( new PojoMassIndexingThreadContext( ictx, typeGroup ) ) ) {
+				.createIdentifierScroll( new PojoMassIndexingThreadContext( ictx, typeGroup ), sessionContext ) ) {
 
 			long totalCount = identifierScroll.totalCount();
 			notifier.notifyAddedTotalCount( totalCount );
@@ -100,8 +101,8 @@ class PojoMassIndexingTypeProcessor {
 		}
 	}
 
-	private void loadAndIndexAllFromQueue(LoadingInvocationContext ictx, PojoInterceptingNextInvoker invoker) throws Exception {
-		MassIndexingSessionContext sessionContext = (MassIndexingSessionContext) ictx.contextData().get( MassIndexingSessionContext.class );
+	private void loadAndIndexAllFromQueue(LoadingInvocationContext<?> ictx, PojoInterceptingNextInvoker invoker) throws Exception {
+		MassIndexingSessionContext sessionContext = (MassIndexingSessionContext) ictx.context( MassIndexingSessionContext.class );
 		PojoIndexer indexer = sessionContext.createIndexer();
 		try {
 			List<?> idList;
@@ -120,14 +121,14 @@ class PojoMassIndexingTypeProcessor {
 		}
 	}
 
-	private void loadAndIndexList(LoadingInvocationContext ictx, List<?> listIds,
+	private void loadAndIndexList(LoadingInvocationContext<?> ictx, List<?> listIds,
 			MassIndexingSessionContext sessionContext,
 			PojoIndexer indexer,
 			PojoInterceptingNextInvoker invoker)
 			throws Exception {
 		invoker.invoke( () -> {
 			try ( EntityLoader<?> entityLoader = typeGroup
-					.createLoader( new PojoMassIndexingThreadContext( ictx, typeGroup ) ) ) {
+					.createLoader( new PojoMassIndexingThreadContext( ictx, typeGroup ), sessionContext ) ) {
 				List<?> result = entityLoader.load( listIds );
 				indexList( sessionContext, indexer, result );
 			}
@@ -146,7 +147,7 @@ class PojoMassIndexingTypeProcessor {
 
 		for ( int i = 0; i < entities.size(); i++ ) {
 			Object entity = entities.get( i );
-			if ( !typeGroup.testIndexingEntity( sessionContext, entity ) ) {
+			if ( !typeGroup.includesInstance( sessionContext, entity ) ) {
 				continue;
 			}
 			indexingFutures[i] = index( sessionContext, indexer, entity );

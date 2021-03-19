@@ -31,16 +31,16 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 
 	@Override
 	protected void assertBeforeSetup() {
-		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isZero();
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isZero();
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isZero();
 	}
 
 	@Override
 	protected void assertAfterSetup() {
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isZero();
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isZero();
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 	protected void assertEntityIndexingFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isZero();
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 1 );
 	}
 
@@ -67,7 +67,7 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 	protected void assertEntityIdGetterFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isZero();
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 1 );
 	}
 

@@ -18,33 +18,34 @@ import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.javabean.massindexing.loader.JavaBeanIndexingOptions;
 import org.hibernate.search.mapper.pojo.loading.EntityIdentifierScroll;
 import org.hibernate.search.mapper.pojo.loading.EntityLoader;
-import org.hibernate.search.mapper.pojo.loading.EntityLoadingTypeGroup;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingStrategy;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingThreadContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.pojo.loading.EntityLoadingTypeGroupStrategy;
+import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingTypeGroup;
 
 public class JavaBeanMapIndexingStrategy<E> implements MassIndexingEntityLoadingStrategy<E, JavaBeanIndexingOptions> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<?, E> source;
-	private final EntityLoadingTypeGroup typeGroup;
+	private final EntityLoadingTypeGroupStrategy typeGroup;
 
-	public JavaBeanMapIndexingStrategy(Map<?, E> source, EntityLoadingTypeGroup typeGroup) {
+	public JavaBeanMapIndexingStrategy(Map<?, E> source, EntityLoadingTypeGroupStrategy typeGroup) {
 		this.source = source;
 		this.typeGroup = typeGroup;
 	}
 
 	@Override
-	public EntityLoadingTypeGroup assignGroup() {
+	public EntityLoadingTypeGroupStrategy groupStrategy() {
 		return typeGroup;
 	}
 
 	@Override
-	public EntityIdentifierScroll createIdentifierScroll(MassIndexingThreadContext<JavaBeanIndexingOptions> context, Set<Class<? extends E>> includedTypes) throws InterruptedException {
+	public EntityIdentifierScroll createIdentifierScroll(MassIndexingThreadContext<JavaBeanIndexingOptions> context,
+			MassIndexingEntityLoadingTypeGroup<E> loadingTypeGroup) throws InterruptedException {
 		Set<?> identifiers = source.entrySet().stream()
-				.filter( ent -> context.commonSuperType().isAssignableFrom( ent.getValue().getClass() ) )
-				.filter( ent -> context.indexed( ent.getValue() ) )
+				.filter( ent -> loadingTypeGroup.includesInstance( ent.getValue() ) )
 				.map( Entry::getKey ).collect( Collectors.toSet() );
 		Iterator<?> iterator = identifiers.iterator();
 		return new EntityIdentifierScroll() {
@@ -60,14 +61,13 @@ public class JavaBeanMapIndexingStrategy<E> implements MassIndexingEntityLoading
 				List<Object> destination = new ArrayList<>( batchSize );
 				while ( iterator.hasNext() ) {
 					destination.add( iterator.next() );
-					if ( !context.active() ) {
-						throw log.contextNotActiveWhileProducingIdsForBatchIndexing( context.includedEntityNames() );
+					if ( Thread.interrupted() ) {
+						throw log.contextInterruptedWhileProducingIdsForBatchIndexing( loadingTypeGroup.toString() );
 					}
 
 					if ( destination.size() == batchSize ) {
 						return destination;
 					}
-
 				}
 				return destination;
 			}
@@ -75,7 +75,8 @@ public class JavaBeanMapIndexingStrategy<E> implements MassIndexingEntityLoading
 	}
 
 	@Override
-	public EntityLoader<E> createLoader(MassIndexingThreadContext<JavaBeanIndexingOptions> context, Set<Class<? extends E>> includedTypes) throws InterruptedException {
+	public EntityLoader<E> createLoader(MassIndexingThreadContext<JavaBeanIndexingOptions> context,
+			MassIndexingEntityLoadingTypeGroup<E> loadingTypeGroup) throws InterruptedException {
 		return (identifiers) -> identifiers.stream().map( source::get ).collect( Collectors.toList() );
 
 	}

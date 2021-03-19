@@ -33,13 +33,12 @@ import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingOptions;
  * subset, always including all subtypes.
  *
  * @author Sanne Grinovero
- * @param <N> Next Indexer
  */
-public class PojoDefaultMassIndexer<N extends PojoMassIndexer<N>> implements PojoMassIndexer<N>, MassIndexingOptions {
+public class PojoDefaultMassIndexer implements PojoMassIndexer, MassIndexingOptions {
 
 	static final String THREAD_NAME_PREFIX = "Mass indexing - ";
 
-	private final MassIndexingContext massIndexingConfigurationContext;
+	private final MassIndexingContext<?> massIndexingConfigurationContext;
 	private final MassIndexingMappingContext mappingContext;
 	private final DetachedBackendSessionContext sessionContext;
 	private final MassIndexingOptions indexerContext;
@@ -64,7 +63,7 @@ public class PojoDefaultMassIndexer<N extends PojoMassIndexer<N>> implements Poj
 
 	public PojoDefaultMassIndexer(
 			MassIndexingOptions indexerContext,
-			MassIndexingContext indexingContext,
+			MassIndexingContext<?> indexingContext,
 			MassIndexingMappingContext mappingContext,
 			DetachedBackendSessionContext sessionContext,
 			Set<? extends PojoRawTypeIdentifier<?>> targetedIndexedTypes,
@@ -73,7 +72,8 @@ public class PojoDefaultMassIndexer<N extends PojoMassIndexer<N>> implements Poj
 		this.massIndexingConfigurationContext = indexingContext;
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
-		this.typeGroupsToIndex = PojoMassIndexingIndexedTypeGroup.disjoint( indexingContext, targetedIndexedTypes );
+		this.typeGroupsToIndex = PojoMassIndexingIndexedTypeGroup.disjoint( indexingContext,
+				mappingContext, targetedIndexedTypes );
 		this.scopeSchemaManager = scopeSchemaManager;
 		this.scopeWorkspace = scopeWorkspace;
 		this.indexerContext = indexerContext != null ? indexerContext : this;
@@ -90,12 +90,12 @@ public class PojoDefaultMassIndexer<N extends PojoMassIndexer<N>> implements Poj
 	}
 
 	@Override
-	public N typesToIndexInParallel(int numberOfThreads) {
+	public PojoMassIndexer typesToIndexInParallel(int numberOfThreads) {
 		if ( numberOfThreads < 1 ) {
 			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
 		}
 		this.typesToIndexInParallel = Math.min( numberOfThreads, typeGroupsToIndex.size() );
-		return (N) this;
+		return this;
 	}
 
 	public int typesToIndexInParallel() {
@@ -103,12 +103,12 @@ public class PojoDefaultMassIndexer<N extends PojoMassIndexer<N>> implements Poj
 	}
 
 	@Override
-	public N threadsToLoadObjects(int numberOfThreads) {
+	public PojoMassIndexer threadsToLoadObjects(int numberOfThreads) {
 		if ( numberOfThreads < 1 ) {
 			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
 		}
 		this.documentBuilderThreads = numberOfThreads;
-		return (N) this;
+		return this;
 	}
 
 	public int threadsToLoadObjects() {
@@ -116,12 +116,12 @@ public class PojoDefaultMassIndexer<N extends PojoMassIndexer<N>> implements Poj
 	}
 
 	@Override
-	public N batchSizeToLoadObjects(int batchSize) {
+	public PojoMassIndexer batchSizeToLoadObjects(int batchSize) {
 		if ( batchSize < 1 ) {
 			throw new IllegalArgumentException( "batchSize must be at least 1" );
 		}
 		this.objectLoadingBatchSize = batchSize;
-		return (N) this;
+		return this;
 	}
 
 	public int batchSizeToLoadObjects() {
@@ -129,9 +129,9 @@ public class PojoDefaultMassIndexer<N extends PojoMassIndexer<N>> implements Poj
 	}
 
 	@Override
-	public N mergeSegmentsOnFinish(boolean enable) {
+	public PojoMassIndexer mergeSegmentsOnFinish(boolean enable) {
 		this.mergeSegmentsOnFinish = enable;
-		return (N) this;
+		return this;
 	}
 
 	public boolean mergeSegmentsOnFinish() {
@@ -139,9 +139,9 @@ public class PojoDefaultMassIndexer<N extends PojoMassIndexer<N>> implements Poj
 	}
 
 	@Override
-	public N mergeSegmentsAfterPurge(boolean enable) {
+	public PojoMassIndexer mergeSegmentsAfterPurge(boolean enable) {
 		this.mergeSegmentsAfterPurge = enable;
-		return (N) this;
+		return this;
 	}
 
 	public boolean mergeSegmentsAfterPurge() {
@@ -149,9 +149,9 @@ public class PojoDefaultMassIndexer<N extends PojoMassIndexer<N>> implements Poj
 	}
 
 	@Override
-	public N dropAndCreateSchemaOnStart(boolean enable) {
+	public PojoMassIndexer dropAndCreateSchemaOnStart(boolean enable) {
 		this.dropAndCreateSchemaOnStart = enable;
-		return (N) this;
+		return this;
 	}
 
 	public boolean dropAndCreateSchemaOnStart() {
@@ -159,9 +159,9 @@ public class PojoDefaultMassIndexer<N extends PojoMassIndexer<N>> implements Poj
 	}
 
 	@Override
-	public N purgeAllOnStart(boolean enable) {
+	public PojoMassIndexer purgeAllOnStart(boolean enable) {
 		this.purgeAtStart = enable;
-		return (N) this;
+		return this;
 	}
 
 	public boolean purgeAtStart() {
@@ -179,9 +179,9 @@ public class PojoDefaultMassIndexer<N extends PojoMassIndexer<N>> implements Poj
 	}
 
 	@Override
-	public N monitor(MassIndexingMonitor monitor) {
+	public PojoMassIndexer monitor(MassIndexingMonitor monitor) {
 		this.monitor = monitor;
-		return (N) this;
+		return this;
 	}
 
 	public MassIndexingMonitor monitor() {
@@ -227,9 +227,9 @@ public class PojoDefaultMassIndexer<N extends PojoMassIndexer<N>> implements Poj
 	}
 
 	@Override
-	public N limitIndexedObjectsTo(long maximum) {
+	public PojoMassIndexer limitIndexedObjectsTo(long maximum) {
 		this.objectsLimit = maximum;
-		return (N) this;
+		return this;
 	}
 
 	@Override
@@ -238,11 +238,11 @@ public class PojoDefaultMassIndexer<N extends PojoMassIndexer<N>> implements Poj
 	}
 
 	@Override
-	public N idFetchSize(int idFetchSize) {
+	public PojoMassIndexer idFetchSize(int idFetchSize) {
 		// don't check for positive/zero values as it's actually used by some databases
 		// as special values which might be useful.
 		this.idFetchSize = idFetchSize;
-		return (N) this;
+		return this;
 	}
 
 	public int idFetchSize() {
@@ -250,9 +250,9 @@ public class PojoDefaultMassIndexer<N extends PojoMassIndexer<N>> implements Poj
 	}
 
 	@Override
-	public N failureHandler(MassIndexingFailureHandler failureHandler) {
+	public PojoMassIndexer failureHandler(MassIndexingFailureHandler failureHandler) {
 		this.failureHandler = failureHandler;
-		return (N) this;
+		return this;
 	}
 
 	private MassIndexingFailureHandler getOrCreateFailureHandler() {

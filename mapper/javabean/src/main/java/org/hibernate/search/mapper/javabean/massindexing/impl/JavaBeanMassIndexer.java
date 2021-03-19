@@ -24,7 +24,6 @@ public class JavaBeanMassIndexer implements MassIndexer, JavaBeanIndexingOptions
 
 	static final String THREAD_NAME_PREFIX = "Java Bean Mass indexing - ";
 
-	private Integer idLoadingTransactionTimeout;
 	private final PojoDefaultMassIndexer delegate;
 
 	public JavaBeanMassIndexer(
@@ -64,17 +63,6 @@ public class JavaBeanMassIndexer implements MassIndexer, JavaBeanIndexingOptions
 	@Override
 	public int fetchSize() {
 		return delegate.fetchSize();
-	}
-
-	@Override
-	public MassIndexer transactionTimeout(int timeoutInSeconds) {
-		this.idLoadingTransactionTimeout = timeoutInSeconds;
-		return this;
-	}
-
-	@Override
-	public Integer transactionTimeout() {
-		return idLoadingTransactionTimeout;
 	}
 
 	@Override

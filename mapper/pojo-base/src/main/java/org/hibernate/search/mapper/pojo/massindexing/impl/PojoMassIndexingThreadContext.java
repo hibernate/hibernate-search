@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.pojo.massindexing.impl;
 
 import org.hibernate.search.mapper.pojo.intercepting.LoadingInvocationContext;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingThreadContext;
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingSessionContext;
 
 public class PojoMassIndexingThreadContext implements MassIndexingThreadContext {
 
@@ -22,45 +21,12 @@ public class PojoMassIndexingThreadContext implements MassIndexingThreadContext 
 	}
 
 	@Override
-	public boolean active() {
-		return invocationContext.active().test();
-	}
-
-	@Override
 	public Object options() {
 		return invocationContext.options();
 	}
 
 	@Override
 	public Object context(Class contextType) {
-		return invocationContext.contextData().get( contextType );
+		return invocationContext.context( contextType );
 	}
-
-	@Override
-	public String includedEntityNames() {
-		return typeGroup.includedEntityNames();
-	}
-
-	@Override
-	public Object entityIdentifier(Object entity) {
-		MassIndexingSessionContext sessionContext = (MassIndexingSessionContext) context( MassIndexingSessionContext.class );
-		return typeGroup.entityIdentifier( sessionContext, entity );
-	}
-
-	@Override
-	public boolean indexed(Object entity) {
-		MassIndexingSessionContext sessionContext = (MassIndexingSessionContext) context( MassIndexingSessionContext.class );
-		return typeGroup.testIndexingEntity( sessionContext, entity );
-	}
-
-	@Override
-	public Class commonSuperType() {
-		return typeGroup.commonSuperType().javaClass();
-	}
-
-	@Override
-	public String commonSuperEntityName() {
-		return typeGroup.commonSuperTypeEntityName();
-	}
-
 }

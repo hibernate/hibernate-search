@@ -7,8 +7,7 @@
 package org.hibernate.search.mapper.javabean.massindexing.loader;
 
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingOptions;
-import org.hibernate.search.mapper.javabean.transaction.TransactionOptions;
 
-public interface JavaBeanIndexingOptions extends MassIndexingOptions, TransactionOptions {
+public interface JavaBeanIndexingOptions extends MassIndexingOptions {
 
 }

@@ -30,8 +30,7 @@ public interface EntityIdentifierScroll extends AutoCloseable {
 	List<?> next();
 
 	/**
-	 * Closes this resource, relinquishing any underlying resources.
-	 * This method is invoked automatically on objects managed by the
+	 * Closes this {@link EntityIdentifierScroll}.
 	 */
 	@Override
 	default void close() {

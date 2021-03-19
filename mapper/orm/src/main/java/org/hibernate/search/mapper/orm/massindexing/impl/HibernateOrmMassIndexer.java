@@ -20,8 +20,9 @@ import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoDefaultMassIndexer;
 import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingContext;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassIndexingOptions;
+import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingOptions;
 
-public class HibernateOrmMassIndexer implements MassIndexer, HibernateOrmMassIndexingOptions {
+public class HibernateOrmMassIndexer implements MassIndexer, MassIndexingOptions, HibernateOrmMassIndexingOptions {
 	static final String THREAD_NAME_PREFIX = "Mass indexing - ";
 
 	private Integer idLoadingTransactionTimeout;
