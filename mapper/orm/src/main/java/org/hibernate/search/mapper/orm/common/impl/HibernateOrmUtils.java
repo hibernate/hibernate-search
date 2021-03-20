@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.common.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -118,7 +119,7 @@ public final class HibernateOrmUtils {
 	}
 
 	public static boolean targetsAllConcreteSubTypes(SessionFactoryImplementor sessionFactory,
-			EntityPersister parentType, Set<?> targetConcreteSubTypes) {
+			EntityPersister parentType, Collection<?> targetConcreteSubTypes) {
 		@SuppressWarnings("unchecked")
 		Set<String> subClassEntityNames = parentType.getEntityMetamodel().getSubclassEntityNames();
 		// Quick check to return true immediately if all subtypes are concrete
