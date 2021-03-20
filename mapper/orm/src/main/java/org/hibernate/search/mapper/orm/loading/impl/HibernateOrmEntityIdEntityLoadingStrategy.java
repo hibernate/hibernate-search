@@ -20,9 +20,9 @@ import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeConte
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
 
 public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> extends AbstractHibernateOrmLoadingStrategy<E>
-		implements HibernateOrmEntityLoadingStrategy<E, I> {
+		implements HibernateOrmEntityLoadingStrategy<E> {
 
-	public static HibernateOrmEntityLoadingStrategy<?, ?> create(SessionFactoryImplementor sessionFactory,
+	public static HibernateOrmEntityLoadingStrategy<?> create(SessionFactoryImplementor sessionFactory,
 			HibernateOrmSessionTypeContextProvider typeContextContainer,
 			EntityPersister entityPersister) {
 		EntityPersister rootEntityPersister = HibernateOrmUtils.toRootEntityType( sessionFactory, entityPersister );

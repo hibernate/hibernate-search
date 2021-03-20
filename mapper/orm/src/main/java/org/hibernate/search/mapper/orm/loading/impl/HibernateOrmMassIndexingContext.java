@@ -22,14 +22,12 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingSessionContext;
 
 public final class HibernateOrmMassIndexingContext implements MassIndexingContext<HibernateOrmMassIndexingOptions> {
-	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final HibernateOrmSessionTypeContextProvider typeContextProvider;
 	private final List<LoadingInterceptor<?>> identifierProducerInterceptors = new ArrayList<>();
 	private final List<LoadingInterceptor<?>> documentProducerInterceptors = new ArrayList<>();
 
 	public HibernateOrmMassIndexingContext(HibernateOrmMassIndexingMappingContext mappingContext,
 			HibernateOrmSessionTypeContextProvider typeContextContainer) {
-		this.mappingContext = mappingContext;
 		this.typeContextProvider = typeContextContainer;
 		identifierProducerInterceptors.add( new HibernateOrmMassIndexingIdentifierProducerInterceptor( mappingContext ) );
 		documentProducerInterceptors.add( new HibernateOrmMassIndexingDocumentProducerInterceptor( mappingContext ) );
