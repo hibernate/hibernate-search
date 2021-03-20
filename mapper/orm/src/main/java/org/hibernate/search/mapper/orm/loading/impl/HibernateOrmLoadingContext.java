@@ -68,12 +68,12 @@ public final class HibernateOrmLoadingContext implements PojoLoadingContext {
 					cacheLookupStrategy, loadingOptions );
 		}
 
-		HibernateOrmEntityLoadingStrategy<?, ?> loadingStrategy = null;
+		HibernateOrmEntityLoadingStrategy<?> loadingStrategy = null;
 		Set<LoadingIndexedTypeContext<? extends T>> typeContexts = new HashSet<>();
 		for ( PojoRawTypeIdentifier<? extends T> type : expectedTypes ) {
 			LoadingIndexedTypeContext<? extends T> typeContext = typeContextProvider.indexedForExactType( type );
 			typeContexts.add( typeContext );
-			HibernateOrmEntityLoadingStrategy<?, ?> thisTypeLoadingStrategy = typeContext.loadingStrategy();
+			HibernateOrmEntityLoadingStrategy<?> thisTypeLoadingStrategy = typeContext.loadingStrategy();
 			if ( loadingStrategy == null ) {
 				loadingStrategy = thisTypeLoadingStrategy;
 			}

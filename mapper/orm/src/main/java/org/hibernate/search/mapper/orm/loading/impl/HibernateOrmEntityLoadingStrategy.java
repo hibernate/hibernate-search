@@ -14,9 +14,8 @@ import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLo
 
 /**
  * @param <E> The entity type.
- * @param <I> The identifier type.
  */
-public interface HibernateOrmEntityLoadingStrategy<E, I> extends MassIndexingEntityLoadingStrategy<E, HibernateOrmMassIndexingOptions> {
+public interface HibernateOrmEntityLoadingStrategy<E> extends MassIndexingEntityLoadingStrategy<E, HibernateOrmMassIndexingOptions> {
 
 	/**
 	 * @param obj Another strategy

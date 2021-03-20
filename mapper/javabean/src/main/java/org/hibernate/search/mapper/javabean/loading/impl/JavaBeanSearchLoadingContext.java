@@ -38,11 +38,9 @@ public final class JavaBeanSearchLoadingContext implements PojoLoadingContext, M
 	private final List<LoadingInterceptor<?>> identifierInterceptors;
 	private final List<LoadingInterceptor<?>> documentInterceptors;
 	private final LoadingTypeContextProvider typeContextProvider;
-	private final JavaBeanMassIndexingMappingContext mappingContext;
 
 	private JavaBeanSearchLoadingContext(Builder builder) {
 		this.typeContextProvider = builder.typeContextProvider;
-		this.mappingContext = builder.mappingContext;
 		this.loaderByType = builder.loaderByType == null ? Collections.emptyMap() : builder.loaderByType;
 		this.indexeStrategyByType = builder.indexeStrategyByType == null ? Collections.emptyMap() : builder.indexeStrategyByType;
 		this.identifierInterceptors = builder.identifierInterceptors;
@@ -86,14 +84,14 @@ public final class JavaBeanSearchLoadingContext implements PojoLoadingContext, M
 
 	@Override
 	public String entityName(PojoRawTypeIdentifier<?> entityType) {
-		LoadingTypeContext<?> typeContext = typeContextProvider.indexedForExactType( entityType );
+		LoadingTypeContext typeContext = typeContextProvider.indexedForExactType( entityType );
 		return typeContext.entityName();
 	}
 
 	@Override
 	public Object entityIdentifier(MassIndexingSessionContext sessionContext, Object entity) {
-		PojoRawTypeIdentifier<?> targetType = sessionContext.runtimeIntrospector().detectEntityType( entity );
-		LoadingTypeContext<?> typeContext = typeContextProvider.indexedForExactType( targetType );
+		PojoRawTypeIdentifier targetType = sessionContext.runtimeIntrospector().detectEntityType( entity );
+		LoadingTypeContext typeContext = typeContextProvider.indexedForExactType( targetType );
 		return typeContext.identifierMapping().identifier( null, () -> entity );
 	}
 

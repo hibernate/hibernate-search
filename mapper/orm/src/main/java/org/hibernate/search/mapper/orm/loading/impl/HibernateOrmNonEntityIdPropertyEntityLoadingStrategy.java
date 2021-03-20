@@ -22,11 +22,11 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> extends AbstractHibernateOrmLoadingStrategy<E>
-		implements HibernateOrmEntityLoadingStrategy<E, I> {
+		implements HibernateOrmEntityLoadingStrategy<E> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static <I> HibernateOrmEntityLoadingStrategy<?, ?> create(SessionFactoryImplementor sessionFactory,
+	public static <I> HibernateOrmEntityLoadingStrategy<?> create(SessionFactoryImplementor sessionFactory,
 			HibernateOrmSessionTypeContextProvider typeContextContainer,
 			EntityPersister entityPersister,
 			String documentIdSourcePropertyName, ValueReadHandle<I> documentIdSourceHandle) {

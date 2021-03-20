@@ -27,7 +27,7 @@ public class JavaBeanMassIndexer implements MassIndexer, JavaBeanIndexingOptions
 	private final PojoDefaultMassIndexer delegate;
 
 	public JavaBeanMassIndexer(
-			MassIndexingContext massIndexingContext,
+			MassIndexingContext<?> massIndexingContext,
 			MassIndexingMappingContext mappingContext,
 			DetachedBackendSessionContext sessionContext,
 			Set<? extends PojoRawTypeIdentifier<?>> targetedIndexedTypes,

@@ -28,7 +28,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 				HibernateOrmScopeIndexedTypeContext<E>, AutomaticIndexingIndexedTypeContext {
 
 	private final boolean documentIdIsEntityId;
-	private final HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy;
+	private final HibernateOrmEntityLoadingStrategy<? super E> loadingStrategy;
 	private final IdentifierMapping identifierMapping;
 
 	private final MappedIndexManager indexManager;
@@ -41,14 +41,14 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 
 		if ( builder.documentIdSourcePropertyName.equals( entityPersister().getIdentifierPropertyName() ) ) {
 			documentIdIsEntityId = true;
-			loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E, ?>) HibernateOrmEntityIdEntityLoadingStrategy.create( sessionFactory,
+			loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E>) HibernateOrmEntityIdEntityLoadingStrategy.create( sessionFactory,
 					typeContextContainer, entityPersister() );
 		}
 		else {
 			// The entity ID is not the property used to generate the document ID
 			// We need to use a criteria query to load entities from the document IDs
 			documentIdIsEntityId = false;
-			loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E, ?>) HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.create( sessionFactory,
+			loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E>) HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.create( sessionFactory,
 					typeContextContainer, entityPersister(),
 					builder.documentIdSourcePropertyName, builder.documentIdSourcePropertyHandle );
 		}
@@ -90,7 +90,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 	}
 
 	@Override
-	public HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy() {
+	public HibernateOrmEntityLoadingStrategy<? super E> loadingStrategy() {
 		return loadingStrategy;
 	}
 

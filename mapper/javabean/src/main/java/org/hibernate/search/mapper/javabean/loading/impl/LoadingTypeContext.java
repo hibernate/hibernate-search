@@ -15,5 +15,5 @@ public interface LoadingTypeContext<E> {
 
 	String entityName();
 
-	IdentifierMapping identifierMapping();
+	IdentifierMapping<E> identifierMapping();
 }

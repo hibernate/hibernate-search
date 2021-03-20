@@ -77,7 +77,7 @@ public class JavaBeanMapIndexingStrategy<E> implements MassIndexingEntityLoading
 	@Override
 	public EntityLoader<E> createLoader(MassIndexingThreadContext<JavaBeanIndexingOptions> context,
 			MassIndexingEntityLoadingTypeGroup<E> loadingTypeGroup) throws InterruptedException {
-		return (identifiers) -> identifiers.stream().map( source::get ).collect( Collectors.toList() );
+		return identifiers -> identifiers.stream().map( source::get ).collect( Collectors.toList() );
 
 	}
 
