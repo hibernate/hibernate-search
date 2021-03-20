@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing.loader;
 
-import java.util.Set;
+import java.util.Map;
 
 /**
  * A group entity types for entity loading entities during mass indexing.
@@ -17,13 +17,7 @@ public interface MassIndexingEntityLoadingTypeGroup<E> {
 	/**
 	 * @return The names of all entity types included in this group.
 	 */
-	Set<String> includedEntityNames();
-
-	/**
-	 * The expected types of loaded objects
-	 * @return A expected types of loaded objects.
-	 */
-	Set<Class<? extends E>> includedEntityTypes();
+	Map<String, Class<? extends E>> includedEntityMap();
 
 	/**
 	 * @param entity An entity of any type.

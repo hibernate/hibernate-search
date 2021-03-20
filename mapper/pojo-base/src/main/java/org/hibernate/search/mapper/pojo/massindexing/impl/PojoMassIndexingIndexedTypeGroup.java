@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
@@ -105,14 +106,13 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 	}
 
 	public String notifiedGroupName() {
-		return includedEntityNames().stream()
+		return includedEntityMap().keySet().stream()
 				.collect( Collectors.joining( "," ) );
 	}
 
-	public Set<String> includedEntityNames() {
+	public Map<String, Class<? extends E>> includedEntityMap() {
 		return includedTypes.stream()
-				.map( indexingContext::entityName )
-				.collect( Collectors.toSet() );
+				.collect( Collectors.toMap( indexingContext::entityName, raw -> raw.javaClass() ) );
 	}
 
 	public Set<Class<? extends E>> includedEntityTypes() {
@@ -145,13 +145,8 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 		return new MassIndexingEntityLoadingTypeGroup<E>() {
 
 			@Override
-			public Set<String> includedEntityNames() {
-				return PojoMassIndexingIndexedTypeGroup.this.includedEntityNames();
-			}
-
-			@Override
-			public Set<Class<? extends E>> includedEntityTypes() {
-				return PojoMassIndexingIndexedTypeGroup.this.includedEntityTypes();
+			public Map<String, Class<? extends E>> includedEntityMap() {
+				return PojoMassIndexingIndexedTypeGroup.this.includedEntityMap();
 			}
 
 			@Override

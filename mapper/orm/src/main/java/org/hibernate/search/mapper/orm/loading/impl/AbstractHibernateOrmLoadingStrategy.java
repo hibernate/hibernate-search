@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.persistence.LockModeType;
 import org.hibernate.CacheMode;
@@ -77,16 +78,16 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E> implements
 	}
 
 	protected HibernateOrmQueryLoader<E, ?> createQueryLoader(
-			Set<Class<? extends E>> targetEntityTypes) {
+			Map<String, Class<? extends E>> targetEntityTypes) {
 		Set<Class<? extends E>> includedTypesFilter;
 		if ( HibernateOrmUtils.targetsAllConcreteSubTypes( sessionFactory, rootEntityPersister,
-				targetEntityTypes ) ) {
+				targetEntityTypes.values() ) ) {
 			// All concrete types are included, no need to filter by type.
 			includedTypesFilter = Collections.emptySet();
 		}
 		else {
 			includedTypesFilter = new HashSet<>( targetEntityTypes.size() );
-			for ( Class<? extends E> includedType : targetEntityTypes ) {
+			for ( Class<? extends E> includedType : targetEntityTypes.values() ) {
 				includedTypesFilter.add( includedType );
 			}
 		}
@@ -96,14 +97,14 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E> implements
 	@Override
 	public EntityIdentifierScroll createIdentifierScroll(MassIndexingThreadContext<HibernateOrmMassIndexingOptions> context,
 			MassIndexingEntityLoadingTypeGroup<E> loadingTypeGroup) throws InterruptedException {
-		HibernateOrmQueryLoader<E, ?> typeQueryLoader = createQueryLoader( loadingTypeGroup.includedEntityTypes() );
+		HibernateOrmQueryLoader<E, ?> typeQueryLoader = createQueryLoader( loadingTypeGroup.includedEntityMap() );
 		return new HibernateOrmEntityIdentifierScroll<>( typeQueryLoader, context, loadingTypeGroup );
 	}
 
 	@Override
 	public EntityLoader<E> createLoader(MassIndexingThreadContext<HibernateOrmMassIndexingOptions> context,
 			MassIndexingEntityLoadingTypeGroup<E> loadingTypeGroup) throws InterruptedException {
-		HibernateOrmQueryLoader<E, ?> typeQueryLoader = createQueryLoader( loadingTypeGroup.includedEntityTypes() );
+		HibernateOrmQueryLoader<E, ?> typeQueryLoader = createQueryLoader( loadingTypeGroup.includedEntityMap() );
 		return new HibernateOrmEntityLoader<>( typeQueryLoader, context );
 	}
 
