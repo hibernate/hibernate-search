@@ -33,8 +33,7 @@ public final class OutboxEvent {
 	public OutboxEvent() {
 	}
 
-	public OutboxEvent(
-			Type type, String entityName, String entityId, DocumentRoutesDescriptor documentRoutesDescriptor,
+	public OutboxEvent(Type type, String entityName, String entityId, DocumentRoutesDescriptor documentRoutesDescriptor,
 			Object originalEntityId) {
 		this.type = type;
 		this.entityName = entityName;
@@ -43,8 +42,8 @@ public final class OutboxEvent {
 		this.originalEntityId = originalEntityId;
 	}
 
-	public OutboxEvent(String entityName, String entityId, byte[] documentRoutes, int retries) {
-		this.type = Type.ADD_OR_UPDATE;
+	public OutboxEvent(Type type, String entityName, String entityId, byte[] documentRoutes, int retries) {
+		this.type = type;
 		this.entityName = entityName;
 		this.entityId = entityId;
 		this.documentRoutes = documentRoutes;
@@ -52,8 +51,8 @@ public final class OutboxEvent {
 		this.originalEntityId = null;
 	}
 
-	public OutboxEvent(String entityName, String entityId, byte[] documentRoutes) {
-		this( entityName, entityId, documentRoutes, 1 );
+	public OutboxEvent(Type type, String entityName, String entityId, byte[] documentRoutes) {
+		this( type, entityName, entityId, documentRoutes, 1 );
 	}
 
 	public Integer getId() {

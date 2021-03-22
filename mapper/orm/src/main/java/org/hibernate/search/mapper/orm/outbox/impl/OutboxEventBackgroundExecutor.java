@@ -198,7 +198,7 @@ public class OutboxEventBackgroundExecutor {
 			Map<OutboxEventReference, List<OutboxEvent>> failedEvents) {
 		for ( Map.Entry<OutboxEventReference, List<OutboxEvent>> entry : failedEvents.entrySet() ) {
 			OutboxEvent eventRetry = new OutboxEvent(
-					entry.getKey().getEntityName(), entry.getKey().getEntityId(),
+					mergeTypes( entry.getValue() ), entry.getKey().getEntityName(), entry.getKey().getEntityId(),
 					mergeDocumentRoutes( entry.getValue() )
 			);
 			session.persist( eventRetry );
@@ -225,16 +225,18 @@ public class OutboxEventBackgroundExecutor {
 		}
 
 		byte[] mergedDocumentRoutes = mergeDocumentRoutes( events );
+		OutboxEvent.Type mergedType = mergeTypes( events );
+
 		int maxRetries = 0;
 		for ( OutboxEvent e : events ) {
 			if ( e.getRetries() > maxRetries ) {
 				maxRetries = e.getRetries();
 			}
-
 			session.delete( e );
 		}
 
-		return new OutboxEvent( reference.getEntityName(), reference.getEntityId(), mergedDocumentRoutes, maxRetries );
+		return new OutboxEvent(
+				mergedType, reference.getEntityName(), reference.getEntityId(), mergedDocumentRoutes, maxRetries );
 	}
 
 	private static byte[] mergeDocumentRoutes(List<OutboxEvent> events) {
@@ -261,6 +263,15 @@ public class OutboxEventBackgroundExecutor {
 		}
 
 		return SerializationUtils.serialize( DocumentRoutesDescriptor.of( currentRoute, previousRoutes ) );
+	}
+
+	private static OutboxEvent.Type mergeTypes(List<OutboxEvent> events) {
+		for ( OutboxEvent event : events ) {
+			if ( !OutboxEvent.Type.DELETE.equals( event.getType() ) ) {
+				return OutboxEvent.Type.ADD_OR_UPDATE;
+			}
+		}
+		return OutboxEvent.Type.DELETE;
 	}
 
 	public static final class MaxRetryException extends Exception {
