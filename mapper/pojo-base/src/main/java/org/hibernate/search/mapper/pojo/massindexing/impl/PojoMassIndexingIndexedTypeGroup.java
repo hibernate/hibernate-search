@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.massindexing.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
@@ -112,13 +113,8 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 
 	public Map<String, Class<? extends E>> includedEntityMap() {
 		return includedTypes.stream()
-				.collect( Collectors.toMap( indexingContext::entityName, raw -> raw.javaClass() ) );
-	}
-
-	public Set<Class<? extends E>> includedEntityTypes() {
-		return includedTypes.stream()
-				.map( PojoRawTypeIdentifier::javaClass )
-				.collect( Collectors.toSet() );
+				.collect( Collectors.toMap( indexingContext::entityName, raw -> raw.javaClass(),
+						(o1, o2) -> o1, LinkedHashMap::new ) );
 	}
 
 	public boolean includesInstance(MassIndexingSessionContext sessionContext, Object entity) {
