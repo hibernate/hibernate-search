@@ -56,7 +56,7 @@ public class OutboxEventProcessingPlan {
 		return failedEvents;
 	}
 
-	Set<OutboxEvent> getFailedEventsSet() {
+	Set<OutboxEvent> collectFailedEvents() {
 		return failedEvents.values().stream().flatMap( events -> events.stream() ).collect( Collectors.toSet() );
 	}
 
