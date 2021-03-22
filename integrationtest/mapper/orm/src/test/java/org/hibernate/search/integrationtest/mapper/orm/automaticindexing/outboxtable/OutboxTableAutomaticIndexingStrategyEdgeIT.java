@@ -191,7 +191,6 @@ public class OutboxTableAutomaticIndexingStrategyEdgeIT {
 					.createdThenExecuted( failingFuture );
 
 			// retry:
-			// all retries have addOrUpdate as type
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.addOrUpdate( "2", b -> b
 							.field( "indexedField", "initialValue" )
@@ -247,7 +246,6 @@ public class OutboxTableAutomaticIndexingStrategyEdgeIT {
 					.createdThenExecuted( failingFuture );
 
 			// retry:
-			// all retries have addOrUpdate as type
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.addOrUpdate( "2", b -> b
 							.field( "indexedField", "initialValue" )
@@ -313,7 +311,6 @@ public class OutboxTableAutomaticIndexingStrategyEdgeIT {
 					.createdThenExecuted( failingFuture );
 
 			// retry:
-			// all retries have addOrUpdate as type
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.addOrUpdate( "2", b -> b
 							.field( "indexedField", "initialValue" )
@@ -383,7 +380,6 @@ public class OutboxTableAutomaticIndexingStrategyEdgeIT {
 					.createdThenExecuted( failingFuture );
 
 			// retry:
-			// all retries have addOrUpdate as type
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.addOrUpdate( "2", b -> b
 							.field( "indexedField", "initialValue" )
