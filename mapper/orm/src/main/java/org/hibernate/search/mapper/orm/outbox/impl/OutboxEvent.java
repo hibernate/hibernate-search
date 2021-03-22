@@ -43,13 +43,17 @@ public final class OutboxEvent {
 		this.originalEntityId = originalEntityId;
 	}
 
-	public OutboxEvent(String entityName, String entityId, byte[] documentRoutes) {
+	public OutboxEvent(String entityName, String entityId, byte[] documentRoutes, int retries) {
 		this.type = Type.ADD_OR_UPDATE;
 		this.entityName = entityName;
 		this.entityId = entityId;
 		this.documentRoutes = documentRoutes;
-		this.retries = 1;
+		this.retries = retries;
 		this.originalEntityId = null;
+	}
+
+	public OutboxEvent(String entityName, String entityId, byte[] documentRoutes) {
+		this( entityName, entityId, documentRoutes, 1 );
 	}
 
 	public Integer getId() {

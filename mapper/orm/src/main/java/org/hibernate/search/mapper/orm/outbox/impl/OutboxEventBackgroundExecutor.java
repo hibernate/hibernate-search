@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -95,9 +96,8 @@ public class OutboxEventBackgroundExecutor {
 						OutboxEventProcessingPlan eventProcessing = new OutboxEventProcessingPlan(
 								mapping, session, outboxRetries );
 						eventProcessing.processEvents();
-						for ( OutboxEvent event : outboxRetries ) {
-							deleteOrUpdateOutboxRetries( session, event, eventProcessing );
-						}
+						deleteProcessedOutboxRetries( session, outboxRetries, eventProcessing.collectFailedEvents() );
+						updateUnprocessedOutboxRetries( session, eventProcessing );
 					}
 				} );
 
@@ -157,28 +157,34 @@ public class OutboxEventBackgroundExecutor {
 		return query.list();
 	}
 
-	private void deleteOrUpdateOutboxRetries(Session session, OutboxEvent event,
-			OutboxEventProcessingPlan processingPlan) {
-		if ( !processingPlan.getFailedEventsSet().contains( event ) ) {
-			// processed:
-			session.delete( event );
-			return;
+	private void deleteProcessedOutboxRetries(Session session, List<OutboxEvent> events,
+			Set<OutboxEvent> failedEvents) {
+		events.stream()
+				.filter( e -> !failedEvents.contains( e ) )
+				.forEach( e -> session.delete( e ) );
+	}
+
+	private void updateUnprocessedOutboxRetries(Session session, OutboxEventProcessingPlan processingPlan) {
+		for ( Map.Entry<OutboxEventReference, List<OutboxEvent>> entry : processingPlan.getFailedEvents().entrySet() ) {
+			OutboxEvent event = mergeOutboxEvents( session, entry.getKey(), entry.getValue() );
+
+			if ( event.getRetries() >= MAX_RETRIES ) {
+				EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
+				builder.throwable( new MaxRetryException( "Max '" + MAX_RETRIES +
+						"' retries exhausted to process the event. Event will be lost." ) );
+				builder.failingOperation( "Processing an outbox event." );
+				builder.entityReference( processingPlan.entityReference( event ) );
+				failureHandler.handle( builder.build() );
+
+				if ( event.getId() != null ) {
+					session.delete( event );
+				}
+				return;
+			}
+
+			event.setRetries( event.getRetries() + 1 );
+			session.update( event );
 		}
-
-		if ( event.getRetries() >= MAX_RETRIES ) {
-			EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
-			builder.throwable( new MaxRetryException( "Max '" + MAX_RETRIES +
-					"' retries exhausted to process the event. Event will be lost." ) );
-			builder.failingOperation( "Processing an outbox event." );
-			builder.entityReference( processingPlan.entityReference( event ) );
-			failureHandler.handle( builder.build() );
-
-			session.delete( event );
-			return;
-		}
-
-		event.setRetries( event.getRetries() + 1 );
-		session.update( event );
 	}
 
 	private List<OutboxEvent> findOutboxes(Session session) {
@@ -206,6 +212,29 @@ public class OutboxEventBackgroundExecutor {
 
 		session.flush();
 		session.clear();
+	}
+
+	private static OutboxEvent mergeOutboxEvents(Session session, OutboxEventReference reference,
+			List<OutboxEvent> events) {
+		if ( events.isEmpty() ) {
+			return null;
+		}
+
+		if ( events.size() == 1 ) {
+			return events.get( 0 );
+		}
+
+		byte[] mergedDocumentRoutes = mergeDocumentRoutes( events );
+		int maxRetries = 0;
+		for ( OutboxEvent e : events ) {
+			if ( e.getRetries() > maxRetries ) {
+				maxRetries = e.getRetries();
+			}
+
+			session.delete( e );
+		}
+
+		return new OutboxEvent( reference.getEntityName(), reference.getEntityId(), mergedDocumentRoutes, maxRetries );
 	}
 
 	private static byte[] mergeDocumentRoutes(List<OutboxEvent> events) {
