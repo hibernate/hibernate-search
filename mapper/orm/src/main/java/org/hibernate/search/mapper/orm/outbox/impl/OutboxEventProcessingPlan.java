@@ -24,15 +24,16 @@ import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
-public class OutboxEventProcessingPlan<Event extends OutboxEventBase> {
+public class OutboxEventProcessingPlan {
 
 	private final AutomaticIndexingQueueEventProcessingPlan processingPlan;
 	private final FailureHandler failureHandler;
-	private final List<Event> events;
-	private final Map<OutboxEventReference, List<Event>> failedEvents = new HashMap<>();
+	private final List<OutboxEvent> events;
+	private final Map<OutboxEventReference, List<OutboxEvent>> failedEvents = new HashMap<>();
 	private final List<Integer> eventsIds;
 
-	public OutboxEventProcessingPlan(AutomaticIndexingMappingContext mapping, Session session, List<Event> events) {
+	public OutboxEventProcessingPlan(AutomaticIndexingMappingContext mapping, Session session,
+			List<OutboxEvent> events) {
 		this.processingPlan = mapping.createIndexingQueueEventProcessingPlan( session );
 		this.failureHandler = mapping.failureHandler();
 		this.events = events;
@@ -51,20 +52,20 @@ public class OutboxEventProcessingPlan<Event extends OutboxEventBase> {
 		return eventsIds;
 	}
 
-	Map<OutboxEventReference, List<Event>> getFailedEvents() {
+	Map<OutboxEventReference, List<OutboxEvent>> getFailedEvents() {
 		return failedEvents;
 	}
 
-	Set<Event> getFailedEventsSet() {
+	Set<OutboxEvent> getFailedEventsSet() {
 		return failedEvents.values().stream().flatMap( events -> events.stream() ).collect( Collectors.toSet() );
 	}
 
-	EntityReference entityReference(Event event) {
+	EntityReference entityReference(OutboxEvent event) {
 		return processingPlan.entityReference( event.getEntityName(), event.getEntityId() );
 	}
 
 	private void addEventsToThePlan() {
-		for ( Event event : events ) {
+		for ( OutboxEvent event : events ) {
 			DocumentRoutesDescriptor routes = getRoutes( event );
 
 			switch ( event.getType() ) {
@@ -82,7 +83,7 @@ public class OutboxEventProcessingPlan<Event extends OutboxEventBase> {
 		}
 	}
 
-	private DocumentRoutesDescriptor getRoutes(Event event) {
+	private DocumentRoutesDescriptor getRoutes(OutboxEvent event) {
 		return SerializationUtils.deserialize( DocumentRoutesDescriptor.class, event.getDocumentRoutes() );
 	}
 
@@ -102,7 +103,7 @@ public class OutboxEventProcessingPlan<Event extends OutboxEventBase> {
 			return;
 		}
 
-		Map<OutboxEventReference, List<Event>> eventsMap = getEventsByReferences();
+		Map<OutboxEventReference, List<OutboxEvent>> eventsMap = getEventsByReferences();
 		for ( EntityReference entityReference : report.failingEntityReferences() ) {
 			OutboxEventReference outboxEventReference = new OutboxEventReference(
 					entityReference.name(),
@@ -119,10 +120,10 @@ public class OutboxEventProcessingPlan<Event extends OutboxEventBase> {
 		}
 	}
 
-	private void reportAllEventsFailure(Throwable throwable, Map<OutboxEventReference, List<Event>> eventsMap) {
+	private void reportAllEventsFailure(Throwable throwable, Map<OutboxEventReference, List<OutboxEvent>> eventsMap) {
 		failedEvents.putAll( eventsMap );
-		for ( List<Event> events : eventsMap.values() ) {
-			for ( Event event : events ) {
+		for ( List<OutboxEvent> events : eventsMap.values() ) {
+			for ( OutboxEvent event : events ) {
 				EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
 				builder.throwable( throwable );
 				builder.failingOperation( "Processing an outbox event." );
@@ -132,9 +133,9 @@ public class OutboxEventProcessingPlan<Event extends OutboxEventBase> {
 		}
 	}
 
-	private Map<OutboxEventReference, List<Event>> getEventsByReferences() {
-		Map<OutboxEventReference, List<Event>> eventsMap = new HashMap<>();
-		for ( Event event : events ) {
+	private Map<OutboxEventReference, List<OutboxEvent>> getEventsByReferences() {
+		Map<OutboxEventReference, List<OutboxEvent>> eventsMap = new HashMap<>();
+		for ( OutboxEvent event : events ) {
 			eventsMap.computeIfAbsent( event.getReference(), key -> new ArrayList<>() );
 			eventsMap.get( event.getReference() ).add( event );
 		}

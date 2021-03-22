@@ -35,7 +35,6 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final String OUTBOX_TABLE_NAME = "HIBERNATE_SEARCH_OUTBOX_TABLE";
-	private static final String OUTBOX_RETRY_TABLE_NAME = "HIBERNATE_SEARCH_OUTBOX_RETRY_TABLE";
 
 	private static final String OUTBOX_ENTITY_DEFINITION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 	"\n" +
@@ -47,31 +46,17 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 	"                <param name=\"table_name\">" + OUTBOX_TABLE_NAME + "_GENERATOR</param>\n" +
 	"                <param name=\"initial_value\">1</param>\n" +
 	"                <param name=\"increment_size\">1</param>\n" +
-	"            </generator>\n\r" +
-	"        </id>\n\r" +
-	"        <property name=\"entityName\" type=\"string\" />\n" +
-	"        <property name=\"entityId\" type=\"string\" />\n" +
-	"        <property name=\"documentRoutes\" type=\"binary\" length=\"8192\" />\n" +
+	"            </generator>\n" +
+	"        </id>\n" +
 	"		 <property name=\"type\" >\n" +
 	" 			 <type name=\"org.hibernate.type.EnumType\">\n" +
 	" 				 <param name=\"enumClass\">" + OutboxEvent.Type.class.getName() + "</param>\n" +
 	" 			 </type>\n" +
 	"		 </property>\n" +
-	"    </class>\n" +
-	"\n" +
-	"    <class name=\"" + OutboxEventRetry.class.getName() + "\" table=\"" + OUTBOX_RETRY_TABLE_NAME + "\">\n" +
-	"        <id name=\"id\" column=\"ID\" type=\"integer\">\n" +
-	"            <generator class=\"org.hibernate.id.enhanced.SequenceStyleGenerator\">\n" +
-	"                <param name=\"sequence_name\">" + OUTBOX_RETRY_TABLE_NAME + "_GENERATOR</param>\n" +
-	"                <param name=\"table_name\">" + OUTBOX_RETRY_TABLE_NAME + "_GENERATOR</param>\n" +
-	"                <param name=\"initial_value\">1</param>\n" +
-	"                <param name=\"increment_size\">1</param>\n" +
-	"            </generator>\n\r" +
-	"        </id>\n\r" +
 	"        <property name=\"entityName\" type=\"string\" />\n" +
 	"        <property name=\"entityId\" type=\"string\" />\n" +
-	"        <property name=\"retries\" type=\"integer\" />\n" +
 	"        <property name=\"documentRoutes\" type=\"binary\" length=\"8192\" />\n" +
+	"        <property name=\"retries\" type=\"integer\" />\n" +
 	"    </class>\n" +
 	"</hibernate-mapping>\n";
 

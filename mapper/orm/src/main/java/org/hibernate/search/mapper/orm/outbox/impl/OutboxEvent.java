@@ -13,7 +13,11 @@ import javax.persistence.Transient;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
-public final class OutboxEvent implements OutboxEventBase {
+public final class OutboxEvent {
+
+	public enum Type {
+		ADD, ADD_OR_UPDATE, DELETE
+	}
 
 	private Integer id;
 	private Type type;
@@ -21,6 +25,8 @@ public final class OutboxEvent implements OutboxEventBase {
 	private String entityName;
 	private String entityId;
 	private byte[] documentRoutes;
+	private int retries = 0;
+
 	@Transient
 	private Object originalEntityId;
 
@@ -37,7 +43,15 @@ public final class OutboxEvent implements OutboxEventBase {
 		this.originalEntityId = originalEntityId;
 	}
 
-	@Override
+	public OutboxEvent(String entityName, String entityId, byte[] documentRoutes) {
+		this.type = Type.ADD_OR_UPDATE;
+		this.entityName = entityName;
+		this.entityId = entityId;
+		this.documentRoutes = documentRoutes;
+		this.retries = 1;
+		this.originalEntityId = null;
+	}
+
 	public Integer getId() {
 		return id;
 	}
@@ -46,7 +60,6 @@ public final class OutboxEvent implements OutboxEventBase {
 		this.id = id;
 	}
 
-	@Override
 	public Type getType() {
 		return type;
 	}
@@ -55,7 +68,6 @@ public final class OutboxEvent implements OutboxEventBase {
 		this.type = type;
 	}
 
-	@Override
 	public String getEntityName() {
 		return entityName;
 	}
@@ -64,7 +76,6 @@ public final class OutboxEvent implements OutboxEventBase {
 		this.entityName = entityName;
 	}
 
-	@Override
 	public String getEntityId() {
 		return entityId;
 	}
@@ -73,7 +84,6 @@ public final class OutboxEvent implements OutboxEventBase {
 		this.entityId = entityId;
 	}
 
-	@Override
 	public byte[] getDocumentRoutes() {
 		return documentRoutes;
 	}
@@ -82,12 +92,24 @@ public final class OutboxEvent implements OutboxEventBase {
 		this.documentRoutes = documentRoutes;
 	}
 
+	public int getRetries() {
+		return retries;
+	}
+
+	public void setRetries(int retries) {
+		this.retries = retries;
+	}
+
 	public Object getOriginalEntityId() {
 		return originalEntityId;
 	}
 
 	public void setOriginalEntityId(Object originalEntityId) {
 		this.originalEntityId = originalEntityId;
+	}
+
+	OutboxEventReference getReference() {
+		return new OutboxEventReference( getEntityName(), getEntityId() );
 	}
 
 	@Override
@@ -113,9 +135,12 @@ public final class OutboxEvent implements OutboxEventBase {
 	@Override
 	public String toString() {
 		return "OutboxEvent{" +
-				"type=" + type +
+				"id=" + id +
+				", type=" + type +
 				", entityName='" + entityName + '\'' +
 				", entityId='" + entityId + '\'' +
+				", retries=" + retries +
+				", originalEntityId=" + originalEntityId +
 				'}';
 	}
 }

@@ -89,13 +89,13 @@ public class OutboxEventBackgroundExecutor {
 			try ( Session session = mapping.sessionFactory().openSession() ) {
 				withinTransaction( session, () -> {
 					// TODO HSEARCH-4194 Guarantee a minimum delay on processing retries of outbox events
-					List<OutboxEventRetry> outboxRetries = findOutboxRetries( session );
+					List<OutboxEvent> outboxRetries = findOutboxRetries( session );
 					if ( !outboxRetries.isEmpty() ) {
 						// Process the event retries
-						OutboxEventProcessingPlan<OutboxEventRetry> eventProcessing = new OutboxEventProcessingPlan<>(
+						OutboxEventProcessingPlan eventProcessing = new OutboxEventProcessingPlan(
 								mapping, session, outboxRetries );
 						eventProcessing.processEvents();
-						for ( OutboxEventRetry event : outboxRetries ) {
+						for ( OutboxEvent event : outboxRetries ) {
 							deleteOrUpdateOutboxRetries( session, event, eventProcessing );
 						}
 					}
@@ -115,7 +115,7 @@ public class OutboxEventBackgroundExecutor {
 					processingTask.ensureScheduled();
 
 					// Process the events
-					OutboxEventProcessingPlan<OutboxEvent> eventProcessing = new OutboxEventProcessingPlan<>(
+					OutboxEventProcessingPlan eventProcessing = new OutboxEventProcessingPlan(
 							mapping, session, outboxes );
 					List<Integer> ids = eventProcessing.processEvents();
 					createOutboxRetries( session, eventProcessing.getFailedEvents() );
@@ -150,22 +150,22 @@ public class OutboxEventBackgroundExecutor {
 		}
 	}
 
-	private List<OutboxEventRetry> findOutboxRetries(Session session) {
-		Query<OutboxEventRetry> query = session.createQuery(
-				"select e from OutboxEventRetry e order by id", OutboxEventRetry.class );
+	private List<OutboxEvent> findOutboxRetries(Session session) {
+		Query<OutboxEvent> query = session.createQuery(
+				"select e from OutboxEvent e where e.retries > 0 order by e.id", OutboxEvent.class );
 		query.setMaxResults( batchSize );
 		return query.list();
 	}
 
-	private void deleteOrUpdateOutboxRetries(Session session, OutboxEventRetry event,
-			OutboxEventProcessingPlan<OutboxEventRetry> processingPlan) {
+	private void deleteOrUpdateOutboxRetries(Session session, OutboxEvent event,
+			OutboxEventProcessingPlan processingPlan) {
 		if ( !processingPlan.getFailedEventsSet().contains( event ) ) {
 			// processed:
 			session.delete( event );
 			return;
 		}
 
-		if ( event.getRetries() >= MAX_RETRIES - 1 ) {
+		if ( event.getRetries() >= MAX_RETRIES ) {
 			EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
 			builder.throwable( new MaxRetryException( "Max '" + MAX_RETRIES +
 					"' retries exhausted to process the event. Event will be lost." ) );
@@ -182,7 +182,8 @@ public class OutboxEventBackgroundExecutor {
 	}
 
 	private List<OutboxEvent> findOutboxes(Session session) {
-		Query<OutboxEvent> query = session.createQuery( "select e from OutboxEvent e order by id", OutboxEvent.class );
+		Query<OutboxEvent> query = session.createQuery(
+				"select e from OutboxEvent e where e.retries = 0 order by e.id", OutboxEvent.class );
 		query.setMaxResults( batchSize );
 		return query.list();
 	}
@@ -190,8 +191,10 @@ public class OutboxEventBackgroundExecutor {
 	private static void createOutboxRetries(Session session,
 			Map<OutboxEventReference, List<OutboxEvent>> failedEvents) {
 		for ( Map.Entry<OutboxEventReference, List<OutboxEvent>> entry : failedEvents.entrySet() ) {
-			OutboxEventRetry eventRetry = new OutboxEventRetry(
-					entry.getKey(), mergeDocumentRoutes( entry.getValue() ) );
+			OutboxEvent eventRetry = new OutboxEvent(
+					entry.getKey().getEntityName(), entry.getKey().getEntityId(),
+					mergeDocumentRoutes( entry.getValue() )
+			);
 			session.persist( eventRetry );
 		}
 	}
