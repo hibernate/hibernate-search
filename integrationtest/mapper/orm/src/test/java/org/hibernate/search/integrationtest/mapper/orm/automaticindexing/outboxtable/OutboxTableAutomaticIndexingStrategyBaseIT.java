@@ -29,7 +29,9 @@ import org.junit.runner.RunWith;
 		//   entities are only visible from other sessions after the original session is closed.
 		"!org.hibernate.search.integrationtest.mapper.orm.automaticindexing.session.AutomaticIndexingOutOfTransactionIT",
 		// > session.getStatistics().getEntityCount() returns different (higher) values with the outbox table strategy
-		"!org.hibernate.search.integrationtest.mapper.orm.automaticindexing.bridge.AutomaticIndexingBridgeExplicitReindexingFunctionalIT"
+		"!org.hibernate.search.integrationtest.mapper.orm.automaticindexing.bridge.AutomaticIndexingBridgeExplicitReindexingFunctionalIT",
+		// > already executed with the outbox table strategy
+		"!org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outboxtable..*"
 })
 public class OutboxTableAutomaticIndexingStrategyBaseIT {
 
