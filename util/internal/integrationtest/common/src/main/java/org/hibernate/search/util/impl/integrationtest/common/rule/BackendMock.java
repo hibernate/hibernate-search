@@ -91,6 +91,10 @@ public class BackendMock implements TestRule {
 		backendBehavior().verifyExpectationsMet();
 	}
 
+	public void awaitFirstDocumentWorkCall() {
+		backendBehavior().awaitFirstDocumentWorkCall();
+	}
+
 	public void inLenientMode(Runnable action) {
 		backendBehavior().lenient( true );
 		try {
