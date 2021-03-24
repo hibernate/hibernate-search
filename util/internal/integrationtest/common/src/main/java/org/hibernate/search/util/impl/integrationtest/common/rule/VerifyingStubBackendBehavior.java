@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -21,6 +22,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
@@ -30,7 +32,6 @@ import org.hibernate.search.engine.search.query.SearchScrollResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResultTotal;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchScrollResult;
-import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
@@ -57,7 +58,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	private final Map<String, CallQueue<SchemaManagementWorkCall>> schemaManagementWorkCall = new HashMap<>();
 
-	private final Map<DocumentKey, CallQueue<DocumentWorkCall>> documentWorkCalls = new HashMap<>();
+	private final Map<DocumentKey, CallQueue<DocumentWorkCall>> documentWorkCalls = new LinkedHashMap<>();
 
 	private final CallQueue<SearchWorkCall<?>> searchCalls = new CallQueue<>();
 
@@ -166,6 +167,16 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		scrollCalls.verifyExpectationsMet();
 		closeScrollCalls.verifyExpectationsMet();
 		nextScrollCalls.verifyExpectationsMet();
+	}
+
+	void awaitFirstDocumentWorkCall() {
+		if ( documentWorkCalls.isEmpty() ) {
+			return;
+		}
+
+		CallQueue<DocumentWorkCall> firstCall = documentWorkCalls.values().iterator().next();
+		indexingWorkThreadingExpectationsSupplier.get().awaitIndexingAssertions(
+				() -> firstCall.verifyExpectationsMet() );
 	}
 
 	@Override
