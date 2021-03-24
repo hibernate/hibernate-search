@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.mapper.orm.outbox;
+package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outboxtable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -202,11 +202,11 @@ public class OutboxTableNoProcessingIT {
 		} );
 	}
 
-	private List<OutboxEvent> findOutboxEntries(Session session) {
+	static List<OutboxEvent> findOutboxEntries(Session session) {
 		return session.createQuery( "select e from OutboxEvent e order by id", OutboxEvent.class ).list();
 	}
 
-	private void verifyOutboxEntry(OutboxEvent outboxEvent, String entityName, String entityId,
+	static void verifyOutboxEntry(OutboxEvent outboxEvent, String entityName, String entityId,
 			OutboxEvent.Type type, String currentRoute, String... previousRoutes) {
 		assertThat( outboxEvent.getEntityName() ).isEqualTo( entityName );
 		assertThat( outboxEvent.getEntityId() ).isEqualTo( entityId );
