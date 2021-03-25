@@ -51,10 +51,6 @@ public final class OutboxEvent {
 		this.originalEntityId = null;
 	}
 
-	public OutboxEvent(Type type, String entityName, String entityId, byte[] documentRoutes) {
-		this( type, entityName, entityId, documentRoutes, 1 );
-	}
-
 	public Integer getId() {
 		return id;
 	}
