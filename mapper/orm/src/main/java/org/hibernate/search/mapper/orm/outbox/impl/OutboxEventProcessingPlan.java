@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.hibernate.Session;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
@@ -56,16 +54,19 @@ public class OutboxEventProcessingPlan {
 		return failedEvents;
 	}
 
-	Set<OutboxEvent> collectFailedEvents() {
-		return failedEvents.values().stream().flatMap( events -> events.stream() ).collect( Collectors.toSet() );
+	EntityReference entityReference(OutboxEvent event) {
+		return processingPlan.entityReference( event.getEntityName(), event.getEntityId() );
 	}
 
-	EntityReference entityReference(OutboxEvent event) {
+	EntityReference entityReference(OutboxEventReference event) {
 		return processingPlan.entityReference( event.getEntityName(), event.getEntityId() );
 	}
 
 	private void addEventsToThePlan() {
 		for ( OutboxEvent event : events ) {
+			// Do this first, so that we're sure to delete the event after it's been processed.
+			// In case of failure, a new "retry" event is created.
+			eventsIds.add( event.getId() );
 			DocumentRoutesDescriptor routes = getRoutes( event );
 
 			switch ( event.getType() ) {
@@ -79,7 +80,6 @@ public class OutboxEventProcessingPlan {
 					processingPlan.delete( event.getEntityName(), event.getEntityId(), routes );
 					break;
 			}
-			eventsIds.add( event.getId() );
 		}
 	}
 
