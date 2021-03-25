@@ -631,12 +631,14 @@ either on a per-field basis with a call to `.boost(...)` just after `.field(...)
 or for the whole predicate with a call to `.boost(...)` after `.matching(...)`.
 
 [[search-dsl-predicate-terms]]
-== `terms`: match a series of term
+== `terms`: match a set of terms
 
 The `terms` predicate matches documents for which a given field contains some terms, any or all of them.
 
 With `matchingAny` we require that at least one of the provided terms matches.
-That is equivalent to having an <<search-dsl-predicate-boolean-or>> applied to the series of single-term predicates.
+Functionally, this is somewhat similar to a <<search-dsl-predicate-boolean-or,boolean `OR`>> with one <<search-dsl-predicate-match,`match`>> predicate per term, but the syntax for a single `terms` predicate is more concise.
+
+NOTE: `matchingAny` expects to be passed *terms*, not just any string. The given terms will not be analyzed/normalized. See <<search-dsl-predicate-terms-analysis>>.
 
 .Matching any of the provided terms
 ====
@@ -647,7 +649,9 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ====
 
 With `matchingAll` we require that all of the provided terms match.
-That is equivalent to having an <<search-dsl-predicate-boolean-and>> applied to the series of single-term predicates.
+Functionally, this is somewhat similar to a <<search-dsl-predicate-boolean-and,boolean `AND`>> with one <<search-dsl-predicate-match,`match`>> predicate per term, but the syntax for a single `terms` predicate is more concise.
+
+NOTE: `matchingAll` expects to be passed *terms*, not just any string. The given terms will not be analyzed/normalized. See <<search-dsl-predicate-terms-analysis>>.
 
 .Matching all of the provided terms
 ====
@@ -657,15 +661,16 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
+[[search-dsl-predicate-terms-analysis]]
 === Terms predicates and analysis
 
 NOTE: For an introduction to analysis and how to configure it,
 refer to the <<concepts-analysis>> section.
 
-Differently from other predicates, the provided terms arguments to `matchAny` or `matchAll`
+Differently from other predicates, the terms passed to `matchingAny()` or `matchingAll()`
 are never analyzed nor normalized.
 This means that in order to match the related documents,
-we need to provide the terms as they were written to the indexes.
+you need to provide the terms as they were written to the indexes.
 
 === Targeting multiple fields
 
