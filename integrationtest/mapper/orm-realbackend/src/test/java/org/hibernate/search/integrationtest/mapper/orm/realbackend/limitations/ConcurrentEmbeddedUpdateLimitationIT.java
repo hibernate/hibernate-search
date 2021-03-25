@@ -27,6 +27,7 @@ import org.hibernate.Transaction;
 import org.hibernate.search.integrationtest.mapper.orm.realbackend.testsupport.BackendConfigurations;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.outbox.impl.OutboxEvent;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -34,9 +35,10 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.awaitility.Awaitility;
 
 /**
  * See "limitations-parallel-embedded-update" in the documentation.
@@ -47,17 +49,43 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withSingleBackend( BackendConfigurations.simple() );
 
 	private SessionFactory sessionFactory;
+	private boolean synchronizationAsync;
 
-	@Before
-	public void setup() {
+	@Test
+	public void indexingStrategySession() {
+		synchronizationAsync = false;
 		sessionFactory = setupHelper.start()
 				// This is absolutely necessary to avoid false positives in this test
 				.withProperty( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY, "sync" )
 				.setup( Book.class, Author.class, BookEdition.class );
+
+		reproducer();
+
+		// The previous data isn't there: good.
+		assertThat( countByEditionAndAuthor( "12th", "asimov" ) ).isEqualTo( 0L );
+
+		// The new data isn't there either: bad!
+		assertThat( countByEditionAndAuthor( "13th", "vonnegut" ) ).isEqualTo( 0L );
+
+		// Turns out only half of the update came through...
+		assertThat( countByEditionAndAuthor( "13th", "asimov" ) ).isEqualTo( 1L );
 	}
 
 	@Test
-	public void reproducer() {
+	public void indexingStrategyOutbox() {
+		synchronizationAsync = true;
+		sessionFactory = setupHelper.start()
+				.withProperty( "hibernate.search.automatic_indexing.strategy", "outbox-polling" )
+				.setup( Book.class, Author.class, BookEdition.class );
+
+		reproducer();
+
+		assertThat( countByEditionAndAuthor( "12th", "asimov" ) ).isEqualTo( 0L );
+		assertThat( countByEditionAndAuthor( "13th", "vonnegut" ) ).isEqualTo( 1L );
+		assertThat( countByEditionAndAuthor( "13th", "asimov" ) ).isEqualTo( 0L );
+	}
+
+	private void reproducer() {
 		with( sessionFactory ).run( session -> {
 			Book book = new Book();
 			book.setTitle( "The Caves Of Steel" );
@@ -121,19 +149,14 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 				throw e;
 			}
 		}
-
-		// The previous data isn't there: good.
-		assertThat( countByEditionAndAuthor( "12th", "asimov" ) ).isEqualTo( 0L );
-
-		// The new data isn't there either: bad!
-		assertThat( countByEditionAndAuthor( "13th", "vonnegut" ) ).isEqualTo( 0L );
-
-		// Turns out only half of the update came through...
-		assertThat( countByEditionAndAuthor( "13th", "asimov" ) ).isEqualTo( 1L );
 	}
 
 	long countByEditionAndAuthor(String editionLabel, String authorName) {
 		return with( sessionFactory ).apply( session -> {
+			if ( synchronizationAsync ) {
+				Awaitility.await().until( () -> noMoreOutboxEvents( session ) );
+			}
+
 			SearchSession searchSession = Search.session( session );
 
 			return searchSession.search( Book.class )
@@ -142,6 +165,10 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 							.must( f.match().field( "authors.name" ).matching( authorName ) ) )
 					.fetchTotalHitCount();
 		} );
+	}
+
+	private static boolean noMoreOutboxEvents(Session session) {
+		return session.createQuery( "select e from OutboxEvent e order by id", OutboxEvent.class ).list().isEmpty();
 	}
 
 	@Entity(name = Author.NAME)
