@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -39,6 +40,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import org.awaitility.Awaitility;
+import org.awaitility.core.ThrowingRunnable;
 
 /**
  * See "limitations-parallel-embedded-update" in the documentation.
@@ -52,7 +54,7 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 	private boolean synchronizationAsync;
 
 	@Test
-	public void indexingStrategySession() {
+	public void indexingStrategySession() throws Throwable {
 		synchronizationAsync = false;
 		sessionFactory = setupHelper.start()
 				// This is absolutely necessary to avoid false positives in this test
@@ -72,7 +74,7 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 	}
 
 	@Test
-	public void indexingStrategyOutbox() {
+	public void indexingStrategyOutbox() throws Throwable {
 		synchronizationAsync = true;
 		sessionFactory = setupHelper.start()
 				.withProperty( "hibernate.search.automatic_indexing.strategy", "outbox-polling" )
@@ -80,12 +82,12 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 
 		reproducer();
 
-		assertThat( countByEditionAndAuthor( "12th", "asimov" ) ).isEqualTo( 0L );
-		assertThat( countByEditionAndAuthor( "13th", "vonnegut" ) ).isEqualTo( 1L );
-		assertThat( countByEditionAndAuthor( "13th", "asimov" ) ).isEqualTo( 0L );
+		verify( () -> assertThat( countByEditionAndAuthor( "12th", "asimov" ) ).isEqualTo( 0L ) );
+		verify( () -> assertThat( countByEditionAndAuthor( "13th", "vonnegut" ) ).isEqualTo( 1L ) );
+		verify( () -> assertThat( countByEditionAndAuthor( "13th", "asimov" ) ).isEqualTo( 0L ) );
 	}
 
-	private void reproducer() {
+	private void reproducer() throws Throwable {
 		with( sessionFactory ).run( session -> {
 			Book book = new Book();
 			book.setTitle( "The Caves Of Steel" );
@@ -111,7 +113,7 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 			session.persist( book );
 		} );
 
-		assertThat( countByEditionAndAuthor( "12th", "asimov" ) ).isEqualTo( 1L );
+		verify( () -> assertThat( countByEditionAndAuthor( "12th", "asimov" ) ).isEqualTo( 1L ) );
 
 		try ( Session session1 = sessionFactory.openSession(); Session session2 = sessionFactory.openSession() ) {
 			Transaction tx1 = null;
@@ -149,6 +151,17 @@ public class ConcurrentEmbeddedUpdateLimitationIT {
 				throw e;
 			}
 		}
+	}
+
+	private void verify(ThrowingRunnable runnable) throws Throwable {
+		if ( !synchronizationAsync ) {
+			runnable.run();
+			return;
+		}
+
+		Awaitility.await()
+				.timeout( 5, TimeUnit.SECONDS )
+				.untilAsserted( runnable );
 	}
 
 	long countByEditionAndAuthor(String editionLabel, String authorName) {
