@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.hibernate.Session;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
@@ -44,6 +45,9 @@ public class OutboxEventProcessingPlan {
 			reportBackendResult( Futures.unwrappedExceptionGet( processingPlan.executeAndReport() ) );
 		}
 		catch (Throwable throwable) {
+			if ( throwable instanceof InterruptedException ) {
+				Thread.currentThread().interrupt();
+			}
 			reportMapperFailure( throwable );
 		}
 
@@ -99,7 +103,8 @@ public class OutboxEventProcessingPlan {
 	}
 
 	private void reportBackendResult(MultiEntityOperationExecutionReport<EntityReference> report) {
-		if ( !report.throwable().isPresent() ) {
+		Optional<Throwable> throwable = report.throwable();
+		if ( !throwable.isPresent() ) {
 			return;
 		}
 
@@ -111,7 +116,7 @@ public class OutboxEventProcessingPlan {
 			);
 
 			EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
-			builder.throwable( report.throwable().get() );
+			builder.throwable( throwable.get() );
 			builder.failingOperation( "Processing an outbox event." );
 			builder.entityReference( entityReference );
 			failureHandler.handle( builder.build() );
