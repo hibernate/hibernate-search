@@ -298,4 +298,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 44, value = "Session factory is closed. Hibernate Search is probably shutting down.")
 	void sessionFactoryIsClosedOnOutboxProcessing();
 
+	@Message(id = ID_OFFSET + 45, value = "Max '%1$s' retries exhausted to process the event. Event will be lost.")
+	SearchException maxRetryExhausted(int retries);
+
 }
