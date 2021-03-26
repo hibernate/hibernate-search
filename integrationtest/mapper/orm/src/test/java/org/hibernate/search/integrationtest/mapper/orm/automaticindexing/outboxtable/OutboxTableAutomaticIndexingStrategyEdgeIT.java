@@ -23,9 +23,9 @@ import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.common.EntityReference;
-import org.hibernate.search.mapper.orm.outbox.impl.OutboxEventBackgroundExecutor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.AutomaticIndexingStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
@@ -413,7 +413,7 @@ public class OutboxTableAutomaticIndexingStrategyEdgeIT {
 		EntityIndexingFailureContext entityFailure = entityFailures.get( 4 );
 		assertThat( entityFailure.failingOperation() ).isEqualTo( "Processing an outbox event." );
 		assertThat( entityFailure.throwable() )
-				.isInstanceOf( OutboxEventBackgroundExecutor.MaxRetryException.class )
+				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Max '3' retries exhausted to process the event. Event will be lost." );
 		hasOneReference( entityFailure.entityReferences(), "indexed", 2 );
 	}
@@ -426,7 +426,7 @@ public class OutboxTableAutomaticIndexingStrategyEdgeIT {
 		hasOneReference( entityFailure.entityReferences(), "indexed", 2 );
 	}
 
-	@SuppressWarnings( "unchecked" )
+	@SuppressWarnings("unchecked")
 	private void hasOneReference(List<Object> entityReferences, String entityName, Object id) {
 		assertThat( entityReferences ).hasSize( 1 );
 		EntityReference entityReference = (EntityReference) entityReferences.get( 0 );

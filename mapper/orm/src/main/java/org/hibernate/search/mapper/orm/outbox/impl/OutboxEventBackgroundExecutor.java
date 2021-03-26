@@ -149,8 +149,7 @@ public class OutboxEventBackgroundExecutor {
 			int minRetries = minRetries( entry.getValue() );
 			if ( minRetries >= MAX_RETRIES ) {
 				EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
-				builder.throwable( new MaxRetryException( "Max '" + MAX_RETRIES +
-						"' retries exhausted to process the event. Event will be lost." ) );
+				builder.throwable( log.maxRetryExhausted( MAX_RETRIES ) );
 				builder.failingOperation( "Processing an outbox event." );
 				builder.entityReference( processingPlan.entityReference( entry.getKey() ) );
 				failureHandler.handle( builder.build() );
@@ -215,12 +214,6 @@ public class OutboxEventBackgroundExecutor {
 			}
 		}
 		return OutboxEvent.Type.DELETE;
-	}
-
-	public static final class MaxRetryException extends Exception {
-		public MaxRetryException(String message) {
-			super( message );
-		}
 	}
 }
 
