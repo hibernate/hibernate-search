@@ -11,7 +11,6 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategy;
-import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
@@ -88,8 +87,7 @@ public final class HibernateOrmMapperSettings {
 	 * The polling interval for the outbox events table, in milliseconds.
 	 * <p>
 	 * Only available when {@link #AUTOMATIC_INDEXING_STRATEGY} is
-	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING} and
-	 * {@link HibernateOrmMapperSpiSettings#AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE} is {@code true}.
+	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING}.
 	 * <p>
 	 * Hibernate Search will wait that long before polling again if the last polling didn't return any event:
 	 * <ul>
@@ -108,8 +106,7 @@ public final class HibernateOrmMapperSettings {
 	 * How many outbox events to process in the same transaction.
 	 * <p>
 	 * Only available when {@link #AUTOMATIC_INDEXING_STRATEGY} is
-	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING} and
-	 * {@link HibernateOrmMapperSpiSettings#AUTOMATIC_INDEXING_PROCESS_OUTBOX_TABLE} is {@code true}.
+	 * {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING}.
 	 * <p>
 	 * Expects a positive Integer value, such as {@code 50},
 	 * or a String that can be parsed into such Integer value.
