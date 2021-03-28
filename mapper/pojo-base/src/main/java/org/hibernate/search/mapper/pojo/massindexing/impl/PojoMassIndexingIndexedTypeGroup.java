@@ -112,13 +112,13 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 
 	public Map<String, Class<? extends E>> includedEntityMap() {
 		return includedTypes.stream()
-				.collect( Collectors.toMap( indexingContext::entityName, raw -> raw.javaClass(),
+				.collect( Collectors.toMap( indexingContext::entityName, PojoRawTypeIdentifier::javaClass,
 						(o1, o2) -> o1, LinkedHashMap::new ) );
 	}
 
 	public boolean includesInstance(MassIndexingSessionContext sessionContext, Object entity) {
 		PojoRawTypeIdentifier<?> targetType = sessionContext.runtimeIntrospector().detectEntityType( entity );
-		return includedTypes.stream().anyMatch( raw -> targetType.equals( raw ) );
+		return includedTypes.stream().anyMatch( targetType::equals );
 	}
 
 	public Object extractReferenceOrSuppress(MassIndexingSessionContext sessionContext, Object entity, Throwable throwable) {
