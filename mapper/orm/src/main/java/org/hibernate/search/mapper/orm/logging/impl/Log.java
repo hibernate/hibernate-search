@@ -44,9 +44,6 @@ import org.jboss.logging.annotations.ValidIdRanges;
 @ValidIdRanges({
 		@ValidIdRange(min = MessageConstants.ORM_ID_RANGE_MIN, max = MessageConstants.ORM_ID_RANGE_MAX),
 		// Exceptions for legacy messages from Search 5 (engine module)
-		@ValidIdRange(min = 27, max = 28),
-		@ValidIdRange(min = 30, max = 30),
-		@ValidIdRange(min = 31, max = 31),
 		@ValidIdRange(min = 34, max = 34),
 		@ValidIdRange(min = 36, max = 36),
 		@ValidIdRange(min = 39, max = 39),
@@ -55,7 +52,6 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = 116, max = 116),
 		@ValidIdRange(min = 183, max = 183),
 		@ValidIdRange(min = 211, max = 212),
-		@ValidIdRange(min = 235, max = 235),
 		@ValidIdRange(min = 276, max = 276),
 		@ValidIdRange(min = 348, max = 349)
 })

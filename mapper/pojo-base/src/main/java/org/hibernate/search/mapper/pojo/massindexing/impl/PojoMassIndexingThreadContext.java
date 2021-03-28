@@ -9,24 +9,24 @@ package org.hibernate.search.mapper.pojo.massindexing.impl;
 import org.hibernate.search.mapper.pojo.intercepting.LoadingInvocationContext;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingThreadContext;
 
-public class PojoMassIndexingThreadContext implements MassIndexingThreadContext {
+public class PojoMassIndexingThreadContext<O> implements MassIndexingThreadContext<O> {
 
-	private final LoadingInvocationContext invocationContext;
-	private final PojoMassIndexingIndexedTypeGroup typeGroup;
+	private final LoadingInvocationContext<O> invocationContext;
+	private final PojoMassIndexingIndexedTypeGroup<?> typeGroup;
 
-	public PojoMassIndexingThreadContext(LoadingInvocationContext invocationContext,
-			PojoMassIndexingIndexedTypeGroup typeGroup) {
+	public PojoMassIndexingThreadContext(LoadingInvocationContext<O> invocationContext,
+			PojoMassIndexingIndexedTypeGroup<?> typeGroup) {
 		this.invocationContext = invocationContext;
 		this.typeGroup = typeGroup;
 	}
 
 	@Override
-	public Object options() {
+	public O options() {
 		return invocationContext.options();
 	}
 
 	@Override
-	public Object context(Class contextType) {
+	public <T> T context(Class<T> contextType) {
 		return invocationContext.context( contextType );
 	}
 }

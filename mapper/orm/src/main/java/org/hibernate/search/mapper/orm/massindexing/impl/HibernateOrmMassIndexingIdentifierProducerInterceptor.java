@@ -79,7 +79,7 @@ public class HibernateOrmMassIndexingIdentifierProducerInterceptor implements Lo
 		}
 	}
 
-	private void inTransactionWrapper(LoadingInvocationContext ictx, StatelessSession upperSession, String tenantId) throws Exception {
+	private void inTransactionWrapper(LoadingInvocationContext<?> ictx, StatelessSession upperSession, String tenantId) throws Exception {
 		StatelessSession session = upperSession;
 		if ( upperSession == null ) {
 			if ( tenantId == null ) {
@@ -97,7 +97,7 @@ public class HibernateOrmMassIndexingIdentifierProducerInterceptor implements Lo
 				transaction.begin();
 			}
 			try {
-				ictx.context( SharedSessionContractImplementor.class, session );
+				ictx.context( SharedSessionContractImplementor.class, sharedSession );
 				ictx.proceed( LoadingNextInvocation::proceed );
 			}
 			finally {

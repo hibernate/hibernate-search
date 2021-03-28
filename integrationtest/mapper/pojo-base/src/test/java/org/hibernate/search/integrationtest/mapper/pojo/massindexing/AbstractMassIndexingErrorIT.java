@@ -41,9 +41,6 @@ import org.hibernate.search.mapper.javabean.massindexing.loader.JavaBeanIndexing
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.util.impl.integrationtest.common.rule.ThreadSpy;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
 
 public abstract class AbstractMassIndexingErrorIT {
 
@@ -53,9 +50,6 @@ public abstract class AbstractMassIndexingErrorIT {
 	public static final String AUTHOR_2 = "James Joyce";
 	public static final String TITLE_3 = "Frankenstein";
 	public static final String AUTHOR_3 = "Mary Shelley";
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	@Rule
 	public final BackendMock backendMock = new BackendMock();

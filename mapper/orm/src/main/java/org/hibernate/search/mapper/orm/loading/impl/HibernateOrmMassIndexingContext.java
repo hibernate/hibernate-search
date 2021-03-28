@@ -34,11 +34,6 @@ public final class HibernateOrmMassIndexingContext implements MassIndexingContex
 	}
 
 	@Override
-	public Object indexingKey(PojoRawTypeIdentifier<?> type) {
-		return type;
-	}
-
-	@Override
 	public <T> MassIndexingEntityLoadingStrategy<T, HibernateOrmMassIndexingOptions> createIndexLoadingStrategy(
 			PojoRawTypeIdentifier<? extends T> expectedType) {
 		LoadingIndexedTypeContext<? extends T> typeContext = typeContextProvider.indexedForExactType( expectedType );

@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 class JavaBeanIndexedTypeContext<E> extends AbstractJavaBeanTypeContext<E>
 		implements JavaBeanScopeIndexedTypeContext<E>, JavaBeanSessionIndexedTypeContext<E>, LoadingTypeContext<E> {
-	private final IdentifierMapping identifierMapping;
+	private final IdentifierMapping<?> identifierMapping;
 	private final MappedIndexManager indexManager;
 
 	private JavaBeanIndexedTypeContext(Builder<E> builder) {
@@ -43,7 +43,7 @@ class JavaBeanIndexedTypeContext<E> extends AbstractJavaBeanTypeContext<E>
 	}
 
 	static class Builder<E> extends AbstractBuilder<E> implements PojoIndexedTypeExtendedMappingCollector {
-		private IdentifierMapping identifierMapping;
+		private IdentifierMapping<?> identifierMapping;
 		private MappedIndexManager indexManager;
 
 		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String entityName) {

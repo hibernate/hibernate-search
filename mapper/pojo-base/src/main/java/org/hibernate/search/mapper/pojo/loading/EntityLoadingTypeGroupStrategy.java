@@ -42,7 +42,7 @@ public interface EntityLoadingTypeGroupStrategy {
 	 * @return e grouping type
 	 * @see GroupingType
 	 */
-	GroupingType copare(String entityName1, Class<?> entityType1, String entityName2, Class<?> entityType2);
+	GroupingType get(String entityName1, Class<?> entityType1, String entityName2, Class<?> entityType2);
 
 	/**
 	 * Static comparator setting grouping by the java type hierarchy.

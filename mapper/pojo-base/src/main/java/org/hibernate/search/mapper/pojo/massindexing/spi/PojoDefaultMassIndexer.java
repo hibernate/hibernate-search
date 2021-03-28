@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing.spi;
 
-import org.hibernate.search.mapper.pojo.massindexing.PojoMassIndexer;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -34,7 +33,7 @@ import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingOptions;
  *
  * @author Sanne Grinovero
  */
-public class PojoDefaultMassIndexer implements PojoMassIndexer, MassIndexingOptions {
+public class PojoDefaultMassIndexer implements PojoMassIndexer<PojoDefaultMassIndexer>, MassIndexingOptions {
 
 	static final String THREAD_NAME_PREFIX = "Mass indexing - ";
 
@@ -90,7 +89,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer, MassIndexingOpti
 	}
 
 	@Override
-	public PojoMassIndexer typesToIndexInParallel(int numberOfThreads) {
+	public PojoDefaultMassIndexer typesToIndexInParallel(int numberOfThreads) {
 		if ( numberOfThreads < 1 ) {
 			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
 		}
@@ -103,7 +102,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer, MassIndexingOpti
 	}
 
 	@Override
-	public PojoMassIndexer threadsToLoadObjects(int numberOfThreads) {
+	public PojoDefaultMassIndexer threadsToLoadObjects(int numberOfThreads) {
 		if ( numberOfThreads < 1 ) {
 			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
 		}
@@ -116,7 +115,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer, MassIndexingOpti
 	}
 
 	@Override
-	public PojoMassIndexer batchSizeToLoadObjects(int batchSize) {
+	public PojoDefaultMassIndexer batchSizeToLoadObjects(int batchSize) {
 		if ( batchSize < 1 ) {
 			throw new IllegalArgumentException( "batchSize must be at least 1" );
 		}
@@ -129,7 +128,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer, MassIndexingOpti
 	}
 
 	@Override
-	public PojoMassIndexer mergeSegmentsOnFinish(boolean enable) {
+	public PojoDefaultMassIndexer mergeSegmentsOnFinish(boolean enable) {
 		this.mergeSegmentsOnFinish = enable;
 		return this;
 	}
@@ -139,7 +138,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer, MassIndexingOpti
 	}
 
 	@Override
-	public PojoMassIndexer mergeSegmentsAfterPurge(boolean enable) {
+	public PojoDefaultMassIndexer mergeSegmentsAfterPurge(boolean enable) {
 		this.mergeSegmentsAfterPurge = enable;
 		return this;
 	}
@@ -149,7 +148,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer, MassIndexingOpti
 	}
 
 	@Override
-	public PojoMassIndexer dropAndCreateSchemaOnStart(boolean enable) {
+	public PojoDefaultMassIndexer dropAndCreateSchemaOnStart(boolean enable) {
 		this.dropAndCreateSchemaOnStart = enable;
 		return this;
 	}
@@ -159,7 +158,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer, MassIndexingOpti
 	}
 
 	@Override
-	public PojoMassIndexer purgeAllOnStart(boolean enable) {
+	public PojoDefaultMassIndexer purgeAllOnStart(boolean enable) {
 		this.purgeAtStart = enable;
 		return this;
 	}
@@ -179,7 +178,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer, MassIndexingOpti
 	}
 
 	@Override
-	public PojoMassIndexer monitor(MassIndexingMonitor monitor) {
+	public PojoDefaultMassIndexer monitor(MassIndexingMonitor monitor) {
 		this.monitor = monitor;
 		return this;
 	}
@@ -227,7 +226,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer, MassIndexingOpti
 	}
 
 	@Override
-	public PojoMassIndexer limitIndexedObjectsTo(long maximum) {
+	public PojoDefaultMassIndexer limitIndexedObjectsTo(long maximum) {
 		this.objectsLimit = maximum;
 		return this;
 	}
@@ -238,7 +237,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer, MassIndexingOpti
 	}
 
 	@Override
-	public PojoMassIndexer idFetchSize(int idFetchSize) {
+	public PojoDefaultMassIndexer idFetchSize(int idFetchSize) {
 		// don't check for positive/zero values as it's actually used by some databases
 		// as special values which might be useful.
 		this.idFetchSize = idFetchSize;
@@ -250,7 +249,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer, MassIndexingOpti
 	}
 
 	@Override
-	public PojoMassIndexer failureHandler(MassIndexingFailureHandler failureHandler) {
+	public PojoDefaultMassIndexer failureHandler(MassIndexingFailureHandler failureHandler) {
 		this.failureHandler = failureHandler;
 		return this;
 	}

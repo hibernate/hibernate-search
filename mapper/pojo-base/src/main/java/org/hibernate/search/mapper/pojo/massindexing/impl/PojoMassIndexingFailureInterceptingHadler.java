@@ -23,7 +23,7 @@ public class PojoMassIndexingFailureInterceptingHadler extends PojoMassIndexingF
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoInterceptingInvoker consumer;
+	private final PojoInterceptingInvoker<?> consumer;
 	private final MassIndexingOptions indexingOptions;
 	private final List<LoadingInterceptor<?>> interceptors;
 	private final String tenantId;
@@ -32,7 +32,7 @@ public class PojoMassIndexingFailureInterceptingHadler extends PojoMassIndexingF
 			MassIndexingOptions indexingOptions,
 			List<LoadingInterceptor<?>> interceptors,
 			PojoMassIndexingNotifier notifier,
-			PojoInterceptingInvoker consumer) {
+			PojoInterceptingInvoker<?> consumer) {
 		super( notifier );
 		this.indexingOptions = indexingOptions;
 		this.tenantId = indexingOptions.tenantIdentifier();
@@ -43,8 +43,10 @@ public class PojoMassIndexingFailureInterceptingHadler extends PojoMassIndexingF
 	@Override
 	public void runWithFailureHandler() {
 		try {
-			new PojoInterceptingHandler( indexingOptions, tenantId,
-					interceptors, consumer ).invoke();
+			PojoInterceptingHandler<?> handler = new PojoInterceptingHandler(
+					indexingOptions, tenantId,
+					interceptors, consumer );
+			handler.invoke();
 		}
 		catch (Exception e) {
 			throw log.massIndexingInterceptionHandlingException( e.getMessage(), e );

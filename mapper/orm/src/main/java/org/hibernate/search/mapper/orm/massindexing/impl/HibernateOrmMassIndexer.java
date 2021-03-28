@@ -30,7 +30,7 @@ public class HibernateOrmMassIndexer implements MassIndexer, MassIndexingOptions
 	private final PojoDefaultMassIndexer delegate;
 
 	public HibernateOrmMassIndexer(
-			MassIndexingContext massIndexingContext,
+			MassIndexingContext<?> massIndexingContext,
 			MassIndexingMappingContext mappingContext,
 			DetachedBackendSessionContext sessionContext,
 			Set<? extends PojoRawTypeIdentifier<?>> targetedIndexedTypes,

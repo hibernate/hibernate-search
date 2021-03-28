@@ -18,6 +18,6 @@ public interface JavaBeanSessionIndexedTypeContext<E> {
 
 	String name();
 
-	IdentifierMapping identifierMapping();
+	IdentifierMapping<E> identifierMapping();
 
 }

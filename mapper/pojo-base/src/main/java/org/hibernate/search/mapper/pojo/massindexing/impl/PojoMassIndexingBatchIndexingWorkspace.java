@@ -38,7 +38,7 @@ public class PojoMassIndexingBatchIndexingWorkspace extends PojoMassIndexingFail
 	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
 	private final MassIndexingContext<?> indexingContext;
 	private final MassIndexingMappingContext mappingContext;
-	private final PojoMassIndexingTypeProcessor typeProcessor;
+	private final PojoMassIndexingTypeProcessor<?> typeProcessor;
 	private final PojoMassIndexingIndexedTypeGroup<?> typeGroup;
 	private final String threadNamePrefix;
 

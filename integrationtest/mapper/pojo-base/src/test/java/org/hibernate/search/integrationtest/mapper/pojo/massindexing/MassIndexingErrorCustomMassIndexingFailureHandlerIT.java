@@ -9,10 +9,17 @@ package org.hibernate.search.integrationtest.mapper.pojo.massindexing;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
+import org.junit.Rule;
 
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 public class MassIndexingErrorCustomMassIndexingFailureHandlerIT extends AbstractMassIndexingErrorIT {
+
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	@Mock
 	private MassIndexingFailureHandler failureHandler;

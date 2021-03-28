@@ -27,9 +27,6 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
 
 /**
  * Test that the {@link MassIndexer} correctly indexes even complex entity hierarchies
@@ -43,9 +40,6 @@ public class MassIndexingComplexHierarchyIT {
 	@Rule
 	public final JavaBeanMappingSetupHelper setupHelper
 			= JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	private SearchMapping mapping;
 

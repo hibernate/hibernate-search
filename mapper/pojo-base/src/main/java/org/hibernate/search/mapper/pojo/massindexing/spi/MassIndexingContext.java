@@ -18,14 +18,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 public interface MassIndexingContext<O> {
 
 	/**
-	 * @param type The type of entities that will have to be indexed.
-	 * @return A "indexed key". The loader key allows grouping together types with the same key,
-	 * to create a single loader for multiple types.
-	 * The main reason to use the same loader key for multiple types is better performance.
-	 */
-	Object indexingKey(PojoRawTypeIdentifier<?> type);
-
-	/**
 	 * @param <T> The exposed type of indexed entities.
 	 * @param expectedType The expected types of indexed objects.
 	 * The types are guaranteed to have the same {@link #indexingKey(PojoRawTypeIdentifier)}.
