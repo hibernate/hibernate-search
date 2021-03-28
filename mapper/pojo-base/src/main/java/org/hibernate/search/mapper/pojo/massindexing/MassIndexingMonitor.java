@@ -11,9 +11,7 @@ package org.hibernate.search.mapper.pojo.massindexing;
  * <p>
  * As a MassIndexer can take some time to finish its job,
  * it is often necessary to monitor its progress.
- * The default, built-in monitor logs progress periodically at the INFO level,
- * but a custom monitor can be set by implementing this interface
- * and passing an instance to {@link PojoMassIndexer#monitor(MassIndexingMonitor)}.
+ * The default, built-in monitor logs progress periodically at the INFO level.
  * <p>
  * Implementations must be threadsafe.
  *

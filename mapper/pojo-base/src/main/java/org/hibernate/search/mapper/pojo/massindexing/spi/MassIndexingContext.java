@@ -20,7 +20,6 @@ public interface MassIndexingContext<O> {
 	/**
 	 * @param <T> The exposed type of indexed entities.
 	 * @param expectedType The expected types of indexed objects.
-	 * The types are guaranteed to have the same {@link #indexingKey(PojoRawTypeIdentifier)}.
 	 * @return A index loader.
 	 * @see MassIndexingContext
 	 */
