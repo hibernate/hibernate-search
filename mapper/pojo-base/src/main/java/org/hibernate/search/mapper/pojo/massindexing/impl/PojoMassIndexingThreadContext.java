@@ -12,12 +12,9 @@ import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingThreadCo
 public class PojoMassIndexingThreadContext<O> implements MassIndexingThreadContext<O> {
 
 	private final LoadingInvocationContext<O> invocationContext;
-	private final PojoMassIndexingIndexedTypeGroup<?> typeGroup;
 
-	public PojoMassIndexingThreadContext(LoadingInvocationContext<O> invocationContext,
-			PojoMassIndexingIndexedTypeGroup<?> typeGroup) {
+	public PojoMassIndexingThreadContext(LoadingInvocationContext<O> invocationContext) {
 		this.invocationContext = invocationContext;
-		this.typeGroup = typeGroup;
 	}
 
 	@Override

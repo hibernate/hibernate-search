@@ -123,11 +123,9 @@ public final class JavaBeanSearchLoadingContext implements PojoLoadingContext, M
 		private Map<PojoRawTypeIdentifier<?>, MassIndexingEntityLoadingStrategy<?, ?>> indexeStrategyByType;
 		private List<LoadingInterceptor<?>> identifierInterceptors = new ArrayList<>();
 		private List<LoadingInterceptor<?>> documentInterceptors = new ArrayList<>();
-		private final JavaBeanMassIndexingMappingContext mappingContext;
 
 		public Builder(LoadingTypeContextProvider typeContextProvider, JavaBeanMassIndexingMappingContext mappingContext) {
 			this.typeContextProvider = typeContextProvider;
-			this.mappingContext = mappingContext;
 			identifierInterceptors.add( JavaBeanSessionContextInterceptor.of( mappingContext ) );
 			documentInterceptors.add( JavaBeanSessionContextInterceptor.of( mappingContext ) );
 		}

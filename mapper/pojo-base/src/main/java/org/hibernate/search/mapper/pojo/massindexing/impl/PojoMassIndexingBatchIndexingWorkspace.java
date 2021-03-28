@@ -60,7 +60,7 @@ public class PojoMassIndexingBatchIndexingWorkspace extends PojoMassIndexingFail
 		this.mappingContext = mappingContext;
 
 		//type options for dsl index invoke
-		typeProcessor = new PojoMassIndexingTypeProcessor(
+		typeProcessor = new PojoMassIndexingTypeProcessor<>(
 				notifier,
 				typeGroup );
 
