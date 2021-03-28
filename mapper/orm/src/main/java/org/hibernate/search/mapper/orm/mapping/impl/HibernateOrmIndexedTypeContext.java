@@ -29,7 +29,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 
 	private final boolean documentIdIsEntityId;
 	private final HibernateOrmEntityLoadingStrategy<? super E> loadingStrategy;
-	private final IdentifierMapping identifierMapping;
+	private final IdentifierMapping<?> identifierMapping;
 
 	private final MappedIndexManager indexManager;
 
@@ -98,7 +98,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 
 		private String documentIdSourcePropertyName;
 		private ValueReadHandle<?> documentIdSourcePropertyHandle;
-		private IdentifierMapping identifierMapping;
+		private IdentifierMapping<?> identifierMapping;
 
 		private MappedIndexManager indexManager;
 

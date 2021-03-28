@@ -25,18 +25,18 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.Throwables;
 
-class PojoMassIndexingTypeProcessor {
+class PojoMassIndexingTypeProcessor<E> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoMassIndexingNotifier notifier;
-	private final PojoMassIndexingIndexedTypeGroup<?> typeGroup;
+	private final PojoMassIndexingIndexedTypeGroup<E> typeGroup;
 
 	private final PojoProducerConsumerQueue<List<?>> primaryKeyStream;
 
 	public PojoMassIndexingTypeProcessor(
 			PojoMassIndexingNotifier notifier,
-			PojoMassIndexingIndexedTypeGroup<?> typeGroup) {
+			PojoMassIndexingIndexedTypeGroup<E> typeGroup) {
 		this.notifier = notifier;
 		this.typeGroup = typeGroup;
 
@@ -44,7 +44,7 @@ class PojoMassIndexingTypeProcessor {
 		this.primaryKeyStream = new PojoProducerConsumerQueue<>( 1 );
 	}
 
-	public PojoInterceptingInvoker identifierProducer() {
+	public PojoInterceptingInvoker<E> identifierProducer() {
 		return (ictx, invoker) -> {
 			log.trace( "started" );
 			try {
@@ -64,7 +64,7 @@ class PojoMassIndexingTypeProcessor {
 		};
 	}
 
-	public PojoInterceptingInvoker documentProducer() {
+	public PojoInterceptingInvoker<E> documentProducer() {
 		return (ictx, invoker) -> {
 			log.trace( "started" );
 			try {
@@ -128,7 +128,7 @@ class PojoMassIndexingTypeProcessor {
 			throws Exception {
 		invoker.invoke( () -> {
 			try ( EntityLoader<?> entityLoader = typeGroup
-					.createLoader( new PojoMassIndexingThreadContext( ictx, typeGroup ), sessionContext ) ) {
+					.createLoader( new PojoMassIndexingThreadContext<>( ictx, typeGroup ), sessionContext ) ) {
 				List<?> result = entityLoader.load( listIds );
 				indexList( sessionContext, indexer, result );
 			}

@@ -35,9 +35,6 @@ import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
 import org.hibernate.search.mapper.javabean.massindexing.loader.JavaBeanIndexingStrategies;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
 
 /**
  * Test interruption of a currently executing {@link MassIndexer}.
@@ -56,9 +53,6 @@ public class MassIndexingInterruptionIT {
 
 	@Rule
 	public ThreadSpy threadSpy = new ThreadSpy();
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	private SearchMapping mapping;
 

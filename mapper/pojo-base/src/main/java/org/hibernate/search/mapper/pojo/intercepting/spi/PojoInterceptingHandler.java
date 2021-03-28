@@ -20,11 +20,11 @@ public class PojoInterceptingHandler<C> {
 	private final C loadingContext;
 	private final String tenantId;
 	private final List<LoadingInterceptor<C>> interceptors;
-	private final PojoInterceptingInvoker loadingProcess;
+	private final PojoInterceptingInvoker<C> loadingProcess;
 
 	public PojoInterceptingHandler(C loadingContext, String tenantId,
 			List<LoadingInterceptor<C>> interceptors,
-			PojoInterceptingInvoker loadingProcess) {
+			PojoInterceptingInvoker<C> loadingProcess) {
 		this.loadingContext = loadingContext;
 		this.tenantId = tenantId;
 		this.interceptors = interceptors;
@@ -70,9 +70,9 @@ public class PojoInterceptingHandler<C> {
 
 	private class PojoInvocationContext implements LoadingInvocationContext<C> {
 		Map<Class<?>, Object> contextData = new HashMap<>();
-		InvokationContextConsumer consumer;
+		InvokationContextConsumer<C> consumer;
 
-		public PojoInvocationContext(InvokationContextConsumer consumer) {
+		public PojoInvocationContext(InvokationContextConsumer<C> consumer) {
 			this.consumer = consumer;
 		}
 

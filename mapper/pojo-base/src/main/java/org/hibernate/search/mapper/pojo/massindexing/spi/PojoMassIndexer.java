@@ -4,10 +4,12 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.massindexing;
+package org.hibernate.search.mapper.pojo.massindexing.spi;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
 
 import org.hibernate.search.util.common.annotation.Incubating;
 
@@ -20,7 +22,7 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * @author Sanne Grinovero
  * @param <N> the {@link PojoMassIndexer}
  */
-public interface PojoMassIndexer<N extends PojoMassIndexer<?>> {
+public interface PojoMassIndexer<N extends PojoMassIndexer<N>> {
 
 	/**
 	 * Sets the number of entity types to be indexed in parallel.

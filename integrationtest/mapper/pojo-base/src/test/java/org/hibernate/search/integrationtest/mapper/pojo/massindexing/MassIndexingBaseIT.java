@@ -30,9 +30,6 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
 
 /**
  * Very basic test to probe an use of {@link MassIndexer} api.
@@ -52,9 +49,6 @@ public class MassIndexingBaseIT {
 	@Rule
 	public final JavaBeanMappingSetupHelper setupHelper
 			= JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	private SearchMapping mapping;
 

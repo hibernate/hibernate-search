@@ -71,8 +71,7 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 	private static <E> PojoMassIndexingIndexedTypeGroup<E> single(MassIndexingContext<?> indexingContext,
 			MassIndexingMappingContext mappingContext,
 			PojoRawTypeIdentifier<E> typeContext) {
-		MassIndexingEntityLoadingStrategy<E, ?> strategy = indexingContext.createIndexLoadingStrategy(
-				(PojoRawTypeIdentifier) indexingContext.indexingKey( typeContext ) );
+		MassIndexingEntityLoadingStrategy<E, ?> strategy = indexingContext.createIndexLoadingStrategy( typeContext );
 		return new PojoMassIndexingIndexedTypeGroup<>( typeContext, indexingContext, mappingContext,
 				strategy, Collections.singleton( typeContext ) );
 	}
@@ -133,7 +132,7 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 		return loadingStrategy.createIdentifierScroll( context, createLoadingTypeGroup( sessionContext ) );
 	}
 
-	EntityLoader createLoader(MassIndexingThreadContext context, MassIndexingSessionContext sessionContext) throws InterruptedException {
+	EntityLoader<E> createLoader(MassIndexingThreadContext context, MassIndexingSessionContext sessionContext) throws InterruptedException {
 		return loadingStrategy.createLoader( context, createLoadingTypeGroup( sessionContext ) );
 	}
 
@@ -173,7 +172,7 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 		if ( !loadingStrategy.equals( other.loadingStrategy ) ) {
 			return null;
 		}
-		EntityLoadingTypeGroupStrategy.GroupingType groupingType = loadingStrategy.groupStrategy().copare(
+		EntityLoadingTypeGroupStrategy.GroupingType groupingType = loadingStrategy.groupStrategy().get(
 				commonSuperName, commonSuperType.javaClass(),
 				other.commonSuperName, other.commonSuperType.javaClass() );
 

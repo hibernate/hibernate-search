@@ -52,6 +52,10 @@ import org.jboss.logging.annotations.ValidIdRanges;
 @ValidIdRanges({
 		@ValidIdRange(min = MessageConstants.MAPPER_POJO_ID_RANGE_MIN, max = MessageConstants.MAPPER_POJO_ID_RANGE_MAX),
 		// Exceptions for legacy messages from Search 5 (engine module)
+		@ValidIdRange(min = 27, max = 28),
+		@ValidIdRange(min = 30, max = 30),
+		@ValidIdRange(min = 31, max = 31),
+		@ValidIdRange(min = 62, max = 62),
 		@ValidIdRange(min = 135, max = 135),
 		@ValidIdRange(min = 159, max = 159),
 		@ValidIdRange(min = 160, max = 160),
@@ -59,6 +63,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = 216, max = 216),
 		@ValidIdRange(min = 221, max = 221),
 		@ValidIdRange(min = 234, max = 234),
+		@ValidIdRange(min = 235, max = 235),
 		@ValidIdRange(min = 295, max = 295),
 		@ValidIdRange(min = 297, max = 297)
 })
@@ -568,28 +573,24 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassFormatter.class) Class<?> actualIdentifierType);
 
 	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET + 91, value = "Mass indexing is going to index %d entities.")
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 27, value = "Mass indexing is going to index %d entities.")
 	void indexingEntities(long count);
 
 	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET + 92, value = "Mass indexing complete. Indexed %1$d entities.")
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 28, value = "Mass indexing complete. Indexed %1$d entities.")
 	void indexingEntitiesCompleted(long nbrOfEntities);
 
 	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET + 93, value = "Mass indexing progress: indexed %1$d entities in %2$d ms.")
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 30, value = "Mass indexing progress: indexed %1$d entities in %2$d ms.")
 	void indexingProgressRaw(long doneCount, long elapsedMs);
 
 	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET + 94, value = "Mass indexing progress: %2$.2f%% [%1$f documents/second].")
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 31, value = "Mass indexing progress: %2$.2f%% [%1$f documents/second].")
 	void indexingProgressStats(float estimateSpeed, float estimatePercentileComplete);
 
 	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET + 95, value = "Mass indexing received interrupt signal: aborting.")
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 62, value = "Mass indexing received interrupt signal: aborting.")
 	void interruptedBatchIndexing();
-
-	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET + 96, value = "Transaction rollback failure: %1$s")
-	void errorRollingBackTransaction(String message, @Cause Exception e1);
 
 	/*
 	 * This is not an exception factory nor a logging statement.
@@ -610,11 +611,8 @@ public interface Log extends BasicLogger {
 	String massIndexingLoadingAndExtractingEntityData(String entityName);
 
 	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET + 97, value = "Default automatic indexing synchronization strategy set to '%s'.")
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 235, value = "Default automatic indexing synchronization strategy set to '%s'.")
 	void defaultAutomaticIndexingSynchronizationStrategy(Object strategy);
-
-	@Message(id = ID_OFFSET + 98, value = "No transaction active while indexing entity '%1$s'. Consider increasing the connection time-out.")
-	SearchException transactionNotActiveWhileProducingIdsForBatchIndexing(String entityName);
 
 	@Message(id = ID_OFFSET + 99, value = "Multiple batching index loader assigned to the same process type: %1$s.")
 	SearchException multipleBatchingDocumentIndexing(String entityName);

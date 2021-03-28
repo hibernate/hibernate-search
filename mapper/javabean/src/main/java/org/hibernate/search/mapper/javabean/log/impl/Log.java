@@ -4,7 +4,6 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-
 package org.hibernate.search.mapper.javabean.log.impl;
 
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
@@ -14,11 +13,8 @@ import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.BasicLogger;
-import static org.jboss.logging.Logger.Level.ERROR;
-import static org.jboss.logging.Logger.Level.WARN;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
-import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.ValidIdRange;
@@ -58,21 +54,10 @@ public interface Log extends BasicLogger {
 			value = "Unable to set up index loading for type '%s', because no index loader was registered for this type.")
 	SearchException indexLoaderNotRegistered(PojoRawTypeIdentifier<?> typeIdentifier);
 
-	@LogMessage(level = WARN)
-	@Message(id = ID_OFFSET + 13, value = "Unable to guess the transaction status: not starting a JTA transaction.")
-	void cannotGuessTransactionStatus(@Cause Exception e);
-
-	@Message(id = ID_OFFSET + 14, value = "Unable to handle transaction: %1$s")
-	SearchException massIndexingTransactionHandlingException(String causeMessage, @Cause Throwable cause);
-
-	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET + 15, value = "Transaction rollback failure: %1$s")
-	void errorRollingBackTransaction(String message, @Cause Exception e1);
-
-	@Message(id = ID_OFFSET + 16, value = "Context is interrupted while indexing entity '%1$s'. Consider increasing the connection time-out.")
+	@Message(id = ID_OFFSET + 13, value = "Context is interrupted while indexing entity '%1$s'. Consider increasing the connection time-out.")
 	SearchException contextInterruptedWhileProducingIdsForBatchIndexing(String entityName);
 
-	@Message(id = ID_OFFSET + 17, value = "Unable to access search session: %1$s" )
+	@Message(id = ID_OFFSET + 14, value = "Unable to access search session: %1$s")
 	SearchException hibernateSessionAccessError(String causeMessage);
 
 }
