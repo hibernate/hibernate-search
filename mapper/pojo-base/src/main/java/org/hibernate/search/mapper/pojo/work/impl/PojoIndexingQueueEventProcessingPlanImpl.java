@@ -71,12 +71,9 @@ public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndex
 	}
 
 	@Override
-	public EntityReferenceInfo entityReference(String entityName, String serializedId) {
+	public Object toIdentifier(String entityName, String serializedId) {
 		PojoWorkIndexedTypeContext<?, ?> typeContext = typeContext( entityName );
-		Class<?> javaClass = typeContext.typeIdentifier().javaClass();
-		Object id = typeContext.identifierMapping().fromDocumentIdentifier( serializedId, sessionContext );
-
-		return new EntityReferenceInfo( javaClass, entityName, id );
+		return typeContext.identifierMapping().fromDocumentIdentifier( serializedId, sessionContext );
 	}
 
 	private PojoWorkIndexedTypeContext<?, ?> typeContext(String entityName) {
