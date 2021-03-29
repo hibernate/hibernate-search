@@ -112,7 +112,7 @@ public class OutboxEventProcessingPlan {
 		for ( EntityReference entityReference : report.failingEntityReferences() ) {
 			OutboxEventReference outboxEventReference = new OutboxEventReference(
 					entityReference.name(),
-					processingPlan.toSerializedId( entityReference.name(), entityReference.id() )
+					extractReferenceOrSuppress( entityReference, throwable.get() )
 			);
 
 			EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
@@ -122,6 +122,16 @@ public class OutboxEventProcessingPlan {
 			failureHandler.handle( builder.build() );
 
 			failedEvents.put( outboxEventReference, eventsMap.get( outboxEventReference ) );
+		}
+	}
+
+	private String extractReferenceOrSuppress(EntityReference entityReference, Throwable throwable) {
+		try {
+			return processingPlan.toSerializedId( entityReference.name(), entityReference.id() );
+		}
+		catch (RuntimeException e) {
+			throwable.addSuppressed( e );
+			return null;
 		}
 	}
 
