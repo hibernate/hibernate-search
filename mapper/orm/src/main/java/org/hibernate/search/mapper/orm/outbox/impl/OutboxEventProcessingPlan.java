@@ -109,20 +109,20 @@ public class OutboxEventProcessingPlan {
 		}
 
 		Map<OutboxEventReference, List<OutboxEvent>> eventsMap = getEventsByReferences();
+		EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
+		builder.throwable( throwable.get() );
+		builder.failingOperation( "Processing an outbox event." );
+
 		for ( EntityReference entityReference : report.failingEntityReferences() ) {
 			OutboxEventReference outboxEventReference = new OutboxEventReference(
 					entityReference.name(),
 					extractReferenceOrSuppress( entityReference, throwable.get() )
 			);
 
-			EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
-			builder.throwable( throwable.get() );
-			builder.failingOperation( "Processing an outbox event." );
 			builder.entityReference( entityReference );
-			failureHandler.handle( builder.build() );
-
 			failedEvents.put( outboxEventReference, eventsMap.get( outboxEventReference ) );
 		}
+		failureHandler.handle( builder.build() );
 	}
 
 	private String extractReferenceOrSuppress(EntityReference entityReference, Throwable throwable) {
@@ -137,15 +137,16 @@ public class OutboxEventProcessingPlan {
 
 	private void reportAllEventsFailure(Throwable throwable, Map<OutboxEventReference, List<OutboxEvent>> eventsMap) {
 		failedEvents.putAll( eventsMap );
+		EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
+		builder.throwable( throwable );
+		builder.failingOperation( "Processing an outbox event." );
+
 		for ( List<OutboxEvent> events : eventsMap.values() ) {
 			for ( OutboxEvent event : events ) {
-				EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
-				builder.throwable( throwable );
-				builder.failingOperation( "Processing an outbox event." );
 				builder.entityReference( entityReference( event ) );
-				failureHandler.handle( builder.build() );
 			}
 		}
+		failureHandler.handle( builder.build() );
 	}
 
 	private Map<OutboxEventReference, List<OutboxEvent>> getEventsByReferences() {
