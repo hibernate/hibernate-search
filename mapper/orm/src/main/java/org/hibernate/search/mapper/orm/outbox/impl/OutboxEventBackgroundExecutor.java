@@ -57,7 +57,7 @@ public class OutboxEventBackgroundExecutor {
 
 		failureHandler = mapping.failureHandler();
 		processingTask = new SingletonTask(
-				"Delayed commit for " + OutboxTableAutomaticIndexingStrategy.NAME,
+				"Delayed commit for " + OutboxPollingAutomaticIndexingStrategy.NAME,
 				new HibernateOrmOutboxWorker(),
 				new HibernateOrmOutboxScheduler( executor ),
 				failureHandler
@@ -69,7 +69,7 @@ public class OutboxEventBackgroundExecutor {
 		processingTask.ensureScheduled();
 	}
 
-	public CompletableFuture<?> completion() {
+	public CompletableFuture<?> preStop() {
 		status.set( Status.STOPPED );
 		return processingTask.completion();
 	}

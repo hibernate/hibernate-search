@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outboxtable;
+package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outbox;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,7 +33,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class OutboxTableNoProcessingIT {
+public class OutboxPollingNoProcessingIT {
 
 	private static final String INDEX_NAME = "IndexedEntity";
 	private static final String ANOTHER_INDEX_NAME = "AnotherIndexedEntity";
