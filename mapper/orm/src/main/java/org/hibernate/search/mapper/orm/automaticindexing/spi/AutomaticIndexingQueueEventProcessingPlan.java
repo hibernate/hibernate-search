@@ -63,12 +63,12 @@ public interface AutomaticIndexingQueueEventProcessingPlan {
 	String toSerializedId(String entityName, Object identifier);
 
 	/**
-	 * Supply the {@link EntityReference} for the provided arguments.
+	 * Convert the serialized id to the original identifier.
 	 *
 	 * @param entityName The name of the entity.
-	 * @param serializedId The serialized entity identifier.
-	 * @return The entity reference.
+	 * @param serializedId The serialized id.
+	 * @return The original entity identifier.
 	 */
-	EntityReference entityReference(String entityName, String serializedId);
+	Object toIdentifier(String entityName, String serializedId);
 
 }

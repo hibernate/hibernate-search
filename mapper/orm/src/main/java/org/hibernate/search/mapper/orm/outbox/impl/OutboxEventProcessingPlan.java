@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.Session;
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -27,6 +28,7 @@ public class OutboxEventProcessingPlan {
 
 	private final AutomaticIndexingQueueEventProcessingPlan processingPlan;
 	private final FailureHandler failureHandler;
+	private final EntityReferenceFactory<EntityReference> entityReferenceFactory;
 	private final List<OutboxEvent> events;
 	private final Map<OutboxEventReference, List<OutboxEvent>> failedEvents = new HashMap<>();
 	private final List<Integer> eventsIds;
@@ -35,6 +37,7 @@ public class OutboxEventProcessingPlan {
 			List<OutboxEvent> events) {
 		this.processingPlan = mapping.createIndexingQueueEventProcessingPlan( session );
 		this.failureHandler = mapping.failureHandler();
+		this.entityReferenceFactory = mapping.entityReferenceFactory();
 		this.events = events;
 		this.eventsIds = new ArrayList<>( events.size() );
 	}
@@ -58,12 +61,18 @@ public class OutboxEventProcessingPlan {
 		return failedEvents;
 	}
 
-	EntityReference entityReference(OutboxEvent event) {
-		return processingPlan.entityReference( event.getEntityName(), event.getEntityId() );
-	}
-
-	EntityReference entityReference(OutboxEventReference event) {
-		return processingPlan.entityReference( event.getEntityName(), event.getEntityId() );
+	EntityReference entityReference(String entityName, String entityId, Throwable throwable) {
+		try {
+			Object identifier = processingPlan.toIdentifier( entityName, entityId );
+			return EntityReferenceFactory.safeCreateEntityReference(
+					entityReferenceFactory, entityName, identifier, throwable::addSuppressed );
+		}
+		catch (RuntimeException e) {
+			// We failed to extract a reference.
+			// Let's just give up and suppress the exception.
+			throwable.addSuppressed( e );
+			return null;
+		}
 	}
 
 	private void addEventsToThePlan() {
@@ -143,7 +152,7 @@ public class OutboxEventProcessingPlan {
 
 		for ( List<OutboxEvent> events : eventsMap.values() ) {
 			for ( OutboxEvent event : events ) {
-				builder.entityReference( entityReference( event ) );
+				builder.entityReference( entityReference( event.getEntityName(), event.getEntityId(), throwable ) );
 			}
 		}
 		failureHandler.handle( builder.build() );

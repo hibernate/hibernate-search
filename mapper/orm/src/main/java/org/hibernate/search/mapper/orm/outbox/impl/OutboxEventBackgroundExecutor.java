@@ -28,6 +28,7 @@ import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMa
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
@@ -149,9 +150,11 @@ public class OutboxEventBackgroundExecutor {
 			int minRetries = minRetries( entry.getValue() );
 			if ( minRetries >= MAX_RETRIES ) {
 				EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
-				builder.throwable( log.maxRetryExhausted( MAX_RETRIES ) );
+				SearchException exception = log.maxRetryExhausted( MAX_RETRIES );
+				builder.throwable( exception );
 				builder.failingOperation( "Processing an outbox event." );
-				builder.entityReference( processingPlan.entityReference( entry.getKey() ) );
+				builder.entityReference( processingPlan.entityReference(
+						entry.getKey().getEntityName(), entry.getKey().getEntityId(), exception ) );
 				failureHandler.handle( builder.build() );
 				continue;
 			}
