@@ -4,11 +4,11 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outboxtable;
+package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outbox;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outboxtable.OutboxTableNoProcessingIT.findOutboxEntries;
-import static org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outboxtable.OutboxTableNoProcessingIT.verifyOutboxEntry;
+import static org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outbox.OutboxPollingNoProcessingIT.findOutboxEntries;
+import static org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outbox.OutboxPollingNoProcessingIT.verifyOutboxEntry;
 
 import java.util.List;
 import javax.persistence.Basic;
@@ -29,7 +29,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class OutboxTableAutomaticIndexingStrategyLifecycleIT {
+public class OutboxPollingAutomaticIndexingStrategyLifecycleIT {
 
 	@Rule
 	public BackendMock backendMock = new BackendMock();

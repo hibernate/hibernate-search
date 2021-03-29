@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class OutboxTableAutomaticIndexingStrategy implements AutomaticIndexingStrategy {
+public class OutboxPollingAutomaticIndexingStrategy implements AutomaticIndexingStrategy {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -77,7 +77,7 @@ public class OutboxTableAutomaticIndexingStrategy implements AutomaticIndexingSt
 			// Nothing to do
 			return CompletableFuture.completedFuture( null );
 		}
-		return executor.completion();
+		return executor.preStop();
 	}
 
 	@Override

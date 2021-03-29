@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.orm.automaticindexing.impl.SessionAutomaticIn
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategy;
-import org.hibernate.search.mapper.orm.outbox.impl.OutboxTableAutomaticIndexingStrategy;
+import org.hibernate.search.mapper.orm.outbox.impl.OutboxPollingAutomaticIndexingStrategy;
 
 public class HibernateOrmBeanConfigurer implements BeanConfigurer {
 	@Override
@@ -33,7 +33,7 @@ public class HibernateOrmBeanConfigurer implements BeanConfigurer {
 		context.define(
 				AutomaticIndexingStrategy.class,
 				AutomaticIndexingStrategyNames.OUTBOX_POLLING,
-				BeanReference.ofInstance( new OutboxTableAutomaticIndexingStrategy() )
+				BeanReference.ofInstance( new OutboxPollingAutomaticIndexingStrategy() )
 		);
 
 		context.define(
