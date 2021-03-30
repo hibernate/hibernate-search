@@ -37,6 +37,15 @@ public class EntityIndexingFailureContext extends FailureContext {
 		return entityReferences;
 	}
 
+	@Override
+	public String toString() {
+		return "EntityIndexingFailureContext{" +
+				"entityReferences=" + entityReferences +
+				", throwable=" + throwable +
+				", failingOperation=" + failingOperation +
+				'}';
+	}
+
 	public static class Builder extends FailureContext.Builder {
 
 		private List<Object> entityReferences;

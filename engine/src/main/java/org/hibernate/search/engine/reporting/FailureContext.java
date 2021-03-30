@@ -20,9 +20,9 @@ public class FailureContext {
 		return new Builder();
 	}
 
-	private final Throwable throwable;
+	protected final Throwable throwable;
 
-	private final Object failingOperation;
+	protected final Object failingOperation;
 
 	FailureContext(Builder builder) {
 		/*
@@ -53,6 +53,14 @@ public class FailureContext {
 	 */
 	public Object failingOperation() {
 		return this.failingOperation;
+	}
+
+	@Override
+	public String toString() {
+		return "FailureContext{" +
+				"throwable=" + throwable +
+				", failingOperation=" + failingOperation +
+				'}';
 	}
 
 	public static class Builder {
