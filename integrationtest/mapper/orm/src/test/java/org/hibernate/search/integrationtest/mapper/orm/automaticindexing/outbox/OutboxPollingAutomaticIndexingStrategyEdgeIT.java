@@ -7,12 +7,14 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outbox;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -36,6 +38,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.awaitility.core.ThrowingRunnable;
 
 /**
  * Extensive tests with edge cases for automatic indexing with {@link AutomaticIndexingStrategyNames#OUTBOX_POLLING}.
@@ -203,7 +207,7 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 		assertThat( failureHandler.genericFailures ).isEmpty();
 
 		List<EntityIndexingFailureContext> entityFailures = failureHandler.entityFailures.get( 2 );
-		assertThat( entityFailures ).hasSize( 1 );
+		awaitFor( () -> assertThat( entityFailures ).hasSize( 1 ) );
 
 		EntityIndexingFailureContext entityFailure = entityFailures.get( 0 );
 		checkId2EntityEventFailure( entityFailure );
@@ -265,7 +269,7 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 		assertThat( failureHandler.genericFailures ).isEmpty();
 
 		List<EntityIndexingFailureContext> entityFailures = failureHandler.entityFailures.get( 2 );
-		assertThat( entityFailures ).hasSize( 2 );
+		awaitFor( () -> assertThat( entityFailures ).hasSize( 2 ) );
 
 		EntityIndexingFailureContext entityFailure = entityFailures.get( 0 );
 		checkId2EntityEventFailure( entityFailure );
@@ -335,7 +339,7 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 		assertThat( failureHandler.genericFailures ).isEmpty();
 
 		List<EntityIndexingFailureContext> entityFailures = failureHandler.entityFailures.get( 2 );
-		assertThat( entityFailures ).hasSize( 3 );
+		awaitFor( () -> assertThat( entityFailures ).hasSize( 3 ) );
 
 		for ( int i = 0; i < 3; i++ ) {
 			EntityIndexingFailureContext entityFailure = entityFailures.get( i );
@@ -403,7 +407,7 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 		assertThat( failureHandler.genericFailures ).isEmpty();
 
 		List<EntityIndexingFailureContext> entityFailures = failureHandler.entityFailures.get( 2 );
-		assertThat( entityFailures ).hasSize( 5 );
+		awaitFor( () -> assertThat( entityFailures ).hasSize( 5 ) );
 
 		for ( int i = 0; i < 4; i++ ) {
 			EntityIndexingFailureContext entityFailure = entityFailures.get( i );
@@ -432,6 +436,10 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 		EntityReference entityReference = (EntityReference) entityReferences.get( 0 );
 		assertThat( entityReference.name() ).isEqualTo( entityName );
 		assertThat( entityReference.id() ).isEqualTo( id );
+	}
+
+	private static void awaitFor(ThrowingRunnable assertion) {
+		await().timeout( 2, TimeUnit.SECONDS ).untilAsserted( assertion );
 	}
 
 	@Entity(name = "indexed")
@@ -479,9 +487,10 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 	}
 
 	private static class TestFailureHandler implements FailureHandler {
-
-		private List<FailureContext> genericFailures = new ArrayList<>();
-		private Map<Integer, List<EntityIndexingFailureContext>> entityFailures = new HashMap<>();
+		// there are no concurrent write in this test,
+		// using volatile list / concurrent hashmap only to make the changes on value lists visible by the main thread
+		private volatile List<FailureContext> genericFailures = new ArrayList<>();
+		private Map<Integer, List<EntityIndexingFailureContext>> entityFailures = new ConcurrentHashMap<>();
 
 		@Override
 		public void handle(FailureContext context) {
