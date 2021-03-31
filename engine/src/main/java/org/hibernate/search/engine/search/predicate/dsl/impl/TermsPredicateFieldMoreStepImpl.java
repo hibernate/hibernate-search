@@ -8,6 +8,7 @@ package org.hibernate.search.engine.search.predicate.dsl.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -51,13 +52,13 @@ class TermsPredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public TermsPredicateOptionsStep<?> matchingAny(Object term, Object... terms) {
-		return commonState.matchingAny( term, terms );
+	public TermsPredicateOptionsStep<?> matchingAny(Collection<?> terms) {
+		return commonState.matchingAny( terms );
 	}
 
 	@Override
-	public TermsPredicateOptionsStep<?> matchingAll(Object term, Object... terms) {
-		return commonState.matchingAll( term, terms );
+	public TermsPredicateOptionsStep<?> matchingAll(Collection<?> terms) {
+		return commonState.matchingAll( terms );
 	}
 
 	@Override
@@ -78,21 +79,21 @@ class TermsPredicateFieldMoreStepImpl
 			super( dslContext );
 		}
 
-		private TermsPredicateOptionsStep<?> matchingAny(Object term, Object ... terms) {
-			Contracts.assertNotNull( term, "term" );
+		private TermsPredicateOptionsStep<?> matchingAny(Collection<?> terms) {
+			Contracts.assertNotNullNorEmpty( terms, "terms" );
 			for ( TermsPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				for ( TermsPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
-					predicateBuilder.matchingAny( term, terms );
+					predicateBuilder.matchingAny( terms );
 				}
 			}
 			return this;
 		}
 
-		private TermsPredicateOptionsStep<?> matchingAll(Object term, Object ... terms) {
-			Contracts.assertNotNull( term, "term" );
+		private TermsPredicateOptionsStep<?> matchingAll(Collection<?> terms) {
+			Contracts.assertNotNullNorEmpty( terms, "terms" );
 			for ( TermsPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				for ( TermsPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
-					predicateBuilder.matchingAll( term, terms );
+					predicateBuilder.matchingAll( terms );
 				}
 			}
 			return this;

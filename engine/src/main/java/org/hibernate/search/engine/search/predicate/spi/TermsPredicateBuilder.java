@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
+import java.util.Collection;
+
 public interface TermsPredicateBuilder extends SearchPredicateBuilder {
 
-	void matchingAny(Object term, Object ... terms);
+	void matchingAny(Collection<?> terms);
 
-	void matchingAll(Object term, Object ... terms);
+	void matchingAll(Collection<?> terms);
 
 }
