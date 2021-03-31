@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl;
 
+import java.util.Collection;
 import java.util.Set;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -132,12 +133,12 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder,
 	}
 
 	@Override
-	public void matchingAny(Object term, Object... terms) {
+	public void matchingAny(Collection<?> terms) {
 		// No-op
 	}
 
 	@Override
-	public void matchingAll(Object term, Object... terms) {
+	public void matchingAll(Collection<?> terms) {
 		// No-op
 	}
 

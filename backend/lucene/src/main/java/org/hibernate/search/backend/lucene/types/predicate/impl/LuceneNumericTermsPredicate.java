@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory;
@@ -55,15 +56,15 @@ public class LuceneNumericTermsPredicate extends AbstractLuceneLeafSingleFieldPr
 		}
 
 		@Override
-		public void matchingAny(Object term, Object... terms) {
+		public void matchingAny(Collection<?> terms) {
 			allMatch = false;
-			fillTerms( term, terms );
+			fillTerms( terms );
 		}
 
 		@Override
-		public void matchingAll(Object term, Object... terms) {
+		public void matchingAll(Collection<?> terms) {
 			allMatch = true;
-			fillTerms( term, terms );
+			fillTerms( terms );
 		}
 
 		@Override
@@ -89,16 +90,15 @@ public class LuceneNumericTermsPredicate extends AbstractLuceneLeafSingleFieldPr
 			return builder.build();
 		}
 
-		private void fillTerms(Object term, Object[] terms) {
-			if ( terms == null || terms.length == 0 ) {
-				this.term = convertAndEncode( codec, term, ValueConvert.NO );
+		private void fillTerms(Collection<?> terms) {
+			if ( terms.size() == 1 ) {
+				this.term = convertAndEncode( codec, terms.iterator().next(), ValueConvert.NO );
 				this.terms = null;
 				return;
 			}
 
 			this.term = null;
-			this.terms = new ArrayList<>( terms.length + 1 );
-			this.terms.add( convertAndEncode( codec, term, ValueConvert.NO ) );
+			this.terms = new ArrayList<>( terms.size() );
 			for ( Object termItem : terms ) {
 				this.terms.add( convertAndEncode( codec, termItem, ValueConvert.NO ) );
 			}

@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collection;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
@@ -125,15 +126,15 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 		}
 
 		@Override
-		public void matchingAny(Object term, Object... terms) {
+		public void matchingAny(Collection<?> terms) {
 			allMatch = false;
-			fillTerms( term, terms );
+			fillTerms( terms );
 		}
 
 		@Override
-		public void matchingAll(Object term, Object... terms) {
+		public void matchingAll(Collection<?> terms) {
 			allMatch = true;
-			fillTerms( term, terms );
+			fillTerms( terms );
 		}
 
 		@Override
@@ -141,22 +142,22 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 			return new ElasticsearchTermsPredicate( this );
 		}
 
-		private void fillTerms(Object term, Object[] terms) {
-			if ( terms == null || terms.length == 0 ) {
-				this.term = encode( term );
+		private void fillTerms(Collection<?> terms) {
+			if ( terms.size() == 1 ) {
+				this.term = encode( terms.iterator().next() );
 				this.terms = null;
 				return;
 			}
 
 			this.term = null;
-			this.terms = encode( term, terms );
+			this.terms = encode( terms );
 		}
 
-		private JsonElement[] encode(Object term, Object[] terms) {
-			JsonElement[] result = new JsonElement[terms.length + 1];
-			result[0] = encode( term );
-			for ( int i = 0; i < terms.length; i++ ) {
-				result[i + 1] = encode( terms[i] );
+		private JsonElement[] encode(Collection<?> terms) {
+			JsonElement[] result = new JsonElement[terms.size()];
+			int i = 0;
+			for ( Object term : terms ) {
+				result[i++] = encode( term );
 			}
 
 			return result;
