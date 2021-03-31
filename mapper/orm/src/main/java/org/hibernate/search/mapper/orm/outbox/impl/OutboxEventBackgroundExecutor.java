@@ -83,6 +83,7 @@ public class OutboxEventBackgroundExecutor {
 		@Override
 		public CompletableFuture<?> work() {
 			if ( mapping.sessionFactory().isClosed() ) {
+				// TODO HHH-14541 Check for this issue
 				log.sessionFactoryIsClosedOnOutboxProcessing();
 				return CompletableFuture.completedFuture( null );
 			}
