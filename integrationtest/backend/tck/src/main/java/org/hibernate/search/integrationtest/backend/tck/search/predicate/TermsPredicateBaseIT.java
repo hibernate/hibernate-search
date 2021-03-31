@@ -7,12 +7,16 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
@@ -55,10 +59,10 @@ public class TermsPredicateBaseIT {
 						InvalidFieldIT.index, UnsupportedTypeIT.index,
 						SearchableIT.searchableYesIndex, SearchableIT.searchableNoIndex,
 						ArgumentCheckingIT.index,
-						TypeCheckingNoConversionIT.index, TypeCheckingNoConversionIT.compatibleIndex,
-						TypeCheckingNoConversionIT.rawFieldCompatibleIndex,
-						TypeCheckingNoConversionIT.missingFieldIndex,
-						TypeCheckingNoConversionIT.incompatibleIndex,
+						TypeCheckingAndConversionIT.index, TypeCheckingAndConversionIT.compatibleIndex,
+						TypeCheckingAndConversionIT.rawFieldCompatibleIndex,
+						TypeCheckingAndConversionIT.missingFieldIndex,
+						TypeCheckingAndConversionIT.incompatibleIndex,
 						ScaleCheckingIT.index, ScaleCheckingIT.compatibleIndex, ScaleCheckingIT.incompatibleIndex
 				)
 				.setup();
@@ -81,16 +85,16 @@ public class TermsPredicateBaseIT {
 		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
 		ScoreIT.dataSets.forEach( d -> d.contribute( ScoreIT.index, scoreIndexer ) );
 
-		final BulkIndexer typeCheckingMainIndexer = TypeCheckingNoConversionIT.index.bulkIndexer();
-		final BulkIndexer typeCheckingCompatibleIndexer = TypeCheckingNoConversionIT.compatibleIndex.bulkIndexer();
-		final BulkIndexer typeCheckingRawFieldCompatibleIndexer = TypeCheckingNoConversionIT.rawFieldCompatibleIndex
+		final BulkIndexer typeCheckingMainIndexer = TypeCheckingAndConversionIT.index.bulkIndexer();
+		final BulkIndexer typeCheckingCompatibleIndexer = TypeCheckingAndConversionIT.compatibleIndex.bulkIndexer();
+		final BulkIndexer typeCheckingRawFieldCompatibleIndexer = TypeCheckingAndConversionIT.rawFieldCompatibleIndex
 				.bulkIndexer();
-		final BulkIndexer typeCheckingMissingFieldIndexer = TypeCheckingNoConversionIT.missingFieldIndex.bulkIndexer();
-		TypeCheckingNoConversionIT.dataSets.forEach(
-				d -> d.contribute( TypeCheckingNoConversionIT.index, typeCheckingMainIndexer,
-						TypeCheckingNoConversionIT.compatibleIndex, typeCheckingCompatibleIndexer,
-						TypeCheckingNoConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer,
-						TypeCheckingNoConversionIT.missingFieldIndex, typeCheckingMissingFieldIndexer
+		final BulkIndexer typeCheckingMissingFieldIndexer = TypeCheckingAndConversionIT.missingFieldIndex.bulkIndexer();
+		TypeCheckingAndConversionIT.dataSets.forEach(
+				d -> d.contribute( TypeCheckingAndConversionIT.index, typeCheckingMainIndexer,
+						TypeCheckingAndConversionIT.compatibleIndex, typeCheckingCompatibleIndexer,
+						TypeCheckingAndConversionIT.rawFieldCompatibleIndex, typeCheckingRawFieldCompatibleIndexer,
+						TypeCheckingAndConversionIT.missingFieldIndex, typeCheckingMissingFieldIndexer
 				) );
 
 		final BulkIndexer scaleCheckingMainIndexer = ScaleCheckingIT.index.bulkIndexer();
@@ -180,7 +184,8 @@ public class TermsPredicateBaseIT {
 			if ( dataSet.values.providesNonMatchingArgs() ) {
 				return f.terms().field( fieldPath ).matchingAny( dataSet.values.nonMatchingArg( 0 ),
 						dataSet.values.matchingArg( matchingDocOrdinal ), dataSet.values.nonMatchingArg( 1 ),
-						dataSet.values.nonMatchingArg( 2 ), dataSet.values.nonMatchingArg( 3 ) );
+						dataSet.values.nonMatchingArg( 2 ), dataSet.values.nonMatchingArg( 3 )
+				);
 			}
 
 			return f.terms().field( fieldPath ).matchingAny( dataSet.values.matchingArg( matchingDocOrdinal ) );
@@ -465,8 +470,8 @@ public class TermsPredicateBaseIT {
 	}
 
 	@RunWith(Parameterized.class)
-	public static class TypeCheckingNoConversionIT<F>
-			extends AbstractPredicateTypeCheckingNoConversionIT<TermsPredicateTestValues<F>> {
+	public static class TypeCheckingAndConversionIT<F>
+			extends AbstractPredicateTypeCheckingAndConversionIT<TermsPredicateTestValues<F>, Object> {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Object[]> parameters = new ArrayList<>();
 
@@ -499,20 +504,41 @@ public class TermsPredicateBaseIT {
 			return parameters;
 		}
 
-		public TypeCheckingNoConversionIT(DataSet<F, TermsPredicateTestValues<F>> dataSet) {
+		public TypeCheckingAndConversionIT(DataSet<F, TermsPredicateTestValues<F>> dataSet) {
 			super( index, compatibleIndex, rawFieldCompatibleIndex, missingFieldIndex, incompatibleIndex, dataSet );
 		}
 
 		@Override
-		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal) {
-			return f.terms().field( fieldPath ).matchingAny( dataSet.values.matchingArg( matchingDocOrdinal ) );
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Object matchingParam) {
+			return f.terms().field( fieldPath ).matchingAny( matchingParam );
+		}
+
+		@Override
+		protected PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, Object matchingParam,
+				ValueConvert valueConvert) {
+			return f.terms().field( fieldPath ).matchingAny( Collections.singletonList( matchingParam ), valueConvert );
 		}
 
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, String field0Path, String field1Path,
-				int matchingDocOrdinal) {
+				Object matchingParam, ValueConvert valueConvert) {
 			return f.terms().field( field0Path ).field( field1Path )
-					.matchingAny( dataSet.values.matchingArg( matchingDocOrdinal ) );
+					.matchingAny( Collections.singletonList( matchingParam ), valueConvert );
+		}
+
+		@Override
+		protected Object invalidTypeParam() {
+			return new InvalidType();
+		}
+
+		@Override
+		protected Object unwrappedMatchingParam(int matchingDocOrdinal) {
+			return dataSet.values.matchingArg( matchingDocOrdinal );
+		}
+
+		@Override
+		protected Object wrappedMatchingParam(int matchingDocOrdinal) {
+			return new ValueWrapper<>( dataSet.values.matchingArg( matchingDocOrdinal ) );
 		}
 
 		@Override

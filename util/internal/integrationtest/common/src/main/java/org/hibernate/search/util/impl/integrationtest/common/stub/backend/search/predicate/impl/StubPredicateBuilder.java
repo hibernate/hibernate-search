@@ -133,12 +133,12 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder,
 	}
 
 	@Override
-	public void matchingAny(Collection<?> terms) {
+	public void matchingAny(Collection<?> terms, ValueConvert convert) {
 		// No-op
 	}
 
 	@Override
-	public void matchingAll(Collection<?> terms) {
+	public void matchingAll(Collection<?> terms, ValueConvert convert) {
 		// No-op
 	}
 
