@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.TermsPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.TermsPredicateOptionsStep;
@@ -52,13 +53,13 @@ class TermsPredicateFieldMoreStepImpl
 	}
 
 	@Override
-	public TermsPredicateOptionsStep<?> matchingAny(Collection<?> terms) {
-		return commonState.matchingAny( terms );
+	public TermsPredicateOptionsStep<?> matchingAny(Collection<?> terms, ValueConvert convert) {
+		return commonState.matchingAny( terms, convert );
 	}
 
 	@Override
-	public TermsPredicateOptionsStep<?> matchingAll(Collection<?> terms) {
-		return commonState.matchingAll( terms );
+	public TermsPredicateOptionsStep<?> matchingAll(Collection<?> terms, ValueConvert convert) {
+		return commonState.matchingAll( terms, convert );
 	}
 
 	@Override
@@ -79,21 +80,25 @@ class TermsPredicateFieldMoreStepImpl
 			super( dslContext );
 		}
 
-		private TermsPredicateOptionsStep<?> matchingAny(Collection<?> terms) {
+		private TermsPredicateOptionsStep<?> matchingAny(Collection<?> terms, ValueConvert convert) {
 			Contracts.assertNotNullNorEmpty( terms, "terms" );
+			Contracts.assertNotNull( convert, "convert" );
+
 			for ( TermsPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				for ( TermsPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
-					predicateBuilder.matchingAny( terms );
+					predicateBuilder.matchingAny( terms, convert );
 				}
 			}
 			return this;
 		}
 
-		private TermsPredicateOptionsStep<?> matchingAll(Collection<?> terms) {
+		private TermsPredicateOptionsStep<?> matchingAll(Collection<?> terms, ValueConvert convert) {
 			Contracts.assertNotNullNorEmpty( terms, "terms" );
+			Contracts.assertNotNull( convert, "convert" );
+
 			for ( TermsPredicateFieldMoreStepImpl fieldSetState : getFieldSetStates() ) {
 				for ( TermsPredicateBuilder predicateBuilder : fieldSetState.predicateBuilders ) {
-					predicateBuilder.matchingAll( terms );
+					predicateBuilder.matchingAll( terms, convert );
 				}
 			}
 			return this;

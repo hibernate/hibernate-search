@@ -56,15 +56,15 @@ public class LuceneNumericTermsPredicate extends AbstractLuceneLeafSingleFieldPr
 		}
 
 		@Override
-		public void matchingAny(Collection<?> terms) {
+		public void matchingAny(Collection<?> terms, ValueConvert convert) {
 			allMatch = false;
-			fillTerms( terms );
+			fillTerms( terms, convert );
 		}
 
 		@Override
-		public void matchingAll(Collection<?> terms) {
+		public void matchingAll(Collection<?> terms, ValueConvert convert) {
 			allMatch = true;
-			fillTerms( terms );
+			fillTerms( terms, convert );
 		}
 
 		@Override
@@ -90,9 +90,9 @@ public class LuceneNumericTermsPredicate extends AbstractLuceneLeafSingleFieldPr
 			return builder.build();
 		}
 
-		private void fillTerms(Collection<?> terms) {
+		private void fillTerms(Collection<?> terms, ValueConvert convert) {
 			if ( terms.size() == 1 ) {
-				this.term = convertAndEncode( codec, terms.iterator().next(), ValueConvert.NO );
+				this.term = convertAndEncode( codec, terms.iterator().next(), convert );
 				this.terms = null;
 				return;
 			}
@@ -100,7 +100,7 @@ public class LuceneNumericTermsPredicate extends AbstractLuceneLeafSingleFieldPr
 			this.term = null;
 			this.terms = new ArrayList<>( terms.size() );
 			for ( Object termItem : terms ) {
-				this.terms.add( convertAndEncode( codec, termItem, ValueConvert.NO ) );
+				this.terms.add( convertAndEncode( codec, termItem, convert ) );
 			}
 		}
 	}

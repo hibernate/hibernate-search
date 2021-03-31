@@ -111,7 +111,7 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 
 	private static class Builder<F> extends AbstractBuilder implements TermsPredicateBuilder {
 
-		private final DslConverter<?, F> dslConverter;
+		private final ElasticsearchSearchValueFieldContext<F> field;
 		private final ElasticsearchFieldCodec<F> codec;
 
 		private JsonElement term;
@@ -121,20 +121,20 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchContext searchContext,
 				ElasticsearchSearchValueFieldContext<F> field) {
 			super( searchContext, field );
-			this.dslConverter = field.type().dslConverter( ValueConvert.NO );
+			this.field = field;
 			this.codec = codec;
 		}
 
 		@Override
-		public void matchingAny(Collection<?> terms) {
+		public void matchingAny(Collection<?> terms, ValueConvert convert) {
 			allMatch = false;
-			fillTerms( terms );
+			fillTerms( terms, convert );
 		}
 
 		@Override
-		public void matchingAll(Collection<?> terms) {
+		public void matchingAll(Collection<?> terms, ValueConvert convert) {
 			allMatch = true;
-			fillTerms( terms );
+			fillTerms( terms, convert );
 		}
 
 		@Override
@@ -142,28 +142,30 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 			return new ElasticsearchTermsPredicate( this );
 		}
 
-		private void fillTerms(Collection<?> terms) {
+		private void fillTerms(Collection<?> terms, ValueConvert convert) {
+			DslConverter<?, F> dslConverter = field.type().dslConverter( convert );
+
 			if ( terms.size() == 1 ) {
-				this.term = encode( terms.iterator().next() );
+				this.term = encode( terms.iterator().next(), dslConverter );
 				this.terms = null;
 				return;
 			}
 
 			this.term = null;
-			this.terms = encode( terms );
+			this.terms = encode( terms, dslConverter );
 		}
 
-		private JsonElement[] encode(Collection<?> terms) {
+		private JsonElement[] encode(Collection<?> terms, DslConverter<?, F> dslConverter) {
 			JsonElement[] result = new JsonElement[terms.size()];
 			int i = 0;
 			for ( Object term : terms ) {
-				result[i++] = encode( term );
+				result[i++] = encode( term, dslConverter );
 			}
 
 			return result;
 		}
 
-		private JsonElement encode(Object term) {
+		private JsonElement encode(Object term, DslConverter<?, F> dslConverter) {
 			try {
 				F converted = dslConverter.convertUnknown( term, searchContext.toDocumentFieldValueConvertContext() );
 				return codec.encode( converted );
