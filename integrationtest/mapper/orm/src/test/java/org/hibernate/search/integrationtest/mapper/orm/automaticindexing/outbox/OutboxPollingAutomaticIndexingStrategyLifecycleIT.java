@@ -70,8 +70,6 @@ public class OutboxPollingAutomaticIndexingStrategyLifecycleIT {
 		// stop Search on partial progressing
 		sessionFactory.close();
 
-		backendMock.resetExpectations(); // we don't need to check (and wait) the other expectations
-
 		sessionFactory = startSearchWithoutOutboxPolling();
 		List<OutboxEvent> outboxEntries;
 		try ( Session session = sessionFactory.openSession() ) {
@@ -83,10 +81,6 @@ public class OutboxPollingAutomaticIndexingStrategyLifecycleIT {
 		sessionFactory.close();
 
 		// process the entities restarting Search:
-		BackendMock.DocumentWorkCallListContext context = backendMock.expectWorks( IndexedEntity.NAME );
-		for ( OutboxEvent event : outboxEntries ) {
-			context.add( event.getEntityId(), b -> b.field( "indexedField", "value for the field" ) );
-		}
 		startSearchWithOutboxPolling();
 
 		backendMock.verifyExpectationsMet();
@@ -144,7 +138,6 @@ public class OutboxPollingAutomaticIndexingStrategyLifecycleIT {
 				.withProperty( "hibernate.search.automatic_indexing.process_outbox_table", "false" )
 				.withProperty( "hibernate.hbm2ddl.auto", "update" )
 				.setup( IndexedEntity.class );
-		backendMock.verifyExpectationsMet();
 		return sessionFactory;
 	}
 
