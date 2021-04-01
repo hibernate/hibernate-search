@@ -21,7 +21,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
-public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> extends AbstractHibernateOrmLoadingStrategy<E>
+public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> extends AbstractHibernateOrmLoadingStrategy<E, I>
 		implements HibernateOrmEntityLoadingStrategy<E> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

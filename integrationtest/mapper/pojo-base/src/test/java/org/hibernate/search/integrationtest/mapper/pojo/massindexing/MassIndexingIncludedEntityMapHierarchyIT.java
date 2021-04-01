@@ -274,12 +274,14 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 	public static class ExceptingMapIndexingStrategy<E> implements MassIndexingEntityLoadingStrategy<E, JavaBeanIndexingOptions> {
 
 		@Override
-		public EntityIdentifierScroll createIdentifierScroll(MassIndexingThreadContext<JavaBeanIndexingOptions> context, MassIndexingEntityLoadingTypeGroup<E> loadingTypeGroup) throws InterruptedException {
+		public EntityIdentifierScroll createIdentifierScroll(MassIndexingThreadContext<JavaBeanIndexingOptions> context,
+				MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) {
 			throw new SimulatedFailure( loadingTypeGroup.includedEntityMap().keySet().stream().collect( Collectors.joining( "," ) ) );
 		}
 
 		@Override
-		public EntityLoader<E> createLoader(MassIndexingThreadContext<JavaBeanIndexingOptions> context, MassIndexingEntityLoadingTypeGroup<E> loadingTypeGroup) throws InterruptedException {
+		public EntityLoader<E> createLoader(MassIndexingThreadContext<JavaBeanIndexingOptions> context,
+				MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) {
 			return identifiers -> null;
 		}
 

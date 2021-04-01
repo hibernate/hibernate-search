@@ -23,7 +23,7 @@ public interface MassIndexingContext<O> {
 	 * @return A index loader.
 	 * @see MassIndexingContext
 	 */
-	<T> MassIndexingEntityLoadingStrategy<T, O> createIndexLoadingStrategy(PojoRawTypeIdentifier<? extends T> expectedType);
+	<T> MassIndexingEntityLoadingStrategy<? super T, O> indexLoadingStrategy(PojoRawTypeIdentifier<T> expectedType);
 
 	/**
 	 * @return A list {@link LoadingInterceptor} of entityIdentifier interceptors.

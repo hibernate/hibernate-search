@@ -35,7 +35,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.mapper.pojo.loading.EntityLoadingTypeGroupStrategy;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingTypeGroup;
 
-public abstract class AbstractHibernateOrmLoadingStrategy<E> implements
+abstract class AbstractHibernateOrmLoadingStrategy<E, I> implements
 		MassIndexingEntityLoadingStrategy<E, HibernateOrmMassIndexingOptions> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -45,12 +45,12 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E> implements
 	private final HibernateOrmSessionTypeContextProvider typeContextProvider;
 	private final SessionFactoryImplementor sessionFactory;
 	private final EntityPersister rootEntityPersister;
-	private final TypeQueryFactory<E, ?> queryFactory;
+	private final TypeQueryFactory<E, I> queryFactory;
 
 	AbstractHibernateOrmLoadingStrategy(
 			HibernateOrmSessionTypeContextProvider typeContextContainer,
 			SessionFactoryImplementor sessionFactory,
-			EntityPersister rootEntityPersister, TypeQueryFactory<E, ?> queryFactory) {
+			EntityPersister rootEntityPersister, TypeQueryFactory<E, I> queryFactory) {
 		this.sessionFactory = sessionFactory;
 		this.rootEntityPersister = rootEntityPersister;
 		this.queryFactory = queryFactory;
@@ -77,8 +77,7 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E> implements
 		};
 	}
 
-	protected HibernateOrmQueryLoader<E, ?> createQueryLoader(
-			Map<String, Class<? extends E>> targetEntityTypes) {
+	protected HibernateOrmQueryLoader<E, ?> createQueryLoader(Map<String, ? extends Class<? extends E>> targetEntityTypes) {
 		Set<Class<? extends E>> includedTypesFilter;
 		if ( HibernateOrmUtils.targetsAllConcreteSubTypes( sessionFactory, rootEntityPersister,
 				targetEntityTypes.values() ) ) {
@@ -94,19 +93,19 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E> implements
 
 	@Override
 	public EntityIdentifierScroll createIdentifierScroll(MassIndexingThreadContext<HibernateOrmMassIndexingOptions> context,
-			MassIndexingEntityLoadingTypeGroup<E> loadingTypeGroup) {
+			MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) {
 		HibernateOrmQueryLoader<E, ?> typeQueryLoader = createQueryLoader( loadingTypeGroup.includedEntityMap() );
 		return new HibernateOrmEntityIdentifierScroll<>( typeQueryLoader, context, loadingTypeGroup );
 	}
 
 	@Override
 	public EntityLoader<E> createLoader(MassIndexingThreadContext<HibernateOrmMassIndexingOptions> context,
-			MassIndexingEntityLoadingTypeGroup<E> loadingTypeGroup) {
+			MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) {
 		HibernateOrmQueryLoader<E, ?> typeQueryLoader = createQueryLoader( loadingTypeGroup.includedEntityMap() );
 		return new HibernateOrmEntityLoader<>( typeQueryLoader, context );
 	}
 
-	private static class HibernateOrmEntityIdentifierScroll<E> implements EntityIdentifierScroll {
+	private static class HibernateOrmEntityIdentifierScroll<E, I> implements EntityIdentifierScroll {
 		private final MassIndexingEntityLoadingTypeGroup<E> loadingTypeGroup;
 		private final MassIndexingThreadContext<HibernateOrmMassIndexingOptions> context;
 		private Long totalCount;
@@ -148,13 +147,13 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E> implements
 		}
 
 		@Override
-		public List<?> next() {
-			ArrayList<Object> destinationList = new ArrayList<>( batchSize );
+		public List<I> next() {
+			ArrayList<I> destinationList = new ArrayList<>( batchSize );
 			long counter = 0;
 			SharedSessionContractImplementor sharedSession = context.context( SharedSessionContractImplementor.class );
 			while ( results.next() ) {
 				@SuppressWarnings("unchecked")
-				Object id = results.get( 0 );
+				I id = (I) results.get( 0 );
 				destinationList.add( id );
 				if ( destinationList.size() == batchSize ) {
 					// Explicitly checking whether the TX is still open; Depending on the driver implementation new ids
@@ -183,11 +182,11 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E> implements
 	}
 
 	private static class HibernateOrmEntityLoader<E> implements EntityLoader<E> {
-		private final HibernateOrmQueryLoader<? super E, ?> typeQueryLoader;
+		private final HibernateOrmQueryLoader<E, ?> typeQueryLoader;
 		private final MassIndexingThreadContext<HibernateOrmMassIndexingOptions> context;
 		private final CacheMode cacheMode;
 
-		public HibernateOrmEntityLoader(HibernateOrmQueryLoader<? super E, ?> typeGroupLoader,
+		public HibernateOrmEntityLoader(HibernateOrmQueryLoader<E, ?> typeGroupLoader,
 				MassIndexingThreadContext<HibernateOrmMassIndexingOptions> context) {
 			this.typeQueryLoader = typeGroupLoader;
 			this.context = context;
@@ -196,9 +195,9 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E> implements
 		}
 
 		@Override
-		public List load(List identifiers) {
+		public List<E> load(List identifiers) {
 			SessionImplementor session = context.context( SessionImplementor.class );
-			Query<? super E> query = typeQueryLoader.createLoadingQuery( session, ID_PARAMETER_NAME )
+			Query<E> query = typeQueryLoader.createLoadingQuery( session, ID_PARAMETER_NAME )
 					.setParameter( ID_PARAMETER_NAME, identifiers )
 					.setCacheMode( cacheMode )
 					.setLockMode( LockModeType.NONE )

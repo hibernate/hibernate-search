@@ -27,7 +27,7 @@ public interface MassIndexingEntityLoadingStrategy<E, O> {
 	 * @throws java.lang.InterruptedException except where loading interrupted
 	 */
 	EntityIdentifierScroll createIdentifierScroll(MassIndexingThreadContext<O> context,
-			MassIndexingEntityLoadingTypeGroup<E> loadingTypeGroup) throws InterruptedException;
+			MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) throws InterruptedException;
 
 	/**
 	 * Loads the entities corresponding to the given identifiers.
@@ -38,7 +38,7 @@ public interface MassIndexingEntityLoadingStrategy<E, O> {
 	 * @throws java.lang.InterruptedException except where loading interrupted
 	 */
 	EntityLoader<E> createLoader(MassIndexingThreadContext<O> context,
-			MassIndexingEntityLoadingTypeGroup<E> loadingTypeGroup) throws InterruptedException;
+			MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) throws InterruptedException;
 
 	/**
 	 * @return A comparator function for grouping type, default is istance of.
