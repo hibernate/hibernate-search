@@ -6,11 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.runtime.spi;
 
-import java.util.function.Supplier;
-
-public interface IdentifierMapping<E> {
+public interface IdentifierMapping {
 
 	Object fromDocumentIdentifier(String documentId, BridgeSessionContext sessionContext);
 
-	Object identifier(Object providedId, Supplier<? extends E> entitySupplier);
 }

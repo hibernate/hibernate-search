@@ -26,19 +26,6 @@ public interface MassIndexingContext<O> {
 	<T> MassIndexingEntityLoadingStrategy<T, O> createIndexLoadingStrategy(PojoRawTypeIdentifier<? extends T> expectedType);
 
 	/**
-	 * @param entityType The type of loaded object.
-	 * @return A entity name of entity type.
-	 */
-	String entityName(PojoRawTypeIdentifier<?> entityType);
-
-	/**
-	 * @param sessionContext the session context
-	 * @param entity the loaded entity
-	 * @return A entity name of entity type.
-	 */
-	Object entityIdentifier(MassIndexingSessionContext sessionContext, Object entity);
-
-	/**
 	 * @return A list {@link LoadingInterceptor} of entityIdentifier interceptors.
 	 */
 	List<? extends LoadingInterceptor<? super O>> identifierInterceptors();

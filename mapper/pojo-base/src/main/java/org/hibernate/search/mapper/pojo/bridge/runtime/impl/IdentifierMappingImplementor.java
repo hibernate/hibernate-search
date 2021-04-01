@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.spi.IdentifierMapping;
  * @param <I> The identifier type for the mapped entity type.
  * @param <E> The entity type mapped to an index.
  */
-public interface IdentifierMappingImplementor<I, E> extends IdentifierMapping<E>, AutoCloseable {
+public interface IdentifierMappingImplementor<I, E> extends IdentifierMapping, AutoCloseable {
 
 	@Override
 	default void close() {
@@ -25,8 +25,7 @@ public interface IdentifierMappingImplementor<I, E> extends IdentifierMapping<E>
 	@Override
 	I fromDocumentIdentifier(String documentId, BridgeSessionContext sessionContext);
 
-	@Override
-	I identifier(Object providedId, Supplier<? extends E> entitySupplier);
+	I getIdentifier(Object providedId, Supplier<? extends E> entitySupplier);
 
 	String toDocumentIdentifier(I identifier, BridgeMappingContext context);
 

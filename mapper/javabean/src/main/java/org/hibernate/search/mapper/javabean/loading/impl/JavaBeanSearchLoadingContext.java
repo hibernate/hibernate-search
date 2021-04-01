@@ -24,7 +24,6 @@ import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingContext;
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingSessionContext;
 import org.hibernate.search.mapper.javabean.massindexing.loader.JavaBeanIndexingOptions;
 import org.hibernate.search.mapper.pojo.loading.LoadingInterceptor;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingStrategy;
@@ -37,10 +36,8 @@ public final class JavaBeanSearchLoadingContext implements PojoLoadingContext, M
 	private final Map<PojoRawTypeIdentifier<?>, MassIndexingEntityLoadingStrategy<?, ?>> indexeStrategyByType;
 	private final List<LoadingInterceptor<?>> identifierInterceptors;
 	private final List<LoadingInterceptor<?>> documentInterceptors;
-	private final LoadingTypeContextProvider typeContextProvider;
 
 	private JavaBeanSearchLoadingContext(Builder builder) {
-		this.typeContextProvider = builder.typeContextProvider;
 		this.loaderByType = builder.loaderByType == null ? Collections.emptyMap() : builder.loaderByType;
 		this.indexeStrategyByType = builder.indexeStrategyByType == null ? Collections.emptyMap() : builder.indexeStrategyByType;
 		this.identifierInterceptors = builder.identifierInterceptors;
@@ -75,19 +72,6 @@ public final class JavaBeanSearchLoadingContext implements PojoLoadingContext, M
 			throw log.entityLoaderNotRegistered( type );
 		}
 		return loader;
-	}
-
-	@Override
-	public String entityName(PojoRawTypeIdentifier<?> entityType) {
-		LoadingTypeContext<?> typeContext = typeContextProvider.indexedForExactType( entityType );
-		return typeContext.entityName();
-	}
-
-	@Override
-	public Object entityIdentifier(MassIndexingSessionContext sessionContext, Object entity) {
-		PojoRawTypeIdentifier<?> targetType = sessionContext.runtimeIntrospector().detectEntityType( entity );
-		LoadingTypeContext typeContext = typeContextProvider.indexedForExactType( targetType );
-		return typeContext.identifierMapping().identifier( null, () -> entity );
 	}
 
 	@Override

@@ -6,11 +6,8 @@
  */
 package org.hibernate.search.mapper.javabean.loading.impl;
 
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-
 public interface LoadingTypeContextProvider {
 
 	<E> LoadingTypeContext<E> indexedForExactClass(Class<E> typeIdentifier);
 
-	<E> LoadingTypeContext<E> indexedForExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 }

@@ -9,10 +9,15 @@ package org.hibernate.search.mapper.pojo.scope.impl;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.mapper.pojo.massindexing.impl.MassIndexingTypeContextProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkIndexedTypeContextProvider;
 
-public interface PojoScopeIndexedTypeContextProvider extends PojoWorkIndexedTypeContextProvider {
+public interface PojoScopeIndexedTypeContextProvider
+		extends PojoWorkIndexedTypeContextProvider, MassIndexingTypeContextProvider {
+
+	@Override
+	<E> Optional<? extends PojoScopeIndexedTypeContext<?, E>> forExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 
 	<E> Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>>> allForSuperType(
 			PojoRawTypeIdentifier<E> typeIdentifier);

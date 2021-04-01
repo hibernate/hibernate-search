@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.orm.loading.impl;
 
 import org.hibernate.persister.entity.EntityPersister;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface LoadingIndexedTypeContext<E> {
 
@@ -15,8 +14,6 @@ public interface LoadingIndexedTypeContext<E> {
 	 * @return The name of the entity in the JPA metamodel.
 	 */
 	String jpaEntityName();
-
-	PojoRawTypeIdentifier<E> typeIdentifier();
 
 	/**
 	 * @return The entity persister, giving access to a representation of the entity type in the Hibernate ORM metamodel.

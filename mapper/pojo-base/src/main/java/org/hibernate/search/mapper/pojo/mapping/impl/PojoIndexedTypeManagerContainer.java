@@ -47,7 +47,7 @@ public class PojoIndexedTypeManagerContainer
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <E> Optional<? extends PojoWorkIndexedTypeContext<?, E>> forExactType(
+	public <E> Optional<? extends PojoIndexedTypeManager<?, E>> forExactType(
 			PojoRawTypeIdentifier<E> typeIdentifier) {
 		return Optional.ofNullable( (PojoIndexedTypeManager<?, E>) byExactType.get( typeIdentifier ) );
 	}

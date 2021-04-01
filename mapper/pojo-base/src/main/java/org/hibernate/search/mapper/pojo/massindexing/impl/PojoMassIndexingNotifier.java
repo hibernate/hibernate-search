@@ -123,7 +123,7 @@ public class PojoMassIndexingNotifier {
 	private Object extractReferenceOrSuppress(PojoMassIndexingIndexedTypeGroup<?> typeGroup,
 			MassIndexingSessionContext sessionContext, Object entity, Throwable throwable) {
 		try {
-			return typeGroup.extractReferenceOrSuppress( sessionContext, entity, throwable );
+			return typeGroup.extractReference( sessionContext, entity );
 		}
 		catch (RuntimeException e) {
 			// We failed to extract a reference.

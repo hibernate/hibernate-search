@@ -21,6 +21,7 @@ import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.DocumentRouter;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierMappingImplementor;
+import org.hibernate.search.mapper.pojo.massindexing.impl.MassIndexingIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -37,7 +38,7 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  * @param <E> The entity type mapped to the index.
  */
 public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<E>
-		implements PojoWorkIndexedTypeContext<I, E>, PojoScopeIndexedTypeContext<I, E> {
+		implements PojoWorkIndexedTypeContext<I, E>, PojoScopeIndexedTypeContext<I, E>, MassIndexingIndexedTypeContext<E> {
 	private final IdentifierMappingImplementor<I, E> identifierMapping;
 	private final DocumentRouter<? super E> documentRouter;
 	private final PojoIndexingProcessor<E> processor;
