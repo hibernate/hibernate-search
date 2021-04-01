@@ -14,7 +14,9 @@ public interface MassIndexingSessionContext extends PojoWorkSessionContext {
 
 	PojoIndexer createIndexer();
 
+	@Override
 	PojoRuntimeIntrospector runtimeIntrospector();
 
+	@Override
 	String tenantIdentifier();
 }

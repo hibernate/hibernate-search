@@ -59,7 +59,7 @@ public class PojoMassIndexingNotifier {
 		monitor.documentsAdded( size );
 	}
 
-	void notifyEntityIndexingFailure(PojoMassIndexingIndexedTypeGroup<?> typeGroup,
+	void notifyEntityIndexingFailure(PojoMassIndexingIndexedTypeGroup<?, ?> typeGroup,
 			MassIndexingSessionContext sessionContext, Object entity, Exception exception) {
 		RecordedEntityIndexingFailure recordedFailure = new RecordedEntityIndexingFailure( exception );
 		entityIndexingFirstFailure.compareAndSet( null, recordedFailure );
@@ -120,7 +120,7 @@ public class PojoMassIndexingNotifier {
 		);
 	}
 
-	private Object extractReferenceOrSuppress(PojoMassIndexingIndexedTypeGroup<?> typeGroup,
+	private Object extractReferenceOrSuppress(PojoMassIndexingIndexedTypeGroup<?, ?> typeGroup,
 			MassIndexingSessionContext sessionContext, Object entity, Throwable throwable) {
 		try {
 			return typeGroup.extractReference( sessionContext, entity );
