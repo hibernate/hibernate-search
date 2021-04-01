@@ -29,7 +29,7 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.impl.PojoDefaultMassIndexer;
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.schema.management.impl.PojoScopeSchemaManagerImpl;
@@ -153,7 +153,7 @@ public final class PojoScopeDelegateImpl<R, E, C> implements PojoScopeDelegate<R
 	}
 
 	@Override
-	public <O> PojoMassIndexer<O> massIndexer(MassIndexingContext<O> context,
+	public <O> PojoMassIndexer<O> massIndexer(PojoMassIndexingContext<O> context,
 			DetachedBackendSessionContext detachedSession) {
 		return new PojoDefaultMassIndexer<>( context, mappingContext, indexedTypeContextProvider, targetedTypeContexts,
 				schemaManager(), workspace( detachedSession ) );

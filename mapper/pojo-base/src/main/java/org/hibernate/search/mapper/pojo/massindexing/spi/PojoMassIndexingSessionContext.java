@@ -10,7 +10,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
-public interface MassIndexingSessionContext extends PojoWorkSessionContext {
+public interface PojoMassIndexingSessionContext extends PojoWorkSessionContext {
 
 	PojoIndexer createIndexer();
 

@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.javabean.massindexing.impl;
 import org.hibernate.search.mapper.javabean.massindexing.loader.JavaBeanIndexingOptions;
 import org.hibernate.search.mapper.pojo.intercepting.LoadingInvocationContext;
 import org.hibernate.search.mapper.pojo.loading.LoadingInterceptor;
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingSessionContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSessionContext;
 
 public class JavaBeanSessionContextInterceptor implements LoadingInterceptor<JavaBeanIndexingOptions> {
 
@@ -25,8 +25,8 @@ public class JavaBeanSessionContextInterceptor implements LoadingInterceptor<Jav
 
 	@Override
 	public void intercept(LoadingInvocationContext<? extends JavaBeanIndexingOptions> ictx) throws Exception {
-		MassIndexingSessionContext sessionContext = mappingContext.sessionContext();
-		ictx.context( MassIndexingSessionContext.class, sessionContext );
+		PojoMassIndexingSessionContext sessionContext = mappingContext.sessionContext();
+		ictx.context( PojoMassIndexingSessionContext.class, sessionContext );
 		ictx.proceed();
 	}
 }

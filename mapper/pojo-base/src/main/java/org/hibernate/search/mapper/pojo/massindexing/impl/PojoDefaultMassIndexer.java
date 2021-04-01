@@ -12,8 +12,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingContext;
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingMappingContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
@@ -30,8 +30,8 @@ import org.hibernate.search.util.common.impl.Futures;
  */
 public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
 
-	private final MassIndexingContext<O> massIndexingConfigurationContext;
-	private final MassIndexingMappingContext mappingContext;
+	private final PojoMassIndexingContext<O> massIndexingConfigurationContext;
+	private final PojoMassIndexingMappingContext mappingContext;
 
 	private final PojoScopeSchemaManager scopeSchemaManager;
 	private final PojoScopeWorkspace scopeWorkspace;
@@ -48,10 +48,10 @@ public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
 	private MassIndexingMonitor monitor;
 	private final List<PojoMassIndexingIndexedTypeGroup<?, O>> typeGroupsToIndex;
 
-	public PojoDefaultMassIndexer(MassIndexingContext<O> indexingContext,
-			MassIndexingMappingContext mappingContext,
-			MassIndexingTypeContextProvider typeContextProvider,
-			Set<? extends MassIndexingIndexedTypeContext<?>> targetedIndexedTypes,
+	public PojoDefaultMassIndexer(PojoMassIndexingContext<O> indexingContext,
+			PojoMassIndexingMappingContext mappingContext,
+			PojoMassIndexingTypeContextProvider typeContextProvider,
+			Set<? extends PojoMassIndexingIndexedTypeContext<?>> targetedIndexedTypes,
 			PojoScopeSchemaManager scopeSchemaManager,
 			PojoScopeWorkspace scopeWorkspace) {
 		this.massIndexingConfigurationContext = indexingContext;

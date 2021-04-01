@@ -19,8 +19,8 @@ import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaMan
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingContext;
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingMappingContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
 
 /**
  * Makes sure that several different BatchIndexingWorkspace(s)
@@ -39,8 +39,8 @@ public class PojoMassIndexingBatchCoordinator<O> extends PojoMassIndexingFailure
 	private final PojoScopeWorkspace scopeWorkspace;
 
 	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
-	private final MassIndexingContext<O> indexingContext;
-	private final MassIndexingMappingContext mappingContext;
+	private final PojoMassIndexingContext<O> indexingContext;
+	private final PojoMassIndexingMappingContext mappingContext;
 	private final int typesToIndexInParallel;
 	private final int documentBuilderThreads;
 	private final boolean mergeSegmentsOnFinish;
@@ -49,8 +49,8 @@ public class PojoMassIndexingBatchCoordinator<O> extends PojoMassIndexingFailure
 	private final boolean mergeSegmentsAfterPurge;
 
 	public PojoMassIndexingBatchCoordinator(O indexingOptions,
-			MassIndexingContext<O> indexingContext,
-			MassIndexingMappingContext mappingContext,
+			PojoMassIndexingContext<O> indexingContext,
+			PojoMassIndexingMappingContext mappingContext,
 			PojoMassIndexingNotifier notifier,
 			List<PojoMassIndexingIndexedTypeGroup<?, O>> typeGroupsToIndex,
 			PojoScopeSchemaManager scopeSchemaManager, PojoScopeWorkspace scopeWorkspace,

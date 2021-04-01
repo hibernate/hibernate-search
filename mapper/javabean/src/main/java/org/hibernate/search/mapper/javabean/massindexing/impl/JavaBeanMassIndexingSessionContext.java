@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.javabean.massindexing.impl;
 
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingSessionContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSessionContext;
 
-public interface JavaBeanMassIndexingSessionContext extends MassIndexingSessionContext {
+public interface JavaBeanMassIndexingSessionContext extends PojoMassIndexingSessionContext {
 
 }

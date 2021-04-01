@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContextBuilder;
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
@@ -51,6 +51,6 @@ public interface PojoScopeDelegate<R, E, C> {
 
 	PojoScopeSchemaManager schemaManager();
 
-	<O> PojoMassIndexer<O> massIndexer(MassIndexingContext<O> context,
+	<O> PojoMassIndexer<O> massIndexer(PojoMassIndexingContext<O> context,
 			DetachedBackendSessionContext detachedSession);
 }

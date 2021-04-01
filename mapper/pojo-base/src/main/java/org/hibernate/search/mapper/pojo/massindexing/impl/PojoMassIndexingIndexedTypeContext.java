@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 /**
  * @param <E> The entity type mapped to the index.
  */
-public interface MassIndexingIndexedTypeContext<E> {
+public interface PojoMassIndexingIndexedTypeContext<E> {
 
 	PojoRawTypeIdentifier<E> typeIdentifier();
 

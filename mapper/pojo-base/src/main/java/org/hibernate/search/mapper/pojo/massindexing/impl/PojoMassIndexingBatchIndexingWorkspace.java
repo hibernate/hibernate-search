@@ -17,8 +17,8 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingMappingContext;
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 
 /**
  * This runnable will prepare a pipeline for batch indexing
@@ -38,14 +38,14 @@ public class PojoMassIndexingBatchIndexingWorkspace<O> extends PojoMassIndexingF
 
 	private final List<CompletableFuture<?>> identifierProducingFutures = new ArrayList<>();
 	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
-	private final MassIndexingContext<O> indexingContext;
-	private final MassIndexingMappingContext mappingContext;
+	private final PojoMassIndexingContext<O> indexingContext;
+	private final PojoMassIndexingMappingContext mappingContext;
 	private final PojoMassIndexingTypeProcessor<?, O> typeProcessor;
 	private final PojoMassIndexingIndexedTypeGroup<?, O> typeGroup;
 
 	PojoMassIndexingBatchIndexingWorkspace(O indexingOptions,
-			MassIndexingContext<O> indexingContext,
-			MassIndexingMappingContext mappingContext,
+			PojoMassIndexingContext<O> indexingContext,
+			PojoMassIndexingMappingContext mappingContext,
 			PojoMassIndexingNotifier notifier,
 			PojoMassIndexingIndexedTypeGroup<?, O> typeGroup,
 			int documentBuilderThreads) {

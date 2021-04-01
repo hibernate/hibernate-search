@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
 import org.hibernate.search.mapper.pojo.loading.LoadingInterceptor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingSessionContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSessionContext;
 import org.hibernate.search.mapper.pojo.intercepting.LoadingInvocationContext;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassIndexingOptions;
 
@@ -67,7 +67,7 @@ public class HibernateOrmMassIndexingDocumentProducerInterceptor implements Load
 			upperSession.setDefaultReadOnly( true );
 
 			HibernateOrmScopeSessionContext sessionContext = mappingContext.sessionContext( upperSession );
-			ictx.context( MassIndexingSessionContext.class, sessionContext );
+			ictx.context( PojoMassIndexingSessionContext.class, sessionContext );
 
 			ictx.proceed( next -> {
 				SessionImplementor session = sessionContext.session();

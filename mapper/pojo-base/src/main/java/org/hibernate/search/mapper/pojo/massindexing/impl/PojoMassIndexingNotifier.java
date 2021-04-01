@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingSessionContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSessionContext;
 
 public class PojoMassIndexingNotifier {
 
@@ -60,7 +60,7 @@ public class PojoMassIndexingNotifier {
 	}
 
 	void notifyEntityIndexingFailure(PojoMassIndexingIndexedTypeGroup<?, ?> typeGroup,
-			MassIndexingSessionContext sessionContext, Object entity, Exception exception) {
+			PojoMassIndexingSessionContext sessionContext, Object entity, Exception exception) {
 		RecordedEntityIndexingFailure recordedFailure = new RecordedEntityIndexingFailure( exception );
 		entityIndexingFirstFailure.compareAndSet( null, recordedFailure );
 		entityIndexingFailureCount.increment();
@@ -121,7 +121,7 @@ public class PojoMassIndexingNotifier {
 	}
 
 	private Object extractReferenceOrSuppress(PojoMassIndexingIndexedTypeGroup<?, ?> typeGroup,
-			MassIndexingSessionContext sessionContext, Object entity, Throwable throwable) {
+			PojoMassIndexingSessionContext sessionContext, Object entity, Throwable throwable) {
 		try {
 			return typeGroup.extractReference( sessionContext, entity );
 		}
