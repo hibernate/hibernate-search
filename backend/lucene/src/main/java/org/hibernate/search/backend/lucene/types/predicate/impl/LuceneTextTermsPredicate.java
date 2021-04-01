@@ -57,6 +57,9 @@ public class LuceneTextTermsPredicate extends AbstractLuceneLeafSingleFieldPredi
 		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchContext searchContext,
 				LuceneSearchValueFieldContext<F> field) {
 			super( searchContext, field );
+			// Score is always constant for this query
+			constantScore();
+
 			this.codec = codec;
 		}
 

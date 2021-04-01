@@ -52,6 +52,9 @@ public class LuceneNumericTermsPredicate extends AbstractLuceneLeafSingleFieldPr
 		private Builder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchContext searchContext,
 				LuceneSearchValueFieldContext<F> field) {
 			super( searchContext, field );
+			// Score is always constant for this query
+			constantScore();
+
 			this.codec = codec;
 		}
 
