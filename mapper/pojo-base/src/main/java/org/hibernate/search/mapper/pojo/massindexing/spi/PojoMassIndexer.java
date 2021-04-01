@@ -11,8 +11,6 @@ import java.util.concurrent.CompletionStage;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
 
-import org.hibernate.search.util.common.annotation.Incubating;
-
 /**
  * A MassIndexer is useful to rebuild the indexes from the
  * data contained in the database.
@@ -20,9 +18,9 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * indexedEmbedded properties are scrolled from database.
  *
  * @author Sanne Grinovero
- * @param <N> the {@link PojoMassIndexer}
+ * @param <O> The options type.
  */
-public interface PojoMassIndexer<N extends PojoMassIndexer<N>> {
+public interface PojoMassIndexer<O> {
 
 	/**
 	 * Sets the number of entity types to be indexed in parallel.
@@ -32,7 +30,7 @@ public interface PojoMassIndexer<N extends PojoMassIndexer<N>> {
 	 * @param threadsToIndexObjects  number of entity types to be indexed in parallel
 	 * @return {@code this} for method chaining
 	 */
-	N typesToIndexInParallel(int threadsToIndexObjects);
+	PojoMassIndexer<O> typesToIndexInParallel(int threadsToIndexObjects);
 
 	/**
 	 * Sets the number of threads to be used to load
@@ -40,14 +38,7 @@ public interface PojoMassIndexer<N extends PojoMassIndexer<N>> {
 	 * @param numberOfThreads the number of threads
 	 * @return {@code this} for method chaining
 	 */
-	N threadsToLoadObjects(int numberOfThreads);
-
-	/**
-	 * Sets the batch size used to load the root entities.
-	 * @param batchSize the batch size
-	 * @return {@code this} for method chaining
-	 */
-	N batchSizeToLoadObjects(int batchSize);
+	PojoMassIndexer<O> threadsToLoadObjects(int numberOfThreads);
 
 	/**
 	 * Merges each index into a single segment after indexing.
@@ -56,7 +47,7 @@ public interface PojoMassIndexer<N extends PojoMassIndexer<N>> {
 	 * @param enable {@code true} to enable this operation, {@code false} to disable it.
 	 * @return {@code this} for method chaining
 	 */
-	N mergeSegmentsOnFinish(boolean enable);
+	PojoMassIndexer<O> mergeSegmentsOnFinish(boolean enable);
 
 	/**
 	 * Merges each index into a single segment after the initial index purge, just before indexing.
@@ -67,7 +58,7 @@ public interface PojoMassIndexer<N extends PojoMassIndexer<N>> {
 	 * @param enable {@code true} to enable this operation, {@code false} to disable it.
 	 * @return {@code this} for method chaining
 	 */
-	N mergeSegmentsAfterPurge(boolean enable);
+	PojoMassIndexer<O> mergeSegmentsAfterPurge(boolean enable);
 
 	/**
 	 * Drops the indexes and their schema (if they exist) and re-creates them before indexing.
@@ -86,7 +77,7 @@ public interface PojoMassIndexer<N extends PojoMassIndexer<N>> {
 	 * @param dropAndCreateSchema if {@code true} the indexes and their schema will be dropped then re-created before starting the indexing
 	 * @return {@code this} for method chaining
 	 */
-	N dropAndCreateSchemaOnStart(boolean dropAndCreateSchema);
+	PojoMassIndexer<O> dropAndCreateSchemaOnStart(boolean dropAndCreateSchema);
 
 	/**
 	 * Removes all entities from the indexes before indexing.
@@ -98,18 +89,7 @@ public interface PojoMassIndexer<N extends PojoMassIndexer<N>> {
 	 * @param purgeAll if {@code true} all entities will be removed from the indexes before starting the indexing
 	 * @return {@code this} for method chaining
 	 */
-	N purgeAllOnStart(boolean purgeAll);
-
-	/**
-	 * Stops indexing after having indexed a set amount of objects.
-	 * <p>
-	 * As a results the indexes will not be consistent
-	 * with the database: use only for testing on an (undefined) subset of database data.
-	 * @param maximum the maximum number of objects to index
-	 * @return {@code this} for method chaining
-	 */
-	@Incubating
-	N limitIndexedObjectsTo(long maximum);
+	PojoMassIndexer<O> purgeAllOnStart(boolean purgeAll);
 
 	/**
 	 * Starts the indexing process in background (asynchronous).
@@ -131,18 +111,6 @@ public interface PojoMassIndexer<N extends PojoMassIndexer<N>> {
 	void startAndWait() throws InterruptedException;
 
 	/**
-	 * Specifies the fetch size to be used when loading primary keys
-	 * if objects to be indexed.
-	 * <p>
-	 * Some databases accept special values,
-	 * for example MySQL might benefit from using {@link Integer#MIN_VALUE}
-	 * otherwise it will attempt to preload everything in memory.
-	 * @param idFetchSize the fetch size to be used when loading primary keys
-	 * @return {@code this} for method chaining
-	 */
-	N idFetchSize(int idFetchSize);
-
-	/**
 	 * Sets the {@link MassIndexingMonitor}.
 	 * <p>
 	 * The default monitor just logs the progress.
@@ -150,7 +118,7 @@ public interface PojoMassIndexer<N extends PojoMassIndexer<N>> {
 	 * @param monitor The monitor that will track mass indexing progress.
 	 * @return {@code this} for method chaining
 	 */
-	N monitor(MassIndexingMonitor monitor);
+	PojoMassIndexer<O> monitor(MassIndexingMonitor monitor);
 
 	/**
 	 * Sets the {@link MassIndexingFailureHandler}.
@@ -161,5 +129,5 @@ public interface PojoMassIndexer<N extends PojoMassIndexer<N>> {
 	 * @param failureHandler The handler for failures occurring during mass indexing.
 	 * @return {@code this} for method chaining
 	 */
-	N failureHandler(MassIndexingFailureHandler failureHandler);
+	PojoMassIndexer<O> failureHandler(MassIndexingFailureHandler failureHandler);
 }

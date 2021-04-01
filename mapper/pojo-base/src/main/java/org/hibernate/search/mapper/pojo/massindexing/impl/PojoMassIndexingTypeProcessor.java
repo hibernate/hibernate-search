@@ -44,7 +44,7 @@ class PojoMassIndexingTypeProcessor<E> {
 		this.primaryKeyStream = new PojoProducerConsumerQueue<>( 1 );
 	}
 
-	public PojoInterceptingInvoker<E> identifierProducer() {
+	public PojoInterceptingInvoker<Object> identifierProducer() {
 		return (ictx, invoker) -> {
 			log.trace( "started" );
 			try {
@@ -64,7 +64,7 @@ class PojoMassIndexingTypeProcessor<E> {
 		};
 	}
 
-	public PojoInterceptingInvoker<E> documentProducer() {
+	public PojoInterceptingInvoker<Object> documentProducer() {
 		return (ictx, invoker) -> {
 			log.trace( "started" );
 			try {

@@ -52,10 +52,10 @@ public class HibernateOrmMassIndexingIdentifierProducerInterceptor implements Lo
 	}
 
 	@Override
-	public void intercept(LoadingInvocationContext<HibernateOrmMassIndexingOptions> ictx) throws Exception {
-		HibernateOrmMassIndexingOptions indexer = (HibernateOrmMassIndexingOptions) ictx.options();
-		Integer transactionTimeout = indexer.transactionTimeout();
-		String tenantId = ictx.tenantId();
+	public void intercept(LoadingInvocationContext<? extends HibernateOrmMassIndexingOptions> ictx) throws Exception {
+		HibernateOrmMassIndexingOptions options = ictx.options();
+		Integer transactionTimeout = options.transactionTimeout();
+		String tenantId = options.tenantIdentifier();
 		boolean wrapInTransaction = wrapInTransaction();
 		if ( wrapInTransaction ) {
 			try ( StatelessSession statelessSession = factory.withStatelessOptions()

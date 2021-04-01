@@ -10,7 +10,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
-import org.hibernate.search.util.common.annotation.Incubating;
 
 
 /**
@@ -100,17 +99,6 @@ public interface MassIndexer {
 	MassIndexer purgeAllOnStart(boolean purgeAll);
 
 	/**
-	 * Stops indexing after having indexed a set amount of objects.
-	 * <p>
-	 * As a results the indexes will not be consistent
-	 * with the database: use only for testing on an (undefined) subset of database data.
-	 * @param maximum the maximum number of objects to index
-	 * @return {@code this} for method chaining
-	 */
-	@Incubating
-	MassIndexer limitIndexedObjectsTo(long maximum);
-
-	/**
 	 * Starts the indexing process in background (asynchronous).
 	 * <p>
 	 * May only be called once.
@@ -128,18 +116,6 @@ public interface MassIndexer {
 	 * while waiting.
 	 */
 	void startAndWait() throws InterruptedException;
-
-	/**
-	 * Specifies the fetch size to be used when loading primary keys
-	 * if objects to be indexed.
-	 * <p>
-	 * Some databases accept special values,
-	 * for example MySQL might benefit from using {@link Integer#MIN_VALUE}
-	 * otherwise it will attempt to preload everything in memory.
-	 * @param idFetchSize the fetch size to be used when loading primary keys
-	 * @return {@code this} for method chaining
-	 */
-	MassIndexer idFetchSize(int idFetchSize);
 
 	/**
 	 * Sets the {@link MassIndexingMonitor}.

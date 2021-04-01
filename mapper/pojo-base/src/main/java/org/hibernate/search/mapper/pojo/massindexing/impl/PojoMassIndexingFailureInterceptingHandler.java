@@ -14,28 +14,24 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.mapper.pojo.intercepting.spi.PojoInterceptingHandler;
 import org.hibernate.search.mapper.pojo.intercepting.spi.PojoInterceptingInvoker;
-import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingOptions;
 
 /**
- * Wraps the execution of a {@code Runnable} in a list of {@link MassIndexingInterceptor}.
+ * Wraps the execution of a {@code Runnable} in a list of {@link LoadingInterceptor}.
  */
-public class PojoMassIndexingFailureInterceptingHadler extends PojoMassIndexingFailureHandledRunnable {
+public class PojoMassIndexingFailureInterceptingHandler<O> extends PojoMassIndexingFailureHandledRunnable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoInterceptingInvoker<?> consumer;
-	private final MassIndexingOptions indexingOptions;
-	private final List<LoadingInterceptor<?>> interceptors;
-	private final String tenantId;
+	private final PojoInterceptingInvoker<? super O> consumer;
+	private final O options;
+	private final List<? extends LoadingInterceptor<? super O>> interceptors;
 
-	PojoMassIndexingFailureInterceptingHadler(
-			MassIndexingOptions indexingOptions,
-			List<LoadingInterceptor<?>> interceptors,
+	PojoMassIndexingFailureInterceptingHandler(O options,
+			List<? extends LoadingInterceptor<? super O>> interceptors,
 			PojoMassIndexingNotifier notifier,
-			PojoInterceptingInvoker<?> consumer) {
+			PojoInterceptingInvoker<? super O> consumer) {
 		super( notifier );
-		this.indexingOptions = indexingOptions;
-		this.tenantId = indexingOptions.tenantIdentifier();
+		this.options = options;
 		this.interceptors = interceptors;
 		this.consumer = consumer;
 	}
@@ -43,9 +39,8 @@ public class PojoMassIndexingFailureInterceptingHadler extends PojoMassIndexingF
 	@Override
 	public void runWithFailureHandler() {
 		try {
-			PojoInterceptingHandler<?> handler = new PojoInterceptingHandler(
-					indexingOptions, tenantId,
-					interceptors, consumer );
+			PojoInterceptingHandler<?> handler = new PojoInterceptingHandler<>(
+					options, interceptors, consumer );
 			handler.invoke();
 		}
 		catch (Exception e) {

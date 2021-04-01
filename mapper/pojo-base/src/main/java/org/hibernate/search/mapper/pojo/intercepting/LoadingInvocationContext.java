@@ -20,11 +20,6 @@ public interface LoadingInvocationContext<O> {
 	O options();
 
 	/**
-	 * @return the identifier of the tenant.
-	 */
-	String tenantId();
-
-	/**
 	 * Enables an interceptor to retrieve or update the data associated with the invocation by another interceptor.
 	 *
 	 * @param <T> a return context type

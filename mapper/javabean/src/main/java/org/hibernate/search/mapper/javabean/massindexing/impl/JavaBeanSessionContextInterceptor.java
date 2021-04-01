@@ -24,7 +24,7 @@ public class JavaBeanSessionContextInterceptor implements LoadingInterceptor<Jav
 	}
 
 	@Override
-	public void intercept(LoadingInvocationContext<JavaBeanIndexingOptions> ictx) throws Exception {
+	public void intercept(LoadingInvocationContext<? extends JavaBeanIndexingOptions> ictx) throws Exception {
 		MassIndexingSessionContext sessionContext = mappingContext.sessionContext();
 		ictx.context( MassIndexingSessionContext.class, sessionContext );
 		ictx.proceed();

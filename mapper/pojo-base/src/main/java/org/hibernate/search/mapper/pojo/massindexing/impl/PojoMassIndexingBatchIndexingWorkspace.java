@@ -18,7 +18,6 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingMappingContext;
-import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingOptions;
 import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingContext;
 
 /**
@@ -26,24 +25,26 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingContext;
  * of entities, managing the lifecycle of several ThreadPools.
  *
  * @author Sanne Grinovero
+ * @param <O> The mass indexing options.
  */
-public class PojoMassIndexingBatchIndexingWorkspace extends PojoMassIndexingFailureHandledRunnable {
+public class PojoMassIndexingBatchIndexingWorkspace<O> extends PojoMassIndexingFailureHandledRunnable {
+
+	public static final String THREAD_NAME_PREFIX = "Mass indexing - ";
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final MassIndexingOptions indexingOptions;
+	private final O indexingOptions;
 	private final int documentBuilderThreads;
 
 	private final List<CompletableFuture<?>> identifierProducingFutures = new ArrayList<>();
 	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
-	private final MassIndexingContext<?> indexingContext;
+	private final MassIndexingContext<O> indexingContext;
 	private final MassIndexingMappingContext mappingContext;
 	private final PojoMassIndexingTypeProcessor<?> typeProcessor;
 	private final PojoMassIndexingIndexedTypeGroup<?> typeGroup;
-	private final String threadNamePrefix;
 
-	PojoMassIndexingBatchIndexingWorkspace(MassIndexingOptions indexingOptions,
-			MassIndexingContext<?> indexingContext,
+	PojoMassIndexingBatchIndexingWorkspace(O indexingOptions,
+			MassIndexingContext<O> indexingContext,
 			MassIndexingMappingContext mappingContext,
 			PojoMassIndexingNotifier notifier,
 			PojoMassIndexingIndexedTypeGroup<?> typeGroup,
@@ -55,7 +56,6 @@ public class PojoMassIndexingBatchIndexingWorkspace extends PojoMassIndexingFail
 		//thread pool sizing:
 		this.documentBuilderThreads = documentBuilderThreads;
 
-		this.threadNamePrefix = indexingOptions.threadNamePrefix();
 		this.indexingContext = indexingContext;
 		this.mappingContext = mappingContext;
 
@@ -103,7 +103,7 @@ public class PojoMassIndexingBatchIndexingWorkspace extends PojoMassIndexingFail
 	}
 
 	private void startProducingPrimaryKeys() {
-		final Runnable primaryKeyOutputter = new PojoMassIndexingFailureInterceptingHadler(
+		final Runnable primaryKeyOutputter = new PojoMassIndexingFailureInterceptingHandler<>(
 				indexingOptions,
 				indexingContext.identifierInterceptors(),
 				getNotifier(),
@@ -111,7 +111,7 @@ public class PojoMassIndexingBatchIndexingWorkspace extends PojoMassIndexingFail
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
 		final ThreadPoolExecutor identifierProducingExecutor = mappingContext.threadPoolProvider().newFixedThreadPool(
 				1,
-				threadNamePrefix + typeGroup.notifiedGroupName() + " - ID loading"
+				THREAD_NAME_PREFIX + typeGroup.notifiedGroupName() + " - ID loading"
 		);
 		try {
 			identifierProducingFutures.add( Futures.runAsync( primaryKeyOutputter, identifierProducingExecutor ) );
@@ -122,14 +122,14 @@ public class PojoMassIndexingBatchIndexingWorkspace extends PojoMassIndexingFail
 	}
 
 	private void startIndexing() {
-		final Runnable documentOutputter = new PojoMassIndexingFailureInterceptingHadler(
+		final Runnable documentOutputter = new PojoMassIndexingFailureInterceptingHandler<O>(
 				indexingOptions,
 				indexingContext.documentInterceptors(),
 				getNotifier(),
 				typeProcessor.documentProducer() );
 		final ThreadPoolExecutor indexingExecutor = mappingContext.threadPoolProvider().newFixedThreadPool(
 				documentBuilderThreads,
-				threadNamePrefix + typeGroup.notifiedGroupName() + " - Entity loading"
+				THREAD_NAME_PREFIX + typeGroup.notifiedGroupName() + " - Entity loading"
 		);
 		try {
 			for ( int i = 0; i < documentBuilderThreads; i++ ) {
