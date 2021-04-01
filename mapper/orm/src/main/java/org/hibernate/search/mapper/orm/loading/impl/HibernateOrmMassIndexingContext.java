@@ -20,8 +20,8 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingContext;
 
 public final class HibernateOrmMassIndexingContext implements MassIndexingContext<HibernateOrmMassIndexingOptions> {
 	private final HibernateOrmSessionTypeContextProvider typeContextProvider;
-	private final List<LoadingInterceptor<?>> identifierProducerInterceptors = new ArrayList<>();
-	private final List<LoadingInterceptor<?>> documentProducerInterceptors = new ArrayList<>();
+	private final List<LoadingInterceptor<HibernateOrmMassIndexingOptions>> identifierProducerInterceptors = new ArrayList<>();
+	private final List<LoadingInterceptor<HibernateOrmMassIndexingOptions>> documentProducerInterceptors = new ArrayList<>();
 
 	public HibernateOrmMassIndexingContext(HibernateOrmMassIndexingMappingContext mappingContext,
 			HibernateOrmSessionTypeContextProvider typeContextContainer) {
@@ -31,19 +31,19 @@ public final class HibernateOrmMassIndexingContext implements MassIndexingContex
 	}
 
 	@Override
-	public <T> MassIndexingEntityLoadingStrategy<T, HibernateOrmMassIndexingOptions> createIndexLoadingStrategy(
-			PojoRawTypeIdentifier<? extends T> expectedType) {
-		LoadingIndexedTypeContext<? extends T> typeContext = typeContextProvider.indexedForExactType( expectedType );
-		return (MassIndexingEntityLoadingStrategy<T, HibernateOrmMassIndexingOptions>) typeContext.loadingStrategy();
+	public <T> MassIndexingEntityLoadingStrategy<? super T, HibernateOrmMassIndexingOptions> indexLoadingStrategy(
+			PojoRawTypeIdentifier<T> expectedType) {
+		LoadingIndexedTypeContext<T> typeContext = typeContextProvider.indexedForExactType( expectedType );
+		return typeContext.loadingStrategy();
 	}
 
 	@Override
-	public List identifierInterceptors() {
+	public List<LoadingInterceptor<HibernateOrmMassIndexingOptions>> identifierInterceptors() {
 		return identifierProducerInterceptors;
 	}
 
 	@Override
-	public List documentInterceptors() {
+	public List<LoadingInterceptor<HibernateOrmMassIndexingOptions>> documentInterceptors() {
 		return documentProducerInterceptors;
 	}
 

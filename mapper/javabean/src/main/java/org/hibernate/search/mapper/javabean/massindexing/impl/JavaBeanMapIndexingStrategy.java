@@ -43,7 +43,7 @@ public class JavaBeanMapIndexingStrategy<E> implements MassIndexingEntityLoading
 
 	@Override
 	public EntityIdentifierScroll createIdentifierScroll(MassIndexingThreadContext<JavaBeanIndexingOptions> context,
-			MassIndexingEntityLoadingTypeGroup<E> loadingTypeGroup) throws InterruptedException {
+			MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) {
 		Set<?> identifiers = source.entrySet().stream()
 				.filter( ent -> loadingTypeGroup.includesInstance( ent.getValue() ) )
 				.map( Entry::getKey ).collect( Collectors.toSet() );
@@ -76,7 +76,7 @@ public class JavaBeanMapIndexingStrategy<E> implements MassIndexingEntityLoading
 
 	@Override
 	public EntityLoader<E> createLoader(MassIndexingThreadContext<JavaBeanIndexingOptions> context,
-			MassIndexingEntityLoadingTypeGroup<E> loadingTypeGroup) throws InterruptedException {
+			MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) {
 		return identifiers -> identifiers.stream().map( source::get ).collect( Collectors.toList() );
 
 	}

@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
 
-public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> extends AbstractHibernateOrmLoadingStrategy<E>
+public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> extends AbstractHibernateOrmLoadingStrategy<E, I>
 		implements HibernateOrmEntityLoadingStrategy<E> {
 
 	public static HibernateOrmEntityLoadingStrategy<?> create(SessionFactoryImplementor sessionFactory,

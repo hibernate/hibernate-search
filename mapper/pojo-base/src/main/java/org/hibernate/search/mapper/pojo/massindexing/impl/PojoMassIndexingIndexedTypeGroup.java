@@ -76,8 +76,8 @@ public class PojoMassIndexingIndexedTypeGroup<E, O> {
 			MassIndexingMappingContext mappingContext,
 			MassIndexingTypeContextProvider typeContextProvider,
 			MassIndexingIndexedTypeContext<E> typeContext) {
-		MassIndexingEntityLoadingStrategy<E, O> strategy =
-				indexingContext.createIndexLoadingStrategy( typeContext.typeIdentifier() );
+		MassIndexingEntityLoadingStrategy<? super E, O> strategy =
+				indexingContext.indexLoadingStrategy( typeContext.typeIdentifier() );
 		return new PojoMassIndexingIndexedTypeGroup<>( typeContext, indexingContext, mappingContext, typeContextProvider,
 				strategy, Collections.singleton( typeContext ) );
 	}
@@ -86,14 +86,14 @@ public class PojoMassIndexingIndexedTypeGroup<E, O> {
 	private final MassIndexingContext<?> indexingContext;
 	private final MassIndexingMappingContext mappingContext;
 	private final MassIndexingTypeContextProvider typeContextProvider;
-	private final MassIndexingEntityLoadingStrategy<E, O> loadingStrategy;
+	private final MassIndexingEntityLoadingStrategy<? super E, O> loadingStrategy;
 	private final Set<MassIndexingIndexedTypeContext<? extends E>> includedTypes;
 
 	private PojoMassIndexingIndexedTypeGroup(MassIndexingIndexedTypeContext<E> commonSuperType,
 			MassIndexingContext<?> indexingContext,
 			MassIndexingMappingContext mappingContext,
 			MassIndexingTypeContextProvider typeContextProvider,
-			MassIndexingEntityLoadingStrategy<E, O> loadingStrategy,
+			MassIndexingEntityLoadingStrategy<? super E, O> loadingStrategy,
 			Set<MassIndexingIndexedTypeContext<? extends E>> includedTypes) {
 		this.commonSuperType = commonSuperType;
 		this.indexingContext = indexingContext;
@@ -154,7 +154,7 @@ public class PojoMassIndexingIndexedTypeGroup<E, O> {
 		return loadingStrategy.createIdentifierScroll( context, createLoadingTypeGroup( sessionContext ) );
 	}
 
-	EntityLoader<E> createLoader(MassIndexingThreadContext<O> context, MassIndexingSessionContext sessionContext) throws InterruptedException {
+	EntityLoader<? super E> createLoader(MassIndexingThreadContext<O> context, MassIndexingSessionContext sessionContext) throws InterruptedException {
 		return loadingStrategy.createLoader( context, createLoadingTypeGroup( sessionContext ) );
 	}
 
