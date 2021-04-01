@@ -121,6 +121,9 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchContext searchContext,
 				ElasticsearchSearchValueFieldContext<F> field) {
 			super( searchContext, field );
+			// Score is always constant for this query
+			constantScore();
+
 			this.field = field;
 			this.codec = codec;
 		}
