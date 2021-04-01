@@ -21,19 +21,14 @@ public interface HibernateOrmMassIndexingOptions {
 	CacheMode cacheMode();
 
 	/**
-	 * @return the thread name prefix.
-	 */
-	String threadNamePrefix();
-
-	/**
 	 * @return the tenant identifier.
 	 */
 	String tenantIdentifier();
 
 	/**
-	 * @return the batch size used to load the root entities.
+	 * @return how many entities to load and index in each batch.
 	 */
-	int batchSize();
+	int batchSizeToLoadObjects();
 
 	/**
 	 * @return the objects limit used to load the root entities.
@@ -43,6 +38,6 @@ public interface HibernateOrmMassIndexingOptions {
 	/**
 	 * @return fetch size used to load the root entities.
 	 */
-	int fetchSize();
+	int idFetchSize();
 
 }

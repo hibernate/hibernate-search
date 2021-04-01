@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.intercepting.spi;
 
 import org.hibernate.search.mapper.pojo.intercepting.LoadingInvocationContext;
 
-public interface PojoInterceptingInvoker<C> {
+public interface PojoInterceptingInvoker<O> {
 
-	void invoke(LoadingInvocationContext<C> ictx, PojoInterceptingNextInvoker invoker) throws Exception;
+	void invoke(LoadingInvocationContext<? extends O> ictx, PojoInterceptingNextInvoker invoker) throws Exception;
 }

@@ -6,8 +6,18 @@
  */
 package org.hibernate.search.mapper.javabean.massindexing.loader;
 
-import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingOptions;
+public interface JavaBeanIndexingOptions {
 
-public interface JavaBeanIndexingOptions extends MassIndexingOptions {
+	/**
+	 * @return the tenant identifier.
+	 */
+	String tenantIdentifier();
+
+	/**
+	 * @return How many entities to load and index in each batch.
+	 * Defines the maximum expected size of each list of IDs returned
+	 * by the {@link org.hibernate.search.mapper.pojo.loading.EntityIdentifierScroll}.
+	 */
+	int batchSizeToLoadObjects();
 
 }

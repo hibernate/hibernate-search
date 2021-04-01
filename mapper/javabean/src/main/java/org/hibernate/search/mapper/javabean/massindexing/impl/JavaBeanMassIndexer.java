@@ -22,47 +22,26 @@ import org.hibernate.search.mapper.javabean.massindexing.loader.JavaBeanIndexing
 
 public class JavaBeanMassIndexer implements MassIndexer, JavaBeanIndexingOptions {
 
-	static final String THREAD_NAME_PREFIX = "Java Bean Mass indexing - ";
+	private final PojoDefaultMassIndexer<JavaBeanIndexingOptions> delegate;
+	private final DetachedBackendSessionContext sessionContext;
 
-	private final PojoDefaultMassIndexer delegate;
+	private int objectLoadingBatchSize = 10;
 
-	public JavaBeanMassIndexer(
-			MassIndexingContext<?> massIndexingContext,
+	public JavaBeanMassIndexer(MassIndexingContext<JavaBeanIndexingOptions> massIndexingContext,
 			MassIndexingMappingContext mappingContext,
 			DetachedBackendSessionContext sessionContext,
 			Set<? extends PojoRawTypeIdentifier<?>> targetedIndexedTypes,
 			PojoScopeSchemaManager scopeSchemaManager,
 			PojoScopeWorkspace scopeWorkspace) {
-
-		delegate = new PojoDefaultMassIndexer( this,
-				massIndexingContext, mappingContext, sessionContext,
+		delegate = new PojoDefaultMassIndexer<>( this,
+				massIndexingContext, mappingContext,
 				targetedIndexedTypes, scopeSchemaManager, scopeWorkspace );
-
-	}
-
-	@Override
-	public String threadNamePrefix() {
-		return THREAD_NAME_PREFIX;
+		this.sessionContext = sessionContext;
 	}
 
 	@Override
 	public String tenantIdentifier() {
-		return delegate.tenantIdentifier();
-	}
-
-	@Override
-	public int batchSize() {
-		return delegate.batchSize();
-	}
-
-	@Override
-	public long objectsLimit() {
-		return delegate.objectsLimit();
-	}
-
-	@Override
-	public int fetchSize() {
-		return delegate.fetchSize();
+		return sessionContext.tenantIdentifier();
 	}
 
 	@Override
@@ -79,8 +58,16 @@ public class JavaBeanMassIndexer implements MassIndexer, JavaBeanIndexingOptions
 
 	@Override
 	public MassIndexer batchSizeToLoadObjects(int batchSize) {
-		delegate.batchSizeToLoadObjects( batchSize );
+		if ( batchSize < 1 ) {
+			throw new IllegalArgumentException( "batchSize must be at least 1" );
+		}
+		this.objectLoadingBatchSize = batchSize;
 		return this;
+	}
+
+	@Override
+	public int batchSizeToLoadObjects() {
+		return objectLoadingBatchSize;
 	}
 
 	@Override
@@ -108,12 +95,6 @@ public class JavaBeanMassIndexer implements MassIndexer, JavaBeanIndexingOptions
 	}
 
 	@Override
-	public MassIndexer limitIndexedObjectsTo(long maximum) {
-		delegate.limitIndexedObjectsTo( maximum );
-		return this;
-	}
-
-	@Override
 	public CompletionStage start() {
 		return delegate.start();
 	}
@@ -121,12 +102,6 @@ public class JavaBeanMassIndexer implements MassIndexer, JavaBeanIndexingOptions
 	@Override
 	public void startAndWait() throws InterruptedException {
 		delegate.startAndWait();
-	}
-
-	@Override
-	public MassIndexer idFetchSize(int idFetchSize) {
-		delegate.idFetchSize( idFetchSize );
-		return this;
 	}
 
 	@Override

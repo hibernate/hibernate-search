@@ -52,11 +52,11 @@ public class HibernateOrmMassIndexingDocumentProducerInterceptor implements Load
 	}
 
 	@Override
-	public void intercept(LoadingInvocationContext<HibernateOrmMassIndexingOptions> ictx) throws Exception {
-		HibernateOrmMassIndexingOptions indexer = ictx.options();
-		CacheMode cacheMode = indexer.cacheMode();
-		Integer transactionTimeout = indexer.transactionTimeout();
-		String tenantId = ictx.tenantId();
+	public void intercept(LoadingInvocationContext<? extends HibernateOrmMassIndexingOptions> ictx) throws Exception {
+		HibernateOrmMassIndexingOptions options = ictx.options();
+		CacheMode cacheMode = options.cacheMode();
+		Integer transactionTimeout = options.transactionTimeout();
+		String tenantId = options.tenantIdentifier();
 
 		try ( SessionImplementor upperSession = (SessionImplementor) factory
 				.withOptions()

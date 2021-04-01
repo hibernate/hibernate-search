@@ -21,7 +21,6 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingMappingContext;
-import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingOptions;
 
 /**
  * Makes sure that several different BatchIndexingWorkspace(s)
@@ -29,17 +28,18 @@ import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingOptions;
  * and IndexWriters.
  *
  * @author Sanne Grinovero
+ * @param <O> The mass indexing options.
  */
-public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHandledRunnable {
+public class PojoMassIndexingBatchCoordinator<O> extends PojoMassIndexingFailureHandledRunnable {
 
-	private final MassIndexingOptions indexingOptions;
+	private final O indexingOptions;
 	private final List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex;
 
 	private final PojoScopeSchemaManager scopeSchemaManager;
 	private final PojoScopeWorkspace scopeWorkspace;
 
 	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
-	private final MassIndexingContext<?> indexingContext;
+	private final MassIndexingContext<O> indexingContext;
 	private final MassIndexingMappingContext mappingContext;
 	private final int typesToIndexInParallel;
 	private final int documentBuilderThreads;
@@ -48,8 +48,8 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	private final boolean purgeAtStart;
 	private final boolean mergeSegmentsAfterPurge;
 
-	public PojoMassIndexingBatchCoordinator(MassIndexingOptions indexingOptions,
-			MassIndexingContext<?> indexingContext,
+	public PojoMassIndexingBatchCoordinator(O indexingOptions,
+			MassIndexingContext<O> indexingContext,
 			MassIndexingMappingContext mappingContext,
 			PojoMassIndexingNotifier notifier,
 			List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex,
@@ -127,7 +127,8 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 	 */
 	private void doBatchWork() throws InterruptedException {
 		ExecutorService executor = mappingContext.threadPoolProvider()
-				.newFixedThreadPool( typesToIndexInParallel, indexingOptions.threadNamePrefix() + "Workspace" );
+				.newFixedThreadPool( typesToIndexInParallel,
+						PojoMassIndexingBatchIndexingWorkspace.THREAD_NAME_PREFIX + "Workspace" );
 
 		for ( PojoMassIndexingIndexedTypeGroup<?> typeGroup : typeGroupsToIndex ) {
 			indexingFutures.add( Futures.runAsync( createBatchIndexingWorkspace( typeGroup ), executor ) );
@@ -140,9 +141,9 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 		);
 	}
 
-	private PojoMassIndexingBatchIndexingWorkspace createBatchIndexingWorkspace(
+	private PojoMassIndexingBatchIndexingWorkspace<O> createBatchIndexingWorkspace(
 			PojoMassIndexingIndexedTypeGroup<?> typeGroup) {
-		return new PojoMassIndexingBatchIndexingWorkspace(
+		return new PojoMassIndexingBatchIndexingWorkspace<>(
 				indexingOptions, indexingContext, mappingContext,
 				getNotifier(), typeGroup, documentBuilderThreads );
 	}

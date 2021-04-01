@@ -20,50 +20,34 @@ import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoDefaultMassIndexer;
 import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingContext;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassIndexingOptions;
-import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingOptions;
 
-public class HibernateOrmMassIndexer implements MassIndexer, MassIndexingOptions, HibernateOrmMassIndexingOptions {
-	static final String THREAD_NAME_PREFIX = "Mass indexing - ";
+public class HibernateOrmMassIndexer implements MassIndexer, HibernateOrmMassIndexingOptions {
 
-	private Integer idLoadingTransactionTimeout;
+	private final PojoDefaultMassIndexer<HibernateOrmMassIndexingOptions> delegate;
+	private final DetachedBackendSessionContext sessionContext;
+
 	private CacheMode cacheMode;
-	private final PojoDefaultMassIndexer delegate;
+	private Integer idLoadingTransactionTimeout;
+	private int idFetchSize = 100; //reasonable default as we only load IDs
+	private int objectLoadingBatchSize = 10;
+	private long objectsLimit = 0; //means no limit at all
 
 	public HibernateOrmMassIndexer(
-			MassIndexingContext<?> massIndexingContext,
+			MassIndexingContext<HibernateOrmMassIndexingOptions> massIndexingContext,
 			MassIndexingMappingContext mappingContext,
 			DetachedBackendSessionContext sessionContext,
 			Set<? extends PojoRawTypeIdentifier<?>> targetedIndexedTypes,
 			PojoScopeSchemaManager scopeSchemaManager,
 			PojoScopeWorkspace scopeWorkspace) {
-		delegate = new PojoDefaultMassIndexer( this,
-				massIndexingContext, mappingContext, sessionContext,
+		delegate = new PojoDefaultMassIndexer<>( this,
+				massIndexingContext, mappingContext,
 				targetedIndexedTypes, scopeSchemaManager, scopeWorkspace );
-	}
-
-	@Override
-	public String threadNamePrefix() {
-		return THREAD_NAME_PREFIX;
+		this.sessionContext = sessionContext;
 	}
 
 	@Override
 	public String tenantIdentifier() {
-		return delegate.tenantIdentifier();
-	}
-
-	@Override
-	public int batchSize() {
-		return delegate.batchSize();
-	}
-
-	@Override
-	public long objectsLimit() {
-		return delegate.objectsLimit();
-	}
-
-	@Override
-	public int fetchSize() {
-		return delegate.fetchSize();
+		return sessionContext.tenantIdentifier();
 	}
 
 	@Override
@@ -101,9 +85,17 @@ public class HibernateOrmMassIndexer implements MassIndexer, MassIndexingOptions
 	}
 
 	@Override
-	public MassIndexer batchSizeToLoadObjects(int batchSize) {
-		delegate.batchSizeToLoadObjects( batchSize );
+	public HibernateOrmMassIndexer batchSizeToLoadObjects(int batchSize) {
+		if ( batchSize < 1 ) {
+			throw new IllegalArgumentException( "batchSize must be at least 1" );
+		}
+		this.objectLoadingBatchSize = batchSize;
 		return this;
+	}
+
+	@Override
+	public int batchSizeToLoadObjects() {
+		return objectLoadingBatchSize;
 	}
 
 	@Override
@@ -131,9 +123,14 @@ public class HibernateOrmMassIndexer implements MassIndexer, MassIndexingOptions
 	}
 
 	@Override
-	public MassIndexer limitIndexedObjectsTo(long maximum) {
-		delegate.limitIndexedObjectsTo( maximum );
+	public HibernateOrmMassIndexer limitIndexedObjectsTo(long maximum) {
+		this.objectsLimit = maximum;
 		return this;
+	}
+
+	@Override
+	public long objectsLimit() {
+		return objectsLimit;
 	}
 
 	@Override
@@ -147,9 +144,16 @@ public class HibernateOrmMassIndexer implements MassIndexer, MassIndexingOptions
 	}
 
 	@Override
-	public MassIndexer idFetchSize(int idFetchSize) {
-		delegate.idFetchSize( idFetchSize );
+	public HibernateOrmMassIndexer idFetchSize(int idFetchSize) {
+		// don't check for positive/zero values as it's actually used by some databases
+		// as special values which might be useful.
+		this.idFetchSize = idFetchSize;
 		return this;
+	}
+
+	@Override
+	public int idFetchSize() {
+		return idFetchSize;
 	}
 
 	@Override

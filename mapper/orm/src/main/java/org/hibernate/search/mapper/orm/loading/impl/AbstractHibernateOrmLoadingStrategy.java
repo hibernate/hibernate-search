@@ -123,8 +123,8 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E> implements
 			this.loadingTypeGroup = loadingTypeGroup;
 
 			HibernateOrmMassIndexingOptions options = context.options();
-			fetchSize = options.fetchSize();
-			batchSize = options.batchSize();
+			fetchSize = options.idFetchSize();
+			batchSize = options.batchSizeToLoadObjects();
 			long objectsLimit = options.objectsLimit();
 
 			SharedSessionContractImplementor session = context.context( SharedSessionContractImplementor.class );

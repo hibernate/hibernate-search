@@ -41,11 +41,11 @@ public interface MassIndexingContext<O> {
 	/**
 	 * @return A list {@link LoadingInterceptor} of entityIdentifier interceptors.
 	 */
-	List<LoadingInterceptor<?>> identifierInterceptors();
+	List<? extends LoadingInterceptor<? super O>> identifierInterceptors();
 
 	/**
 	 * @return A list {@link LoadingInterceptor} of entity interceptors.
 	 */
-	List<LoadingInterceptor<?>> documentInterceptors();
+	List<? extends LoadingInterceptor<? super O>> documentInterceptors();
 
 }

@@ -56,7 +56,7 @@ public class JavaBeanMapIndexingStrategy<E> implements MassIndexingEntityLoading
 
 			@Override
 			public List<?> next() {
-				int batchSize = context.options().batchSize();
+				int batchSize = context.options().batchSizeToLoadObjects();
 
 				List<Object> destination = new ArrayList<>( batchSize );
 				while ( iterator.hasNext() ) {

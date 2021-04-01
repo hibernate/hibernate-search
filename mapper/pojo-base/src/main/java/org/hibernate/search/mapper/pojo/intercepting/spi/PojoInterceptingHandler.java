@@ -15,27 +15,25 @@ import org.hibernate.search.mapper.pojo.loading.LoadingInterceptor;
 import org.hibernate.search.mapper.pojo.intercepting.LoadingInvocationContext;
 import org.hibernate.search.mapper.pojo.intercepting.LoadingInvocationInterceptor;
 
-public class PojoInterceptingHandler<C> {
+public class PojoInterceptingHandler<O> {
 
-	private final C loadingContext;
-	private final String tenantId;
-	private final List<LoadingInterceptor<C>> interceptors;
-	private final PojoInterceptingInvoker<C> loadingProcess;
+	private final O options;
+	private final List<? extends LoadingInterceptor<? super O>> interceptors;
+	private final PojoInterceptingInvoker<? super O> loadingProcess;
 
-	public PojoInterceptingHandler(C loadingContext, String tenantId,
-			List<LoadingInterceptor<C>> interceptors,
-			PojoInterceptingInvoker<C> loadingProcess) {
-		this.loadingContext = loadingContext;
-		this.tenantId = tenantId;
+	public PojoInterceptingHandler(O options,
+			List<? extends LoadingInterceptor<? super O>> interceptors,
+			PojoInterceptingInvoker<? super O> loadingProcess) {
+		this.options = options;
 		this.interceptors = interceptors;
 		this.loadingProcess = loadingProcess;
 	}
 
 	public void invoke() throws Exception {
-		Iterator<LoadingInterceptor<C>> iterator = interceptors.iterator();
+		Iterator<? extends LoadingInterceptor<? super O>> iterator = interceptors.iterator();
 		List<LoadingInvocationInterceptor> handlers = new ArrayList<>();
 
-		LoadingInvocationContext<C> ictx = new PojoInvocationContext( (nctx, next) -> {
+		LoadingInvocationContext<O> ictx = new PojoInvocationContext( (nctx, next) -> {
 			if ( next != null ) {
 				handlers.add( next );
 			}
@@ -68,22 +66,17 @@ public class PojoInterceptingHandler<C> {
 		}
 	}
 
-	private class PojoInvocationContext implements LoadingInvocationContext<C> {
+	private class PojoInvocationContext implements LoadingInvocationContext<O> {
 		Map<Class<?>, Object> contextData = new HashMap<>();
-		InvokationContextConsumer<C> consumer;
+		InvokationContextConsumer<O> consumer;
 
-		public PojoInvocationContext(InvokationContextConsumer<C> consumer) {
+		public PojoInvocationContext(InvokationContextConsumer<O> consumer) {
 			this.consumer = consumer;
 		}
 
 		@Override
-		public C options() {
-			return loadingContext;
-		}
-
-		@Override
-		public String tenantId() {
-			return tenantId;
+		public O options() {
+			return options;
 		}
 
 		@Override
