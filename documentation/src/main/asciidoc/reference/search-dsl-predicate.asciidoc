@@ -638,7 +638,7 @@ The `terms` predicate matches documents for which a given field contains some te
 With `matchingAny` we require that at least one of the provided terms matches.
 Functionally, this is somewhat similar to a <<search-dsl-predicate-boolean-or,boolean `OR`>> with one <<search-dsl-predicate-match,`match`>> predicate per term, but the syntax for a single `terms` predicate is more concise.
 
-NOTE: `matchingAny` expects to be passed *terms*, not just any string. The given terms will not be analyzed/normalized. See <<search-dsl-predicate-terms-analysis>>.
+NOTE: `matchingAny` expects to be passed *terms*, not just any string. The given terms will not be analyzed. See <<search-dsl-predicate-terms-analysis>>.
 
 .Matching any of the provided terms
 ====
@@ -651,7 +651,12 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 With `matchingAll` we require that all of the provided terms match.
 Functionally, this is somewhat similar to a <<search-dsl-predicate-boolean-and,boolean `AND`>> with one <<search-dsl-predicate-match,`match`>> predicate per term, but the syntax for a single `terms` predicate is more concise.
 
-NOTE: `matchingAll` expects to be passed *terms*, not just any string. The given terms will not be analyzed/normalized. See <<search-dsl-predicate-terms-analysis>>.
+NOTE: `matchingAll` expects to be passed *terms*, not just any string. The given terms will not be analyzed. See <<search-dsl-predicate-terms-analysis>>.
+
+[WARNING]
+====
+With `matchingAll` the given terms must not be more than 1024.
+====
 
 .Matching all of the provided terms
 ====
@@ -668,9 +673,13 @@ NOTE: For an introduction to analysis and how to configure it,
 refer to the <<concepts-analysis>> section.
 
 Differently from other predicates, the terms passed to `matchingAny()` or `matchingAll()`
-are never analyzed nor normalized.
-This means that in order to match the related documents,
+are never analyzed nor **usually** normalized.
+If it is true, this means that in order to match the related documents,
 you need to provide the terms as they were written to the indexes.
+
+This is always true with the Lucene backend.
+For the Elasticsearch backend: terms are never analyzed nor normalized if an analyzer is defined on the field.
+While terms are normalized if a normalizer is defined on the field.
 
 === Targeting multiple fields
 
