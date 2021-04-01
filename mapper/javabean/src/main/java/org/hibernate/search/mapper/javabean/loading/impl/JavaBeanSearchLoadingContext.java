@@ -23,12 +23,13 @@ import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.javabean.massindexing.loader.JavaBeanIndexingOptions;
 import org.hibernate.search.mapper.pojo.loading.LoadingInterceptor;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingStrategy;
 
-public final class JavaBeanSearchLoadingContext implements PojoLoadingContext, MassIndexingContext<JavaBeanIndexingOptions> {
+public final class JavaBeanSearchLoadingContext implements PojoLoadingContext,
+		PojoMassIndexingContext<JavaBeanIndexingOptions> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

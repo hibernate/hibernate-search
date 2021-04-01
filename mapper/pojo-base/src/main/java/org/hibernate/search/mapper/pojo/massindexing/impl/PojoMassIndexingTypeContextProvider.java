@@ -10,8 +10,8 @@ import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
-public interface MassIndexingTypeContextProvider {
+public interface PojoMassIndexingTypeContextProvider {
 
-	<E> Optional<? extends MassIndexingIndexedTypeContext<E>> forExactType(PojoRawTypeIdentifier<E> typeIdentifier);
+	<E> Optional<? extends PojoMassIndexingIndexedTypeContext<E>> forExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 
 }

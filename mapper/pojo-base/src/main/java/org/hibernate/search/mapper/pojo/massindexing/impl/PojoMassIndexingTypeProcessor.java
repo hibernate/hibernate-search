@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingSessionContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSessionContext;
 import org.hibernate.search.mapper.pojo.intercepting.LoadingInvocationContext;
 import org.hibernate.search.mapper.pojo.intercepting.spi.PojoInterceptingInvoker;
 import org.hibernate.search.mapper.pojo.intercepting.spi.PojoInterceptingNextInvoker;
@@ -81,7 +81,7 @@ class PojoMassIndexingTypeProcessor<E, O> {
 	}
 
 	private void loadAllIdentifiers(LoadingInvocationContext<O> ictx) throws InterruptedException {
-		MassIndexingSessionContext sessionContext = ictx.context( MassIndexingSessionContext.class );
+		PojoMassIndexingSessionContext sessionContext = ictx.context( PojoMassIndexingSessionContext.class );
 		try ( EntityIdentifierScroll identifierScroll = typeGroup
 				.createIdentifierScroll( new PojoMassIndexingThreadContext<>( ictx ), sessionContext ) ) {
 
@@ -102,7 +102,7 @@ class PojoMassIndexingTypeProcessor<E, O> {
 	}
 
 	private void loadAndIndexAllFromQueue(LoadingInvocationContext<O> ictx, PojoInterceptingNextInvoker invoker) throws Exception {
-		MassIndexingSessionContext sessionContext = ictx.context( MassIndexingSessionContext.class );
+		PojoMassIndexingSessionContext sessionContext = ictx.context( PojoMassIndexingSessionContext.class );
 		PojoIndexer indexer = sessionContext.createIndexer();
 		try {
 			List<?> idList;
@@ -122,7 +122,7 @@ class PojoMassIndexingTypeProcessor<E, O> {
 	}
 
 	private void loadAndIndexList(LoadingInvocationContext<O> ictx, List<?> listIds,
-			MassIndexingSessionContext sessionContext,
+			PojoMassIndexingSessionContext sessionContext,
 			PojoIndexer indexer,
 			PojoInterceptingNextInvoker invoker)
 			throws Exception {
@@ -135,7 +135,7 @@ class PojoMassIndexingTypeProcessor<E, O> {
 		} );
 	}
 
-	private void indexList(MassIndexingSessionContext sessionContext, PojoIndexer indexer,
+	private void indexList(PojoMassIndexingSessionContext sessionContext, PojoIndexer indexer,
 			List<?> entities)
 			throws InterruptedException {
 		if ( entities == null || entities.isEmpty() ) {
@@ -181,7 +181,7 @@ class PojoMassIndexingTypeProcessor<E, O> {
 		notifier.notifyDocumentsAdded( successfulEntities );
 	}
 
-	private CompletableFuture<?> index(MassIndexingSessionContext sessionContext,
+	private CompletableFuture<?> index(PojoMassIndexingSessionContext sessionContext,
 			PojoIndexer indexer, Object entity) throws InterruptedException {
 		// abort if the thread has been interrupted while not in wait(), I/O or similar which themselves would have
 		// raised the InterruptedException
@@ -208,7 +208,7 @@ class PojoMassIndexingTypeProcessor<E, O> {
 		return future;
 	}
 
-	private PojoRawTypeIdentifier<?> detectTypeIdentifier(MassIndexingSessionContext sessionContext,
+	private PojoRawTypeIdentifier<?> detectTypeIdentifier(PojoMassIndexingSessionContext sessionContext,
 			Object entity) {
 		return sessionContext.runtimeIntrospector().detectEntityType( entity );
 	}

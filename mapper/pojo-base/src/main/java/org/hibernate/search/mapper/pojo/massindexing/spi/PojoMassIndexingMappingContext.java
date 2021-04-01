@@ -13,7 +13,7 @@ import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 /**
  * Contextual information about a search mapping.
  */
-public interface MassIndexingMappingContext {
+public interface PojoMassIndexingMappingContext {
 
 	/**
 	 * @return A {@link EntityReferenceFactory} that relies on the object's class to return entity types.

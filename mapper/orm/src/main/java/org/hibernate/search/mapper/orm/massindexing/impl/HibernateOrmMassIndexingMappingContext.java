@@ -13,9 +13,9 @@ import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingMappingContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
 
-public interface HibernateOrmMassIndexingMappingContext extends MassIndexingMappingContext {
+public interface HibernateOrmMassIndexingMappingContext extends PojoMassIndexingMappingContext {
 
 	SessionFactoryImplementor sessionFactory();
 

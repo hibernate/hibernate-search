@@ -16,9 +16,9 @@ import org.hibernate.search.mapper.pojo.loading.LoadingInterceptor;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingStrategy;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 
-public final class HibernateOrmMassIndexingContext implements MassIndexingContext<HibernateOrmMassIndexingOptions> {
+public final class HibernateOrmMassIndexingContext implements PojoMassIndexingContext<HibernateOrmMassIndexingOptions> {
 	private final HibernateOrmSessionTypeContextProvider typeContextProvider;
 	private final List<LoadingInterceptor<HibernateOrmMassIndexingOptions>> identifierProducerInterceptors = new ArrayList<>();
 	private final List<LoadingInterceptor<HibernateOrmMassIndexingOptions>> documentProducerInterceptors = new ArrayList<>();

@@ -7,13 +7,13 @@
 package org.hibernate.search.mapper.pojo.massindexing.spi;
 
 /**
- * A builder for {@link MassIndexingContext},
+ * A builder for {@link PojoMassIndexingContext},
  * allowing changes to the parameters of object loading,
  * for example while a query is being built.
  *
  * @param <LOS> The type of the initial step of the mass indexing loading options definition DSL
  */
-public interface MassIndexingContextBuilder<LOS> {
+public interface PojoMassIndexingContextBuilder<LOS> {
 
 	/**
 	 * @return The inital step of the mass indexing loading options definition DSL passed to user-defined consumers added through
@@ -23,5 +23,5 @@ public interface MassIndexingContextBuilder<LOS> {
 	/**
 	 * @return The configured loading context.
 	 */
-	MassIndexingContext<?> build();
+	PojoMassIndexingContext<?> build();
 }
