@@ -46,7 +46,7 @@ public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
 
 	private MassIndexingFailureHandler failureHandler;
 	private MassIndexingMonitor monitor;
-	private final List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex;
+	private final List<PojoMassIndexingIndexedTypeGroup<?, O>> typeGroupsToIndex;
 
 	public PojoDefaultMassIndexer(MassIndexingContext<O> indexingContext,
 			MassIndexingMappingContext mappingContext,

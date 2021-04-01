@@ -33,7 +33,7 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingMappingCont
 public class PojoMassIndexingBatchCoordinator<O> extends PojoMassIndexingFailureHandledRunnable {
 
 	private final O indexingOptions;
-	private final List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex;
+	private final List<PojoMassIndexingIndexedTypeGroup<?, O>> typeGroupsToIndex;
 
 	private final PojoScopeSchemaManager scopeSchemaManager;
 	private final PojoScopeWorkspace scopeWorkspace;
@@ -52,7 +52,7 @@ public class PojoMassIndexingBatchCoordinator<O> extends PojoMassIndexingFailure
 			MassIndexingContext<O> indexingContext,
 			MassIndexingMappingContext mappingContext,
 			PojoMassIndexingNotifier notifier,
-			List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex,
+			List<PojoMassIndexingIndexedTypeGroup<?, O>> typeGroupsToIndex,
 			PojoScopeSchemaManager scopeSchemaManager, PojoScopeWorkspace scopeWorkspace,
 			int typesToIndexInParallel, int documentBuilderThreads, boolean mergeSegmentsOnFinish,
 			boolean dropAndCreateSchemaOnStart, boolean purgeAtStart, boolean mergeSegmentsAfterPurge) {
@@ -130,7 +130,7 @@ public class PojoMassIndexingBatchCoordinator<O> extends PojoMassIndexingFailure
 				.newFixedThreadPool( typesToIndexInParallel,
 						PojoMassIndexingBatchIndexingWorkspace.THREAD_NAME_PREFIX + "Workspace" );
 
-		for ( PojoMassIndexingIndexedTypeGroup<?> typeGroup : typeGroupsToIndex ) {
+		for ( PojoMassIndexingIndexedTypeGroup<?, O> typeGroup : typeGroupsToIndex ) {
 			indexingFutures.add( Futures.runAsync( createBatchIndexingWorkspace( typeGroup ), executor ) );
 		}
 		executor.shutdown();
@@ -142,7 +142,7 @@ public class PojoMassIndexingBatchCoordinator<O> extends PojoMassIndexingFailure
 	}
 
 	private PojoMassIndexingBatchIndexingWorkspace<O> createBatchIndexingWorkspace(
-			PojoMassIndexingIndexedTypeGroup<?> typeGroup) {
+			PojoMassIndexingIndexedTypeGroup<?, O> typeGroup) {
 		return new PojoMassIndexingBatchIndexingWorkspace<>(
 				indexingOptions, indexingContext, mappingContext,
 				getNotifier(), typeGroup, documentBuilderThreads );

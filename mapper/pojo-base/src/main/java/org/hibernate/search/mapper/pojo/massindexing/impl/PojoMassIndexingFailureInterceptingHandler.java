@@ -22,14 +22,14 @@ public class PojoMassIndexingFailureInterceptingHandler<O> extends PojoMassIndex
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoInterceptingInvoker<? super O> consumer;
+	private final PojoInterceptingInvoker<O> consumer;
 	private final O options;
 	private final List<? extends LoadingInterceptor<? super O>> interceptors;
 
 	PojoMassIndexingFailureInterceptingHandler(O options,
 			List<? extends LoadingInterceptor<? super O>> interceptors,
 			PojoMassIndexingNotifier notifier,
-			PojoInterceptingInvoker<? super O> consumer) {
+			PojoInterceptingInvoker<O> consumer) {
 		super( notifier );
 		this.options = options;
 		this.interceptors = interceptors;

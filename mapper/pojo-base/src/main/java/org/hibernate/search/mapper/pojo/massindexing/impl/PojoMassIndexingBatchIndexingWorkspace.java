@@ -40,14 +40,14 @@ public class PojoMassIndexingBatchIndexingWorkspace<O> extends PojoMassIndexingF
 	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
 	private final MassIndexingContext<O> indexingContext;
 	private final MassIndexingMappingContext mappingContext;
-	private final PojoMassIndexingTypeProcessor<?> typeProcessor;
-	private final PojoMassIndexingIndexedTypeGroup<?> typeGroup;
+	private final PojoMassIndexingTypeProcessor<?, O> typeProcessor;
+	private final PojoMassIndexingIndexedTypeGroup<?, O> typeGroup;
 
 	PojoMassIndexingBatchIndexingWorkspace(O indexingOptions,
 			MassIndexingContext<O> indexingContext,
 			MassIndexingMappingContext mappingContext,
 			PojoMassIndexingNotifier notifier,
-			PojoMassIndexingIndexedTypeGroup<?> typeGroup,
+			PojoMassIndexingIndexedTypeGroup<?, O> typeGroup,
 			int documentBuilderThreads) {
 		super( notifier );
 		this.indexingOptions = indexingOptions;

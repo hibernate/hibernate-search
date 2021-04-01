@@ -19,11 +19,11 @@ public class PojoInterceptingHandler<O> {
 
 	private final O options;
 	private final List<? extends LoadingInterceptor<? super O>> interceptors;
-	private final PojoInterceptingInvoker<? super O> loadingProcess;
+	private final PojoInterceptingInvoker<O> loadingProcess;
 
 	public PojoInterceptingHandler(O options,
 			List<? extends LoadingInterceptor<? super O>> interceptors,
-			PojoInterceptingInvoker<? super O> loadingProcess) {
+			PojoInterceptingInvoker<O> loadingProcess) {
 		this.options = options;
 		this.interceptors = interceptors;
 		this.loadingProcess = loadingProcess;

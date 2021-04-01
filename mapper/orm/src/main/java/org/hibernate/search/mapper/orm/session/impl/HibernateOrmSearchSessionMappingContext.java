@@ -19,6 +19,7 @@ import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionMappingCont
 public interface HibernateOrmSearchSessionMappingContext
 		extends PojoSearchSessionMappingContext, LoadingMappingContext {
 
+	@Override
 	FailureHandler failureHandler();
 
 	@Override
