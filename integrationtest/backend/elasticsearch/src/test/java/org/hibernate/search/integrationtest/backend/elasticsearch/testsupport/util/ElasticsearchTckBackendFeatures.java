@@ -151,6 +151,13 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
+	public boolean termsArgumentsAreNormalized() {
+		// Surprisingly it is!
+		// See *.tck.search.predicate.TermsPredicateSpecificsIT#normalizedField_termIsNotNormalized
+		return true;
+	}
+
+	@Override
 	public boolean supportsDistanceSortWhenFieldMissingInSomeTargetIndexes() {
 		// Not supported in older versions of Elasticsearch
 		return dialect.supportsIgnoreUnmappedForGeoPointField();
