@@ -36,7 +36,6 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
-import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
 import org.jboss.logging.annotations.Cause;
@@ -74,6 +73,26 @@ public interface Log extends BasicLogger {
 	// DO NOT ADD ANY NEW MESSAGES HERE
 	// -----------------------------------
 	int ID_OFFSET_LEGACY_ENGINE = MessageConstants.ENGINE_ID_RANGE_MIN;
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 27, value = "Mass indexing is going to index %d entities.")
+	void indexingEntities(long count);
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 28, value = "Mass indexing complete. Indexed %1$d entities.")
+	void indexingEntitiesCompleted(long nbrOfEntities);
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 30, value = "Mass indexing progress: indexed %1$d entities in %2$d ms.")
+	void indexingProgressRaw(long doneCount, long elapsedMs);
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 31, value = "Mass indexing progress: %2$.2f%% [%1$f documents/second].")
+	void indexingProgressStats(float estimateSpeed, float estimatePercentileComplete);
+
+	@LogMessage(level = ERROR)
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 62, value = "Mass indexing received interrupt signal: aborting.")
+	void interruptedBatchIndexing();
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 135,
 			value = "No default value bridge implementation for type '%1$s'."
@@ -572,26 +591,6 @@ public interface Log extends BasicLogger {
 	SearchException wrongRequiredIdentifierType(@FormatWith(ClassFormatter.class) Class<?> requiredIdentifierType,
 			@FormatWith(ClassFormatter.class) Class<?> actualIdentifierType);
 
-	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 27, value = "Mass indexing is going to index %d entities.")
-	void indexingEntities(long count);
-
-	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 28, value = "Mass indexing complete. Indexed %1$d entities.")
-	void indexingEntitiesCompleted(long nbrOfEntities);
-
-	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 30, value = "Mass indexing progress: indexed %1$d entities in %2$d ms.")
-	void indexingProgressRaw(long doneCount, long elapsedMs);
-
-	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 31, value = "Mass indexing progress: %2$.2f%% [%1$f documents/second].")
-	void indexingProgressStats(float estimateSpeed, float estimatePercentileComplete);
-
-	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 62, value = "Mass indexing received interrupt signal: aborting.")
-	void interruptedBatchIndexing();
-
 	/*
 	 * This is not an exception factory nor a logging statement.
 	 * The returned string is passed to the FailureHandler,
@@ -609,13 +608,6 @@ public interface Log extends BasicLogger {
 
 	@Message(value = "Loading and extracting entity data for entity '%s' during mass indexing")
 	String massIndexingLoadingAndExtractingEntityData(String entityName);
-
-	@LogMessage(level = DEBUG)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 235, value = "Default automatic indexing synchronization strategy set to '%s'.")
-	void defaultAutomaticIndexingSynchronizationStrategy(Object strategy);
-
-	@Message(id = ID_OFFSET + 99, value = "Multiple batching index loader assigned to the same process type: %1$s.")
-	SearchException multipleBatchingDocumentIndexing(String entityName);
 
 	@Message(id = ID_OFFSET + 100, value = "Unable to handle mass indexing proccess: %1$s")
 	SearchException massIndexingInterceptionHandlingException(String causeMessage, @Cause Throwable cause);
