@@ -83,6 +83,10 @@ public class TckBackendFeatures {
 		return false;
 	}
 
+	public boolean termsArgumentsAreNormalized() {
+		return false;
+	}
+
 	public boolean supportsDistanceSortWhenFieldMissingInSomeTargetIndexes() {
 		return true;
 	}
