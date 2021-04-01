@@ -696,7 +696,7 @@ public abstract class AbstractMassIndexingFailureIT {
 
 		@Id // This must be on the getter, so that Hibernate Search uses getters instead of direct field access
 		public Integer getId() {
-			if ( id == 2 && failOnBook2GetId.get() ) {
+			if ( id == 2 && failOnBook2GetId.getAndSet( false ) ) {
 				throw new SimulatedFailure( "getId failure" );
 			}
 			return id;

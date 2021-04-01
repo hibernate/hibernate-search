@@ -8,18 +8,15 @@ package org.hibernate.search.mapper.orm.loading.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.hibernate.Session;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingDocumentProducerInterceptor;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingIdentifierProducerInterceptor;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingMappingContext;
-import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingSessionContext;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.loading.LoadingInterceptor;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingStrategy;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingContext;
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingSessionContext;
 
 public final class HibernateOrmMassIndexingContext implements MassIndexingContext<HibernateOrmMassIndexingOptions> {
 	private final HibernateOrmSessionTypeContextProvider typeContextProvider;
@@ -38,18 +35,6 @@ public final class HibernateOrmMassIndexingContext implements MassIndexingContex
 			PojoRawTypeIdentifier<? extends T> expectedType) {
 		LoadingIndexedTypeContext<? extends T> typeContext = typeContextProvider.indexedForExactType( expectedType );
 		return (MassIndexingEntityLoadingStrategy<T, HibernateOrmMassIndexingOptions>) typeContext.loadingStrategy();
-	}
-
-	@Override
-	public String entityName(PojoRawTypeIdentifier<?> entityType) {
-		LoadingIndexedTypeContext<?> typeContext = typeContextProvider.indexedForExactType( entityType );
-		return typeContext.jpaEntityName();
-	}
-
-	@Override
-	public Object entityIdentifier(MassIndexingSessionContext sessionContext, Object entity) {
-		Session session = ((HibernateOrmMassIndexingSessionContext) sessionContext).session();
-		return session.getIdentifier( entity );
 	}
 
 	@Override

@@ -7,26 +7,25 @@
 package org.hibernate.search.mapper.javabean.scope.impl;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
+import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.entity.SearchIndexedEntity;
-import org.hibernate.search.mapper.javabean.loading.impl.LoadingTypeContext;
+import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
 import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexer;
+import org.hibernate.search.mapper.javabean.massindexing.loader.JavaBeanIndexingOptions;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchSession;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContextBuilder;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeSessionContext;
-import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
 
 public class SearchScopeImpl<E> implements SearchScope<E> {
 
@@ -70,19 +69,8 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 	public MassIndexer massIndexer(JavaBeanSearchSession session) {
 		DetachedBackendSessionContext detachedSession = session.mappingContext()
 				.detachedBackendSessionContext( session.tenantIdentifier() );
-
-		Set<? extends PojoRawTypeIdentifier<?>> targetedIndexedTypes = delegate.includedIndexedTypes()
-				.stream()
-				.map( LoadingTypeContext::typeIdentifier )
-				.collect( Collectors.toSet() );
-
-		return new JavaBeanMassIndexer(
-				session.loadingContextBuilder().build(),
-				session.mappingContext(),
-				detachedSession,
-				targetedIndexedTypes,
-				delegate.schemaManager(),
-				delegate.workspace( detachedSession )
-		);
+		PojoMassIndexer<JavaBeanIndexingOptions> massIndexerDelegate = delegate.massIndexer(
+				session.loadingContextBuilder().build(), detachedSession );
+		return new JavaBeanMassIndexer( massIndexerDelegate, detachedSession );
 	}
 }

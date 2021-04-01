@@ -6,36 +6,24 @@
  */
 package org.hibernate.search.mapper.javabean.massindexing.impl;
 
-import java.util.Set;
 import java.util.concurrent.CompletionStage;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
-import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingMappingContext;
 import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoDefaultMassIndexer;
-import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingContext;
 import org.hibernate.search.mapper.javabean.massindexing.loader.JavaBeanIndexingOptions;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 
 public class JavaBeanMassIndexer implements MassIndexer, JavaBeanIndexingOptions {
 
-	private final PojoDefaultMassIndexer<JavaBeanIndexingOptions> delegate;
+	private final PojoMassIndexer<JavaBeanIndexingOptions> delegate;
 	private final DetachedBackendSessionContext sessionContext;
 
 	private int objectLoadingBatchSize = 10;
 
-	public JavaBeanMassIndexer(MassIndexingContext<JavaBeanIndexingOptions> massIndexingContext,
-			MassIndexingMappingContext mappingContext,
-			DetachedBackendSessionContext sessionContext,
-			Set<? extends PojoRawTypeIdentifier<?>> targetedIndexedTypes,
-			PojoScopeSchemaManager scopeSchemaManager,
-			PojoScopeWorkspace scopeWorkspace) {
-		delegate = new PojoDefaultMassIndexer<>( this,
-				massIndexingContext, mappingContext,
-				targetedIndexedTypes, scopeSchemaManager, scopeWorkspace );
+	public JavaBeanMassIndexer(PojoMassIndexer<JavaBeanIndexingOptions> delegate,
+			DetachedBackendSessionContext sessionContext) {
+		this.delegate = delegate;
 		this.sessionContext = sessionContext;
 	}
 
@@ -96,12 +84,12 @@ public class JavaBeanMassIndexer implements MassIndexer, JavaBeanIndexingOptions
 
 	@Override
 	public CompletionStage start() {
-		return delegate.start();
+		return delegate.start( this );
 	}
 
 	@Override
 	public void startAndWait() throws InterruptedException {
-		delegate.startAndWait();
+		delegate.startAndWait( this );
 	}
 
 	@Override

@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.scope.impl;
 
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
+import org.hibernate.search.mapper.pojo.massindexing.impl.MassIndexingIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.schema.management.impl.PojoSchemaManagementIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.search.loading.impl.PojoSearchLoadingIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkIndexedTypeContext;
@@ -18,7 +19,7 @@ import org.hibernate.search.mapper.pojo.work.impl.PojoWorkIndexedTypeContext;
  */
 public interface PojoScopeIndexedTypeContext<I, E>
 		extends PojoWorkIndexedTypeContext<I, E>, PojoSchemaManagementIndexedTypeContext,
-				PojoSearchLoadingIndexedTypeContext<E> {
+				PojoSearchLoadingIndexedTypeContext<E>, MassIndexingIndexedTypeContext<E> {
 
 	String entityName();
 

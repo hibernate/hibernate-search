@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.orm.scope.impl;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
@@ -15,22 +14,22 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
+import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmLoadingContext;
+import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassIndexingContext;
+import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassIndexingOptions;
+import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
+import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexer;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.schema.management.impl.SearchSchemaManagerImpl;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
-import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmLoadingContext;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.work.impl.SearchWorkspaceImpl;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
-import org.hibernate.search.mapper.orm.common.EntityReference;
-import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassIndexingContext;
-import org.hibernate.search.mapper.orm.loading.impl.LoadingIndexedTypeContext;
-import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexer;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 
 public class SearchScopeImpl<E> implements SearchScope<E> {
 
@@ -99,21 +98,13 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 	}
 
 	public MassIndexer massIndexer(DetachedBackendSessionContext detachedSessionContext) {
-		Set<? extends PojoRawTypeIdentifier<?>> targetedIndexedTypes = delegate.includedIndexedTypes().stream()
-				.map( LoadingIndexedTypeContext::typeIdentifier )
-				.collect( Collectors.toSet() );
-
-		HibernateOrmMassIndexingContext configurationContext
-				= new HibernateOrmMassIndexingContext( mappingContext,
+		HibernateOrmMassIndexingContext massIndexingContext = new HibernateOrmMassIndexingContext( mappingContext,
 						mappingContext.typeContextProvider() );
 
-		return new HibernateOrmMassIndexer(
-				configurationContext,
-				mappingContext,
-				detachedSessionContext,
-				targetedIndexedTypes,
-				delegate.schemaManager(),
-				delegate.workspace( detachedSessionContext ) );
+		PojoMassIndexer<HibernateOrmMassIndexingOptions> massIndexerDelegate = delegate
+				.massIndexer( massIndexingContext, detachedSessionContext );
+
+		return new HibernateOrmMassIndexer( massIndexerDelegate, detachedSessionContext );
 	}
 
 	@Override

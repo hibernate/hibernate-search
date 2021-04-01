@@ -95,20 +95,22 @@ public interface PojoMassIndexer<O> {
 	 * Starts the indexing process in background (asynchronous).
 	 * <p>
 	 * May only be called once.
+	 * @param options The mass indexing options.
 	 * @return a {@link java.util.concurrent.CompletionStage} to react to the completion of the indexing task.
 	 * Call {@link CompletionStage#toCompletableFuture()} on the returned object
 	 * to convert it to a {@link CompletableFuture} (which implements {@link java.util.concurrent.Future}).
 	 */
-	CompletionStage<?> start();
+	CompletionStage<?> start(O options);
 
 	/**
 	 * Starts the indexing process, and then block until it's finished.
 	 * <p>
 	 * May only be called once.
+	 * @param options The mass indexing options.
 	 * @throws InterruptedException if the current thread is interrupted
 	 * while waiting.
 	 */
-	void startAndWait() throws InterruptedException;
+	void startAndWait(O options) throws InterruptedException;
 
 	/**
 	 * Sets the {@link MassIndexingMonitor}.

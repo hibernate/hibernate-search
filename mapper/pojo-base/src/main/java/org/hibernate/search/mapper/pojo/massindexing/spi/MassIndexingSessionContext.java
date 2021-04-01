@@ -8,8 +8,9 @@ package org.hibernate.search.mapper.pojo.massindexing.spi;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
-public interface MassIndexingSessionContext {
+public interface MassIndexingSessionContext extends PojoWorkSessionContext {
 
 	PojoIndexer createIndexer();
 

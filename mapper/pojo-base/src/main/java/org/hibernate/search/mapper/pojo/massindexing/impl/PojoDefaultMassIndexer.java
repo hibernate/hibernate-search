@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.massindexing.spi;
+package org.hibernate.search.mapper.pojo.massindexing.impl;
 
 import java.util.List;
 import java.util.Set;
@@ -12,14 +12,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
-import org.hibernate.search.mapper.pojo.massindexing.impl.PojoMassIndexingBatchCoordinator;
-import org.hibernate.search.mapper.pojo.massindexing.impl.PojoMassIndexingBatchIndexingWorkspace;
-import org.hibernate.search.mapper.pojo.massindexing.impl.PojoMassIndexingDelegatingFailureHandler;
-import org.hibernate.search.mapper.pojo.massindexing.impl.PojoMassIndexingFailSafeFailureHandlerWrapper;
-import org.hibernate.search.mapper.pojo.massindexing.impl.PojoMassIndexingIndexedTypeGroup;
-import org.hibernate.search.mapper.pojo.massindexing.impl.PojoMassIndexingLoggingMonitor;
-import org.hibernate.search.mapper.pojo.massindexing.impl.PojoMassIndexingNotifier;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingMappingContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
@@ -35,7 +30,6 @@ import org.hibernate.search.util.common.impl.Futures;
  */
 public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
 
-	private final O options;
 	private final MassIndexingContext<O> massIndexingConfigurationContext;
 	private final MassIndexingMappingContext mappingContext;
 
@@ -54,17 +48,16 @@ public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
 	private MassIndexingMonitor monitor;
 	private final List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex;
 
-	public PojoDefaultMassIndexer(O options,
-			MassIndexingContext<O> indexingContext,
+	public PojoDefaultMassIndexer(MassIndexingContext<O> indexingContext,
 			MassIndexingMappingContext mappingContext,
-			Set<? extends PojoRawTypeIdentifier<?>> targetedIndexedTypes,
+			MassIndexingTypeContextProvider typeContextProvider,
+			Set<? extends MassIndexingIndexedTypeContext<?>> targetedIndexedTypes,
 			PojoScopeSchemaManager scopeSchemaManager,
 			PojoScopeWorkspace scopeWorkspace) {
-		this.options = options;
 		this.massIndexingConfigurationContext = indexingContext;
 		this.mappingContext = mappingContext;
 		this.typeGroupsToIndex = PojoMassIndexingIndexedTypeGroup.disjoint( indexingContext,
-				mappingContext, targetedIndexedTypes );
+				mappingContext, typeContextProvider, targetedIndexedTypes );
 		this.scopeSchemaManager = scopeSchemaManager;
 		this.scopeWorkspace = scopeWorkspace;
 	}
@@ -146,8 +139,8 @@ public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
 	}
 
 	@Override
-	public CompletableFuture<?> start() {
-		PojoMassIndexingBatchCoordinator<O> coordinator = createCoordinator();
+	public CompletableFuture<?> start(O options) {
+		PojoMassIndexingBatchCoordinator<O> coordinator = createCoordinator( options );
 		ExecutorService executor = mappingContext.threadPoolProvider()
 				.newFixedThreadPool( 1,
 						PojoMassIndexingBatchIndexingWorkspace.THREAD_NAME_PREFIX + "Coordinator" );
@@ -161,15 +154,15 @@ public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
 	}
 
 	@Override
-	public void startAndWait() throws InterruptedException {
-		PojoMassIndexingBatchCoordinator<O> coordinator = createCoordinator();
+	public void startAndWait(O options) throws InterruptedException {
+		PojoMassIndexingBatchCoordinator<O> coordinator = createCoordinator( options );
 		coordinator.run();
 		if ( Thread.interrupted() ) {
 			throw new InterruptedException();
 		}
 	}
 
-	private PojoMassIndexingBatchCoordinator<O> createCoordinator() {
+	private PojoMassIndexingBatchCoordinator<O> createCoordinator(O options) {
 		PojoMassIndexingNotifier notifier = new PojoMassIndexingNotifier(
 				getOrCreateFailureHandler(),
 				getOrCreateMonitor()

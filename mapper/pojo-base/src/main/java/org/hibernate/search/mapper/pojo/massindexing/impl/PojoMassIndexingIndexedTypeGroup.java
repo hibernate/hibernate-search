@@ -13,9 +13,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.mapper.pojo.loading.EntityIdentifierScroll;
 import org.hibernate.search.mapper.pojo.loading.EntityLoader;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingStrategy;
@@ -26,6 +27,7 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingContext;
 import org.hibernate.search.mapper.pojo.loading.EntityLoadingTypeGroupStrategy;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingTypeGroup;
 import org.hibernate.search.mapper.pojo.massindexing.spi.MassIndexingMappingContext;
+import org.hibernate.search.util.common.AssertionFailure;
 
 public class PojoMassIndexingIndexedTypeGroup<E> {
 
@@ -46,11 +48,12 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 	 */
 	public static List<PojoMassIndexingIndexedTypeGroup<?>> disjoint(MassIndexingContext<?> indexingContext,
 			MassIndexingMappingContext mappingContext,
-			Set<? extends PojoRawTypeIdentifier<?>> indexedTypeContexts) {
+			MassIndexingTypeContextProvider typeContextProvider,
+			Set<? extends MassIndexingIndexedTypeContext<?>> indexedTypeContexts) {
 		List<PojoMassIndexingIndexedTypeGroup<?>> typeGroups = new ArrayList<>();
-		for ( PojoRawTypeIdentifier<?> typeContext : indexedTypeContexts ) {
+		for ( MassIndexingIndexedTypeContext<?> typeContext : indexedTypeContexts ) {
 			PojoMassIndexingIndexedTypeGroup<?> typeGroup = PojoMassIndexingIndexedTypeGroup.single( indexingContext,
-					mappingContext, typeContext );
+					mappingContext, typeContextProvider, typeContext );
 			// First try to merge this new type group with an existing one
 			ListIterator<PojoMassIndexingIndexedTypeGroup<?>> iterator = typeGroups.listIterator();
 			while ( iterator.hasNext() ) {
@@ -70,30 +73,33 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 
 	private static <E> PojoMassIndexingIndexedTypeGroup<E> single(MassIndexingContext<?> indexingContext,
 			MassIndexingMappingContext mappingContext,
-			PojoRawTypeIdentifier<E> typeContext) {
-		MassIndexingEntityLoadingStrategy<E, ?> strategy = indexingContext.createIndexLoadingStrategy( typeContext );
-		return new PojoMassIndexingIndexedTypeGroup<>( typeContext, indexingContext, mappingContext,
+			MassIndexingTypeContextProvider typeContextProvider,
+			MassIndexingIndexedTypeContext<E> typeContext) {
+		MassIndexingEntityLoadingStrategy<E, ?> strategy =
+				indexingContext.createIndexLoadingStrategy( typeContext.typeIdentifier() );
+		return new PojoMassIndexingIndexedTypeGroup<>( typeContext, indexingContext, mappingContext, typeContextProvider,
 				strategy, Collections.singleton( typeContext ) );
 	}
 
-	private final PojoRawTypeIdentifier<E> commonSuperType;
-	private final String commonSuperName;
+	private final MassIndexingIndexedTypeContext<E> commonSuperType;
 	private final MassIndexingContext<?> indexingContext;
 	private final MassIndexingMappingContext mappingContext;
+	private final MassIndexingTypeContextProvider typeContextProvider;
 	private final MassIndexingEntityLoadingStrategy<E, ?> loadingStrategy;
-	private final Set<PojoRawTypeIdentifier<? extends E>> includedTypes;
+	private final Set<MassIndexingIndexedTypeContext<? extends E>> includedTypes;
 
-	private PojoMassIndexingIndexedTypeGroup(PojoRawTypeIdentifier<E> commonSuperType,
+	private PojoMassIndexingIndexedTypeGroup(MassIndexingIndexedTypeContext<E> commonSuperType,
 			MassIndexingContext<?> indexingContext,
 			MassIndexingMappingContext mappingContext,
+			MassIndexingTypeContextProvider typeContextProvider,
 			MassIndexingEntityLoadingStrategy<E, ?> loadingStrategy,
-			Set<PojoRawTypeIdentifier<? extends E>> includedTypes) {
+			Set<MassIndexingIndexedTypeContext<? extends E>> includedTypes) {
 		this.commonSuperType = commonSuperType;
 		this.indexingContext = indexingContext;
 		this.mappingContext = mappingContext;
+		this.typeContextProvider = typeContextProvider;
 		this.loadingStrategy = loadingStrategy;
 		this.includedTypes = includedTypes;
-		this.commonSuperName = indexingContext.entityName( commonSuperType );
 	}
 
 	@Override
@@ -112,20 +118,36 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 
 	public Map<String, Class<? extends E>> includedEntityMap() {
 		return includedTypes.stream()
-				.collect( Collectors.toMap( indexingContext::entityName, PojoRawTypeIdentifier::javaClass,
+				.collect( Collectors.toMap( MassIndexingIndexedTypeContext::entityName, t -> t.typeIdentifier().javaClass(),
 						(o1, o2) -> o1, LinkedHashMap::new ) );
 	}
 
 	public boolean includesInstance(MassIndexingSessionContext sessionContext, Object entity) {
 		PojoRawTypeIdentifier<?> targetType = sessionContext.runtimeIntrospector().detectEntityType( entity );
-		return includedTypes.stream().anyMatch( targetType::equals );
+		Optional<? extends MassIndexingIndexedTypeContext<?>> typeContextOptional =
+				typeContextProvider.forExactType( targetType );
+		if ( !typeContextOptional.isPresent() ) {
+			return false;
+		}
+		MassIndexingIndexedTypeContext<?> typeContext = typeContextOptional.get();
+		return includedTypes.stream().anyMatch( Predicate.isEqual( typeContext ) );
 	}
 
-	public Object extractReferenceOrSuppress(MassIndexingSessionContext sessionContext, Object entity, Throwable throwable) {
-		String entityName = indexingContext.entityName( commonSuperType );
-		Object identifier = indexingContext.entityIdentifier( sessionContext, entity );
-		return EntityReferenceFactory.safeCreateEntityReference( mappingContext.entityReferenceFactory(),
-				entityName, identifier, throwable::addSuppressed );
+	public Object extractReference(MassIndexingSessionContext sessionContext, Object entity) {
+		PojoRawTypeIdentifier<?> targetType = sessionContext.runtimeIntrospector().detectEntityType( entity );
+		MassIndexingIndexedTypeContext<?> typeContext = typeContextProvider.forExactType( targetType )
+				.orElseThrow( () -> new AssertionFailure(
+						"Processing a non-indexed type in the MassIndexer: " + targetType ) );
+		String entityName = typeContext.entityName();
+		Object identifier = extractIdentifier( typeContext, sessionContext, entity );
+		return mappingContext.entityReferenceFactory().createEntityReference( entityName, identifier );
+
+	}
+
+	public <E2> Object extractIdentifier(MassIndexingIndexedTypeContext<E2> typeContext,
+			MassIndexingSessionContext sessionContext, Object entity) {
+		return typeContext.identifierMapping().getIdentifier( null,
+				typeContext.toEntitySupplier( sessionContext, entity ) );
 	}
 
 	EntityIdentifierScroll createIdentifierScroll(MassIndexingThreadContext context, MassIndexingSessionContext sessionContext) throws InterruptedException {
@@ -173,8 +195,8 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 			return null;
 		}
 		EntityLoadingTypeGroupStrategy.GroupingType groupingType = loadingStrategy.groupStrategy().get(
-				commonSuperName, commonSuperType.javaClass(),
-				other.commonSuperName, other.commonSuperType.javaClass() );
+				commonSuperType.entityName(), commonSuperType.typeIdentifier().javaClass(),
+				other.commonSuperType.entityName(), other.commonSuperType.typeIdentifier().javaClass() );
 
 		if ( groupingType == EntityLoadingTypeGroupStrategy.GroupingType.SUPER ) {
 			return withAdditionalTypes( ((PojoMassIndexingIndexedTypeGroup<? extends E>) other).includedTypes );
@@ -186,11 +208,11 @@ public class PojoMassIndexingIndexedTypeGroup<E> {
 	}
 
 	private PojoMassIndexingIndexedTypeGroup<E> withAdditionalTypes(
-			Set<? extends PojoRawTypeIdentifier<? extends E>> otherIncludedSubTypes) {
-		Set<PojoRawTypeIdentifier<? extends E>> mergedIncludedSubTypes
+			Set<? extends MassIndexingIndexedTypeContext<? extends E>> otherIncludedSubTypes) {
+		Set<MassIndexingIndexedTypeContext<? extends E>> mergedIncludedSubTypes
 				= new LinkedHashSet<>( includedTypes );
 		mergedIncludedSubTypes.addAll( otherIncludedSubTypes );
 		return new PojoMassIndexingIndexedTypeGroup<>( commonSuperType, indexingContext, mappingContext,
-				loadingStrategy, mergedIncludedSubTypes );
+				typeContextProvider, loadingStrategy, mergedIncludedSubTypes );
 	}
 }
