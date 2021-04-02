@@ -77,6 +77,8 @@ public interface ElasticsearchTestDialect {
 
 	boolean hasBugForExistsOnNullGeoPointFieldWithoutDocValues();
 
+	boolean supportMoreThan1024Terms();
+
 	boolean supportsIgnoreUnmappedForGeoPointField();
 
 	boolean ignoresFieldSortWhenNestedFieldMissing();

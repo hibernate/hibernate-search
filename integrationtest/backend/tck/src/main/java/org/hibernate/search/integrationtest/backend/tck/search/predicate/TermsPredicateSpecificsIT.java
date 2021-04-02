@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +43,10 @@ public class TermsPredicateSpecificsIT {
 
 	public TermsPredicateSpecificsIT() {
 		for ( int i = 0; i < LOT_OF_TERMS_SIZE; i++ ) {
-			lotsOfTerms.add( "term" + i );
+			if ( i == 7 ) {
+				lotsOfTerms.add( "term" + i );
+			}
+			lotsOfTerms.add( "wrong-term" + i );
 		}
 	}
 
@@ -90,6 +94,11 @@ public class TermsPredicateSpecificsIT {
 
 	@Test
 	public void lotsOfTerms_matchingAny() {
+		assumeTrue(
+				"More than 1024 terms on matching any must be supported",
+				TckConfiguration.get().getBackendFeatures().supportMoreThan1024TermsOnMatchingAny()
+		);
+
 		StubMappingScope scope = index.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query().where(

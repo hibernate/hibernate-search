@@ -163,6 +163,11 @@ public class Elasticsearch710TestDialect implements ElasticsearchTestDialect {
 	}
 
 	@Override
+	public boolean supportMoreThan1024Terms() {
+		return true;
+	}
+
+	@Override
 	public boolean supportsIgnoreUnmappedForGeoPointField() {
 		return true;
 	}

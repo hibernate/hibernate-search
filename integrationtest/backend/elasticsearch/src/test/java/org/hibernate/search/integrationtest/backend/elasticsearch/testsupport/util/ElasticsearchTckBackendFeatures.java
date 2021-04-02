@@ -158,6 +158,11 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
+	public boolean supportMoreThan1024TermsOnMatchingAny() {
+		return dialect.supportMoreThan1024Terms();
+	}
+
+	@Override
 	public boolean supportsDistanceSortWhenFieldMissingInSomeTargetIndexes() {
 		// Not supported in older versions of Elasticsearch
 		return dialect.supportsIgnoreUnmappedForGeoPointField();
