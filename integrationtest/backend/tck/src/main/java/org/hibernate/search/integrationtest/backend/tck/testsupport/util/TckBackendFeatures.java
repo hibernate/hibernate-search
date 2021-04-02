@@ -87,6 +87,10 @@ public class TckBackendFeatures {
 		return false;
 	}
 
+	public boolean supportMoreThan1024TermsOnMatchingAny() {
+		return true;
+	}
+
 	public boolean supportsDistanceSortWhenFieldMissingInSomeTargetIndexes() {
 		return true;
 	}

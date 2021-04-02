@@ -24,4 +24,9 @@ public class Elasticsearch5TestDialect extends Elasticsearch60TestDialect {
 	public boolean hasBugForSortMaxOnNegativeFloats() {
 		return true;
 	}
+
+	@Override
+	public boolean supportMoreThan1024Terms() {
+		return false;
+	}
 }
