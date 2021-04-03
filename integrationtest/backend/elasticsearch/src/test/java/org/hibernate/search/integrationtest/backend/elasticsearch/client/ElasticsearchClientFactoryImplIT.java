@@ -16,6 +16,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -77,16 +81,23 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.logging.log4j.Level;
 import org.assertj.core.api.InstanceOfAssertFactories;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.DefaultElasticsearchClientFactoryTest")
 public class ElasticsearchClientFactoryImplIT {
 
 	private static final JsonParser JSON_PARSER = new JsonParser();
+
+	@Rule
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	// Some tests in here are flaky, for some reason once in a while wiremock takes a very long time to answer
 	// even though no delay was configured.
@@ -149,6 +160,39 @@ public class ElasticsearchClientFactoryImplIT {
 							.andMatching( httpProtocol() )
 			);
 		}
+	}
+
+	@Test
+	public void simple_httpClientConfigurer() throws Exception {
+		String payload = "{ \"foo\": \"bar\" }";
+		String statusMessage = "StatusMessage";
+		String responseBody = "{ \"foo\": \"bar\" }";
+		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
+				.withRequestBody( equalToJson( payload ) )
+				.andMatching( httpProtocol() )
+				.willReturn( elasticsearchResponse().withStatus( 200 )
+						.withStatusMessage( statusMessage )
+						.withBody( responseBody ) ) );
+
+		HttpResponseInterceptor responseInterceptor = spy( HttpResponseInterceptor.class );
+
+		try ( ElasticsearchClientImplementor client = createClient( properties -> properties.accept(
+				ElasticsearchBackendSettings.CLIENT_CONFIGURER,
+				(ElasticsearchHttpClientConfigurer) context ->
+						context.clientBuilder().addInterceptorFirst( responseInterceptor )
+		) ) ) {
+			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
+			assertThat( result.statusCode() ).as( "status code" ).isEqualTo( 200 );
+			assertThat( result.statusMessage() ).as( "status message" ).isEqualTo( statusMessage );
+			assertJsonEquals( responseBody, result.body().toString() );
+
+			wireMockRule1.verify(
+					postRequestedFor( urlPathMatching( "/myIndex/myType" ) )
+							.andMatching( httpProtocol() )
+			);
+		}
+
+		verify( responseInterceptor, times( 1 ) ).process( any(), any() );
 	}
 
 	@Test
