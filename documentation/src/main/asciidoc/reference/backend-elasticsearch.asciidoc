@@ -296,6 +296,48 @@ The default for this property is `10`.
 +
 These properties expect a positive <<configuration-property-types,Integer value>>, such as `20`.
 
+=== Custom HTTP client configurations
+
+It is possible to configure the HTTP client directly
+using an instance of `org.apache.http.impl.nio.client.HttpAsyncClientBuilder`.
+
+With this API you can add interceptors, change the keep alive, the max connections,
+the SSL key/trust store settings and many other client configurations.
+
+Configure the HTTP client directly requires two steps:
+
+. Define a class that implements the `org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer` interface.
+. Configure Hibernate Search to use that implementation by setting the configuration property
+`hibernate.search.backend.client.configurer`
+to a <<configuration-bean-reference-parsing,bean reference>> pointing to the implementation,
+for example `class:org.hibernate.search.documentation.backend.elasticsearch.client.HttpClientConfigurer`.
+
+.Implementing and using a `ElasticsearchHttpClientConfigurer`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/client/HttpClientConfigurer.java[tags=include]
+----
+<1> The class has to implement the `ElasticsearchHttpClientConfigurer` interface.
+<2> The `configure` method provides the access to the `ElasticsearchHttpClientConfigurationContext`.
+<3> From the context it is possible to get the `HttpAsyncClientBuilder`.
+<4> Finally you can use the builder to configure the client with your custom settings.
+====
+
+.Define a custom http client configurer in the properties
+====
+[source, XML, indent=0, subs="+callouts"]
+----
+include::{resourcesdir}/configuration/http-client-configurer.properties[]
+----
+<1> Specify the HTTP client configurer.
+====
+
+[NOTE]
+====
+Any setting defined by a custom http client configurer will override any other setting defined by Hibernate Search.
+====
+
 [[backend-elasticsearch-configuration-version]]
 === Version
 // Keep the old anchor to avoid dead links
