@@ -115,8 +115,8 @@
         </testResources>
         <plugins>
             <plugin>
-                <groupId>com.github.alexcojocaru</groupId>
-                <artifactId>elasticsearch-maven-plugin</artifactId>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -169,7 +169,6 @@
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
-                    <!-- Inherit execution unpack-shared-test-build-resources -->
                     <execution>
                         <id>unpack-asciidoctor-theme</id>
                         <phase>generate-resources</phase>
