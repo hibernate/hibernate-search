@@ -32,7 +32,6 @@
         <module>backend/elasticsearch</module>
         <module>mapper/orm</module>
         <module>mapper/stub</module>
-        <module>sharedresources</module>
         <module>v5migrationhelper</module>
         <module>jbatch-runtime</module>
         <module>jberet-se</module>

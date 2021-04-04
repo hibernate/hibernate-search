@@ -194,41 +194,6 @@
                         </execution>
                     </executions>
                 </plugin>
-                <plugin>
-                    <groupId>com.github.alexcojocaru</groupId>
-                    <artifactId>elasticsearch-maven-plugin</artifactId>
-                    <version>${version.com.github.alexcojocaru.elasticsearch.plugin}</version>
-                    <configuration>
-                        <skip>${test.elasticsearch.run.skip}</skip>
-                        <flavour>${test.elasticsearch.run.flavour}</flavour>
-                        <clusterName>hsearchEsTestCluster</clusterName>
-                        <httpPort>9200</httpPort>
-                        <version>${test.elasticsearch.connection.version}</version>
-                        <timeout>90</timeout><!-- Make it work on our slow CI -->
-                        <!-- auto-create-index is necessary for non-OSS Elasticsearch -->
-                        <autoCreateIndex>true</autoCreateIndex>
-                        <environmentVariables>
-                            <JAVA_HOME>${test.elasticsearch.run.java_home}</JAVA_HOME>
-                        </environmentVariables>
-                    </configuration>
-                    <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
-                    <executions>
-                        <execution>
-                            <id>start-elasticsearch</id>
-                            <phase>pre-integration-test</phase>
-                            <goals>
-                                <goal>runforked</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>stop-elasticsearch</id>
-                            <phase>post-integration-test</phase>
-                            <goals>
-                                <goal>stop</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -239,45 +204,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack-integrationtest-sharedresources</id>
-                        <phase>generate-test-resources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>hibernate-search-util-internal-integrationtest-sharedresources</artifactId>
-                                    <classifier>build-resources</classifier>
-                                    <type>zip</type>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                            </artifactItems>
-                            <outputDirectory>${project.build.directory}/</outputDirectory>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                        </configuration>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <!--
-                        This ensures that using mvn install -pl <some project> -am
-                        will correctly force the build of the integrationtest-sharedresources module.
-                     -->
-                    <dependency>
-                        <groupId>${project.groupId}</groupId>
-                        <artifactId>hibernate-search-util-internal-integrationtest-sharedresources</artifactId>
-                        <classifier>build-resources</classifier>
-                        <type>zip</type>
-                        <version>${project.version}</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>
@@ -375,21 +301,6 @@
                 <test.elasticsearch.run.flavour></test.elasticsearch.run.flavour>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch5TestDialect</test.elasticsearch.testdialect>
             </properties>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>com.github.alexcojocaru</groupId>
-                            <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${version.com.github.alexcojocaru.elasticsearch.plugin}</version>
-                            <configuration>
-                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/5.0/configuration/</pathConf>
-                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/5.0/init/init.script</pathInitScript>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
         </profile>
 
         <!-- Elasticsearch 6.0 to 6.2 test environment -->
@@ -401,21 +312,6 @@
                 <test.elasticsearch.run.flavour></test.elasticsearch.run.flavour>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch60TestDialect</test.elasticsearch.testdialect>
             </properties>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>com.github.alexcojocaru</groupId>
-                            <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${version.com.github.alexcojocaru.elasticsearch.plugin}</version>
-                            <configuration>
-                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/6.0/configuration/</pathConf>
-                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/6.0/init/init.script</pathInitScript>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
         </profile>
 
         <!-- Elasticsearch 6.3 test environment -->
@@ -425,21 +321,6 @@
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-6.3}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch63TestDialect</test.elasticsearch.testdialect>
             </properties>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>com.github.alexcojocaru</groupId>
-                            <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${version.com.github.alexcojocaru.elasticsearch.plugin}</version>
-                            <configuration>
-                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/6.0/configuration/</pathConf>
-                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/6.0/init/init.script</pathInitScript>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
         </profile>
 
         <!-- Elasticsearch 6.4 to 6.6 test environment -->
@@ -449,21 +330,6 @@
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-6.6}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch64TestDialect</test.elasticsearch.testdialect>
             </properties>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>com.github.alexcojocaru</groupId>
-                            <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${version.com.github.alexcojocaru.elasticsearch.plugin}</version>
-                            <configuration>
-                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/6.0/configuration/</pathConf>
-                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/6.0/init/init.script</pathInitScript>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
         </profile>
 
         <!-- Elasticsearch 6.7 test environment -->
@@ -473,21 +339,6 @@
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-6.7}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch67TestDialect</test.elasticsearch.testdialect>
             </properties>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>com.github.alexcojocaru</groupId>
-                            <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${version.com.github.alexcojocaru.elasticsearch.plugin}</version>
-                            <configuration>
-                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/6.0/configuration/</pathConf>
-                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/6.0/init/init.script</pathInitScript>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
         </profile>
 
         <!-- Elasticsearch 6.8 test environment -->
@@ -497,21 +348,6 @@
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-6.8}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch68TestDialect</test.elasticsearch.testdialect>
             </properties>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>com.github.alexcojocaru</groupId>
-                            <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${version.com.github.alexcojocaru.elasticsearch.plugin}</version>
-                            <configuration>
-                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/6.0/configuration/</pathConf>
-                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/6.0/init/init.script</pathInitScript>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
         </profile>
 
         <!-- Elasticsearch 7.0 to 7.2 test environment -->
@@ -521,21 +357,6 @@
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.2}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch70TestDialect</test.elasticsearch.testdialect>
             </properties>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>com.github.alexcojocaru</groupId>
-                            <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${version.com.github.alexcojocaru.elasticsearch.plugin}</version>
-                            <configuration>
-                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/7.0/configuration/</pathConf>
-                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/7.0/init/init.script</pathInitScript>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
         </profile>
 
         <!-- Elasticsearch 7.3 to 7.6 test environment -->
@@ -545,21 +366,6 @@
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.6}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch73TestDialect</test.elasticsearch.testdialect>
             </properties>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>com.github.alexcojocaru</groupId>
-                            <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${version.com.github.alexcojocaru.elasticsearch.plugin}</version>
-                            <configuration>
-                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/7.0/configuration/</pathConf>
-                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/7.0/init/init.script</pathInitScript>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
         </profile>
 
         <!-- Elasticsearch 7.7 test environment -->
@@ -569,21 +375,6 @@
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.7}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch77TestDialect</test.elasticsearch.testdialect>
             </properties>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>com.github.alexcojocaru</groupId>
-                            <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${version.com.github.alexcojocaru.elasticsearch.plugin}</version>
-                            <configuration>
-                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/7.0/configuration/</pathConf>
-                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/7.0/init/init.script</pathInitScript>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
         </profile>
 
         <!-- Elasticsearch 7.8 to 7.9 test environment -->
@@ -593,21 +384,6 @@
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.9}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch78TestDialect</test.elasticsearch.testdialect>
             </properties>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>com.github.alexcojocaru</groupId>
-                            <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${version.com.github.alexcojocaru.elasticsearch.plugin}</version>
-                            <configuration>
-                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/7.8/configuration/</pathConf>
-                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/7.8/init/init.json</pathInitScript>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
         </profile>
 
         <!-- Elasticsearch 7.10 test environment (default) -->
@@ -623,21 +399,6 @@
                 <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.10}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch710TestDialect</test.elasticsearch.testdialect>
             </properties>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>com.github.alexcojocaru</groupId>
-                            <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${version.com.github.alexcojocaru.elasticsearch.plugin}</version>
-                            <configuration>
-                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/7.8/configuration/</pathConf>
-                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/7.8/init/init.json</pathInitScript>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
         </profile>
 
         <!-- Elasticsearch 7.11+ test environment -->
@@ -649,21 +410,6 @@
                 <test.elasticsearch.run.flavour>default</test.elasticsearch.run.flavour>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch710TestDialect</test.elasticsearch.testdialect>
             </properties>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>com.github.alexcojocaru</groupId>
-                            <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${version.com.github.alexcojocaru.elasticsearch.plugin}</version>
-                            <configuration>
-                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/7.8/configuration/</pathConf>
-                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/7.8/init/init.json</pathInitScript>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
         </profile>
 
         <!-- =============================== -->
