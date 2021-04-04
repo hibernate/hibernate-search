@@ -326,6 +326,7 @@
         <version.jacoco.plugin>0.8.3</version.jacoco.plugin>
         <version.coveralls.plugin>4.3.0</version.coveralls.plugin>
         <version.com.buschmais.jqassistant.plugin>1.8.0</version.com.buschmais.jqassistant.plugin>
+        <version.docker.maven.plugin>0.34.1</version.docker.maven.plugin>
         <version.com.github.alexcojocaru.elasticsearch.plugin>6.19</version.com.github.alexcojocaru.elasticsearch.plugin>
         <version.moditect.plugin>1.0.0.Beta2</version.moditect.plugin>
         <version.sonar.plugin>3.7.0.1746</version.sonar.plugin>
@@ -1626,6 +1627,11 @@
                             <version>${version.failsafe.plugin}</version>
                         </dependency>
                     </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>${version.docker.maven.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.alexcojocaru</groupId>
