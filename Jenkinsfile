@@ -10,7 +10,7 @@ import groovy.transform.Field
 /*
  * See https://github.com/hibernate/hibernate-jenkins-pipeline-helpers
  */
-@Library('hibernate-jenkins-pipeline-helpers@1.3')
+@Library('hibernate-jenkins-pipeline-helpers@1.4')
 import org.hibernate.jenkins.pipeline.helpers.job.JobHelper
 import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
 import org.hibernate.jenkins.pipeline.helpers.version.Version
@@ -207,50 +207,39 @@ stage('Configure') {
 			],
 			esLocal: [
 					new EsLocalBuildEnvironment(versionRange: '[5.6,6.0)', mavenProfile: 'elasticsearch-5.6',
-							jdkTool: 'OpenJDK 8 Latest',
 							condition: TestCondition.AFTER_MERGE),
 					// ES 6.2, 6.3.0, 6.3.1 and 6.3.2 and below have a bug that prevents double-nested
 					// sorts from working: https://github.com/elastic/elasticsearch/issues/32130
 					new EsLocalBuildEnvironment(versionRange: '[6.0,6.2)', mavenProfile: 'elasticsearch-6.0',
-							jdkTool: 'OpenJDK 8 Latest',
 							condition: TestCondition.ON_DEMAND),
 					// ES 6.3 has a bug that prevents IndexingIT from passing.
 					// See https://github.com/elastic/elasticsearch/issues/32395
 					new EsLocalBuildEnvironment(versionRange: '[6.3,6.4)', mavenProfile: 'elasticsearch-6.3',
-							jdkTool: 'OpenJDK 8 Latest',
 							condition: TestCondition.ON_DEMAND),
 					new EsLocalBuildEnvironment(versionRange: '[6.4,6.7)', mavenProfile: 'elasticsearch-6.4',
-							jdkTool: 'OpenJDK 8 Latest',
 							condition: TestCondition.AFTER_MERGE),
 					// Not testing 6.7 to make the build quicker.
 					// The only difference with 6.8+ is a bug in field sorts that is already present in earlier versions.
 					new EsLocalBuildEnvironment(versionRange: '[6.7,6.8)', mavenProfile: 'elasticsearch-6.7',
-							jdkTool: 'OpenJDK 8 Latest',
 							condition: TestCondition.ON_DEMAND),
 					new EsLocalBuildEnvironment(versionRange: '[6.8,7.0)', mavenProfile: 'elasticsearch-6.8',
-							jdkTool: 'OpenJDK 8 Latest',
 							condition: TestCondition.AFTER_MERGE),
 					// Not testing 7.0/7.1/7.2 to make the build quicker.
 					// The only difference with 7.3+ is they have a bug in their BigInteger support.
 					new EsLocalBuildEnvironment(versionRange: '[7.0,7.3)', mavenProfile: 'elasticsearch-7.0',
-							jdkTool: 'OpenJDK 8 Latest',
 							condition: TestCondition.ON_DEMAND),
 					new EsLocalBuildEnvironment(versionRange: '[7.3,7.7)', mavenProfile: 'elasticsearch-7.3',
-							jdkTool: 'OpenJDK 11 Latest',
 							condition: TestCondition.AFTER_MERGE),
 					// Not testing 7.7 to make the build quicker.
 					// The only difference with 7.7+ is how we create templates for tests.
 					new EsLocalBuildEnvironment(versionRange: '[7.7,7.8)', mavenProfile: 'elasticsearch-7.7',
-							jdkTool: 'OpenJDK 11 Latest',
 							condition: TestCondition.ON_DEMAND),
 					// Not testing 7.9 to make the build quicker.
 					// The only difference with 7.10+ is an additional test for exists on null values,
 					// which is disabled on 7.10 but enabled on all older versions (not just 7.9).
 					new EsLocalBuildEnvironment(versionRange: '[7.8,7.10)', mavenProfile: 'elasticsearch-7.8',
-							jdkTool: 'OpenJDK 11 Latest',
 							condition: TestCondition.AFTER_MERGE),
 					new EsLocalBuildEnvironment(versionRange: '[7.10,7.x)', mavenProfile: 'elasticsearch-7.10',
-							jdkTool: 'OpenJDK 11 Latest',
 							condition: TestCondition.BEFORE_MERGE,
 							isDefault: true)
 			],
@@ -461,7 +450,6 @@ stage('Default build') {
 					-Pdist -Pcoverage -Pjqassistant \
 					${enableDefaultBuildIT ? '' : '-DskipITs'} \
 					${toTestJdkArg(environments.content.jdk.default)} \
-					${toElasticsearchJdkArg(environments.content.jdk.default)} \
 			"""
 
 			// Don't try to report to Coveralls.io or SonarCloud if coverage data is missing
@@ -757,10 +745,6 @@ abstract class BuildEnvironment {
 	String getMavenJdkTool(def allEnvironments) {
 		allEnvironments.content.jdk.default.buildJdkTool
 	}
-
-	String getElasticsearchJdkTool(def allEnvironments) {
-		allEnvironments.content.esLocal.default.jdkTool
-	}
 }
 
 class JdkBuildEnvironment extends BuildEnvironment {
@@ -794,13 +778,8 @@ class DatabaseBuildEnvironment extends BuildEnvironment {
 class EsLocalBuildEnvironment extends BuildEnvironment {
 	String versionRange
 	String mavenProfile
-	String jdkTool
 	@Override
 	String getTag() { "elasticsearch-local-$versionRange" }
-	@Override
-	String getElasticsearchJdkTool(def allEnvironments) {
-		jdkTool
-	}
 }
 
 class EsAwsBuildEnvironment extends BuildEnvironment {
@@ -811,10 +790,6 @@ class EsAwsBuildEnvironment extends BuildEnvironment {
 	boolean staticCredentials = false
 	@Override
 	String getTag() { "elasticsearch-aws-$version" + (staticCredentials ? "-credentials-static" : "") }
-	@Override
-	String getElasticsearchJdkTool(def allEnvironments) {
-		null // No JDK needed for Elasticsearch: the Elasticsearch instance is remote.
-	}
 	String getNameEmbeddableVersion() {
 		version.replaceAll('\\.', '')
 	}
@@ -918,7 +893,6 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, String project
 		sh """ \
 				mvn -Dsurefire.environment=$testSuffix \
 						${toTestJdkArg(buildEnv)} \
-						${toElasticsearchJdkArg(buildEnv)} \
 						--fail-at-end \
 						$args \
 		"""
@@ -961,15 +935,4 @@ String toTestJdkArg(BuildEnvironment buildEnv) {
 	}
 
 	return args
-}
-
-String toElasticsearchJdkArg(BuildEnvironment buildEnv) {
-	String elasticsearchJdkTool = buildEnv.getElasticsearchJdkTool(environments)
-
-	if (elasticsearchJdkTool == null || buildEnv.getMavenJdkTool(environments) == elasticsearchJdkTool) {
-		return '' // No specific JDK needed
-	}
-
-	def elasticsearchJdkToolPath = tool(name: elasticsearchJdkTool, type: 'jdk')
-	return "-Dtest.elasticsearch.run.java_home=$elasticsearchJdkToolPath"
 }
