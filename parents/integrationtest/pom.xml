@@ -152,6 +152,13 @@
                                 <run>
                                     <env>
                                         <discovery.type>single-node</discovery.type>
+                                        <!-- fix Docker images for older versions -->
+                                        <xpack.security.enabled>false</xpack.security.enabled>
+                                        <!-- Prevent swapping
+                                            This may trigger warnings upon boot if the system is not correctly set up.
+                                            See https://www.elastic.co/guide/en/elasticsearch/reference/7.5/setup-configuration-memory.html#bootstrap-memory_lock
+                                         -->
+                                        <bootstrap.memory_lock>true</bootstrap.memory_lock>
                                     </env>
                                     <ports>
                                         <port>9200:9200</port>
