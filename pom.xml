@@ -480,8 +480,6 @@
 
         <!-- Control how an Elasticsearch instance is run automatically during tests -->
         <test.elasticsearch.run.skip>false</test.elasticsearch.run.skip>
-        <test.elasticsearch.run.java_home>${java.home}</test.elasticsearch.run.java_home>
-        <test.elasticsearch.run.flavour>oss</test.elasticsearch.run.flavour>
         <!--
              These properties are transparently passed as system properties to integration tests,
              and retrieved by a test utility:

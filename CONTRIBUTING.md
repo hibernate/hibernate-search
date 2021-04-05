@@ -261,15 +261,6 @@ Or more simply, if your AWS credentials are already stored in `~/.aws/credential
         -Dtest.elasticsearch.connection.aws.region=<Your AWS region ID>
 ```
 
-When building Hibernate Search with new JDKs,
-you may want to run Elasticsearch with a different JDK than the one used by Maven.
-This can be done by setting a property
-(**this will only work with the profiles for Elasticsearch 5 and above**):
-
-```bash
-./mvnw clean install -Dtest.elasticsearch.run.java_home=/path/to/my/jdk
-```
-
 ### JQAssistant
 
 You can request static analysis and sanity checks with the `jqassistant` profile.
