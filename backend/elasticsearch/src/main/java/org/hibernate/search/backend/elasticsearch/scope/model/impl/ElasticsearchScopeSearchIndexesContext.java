@@ -42,6 +42,7 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 	private final Set<ElasticsearchIndexModel> indexModels;
 	private final Set<String> hibernateSearchIndexNames;
 	private final Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex;
+	private final int maxResultWindow;
 
 	public ElasticsearchScopeSearchIndexesContext(Set<ElasticsearchIndexModel> indexModels) {
 		this.indexModels = indexModels;
@@ -52,6 +53,15 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 			hibernateSearchIndexNames.add( model.hibernateSearchName() );
 			mappedTypeNameToIndex.put( model.mappedTypeName(), model );
 		}
+
+		int currentMaxResultWindow = Integer.MAX_VALUE;
+		for ( ElasticsearchIndexModel index : indexModels ) {
+			if ( index.maxResultWindow() < currentMaxResultWindow ) {
+				// take the minimum
+				currentMaxResultWindow = index.maxResultWindow();
+			}
+		}
+		this.maxResultWindow = currentMaxResultWindow;
 	}
 
 	@Override
@@ -115,6 +125,11 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 			throw log.unknownNamedPredicateForSearch( absoluteNamedPredicatePath, indexesEventContext() );
 		}
 		return resultOrNull;
+	}
+
+	@Override
+	public int maxResultWindow() {
+		return maxResultWindow;
 	}
 
 	private EventContext indexesEventContext() {

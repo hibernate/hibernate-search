@@ -26,6 +26,7 @@ import com.google.gson.annotations.SerializedName;
 public class IndexSettings {
 
 	public static final String MAX_RESULT_WINDOW_ATTRIBUTE = "max_result_window";
+	public static final int MAX_RESULT_WINDOW_DEFAULT = 10_000;
 
 	private Analysis analysis;
 

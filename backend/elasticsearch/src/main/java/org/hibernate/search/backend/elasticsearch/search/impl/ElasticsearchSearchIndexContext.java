@@ -20,4 +20,7 @@ public interface ElasticsearchSearchIndexContext {
 	String mappedTypeName();
 
 	DocumentIdentifierValueConverter<?> idDslConverter();
+
+	int maxResultWindow();
+
 }

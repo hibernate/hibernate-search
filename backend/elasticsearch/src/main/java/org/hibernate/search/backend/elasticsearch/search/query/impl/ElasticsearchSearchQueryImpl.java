@@ -50,11 +50,6 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	/**
-	 * ES default limit for (limit + offset); any search query beyond that limit will be rejected.
-	 */
-	private static final int MAX_RESULT_WINDOW_SIZE = 10000;
-
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final ElasticsearchParallelWorkOrchestrator queryOrchestrator;
 	private final ElasticsearchSearchContext searchContext;
@@ -66,6 +61,11 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private final ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor;
 	private final Integer scrollTimeout;
 	private final Long totalHitCountThreshold;
+
+	/**
+	 * ES limit for (limit + offset); any search query beyond that limit will be rejected.
+	 */
+	private final int maxResultWindow;
 
 	private TimeoutManager timeoutManager;
 
@@ -91,6 +91,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		this.timeoutManager = timeoutManager;
 		this.scrollTimeout = scrollTimeout;
 		this.totalHitCountThreshold = totalHitCountThreshold;
+		this.maxResultWindow = searchContext.indexes().maxResultWindow();
 	}
 
 	@Override
@@ -245,7 +246,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		}
 		else {
 			// Elasticsearch has a default limit of 10, which is not what we want.
-			int maxLimitThatElasticsearchWillAccept = MAX_RESULT_WINDOW_SIZE;
+			int maxLimitThatElasticsearchWillAccept = maxResultWindow;
 			if ( offset != null ) {
 				maxLimitThatElasticsearchWillAccept -= offset;
 			}

@@ -92,6 +92,13 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 	}
 
 	@Override
+	public int maxResultWindow() {
+		return ( customIndexSettings == null || customIndexSettings.getMaxResultWindow() == null ) ?
+				IndexSettings.MAX_RESULT_WINDOW_DEFAULT :
+				customIndexSettings.getMaxResultWindow();
+	}
+
+	@Override
 	public ElasticsearchIndexSchemaObjectNode root() {
 		return rootNode;
 	}
