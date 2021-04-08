@@ -733,4 +733,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 139, value = "Unknown filter definition '%1$s'.")
 	SearchException unknownNamedPredicateForSearch(String name, @Param EventContext context);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = ID_OFFSET + 140, value = "A search query fetching all hits was requested," +
+			" but only '%2$s' hits were retrieved because the maximum result window size forces a limit of '%1$s'" +
+			" hits. Refer to Elasticsearch's 'max_result_window_size' setting for more information." )
+	void defaultedLimitedHits(Integer defaultLimit, long hitCount);
+
 }
