@@ -114,8 +114,9 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	@Override
 	public ElasticsearchSearchResult<H> fetch(Integer offset, Integer limit) {
 		timeoutManager.start();
+		Integer defaultedLimit = defaultedLimit( limit, offset );
 		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> work = searchWorkBuilder()
-				.paging( defaultedLimit( limit, offset ), offset )
+				.paging( defaultedLimit, offset )
 				.totalHitCountThreshold( totalHitCountThreshold )
 				.build();
 
@@ -130,14 +131,20 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				 */
 				.loadBlocking();
 		timeoutManager.stop();
+
+		if ( limit == null && result.total().hitCountLowerBound() > defaultedLimit ) {
+			// user may not be aware of this defaultedLimit
+			log.defaultedLimitedHits( defaultedLimit, result.total().hitCountLowerBound() );
+		}
 		return result;
 	}
 
 	@Override
 	public List<H> fetchHits(Integer offset, Integer limit) {
 		timeoutManager.start();
+		Integer defaultedLimit = defaultedLimit( limit, offset );
 		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> work = searchWorkBuilder()
-				.paging( defaultedLimit( limit, offset ), offset )
+				.paging( defaultedLimit, offset )
 				.disableTrackTotalHits()
 				.build();
 
@@ -152,6 +159,11 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				 */
 				.loadBlocking();
 		timeoutManager.stop();
+
+		if ( limit == null && result.total().hitCountLowerBound() > defaultedLimit ) {
+			// user may not be aware of this defaultedLimit
+			log.defaultedLimitedHits( defaultedLimit, result.total().hitCountLowerBound() );
+		}
 		return result.hits();
 	}
 
