@@ -31,4 +31,7 @@ public interface ElasticsearchSearchIndexesContext {
 	ElasticsearchSearchFieldContext field(String absoluteFieldPath);
 
 	ElasticsearchIndexSchemaNamedPredicateNode namedPredicate(String absoluteNamedPredicatePath);
+
+	int maxResultWindow();
+
 }
