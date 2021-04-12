@@ -24,7 +24,7 @@ public interface TermsPredicateMatchingStep<N extends TermsPredicateOptionsStep<
 	 * @param firstTerm The (first) term to match.
 	 * @param otherTerms The others (optional) terms to match.
 	 * The signature of this method defines these parameter as a {@link Object},
-	 * but a specific type is expected depending on the targeted field and on the {@code dslConverter} parameter.
+	 * but a specific type is expected depending on the targeted field.
 	 * See {@link ValueConvert#YES} for more information.
 	 * @return The next step.
 	 */
@@ -37,7 +37,7 @@ public interface TermsPredicateMatchingStep<N extends TermsPredicateOptionsStep<
 	 *
 	 * @param terms The terms to match.
 	 * The signature of this method defines this parameter as a {@link Collection} of any {@link Object},
-	 * but a specific type is expected depending on the targeted field and on the {@code dslConverter} parameter.
+	 * but a specific type is expected depending on the targeted field.
 	 * See {@link ValueConvert#YES} for more information.
 	 * @return The next step.
 	 */
@@ -50,7 +50,7 @@ public interface TermsPredicateMatchingStep<N extends TermsPredicateOptionsStep<
 	 *
 	 * @param terms The terms to match.
 	 * The signature of this method defines this parameter as a {@link Collection} of any {@link Object},
-	 * but a specific type is expected depending on the targeted field and on the {@code dslConverter} parameter.
+	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
 	 * See {@link ValueConvert} for more information.
 	 * @param convert Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
 	 * See {@link ValueConvert} for more information.
@@ -64,7 +64,7 @@ public interface TermsPredicateMatchingStep<N extends TermsPredicateOptionsStep<
 	 * @param firstTerm The (first) term to match.
 	 * @param otherTerms The others (optional) terms to match.
 	 * The signature of this method defines these parameter as a {@link Object},
-	 * but a specific type is expected depending on the targeted field and on the {@code dslConverter} parameter.
+	 * but a specific type is expected depending on the targeted field.
 	 * See {@link ValueConvert#YES} for more information.
 	 * @return The next step.
 	 */
@@ -77,7 +77,7 @@ public interface TermsPredicateMatchingStep<N extends TermsPredicateOptionsStep<
 	 *
 	 * @param terms The terms to match.
 	 * The signature of this method defines this parameter as a {@link Collection} of any {@link Object},
-	 * but a specific type is expected depending on the targeted field and on the {@code dslConverter} parameter.
+	 * but a specific type is expected depending on the targeted field.
 	 * See {@link ValueConvert#YES} for more information.
 	 * @return The next step.
 	 */
@@ -90,7 +90,7 @@ public interface TermsPredicateMatchingStep<N extends TermsPredicateOptionsStep<
 	 *
 	 * @param terms The terms to match.
 	 * The signature of this method defines this parameter as a {@link Collection} of any {@link Object},
-	 * but a specific type is expected depending on the targeted field and on the {@code dslConverter} parameter.
+	 * but a specific type is expected depending on the targeted field and on the {@code convert} parameter.
 	 * See {@link ValueConvert} for more information.
 	 * @param convert Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
 	 * See {@link ValueConvert} for more information.
