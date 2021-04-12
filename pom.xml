@@ -2088,6 +2088,17 @@
         </profile>
 
         <profile>
+            <id>jdk17+</id>
+            <activation>
+                <jdk>[17,)</jdk>
+            </activation>
+            <properties>
+                <!-- ForbiddenAPIs doesn't work with JDK17: https://github.com/policeman-tools/forbidden-apis/issues/177 -->
+                <forbiddenapis.skip>true</forbiddenapis.skip>
+            </properties>
+        </profile>
+
+        <profile>
             <id>compiler-eclipse</id>
             <build>
                 <pluginManagement>
