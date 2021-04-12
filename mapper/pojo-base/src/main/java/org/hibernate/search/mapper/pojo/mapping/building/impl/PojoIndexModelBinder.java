@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
@@ -67,7 +68,7 @@ public interface PojoIndexModelBinder {
 
 	<V> Optional<BoundValueBridge<V, ?>> bindValue(IndexBindingContext bindingContext,
 			BoundPojoModelPathValueNode<?, ?, V> modelPath, boolean multiValued,
-			ValueBinder binder,
+			ValueBinder binder, Map<String, Object> params,
 			String relativeFieldName, FieldModelContributor contributor);
 
 }

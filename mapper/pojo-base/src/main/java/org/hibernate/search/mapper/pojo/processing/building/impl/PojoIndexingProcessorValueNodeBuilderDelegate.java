@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -69,7 +70,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 	}
 
 	@Override
-	public void valueBinder(ValueBinder binder, String relativeFieldName,
+	public void valueBinder(ValueBinder binder, Map<String, Object> params, String relativeFieldName,
 			FieldModelContributor fieldModelContributor) {
 		String defaultedRelativeFieldName = relativeFieldName;
 		if ( defaultedRelativeFieldName == null ) {
@@ -78,7 +79,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 
 		mappingHelper.indexModelBinder().bindValue(
 				bindingContext, modelPath, multiValuedFromContainerExtractor,
-				binder, defaultedRelativeFieldName,
+				binder, params, defaultedRelativeFieldName,
 				fieldModelContributor
 		)
 				.ifPresent( boundBridges::add );

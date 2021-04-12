@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.ObjectStructure;
@@ -15,7 +16,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 public interface PojoMappingCollectorValueNode extends PojoMappingCollector {
 
-	void valueBinder(ValueBinder binder,
+	void valueBinder(ValueBinder binder, Map<String, Object> params,
 			String relativeFieldName, FieldModelContributor fieldModelContributor);
 
 	void indexedEmbedded(PojoRawTypeModel<?> definingTypeModel, String relativePrefix, ObjectStructure structure,
