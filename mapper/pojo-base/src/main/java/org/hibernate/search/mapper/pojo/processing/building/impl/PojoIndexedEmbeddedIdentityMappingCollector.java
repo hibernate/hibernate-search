@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.processing.building.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -57,7 +58,7 @@ class PojoIndexedEmbeddedIdentityMappingCollector<E> implements PojoIdentityMapp
 		embeddedTypeNodeBuilder.property( identifierModelPath.getPropertyModel().name() )
 				.value( ContainerExtractorPath.defaultExtractors() )
 				.valueBinder( identifierBinder == null ? null : new IdentifierBinderToValueBinderAdapter( identifierBinder ),
-						null,
+						Collections.emptyMap(), null,
 						context -> context.standardTypeOptionsStep().searchable( Searchable.YES )
 								.projectable( Projectable.YES ) );
 	}

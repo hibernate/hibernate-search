@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Map;
 
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -31,7 +32,10 @@ abstract class AbstractPropertyMappingFieldOptionsStep<S extends PropertyMapping
 
 	protected final String relativeFieldName;
 	final PojoCompositeFieldModelContributor fieldModelContributor;
+
 	private ValueBinder binder;
+	private Map<String, Object> params;
+
 	private ContainerExtractorPath extractorPath = ContainerExtractorPath.defaultExtractors();
 
 	AbstractPropertyMappingFieldOptionsStep(PropertyMappingStep delegate, String relativeFieldName,
@@ -55,7 +59,7 @@ abstract class AbstractPropertyMappingFieldOptionsStep<S extends PropertyMapping
 	@Override
 	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
 		collector.value( extractorPath )
-				.valueBinder( binder, relativeFieldName, fieldModelContributor );
+				.valueBinder( binder, params, relativeFieldName, fieldModelContributor );
 	}
 
 	@Override
@@ -69,8 +73,9 @@ abstract class AbstractPropertyMappingFieldOptionsStep<S extends PropertyMapping
 	}
 
 	@Override
-	public S valueBinder(ValueBinder binder) {
+	public S valueBinder(ValueBinder binder, Map<String, Object> params) {
 		this.binder = binder;
+		this.params = params;
 		return thisAsS();
 	}
 

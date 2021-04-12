@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -167,7 +168,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	@Override
 	public <V> Optional<BoundValueBridge<V, ?>> bindValue(IndexBindingContext indexBindingContext,
 			BoundPojoModelPathValueNode<?, ?, V> modelPath, boolean multiValued,
-			ValueBinder binder,
+			ValueBinder binder, Map<String, Object> params,
 			String relativeFieldName, FieldModelContributor contributor) {
 		Integer decimalScale = typeAdditionalMetadataProvider.get( modelPath ).getDecimalScale();
 		IndexFieldTypeDefaultsProvider defaultsProvider = new IndexFieldTypeDefaultsProvider( decimalScale );
@@ -183,7 +184,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 				beanResolver, introspector,
 				valueTypeModel, multiValued,
 				indexBindingContext, defaultsProvider,
-				relativeFieldName, contributor
+				relativeFieldName, contributor, params
 		);
 
 		return bindingContext.applyBinder( defaultedBinder );

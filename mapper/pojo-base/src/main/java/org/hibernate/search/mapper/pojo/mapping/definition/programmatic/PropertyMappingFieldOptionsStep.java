@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
@@ -46,12 +49,30 @@ public interface PropertyMappingFieldOptionsStep<S extends PropertyMappingFieldO
 	}
 
 	/**
+	 * Define a value binder, responsible for creating a bridge.
+	 * To pass some parameters to the bridge,
+	 * use the method {@link #valueBinder(ValueBinder, Map)} instead.
+	 *
 	 * @param binder A {@link ValueBinder} responsible for creating a bridge.
 	 * @return {@code this}, for method chaining.
 	 * @see GenericField#valueBinder()
 	 * @see ValueBinder
 	 */
-	S valueBinder(ValueBinder binder);
+	default S valueBinder(ValueBinder binder) {
+		return valueBinder( binder, Collections.emptyMap() );
+	}
+
+	/**
+	 * Define a value binder, responsible for creating a bridge.
+	 * With this method it is possible to pass a set of parameters to the binder,
+	 * so that they can be used by the bridge.
+	 *
+	 * @param binder A {@link ValueBinder} responsible for creating a bridge.
+	 * @param params The parameters to pass to the binder.
+	 * @return {@code this}, for method chaining.
+	 * @see ValueBinder
+	 */
+	S valueBinder(ValueBinder binder, Map<String, Object> params);
 
 	/**
 	 * @param extractorName The name of the container extractor to use.
