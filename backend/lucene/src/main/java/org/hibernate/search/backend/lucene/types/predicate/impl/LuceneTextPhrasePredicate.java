@@ -31,7 +31,7 @@ public class LuceneTextPhrasePredicate extends AbstractLuceneLeafSingleFieldPred
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private LuceneTextPhrasePredicate(Builder builder) {
+	private LuceneTextPhrasePredicate(Builder<?> builder) {
 		super( builder );
 	}
 

@@ -24,7 +24,7 @@ import org.apache.lucene.search.Query;
 
 public class LuceneNumericRangePredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
-	private LuceneNumericRangePredicate(Builder builder) {
+	private LuceneNumericRangePredicate(Builder<?, ?> builder) {
 		super( builder );
 	}
 

@@ -25,7 +25,7 @@ public class LuceneNumericMatchPredicate extends AbstractLuceneLeafSingleFieldPr
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private LuceneNumericMatchPredicate(Builder builder) {
+	private LuceneNumericMatchPredicate(Builder<?, ?> builder) {
 		super( builder );
 	}
 

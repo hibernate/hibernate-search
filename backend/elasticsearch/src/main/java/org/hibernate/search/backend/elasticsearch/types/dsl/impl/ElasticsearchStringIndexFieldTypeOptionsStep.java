@@ -188,7 +188,7 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 			builder.queryElementFactory( PredicateTypeKeys.PHRASE, new ElasticsearchTextPhrasePredicate.Factory() );
 			builder.queryElementFactory( PredicateTypeKeys.WILDCARD, new ElasticsearchTextWildcardPredicate.Factory() );
 			builder.queryElementFactory( PredicateTypeKeys.REGEXP, new ElasticsearchTextRegexpPredicate.Factory() );
-			builder.queryElementFactory( PredicateTypeKeys.TERMS, new ElasticsearchTermsPredicate.Factory( codec ) );
+			builder.queryElementFactory( PredicateTypeKeys.TERMS, new ElasticsearchTermsPredicate.Factory<>( codec ) );
 			builder.queryElementFactory( PredicateTypeKeys.SIMPLE_QUERY_STRING,
 					new ElasticsearchSimpleQueryStringPredicateBuilderFieldState.Factory() );
 		}
