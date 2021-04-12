@@ -24,7 +24,7 @@ import org.apache.lucene.util.BytesRef;
 
 public class LuceneTextRangePredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
-	private LuceneTextRangePredicate(Builder builder) {
+	private LuceneTextRangePredicate(Builder<?> builder) {
 		super( builder );
 	}
 

@@ -34,7 +34,7 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private LuceneTextMatchPredicate(Builder builder) {
+	private LuceneTextMatchPredicate(Builder<?> builder) {
 		super( builder );
 	}
 

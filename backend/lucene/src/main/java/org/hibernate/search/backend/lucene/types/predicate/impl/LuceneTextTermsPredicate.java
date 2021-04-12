@@ -30,7 +30,7 @@ import org.apache.lucene.util.BytesRef;
 
 public class LuceneTextTermsPredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
-	private LuceneTextTermsPredicate(Builder builder) {
+	private LuceneTextTermsPredicate(Builder<?> builder) {
 		super( builder );
 	}
 

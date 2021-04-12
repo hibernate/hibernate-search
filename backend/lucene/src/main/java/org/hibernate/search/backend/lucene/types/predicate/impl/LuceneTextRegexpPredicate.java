@@ -19,7 +19,7 @@ import org.apache.lucene.search.RegexpQuery;
 
 public class LuceneTextRegexpPredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
-	private LuceneTextRegexpPredicate(Builder builder) {
+	private LuceneTextRegexpPredicate(Builder<?> builder) {
 		super( builder );
 	}
 

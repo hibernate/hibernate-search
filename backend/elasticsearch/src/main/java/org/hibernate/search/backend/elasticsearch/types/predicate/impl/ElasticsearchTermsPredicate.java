@@ -47,7 +47,7 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 	private final JsonElement[] terms;
 	private boolean allMatch;
 
-	public ElasticsearchTermsPredicate(Builder builder) {
+	public ElasticsearchTermsPredicate(Builder<?> builder) {
 		super( builder );
 		this.term = builder.term;
 		this.terms = builder.terms;

@@ -25,7 +25,7 @@ import org.apache.lucene.search.Query;
 
 public class LuceneNumericTermsPredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
-	private LuceneNumericTermsPredicate(Builder builder) {
+	private LuceneNumericTermsPredicate(Builder<?, ?> builder) {
 		super( builder );
 	}
 

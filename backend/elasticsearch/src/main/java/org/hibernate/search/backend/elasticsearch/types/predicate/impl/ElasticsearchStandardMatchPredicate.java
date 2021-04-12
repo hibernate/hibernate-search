@@ -38,7 +38,7 @@ public class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSi
 
 	private final JsonElement value;
 
-	ElasticsearchStandardMatchPredicate(Builder builder) {
+	ElasticsearchStandardMatchPredicate(Builder<?> builder) {
 		super( builder );
 		value = builder.value;
 	}

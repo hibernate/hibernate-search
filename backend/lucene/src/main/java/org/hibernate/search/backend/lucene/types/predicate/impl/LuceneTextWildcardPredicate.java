@@ -22,7 +22,7 @@ import org.apache.lucene.util.BytesRef;
 
 public class LuceneTextWildcardPredicate extends AbstractLuceneLeafSingleFieldPredicate {
 
-	private LuceneTextWildcardPredicate(Builder builder) {
+	private LuceneTextWildcardPredicate(Builder<?> builder) {
 		super( builder );
 	}
 
