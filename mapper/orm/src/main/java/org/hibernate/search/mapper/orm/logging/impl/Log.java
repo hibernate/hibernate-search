@@ -52,7 +52,6 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = 36, max = 36),
 		@ValidIdRange(min = 39, max = 39),
 		@ValidIdRange(min = 62, max = 62),
-		@ValidIdRange(min = 65, max = 65),
 		@ValidIdRange(min = 116, max = 116),
 		@ValidIdRange(min = 183, max = 183),
 		@ValidIdRange(min = 211, max = 212),
@@ -99,10 +98,6 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = ERROR)
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 62, value = "Mass indexing received interrupt signal: aborting.")
 	void interruptedBatchIndexing();
-
-	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 65, value = "Transaction rollback failure: %1$s")
-	void errorRollingBackTransaction(String message, @Cause Exception e1);
 
 	/*
 	 * This is not an exception factory nor a logging statement.
