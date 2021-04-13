@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.index.spi;
 
 import java.util.Set;
 
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 
 public interface ShardingStrategyInitializationContext {

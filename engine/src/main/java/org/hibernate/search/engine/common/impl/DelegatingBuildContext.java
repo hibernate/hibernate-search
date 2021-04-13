@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.common.impl;
 
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.resources.impl.EngineThreads;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.reporting.FailureHandler;

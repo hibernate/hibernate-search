@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.aws.impl;
 
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsCredentialsTypeNames;
 import org.hibernate.search.backend.elasticsearch.aws.spi.ElasticsearcAwsCredentialsProvider;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;

@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.cfg.spi;
+package org.hibernate.search.engine.cfg;
 
 import java.util.Map;
 import java.util.Optional;
@@ -16,6 +16,7 @@ import org.hibernate.search.engine.cfg.impl.MaskedConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.OverriddenConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.PrefixedConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.SystemConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 
 /**
  * A source of property values for Hibernate Search.

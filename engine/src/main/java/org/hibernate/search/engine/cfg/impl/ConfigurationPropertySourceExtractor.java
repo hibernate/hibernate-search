@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.cfg.impl;
 
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 
 public interface ConfigurationPropertySourceExtractor {
 

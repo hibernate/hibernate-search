@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 
 /**

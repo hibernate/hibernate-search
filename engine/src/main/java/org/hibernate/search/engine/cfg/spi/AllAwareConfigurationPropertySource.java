@@ -9,6 +9,8 @@ package org.hibernate.search.engine.cfg.spi;
 import java.util.Set;
 import java.util.function.BiPredicate;
 
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+
 /**
  * A source of property values for Hibernate Search with knowledge of the full set of properties.
  * <p>

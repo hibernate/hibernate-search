@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.util.common.SearchException;
 
 import org.junit.Rule;

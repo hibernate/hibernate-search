@@ -22,7 +22,7 @@ import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.impl.ConfigurationPropertySourceExtractor;
 import org.hibernate.search.engine.cfg.impl.EngineConfigurationUtils;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;

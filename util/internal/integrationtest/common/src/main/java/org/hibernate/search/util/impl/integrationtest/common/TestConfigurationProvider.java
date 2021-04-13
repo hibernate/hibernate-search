@@ -15,7 +15,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.impl.BeanResolverImpl;
 import org.hibernate.search.engine.environment.classpath.spi.AggregatedClassLoader;

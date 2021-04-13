@@ -20,6 +20,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
