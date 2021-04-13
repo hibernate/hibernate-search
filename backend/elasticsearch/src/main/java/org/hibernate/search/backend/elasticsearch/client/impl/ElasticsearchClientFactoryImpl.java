@@ -136,6 +136,11 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 					.withDefault( ElasticsearchBackendSettings.Defaults.DISCOVERY_REFRESH_INTERVAL )
 					.build();
 
+	private static final OptionalConfigurationProperty<BeanReference<? extends ElasticsearchHttpClientConfigurer>>
+			CLIENT_CONFIGURER = ConfigurationProperty.forKey( ElasticsearchBackendSettings.CLIENT_CONFIGURER )
+			.asBeanReference( ElasticsearchHttpClientConfigurer.class )
+			.build();
+
 	private final List<ElasticsearchHttpClientConfigurer> httpClientConfigurers;
 
 	ElasticsearchClientFactoryImpl(List<ElasticsearchHttpClientConfigurer> httpClientConfigurers) {
@@ -171,18 +176,30 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 			builder.setPathPrefix( pathPrefix );
 		}
 
-		return builder
-				.setRequestConfigCallback( b -> customizeRequestConfig( b, propertySource ) )
-				.setHttpClientConfigCallback(
-						b -> customizeHttpClientConfig(
-								b,
-								beanResolver, propertySource,
-								threadProvider, threadNamePrefix,
-								hosts,
-								httpClientConfigurers
-						)
-				)
-				.build();
+		Optional<? extends BeanHolder<? extends ElasticsearchHttpClientConfigurer>> customConfig = CLIENT_CONFIGURER
+				.getAndMap( propertySource, beanResolver::resolve );
+
+		try {
+			return builder
+					.setRequestConfigCallback( b -> customizeRequestConfig( b, propertySource ) )
+					.setHttpClientConfigCallback(
+							b -> customizeHttpClientConfig(
+									b,
+									beanResolver, propertySource,
+									threadProvider, threadNamePrefix,
+									hosts,
+									httpClientConfigurers, customConfig
+							)
+					)
+					.build();
+		}
+		finally {
+			if ( customConfig.isPresent() ) {
+				// Assuming that #customizeHttpClientConfig has been already executed
+				// and therefore the bean has been already used.
+				customConfig.get().close();
+			}
+		}
 	}
 
 	private Sniffer createSniffer(ConfigurationPropertySource propertySource,
@@ -213,8 +230,8 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 	private HttpAsyncClientBuilder customizeHttpClientConfig(HttpAsyncClientBuilder builder,
 			BeanResolver beanResolver, ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider, String threadNamePrefix,
-			ServerUris hosts,
-			Iterable<ElasticsearchHttpClientConfigurer> configurers) {
+			ServerUris hosts, Iterable<ElasticsearchHttpClientConfigurer> configurers,
+			Optional<? extends BeanHolder<? extends ElasticsearchHttpClientConfigurer>> customConfig) {
 		builder.setMaxConnTotal( MAX_TOTAL_CONNECTION.get( propertySource ) )
 				.setMaxConnPerRoute( MAX_TOTAL_CONNECTION_PER_ROUTE.get( propertySource ) )
 				.setThreadFactory( threadProvider.createThreadFactory( threadNamePrefix + " - Transport thread" ) );
@@ -235,7 +252,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 			credentialsProvider.setCredentials(
 					new AuthScope( AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthScope.ANY_SCHEME ),
 					new UsernamePasswordCredentials( username.get(), password.orElse( null ) )
-					);
+			);
 
 			builder.setDefaultCredentialsProvider( credentialsProvider );
 		}
@@ -245,6 +262,10 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 		for ( ElasticsearchHttpClientConfigurer configurer : configurers ) {
 			configurer.configure( clientConfigurationContext );
+		}
+		if ( customConfig.isPresent() ) {
+			BeanHolder<? extends ElasticsearchHttpClientConfigurer> customConfigBeanHolder = customConfig.get();
+			customConfigBeanHolder.get().configure( clientConfigurationContext );
 		}
 
 		return builder;

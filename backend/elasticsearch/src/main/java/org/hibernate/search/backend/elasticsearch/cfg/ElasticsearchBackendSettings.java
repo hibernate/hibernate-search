@@ -10,11 +10,14 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
+import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.SimpleIndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
 import org.hibernate.search.backend.elasticsearch.multitenancy.MultiTenancyStrategyName;
 import org.hibernate.search.engine.environment.bean.BeanReference;
+
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 
 /**
  * Configuration properties for Elasticsearch backends.
@@ -199,6 +202,20 @@ public final class ElasticsearchBackendSettings {
 	 * Defaults to {@link Defaults#DISCOVERY_REFRESH_INTERVAL}.
 	 */
 	public static final String DISCOVERY_REFRESH_INTERVAL = "discovery.refresh_interval";
+
+	/**
+	 * Allows to define a {@link ElasticsearchHttpClientConfigurer},
+	 * that can be used for instance to set custom HTTP client configurations,
+	 * using an instance of {@link HttpAsyncClientBuilder}.
+	 * <p>
+	 * It can be used for example to tune the SSL context to accept self-signed certificates.
+	 * It allows to override other HTTP client settings, such as {@link #USERNAME} or {@link #MAX_CONNECTIONS_PER_ROUTE}.
+	 * <p>
+	 * Expects a reference to a bean of type {@link ElasticsearchHttpClientConfigurer}.
+	 * <p>
+	 * Defaults to no value.
+	 */
+	public static final String CLIENT_CONFIGURER = "client.configurer";
 
 	/**
 	 * Whether JSON included in logs should be pretty-printed (indented, with line breaks).
