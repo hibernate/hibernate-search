@@ -38,6 +38,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchRequ
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchResponseFormatter;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.impl.EmbeddedThreadProvider;
@@ -583,7 +584,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 	public void open(TestConfigurationProvider configurationProvider) {
 		Map<String, Object> map = new LinkedHashMap<>();
 		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( map );
-		ConfigurationPropertySource backendProperties = ConfigurationPropertySource.fromMap( map );
+		ConfigurationPropertySource backendProperties = AllAwareConfigurationPropertySource.fromMap( map );
 		threadPoolProvider = new ThreadPoolProviderImpl(
 				BeanHolder.of( new EmbeddedThreadProvider( "Test Elasticsearch client: " ) )
 		);

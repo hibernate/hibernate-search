@@ -41,6 +41,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRespon
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -952,7 +953,7 @@ public class ElasticsearchClientFactoryImplIT {
 			clientProperties.put( ElasticsearchBackendSettings.URIS, httpUrisFor( wireMockRule1 ) );
 		}
 
-		ConfigurationPropertySource clientPropertySource = ConfigurationPropertySource.fromMap( clientProperties );
+		ConfigurationPropertySource clientPropertySource = AllAwareConfigurationPropertySource.fromMap( clientProperties );
 
 		Map<String, Object> beanResolverConfiguration = new HashMap<>();
 		// Accept Wiremock's self-signed SSL certificates
@@ -962,7 +963,7 @@ public class ElasticsearchClientFactoryImplIT {
 		);
 
 		BeanResolver beanResolver = testConfigurationProvider.createBeanResolverForTest(
-				ConfigurationPropertySource.fromMap( beanResolverConfiguration )
+				AllAwareConfigurationPropertySource.fromMap( beanResolverConfiguration )
 
 		);
 		try ( BeanHolder<ElasticsearchClientFactory> factoryHolder =

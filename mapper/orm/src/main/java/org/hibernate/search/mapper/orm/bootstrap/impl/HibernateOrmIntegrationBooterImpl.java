@@ -22,6 +22,7 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.resource.beans.container.spi.BeanContainer;
 import org.hibernate.resource.beans.container.spi.ExtendedBeanManager;
 import org.hibernate.resource.beans.spi.ManagedBeanRegistry;
+import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
@@ -58,7 +59,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	static ConfigurationPropertySource getPropertySource(ServiceRegistry serviceRegistry,
 			ConfigurationPropertyChecker propertyChecker) {
 		return propertyChecker.wrap(
-				ConfigurationPropertySource.fromMap(
+				AllAwareConfigurationPropertySource.fromMap(
 						serviceRegistry.getService( ConfigurationService.class )
 								.getSettings()
 				)

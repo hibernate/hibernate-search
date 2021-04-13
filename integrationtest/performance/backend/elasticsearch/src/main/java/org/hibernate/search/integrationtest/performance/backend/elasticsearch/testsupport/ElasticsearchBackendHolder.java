@@ -12,6 +12,7 @@ import java.util.Map;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.filesystem.TemporaryFileHolder;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.index.AbstractBackendHolder;
 
@@ -44,7 +45,7 @@ public class ElasticsearchBackendHolder extends AbstractBackendHolder {
 
 		map.put( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS, IndexStatus.YELLOW );
 
-		return ConfigurationPropertySource.fromMap( map );
+		return AllAwareConfigurationPropertySource.fromMap( map );
 	}
 
 	@Override
