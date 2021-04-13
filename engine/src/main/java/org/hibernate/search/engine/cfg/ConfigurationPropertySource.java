@@ -6,17 +6,13 @@
  */
 package org.hibernate.search.engine.cfg;
 
-import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.impl.EmptyConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.FallbackConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.impl.MapConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.MaskedConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.OverriddenConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.PrefixedConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.impl.SystemConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 
 /**
  * A source of property values for Hibernate Search.
@@ -89,21 +85,6 @@ public interface ConfigurationPropertySource {
 	 */
 	default ConfigurationPropertySource withOverride(ConfigurationPropertySource override) {
 		return new OverriddenConfigurationPropertySource( this, override );
-	}
-
-	/**
-	 * @param map The {@link Map} object to extract property values from.
-	 * @return A source containing the properties from the given {@link Map} object.
-	 */
-	static AllAwareConfigurationPropertySource fromMap(Map<String, ?> map) {
-		return new MapConfigurationPropertySource( map );
-	}
-
-	/**
-	 * @return A source containing the system properties ({@link System#getProperty(String)}).
-	 */
-	static AllAwareConfigurationPropertySource system() {
-		return SystemConfigurationPropertySource.get();
 	}
 
 	/**

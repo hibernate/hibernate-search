@@ -86,7 +86,7 @@ public class SearchSetupHelper implements TestRule {
 			properties.put( backendPrefix + entry.getKey(), entry.getValue() );
 		}
 
-		AllAwareConfigurationPropertySource propertySource = ConfigurationPropertySource.fromMap( properties );
+		AllAwareConfigurationPropertySource propertySource = AllAwareConfigurationPropertySource.fromMap( properties );
 
 		SetupContext setupContext = new SetupContext( backendName, propertySource );
 
@@ -165,7 +165,7 @@ public class SearchSetupHelper implements TestRule {
 		SetupContext(String defaultBackendName, AllAwareConfigurationPropertySource basePropertySource) {
 			this.unusedPropertyChecker = ConfigurationPropertyChecker.create();
 			this.propertySource = unusedPropertyChecker.wrap( basePropertySource )
-					.withOverride( unusedPropertyChecker.wrap( ConfigurationPropertySource.fromMap( overriddenProperties ) ) );
+					.withOverride( unusedPropertyChecker.wrap( AllAwareConfigurationPropertySource.fromMap( overriddenProperties ) ) );
 		}
 
 		public SetupContext expectCustomBeans() {

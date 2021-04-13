@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -50,7 +51,7 @@ public final class SearchMappingBuilder {
 
 	private static ConfigurationPropertySource getPropertySource(Map<String, Object> properties,
 			ConfigurationPropertyChecker propertyChecker) {
-		return propertyChecker.wrap( ConfigurationPropertySource.fromMap( properties ) );
+		return propertyChecker.wrap( AllAwareConfigurationPropertySource.fromMap( properties ) );
 	}
 
 	private final ConfigurationPropertyChecker propertyChecker;

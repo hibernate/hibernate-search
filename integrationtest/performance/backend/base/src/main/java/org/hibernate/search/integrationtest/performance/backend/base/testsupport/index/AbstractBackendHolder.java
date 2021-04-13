@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.engine.cfg.EngineSettings;
+import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
@@ -44,13 +45,13 @@ public abstract class AbstractBackendHolder {
 		Map<String, Object> baseProperties = new LinkedHashMap<>();
 
 		ConfigurationPropertySource configurationFromParameter =
-				ConfigurationPropertySource.fromMap( stringToMap( getConfigurationParameter() ) );
+				AllAwareConfigurationPropertySource.fromMap( stringToMap( getConfigurationParameter() ) );
 
-		ConfigurationPropertySource propertySource = ConfigurationPropertySource.fromMap( baseProperties )
+		ConfigurationPropertySource propertySource = AllAwareConfigurationPropertySource.fromMap( baseProperties )
 				.withOverride(
 						getDefaultBackendProperties( temporaryFileHolder )
 								// Allow overrides at the backend level using system properties.
-								.withOverride( ConfigurationPropertySource.system() )
+								.withOverride( AllAwareConfigurationPropertySource.system() )
 								// Allow multiple backend configurations to be tested using a benchmark parameter.
 								// This configuration can set backend properties or set defaults for index properties.
 								.withOverride( configurationFromParameter )

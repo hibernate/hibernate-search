@@ -29,7 +29,7 @@ public class MapConfigurationPropertySourceTest extends AbstractAllAwareConfigur
 
 	@Test
 	public void get_integer() {
-		ConfigurationPropertySource propertySource = ConfigurationPropertySource.fromMap(
+		ConfigurationPropertySource propertySource = AllAwareConfigurationPropertySource.fromMap(
 				Collections.singletonMap( "someKey", 42 )
 		);
 		assertThat( (Optional<Object>) propertySource.get( "someKey" ) ).contains( 42 );
@@ -37,6 +37,6 @@ public class MapConfigurationPropertySourceTest extends AbstractAllAwareConfigur
 
 	@Override
 	protected AllAwareConfigurationPropertySource createPropertySource(Map<String, String> content) {
-		return ConfigurationPropertySource.fromMap( content );
+		return AllAwareConfigurationPropertySource.fromMap( content );
 	}
 }

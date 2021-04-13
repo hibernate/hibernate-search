@@ -42,6 +42,6 @@ public class SystemConfigurationPropertySourceTest extends AbstractAllAwareConfi
 			toClear.add( key );
 			System.setProperty( key, value );
 		}
-		return ConfigurationPropertySource.system();
+		return AllAwareConfigurationPropertySource.system();
 	}
 }
