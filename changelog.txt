@@ -1,6 +1,23 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.3.Final (13-04-2021)
+-------------------------
+
+** Bug
+    * HSEARCH-4183 SearchResult.took() returns incorrect, very large value with the Lucene backend
+    * HSEARCH-4173 Multi-index Elasticsearch query fails (sometimes silently) when field is present in only one index
+
+** Task
+    * HSEARCH-4211 Use commits instead of rollbacks in the mass indexer
+    * HSEARCH-4210 Skip forbiddenapis on JDK17+
+    * HSEARCH-4196 Upgrade to ORM 5.4.30.Final
+    * HSEARCH-4191 Get rid of master/slave in Git repository, documentation where possible, etc.
+    * HSEARCH-4189 Test Hibernate Search against JDK 17
+    * HSEARCH-4181 Upgrade to Hibernate ORM 5.4.29.Final
+    * HSEARCH-4178 Upgrade to maven-checkstyle-plugin 3.1.2 and Checkstyle 8.41
+    * HSEARCH-4174 Reorganize Elasticsearch version properties in POM
+
 6.0.2.Final (23-02-2021)
 -------------------------
 
