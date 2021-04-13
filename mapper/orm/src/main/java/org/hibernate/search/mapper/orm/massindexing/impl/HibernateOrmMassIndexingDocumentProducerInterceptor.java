@@ -7,8 +7,6 @@
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
 import java.lang.invoke.MethodHandles;
-import javax.transaction.NotSupportedException;
-import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
@@ -72,30 +70,53 @@ public class HibernateOrmMassIndexingDocumentProducerInterceptor implements Load
 			ictx.proceed( next -> {
 				SessionImplementor session = sessionContext.session();
 				ictx.context( SessionImplementor.class, session );
+				beginTransaction( session, transactionTimeout );
 				try {
-					beginTransaction( session, transactionTimeout );
 					next.proceed();
 					session.clear();
 				}
-				finally {
-					// it's read-only, so no need to commit
-					rollbackTransaction( session );
+				catch (Exception e) {
+					try {
+						rollbackTransaction( session );
+					}
+					catch (Exception e2) {
+						e.addSuppressed( e2 );
+					}
+					throw e;
 				}
-
+				commitTransaction( session );
 			} );
-
 		}
 	}
 
-	private void beginTransaction(Session session, Integer transactionTimeout) throws SystemException, NotSupportedException {
-		if ( transactionManager != null ) {
-			if ( transactionTimeout != null ) {
-				transactionManager.setTransactionTimeout( transactionTimeout );
+	private void beginTransaction(Session session, Integer transactionTimeout) {
+		try {
+			if ( transactionManager != null ) {
+				if ( transactionTimeout != null ) {
+					transactionManager.setTransactionTimeout( transactionTimeout );
+				}
+				transactionManager.begin();
 			}
-			transactionManager.begin();
+			else {
+				session.beginTransaction();
+			}
 		}
-		else {
-			session.beginTransaction();
+		catch (Exception e) {
+			throw log.massIndexingTransactionHandlingException( e.getMessage(), e );
+		}
+	}
+
+	private void commitTransaction(SessionImplementor session) {
+		try {
+			if ( transactionManager != null ) {
+				transactionManager.commit();
+			}
+			else {
+				session.accessTransaction().commit();
+			}
+		}
+		catch (Exception e) {
+			throw log.massIndexingTransactionHandlingException( e.getMessage(), e );
 		}
 	}
 
@@ -108,8 +129,8 @@ public class HibernateOrmMassIndexingDocumentProducerInterceptor implements Load
 				session.accessTransaction().rollback();
 			}
 		}
-		catch (IllegalStateException | SecurityException | SystemException e) {
-			log.errorRollingBackTransaction( e.getMessage(), e );
+		catch (Exception e) {
+			throw log.massIndexingTransactionHandlingException( e.getMessage(), e );
 		}
 	}
 
