@@ -94,8 +94,8 @@ public class OptionallyWrapInJTATransaction extends FailureHandledRunnable {
 			try {
 				batchContext.transactionManager.rollback();
 			}
-			catch (SystemException e) {
-				log.errorRollingBackTransaction( e.getMessage(), e );
+			catch (Exception e) {
+				throw log.massIndexingTransactionHandlingException( e.getMessage(), e );
 			}
 		}
 	}

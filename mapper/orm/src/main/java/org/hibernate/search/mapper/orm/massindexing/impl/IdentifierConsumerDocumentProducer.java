@@ -14,8 +14,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
-import javax.transaction.NotSupportedException;
-import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 
 import org.hibernate.CacheMode;
@@ -102,7 +100,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			session.setDefaultReadOnly( true );
 			loadAndIndexAllFromQueue( session );
 		}
-		catch (Exception exception) {
+		catch (RuntimeException exception) {
 			notifier.notifyRunnableFailure(
 					exception,
 					log.massIndexingLoadingAndExtractingEntityData( type.jpaEntityName() )
@@ -111,7 +109,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		log.trace( "finished" );
 	}
 
-	private void loadAndIndexAllFromQueue(SessionImplementor session) throws SystemException, NotSupportedException {
+	private void loadAndIndexAllFromQueue(SessionImplementor session) {
 		HibernateOrmScopeSessionContext sessionContext = mappingContext.sessionContext( session );
 		PojoIndexer indexer = sessionContext.createIndexer();
 		try {
@@ -133,11 +131,10 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 
 	private void loadAndIndexList(List<I> listIds, HibernateOrmMassIndexingSessionContext sessionContext,
 			PojoIndexer indexer)
-			throws InterruptedException, NotSupportedException, SystemException {
+			throws InterruptedException {
 		SessionImplementor session = sessionContext.session();
+		beginTransaction( session );
 		try {
-			beginTransaction( session );
-
 			CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
 			CriteriaQuery<E> criteriaQuery = criteriaBuilder.createQuery( type.entityTypeDescriptor().getJavaType() );
 			Root<E> root = criteriaQuery.from( type.entityTypeDescriptor() );
@@ -154,22 +151,47 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			indexList( sessionContext, indexer, query.getResultList() );
 			session.clear();
 		}
-		finally {
-			// it's read-only, so no need to commit
-			rollbackTransaction( session );
+		catch (Exception e) {
+			try {
+				rollbackTransaction( session );
+			}
+			catch (Exception e2) {
+				e.addSuppressed( e2 );
+			}
+			throw e;
+		}
+		commitTransaction( session );
+	}
+
+	private void beginTransaction(Session session) {
+		try {
+			if ( transactionManager != null ) {
+				if ( transactionTimeout != null ) {
+					transactionManager.setTransactionTimeout( transactionTimeout );
+				}
+
+				transactionManager.begin();
+			}
+			else {
+				session.beginTransaction();
+			}
+		}
+		catch (Exception e) {
+			throw log.massIndexingTransactionHandlingException( e.getMessage(), e );
 		}
 	}
 
-	private void beginTransaction(Session session) throws SystemException, NotSupportedException {
-		if ( transactionManager != null ) {
-			if ( transactionTimeout != null ) {
-				transactionManager.setTransactionTimeout( transactionTimeout );
+	private void commitTransaction(SessionImplementor session) {
+		try {
+			if ( transactionManager != null ) {
+				transactionManager.commit();
 			}
-
-			transactionManager.begin();
+			else {
+				session.accessTransaction().commit();
+			}
 		}
-		else {
-			session.beginTransaction();
+		catch (Exception e) {
+			throw log.massIndexingTransactionHandlingException( e.getMessage(), e );
 		}
 	}
 
@@ -183,7 +205,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			}
 		}
 		catch (Exception e) {
-			log.errorRollingBackTransaction( e.getMessage(), e );
+			throw log.massIndexingTransactionHandlingException( e.getMessage(), e );
 		}
 	}
 
