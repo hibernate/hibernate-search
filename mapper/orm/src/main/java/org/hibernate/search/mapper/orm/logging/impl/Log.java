@@ -8,7 +8,6 @@
 package org.hibernate.search.mapper.orm.logging.impl;
 
 import static org.jboss.logging.Logger.Level.DEBUG;
-import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.WARN;
 
@@ -48,7 +47,6 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = 36, max = 36),
 		@ValidIdRange(min = 39, max = 39),
 		@ValidIdRange(min = 62, max = 62),
-		@ValidIdRange(min = 65, max = 65),
 		@ValidIdRange(min = 116, max = 116),
 		@ValidIdRange(min = 183, max = 183),
 		@ValidIdRange(min = 211, max = 212),
@@ -74,10 +72,6 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 39, value = "Unable to properly close scroll in ScrollableResults.")
 	void unableToCloseSearcherInScrollableResult(@Cause Exception e);
-
-	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 65, value = "Transaction rollback failure: %1$s")
-	void errorRollingBackTransaction(String message, @Cause Exception e1);
 
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 276, value = "No transaction active while indexing entity '%1$s'. Consider increasing the connection time-out.")
 	SearchException transactionNotActiveWhileProducingIdsForBatchIndexing(String entityName);
