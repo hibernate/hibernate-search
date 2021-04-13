@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreat
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.store.FSLockFactory;

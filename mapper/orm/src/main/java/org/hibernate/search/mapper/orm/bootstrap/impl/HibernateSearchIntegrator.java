@@ -17,7 +17,7 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;

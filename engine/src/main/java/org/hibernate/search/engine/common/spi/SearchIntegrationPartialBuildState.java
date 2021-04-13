@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.common.spi;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 
 public interface SearchIntegrationPartialBuildState {
 

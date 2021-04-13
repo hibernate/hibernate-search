@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsCreden
 import org.hibernate.search.backend.elasticsearch.aws.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.aws.spi.ElasticsearcAwsCredentialsProvider;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 

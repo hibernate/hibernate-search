@@ -8,7 +8,7 @@ package org.hibernate.search.engine.common.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;

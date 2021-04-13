@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertyCheckingStrategyName;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;

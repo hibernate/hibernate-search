@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 
 import org.junit.After;
 import org.junit.Test;

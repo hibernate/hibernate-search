@@ -11,7 +11,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;

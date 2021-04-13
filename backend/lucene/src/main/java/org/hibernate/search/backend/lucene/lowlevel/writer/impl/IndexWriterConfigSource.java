@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 
 import java.util.List;
 
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.analysis.Analyzer;

@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.lowlevel.directory.LockingStrategyName;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.AssertionFailure;

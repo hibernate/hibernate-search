@@ -14,7 +14,7 @@ import java.util.Map;
 
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;

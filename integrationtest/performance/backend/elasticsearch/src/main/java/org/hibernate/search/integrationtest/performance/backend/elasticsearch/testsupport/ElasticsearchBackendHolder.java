@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.filesystem.TemporaryFileHolder;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.index.AbstractBackendHolder;
 

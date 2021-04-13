@@ -12,7 +12,7 @@ import java.util.Map;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.filesystem.TemporaryFileHolder;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.index.AbstractBackendHolder;
 

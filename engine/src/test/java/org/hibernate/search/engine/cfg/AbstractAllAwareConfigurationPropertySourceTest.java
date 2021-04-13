@@ -15,7 +15,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 
 import org.junit.Test;
 

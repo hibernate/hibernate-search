@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneParallelWork
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneParallelWorkOrchestratorImpl;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSerialWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSerialWorkOrchestratorImpl;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;

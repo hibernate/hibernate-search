@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExe
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexingWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.data.impl.SimpleHashFunction;
 import org.hibernate.search.util.common.impl.Closer;

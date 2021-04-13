@@ -8,7 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
