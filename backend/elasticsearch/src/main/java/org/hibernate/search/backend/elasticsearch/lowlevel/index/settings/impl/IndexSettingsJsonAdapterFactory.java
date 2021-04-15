@@ -13,5 +13,6 @@ public class IndexSettingsJsonAdapterFactory extends AbstractConfiguredExtraProp
 	@Override
 	protected <T> void addFields(Builder<T> builder) {
 		builder.add( "analysis", Analysis.class );
+		builder.add( "maxResultWindow", Integer.class );
 	}
 }
