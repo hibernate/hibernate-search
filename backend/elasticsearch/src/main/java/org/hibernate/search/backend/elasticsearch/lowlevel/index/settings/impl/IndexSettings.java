@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.SerializeExtraProper
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.JsonAdapter;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Settings for an Elasticsearch index.
@@ -24,7 +25,12 @@ import com.google.gson.annotations.JsonAdapter;
 @JsonAdapter(IndexSettingsJsonAdapterFactory.class)
 public class IndexSettings {
 
+	public static final String MAX_RESULT_WINDOW_ATTRIBUTE = "max_result_window";
+
 	private Analysis analysis;
+
+	@SerializedName(IndexSettings.MAX_RESULT_WINDOW_ATTRIBUTE)
+	private Integer maxResultWindow;
 
 	@SerializeExtraProperties
 	private Map<String, JsonElement> extraAttributes;
@@ -32,8 +38,9 @@ public class IndexSettings {
 	public IndexSettings() {
 	}
 
-	public IndexSettings(Analysis analysis, Map<String, JsonElement> extraAttributes) {
+	public IndexSettings(Analysis analysis, Integer maxResultWindow, Map<String, JsonElement> extraAttributes) {
 		this.analysis = analysis;
+		this.maxResultWindow = maxResultWindow;
 		this.extraAttributes = extraAttributes;
 	}
 
@@ -43,6 +50,10 @@ public class IndexSettings {
 
 	public void setAnalysis(Analysis analysis) {
 		this.analysis = analysis;
+	}
+
+	public Integer getMaxResultWindow() {
+		return maxResultWindow;
 	}
 
 	public Map<String, JsonElement> getExtraAttributes() {
@@ -72,6 +83,10 @@ public class IndexSettings {
 		}
 		else {
 			analysis.merge( overridingIndexSettings.analysis );
+		}
+
+		if ( overridingIndexSettings.maxResultWindow != null ) {
+			maxResultWindow = overridingIndexSettings.maxResultWindow;
 		}
 
 		extraAttributes = overridingIndexSettings.extraAttributes;
@@ -110,6 +125,6 @@ public class IndexSettings {
 		for ( String key : keysToRemove ) {
 			newExtraAttributes.remove( key );
 		}
-		return new IndexSettings( analysis, newExtraAttributes );
+		return new IndexSettings( analysis, maxResultWindow, newExtraAttributes );
 	}
 }
