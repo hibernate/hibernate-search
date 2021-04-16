@@ -8,10 +8,14 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processin
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
@@ -42,12 +46,21 @@ abstract class AbstractFieldAnnotationProcessor<A extends Annotation> implements
 		PropertyMappingFieldOptionsStep<?> fieldContext =
 				initFieldMappingContext( mappingContext, annotation, cleanedUpRelativeFieldName );
 
+		ValueBinderRef valueBinder = getValueBinder( annotation );
 		ValueBinder binder = createValueBinder(
 				getValueBridge( annotation ),
-				getValueBinder( annotation ),
+				valueBinder,
 				context
 		);
-		fieldContext.valueBinder( binder );
+
+		if ( valueBinder.params() != null ) {
+			Map<String, Object> params = Arrays.stream( valueBinder.params() )
+					.collect( Collectors.toMap( Parameter::name, Parameter::value ) );
+			fieldContext.valueBinder( binder, params );
+		}
+		else {
+			fieldContext.valueBinder( binder );
+		}
 
 		ContainerExtractorPath extractorPath =
 				context.toContainerExtractorPath( getExtraction( annotation ) );
