@@ -180,6 +180,48 @@ public class ElasticsearchIndexSchemaManagerValidationCustomSettingsIT {
 		);
 	}
 
+	@Test
+	public void invalid_maxResultWindow() {
+		elasticsearchClient.index( index.name() ).deleteAndCreate( "index", "{ 'max_result_window': '20000' }" );
+
+		elasticsearchClient.index( index.name() ).type().putMapping(
+				simpleMappingForInitialization( "" )
+		);
+
+		assertThatThrownBy( () -> setupAndValidate( "max-result-window.json" ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( buildValidationFailureReportPattern()
+						.indexSettingsCustomAttributeContext( "max_result_window" )
+						.failure(
+								"Invalid value. Expected '250', actual is '20000'"
+						)
+						.build() );
+	}
+
+	@Test
+	public void default_maxResultWindow() {
+		elasticsearchClient.index( index.name() ).deleteAndCreate( "index", "{ 'max_result_window': '10000' }" );
+
+		elasticsearchClient.index( index.name() ).type().putMapping(
+				simpleMappingForInitialization( "" )
+		);
+
+		setupAndValidate( null );
+		// If we get here, it means validation passed (no exception was thrown)
+	}
+
+	@Test
+	public void empty() {
+		elasticsearchClient.index( index.name() ).deleteAndCreate( "index", "{ }" );
+
+		elasticsearchClient.index( index.name() ).type().putMapping(
+				simpleMappingForInitialization( "" )
+		);
+
+		setupAndValidate( null );
+		// If we get here, it means validation passed (no exception was thrown)
+	}
+
 	private void setupAndValidateExpectingFailure(String failureReportPattern) {
 		assertThatThrownBy( this::setupAndValidate )
 				.isInstanceOf( SearchException.class )
@@ -187,7 +229,11 @@ public class ElasticsearchIndexSchemaManagerValidationCustomSettingsIT {
 	}
 
 	private void setupAndValidate() {
-		setupHelper.start()
+		setupAndValidate( "valid.json" );
+	}
+
+	private void setupAndValidate(String customSettingsFile) {
+		SearchSetupHelper.SetupContext setupContext = setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(
 						// use an empty analysis configurer,
@@ -197,11 +243,16 @@ public class ElasticsearchIndexSchemaManagerValidationCustomSettingsIT {
 							// No-op
 						}
 				)
-				.withIndexProperty( index.name(), ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE,
-						"custom-index-settings/valid.json"
-				)
-				.withIndex( index )
-				.setup();
+				.withIndex( index );
+
+		if ( customSettingsFile != null ) {
+			setupContext
+					.withIndexProperty( index.name(), ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE,
+							"custom-index-settings/" + customSettingsFile
+					);
+		}
+
+		setupContext.setup();
 
 		Futures.unwrappedExceptionJoin( operation.apply( index.schemaManager() ) );
 	}

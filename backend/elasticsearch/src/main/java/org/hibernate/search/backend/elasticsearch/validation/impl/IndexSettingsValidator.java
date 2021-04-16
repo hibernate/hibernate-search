@@ -28,13 +28,15 @@ public class IndexSettingsValidator implements Validator<IndexSettings> {
 	@Override
 	public void validate(ValidationErrorCollector errorCollector, IndexSettings expected, IndexSettings actual) {
 		Analysis expectedAnalysis = expected.getAnalysis();
-		if ( expectedAnalysis == null ) {
-			// No expectation
-			return;
+		if ( expectedAnalysis != null ) {
+			validateAnalysisSettings( errorCollector, expectedAnalysis, actual.getAnalysis() );
 		}
-		Analysis actualAnalysis = actual.getAnalysis();
 
-		validateAnalysisSettings( errorCollector, expectedAnalysis, actualAnalysis );
+		LeafValidators.EQUAL.validateWithDefault(
+				errorCollector, ValidationContextType.CUSTOM_INDEX_SETTINGS_ATTRIBUTE,
+				IndexSettings.MAX_RESULT_WINDOW_ATTRIBUTE, expected.getMaxResultWindow(), actual.getMaxResultWindow(),
+				IndexSettings.MAX_RESULT_WINDOW_DEFAULT
+		);
 
 		extraAttributeValidator.validateAllIgnoreUnexpected(
 				errorCollector, ValidationContextType.CUSTOM_INDEX_SETTINGS_ATTRIBUTE,

@@ -193,7 +193,35 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomSettingsIT {
 						"Unable to update settings", "index.number_of_shards" );
 	}
 
+	@Test
+	public void change_maxResultWindow() {
+		elasticsearchClient.index( index.name() ).deleteAndCreate( "index", "{ 'max_result_window': '20000' }" );
+
+		setupAndUpdateIndex( "max-result-window.json" );
+
+		assertJsonEquals(
+				"\"250\"",
+				elasticsearchClient.index( index.name() ).settings( "index.max_result_window" ).get()
+		);
+	}
+
+	@Test
+	public void set_maxResultWindow() {
+		elasticsearchClient.index( index.name() ).deleteAndCreate( "index", "{ }" );
+
+		setupAndUpdateIndex( "max-result-window.json" );
+
+		assertJsonEquals(
+				"\"250\"",
+				elasticsearchClient.index( index.name() ).settings( "index.max_result_window" ).get()
+		);
+	}
+
 	private void setupAndUpdateIndex() {
+		setupAndUpdateIndex( "valid.json" );
+	}
+
+	private void setupAndUpdateIndex(String customSettingsFile) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(
@@ -205,7 +233,7 @@ public class ElasticsearchIndexSchemaManagerUpdateCustomSettingsIT {
 						}
 				)
 				.withIndexProperty( index.name(), ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_SETTINGS_FILE,
-						"custom-index-settings/valid.json"
+						"custom-index-settings/" + customSettingsFile
 				)
 				.withIndex( index )
 				.setup();

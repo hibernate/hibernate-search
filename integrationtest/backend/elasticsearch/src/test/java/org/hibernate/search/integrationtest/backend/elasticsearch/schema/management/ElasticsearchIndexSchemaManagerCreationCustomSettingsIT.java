@@ -208,6 +208,21 @@ public class ElasticsearchIndexSchemaManagerCreationCustomSettingsIT {
 				.isEqualTo( "\"3\"" );
 	}
 
+	@Test
+	public void maxResultWindow() {
+		elasticsearchClient.index( index.name() )
+				.ensureDoesNotExist().registerForCleanup();
+
+		// use an empty analysis configurer,
+		// so that we have only the custom settings definitions
+		setupAndCreateIndex( new EmptyElasticsearchAnalysisConfigurer(), "custom-index-settings/max-result-window.json" );
+
+		assertJsonEquals(
+				"\"250\"",
+				elasticsearchClient.index( index.name() ).settings( "index.max_result_window" ).get()
+		);
+	}
+
 	private void setupAndCreateIndex(ElasticsearchAnalysisConfigurer analysisConfigurer, String customSettingsFile) {
 		setupHelper.start()
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
