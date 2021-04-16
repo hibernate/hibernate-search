@@ -159,6 +159,7 @@
                                             See https://www.elastic.co/guide/en/elasticsearch/reference/7.5/setup-configuration-memory.html#bootstrap-memory_lock
                                          -->
                                         <bootstrap.memory_lock>true</bootstrap.memory_lock>
+                                        <logger.level>WARN</logger.level>
                                     </env>
                                     <ports>
                                         <port>9200:9200</port>
