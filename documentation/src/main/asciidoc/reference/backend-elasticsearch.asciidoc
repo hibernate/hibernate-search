@@ -962,6 +962,13 @@ When analysis is configured both through an <<backend-elasticsearch-analysis-ana
 Custom index setting must be provided in the simplified form, the one without the attribute the `index` attribute.
 ====
 
+=== Max result window size
+
+If the setting `index.max_result_window` is used,
+Hibernate Search will use this value to limit the returning hits size
+if no limit has been defined on the query by the user.
+In this case if Hibernate Search notices there are more results, a warning will be logged.
+
 [[backend-elasticsearch-threads]]
 == Threads
 
