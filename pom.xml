@@ -217,7 +217,7 @@
         <version.org.jboss.jboss-transaction-spi>7.6.0.Final</version.org.jboss.jboss-transaction-spi>
 
         <!-- Jackson: used by the Elasticsearch REST client, Avro, and in tests (wiremock, ...) -->
-        <version.com.fasterxml.jackson>2.9.10</version.com.fasterxml.jackson>
+        <version.com.fasterxml.jackson>2.12.3</version.com.fasterxml.jackson>
         <!--
              In the past, there has been jackson-databind bugfix releases without any jackson-core release,
              so we had to use different versions, e.g. jackson-core 2.9.9 and jackson-databind 2.9.9.3.
