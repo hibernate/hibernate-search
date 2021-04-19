@@ -9,18 +9,23 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyBinding;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -101,5 +106,127 @@ public class PropertyBindingBaseIT {
 						.failure( "Empty binder reference." )
 						.build()
 				);
+	}
+
+	@Test
+	public void customBridge_withParameters_annotationMapping() {
+		backendMock.expectSchema( INDEX_NAME, b -> {
+			b.field( "sum", Integer.class );
+			b.field( "diff", Integer.class );
+		} );
+		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( AnnotatedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			SearchIndexingPlan plan = session.indexingPlan();
+			plan.add( new AnnotatedEntity( 1, 14 ) );
+			plan.add( new AnnotatedEntity( 2, -7 ) );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> {
+						b.field( "sum", 21 );
+						b.field( "diff", 7 );
+					} )
+					.add( "2", b -> {
+						b.field( "sum", 0 );
+						b.field( "diff", -14 );
+					} )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+	@Test
+	public void customBridge_withParameters_programmaticMapping() {
+		backendMock.expectSchema( INDEX_NAME, b -> {
+			b.field( "sum", Integer.class );
+			b.field( "diff", Integer.class );
+		} );
+		SearchMapping mapping = setupHelper.start()
+				.withConfiguration( builder -> {
+					builder.addEntityType( NotAnnotatedEntity.class );
+
+					TypeMappingStep indexedEntity = builder.programmaticMapping().type( NotAnnotatedEntity.class );
+					indexedEntity.indexed().index( INDEX_NAME );
+					indexedEntity.property( "id" ).documentId();
+					indexedEntity.property( "value" ).binder( new ParametricBinder(),
+							Collections.singletonMap( "base", 7 )
+					);
+				} )
+				.expectCustomBeans().setup( NotAnnotatedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			SearchIndexingPlan plan = session.indexingPlan();
+			plan.add( new NotAnnotatedEntity( 1, 14 ) );
+			plan.add( new NotAnnotatedEntity( 2, -7 ) );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> {
+						b.field( "sum", 21 );
+						b.field( "diff", 7 );
+					} )
+					.add( "2", b -> {
+						b.field( "sum", 0 );
+						b.field( "diff", -14 );
+					} )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	public static class ParametricBinder implements PropertyBinder {
+
+		@Override
+		public void bind(PropertyBindingContext context) {
+			context.dependencies().useRootOnly();
+
+			IndexFieldReference<Integer> sum = context.indexSchemaElement().field( "sum", f -> f.asInteger() )
+					.toReference();
+			IndexFieldReference<Integer> diff = context.indexSchemaElement().field( "diff", f -> f.asInteger() )
+					.toReference();
+			Integer base = extractBase( context );
+
+			context.bridge( Integer.class, (DocumentElement target, Integer bridgedElement,
+					PropertyBridgeWriteContext writeContext) -> {
+				target.addValue( sum, bridgedElement + base );
+				target.addValue( diff, bridgedElement - base );
+			} );
+		}
+
+		@SuppressWarnings("uncheked")
+		private static Integer extractBase(PropertyBindingContext context) {
+			Integer base = (Integer) context.parameter( "base" );
+			if ( base != null ) {
+				return base;
+			}
+
+			String stringBase = (String) context.parameter( "stringBase" );
+			return Integer.parseInt( stringBase );
+		}
+	}
+
+	@Indexed(index = INDEX_NAME)
+	private static class AnnotatedEntity {
+		@DocumentId
+		Integer id;
+
+		@PropertyBinding(binder = @PropertyBinderRef(type = ParametricBinder.class,
+				params = @Parameter(name = "stringBase", value = "7")))
+		int value;
+
+		AnnotatedEntity(Integer id, int value) {
+			this.id = id;
+			this.value = value;
+		}
+	}
+
+	private static class NotAnnotatedEntity {
+		Integer id;
+		int value;
+
+		NotAnnotatedEntity(Integer id, int value) {
+			this.id = id;
+			this.value = value;
+		}
 	}
 }
