@@ -141,7 +141,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 	@Override
 	public <P> Optional<BoundPropertyBridge<P>> bindProperty(IndexBindingContext indexBindingContext,
-			BoundPojoModelPathPropertyNode<?, P> modelPath, PropertyBinder binder) {
+			BoundPojoModelPathPropertyNode<?, P> modelPath, PropertyBinder binder, Map<String, Object> params) {
 		PojoModelPropertyRootElement<P> pojoModelRootElement =
 				new PojoModelPropertyRootElement<>( modelPath, introspector, typeAdditionalMetadataProvider );
 		PojoPropertyIndexingDependencyConfigurationContextImpl<P> pojoDependencyContext =
@@ -159,7 +159,8 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 				propertyTypeModel,
 				indexBindingContext,
 				pojoModelRootElement,
-				pojoDependencyContext
+				pojoDependencyContext,
+				params
 		);
 
 		return bindingContext.applyBinder( binder );

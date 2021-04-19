@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
+import java.util.Map;
+
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoPropertyMetadataContributor;
@@ -72,8 +74,8 @@ class InitialPropertyMappingStep
 	}
 
 	@Override
-	public PropertyMappingStep binder(PropertyBinder binder) {
-		children.add( new PropertyBridgeMappingContributor( binder ) );
+	public PropertyMappingStep binder(PropertyBinder binder, Map<String, Object> params) {
+		children.add( new PropertyBridgeMappingContributor( binder, params ) );
 		return this;
 	}
 

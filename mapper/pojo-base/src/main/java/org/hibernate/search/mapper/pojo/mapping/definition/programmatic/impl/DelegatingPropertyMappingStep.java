@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
+import java.util.Map;
+
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.AssociationInverseSideOptionsStep;
@@ -42,8 +44,8 @@ class DelegatingPropertyMappingStep implements PropertyMappingStep {
 	}
 
 	@Override
-	public PropertyMappingStep binder(PropertyBinder binder) {
-		return delegate.binder( binder );
+	public PropertyMappingStep binder(PropertyBinder binder, Map<String, Object> params) {
+		return delegate.binder( binder, params );
 	}
 
 	@Override

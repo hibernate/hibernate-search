@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.GeoPointBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
@@ -44,11 +47,28 @@ public interface PropertyMappingStep {
 	PropertyMappingDocumentIdOptionsStep documentId();
 
 	/**
+	 * Define a property binder, responsible for creating a bridge.
+	 * To pass some parameters to the bridge,
+	 * use the method {@link #binder(PropertyBinder, Map)} instead.
+	 *
 	 * @param binder A {@link PropertyBinder} responsible for creating a bridge.
 	 * @return {@code this}, for method chaining.
 	 * @see PropertyBinder
 	 */
-	PropertyMappingStep binder(PropertyBinder binder);
+	default PropertyMappingStep binder(PropertyBinder binder) {
+		return binder( binder, Collections.emptyMap() );
+	}
+
+	/**
+	 * Define a property binder, responsible for creating a bridge.
+	 * With this method it is possible to pass a set of parameters to the binder,
+	 * so that they can be used by the bridge.
+	 *
+	 * @param binder A {@link PropertyBinder} responsible for creating a bridge.
+	 * @param params The parameters to pass to the binder.
+	 * @return {@code this}, for method chaining.
+	 */
+	PropertyMappingStep binder(PropertyBinder binder, Map<String, Object> params);
 
 	/**
 	 * @param binder A {@link MarkerBinder} responsible for creating a marker object.

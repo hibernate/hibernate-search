@@ -73,8 +73,8 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 	}
 
 	@Override
-	public void propertyBinder(PropertyBinder binder) {
-		mappingHelper.indexModelBinder().bindProperty( bindingContext, modelPath, binder )
+	public void propertyBinder(PropertyBinder binder, Map<String, Object> params) {
+		mappingHelper.indexModelBinder().bindProperty( bindingContext, modelPath, binder, params )
 				.ifPresent( boundPropertyBridges::add );
 	}
 
