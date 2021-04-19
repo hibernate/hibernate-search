@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -42,6 +43,7 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 	private final IndexFieldTypeFactory indexFieldTypeFactory;
 	private final PojoIndexSchemaContributionListener listener;
 	private final IndexSchemaElement indexSchemaElement;
+	private final Map<String, Object> params;
 
 	private PartialBinding<P> partialBinding;
 
@@ -50,7 +52,8 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 			PojoTypeModel<P> propertyTypeModel,
 			IndexBindingContext indexBindingContext,
 			PojoModelPropertyRootElement<P> bridgedElement,
-			PojoPropertyIndexingDependencyConfigurationContextImpl<P> dependencyContext) {
+			PojoPropertyIndexingDependencyConfigurationContextImpl<P> dependencyContext,
+			Map<String, Object> params) {
 		super( beanResolver );
 		this.introspector = introspector;
 		this.propertyTypeModel = propertyTypeModel;
@@ -59,6 +62,7 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 		this.indexFieldTypeFactory = indexBindingContext.createTypeFactory();
 		this.listener = new PojoIndexSchemaContributionListener();
 		this.indexSchemaElement = indexBindingContext.schemaElement( listener );
+		this.params = params;
 	}
 
 	@Override
@@ -89,6 +93,11 @@ public class PropertyBindingContextImpl<P> extends AbstractCompositeBindingConte
 	@Override
 	public IndexSchemaElement indexSchemaElement() {
 		return indexSchemaElement;
+	}
+
+	@Override
+	public Object parameter(String name) {
+		return params.get( name );
 	}
 
 	public Optional<BoundPropertyBridge<P>> applyBinder(PropertyBinder binder) {

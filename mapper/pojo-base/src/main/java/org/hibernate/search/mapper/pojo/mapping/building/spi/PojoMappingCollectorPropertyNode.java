@@ -6,13 +6,15 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
+import java.util.Map;
+
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 
 public interface PojoMappingCollectorPropertyNode extends PojoMappingCollector {
 
-	void propertyBinder(PropertyBinder binder);
+	void propertyBinder(PropertyBinder binder, Map<String, Object> params);
 
 	void identifierBinder(IdentifierBinder binder);
 

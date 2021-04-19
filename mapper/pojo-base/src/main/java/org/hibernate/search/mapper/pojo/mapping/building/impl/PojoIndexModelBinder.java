@@ -64,7 +64,7 @@ public interface PojoIndexModelBinder {
 			BoundPojoModelPathTypeNode<T> modelPath, TypeBinder binder);
 
 	<P> Optional<BoundPropertyBridge<P>> bindProperty(IndexBindingContext bindingContext,
-			BoundPojoModelPathPropertyNode<?, P> modelPath, PropertyBinder binder);
+			BoundPojoModelPathPropertyNode<?, P> modelPath, PropertyBinder binder, Map<String, Object> params);
 
 	<V> Optional<BoundValueBridge<V, ?>> bindValue(IndexBindingContext bindingContext,
 			BoundPojoModelPathValueNode<?, ?, V> modelPath, boolean multiValued,
