@@ -11,20 +11,26 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collections;
 
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ScaledNumberField;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -267,6 +273,100 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
+	public void customBridge_withParameters_annotationMapping() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@ScaledNumberField(decimalScale = 2, valueBinder = @ValueBinderRef(type = ParametricBridge.ParametricBinder.class,
+					params = {
+							@Parameter(name = "unscaledVal", value = "773"), @Parameter(name = "scale", value = "2")
+					}))
+			WrappedValue wrap;
+
+			IndexedEntity() {
+			}
+
+			IndexedEntity(Integer id, WrappedValue wrap) {
+				this.id = id;
+				this.wrap = wrap;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b.field( "wrap", BigDecimal.class, f -> f.decimalScale( 2 ) ) );
+		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			IndexedEntity entity1 = new IndexedEntity( 1, new WrappedValue( new BigInteger( "739" ), 2 ) );
+			IndexedEntity entity2 = new IndexedEntity( 2, new WrappedValue( new BigInteger( "333" ), 2 ) );
+			IndexedEntity entity3 = new IndexedEntity( 3, new WrappedValue( new BigInteger( "-773" ), 2 ) );
+
+			SearchIndexingPlan plan = session.indexingPlan();
+			plan.add( entity1 );
+			plan.add( entity2 );
+			plan.add( entity3 );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b.field( "wrap", new BigDecimal( new BigInteger( "1512" ), 2 ) ) )
+					.add( "2", b -> b.field( "wrap", new BigDecimal( new BigInteger( "1106" ), 2 ) ) )
+					.add( "3", b -> b.field( "wrap", new BigDecimal( BigInteger.ZERO, 2 ) ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void customBridge_withParameters_programmaticMapping() {
+		class IndexedEntity {
+			Integer id;
+			WrappedValue wrap;
+
+			IndexedEntity() {
+			}
+
+			IndexedEntity(Integer id, WrappedValue wrap) {
+				this.id = id;
+				this.wrap = wrap;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b.field( "wrap", BigDecimal.class, f -> f.decimalScale( 2 ) ) );
+		SearchMapping mapping = setupHelper.start()
+				.withConfiguration( builder -> {
+					builder.addEntityType( IndexedEntity.class );
+
+					TypeMappingStep indexedEntity = builder.programmaticMapping().type( IndexedEntity.class );
+					indexedEntity.indexed().index( INDEX_NAME );
+					indexedEntity.property( "id" ).documentId();
+					indexedEntity.property( "wrap" ).scaledNumberField().decimalScale( 2 ).valueBinder(
+							new ParametricBridge.ParametricBinder(),
+							Collections.singletonMap( "baseDecimal", new BigDecimal( new BigInteger( "773" ), 2 ) )
+					);
+				} )
+				.expectCustomBeans().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			IndexedEntity entity1 = new IndexedEntity( 1, new WrappedValue( new BigInteger( "739" ), 2 ) );
+			IndexedEntity entity2 = new IndexedEntity( 2, new WrappedValue( new BigInteger( "333" ), 2 ) );
+			IndexedEntity entity3 = new IndexedEntity( 3, new WrappedValue( new BigInteger( "-773" ), 2 ) );
+
+			SearchIndexingPlan plan = session.indexingPlan();
+			plan.add( entity1 );
+			plan.add( entity2 );
+			plan.add( entity3 );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b.field( "wrap", new BigDecimal( new BigInteger( "1512" ), 2 ) ) )
+					.add( "2", b -> b.field( "wrap", new BigDecimal( new BigInteger( "1106" ), 2 ) ) )
+					.add( "3", b -> b.field( "wrap", new BigDecimal( BigInteger.ZERO, 2 ) ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
 	public void customBridge_implicitFieldType_invalid() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
@@ -393,7 +493,56 @@ public class ScaledNumberFieldIT {
 		}
 	}
 
+	public static class ParametricBridge implements ValueBridge<WrappedValue, BigDecimal> {
+
+		private final BigDecimal baseDecimal;
+
+		private ParametricBridge(BigDecimal baseDecimal) {
+			this.baseDecimal = baseDecimal;
+		}
+
+		@Override
+		public BigDecimal toIndexedValue(WrappedValue value, ValueBridgeToIndexedValueContext context) {
+			return ( value == null ) ? baseDecimal : value.wrapped.add( baseDecimal );
+		}
+
+		public static class ParametricBinder implements ValueBinder {
+			@Override
+			public void bind(ValueBindingContext<?> context) {
+				context.bridge( WrappedValue.class, new ParametricBridge( extractBaseDecimal( context ) ),
+						context.typeFactory().asBigDecimal()
+				);
+			}
+		}
+
+		@SuppressWarnings("uncheked")
+		private static BigDecimal extractBaseDecimal(ValueBindingContext<?> context) {
+			BigDecimal baseDecimal = (BigDecimal) context.parameter( "baseDecimal" );
+			if ( baseDecimal != null ) {
+				return baseDecimal;
+			}
+
+			Object unscaledValParam = context.parameter( "unscaledVal" );
+			Object scaleParam = context.parameter( "scale" );
+
+			if ( unscaledValParam == null || scaleParam == null ) {
+				return BigDecimal.ZERO;
+			}
+
+			BigInteger unscaledVal = new BigInteger( (String) unscaledValParam );
+			int scale = Integer.parseInt( (String) scaleParam );
+			return new BigDecimal( unscaledVal, scale );
+		}
+	}
+
 	private static class WrappedValue {
 		private BigDecimal wrapped;
+
+		WrappedValue() {
+		}
+
+		WrappedValue(BigInteger unscaledValue, int scale) {
+			this.wrapped = new BigDecimal( unscaledValue, scale );
+		}
 	}
 }
