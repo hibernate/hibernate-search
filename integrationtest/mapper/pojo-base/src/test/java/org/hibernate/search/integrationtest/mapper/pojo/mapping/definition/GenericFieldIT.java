@@ -11,13 +11,18 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Collections;
 
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
@@ -25,6 +30,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValue
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -188,6 +194,85 @@ public class GenericFieldIT {
 	}
 
 	@Test
+	public void customBridge_withParameters_annotationMapping() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@GenericField(valueBinder = @ValueBinderRef(type = ParametricBridge.ParametricBinder.class,
+					params = @Parameter(name = "stringBase", value = "4")))
+			Integer value;
+
+			IndexedEntity() {
+			}
+			IndexedEntity(Integer id, Integer value) {
+				this.id = id;
+				this.value = value;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b.field( "value", String.class ) );
+		SearchMapping mapping = setupHelper.start()
+				.expectCustomBeans().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			SearchIndexingPlan plan = session.indexingPlan();
+			plan.add( new IndexedEntity( 1, 93 ) );
+			plan.add( new IndexedEntity( 2, null ) );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b.field( "value", "1" ) )
+					.add( "2", b -> b.field( "value", "4" ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void customBridge_withParameters_programmaticMapping() {
+		class IndexedEntity {
+			Integer id;
+			Integer value;
+
+			IndexedEntity() {
+			}
+			IndexedEntity(Integer id, Integer value) {
+				this.id = id;
+				this.value = value;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b.field( "value", String.class ) );
+		SearchMapping mapping = setupHelper.start()
+				.withConfiguration( builder -> {
+					builder.addEntityType( IndexedEntity.class );
+
+					TypeMappingStep indexedEntity = builder.programmaticMapping().type( IndexedEntity.class );
+					indexedEntity.indexed().index( INDEX_NAME );
+					indexedEntity.property( "id" ).documentId();
+					indexedEntity.property( "value" ).genericField().valueBinder(
+							new ParametricBridge.ParametricBinder(),
+							Collections.singletonMap( "base", 4 )
+					);
+				} )
+				.expectCustomBeans().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			SearchIndexingPlan plan = session.indexingPlan();
+			plan.add( new IndexedEntity( 1, 93 ) );
+			plan.add( new IndexedEntity( 2, null ) );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b.field( "value", "1" ) )
+					.add( "2", b -> b.field( "value", "4" ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
 	public void customBridge_explicitFieldType_invalid() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
@@ -284,6 +369,47 @@ public class GenericFieldIT {
 		@Override
 		public T toIndexedValue(String value, ValueBridgeToIndexedValueContext context) {
 			throw new UnsupportedOperationException( "Should not be called" );
+		}
+	}
+
+	public static class ParametricBridge implements ValueBridge<Integer, String> {
+
+		private final Integer base;
+
+		private ParametricBridge(Integer base) {
+			this.base = base;
+		}
+
+		@Override
+		public String toIndexedValue(Integer value, ValueBridgeToIndexedValueContext context) {
+			if ( value == null ) {
+				return base.toString();
+			}
+
+			return ( value % base ) + "";
+		}
+
+		public static class ParametricBinder implements ValueBinder {
+			@Override
+			public void bind(ValueBindingContext<?> context) {
+				context.bridge( Integer.class, new ParametricBridge( extractBase( context ) ),
+						context.typeFactory().asString() );
+			}
+		}
+
+		@SuppressWarnings("uncheked")
+		private static Integer extractBase(ValueBindingContext<?> context) {
+			Integer base = (Integer) context.parameter( "base" );
+			if ( base != null ) {
+				return base;
+			}
+
+			String stringBase = (String) context.parameter( "stringBase" );
+			if ( stringBase == null ) {
+				return 0;
+			}
+
+			return Integer.parseInt( stringBase );
 		}
 	}
 
