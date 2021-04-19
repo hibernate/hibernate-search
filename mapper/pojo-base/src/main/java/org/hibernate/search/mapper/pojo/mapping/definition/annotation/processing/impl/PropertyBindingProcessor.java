@@ -7,9 +7,13 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanDelegatingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
@@ -28,8 +32,17 @@ public final class PropertyBindingProcessor implements PropertyMappingAnnotation
 	@Override
 	public void process(PropertyMappingStep mapping, PropertyBinding annotation,
 			PropertyMappingAnnotationProcessorContext context) {
-		PropertyBinder binder = createBinder( annotation.binder(), context );
-		mapping.binder( binder );
+		PropertyBinderRef propertyBinder = annotation.binder();
+		PropertyBinder binder = createBinder( propertyBinder, context );
+
+		if ( propertyBinder.params() != null ) {
+			Map<String, Object> params = Arrays.stream( propertyBinder.params() )
+					.collect( Collectors.toMap( Parameter::name, Parameter::value ) );
+			mapping.binder( binder, params );
+		}
+		else {
+			mapping.binder( binder );
+		}
 	}
 
 	private PropertyBinder createBinder(PropertyBinderRef binderReferenceAnnotation, MappingAnnotationProcessorContext context) {
