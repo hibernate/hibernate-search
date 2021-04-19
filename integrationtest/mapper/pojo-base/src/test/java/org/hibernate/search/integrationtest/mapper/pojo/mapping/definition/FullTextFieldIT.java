@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
@@ -18,16 +19,17 @@ import org.hibernate.search.engine.backend.types.TermVector;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
-import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
@@ -332,6 +334,81 @@ public class FullTextFieldIT {
 	}
 
 	@Test
+	public void customBridge_withParameters_annotationMapping() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@FullTextField(valueBinder = @ValueBinderRef(type = ParametricBridge.ParametricBinder.class,
+					params = @Parameter(name = "fixedPrefix", value = "fixed-prefix-")))
+			WrappedValue wrap;
+
+			IndexedEntity() {
+			}
+			IndexedEntity(Integer id, WrappedValue wrap) {
+				this.id = id;
+				this.wrap = wrap;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b.field( "wrap", String.class, f -> f.analyzerName( "default" ) ) );
+		SearchMapping mapping = setupHelper.start()
+				.expectCustomBeans().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			IndexedEntity entity = new IndexedEntity( 1, new WrappedValue( "bla-bla-bla" ) );
+			session.indexingPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b.field( "wrap", "fixed-prefix-bla-bla-bla" ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void customBridge_withParameters_programmaticMapping() {
+		class IndexedEntity {
+			Integer id;
+			WrappedValue wrap;
+
+			IndexedEntity() {
+			}
+			IndexedEntity(Integer id, WrappedValue wrap) {
+				this.id = id;
+				this.wrap = wrap;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b.field( "wrap", String.class, f -> f.analyzerName( "default" ) ) );
+		SearchMapping mapping = setupHelper.start()
+				.withConfiguration( builder -> {
+					builder.addEntityType( IndexedEntity.class );
+
+					TypeMappingStep indexedEntity = builder.programmaticMapping().type( IndexedEntity.class );
+					indexedEntity.indexed().index( INDEX_NAME );
+					indexedEntity.property( "id" ).documentId();
+					indexedEntity.property( "wrap" ).fullTextField().valueBinder(
+							new ParametricBridge.ParametricBinder(),
+							Collections.singletonMap( "fixedPrefix", "fixed-prefix-" )
+					);
+				} )
+				.expectCustomBeans().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			IndexedEntity entity = new IndexedEntity( 1, new WrappedValue( "bla-bla-bla" ) );
+			session.indexingPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b.field( "wrap", "fixed-prefix-bla-bla-bla" ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
 	public void defaultBridge_invalidFieldType() {
 		@Indexed
 		class IndexedEntity {
@@ -511,8 +588,41 @@ public class FullTextFieldIT {
 		}
 	}
 
-	private static class WrappedValue {
-		private String wrapped;
+	public static class ParametricBridge implements ValueBridge<WrappedValue, String> {
+
+		private final String fixedPrefix;
+
+		private ParametricBridge(String fixedPrefix) {
+			this.fixedPrefix = ( fixedPrefix == null ) ? "" : fixedPrefix;
+		}
+
+		@Override
+		public String toIndexedValue(WrappedValue value, ValueBridgeToIndexedValueContext context) {
+			return ( value == null ) ? fixedPrefix : fixedPrefix + value.wrapped;
+		}
+
+		public static class ParametricBinder implements ValueBinder {
+			@Override
+			public void bind(ValueBindingContext<?> context) {
+				context.bridge( WrappedValue.class, new ParametricBridge( extractFixedPrefix( context ) ),
+						context.typeFactory().asString() );
+			}
+		}
+
+		@SuppressWarnings("uncheked")
+		private static String extractFixedPrefix(ValueBindingContext<?> context) {
+			return (String) context.parameter( "fixedPrefix" );
+		}
 	}
 
+	private static class WrappedValue {
+		private String wrapped;
+
+		WrappedValue() {
+		}
+
+		WrappedValue(String wrapped) {
+			this.wrapped = wrapped;
+		}
+	}
 }
