@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -42,6 +43,7 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 	private final IndexFieldTypeFactory indexFieldTypeFactory;
 	private final PojoIndexSchemaContributionListener listener;
 	private final IndexSchemaElement indexSchemaElement;
+	private final Map<String, Object> params;
 
 	private PartialBinding<T> partialBinding;
 
@@ -50,7 +52,8 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 			PojoTypeModel<T> typeModel,
 			IndexBindingContext indexBindingContext,
 			PojoModelTypeRootElement<T> bridgedElement,
-			PojoTypeIndexingDependencyConfigurationContextImpl<T> dependencyContext) {
+			PojoTypeIndexingDependencyConfigurationContextImpl<T> dependencyContext,
+			Map<String, Object> params) {
 		super( beanResolver );
 		this.introspector = introspector;
 		this.typeModel = typeModel;
@@ -59,6 +62,7 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 		this.indexFieldTypeFactory = indexBindingContext.createTypeFactory();
 		this.listener = new PojoIndexSchemaContributionListener();
 		this.indexSchemaElement = indexBindingContext.schemaElement( listener );
+		this.params = params;
 	}
 
 	@Override
@@ -89,6 +93,11 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 	@Override
 	public IndexSchemaElement indexSchemaElement() {
 		return indexSchemaElement;
+	}
+
+	@Override
+	public Object parameter(String name) {
+		return params.get( name );
 	}
 
 	public Optional<BoundTypeBridge<T>> applyBinder(TypeBinder binder) {

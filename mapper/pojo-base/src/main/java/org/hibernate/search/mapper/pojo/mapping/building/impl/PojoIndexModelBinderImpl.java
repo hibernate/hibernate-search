@@ -114,7 +114,8 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 	@Override
 	public <T> Optional<BoundTypeBridge<T>> bindType(IndexBindingContext indexBindingContext,
-			BoundPojoModelPathTypeNode<T> modelPath, TypeBinder binder) {
+			BoundPojoModelPathTypeNode<T> modelPath, TypeBinder binder,
+			Map<String, Object> params) {
 		PojoModelTypeRootElement<T> pojoModelRootElement =
 				new PojoModelTypeRootElement<>( modelPath, introspector, typeAdditionalMetadataProvider );
 
@@ -133,7 +134,8 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 				typeModel,
 				indexBindingContext,
 				pojoModelRootElement,
-				pojoDependencyContext
+				pojoDependencyContext,
+				params
 		);
 
 		return bindingContext.applyBinder( binder );

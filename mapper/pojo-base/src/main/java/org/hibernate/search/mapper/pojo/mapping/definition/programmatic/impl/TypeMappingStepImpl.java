@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
+import java.util.Map;
+
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
@@ -56,8 +58,8 @@ public class TypeMappingStepImpl
 	}
 
 	@Override
-	public TypeMappingStep binder(TypeBinder binder) {
-		children.add( new TypeBridgeMappingContributor( binder ) );
+	public TypeMappingStep binder(TypeBinder binder, Map<String, Object> params) {
+		children.add( new TypeBridgeMappingContributor( binder, params ) );
 		return this;
 	}
 
