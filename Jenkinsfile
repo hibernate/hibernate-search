@@ -206,6 +206,8 @@ stage('Configure') {
 							condition: TestCondition.AFTER_MERGE)
 			],
 			esLocal: [
+					// --------------------------------------------
+					// Elasticsearch distribution from Elastic
 					new EsLocalBuildEnvironment(versionRange: '[5.6,6.0)', mavenProfile: 'elasticsearch-5.6',
 							condition: TestCondition.AFTER_MERGE),
 					// ES 6.2, 6.3.0, 6.3.1 and 6.3.2 and below have a bug that prevents double-nested
@@ -243,6 +245,11 @@ stage('Configure') {
 							condition: TestCondition.BEFORE_MERGE,
 							isDefault: true),
 					new EsLocalBuildEnvironment(versionRange: '[7.11,7.x)', mavenProfile: 'elasticsearch-7.11',
+							condition: TestCondition.AFTER_MERGE),
+
+					// --------------------------------------------
+					// Open Distro for Elasticsearch
+					new OpenDistroEsLocalBuildEnvironment(version: '1.13.2', mavenProfile: 'opendistro-elasticsearch-1.13',
 							condition: TestCondition.AFTER_MERGE)
 			],
 			// Note that each of these environments will only be tested if the appropriate
@@ -564,6 +571,12 @@ stage('Non-default environments') {
 	environments.content.esLocal.enabled.each { EsLocalBuildEnvironment buildEnv ->
 		executions.put(buildEnv.tag, {
 			runBuildOnNode {
+				if ( buildEnv.dockerHubImage ) {
+					// Authenticated pull, to avoid failure due to throttling.
+					docker.withRegistry('https://index.docker.io/v1/', 'hibernateci.hub.docker.com') {
+						docker.image(buildEnv.dockerHubImage).pull()
+					}
+				}
 				helper.withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install \
@@ -782,6 +795,15 @@ class EsLocalBuildEnvironment extends BuildEnvironment {
 	String mavenProfile
 	@Override
 	String getTag() { "elasticsearch-local-$versionRange" }
+	String getDockerHubImage() { null }
+}
+
+class OpenDistroEsLocalBuildEnvironment extends EsLocalBuildEnvironment {
+	String version
+	@Override
+	String getTag() { "opendistro-elasticsearch-local-$version" }
+	@Override
+	String getDockerHubImage() { "amazon/opendistro-for-elasticsearch:$version" }
 }
 
 class EsAwsBuildEnvironment extends BuildEnvironment {
