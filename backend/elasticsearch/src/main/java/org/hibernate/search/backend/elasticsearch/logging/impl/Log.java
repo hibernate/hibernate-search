@@ -740,4 +740,13 @@ public interface Log extends BasicLogger {
 			" hits. Refer to Elasticsearch's 'max_result_window_size' setting for more information." )
 	void defaultedLimitedHits(Integer defaultLimit, long hitCount);
 
+	@Message(id = ID_OFFSET + 141,
+			value = "Incompatible Elasticsearch version:"
+					+ " version '%2$s' does not match version '%1$s' that was provided "
+					+ " when the backend was created."
+					+ " You can provide a more precise version on startup,"
+					+ " but you cannot override the version that was provided when the backend was created.")
+	SearchException incompatibleElasticsearchVersionOnStart(ElasticsearchVersion versionOnCreation,
+			ElasticsearchVersion versionOnStart);
+
 }
