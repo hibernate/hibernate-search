@@ -9,18 +9,23 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.TypeBinding;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -42,7 +47,8 @@ public class TypeBindingBaseIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
+	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock(
+			MethodHandles.lookup(), backendMock );
 
 	/**
 	 * Basic test checking that a simple type binding will be applied as expected.
@@ -100,5 +106,141 @@ public class TypeBindingBaseIT {
 						.failure( "Empty binder reference." )
 						.build()
 				);
+	}
+
+	@Test
+	public void customBridge_withParameters_annotationMapping() {
+		backendMock.expectSchema( INDEX_NAME, b -> {
+			b.field( "quotient", Integer.class );
+			b.field( "reminder", Integer.class );
+		} );
+		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( AnnotatedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			SearchIndexingPlan plan = session.indexingPlan();
+			plan.add( new AnnotatedEntity( 1, 14, 3 ) );
+			plan.add( new AnnotatedEntity( 2, -7, 99 ) );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> {
+						b.field( "quotient", 2 );
+						b.field( "reminder", 3 );
+					} )
+					.add( "2", b -> {
+						b.field( "quotient", 13 );
+						b.field( "reminder", 1 );
+					} )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void customBridge_withParameters_programmaticMapping() {
+		backendMock.expectSchema( INDEX_NAME, b -> {
+			b.field( "quotient", Integer.class );
+			b.field( "reminder", Integer.class );
+		} );
+		SearchMapping mapping = setupHelper.start().expectCustomBeans()
+				.withConfiguration( builder -> {
+					builder.addEntityType( NotAnnotatedEntity.class );
+
+					TypeMappingStep indexedEntity = builder.programmaticMapping().type( NotAnnotatedEntity.class )
+							.binder( new ParametricBinder(), Collections.singletonMap( "base", 7 ) );
+					indexedEntity.indexed().index( INDEX_NAME );
+					indexedEntity.property( "id" ).documentId();
+					indexedEntity.property( "value1" );
+					indexedEntity.property( "value2" );
+				} )
+				.setup( NotAnnotatedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			SearchIndexingPlan plan = session.indexingPlan();
+			plan.add( new NotAnnotatedEntity( 1, 14, 3 ) );
+			plan.add( new NotAnnotatedEntity( 2, -7, 99 ) );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> {
+						b.field( "quotient", 2 );
+						b.field( "reminder", 3 );
+					} )
+					.add( "2", b -> {
+						b.field( "quotient", 13 );
+						b.field( "reminder", 1 );
+					} )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	public static class ParametricBinder implements TypeBinder {
+
+		@Override
+		public void bind(TypeBindingContext context) {
+			context.dependencies().use( "value1" ).use( "value2" );
+
+			IndexFieldReference<Integer> quotient = context.indexSchemaElement().field( "quotient", f -> f.asInteger() )
+					.toReference();
+			IndexFieldReference<Integer> reminder = context.indexSchemaElement().field( "reminder", f -> f.asInteger() )
+					.toReference();
+			Integer base = extractBase( context );
+
+			context.bridge( (DocumentElement target, Object bridgedElement, TypeBridgeWriteContext writeContext) -> {
+				if ( bridgedElement instanceof AnnotatedEntity ) {
+					AnnotatedEntity casted = (AnnotatedEntity) bridgedElement;
+					int sum = casted.value1 + casted.value2;
+					target.addValue( quotient, sum / base );
+					target.addValue( reminder, sum % base );
+				}
+				else if ( bridgedElement instanceof NotAnnotatedEntity ) {
+					NotAnnotatedEntity casted = (NotAnnotatedEntity) bridgedElement;
+					int sum = casted.value1 + casted.value2;
+					target.addValue( quotient, sum / base );
+					target.addValue( reminder, sum % base );
+				}
+			} );
+		}
+	}
+
+	@SuppressWarnings("uncheked")
+	private static Integer extractBase(TypeBindingContext context) {
+		Integer base = (Integer) context.parameter( "base" );
+		if ( base != null ) {
+			return base;
+		}
+
+		String stringBase = (String) context.parameter( "stringBase" );
+		return Integer.parseInt( stringBase );
+	}
+
+	@Indexed(index = INDEX_NAME)
+	@TypeBinding(binder = @TypeBinderRef(type = ParametricBinder.class,
+			params = @Parameter(name = "stringBase", value = "7")))
+	private static class AnnotatedEntity {
+		@DocumentId
+		Integer id;
+
+		int value1;
+		int value2;
+
+		AnnotatedEntity(Integer id, int value1, int value2) {
+			this.id = id;
+			this.value1 = value1;
+			this.value2 = value2;
+		}
+	}
+
+	private static class NotAnnotatedEntity {
+		Integer id;
+		int value1;
+		int value2;
+
+		NotAnnotatedEntity(Integer id, int value1, int value2) {
+			this.id = id;
+			this.value1 = value1;
+			this.value2 = value2;
+		}
 	}
 }
