@@ -12,6 +12,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
+import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 
 /**
@@ -40,6 +41,12 @@ public @interface TypeBinderRef {
 	 * @return How to retrieve the binder. See {@link BeanRetrieval}.
 	 */
 	BeanRetrieval retrieval() default BeanRetrieval.ANY;
+
+	/**
+	 * @return A parameter that can be statically passed to a given {@link TypeBinder},
+	 * so that it can be used by its {@link TypeBridge}.
+	 */
+	Parameter[] params() default {};
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.

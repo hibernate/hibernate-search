@@ -7,9 +7,13 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanDelegatingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
@@ -28,8 +32,17 @@ public final class TypeBindingProcessor implements TypeMappingAnnotationProcesso
 	@Override
 	public void process(TypeMappingStep mapping, TypeBinding annotation,
 			TypeMappingAnnotationProcessorContext context) {
-		TypeBinder binder = createBinder( annotation.binder(), context );
-		mapping.binder( binder );
+		TypeBinderRef typeBinder = annotation.binder();
+		TypeBinder binder = createBinder( typeBinder, context );
+
+		if ( typeBinder.params() != null ) {
+			Map<String, Object> params = Arrays.stream( typeBinder.params() )
+					.collect( Collectors.toMap( Parameter::name, Parameter::value ) );
+			mapping.binder( binder, params );
+		}
+		else {
+			mapping.binder( binder );
+		}
 	}
 
 	private TypeBinder createBinder(TypeBinderRef binderReferenceAnnotation, MappingAnnotationProcessorContext context) {
