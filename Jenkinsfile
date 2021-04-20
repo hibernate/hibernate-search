@@ -562,7 +562,8 @@ stage('Non-default environments') {
 							-pl ${[
 								'org.hibernate.search:hibernate-search-integrationtest-mapper-orm',
 								'org.hibernate.search:hibernate-search-integrationtest-mapper-orm-envers',
-								'org.hibernate.search:hibernate-search-integrationtest-showcase-library'
+								'org.hibernate.search:hibernate-search-integrationtest-showcase-library',
+								'org.hibernate.search:hibernate-search-integrationtest-mapper-orm-realbackend'
 								 ].join(',')} \
 							-P$buildEnv.mavenProfile \
 					"""
@@ -586,7 +587,8 @@ stage('Non-default environments') {
 							clean install \
 							-pl ${[
 								'org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch',
-								'org.hibernate.search:hibernate-search-integrationtest-showcase-library'
+								'org.hibernate.search:hibernate-search-integrationtest-showcase-library',
+								'org.hibernate.search:hibernate-search-integrationtest-mapper-orm-realbackend'
 								 ].join(',')} \
 							${toElasticsearchVersionArgs(buildEnv.mavenProfile, null)} \
 					"""
