@@ -20,8 +20,8 @@ import java.util.function.Function;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
@@ -241,9 +241,9 @@ public class SearchSetupHelper implements TestRule {
 			SearchIntegrationPartialBuildState integrationPartialBuildState = integrationBuilder.prepareBuild();
 			integrationPartialBuildStates.add( integrationPartialBuildState );
 
-			return () -> {
+			return overrides -> {
 				SearchIntegrationFinalizer finalizer =
-						integrationPartialBuildState.finalizer( propertySource, unusedPropertyChecker );
+						integrationPartialBuildState.finalizer( propertySource.withOverride( overrides ), unusedPropertyChecker );
 				StubMapping mapping = finalizer.finalizeMapping(
 						mappingKey,
 						(context, partialMapping) -> partialMapping.finalizeMapping( schemaManagementStrategy )
@@ -265,7 +265,11 @@ public class SearchSetupHelper implements TestRule {
 
 	public interface PartialSetup {
 
-		SearchIntegration doSecondPhase();
+		default SearchIntegration doSecondPhase() {
+			return doSecondPhase( ConfigurationPropertySource.empty() );
+		}
+
+		SearchIntegration doSecondPhase(ConfigurationPropertySource overrides);
 
 	}
 }

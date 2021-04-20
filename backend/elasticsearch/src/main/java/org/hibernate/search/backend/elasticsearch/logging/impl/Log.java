@@ -704,4 +704,13 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 130,
 			value = "Invalid target hosts configuration: the list of URIs must not be empty.")
 	SearchException emptyListOfUris();
+
+	@Message(id = ID_OFFSET + 141,
+			value = "Incompatible Elasticsearch version:"
+					+ " version '%2$s' does not match version '%1$s' that was provided "
+					+ " when the backend was created."
+					+ " You can provide a more precise version on startup,"
+					+ " but you cannot override the version that was provided when the backend was created.")
+	SearchException incompatibleElasticsearchVersionOnStart(ElasticsearchVersion versionOnCreation,
+			ElasticsearchVersion versionOnStart);
 }

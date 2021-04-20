@@ -10,10 +10,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
+import org.hibernate.search.engine.cfg.BackendSettings;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -125,7 +130,7 @@ public class ElasticsearchBootstrapIT {
 						)
 						.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 						.withIndex( StubMappedIndex.withoutFields() )
-						.setupFirstPhaseOnly(),
+						.setup(),
 				"NO version check with partial version number"
 		)
 				.isInstanceOf( SearchException.class )
@@ -151,9 +156,6 @@ public class ElasticsearchBootstrapIT {
 
 		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start()
 				.withBackendProperty(
-						ElasticsearchBackendSettings.VERSION_CHECK_ENABLED, false
-				)
-				.withBackendProperty(
 						ElasticsearchBackendSettings.VERSION, versionWithMajorAndMinorOnly
 				)
 				.withBackendProperty(
@@ -166,7 +168,92 @@ public class ElasticsearchBootstrapIT {
 		// We do not expect the client to be created in the first phase
 		assertThat( elasticsearchClientSpy.getCreatedClientCount() ).isZero();
 
-		partialSetup.doSecondPhase();
+		Map<String, Object> runtimeProperties = new HashMap<>();
+		runtimeProperties.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION_CHECK_ENABLED ), false );
+		partialSetup.doSecondPhase( ConfigurationPropertySource.fromMap( runtimeProperties ) );
+		// We do not expect any request, since the version check is disabled
+		assertThat( elasticsearchClientSpy.getRequestCount() ).isZero();
+
+		checkBackendWorks();
+
+		assertThat( elasticsearchClientSpy.getRequestCount() ).isNotZero();
+	}
+
+	/**
+	 * Check that an exception is thrown when version_check.enabled is false
+	 * and specifying a version on backend creation, and a different one on backend start.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4214")
+	public void noVersionCheck_versionOverrideOnStart_incompatibleVersion() {
+		ElasticsearchVersion clusterVersion = ElasticsearchVersion.of( ElasticsearchTestDialect.getClusterVersion() );
+		String versionWithMajorOnly = String.valueOf( clusterVersion.major() );
+		String incompatibleVersionWithMajorAndMinorOnly = "2." + clusterVersion.minor().getAsInt();
+
+		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start()
+				.withBackendProperty(
+						ElasticsearchBackendSettings.VERSION, versionWithMajorOnly
+				)
+				.withBackendProperty(
+						ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
+						elasticsearchClientSpy.factoryReference()
+				)
+				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
+				.withIndex( index )
+				.setupFirstPhaseOnly();
+		// We do not expect the client to be created in the first phase
+		assertThat( elasticsearchClientSpy.getCreatedClientCount() ).isZero();
+
+		Map<String, Object> runtimeProperties = new HashMap<>();
+		runtimeProperties.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION_CHECK_ENABLED ), false );
+		runtimeProperties.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION ), incompatibleVersionWithMajorAndMinorOnly );
+		assertThatThrownBy(
+				() -> partialSetup.doSecondPhase( ConfigurationPropertySource.fromMap( runtimeProperties ) ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.defaultBackendContext()
+						.failure(
+								"Invalid value for configuration property 'hibernate.search.backend.version': '"
+										+ incompatibleVersionWithMajorAndMinorOnly + "'",
+								"Incompatible Elasticsearch version:"
+										+ " version '" + incompatibleVersionWithMajorAndMinorOnly
+										+ "' does not match version '" + versionWithMajorOnly + "' that was provided "
+										+ " when the backend was created.",
+								"You can provide a more precise version on startup,"
+										+ " but you cannot override the version that was provided when the backend was created." )
+						.build()
+				);
+	}
+
+	/**
+	 * Check everything works fine when version_check.enabled is false
+	 * and specifying a version on backend creation, and a more precise one on backend start.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4214")
+	public void noVersionCheck_versionOverrideOnStart_compatibleVersion() {
+		ElasticsearchVersion clusterVersion = ElasticsearchVersion.of( ElasticsearchTestDialect.getClusterVersion() );
+		String versionWithMajorOnly = String.valueOf( clusterVersion.major() );
+		String versionWithMajorAndMinorOnly = clusterVersion.major() + "." + clusterVersion.minor().getAsInt();
+
+		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start()
+				.withBackendProperty(
+						ElasticsearchBackendSettings.VERSION, versionWithMajorOnly
+				)
+				.withBackendProperty(
+						ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
+						elasticsearchClientSpy.factoryReference()
+				)
+				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
+				.withIndex( index )
+				.setupFirstPhaseOnly();
+		// We do not expect the client to be created in the first phase
+		assertThat( elasticsearchClientSpy.getCreatedClientCount() ).isZero();
+
+		Map<String, Object> runtimeProperties = new HashMap<>();
+		runtimeProperties.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION_CHECK_ENABLED ), false );
+		runtimeProperties.put( BackendSettings.backendKey( ElasticsearchBackendSettings.VERSION ), versionWithMajorAndMinorOnly );
+		partialSetup.doSecondPhase( ConfigurationPropertySource.fromMap( runtimeProperties ) );
 		// We do not expect any request, since the version check is disabled
 		assertThat( elasticsearchClientSpy.getRequestCount() ).isZero();
 
