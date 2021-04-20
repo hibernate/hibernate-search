@@ -84,6 +84,11 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
+	public boolean isOpen() {
+		return active;
+	}
+
+	@Override
 	public MassIndexer massIndexer(Collection<? extends Class<?>> types) {
 		chackActiveAndThrow();
 		return scope( types ).massIndexer( this );
