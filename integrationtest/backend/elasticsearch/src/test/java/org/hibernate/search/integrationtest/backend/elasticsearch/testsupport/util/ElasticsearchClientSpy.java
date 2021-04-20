@@ -29,6 +29,7 @@ import org.junit.runners.model.Statement;
 
 public class ElasticsearchClientSpy implements TestRule {
 	private final AtomicInteger createdClientCount = new AtomicInteger();
+	private final AtomicInteger requestCount = new AtomicInteger();
 	private final CallQueue<ElasticsearchClientSubmitCall> expectations = new CallQueue<>();
 
 	@Override
@@ -65,6 +66,10 @@ public class ElasticsearchClientSpy implements TestRule {
 
 	public int getCreatedClientCount() {
 		return createdClientCount.get();
+	}
+
+	public int getRequestCount() {
+		return requestCount.get();
 	}
 
 	public BeanReference<ElasticsearchClientFactory> factoryReference() {
@@ -120,6 +125,7 @@ public class ElasticsearchClientSpy implements TestRule {
 
 		@Override
 		public CompletableFuture<ElasticsearchResponse> submit(ElasticsearchRequest request) {
+			requestCount.incrementAndGet();
 			return expectations.verify(
 					new ElasticsearchClientSubmitCall( request ),
 					// If there was an expectation, check it is met and forward the request to the actual client
