@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -18,7 +17,6 @@ import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDial
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.DiscriminatorTypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.IndexNameTypeNameMapping;
@@ -34,13 +32,11 @@ import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.Gson;
@@ -48,19 +44,6 @@ import com.google.gson.GsonBuilder;
 
 
 public class ElasticsearchBackendFactory implements BackendFactory {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private static final OptionalConfigurationProperty<ElasticsearchVersion> VERSION =
-			ConfigurationProperty.forKey( ElasticsearchBackendSettings.VERSION )
-					.as( ElasticsearchVersion.class, ElasticsearchVersion::of )
-					.build();
-
-	private static final ConfigurationProperty<Boolean> VERSION_CHECK_ENABLED =
-			ConfigurationProperty.forKey( ElasticsearchBackendSettings.VERSION_CHECK_ENABLED )
-					.asBoolean()
-					.withDefault( ElasticsearchBackendSettings.Defaults.VERSION_CHECK_ENABLED )
-					.build();
 
 	private static final ConfigurationProperty<MultiTenancyStrategyName> MULTI_TENANCY_STRATEGY =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.MULTI_TENANCY_STRATEGY )
@@ -103,8 +86,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		 */
 		GsonProvider defaultGsonProvider = GsonProvider.create( GsonBuilder::new, logPrettyPrinting );
 
-		Optional<ElasticsearchVersion> configuredVersion = VERSION.get( propertySource );
-		boolean versionCheckEnabled = getVersionCheckEnabled( propertySource );
+		Optional<ElasticsearchVersion> configuredVersion = ElasticsearchLinkImpl.VERSION.get( propertySource );
 
 		BeanResolver beanResolver = buildContext.beanResolver();
 		BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder = null;
@@ -119,7 +101,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
 			link = new ElasticsearchLinkImpl(
 					clientFactoryHolder, threads, defaultGsonProvider, logPrettyPrinting,
-					dialectFactory, configuredVersion, versionCheckEnabled
+					dialectFactory, configuredVersion
 			);
 
 			ElasticsearchModelDialect dialect;
@@ -163,20 +145,6 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.push( BackendThreads::onStop, threads );
 			throw e;
 		}
-	}
-
-	private boolean getVersionCheckEnabled(ConfigurationPropertySource propertySource) {
-		boolean versionCheckEnabled = VERSION_CHECK_ENABLED.get( propertySource );
-		if ( !versionCheckEnabled ) {
-			VERSION.getAndTransform( propertySource, optionalValue -> {
-				if ( !optionalValue.isPresent() || optionalValue.isPresent() && !optionalValue.get().minor().isPresent() ) {
-					throw log.impreciseElasticsearchVersionWhenNoVersionCheck(
-							VERSION_CHECK_ENABLED.resolveOrRaw( propertySource ) );
-				}
-				return optionalValue;
-			} );
-		}
-		return versionCheckEnabled;
 	}
 
 	private MultiTenancyStrategy getMultiTenancyStrategy(ConfigurationPropertySource propertySource) {
