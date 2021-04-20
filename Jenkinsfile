@@ -559,7 +559,11 @@ stage('Non-default environments') {
 				helper.withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install \
-							-pl org.hibernate.search:hibernate-search-integrationtest-mapper-orm,org.hibernate.search:hibernate-search-integrationtest-mapper-orm-envers,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
+							-pl ${[
+								'org.hibernate.search:hibernate-search-integrationtest-mapper-orm',
+								'org.hibernate.search:hibernate-search-integrationtest-mapper-orm-envers',
+								'org.hibernate.search:hibernate-search-integrationtest-showcase-library'
+								 ].join(',')} \
 							-P$buildEnv.mavenProfile \
 					"""
 				}
@@ -580,7 +584,10 @@ stage('Non-default environments') {
 				helper.withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install \
-							-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
+							-pl ${[
+								'org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch',
+								'org.hibernate.search:hibernate-search-integrationtest-showcase-library'
+								 ].join(',')} \
 							${toElasticsearchVersionArgs(buildEnv.mavenProfile, null)} \
 					"""
 				}
@@ -623,7 +630,10 @@ stage('Non-default environments') {
 								mavenNonDefaultBuild buildEnv, """ \
 										clean install \
 										--fail-fast \
-										-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
+										-pl ${[
+											'org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch',
+											'org.hibernate.search:hibernate-search-integrationtest-showcase-library'
+											 ].join(',')} \
 										${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
 										-Dtest.elasticsearch.connection.uris=$buildEnv.endpointUris \
 										-Dtest.elasticsearch.connection.aws.signing.enabled=true \
