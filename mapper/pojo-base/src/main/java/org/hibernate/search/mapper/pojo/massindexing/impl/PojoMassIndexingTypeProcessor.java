@@ -142,14 +142,16 @@ class PojoMassIndexingTypeProcessor<E, O> {
 			return;
 		}
 
+		entities.removeIf( entity -> !typeGroup.includesInstance( sessionContext, entity ) );
+		if ( entities.isEmpty() ) {
+			return;
+		}
+
 		notifier.notifyEntitiesLoaded( entities.size() );
 		CompletableFuture<?>[] indexingFutures = new CompletableFuture<?>[entities.size()];
 
 		for ( int i = 0; i < entities.size(); i++ ) {
 			Object entity = entities.get( i );
-			if ( !typeGroup.includesInstance( sessionContext, entity ) ) {
-				continue;
-			}
 			indexingFutures[i] = index( sessionContext, indexer, entity );
 		}
 
