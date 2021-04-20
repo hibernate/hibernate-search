@@ -184,7 +184,7 @@ To build the distribution bundle run:
 ### Elasticsearch
 
 The Elasticsearch integration tests run against one single version of Elasticsearch at a time,
-launching an Elasticsearch server automatically on port 9200.
+launching an Elasticsearch server automatically on port 9200 using Docker.
 You may redefine the version to use by specifying the right profile and using the
 `test.elasticsearch.connection.version` property:
 
@@ -194,21 +194,22 @@ You may redefine the version to use by specifying the right profile and using th
 
 The following profiles are available:
 
- * `elasticsearch-5.6` for 5.6.x and later 5.x
- * `elasticsearch-6.0` for 6.0.x to 6.2.x
- * `elasticsearch-6.3` for 6.3.x
- * `elasticsearch-6.4` for 6.4.x to 6.6.x
- * `elasticsearch-6.7` for 6.7.x
- * `elasticsearch-6.8` for 6.8 and later 6.x
- * `elasticsearch-7.0` for 7.0 to 7.2
- * `elasticsearch-7.3` for 7.3 to 7.6
- * `elasticsearch-7.7` for 7.7
- * `elasticsearch-7.8` for 7.8 to 7.9
- * `elasticsearch-7.10` for 7.10 (the default)
- * `elasticsearch-7.11` for 7.11+ ([not open-source](https://opensource.org/node/1099))
-
-A list of available versions for `test.elasticsearch.connection.version` can be found on
-[Maven Central](https://search.maven.org/search?q=g:org.elasticsearch%20AND%20a:elasticsearch&core=gav).
+* Elasticsearch distribution from Elastic
+  (see available version on [Maven Central](https://search.maven.org/search?q=g:org.elasticsearch%20AND%20a:elasticsearch&core=gav))
+  * `elasticsearch-5.6` for 5.6.x and later 5.x
+  * `elasticsearch-6.0` for 6.0.x to 6.2.x
+  * `elasticsearch-6.3` for 6.3.x
+  * `elasticsearch-6.4` for 6.4.x to 6.6.x
+  * `elasticsearch-6.7` for 6.7.x
+  * `elasticsearch-6.8` for 6.8 and later 6.x
+  * `elasticsearch-7.0` for 7.0 to 7.2
+  * `elasticsearch-7.3` for 7.3 to 7.6
+  * `elasticsearch-7.7` for 7.7
+  * `elasticsearch-7.8` for 7.8 to 7.9
+  * `elasticsearch-7.10` for 7.10 (**the default**)
+  * `elasticsearch-7.11` for 7.11+ ([not open-source](https://opensource.org/node/1099))
+* [Open Distro for Elasticsearch](https://opendistro.github.io/for-elasticsearch/):
+  * `opendistro-elasticsearch-1.13` for 1.13+
 
 Alternatively, you can prevent the build from launching an Elasticsearch server automatically
 and run Elasticsearch-related tests against your own server using the
@@ -229,6 +230,15 @@ you will still have to select a profile among those listed above, and specify th
 
 ```bash
 ./mvnw clean install -Pelasticsearch-6.0 -Dtest.elasticsearch.connection.version=6.0.0 \
+        -Dtest.elasticsearch.connection.uris=http://localhost:9200
+```
+
+You can specify the image tag independently of the Elasticsearch version,
+which can be useful for Open Distro for Elasticsearch:
+
+```bash
+./mvnw clean install -Popendistro-elasticsearch-1.13 -Dtest.elasticsearch.run.image.tag=1.13.1 \
+        -Dtest.elasticsearch.connection.version=7.10.2 \
         -Dtest.elasticsearch.connection.uris=http://localhost:9200
 ```
 
