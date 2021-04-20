@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
@@ -23,11 +26,29 @@ public interface TypeMappingStep {
 	TypeMappingIndexedStep indexed();
 
 	/**
+	 * Define a type binder, responsible for creating a bridge.
+	 * To pass some parameters to the bridge,
+	 * use the method {@link #binder(TypeBinder, Map)} instead.
+	 *
 	 * @param binder A {@link TypeBinder} responsible for creating a bridge.
 	 * @return {@code this}, for method chaining.
 	 * @see TypeBinder
 	 */
-	TypeMappingStep binder(TypeBinder binder);
+	default TypeMappingStep binder(TypeBinder binder) {
+		return binder( binder, Collections.emptyMap() );
+	}
+
+	/**
+	 * Define a type binder, responsible for creating a bridge.
+	 * With this method it is possible to pass a set of parameters to the binder,
+	 * so that they can be used by the bridge.
+	 *
+	 * @param binder A {@link TypeBinder} responsible for creating a bridge.
+	 * @param params The parameters to pass to the binder.
+	 * @return {@code this}, for method chaining.
+	 * @see TypeBinder
+	 */
+	TypeMappingStep binder(TypeBinder binder, Map<String, Object> params);
 
 	/**
 	 * Starts the definition of the mapping of a specific property.

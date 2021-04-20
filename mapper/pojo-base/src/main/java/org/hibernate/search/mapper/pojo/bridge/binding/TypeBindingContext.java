@@ -81,4 +81,10 @@ public interface TypeBindingContext extends BindingContext {
 	 */
 	IndexSchemaElement indexSchemaElement();
 
+	/**
+	 * @param name The parameter name
+	 * @return Get a parameter defined for the binder by the given name. {@code null} if it does not exist.
+	 */
+	Object parameter(String name);
+
 }

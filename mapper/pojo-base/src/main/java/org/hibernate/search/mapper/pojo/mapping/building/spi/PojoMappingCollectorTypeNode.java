@@ -6,11 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
+import java.util.Map;
+
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 
 public interface PojoMappingCollectorTypeNode extends PojoMappingCollector {
 
-	void typeBinder(TypeBinder builder);
+	void typeBinder(TypeBinder builder, Map<String, Object> params);
 
 	PojoMappingCollectorPropertyNode property(String propertyName);
 
