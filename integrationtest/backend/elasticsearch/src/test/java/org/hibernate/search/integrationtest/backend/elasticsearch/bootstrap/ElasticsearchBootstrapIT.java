@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.bootstrap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
@@ -34,6 +35,8 @@ public class ElasticsearchBootstrapIT {
 	@Rule
 	public ElasticsearchClientSpy elasticsearchClientSpy = new ElasticsearchClientSpy();
 
+	private final StubMappedIndex index = StubMappedIndex.withoutFields();
+
 	/**
 	 * Check that we boot successfully when the Elasticsearch model dialect is determined
 	 * from an explicitly configured Elasticsearch version,
@@ -50,12 +53,11 @@ public class ElasticsearchBootstrapIT {
 						elasticsearchClientSpy.factoryReference()
 				)
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
-				.withIndex( StubMappedIndex.withoutFields() )
+				.withIndex( index )
 				.setupFirstPhaseOnly();
 
 		// We do not expect the client to be created in the first phase
-		assertThat( elasticsearchClientSpy.getCreatedClientCount() ).isEqualTo( 0 );
-		elasticsearchClientSpy.verifyExpectationsMet();
+		assertThat( elasticsearchClientSpy.getCreatedClientCount() ).isZero();
 
 		// In the *second* phase, however, we expect the client to be created and used to check the version
 		elasticsearchClientSpy.expectNext(
@@ -63,14 +65,17 @@ public class ElasticsearchBootstrapIT {
 		);
 		partialSetup.doSecondPhase();
 		elasticsearchClientSpy.verifyExpectationsMet();
+
+		checkBackendWorks();
 	}
 
 	/**
-	 * Check that an exception is thrown when version check is at false without explicit cluster version specified
+	 * Check that an exception is thrown when version_check.enabled is false
+	 * without specifying the Elasticsearch version.
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3841")
-	public void explicitProtocolDialect_noVersionCheck() {
+	public void noVersionCheck_missingVersion() {
 		assertThatThrownBy(
 				() -> setupHelper.start()
 						.withBackendProperty(
@@ -97,11 +102,12 @@ public class ElasticsearchBootstrapIT {
 	}
 
 	/**
-	 * Check that an exception is thrown when version check is at false with a partial version is specified
+	 * Check that an exception is thrown when version_check.enabled is false
+	 * while specifying only the major number of the Elasticsearch version.
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3841")
-	public void explicitProtocolDialect_noVersionCheck_incompleteVersion() {
+	public void noVersionCheck_incompleteVersion() {
 		ElasticsearchVersion clusterVersion = ElasticsearchVersion.of( ElasticsearchTestDialect.getClusterVersion() );
 		String versionWithMajorOnly = String.valueOf( clusterVersion.major() );
 
@@ -134,14 +140,14 @@ public class ElasticsearchBootstrapIT {
 	}
 
 	/**
-	 * Check that everything is fine when version check is at false with a version is specified with major & minor
+	 * Check everything works fine when version_check.enabled is false
+	 * and specifying the major and minor number of the Elasticsearch version.
 	 */
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3841")
-	public void explicitProtocolDialect_noVersionCheck_completeVersion() {
+	@TestForIssue(jiraKey = {"HSEARCH-3841", "HSEARCH-4214"})
+	public void noVersionCheck_completeVersion() {
 		ElasticsearchVersion clusterVersion = ElasticsearchVersion.of( ElasticsearchTestDialect.getClusterVersion() );
-		String versionWithMajorAndMinorOnly = String.valueOf( clusterVersion.major() )
-				+ "." + String.valueOf( clusterVersion.minor().getAsInt() );
+		String versionWithMajorAndMinorOnly = clusterVersion.major() + "." + clusterVersion.minor().getAsInt();
 
 		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start()
 				.withBackendProperty(
@@ -155,13 +161,24 @@ public class ElasticsearchBootstrapIT {
 						elasticsearchClientSpy.factoryReference()
 				)
 				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
-				.withIndex( StubMappedIndex.withoutFields() )
+				.withIndex( index )
 				.setupFirstPhaseOnly();
 		// We do not expect the client to be created in the first phase
-		assertThat( elasticsearchClientSpy.getCreatedClientCount() ).isEqualTo( 0 );
-		elasticsearchClientSpy.verifyExpectationsMet();
+		assertThat( elasticsearchClientSpy.getCreatedClientCount() ).isZero();
 
 		partialSetup.doSecondPhase();
-		elasticsearchClientSpy.verifyExpectationsMet();
+		// We do not expect any request, since the version check is disabled
+		assertThat( elasticsearchClientSpy.getRequestCount() ).isZero();
+
+		checkBackendWorks();
+
+		assertThat( elasticsearchClientSpy.getRequestCount() ).isNotZero();
+	}
+
+	private void checkBackendWorks() {
+		index.schemaManager().createIfMissing().join();
+		assertThatQuery( index.query().where( f -> f.matchAll() ) ).hasNoHits();
+		index.index( "1", document -> { } );
+		assertThatQuery( index.query().where( f -> f.matchAll() ) ).hasDocRefHitsAnyOrder( index.typeName(), "1" );
 	}
 }
