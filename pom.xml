@@ -224,6 +224,10 @@
         <version.org.elasticsearch.latest-6.3>6.3.2</version.org.elasticsearch.latest-6.3>
         <version.org.elasticsearch.latest-6.2>6.2.4</version.org.elasticsearch.latest-6.2>
         <version.org.elasticsearch.latest-5.6>5.6.16</version.org.elasticsearch.latest-5.6>
+        <!-- The latest micro of other Elasticsearch distributions -->
+        <!-- Using .reported suffixes to indicate the version reported by these distributions when doing a "GET /", if different -->
+        <version.io.github.opendistro.elasticsearch.latest-1.13>1.13.2</version.io.github.opendistro.elasticsearch.latest-1.13>
+        <version.io.github.opendistro.elasticsearch.latest-1.13.reported>7.10.2</version.io.github.opendistro.elasticsearch.latest-1.13.reported>
         <version.com.google.code.gson>2.8.5</version.com.google.code.gson>
         <version.software.amazon.awssdk>2.14.18</version.software.amazon.awssdk>
         <!-- Jackson: used by the Elasticsearch REST client, the AWS SDK and in tests (wiremock, ...) -->
@@ -479,7 +483,19 @@
         <!-- Elasticsearch tests properties -->
 
         <!-- Control how an Elasticsearch instance is run automatically during tests -->
+        <!-- By default, the plugin is not skipped, but each container (elastic, opendistro, etc.) is skipped;
+             Maven profiles will re-enable the right container depending on configuration.
+          -->
         <test.elasticsearch.run.skip>false</test.elasticsearch.run.skip>
+        <test.elasticsearch.run.elastic.skip>true</test.elasticsearch.run.elastic.skip>
+        <test.elasticsearch.run.elastic.image.name>docker.elastic.co/elasticsearch/elasticsearch</test.elasticsearch.run.elastic.image.name>
+        <test.elasticsearch.run.elastic.image.tag>${test.elasticsearch.connection.version}</test.elasticsearch.run.elastic.image.tag>
+        <test.elasticsearch.run.opendistro.skip>true</test.elasticsearch.run.opendistro.skip>
+        <test.elasticsearch.run.opendistro.image.name>amazon/opendistro-for-elasticsearch</test.elasticsearch.run.opendistro.image.name>
+        <!-- We will never use this tag, but the docker-maven-plugin validates the tag
+             even when we disable the OpenDistro run,
+             so we need to put *something* here that matches the regexp. -->
+        <test.elasticsearch.run.opendistro.image.tag>none</test.elasticsearch.run.opendistro.image.tag>
         <!--
              These properties are transparently passed as system properties to integration tests,
              and retrieved by a test utility:
@@ -489,6 +505,7 @@
              (which is located in a dependency of the integration tests modules).
          -->
         <test.elasticsearch.connection.uris></test.elasticsearch.connection.uris>
+        <test.elasticsearch.connection.version></test.elasticsearch.connection.version>
         <test.elasticsearch.connection.username></test.elasticsearch.connection.username>
         <test.elasticsearch.connection.password></test.elasticsearch.connection.password>
         <test.elasticsearch.connection.aws.signing.enabled>false</test.elasticsearch.connection.aws.signing.enabled>
