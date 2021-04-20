@@ -27,6 +27,12 @@ public interface SearchSession extends AutoCloseable {
 	void close();
 
 	/**
+	 * Determine whether the search session is open.
+	 * @return true until the search session has been closed
+	 */
+	boolean isOpen();
+
+	/**
 	 * Creates a {@link MassIndexer} to rebuild the indexes of all indexed entity types.
 	 * <p>
 	 * {@link MassIndexer} instances cannot be reused.
