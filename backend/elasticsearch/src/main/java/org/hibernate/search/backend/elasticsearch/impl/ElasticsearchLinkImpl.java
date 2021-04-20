@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
-import com.google.gson.GsonBuilder;
+import java.lang.invoke.MethodHandles;
+import java.util.Optional;
+
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
@@ -23,19 +25,30 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.El
 import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
-import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import java.lang.invoke.MethodHandles;
-import java.util.Optional;
+import com.google.gson.GsonBuilder;
 
 class ElasticsearchLinkImpl implements ElasticsearchLink {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	static final OptionalConfigurationProperty<ElasticsearchVersion> VERSION =
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.VERSION )
+					.as( ElasticsearchVersion.class, ElasticsearchVersion::of )
+					.build();
+
+	private static final ConfigurationProperty<Boolean> VERSION_CHECK_ENABLED =
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.VERSION_CHECK_ENABLED )
+					.asBoolean()
+					.withDefault( ElasticsearchBackendSettings.Defaults.VERSION_CHECK_ENABLED )
+					.build();
 
 	private static final ConfigurationProperty<Integer> SCROLL_TIMEOUT =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.SCROLL_TIMEOUT )
@@ -48,8 +61,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 	private final GsonProvider defaultGsonProvider;
 	private final boolean logPrettyPrinting;
 	private final ElasticsearchDialectFactory dialectFactory;
-	private final Optional<ElasticsearchVersion> configuredVersionOptional;
-	private final boolean versionCheckEnabled;
+	private final Optional<ElasticsearchVersion> configuredVersionOnBackendCreationOptional;
 
 	private ElasticsearchClientImplementor clientImplementor;
 	private ElasticsearchVersion elasticsearchVersion;
@@ -63,15 +75,13 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 	ElasticsearchLinkImpl(BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder,
 			BackendThreads threads, GsonProvider defaultGsonProvider, boolean logPrettyPrinting,
 			ElasticsearchDialectFactory dialectFactory,
-			Optional<ElasticsearchVersion> configuredVersionOptional,
-			boolean versionCheckEnabled) {
+			Optional<ElasticsearchVersion> configuredVersionOnBackendCreationOptional) {
 		this.clientFactoryHolder = clientFactoryHolder;
 		this.threads = threads;
 		this.defaultGsonProvider = defaultGsonProvider;
 		this.logPrettyPrinting = logPrettyPrinting;
 		this.dialectFactory = dialectFactory;
-		this.configuredVersionOptional = configuredVersionOptional;
-		this.versionCheckEnabled = versionCheckEnabled;
+		this.configuredVersionOnBackendCreationOptional = configuredVersionOnBackendCreationOptional;
 	}
 
 	@Override
@@ -129,18 +139,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 			);
 			clientFactoryHolder.close(); // We won't need it anymore
 
-			if ( versionCheckEnabled ) {
-				elasticsearchVersion = ElasticsearchClientUtils.getElasticsearchVersion( clientImplementor );
-				if ( configuredVersionOptional.isPresent() ) {
-					ElasticsearchVersion configuredVersion = configuredVersionOptional.get();
-					if ( !configuredVersion.matches( elasticsearchVersion ) ) {
-						throw log.unexpectedElasticsearchVersion( configuredVersion, elasticsearchVersion );
-					}
-				}
-			}
-			else {
-				configuredVersionOptional.ifPresent( version -> elasticsearchVersion = version );
-			}
+			elasticsearchVersion = initVersion( propertySource );
 
 			ElasticsearchProtocolDialect protocolDialect = dialectFactory.createProtocolDialect( elasticsearchVersion );
 			gsonProvider = GsonProvider.create( GsonBuilder::new, logPrettyPrinting );
@@ -164,6 +163,52 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 			throw new AssertionFailure(
 					"Attempt to retrieve Elasticsearch client or related information before the backend was started."
 			);
+		}
+	}
+
+	private ElasticsearchVersion initVersion(ConfigurationPropertySource propertySource) {
+		boolean versionCheckEnabled = VERSION_CHECK_ENABLED.get( propertySource );
+		Optional<ElasticsearchVersion> configuredVersionOptional = VERSION.getAndTransform( propertySource,
+				configuredVersionOnStartOptional -> {
+					Optional<ElasticsearchVersion> resultOptional;
+					if ( configuredVersionOnStartOptional.isPresent() ) {
+						// Allow overriding the version on start,
+						// but expect it to match the version configured on backend creation (if any)
+						if ( configuredVersionOnBackendCreationOptional.isPresent()
+								&& !configuredVersionOnBackendCreationOptional.get()
+								.matches( configuredVersionOnStartOptional.get() ) ) {
+							throw log.incompatibleElasticsearchVersionOnStart(
+									configuredVersionOnBackendCreationOptional.get(),
+									configuredVersionOnStartOptional.get() );
+						}
+						resultOptional = configuredVersionOnStartOptional;
+					}
+					else {
+						// Default to the version configured when the backend was created
+						resultOptional = configuredVersionOnBackendCreationOptional;
+					}
+					if ( !versionCheckEnabled
+							&& ( !resultOptional.isPresent() || !resultOptional.get().minor().isPresent() ) ) {
+						throw log.impreciseElasticsearchVersionWhenNoVersionCheck(
+								VERSION_CHECK_ENABLED.resolveOrRaw( propertySource ) );
+					}
+					return resultOptional;
+				} );
+
+		if ( versionCheckEnabled ) {
+			ElasticsearchVersion versionFromCluster =
+					ElasticsearchClientUtils.getElasticsearchVersion( clientImplementor );
+			if ( configuredVersionOptional.isPresent() ) {
+				ElasticsearchVersion configuredVersion = configuredVersionOptional.get();
+				if ( !configuredVersion.matches( versionFromCluster ) ) {
+					throw log.unexpectedElasticsearchVersion( configuredVersion, versionFromCluster );
+				}
+			}
+			return versionFromCluster;
+		}
+		else {
+			// In this case we know the optional is non-empty, see above.
+			return configuredVersionOptional.get();
 		}
 	}
 }
