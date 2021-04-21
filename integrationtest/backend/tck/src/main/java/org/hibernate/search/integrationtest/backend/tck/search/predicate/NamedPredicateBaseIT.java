@@ -14,8 +14,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateFactory;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateFactoryContext;
+import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
+import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProviderContext;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryFinalStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
@@ -121,9 +121,9 @@ public class NamedPredicateBaseIT {
 				c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ) )
 				.map( nest, "tested_field" );
 
-			root.namedPredicate( "match_predicate", new TestNamedPredicateFactory() );
+			root.namedPredicate( "match_predicate", new TestNamedPredicateProvider() );
 
-			nest.namedPredicate( "match_predicate", new TestNamedPredicateFactory() );
+			nest.namedPredicate( "match_predicate", new TestNamedPredicateProvider() );
 		}
 	}
 
@@ -164,13 +164,13 @@ public class NamedPredicateBaseIT {
 		}
 	}
 
-	public static class TestNamedPredicateFactory implements NamedPredicateFactory {
+	public static class TestNamedPredicateProvider implements NamedPredicateProvider {
 
 		@Override
-		public SearchPredicate create(NamedPredicateFactoryContext ctx) {
-			String absoluteFieldPath = ctx.resolvePath( "tested_field" );
-			String queryString = (String) ctx.param( "query" );
-			SearchPredicate predicate = ctx.predicate()
+		public SearchPredicate create(NamedPredicateProviderContext context) {
+			String absoluteFieldPath = context.resolvePath( "tested_field" );
+			String queryString = (String) context.param( "query" );
+			SearchPredicate predicate = context.predicate()
 				.match().field( absoluteFieldPath )
 				.matching( queryString )
 				.toPredicate();

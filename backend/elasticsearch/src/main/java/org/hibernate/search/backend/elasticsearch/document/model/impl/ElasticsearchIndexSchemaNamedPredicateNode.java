@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateFactory;
+import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 
 public class ElasticsearchIndexSchemaNamedPredicateNode {
 
@@ -14,15 +14,15 @@ public class ElasticsearchIndexSchemaNamedPredicateNode {
 	private final String relativeNamedPredicateName;
 	private final String absoluteNamedPredicatePath;
 
-	private final NamedPredicateFactory factory;
+	private final NamedPredicateProvider provider;
 
 	public ElasticsearchIndexSchemaNamedPredicateNode(ElasticsearchIndexSchemaObjectNode parent,
 			String relativeNamedPredicateName,
-			NamedPredicateFactory factory) {
+			NamedPredicateProvider provider) {
 		this.parent = parent;
 		this.relativeNamedPredicateName = relativeNamedPredicateName;
 		this.absoluteNamedPredicatePath = parent.absolutePath( relativeNamedPredicateName );
-		this.factory = factory;
+		this.provider = provider;
 	}
 
 	public ElasticsearchIndexSchemaObjectNode parent() {
@@ -33,8 +33,8 @@ public class ElasticsearchIndexSchemaNamedPredicateNode {
 		return absoluteNamedPredicatePath;
 	}
 
-	public NamedPredicateFactory getFactory() {
-		return factory;
+	public NamedPredicateProvider provider() {
+		return provider;
 	}
 
 	@Override

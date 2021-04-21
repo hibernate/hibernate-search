@@ -11,14 +11,16 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
- * The context provided to the {@link NamedPredicateFactory}.
- * @see NamedPredicateFactory#create(NamedPredicateFactoryContext)
+ * The context passed to {@link NamedPredicateProvider#create(NamedPredicateProviderContext)}.
+ * @see NamedPredicateProvider#create(NamedPredicateProviderContext)
  */
 @Incubating
-public interface NamedPredicateFactoryContext {
+public interface NamedPredicateProviderContext {
 
 	/**
-	 * @return A predicate factory. This factory is only valid in the present context and must not be used after {@link NamedPredicateFactory#create(NamedPredicateFactoryContext)} returns.
+	 * @return A predicate factory.
+	 * This factory is only valid in the present context and must not be used after
+	 * {@link NamedPredicateProvider#create(NamedPredicateProviderContext)} returns.
 	 * @see SearchPredicateFactory
 	 */
 	SearchPredicateFactory predicate();

@@ -18,22 +18,22 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBui
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateFactory;
+import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 
-public class ElasticsearchIndexSchemaNamedPredicateFactoryBuilder implements IndexSchemaNamedPredicateOptionsStep,
+public class ElasticsearchIndexSchemaNamedPredicateNodeBuilder implements IndexSchemaNamedPredicateOptionsStep,
 		ElasticsearchIndexSchemaNodeContributor, IndexSchemaBuildContext {
 
 	private final AbstractElasticsearchIndexSchemaObjectNodeBuilder parent;
 	private final String relativeNamedPredicateName;
 	private final String absoluteNamedPredicatePath;
-	private final NamedPredicateFactory factory;
+	private final NamedPredicateProvider provider;
 
-	ElasticsearchIndexSchemaNamedPredicateFactoryBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent, String relativeNamedPredicateName,
-			NamedPredicateFactory factory) {
+	ElasticsearchIndexSchemaNamedPredicateNodeBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
+			String relativeNamedPredicateName, NamedPredicateProvider provider) {
 		this.parent = parent;
 		this.relativeNamedPredicateName = relativeNamedPredicateName;
 		this.absoluteNamedPredicatePath = FieldPaths.compose( parent.getAbsolutePath(), relativeNamedPredicateName );
-		this.factory = factory;
+		this.provider = provider;
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class ElasticsearchIndexSchemaNamedPredicateFactoryBuilder implements Ind
 			AbstractTypeMapping parentMapping) {
 
 		ElasticsearchIndexSchemaNamedPredicateNode namedPredicateNode = new ElasticsearchIndexSchemaNamedPredicateNode(
-				parentNode, relativeNamedPredicateName, factory
+				parentNode, relativeNamedPredicateName, provider
 		);
 
 		collector.collect( absoluteNamedPredicatePath, namedPredicateNode );
