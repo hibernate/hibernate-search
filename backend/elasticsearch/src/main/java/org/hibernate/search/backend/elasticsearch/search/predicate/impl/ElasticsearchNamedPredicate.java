@@ -70,7 +70,7 @@ class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFieldPredic
 
 			NamedPredicateProvider namedPredicateProvider = namedPredicate.provider();
 
-			buildPredicate = (ElasticsearchSearchPredicate) namedPredicateProvider.create( ctx );
+			buildPredicate = ElasticsearchSearchPredicate.from( searchContext, namedPredicateProvider.create( ctx ) );
 
 			return new ElasticsearchNamedPredicate( this );
 		}
