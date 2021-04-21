@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+
 import java.util.function.Function;
+
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -17,11 +20,9 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProviderContext;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryFinalStep;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.AnalyzedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
@@ -68,62 +69,59 @@ public class NamedPredicateBaseIT {
 	public void searchNamedPredicateInRoot() {
 		StubMappingScope scope = index.createScope();
 		Function<String, SearchQueryFinalStep<DocumentReference>> createQuery = queryString -> scope.query()
-			.where( f -> f.named( "match_predicate" )
-			.param( "query", queryString ) );
+				.where( f -> f.named( "match_predicate" )
+				.param( "query", queryString ) );
 
 		assertThatQuery( createQuery.apply( TERM_PATTERN_1 ) )
-			.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
 		assertThatQuery( createQuery.apply( TERM_PATTERN_2 ) )
-			.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
 
 		assertThatQuery( createQuery.apply( TERM_PATTERN_3 ) )
-			.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_3 );
 
 		assertThatQuery( createQuery.apply( TERM_PATTERN_4 ) )
-			.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_4 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_4 );
 	}
 
 	@Test
 	public void searchNamedPredicateInNested() {
 		StubMappingScope scope = index.createScope();
 		Function<String, SearchQueryFinalStep<DocumentReference>> createQuery = queryString -> scope.query()
-			.where( f -> f.named( "nested.match_predicate" )
-			.param( "query", queryString ) );
+				.where( f -> f.named( "nested.match_predicate" )
+				.param( "query", queryString ) );
 
 		assertThatQuery( createQuery.apply( TERM_PATTERN_1 ) )
-			.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
 
 		assertThatQuery( createQuery.apply( TERM_PATTERN_2 ) )
-			.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_2 );
 
 		assertThatQuery( createQuery.apply( TERM_PATTERN_3 ) )
-			.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_3 );
 
 		assertThatQuery( createQuery.apply( TERM_PATTERN_4 ) )
-			.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_4 );
+				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_4 );
 	}
 
 	private static class IndexBinding {
-		final SimpleFieldModel<String> field1;
-		final SimpleFieldModel<String> field2;
+		final SimpleFieldModel<String> fieldInRoot;
 		final IndexObjectFieldReference nested;
+		final SimpleFieldModel<String> fieldInNested;
 
 		IndexBinding(IndexSchemaElement root) {
-			field1 = SimpleFieldModel.mapperWithOverride( AnalyzedStringFieldTypeDescriptor.INSTANCE,
-				c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ) )
-				.map( root, "tested_field" );
+			fieldInRoot = SimpleFieldModel.mapper( AnalyzedStringFieldTypeDescriptor.INSTANCE )
+					.map( root, "fieldInRoot" );
 
 			IndexSchemaObjectField nest = root.objectField( "nested", ObjectStructure.NESTED ).multiValued();
 			nested = nest.toReference();
 
-			field2 = SimpleFieldModel.mapperWithOverride( AnalyzedStringFieldTypeDescriptor.INSTANCE,
-				c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ) )
-				.map( nest, "tested_field" );
+			fieldInNested = SimpleFieldModel.mapper( AnalyzedStringFieldTypeDescriptor.INSTANCE )
+					.map( nest, "fieldInNested" );
 
-			root.namedPredicate( "match_predicate", new TestNamedPredicateProvider() );
-
-			nest.namedPredicate( "match_predicate", new TestNamedPredicateProvider() );
+			root.namedPredicate( "match_predicate", new TestNamedPredicateProvider( "fieldInRoot" ) );
+			nest.namedPredicate( "match_predicate", new TestNamedPredicateProvider( "fieldInNested" ) );
 		}
 	}
 
@@ -134,47 +132,51 @@ public class NamedPredicateBaseIT {
 
 		public void contribute(BulkIndexer indexer) {
 			indexer
-				.add( DOCUMENT_1, document -> {
-					document.addValue( index.binding().field1.reference, TEXT_MATCHING_1 );
-					IndexObjectFieldReference level1 = index.binding().nested;
-					DocumentElement nested = document.addObject( level1 );
-					nested.addValue( index.binding().field2.reference, TEXT_MATCHING_1 );
-
-				} )
-				.add( DOCUMENT_2, document -> {
-					document.addValue( index.binding().field1.reference, TEXT_MATCHING_2 );
-					IndexObjectFieldReference level1 = index.binding().nested;
-					DocumentElement nested = document.addObject( level1 );
-					nested.addValue( index.binding().field2.reference, TEXT_MATCHING_2 );
-				} )
-				.add( DOCUMENT_3, document -> {
-					document.addValue( index.binding().field1.reference, TEXT_MATCHING_3 );
-					IndexObjectFieldReference level1 = index.binding().nested;
-					DocumentElement nested = document.addObject( level1 );
-					nested.addValue( index.binding().field2.reference, TEXT_MATCHING_3 );
-				} )
-				.add( DOCUMENT_4, document -> {
-					document.addValue( index.binding().field1.reference, TEXT_MATCHING_4 );
-					IndexObjectFieldReference level1 = index.binding().nested;
-					DocumentElement nested = document.addObject( level1 );
-					nested.addValue( index.binding().field2.reference, TEXT_MATCHING_4 );
-				} )
-				.add( EMPTY, document -> {
-				} );
+					.add( DOCUMENT_1, document -> {
+						document.addValue( index.binding().fieldInRoot.reference, TEXT_MATCHING_1 );
+						IndexObjectFieldReference level1 = index.binding().nested;
+						DocumentElement nested = document.addObject( level1 );
+						nested.addValue( index.binding().fieldInNested.reference, TEXT_MATCHING_1 );
+					} )
+					.add( DOCUMENT_2, document -> {
+						document.addValue( index.binding().fieldInRoot.reference, TEXT_MATCHING_2 );
+						IndexObjectFieldReference level1 = index.binding().nested;
+						DocumentElement nested = document.addObject( level1 );
+						nested.addValue( index.binding().fieldInNested.reference, TEXT_MATCHING_2 );
+					} )
+					.add( DOCUMENT_3, document -> {
+						document.addValue( index.binding().fieldInRoot.reference, TEXT_MATCHING_3 );
+						IndexObjectFieldReference level1 = index.binding().nested;
+						DocumentElement nested = document.addObject( level1 );
+						nested.addValue( index.binding().fieldInNested.reference, TEXT_MATCHING_3 );
+					} )
+					.add( DOCUMENT_4, document -> {
+						document.addValue( index.binding().fieldInRoot.reference, TEXT_MATCHING_4 );
+						IndexObjectFieldReference level1 = index.binding().nested;
+						DocumentElement nested = document.addObject( level1 );
+						nested.addValue( index.binding().fieldInNested.reference, TEXT_MATCHING_4 );
+					} )
+					.add( EMPTY, document -> {
+					} );
 		}
 	}
 
 	public static class TestNamedPredicateProvider implements NamedPredicateProvider {
 
+		private final String fieldName;
+
+		public TestNamedPredicateProvider(String fieldName) {
+			this.fieldName = fieldName;
+		}
+
 		@Override
 		public SearchPredicate create(NamedPredicateProviderContext context) {
-			String absoluteFieldPath = context.absolutePath( "tested_field" );
+			String absoluteFieldPath = context.absolutePath( fieldName );
 			String queryString = (String) context.param( "query" );
-			SearchPredicate predicate = context.predicate()
-				.match().field( absoluteFieldPath )
-				.matching( queryString )
-				.toPredicate();
-			return predicate;
+			return context.predicate()
+					.match().field( absoluteFieldPath )
+					.matching( queryString )
+					.toPredicate();
 		}
 	}
 
