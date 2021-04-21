@@ -22,7 +22,6 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldTemplate;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaRootNode;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactory;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIndexFieldTypeFactoryImpl;
@@ -118,7 +117,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 		};
 
 		Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByName = new TreeMap<>();
-		LuceneIndexSchemaObjectNode rootNode = new LuceneIndexSchemaRootNode( staticChildrenByName );
+		LuceneIndexSchemaRootNode rootNode = new LuceneIndexSchemaRootNode( staticChildrenByName );
 		contributeChildren( rootNode, collector, staticChildrenByName );
 
 		return new LuceneIndexModel(

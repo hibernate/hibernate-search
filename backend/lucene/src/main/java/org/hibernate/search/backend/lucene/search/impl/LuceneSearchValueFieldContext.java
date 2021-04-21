@@ -12,7 +12,7 @@ package org.hibernate.search.backend.lucene.search.impl;
  *
  * @param <F> The indexed field value type.
  */
-public interface LuceneSearchValueFieldContext<F> extends LuceneSearchFieldContext {
+public interface LuceneSearchValueFieldContext<F> extends LuceneSearchIndexSchemaElementContext {
 
 	String nestedDocumentPath();
 

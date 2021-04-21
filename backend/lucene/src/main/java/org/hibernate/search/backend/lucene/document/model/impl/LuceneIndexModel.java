@@ -36,7 +36,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 
 	private final DocumentIdentifierValueConverter<?> idDslConverter;
 
-	private final LuceneIndexSchemaObjectNode rootNode;
+	private final LuceneIndexSchemaRootNode rootNode;
 	private final Map<String, AbstractLuceneIndexSchemaFieldNode> staticFields;
 	private final List<IndexFieldDescriptor> includedStaticFields;
 	private final List<AbstractLuceneIndexSchemaFieldTemplate<?>> fieldTemplates;
@@ -50,7 +50,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 	public LuceneIndexModel(String indexName,
 			String mappedTypeName,
 			DocumentIdentifierValueConverter<?> idDslConverter,
-			LuceneIndexSchemaObjectNode rootNode,
+			LuceneIndexSchemaRootNode rootNode,
 			Map<String, AbstractLuceneIndexSchemaFieldNode> staticFields,
 			List<AbstractLuceneIndexSchemaFieldTemplate<?>> fieldTemplates,
 			Map<String, LuceneIndexSchemaNamedPredicateNode> namedPredicateNodes,
@@ -81,7 +81,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 	}
 
 	@Override
-	public LuceneIndexSchemaObjectNode root() {
+	public LuceneIndexSchemaRootNode root() {
 		return rootNode;
 	}
 

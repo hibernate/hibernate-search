@@ -11,9 +11,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchObjectFieldContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchObjectFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateTypeKeys;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectExistsPredicate;
@@ -23,11 +23,12 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusio
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldTypeDescriptor;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 
 public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaFieldNode
 		implements IndexObjectFieldDescriptor, LuceneIndexSchemaObjectNode,
-				IndexObjectFieldTypeDescriptor, LuceneSearchObjectFieldContext {
+				IndexObjectFieldTypeDescriptor, LuceneSearchCompositeIndexSchemaElementContext {
 
 	private final List<String> nestedPathHierarchy;
 
@@ -109,24 +110,26 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 
 	@Override
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchContext searchContext) {
-		LuceneSearchObjectFieldQueryElementFactory<T> factory = queryElementFactory( key );
+		LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
 		if ( factory == null ) {
-			throw log.cannotUseQueryElementForObjectField( absolutePath(), key.toString(), eventContext() );
+			EventContext eventContext = eventContext();
+			throw log.cannotUseQueryElementForObjectField( absolutePath, key.toString(), eventContext );
 		}
 		try {
 			return factory.create( searchContext, this );
 		}
 		catch (SearchException e) {
+			EventContext eventContext = eventContext();
 			throw log.cannotUseQueryElementForObjectFieldBecauseCreationException( absolutePath, key.toString(),
-					e.getMessage(), e, null );
+					e.getMessage(), e, eventContext );
 		}
 	}
 
 	@Override
 	@SuppressWarnings("unchecked") // The "equals" condition tells us what T is exactly, so we can cast safely.
-	public <T> LuceneSearchObjectFieldQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
+	public <T> LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
 		if ( PredicateTypeKeys.EXISTS.equals( key ) ) {
-			return (LuceneSearchObjectFieldQueryElementFactory<T>)
+			return (LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T>)
 					LuceneObjectExistsPredicate.Factory.INSTANCE;
 		}
 		// Otherwise: not supported for object fields.

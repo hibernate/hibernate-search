@@ -6,40 +6,42 @@
  */
 package org.hibernate.search.backend.lucene.search.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-public final class LuceneMultiIndexSearchObjectFieldContext extends
+public final class LuceneMultiIndexSearchRootContext extends
 		AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext {
 
-	private final String absolutePath;
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public LuceneMultiIndexSearchObjectFieldContext(LuceneSearchIndexesContext indexesContext,
-			String absolutePath, List<LuceneSearchCompositeIndexSchemaElementContext> fieldForEachIndex) {
-		super( indexesContext, fieldForEachIndex );
-		this.absolutePath = absolutePath;
+	public LuceneMultiIndexSearchRootContext(LuceneSearchIndexesContext indexesContext,
+			List<LuceneSearchCompositeIndexSchemaElementContext> rootForEachIndex) {
+		super( indexesContext, rootForEachIndex );
 	}
 
 	@Override
 	public boolean isObjectField() {
-		return true;
+		return false;
 	}
 
 	@Override
 	public LuceneSearchCompositeIndexSchemaElementContext toObjectField() {
-		return this;
+		throw log.invalidIndexElementTypeRootIsNotObjectField();
 	}
 
 	@Override
 	public String absolutePath() {
-		return absolutePath;
+		return null;
 	}
 
 	@Override
 	protected EventContext relativeEventContext() {
-		return EventContexts.fromIndexFieldAbsolutePath( absolutePath );
+		return EventContexts.indexSchemaRoot();
 	}
 
 }

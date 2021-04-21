@@ -12,12 +12,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
-import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 
-public class LuceneIndexSchemaRootNode implements LuceneIndexSchemaObjectNode {
+public class LuceneIndexSchemaRootNode
+		implements LuceneIndexSchemaObjectNode, LuceneSearchCompositeIndexSchemaElementContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -44,7 +51,7 @@ public class LuceneIndexSchemaRootNode implements LuceneIndexSchemaObjectNode {
 	}
 
 	@Override
-	public IndexObjectFieldDescriptor toObjectField() {
+	public LuceneIndexSchemaObjectFieldNode toObjectField() {
 		throw log.invalidIndexElementTypeRootIsNotObjectField();
 	}
 
@@ -74,12 +81,47 @@ public class LuceneIndexSchemaRootNode implements LuceneIndexSchemaObjectNode {
 	}
 
 	@Override
+	public boolean nested() {
+		return false;
+	}
+
+	@Override
 	public boolean multiValuedInRoot() {
 		return false;
 	}
 
 	@Override
+	public EventContext eventContext() {
+		return EventContexts.indexSchemaRoot();
+	}
+
+	@Override
 	public boolean dynamic() {
 		return false;
+	}
+
+	@Override
+	public <T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchContext searchContext) {
+		LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
+		if ( factory == null ) {
+			EventContext eventContext = eventContext();
+			throw log.cannotUseQueryElementForObjectField( null, key.toString(), eventContext );
+		}
+		try {
+			return factory.create( searchContext, this );
+		}
+		catch (SearchException e) {
+			EventContext eventContext = eventContext();
+			throw log.cannotUseQueryElementForObjectFieldBecauseCreationException( null, key.toString(),
+					e.getMessage(), e, eventContext );
+		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked") // The "equals" condition tells us what T is exactly, so we can cast safely.
+	public <T> LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
+		// TODO add more here.
+		// Otherwise: not supported for the root.
+		return null;
 	}
 }

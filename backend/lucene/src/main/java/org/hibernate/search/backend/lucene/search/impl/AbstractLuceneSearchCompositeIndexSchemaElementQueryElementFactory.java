@@ -11,13 +11,13 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public abstract class AbstractLuceneSearchObjectFieldQueryElementFactory<T>
-		implements LuceneSearchObjectFieldQueryElementFactory<T> {
+public abstract class AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T>
+		implements LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
-	public void checkCompatibleWith(LuceneSearchObjectFieldQueryElementFactory<?> other) {
+	public void checkCompatibleWith(LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?> other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			throw log.differentImplementationClassForQueryElement( getClass(), other.getClass() );
 		}

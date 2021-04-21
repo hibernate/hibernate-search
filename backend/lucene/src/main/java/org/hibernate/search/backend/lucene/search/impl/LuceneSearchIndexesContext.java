@@ -24,7 +24,9 @@ public interface LuceneSearchIndexesContext {
 
 	DocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
 
-	LuceneSearchFieldContext field(String absoluteFieldPath);
+	LuceneSearchCompositeIndexSchemaElementContext root();
+
+	LuceneSearchIndexSchemaElementContext field(String absoluteFieldPath);
 
 	LuceneIndexSchemaNamedPredicateNode namedPredicate(String absoluteNamedPredicatePath);
 

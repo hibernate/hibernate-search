@@ -9,14 +9,15 @@ package org.hibernate.search.backend.lucene.document.model.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexSchemaElementContext;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-public abstract class AbstractLuceneIndexSchemaFieldNode implements IndexFieldDescriptor, LuceneSearchFieldContext {
+public abstract class AbstractLuceneIndexSchemaFieldNode implements IndexFieldDescriptor,
+		LuceneSearchIndexSchemaElementContext {
 	protected static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final LuceneIndexSchemaObjectNode parent;
