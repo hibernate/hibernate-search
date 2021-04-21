@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
@@ -38,10 +41,28 @@ public interface TypeMappingIndexedStep {
 	TypeMappingIndexedStep enabled(boolean enabled);
 
 	/**
+	 * Define a routing binder, responsible for creating a bridge.
+	 * To pass some parameters to the bridge,
+	 * use the method {@link #routingBinder(RoutingBinder, Map)} instead.
+	 *
 	 * @param binder A {@link RoutingBinder} responsible for creating a bridge.
 	 * @return {@code this}, for method chaining.
 	 * @see Indexed#routingBinder()
 	 */
-	TypeMappingIndexedStep routingBinder(RoutingBinder binder);
+	default TypeMappingIndexedStep routingBinder(RoutingBinder binder) {
+		return routingBinder( binder, Collections.emptyMap() );
+	}
+
+	/**
+	 * Define a routing binder, responsible for creating a bridge.
+	 * With this method it is possible to pass a set of parameters to the binder,
+	 * so that they can be used by the bridge.
+	 *
+	 * @param binder A {@link RoutingBinder} responsible for creating a bridge.
+	 * @param params The parameters to pass to the binder.
+	 * @return {@code this}, for method chaining.
+	 * @see Indexed#routingBinder()
+	 */
+	TypeMappingIndexedStep routingBinder(RoutingBinder binder, Map<String, Object> params);
 
 }
