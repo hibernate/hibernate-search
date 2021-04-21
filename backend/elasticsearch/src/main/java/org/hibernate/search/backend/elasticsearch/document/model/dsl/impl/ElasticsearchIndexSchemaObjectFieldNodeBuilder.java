@@ -86,7 +86,8 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 
 		Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByName = new TreeMap<>();
 		ElasticsearchIndexSchemaObjectFieldNode fieldNode = new ElasticsearchIndexSchemaObjectFieldNode(
-				parentNode, relativeFieldName, inclusion, structure, multiValued, staticChildrenByName
+				parentNode, relativeFieldName, inclusion, structure, multiValued,
+				staticChildrenByName, buildQueryElementFactoryMap()
 		);
 
 		staticChildrenByNameForParent.put( relativeFieldName, fieldNode );

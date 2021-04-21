@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -15,6 +17,10 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.impl.SearchQueryElementTypeKey;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneNamedPredicate;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateTypeKeys;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -37,7 +43,7 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, LuceneIndexSchemaNodeContributor> fields = new LinkedHashMap<>();
 	private final Map<String, LuceneIndexSchemaNodeContributor> templates = new LinkedHashMap<>();
-	private final Map<String, LuceneIndexSchemaNodeContributor> namedPredicates = new LinkedHashMap<>();
+	private final Map<String, LuceneIndexSchemaNamedPredicateOptions> namedPredicates = new LinkedHashMap<>();
 
 	@Override
 	public String toString() {
@@ -71,11 +77,10 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 	@Override
 	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String name,
 			IndexFieldInclusion inclusion, NamedPredicateProvider provider) {
-		LuceneIndexSchemaNamedPredicateNodeBuilder childBuilder = new LuceneIndexSchemaNamedPredicateNodeBuilder(
-				this, name, inclusion, provider
-		);
-		putNamedPredicate( name, childBuilder );
-		return childBuilder;
+		LuceneIndexSchemaNamedPredicateOptions options = new LuceneIndexSchemaNamedPredicateOptions(
+				inclusion, provider );
+		putNamedPredicate( name, options );
+		return options;
 	}
 
 	@Override
@@ -106,6 +111,22 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 
 	abstract String getAbsolutePath();
 
+	final Map<SearchQueryElementTypeKey<?>, LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>> buildQueryElementFactoryMap() {
+		if ( namedPredicates.isEmpty() ) {
+			return Collections.emptyMap();
+		}
+		Map<SearchQueryElementTypeKey<?>, LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>> result = new HashMap<>();
+		for ( Map.Entry<String, LuceneIndexSchemaNamedPredicateOptions> entry : namedPredicates.entrySet() ) {
+			LuceneIndexSchemaNamedPredicateOptions options = entry.getValue();
+			if ( IndexFieldInclusion.EXCLUDED.equals( options.inclusion ) ) {
+				continue;
+			}
+			result.put( PredicateTypeKeys.named( entry.getKey() ),
+					new LuceneNamedPredicate.Factory( options.provider ) );
+		}
+		return result;
+	}
+
 	final void contributeChildren(LuceneIndexSchemaObjectNode node, LuceneIndexSchemaNodeCollector collector,
 			Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByNameForParent) {
 		for ( LuceneIndexSchemaNodeContributor contributor : fields.values() ) {
@@ -116,9 +137,6 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 		// should be appear first in the list.
 		for ( LuceneIndexSchemaNodeContributor template : templates.values() ) {
 			template.contribute( collector, node, staticChildrenByNameForParent );
-		}
-		for ( LuceneIndexSchemaNodeContributor contributor : namedPredicates.values() ) {
-			contributor.contribute( collector, node, staticChildrenByNameForParent );
 		}
 	}
 
@@ -136,8 +154,8 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 		}
 	}
 
-	private void putNamedPredicate(String name, LuceneIndexSchemaNodeContributor contributor) {
-		Object previous = namedPredicates.putIfAbsent( name, contributor );
+	private void putNamedPredicate(String name, LuceneIndexSchemaNamedPredicateOptions options) {
+		Object previous = namedPredicates.putIfAbsent( name, options );
 		if ( previous != null ) {
 			throw log.indexSchemaNamedPredicateNameConflict( name, eventContext() );
 		}

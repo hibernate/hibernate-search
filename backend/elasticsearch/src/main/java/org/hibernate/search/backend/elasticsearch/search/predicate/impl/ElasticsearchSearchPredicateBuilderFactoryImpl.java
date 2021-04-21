@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexSchemaElementContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -32,8 +33,6 @@ import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNamedPredicateNode;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 
 public class ElasticsearchSearchPredicateBuilderFactoryImpl implements ElasticsearchSearchPredicateBuilderFactory {
@@ -139,6 +138,13 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	}
 
 	@Override
+	public NamedPredicateBuilder named(String absoluteFieldPath, String name) {
+		ElasticsearchSearchIndexSchemaElementContext targetElementContext =
+				absoluteFieldPath == null ? indexes.root() : indexes.field( absoluteFieldPath );
+		return targetElementContext.queryElement( PredicateTypeKeys.named( name ), searchContext );
+	}
+
+	@Override
 	public ElasticsearchSearchPredicate fromJson(JsonObject jsonObject) {
 		return new ElasticsearchUserProvidedJsonPredicate( searchContext, jsonObject );
 	}
@@ -146,11 +152,5 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	@Override
 	public ElasticsearchSearchPredicate fromJson(String jsonString) {
 		return fromJson( searchContext.userFacingGson().fromJson( jsonString, JsonObject.class ) );
-	}
-
-	@Override
-	public NamedPredicateBuilder named(SearchPredicateFactory predicateFactory, String name) {
-		ElasticsearchIndexSchemaNamedPredicateNode namedPredicate = indexes.namedPredicate( name );
-		return new ElasticsearchNamedPredicate.Builder( searchContext, predicateFactory, namedPredicate );
 	}
 }

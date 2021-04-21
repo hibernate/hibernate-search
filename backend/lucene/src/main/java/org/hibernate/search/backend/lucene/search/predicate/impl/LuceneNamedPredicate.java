@@ -6,54 +6,86 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 import org.apache.lucene.search.Query;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNamedPredicateNode;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProviderContext;
 import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
+public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 
-	private final LuceneSearchPredicate buildPredicate;
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private LuceneNamedPredicate(Builder builder) {
+	private final LuceneSearchPredicate instance;
+
+	private LuceneNamedPredicate(Builder builder, LuceneSearchPredicate providedPredicate) {
 		super( builder );
-		buildPredicate = builder.buildPredicate;
-		// Ensure illegal attempts to mutate the predicate will fail
-		builder.namedPredicate = null;
-		builder.params = null;
-		builder.buildPredicate = null;
+		instance = providedPredicate;
 	}
 
 	@Override
 	public void checkNestableWithin(String expectedParentNestedPath) {
-		buildPredicate.checkNestableWithin( expectedParentNestedPath );
+		instance.checkNestableWithin( expectedParentNestedPath );
 		super.checkNestableWithin( expectedParentNestedPath );
 	}
 
 	@Override
 	protected Query doToQuery(PredicateRequestContext context) {
-		return buildPredicate.toQuery( context );
+		return instance.toQuery( context );
 	}
 
-	static class Builder extends AbstractBuilder implements NamedPredicateBuilder {
-		private Map<String, Object> params = new LinkedHashMap<>();
-		private LuceneIndexSchemaNamedPredicateNode namedPredicate;
-		private LuceneSearchPredicate buildPredicate;
-		private final SearchPredicateFactory predicateFactory;
+	public static class Factory
+			extends AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<NamedPredicateBuilder> {
+		private final NamedPredicateProvider provider;
 
-		Builder(LuceneSearchContext searchContext, SearchPredicateFactory predicateFactory,
-				LuceneIndexSchemaNamedPredicateNode namedPredicate) {
-			super( searchContext, namedPredicate.absoluteNamedPredicatePath(), namedPredicate.parent().nestedPathHierarchy() );
-			this.namedPredicate = namedPredicate;
-			this.predicateFactory = predicateFactory;
+		public Factory(NamedPredicateProvider provider) {
+			this.provider = provider;
+		}
+
+		@Override
+		public void checkCompatibleWith(LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?> other) {
+			super.checkCompatibleWith( other );
+			Factory castedOther = (Factory) other;
+			if ( !provider.equals( castedOther.provider ) ) {
+				throw log.differentProviderForQueryElement( provider, castedOther.provider );
+			}
+		}
+
+		@Override
+		public NamedPredicateBuilder create(LuceneSearchContext searchContext,
+				LuceneSearchCompositeIndexSchemaElementContext field) {
+			return new Builder( provider, searchContext, field );
+		}
+	}
+
+	private static class Builder extends AbstractBuilder implements NamedPredicateBuilder {
+		private final NamedPredicateProvider provider;
+		private final LuceneSearchCompositeIndexSchemaElementContext field;
+		private SearchPredicateFactory factory;
+		private final Map<String, Object> params = new LinkedHashMap<>();
+
+		Builder(NamedPredicateProvider provider, LuceneSearchContext searchContext,
+				LuceneSearchCompositeIndexSchemaElementContext field) {
+			super( searchContext, field );
+			this.provider = provider;
+			this.field = field;
+		}
+
+		@Override
+		public void factory(SearchPredicateFactory factory) {
+			this.factory = factory;
 		}
 
 		@Override
@@ -64,33 +96,30 @@ class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 		@Override
 		public SearchPredicate build() {
 			LuceneNamedPredicateProviderContext ctx = new LuceneNamedPredicateProviderContext(
-					namedPredicate,
-					predicateFactory, params );
+					factory, field, params );
 
-			NamedPredicateProvider namedPredicateProvider = namedPredicate.provider();
+			LuceneSearchPredicate providedPredicate = LuceneSearchPredicate.from( searchContext, provider.create( ctx ) );
 
-			buildPredicate = LuceneSearchPredicate.from( searchContext, namedPredicateProvider.create( ctx ) );
-
-			return new LuceneNamedPredicate( this );
+			return new LuceneNamedPredicate( this, providedPredicate );
 		}
 	}
 
-	public static class LuceneNamedPredicateProviderContext implements NamedPredicateProviderContext {
+	private static class LuceneNamedPredicateProviderContext implements NamedPredicateProviderContext {
 
-		private final SearchPredicateFactory predicate;
-		private final LuceneIndexSchemaNamedPredicateNode namedPredicate;
+		private final SearchPredicateFactory factory;
+		private final LuceneSearchCompositeIndexSchemaElementContext field;
 		private final Map<String, Object> params;
 
-		public LuceneNamedPredicateProviderContext(LuceneIndexSchemaNamedPredicateNode namedPredicate,
-				SearchPredicateFactory predicate, Map<String, Object> params) {
-			this.namedPredicate = namedPredicate;
-			this.predicate = predicate;
+		LuceneNamedPredicateProviderContext(SearchPredicateFactory factory,
+				LuceneSearchCompositeIndexSchemaElementContext field, Map<String, Object> params) {
+			this.factory = factory;
+			this.field = field;
 			this.params = params;
 		}
 
 		@Override
 		public SearchPredicateFactory predicate() {
-			return predicate;
+			return factory;
 		}
 
 		@Override
@@ -100,7 +129,7 @@ class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 
 		@Override
 		public String absolutePath(String relativeFieldPath) {
-			return namedPredicate.parent().absolutePath( relativeFieldPath );
+			return field.absolutePath( relativeFieldPath );
 		}
 	}
 }

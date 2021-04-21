@@ -733,11 +733,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 137, value = "The index schema named predicate '%1$s' was added twice.")
 	SearchException indexSchemaNamedPredicateNameConflict(String relativeFilterName, @Param EventContext context);
 
-	@Message(id = ID_OFFSET + 138, value = "Multiple conflicting models for filter definition name '%1$s'.")
-	SearchException conflictingNamedPredicateModel(String name, @Param EventContext context);
-
-	@Message(id = ID_OFFSET + 139, value = "Unknown filter definition '%1$s'.")
-	SearchException unknownNamedPredicateForSearch(String name, @Param EventContext context);
+	@Message(id = ID_OFFSET + 138,
+			value = "Provider differs: '%1$s' vs. '%2$s'.")
+	SearchException differentProviderForQueryElement(Object provider1, Object provider2);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET + 140, value = "A search query fetching all hits was requested," +

@@ -6,14 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
-import java.util.List;
-
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexSchemaElementContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
@@ -43,28 +42,22 @@ public class ElasticsearchExistsPredicate extends AbstractElasticsearchSingleFie
 		@Override
 		public ExistsPredicateBuilder create(ElasticsearchSearchContext searchContext,
 				ElasticsearchSearchValueFieldContext<F> field) {
-			return new Builder( searchContext, field.absolutePath(), field.nestedPathHierarchy() );
+			return new Builder( searchContext, field );
 		}
 	}
 
 	public static class ObjectFieldFactory
 			extends AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<ExistsPredicateBuilder> {
-		public static final ObjectFieldFactory INSTANCE = new ObjectFieldFactory();
-
-		private ObjectFieldFactory() {
-		}
-
 		@Override
 		public ExistsPredicateBuilder create(ElasticsearchSearchContext searchContext,
 				ElasticsearchSearchCompositeIndexSchemaElementContext field) {
-			return new Builder( searchContext, field.absolutePath(), field.nestedPathHierarchy() );
+			return new Builder( searchContext, field );
 		}
 	}
 
-	public static class Builder extends AbstractBuilder implements ExistsPredicateBuilder {
-		public Builder(ElasticsearchSearchContext searchContext, String absoluteFieldPath,
-				List<String> nestedPathHierarchy) {
-			super( searchContext, absoluteFieldPath, nestedPathHierarchy );
+	private static class Builder extends AbstractBuilder implements ExistsPredicateBuilder {
+		Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchIndexSchemaElementContext field) {
+			super( searchContext, field );
 		}
 
 		@Override

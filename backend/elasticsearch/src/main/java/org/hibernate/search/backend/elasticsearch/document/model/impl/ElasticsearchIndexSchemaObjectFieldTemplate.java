@@ -30,7 +30,7 @@ public class ElasticsearchIndexSchemaObjectFieldTemplate
 			String relativePath, IndexFieldInclusion inclusion, boolean multiValued) {
 		return new ElasticsearchIndexSchemaObjectFieldNode(
 				parent, relativePath, inclusion, structure, multiValued,
-				Collections.emptyMap()
+				Collections.emptyMap(), Collections.emptyMap()
 		);
 	}
 }

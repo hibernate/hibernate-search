@@ -15,6 +15,4 @@ public interface LuceneIndexSchemaNodeCollector {
 	void collect(LuceneIndexSchemaObjectFieldTemplate template);
 
 	void collect(LuceneIndexSchemaValueFieldTemplate template);
-
-	void collect(String absoluteNamedPredicatePath, LuceneIndexSchemaNamedPredicateNode schemaNamedPredicateNode);
 }

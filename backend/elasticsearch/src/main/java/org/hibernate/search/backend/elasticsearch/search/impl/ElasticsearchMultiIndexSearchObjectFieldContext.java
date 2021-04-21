@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.impl;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -36,6 +37,11 @@ public class ElasticsearchMultiIndexSearchObjectFieldContext
 	@Override
 	public String absolutePath() {
 		return absolutePath;
+	}
+
+	@Override
+	public String absolutePath(String relativeFieldName) {
+		return FieldPaths.compose( absolutePath, relativeFieldName );
 	}
 
 	@Override

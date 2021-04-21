@@ -16,7 +16,6 @@ import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDef
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldTemplate;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNamedPredicateNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldTemplate;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
@@ -78,7 +77,6 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 	public LuceneIndexModel build(String indexName) {
 		Map<String, AbstractLuceneIndexSchemaFieldNode> staticFields = new HashMap<>();
 		List<AbstractLuceneIndexSchemaFieldTemplate<?>> fieldTemplates = new ArrayList<>();
-		Map<String, LuceneIndexSchemaNamedPredicateNode> namedPredicateNodes = new HashMap<>();
 		// Initializing a one-element array so that we can mutate the boolean below.
 		// Alternatively we could use AtomicBoolean, but we don't need concurrent access here.
 		boolean[] hasNestedDocument = new boolean[1];
@@ -106,25 +104,20 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 			}
 
 			@Override
-			public void collect(String absoluteFilterPath, LuceneIndexSchemaNamedPredicateNode node) {
-				namedPredicateNodes.put( absoluteFilterPath, node );
-			}
-
-			@Override
 			public void collect(LuceneIndexSchemaValueFieldTemplate template) {
 				fieldTemplates.add( template );
 			}
 		};
 
 		Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByName = new TreeMap<>();
-		LuceneIndexSchemaRootNode rootNode = new LuceneIndexSchemaRootNode( staticChildrenByName );
+		LuceneIndexSchemaRootNode rootNode = new LuceneIndexSchemaRootNode( staticChildrenByName, buildQueryElementFactoryMap() );
 		contributeChildren( rootNode, collector, staticChildrenByName );
 
 		return new LuceneIndexModel(
 				indexName,
 				mappedTypeName,
 				idDslConverter == null ? new StringDocumentIdentifierValueConverter() : idDslConverter,
-				rootNode, staticFields, fieldTemplates, namedPredicateNodes, hasNestedDocument[0]
+				rootNode, staticFields, fieldTemplates, hasNestedDocument[0]
 		);
 	}
 

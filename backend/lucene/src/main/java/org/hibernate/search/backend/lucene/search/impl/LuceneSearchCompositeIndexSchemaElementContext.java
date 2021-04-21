@@ -15,6 +15,8 @@ import java.util.Map;
  */
 public interface LuceneSearchCompositeIndexSchemaElementContext extends LuceneSearchIndexSchemaElementContext {
 
+	String absolutePath(String relativeFieldName);
+
 	Map<String, ? extends LuceneSearchIndexSchemaElementContext> staticChildrenByName();
 
 	boolean nested();

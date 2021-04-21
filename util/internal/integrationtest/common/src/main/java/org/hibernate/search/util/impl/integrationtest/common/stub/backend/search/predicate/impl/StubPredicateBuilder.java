@@ -11,6 +11,7 @@ import java.util.Set;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
@@ -186,6 +187,11 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder,
 	public void nested(SearchPredicate nestedPredicate) {
 		// No-op, just check the type
 		StubSearchPredicate.from( nestedPredicate );
+	}
+
+	@Override
+	public void factory(SearchPredicateFactory factory) {
+		// No-op, just simulates a call on this object
 	}
 
 	@Override

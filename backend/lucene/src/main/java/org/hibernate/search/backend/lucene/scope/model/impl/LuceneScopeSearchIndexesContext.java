@@ -17,7 +17,6 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNamedPredicateNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchObjectFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchRootContext;
@@ -117,21 +116,6 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 	}
 
 	@Override
-	public LuceneIndexSchemaNamedPredicateNode namedPredicate(String absoluteNamedPredicatePath) {
-		LuceneIndexSchemaNamedPredicateNode resultOrNull;
-		if ( elements().size() == 1 ) {
-			resultOrNull = elements().iterator().next().model().namedPredicateNode( absoluteNamedPredicatePath );
-		}
-		else {
-			resultOrNull = createMultiIndexNamedPredicateNode( absoluteNamedPredicatePath );
-		}
-		if ( resultOrNull == null ) {
-			throw log.unknownNamedPredicateForSearch( absoluteNamedPredicatePath, indexesEventContext() );
-		}
-		return resultOrNull;
-	}
-
-	@Override
 	public boolean hasNestedDocuments() {
 		for ( LuceneScopeIndexManagerContext element : elements() ) {
 			if ( element.model().hasNestedDocuments() ) {
@@ -163,7 +147,8 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 			}
 			else if ( firstField.isObjectField() != fieldForCurrentIndex.isObjectField() ) {
 				SearchException cause = log.conflictingFieldModel();
-				throw log.inconsistentConfigurationForIndexElementForSearch( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ), cause.getMessage(),
+				throw log.inconsistentConfigurationForIndexElementForSearch(
+						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ), cause.getMessage(),
 						EventContexts.fromIndexNames( indexOfFirstField.model().hibernateSearchName(),
 								index.model().hibernateSearchName() ),
 						cause );
@@ -183,28 +168,5 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 			return new LuceneMultiIndexSearchValueFieldContext<>( indexNames, absoluteFieldPath,
 					(List) fieldForEachIndex );
 		}
-	}
-
-	private LuceneIndexSchemaNamedPredicateNode createMultiIndexNamedPredicateNode(String absoluteNamedPredicateName) {
-		List<LuceneIndexSchemaNamedPredicateNode> nodeForEachIndex = new ArrayList<>();
-		LuceneIndexSchemaNamedPredicateNode firstNode = null;
-		for ( LuceneScopeIndexManagerContext index : elements() ) {
-			LuceneIndexModel indexModel = index.model();
-			LuceneIndexSchemaNamedPredicateNode nodeForCurrentIndex = indexModel.namedPredicateNode( absoluteNamedPredicateName );
-			if ( nodeForCurrentIndex == null ) {
-				continue;
-			}
-			if ( firstNode == null ) {
-				firstNode = nodeForCurrentIndex;
-			}
-			nodeForEachIndex.add( nodeForCurrentIndex );
-		}
-		if ( nodeForEachIndex.isEmpty() ) {
-			return null;
-		}
-		if ( nodeForEachIndex.size() > 1 ) {
-			throw log.conflictingNamedPredicateModel( absoluteNamedPredicateName, indexesEventContext() );
-		}
-		return firstNode;
 	}
 }

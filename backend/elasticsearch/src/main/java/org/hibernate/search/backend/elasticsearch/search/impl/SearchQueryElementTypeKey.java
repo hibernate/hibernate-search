@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
+import java.util.Objects;
+
 public class SearchQueryElementTypeKey<T> {
 
 	public static <T> SearchQueryElementTypeKey<T> of(String namespace, String name) {
@@ -23,6 +25,23 @@ public class SearchQueryElementTypeKey<T> {
 	@Override
 	public String toString() {
 		return namespace + ":" + name;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+		SearchQueryElementTypeKey<?> that = (SearchQueryElementTypeKey<?>) o;
+		return Objects.equals( namespace, that.namespace ) && Objects.equals( name, that.name );
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash( namespace, name );
 	}
 
 }

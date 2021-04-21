@@ -29,11 +29,14 @@ public class ElasticsearchIndexSchemaRootNode implements ElasticsearchIndexSchem
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByName;
+	private final Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>> queryElementFactories;
 
 	public ElasticsearchIndexSchemaRootNode(
-			Map<String, AbstractElasticsearchIndexSchemaFieldNode> notYetInitializedStaticChildren) {
+			Map<String, AbstractElasticsearchIndexSchemaFieldNode> notYetInitializedStaticChildren,
+			Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>> queryElementFactories) {
 		// We expect the children to be added to the list externally, just after the constructor call.
 		this.staticChildrenByName = Collections.unmodifiableMap( notYetInitializedStaticChildren );
+		this.queryElementFactories = queryElementFactories;
 	}
 
 	@Override
@@ -114,10 +117,8 @@ public class ElasticsearchIndexSchemaRootNode implements ElasticsearchIndexSchem
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // The "equals" condition tells us what T is exactly, so we can cast safely.
+	@SuppressWarnings("unchecked") // The cast is safe because the key type always matches the value type.
 	public <T> ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
-		// TODO add named predicate support here
-		// Otherwise: not supported for object fields.
-		return null;
+		return (ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T>) queryElementFactories.get( key );
 	}
 }

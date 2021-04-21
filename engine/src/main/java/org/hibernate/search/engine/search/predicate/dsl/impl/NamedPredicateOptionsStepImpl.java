@@ -7,10 +7,10 @@
 package org.hibernate.search.engine.search.predicate.dsl.impl;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.dsl.NamedPredicateOptionsStep;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 
 public class NamedPredicateOptionsStepImpl
@@ -19,9 +19,11 @@ public class NamedPredicateOptionsStepImpl
 
 	private final NamedPredicateBuilder builder;
 
-	public NamedPredicateOptionsStepImpl(SearchPredicateFactory predicateFactory, SearchPredicateDslContext<?> dslContext, String name) {
+	public NamedPredicateOptionsStepImpl(SearchPredicateFactory predicateFactory,
+			SearchPredicateDslContext<?> dslContext, String absoluteFieldPath, String predicateName) {
 		super( dslContext );
-		this.builder = dslContext.builderFactory().named( predicateFactory, name );
+		this.builder = dslContext.builderFactory().named( absoluteFieldPath, predicateName );
+		builder.factory( predicateFactory );
 	}
 
 	@Override

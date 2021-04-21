@@ -29,10 +29,13 @@ public class LuceneIndexSchemaRootNode
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByName;
+	private final Map<SearchQueryElementTypeKey<?>, LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>> queryElementFactories;
 
-	public LuceneIndexSchemaRootNode(Map<String, AbstractLuceneIndexSchemaFieldNode> notYetInitializedStaticChildren) {
+	public LuceneIndexSchemaRootNode(Map<String, AbstractLuceneIndexSchemaFieldNode> notYetInitializedStaticChildren,
+			Map<SearchQueryElementTypeKey<?>, LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>> queryElementFactories) {
 		// We expect the children to be added to the list externally, just after the constructor call.
 		this.staticChildrenByName = Collections.unmodifiableMap( notYetInitializedStaticChildren );
+		this.queryElementFactories = queryElementFactories;
 	}
 
 	@Override
@@ -118,10 +121,8 @@ public class LuceneIndexSchemaRootNode
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // The "equals" condition tells us what T is exactly, so we can cast safely.
+	@SuppressWarnings("unchecked") // The cast is safe because the key type always matches the value type.
 	public <T> LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
-		// TODO add more here.
-		// Otherwise: not supported for the root.
-		return null;
+		return (LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T>) queryElementFactories.get( key );
 	}
 }
