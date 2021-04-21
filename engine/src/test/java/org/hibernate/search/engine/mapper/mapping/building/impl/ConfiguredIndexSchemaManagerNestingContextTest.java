@@ -68,7 +68,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	private IndexSchemaNestingContext.CompositeFactory<Object> compositeFactoryMock;
 
 	@Mock
-	private IndexSchemaNestingContext.TemplateFactory<Object> templateFactoryMock;
+	private IndexSchemaNestingContext.UnfilteredFactory<Object> unfilteredFactoryMock;
 
 	@Mock
 	private ConfiguredIndexSchemaNestingContext.NestedContextBuilder<Object> nestedContextBuilderMock;
@@ -997,18 +997,18 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 
 	private void checkDynamicIncluded(String expectedPrefix, IndexSchemaNestingContext context) {
 		Object expectedReturn = new Object();
-		when( templateFactoryMock.create( IndexFieldInclusion.INCLUDED, expectedPrefix ) )
+		when( unfilteredFactoryMock.create( IndexFieldInclusion.INCLUDED, expectedPrefix ) )
 				.thenReturn( expectedReturn );
-		Object actualReturn = context.nestTemplate( templateFactoryMock );
+		Object actualReturn = context.nestUnfiltered( unfilteredFactoryMock );
 		verifyNoOtherInteractionsAndReset();
 		assertSame( expectedReturn, actualReturn );
 	}
 
 	private void checkDynamicExcluded(String expectedPrefix, IndexSchemaNestingContext context) {
 		Object expectedReturn = new Object();
-		when( templateFactoryMock.create( IndexFieldInclusion.EXCLUDED, expectedPrefix ) )
+		when( unfilteredFactoryMock.create( IndexFieldInclusion.EXCLUDED, expectedPrefix ) )
 				.thenReturn( expectedReturn );
-		Object actualReturn = context.nestTemplate( templateFactoryMock );
+		Object actualReturn = context.nestUnfiltered( unfilteredFactoryMock );
 		verifyNoOtherInteractionsAndReset();
 		assertSame( expectedReturn, actualReturn );
 	}
@@ -1119,7 +1119,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest {
 	}
 
 	private void verifyNoOtherInteractionsAndReset() {
-		verifyNoMoreInteractions( leafFactoryMock, compositeFactoryMock, templateFactoryMock, nestedContextBuilderMock );
-		reset( leafFactoryMock, compositeFactoryMock, templateFactoryMock, nestedContextBuilderMock );
+		verifyNoMoreInteractions( leafFactoryMock, compositeFactoryMock, unfilteredFactoryMock, nestedContextBuilderMock );
+		reset( leafFactoryMock, compositeFactoryMock, unfilteredFactoryMock, nestedContextBuilderMock );
 	}
 }

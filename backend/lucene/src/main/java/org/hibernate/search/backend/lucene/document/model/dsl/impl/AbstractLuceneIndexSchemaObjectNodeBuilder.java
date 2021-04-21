@@ -72,7 +72,7 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String name,
 			IndexFieldInclusion inclusion, NamedPredicateProvider provider) {
 		LuceneIndexSchemaNamedPredicateNodeBuilder childBuilder = new LuceneIndexSchemaNamedPredicateNodeBuilder(
-				this, name, provider
+				this, name, inclusion, provider
 		);
 		putNamedPredicate( name, childBuilder );
 		return childBuilder;

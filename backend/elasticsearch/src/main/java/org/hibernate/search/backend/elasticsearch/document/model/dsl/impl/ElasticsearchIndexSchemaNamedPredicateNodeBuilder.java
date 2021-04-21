@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import java.util.Map;
+
 import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNamedPredicateNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
@@ -14,11 +15,12 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 public class ElasticsearchIndexSchemaNamedPredicateNodeBuilder implements IndexSchemaNamedPredicateOptionsStep,
 		ElasticsearchIndexSchemaNodeContributor, IndexSchemaBuildContext {
@@ -26,13 +28,15 @@ public class ElasticsearchIndexSchemaNamedPredicateNodeBuilder implements IndexS
 	private final AbstractElasticsearchIndexSchemaObjectNodeBuilder parent;
 	private final String relativeNamedPredicateName;
 	private final String absoluteNamedPredicatePath;
+	private final IndexFieldInclusion inclusion;
 	private final NamedPredicateProvider provider;
 
 	ElasticsearchIndexSchemaNamedPredicateNodeBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
-			String relativeNamedPredicateName, NamedPredicateProvider provider) {
+			String relativeNamedPredicateName, IndexFieldInclusion inclusion, NamedPredicateProvider provider) {
 		this.parent = parent;
 		this.relativeNamedPredicateName = relativeNamedPredicateName;
 		this.absoluteNamedPredicatePath = FieldPaths.compose( parent.getAbsolutePath(), relativeNamedPredicateName );
+		this.inclusion = inclusion;
 		this.provider = provider;
 	}
 
@@ -41,6 +45,9 @@ public class ElasticsearchIndexSchemaNamedPredicateNodeBuilder implements IndexS
 			ElasticsearchIndexSchemaObjectNode parentNode,
 			Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByNameForParent,
 			AbstractTypeMapping parentMapping) {
+		if ( IndexFieldInclusion.EXCLUDED.equals( inclusion ) ) {
+			return;
+		}
 
 		ElasticsearchIndexSchemaNamedPredicateNode namedPredicateNode = new ElasticsearchIndexSchemaNamedPredicateNode(
 				parentNode, relativeNamedPredicateName, provider

@@ -44,19 +44,19 @@ public interface IndexSchemaNestingContext {
 	<T> T nest(String relativeName, CompositeFactory<T> factory);
 
 	/**
-	 * Nest a template schema element in this context.
+	 * Nest an unfiltered schema element in this context.
 	 * <p>
 	 * The schema element will be created using the given factory,
 	 * passing the {@link IndexFieldInclusion} to signal whether it's included or not.
 	 * <p>
-	 * Template elements do not take inclusion filters into account;
+	 * Unfiltered schema elements do not take inclusion filters into account;
 	 * they are included as soon as their parent is included.
 	 *
 	 * @param factory The element factory to use.
 	 * @param <T> The type of the created schema element.
 	 * @return The created schema element.
 	 */
-	<T> T nestTemplate(TemplateFactory<T> factory);
+	<T> T nestUnfiltered(UnfilteredFactory<T> factory);
 
 	/**
 	 * @return A nesting context that always excludes all elements and does not prefix the field names.
@@ -74,7 +74,7 @@ public interface IndexSchemaNestingContext {
 				IndexSchemaNestingContext nestedNestingContext);
 	}
 
-	interface TemplateFactory<T> {
+	interface UnfilteredFactory<T> {
 		T create(IndexFieldInclusion inclusion, String prefix);
 	}
 

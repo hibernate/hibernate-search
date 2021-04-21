@@ -27,7 +27,7 @@ class ExcludeAllIndexSchemaNestingContext implements IndexSchemaNestingContext {
 	}
 
 	@Override
-	public <T> T nestTemplate(TemplateFactory<T> factory) {
+	public <T> T nestUnfiltered(UnfilteredFactory<T> factory) {
 		return factory.create( IndexFieldInclusion.EXCLUDED, "" );
 	}
 }

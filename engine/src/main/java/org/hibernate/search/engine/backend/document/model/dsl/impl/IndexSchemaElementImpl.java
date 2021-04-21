@@ -74,9 +74,10 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	public IndexSchemaNamedPredicateOptionsStep namedPredicate(String relativeNamedPredicateName,
 			NamedPredicateProvider provider) {
 		checkRelativeNamedPredicateName( relativeNamedPredicateName );
-		return nestingContext.<IndexSchemaNamedPredicateOptionsStep>nest(
-				relativeNamedPredicateName,
-				(prefixedName, inclusion) -> objectNodeBuilder.addNamedPredicate( prefixedName, inclusion, provider )
+		return nestingContext.nestUnfiltered(
+				(inclusion, prefix) ->
+						// Ignore the prefix: it's not relevant here, and it's a deprecated feature anyway.
+						objectNodeBuilder.addNamedPredicate( relativeNamedPredicateName, inclusion, provider )
 		);
 	}
 
@@ -108,7 +109,9 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	public IndexSchemaFieldTemplateOptionsStep<?> fieldTemplate(String templateName, IndexFieldType<?> type) {
 		checkFieldTemplateName( templateName );
 		IndexSchemaFieldTemplateOptionsStep<?> fieldTemplateFinalStep =
-				nestingContext.nestTemplate(
+				// Filters are ignored for dynamic paths: as soon as the parent element is included,
+				// all dynamic paths registered on that element are included.
+				nestingContext.nestUnfiltered(
 						(inclusion, prefix) -> objectNodeBuilder.addFieldTemplate(
 								templateName, inclusion, type, prefix
 						)
@@ -129,7 +132,9 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	public IndexSchemaFieldTemplateOptionsStep<?> objectFieldTemplate(String templateName, ObjectStructure structure) {
 		checkFieldTemplateName( templateName );
 		IndexSchemaFieldTemplateOptionsStep<?> fieldTemplateFinalStep =
-				nestingContext.nestTemplate(
+				// Filters are ignored for dynamic paths: as soon as the parent element is included,
+				// all dynamic paths registered on that element are included.
+				nestingContext.nestUnfiltered(
 						(inclusion, prefix) -> objectNodeBuilder.addObjectFieldTemplate(
 								templateName, structure, prefix, inclusion
 						)

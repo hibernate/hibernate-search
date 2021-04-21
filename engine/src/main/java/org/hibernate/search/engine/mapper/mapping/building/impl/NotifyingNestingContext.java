@@ -49,8 +49,8 @@ class NotifyingNestingContext implements IndexSchemaNestingContext {
 	}
 
 	@Override
-	public <T> T nestTemplate(TemplateFactory<T> factory) {
-		return delegate.nestTemplate(
+	public <T> T nestUnfiltered(UnfilteredFactory<T> factory) {
+		return delegate.nestUnfiltered(
 				(inclusion, prefix) -> {
 					if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
 						listener.onSchemaContributed();
