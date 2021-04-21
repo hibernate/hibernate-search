@@ -12,6 +12,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
+import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
 
 /**
@@ -40,6 +42,12 @@ public @interface RoutingBinderRef {
 	 * @return How to retrieve the binder. See {@link BeanRetrieval}.
 	 */
 	BeanRetrieval retrieval() default BeanRetrieval.ANY;
+
+	/**
+	 * @return A parameter that can be statically passed to a given {@link IdentifierBinder},
+	 * so that it can be used by its {@link IdentifierBridge}.
+	 */
+	Parameter[] params() default {};
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.
