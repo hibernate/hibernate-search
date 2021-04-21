@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A factory for search predicates.
@@ -161,6 +162,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where named predicate predicates can be defined.
 	 * @see NamedPredicateOptionsStep
 	 */
+	@Incubating
 	NamedPredicateOptionsStep named(String name);
 
 	/**
