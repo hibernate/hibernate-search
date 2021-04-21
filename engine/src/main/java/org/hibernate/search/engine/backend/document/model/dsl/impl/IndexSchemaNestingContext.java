@@ -14,8 +14,8 @@ public interface IndexSchemaNestingContext {
 	/**
 	 * Nest a leaf schema element in this context.
 	 * <p>
-	 * The schema element will be created using one of the two given factories,
-	 * depending on whether internal filters lead to its inclusion or exclusion.
+	 * The schema element will be created using the given factory,
+	 * passing the {@link IndexFieldInclusion} to signal whether it's included or not.
 	 * <p>
 	 * The name passed to the factory will still be relative and still won't contain any dot ("."),
 	 * but may be prefixed as required by this context's configuration.
@@ -30,8 +30,8 @@ public interface IndexSchemaNestingContext {
 	/**
 	 * Nest a composite schema element in this context.
 	 * <p>
-	 * The schema element will be created using one of the two given factories,
-	 * depending on whether internal filters lead to its inclusion or exclusion.
+	 * The schema element will be created using the given factory,
+	 * passing the {@link IndexFieldInclusion} to signal whether it's included or not.
 	 * <p>
 	 * The name passed to the factory will still be relative and still won't contain any dot ("."),
 	 * but may be prefixed as required by this context's configuration.
@@ -46,8 +46,9 @@ public interface IndexSchemaNestingContext {
 	/**
 	 * Nest a template schema element in this context.
 	 * <p>
-	 * The schema element will be created using one of the two given factories,
-	 * depending on whether it is included or excluded.
+	 * The schema element will be created using the given factory,
+	 * passing the {@link IndexFieldInclusion} to signal whether it's included or not.
+	 * <p>
 	 * Template elements do not take inclusion filters into account;
 	 * they are included as soon as their parent is included.
 	 *
