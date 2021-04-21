@@ -16,6 +16,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 import org.hibernate.search.integrationtest.mapper.pojo.mapping.annotation.processing.CustomPropertyMappingAnnotationBaseIT;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
@@ -1128,5 +1129,47 @@ public class PropertyBridgeBaseIT {
 				context.bridge( new RawTypeBridge( fieldReference ) );
 			}
 		}
+	}
+
+	/**
+	 * Test that named predicate definitions are forwarded to the backend.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4166")
+	public void namedPredicate() {
+		class Contained {
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			Contained contained;
+		}
+
+		NamedPredicateProvider namedPredicateProvider = context -> {
+			throw new IllegalStateException( "should not be used" );
+		};
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "string", String.class, b2 -> { } )
+				.namedPredicate( "named", b2 -> b2
+						.namedPredicateProvider( namedPredicateProvider )
+				)
+		);
+
+		SearchMapping mapping = setupHelper.start().withConfiguration(
+				b -> b.programmaticMapping().type( IndexedEntity.class ).property( "contained" )
+						.binder( context -> {
+							context.dependencies().useRootOnly();
+							context.indexSchemaElement()
+									.field( "string", f -> f.asString() )
+									.toReference();
+							context.indexSchemaElement()
+									.namedPredicate( "named", namedPredicateProvider );
+							context.bridge( new UnusedPropertyBridge() );
+						} )
+		)
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
 	}
 }
