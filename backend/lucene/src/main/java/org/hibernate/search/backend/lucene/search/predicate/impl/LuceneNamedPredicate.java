@@ -69,7 +69,7 @@ class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 
 			NamedPredicateProvider namedPredicateProvider = namedPredicate.provider();
 
-			buildPredicate = (LuceneSearchPredicate) namedPredicateProvider.create( ctx );
+			buildPredicate = LuceneSearchPredicate.from( searchContext, namedPredicateProvider.create( ctx ) );
 
 			return new LuceneNamedPredicate( this );
 		}
