@@ -40,6 +40,10 @@ public final class PredicateTypeKeys {
 	public static final SearchQueryElementTypeKey<SpatialWithinBoundingBoxPredicateBuilder> SPATIAL_WITHIN_BOUNDING_BOX =
 			key( "spatial:within-bounding-box" );
 
+	public static <T> SearchQueryElementTypeKey<T> named(String name) {
+		return key( "named:" + name );
+	}
+
 	private static <T> SearchQueryElementTypeKey<T> key(String name) {
 		return SearchQueryElementTypeKey.of( "predicate", name );
 	}

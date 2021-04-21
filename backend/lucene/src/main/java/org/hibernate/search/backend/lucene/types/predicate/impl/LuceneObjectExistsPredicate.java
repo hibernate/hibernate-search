@@ -70,7 +70,7 @@ public class LuceneObjectExistsPredicate extends AbstractLuceneSingleFieldPredic
 
 		@Override
 		public ExistsPredicateBuilder create(LuceneSearchContext searchContext, LuceneSearchCompositeIndexSchemaElementContext field) {
-			Builder builder = new Builder( searchContext, field.absolutePath(), field.nestedPathHierarchy() );
+			Builder builder = new Builder( searchContext, field );
 			for ( LuceneSearchIndexSchemaElementContext child : field.staticChildrenByName().values() ) {
 				builder.addChild( child );
 			}
@@ -78,12 +78,11 @@ public class LuceneObjectExistsPredicate extends AbstractLuceneSingleFieldPredic
 		}
 	}
 
-	public static class Builder extends AbstractBuilder implements ExistsPredicateBuilder {
+	private static class Builder extends AbstractBuilder implements ExistsPredicateBuilder {
 		private List<LuceneSearchPredicate> children = new ArrayList<>();
 
-		public Builder(LuceneSearchContext searchContext, String absoluteFieldPath,
-				List<String> nestedPathHierarchy) {
-			super( searchContext, absoluteFieldPath, nestedPathHierarchy );
+		public Builder(LuceneSearchContext searchContext, LuceneSearchCompositeIndexSchemaElementContext field) {
+			super( searchContext, field );
 		}
 
 		public void addChild(LuceneSearchIndexSchemaElementContext child) {

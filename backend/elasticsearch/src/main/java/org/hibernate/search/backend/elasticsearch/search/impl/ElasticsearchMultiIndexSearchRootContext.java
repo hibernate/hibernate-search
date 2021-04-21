@@ -36,6 +36,11 @@ public class ElasticsearchMultiIndexSearchRootContext
 	}
 
 	@Override
+	public String absolutePath(String relativeFieldName) {
+		return relativeFieldName;
+	}
+
+	@Override
 	protected EventContext relativeEventContext() {
 		return EventContexts.indexSchemaRoot();
 	}

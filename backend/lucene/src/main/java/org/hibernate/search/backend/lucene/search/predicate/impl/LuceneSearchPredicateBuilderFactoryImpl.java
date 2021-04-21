@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexSchemaElementContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -32,8 +33,6 @@ import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Query;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNamedPredicateNode;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 
 
@@ -83,12 +82,6 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	@Override
 	public PhrasePredicateBuilder phrase(String absoluteFieldPath) {
 		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.PHRASE, searchContext );
-	}
-
-	@Override
-	public NamedPredicateBuilder named(SearchPredicateFactory namedPredicateFactory, String name) {
-		LuceneIndexSchemaNamedPredicateNode namedPredicate = indexes.namedPredicate( name );
-		return new LuceneNamedPredicate.Builder( searchContext, namedPredicateFactory, namedPredicate );
 	}
 
 	@Override
@@ -144,6 +137,13 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 		}
 		return new LuceneNestedPredicate.Builder( searchContext, absoluteFieldPath,
 				field.nestedPathHierarchy() );
+	}
+
+	@Override
+	public NamedPredicateBuilder named(String absoluteFieldPath, String name) {
+		LuceneSearchIndexSchemaElementContext targetElementContext =
+				absoluteFieldPath == null ? indexes.root() : indexes.field( absoluteFieldPath );
+		return targetElementContext.queryElement( PredicateTypeKeys.named( name ), searchContext );
 	}
 
 	@Override

@@ -77,7 +77,8 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 
 		Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByName = new TreeMap<>();
 		LuceneIndexSchemaObjectFieldNode node = new LuceneIndexSchemaObjectFieldNode(
-				parentNode, relativeFieldName, inclusion, structure, multiValued, false, staticChildrenByName
+				parentNode, relativeFieldName, inclusion, structure, multiValued, false,
+				staticChildrenByName, buildQueryElementFactoryMap()
 		);
 
 		staticChildrenByNameForParent.put( relativeFieldName, node );

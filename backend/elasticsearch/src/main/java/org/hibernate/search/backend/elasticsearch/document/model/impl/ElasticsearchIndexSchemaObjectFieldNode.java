@@ -9,21 +9,22 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchExistsPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateTypeKeys;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
-import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldTypeDescriptor;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -35,15 +36,25 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private static final Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>>
+			DEFAULT_QUERY_ELEMENT_FACTORIES;
+	static {
+		Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>> map = new HashMap<>();
+		map.put( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.ObjectFieldFactory() );
+		DEFAULT_QUERY_ELEMENT_FACTORIES = Collections.unmodifiableMap( map );
+	}
+
 	private final List<String> nestedPathHierarchy;
 
 	private final ObjectStructure structure;
 
 	private final Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByName;
+	private final Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>> queryElementFactories;
 
 	public ElasticsearchIndexSchemaObjectFieldNode(ElasticsearchIndexSchemaObjectNode parent, String relativeFieldName,
 			IndexFieldInclusion inclusion, ObjectStructure structure, boolean multiValued,
-			Map<String, AbstractElasticsearchIndexSchemaFieldNode> notYetInitializedStaticChildren) {
+			Map<String, AbstractElasticsearchIndexSchemaFieldNode> notYetInitializedStaticChildren,
+			Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>> queryElementFactories) {
 		super( parent, relativeFieldName, inclusion, multiValued );
 		// at the root object level the nestedPathHierarchy is empty
 		List<String> theNestedPathHierarchy = parent.nestedPathHierarchy();
@@ -56,6 +67,13 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 		this.structure = ObjectStructure.DEFAULT.equals( structure ) ? ObjectStructure.FLATTENED : structure;
 		// We expect the children to be added to the list externally, just after the constructor call.
 		this.staticChildrenByName = Collections.unmodifiableMap( notYetInitializedStaticChildren );
+		if ( queryElementFactories.isEmpty() ) {
+			this.queryElementFactories = DEFAULT_QUERY_ELEMENT_FACTORIES;
+		}
+		else {
+			this.queryElementFactories = new HashMap<>( DEFAULT_QUERY_ELEMENT_FACTORIES );
+			this.queryElementFactories.putAll( queryElementFactories );
+		}
 	}
 
 	@Override
@@ -132,14 +150,9 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // The "equals" condition tells us what T is exactly, so we can cast safely.
+	@SuppressWarnings("unchecked") // The cast is safe because the key type always matches the value type.
 	public <T> ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
-		if ( PredicateTypeKeys.EXISTS.equals( key ) ) {
-			return (ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T>)
-					ElasticsearchExistsPredicate.ObjectFieldFactory.INSTANCE;
-		}
-		// Otherwise: not supported for object fields.
-		return null;
+		return (ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T>) queryElementFactories.get( key );
 	}
 
 }

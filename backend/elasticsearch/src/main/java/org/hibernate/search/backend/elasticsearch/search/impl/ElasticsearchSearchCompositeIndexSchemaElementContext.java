@@ -13,6 +13,8 @@ package org.hibernate.search.backend.elasticsearch.search.impl;
  */
 public interface ElasticsearchSearchCompositeIndexSchemaElementContext extends ElasticsearchSearchIndexSchemaElementContext {
 
+	String absolutePath(String relativeFieldName);
+
 	boolean nested();
 
 	<T> ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(

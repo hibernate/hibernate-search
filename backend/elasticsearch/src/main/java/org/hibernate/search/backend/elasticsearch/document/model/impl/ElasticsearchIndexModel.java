@@ -45,7 +45,6 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 	private final List<IndexFieldDescriptor> includedStaticFields;
 	private final List<AbstractElasticsearchIndexSchemaFieldTemplate<?>> fieldTemplates;
 	private final ConcurrentMap<String, AbstractElasticsearchIndexSchemaFieldNode> dynamicFieldsCache = new ConcurrentHashMap<>();
-	private final Map<String, ElasticsearchIndexSchemaNamedPredicateNode> namedPredicateNodes;
 
 	public ElasticsearchIndexModel(IndexNames names,
 			String mappedTypeName,
@@ -53,8 +52,7 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 			RootTypeMapping mapping, DocumentIdentifierValueConverter<?> idDslConverter,
 			ElasticsearchIndexSchemaRootNode rootNode,
 			Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticFields,
-			List<AbstractElasticsearchIndexSchemaFieldTemplate<?>> fieldTemplates,
-			Map<String, ElasticsearchIndexSchemaNamedPredicateNode> namedPredicateNodes) {
+			List<AbstractElasticsearchIndexSchemaFieldTemplate<?>> fieldTemplates) {
 		this.names = names;
 		this.mappedTypeName = mappedTypeName;
 		this.eventContext = EventContexts.fromIndexName( hibernateSearchName() );
@@ -68,7 +66,6 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 				.filter( field -> IndexFieldInclusion.INCLUDED.equals( field.inclusion() ) )
 				.collect( Collectors.toList() ) );
 		this.fieldTemplates = fieldTemplates;
-		this.namedPredicateNodes = namedPredicateNodes;
 	}
 
 	@Override
@@ -124,10 +121,6 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 
 	public EventContext getEventContext() {
 		return eventContext;
-	}
-
-	public ElasticsearchIndexSchemaNamedPredicateNode namedPredicateNode(String absoluteNamedPredicatePath) {
-		return namedPredicateNodes.get( absoluteNamedPredicatePath );
 	}
 
 	public void contributeLowLevelMetadata(LowLevelIndexMetadataBuilder builder) {

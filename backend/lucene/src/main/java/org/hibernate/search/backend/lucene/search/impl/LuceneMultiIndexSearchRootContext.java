@@ -40,6 +40,11 @@ public final class LuceneMultiIndexSearchRootContext extends
 	}
 
 	@Override
+	public String absolutePath(String relativeFieldName) {
+		return relativeFieldName;
+	}
+
+	@Override
 	protected EventContext relativeEventContext() {
 		return EventContexts.indexSchemaRoot();
 	}

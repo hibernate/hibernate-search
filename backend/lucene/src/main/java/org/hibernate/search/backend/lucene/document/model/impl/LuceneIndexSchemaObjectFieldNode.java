@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.document.model.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,10 +19,10 @@ import org.hibernate.search.backend.lucene.search.impl.SearchQueryElementTypeKey
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateTypeKeys;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectExistsPredicate;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
-import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldTypeDescriptor;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -30,15 +31,25 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 		implements IndexObjectFieldDescriptor, LuceneIndexSchemaObjectNode,
 				IndexObjectFieldTypeDescriptor, LuceneSearchCompositeIndexSchemaElementContext {
 
+	private static final Map<SearchQueryElementTypeKey<?>, LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>>
+			DEFAULT_QUERY_ELEMENT_FACTORIES;
+	static {
+		Map<SearchQueryElementTypeKey<?>, LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>> map = new HashMap<>();
+		map.put( PredicateTypeKeys.EXISTS, LuceneObjectExistsPredicate.Factory.INSTANCE );
+		DEFAULT_QUERY_ELEMENT_FACTORIES = Collections.unmodifiableMap( map );
+	}
+
 	private final List<String> nestedPathHierarchy;
 
 	private final ObjectStructure structure;
 
 	private final Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByName;
+	private final Map<SearchQueryElementTypeKey<?>, LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>> queryElementFactories;
 
 	public LuceneIndexSchemaObjectFieldNode(LuceneIndexSchemaObjectNode parent, String relativeName,
 			IndexFieldInclusion inclusion, ObjectStructure structure, boolean multiValued, boolean dynamic,
-			Map<String, AbstractLuceneIndexSchemaFieldNode> notYetInitializedStaticChildren) {
+			Map<String, AbstractLuceneIndexSchemaFieldNode> notYetInitializedStaticChildren,
+			Map<SearchQueryElementTypeKey<?>, LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>> queryElementFactories) {
 		super( parent, relativeName, inclusion, multiValued, dynamic );
 		List<String> theNestedPathHierarchy = parent.nestedPathHierarchy();
 		if ( ObjectStructure.NESTED.equals( structure ) ) {
@@ -50,6 +61,13 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 		this.structure = structure;
 		// We expect the children to be added to the list externally, just after the constructor call.
 		this.staticChildrenByName = Collections.unmodifiableMap( notYetInitializedStaticChildren );
+		if ( queryElementFactories.isEmpty() ) {
+			this.queryElementFactories = DEFAULT_QUERY_ELEMENT_FACTORIES;
+		}
+		else {
+			this.queryElementFactories = new HashMap<>( DEFAULT_QUERY_ELEMENT_FACTORIES );
+			this.queryElementFactories.putAll( queryElementFactories );
+		}
 	}
 
 	@Override
@@ -126,14 +144,9 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // The "equals" condition tells us what T is exactly, so we can cast safely.
+	@SuppressWarnings("unchecked") // The cast is safe because the key type always matches the value type.
 	public <T> LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
-		if ( PredicateTypeKeys.EXISTS.equals( key ) ) {
-			return (LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T>)
-					LuceneObjectExistsPredicate.Factory.INSTANCE;
-		}
-		// Otherwise: not supported for object fields.
-		return null;
+		return (LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T>) queryElementFactories.get( key );
 	}
 
 	public ObjectStructure structure() {

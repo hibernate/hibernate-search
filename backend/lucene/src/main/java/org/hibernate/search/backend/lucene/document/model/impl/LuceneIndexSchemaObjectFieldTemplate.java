@@ -30,7 +30,7 @@ public class LuceneIndexSchemaObjectFieldTemplate
 			String relativePath, IndexFieldInclusion inclusion, boolean multiValued) {
 		return new LuceneIndexSchemaObjectFieldNode(
 				parent, relativePath, inclusion, structure, multiValued, true,
-				Collections.emptyMap()
+				Collections.emptyMap(), Collections.emptyMap()
 		);
 	}
 

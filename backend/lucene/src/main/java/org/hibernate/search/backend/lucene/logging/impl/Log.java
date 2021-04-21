@@ -648,13 +648,8 @@ public interface Log extends BasicLogger {
 			@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 144,
-
-		value = "Multiple conflicting models for named predicate definition name '%1$s'.")
-	SearchException conflictingNamedPredicateModel(String name, @Param EventContext context);
-
-	@Message(id = ID_OFFSET + 145,
-		value = "Unknown nmaed predicate definition '%1$s'.")
-	SearchException unknownNamedPredicateForSearch(String name, @Param EventContext context);
+			value = "Provider differs: '%1$s' vs. '%2$s'.")
+	SearchException differentProviderForQueryElement(Object provider1, Object provider2);
 
 	@Message(id = ID_OFFSET + 146,
 			value = "Unable to apply query caching configuration: %1$s")

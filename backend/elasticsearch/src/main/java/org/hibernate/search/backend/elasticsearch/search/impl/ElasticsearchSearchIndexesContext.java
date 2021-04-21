@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.search.impl;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNamedPredicateNode;
 
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -31,8 +30,6 @@ public interface ElasticsearchSearchIndexesContext {
 	ElasticsearchSearchCompositeIndexSchemaElementContext root();
 
 	ElasticsearchSearchIndexSchemaElementContext field(String absoluteFieldPath);
-
-	ElasticsearchIndexSchemaNamedPredicateNode namedPredicate(String absoluteNamedPredicatePath);
 
 	int maxResultWindow();
 
