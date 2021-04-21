@@ -72,7 +72,7 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String relativeNamedPredicateName,
 			IndexFieldInclusion inclusion, NamedPredicateProvider provider) {
 		ElasticsearchIndexSchemaNamedPredicateNodeBuilder childBuilder = new ElasticsearchIndexSchemaNamedPredicateNodeBuilder(
-			this, relativeNamedPredicateName, provider
+			this, relativeNamedPredicateName, inclusion, provider
 		);
 		putNamedPredicate( relativeNamedPredicateName, childBuilder );
 		return childBuilder;
