@@ -6,9 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanDelegatingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -41,7 +45,17 @@ public class IndexedProcessor implements TypeMappingAnnotationProcessor<Indexed>
 				routingBinderReferenceAnnotation.type(), routingBinderReferenceAnnotation.name(),
 				routingBinderReferenceAnnotation.retrieval()
 		);
-		if ( routingBinderReference.isPresent() ) {
+
+		if ( !routingBinderReference.isPresent() ) {
+			return;
+		}
+
+		if ( routingBinderReferenceAnnotation.params() != null ) {
+			Map<String, Object> params = Arrays.stream( routingBinderReferenceAnnotation.params() )
+					.collect( Collectors.toMap( Parameter::name, Parameter::value ) );
+			indexedStep.routingBinder( new BeanDelegatingBinder( routingBinderReference.get() ), params );
+		}
+		else {
 			indexedStep.routingBinder( new BeanDelegatingBinder( routingBinderReference.get() ) );
 		}
 	}

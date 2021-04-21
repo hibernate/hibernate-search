@@ -10,11 +10,13 @@ import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingDocumentIdOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingIndexedStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 
 /**
@@ -34,10 +36,11 @@ public @interface Parameter {
 	 * Using annotation APIs is possible to pass only {@link String} values.
 	 * The programmatic APIs allow to pass any {@link Object} value.
 	 *
-	 * @see {@link PropertyMappingFieldOptionsStep#valueBinder(ValueBinder, Map)}.
-	 * @see {@link PropertyMappingStep#binder(PropertyBinder, Map)}.
-	 * @see {@link TypeMappingStep#binder(TypeBinder, Map)}.
-	 * @see {@link PropertyMappingDocumentIdOptionsStep#identifierBinder(IdentifierBinder, Map)}
+	 * @see PropertyMappingFieldOptionsStep#valueBinder(ValueBinder, Map)
+	 * @see PropertyMappingStep#binder(PropertyBinder, Map)
+	 * @see TypeMappingStep#binder(TypeBinder, Map)
+	 * @see PropertyMappingDocumentIdOptionsStep#identifierBinder(IdentifierBinder, Map)
+	 * @see TypeMappingIndexedStep#routingBinder(RoutingBinder, Map)
 	 */
 	String value();
 
