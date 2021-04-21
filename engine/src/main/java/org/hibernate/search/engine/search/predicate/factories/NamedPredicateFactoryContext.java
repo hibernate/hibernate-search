@@ -8,11 +8,13 @@ package org.hibernate.search.engine.search.predicate.factories;
 
 import org.hibernate.search.engine.search.predicate.dsl.NamedPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * The context provided to the {@link NamedPredicateFactory}.
  * @see NamedPredicateFactory#create(NamedPredicateFactoryContext)
  */
+@Incubating
 public interface NamedPredicateFactoryContext {
 
 	/**

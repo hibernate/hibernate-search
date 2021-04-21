@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.search.predicate.factories.NamedPredicateFactory;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * An element of the index schema,
@@ -72,6 +73,7 @@ public interface IndexSchemaElement {
 	 * @return A DSL step where the named predicate can be defined in more details,
 	 * @see NamedPredicateFactory
 	 */
+	@Incubating
 	IndexSchemaNamedPredicateOptionsStep namedPredicate(
 			String relativeNamedPredicateName, NamedPredicateFactory factory);
 

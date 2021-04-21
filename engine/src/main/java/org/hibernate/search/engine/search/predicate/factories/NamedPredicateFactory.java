@@ -8,6 +8,7 @@ package org.hibernate.search.engine.search.predicate.factories;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A factory for predicates, which is given a name and assigned to an element in the index schema.
@@ -18,6 +19,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
  * @see SearchPredicate
  *
  */
+@Incubating
 public interface NamedPredicateFactory {
 
 	/**
