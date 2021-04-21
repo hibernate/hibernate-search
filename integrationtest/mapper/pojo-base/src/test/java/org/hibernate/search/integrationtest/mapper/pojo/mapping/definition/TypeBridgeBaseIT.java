@@ -14,6 +14,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 import org.hibernate.search.integrationtest.mapper.pojo.mapping.annotation.processing.CustomTypeMappingAnnotationBaseIT;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
@@ -982,5 +983,98 @@ public class TypeBridgeBaseIT {
 	private static class IndexedEntity {
 		@DocumentId
 		Integer id;
+	}
+
+	/**
+	 * Test that named predicate definitions are forwarded to the backend.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4166")
+	public void namedPredicate() {
+		class Contained {
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@IndexedEmbedded
+			Contained contained;
+		}
+
+		NamedPredicateProvider namedPredicateProvider = context -> {
+			throw new IllegalStateException( "should not be used" );
+		};
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "contained", b2 -> b2
+						.field( "string", String.class, b3 -> { } )
+						.namedPredicate( "named", b3 -> b3
+								.namedPredicateProvider( namedPredicateProvider )
+						)
+				)
+		);
+
+		SearchMapping mapping = setupHelper.start().withConfiguration(
+				b -> b.programmaticMapping().type( Contained.class )
+						.binder( context -> {
+							context.dependencies().useRootOnly();
+							context.indexSchemaElement()
+									.field( "string", f -> f.asString() )
+									.toReference();
+							context.indexSchemaElement()
+									.namedPredicate( "named", namedPredicateProvider );
+							context.bridge( new UnusedTypeBridge() );
+						} )
+		)
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Test that indexed-embedded includePaths filters do not affect named predicates.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4166")
+	public void namedPredicate_indexedEmbeddedIncludePaths() {
+		class Contained {
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@IndexedEmbedded(includePaths = "included")
+			Contained contained;
+		}
+
+		NamedPredicateProvider namedPredicateProvider = context -> {
+			throw new IllegalStateException( "should not be used" );
+		};
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "contained", b2 -> b2
+						.field( "included", String.class, b3 -> { } )
+						.namedPredicate( "named", b3 -> b3
+								.namedPredicateProvider( namedPredicateProvider )
+						)
+				)
+		);
+
+		SearchMapping mapping = setupHelper.start().withConfiguration(
+				b -> b.programmaticMapping().type( Contained.class )
+						.binder( context -> {
+							context.dependencies().useRootOnly();
+							context.indexSchemaElement()
+									.field( "included", f -> f.asString() )
+									.toReference();
+							context.indexSchemaElement()
+									.field( "excluded", f -> f.asString() )
+									.toReference();
+							context.indexSchemaElement()
+									.namedPredicate( "named", namedPredicateProvider );
+							context.bridge( new UnusedTypeBridge() );
+						} )
+		)
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
 	}
 }
