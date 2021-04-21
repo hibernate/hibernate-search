@@ -71,7 +71,6 @@ public class ProvidedIdIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			backendMock.expectSearchReferences(
 					Collections.singletonList( entityAndIndexName ),
-					b -> { },
 					StubSearchWorkBehavior.of(
 							1L,
 							StubBackendUtils.reference( entityAndIndexName, "42" )

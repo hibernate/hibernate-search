@@ -108,7 +108,6 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 		try ( SearchSession session = mapping.createSession() ) {
 			backendMock.expectSearchReferences(
 					Collections.singletonList( DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME ),
-					b -> { },
 					StubSearchWorkBehavior.of(
 							1L,
 							StubBackendUtils.reference(
