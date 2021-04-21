@@ -147,9 +147,6 @@ class PojoMassIndexingTypeProcessor<E, O> {
 
 		for ( int i = 0; i < entities.size(); i++ ) {
 			Object entity = entities.get( i );
-			if ( !typeGroup.includesInstance( sessionContext, entity ) ) {
-				continue;
-			}
 			indexingFutures[i] = index( sessionContext, indexer, entity );
 		}
 
