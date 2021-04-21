@@ -8,9 +8,11 @@ package org.hibernate.search.mapper.pojo.bridge.mapping.annotation;
 
 import java.util.Map;
 
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingDocumentIdOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
@@ -35,6 +37,7 @@ public @interface Parameter {
 	 * @see {@link PropertyMappingFieldOptionsStep#valueBinder(ValueBinder, Map)}.
 	 * @see {@link PropertyMappingStep#binder(PropertyBinder, Map)}.
 	 * @see {@link TypeMappingStep#binder(TypeBinder, Map)}.
+	 * @see {@link PropertyMappingDocumentIdOptionsStep#identifierBinder(IdentifierBinder, Map)}
 	 */
 	String value();
 
