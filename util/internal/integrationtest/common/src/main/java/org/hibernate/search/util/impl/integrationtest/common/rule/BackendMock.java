@@ -190,6 +190,12 @@ public class BackendMock implements TestRule {
 		);
 	}
 
+	public BackendMock expectSearchReferences(Collection<String> indexNames,
+			StubSearchWorkBehavior<DocumentReference> behavior) {
+		return expectSearch( indexNames, b -> {
+		}, StubSearchWork.ResultType.REFERENCES, behavior );
+	}
+
 	public BackendMock expectSearchReferences(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
 			StubSearchWorkBehavior<DocumentReference> behavior) {
 		return expectSearch( indexNames, contributor, StubSearchWork.ResultType.REFERENCES, behavior );

@@ -158,7 +158,6 @@ public class DatabaseMultitenancyIT {
 					.toQuery();
 
 			backendMock.expectSearchReferences( Collections.singletonList( Clock.INDEX ),
-					b -> { },
 					StubSearchWorkBehavior.of( 1, documentReferencesOf( models ) )
 			);
 
