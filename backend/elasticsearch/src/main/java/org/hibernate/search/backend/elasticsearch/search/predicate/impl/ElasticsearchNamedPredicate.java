@@ -15,8 +15,8 @@ import com.google.gson.JsonObject;
 import java.util.LinkedHashMap;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNamedPredicateNode;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateFactoryContext;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateFactory;
+import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProviderContext;
+import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 
 class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFieldPredicate {
@@ -64,25 +64,25 @@ class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFieldPredic
 
 		@Override
 		public SearchPredicate build() {
-			ElasticsearchNamedPredicateFactoryContext ctx = new ElasticsearchNamedPredicateFactoryContext( namedPredicate,
+			ElasticsearchNamedPredicateProviderContext ctx = new ElasticsearchNamedPredicateProviderContext( namedPredicate,
 					predicateFactory,
 					params );
 
-			NamedPredicateFactory namedPredicateFactory = (NamedPredicateFactory) namedPredicate.getFactory();
+			NamedPredicateProvider namedPredicateProvider = namedPredicate.provider();
 
-			buildPredicate = (ElasticsearchSearchPredicate) namedPredicateFactory.create( ctx );
+			buildPredicate = (ElasticsearchSearchPredicate) namedPredicateProvider.create( ctx );
 
 			return new ElasticsearchNamedPredicate( this );
 		}
 	}
 
-	public static class ElasticsearchNamedPredicateFactoryContext implements NamedPredicateFactoryContext {
+	public static class ElasticsearchNamedPredicateProviderContext implements NamedPredicateProviderContext {
 
 		private final ElasticsearchIndexSchemaNamedPredicateNode namedPredicate;
 		private final SearchPredicateFactory predicate;
 		private final Map<String, Object> params;
 
-		public ElasticsearchNamedPredicateFactoryContext(ElasticsearchIndexSchemaNamedPredicateNode namedPredicate,
+		public ElasticsearchNamedPredicateProviderContext(ElasticsearchIndexSchemaNamedPredicateNode namedPredicate,
 				SearchPredicateFactory predicate,
 				Map<String, Object> params) {
 			this.namedPredicate = namedPredicate;

@@ -20,13 +20,13 @@ import org.hibernate.search.util.common.annotation.Incubating;
  *
  */
 @Incubating
-public interface NamedPredicateFactory {
+public interface NamedPredicateProvider {
 
 	/**
 	 * Creates a named predicate.
-	 * @param ctx The context, exposing in particular a {@link SearchPredicateFactory}.
+	 * @param context The context, exposing in particular a {@link SearchPredicateFactory}.
 	 * @return The created {@link SearchPredicate}.
 	 */
-	SearchPredicate create(NamedPredicateFactoryContext ctx);
+	SearchPredicate create(NamedPredicateProviderContext context);
 
 }

@@ -25,7 +25,7 @@ import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.StringHelper;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateFactory;
+import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 
 public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> implements IndexSchemaElement {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -71,11 +71,12 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	}
 
 	@Override
-	public IndexSchemaNamedPredicateOptionsStep namedPredicate(String relativeNamedPredicateName, NamedPredicateFactory factory) {
+	public IndexSchemaNamedPredicateOptionsStep namedPredicate(String relativeNamedPredicateName,
+			NamedPredicateProvider provider) {
 		checkRelativeNamedPredicateName( relativeNamedPredicateName );
 		return nestingContext.<IndexSchemaNamedPredicateOptionsStep>nest(
 				relativeNamedPredicateName,
-				(prefixedName, inclusion) -> objectNodeBuilder.addNamedPredicate( prefixedName, inclusion, factory )
+				(prefixedName, inclusion) -> objectNodeBuilder.addNamedPredicate( prefixedName, inclusion, provider )
 		);
 	}
 

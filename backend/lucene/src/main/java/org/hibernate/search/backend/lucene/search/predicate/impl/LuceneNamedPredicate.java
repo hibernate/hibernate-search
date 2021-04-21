@@ -15,8 +15,8 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNamedPredicateNode;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateFactoryContext;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateFactory;
+import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProviderContext;
+import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
 
 class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
@@ -63,25 +63,25 @@ class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 
 		@Override
 		public SearchPredicate build() {
-			LuceneNamedPredicateFactoryContext ctx = new LuceneNamedPredicateFactoryContext(
+			LuceneNamedPredicateProviderContext ctx = new LuceneNamedPredicateProviderContext(
 					namedPredicate,
 					predicateFactory, params );
 
-			NamedPredicateFactory namedPredicateFactory = (NamedPredicateFactory) namedPredicate.factory();
+			NamedPredicateProvider namedPredicateProvider = namedPredicate.provider();
 
-			buildPredicate = (LuceneSearchPredicate) namedPredicateFactory.create( ctx );
+			buildPredicate = (LuceneSearchPredicate) namedPredicateProvider.create( ctx );
 
 			return new LuceneNamedPredicate( this );
 		}
 	}
 
-	public static class LuceneNamedPredicateFactoryContext implements NamedPredicateFactoryContext {
+	public static class LuceneNamedPredicateProviderContext implements NamedPredicateProviderContext {
 
 		private final SearchPredicateFactory predicate;
 		private final LuceneIndexSchemaNamedPredicateNode namedPredicate;
 		private final Map<String, Object> params;
 
-		public LuceneNamedPredicateFactoryContext(LuceneIndexSchemaNamedPredicateNode namedPredicate,
+		public LuceneNamedPredicateProviderContext(LuceneIndexSchemaNamedPredicateNode namedPredicate,
 				SearchPredicateFactory predicate, Map<String, Object> params) {
 			this.namedPredicate = namedPredicate;
 			this.predicate = predicate;

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateFactory;
+import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 
 public class LuceneIndexSchemaNamedPredicateNode {
 
@@ -14,15 +14,15 @@ public class LuceneIndexSchemaNamedPredicateNode {
 	private final String relativeNamedPredicateName;
 	private final String absoluteNamedPredicatePath;
 
-	private final NamedPredicateFactory factory;
+	private final NamedPredicateProvider provider;
 
 	public LuceneIndexSchemaNamedPredicateNode(LuceneIndexSchemaObjectNode parent,
 			String relativeNamedPredicateName,
-			NamedPredicateFactory factory) {
+			NamedPredicateProvider provider) {
 		this.parent = parent;
 		this.relativeNamedPredicateName = relativeNamedPredicateName;
 		this.absoluteNamedPredicatePath = parent.absolutePath( relativeNamedPredicateName );
-		this.factory = factory;
+		this.provider = provider;
 	}
 
 	public LuceneIndexSchemaObjectNode parent() {
@@ -33,8 +33,8 @@ public class LuceneIndexSchemaNamedPredicateNode {
 		return absoluteNamedPredicatePath;
 	}
 
-	public NamedPredicateFactory factory() {
-		return factory;
+	public NamedPredicateProvider provider() {
+		return provider;
 	}
 
 	@Override

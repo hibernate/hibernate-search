@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateFactory;
+import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -69,13 +69,13 @@ public interface IndexSchemaElement {
 	 * Add a named predicate factory to this index schema element.
 	 *
 	 * @param relativeNamedPredicateName The relative name of the new named predicate.
-	 * @param factory The named predicate factory.
+	 * @param provider The provider of named predicate instances.
 	 * @return A DSL step where the named predicate can be defined in more details,
-	 * @see NamedPredicateFactory
+	 * @see NamedPredicateProvider
 	 */
 	@Incubating
 	IndexSchemaNamedPredicateOptionsStep namedPredicate(
-			String relativeNamedPredicateName, NamedPredicateFactory factory);
+			String relativeNamedPredicateName, NamedPredicateProvider provider);
 
 	/**
 	 * Add an object field to this index schema element with the default structure.

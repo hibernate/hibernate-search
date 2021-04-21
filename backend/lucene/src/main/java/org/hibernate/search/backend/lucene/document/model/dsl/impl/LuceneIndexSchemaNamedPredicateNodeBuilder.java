@@ -17,21 +17,22 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBui
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
-import org.hibernate.search.engine.search.predicate.factories.NamedPredicateFactory;
+import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 
-public class LuceneIndexSchemaNamedPredicateFactoryBuilder implements IndexSchemaNamedPredicateOptionsStep,
+public class LuceneIndexSchemaNamedPredicateNodeBuilder implements IndexSchemaNamedPredicateOptionsStep,
 		LuceneIndexSchemaNodeContributor, IndexSchemaBuildContext {
 
 	private final AbstractLuceneIndexSchemaObjectNodeBuilder parent;
 	private final String relativeNamedPredicateName;
 	private final String absoluteNamedPredicatePath;
-	private final NamedPredicateFactory factory;
+	private final NamedPredicateProvider provider;
 
-	LuceneIndexSchemaNamedPredicateFactoryBuilder(AbstractLuceneIndexSchemaObjectNodeBuilder parent, String relativeNamedPredicateName, NamedPredicateFactory factory) {
+	LuceneIndexSchemaNamedPredicateNodeBuilder(AbstractLuceneIndexSchemaObjectNodeBuilder parent,
+			String relativeNamedPredicateName, NamedPredicateProvider provider) {
 		this.parent = parent;
 		this.relativeNamedPredicateName = relativeNamedPredicateName;
 		this.absoluteNamedPredicatePath = FieldPaths.compose( parent.getAbsolutePath(), relativeNamedPredicateName );
-		this.factory = factory;
+		this.provider = provider;
 	}
 
 	@Override
@@ -39,7 +40,7 @@ public class LuceneIndexSchemaNamedPredicateFactoryBuilder implements IndexSchem
 			Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByNameForParent) {
 
 		LuceneIndexSchemaNamedPredicateNode namedPredicateNode = new LuceneIndexSchemaNamedPredicateNode(
-				parentNode, relativeNamedPredicateName, factory
+				parentNode, relativeNamedPredicateName, provider
 		);
 
 		collector.collect( absoluteNamedPredicatePath, namedPredicateNode );
