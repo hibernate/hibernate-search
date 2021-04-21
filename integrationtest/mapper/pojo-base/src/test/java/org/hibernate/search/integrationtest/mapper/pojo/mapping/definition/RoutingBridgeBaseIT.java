@@ -9,12 +9,17 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.integrationtest.mapper.pojo.work.operations.PojoIndexingPlanOperationIT;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.RoutingBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingBinderRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -645,6 +650,124 @@ public class RoutingBridgeBaseIT {
 		public void previousRoutes(DocumentRoutes routes, Object entityIdentifier, T indexedEntity,
 				RoutingBridgeRouteContext context) {
 			throw new AssertionFailure( "Should not be called" );
+		}
+	}
+
+	@Test
+	public void parameters_annotationMapping() {
+		backendMock.expectSchema( INDEX_NAME, b -> { } );
+		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( AnnotatedRoutedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		AnnotatedRoutedEntity entity = new AnnotatedRoutedEntity( 1, 24 );
+		try ( SearchSession session = mapping.createSession() ) {
+			session.indexingPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( b -> b.identifier( "1" ).routingKey( "3" )
+							.document( StubDocumentNode.document().build() ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void parameters_programmaticMapping() {
+		backendMock.expectSchema( INDEX_NAME, b -> { } );
+		SearchMapping mapping = setupHelper.start().expectCustomBeans()
+				.withConfiguration( builder -> {
+					builder.addEntityType( NotAnnotatedRoutedEntity.class );
+
+					TypeMappingStep entity = builder.programmaticMapping().type( NotAnnotatedRoutedEntity.class );
+					entity.indexed().index( INDEX_NAME ).routingBinder( new ParametricBinder(),
+									Collections.singletonMap( "modulus", 7 ) );
+					entity.property( "id" ).documentId();
+				} )
+				.setup( NotAnnotatedRoutedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		NotAnnotatedRoutedEntity entity = new NotAnnotatedRoutedEntity( 1, 24 );
+		try ( SearchSession session = mapping.createSession() ) {
+			session.indexingPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( b -> b.identifier( "1" ).routingKey( "3" )
+							.document( StubDocumentNode.document().build() ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Indexed(index = INDEX_NAME, routingBinder = @RoutingBinderRef(type = ParametricBinder.class,
+			params = @Parameter(name = "stringModulus", value = "7")))
+	class AnnotatedRoutedEntity {
+		@DocumentId
+		int id;
+		int value;
+
+		AnnotatedRoutedEntity(int id, int value) {
+			this.id = id;
+			this.value = value;
+		}
+	}
+
+	public static class NotAnnotatedRoutedEntity {
+		private int id;
+		private int value;
+
+		public NotAnnotatedRoutedEntity(int id, int value) {
+			this.id = id;
+			this.value = value;
+		}
+	}
+
+	public static class ParametricBinder implements RoutingBinder {
+
+		@Override
+		public void bind(RoutingBindingContext context) {
+			context.dependencies().use( "value" );
+			context.bridge( Object.class, new ParametricBridge( modulus( context ) ) );
+		}
+
+		@SuppressWarnings("uncheked")
+		private static int modulus(RoutingBindingContext context) {
+			Integer modulus = (Integer) context.parameter( "modulus" );
+			if ( modulus != null ) {
+				return modulus;
+			}
+
+			String stringModulus = (String) context.parameter( "stringModulus" );
+			return Integer.parseInt( stringModulus );
+		}
+	}
+
+	public static class ParametricBridge implements RoutingBridge<Object> {
+		private int modulus;
+
+		public ParametricBridge(int modulus) {
+			this.modulus = modulus;
+		}
+
+		@Override
+		public void route(DocumentRoutes routes, Object entityIdentifier, Object indexedEntity,
+				RoutingBridgeRouteContext context) {
+			if ( indexedEntity instanceof AnnotatedRoutedEntity ) {
+				AnnotatedRoutedEntity casted = (AnnotatedRoutedEntity) indexedEntity;
+				routes.addRoute().routingKey( casted.value % modulus + "" );
+			}
+			else if ( indexedEntity instanceof NotAnnotatedRoutedEntity ) {
+				NotAnnotatedRoutedEntity casted = (NotAnnotatedRoutedEntity) indexedEntity;
+				routes.addRoute().routingKey( casted.value % modulus + "" );
+			}
+		}
+
+		@Override
+		public void previousRoutes(DocumentRoutes routes, Object entityIdentifier, Object indexedEntity,
+				RoutingBridgeRouteContext context) {
+			for ( int i = 0; i < modulus; i++ ) {
+				// all routes allowed by the module
+				routes.addRoute().routingKey( i + "" );
+			}
 		}
 	}
 }
