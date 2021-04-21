@@ -111,8 +111,8 @@ public class DelegatingSearchPredicateFactory implements SearchPredicateFactory 
 	}
 
 	@Override
-	public NamedPredicateOptionsStep named(String name) {
-		return delegate.named( name );
+	public NamedPredicateOptionsStep named(String path) {
+		return delegate.named( path );
 	}
 
 	@Override

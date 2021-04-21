@@ -111,8 +111,8 @@ public class DefaultSearchPredicateFactory implements SearchPredicateFactory {
 	}
 
 	@Override
-	public NamedPredicateOptionsStep named(String name) {
-		return new NamedPredicateOptionsStepImpl( this, dslContext, name );
+	public NamedPredicateOptionsStep named(String path) {
+		return new NamedPredicateOptionsStepImpl( this, dslContext, path );
 	}
 
 	@Override

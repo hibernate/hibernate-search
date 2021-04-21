@@ -158,12 +158,13 @@ public interface SearchPredicateFactory {
 	/**
 	 * Match documents if they match a combination of defined named predicate clauses.
 	 *
-	 * @param name the name of definied named predicate
+	 * @param path the path to the named predicate, formatted as {@code <object field path>.<predicate name>},
+	 * or just {@code <predicate name>} if the predicate was declared at the root.
 	 * @return The initial step of a DSL where named predicate predicates can be defined.
 	 * @see NamedPredicateOptionsStep
 	 */
 	@Incubating
-	NamedPredicateOptionsStep named(String name);
+	NamedPredicateOptionsStep named(String path);
 
 	/**
 	 * Extend the current factory with the given extension,
