@@ -7,25 +7,26 @@
 package org.hibernate.search.backend.lucene.search.impl;
 
 /**
- * A factory for query elements (predicates, sorts, projections, aggregations, ...) targeting object fields.
+ * A factory for query elements (predicates, sorts, projections, aggregations, ...)
+ * targeting composite index elements (either the root or an object field).
  *
- * @param <T> The type returned by {@link #create(LuceneSearchContext, LuceneSearchObjectFieldContext)}.
+ * @param <T> The type returned by {@link #create(LuceneSearchContext, LuceneSearchCompositeIndexSchemaElementContext)}.
  * Can be the type of the query element, or an intermediary builder type.
  */
-public interface LuceneSearchObjectFieldQueryElementFactory<T> {
+public interface LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> {
 
 	/**
 	 * @param searchContext The search context, i.e. information regarding the targeted indexes.
 	 * @param field The targeted field.
 	 * @return The query element, or an intermediary builder (depending on the factory type).
 	 */
-	T create(LuceneSearchContext searchContext, LuceneSearchObjectFieldContext field);
+	T create(LuceneSearchContext searchContext, LuceneSearchCompositeIndexSchemaElementContext field);
 
 	/**
 	 * Checks whether this factory and the given factory can be used interchangeably.
 	 * @param other Another factory.
 	 * @throws org.hibernate.search.util.common.SearchException if the two factories cannot be used interchangeably.
 	 */
-	void checkCompatibleWith(LuceneSearchObjectFieldQueryElementFactory<?> other);
+	void checkCompatibleWith(LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?> other);
 
 }

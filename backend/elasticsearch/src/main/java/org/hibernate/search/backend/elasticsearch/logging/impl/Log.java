@@ -666,8 +666,7 @@ public interface Log extends BasicLogger {
 			value = "This field is a value field in some indexes, but an object field in other indexes.")
 	SearchException conflictingFieldModel();
 
-	@Message(id = ID_OFFSET + 123, value = "Cannot use '%2$s' on field '%1$s'."
-			+ " '%2$s' is not available for object fields.")
+	@Message(id = ID_OFFSET + 123, value = "Cannot use '%2$s' on field '%1$s'.")
 	SearchException cannotUseQueryElementForObjectField(String absoluteFieldPath, String queryElementName, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 124, value = "Cannot use '%2$s' on field '%1$s': %3$s")

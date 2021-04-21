@@ -11,7 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchObjectFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
@@ -137,7 +137,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public NestedPredicateBuilder nested(String absoluteFieldPath) {
-		LuceneSearchObjectFieldContext field = indexes.field( absoluteFieldPath ).toObjectField();
+		LuceneSearchCompositeIndexSchemaElementContext field = indexes.field( absoluteFieldPath ).toObjectField();
 		if ( !field.nested() ) {
 			throw log.nonNestedFieldForNestedQuery( absoluteFieldPath,
 					EventContexts.fromIndexNames( indexes.indexNames() ) );

@@ -20,8 +20,10 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNamedPredicateNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchObjectFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchRootContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchValueFieldContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchFieldContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexSchemaElementContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
@@ -86,8 +88,22 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 	}
 
 	@Override
-	public LuceneSearchFieldContext field(String absoluteFieldPath) {
-		LuceneSearchFieldContext resultOrNull;
+	public LuceneSearchCompositeIndexSchemaElementContext root() {
+		if ( elements().size() == 1 ) {
+			return elements().iterator().next().model().root();
+		}
+		else {
+			List<LuceneSearchCompositeIndexSchemaElementContext> rootForEachIndex = new ArrayList<>();
+			for ( LuceneScopeIndexManagerContext index : elements() ) {
+				rootForEachIndex.add( index.model().root() );
+			}
+			return new LuceneMultiIndexSearchRootContext( this, rootForEachIndex );
+		}
+	}
+
+	@Override
+	public LuceneSearchIndexSchemaElementContext field(String absoluteFieldPath) {
+		LuceneSearchIndexSchemaElementContext resultOrNull;
 		if ( elements().size() == 1 ) {
 			resultOrNull = elements().iterator().next().model().fieldOrNull( absoluteFieldPath );
 		}
@@ -130,8 +146,8 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"}) // We check types using reflection
-	private LuceneSearchFieldContext createMultiIndexFieldContext(String absoluteFieldPath) {
-		List<LuceneSearchFieldContext> fieldForEachIndex = new ArrayList<>();
+	private LuceneSearchIndexSchemaElementContext createMultiIndexFieldContext(String absoluteFieldPath) {
+		List<LuceneSearchIndexSchemaElementContext> fieldForEachIndex = new ArrayList<>();
 		LuceneScopeIndexManagerContext indexOfFirstField = null;
 		AbstractLuceneIndexSchemaFieldNode firstField = null;
 
