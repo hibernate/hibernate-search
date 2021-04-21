@@ -224,7 +224,8 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 					new PojoRoutingIndexingDependencyConfigurationContextImpl<>( introspector, extractorBinder,
 							typeAdditionalMetadataProvider, indexedEntityType );
 			routingBridge = new RoutingBindingContextImpl<>( mappingHelper.beanResolver(),
-					introspector, indexedEntityType, pojoModelRootElement, dependencyContext )
+					introspector, indexedEntityType, pojoModelRootElement, dependencyContext,
+					indexedTypeMetadata.routingBinderParams() )
 					.applyBinder( routingBinderOptional.get() );
 		}
 
