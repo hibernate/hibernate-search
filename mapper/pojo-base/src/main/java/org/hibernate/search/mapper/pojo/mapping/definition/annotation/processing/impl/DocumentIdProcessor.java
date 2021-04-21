@@ -7,12 +7,16 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanDelegatingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
@@ -33,7 +37,15 @@ public class DocumentIdProcessor implements PropertyMappingAnnotationProcessor<D
 			PropertyMappingAnnotationProcessorContext context) {
 		IdentifierBinder binder = createIdentifierBinder( annotation, context );
 
-		mappingContext.documentId().identifierBinder( binder );
+		IdentifierBinderRef identifierBinderRef = annotation.identifierBinder();
+		if ( identifierBinderRef.params() != null ) {
+			Map<String, Object> params = Arrays.stream( identifierBinderRef.params() )
+					.collect( Collectors.toMap( Parameter::name, Parameter::value ) );
+			mappingContext.documentId().identifierBinder( binder, params );
+		}
+		else {
+			mappingContext.documentId().identifierBinder( binder );
+		}
 	}
 
 	@SuppressWarnings("rawtypes") // Raw types are the best we can do here
