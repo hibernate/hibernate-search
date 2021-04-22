@@ -11,11 +11,11 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocum
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 
 //tag::include[]
-class OffsetIdentifierBridge implements IdentifierBridge<Integer> { // <1>
+public class OffsetIdentifierBridge implements IdentifierBridge<Integer> { // <1>
 
 	private final int offset;
 
-	OffsetIdentifierBridge(int offset) { // <2>
+	public OffsetIdentifierBridge(int offset) { // <2>
 		this.offset = offset;
 	}
 
