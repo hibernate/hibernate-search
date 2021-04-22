@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -20,6 +21,7 @@ import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProv
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.KeywordStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
@@ -106,6 +108,46 @@ public class NamedPredicateBaseIT {
 						.param( "value1", WORD_1 )
 						.param( "value2", WORD_4 ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
+	}
+
+	@Test
+	public void nullPath() {
+		SearchPredicateFactory f = index.createScope().predicate();
+		assertThatThrownBy( () -> f.named( null ) )
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContainingAll( "must not be null" );
+	}
+
+	@Test
+	public void unknownField() {
+		SearchPredicateFactory f = index.createScope().predicate();
+		assertThatThrownBy( () -> f.named( "unknown_field.my-predicate" ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "Unknown field", "'unknown_field'" );
+	}
+
+	@Test
+	public void unknownPredicate_root() {
+		SearchPredicateFactory f = index.createScope().predicate();
+		assertThatThrownBy( () -> f.named( "unknown-predicate" ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "Cannot use 'predicate:named:unknown-predicate' on index schema root" );
+	}
+
+	@Test
+	public void unknownPredicate_objectField() {
+		SearchPredicateFactory f = index.createScope().predicate();
+		assertThatThrownBy( () -> f.named( "nested.unknown-predicate" ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "Cannot use 'predicate:named:unknown-predicate' on field 'nested'" );
+	}
+
+	@Test
+	public void unknownPredicate_valueField() {
+		SearchPredicateFactory f = index.createScope().predicate();
+		assertThatThrownBy( () -> f.named( "field1.unknown-predicate" ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll( "Cannot use 'predicate:named:unknown-predicate' on field 'field1'" );
 	}
 
 	private static class IndexBinding {
