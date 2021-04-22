@@ -80,8 +80,8 @@ class InitialPropertyMappingStep
 	}
 
 	@Override
-	public PropertyMappingStep marker(MarkerBinder binder) {
-		children.add( new MarkerMappingContributor( binder ) );
+	public PropertyMappingStep marker(MarkerBinder binder, Map<String, Object> params) {
+		children.add( new MarkerMappingContributor( binder, params ) );
 		return this;
 	}
 

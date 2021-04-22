@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Map;
 
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
@@ -19,15 +20,22 @@ public final class MarkerBindingContextImpl extends AbstractBindingContext
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final Map<String, Object> params;
 	private Object marker;
 
-	public MarkerBindingContextImpl(BeanResolver beanResolver) {
+	public MarkerBindingContextImpl(BeanResolver beanResolver, Map<String, Object> params) {
 		super( beanResolver );
+		this.params = params;
 	}
 
 	@Override
 	public void marker(Object marker) {
 		this.marker = marker;
+	}
+
+	@Override
+	public Object parameter(String name) {
+		return params.get( name );
 	}
 
 	public Object applyBinder(MarkerBinder binder) {
