@@ -341,7 +341,7 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
-						"Field attribute 'projectionConverter' differs:", " vs. "
+						"Attribute 'projectionConverter' differs:", " vs. "
 				);
 	}
 
@@ -443,7 +443,7 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
-						"Field attribute 'nested", "' differs:"
+						"Attribute 'nested", "' differs:"
 				);
 	}
 

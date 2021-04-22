@@ -99,9 +99,7 @@ public class DistanceSearchProjectionTypeIndependentIT {
 		assertThatThrownBy( () -> scope.projection()
 				.distance( fieldPath, SOME_POINT ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Cannot use 'projection:distance' on field '" + fieldPath + "'",
-						"'projection:distance' is not available for object fields" );
+				.hasMessageContaining( "Cannot use 'projection:distance' on field '" + fieldPath + "'" );
 	}
 
 	@Test
@@ -112,9 +110,7 @@ public class DistanceSearchProjectionTypeIndependentIT {
 		assertThatThrownBy( () -> scope.projection()
 				.distance( fieldPath, SOME_POINT ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Cannot use 'projection:distance' on field '" + fieldPath + "'",
-						"'projection:distance' is not available for object fields" );
+				.hasMessageContaining( "Cannot use 'projection:distance' on field '" + fieldPath + "'" );
 	}
 
 	private static class IndexBinding {

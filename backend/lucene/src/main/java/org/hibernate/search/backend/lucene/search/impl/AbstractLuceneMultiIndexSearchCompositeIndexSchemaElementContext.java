@@ -37,7 +37,7 @@ abstract class AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext
 
 	@Override
 	public List<String> nestedPathHierarchy() {
-		return getFromFieldIfCompatible( LuceneSearchCompositeIndexSchemaElementContext::nestedPathHierarchy, Object::equals,
+		return getFromElementIfCompatible( LuceneSearchCompositeIndexSchemaElementContext::nestedPathHierarchy, Object::equals,
 				"nestedPathHierarchy" );
 	}
 
@@ -56,14 +56,14 @@ abstract class AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchContext searchContext) {
 		LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
 		if ( factory == null ) {
-			throw log.cannotUseQueryElementForObjectField( absolutePath(), key.toString(),
+			throw log.cannotUseQueryElementForCompositeIndexElement( relativeEventContext(), key.toString(),
 					indexesEventContext() );
 		}
 		try {
 			return factory.create( searchContext, this );
 		}
 		catch (SearchException e) {
-			throw log.cannotUseQueryElementForObjectFieldBecauseCreationException( absolutePath(), key.toString(),
+			throw log.cannotUseQueryElementForCompositeIndexElementBecauseCreationException( relativeEventContext(), key.toString(),
 					e.getMessage(), e, indexesEventContext() );
 		}
 	}
@@ -75,7 +75,7 @@ abstract class AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext
 		}
 
 		// TODO HSEARCH-4050 remove this unnecessary restriction?
-		getFromFieldIfCompatible( field -> field.staticChildrenByName().keySet(),
+		getFromElementIfCompatible( field -> field.staticChildrenByName().keySet(),
 				Object::equals, "staticChildren" );
 
 		Map<String, LuceneSearchIndexSchemaElementContext> result = new TreeMap<>();
@@ -86,7 +86,7 @@ abstract class AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext
 					result.computeIfAbsent( child.absolutePath(), createChildFieldContext );
 				}
 				catch (SearchException e) {
-					throw log.inconsistentConfigurationForFieldForSearch( absolutePath(), e.getMessage(),
+					throw log.inconsistentConfigurationForIndexElementForSearch( relativeEventContext(), e.getMessage(),
 							indexesEventContext(), e );
 				}
 			}
@@ -100,7 +100,7 @@ abstract class AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext
 
 	@Override
 	public boolean nested() {
-		return getFromFieldIfCompatible( LuceneSearchCompositeIndexSchemaElementContext::nested, Object::equals, "nested" );
+		return getFromElementIfCompatible( LuceneSearchCompositeIndexSchemaElementContext::nested, Object::equals, "nested" );
 	}
 
 	@Override
@@ -119,8 +119,8 @@ abstract class AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext
 		return factory;
 	}
 
-	private <T> T getFromFieldIfCompatible(Function<LuceneSearchCompositeIndexSchemaElementContext, T> getter,
-			BiPredicate<T, T> compatiblityChecker, String attributeName) {
+	private <T> T getFromElementIfCompatible(Function<LuceneSearchCompositeIndexSchemaElementContext, T> getter,
+			BiPredicate<T, T> compatibilityChecker, String attributeName) {
 		T attribute = null;
 		for ( LuceneSearchCompositeIndexSchemaElementContext fieldContext : fieldForEachIndex ) {
 			T attributeForFieldContext = getter.apply( fieldContext );
@@ -128,7 +128,7 @@ abstract class AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext
 				attribute = attributeForFieldContext;
 			}
 			else {
-				checkAttributeCompatibility( compatiblityChecker, attributeName, attribute, attributeForFieldContext );
+				checkAttributeCompatibility( compatibilityChecker, attributeName, attribute, attributeForFieldContext );
 			}
 		}
 		return attribute;
@@ -143,7 +143,7 @@ abstract class AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext
 		try {
 			try {
 				if ( factory1 == null || factory2 == null ) {
-					throw log.partialSupportForQueryElement( key.toString() );
+					throw log.partialSupportForQueryElementInCompositeIndexElement( key.toString() );
 				}
 
 				factory1.checkCompatibleWith( factory2 );
@@ -153,19 +153,21 @@ abstract class AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext
 			}
 		}
 		catch (SearchException e) {
-			throw log.inconsistentConfigurationForFieldForSearch( absolutePath(), e.getMessage(), indexesEventContext(), e );
+			throw log.inconsistentConfigurationForIndexElementForSearch( relativeEventContext(), e.getMessage(),
+					indexesEventContext(), e );
 		}
 	}
 
-	private <T> void checkAttributeCompatibility(BiPredicate<T, T> compatiblityChecker, String attributeName,
+	private <T> void checkAttributeCompatibility(BiPredicate<T, T> compatibilityChecker, String attributeName,
 			T attribute1, T attribute2) {
 		try {
-			if ( !compatiblityChecker.test( attribute1, attribute2 ) ) {
-				throw log.differentFieldAttribute( attributeName, attribute1, attribute2 );
+			if ( !compatibilityChecker.test( attribute1, attribute2 ) ) {
+				throw log.differentIndexElementAttribute( attributeName, attribute1, attribute2 );
 			}
 		}
 		catch (SearchException e) {
-			throw log.inconsistentConfigurationForFieldForSearch( absolutePath(), e.getMessage(), indexesEventContext(), e );
+			throw log.inconsistentConfigurationForIndexElementForSearch( relativeEventContext(), e.getMessage(),
+					indexesEventContext(), e );
 		}
 	}
 }

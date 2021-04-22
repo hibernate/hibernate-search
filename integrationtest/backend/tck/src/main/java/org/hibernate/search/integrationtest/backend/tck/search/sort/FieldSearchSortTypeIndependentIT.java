@@ -71,9 +71,7 @@ public class FieldSearchSortTypeIndependentIT {
 				.toQuery()
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Cannot use 'sort:field' on field '" + absoluteFieldPath + "'",
-						"'sort:field' is not available for object fields" );
+				.hasMessageContaining( "Cannot use 'sort:field' on field '" + absoluteFieldPath + "'" );
 	}
 
 	@Test
@@ -88,9 +86,7 @@ public class FieldSearchSortTypeIndependentIT {
 				.toQuery()
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Cannot use 'sort:field' on field '" + absoluteFieldPath + "'",
-						"'sort:field' is not available for object fields" );
+				.hasMessageContaining( "Cannot use 'sort:field' on field '" + absoluteFieldPath + "'" );
 	}
 
 	private static class IndexBinding {

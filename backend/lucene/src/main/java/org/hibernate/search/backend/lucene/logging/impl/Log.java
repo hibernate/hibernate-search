@@ -30,6 +30,7 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
+import org.hibernate.search.util.common.logging.impl.EventContextNoPrefixFormatter;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
@@ -315,9 +316,10 @@ public interface Log extends BasicLogger {
 	SearchException cannotMixLuceneSearchQueryWithOtherProjections(SearchProjection<?> projection);
 
 	@Message(id = ID_OFFSET + 58,
-			value = "Inconsistent configuration for field '%1$s' in a search query across multiple indexes: %2$s")
-	SearchException inconsistentConfigurationForFieldForSearch(String absoluteFieldPath, String causeMessage,
-			@Param EventContext context, @Cause SearchException cause);
+			value = "Inconsistent configuration for %1$s in a search query across multiple indexes: %2$s")
+	SearchException inconsistentConfigurationForIndexElementForSearch(
+			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext, String causeMessage,
+			@Param EventContext elementContextAsParam, @Cause SearchException cause);
 
 	@Message(id = ID_OFFSET + 61, value = "Unable to shut down index accessor: %1$s")
 	SearchException unableToShutdownIndexAccessor(String causeMessage, @Cause Exception cause);
@@ -595,8 +597,8 @@ public interface Log extends BasicLogger {
 			String causeMessage, @Cause SearchException cause);
 
 	@Message(id = ID_OFFSET + 134,
-			value = "Field attribute '%1$s' differs: '%2$s' vs. '%3$s'.")
-	SearchException differentFieldAttribute(String attributeName, Object component1, Object component2);
+			value = "Attribute '%1$s' differs: '%2$s' vs. '%3$s'.")
+	SearchException differentIndexElementAttribute(String attributeName, Object component1, Object component2);
 
 	@Message(id = ID_OFFSET + 135,
 			value = "Implementation class differs: '%1$s' vs. '%2$s'.")
@@ -620,13 +622,16 @@ public interface Log extends BasicLogger {
 	void deprecatedFileSystemAccessStrategy(String accessStrategyName,
 			@FormatWith(EventContextFormatter.class) EventContext eventContext);
 
-	@Message(id = ID_OFFSET + 139, value = "Cannot use '%2$s' on field '%1$s'."
-			+ " '%2$s' is not available for object fields.")
-	SearchException cannotUseQueryElementForObjectField(String absoluteFieldPath, String queryElementName, @Param EventContext context);
+	@Message(id = ID_OFFSET + 139, value = "Cannot use '%2$s' on %1$s.")
+	SearchException cannotUseQueryElementForCompositeIndexElement(
+			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext, String queryElementName,
+			@Param EventContext elementContextAsParam);
 
-	@Message(id = ID_OFFSET + 140, value = "Cannot use '%2$s' on field '%1$s': %3$s")
-	SearchException cannotUseQueryElementForObjectFieldBecauseCreationException(String absoluteFieldPath,
-			String queryElementName, String causeMessage, @Cause SearchException cause, @Param EventContext context);
+	@Message(id = ID_OFFSET + 140, value = "Cannot use '%2$s' on %1$s: %3$s")
+	SearchException cannotUseQueryElementForCompositeIndexElementBecauseCreationException(
+			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext,
+			String queryElementName, String causeMessage, @Cause SearchException cause,
+			@Param EventContext elementContextAsParam);
 
 	@Message(id = ID_OFFSET + 141,
 			value = "Unable to compute size of index: %1$s")
@@ -654,4 +659,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 146,
 			value = "Unable to apply query caching configuration: %1$s")
 	SearchException unableToApplyQueryCacheConfiguration(String errorMessage, @Cause Exception e);
+
+	@Message(id = ID_OFFSET + 147,
+			value = "'%1$s' can be used in some of the targeted indexes, but not all of them.")
+	SearchException partialSupportForQueryElementInCompositeIndexElement(String queryElementName);
+
 }

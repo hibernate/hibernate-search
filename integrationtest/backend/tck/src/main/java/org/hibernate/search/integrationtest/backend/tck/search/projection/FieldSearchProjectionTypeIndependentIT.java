@@ -81,9 +81,7 @@ public class FieldSearchProjectionTypeIndependentIT {
 				.field( fieldPath, Object.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Cannot use 'projection:field' on field '" + fieldPath + "'",
-						"'projection:field' is not available for object fields" );
+				.hasMessageContaining( "Cannot use 'projection:field' on field '" + fieldPath + "'" );
 	}
 
 	@Test
@@ -95,9 +93,7 @@ public class FieldSearchProjectionTypeIndependentIT {
 				.field( fieldPath, Object.class )
 		)
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Cannot use 'projection:field' on field '" + fieldPath + "'",
-						"'projection:field' is not available for object fields" );
+				.hasMessageContaining( "Cannot use 'projection:field' on field '" + fieldPath + "'" );
 	}
 
 	private static class IndexBinding {

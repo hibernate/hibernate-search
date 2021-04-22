@@ -105,10 +105,8 @@ public class SingleFieldAggregationInvalidFieldIT<F> {
 
 		assertThatThrownBy( () -> scenario.setup( index.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Cannot use 'aggregation:" + expectations.aggregationName() + "' on field '" + fieldPath + "'",
-						"'aggregation:" + expectations.aggregationName()
-								+ "' is not available for object fields" );
+				.hasMessageContaining(
+						"Cannot use 'aggregation:" + expectations.aggregationName() + "' on field '" + fieldPath + "'" );
 	}
 
 	@Test
@@ -119,10 +117,8 @@ public class SingleFieldAggregationInvalidFieldIT<F> {
 
 		assertThatThrownBy( () -> scenario.setup( index.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"Cannot use 'aggregation:" + expectations.aggregationName() + "' on field '" + fieldPath + "'",
-						"'aggregation:" + expectations.aggregationName()
-								+ "' is not available for object fields" );
+				.hasMessageContaining(
+						"Cannot use 'aggregation:" + expectations.aggregationName() + "' on field '" + fieldPath + "'" );
 	}
 
 	private static class IndexBinding {

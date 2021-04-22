@@ -150,7 +150,7 @@ public class ExistsPredicateObjectsSpecificsIT {
 				.hasMessageContainingAll(
 						"Cannot use 'predicate:exists' on field '" + fieldPath + "'",
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
-						"Field attribute 'nestedPathHierarchy' differs:", " vs. " )
+						"Attribute 'nestedPathHierarchy' differs:", " vs. " )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), invertedIndex.name() )
 				) );
@@ -166,7 +166,7 @@ public class ExistsPredicateObjectsSpecificsIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
-						"Field attribute 'staticChildren' differs" )
+						"Attribute 'staticChildren' differs" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), differentFieldsIndex.name() )
 				) );
@@ -236,7 +236,7 @@ public class ExistsPredicateObjectsSpecificsIT {
 				.hasMessageContainingAll(
 						"Cannot use 'predicate:exists' on field '" + fieldPath + "'",
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
-						"Field attribute 'nestedPathHierarchy' differs:", " vs. " )
+						"Attribute 'nestedPathHierarchy' differs:", " vs. " )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( invertedIndex.name(), mainIndex.name() )
 				) );
@@ -252,7 +252,7 @@ public class ExistsPredicateObjectsSpecificsIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
-						"Field attribute 'staticChildren' differs" )
+						"Attribute 'staticChildren' differs" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( differentFieldsIndex.name(), mainIndex.name() )
 				) );

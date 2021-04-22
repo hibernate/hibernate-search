@@ -251,7 +251,7 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
-						"Field attribute 'nested", "' differs:"
+						"Attribute 'nested", "' differs:"
 				);
 	}
 
