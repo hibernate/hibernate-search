@@ -37,5 +37,4 @@ public interface NamedPredicateProviderContext {
 	 * @return The absolute path of the field. Note the path is returned even if the field doesn't exist.
 	 */
 	String absolutePath(String relativeFieldPath);
-
 }
