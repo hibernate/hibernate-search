@@ -29,6 +29,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SpatialPredicateInitialS
 import org.hibernate.search.engine.search.predicate.dsl.TermsPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
+import org.hibernate.search.util.common.impl.Contracts;
 
 
 public class DefaultSearchPredicateFactory implements SearchPredicateFactory {
@@ -113,6 +114,7 @@ public class DefaultSearchPredicateFactory implements SearchPredicateFactory {
 
 	@Override
 	public NamedPredicateOptionsStep named(String path) {
+		Contracts.assertNotNull( path, "path" );
 		String absoluteFieldPath;
 		String predicateName;
 		int dotIndex = path.lastIndexOf( FieldPaths.PATH_SEPARATOR );
