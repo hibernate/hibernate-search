@@ -10,12 +10,12 @@ import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 
 //tag::include[]
-class BooleanAsStringBridge implements ValueBridge<Boolean, String> { // <1>
+public class BooleanAsStringBridge implements ValueBridge<Boolean, String> { // <1>
 
 	private final String trueAsString;
 	private final String falseAsString;
 
-	BooleanAsStringBridge(String trueAsString, String falseAsString) { // <2>
+	public BooleanAsStringBridge(String trueAsString, String falseAsString) { // <2>
 		this.trueAsString = trueAsString;
 		this.falseAsString = falseAsString;
 	}
