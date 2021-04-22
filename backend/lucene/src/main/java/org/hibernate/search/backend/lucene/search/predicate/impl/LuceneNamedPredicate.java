@@ -22,6 +22,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProviderContext;
 import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
+import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
@@ -124,11 +125,13 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 
 		@Override
 		public Object param(String name) {
+			Contracts.assertNotNull( name, "name" );
 			return params.get( name );
 		}
 
 		@Override
 		public String absolutePath(String relativeFieldPath) {
+			Contracts.assertNotNull( relativeFieldPath, "relativeFieldPath" );
 			return field.absolutePath( relativeFieldPath );
 		}
 	}
