@@ -37,20 +37,17 @@ public class DefaultIdentifierBindingContext<I> extends AbstractBindingContext
 	private final PojoGenericTypeModel<I> identifierTypeModel;
 	private final PojoModelValue<I> bridgedElement;
 
-	private final Map<String, Object> params;
-
 	private PartialBinding<I> partialBinding;
 
 	public DefaultIdentifierBindingContext(BeanResolver beanResolver,
 			PojoBootstrapIntrospector introspector,
 			IndexedEntityBindingContext indexedEntityBindingContext,
 			PojoGenericTypeModel<I> valueTypeModel, Map<String, Object> params) {
-		super( beanResolver );
+		super( beanResolver, params );
 		this.introspector = introspector;
 		this.indexedEntityBindingContext = indexedEntityBindingContext;
 		this.identifierTypeModel = valueTypeModel;
 		this.bridgedElement = new PojoModelValueElement<>( introspector, valueTypeModel );
-		this.params = params;
 	}
 
 	@Override
@@ -83,11 +80,6 @@ public class DefaultIdentifierBindingContext<I> extends AbstractBindingContext
 	@Override
 	public PojoModelValue<I> bridgedElement() {
 		return bridgedElement;
-	}
-
-	@Override
-	public Object parameter(String name) {
-		return params.get( name );
 	}
 
 	public BoundIdentifierBridge<I> applyBinder(IdentifierBinder binder) {

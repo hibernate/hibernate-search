@@ -20,22 +20,15 @@ public final class MarkerBindingContextImpl extends AbstractBindingContext
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Map<String, Object> params;
 	private Object marker;
 
 	public MarkerBindingContextImpl(BeanResolver beanResolver, Map<String, Object> params) {
-		super( beanResolver );
-		this.params = params;
+		super( beanResolver, params );
 	}
 
 	@Override
 	public void marker(Object marker) {
 		this.marker = marker;
-	}
-
-	@Override
-	public Object parameter(String name) {
-		return params.get( name );
 	}
 
 	public Object applyBinder(MarkerBinder binder) {

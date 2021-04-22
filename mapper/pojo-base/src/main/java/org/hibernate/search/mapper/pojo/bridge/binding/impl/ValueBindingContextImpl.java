@@ -55,7 +55,6 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 	private final IndexSchemaElement schemaElement;
 	private final String relativeFieldName;
 	private final FieldModelContributor contributor;
-	private final Map<String, Object> params;
 
 	private PartialBinding<V, ?> partialBinding;
 
@@ -66,7 +65,7 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 			IndexFieldTypeDefaultsProvider defaultsProvider,
 			String relativeFieldName, FieldModelContributor contributor,
 			Map<String, Object> params) {
-		super( beanResolver );
+		super( beanResolver, params );
 		this.introspector = introspector;
 		this.valueTypeModel = valueTypeModel;
 		this.multiValued = multiValued;
@@ -77,7 +76,6 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 		this.schemaElement = indexBindingContext.schemaElement( listener );
 		this.relativeFieldName = relativeFieldName;
 		this.contributor = contributor;
-		this.params = params;
 	}
 
 	@Override
@@ -124,11 +122,6 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 	@Override
 	public IndexFieldTypeFactory typeFactory() {
 		return indexFieldTypeFactory;
-	}
-
-	@Override
-	public Object parameter(String name) {
-		return params.get( name );
 	}
 
 	public Optional<BoundValueBridge<V, ?>> applyBinder(ValueBinder binder) {

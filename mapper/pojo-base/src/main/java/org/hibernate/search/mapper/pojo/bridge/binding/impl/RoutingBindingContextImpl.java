@@ -33,7 +33,6 @@ public class RoutingBindingContextImpl<E> extends AbstractCompositeBindingContex
 	private final PojoRawTypeModel<E> indexedEntityType;
 	private final PojoModelTypeRootElement<E> pojoModelTypeRootElement;
 	private final PojoRoutingIndexingDependencyConfigurationContextImpl<E> dependencyContext;
-	private final Map<String, Object> params;
 
 	private BeanHolder<? extends RoutingBridge<? super E>> routingBridgeHolder;
 
@@ -41,12 +40,11 @@ public class RoutingBindingContextImpl<E> extends AbstractCompositeBindingContex
 			PojoRawTypeModel<E> indexedEntityType, PojoModelTypeRootElement<E> pojoModelTypeRootElement,
 			PojoRoutingIndexingDependencyConfigurationContextImpl<E> dependencyContext,
 			Map<String, Object> params) {
-		super( beanResolver );
+		super( beanResolver, params );
 		this.introspector = introspector;
 		this.indexedEntityType = indexedEntityType;
 		this.pojoModelTypeRootElement = pojoModelTypeRootElement;
 		this.dependencyContext = dependencyContext;
-		this.params = params;
 	}
 
 	@Override
@@ -72,11 +70,6 @@ public class RoutingBindingContextImpl<E> extends AbstractCompositeBindingContex
 	@Override
 	public PojoRoutingIndexingDependencyConfigurationContext dependencies() {
 		return dependencyContext;
-	}
-
-	@Override
-	public Object parameter(String name) {
-		return params.get( name );
 	}
 
 	public BoundRoutingBridge<E> applyBinder(RoutingBinder binder) {
