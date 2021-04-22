@@ -163,11 +163,10 @@ but not for `ARCHIVED`.
 // Legacy anchor from earlier 6.0 beta versions
 [[mapper-orm-bridge-routingkeybridge-parameters]]
 
-Routing bridges are usually applied with the built-in `@Indexed` annotation and its `routingBinder` attribute,
-which does not accept any parameter other than the routing binder.
+There are two ways to pass parameters to routing bridges:
 
-In some cases, it is necessary to pass parameters directly to the routing binder.
-This is achieved by defining a <<mapper-orm-custom-annotations,custom annotation>> with attributes.
+* One is (mostly) limited to string parameters, but is trivial to implement.
+* The other can allow any type of parameters, but requires you to declare your own annotations.
 
 Refer to <<mapper-orm-bridge-typebridge-parameters,this example for `TypeBinder`>>,
 which is fairly similar to what you'll need for a `RoutingBinder`.
