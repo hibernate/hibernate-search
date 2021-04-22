@@ -45,7 +45,7 @@ public class ElasticsearchMultiIndexSearchValueFieldContext<F>
 	}
 
 	@Override
-	public ElasticsearchSearchObjectFieldContext toObjectField() {
+	public ElasticsearchSearchCompositeIndexSchemaElementContext toObjectField() {
 		throw log.invalidIndexElementTypeValueFieldIsNotObjectField( absolutePath );
 	}
 

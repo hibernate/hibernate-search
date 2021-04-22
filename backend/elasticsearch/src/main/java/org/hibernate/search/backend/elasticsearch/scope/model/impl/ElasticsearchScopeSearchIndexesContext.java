@@ -20,8 +20,10 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNamedPredicateNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMultiIndexSearchObjectFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMultiIndexSearchRootContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMultiIndexSearchValueFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexSchemaElementContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
@@ -98,8 +100,22 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 	}
 
 	@Override
-	public ElasticsearchSearchFieldContext field(String absoluteFieldPath) {
-		ElasticsearchSearchFieldContext resultOrNull;
+	public ElasticsearchSearchCompositeIndexSchemaElementContext root() {
+		if ( elements().size() == 1 ) {
+			return indexModels.iterator().next().root();
+		}
+		else {
+			List<ElasticsearchSearchCompositeIndexSchemaElementContext> rootForEachIndex = new ArrayList<>();
+			for ( ElasticsearchIndexModel indexModel : indexModels ) {
+				rootForEachIndex.add( indexModel.root() );
+			}
+			return new ElasticsearchMultiIndexSearchRootContext( hibernateSearchIndexNames, rootForEachIndex );
+		}
+	}
+
+	@Override
+	public ElasticsearchSearchIndexSchemaElementContext field(String absoluteFieldPath) {
+		ElasticsearchSearchIndexSchemaElementContext resultOrNull;
 		if ( elements().size() == 1 ) {
 			resultOrNull = indexModels.iterator().next().fieldOrNull( absoluteFieldPath );
 		}
@@ -137,8 +153,8 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"}) // We check types using reflection
-	private ElasticsearchSearchFieldContext createMultiIndexFieldContext(String absoluteFieldPath) {
-		List<ElasticsearchSearchFieldContext> fieldForEachIndex = new ArrayList<>();
+	private ElasticsearchSearchIndexSchemaElementContext createMultiIndexFieldContext(String absoluteFieldPath) {
+		List<ElasticsearchSearchIndexSchemaElementContext> fieldForEachIndex = new ArrayList<>();
 		ElasticsearchSearchIndexContext indexModelOfFirstField = null;
 		AbstractElasticsearchIndexSchemaFieldNode firstField = null;
 

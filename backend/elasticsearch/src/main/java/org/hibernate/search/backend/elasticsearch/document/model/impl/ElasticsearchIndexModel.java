@@ -40,7 +40,7 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 	private final RootTypeMapping mapping;
 
 	private final DocumentIdentifierValueConverter<?> idDslConverter;
-	private final ElasticsearchIndexSchemaObjectNode rootNode;
+	private final ElasticsearchIndexSchemaRootNode rootNode;
 	private final Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticFields;
 	private final List<IndexFieldDescriptor> includedStaticFields;
 	private final List<AbstractElasticsearchIndexSchemaFieldTemplate<?>> fieldTemplates;
@@ -51,7 +51,7 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 			String mappedTypeName,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, IndexSettings customIndexSettings,
 			RootTypeMapping mapping, DocumentIdentifierValueConverter<?> idDslConverter,
-			ElasticsearchIndexSchemaObjectNode rootNode,
+			ElasticsearchIndexSchemaRootNode rootNode,
 			Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticFields,
 			List<AbstractElasticsearchIndexSchemaFieldTemplate<?>> fieldTemplates,
 			Map<String, ElasticsearchIndexSchemaNamedPredicateNode> namedPredicateNodes) {
@@ -99,7 +99,7 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 	}
 
 	@Override
-	public ElasticsearchIndexSchemaObjectNode root() {
+	public ElasticsearchIndexSchemaRootNode root() {
 		return rootNode;
 	}
 

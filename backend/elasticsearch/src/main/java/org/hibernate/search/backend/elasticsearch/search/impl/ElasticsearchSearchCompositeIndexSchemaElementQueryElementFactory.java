@@ -9,23 +9,23 @@ package org.hibernate.search.backend.elasticsearch.search.impl;
 /**
  * A factory for query elements (predicates, sorts, projections, aggregations, ...) targeting object fields.
  *
- * @param <T> The type returned by {@link #create(ElasticsearchSearchContext, ElasticsearchSearchObjectFieldContext)}.
+ * @param <T> The type returned by {@link #create(ElasticsearchSearchContext, ElasticsearchSearchCompositeIndexSchemaElementContext)}.
  * Can be the type of the query element, or an intermediary builder type.
  */
-public interface ElasticsearchSearchObjectFieldQueryElementFactory<T> {
+public interface ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> {
 
 	/**
 	 * @param searchContext The search context, i.e. information regarding the targeted indexes.
 	 * @param field The targeted field.
 	 * @return The query element, or an intermediary builder (depending on the factory type).
 	 */
-	T create(ElasticsearchSearchContext searchContext, ElasticsearchSearchObjectFieldContext field);
+	T create(ElasticsearchSearchContext searchContext, ElasticsearchSearchCompositeIndexSchemaElementContext field);
 
 	/**
 	 * Checks whether this factory and the given factory can be used interchangeably.
 	 * @param other Another factory.
 	 * @throws org.hibernate.search.util.common.SearchException if the two factories cannot be used interchangeably.
 	 */
-	void checkCompatibleWith(ElasticsearchSearchObjectFieldQueryElementFactory<?> other);
+	void checkCompatibleWith(ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?> other);
 
 }

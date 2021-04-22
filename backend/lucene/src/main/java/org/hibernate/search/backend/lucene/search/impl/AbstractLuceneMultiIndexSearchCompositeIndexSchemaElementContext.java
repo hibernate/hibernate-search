@@ -56,14 +56,15 @@ abstract class AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchContext searchContext) {
 		LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
 		if ( factory == null ) {
-			throw log.cannotUseQueryElementForObjectField( absolutePath(), key.toString(), eventContext() );
+			throw log.cannotUseQueryElementForObjectField( absolutePath(), key.toString(),
+					indexesEventContext() );
 		}
 		try {
 			return factory.create( searchContext, this );
 		}
 		catch (SearchException e) {
 			throw log.cannotUseQueryElementForObjectFieldBecauseCreationException( absolutePath(), key.toString(),
-					e.getMessage(), e, eventContext() );
+					e.getMessage(), e, indexesEventContext() );
 		}
 	}
 
