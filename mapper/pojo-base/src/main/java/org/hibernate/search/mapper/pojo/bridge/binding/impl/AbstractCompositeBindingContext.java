@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Map;
 
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -18,8 +19,8 @@ public abstract class AbstractCompositeBindingContext extends AbstractBindingCon
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	protected AbstractCompositeBindingContext(BeanResolver beanResolver) {
-		super( beanResolver );
+	protected AbstractCompositeBindingContext(BeanResolver beanResolver, Map<String, Object> params) {
+		super( beanResolver, params );
 	}
 
 	static void checkBridgeDependencies(AbstractPojoModelCompositeElement<?> pojoModelRootElement,

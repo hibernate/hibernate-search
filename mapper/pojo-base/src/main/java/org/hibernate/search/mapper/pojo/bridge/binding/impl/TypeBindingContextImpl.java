@@ -43,7 +43,6 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 	private final IndexFieldTypeFactory indexFieldTypeFactory;
 	private final PojoIndexSchemaContributionListener listener;
 	private final IndexSchemaElement indexSchemaElement;
-	private final Map<String, Object> params;
 
 	private PartialBinding<T> partialBinding;
 
@@ -54,7 +53,7 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 			PojoModelTypeRootElement<T> bridgedElement,
 			PojoTypeIndexingDependencyConfigurationContextImpl<T> dependencyContext,
 			Map<String, Object> params) {
-		super( beanResolver );
+		super( beanResolver, params );
 		this.introspector = introspector;
 		this.typeModel = typeModel;
 		this.bridgedElement = bridgedElement;
@@ -62,7 +61,6 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 		this.indexFieldTypeFactory = indexBindingContext.createTypeFactory();
 		this.listener = new PojoIndexSchemaContributionListener();
 		this.indexSchemaElement = indexBindingContext.schemaElement( listener );
-		this.params = params;
 	}
 
 	@Override
@@ -93,11 +91,6 @@ public class TypeBindingContextImpl<T> extends AbstractCompositeBindingContext
 	@Override
 	public IndexSchemaElement indexSchemaElement() {
 		return indexSchemaElement;
-	}
-
-	@Override
-	public Object parameter(String name) {
-		return params.get( name );
 	}
 
 	public Optional<BoundTypeBridge<T>> applyBinder(TypeBinder binder) {

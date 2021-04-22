@@ -6,15 +6,19 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
+import java.util.Map;
+
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.mapper.pojo.bridge.binding.BindingContext;
 
 abstract class AbstractBindingContext implements BindingContext {
 
 	private final BeanResolver beanResolver;
+	private final Map<String, Object> params;
 
-	AbstractBindingContext(BeanResolver beanResolver) {
+	AbstractBindingContext(BeanResolver beanResolver, Map<String, Object> params) {
 		this.beanResolver = beanResolver;
+		this.params = params;
 	}
 
 	@Override
@@ -22,4 +26,8 @@ abstract class AbstractBindingContext implements BindingContext {
 		return beanResolver;
 	}
 
+	@Override
+	public Object parameter(String name) {
+		return params.get( name );
+	}
 }
