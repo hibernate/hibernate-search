@@ -83,8 +83,8 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 		);
 	}
 
-	Object bindMarker(MarkerBinder binder) {
-		MarkerBindingContextImpl bindingContext = new MarkerBindingContextImpl( beanResolver );
+	Object bindMarker(MarkerBinder binder, Map<String, Object> params) {
+		MarkerBindingContextImpl bindingContext = new MarkerBindingContextImpl( beanResolver, params );
 		return bindingContext.applyBinder( binder );
 	}
 

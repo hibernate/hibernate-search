@@ -49,7 +49,7 @@ class DelegatingPropertyMappingStep implements PropertyMappingStep {
 	}
 
 	@Override
-	public PropertyMappingStep marker(MarkerBinder binder) {
+	public PropertyMappingStep marker(MarkerBinder binder, Map<String, Object> params) {
 		return delegate.marker( binder );
 	}
 

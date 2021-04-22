@@ -71,13 +71,33 @@ public interface PropertyMappingStep {
 	PropertyMappingStep binder(PropertyBinder binder, Map<String, Object> params);
 
 	/**
+	 * Define a marker binder, responsible for creating a marker object.
+	 * To use some parameters to create the marker object,
+	 * use the method {@link #marker(MarkerBinder, Map)} instead.
+	 *
 	 * @param binder A {@link MarkerBinder} responsible for creating a marker object.
 	 * @return {@code this}, for method chaining.
 	 * @see MarkerBinder
 	 * @see GeoPointBinder#latitude()
 	 * @see GeoPointBinder#longitude()
 	 */
-	PropertyMappingStep marker(MarkerBinder binder);
+	default PropertyMappingStep marker(MarkerBinder binder) {
+		return marker( binder, Collections.emptyMap() );
+	}
+
+	/**
+	 * Define a marker binder, responsible for creating a marker object.
+	 * With this method it is possible to pass a set of parameters to the binder,
+	 * so that they can be used to create the marker object.
+	 *
+	 * @param binder A {@link MarkerBinder} responsible for creating a marker object.
+	 * @param params The parameters to pass to the binder.
+	 * @return {@code this}, for method chaining.
+	 * @see MarkerBinder
+	 * @see GeoPointBinder#latitude()
+	 * @see GeoPointBinder#longitude()
+	 */
+	PropertyMappingStep marker(MarkerBinder binder, Map<String, Object> params);
 
 	/**
 	 * Maps the property to a field of standard type in the index with the same name as this property.

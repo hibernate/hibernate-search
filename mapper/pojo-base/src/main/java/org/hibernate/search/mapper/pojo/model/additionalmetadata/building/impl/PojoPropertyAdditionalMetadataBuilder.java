@@ -53,8 +53,8 @@ class PojoPropertyAdditionalMetadataBuilder implements PojoAdditionalMetadataCol
 	}
 
 	@Override
-	public final void markerBinder(MarkerBinder builder) {
-		doAddMarker( rootBuilder.bindMarker( builder ) );
+	public final void markerBinder(MarkerBinder builder, Map<String, Object> params) {
+		doAddMarker( rootBuilder.bindMarker( builder, params ) );
 	}
 
 	@SuppressWarnings("unchecked")
