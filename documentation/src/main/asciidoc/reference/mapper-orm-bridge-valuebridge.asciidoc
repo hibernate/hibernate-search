@@ -287,10 +287,50 @@ which already accept parameters to configure the field name,
 whether the field is sortable, etc.
 
 However, these parameters are not passed to the value bridge or value binder.
-In some cases, it is necessary to pass parameters directly to the value bridge or value binder.
-This is achieved by defining a <<mapper-orm-custom-annotations,custom annotation>> with attributes:
+There are two ways to pass parameters to property bridges:
 
-.Passing parameters to a `ValueBridge`
+* One is (mostly) limited to string parameters, but is trivial to implement.
+* The other can allow any type of parameters, but requires you to declare your own annotations.
+
+=== Simple, string parameters
+
+You can define string parameters to the `@TypeBinderRef` annotation and then use them later in the binder:
+
+.Passing parameters to a `ValueBridge` using the `@TypeBinderRef` annotation
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/parameter/context/Book.java[tags=include;!getters-setters]
+----
+<1> Define the binder to use on the property,
+setting the `fieldName` parameter.
+<2> Because we use a value bridge,
+the annotation can be transparently applied to containers.
+Here, the bridge will be applied successively to each value in the map.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/parameter/context/BooleanAsStringBinder.java[tags=include]
+----
+<1> Use the binding context to get the parameter values.
+<2> Pass them as arguments to the bridge constructor.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/parameter/BooleanAsStringBridge.java[tags=include]
+----
+<1> Implement a bridge that does not index booleans directly,
+but indexes them as strings instead.
+<2> The bridge accepts two parameters in its constructors:
+the string representing `true` and the string representing `false`.
+====
+
+=== Parameters with custom annotations
+
+You can pass parameters of any type to the bridge by defining
+a <<mapper-orm-custom-annotations,custom annotation>> with attributes:
+
+.Passing parameters to a `ValueBridge` using a custom annotation
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
