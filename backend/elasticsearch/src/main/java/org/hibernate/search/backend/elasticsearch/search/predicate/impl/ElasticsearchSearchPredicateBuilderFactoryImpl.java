@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexSchemaElementContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -107,16 +106,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public ExistsPredicateBuilder exists(String absoluteFieldPath) {
-		ElasticsearchSearchIndexSchemaElementContext field = indexes.field( absoluteFieldPath );
-		if ( field.isObjectField() ) {
-			return new ElasticsearchExistsPredicate.Builder( searchContext, absoluteFieldPath,
-					field.nestedPathHierarchy() );
-		}
-		else {
-			// Make sure to fail for fields with different type
-			// We may be able to relax this constraint, but that would require more extensive testing
-			return field.queryElement( PredicateTypeKeys.EXISTS, searchContext );
-		}
+		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.EXISTS, searchContext );
 	}
 
 	@Override
