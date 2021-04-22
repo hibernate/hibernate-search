@@ -83,12 +83,15 @@ public class ElasticsearchMultiIndexSearchValueFieldContext<F>
 
 	@Override
 	public EventContext eventContext() {
-		return indexesEventContext()
-				.append( EventContexts.fromIndexFieldAbsolutePath( absolutePath ) );
+		return indexesEventContext().append( relativeEventContext() );
 	}
 
 	private EventContext indexesEventContext() {
 		return EventContexts.fromIndexNames( indexNames );
+	}
+
+	private EventContext relativeEventContext() {
+		return EventContexts.fromIndexFieldAbsolutePath( absolutePath );
 	}
 
 	@Override
@@ -219,7 +222,8 @@ public class ElasticsearchMultiIndexSearchValueFieldContext<F>
 			}
 		}
 		catch (SearchException e) {
-			throw log.inconsistentConfigurationForFieldForSearch( absolutePath, e.getMessage(), indexesEventContext(), e );
+			throw log.inconsistentConfigurationForIndexElementForSearch( relativeEventContext(), e.getMessage(),
+					indexesEventContext(), e );
 		}
 	}
 
@@ -227,11 +231,12 @@ public class ElasticsearchMultiIndexSearchValueFieldContext<F>
 			T attribute1, T attribute2) {
 		try {
 			if ( !compatiblityChecker.test( attribute1, attribute2 ) ) {
-				throw log.differentFieldAttribute( attributeName, attribute1, attribute2 );
+				throw log.differentIndexElementAttribute( attributeName, attribute1, attribute2 );
 			}
 		}
 		catch (SearchException e) {
-			throw log.inconsistentConfigurationForFieldForSearch( absolutePath, e.getMessage(), indexesEventContext(), e );
+			throw log.inconsistentConfigurationForIndexElementForSearch( relativeEventContext(), e.getMessage(),
+					indexesEventContext(), e );
 		}
 	}
 }

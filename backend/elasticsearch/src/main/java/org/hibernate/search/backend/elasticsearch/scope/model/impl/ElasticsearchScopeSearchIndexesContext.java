@@ -170,7 +170,8 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 			}
 			else if ( firstField.isObjectField() != fieldForCurrentIndex.isObjectField() ) {
 				SearchException cause = log.conflictingFieldModel();
-				throw log.inconsistentConfigurationForFieldForSearch( absoluteFieldPath, cause.getMessage(),
+				throw log.inconsistentConfigurationForIndexElementForSearch(
+						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ), cause.getMessage(),
 						EventContexts.fromIndexNames( indexModelOfFirstField.names().hibernateSearchIndex(),
 								indexModel.names().hibernateSearchIndex() ),
 						cause );

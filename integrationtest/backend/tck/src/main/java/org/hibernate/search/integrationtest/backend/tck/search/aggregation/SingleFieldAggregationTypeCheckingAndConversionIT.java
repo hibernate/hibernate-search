@@ -430,7 +430,7 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
-						"Field attribute '", "Converter' differs:", " vs. "
+						"Attribute '", "Converter' differs:", " vs. "
 				);
 	}
 

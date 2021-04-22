@@ -33,6 +33,7 @@ import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.DurationInSecondsAndFractionsFormatter;
+import org.hibernate.search.util.common.logging.impl.EventContextNoPrefixFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -355,9 +356,10 @@ public interface Log extends BasicLogger {
 	SearchException cannotMixElasticsearchSearchQueryWithOtherProjections(SearchProjection<?> projection);
 
 	@Message(id = ID_OFFSET + 41,
-			value = "Inconsistent configuration for field '%1$s' in a search query across multiple indexes: %2$s")
-	SearchException inconsistentConfigurationForFieldForSearch(String absoluteFieldPath, String causeMessage,
-			@Param EventContext context, @Cause SearchException cause);
+			value = "Inconsistent configuration for %1$s in a search query across multiple indexes: %2$s")
+	SearchException inconsistentConfigurationForIndexElementForSearch(
+			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext, String causeMessage,
+			@Param EventContext elementContextAsParam, @Cause SearchException cause);
 
 	@Message(id = ID_OFFSET + 44, value = "Unable to shut down the Elasticsearch client: %1$s")
 	SearchException unableToShutdownClient(String causeMessage, @Cause Exception cause);
@@ -640,8 +642,8 @@ public interface Log extends BasicLogger {
 			String causeMessage, @Cause SearchException cause);
 
 	@Message(id = ID_OFFSET + 116,
-			value = "Field attribute '%1$s' differs: '%2$s' vs. '%3$s'.")
-	SearchException differentFieldAttribute(String attributeName, Object component1, Object component2);
+			value = "Attribute '%1$s' differs: '%2$s' vs. '%3$s'.")
+	SearchException differentIndexElementAttribute(String attributeName, Object component1, Object component2);
 
 	@Message(id = ID_OFFSET + 117,
 			value = "Implementation class differs: '%1$s' vs. '%2$s'.")
@@ -666,12 +668,16 @@ public interface Log extends BasicLogger {
 			value = "This field is a value field in some indexes, but an object field in other indexes.")
 	SearchException conflictingFieldModel();
 
-	@Message(id = ID_OFFSET + 123, value = "Cannot use '%2$s' on field '%1$s'.")
-	SearchException cannotUseQueryElementForObjectField(String absoluteFieldPath, String queryElementName, @Param EventContext context);
+	@Message(id = ID_OFFSET + 123, value = "Cannot use '%2$s' on %1$s.")
+	SearchException cannotUseQueryElementForCompositeIndexElement(
+			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext, String queryElementName,
+			@Param EventContext elementContextAsParam);
 
-	@Message(id = ID_OFFSET + 124, value = "Cannot use '%2$s' on field '%1$s': %3$s")
-	SearchException cannotUseQueryElementForObjectFieldBecauseCreationException(String absoluteFieldPath,
-			String queryElementName, String causeMessage, @Cause SearchException cause, @Param EventContext context);
+	@Message(id = ID_OFFSET + 124, value = "Cannot use '%2$s' on %1$s: %3$s")
+	SearchException cannotUseQueryElementForCompositeIndexElementBecauseCreationException(
+			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext,
+			String queryElementName, String causeMessage, @Cause SearchException cause,
+			@Param EventContext elementContextAsParam);
 
 	@Message(id = ID_OFFSET + 125,
 			value = "Unable to update aliases for index '%1$s': %2$s")
@@ -747,5 +753,9 @@ public interface Log extends BasicLogger {
 					+ " but you cannot override the version that was provided when the backend was created.")
 	SearchException incompatibleElasticsearchVersionOnStart(ElasticsearchVersion versionOnCreation,
 			ElasticsearchVersion versionOnStart);
+
+	@Message(id = ID_OFFSET + 142,
+			value = "'%1$s' can be used in some of the targeted indexes, but not all of them.")
+	SearchException partialSupportForQueryElementInCompositeIndexElement(String queryElementName);
 
 }

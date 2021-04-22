@@ -83,12 +83,15 @@ public class LuceneMultiIndexSearchValueFieldContext<F>
 
 	@Override
 	public EventContext eventContext() {
-		return indexesEventContext()
-				.append( EventContexts.fromIndexFieldAbsolutePath( absolutePath ) );
+		return indexesEventContext().append( relativeEventContext() );
 	}
 
 	private EventContext indexesEventContext() {
 		return EventContexts.fromIndexNames( indexNames );
+	}
+
+	private EventContext relativeEventContext() {
+		return EventContexts.fromIndexFieldAbsolutePath( absolutePath );
 	}
 
 	@Override
@@ -154,7 +157,7 @@ public class LuceneMultiIndexSearchValueFieldContext<F>
 	}
 
 	private <T> T getFromFieldIfCompatible(Function<LuceneSearchValueFieldContext<F>, T> getter,
-			BiPredicate<T, T> compatiblityChecker, String attributeName) {
+			BiPredicate<T, T> compatibilityChecker, String attributeName) {
 		T attribute = null;
 		for ( LuceneSearchValueFieldContext<F> fieldContext : fieldForEachIndex ) {
 			T attributeForFieldContext = getter.apply( fieldContext );
@@ -162,14 +165,14 @@ public class LuceneMultiIndexSearchValueFieldContext<F>
 				attribute = attributeForFieldContext;
 			}
 			else {
-				checkAttributeCompatibility( compatiblityChecker, attributeName, attribute, attributeForFieldContext );
+				checkAttributeCompatibility( compatibilityChecker, attributeName, attribute, attributeForFieldContext );
 			}
 		}
 		return attribute;
 	}
 
 	private <T> T getFromTypeIfCompatible(Function<LuceneSearchValueFieldTypeContext<F>, T> getter,
-			BiPredicate<T, T> compatiblityChecker, String attributeName) {
+			BiPredicate<T, T> compatibilityChecker, String attributeName) {
 		T attribute = null;
 		for ( LuceneSearchValueFieldContext<F> fieldContext : fieldForEachIndex ) {
 			LuceneSearchValueFieldTypeContext<F> fieldType = fieldContext.type();
@@ -178,7 +181,7 @@ public class LuceneMultiIndexSearchValueFieldContext<F>
 				attribute = attributeForFieldContext;
 			}
 			else {
-				checkAttributeCompatibility( compatiblityChecker, attributeName, attribute, attributeForFieldContext );
+				checkAttributeCompatibility( compatibilityChecker, attributeName, attribute, attributeForFieldContext );
 			}
 		}
 		return attribute;
@@ -202,19 +205,21 @@ public class LuceneMultiIndexSearchValueFieldContext<F>
 			}
 		}
 		catch (SearchException e) {
-			throw log.inconsistentConfigurationForFieldForSearch( absolutePath, e.getMessage(), indexesEventContext(), e );
+			throw log.inconsistentConfigurationForIndexElementForSearch( relativeEventContext(), e.getMessage(),
+					indexesEventContext(), e );
 		}
 	}
 
-	private <T> void checkAttributeCompatibility(BiPredicate<T, T> compatiblityChecker, String attributeName,
+	private <T> void checkAttributeCompatibility(BiPredicate<T, T> compatibilityChecker, String attributeName,
 			T attribute1, T attribute2) {
 		try {
-			if ( !compatiblityChecker.test( attribute1, attribute2 ) ) {
-				throw log.differentFieldAttribute( attributeName, attribute1, attribute2 );
+			if ( !compatibilityChecker.test( attribute1, attribute2 ) ) {
+				throw log.differentIndexElementAttribute( attributeName, attribute1, attribute2 );
 			}
 		}
 		catch (SearchException e) {
-			throw log.inconsistentConfigurationForFieldForSearch( absolutePath, e.getMessage(), indexesEventContext(), e );
+			throw log.inconsistentConfigurationForIndexElementForSearch( relativeEventContext(), e.getMessage(),
+					indexesEventContext(), e );
 		}
 	}
 }

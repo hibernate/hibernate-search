@@ -105,14 +105,14 @@ public class LuceneIndexSchemaRootNode
 		LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
 		if ( factory == null ) {
 			EventContext eventContext = eventContext();
-			throw log.cannotUseQueryElementForObjectField( null, key.toString(), eventContext );
+			throw log.cannotUseQueryElementForCompositeIndexElement( eventContext, key.toString(), eventContext );
 		}
 		try {
 			return factory.create( searchContext, this );
 		}
 		catch (SearchException e) {
 			EventContext eventContext = eventContext();
-			throw log.cannotUseQueryElementForObjectFieldBecauseCreationException( null, key.toString(),
+			throw log.cannotUseQueryElementForCompositeIndexElementBecauseCreationException( eventContext, key.toString(),
 					e.getMessage(), e, eventContext );
 		}
 	}

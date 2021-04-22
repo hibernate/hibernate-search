@@ -163,7 +163,7 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 			}
 			else if ( firstField.isObjectField() != fieldForCurrentIndex.isObjectField() ) {
 				SearchException cause = log.conflictingFieldModel();
-				throw log.inconsistentConfigurationForFieldForSearch( absoluteFieldPath, cause.getMessage(),
+				throw log.inconsistentConfigurationForIndexElementForSearch( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ), cause.getMessage(),
 						EventContexts.fromIndexNames( indexOfFirstField.model().hibernateSearchName(),
 								index.model().hibernateSearchName() ),
 						cause );

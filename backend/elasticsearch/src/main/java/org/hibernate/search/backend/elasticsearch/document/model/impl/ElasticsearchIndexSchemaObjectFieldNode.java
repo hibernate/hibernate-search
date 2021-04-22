@@ -26,6 +26,7 @@ import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldTypeDescriptor;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 
 public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsearchIndexSchemaFieldNode
@@ -117,14 +118,16 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchContext searchContext) {
 		ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
 		if ( factory == null ) {
-			throw log.cannotUseQueryElementForObjectField( absolutePath(), key.toString(), eventContext() );
+			EventContext eventContext = eventContext();
+			throw log.cannotUseQueryElementForCompositeIndexElement( eventContext, key.toString(), eventContext );
 		}
 		try {
 			return factory.create( searchContext, this );
 		}
 		catch (SearchException e) {
-			throw log.cannotUseQueryElementForObjectFieldBecauseCreationException( absolutePath, key.toString(),
-					e.getMessage(), e, null );
+			EventContext eventContext = eventContext();
+			throw log.cannotUseQueryElementForCompositeIndexElementBecauseCreationException( eventContext, key.toString(),
+					e.getMessage(), e, eventContext );
 		}
 	}
 
