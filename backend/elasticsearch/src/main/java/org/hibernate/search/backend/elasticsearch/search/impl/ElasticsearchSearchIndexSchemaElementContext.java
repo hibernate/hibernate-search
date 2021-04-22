@@ -11,14 +11,16 @@ import java.util.List;
 import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
 
 /**
- * Information about a field targeted by search,
- * be it in a projection, a predicate, a sort, ...
+ * Information about an index element targeted by search,
+ * be it the index root, a value field or an object field.
+ * <p>
+ * This is used in predicates, projections, sorts, ...
  */
-public interface ElasticsearchSearchFieldContext extends EventContextProvider {
+public interface ElasticsearchSearchIndexSchemaElementContext extends EventContextProvider {
 
 	boolean isObjectField();
 
-	ElasticsearchSearchObjectFieldContext toObjectField();
+	ElasticsearchSearchCompositeIndexSchemaElementContext toObjectField();
 
 	String absolutePath();
 

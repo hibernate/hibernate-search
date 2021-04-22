@@ -12,15 +12,12 @@ import java.util.Set;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-public class ElasticsearchMultiIndexSearchObjectFieldContext
+public class ElasticsearchMultiIndexSearchRootContext
 		extends AbstractElasticsearchMultiIndexSearchCompositeIndexSchemaElementContext {
 
-	private final String absolutePath;
-
-	public ElasticsearchMultiIndexSearchObjectFieldContext(Set<String> indexNames, String absolutePath,
-			List<ElasticsearchSearchCompositeIndexSchemaElementContext> fieldForEachIndex) {
-		super( indexNames, fieldForEachIndex );
-		this.absolutePath = absolutePath;
+	public ElasticsearchMultiIndexSearchRootContext(Set<String> indexNames,
+			List<ElasticsearchSearchCompositeIndexSchemaElementContext> rootForEachIndex) {
+		super( indexNames, rootForEachIndex );
 	}
 
 	@Override
@@ -35,12 +32,12 @@ public class ElasticsearchMultiIndexSearchObjectFieldContext
 
 	@Override
 	public String absolutePath() {
-		return absolutePath;
+		return null;
 	}
 
 	@Override
 	protected EventContext relativeEventContext() {
-		return EventContexts.fromIndexFieldAbsolutePath( absolutePath );
+		return EventContexts.indexSchemaRoot();
 	}
 
 }

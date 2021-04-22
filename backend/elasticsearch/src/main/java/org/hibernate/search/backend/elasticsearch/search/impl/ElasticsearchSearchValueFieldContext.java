@@ -12,7 +12,7 @@ package org.hibernate.search.backend.elasticsearch.search.impl;
  *
  * @param <F> The indexed field value type.
  */
-public interface ElasticsearchSearchValueFieldContext<F> extends ElasticsearchSearchFieldContext {
+public interface ElasticsearchSearchValueFieldContext<F> extends ElasticsearchSearchIndexSchemaElementContext {
 
 	String[] absolutePathComponents();
 

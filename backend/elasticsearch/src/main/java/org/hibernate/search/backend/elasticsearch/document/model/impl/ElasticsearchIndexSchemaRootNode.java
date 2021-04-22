@@ -12,12 +12,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
-import org.hibernate.search.engine.backend.metamodel.IndexObjectFieldDescriptor;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 
-public class ElasticsearchIndexSchemaRootNode implements ElasticsearchIndexSchemaObjectNode {
+public class ElasticsearchIndexSchemaRootNode implements ElasticsearchIndexSchemaObjectNode,
+		ElasticsearchSearchCompositeIndexSchemaElementContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -45,7 +52,7 @@ public class ElasticsearchIndexSchemaRootNode implements ElasticsearchIndexSchem
 	}
 
 	@Override
-	public IndexObjectFieldDescriptor toObjectField() {
+	public ElasticsearchIndexSchemaObjectFieldNode toObjectField() {
 		throw log.invalidIndexElementTypeRootIsNotObjectField();
 	}
 
@@ -75,7 +82,40 @@ public class ElasticsearchIndexSchemaRootNode implements ElasticsearchIndexSchem
 	}
 
 	@Override
+	public boolean nested() {
+		return false;
+	}
+
+	@Override
 	public boolean multiValuedInRoot() {
 		return false;
+	}
+
+	@Override
+	public EventContext eventContext() {
+		return EventContexts.indexSchemaRoot();
+	}
+
+	@Override
+	public <T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchContext searchContext) {
+		ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
+		if ( factory == null ) {
+			throw log.cannotUseQueryElementForObjectField( absolutePath(), key.toString(), eventContext() );
+		}
+		try {
+			return factory.create( searchContext, this );
+		}
+		catch (SearchException e) {
+			throw log.cannotUseQueryElementForObjectFieldBecauseCreationException( null, key.toString(),
+					e.getMessage(), e, null );
+		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked") // The "equals" condition tells us what T is exactly, so we can cast safely.
+	public <T> ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
+		// TODO add named predicate support here
+		// Otherwise: not supported for object fields.
+		return null;
 	}
 }

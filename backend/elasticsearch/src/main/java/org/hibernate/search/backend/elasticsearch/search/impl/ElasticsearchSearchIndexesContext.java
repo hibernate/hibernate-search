@@ -28,7 +28,9 @@ public interface ElasticsearchSearchIndexesContext {
 
 	DocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
 
-	ElasticsearchSearchFieldContext field(String absoluteFieldPath);
+	ElasticsearchSearchCompositeIndexSchemaElementContext root();
+
+	ElasticsearchSearchIndexSchemaElementContext field(String absoluteFieldPath);
 
 	ElasticsearchIndexSchemaNamedPredicateNode namedPredicate(String absoluteNamedPredicatePath);
 

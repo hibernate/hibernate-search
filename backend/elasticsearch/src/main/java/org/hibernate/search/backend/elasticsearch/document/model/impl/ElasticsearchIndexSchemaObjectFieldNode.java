@@ -14,8 +14,8 @@ import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchObjectFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchObjectFieldQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchExistsPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateTypeKeys;
@@ -30,7 +30,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsearchIndexSchemaFieldNode
 		implements IndexObjectFieldDescriptor, ElasticsearchIndexSchemaObjectNode,
-				IndexObjectFieldTypeDescriptor, ElasticsearchSearchObjectFieldContext {
+				IndexObjectFieldTypeDescriptor, ElasticsearchSearchCompositeIndexSchemaElementContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -115,7 +115,7 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 
 	@Override
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchContext searchContext) {
-		ElasticsearchSearchObjectFieldQueryElementFactory<T> factory = queryElementFactory( key );
+		ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
 		if ( factory == null ) {
 			throw log.cannotUseQueryElementForObjectField( absolutePath(), key.toString(), eventContext() );
 		}
@@ -130,9 +130,9 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 
 	@Override
 	@SuppressWarnings("unchecked") // The "equals" condition tells us what T is exactly, so we can cast safely.
-	public <T> ElasticsearchSearchObjectFieldQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
+	public <T> ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
 		if ( PredicateTypeKeys.EXISTS.equals( key ) ) {
-			return (ElasticsearchSearchObjectFieldQueryElementFactory<T>)
+			return (ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T>)
 					ElasticsearchExistsPredicate.ObjectFieldFactory.INSTANCE;
 		}
 		// Otherwise: not supported for object fields.

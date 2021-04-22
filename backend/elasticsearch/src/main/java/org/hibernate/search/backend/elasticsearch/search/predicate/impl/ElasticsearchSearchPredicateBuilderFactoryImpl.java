@@ -10,9 +10,9 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexSchemaElementContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchObjectFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
@@ -107,7 +107,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public ExistsPredicateBuilder exists(String absoluteFieldPath) {
-		ElasticsearchSearchFieldContext field = indexes.field( absoluteFieldPath );
+		ElasticsearchSearchIndexSchemaElementContext field = indexes.field( absoluteFieldPath );
 		if ( field.isObjectField() ) {
 			return new ElasticsearchExistsPredicate.Builder( searchContext, absoluteFieldPath,
 					field.nestedPathHierarchy() );
@@ -139,7 +139,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public NestedPredicateBuilder nested(String absoluteFieldPath) {
-		ElasticsearchSearchObjectFieldContext field = indexes.field( absoluteFieldPath ).toObjectField();
+		ElasticsearchSearchCompositeIndexSchemaElementContext field = indexes.field( absoluteFieldPath ).toObjectField();
 		if ( !field.nested() ) {
 			throw log.nonNestedFieldForNestedQuery( absoluteFieldPath,
 					EventContexts.fromIndexNames( indexes.hibernateSearchIndexNames() ) );

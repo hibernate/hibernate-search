@@ -10,10 +10,10 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchObjectFieldQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchObjectFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
@@ -48,7 +48,7 @@ public class ElasticsearchExistsPredicate extends AbstractElasticsearchSingleFie
 	}
 
 	public static class ObjectFieldFactory
-			extends AbstractElasticsearchSearchObjectFieldQueryElementFactory<ExistsPredicateBuilder> {
+			extends AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<ExistsPredicateBuilder> {
 		public static final ObjectFieldFactory INSTANCE = new ObjectFieldFactory();
 
 		private ObjectFieldFactory() {
@@ -56,7 +56,7 @@ public class ElasticsearchExistsPredicate extends AbstractElasticsearchSingleFie
 
 		@Override
 		public ExistsPredicateBuilder create(ElasticsearchSearchContext searchContext,
-				ElasticsearchSearchObjectFieldContext field) {
+				ElasticsearchSearchCompositeIndexSchemaElementContext field) {
 			return new Builder( searchContext, field.absolutePath(), field.nestedPathHierarchy() );
 		}
 	}
