@@ -33,8 +33,9 @@ public interface NamedPredicateProviderContext {
 	Object param(String name);
 
 	/**
-	 * @param relative relative name
-	 * @return absolute path.
+	 * @param relativeFieldPath The path a field, relative to the element to which the named predicate was assigned.
+	 * @return The absolute path of the field. Note the path is returned even if the field doesn't exist.
 	 */
-	String resolvePath(String relative);
+	String absolutePath(String relativeFieldPath);
+
 }
