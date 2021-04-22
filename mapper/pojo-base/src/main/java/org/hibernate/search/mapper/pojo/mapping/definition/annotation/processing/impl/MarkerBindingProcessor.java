@@ -7,10 +7,14 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerBinderRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanDelegatingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -28,8 +32,17 @@ public final class MarkerBindingProcessor implements PropertyMappingAnnotationPr
 	@Override
 	public void process(PropertyMappingStep mapping, MarkerBinding annotation,
 			PropertyMappingAnnotationProcessorContext context) {
-		MarkerBinder binder = createBinder( annotation.binder(), context );
-		mapping.marker( binder );
+		MarkerBinderRef markerBinderRef = annotation.binder();
+		MarkerBinder binder = createBinder( markerBinderRef, context );
+
+		if ( markerBinderRef.params() != null ) {
+			Map<String, Object> params = Arrays.stream( markerBinderRef.params() )
+					.collect( Collectors.toMap( Parameter::name, Parameter::value ) );
+			mapping.marker( binder, params );
+		}
+		else {
+			mapping.marker( binder );
+		}
 	}
 
 	private MarkerBinder createBinder(MarkerBinderRef binderReferenceAnnotation, MappingAnnotationProcessorContext context) {
