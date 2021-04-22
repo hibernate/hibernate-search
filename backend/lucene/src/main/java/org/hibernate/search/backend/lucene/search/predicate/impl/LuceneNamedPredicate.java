@@ -99,8 +99,8 @@ class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 		}
 
 		@Override
-		public String resolvePath(String relativeFieldName) {
-			return namedPredicate.parent().absolutePath( relativeFieldName );
+		public String absolutePath(String relativeFieldPath) {
+			return namedPredicate.parent().absolutePath( relativeFieldPath );
 		}
 	}
 }

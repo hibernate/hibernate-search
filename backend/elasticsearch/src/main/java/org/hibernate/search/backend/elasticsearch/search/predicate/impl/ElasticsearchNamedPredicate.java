@@ -101,8 +101,8 @@ class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFieldPredic
 		}
 
 		@Override
-		public String resolvePath(String relativeFieldName) {
-			return namedPredicate.parent().absolutePath( relativeFieldName );
+		public String absolutePath(String relativeFieldPath) {
+			return namedPredicate.parent().absolutePath( relativeFieldPath );
 		}
 	}
 }

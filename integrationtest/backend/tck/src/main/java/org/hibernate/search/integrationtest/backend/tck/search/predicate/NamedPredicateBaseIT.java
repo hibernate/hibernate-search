@@ -168,7 +168,7 @@ public class NamedPredicateBaseIT {
 
 		@Override
 		public SearchPredicate create(NamedPredicateProviderContext context) {
-			String absoluteFieldPath = context.resolvePath( "tested_field" );
+			String absoluteFieldPath = context.absolutePath( "tested_field" );
 			String queryString = (String) context.param( "query" );
 			SearchPredicate predicate = context.predicate()
 				.match().field( absoluteFieldPath )
