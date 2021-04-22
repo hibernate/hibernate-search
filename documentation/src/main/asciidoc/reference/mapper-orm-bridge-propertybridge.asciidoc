@@ -123,15 +123,45 @@ Here is an example of what an indexed document would look like, with the Elastic
 // Search 5 anchors backward compatibility
 [[_parameterized_bridge]]
 
-The property bridges are usually applied with the built-in `@PropertyBinding` annotation.
-which does not accept any parameter other than the property binder.
+There are two ways to pass parameters to property bridges:
 
-In some cases, it is necessary to pass parameters directly to the property binder.
-This is achieved by defining a <<mapper-orm-custom-annotations,custom annotation>> with attributes:
+* One is (mostly) limited to string parameters, but is trivial to implement.
+* The other can allow any type of parameters, but requires you to declare your own annotations.
+
+=== Simple, string parameters
+
+You can define string parameters to the `@PropertyBinderRef` annotation and then use them later in the binder:
 
 // Search 5 anchors backward compatibility
 [[example-passing-bridge-parameters]]
-.Passing parameters to a `PropertyBinder`
+.Passing parameters to a `PropertyBinder` using the `@PropertyBinderRef` annotation
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/parameter/context/Invoice.java[tags=include;!getters-setters]
+----
+<1> Define the binder to use on the property,
+setting the `fieldName` parameter.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/parameter/context/InvoiceLineItemsSummaryBinder.java[tags=include]
+----
+<1> Use the binding context to get the parameter value.
+<2> In the `bind` method, use the value of parameters.
+Here use the `fieldName` parameter to set the field name,
+but we could pass parameters for any purpose:
+defining the field as sortable,
+defining a normalizer,
+...
+====
+
+=== Parameters with custom annotations
+
+You can pass parameters of any type to the bridge by defining
+a <<mapper-orm-custom-annotations,custom annotation>> with attributes:
+
+.Passing parameters to a `PropertyBinder` using a custom annotation
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
