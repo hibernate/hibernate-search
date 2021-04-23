@@ -65,6 +65,9 @@ public class LuceneSimpleMappingAnalysisConfigurer implements LuceneAnalysisConf
 						.param( "pattern", "-+" )
 						.param( "replacement", "" );
 
+		context.normalizer( "lowercase" ).custom()
+				.tokenFilter( LowerCaseFilterFactory.class );
+
 		// For AlternativeBinderIT
 
 		context.analyzer( "text_en" ).custom()

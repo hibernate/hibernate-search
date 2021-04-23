@@ -53,6 +53,9 @@ public class ElasticsearchSimpleMappingAnalysisConfigurer implements Elasticsear
 				.param( "pattern", "-+" )
 				.param( "replacement", "" );
 
+		context.normalizer( "lowercase" ).custom()
+				.tokenFilters( "lowercase" );
+
 		// For AlternativeBinderIT
 
 		context.analyzer( "text_en" ).custom()

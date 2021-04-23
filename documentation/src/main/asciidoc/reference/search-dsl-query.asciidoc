@@ -361,6 +361,8 @@ to ensure entities don't stay in the session taking more and more memory.
 
 [[search-dsl-query-routing]]
 == Routing
+// Search 5 anchors backward compatibility
+[[query-filter-shard]]
 
 include::components/sharding-intro-note.asciidoc[]
 
