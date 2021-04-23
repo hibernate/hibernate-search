@@ -23,6 +23,8 @@ include::mapper-orm-bridge-index-field-dsl.asciidoc[]
 
 include::mapper-orm-bridge-index-field-type-dsl.asciidoc[]
 
+include::mapper-orm-bridge-named-predicate.asciidoc[]
+
 include::mapper-orm-bridge-resolver.asciidoc[]
 
 :leveloffset: -1
