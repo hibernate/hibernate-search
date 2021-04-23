@@ -19,6 +19,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSp
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresSingleModelDialectForMajorVersion;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -31,6 +32,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 public class ElasticsearchBootstrapIT {
 
@@ -111,6 +113,7 @@ public class ElasticsearchBootstrapIT {
 	 * while specifying only the major number of the Elasticsearch version.
 	 */
 	@Test
+	@Category(RequiresSingleModelDialectForMajorVersion.class)
 	@TestForIssue(jiraKey = "HSEARCH-3841")
 	public void noVersionCheck_incompleteVersion() {
 		ElasticsearchVersion clusterVersion = ElasticsearchVersion.of( ElasticsearchTestDialect.getClusterVersion() );
@@ -184,6 +187,7 @@ public class ElasticsearchBootstrapIT {
 	 * and specifying a version on backend creation, and a different one on backend start.
 	 */
 	@Test
+	@Category(RequiresSingleModelDialectForMajorVersion.class)
 	@TestForIssue(jiraKey = "HSEARCH-4214")
 	public void noVersionCheck_versionOverrideOnStart_incompatibleVersion() {
 		ElasticsearchVersion clusterVersion = ElasticsearchVersion.of( ElasticsearchTestDialect.getClusterVersion() );
@@ -230,6 +234,7 @@ public class ElasticsearchBootstrapIT {
 	 * and specifying a version on backend creation, and a more precise one on backend start.
 	 */
 	@Test
+	@Category(RequiresSingleModelDialectForMajorVersion.class)
 	@TestForIssue(jiraKey = "HSEARCH-4214")
 	public void noVersionCheck_versionOverrideOnStart_compatibleVersion() {
 		ElasticsearchVersion clusterVersion = ElasticsearchVersion.of( ElasticsearchTestDialect.getClusterVersion() );
