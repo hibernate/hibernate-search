@@ -9,26 +9,28 @@ package org.hibernate.search.mapper.pojo.loading;
 /**
  * A type group for grouping types during mass indexing.
  */
-public interface EntityLoadingTypeGroupStrategy {
+public interface EntityLoadingTypeGroupingStrategy {
 
 	/**
-	 * The value returned after the type comparison determines how the entity types are grouped. *
+	 * The value returned after the type comparison determines how the entity types are grouped.
 	 */
 	enum GroupingType {
 		/**
-		 * Entities will not be grouped.
+		 * Entity types will not be grouped.
 		 */
 		NONE,
 		/**
 		 * The first type is the parent type of the second type.
+		 * <p>
 		 * The loader of the first type will be selected as the target loader,
-		 * and the loader of the second type will be set next.
+		 * and the second type will be marked as included in the group.
 		 */
 		SUPER,
 		/**
 		 * The second type is the parent type of the first type.
-		 * The first type will be set included.
-		 * A loader of the second type will be selected as the target loader.
+		 * <p>
+		 * The loader of the second type will be selected as the target loader,
+		 * and the first type will be marked as included in the group.
 		 */
 		INCLUDED
 	}
@@ -45,11 +47,10 @@ public interface EntityLoadingTypeGroupStrategy {
 	GroupingType get(String entityName1, Class<?> entityType1, String entityName2, Class<?> entityType2);
 
 	/**
-	 * Static comparator setting grouping by the java type hierarchy.
-	 * @return a {@link EntityLoadingTypeGroupStrategy}
+	 * A strategy that groups entity types according to the java type hierarchy.
+	 * @return a {@link EntityLoadingTypeGroupingStrategy}
 	 */
-	static EntityLoadingTypeGroupStrategy byJavaTypeHierarchy() {
-
+	static EntityLoadingTypeGroupingStrategy byJavaTypeHierarchy() {
 		return (entityName1, entityType1, entityName2, entityType2) -> {
 
 			if ( entityType1.isAssignableFrom( entityType2 ) ) {
@@ -63,10 +64,10 @@ public interface EntityLoadingTypeGroupStrategy {
 	}
 
 	/**
-	 * A static comparator that always returns no grouping.
-	 * @return a {@link EntityLoadingTypeGroupStrategy}
+	 * A strategy that never groups entity types.
+	 * @return a {@link EntityLoadingTypeGroupingStrategy}
 	 */
-	static EntityLoadingTypeGroupStrategy none() {
+	static EntityLoadingTypeGroupingStrategy none() {
 		return (entityName1, entityType1, entityName2, entityType2) -> GroupingType.NONE;
 	}
 }
