@@ -16,7 +16,7 @@ public interface LoadingOptions {
 
 	<T> void massIndexingLoadingStrategy(Class<T> type, MassIndexingEntityLoadingStrategy<T, JavaBeanIndexingOptions> loadingStrategy);
 
-	void identifierInterceptor(LoadingInterceptor<JavaBeanIndexingOptions> interceptor);
+	void identifierInterceptor(LoadingInterceptor interceptor);
 
-	void documentInterceptor(LoadingInterceptor<JavaBeanIndexingOptions> interceptor);
+	void documentInterceptor(LoadingInterceptor interceptor);
 }

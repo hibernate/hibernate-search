@@ -34,7 +34,8 @@ public class JavaBeanMapIndexingStrategy<E> implements MassIndexingEntityLoading
 	}
 
 	@Override
-	public EntityIdentifierScroll createIdentifierScroll(MassIndexingThreadContext<JavaBeanIndexingOptions> context,
+	public EntityIdentifierScroll createIdentifierScroll(JavaBeanIndexingOptions options,
+			MassIndexingThreadContext context,
 			MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) {
 		Set<?> identifiers = source.entrySet().stream()
 				.filter( ent -> loadingTypeGroup.includesInstance( ent.getValue() ) )
@@ -48,7 +49,7 @@ public class JavaBeanMapIndexingStrategy<E> implements MassIndexingEntityLoading
 
 			@Override
 			public List<?> next() {
-				int batchSize = context.options().batchSizeToLoadObjects();
+				int batchSize = options.batchSizeToLoadObjects();
 
 				List<Object> destination = new ArrayList<>( batchSize );
 				while ( iterator.hasNext() ) {
@@ -67,7 +68,7 @@ public class JavaBeanMapIndexingStrategy<E> implements MassIndexingEntityLoading
 	}
 
 	@Override
-	public EntityLoader<E> createLoader(MassIndexingThreadContext<JavaBeanIndexingOptions> context,
+	public EntityLoader<E> createLoader(JavaBeanIndexingOptions options, MassIndexingThreadContext context,
 			MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) {
 		return identifiers -> identifiers.stream().map( source::get ).collect( Collectors.toList() );
 

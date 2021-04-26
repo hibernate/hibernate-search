@@ -23,20 +23,23 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSession
 import org.hibernate.search.mapper.pojo.intercepting.LoadingInvocationContext;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassIndexingOptions;
 
-public class HibernateOrmMassIndexingDocumentProducerInterceptor implements LoadingInterceptor<HibernateOrmMassIndexingOptions> {
+public class HibernateOrmMassIndexingDocumentProducerInterceptor implements LoadingInterceptor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	final SessionFactoryImplementor factory;
-	final TransactionManager transactionManager;
-	final TransactionCoordinatorBuilder transactionCoordinatorBuilder;
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
+	private final SessionFactoryImplementor factory;
+	private final TransactionManager transactionManager;
+	private final TransactionCoordinatorBuilder transactionCoordinatorBuilder;
+	private final HibernateOrmMassIndexingOptions options;
 
-	public HibernateOrmMassIndexingDocumentProducerInterceptor(HibernateOrmMassIndexingMappingContext mappingContext) {
+	public HibernateOrmMassIndexingDocumentProducerInterceptor(HibernateOrmMassIndexingMappingContext mappingContext,
+			HibernateOrmMassIndexingOptions options) {
 		this.mappingContext = mappingContext;
 		this.factory = mappingContext.sessionFactory();
 		this.transactionManager = lookupTransactionManager( factory );
 		this.transactionCoordinatorBuilder = lookupTransactionCoordinatorBuilder( factory );
+		this.options = options;
 	}
 
 	private static TransactionCoordinatorBuilder lookupTransactionCoordinatorBuilder(SessionFactoryImplementor sessionFactory) {
@@ -50,8 +53,7 @@ public class HibernateOrmMassIndexingDocumentProducerInterceptor implements Load
 	}
 
 	@Override
-	public void intercept(LoadingInvocationContext<? extends HibernateOrmMassIndexingOptions> ictx) throws Exception {
-		HibernateOrmMassIndexingOptions options = ictx.options();
+	public void intercept(LoadingInvocationContext ictx) throws Exception {
 		CacheMode cacheMode = options.cacheMode();
 		Integer transactionTimeout = options.transactionTimeout();
 		String tenantId = options.tenantIdentifier();

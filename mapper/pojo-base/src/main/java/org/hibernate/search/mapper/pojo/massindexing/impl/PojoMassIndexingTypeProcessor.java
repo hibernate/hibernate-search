@@ -29,14 +29,16 @@ class PojoMassIndexingTypeProcessor<E, O> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final O options;
 	private final PojoMassIndexingNotifier notifier;
 	private final PojoMassIndexingIndexedTypeGroup<E, O> typeGroup;
 
 	private final PojoProducerConsumerQueue<List<?>> primaryKeyStream;
 
-	public PojoMassIndexingTypeProcessor(
+	public PojoMassIndexingTypeProcessor(O options,
 			PojoMassIndexingNotifier notifier,
 			PojoMassIndexingIndexedTypeGroup<E, O> typeGroup) {
+		this.options = options;
 		this.notifier = notifier;
 		this.typeGroup = typeGroup;
 
@@ -44,7 +46,7 @@ class PojoMassIndexingTypeProcessor<E, O> {
 		this.primaryKeyStream = new PojoProducerConsumerQueue<>( 1 );
 	}
 
-	public PojoInterceptingInvoker<O> identifierProducer() {
+	public PojoInterceptingInvoker identifierProducer() {
 		return (ictx, invoker) -> {
 			log.trace( "started" );
 			try {
@@ -64,7 +66,7 @@ class PojoMassIndexingTypeProcessor<E, O> {
 		};
 	}
 
-	public PojoInterceptingInvoker<O> documentProducer() {
+	public PojoInterceptingInvoker documentProducer() {
 		return (ictx, invoker) -> {
 			log.trace( "started" );
 			try {
@@ -80,10 +82,10 @@ class PojoMassIndexingTypeProcessor<E, O> {
 		};
 	}
 
-	private void loadAllIdentifiers(LoadingInvocationContext<O> ictx) throws InterruptedException {
+	private void loadAllIdentifiers(LoadingInvocationContext ictx) throws InterruptedException {
 		PojoMassIndexingSessionContext sessionContext = ictx.context( PojoMassIndexingSessionContext.class );
 		try ( EntityIdentifierScroll identifierScroll = typeGroup
-				.createIdentifierScroll( new PojoMassIndexingThreadContext<>( ictx ), sessionContext ) ) {
+				.createIdentifierScroll( new PojoMassIndexingThreadContext( ictx ), options, sessionContext ) ) {
 
 			long totalCount = identifierScroll.totalCount();
 			notifier.notifyAddedTotalCount( totalCount );
@@ -101,7 +103,7 @@ class PojoMassIndexingTypeProcessor<E, O> {
 		}
 	}
 
-	private void loadAndIndexAllFromQueue(LoadingInvocationContext<O> ictx, PojoInterceptingNextInvoker invoker) throws Exception {
+	private void loadAndIndexAllFromQueue(LoadingInvocationContext ictx, PojoInterceptingNextInvoker invoker) throws Exception {
 		PojoMassIndexingSessionContext sessionContext = ictx.context( PojoMassIndexingSessionContext.class );
 		PojoIndexer indexer = sessionContext.createIndexer();
 		try {
@@ -121,14 +123,14 @@ class PojoMassIndexingTypeProcessor<E, O> {
 		}
 	}
 
-	private void loadAndIndexList(LoadingInvocationContext<O> ictx, List<?> listIds,
+	private void loadAndIndexList(LoadingInvocationContext ictx, List<?> listIds,
 			PojoMassIndexingSessionContext sessionContext,
 			PojoIndexer indexer,
 			PojoInterceptingNextInvoker invoker)
 			throws Exception {
 		invoker.invoke( () -> {
 			try ( EntityLoader<?> entityLoader = typeGroup
-					.createLoader( new PojoMassIndexingThreadContext<>( ictx ), sessionContext ) ) {
+					.createLoader( new PojoMassIndexingThreadContext( ictx ), options, sessionContext ) ) {
 				List<?> result = entityLoader.load( listIds );
 				indexList( sessionContext, indexer, result );
 			}

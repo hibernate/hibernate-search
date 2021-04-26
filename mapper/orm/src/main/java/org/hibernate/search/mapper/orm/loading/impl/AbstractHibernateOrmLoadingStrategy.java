@@ -66,33 +66,34 @@ abstract class AbstractHibernateOrmLoadingStrategy<E, I> implements
 	}
 
 	@Override
-	public EntityIdentifierScroll createIdentifierScroll(MassIndexingThreadContext<HibernateOrmMassIndexingOptions> context,
+	public EntityIdentifierScroll createIdentifierScroll(HibernateOrmMassIndexingOptions options,
+			MassIndexingThreadContext context,
 			MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) {
 		HibernateOrmQueryLoader<E, ?> typeQueryLoader = createQueryLoader( loadingTypeGroup.includedEntityMap() );
-		return new HibernateOrmEntityIdentifierScroll<>( typeQueryLoader, context, loadingTypeGroup );
+		return new HibernateOrmEntityIdentifierScroll<>( typeQueryLoader, options, context, loadingTypeGroup );
 	}
 
 	@Override
-	public EntityLoader<E> createLoader(MassIndexingThreadContext<HibernateOrmMassIndexingOptions> context,
+	public EntityLoader<E> createLoader(HibernateOrmMassIndexingOptions options, MassIndexingThreadContext context,
 			MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) {
 		HibernateOrmQueryLoader<E, ?> typeQueryLoader = createQueryLoader( loadingTypeGroup.includedEntityMap() );
-		return new HibernateOrmEntityLoader<>( typeQueryLoader, context );
+		return new HibernateOrmEntityLoader<>( typeQueryLoader, options, context );
 	}
 
 	private static class HibernateOrmEntityIdentifierScroll<E, I> implements EntityIdentifierScroll {
 		private final MassIndexingEntityLoadingTypeGroup<E> loadingTypeGroup;
-		private final MassIndexingThreadContext<HibernateOrmMassIndexingOptions> context;
+		private final MassIndexingThreadContext context;
 		private Long totalCount;
 		private final ScrollableResults results;
 		private final int batchSize;
 
 		public HibernateOrmEntityIdentifierScroll(HibernateOrmQueryLoader<? super E, ?> typeQueryLoader,
-				MassIndexingThreadContext<HibernateOrmMassIndexingOptions> context,
+				HibernateOrmMassIndexingOptions options,
+				MassIndexingThreadContext context,
 				MassIndexingEntityLoadingTypeGroup<E> loadingTypeGroup) {
 			this.context = context;
 			this.loadingTypeGroup = loadingTypeGroup;
 
-			HibernateOrmMassIndexingOptions options = context.options();
 			int fetchSize = options.idFetchSize();
 			batchSize = options.batchSizeToLoadObjects();
 			long objectsLimit = options.objectsLimit();
@@ -157,14 +158,15 @@ abstract class AbstractHibernateOrmLoadingStrategy<E, I> implements
 
 	private static class HibernateOrmEntityLoader<E> implements EntityLoader<E> {
 		private final HibernateOrmQueryLoader<E, ?> typeQueryLoader;
-		private final MassIndexingThreadContext<HibernateOrmMassIndexingOptions> context;
+		private final MassIndexingThreadContext context;
 		private final CacheMode cacheMode;
 
 		public HibernateOrmEntityLoader(HibernateOrmQueryLoader<E, ?> typeGroupLoader,
-				MassIndexingThreadContext<HibernateOrmMassIndexingOptions> context) {
+				HibernateOrmMassIndexingOptions options,
+				MassIndexingThreadContext context) {
 			this.typeQueryLoader = typeGroupLoader;
 			this.context = context;
-			cacheMode = context.options().cacheMode();
+			cacheMode = options.cacheMode();
 
 		}
 

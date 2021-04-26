@@ -15,25 +15,22 @@ import org.hibernate.search.mapper.pojo.loading.LoadingInterceptor;
 import org.hibernate.search.mapper.pojo.intercepting.LoadingInvocationContext;
 import org.hibernate.search.mapper.pojo.intercepting.LoadingInvocationInterceptor;
 
-public class PojoInterceptingHandler<O> {
+public class PojoInterceptingHandler {
 
-	private final O options;
-	private final List<? extends LoadingInterceptor<? super O>> interceptors;
-	private final PojoInterceptingInvoker<O> loadingProcess;
+	private final List<? extends LoadingInterceptor> interceptors;
+	private final PojoInterceptingInvoker loadingProcess;
 
-	public PojoInterceptingHandler(O options,
-			List<? extends LoadingInterceptor<? super O>> interceptors,
-			PojoInterceptingInvoker<O> loadingProcess) {
-		this.options = options;
+	public PojoInterceptingHandler(List<? extends LoadingInterceptor> interceptors,
+			PojoInterceptingInvoker loadingProcess) {
 		this.interceptors = interceptors;
 		this.loadingProcess = loadingProcess;
 	}
 
 	public void invoke() throws Exception {
-		Iterator<? extends LoadingInterceptor<? super O>> iterator = interceptors.iterator();
+		Iterator<? extends LoadingInterceptor> iterator = interceptors.iterator();
 		List<LoadingInvocationInterceptor> handlers = new ArrayList<>();
 
-		LoadingInvocationContext<O> ictx = new PojoInvocationContext( (nctx, next) -> {
+		LoadingInvocationContext ictx = new PojoInvocationContext( (nctx, next) -> {
 			if ( next != null ) {
 				handlers.add( next );
 			}
@@ -66,17 +63,12 @@ public class PojoInterceptingHandler<O> {
 		}
 	}
 
-	private class PojoInvocationContext implements LoadingInvocationContext<O> {
+	private static class PojoInvocationContext implements LoadingInvocationContext {
 		Map<Class<?>, Object> contextData = new HashMap<>();
-		InvokationContextConsumer<O> consumer;
+		InvokationContextConsumer consumer;
 
-		public PojoInvocationContext(InvokationContextConsumer<O> consumer) {
+		public PojoInvocationContext(InvokationContextConsumer consumer) {
 			this.consumer = consumer;
-		}
-
-		@Override
-		public O options() {
-			return options;
 		}
 
 		@Override
@@ -100,8 +92,8 @@ public class PojoInterceptingHandler<O> {
 		}
 	}
 
-	interface InvokationContextConsumer<C> {
-		void invoke(LoadingInvocationContext<C> nctx, LoadingInvocationInterceptor next) throws Exception;
+	interface InvokationContextConsumer {
+		void invoke(LoadingInvocationContext nctx, LoadingInvocationInterceptor next) throws Exception;
 	}
 
 }

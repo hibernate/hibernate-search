@@ -262,13 +262,13 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 	public static class ExceptingMapIndexingStrategy<E> implements MassIndexingEntityLoadingStrategy<E, JavaBeanIndexingOptions> {
 
 		@Override
-		public EntityIdentifierScroll createIdentifierScroll(MassIndexingThreadContext<JavaBeanIndexingOptions> context,
+		public EntityIdentifierScroll createIdentifierScroll(JavaBeanIndexingOptions options, MassIndexingThreadContext context,
 				MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) {
 			throw new SimulatedFailure( loadingTypeGroup.includedEntityMap().keySet().stream().collect( Collectors.joining( "," ) ) );
 		}
 
 		@Override
-		public EntityLoader<E> createLoader(MassIndexingThreadContext<JavaBeanIndexingOptions> context,
+		public EntityLoader<E> createLoader(JavaBeanIndexingOptions options, MassIndexingThreadContext context,
 				MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) {
 			return identifiers -> null;
 		}

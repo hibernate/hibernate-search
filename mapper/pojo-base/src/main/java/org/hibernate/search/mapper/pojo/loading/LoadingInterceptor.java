@@ -10,11 +10,9 @@ import org.hibernate.search.mapper.pojo.intercepting.LoadingInvocationContext;
 
 /**
  * A mass indexing loading interceptor.
- *
- * @param <O> The options for loading process
  */
-public interface LoadingInterceptor<O> {
+public interface LoadingInterceptor {
 
-	void intercept(LoadingInvocationContext<? extends O> ictx) throws Exception;
+	void intercept(LoadingInvocationContext ictx) throws Exception;
 
 }

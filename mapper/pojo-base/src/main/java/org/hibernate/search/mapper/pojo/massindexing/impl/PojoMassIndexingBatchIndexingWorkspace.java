@@ -33,7 +33,7 @@ public class PojoMassIndexingBatchIndexingWorkspace<O> extends PojoMassIndexingF
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final O indexingOptions;
+	private final O options;
 	private final int documentBuilderThreads;
 
 	private final List<CompletableFuture<?>> identifierProducingFutures = new ArrayList<>();
@@ -43,14 +43,14 @@ public class PojoMassIndexingBatchIndexingWorkspace<O> extends PojoMassIndexingF
 	private final PojoMassIndexingTypeProcessor<?, O> typeProcessor;
 	private final PojoMassIndexingIndexedTypeGroup<?, O> typeGroup;
 
-	PojoMassIndexingBatchIndexingWorkspace(O indexingOptions,
+	PojoMassIndexingBatchIndexingWorkspace(O options,
 			PojoMassIndexingContext<O> indexingContext,
 			PojoMassIndexingMappingContext mappingContext,
 			PojoMassIndexingNotifier notifier,
 			PojoMassIndexingIndexedTypeGroup<?, O> typeGroup,
 			int documentBuilderThreads) {
 		super( notifier );
-		this.indexingOptions = indexingOptions;
+		this.options = options;
 		this.typeGroup = typeGroup;
 
 		//thread pool sizing:
@@ -60,9 +60,7 @@ public class PojoMassIndexingBatchIndexingWorkspace<O> extends PojoMassIndexingF
 		this.mappingContext = mappingContext;
 
 		//type options for dsl index invoke
-		typeProcessor = new PojoMassIndexingTypeProcessor<>(
-				notifier,
-				typeGroup );
+		typeProcessor = new PojoMassIndexingTypeProcessor<>( options, notifier, typeGroup );
 
 	}
 
@@ -103,9 +101,8 @@ public class PojoMassIndexingBatchIndexingWorkspace<O> extends PojoMassIndexingF
 	}
 
 	private void startProducingPrimaryKeys() {
-		final Runnable primaryKeyOutputter = new PojoMassIndexingFailureInterceptingHandler<>(
-				indexingOptions,
-				indexingContext.identifierInterceptors(),
+		final Runnable primaryKeyOutputter = new PojoMassIndexingFailureInterceptingHandler(
+				indexingContext.identifierInterceptors( options ),
 				getNotifier(),
 				typeProcessor.identifierProducer() );
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
@@ -122,9 +119,8 @@ public class PojoMassIndexingBatchIndexingWorkspace<O> extends PojoMassIndexingF
 	}
 
 	private void startIndexing() {
-		final Runnable documentOutputter = new PojoMassIndexingFailureInterceptingHandler<O>(
-				indexingOptions,
-				indexingContext.documentInterceptors(),
+		final Runnable documentOutputter = new PojoMassIndexingFailureInterceptingHandler(
+				indexingContext.documentInterceptors( options ),
 				getNotifier(),
 				typeProcessor.documentProducer() );
 		final ThreadPoolExecutor indexingExecutor = mappingContext.threadPoolProvider().newFixedThreadPool(

@@ -35,8 +35,8 @@ public final class JavaBeanSearchLoadingContext implements PojoLoadingContext,
 
 	private final Map<PojoRawTypeIdentifier<?>, PojoLoader<?>> loaderByType;
 	private final Map<PojoRawTypeIdentifier<?>, MassIndexingEntityLoadingStrategy<?, ?>> indexLoadingStrategyByType;
-	private final List<LoadingInterceptor<? super JavaBeanIndexingOptions>> identifierInterceptors;
-	private final List<LoadingInterceptor<? super JavaBeanIndexingOptions>> documentInterceptors;
+	private final List<LoadingInterceptor> identifierInterceptors;
+	private final List<LoadingInterceptor> documentInterceptors;
 
 	private JavaBeanSearchLoadingContext(Builder builder) {
 		this.loaderByType = builder.loaderByType == null ? Collections.emptyMap() : builder.loaderByType;
@@ -96,12 +96,12 @@ public final class JavaBeanSearchLoadingContext implements PojoLoadingContext,
 	}
 
 	@Override
-	public List<LoadingInterceptor<? super JavaBeanIndexingOptions>> identifierInterceptors() {
+	public List<LoadingInterceptor> identifierInterceptors(JavaBeanIndexingOptions options) {
 		return identifierInterceptors;
 	}
 
 	@Override
-	public List<LoadingInterceptor<? super JavaBeanIndexingOptions>> documentInterceptors() {
+	public List<LoadingInterceptor> documentInterceptors(JavaBeanIndexingOptions options) {
 		return documentInterceptors;
 	}
 
@@ -109,8 +109,8 @@ public final class JavaBeanSearchLoadingContext implements PojoLoadingContext,
 		private final LoadingTypeContextProvider typeContextProvider;
 		private Map<PojoRawTypeIdentifier<?>, PojoLoader<?>> loaderByType;
 		private Map<PojoRawTypeIdentifier<?>, MassIndexingEntityLoadingStrategy<?, ?>> indexeStrategyByType;
-		private final List<LoadingInterceptor<? super JavaBeanIndexingOptions>> identifierInterceptors = new ArrayList<>();
-		private final List<LoadingInterceptor<? super JavaBeanIndexingOptions>> documentInterceptors = new ArrayList<>();
+		private final List<LoadingInterceptor> identifierInterceptors = new ArrayList<>();
+		private final List<LoadingInterceptor> documentInterceptors = new ArrayList<>();
 
 		public Builder(LoadingTypeContextProvider typeContextProvider, JavaBeanMassIndexingMappingContext mappingContext) {
 			this.typeContextProvider = typeContextProvider;
@@ -148,12 +148,12 @@ public final class JavaBeanSearchLoadingContext implements PojoLoadingContext,
 		}
 
 		@Override
-		public void identifierInterceptor(LoadingInterceptor<JavaBeanIndexingOptions> interceptor) {
+		public void identifierInterceptor(LoadingInterceptor interceptor) {
 			identifierInterceptors.add( interceptor );
 		}
 
 		@Override
-		public void documentInterceptor(LoadingInterceptor<JavaBeanIndexingOptions> interceptor) {
+		public void documentInterceptor(LoadingInterceptor interceptor) {
 			documentInterceptors.add( interceptor );
 		}
 
