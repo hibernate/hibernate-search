@@ -910,8 +910,21 @@ void runBuildOnNode(Closure body) {
 
 void runBuildOnNode(String label, Closure body) {
 	node( label ) {
-		timeout( [time: 1, unit: 'HOURS'], body )
+		pruneDockerContainers()
+        try {
+        	timeout( [time: 1, unit: 'HOURS'], body )
+        }
+        finally {
+        	pruneDockerContainers()
+        }
 	}
+}
+
+void pruneDockerContainers() {
+	sh 'docker container prune -f || true'
+	sh 'docker image prune -f || true'
+	sh 'docker network prune -f || true'
+	sh 'docker volume prune -f || true'
 }
 
 void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args, String projectPath = '.') {
