@@ -51,8 +51,8 @@ public interface Log extends BasicLogger {
 	SearchException invalidStringForBeanProvider(String value, Class<BeanProvider> expectedType);
 
 	@Message(id = ID_OFFSET + 12,
-			value = "Unable to set up index loading for type '%s', because no index loader was registered for this type.")
-	SearchException indexLoaderNotRegistered(PojoRawTypeIdentifier<?> typeIdentifier);
+			value = "Unable to set up entity loading for type '%s', because no entity loading strategy was registered for this type.")
+	SearchException entityLoadingStrategyNotRegistered(PojoRawTypeIdentifier<?> typeIdentifier);
 
 	@Message(id = ID_OFFSET + 13, value = "Context is interrupted while indexing entity '%1$s'. Consider increasing the connection time-out.")
 	SearchException contextInterruptedWhileProducingIdsForBatchIndexing(String entityName);

@@ -12,4 +12,6 @@ public interface LoadingTypeContext<E> {
 
 	PojoRawTypeIdentifier<E> typeIdentifier();
 
+	String name();
+
 }

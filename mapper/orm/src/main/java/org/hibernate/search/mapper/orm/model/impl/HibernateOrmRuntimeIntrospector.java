@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.model.impl;
 
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -19,10 +19,10 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 public class HibernateOrmRuntimeIntrospector implements PojoRuntimeIntrospector {
 
 	private final HibernateOrmRuntimeIntrospectorTypeContextProvider typeContextProvider;
-	private final SessionImplementor sessionImplementor;
+	private final SharedSessionContractImplementor sessionImplementor;
 
 	public HibernateOrmRuntimeIntrospector(HibernateOrmRuntimeIntrospectorTypeContextProvider typeContextProvider,
-			SessionImplementor sessionImplementor) {
+			SharedSessionContractImplementor sessionImplementor) {
 		this.typeContextProvider = typeContextProvider;
 		this.sessionImplementor = sessionImplementor;
 	}

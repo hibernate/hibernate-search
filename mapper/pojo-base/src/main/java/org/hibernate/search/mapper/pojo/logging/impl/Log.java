@@ -614,9 +614,6 @@ public interface Log extends BasicLogger {
 	@Message(value = "Loading and extracting entity data for entity '%s' during mass indexing")
 	String massIndexingLoadingAndExtractingEntityData(String entityName);
 
-	@Message(id = ID_OFFSET + 100, value = "Unable to handle mass indexing proccess: %1$s")
-	SearchException massIndexingInterceptionHandlingException(String causeMessage, @Cause Throwable cause);
-
 	@Message(id = ID_OFFSET + 101, value = "%1$s entities could not be indexed. See the logs for details."
 			+ " First failure on entity '%2$s': %3$s")
 	SearchException massIndexingEntityFailures(long finalFailureCount,

@@ -8,6 +8,20 @@ package org.hibernate.search.mapper.javabean.loading;
 
 import java.util.List;
 
+/**
+ * A loader for loading a small selection of entities, used in particular during search.
+ * <p>
+ * Compared to {@link MassEntityLoader}, this loader:
+ * <ul>
+ *     <li>Receives batches of identifiers from the caller.</li>
+ *     <li>Is expected to load a small number of entities, potentially in a single batch.</li>
+ *     <li>Returns loaded entities as a list.</li>
+ *     <li>Relies on a pre-existing loading context (a session, a transaction, ...).</li>
+ *     <li>Must ensure entities remain usable (lazy-loading, ...) as long as the supporting context is active.</li>
+ * </ul>
+ *
+ * @param <E> The type of loaded entities.
+ */
 public interface EntityLoader<E> {
 
 	/**

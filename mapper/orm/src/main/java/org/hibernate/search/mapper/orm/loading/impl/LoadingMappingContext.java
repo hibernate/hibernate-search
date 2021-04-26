@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
+import javax.persistence.EntityManager;
+
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 
 public interface LoadingMappingContext {
@@ -13,5 +15,7 @@ public interface LoadingMappingContext {
 	EntityLoadingCacheLookupStrategy cacheLookupStrategy();
 
 	int fetchSize();
+
+	LoadingSessionContext sessionContext(EntityManager entityManager);
 
 }

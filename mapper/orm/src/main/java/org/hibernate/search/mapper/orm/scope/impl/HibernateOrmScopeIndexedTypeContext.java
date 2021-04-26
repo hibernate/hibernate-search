@@ -24,6 +24,6 @@ public interface HibernateOrmScopeIndexedTypeContext<E>
 				HibernateOrmMassIndexingIndexedTypeContext<E> {
 
 	@Override
-	HibernateOrmEntityLoadingStrategy<? super E> loadingStrategy();
+	HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy();
 
 }

@@ -6,16 +6,18 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
-import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingStrategy;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 /**
- * @param <E> The entity type.
+ * @param <E> The type of loaded entities.
+ * @param <I> The type of entity identifiers.
  */
-public interface HibernateOrmEntityLoadingStrategy<E> extends MassIndexingEntityLoadingStrategy<E, HibernateOrmMassIndexingOptions> {
+public interface HibernateOrmEntityLoadingStrategy<E, I> {
 
 	/**
 	 * @param obj Another strategy
@@ -35,5 +37,7 @@ public interface HibernateOrmEntityLoadingStrategy<E> extends MassIndexingEntity
 	<E2> PojoLoader<E2> createLoader(Set<LoadingIndexedTypeContext<? extends E2>> targetEntityTypeContexts,
 			LoadingSessionContext sessionContext, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions);
+
+	HibernateOrmQueryLoader<E, I> createQueryLoader(Collection<PojoRawTypeIdentifier<? extends E>> targetEntityTypes);
 
 }

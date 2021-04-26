@@ -4,20 +4,22 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.massindexing.loader;
+package org.hibernate.search.mapper.javabean.loading;
 
 import java.util.Map;
 
 /**
- * A group entity types for entity loading entities during mass indexing.
- * @param <E> The resulting entity type (output)
+ * A group of entity types for entity loading.
+ *
+ * @param <E> The type of loaded entities.
  */
-public interface MassIndexingEntityLoadingTypeGroup<E> {
+public interface LoadingTypeGroup<E> {
 
 	/**
-	 * @return The names of all entity types included in this group.
+	 * @return A map of entity classes by entity name,
+	 * representing all entity types included in this group, and only these types.
 	 */
-	Map<String, Class<? extends E>> includedEntityMap();
+	Map<String, Class<? extends E>> includedTypesMap();
 
 	/**
 	 * @param entity An entity of any type.

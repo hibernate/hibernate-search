@@ -39,6 +39,7 @@ class JavaBeanTypeContextContainer implements JavaBeanSearchSessionTypeContextPr
 		}
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public <E> JavaBeanIndexedTypeContext<E> indexedForExactType(PojoRawTypeIdentifier<E> typeIdentifier) {
 		return (JavaBeanIndexedTypeContext<E>) indexedTypeContexts.get( typeIdentifier );
