@@ -6,28 +6,26 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingDocumentProducerInterceptor;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingIdentifierProducerInterceptor;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingMappingContext;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.loading.LoadingInterceptor;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingStrategy;
-
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public final class HibernateOrmMassIndexingContext implements PojoMassIndexingContext<HibernateOrmMassIndexingOptions> {
+	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final HibernateOrmSessionTypeContextProvider typeContextProvider;
-	private final List<LoadingInterceptor<HibernateOrmMassIndexingOptions>> identifierProducerInterceptors = new ArrayList<>();
-	private final List<LoadingInterceptor<HibernateOrmMassIndexingOptions>> documentProducerInterceptors = new ArrayList<>();
 
 	public HibernateOrmMassIndexingContext(HibernateOrmMassIndexingMappingContext mappingContext,
 			HibernateOrmSessionTypeContextProvider typeContextContainer) {
+		this.mappingContext = mappingContext;
 		this.typeContextProvider = typeContextContainer;
-		identifierProducerInterceptors.add( new HibernateOrmMassIndexingIdentifierProducerInterceptor( mappingContext ) );
-		documentProducerInterceptors.add( new HibernateOrmMassIndexingDocumentProducerInterceptor( mappingContext ) );
 	}
 
 	@Override
@@ -38,13 +36,13 @@ public final class HibernateOrmMassIndexingContext implements PojoMassIndexingCo
 	}
 
 	@Override
-	public List<LoadingInterceptor<HibernateOrmMassIndexingOptions>> identifierInterceptors() {
-		return identifierProducerInterceptors;
+	public List<LoadingInterceptor> identifierInterceptors(HibernateOrmMassIndexingOptions options) {
+		return Collections.singletonList( new HibernateOrmMassIndexingIdentifierProducerInterceptor( mappingContext, options ) );
 	}
 
 	@Override
-	public List<LoadingInterceptor<HibernateOrmMassIndexingOptions>> documentInterceptors() {
-		return documentProducerInterceptors;
+	public List<LoadingInterceptor> documentInterceptors(HibernateOrmMassIndexingOptions options) {
+		return Collections.singletonList( new HibernateOrmMassIndexingDocumentProducerInterceptor( mappingContext, options ) );
 	}
 
 }

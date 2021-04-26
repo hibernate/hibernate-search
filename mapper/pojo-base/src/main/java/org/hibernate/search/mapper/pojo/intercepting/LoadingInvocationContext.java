@@ -10,14 +10,8 @@ package org.hibernate.search.mapper.pojo.intercepting;
  * Exposes contextual information about the intercepted invocation and
  * operations that enable interceptor methods to control the behavior
  * of the invocation chain.
- * @param <O> The options for loading process
  */
-public interface LoadingInvocationContext<O> {
-
-	/**
-	 * @return The mass options for loading process.
-	 */
-	O options();
+public interface LoadingInvocationContext {
 
 	/**
 	 * Enables an interceptor to retrieve or update the data associated with the invocation by another interceptor.

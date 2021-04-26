@@ -18,20 +18,17 @@ import org.hibernate.search.mapper.pojo.intercepting.spi.PojoInterceptingInvoker
 /**
  * Wraps the execution of a {@code Runnable} in a list of {@link LoadingInterceptor}.
  */
-public class PojoMassIndexingFailureInterceptingHandler<O> extends PojoMassIndexingFailureHandledRunnable {
+public class PojoMassIndexingFailureInterceptingHandler extends PojoMassIndexingFailureHandledRunnable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoInterceptingInvoker<O> consumer;
-	private final O options;
-	private final List<? extends LoadingInterceptor<? super O>> interceptors;
+	private final PojoInterceptingInvoker consumer;
+	private final List<? extends LoadingInterceptor> interceptors;
 
-	PojoMassIndexingFailureInterceptingHandler(O options,
-			List<? extends LoadingInterceptor<? super O>> interceptors,
+	PojoMassIndexingFailureInterceptingHandler(List<? extends LoadingInterceptor> interceptors,
 			PojoMassIndexingNotifier notifier,
-			PojoInterceptingInvoker<O> consumer) {
+			PojoInterceptingInvoker consumer) {
 		super( notifier );
-		this.options = options;
 		this.interceptors = interceptors;
 		this.consumer = consumer;
 	}
@@ -39,8 +36,7 @@ public class PojoMassIndexingFailureInterceptingHandler<O> extends PojoMassIndex
 	@Override
 	public void runWithFailureHandler() {
 		try {
-			PojoInterceptingHandler<?> handler = new PojoInterceptingHandler<>(
-					options, interceptors, consumer );
+			PojoInterceptingHandler handler = new PojoInterceptingHandler( interceptors, consumer );
 			handler.invoke();
 		}
 		catch (Exception e) {

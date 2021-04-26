@@ -13,7 +13,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 /**
  * Contextual information about a mass indexing proccess.
- * @param <O> The options for mass indexing proccess.
+ * @param <O> The type of options passed to the mass indexer.
  */
 public interface PojoMassIndexingContext<O> {
 
@@ -26,13 +26,15 @@ public interface PojoMassIndexingContext<O> {
 	<T> MassIndexingEntityLoadingStrategy<? super T, O> indexLoadingStrategy(PojoRawTypeIdentifier<T> expectedType);
 
 	/**
+	 * @param options Options passed to the mass indexer.
 	 * @return A list {@link LoadingInterceptor} of entityIdentifier interceptors.
 	 */
-	List<? extends LoadingInterceptor<? super O>> identifierInterceptors();
+	List<? extends LoadingInterceptor> identifierInterceptors(O options);
 
 	/**
+	 * @param options Options passed to the mass indexer.
 	 * @return A list {@link LoadingInterceptor} of entity interceptors.
 	 */
-	List<? extends LoadingInterceptor<? super O>> documentInterceptors();
+	List<? extends LoadingInterceptor> documentInterceptors(O options);
 
 }

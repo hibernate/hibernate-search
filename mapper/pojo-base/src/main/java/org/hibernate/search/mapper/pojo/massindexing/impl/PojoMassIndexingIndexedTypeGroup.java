@@ -149,12 +149,13 @@ public class PojoMassIndexingIndexedTypeGroup<E, O> {
 				typeContext.toEntitySupplier( sessionContext, entity ) );
 	}
 
-	EntityIdentifierScroll createIdentifierScroll(MassIndexingThreadContext<O> context, PojoMassIndexingSessionContext sessionContext) throws InterruptedException {
-		return loadingStrategy.createIdentifierScroll( context, createLoadingTypeGroup( sessionContext ) );
+	EntityIdentifierScroll createIdentifierScroll(MassIndexingThreadContext context, O options,
+			PojoMassIndexingSessionContext sessionContext) throws InterruptedException {
+		return loadingStrategy.createIdentifierScroll( options, context, createLoadingTypeGroup( sessionContext ) );
 	}
 
-	EntityLoader<? super E> createLoader(MassIndexingThreadContext<O> context, PojoMassIndexingSessionContext sessionContext) throws InterruptedException {
-		return loadingStrategy.createLoader( context, createLoadingTypeGroup( sessionContext ) );
+	EntityLoader<? super E> createLoader(MassIndexingThreadContext context, O options, PojoMassIndexingSessionContext sessionContext) throws InterruptedException {
+		return loadingStrategy.createLoader( options, context, createLoadingTypeGroup( sessionContext ) );
 	}
 
 	private MassIndexingEntityLoadingTypeGroup<E> createLoadingTypeGroup(PojoMassIndexingSessionContext sessionContext) {

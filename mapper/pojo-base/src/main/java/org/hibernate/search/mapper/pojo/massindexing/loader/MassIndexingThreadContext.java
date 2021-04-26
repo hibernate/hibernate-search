@@ -8,14 +8,8 @@ package org.hibernate.search.mapper.pojo.massindexing.loader;
 
 /**
  * Contextual information about a mass indexing proccess.
- * @param <O> The options for mass indexing proccess.
  */
-public interface MassIndexingThreadContext<O> {
-
-	/**
-	 * @return The mass options for loading process.
-	 */
-	O options();
+public interface MassIndexingThreadContext {
 
 	/**
 	 * Get the context contributed by interceptors.

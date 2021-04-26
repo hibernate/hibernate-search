@@ -13,30 +13,32 @@ import org.hibernate.search.mapper.pojo.loading.EntityIdentifierScroll;
  * A start loader for entity loading entities during mass indexing.
  *
  * @param <E> The resulting entity type (output)
- * @param <O> The options for mass indexing proccess.
+ * @param <O> The type of options passed to the mass indexer.
  */
 public interface MassIndexingEntityLoadingStrategy<E, O> {
 
 	/**
 	 * Streams the identifiers of entities to reindex.
 	 *
+	 * @param options Options passed to the mass indexer.
 	 * @param context A mass indexing context for objects to load.
 	 * @param loadingTypeGroup The grouping types of loaded objects.
 	 * @return A {@link EntityIdentifierScroll}.
 	 * @throws java.lang.InterruptedException except where loading interrupted
 	 */
-	EntityIdentifierScroll createIdentifierScroll(MassIndexingThreadContext<O> context,
+	EntityIdentifierScroll createIdentifierScroll(O options, MassIndexingThreadContext context,
 			MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) throws InterruptedException;
 
 	/**
 	 * Loads the entities corresponding to the given identifiers.
 	 *
+	 * @param options Options passed to the mass indexer.
 	 * @param context A mass indexing context for objects to load.
 	 * @param loadingTypeGroup The grouping types of loaded objects.
 	 * @return A {@link EntityLoader}.
 	 * @throws java.lang.InterruptedException except where loading interrupted
 	 */
-	EntityLoader<E> createLoader(MassIndexingThreadContext<O> context,
+	EntityLoader<E> createLoader(O options, MassIndexingThreadContext context,
 			MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) throws InterruptedException;
 
 }
