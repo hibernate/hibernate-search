@@ -28,11 +28,11 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.loading.EntityIdentifierScroll;
 import org.hibernate.search.mapper.pojo.loading.EntityLoader;
-import org.hibernate.search.mapper.pojo.loading.EntityLoadingTypeGroupStrategy.GroupingType;
+import org.hibernate.search.mapper.pojo.loading.EntityLoadingTypeGroupingStrategy.GroupingType;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingStrategy;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingThreadContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.mapper.pojo.loading.EntityLoadingTypeGroupStrategy;
+import org.hibernate.search.mapper.pojo.loading.EntityLoadingTypeGroupingStrategy;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingTypeGroup;
 
 abstract class AbstractHibernateOrmLoadingStrategy<E, I> implements
@@ -58,7 +58,7 @@ abstract class AbstractHibernateOrmLoadingStrategy<E, I> implements
 	}
 
 	@Override
-	public EntityLoadingTypeGroupStrategy groupStrategy() {
+	public EntityLoadingTypeGroupingStrategy groupingStrategy() {
 		return (entityName1, entityType1, entityName2, entityType2) -> {
 			LoadingIndexedTypeContext<?> commonSuperType1 = typeContextProvider
 					.indexedForEntityName( entityName1 );

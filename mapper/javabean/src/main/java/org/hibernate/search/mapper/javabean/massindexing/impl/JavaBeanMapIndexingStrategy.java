@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.pojo.loading.EntityLoader;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingStrategy;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingThreadContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.mapper.pojo.loading.EntityLoadingTypeGroupStrategy;
+import org.hibernate.search.mapper.pojo.loading.EntityLoadingTypeGroupingStrategy;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingTypeGroup;
 
 public class JavaBeanMapIndexingStrategy<E> implements MassIndexingEntityLoadingStrategy<E, JavaBeanIndexingOptions> {
@@ -29,15 +29,15 @@ public class JavaBeanMapIndexingStrategy<E> implements MassIndexingEntityLoading
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<?, E> source;
-	private final EntityLoadingTypeGroupStrategy typeGroup;
+	private final EntityLoadingTypeGroupingStrategy typeGroup;
 
-	public JavaBeanMapIndexingStrategy(Map<?, E> source, EntityLoadingTypeGroupStrategy typeGroup) {
+	public JavaBeanMapIndexingStrategy(Map<?, E> source, EntityLoadingTypeGroupingStrategy typeGroup) {
 		this.source = source;
 		this.typeGroup = typeGroup;
 	}
 
 	@Override
-	public EntityLoadingTypeGroupStrategy groupStrategy() {
+	public EntityLoadingTypeGroupingStrategy groupingStrategy() {
 		return typeGroup;
 	}
 

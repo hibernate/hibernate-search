@@ -24,7 +24,7 @@ import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingThreadCo
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSessionContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
-import org.hibernate.search.mapper.pojo.loading.EntityLoadingTypeGroupStrategy;
+import org.hibernate.search.mapper.pojo.loading.EntityLoadingTypeGroupingStrategy;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingTypeGroup;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -194,14 +194,14 @@ public class PojoMassIndexingIndexedTypeGroup<E, O> {
 		if ( !loadingStrategy.equals( other.loadingStrategy ) ) {
 			return null;
 		}
-		EntityLoadingTypeGroupStrategy.GroupingType groupingType = loadingStrategy.groupStrategy().get(
+		EntityLoadingTypeGroupingStrategy.GroupingType groupingType = loadingStrategy.groupingStrategy().get(
 				commonSuperType.entityName(), commonSuperType.typeIdentifier().javaClass(),
 				other.commonSuperType.entityName(), other.commonSuperType.typeIdentifier().javaClass() );
 
-		if ( groupingType == EntityLoadingTypeGroupStrategy.GroupingType.SUPER ) {
+		if ( groupingType == EntityLoadingTypeGroupingStrategy.GroupingType.SUPER ) {
 			return withAdditionalTypes( ((PojoMassIndexingIndexedTypeGroup<? extends E, O>) other).includedTypes );
 		}
-		if ( groupingType == EntityLoadingTypeGroupStrategy.GroupingType.INCLUDED ) {
+		if ( groupingType == EntityLoadingTypeGroupingStrategy.GroupingType.INCLUDED ) {
 			return ((PojoMassIndexingIndexedTypeGroup<? super E, O>) other).withAdditionalTypes( includedTypes );
 		}
 		return null;
