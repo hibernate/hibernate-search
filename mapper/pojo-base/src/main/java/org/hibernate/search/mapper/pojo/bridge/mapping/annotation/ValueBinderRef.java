@@ -12,7 +12,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
-import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -49,8 +48,7 @@ public @interface ValueBinderRef {
 	BeanRetrieval retrieval() default BeanRetrieval.ANY;
 
 	/**
-	 * @return A parameter that can be statically passed to a given {@link ValueBinder},
-	 * so that it can be used by its {@link ValueBridge}.
+	 * @return Parameters that will be passed to the {@link ValueBinder}.
 	 */
 	Parameter[] params() default {};
 

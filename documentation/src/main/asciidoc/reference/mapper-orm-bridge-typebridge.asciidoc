@@ -109,7 +109,7 @@ There are two ways to pass parameters to type bridges:
 
 === Simple, string parameters
 
-You can define string parameters to the `@TypeBinderRef` annotation and then use them later in the binder:
+You can pass string parameters to the `@TypeBinderRef` annotation and then use them later in the binder:
 
 .Passing parameters to a `TypeBinder` using the `@TypeBinderRef` annotation
 ====

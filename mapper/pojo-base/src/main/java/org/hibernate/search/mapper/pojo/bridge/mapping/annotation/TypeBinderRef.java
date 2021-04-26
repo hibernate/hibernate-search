@@ -12,7 +12,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
-import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 
 /**
@@ -43,8 +42,7 @@ public @interface TypeBinderRef {
 	BeanRetrieval retrieval() default BeanRetrieval.ANY;
 
 	/**
-	 * @return A parameter that can be statically passed to a given {@link TypeBinder},
-	 * so that it can be used by its {@link TypeBridge}.
+	 * @return Parameters that will be passed to the {@link TypeBinder}.
 	 */
 	Parameter[] params() default {};
 
@@ -56,4 +54,3 @@ public @interface TypeBinderRef {
 		}
 	}
 }
-

@@ -21,21 +21,18 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMapp
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 
 /**
- * A parameter that can be statically passed to a given binder,
- * so that it can be used by its bridge.
+ * A parameter, i.e. a name/value pair.
  */
 public @interface Parameter {
 
 	/**
 	 * @return The name of the parameter.
-	 * Must be unique for the bridge is used in.
+	 * Must be unique in a given set of parameters.
 	 */
 	String name();
 
 	/**
 	 * @return The value of the parameter.
-	 * Using annotation APIs is possible to pass only {@link String} values.
-	 * The programmatic APIs allow to pass any {@link Object} value.
 	 *
 	 * @see PropertyMappingFieldOptionsStep#valueBinder(ValueBinder, Map)
 	 * @see PropertyMappingStep#binder(PropertyBinder, Map)
