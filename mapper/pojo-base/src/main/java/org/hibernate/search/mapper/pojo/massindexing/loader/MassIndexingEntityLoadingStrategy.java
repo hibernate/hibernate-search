@@ -24,10 +24,9 @@ public interface MassIndexingEntityLoadingStrategy<E, O> {
 	 * @param context A mass indexing context for objects to load.
 	 * @param loadingTypeGroup The grouping types of loaded objects.
 	 * @return A {@link EntityIdentifierScroll}.
-	 * @throws java.lang.InterruptedException except where loading interrupted
 	 */
 	EntityIdentifierScroll createIdentifierScroll(O options, MassIndexingThreadContext context,
-			MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) throws InterruptedException;
+			MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup);
 
 	/**
 	 * Loads the entities corresponding to the given identifiers.
@@ -36,9 +35,8 @@ public interface MassIndexingEntityLoadingStrategy<E, O> {
 	 * @param context A mass indexing context for objects to load.
 	 * @param loadingTypeGroup The grouping types of loaded objects.
 	 * @return A {@link EntityLoader}.
-	 * @throws java.lang.InterruptedException except where loading interrupted
 	 */
 	EntityLoader<E> createLoader(O options, MassIndexingThreadContext context,
-			MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) throws InterruptedException;
+			MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup);
 
 }

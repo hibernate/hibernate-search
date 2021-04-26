@@ -82,7 +82,7 @@ class PojoMassIndexingTypeProcessor<E, O> {
 		};
 	}
 
-	private void loadAllIdentifiers(LoadingInvocationContext ictx) throws InterruptedException {
+	private void loadAllIdentifiers(LoadingInvocationContext ictx) {
 		PojoMassIndexingSessionContext sessionContext = ictx.context( PojoMassIndexingSessionContext.class );
 		try ( EntityIdentifierScroll identifierScroll = typeGroup
 				.createIdentifierScroll( new PojoMassIndexingThreadContext( ictx ), options, sessionContext ) ) {
