@@ -55,7 +55,7 @@ public final class HibernateOrmUtils {
 		}
 	}
 
-	public static boolean isSuperTypeOf(EntityPersister type1, EntityPersister type2) {
+	private static boolean isSuperTypeOf(EntityPersister type1, EntityPersister type2) {
 		return type1.isSubclassEntityName( type2.getEntityName() );
 	}
 

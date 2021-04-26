@@ -7,11 +7,15 @@
 package org.hibernate.search.mapper.pojo.massindexing.impl;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface PojoMassIndexingTypeContextProvider {
 
 	<E> Optional<? extends PojoMassIndexingIndexedTypeContext<E>> forExactType(PojoRawTypeIdentifier<E> typeIdentifier);
+
+	<E> Optional<? extends Set<? extends PojoMassIndexingIndexedTypeContext<? extends E>>> allForSuperType(
+			PojoRawTypeIdentifier<E> typeIdentifier);
 
 }

@@ -24,7 +24,6 @@ import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingThreadCo
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSessionContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
-import org.hibernate.search.mapper.pojo.loading.EntityLoadingTypeGroupingStrategy;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingTypeGroup;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -194,17 +193,27 @@ public class PojoMassIndexingIndexedTypeGroup<E, O> {
 		if ( !loadingStrategy.equals( other.loadingStrategy ) ) {
 			return null;
 		}
-		EntityLoadingTypeGroupingStrategy.GroupingType groupingType = loadingStrategy.groupingStrategy().get(
-				commonSuperType.entityName(), commonSuperType.typeIdentifier().javaClass(),
-				other.commonSuperType.entityName(), other.commonSuperType.typeIdentifier().javaClass() );
 
-		if ( groupingType == EntityLoadingTypeGroupingStrategy.GroupingType.SUPER ) {
+		// We know both types are indexed types, which means both types are entity types,
+		// so if they share the same loading strategy, we can assume they also share the same identifier space.
+		// If one is the supertype of the other, make sure to load them in the same group:
+		// if all subtypes are included in a group, it should perform better.
+		if ( isFirstSuperTypeOfSecond( commonSuperType, other.commonSuperType ) ) {
 			return withAdditionalTypes( ((PojoMassIndexingIndexedTypeGroup<? extends E, O>) other).includedTypes );
 		}
-		if ( groupingType == EntityLoadingTypeGroupingStrategy.GroupingType.INCLUDED ) {
+		else if ( isFirstSuperTypeOfSecond( other.commonSuperType, commonSuperType ) ) {
 			return ((PojoMassIndexingIndexedTypeGroup<? super E, O>) other).withAdditionalTypes( includedTypes );
 		}
-		return null;
+		else {
+			return null;
+		}
+	}
+
+	private boolean isFirstSuperTypeOfSecond(PojoMassIndexingIndexedTypeContext<?> first,
+			PojoMassIndexingIndexedTypeContext<?> second) {
+		return typeContextProvider.allForSuperType( first.typeIdentifier() )
+				.map( s -> s.contains( second ) )
+				.orElse( false );
 	}
 
 	private PojoMassIndexingIndexedTypeGroup<E, O> withAdditionalTypes(

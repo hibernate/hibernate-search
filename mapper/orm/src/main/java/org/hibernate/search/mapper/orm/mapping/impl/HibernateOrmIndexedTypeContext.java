@@ -15,7 +15,6 @@ import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmEntityIdEntityLo
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmNonEntityIdPropertyEntityLoadingStrategy;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionIndexedTypeContext;
-import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -35,22 +34,21 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 
 	// Casts are safe because the loading strategy will target either "E" or "? super E", by contract
 	@SuppressWarnings("unchecked")
-	private HibernateOrmIndexedTypeContext(Builder<E> builder, HibernateOrmSessionTypeContextProvider typeContextContainer,
-			SessionFactoryImplementor sessionFactory) {
+	private HibernateOrmIndexedTypeContext(Builder<E> builder, SessionFactoryImplementor sessionFactory) {
 		super( builder, sessionFactory );
 
 		if ( builder.documentIdSourcePropertyName.equals( entityPersister().getIdentifierPropertyName() ) ) {
 			documentIdIsEntityId = true;
-			loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E>) HibernateOrmEntityIdEntityLoadingStrategy.create( sessionFactory,
-					typeContextContainer, entityPersister() );
+			loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E>)
+					HibernateOrmEntityIdEntityLoadingStrategy.create( sessionFactory, entityPersister() );
 		}
 		else {
 			// The entity ID is not the property used to generate the document ID
 			// We need to use a criteria query to load entities from the document IDs
 			documentIdIsEntityId = false;
-			loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E>) HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.create( sessionFactory,
-					typeContextContainer, entityPersister(),
-					builder.documentIdSourcePropertyName, builder.documentIdSourcePropertyHandle );
+			loadingStrategy = (HibernateOrmEntityLoadingStrategy<? super E>)
+					HibernateOrmNonEntityIdPropertyEntityLoadingStrategy.create( sessionFactory, entityPersister(),
+							builder.documentIdSourcePropertyName, builder.documentIdSourcePropertyHandle );
 		}
 
 		this.identifierMapping = builder.identifierMapping;
@@ -122,9 +120,8 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 			this.indexManager = indexManager;
 		}
 
-		public HibernateOrmIndexedTypeContext<E> build(HibernateOrmSessionTypeContextProvider typeContextContainer,
-				SessionFactoryImplementor sessionFactory) {
-			return new HibernateOrmIndexedTypeContext<>( this, typeContextContainer, sessionFactory );
+		public HibernateOrmIndexedTypeContext<E> build(SessionFactoryImplementor sessionFactory) {
+			return new HibernateOrmIndexedTypeContext<>( this, sessionFactory );
 		}
 	}
 }

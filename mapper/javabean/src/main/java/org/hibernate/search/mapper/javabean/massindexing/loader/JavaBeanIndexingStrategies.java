@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.javabean.massindexing.loader;
 import java.util.Map;
 import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMapIndexingStrategy;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingStrategy;
-import org.hibernate.search.mapper.pojo.loading.EntityLoadingTypeGroupingStrategy;
 
 public class JavaBeanIndexingStrategies {
 
@@ -17,11 +16,6 @@ public class JavaBeanIndexingStrategies {
 	}
 
 	public static <T> MassIndexingEntityLoadingStrategy<T, JavaBeanIndexingOptions> from(Map<?, T> map) {
-		return JavaBeanIndexingStrategies.from( map, EntityLoadingTypeGroupingStrategy.byJavaTypeHierarchy() );
-	}
-
-	public static <T> MassIndexingEntityLoadingStrategy<T, JavaBeanIndexingOptions> from(Map<?, T> map,
-			EntityLoadingTypeGroupingStrategy group) {
-		return new JavaBeanMapIndexingStrategy<>( map, group );
+		return new JavaBeanMapIndexingStrategy<>( map );
 	}
 }

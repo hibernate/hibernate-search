@@ -25,14 +25,11 @@ import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.loading.EntityIdentifierScroll;
 import org.hibernate.search.mapper.pojo.loading.EntityLoader;
-import org.hibernate.search.mapper.pojo.loading.EntityLoadingTypeGroupingStrategy.GroupingType;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingStrategy;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingThreadContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.mapper.pojo.loading.EntityLoadingTypeGroupingStrategy;
 import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingTypeGroup;
 
 abstract class AbstractHibernateOrmLoadingStrategy<E, I> implements
@@ -42,39 +39,16 @@ abstract class AbstractHibernateOrmLoadingStrategy<E, I> implements
 
 	private static final String ID_PARAMETER_NAME = "ids";
 
-	private final HibernateOrmSessionTypeContextProvider typeContextProvider;
 	private final SessionFactoryImplementor sessionFactory;
 	private final EntityPersister rootEntityPersister;
 	private final TypeQueryFactory<E, I> queryFactory;
 
 	AbstractHibernateOrmLoadingStrategy(
-			HibernateOrmSessionTypeContextProvider typeContextContainer,
 			SessionFactoryImplementor sessionFactory,
 			EntityPersister rootEntityPersister, TypeQueryFactory<E, I> queryFactory) {
 		this.sessionFactory = sessionFactory;
 		this.rootEntityPersister = rootEntityPersister;
 		this.queryFactory = queryFactory;
-		this.typeContextProvider = typeContextContainer;
-	}
-
-	@Override
-	public EntityLoadingTypeGroupingStrategy groupingStrategy() {
-		return (entityName1, entityType1, entityName2, entityType2) -> {
-			LoadingIndexedTypeContext<?> commonSuperType1 = typeContextProvider
-					.indexedForEntityName( entityName1 );
-			LoadingIndexedTypeContext<?> commonSuperType2 = typeContextProvider
-					.indexedForEntityName( entityName2 );
-
-			EntityPersister entityPersister = commonSuperType1.entityPersister();
-			EntityPersister otherEntityPersister = commonSuperType2.entityPersister();
-			if ( HibernateOrmUtils.isSuperTypeOf( entityPersister, otherEntityPersister ) ) {
-				return GroupingType.SUPER;
-			}
-			if ( HibernateOrmUtils.isSuperTypeOf( otherEntityPersister, entityPersister ) ) {
-				return GroupingType.INCLUDED;
-			}
-			return GroupingType.NONE;
-		};
 	}
 
 	protected HibernateOrmQueryLoader<E, ?> createQueryLoader(Map<String, ? extends Class<? extends E>> targetEntityTypes) {
