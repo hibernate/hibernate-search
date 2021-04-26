@@ -15,7 +15,6 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
-import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -27,7 +26,6 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> extends 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static <I> HibernateOrmEntityLoadingStrategy<?> create(SessionFactoryImplementor sessionFactory,
-			HibernateOrmSessionTypeContextProvider typeContextContainer,
 			EntityPersister entityPersister,
 			String documentIdSourcePropertyName, ValueReadHandle<I> documentIdSourceHandle) {
 		// By contract, the documentIdSourceHandle and the documentIdSourcePropertyName refer to the same property,
@@ -36,7 +34,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> extends 
 		TypeQueryFactory<?, I> queryFactory = (TypeQueryFactory<?, I>) TypeQueryFactory.create( sessionFactory,
 				entityPersister, documentIdSourcePropertyName );
 		return new HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<>( sessionFactory,
-				typeContextContainer, entityPersister, queryFactory,
+				entityPersister, queryFactory,
 				documentIdSourcePropertyName, documentIdSourceHandle );
 	}
 
@@ -46,12 +44,11 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> extends 
 	private final ValueReadHandle<?> documentIdSourceHandle;
 
 	private HibernateOrmNonEntityIdPropertyEntityLoadingStrategy(SessionFactoryImplementor sessionFactory,
-			HibernateOrmSessionTypeContextProvider typeContextContainer,
 			EntityPersister entityPersister,
 			TypeQueryFactory<E, I> queryFactory,
 			String documentIdSourcePropertyName,
 			ValueReadHandle<I> documentIdSourceHandle) {
-		super( typeContextContainer, sessionFactory, entityPersister, queryFactory );
+		super( sessionFactory, entityPersister, queryFactory );
 		this.entityPersister = entityPersister;
 		this.queryFactory = queryFactory;
 		this.documentIdSourcePropertyName = documentIdSourcePropertyName;

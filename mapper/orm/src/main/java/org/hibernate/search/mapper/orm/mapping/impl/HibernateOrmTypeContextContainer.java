@@ -41,13 +41,8 @@ class HibernateOrmTypeContextContainer
 	private final HibernateOrmRawTypeIdentifierResolver typeIdentifierResolver;
 
 	private HibernateOrmTypeContextContainer(Builder builder, SessionFactoryImplementor sessionFactory) {
-		init( builder, sessionFactory );
-		this.typeIdentifierResolver = builder.basicTypeMetadataProvider.getTypeIdentifierResolver();
-	}
-
-	private void init(Builder builder, SessionFactoryImplementor sessionFactory) {
 		for ( HibernateOrmIndexedTypeContext.Builder<?> contextBuilder : builder.indexedTypeContextBuilders ) {
-			HibernateOrmIndexedTypeContext<?> indexedTypeContext = contextBuilder.build( this, sessionFactory );
+			HibernateOrmIndexedTypeContext<?> indexedTypeContext = contextBuilder.build( sessionFactory );
 			PojoRawTypeIdentifier<?> typeIdentifier = indexedTypeContext.typeIdentifier();
 			indexedTypeContexts.put( typeIdentifier, indexedTypeContext );
 			indexedTypeContextsByHibernateOrmEntityName.put( indexedTypeContext.hibernateOrmEntityName(), indexedTypeContext );
@@ -57,6 +52,8 @@ class HibernateOrmTypeContextContainer
 			HibernateOrmContainedTypeContext<?> containedTypeContext = contextBuilder.build( sessionFactory );
 			containedTypeContextsByHibernateOrmEntityName.put( containedTypeContext.hibernateOrmEntityName(), containedTypeContext );
 		}
+
+		this.typeIdentifierResolver = builder.basicTypeMetadataProvider.getTypeIdentifierResolver();
 	}
 
 	@Override
@@ -67,11 +64,6 @@ class HibernateOrmTypeContextContainer
 
 	@Override
 	public HibernateOrmIndexedTypeContext<?> indexedForJpaEntityName(String indexName) {
-		return indexedTypeContextsByJpaEntityName.get( indexName );
-	}
-
-	@Override
-	public HibernateOrmIndexedTypeContext<?> indexedForEntityName(String indexName) {
 		return indexedTypeContextsByJpaEntityName.get( indexName );
 	}
 

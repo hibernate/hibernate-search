@@ -16,28 +16,25 @@ import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
-import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
 
 public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> extends AbstractHibernateOrmLoadingStrategy<E, I>
 		implements HibernateOrmEntityLoadingStrategy<E> {
 
 	public static HibernateOrmEntityLoadingStrategy<?> create(SessionFactoryImplementor sessionFactory,
-			HibernateOrmSessionTypeContextProvider typeContextContainer,
 			EntityPersister entityPersister) {
 		EntityPersister rootEntityPersister = HibernateOrmUtils.toRootEntityType( sessionFactory, entityPersister );
 		TypeQueryFactory<?, ?> queryFactory = TypeQueryFactory.create( sessionFactory, rootEntityPersister,
 				entityPersister.getIdentifierPropertyName() );
-		return new HibernateOrmEntityIdEntityLoadingStrategy<>( sessionFactory, typeContextContainer, rootEntityPersister, queryFactory );
+		return new HibernateOrmEntityIdEntityLoadingStrategy<>( sessionFactory, rootEntityPersister, queryFactory );
 	}
 
 	private final EntityPersister rootEntityPersister;
 	private final TypeQueryFactory<E, I> queryFactory;
 
 	HibernateOrmEntityIdEntityLoadingStrategy(SessionFactoryImplementor sessionFactory,
-			HibernateOrmSessionTypeContextProvider typeContextContainer,
 			EntityPersister rootEntityPersister, TypeQueryFactory<E, I> queryFactory) {
-		super( typeContextContainer, sessionFactory, rootEntityPersister, queryFactory );
+		super( sessionFactory, rootEntityPersister, queryFactory );
 		this.rootEntityPersister = rootEntityPersister;
 		this.queryFactory = queryFactory;
 	}

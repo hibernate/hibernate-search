@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.pojo.massindexing.loader;
 
 import org.hibernate.search.mapper.pojo.loading.EntityLoader;
 import org.hibernate.search.mapper.pojo.loading.EntityIdentifierScroll;
-import org.hibernate.search.mapper.pojo.loading.EntityLoadingTypeGroupingStrategy;
 
 /**
  * A start loader for entity loading entities during mass indexing.
@@ -39,12 +38,5 @@ public interface MassIndexingEntityLoadingStrategy<E, O> {
 	 */
 	EntityLoader<E> createLoader(MassIndexingThreadContext<O> context,
 			MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) throws InterruptedException;
-
-	/**
-	 * @return A comparator function for grouping type. Defaults to grouping according to the Java type hierarchy.
-	 */
-	default EntityLoadingTypeGroupingStrategy groupingStrategy() {
-		return EntityLoadingTypeGroupingStrategy.byJavaTypeHierarchy();
-	}
 
 }
