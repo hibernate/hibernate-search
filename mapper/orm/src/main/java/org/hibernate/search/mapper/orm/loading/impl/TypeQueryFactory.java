@@ -16,7 +16,7 @@ import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
 
-interface TypeQueryFactory<E, I> {
+public interface TypeQueryFactory<E, I> {
 
 	static TypeQueryFactory<?, ?> create(SessionFactoryImplementor sessionFactory, EntityPersister entityPersister,
 			String uniquePropertyName) {

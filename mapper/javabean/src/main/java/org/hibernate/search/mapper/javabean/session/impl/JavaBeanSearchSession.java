@@ -177,7 +177,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 	}
 
 	public JavaBeanLoadingContextBuilder loadingContextBuilder() {
-		JavaBeanSearchLoadingContext.Builder builder = new JavaBeanSearchLoadingContext.Builder( typeContextProvider, mappingContext );
+		JavaBeanSearchLoadingContext.Builder builder = new JavaBeanSearchLoadingContext.Builder( mappingContext, typeContextProvider );
 		if ( loadingOptionsContributor != null ) {
 			loadingOptionsContributor.accept( builder );
 		}

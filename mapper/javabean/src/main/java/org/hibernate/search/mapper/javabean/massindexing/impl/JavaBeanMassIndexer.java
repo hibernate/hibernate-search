@@ -6,22 +6,25 @@
  */
 package org.hibernate.search.mapper.javabean.massindexing.impl;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletionStage;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
-import org.hibernate.search.mapper.javabean.massindexing.loader.JavaBeanIndexingOptions;
+import org.hibernate.search.mapper.javabean.loading.MassLoadingOptions;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 
-public class JavaBeanMassIndexer implements MassIndexer, JavaBeanIndexingOptions {
+public class JavaBeanMassIndexer implements MassIndexer, MassLoadingOptions {
 
-	private final PojoMassIndexer<JavaBeanIndexingOptions> delegate;
+	private final PojoMassIndexer<MassLoadingOptions> delegate;
 	private final DetachedBackendSessionContext sessionContext;
 
 	private int objectLoadingBatchSize = 10;
+	private final Map<Class<?>, Object> contextData = new HashMap<>();
 
-	public JavaBeanMassIndexer(PojoMassIndexer<JavaBeanIndexingOptions> delegate,
+	public JavaBeanMassIndexer(PojoMassIndexer<MassLoadingOptions> delegate,
 			DetachedBackendSessionContext sessionContext) {
 		this.delegate = delegate;
 		this.sessionContext = sessionContext;
@@ -54,7 +57,7 @@ public class JavaBeanMassIndexer implements MassIndexer, JavaBeanIndexingOptions
 	}
 
 	@Override
-	public int batchSizeToLoadObjects() {
+	public int batchSize() {
 		return objectLoadingBatchSize;
 	}
 
@@ -101,6 +104,18 @@ public class JavaBeanMassIndexer implements MassIndexer, JavaBeanIndexingOptions
 	@Override
 	public MassIndexer failureHandler(MassIndexingFailureHandler failureHandler) {
 		delegate.failureHandler( failureHandler );
+		return this;
+	}
+
+	@Override
+	public <T> MassIndexer context(Class<T> contextType, T context) {
+		contextData.put( contextType, context );
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> T context(Class<T> contextType) {
+		return (T) contextData.get( contextType );
 		return this;
 	}
 

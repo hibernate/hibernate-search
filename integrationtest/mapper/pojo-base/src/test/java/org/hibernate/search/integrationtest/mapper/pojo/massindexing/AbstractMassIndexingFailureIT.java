@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
+import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategies;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -39,7 +40,6 @@ import org.awaitility.Awaitility;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
-import org.hibernate.search.mapper.javabean.massindexing.loader.JavaBeanIndexingStrategies;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 
@@ -657,7 +657,7 @@ public abstract class AbstractMassIndexingFailureIT {
 
 	private SearchSession session(SearchMapping mapping) {
 		return mapping.createSessionWithOptions().loading( (o) -> {
-			o.massIndexingLoadingStrategy( Book.class, JavaBeanIndexingStrategies.from( booksmap ) );
+			o.massLoadingStrategy( Book.class, MassLoadingStrategies.from( booksmap ) );
 		} ).build();
 	}
 

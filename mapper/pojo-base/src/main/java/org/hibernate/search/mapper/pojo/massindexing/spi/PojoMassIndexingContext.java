@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.massindexing.spi;
 
-import java.util.List;
-import org.hibernate.search.mapper.pojo.loading.LoadingInterceptor;
-import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingStrategy;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 /**
@@ -20,21 +17,8 @@ public interface PojoMassIndexingContext<O> {
 	/**
 	 * @param <T> The exposed type of indexed entities.
 	 * @param expectedType The expected types of indexed objects.
-	 * @return A index loader.
-	 * @see PojoMassIndexingContext
+	 * @return A loading strategy.
 	 */
-	<T> MassIndexingEntityLoadingStrategy<? super T, O> indexLoadingStrategy(PojoRawTypeIdentifier<T> expectedType);
-
-	/**
-	 * @param options Options passed to the mass indexer.
-	 * @return A list {@link LoadingInterceptor} of entityIdentifier interceptors.
-	 */
-	List<? extends LoadingInterceptor> identifierInterceptors(O options);
-
-	/**
-	 * @param options Options passed to the mass indexer.
-	 * @return A list {@link LoadingInterceptor} of entity interceptors.
-	 */
-	List<? extends LoadingInterceptor> documentInterceptors(O options);
+	<T> PojoMassIndexingLoadingStrategy<? super T, ?, O> loadingStrategy(PojoRawTypeIdentifier<T> expectedType);
 
 }

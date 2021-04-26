@@ -18,10 +18,10 @@ import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
 
-public class HibernateOrmEntityIdEntityLoadingStrategy<E, I> extends AbstractHibernateOrmLoadingStrategy<E, I>
-		implements HibernateOrmEntityLoadingStrategy<E> {
+public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
+		extends AbstractHibernateOrmLoadingStrategy<E, I> {
 
-	public static HibernateOrmEntityLoadingStrategy<?> create(SessionFactoryImplementor sessionFactory,
+	public static HibernateOrmEntityLoadingStrategy<?, ?> create(SessionFactoryImplementor sessionFactory,
 			EntityPersister entityPersister) {
 		EntityPersister rootEntityPersister = HibernateOrmUtils.toRootEntityType( sessionFactory, entityPersister );
 		TypeQueryFactory<?, ?> queryFactory = TypeQueryFactory.create( sessionFactory, rootEntityPersister,

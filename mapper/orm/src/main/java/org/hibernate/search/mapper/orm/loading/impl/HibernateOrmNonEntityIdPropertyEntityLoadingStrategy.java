@@ -20,12 +20,12 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
-public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I> extends AbstractHibernateOrmLoadingStrategy<E, I>
-		implements HibernateOrmEntityLoadingStrategy<E> {
+public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
+		extends AbstractHibernateOrmLoadingStrategy<E, I> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static <I> HibernateOrmEntityLoadingStrategy<?> create(SessionFactoryImplementor sessionFactory,
+	public static <I> HibernateOrmEntityLoadingStrategy<?, ?> create(SessionFactoryImplementor sessionFactory,
 			EntityPersister entityPersister,
 			String documentIdSourcePropertyName, ValueReadHandle<I> documentIdSourceHandle) {
 		// By contract, the documentIdSourceHandle and the documentIdSourcePropertyName refer to the same property,

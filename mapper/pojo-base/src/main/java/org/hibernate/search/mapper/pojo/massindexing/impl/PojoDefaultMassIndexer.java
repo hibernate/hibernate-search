@@ -30,7 +30,6 @@ import org.hibernate.search.util.common.impl.Futures;
  */
 public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
 
-	private final PojoMassIndexingContext<O> massIndexingConfigurationContext;
 	private final PojoMassIndexingMappingContext mappingContext;
 
 	private final PojoScopeSchemaManager scopeSchemaManager;
@@ -54,7 +53,6 @@ public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
 			Set<? extends PojoMassIndexingIndexedTypeContext<?>> targetedIndexedTypes,
 			PojoScopeSchemaManager scopeSchemaManager,
 			PojoScopeWorkspace scopeWorkspace) {
-		this.massIndexingConfigurationContext = indexingContext;
 		this.mappingContext = mappingContext;
 		this.typeGroupsToIndex = PojoMassIndexingIndexedTypeGroup.disjoint( indexingContext,
 				mappingContext, typeContextProvider, targetedIndexedTypes );
@@ -168,7 +166,7 @@ public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
 				getOrCreateMonitor()
 		);
 		return new PojoMassIndexingBatchCoordinator<>(
-				options, massIndexingConfigurationContext, mappingContext,
+				options, mappingContext,
 				notifier,
 				typeGroupsToIndex, scopeSchemaManager, scopeWorkspace,
 				typesToIndexInParallel, documentBuilderThreads,

@@ -6,33 +6,37 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.massindexing;
 
-import java.lang.invoke.MethodHandles;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 
+import java.lang.invoke.MethodHandles;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.javabean.loading.MassIdentifierLoader;
+import org.hibernate.search.mapper.javabean.loading.MassIdentifierSink;
+import org.hibernate.search.mapper.javabean.loading.MassEntityLoader;
+import org.hibernate.search.mapper.javabean.loading.MassLoadingOptions;
+import org.hibernate.search.mapper.javabean.loading.LoadingTypeGroup;
+import org.hibernate.search.mapper.javabean.loading.MassEntitySink;
+import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategy;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
-import org.hibernate.search.mapper.javabean.massindexing.loader.JavaBeanIndexingOptions;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
-import org.hibernate.search.mapper.pojo.loading.EntityIdentifierScroll;
-import org.hibernate.search.mapper.pojo.loading.EntityLoader;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureContext;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
-import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingStrategy;
-import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingTypeGroup;
-import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingThreadContext;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -43,7 +47,7 @@ import org.mockito.quality.Strictness;
 /**
  * Test that the {@link MassIndexer} correctly indexes even complex entity hierarchies
  * where superclasses are indexed but not all of their subclasses, and vice-versa.
- * It also tests {@link MassIndexingEntityLoadingTypeGroup#includedEntityMap()},
+ * It also tests {@link LoadingTypeGroup#includedTypesMap()},
  * and the position of the first item for the group super type.
  */
 public class MassIndexingIncludedEntityMapHierarchyIT {
@@ -250,27 +254,38 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 
 	private SearchSession createSession() {
 		return mapping.createSessionWithOptions().loading( (o) -> {
-			o.massIndexingLoadingStrategy( H1_Root_NotIndexed.class, exeptingStrategy() );
-			o.massIndexingLoadingStrategy( H2_Root_Indexed.class, exeptingStrategy() );
+			o.massLoadingStrategy( H1_Root_NotIndexed.class, failingStrategy() );
+			o.massLoadingStrategy( H2_Root_Indexed.class, failingStrategy() );
 		} ).build();
 	}
 
-	public static ExceptingMapIndexingStrategy exeptingStrategy() {
-		return new ExceptingMapIndexingStrategy<>();
+	public static FailingMassIndexingStrategy failingStrategy() {
+		return new FailingMassIndexingStrategy<>();
 	}
 
-	public static class ExceptingMapIndexingStrategy<E> implements MassIndexingEntityLoadingStrategy<E, JavaBeanIndexingOptions> {
+	public static class FailingMassIndexingStrategy<E> implements MassLoadingStrategy<E, Object> {
 
 		@Override
-		public EntityIdentifierScroll createIdentifierScroll(JavaBeanIndexingOptions options, MassIndexingThreadContext context,
-				MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) {
-			throw new SimulatedFailure( loadingTypeGroup.includedEntityMap().keySet().stream().collect( Collectors.joining( "," ) ) );
+		public MassIdentifierLoader createIdentifierLoader(LoadingTypeGroup<E> includedTypes,
+				MassIdentifierSink<Object> sink, MassLoadingOptions options) {
+			throw new SimulatedFailure( includedTypes.includedTypesMap().keySet().stream()
+					.collect( Collectors.joining( "," ) ) );
 		}
 
 		@Override
-		public EntityLoader<E> createLoader(JavaBeanIndexingOptions options, MassIndexingThreadContext context,
-				MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) {
-			return identifiers -> null;
+		public MassEntityLoader<Object> createEntityLoader(LoadingTypeGroup<E> includedTypes, MassEntitySink<E> sink,
+				MassLoadingOptions options) {
+			return new MassEntityLoader<Object>() {
+				@Override
+				public void close() {
+					// Nothing to do.
+				}
+
+				@Override
+				public void load(List<Object> identifiers) {
+					throw new UnsupportedOperationException( "Didn't expect this to be called" );
+				}
+			};
 		}
 
 	}

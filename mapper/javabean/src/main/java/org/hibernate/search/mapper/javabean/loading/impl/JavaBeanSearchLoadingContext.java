@@ -7,42 +7,40 @@
 package org.hibernate.search.mapper.javabean.loading.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.hibernate.search.mapper.javabean.loading.EntityLoader;
 
+import org.hibernate.search.mapper.javabean.loading.MassLoadingOptions;
+import org.hibernate.search.mapper.javabean.loading.EntityLoader;
+import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategy;
 import org.hibernate.search.mapper.javabean.loading.LoadingOptions;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
+import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexingLoadingStrategy;
 import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexingMappingContext;
-import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanSessionContextInterceptor;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingLoadingStrategy;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
-import org.hibernate.search.mapper.javabean.massindexing.loader.JavaBeanIndexingOptions;
-import org.hibernate.search.mapper.pojo.loading.LoadingInterceptor;
-import org.hibernate.search.mapper.pojo.massindexing.loader.MassIndexingEntityLoadingStrategy;
 
 public final class JavaBeanSearchLoadingContext implements PojoLoadingContext,
-		PojoMassIndexingContext<JavaBeanIndexingOptions> {
+		PojoMassIndexingContext<MassLoadingOptions> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final JavaBeanMassIndexingMappingContext mappingContext;
+	private final LoadingTypeContextProvider typeContextProvider;
 	private final Map<PojoRawTypeIdentifier<?>, PojoLoader<?>> loaderByType;
-	private final Map<PojoRawTypeIdentifier<?>, MassIndexingEntityLoadingStrategy<?, ?>> indexLoadingStrategyByType;
-	private final List<LoadingInterceptor> identifierInterceptors;
-	private final List<LoadingInterceptor> documentInterceptors;
+	private final Map<PojoRawTypeIdentifier<?>, MassLoadingStrategy<?, ?>> massLoadingStrategyByType;
 
 	private JavaBeanSearchLoadingContext(Builder builder) {
+		this.mappingContext = builder.mappingContext;
+		this.typeContextProvider = builder.typeContextProvider;
 		this.loaderByType = builder.loaderByType == null ? Collections.emptyMap() : builder.loaderByType;
-		this.indexLoadingStrategyByType = builder.indexeStrategyByType == null ? Collections.emptyMap() : builder.indexeStrategyByType;
-		this.identifierInterceptors = builder.identifierInterceptors;
-		this.documentInterceptors = builder.documentInterceptors;
+		this.massLoadingStrategyByType = builder.massLoadingStrategyByType == null ? Collections.emptyMap() : builder.massLoadingStrategyByType;
 	}
 
 	@Override
@@ -77,45 +75,33 @@ public final class JavaBeanSearchLoadingContext implements PojoLoadingContext,
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> MassIndexingEntityLoadingStrategy<? super T, JavaBeanIndexingOptions> indexLoadingStrategy(PojoRawTypeIdentifier<T> expectedType) {
-		MassIndexingEntityLoadingStrategy<? super T, JavaBeanIndexingOptions> strategy =
-				(MassIndexingEntityLoadingStrategy<T, JavaBeanIndexingOptions>) indexLoadingStrategyByType.get( expectedType );
+	public <T> PojoMassIndexingLoadingStrategy<? super T, ?, MassLoadingOptions> loadingStrategy(PojoRawTypeIdentifier<T> expectedType) {
+		MassLoadingStrategy<? super T, ?> strategy =
+				(MassLoadingStrategy<T, ?>) massLoadingStrategyByType.get( expectedType );
 		if ( strategy == null ) {
-			for ( Map.Entry<PojoRawTypeIdentifier<?>, MassIndexingEntityLoadingStrategy<?, ?>> entry : indexLoadingStrategyByType
-					.entrySet() ) {
+			for ( Map.Entry<PojoRawTypeIdentifier<?>, MassLoadingStrategy<?, ?>> entry :
+					massLoadingStrategyByType.entrySet() ) {
 				if ( entry.getKey().javaClass().isAssignableFrom( expectedType.javaClass() ) ) {
-					strategy = (MassIndexingEntityLoadingStrategy<? super T, JavaBeanIndexingOptions>) entry.getValue();
+					strategy = (MassLoadingStrategy<? super T, MassLoadingOptions>) entry.getValue();
 					break;
 				}
 			}
 		}
 		if ( strategy == null ) {
-			throw log.indexLoaderNotRegistered( expectedType );
+			throw log.entityLoadingStrategyNotRegistered( expectedType );
 		}
-		return strategy;
-	}
-
-	@Override
-	public List<LoadingInterceptor> identifierInterceptors(JavaBeanIndexingOptions options) {
-		return identifierInterceptors;
-	}
-
-	@Override
-	public List<LoadingInterceptor> documentInterceptors(JavaBeanIndexingOptions options) {
-		return documentInterceptors;
+		return new JavaBeanMassIndexingLoadingStrategy<>( mappingContext, typeContextProvider, strategy );
 	}
 
 	public static final class Builder implements JavaBeanLoadingContextBuilder, LoadingOptions {
+		private final JavaBeanMassIndexingMappingContext mappingContext;
 		private final LoadingTypeContextProvider typeContextProvider;
 		private Map<PojoRawTypeIdentifier<?>, PojoLoader<?>> loaderByType;
-		private Map<PojoRawTypeIdentifier<?>, MassIndexingEntityLoadingStrategy<?, ?>> indexeStrategyByType;
-		private final List<LoadingInterceptor> identifierInterceptors = new ArrayList<>();
-		private final List<LoadingInterceptor> documentInterceptors = new ArrayList<>();
+		private Map<PojoRawTypeIdentifier<?>, MassLoadingStrategy<?, ?>> massLoadingStrategyByType;
 
-		public Builder(LoadingTypeContextProvider typeContextProvider, JavaBeanMassIndexingMappingContext mappingContext) {
+		public Builder(JavaBeanMassIndexingMappingContext mappingContext, LoadingTypeContextProvider typeContextProvider) {
+			this.mappingContext = mappingContext;
 			this.typeContextProvider = typeContextProvider;
-			identifierInterceptors.add( JavaBeanSessionContextInterceptor.of( mappingContext ) );
-			documentInterceptors.add( JavaBeanSessionContextInterceptor.of( mappingContext ) );
 		}
 
 		@Override
@@ -136,25 +122,15 @@ public final class JavaBeanSearchLoadingContext implements PojoLoadingContext,
 		}
 
 		@Override
-		public <T> void massIndexingLoadingStrategy(Class<T> type, MassIndexingEntityLoadingStrategy<T, JavaBeanIndexingOptions> loadingStrategy) {
+		public <T> void massLoadingStrategy(Class<T> type, MassLoadingStrategy<T, ?> loadingStrategy) {
 			LoadingTypeContext<T> typeContext = typeContextProvider.indexedForExactClass( type );
 			PojoRawTypeIdentifier<T> typeIdentifier = typeContext != null
 					? typeContext.typeIdentifier() : PojoRawTypeIdentifier.of( type );
-			if ( indexeStrategyByType == null ) {
-				indexeStrategyByType = new LinkedHashMap<>();
+			if ( massLoadingStrategyByType == null ) {
+				massLoadingStrategyByType = new LinkedHashMap<>();
 			}
 
-			indexeStrategyByType.put( typeIdentifier, loadingStrategy );
-		}
-
-		@Override
-		public void identifierInterceptor(LoadingInterceptor interceptor) {
-			identifierInterceptors.add( interceptor );
-		}
-
-		@Override
-		public void documentInterceptor(LoadingInterceptor interceptor) {
-			documentInterceptors.add( interceptor );
+			massLoadingStrategyByType.put( typeIdentifier, loadingStrategy );
 		}
 
 		@Override

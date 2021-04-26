@@ -12,56 +12,49 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
 
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingLoadingStrategy;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 
 /**
  * This runnable will prepare a pipeline for batch indexing
  * of entities, managing the lifecycle of several ThreadPools.
  *
  * @author Sanne Grinovero
- * @param <O> The mass indexing options.
+ * @param <E> The type of indexed entities.
+ * @param <I> The type of identifiers.
+ * @param <O> The type of mass indexing options.
  */
-public class PojoMassIndexingBatchIndexingWorkspace<O> extends PojoMassIndexingFailureHandledRunnable {
+public class PojoMassIndexingBatchIndexingWorkspace<E, I, O> extends PojoMassIndexingFailureHandledRunnable {
 
 	public static final String THREAD_NAME_PREFIX = "Mass indexing - ";
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final O options;
-	private final int documentBuilderThreads;
-
 	private final List<CompletableFuture<?>> identifierProducingFutures = new ArrayList<>();
 	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
-	private final PojoMassIndexingContext<O> indexingContext;
 	private final PojoMassIndexingMappingContext mappingContext;
-	private final PojoMassIndexingTypeProcessor<?, O> typeProcessor;
-	private final PojoMassIndexingIndexedTypeGroup<?, O> typeGroup;
+	private final PojoMassIndexingIndexedTypeGroup<E, ?> typeGroup;
+	private final PojoMassIndexingLoadingStrategy<E, I, O> loadingStrategy;
+	private final O options;
 
-	PojoMassIndexingBatchIndexingWorkspace(O options,
-			PojoMassIndexingContext<O> indexingContext,
-			PojoMassIndexingMappingContext mappingContext,
+	private final int entityExtractingThreads;
+
+	PojoMassIndexingBatchIndexingWorkspace(PojoMassIndexingMappingContext mappingContext,
 			PojoMassIndexingNotifier notifier,
-			PojoMassIndexingIndexedTypeGroup<?, O> typeGroup,
-			int documentBuilderThreads) {
+			PojoMassIndexingIndexedTypeGroup<E, ?> typeGroup,
+			PojoMassIndexingLoadingStrategy<E, I, O> loadingStrategy,
+			O options, int entityExtractingThreads) {
 		super( notifier );
-		this.options = options;
-		this.typeGroup = typeGroup;
-
-		//thread pool sizing:
-		this.documentBuilderThreads = documentBuilderThreads;
-
-		this.indexingContext = indexingContext;
 		this.mappingContext = mappingContext;
-
-		//type options for dsl index invoke
-		typeProcessor = new PojoMassIndexingTypeProcessor<>( options, notifier, typeGroup );
-
+		this.typeGroup = typeGroup;
+		this.loadingStrategy = loadingStrategy;
+		this.options = options;
+		this.entityExtractingThreads = entityExtractingThreads;
 	}
 
 	@Override
@@ -70,9 +63,11 @@ public class PojoMassIndexingBatchIndexingWorkspace<O> extends PojoMassIndexingF
 			throw new AssertionFailure( "BatchIndexingWorkspace instance not expected to be reused" );
 		}
 
+		PojoProducerConsumerQueue<List<I>> identifierQueue = new PojoProducerConsumerQueue<>( 1 );
+
 		// First start the consumers, then the producers (reverse order):
-		startIndexing();
-		startProducingPrimaryKeys();
+		startIndexing( identifierQueue );
+		startProducingPrimaryKeys( identifierQueue );
 		// Wait for indexing to finish.
 		Futures.unwrappedExceptionGet(
 				CompletableFuture.allOf( indexingFutures.toArray( new CompletableFuture[0] ) )
@@ -100,36 +95,32 @@ public class PojoMassIndexingBatchIndexingWorkspace<O> extends PojoMassIndexingF
 		}
 	}
 
-	private void startProducingPrimaryKeys() {
-		final Runnable primaryKeyOutputter = new PojoMassIndexingFailureInterceptingHandler(
-				indexingContext.identifierInterceptors( options ),
-				getNotifier(),
-				typeProcessor.identifierProducer() );
+	private void startProducingPrimaryKeys(PojoProducerConsumerQueue<List<I>> identifierQueue) {
+		final Runnable runnable = new PojoMassIndexingEntityIdentifierLoadingRunnable<>( getNotifier(), typeGroup,
+				loadingStrategy, options, identifierQueue );
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
 		final ThreadPoolExecutor identifierProducingExecutor = mappingContext.threadPoolProvider().newFixedThreadPool(
 				1,
 				THREAD_NAME_PREFIX + typeGroup.notifiedGroupName() + " - ID loading"
 		);
 		try {
-			identifierProducingFutures.add( Futures.runAsync( primaryKeyOutputter, identifierProducingExecutor ) );
+			identifierProducingFutures.add( Futures.runAsync( runnable, identifierProducingExecutor ) );
 		}
 		finally {
 			identifierProducingExecutor.shutdown();
 		}
 	}
 
-	private void startIndexing() {
-		final Runnable documentOutputter = new PojoMassIndexingFailureInterceptingHandler(
-				indexingContext.documentInterceptors( options ),
-				getNotifier(),
-				typeProcessor.documentProducer() );
+	private void startIndexing(PojoProducerConsumerQueue<List<I>> identifierQueue) {
+		final Runnable runnable = new PojoMassIndexingEntityLoadingRunnable<>( getNotifier(), typeGroup,
+				loadingStrategy, options, identifierQueue );
 		final ThreadPoolExecutor indexingExecutor = mappingContext.threadPoolProvider().newFixedThreadPool(
-				documentBuilderThreads,
+				entityExtractingThreads,
 				THREAD_NAME_PREFIX + typeGroup.notifiedGroupName() + " - Entity loading"
 		);
 		try {
-			for ( int i = 0; i < documentBuilderThreads; i++ ) {
-				indexingFutures.add( Futures.runAsync( documentOutputter, indexingExecutor ) );
+			for ( int i = 0; i < entityExtractingThreads; i++ ) {
+				indexingFutures.add( Futures.runAsync( runnable, indexingExecutor ) );
 			}
 		}
 		finally {

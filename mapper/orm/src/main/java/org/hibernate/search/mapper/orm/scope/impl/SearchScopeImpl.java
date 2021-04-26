@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmLoadingContext;
-import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassIndexingContext;
+import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingContext;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassIndexingOptions;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexer;

@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaMan
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
 
 /**
@@ -32,14 +31,13 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMapping
  */
 public class PojoMassIndexingBatchCoordinator<O> extends PojoMassIndexingFailureHandledRunnable {
 
-	private final O indexingOptions;
+	private final O options;
 	private final List<PojoMassIndexingIndexedTypeGroup<?, O>> typeGroupsToIndex;
 
 	private final PojoScopeSchemaManager scopeSchemaManager;
 	private final PojoScopeWorkspace scopeWorkspace;
 
 	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
-	private final PojoMassIndexingContext<O> indexingContext;
 	private final PojoMassIndexingMappingContext mappingContext;
 	private final int typesToIndexInParallel;
 	private final int documentBuilderThreads;
@@ -48,8 +46,7 @@ public class PojoMassIndexingBatchCoordinator<O> extends PojoMassIndexingFailure
 	private final boolean purgeAtStart;
 	private final boolean mergeSegmentsAfterPurge;
 
-	public PojoMassIndexingBatchCoordinator(O indexingOptions,
-			PojoMassIndexingContext<O> indexingContext,
+	public PojoMassIndexingBatchCoordinator(O options,
 			PojoMassIndexingMappingContext mappingContext,
 			PojoMassIndexingNotifier notifier,
 			List<PojoMassIndexingIndexedTypeGroup<?, O>> typeGroupsToIndex,
@@ -57,8 +54,7 @@ public class PojoMassIndexingBatchCoordinator<O> extends PojoMassIndexingFailure
 			int typesToIndexInParallel, int documentBuilderThreads, boolean mergeSegmentsOnFinish,
 			boolean dropAndCreateSchemaOnStart, boolean purgeAtStart, boolean mergeSegmentsAfterPurge) {
 		super( notifier );
-		this.indexingOptions = indexingOptions;
-		this.indexingContext = indexingContext;
+		this.options = options;
 		this.mappingContext = mappingContext;
 		this.typeGroupsToIndex = typeGroupsToIndex;
 
@@ -141,11 +137,12 @@ public class PojoMassIndexingBatchCoordinator<O> extends PojoMassIndexingFailure
 		);
 	}
 
-	private PojoMassIndexingBatchIndexingWorkspace<O> createBatchIndexingWorkspace(
-			PojoMassIndexingIndexedTypeGroup<?, O> typeGroup) {
+	private <E> PojoMassIndexingBatchIndexingWorkspace<E, ?, O> createBatchIndexingWorkspace(
+			PojoMassIndexingIndexedTypeGroup<E, O> typeGroup) {
 		return new PojoMassIndexingBatchIndexingWorkspace<>(
-				indexingOptions, indexingContext, mappingContext,
-				getNotifier(), typeGroup, documentBuilderThreads );
+				mappingContext, getNotifier(), typeGroup,
+				typeGroup.loadingStrategy(),
+				options, documentBuilderThreads );
 	}
 
 	/**

@@ -8,6 +8,8 @@ package org.hibernate.search.mapper.javabean.massindexing;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+
+import org.hibernate.search.mapper.javabean.loading.MassLoadingOptions;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
 
@@ -137,5 +139,19 @@ public interface MassIndexer {
 	 * @return {@code this} for method chaining
 	 */
 	MassIndexer failureHandler(MassIndexingFailureHandler failureHandler);
+
+	/**
+	 * Sets context for use by the loading strategies.
+	 * <p>
+	 * The context can be retrieved through
+	 * {@link MassLoadingOptions#context(Class)}.
+	 *
+	 * @param <T> The type of context.
+	 * @param contextType The type of context, used as a key to retrieve it from
+	 * {@link MassLoadingOptions#context(Class)}.
+	 * @param context The context instance.
+	 * @return {@code this} for method chaining
+	 */
+	<T> MassIndexer context(Class<T> contextType, T context);
 
 }
