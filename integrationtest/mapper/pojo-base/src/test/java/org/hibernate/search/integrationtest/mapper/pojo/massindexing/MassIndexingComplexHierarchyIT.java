@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.mapper.pojo.massindexing;
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 import static org.assertj.core.api.Fail.fail;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -201,18 +200,6 @@ public class MassIndexingComplexHierarchyIT {
 
 	private SearchSession createSession() {
 		return mapping.createSessionWithOptions().loading( (o) -> {
-
-			o.registerLoader( H1_Root_NotIndexed.class, (identifiers) -> {
-				return identifiers.stream()
-						.map( (identifier) -> h1map.get( (Integer) identifier ) )
-						.collect( Collectors.toList() );
-			} );
-			o.registerLoader( H2_Root_Indexed.class, (identifiers) -> {
-				return identifiers.stream()
-						.map( (identifier) -> h2map.get( (Integer) identifier ) )
-						.collect( Collectors.toList() );
-			} );
-
 			o.massIndexingLoadingStrategy( H1_Root_NotIndexed.class, JavaBeanIndexingStrategies.from( h1map ) );
 			o.massIndexingLoadingStrategy( H2_Root_Indexed.class, JavaBeanIndexingStrategies.from( h2map ) );
 		} ).build();

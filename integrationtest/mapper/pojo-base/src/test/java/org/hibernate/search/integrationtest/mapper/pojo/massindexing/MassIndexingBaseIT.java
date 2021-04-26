@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.mapper.pojo.massindexing;
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
 
@@ -233,12 +232,6 @@ public class MassIndexingBaseIT {
 
 	private SearchSession createSessionFromMap() {
 		return mapping.createSessionWithOptions().loading( (o) -> {
-			o.registerLoader( Book.class, (identifiers) -> {
-				return identifiers.stream()
-						.map( (identifier) -> booksmap.get( (Integer) identifier ) )
-						.collect( Collectors.toList() );
-			} );
-
 			o.massIndexingLoadingStrategy( Book.class, JavaBeanIndexingStrategies.from( booksmap ) );
 		} ).build();
 	}

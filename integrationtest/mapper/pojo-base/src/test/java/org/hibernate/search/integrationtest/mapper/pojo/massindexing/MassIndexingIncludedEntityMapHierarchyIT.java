@@ -250,18 +250,6 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 
 	private SearchSession createSession() {
 		return mapping.createSessionWithOptions().loading( (o) -> {
-
-			o.registerLoader( H1_Root_NotIndexed.class, (identifiers) -> {
-				return identifiers.stream()
-						.map( (identifier) -> h1map.get( (Integer) identifier ) )
-						.collect( Collectors.toList() );
-			} );
-			o.registerLoader( H2_Root_Indexed.class, (identifiers) -> {
-				return identifiers.stream()
-						.map( (identifier) -> h2map.get( (Integer) identifier ) )
-						.collect( Collectors.toList() );
-			} );
-
 			o.massIndexingLoadingStrategy( H1_Root_NotIndexed.class, exeptingStrategy() );
 			o.massIndexingLoadingStrategy( H2_Root_Indexed.class, exeptingStrategy() );
 		} ).build();

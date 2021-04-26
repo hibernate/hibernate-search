@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.mapper.pojo.massindexing;
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 import static org.assertj.core.api.Fail.fail;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -95,12 +94,6 @@ public class MassIndexingPrimitiveIdIT {
 
 	private SearchSession createSessionFromMap() {
 		return mapping.createSessionWithOptions().loading( (o) -> {
-			o.registerLoader( EntityWithPrimitiveId.class, (identifiers) -> {
-				return identifiers.stream()
-						.map( (identifier) -> entitymap.get( (Integer) identifier ) )
-						.collect( Collectors.toList() );
-			} );
-
 			o.massIndexingLoadingStrategy( EntityWithPrimitiveId.class, JavaBeanIndexingStrategies.from( entitymap ) );
 		} ).build();
 	}

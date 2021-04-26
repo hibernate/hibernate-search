@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -190,12 +189,6 @@ public class MassIndexingInterruptionIT {
 
 	private SearchSession createSessionFromMap() {
 		return mapping.createSessionWithOptions().loading( (o) -> {
-			o.registerLoader( Book.class, (identifiers) -> {
-				return identifiers.stream()
-						.map( (identifier) -> booksmap.get( (Integer) identifier ) )
-						.collect( Collectors.toList() );
-			} );
-
 			o.massIndexingLoadingStrategy( Book.class, JavaBeanIndexingStrategies.from( booksmap ) );
 		} ).build();
 	}
