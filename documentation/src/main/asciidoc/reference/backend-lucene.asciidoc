@@ -1113,6 +1113,43 @@ hibernate.search.backend.io.merge.max_forced_size = 7
 ----
 ========
 
+[[backend-lucene-search]]
+== Searching
+
+Searching with the Lucene backend relies on the <<search-dsl,same APIs as any other backend>>.
+
+This section details Lucene-specific configuration related to searching.
+
+[[backend-lucene-search-caching]]
+=== Low-level hit caching
+
+include::components/lucene-api-warning.asciidoc[]
+
+Lucene supports caching low-level hits,
+i.e. caching the list of documents that match a given `org.apache.lucene.search.Query`
+in a given index segment.
+
+This cache can be useful in read-intensive scenarios,
+where the same query is executed very often on the same index,
+and the index is rarely written to.
+
+NOTE: This is different from Hibernate ORM caching,
+which caches the content of entities or the results of *database* queries.
+Hibernate ORM caching can also be leveraged in Hibernate Search, but through a different API:
+see <<search-dsl-query-cache-lookup-strategy>>.
+
+To configure caching in a Lucene backend, you will need to:
+
+. Define a class that implements the `org.hibernate.search.backend.lucene.cache.QueryCachingConfigurer` interface.
+. Configure the backend to use that implementation by setting the configuration property
+`hibernate.search.backend.query.caching.configurer`
+to a <<configuration-bean-reference-parsing,bean reference>> pointing to the implementation,
+for example `class:com.mycompany.MyQueryCachingConfigurer`.
+
+Hibernate Search will call the `configure` method of this implementation on startup,
+and the configurer will be able to take advantage of a DSL to define
+the `org.apache.lucene.search.QueryCache` and the `org.apache.lucene.search.QueryCachingPolicy`.
+
 [[backend-lucene-access-analyzers]]
 == Retrieving analyzers and normalizers
 
