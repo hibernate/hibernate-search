@@ -287,16 +287,16 @@ which already accept parameters to configure the field name,
 whether the field is sortable, etc.
 
 However, these parameters are not passed to the value bridge or value binder.
-There are two ways to pass parameters to property bridges:
+There are two ways to pass parameters to value bridges:
 
 * One is (mostly) limited to string parameters, but is trivial to implement.
 * The other can allow any type of parameters, but requires you to declare your own annotations.
 
 === Simple, string parameters
 
-You can define string parameters to the `@TypeBinderRef` annotation and then use them later in the binder:
+You can define string parameters to the `@ValueBinderRef` annotation and then use them later in the binder:
 
-.Passing parameters to a `ValueBridge` using the `@TypeBinderRef` annotation
+.Passing parameters to a `ValueBridge` using the `@ValueBinderRef` annotation
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----

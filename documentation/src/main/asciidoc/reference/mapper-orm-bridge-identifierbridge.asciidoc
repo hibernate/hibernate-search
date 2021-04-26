@@ -138,9 +138,9 @@ There are two ways to pass parameters to identifier bridges:
 
 === Simple, string parameters
 
-You can define string parameters to the `@IdentifierBinderRef` annotation and then use them later in the binder:
+You can pass string parameters to the `@IdentifierBinderRef` annotation and then use them later in the binder:
 
-.Passing parameters to an `IdentifierBridge` using the `@TypeBinderRef` annotation
+.Passing parameters to an `IdentifierBridge` using the `@IdentifierBinderRef` annotation
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -160,7 +160,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/identi
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/identifierbridge/parameter/OffsetIdentifierBridge.java[tags=include]
 ----
-<1> Implement a bridge that index the identifier as is,
+<1> Implement a bridge that indexes the identifier as is,
 but adds a configurable offset,
 For example, with an offset of 1 and database identifiers starting at 0, index identifiers will start at 1.
 <2> The bridge accepts one parameter in its constructors:

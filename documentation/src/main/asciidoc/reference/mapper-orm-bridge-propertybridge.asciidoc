@@ -130,7 +130,7 @@ There are two ways to pass parameters to property bridges:
 
 === Simple, string parameters
 
-You can define string parameters to the `@PropertyBinderRef` annotation and then use them later in the binder:
+You can pass string parameters to the `@PropertyBinderRef` annotation and then use them later in the binder:
 
 // Search 5 anchors backward compatibility
 [[example-passing-bridge-parameters]]

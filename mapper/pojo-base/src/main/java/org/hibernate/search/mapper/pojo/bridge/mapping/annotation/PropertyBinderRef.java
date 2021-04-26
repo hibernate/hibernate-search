@@ -12,7 +12,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
-import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 
 /**
@@ -43,8 +42,7 @@ public @interface PropertyBinderRef {
 	BeanRetrieval retrieval() default BeanRetrieval.ANY;
 
 	/**
-	 * @return A parameter that can be statically passed to a given {@link PropertyBinder},
-	 * so that it can be used by its {@link PropertyBridge}.
+	 * @return Parameters that will be passed to the {@link PropertyBinder}.
 	 */
 	Parameter[] params() default {};
 

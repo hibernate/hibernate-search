@@ -40,8 +40,7 @@ public interface TypeMappingStep {
 
 	/**
 	 * Define a type binder, responsible for creating a bridge.
-	 * With this method it is possible to pass a set of parameters to the binder,
-	 * so that they can be used by the bridge.
+	 * With this method it is possible to pass a set of parameters to the binder.
 	 *
 	 * @param binder A {@link TypeBinder} responsible for creating a bridge.
 	 * @param params The parameters to pass to the binder.
