@@ -300,13 +300,12 @@ You can define string parameters to the `@ValueBinderRef` annotation and then us
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/parameter/context/Book.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/parameter/BooleanAsStringBridge.java[tags=include]
 ----
-<1> Define the binder to use on the property,
-setting the `fieldName` parameter.
-<2> Because we use a value bridge,
-the annotation can be transparently applied to containers.
-Here, the bridge will be applied successively to each value in the map.
+<1> Implement a bridge that does not index booleans directly,
+but indexes them as strings instead.
+<2> The bridge accepts two parameters in its constructors:
+the string representing `true` and the string representing `false`.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -317,12 +316,13 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valueb
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/parameter/BooleanAsStringBridge.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/parameter/context/Book.java[tags=include;!getters-setters]
 ----
-<1> Implement a bridge that does not index booleans directly,
-but indexes them as strings instead.
-<2> The bridge accepts two parameters in its constructors:
-the string representing `true` and the string representing `false`.
+<1> Define the binder to use on the property,
+setting the `fieldName` parameter.
+<2> Because we use a value bridge,
+the annotation can be transparently applied to containers.
+Here, the bridge will be applied successively to each value in the map.
 ====
 
 === Parameters with custom annotations

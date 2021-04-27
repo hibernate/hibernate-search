@@ -144,10 +144,13 @@ You can pass string parameters to the `@IdentifierBinderRef` annotation and then
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/identifierbridge/parameter/context/Book.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/identifierbridge/parameter/OffsetIdentifierBridge.java[tags=include]
 ----
-<1> Define the binder to use on the identifier,
-setting the parameter.
+<1> Implement a bridge that indexes the identifier as is,
+but adds a configurable offset,
+For example, with an offset of 1 and database identifiers starting at 0, index identifiers will start at 1.
+<2> The bridge accepts one parameter in its constructors:
+the offset to apply to identifiers.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -158,13 +161,10 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/identi
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/identifierbridge/parameter/OffsetIdentifierBridge.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/identifierbridge/parameter/context/Book.java[tags=include;!getters-setters]
 ----
-<1> Implement a bridge that indexes the identifier as is,
-but adds a configurable offset,
-For example, with an offset of 1 and database identifiers starting at 0, index identifiers will start at 1.
-<2> The bridge accepts one parameter in its constructors:
-the offset to apply to identifiers.
+<1> Define the binder to use on the identifier,
+setting the parameter.
 ====
 
 === Parameters with custom annotations
