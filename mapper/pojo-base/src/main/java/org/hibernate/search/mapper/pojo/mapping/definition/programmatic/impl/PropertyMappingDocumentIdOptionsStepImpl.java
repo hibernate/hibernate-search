@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
+import java.util.Map;
+
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
@@ -22,6 +24,7 @@ class PropertyMappingDocumentIdOptionsStepImpl extends DelegatingPropertyMapping
 		implements PropertyMappingDocumentIdOptionsStep, PojoPropertyMetadataContributor {
 
 	private IdentifierBinder binder;
+	private Map<String, Object> params;
 
 	PropertyMappingDocumentIdOptionsStepImpl(PropertyMappingStep parent) {
 		super( parent );
@@ -34,7 +37,7 @@ class PropertyMappingDocumentIdOptionsStepImpl extends DelegatingPropertyMapping
 
 	@Override
 	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
-		collector.identifierBinder( binder );
+		collector.identifierBinder( binder, params );
 	}
 
 	@Override
@@ -48,8 +51,9 @@ class PropertyMappingDocumentIdOptionsStepImpl extends DelegatingPropertyMapping
 	}
 
 	@Override
-	public PropertyMappingDocumentIdOptionsStep identifierBinder(IdentifierBinder binder) {
+	public PropertyMappingDocumentIdOptionsStep identifierBinder(IdentifierBinder binder, Map<String, Object> params) {
 		this.binder = binder;
+		this.params = params;
 		return this;
 	}
 }

@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
@@ -41,10 +44,28 @@ public interface PropertyMappingDocumentIdOptionsStep extends PropertyMappingSte
 	}
 
 	/**
+	 * Define an identifier binder, responsible for creating a bridge.
+	 * To pass some parameters to the bridge,
+	 * use the method {@link #identifierBinder(IdentifierBinder, Map)} instead.
+	 *
 	 * @param binder A {@link IdentifierBinder} responsible for creating a bridge.
 	 * @return {@code this}, for method chaining.
 	 * @see IdentifierBinder
 	 */
-	PropertyMappingDocumentIdOptionsStep identifierBinder(IdentifierBinder binder);
+	default PropertyMappingDocumentIdOptionsStep identifierBinder(IdentifierBinder binder) {
+		return identifierBinder( binder, Collections.emptyMap() );
+	}
+
+	/**
+	 * Define an identifier binder, responsible for creating a bridge.
+	 * With this method it is possible to pass a set of parameters to the binder,
+	 * so that they can be used by the bridge.
+	 *
+	 * @param binder A {@link IdentifierBinder} responsible for creating a bridge.
+	 * @param params The parameters to pass to the binder.
+	 * @return {@code this}, for method chaining.
+	 * @see IdentifierBinder
+	 */
+	PropertyMappingDocumentIdOptionsStep identifierBinder(IdentifierBinder binder, Map<String, Object> params);
 
 }

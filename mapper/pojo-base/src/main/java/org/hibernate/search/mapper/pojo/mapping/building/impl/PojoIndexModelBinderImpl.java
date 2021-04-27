@@ -94,7 +94,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	public <I> BoundIdentifierBridge<I> bindIdentifier(
 			IndexedEntityBindingContext indexedEntityBindingContext,
 			BoundPojoModelPathPropertyNode<?, I> modelPath,
-			IdentifierBinder binder) {
+			IdentifierBinder binder, Map<String, Object> params) {
 		PojoGenericTypeModel<I> identifierTypeModel = modelPath.valueWithoutExtractors().getTypeModel();
 
 		IdentifierBinder defaultedBinder = binder;
@@ -106,7 +106,8 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 				beanResolver,
 				introspector,
 				indexedEntityBindingContext,
-				identifierTypeModel
+				identifierTypeModel,
+				params
 		);
 
 		return bindingContext.applyBinder( defaultedBinder );
