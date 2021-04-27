@@ -12,6 +12,7 @@ import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
@@ -517,18 +518,13 @@ public class ScaledNumberFieldIT {
 
 		@SuppressWarnings("uncheked")
 		private static BigDecimal extractBaseDecimal(ValueBindingContext<?> context) {
-			BigDecimal baseDecimal = (BigDecimal) context.param( "baseDecimal" );
-			if ( baseDecimal != null ) {
-				return baseDecimal;
+			Optional<Object> optionalBaseDecimal = context.paramOptional( "baseDecimal" );
+			if ( optionalBaseDecimal.isPresent() ) {
+				return (BigDecimal) optionalBaseDecimal.get();
 			}
 
 			Object unscaledValParam = context.param( "unscaledVal" );
 			Object scaleParam = context.param( "scale" );
-
-			if ( unscaledValParam == null || scaleParam == null ) {
-				return BigDecimal.ZERO;
-			}
-
 			BigInteger unscaledVal = new BigInteger( (String) unscaledValParam );
 			int scale = Integer.parseInt( (String) scaleParam );
 			return new BigDecimal( unscaledVal, scale );

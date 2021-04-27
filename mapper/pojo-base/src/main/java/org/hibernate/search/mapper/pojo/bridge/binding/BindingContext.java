@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.binding;
 
+import java.util.Optional;
+
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.SearchException;
 
@@ -23,5 +25,12 @@ public interface BindingContext {
 	 * @throws SearchException if it does not exist a param having such name
 	 */
 	Object param(String name);
+
+	/**
+	 * @param name The name of the param
+	 * @return Get an optional param defined for the binder by the given name,
+	 * a param having such name may either exist or not.
+	 */
+	Optional<Object> paramOptional(String name);
 
 }

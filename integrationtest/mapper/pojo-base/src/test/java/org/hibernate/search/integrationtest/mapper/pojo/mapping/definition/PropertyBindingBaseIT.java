@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -184,7 +185,7 @@ public class PropertyBindingBaseIT {
 					.toReference();
 			IndexFieldReference<Integer> diff = context.indexSchemaElement().field( "diff", f -> f.asInteger() )
 					.toReference();
-			Integer base = extractBase( context );
+			int base = extractBase( context );
 
 			context.bridge( Integer.class, (DocumentElement target, Integer bridgedElement,
 					PropertyBridgeWriteContext writeContext) -> {
@@ -194,10 +195,10 @@ public class PropertyBindingBaseIT {
 		}
 
 		@SuppressWarnings("uncheked")
-		private static Integer extractBase(PropertyBindingContext context) {
-			Integer base = (Integer) context.param( "base" );
-			if ( base != null ) {
-				return base;
+		private static int extractBase(PropertyBindingContext context) {
+			Optional<Object> optionalBase = context.paramOptional( "base" );
+			if ( optionalBase.isPresent() ) {
+				return (Integer) optionalBase.get();
 			}
 
 			String stringBase = (String) context.param( "stringBase" );

@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.integrationtest.mapper.pojo.work.operations.PojoIndexingPlanOperationIT;
@@ -731,9 +732,9 @@ public class RoutingBridgeBaseIT {
 
 		@SuppressWarnings("uncheked")
 		private static int modulus(RoutingBindingContext context) {
-			Integer modulus = (Integer) context.param( "modulus" );
-			if ( modulus != null ) {
-				return modulus;
+			Optional<Object> optionalModulus = context.paramOptional( "modulus" );
+			if ( optionalModulus.isPresent() ) {
+				return (Integer) optionalModulus.get();
 			}
 
 			String stringModulus = (String) context.param( "stringModulus" );

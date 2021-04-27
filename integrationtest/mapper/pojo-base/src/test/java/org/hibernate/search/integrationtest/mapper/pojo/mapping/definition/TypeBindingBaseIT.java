@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -206,9 +207,9 @@ public class TypeBindingBaseIT {
 
 	@SuppressWarnings("uncheked")
 	private static Integer extractBase(TypeBindingContext context) {
-		Integer base = (Integer) context.param( "base" );
-		if ( base != null ) {
-			return base;
+		Optional<Object> optionalBase = context.paramOptional( "base" );
+		if ( optionalBase.isPresent() ) {
+			return (Integer) optionalBase.get();
 		}
 
 		String stringBase = (String) context.param( "stringBase" );
