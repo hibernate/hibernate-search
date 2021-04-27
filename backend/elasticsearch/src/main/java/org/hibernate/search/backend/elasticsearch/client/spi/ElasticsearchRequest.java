@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-import org.hibernate.search.engine.common.timing.spi.Deadline;
+import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
 import com.google.gson.JsonObject;

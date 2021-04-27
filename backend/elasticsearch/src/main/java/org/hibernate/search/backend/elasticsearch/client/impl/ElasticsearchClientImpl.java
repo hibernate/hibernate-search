@@ -27,7 +27,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRespon
 import org.hibernate.search.backend.elasticsearch.gson.spi.JsonLogHelper;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchLogCategories;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.engine.common.timing.spi.Deadline;
+import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -140,7 +140,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 		}
 
 		long currentTimeoutValue = deadline == null ?
-				Long.valueOf( requestTimeoutMs.get() ) : deadline.remainingTimeMillis();
+				Long.valueOf( requestTimeoutMs.get() ) : deadline.checkRemainingTimeMillis();
 
 		/*
 		 * TODO HSEARCH-3590 maybe the callback should also cancel the request?
@@ -184,7 +184,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 			return;
 		}
 
-		long timeToHardTimeout = deadline.remainingTimeMillis();
+		long timeToHardTimeout = deadline.checkRemainingTimeMillis();
 
 		// set a per-request socket timeout
 		int socketTimeoutMs = ( timeToHardTimeout <= Integer.MAX_VALUE ) ? Math.toIntExact( timeToHardTimeout ) : -1;

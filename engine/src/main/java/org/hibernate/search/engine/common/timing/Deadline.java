@@ -4,13 +4,15 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.common.timing.spi;
+package org.hibernate.search.engine.common.timing;
 
 import org.hibernate.search.util.common.SearchTimeoutException;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
- * Common interface providing a deadline through the method {@link #remainingTimeMillis}.
+ * Common interface providing a deadline through the method {@link #checkRemainingTimeMillis}.
  */
+@Incubating
 public interface Deadline {
 
 	/**
@@ -18,7 +20,7 @@ public interface Deadline {
 	 * @throws org.hibernate.search.util.common.SearchTimeoutException If the deadline was reached
 	 * and it's a hard deadline requiring immediate failure.
 	 */
-	long remainingTimeMillis();
+	long checkRemainingTimeMillis();
 
 	/**
 	 * @param cause The cause of the timeout, or {@code null}.
@@ -32,15 +34,5 @@ public interface Deadline {
 	 * @return An exception to be thrown on timeout.
 	 */
 	SearchTimeoutException forceTimeoutAndCreateException(Exception cause);
-
-	/**
-	 * @param milliseconds The number of milliseconds until the deadline.
-	 * @return An immutable {@link Deadline} which does not track the passing time.
-	 * {@link #remainingTimeMillis()} will always return the same value
-	 * and will never throw an exception.
-	 */
-	static Deadline ofMilliseconds(long milliseconds) {
-		return new StaticDeadline( milliseconds );
-	}
 
 }

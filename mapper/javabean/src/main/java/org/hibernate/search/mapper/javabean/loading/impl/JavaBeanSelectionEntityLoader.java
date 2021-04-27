@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.javabean.loading.impl;
 
 import java.util.List;
 
-import org.hibernate.search.engine.common.timing.spi.Deadline;
+import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.mapper.javabean.loading.SelectionEntityLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 

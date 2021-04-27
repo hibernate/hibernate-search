@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.WaitForIndexStatusWorkBuilder;
-import org.hibernate.search.engine.common.timing.spi.Deadline;
+import org.hibernate.search.engine.common.timing.spi.StaticDeadline;
 
 
 public class WaitForIndexStatusWork extends AbstractNonBulkableWork<Void> {
@@ -50,7 +50,7 @@ public class WaitForIndexStatusWork extends AbstractNonBulkableWork<Void> {
 					.param( "wait_for_status", requiredStatus.externalRepresentation() )
 					.param( "timeout", requiredStatusTimeoutInMs + "ms" );
 
-			builder.deadline( Deadline.ofMilliseconds( requiredStatusTimeoutInMs ) );
+			builder.deadline( StaticDeadline.ofMilliseconds( requiredStatusTimeoutInMs ) );
 
 			return builder.build();
 		}

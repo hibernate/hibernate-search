@@ -12,7 +12,7 @@ import java.util.function.Function;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
-import org.hibernate.search.engine.common.timing.spi.Deadline;
+import org.hibernate.search.engine.common.timing.Deadline;
 
 
 public interface SearchWorkBuilder<R> extends ElasticsearchWorkBuilder<NonBulkableWork<R>> {

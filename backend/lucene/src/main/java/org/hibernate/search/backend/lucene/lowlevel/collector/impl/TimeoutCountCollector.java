@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 
-import org.hibernate.search.engine.common.timing.spi.Deadline;
+import org.hibernate.search.engine.common.timing.Deadline;
 
 import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.SimpleCollector;
@@ -35,7 +35,7 @@ public class TimeoutCountCollector extends SimpleCollector {
 	public void collect(int doc) {
 		// Check for timeout each 256 elements:
 		if ( totalHits % 256 == 0 ) {
-			deadline.remainingTimeMillis();
+			deadline.checkRemainingTimeMillis();
 		}
 		totalHits++;
 	}

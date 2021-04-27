@@ -13,7 +13,7 @@ import org.hibernate.exception.LockTimeoutException;
 import org.hibernate.jpa.QueryHints;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
-import org.hibernate.search.engine.common.timing.spi.Deadline;
+import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 
@@ -38,7 +38,7 @@ abstract class AbstractHibernateOrmSelectionEntityLoader<E> implements PojoSelec
 
 	@Override
 	public final List<?> loadBlocking(List<?> identifiers, Deadline deadline) {
-		Long timeout = deadline == null ? null : deadline.remainingTimeMillis();
+		Long timeout = deadline == null ? null : deadline.checkRemainingTimeMillis();
 		try {
 			return doLoadEntities( identifiers, timeout );
 		}
