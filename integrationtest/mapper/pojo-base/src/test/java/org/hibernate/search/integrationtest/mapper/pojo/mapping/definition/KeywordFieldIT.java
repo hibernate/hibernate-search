@@ -20,7 +20,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
@@ -256,13 +256,13 @@ public class KeywordFieldIT {
 	}
 
 	@Test
-	public void customBridge_withParameters_annotationMapping() {
+	public void customBridge_withParams_annotationMapping() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
 			@KeywordField(valueBinder = @ValueBinderRef(type = ParametricBridge.ParametricBinder.class,
-					params = @Parameter(name = "fixedPrefix", value = "fixed-prefix-")))
+					params = @Param(name = "fixedPrefix", value = "fixed-prefix-")))
 			WrappedValue wrap;
 
 			IndexedEntity() {
@@ -290,7 +290,7 @@ public class KeywordFieldIT {
 	}
 
 	@Test
-	public void customBridge_withParameters_programmaticMapping() {
+	public void customBridge_withParams_programmaticMapping() {
 		class IndexedEntity {
 			Integer id;
 			WrappedValue wrap;
@@ -536,7 +536,7 @@ public class KeywordFieldIT {
 
 		@SuppressWarnings("uncheked")
 		private static String extractFixedPrefix(ValueBindingContext<?> context) {
-			return (String) context.parameter( "fixedPrefix" );
+			return (String) context.param( "fixedPrefix" );
 		}
 	}
 

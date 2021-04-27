@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
@@ -55,7 +55,7 @@ abstract class AbstractFieldAnnotationProcessor<A extends Annotation> implements
 
 		if ( valueBinder.params() != null ) {
 			Map<String, Object> params = Arrays.stream( valueBinder.params() )
-					.collect( Collectors.toMap( Parameter::name, Parameter::value ) );
+					.collect( Collectors.toMap( Param::name, Param::value ) );
 			fieldContext.valueBinder( binder, params );
 		}
 		else {

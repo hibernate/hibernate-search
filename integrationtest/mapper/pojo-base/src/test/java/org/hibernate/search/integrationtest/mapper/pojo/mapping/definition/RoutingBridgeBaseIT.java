@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
@@ -654,7 +654,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void parameters_annotationMapping() {
+	public void params_annotationMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> { } );
 		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( AnnotatedRoutedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -672,7 +672,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
-	public void parameters_programmaticMapping() {
+	public void params_programmaticMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> { } );
 		SearchMapping mapping = setupHelper.start().expectCustomBeans()
 				.withConfiguration( builder -> {
@@ -699,7 +699,7 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Indexed(index = INDEX_NAME, routingBinder = @RoutingBinderRef(type = ParametricBinder.class,
-			params = @Parameter(name = "stringModulus", value = "7")))
+			params = @Param(name = "stringModulus", value = "7")))
 	class AnnotatedRoutedEntity {
 		@DocumentId
 		int id;
@@ -731,12 +731,12 @@ public class RoutingBridgeBaseIT {
 
 		@SuppressWarnings("uncheked")
 		private static int modulus(RoutingBindingContext context) {
-			Integer modulus = (Integer) context.parameter( "modulus" );
+			Integer modulus = (Integer) context.param( "modulus" );
 			if ( modulus != null ) {
 				return modulus;
 			}
 
-			String stringModulus = (String) context.parameter( "stringModulus" );
+			String stringModulus = (String) context.param( "stringModulus" );
 			return Integer.parseInt( stringModulus );
 		}
 	}

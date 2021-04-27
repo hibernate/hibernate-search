@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanDelegatingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -52,7 +52,7 @@ public class IndexedProcessor implements TypeMappingAnnotationProcessor<Indexed>
 
 		if ( routingBinderReferenceAnnotation.params() != null ) {
 			Map<String, Object> params = Arrays.stream( routingBinderReferenceAnnotation.params() )
-					.collect( Collectors.toMap( Parameter::name, Parameter::value ) );
+					.collect( Collectors.toMap( Param::name, Param::value ) );
 			indexedStep.routingBinder( new BeanDelegatingBinder( routingBinderReference.get() ), params );
 		}
 		else {

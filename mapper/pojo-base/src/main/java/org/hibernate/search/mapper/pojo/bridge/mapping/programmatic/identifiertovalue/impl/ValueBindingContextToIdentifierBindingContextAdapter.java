@@ -40,8 +40,8 @@ final class ValueBindingContextToIdentifierBindingContextAdapter<I> implements I
 	}
 
 	@Override
-	public Object parameter(String name) {
-		return delegate.parameter( name );
+	public Object param(String name) {
+		return delegate.param( name );
 	}
 
 	@Override

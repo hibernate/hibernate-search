@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
@@ -109,7 +109,7 @@ public class PropertyBindingBaseIT {
 	}
 
 	@Test
-	public void customBridge_withParameters_annotationMapping() {
+	public void customBridge_withParams_annotationMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> {
 			b.field( "sum", Integer.class );
 			b.field( "diff", Integer.class );
@@ -136,7 +136,7 @@ public class PropertyBindingBaseIT {
 		backendMock.verifyExpectationsMet();
 	}
 	@Test
-	public void customBridge_withParameters_programmaticMapping() {
+	public void customBridge_withParams_programmaticMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> {
 			b.field( "sum", Integer.class );
 			b.field( "diff", Integer.class );
@@ -195,12 +195,12 @@ public class PropertyBindingBaseIT {
 
 		@SuppressWarnings("uncheked")
 		private static Integer extractBase(PropertyBindingContext context) {
-			Integer base = (Integer) context.parameter( "base" );
+			Integer base = (Integer) context.param( "base" );
 			if ( base != null ) {
 				return base;
 			}
 
-			String stringBase = (String) context.parameter( "stringBase" );
+			String stringBase = (String) context.param( "stringBase" );
 			return Integer.parseInt( stringBase );
 		}
 	}
@@ -211,7 +211,7 @@ public class PropertyBindingBaseIT {
 		Integer id;
 
 		@PropertyBinding(binder = @PropertyBinderRef(type = ParametricBinder.class,
-				params = @Parameter(name = "stringBase", value = "7")))
+				params = @Param(name = "stringBase", value = "7")))
 		int value;
 
 		AnnotatedEntity(Integer id, int value) {

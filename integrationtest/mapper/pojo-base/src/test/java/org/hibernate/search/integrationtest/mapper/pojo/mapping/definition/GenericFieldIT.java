@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
@@ -194,13 +194,13 @@ public class GenericFieldIT {
 	}
 
 	@Test
-	public void customBridge_withParameters_annotationMapping() {
+	public void customBridge_withParams_annotationMapping() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
 			@GenericField(valueBinder = @ValueBinderRef(type = ParametricBridge.ParametricBinder.class,
-					params = @Parameter(name = "stringBase", value = "4")))
+					params = @Param(name = "stringBase", value = "4")))
 			Integer value;
 
 			IndexedEntity() {
@@ -230,7 +230,7 @@ public class GenericFieldIT {
 	}
 
 	@Test
-	public void customBridge_withParameters_programmaticMapping() {
+	public void customBridge_withParams_programmaticMapping() {
 		class IndexedEntity {
 			Integer id;
 			Integer value;
@@ -399,12 +399,12 @@ public class GenericFieldIT {
 
 		@SuppressWarnings("uncheked")
 		private static Integer extractBase(ValueBindingContext<?> context) {
-			Integer base = (Integer) context.parameter( "base" );
+			Integer base = (Integer) context.param( "base" );
 			if ( base != null ) {
 				return base;
 			}
 
-			String stringBase = (String) context.parameter( "stringBase" );
+			String stringBase = (String) context.param( "stringBase" );
 			if ( stringBase == null ) {
 				return 0;
 			}

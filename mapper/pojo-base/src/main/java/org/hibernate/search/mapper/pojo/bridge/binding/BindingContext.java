@@ -17,9 +17,9 @@ public interface BindingContext {
 	BeanResolver beanResolver();
 
 	/**
-	 * @param name The parameter name
-	 * @return Get a parameter defined for the binder by the given name. {@code null} if it does not exist.
+	 * @param name The name of the param
+	 * @return Get a param defined for the binder by the given name. {@code null} if it does not exist.
 	 */
-	Object parameter(String name);
+	Object param(String name);
 
 }

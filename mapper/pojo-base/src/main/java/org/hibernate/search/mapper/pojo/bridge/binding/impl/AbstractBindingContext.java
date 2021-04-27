@@ -27,7 +27,7 @@ abstract class AbstractBindingContext implements BindingContext {
 	}
 
 	@Override
-	public Object parameter(String name) {
+	public Object param(String name) {
 		return params.get( name );
 	}
 }

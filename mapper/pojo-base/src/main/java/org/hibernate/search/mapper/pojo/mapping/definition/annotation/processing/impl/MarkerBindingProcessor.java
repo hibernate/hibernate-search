@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerBinderRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanDelegatingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -37,7 +37,7 @@ public final class MarkerBindingProcessor implements PropertyMappingAnnotationPr
 
 		if ( markerBinderRef.params() != null ) {
 			Map<String, Object> params = Arrays.stream( markerBinderRef.params() )
-					.collect( Collectors.toMap( Parameter::name, Parameter::value ) );
+					.collect( Collectors.toMap( Param::name, Param::value ) );
 			mapping.marker( binder, params );
 		}
 		else {

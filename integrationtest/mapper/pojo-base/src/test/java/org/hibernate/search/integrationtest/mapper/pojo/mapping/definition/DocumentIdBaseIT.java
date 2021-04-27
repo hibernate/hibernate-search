@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
@@ -331,11 +331,11 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
-	public void customBridge_withParameters_annotationMapping() {
+	public void customBridge_withParams_annotationMapping() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId(identifierBinder = @IdentifierBinderRef(type = ParametricBridge.ParametricBinder.class,
-					params = @Parameter(name = "fixedPrefix", value = "fixed-prefix-")))
+					params = @Param(name = "fixedPrefix", value = "fixed-prefix-")))
 			Integer id;
 			@GenericField
 			String value;
@@ -377,7 +377,7 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
-	public void customBridge_withParameters_programmaticMapping() {
+	public void customBridge_withParams_programmaticMapping() {
 		class IndexedEntity {
 			Integer id;
 			String value;
@@ -459,7 +459,7 @@ public class DocumentIdBaseIT {
 
 		@SuppressWarnings("uncheked")
 		private static String extractFixedPrefix(IdentifierBindingContext<?> context) {
-			return (String) context.parameter( "fixedPrefix" );
+			return (String) context.param( "fixedPrefix" );
 		}
 	}
 }
