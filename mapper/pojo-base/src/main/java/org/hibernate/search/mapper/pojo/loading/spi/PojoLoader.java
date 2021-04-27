@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.engine.common.timing.spi.Deadline;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 /**
  * A loader for loading a small selection of entities, used in particular during search.
@@ -74,6 +73,6 @@ public interface PojoLoader<E> {
 	 * @return The given {@code loadedObject} if is an instance of {@code expectedType} exactly (not an instance of a subtype).
 	 * {@code null} otherwise.
 	 */
-	<E2 extends E> E2 castToExactTypeOrNull(PojoRawTypeIdentifier<E2> expectedType, Object loadedObject);
+	<E2 extends E> E2 castToExactTypeOrNull(PojoLoadingTypeContext<E2> expectedType, Object loadedObject);
 
 }

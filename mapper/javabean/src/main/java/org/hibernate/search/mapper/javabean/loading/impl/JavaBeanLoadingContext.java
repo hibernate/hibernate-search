@@ -21,6 +21,7 @@ import org.hibernate.search.mapper.javabean.loading.LoadingOptions;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexingLoadingStrategy;
 import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexingMappingContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingLoadingStrategy;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
@@ -82,14 +83,14 @@ public final class JavaBeanLoadingContext implements PojoLoadingContext, PojoMas
 	}
 
 	@Override
-	public Object loaderKey(PojoRawTypeIdentifier<?> type) {
-		return type;
+	public Object loaderKey(PojoLoadingTypeContext<?> type) {
+		return type.typeIdentifier();
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> PojoLoader<? super T> createLoader(Set<PojoRawTypeIdentifier<? extends T>> expectedTypes) {
-		PojoRawTypeIdentifier<? extends T> type = expectedTypes.iterator().next();
+	public <T> PojoLoader<? super T> createLoader(Set<PojoLoadingTypeContext<? extends T>> expectedTypes) {
+		PojoRawTypeIdentifier<? extends T> type = expectedTypes.iterator().next().typeIdentifier();
 		PojoLoader<? super T> loader = (PojoLoader<T>) loaderByType.get( type );
 		if ( loader == null ) {
 			for ( Map.Entry<PojoRawTypeIdentifier<?>, PojoLoader<?>> entry : loaderByType.entrySet() ) {

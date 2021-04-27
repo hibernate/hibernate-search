@@ -55,7 +55,7 @@ public class PojoSearchLoadingContext<R, E> implements SearchLoadingContext<R, E
 	private boolean hasCommonLoaderKey() {
 		Object loaderKey = null;
 		for ( PojoSearchLoadingIndexedTypeContext<? extends E> typeContext : targetTypesByEntityName.values() ) {
-			Object thisTypeLoaderKey = delegate.loaderKey( typeContext.typeIdentifier() );
+			Object thisTypeLoaderKey = delegate.loaderKey( typeContext );
 			if ( loaderKey == null ) {
 				loaderKey = thisTypeLoaderKey;
 			}

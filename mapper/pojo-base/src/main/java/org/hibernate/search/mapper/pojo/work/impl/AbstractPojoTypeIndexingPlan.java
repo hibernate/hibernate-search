@@ -172,7 +172,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 
 		void planLoading() {
 			if ( EntityStatus.PRESENT == currentStatus && entitySupplier == null ) {
-				loadingOrdinal = root.loadingPlan().planLoading( typeContext().typeIdentifier(), identifier );
+				loadingOrdinal = root.loadingPlan().planLoading( typeContext(), identifier );
 			}
 		}
 
@@ -192,7 +192,7 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 
 		Supplier<E> entitySupplierOrLoad() {
 			if ( entitySupplier == null && loadingOrdinal != null ) {
-				E loaded = root.loadingPlan().retrieve( typeContext().typeIdentifier(), loadingOrdinal );
+				E loaded = root.loadingPlan().retrieve( typeContext(), loadingOrdinal );
 				entitySupplier = typeContext().toEntitySupplier( sessionContext, loaded );
 				loadingOrdinal = null;
 			}
