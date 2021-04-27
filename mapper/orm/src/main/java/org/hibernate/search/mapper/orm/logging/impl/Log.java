@@ -73,8 +73,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 39, value = "Unable to properly close scroll in ScrollableResults.")
 	void unableToCloseSearcherInScrollableResult(@Cause Exception e);
 
-	@Message(id = ID_OFFSET_LEGACY_ENGINE + 276, value = "No transaction active while indexing entity '%1$s'. Consider increasing the connection time-out.")
-	SearchException transactionNotActiveWhileProducingIdsForBatchIndexing(String entityName);
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 276, value = "No transaction active. Consider increasing the connection time-out.")
+	SearchException transactionNotActiveWhileProducingIdsForBatchIndexing();
 
 	// -----------------------------------
 	// New messages from Search 6 onwards

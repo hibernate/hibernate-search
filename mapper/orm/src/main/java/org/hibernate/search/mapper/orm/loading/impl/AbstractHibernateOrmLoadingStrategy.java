@@ -70,7 +70,7 @@ abstract class AbstractHibernateOrmLoadingStrategy<E, I> implements
 			MassIndexingThreadContext context,
 			MassIndexingEntityLoadingTypeGroup<? extends E> loadingTypeGroup) {
 		HibernateOrmQueryLoader<E, ?> typeQueryLoader = createQueryLoader( loadingTypeGroup.includedEntityMap() );
-		return new HibernateOrmEntityIdentifierScroll<>( typeQueryLoader, options, context, loadingTypeGroup );
+		return new HibernateOrmEntityIdentifierScroll<>( typeQueryLoader, options, context );
 	}
 
 	@Override
@@ -81,7 +81,6 @@ abstract class AbstractHibernateOrmLoadingStrategy<E, I> implements
 	}
 
 	private static class HibernateOrmEntityIdentifierScroll<E, I> implements EntityIdentifierScroll {
-		private final MassIndexingEntityLoadingTypeGroup<E> loadingTypeGroup;
 		private final MassIndexingThreadContext context;
 		private Long totalCount;
 		private final ScrollableResults results;
@@ -89,10 +88,8 @@ abstract class AbstractHibernateOrmLoadingStrategy<E, I> implements
 
 		public HibernateOrmEntityIdentifierScroll(HibernateOrmQueryLoader<? super E, ?> typeQueryLoader,
 				HibernateOrmMassIndexingOptions options,
-				MassIndexingThreadContext context,
-				MassIndexingEntityLoadingTypeGroup<E> loadingTypeGroup) {
+				MassIndexingThreadContext context) {
 			this.context = context;
-			this.loadingTypeGroup = loadingTypeGroup;
 
 			int fetchSize = options.idFetchSize();
 			batchSize = options.batchSizeToLoadObjects();
@@ -134,8 +131,7 @@ abstract class AbstractHibernateOrmLoadingStrategy<E, I> implements
 					// Explicitly checking whether the TX is still open; Depending on the driver implementation new ids
 					// might be produced otherwise if the driver fetches all rows up-front
 					if ( !sharedSession.isTransactionInProgress() ) {
-						throw log.transactionNotActiveWhileProducingIdsForBatchIndexing( loadingTypeGroup
-								.toString() );
+						throw log.transactionNotActiveWhileProducingIdsForBatchIndexing();
 					}
 
 					return destinationList;
