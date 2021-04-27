@@ -35,14 +35,16 @@ public class AbstractPojoTypeManager<E>
 	protected final String entityName;
 	protected final PojoRawTypeIdentifier<E> typeIdentifier;
 	protected final PojoCaster<E> caster;
+	private final boolean singleConcreteTypeInEntityHierarchy;
 	protected final PojoImplicitReindexingResolver<E> reindexingResolver;
 
 	public AbstractPojoTypeManager(String entityName, PojoRawTypeIdentifier<E> typeIdentifier,
-			PojoCaster<E> caster,
+			PojoCaster<E> caster, boolean singleConcreteTypeInEntityHierarchy,
 			PojoImplicitReindexingResolver<E> reindexingResolver) {
 		this.entityName = entityName;
 		this.typeIdentifier = typeIdentifier;
 		this.caster = caster;
+		this.singleConcreteTypeInEntityHierarchy = singleConcreteTypeInEntityHierarchy;
 		this.reindexingResolver = reindexingResolver;
 	}
 
@@ -87,6 +89,11 @@ public class AbstractPojoTypeManager<E>
 
 	public String entityName() {
 		return entityName;
+	}
+
+	@Override
+	public final boolean isSingleConcreteTypeInEntityHierarchy() {
+		return singleConcreteTypeInEntityHierarchy;
 	}
 
 	@Override

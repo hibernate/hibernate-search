@@ -8,12 +8,16 @@ package org.hibernate.search.mapper.pojo.loading.spi;
 
 import java.util.Set;
 
+import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+
 public interface PojoLoadingContext {
 
 	/**
 	 * Check whether this context is still open, throwing an exception if it is not.
 	 */
 	void checkOpen();
+
+	PojoRuntimeIntrospector runtimeIntrospector();
 
 	/**
 	 * @param type The type of entities that will have to be loaded.
@@ -31,5 +35,4 @@ public interface PojoLoadingContext {
 	 * @see PojoLoader
 	 */
 	<T> PojoLoader<? super T> createLoader(Set<PojoLoadingTypeContext<? extends T>> expectedTypes);
-
 }
