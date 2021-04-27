@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -33,6 +34,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LatitudeMark
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LongitudeMarker;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
@@ -44,6 +46,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
@@ -1298,6 +1301,148 @@ public class IndexedEmbeddedBaseIT {
 					IdentifierBridgeFromDocumentIdentifierContext context) {
 				assertThat( context ).isNotNull();
 				return Long.parseLong( documentIdentifier ) - 1;
+			}
+		}
+	}
+
+	@Test
+	public void includeEmbeddedObjectId_identifierBridge_withParams_annotationMapping() {
+		class IndexedEmbeddedLevel1 {
+			@DocumentId(identifierBinder = @IdentifierBinderRef(type = ParametricBinder.class,
+					params = @Parameter(name = "stringBase", value = "3")))
+			Long theId;
+			@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "level1")))
+			Object containing;
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@IndexedEmbedded(includeEmbeddedObjectId = true)
+			IndexedEmbeddedLevel1 level1;
+			public IndexedEntity(int id, Long level1Id) {
+				this.id = id;
+				this.level1 = new IndexedEmbeddedLevel1();
+				this.level1.theId = level1Id;
+				this.level1.containing = this;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "level1", b2 -> b2
+						// The ID is a long, and there is an identifier bridge on the DocumentId,
+						// so the ID field will be generated with the identifier bridge, and thus will be a String.
+						.field( "theId", String.class, b3 -> b3
+								.searchable( Searchable.YES ).projectable( Projectable.YES ) )
+				)
+		);
+		SearchMapping mapping = setupHelper.start().expectCustomBeans()
+				.setup( IndexedEntity.class, IndexedEmbeddedLevel1.class );
+		backendMock.verifyExpectationsMet();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> new IndexedEntity( id, 4242L ),
+				document -> document
+						.objectField( "level1", b2 -> b2
+								.field( "theId", "4245" ) )
+		);
+	}
+
+	@Test
+	public void customBridge_withParameters_programmaticMapping() {
+		class IndexedEmbeddedLevel1 {
+			Long theId;
+			Object containing;
+		}
+		class IndexedEntity {
+			Integer id;
+			IndexedEmbeddedLevel1 level1;
+			public IndexedEntity(int id, Long level1Id) {
+				this.id = id;
+				this.level1 = new IndexedEmbeddedLevel1();
+				this.level1.theId = level1Id;
+				this.level1.containing = this;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "level1", b2 -> b2
+						// The ID is a long, and there is an identifier bridge on the DocumentId,
+						// so the ID field will be generated with the identifier bridge, and thus will be a String.
+						.field( "theId", String.class, b3 -> b3
+								.searchable( Searchable.YES ).projectable( Projectable.YES ) )
+				)
+		);
+		SearchMapping mapping = setupHelper.start().expectCustomBeans()
+				.withConfiguration( builder -> {
+					builder.addEntityType( IndexedEntity.class );
+					builder.addEntityType( IndexedEmbeddedLevel1.class );
+
+					TypeMappingStep indexedEmbeddedLevel1 = builder.programmaticMapping()
+							.type( IndexedEmbeddedLevel1.class );
+					indexedEmbeddedLevel1.property( "theId" ).documentId().identifierBinder( new ParametricBinder(),
+							Collections.singletonMap( "base", 3 )
+					);
+					indexedEmbeddedLevel1.property( "containing" )
+							.associationInverseSide( PojoModelPath.ofValue( "level1" ) );
+
+					TypeMappingStep indexedEntity = builder.programmaticMapping()
+							.type( IndexedEntity.class );
+					indexedEntity.indexed().index( INDEX_NAME );
+					indexedEntity.property( "id" ).documentId();
+					indexedEntity.property( "level1" ).indexedEmbedded().includeEmbeddedObjectId( true );
+				} )
+				.setup( IndexedEntity.class, IndexedEmbeddedLevel1.class );
+		backendMock.verifyExpectationsMet();
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> new IndexedEntity( id, 4242L ),
+				document -> document
+						.objectField( "level1", b2 -> b2
+								.field( "theId", "4245" ) )
+		);
+	}
+
+	public static class ParametricBinder implements IdentifierBinder {
+		@Override
+		public void bind(IdentifierBindingContext<?> context) {
+			assertThat( context.bridgedElement() ).isNotNull();
+			assertThat( context.beanResolver() ).isNotNull();
+			context.bridge( Long.class, new Bridge( extractBase( context ) ) );
+		}
+
+		@SuppressWarnings("uncheked")
+		private static Integer extractBase(IdentifierBindingContext<?> context) {
+			Integer base = (Integer) context.parameter( "base" );
+			if ( base != null ) {
+				return base;
+			}
+
+			String stringBase = (String) context.parameter( "stringBase" );
+			return Integer.parseInt( stringBase );
+		}
+
+		public static class Bridge implements IdentifierBridge<Long> {
+			private final int base;
+
+			public Bridge(int base) {
+				this.base = base;
+			}
+
+			@Override
+			public String toDocumentIdentifier(Long propertyValue,
+					IdentifierBridgeToDocumentIdentifierContext context) {
+				assertThat( context ).isNotNull();
+				return String.valueOf( propertyValue + base );
+			}
+
+			@Override
+			public Long fromDocumentIdentifier(String documentIdentifier,
+					IdentifierBridgeFromDocumentIdentifierContext context) {
+				assertThat( context ).isNotNull();
+				return Long.parseLong( documentIdentifier ) - base;
 			}
 		}
 	}

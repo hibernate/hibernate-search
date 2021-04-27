@@ -6,21 +6,35 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 
+import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.javabean.common.EntityReference;
+import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBinderRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -33,6 +47,8 @@ import org.junit.Test;
  */
 @SuppressWarnings("unused")
 public class DocumentIdBaseIT {
+
+	private static final String INDEX_NAME = "IndexName";
 
 	@Rule
 	public BackendMock backendMock = new BackendMock();
@@ -314,4 +330,136 @@ public class DocumentIdBaseIT {
 				);
 	}
 
+	@Test
+	public void customBridge_withParameters_annotationMapping() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId(identifierBinder = @IdentifierBinderRef(type = ParametricBridge.ParametricBinder.class,
+					params = @Parameter(name = "fixedPrefix", value = "fixed-prefix-")))
+			Integer id;
+			@GenericField
+			String value;
+
+			IndexedEntity(Integer id, String value) {
+				this.id = id;
+				this.value = value;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b.field( "value", String.class ) );
+		SearchMapping mapping = setupHelper.start().expectCustomBeans().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			IndexedEntity entity = new IndexedEntity( 1, "bla-bla-bla" );
+			session.indexingPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "fixed-prefix-1", b -> b.field( "value", "bla-bla-bla" ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			backendMock.expectSearchReferences( Collections.singletonList( INDEX_NAME ),
+					StubSearchWorkBehavior.of( 1L, StubBackendUtils.reference( "IndexedEntity", "fixed-prefix-1" ) )
+			);
+
+			SearchQuery<EntityReference> query = session.search( IndexedEntity.class )
+					.selectEntityReference()
+					.where( f -> f.matchAll() )
+					.toQuery();
+
+			assertThat( query.fetchAll().hits() )
+					.containsExactly( EntityReferenceImpl.withName( IndexedEntity.class, "IndexedEntity", 1 ) );
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void customBridge_withParameters_programmaticMapping() {
+		class IndexedEntity {
+			Integer id;
+			String value;
+
+			IndexedEntity(Integer id, String value) {
+				this.id = id;
+				this.value = value;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b.field( "value", String.class ) );
+		SearchMapping mapping = setupHelper.start()
+				.withConfiguration( builder -> {
+					builder.addEntityType( IndexedEntity.class );
+
+					TypeMappingStep indexedEntity = builder.programmaticMapping().type( IndexedEntity.class );
+					indexedEntity.indexed().index( INDEX_NAME );
+					indexedEntity.property( "id" ).documentId().identifierBinder(
+							new ParametricBridge.ParametricBinder(),
+							Collections.singletonMap( "fixedPrefix", "fixed-prefix-" )
+					);
+					indexedEntity.property( "value" ).genericField();
+				} )
+				.expectCustomBeans().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			IndexedEntity entity = new IndexedEntity( 1, "bla-bla-bla" );
+			session.indexingPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "fixed-prefix-1", b -> b.field( "value", "bla-bla-bla" ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		try ( SearchSession session = mapping.createSession() ) {
+			backendMock.expectSearchReferences( Collections.singletonList( INDEX_NAME ),
+					StubSearchWorkBehavior.of( 1L, StubBackendUtils.reference( "IndexedEntity", "fixed-prefix-1" ) )
+			);
+
+			SearchQuery<EntityReference> query = session.search( IndexedEntity.class )
+					.selectEntityReference()
+					.where( f -> f.matchAll() )
+					.toQuery();
+
+			assertThat( query.fetchAll().hits() )
+					.containsExactly( EntityReferenceImpl.withName( IndexedEntity.class, "IndexedEntity", 1 ) );
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	public static class ParametricBridge implements IdentifierBridge<Integer> {
+
+		private final String fixedPrefix;
+
+		private ParametricBridge(String fixedPrefix) {
+			this.fixedPrefix = ( fixedPrefix == null ) ? "" : fixedPrefix;
+		}
+
+		@Override
+		public String toDocumentIdentifier(Integer propertyValue, IdentifierBridgeToDocumentIdentifierContext context) {
+			return fixedPrefix + propertyValue;
+		}
+
+		@Override
+		public Integer fromDocumentIdentifier(String documentIdentifier,
+				IdentifierBridgeFromDocumentIdentifierContext context) {
+			String substring = documentIdentifier.substring( fixedPrefix.length() );
+			return Integer.parseInt( substring );
+		}
+
+		public static class ParametricBinder implements IdentifierBinder {
+			@Override
+			public void bind(IdentifierBindingContext<?> context) {
+				context.bridge( Integer.class, new ParametricBridge( extractFixedPrefix( context ) ) );
+			}
+		}
+
+		@SuppressWarnings("uncheked")
+		private static String extractFixedPrefix(IdentifierBindingContext<?> context) {
+			return (String) context.parameter( "fixedPrefix" );
+		}
+	}
 }

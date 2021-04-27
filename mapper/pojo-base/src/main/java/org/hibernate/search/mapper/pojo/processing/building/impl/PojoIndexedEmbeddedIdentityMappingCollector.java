@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.processing.building.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -29,6 +30,7 @@ class PojoIndexedEmbeddedIdentityMappingCollector<E> implements PojoIdentityMapp
 
 	private BoundPojoModelPathPropertyNode<?, ?> identifierModelPath;
 	private IdentifierBinder identifierBinder;
+	private Map<String, Object> params = Collections.emptyMap();
 
 	PojoIndexedEmbeddedIdentityMappingCollector(PojoRawTypeModel<E> typeModel, PojoMappingHelper mappingHelper) {
 		this.typeModel = typeModel;
@@ -40,6 +42,7 @@ class PojoIndexedEmbeddedIdentityMappingCollector<E> implements PojoIdentityMapp
 			IdentifierBinder binder, Map<String, Object> params) {
 		this.identifierModelPath = modelPath;
 		this.identifierBinder = binder;
+		this.params = params;
 	}
 
 	public void contributeIdentifierField(AbstractPojoIndexingProcessorTypeNodeBuilder<?, ?> embeddedTypeNodeBuilder) {
@@ -48,7 +51,7 @@ class PojoIndexedEmbeddedIdentityMappingCollector<E> implements PojoIdentityMapp
 			Optional<BoundPojoModelPathPropertyNode<E, ?>> entityIdPropertyPath = mappingHelper.indexModelBinder()
 					.createEntityIdPropertyPath( typeModel );
 			if ( entityIdPropertyPath.isPresent() ) {
-				identifierBridge( entityIdPropertyPath.get(), null, Collections.emptyMap() );
+				identifierBridge( entityIdPropertyPath.get(), null, params );
 			}
 			else {
 				throw log.missingIdentifierMapping( typeModel );
@@ -58,7 +61,7 @@ class PojoIndexedEmbeddedIdentityMappingCollector<E> implements PojoIdentityMapp
 		embeddedTypeNodeBuilder.property( identifierModelPath.getPropertyModel().name() )
 				.value( ContainerExtractorPath.defaultExtractors() )
 				.valueBinder( identifierBinder == null ? null : new IdentifierBinderToValueBinderAdapter( identifierBinder ),
-						Collections.emptyMap(), null,
+						params, null,
 						context -> context.standardTypeOptionsStep().searchable( Searchable.YES )
 								.projectable( Projectable.YES ) );
 	}
