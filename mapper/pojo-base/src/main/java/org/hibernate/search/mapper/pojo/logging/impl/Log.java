@@ -632,4 +632,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 103, value = "Mass indexing received interrupt signal. The index is left in an unknown state!")
 	SearchException massIndexingThreadInterrupted(@Cause InterruptedException e);
 
+	@Message(id = ID_OFFSET + 104, value = "Param with name '%1$s' has not been defined for the binder.")
+	SearchException paramNotDefined(String name);
+
 }

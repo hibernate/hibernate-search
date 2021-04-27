@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.bridge.binding;
 
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.util.common.SearchException;
 
 public interface BindingContext {
 
@@ -18,7 +19,8 @@ public interface BindingContext {
 
 	/**
 	 * @param name The name of the param
-	 * @return Get a param defined for the binder by the given name. {@code null} if it does not exist.
+	 * @return Get a param defined for the binder by the given name
+	 * @throws SearchException if it does not exist a param having such name
 	 */
 	Object param(String name);
 
