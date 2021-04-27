@@ -16,7 +16,6 @@ import org.hibernate.query.Query;
 import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 
 abstract class AbstractHibernateOrmEntityLoader<E> implements PojoLoader<E> {
 	protected static final String IDS_PARAMETER_NAME = "ids";
@@ -50,23 +49,6 @@ abstract class AbstractHibernateOrmEntityLoader<E> implements PojoLoader<E> {
 				throw e;
 			}
 			throw deadline.forceTimeoutAndCreateException( e );
-		}
-	}
-
-	@Override
-	// The cast is safe because we use reflection to check it.
-	@SuppressWarnings("unchecked")
-	public final <E2 extends E> E2 castToExactTypeOrNull(PojoLoadingTypeContext<E2> expectedType, Object loadedObject) {
-		if ( singleConcreteTypeInHierarchy ) {
-			// The loaded object will always be an instance of the exact same type,
-			// and we can only get passed that exact type.
-			return (E2) loadedObject;
-		}
-		else if ( expectedType.typeIdentifier().equals( sessionContext.runtimeIntrospector().detectEntityType( loadedObject ) ) ) {
-			return (E2) loadedObject;
-		}
-		else {
-			return null;
 		}
 	}
 

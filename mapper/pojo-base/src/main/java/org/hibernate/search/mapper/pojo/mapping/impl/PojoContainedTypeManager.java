@@ -18,8 +18,8 @@ import org.hibernate.search.mapper.pojo.work.impl.PojoWorkContainedTypeContext;
 public class PojoContainedTypeManager<E> extends AbstractPojoTypeManager<E>
 		implements PojoWorkContainedTypeContext<E>, PojoScopeContainedTypeContext<E> {
 	public PojoContainedTypeManager(String entityName, PojoRawTypeIdentifier<E> typeIdentifier,
-			PojoCaster<E> caster,
+			PojoCaster<E> caster, boolean singleConcreteTypeInEntityHierarchy,
 			PojoImplicitReindexingResolver<E> reindexingResolver) {
-		super( entityName, typeIdentifier, caster, reindexingResolver );
+		super( entityName, typeIdentifier, caster, singleConcreteTypeInEntityHierarchy, reindexingResolver );
 	}
 }

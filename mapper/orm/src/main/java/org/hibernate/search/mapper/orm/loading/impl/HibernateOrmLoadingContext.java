@@ -25,6 +25,7 @@ import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -52,6 +53,11 @@ public final class HibernateOrmLoadingContext implements PojoLoadingContext {
 		catch (IllegalStateException e) {
 			throw log.hibernateSessionIsClosed( e );
 		}
+	}
+
+	@Override
+	public PojoRuntimeIntrospector runtimeIntrospector() {
+		return sessionContext.runtimeIntrospector();
 	}
 
 	@Override

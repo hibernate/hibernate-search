@@ -12,4 +12,6 @@ public interface PojoLoadingTypeContext<E> {
 
 	PojoRawTypeIdentifier<E> typeIdentifier();
 
+	boolean isSingleConcreteTypeInEntityHierarchy();
+
 }

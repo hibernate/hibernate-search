@@ -27,6 +27,7 @@ import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class JavaBeanLoadingContext implements PojoLoadingContext, PojoMassIndexingContext, MassLoadingOptions {
@@ -80,6 +81,11 @@ public final class JavaBeanLoadingContext implements PojoLoadingContext, PojoMas
 	@Override
 	public void checkOpen() {
 		// Nothing to do: we're always "open"
+	}
+
+	@Override
+	public PojoRuntimeIntrospector runtimeIntrospector() {
+		return PojoRuntimeIntrospector.simple();
 	}
 
 	@Override

@@ -46,12 +46,12 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<E>
 	private final MappedIndexManager indexManager;
 
 	public PojoIndexedTypeManager(String entityName, PojoRawTypeIdentifier<E> typeIdentifier,
-			PojoCaster<E> caster,
+			PojoCaster<E> caster, boolean singleConcreteTypeInEntityHierarchy,
 			IdentifierMappingImplementor<I, E> identifierMapping,
 			DocumentRouter<? super E> documentRouter,
 			PojoIndexingProcessor<E> processor, MappedIndexManager indexManager,
 			PojoImplicitReindexingResolver<E> reindexingResolver) {
-		super( entityName, typeIdentifier, caster, reindexingResolver );
+		super( entityName, typeIdentifier, caster, singleConcreteTypeInEntityHierarchy, reindexingResolver );
 		this.identifierMapping = identifierMapping;
 		this.documentRouter = documentRouter;
 		this.processor = processor;

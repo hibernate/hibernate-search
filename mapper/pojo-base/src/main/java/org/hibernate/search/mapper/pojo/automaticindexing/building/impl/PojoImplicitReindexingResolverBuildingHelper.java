@@ -113,6 +113,11 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		}
 	}
 
+	public boolean isSingleConcreteTypeInEntityHierarchy(PojoRawTypeModel<?> typeModel) {
+		return typeModel.ascendingSuperTypes().filter( this::isEntity )
+				.allMatch( t -> getConcreteEntitySubTypesForEntitySuperType( t ).size() <= 1 );
+	}
+
 	PojoAssociationPathInverter pathInverter() {
 		return pathInverter;
 	}

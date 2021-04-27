@@ -138,8 +138,10 @@ class PojoIndexedTypeManagerBuilder<E> {
 		MappedIndexManager indexManager = indexManagerBuilder.build();
 		extendedMappingCollector.indexManager( indexManager );
 
+
 		PojoIndexedTypeManager<?, E> typeManager = new PojoIndexedTypeManager<>(
 				entityName, typeModel.typeIdentifier(), typeModel.caster(),
+				reindexingResolverBuildingHelper.isSingleConcreteTypeInEntityHierarchy( typeModel ),
 				identityMappingCollector.identifierMapping,
 				identityMappingCollector.routingBridge == null ? NoOpDocumentRouter.INSTANCE
 						: new RoutingBridgeDocumentRouter<>( identityMappingCollector.routingBridge.getBridgeHolder() ),

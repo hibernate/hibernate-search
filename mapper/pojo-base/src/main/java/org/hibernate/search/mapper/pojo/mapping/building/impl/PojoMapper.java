@@ -378,6 +378,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 
 			PojoContainedTypeManager<T> typeManager = new PojoContainedTypeManager<>(
 					entityName, entityType.typeIdentifier(), entityType.caster(),
+					reindexingResolverBuildingHelper.isSingleConcreteTypeInEntityHierarchy( entityType ),
 					reindexingResolver
 			);
 			log.containedTypeManager( entityType, typeManager );

@@ -11,7 +11,6 @@ import java.util.List;
 import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.mapper.javabean.loading.EntityLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 
 public class JavaBeanLoader<E> implements PojoLoader<E> {
 
@@ -26,14 +25,4 @@ public class JavaBeanLoader<E> implements PojoLoader<E> {
 		return delegate.load( identifiers );
 	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public <E2 extends E> E2 castToExactTypeOrNull(PojoLoadingTypeContext<E2> expectedType, Object loadedObject) {
-		if ( expectedType.typeIdentifier().javaClass().equals( loadedObject.getClass() ) ) {
-			return (E2) loadedObject;
-		}
-		else {
-			return null;
-		}
-	}
 }
