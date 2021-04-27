@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.common.timing.spi.Deadline;
+import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.util.common.impl.TimeHelper;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -139,7 +139,7 @@ public class TimeoutManager {
 		if ( deadline == null ) {
 			return false;
 		}
-		return deadline.remainingTimeMillis() <= 0;
+		return deadline.checkRemainingTimeMillis() <= 0;
 	}
 
 	public boolean hasHardTimeout() {
@@ -168,7 +168,7 @@ public class TimeoutManager {
 		boolean timedOut = false;
 
 		@Override
-		public long remainingTimeMillis() {
+		public long checkRemainingTimeMillis() {
 			final long elapsedTime = elapsedTimeEstimateMillis();
 			long timeLeft = timeoutMs - elapsedTime;
 			if ( timeLeft <= 0 ) {

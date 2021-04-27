@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.loading.spi;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.search.engine.common.timing.spi.Deadline;
+import org.hibernate.search.engine.common.timing.Deadline;
 
 /**
  * A loader for loading a small selection of entities, used in particular during search.

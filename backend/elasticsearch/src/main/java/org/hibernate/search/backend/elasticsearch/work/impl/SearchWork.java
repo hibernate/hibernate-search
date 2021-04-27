@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
-import org.hibernate.search.engine.common.timing.spi.Deadline;
+import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.util.common.logging.impl.DefaultLogCategories;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -208,7 +208,7 @@ public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 			}
 
 			// Server-side timeout
-			builder.param( "timeout", deadline.remainingTimeMillis() + "ms" );
+			builder.param( "timeout", deadline.checkRemainingTimeMillis() + "ms" );
 			if ( allowPartialSearchResultsSupported ) {
 				// If failOnDeadline is true: ask the server to fail on timeout.
 				// Functionally, this does not matter, because we also have a client-side timeout.

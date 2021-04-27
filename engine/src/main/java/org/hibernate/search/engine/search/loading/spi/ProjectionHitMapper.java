@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.search.loading.spi;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.common.timing.spi.Deadline;
+import org.hibernate.search.engine.common.timing.Deadline;
 
 /**
  * Contract binding result hits and the mapper.

@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 
 import java.util.Collection;
 
-import org.hibernate.search.engine.common.timing.spi.Deadline;
+import org.hibernate.search.engine.common.timing.Deadline;
 
 import org.apache.lucene.search.CollectorManager;
 
