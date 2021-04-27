@@ -6,12 +6,17 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.mapper.pojo.bridge.binding.BindingContext;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 abstract class AbstractBindingContext implements BindingContext {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanResolver beanResolver;
 	private final Map<String, Object> params;
@@ -28,6 +33,11 @@ abstract class AbstractBindingContext implements BindingContext {
 
 	@Override
 	public Object param(String name) {
-		return params.get( name );
+		Object value = params.get( name );
+		if ( value == null ) {
+			throw log.paramNotDefined( name );
+		}
+
+		return value;
 	}
 }
