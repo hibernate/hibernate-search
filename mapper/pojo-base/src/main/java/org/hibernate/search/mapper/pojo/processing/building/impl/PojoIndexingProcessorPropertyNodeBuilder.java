@@ -79,8 +79,8 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 	}
 
 	@Override
-	public void identifierBinder(IdentifierBinder binder) {
-		identityMappingCollector.identifierBridge( modelPath, binder );
+	public void identifierBinder(IdentifierBinder binder, Map<String, Object> params) {
+		identityMappingCollector.identifierBridge( modelPath, binder, params );
 	}
 
 	@Override

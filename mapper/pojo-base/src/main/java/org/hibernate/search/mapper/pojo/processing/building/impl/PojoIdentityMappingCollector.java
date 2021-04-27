@@ -6,11 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.processing.building.impl;
 
+import java.util.Map;
+
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 
 public interface PojoIdentityMappingCollector {
 
 	<T> void identifierBridge(BoundPojoModelPathPropertyNode<?, T> modelPath,
-			IdentifierBinder binder);
+			IdentifierBinder binder, Map<String, Object> params);
 }

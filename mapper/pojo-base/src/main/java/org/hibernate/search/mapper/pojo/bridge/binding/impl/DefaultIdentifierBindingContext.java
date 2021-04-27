@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Map;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -36,17 +37,20 @@ public class DefaultIdentifierBindingContext<I> extends AbstractBindingContext
 	private final PojoGenericTypeModel<I> identifierTypeModel;
 	private final PojoModelValue<I> bridgedElement;
 
+	private final Map<String, Object> params;
+
 	private PartialBinding<I> partialBinding;
 
 	public DefaultIdentifierBindingContext(BeanResolver beanResolver,
 			PojoBootstrapIntrospector introspector,
 			IndexedEntityBindingContext indexedEntityBindingContext,
-			PojoGenericTypeModel<I> valueTypeModel) {
+			PojoGenericTypeModel<I> valueTypeModel, Map<String, Object> params) {
 		super( beanResolver );
 		this.introspector = introspector;
 		this.indexedEntityBindingContext = indexedEntityBindingContext;
 		this.identifierTypeModel = valueTypeModel;
 		this.bridgedElement = new PojoModelValueElement<>( introspector, valueTypeModel );
+		this.params = params;
 	}
 
 	@Override
@@ -79,6 +83,11 @@ public class DefaultIdentifierBindingContext<I> extends AbstractBindingContext
 	@Override
 	public PojoModelValue<I> bridgedElement() {
 		return bridgedElement;
+	}
+
+	@Override
+	public Object parameter(String name) {
+		return params.get( name );
 	}
 
 	public BoundIdentifierBridge<I> applyBinder(IdentifierBinder binder) {

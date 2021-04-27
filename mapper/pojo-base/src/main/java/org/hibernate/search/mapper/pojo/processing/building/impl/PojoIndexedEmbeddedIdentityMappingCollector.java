@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.processing.building.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -37,7 +37,7 @@ class PojoIndexedEmbeddedIdentityMappingCollector<E> implements PojoIdentityMapp
 
 	@Override
 	public <T> void identifierBridge(BoundPojoModelPathPropertyNode<?, T> modelPath,
-			IdentifierBinder binder) {
+			IdentifierBinder binder, Map<String, Object> params) {
 		this.identifierModelPath = modelPath;
 		this.identifierBinder = binder;
 	}
@@ -48,7 +48,7 @@ class PojoIndexedEmbeddedIdentityMappingCollector<E> implements PojoIdentityMapp
 			Optional<BoundPojoModelPathPropertyNode<E, ?>> entityIdPropertyPath = mappingHelper.indexModelBinder()
 					.createEntityIdPropertyPath( typeModel );
 			if ( entityIdPropertyPath.isPresent() ) {
-				identifierBridge( entityIdPropertyPath.get(), null );
+				identifierBridge( entityIdPropertyPath.get(), null, Collections.emptyMap() );
 			}
 			else {
 				throw log.missingIdentifierMapping( typeModel );

@@ -16,7 +16,7 @@ public interface PojoMappingCollectorPropertyNode extends PojoMappingCollector {
 
 	void propertyBinder(PropertyBinder binder, Map<String, Object> params);
 
-	void identifierBinder(IdentifierBinder binder);
+	void identifierBinder(IdentifierBinder binder, Map<String, Object> params);
 
 	PojoMappingCollectorValueNode value(ContainerExtractorPath extractorPath);
 

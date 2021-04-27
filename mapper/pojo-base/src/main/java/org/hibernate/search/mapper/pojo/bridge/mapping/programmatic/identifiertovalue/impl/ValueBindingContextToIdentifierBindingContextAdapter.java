@@ -40,6 +40,11 @@ final class ValueBindingContextToIdentifierBindingContextAdapter<I> implements I
 	}
 
 	@Override
+	public Object parameter(String name) {
+		return delegate.parameter( name );
+	}
+
+	@Override
 	public BeanResolver beanResolver() {
 		return delegate.beanResolver();
 	}
