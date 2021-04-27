@@ -100,7 +100,11 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 					.allSatisfy( loadedEntity -> {
 						// Loading should fully initialize entities
 						assertThat( Hibernate.isInitialized( loadedEntity ) ).isTrue();
-					} );
+					} )
+					.allSatisfy(
+							element -> assertThat( element )
+									.isInstanceOfAny( targetClasses.toArray( new Class<?>[0] ) )
+					);
 
 			assertionsContributor.accept( softAssertions, loadedEntities );
 
@@ -118,10 +122,6 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 					.as(
 							"Loaded, then unproxified entities when targeting types " + targetClasses
 									+ " and when the backend returns document references " + hitDocumentReferences
-					)
-					.allSatisfy(
-							element -> assertThat( element )
-									.isInstanceOfAny( targetClasses.toArray( new Class<?>[0] ) )
 					)
 					.containsExactlyElementsOf( unproxyfiedExpectedLoadedEntities );
 		} );
