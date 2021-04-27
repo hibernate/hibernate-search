@@ -78,8 +78,7 @@ public final class JavaBeanLoadingContext implements PojoLoadingContext, PojoMas
 
 	@Override
 	public void checkOpen() {
-		// Nothing to do: we're always "open",
-		// but don't ever try to use createLoader(), as *that* will fail.
+		// Nothing to do: we're always "open"
 	}
 
 	@Override
