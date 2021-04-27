@@ -64,7 +64,8 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = 234, max = 234),
 		@ValidIdRange(min = 235, max = 235),
 		@ValidIdRange(min = 295, max = 295),
-		@ValidIdRange(min = 297, max = 297)
+		@ValidIdRange(min = 297, max = 297),
+		@ValidIdRange(min = 337, max = 337)
 })
 public interface Log extends BasicLogger {
 
@@ -145,6 +146,10 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_LEGACY_ENGINE + 297, value = "Unable to convert '%2$s' into type '%1$s': value is too large.")
 	SearchException valueTooLargeForConversionException(@FormatWith(SimpleNameClassFormatter.class) Class<?> type,
 			Object duration, @Cause Exception ae);
+
+	@Message(id = ID_OFFSET_LEGACY_ENGINE + 337, value = "Conflicting usage of @Param annotation for parameter name:" +
+			" '%1$s'. Can't assign both value '%2$s' and '%3$s'" )
+	SearchException conflictingParameterDefined(String name, Object value1, Object value2);
 
 	// -----------------------------------
 	// New messages from Search 6 onwards

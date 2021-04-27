@@ -6,14 +6,18 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.MappingAnnotationProcessorUtils;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 /**
@@ -88,5 +92,15 @@ public interface MappingAnnotationProcessorContext {
 	 * for use in log messages and exception messages.
 	 */
 	EventContext eventContext();
+
+	/**
+	 * @param params The original params
+	 * @return A {@link Map} created from {@link Param}
+	 * using {@link Param#name()} as key and {@link Param#value()} as value
+	 * @throws SearchException if {@code params} contain multiple param with the same {@link Param#name()}
+	 */
+	default Map<String, Object> toMap(Param[] params) {
+		return MappingAnnotationProcessorUtils.toMap( params );
+	}
 
 }

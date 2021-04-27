@@ -7,16 +7,13 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
-import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanDelegatingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
@@ -39,8 +36,7 @@ public class DocumentIdProcessor implements PropertyMappingAnnotationProcessor<D
 
 		IdentifierBinderRef identifierBinderRef = annotation.identifierBinder();
 		if ( identifierBinderRef.params() != null ) {
-			Map<String, Object> params = Arrays.stream( identifierBinderRef.params() )
-					.collect( Collectors.toMap( Param::name, Param::value ) );
+			Map<String, Object> params = context.toMap( identifierBinderRef.params() );
 			mappingContext.documentId().identifierBinder( binder, params );
 		}
 		else {
