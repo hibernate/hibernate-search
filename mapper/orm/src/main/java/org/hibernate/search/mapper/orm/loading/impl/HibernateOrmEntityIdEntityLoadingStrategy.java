@@ -64,7 +64,7 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 					targetEntityTypeContexts.iterator().next();
 			/*
 			 * This cast is safe: the loader will only return instances of E2.
-			 * See hasExpectedType() and its callers for more information,
+			 * See PojoLoader.castToExactTypeOrNull() and its callers for more information,
 			 * in particular runtime checks handling edge cases.
 			 */
 			@SuppressWarnings("unchecked")
@@ -88,7 +88,7 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 		 *
 		 * However, we perform some runtime checks that make this cast safe.
 		 *
-		 * See hasExpectedType() and its callers for more information.
+		 * See PojoLoader.castToExactTypeOrNull() and its callers for more information.
 		 */
 		@SuppressWarnings("unchecked")
 		PojoLoader<E2> result = (PojoLoader<E2>) doCreate( commonSuperType, sessionContext, cacheLookupStrategy,
