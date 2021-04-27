@@ -71,7 +71,8 @@ public interface PojoLoader<E> {
 	 * when creating this loader.
 	 * @param loadedObject A loaded object, i.e. an element retrieved from the list
 	 * returned by {@link #loadBlocking(List, Deadline)}.
-	 * @return {@code true} if the loaded object is an instance of the expected type or a subtype.
+	 * @return The given {@code loadedObject} if is an instance of {@code expectedType} exactly (not an instance of a subtype).
+	 * {@code null} otherwise.
 	 */
 	<E2 extends E> E2 castToExactTypeOrNull(PojoRawTypeIdentifier<E2> expectedType, Object loadedObject);
 
