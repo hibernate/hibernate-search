@@ -138,13 +138,6 @@ You can pass string parameters to the `@PropertyBinderRef` annotation and then u
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/parameter/context/Invoice.java[tags=include;!getters-setters]
-----
-<1> Define the binder to use on the property,
-setting the `fieldName` parameter.
-
-[source, JAVA, indent=0, subs="+callouts"]
-----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/parameter/context/InvoiceLineItemsSummaryBinder.java[tags=include]
 ----
 <1> Use the binding context to get the parameter value.
@@ -154,6 +147,13 @@ but we could pass parameters for any purpose:
 defining the field as sortable,
 defining a normalizer,
 ...
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/parameter/context/Invoice.java[tags=include;!getters-setters]
+----
+<1> Define the binder to use on the property,
+setting the `fieldName` parameter.
 ====
 
 === Parameters with custom annotations
