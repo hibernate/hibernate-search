@@ -14,13 +14,13 @@ import java.util.Set;
 import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 
 public final class PojoSingleLoaderLoadingPlan<T> implements PojoLoadingPlan<T> {
 
 	private final PojoLoadingContext context;
 
-	private final Set<PojoRawTypeIdentifier<? extends T>> expectedTypes = new LinkedHashSet<>();
+	private final Set<PojoLoadingTypeContext<? extends T>> expectedTypes = new LinkedHashSet<>();
 	private final List<Object> identifiers = new ArrayList<>();
 
 	private PojoLoader<? super T> loader;
@@ -31,7 +31,7 @@ public final class PojoSingleLoaderLoadingPlan<T> implements PojoLoadingPlan<T> 
 	}
 
 	@Override
-	public int planLoading(PojoRawTypeIdentifier<? extends T> expectedType, Object identifier) {
+	public int planLoading(PojoLoadingTypeContext<? extends T> expectedType, Object identifier) {
 		expectedTypes.add( expectedType );
 		identifiers.add( identifier );
 		return identifiers.size() - 1;
@@ -57,7 +57,7 @@ public final class PojoSingleLoaderLoadingPlan<T> implements PojoLoadingPlan<T> 
 	}
 
 	@Override
-	public <T2 extends T> T2 retrieve(PojoRawTypeIdentifier<T2> expectedType, int ordinal) {
+	public <T2 extends T> T2 retrieve(PojoLoadingTypeContext<T2> expectedType, int ordinal) {
 		Object retrieved = loaded.get( ordinal );
 		if ( retrieved == null ) {
 			return null; // Couldn't be loaded.

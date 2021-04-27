@@ -47,6 +47,23 @@ public class AbstractPojoTypeManager<E>
 	}
 
 	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+		AbstractPojoTypeManager<?> that = (AbstractPojoTypeManager<?>) o;
+		return typeIdentifier.equals( that.typeIdentifier );
+	}
+
+	@Override
+	public int hashCode() {
+		return typeIdentifier.hashCode();
+	}
+
+	@Override
 	public final String toString() {
 		return getClass().getSimpleName() + "[entityName = " + entityName + ", javaType = " + typeIdentifier + "]";
 	}

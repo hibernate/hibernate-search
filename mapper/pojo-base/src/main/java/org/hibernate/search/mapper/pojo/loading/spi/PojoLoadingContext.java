@@ -8,8 +8,6 @@ package org.hibernate.search.mapper.pojo.loading.spi;
 
 import java.util.Set;
 
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-
 public interface PojoLoadingContext {
 
 	/**
@@ -23,15 +21,15 @@ public interface PojoLoadingContext {
 	 * to create a single loader for multiple types.
 	 * The main reason to use the same loader key for multiple types is better performance.
 	 */
-	Object loaderKey(PojoRawTypeIdentifier<?> type);
+	Object loaderKey(PojoLoadingTypeContext<?> type);
 
 	/**
 	 * @param <T> The exposed type of loaded entities.
 	 * @param expectedTypes The expected types of loaded objects.
-	 * The types are guaranteed to have the same {@link #loaderKey(PojoRawTypeIdentifier)}.
+	 * The types are guaranteed to have the same {@link #loaderKey(PojoLoadingTypeContext)}.
 	 * @return A loader.
 	 * @see PojoLoader
 	 */
-	<T> PojoLoader<? super T> createLoader(Set<PojoRawTypeIdentifier<? extends T>> expectedTypes);
+	<T> PojoLoader<? super T> createLoader(Set<PojoLoadingTypeContext<? extends T>> expectedTypes);
 
 }

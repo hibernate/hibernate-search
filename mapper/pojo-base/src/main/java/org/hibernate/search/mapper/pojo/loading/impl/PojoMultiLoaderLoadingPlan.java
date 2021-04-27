@@ -11,13 +11,13 @@ import java.util.Map;
 
 import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 
 public final class PojoMultiLoaderLoadingPlan<T> implements PojoLoadingPlan<T> {
 
 	private final PojoLoadingContext context;
 
-	private final Map<PojoRawTypeIdentifier<? extends T>, PojoSingleLoaderLoadingPlan<T>> planByType = new LinkedHashMap<>();
+	private final Map<PojoLoadingTypeContext<? extends T>, PojoSingleLoaderLoadingPlan<T>> planByType = new LinkedHashMap<>();
 	private final Map<Object, PojoSingleLoaderLoadingPlan<T>> planByLoaderKey = new LinkedHashMap<>();
 
 	public PojoMultiLoaderLoadingPlan(PojoLoadingContext context) {
@@ -25,7 +25,7 @@ public final class PojoMultiLoaderLoadingPlan<T> implements PojoLoadingPlan<T> {
 	}
 
 	@Override
-	public int planLoading(PojoRawTypeIdentifier<? extends T> expectedType, Object identifier) {
+	public int planLoading(PojoLoadingTypeContext<? extends T> expectedType, Object identifier) {
 		return delegate( expectedType ).planLoading( expectedType, identifier );
 	}
 
@@ -38,7 +38,7 @@ public final class PojoMultiLoaderLoadingPlan<T> implements PojoLoadingPlan<T> {
 	}
 
 	@Override
-	public <T2 extends T> T2 retrieve(PojoRawTypeIdentifier<T2> expectedType, int ordinal) {
+	public <T2 extends T> T2 retrieve(PojoLoadingTypeContext<T2> expectedType, int ordinal) {
 		return delegate( expectedType ).retrieve( expectedType, ordinal );
 	}
 
@@ -48,7 +48,7 @@ public final class PojoMultiLoaderLoadingPlan<T> implements PojoLoadingPlan<T> {
 		planByLoaderKey.clear();
 	}
 
-	private PojoSingleLoaderLoadingPlan<T> delegate(PojoRawTypeIdentifier<? extends T> type) {
+	private PojoSingleLoaderLoadingPlan<T> delegate(PojoLoadingTypeContext<? extends T> type) {
 		PojoSingleLoaderLoadingPlan<T> delegate = planByType.get( type );
 		if ( delegate != null ) {
 			return delegate;

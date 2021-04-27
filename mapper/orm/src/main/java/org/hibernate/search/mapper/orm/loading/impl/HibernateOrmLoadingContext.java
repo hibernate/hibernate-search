@@ -24,7 +24,7 @@ import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsSt
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContextBuilder;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -55,23 +55,23 @@ public final class HibernateOrmLoadingContext implements PojoLoadingContext {
 	}
 
 	@Override
-	public Object loaderKey(PojoRawTypeIdentifier<?> type) {
-		return typeContextProvider.indexedForExactType( type ).loadingStrategy();
+	public Object loaderKey(PojoLoadingTypeContext<?> type) {
+		return typeContextProvider.indexedForExactType( type.typeIdentifier() ).loadingStrategy();
 	}
 
 	@Override
-	public <T> PojoLoader<T> createLoader(Set<PojoRawTypeIdentifier<? extends T>> expectedTypes) {
+	public <T> PojoLoader<T> createLoader(Set<PojoLoadingTypeContext<? extends T>> expectedTypes) {
 		if ( expectedTypes.size() == 1 ) {
 			// Optimization: no need for the checks below if there's only one type.
-			LoadingIndexedTypeContext<? extends T> typeContext = typeContextProvider.indexedForExactType( expectedTypes.iterator().next() );
+			LoadingIndexedTypeContext<? extends T> typeContext = typeContextProvider.indexedForExactType( expectedTypes.iterator().next().typeIdentifier() );
 			return typeContext.loadingStrategy().createLoader( Collections.singleton( typeContext ), sessionContext,
 					cacheLookupStrategy, loadingOptions );
 		}
 
 		HibernateOrmEntityLoadingStrategy<?, ?> loadingStrategy = null;
 		Set<LoadingIndexedTypeContext<? extends T>> typeContexts = new HashSet<>();
-		for ( PojoRawTypeIdentifier<? extends T> type : expectedTypes ) {
-			LoadingIndexedTypeContext<? extends T> typeContext = typeContextProvider.indexedForExactType( type );
+		for ( PojoLoadingTypeContext<? extends T> type : expectedTypes ) {
+			LoadingIndexedTypeContext<? extends T> typeContext = typeContextProvider.indexedForExactType( type.typeIdentifier() );
 			typeContexts.add( typeContext );
 			HibernateOrmEntityLoadingStrategy<?, ?> thisTypeLoadingStrategy = typeContext.loadingStrategy();
 			if ( loadingStrategy == null ) {

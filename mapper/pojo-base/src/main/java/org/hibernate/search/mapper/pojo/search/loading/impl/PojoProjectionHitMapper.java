@@ -17,7 +17,6 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 import org.hibernate.search.mapper.pojo.loading.impl.PojoLoadingPlan;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class PojoProjectionHitMapper<R, E> implements ProjectionHitMapper<R, E> {
@@ -45,9 +44,8 @@ public final class PojoProjectionHitMapper<R, E> implements ProjectionHitMapper<
 		if ( type == null ) {
 			throw log.unexpectedEntityNameForEntityLoading( reference.typeName(), targetTypesByEntityName.keySet() );
 		}
-		PojoRawTypeIdentifier<? extends E> typeIdentifier = type.typeIdentifier();
 		Object identifier = type.identifierMapping().fromDocumentIdentifier( reference.id(), sessionContext );
-		int ordinal = loadingPlan.planLoading( typeIdentifier, identifier );
+		int ordinal = loadingPlan.planLoading( type, identifier );
 		if ( targetTypesByEntityName.size() == 1 ) {
 			// Optimization: take advantage of Integer unboxing cache when possible.
 			// This should avoid unnecessary allocations when
@@ -55,7 +53,7 @@ public final class PojoProjectionHitMapper<R, E> implements ProjectionHitMapper<
 			return ordinal;
 		}
 		else {
-			return new TypeAndOrdinal<>( typeIdentifier, ordinal );
+			return new TypeAndOrdinal<>( type, ordinal );
 		}
 	}
 
@@ -65,7 +63,7 @@ public final class PojoProjectionHitMapper<R, E> implements ProjectionHitMapper<
 		if ( targetTypesByEntityName.size() == 1 ) {
 			// Optimization, see planLoading().
 			return new PojoSingleTypeLoadingResult<>( documentReferenceConverter,
-					targetTypesByEntityName.values().iterator().next().typeIdentifier(), loadingPlan );
+					targetTypesByEntityName.values().iterator().next(), loadingPlan );
 		}
 		else {
 			return new PojoMultiTypeLoadingResult<>( documentReferenceConverter, loadingPlan );
@@ -74,20 +72,20 @@ public final class PojoProjectionHitMapper<R, E> implements ProjectionHitMapper<
 
 	private static class PojoSingleTypeLoadingResult<R, E> implements LoadingResult<R, E> {
 		private final DocumentReferenceConverter<R> documentReferenceConverter;
-		private final PojoRawTypeIdentifier<? extends E> typeIdentifier;
+		private final PojoSearchLoadingIndexedTypeContext<? extends E> type;
 		private final PojoLoadingPlan<E> loadingPlan;
 
 		private PojoSingleTypeLoadingResult(DocumentReferenceConverter<R> documentReferenceConverter,
-				PojoRawTypeIdentifier<? extends E> typeIdentifier,
+				PojoSearchLoadingIndexedTypeContext<? extends E> type,
 				PojoLoadingPlan<E> loadingPlan) {
 			this.documentReferenceConverter = documentReferenceConverter;
-			this.typeIdentifier = typeIdentifier;
+			this.type = type;
 			this.loadingPlan = loadingPlan;
 		}
 
 		@Override
 		public E get(Object key) {
-			return loadingPlan.retrieve( typeIdentifier, (int) key );
+			return loadingPlan.retrieve( type, (int) key );
 		}
 
 		@Override
@@ -120,10 +118,10 @@ public final class PojoProjectionHitMapper<R, E> implements ProjectionHitMapper<
 	}
 
 	private static final class TypeAndOrdinal<E> {
-		private final PojoRawTypeIdentifier<E> type;
+		private final PojoSearchLoadingIndexedTypeContext<? extends E> type;
 		private final int ordinal;
 
-		public TypeAndOrdinal(PojoRawTypeIdentifier<E> type, int ordinal) {
+		public TypeAndOrdinal(PojoSearchLoadingIndexedTypeContext<? extends E> type, int ordinal) {
 			this.type = type;
 			this.ordinal = ordinal;
 		}
