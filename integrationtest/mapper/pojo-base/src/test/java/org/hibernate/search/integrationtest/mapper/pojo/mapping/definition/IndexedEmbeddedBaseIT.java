@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -1414,10 +1415,10 @@ public class IndexedEmbeddedBaseIT {
 		}
 
 		@SuppressWarnings("uncheked")
-		private static Integer extractBase(IdentifierBindingContext<?> context) {
-			Integer base = (Integer) context.param( "base" );
-			if ( base != null ) {
-				return base;
+		private static int extractBase(IdentifierBindingContext<?> context) {
+			Optional<Object> optionalBase = context.paramOptional( "base" );
+			if ( optionalBase.isPresent() ) {
+				return (Integer) optionalBase.get();
 			}
 
 			String stringBase = (String) context.param( "stringBase" );

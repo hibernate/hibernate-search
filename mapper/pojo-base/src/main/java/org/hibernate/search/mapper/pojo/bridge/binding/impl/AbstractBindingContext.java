@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
+import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.mapper.pojo.bridge.binding.BindingContext;
@@ -39,5 +40,10 @@ abstract class AbstractBindingContext implements BindingContext {
 		}
 
 		return value;
+	}
+
+	@Override
+	public Optional<Object> paramOptional(String name) {
+		return Optional.ofNullable( params.get( name ) );
 	}
 }

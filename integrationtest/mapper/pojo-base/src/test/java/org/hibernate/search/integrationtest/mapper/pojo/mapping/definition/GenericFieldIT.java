@@ -12,6 +12,7 @@ import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
@@ -374,16 +375,16 @@ public class GenericFieldIT {
 
 	public static class ParametricBridge implements ValueBridge<Integer, String> {
 
-		private final Integer base;
+		private final int base;
 
-		private ParametricBridge(Integer base) {
+		private ParametricBridge(int base) {
 			this.base = base;
 		}
 
 		@Override
 		public String toIndexedValue(Integer value, ValueBridgeToIndexedValueContext context) {
 			if ( value == null ) {
-				return base.toString();
+				return base + "";
 			}
 
 			return ( value % base ) + "";
@@ -398,17 +399,13 @@ public class GenericFieldIT {
 		}
 
 		@SuppressWarnings("uncheked")
-		private static Integer extractBase(ValueBindingContext<?> context) {
-			Integer base = (Integer) context.param( "base" );
-			if ( base != null ) {
-				return base;
+		private static int extractBase(ValueBindingContext<?> context) {
+			Optional<Object> optionalBase = context.paramOptional( "base" );
+			if ( optionalBase.isPresent() ) {
+				return (Integer) optionalBase.get();
 			}
 
 			String stringBase = (String) context.param( "stringBase" );
-			if ( stringBase == null ) {
-				return 0;
-			}
-
 			return Integer.parseInt( stringBase );
 		}
 	}

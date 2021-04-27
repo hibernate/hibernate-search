@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.bridge.binding.BindingContext;
@@ -85,10 +86,10 @@ public class MarkerBindingBaseIT {
 		}
 
 		@SuppressWarnings("uncheked")
-		private static Integer extractScale(BindingContext context) {
-			Integer scale = (Integer) context.param( "scale" );
-			if ( scale != null ) {
-				return scale;
+		private static int extractScale(BindingContext context) {
+			Optional<Object> optionalScale = context.paramOptional( "scale" );
+			if ( optionalScale.isPresent() ) {
+				return (Integer) optionalScale.get();
 			}
 
 			String stringScale = (String) context.param( "stringScale" );

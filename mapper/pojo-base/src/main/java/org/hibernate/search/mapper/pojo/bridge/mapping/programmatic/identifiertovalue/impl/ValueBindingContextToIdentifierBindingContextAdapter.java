@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.identifiertovalue.impl;
 
+import java.util.Optional;
+
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
@@ -42,6 +44,11 @@ final class ValueBindingContextToIdentifierBindingContextAdapter<I> implements I
 	@Override
 	public Object param(String name) {
 		return delegate.param( name );
+	}
+
+	@Override
+	public Optional<Object> paramOptional(String name) {
+		return delegate.paramOptional( name );
 	}
 
 	@Override
