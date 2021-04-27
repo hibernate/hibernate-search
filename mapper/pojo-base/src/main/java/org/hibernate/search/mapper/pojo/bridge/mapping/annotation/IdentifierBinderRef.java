@@ -13,6 +13,7 @@ import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 
 /**
@@ -44,9 +45,9 @@ public @interface IdentifierBinderRef {
 	BeanRetrieval retrieval() default BeanRetrieval.ANY;
 
 	/**
-	 * @return Parameters that will be passed to the {@link IdentifierBinder}.
+	 * @return Params that will be passed to the {@link IdentifierBinder}.
 	 */
-	Parameter[] params() default {};
+	Param[] params() default {};
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.

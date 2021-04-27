@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanDelegatingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
@@ -37,7 +37,7 @@ public final class PropertyBindingProcessor implements PropertyMappingAnnotation
 
 		if ( propertyBinder.params() != null ) {
 			Map<String, Object> params = Arrays.stream( propertyBinder.params() )
-					.collect( Collectors.toMap( Parameter::name, Parameter::value ) );
+					.collect( Collectors.toMap( Param::name, Param::value ) );
 			mapping.binder( binder, params );
 		}
 		else {

@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
@@ -273,14 +273,14 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
-	public void customBridge_withParameters_annotationMapping() {
+	public void customBridge_withParams_annotationMapping() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			@DocumentId
 			Integer id;
 			@ScaledNumberField(decimalScale = 2, valueBinder = @ValueBinderRef(type = ParametricBridge.ParametricBinder.class,
 					params = {
-							@Parameter(name = "unscaledVal", value = "773"), @Parameter(name = "scale", value = "2")
+							@Param(name = "unscaledVal", value = "773"), @Param(name = "scale", value = "2")
 					}))
 			WrappedValue wrap;
 
@@ -317,7 +317,7 @@ public class ScaledNumberFieldIT {
 	}
 
 	@Test
-	public void customBridge_withParameters_programmaticMapping() {
+	public void customBridge_withParams_programmaticMapping() {
 		class IndexedEntity {
 			Integer id;
 			WrappedValue wrap;
@@ -517,13 +517,13 @@ public class ScaledNumberFieldIT {
 
 		@SuppressWarnings("uncheked")
 		private static BigDecimal extractBaseDecimal(ValueBindingContext<?> context) {
-			BigDecimal baseDecimal = (BigDecimal) context.parameter( "baseDecimal" );
+			BigDecimal baseDecimal = (BigDecimal) context.param( "baseDecimal" );
 			if ( baseDecimal != null ) {
 				return baseDecimal;
 			}
 
-			Object unscaledValParam = context.parameter( "unscaledVal" );
-			Object scaleParam = context.parameter( "scale" );
+			Object unscaledValParam = context.param( "unscaledVal" );
+			Object scaleParam = context.param( "scale" );
 
 			if ( unscaledValParam == null || scaleParam == null ) {
 				return BigDecimal.ZERO;

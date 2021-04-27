@@ -13,6 +13,7 @@ import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 
 /**
  * References a {@link TypeBinder}.
@@ -42,9 +43,9 @@ public @interface TypeBinderRef {
 	BeanRetrieval retrieval() default BeanRetrieval.ANY;
 
 	/**
-	 * @return Parameters that will be passed to the {@link TypeBinder}.
+	 * @return Params that will be passed to the {@link TypeBinder}.
 	 */
-	Parameter[] params() default {};
+	Param[] params() default {};
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.

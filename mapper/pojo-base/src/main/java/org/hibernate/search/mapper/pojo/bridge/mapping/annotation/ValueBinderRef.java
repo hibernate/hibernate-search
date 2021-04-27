@@ -13,6 +13,7 @@ import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
@@ -48,9 +49,9 @@ public @interface ValueBinderRef {
 	BeanRetrieval retrieval() default BeanRetrieval.ANY;
 
 	/**
-	 * @return Parameters that will be passed to the {@link ValueBinder}.
+	 * @return Params that will be passed to the {@link ValueBinder}.
 	 */
-	Parameter[] params() default {};
+	Param[] params() default {};
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.

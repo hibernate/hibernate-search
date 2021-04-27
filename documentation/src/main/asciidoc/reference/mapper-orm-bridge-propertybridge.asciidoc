@@ -138,7 +138,7 @@ You can pass string parameters to the `@PropertyBinderRef` annotation and then u
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/parameter/context/InvoiceLineItemsSummaryBinder.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/param/context/InvoiceLineItemsSummaryBinder.java[tags=include]
 ----
 <1> Use the binding context to get the parameter value.
 <2> In the `bind` method, use the value of parameters.
@@ -150,7 +150,7 @@ defining a normalizer,
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/parameter/context/Invoice.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/param/context/Invoice.java[tags=include;!getters-setters]
 ----
 <1> Define the binder to use on the property,
 setting the `fieldName` parameter.
@@ -165,7 +165,7 @@ a <<mapper-orm-custom-annotations,custom annotation>> with attributes:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/parameter/InvoiceLineItemsSummaryBinding.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/param/InvoiceLineItemsSummaryBinding.java[tags=include]
 ----
 <1> Define an annotation with retention `RUNTIME`.
 *Any other retention policy will cause the annotation to be ignored by Hibernate Search*.
@@ -189,7 +189,7 @@ Here we're using a setter, but passing the data through the constructor would wo
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/parameter/InvoiceLineItemsSummaryBinder.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/param/InvoiceLineItemsSummaryBinder.java[tags=include]
 ----
 <1> Implement setters in the binder.
 Alternatively, we could expose a parameterized constructor.
@@ -202,7 +202,7 @@ defining a normalizer,
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/parameter/Invoice.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/param/Invoice.java[tags=include;!getters-setters]
 ----
 <1> Apply the bridge using its custom annotation,
 setting the `fieldName` parameter.
@@ -250,7 +250,7 @@ Just pass an instance of the binder. You can pass arguments either through the b
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/parameter/PropertyBridgeParameterIT.java[tags=programmatic]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/propertybridge/param/PropertyBridgeParamIT.java[tags=programmatic]
 ----
 ====
 

@@ -34,7 +34,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LatitudeMark
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LongitudeMarker;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
@@ -1309,7 +1309,7 @@ public class IndexedEmbeddedBaseIT {
 	public void includeEmbeddedObjectId_identifierBridge_withParams_annotationMapping() {
 		class IndexedEmbeddedLevel1 {
 			@DocumentId(identifierBinder = @IdentifierBinderRef(type = ParametricBinder.class,
-					params = @Parameter(name = "stringBase", value = "3")))
+					params = @Param(name = "stringBase", value = "3")))
 			Long theId;
 			@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "level1")))
 			Object containing;
@@ -1350,7 +1350,7 @@ public class IndexedEmbeddedBaseIT {
 	}
 
 	@Test
-	public void customBridge_withParameters_programmaticMapping() {
+	public void includeEmbeddedObjectId_identifierBridge_withParams_programmaticMapping() {
 		class IndexedEmbeddedLevel1 {
 			Long theId;
 			Object containing;
@@ -1415,12 +1415,12 @@ public class IndexedEmbeddedBaseIT {
 
 		@SuppressWarnings("uncheked")
 		private static Integer extractBase(IdentifierBindingContext<?> context) {
-			Integer base = (Integer) context.parameter( "base" );
+			Integer base = (Integer) context.param( "base" );
 			if ( base != null ) {
 				return base;
 			}
 
-			String stringBase = (String) context.parameter( "stringBase" );
+			String stringBase = (String) context.param( "stringBase" );
 			return Integer.parseInt( stringBase );
 		}
 

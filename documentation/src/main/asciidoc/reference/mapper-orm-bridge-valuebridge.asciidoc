@@ -300,7 +300,7 @@ You can define string parameters to the `@ValueBinderRef` annotation and then us
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/parameter/BooleanAsStringBridge.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/param/BooleanAsStringBridge.java[tags=include]
 ----
 <1> Implement a bridge that does not index booleans directly,
 but indexes them as strings instead.
@@ -309,14 +309,14 @@ the string representing `true` and the string representing `false`.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/parameter/context/BooleanAsStringBinder.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/param/context/BooleanAsStringBinder.java[tags=include]
 ----
 <1> Use the binding context to get the parameter values.
 <2> Pass them as arguments to the bridge constructor.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/parameter/context/Book.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/param/context/Book.java[tags=include;!getters-setters]
 ----
 <1> Define the binder to use on the property,
 setting the `fieldName` parameter.
@@ -334,7 +334,7 @@ a <<mapper-orm-custom-annotations,custom annotation>> with attributes:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/parameter/BooleanAsStringBridge.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/param/BooleanAsStringBridge.java[tags=include]
 ----
 <1> Implement a bridge that does not index booleans directly,
 but indexes them as strings instead.
@@ -343,7 +343,7 @@ the string representing `true` and the string representing `false`.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/parameter/BooleanAsStringField.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/param/BooleanAsStringField.java[tags=include]
 ----
 <1> Define an annotation with retention `RUNTIME`.
 *Any other retention policy will cause the annotation to be ignored by Hibernate Search*.
@@ -380,7 +380,7 @@ to something that can be passed to the mapping
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/parameter/Book.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valuebridge/param/Book.java[tags=include;!getters-setters]
 ----
 <1> Apply the bridge using its custom annotation,
 setting the parameters.

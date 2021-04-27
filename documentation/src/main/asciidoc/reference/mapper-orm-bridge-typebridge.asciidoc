@@ -115,7 +115,7 @@ You can pass string parameters to the `@TypeBinderRef` annotation and then use t
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebridge/parameter/context/FullNameBinder.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebridge/param/context/FullNameBinder.java[tags=include]
 ----
 <1> Use the binding context to get the parameter value.
 <2> In the `bind` method, use the value of parameters.
@@ -127,7 +127,7 @@ defining a normalizer,custom annotation
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebridge/parameter/context/Author.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebridge/param/context/Author.java[tags=include;!getters-setters]
 ----
 <1> Define the binder to use on the type,
 setting the `sortField` parameter.
@@ -142,7 +142,7 @@ a <<mapper-orm-custom-annotations,custom annotation>> with attributes:
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebridge/parameter/FullNameBinding.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebridge/param/FullNameBinding.java[tags=include]
 ----
 <1> Define an annotation with retention `RUNTIME`.
 *Any other retention policy will cause the annotation to be ignored by Hibernate Search*.
@@ -165,7 +165,7 @@ Here we're using a setter, but passing the data through the constructor would wo
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebridge/parameter/FullNameBinder.java[tags=include]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebridge/param/FullNameBinder.java[tags=include]
 ----
 <1> Implement setters in the binder.
 Alternatively, we could expose a parameterized constructor.
@@ -178,7 +178,7 @@ defining a normalizer,custom annotation
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebridge/parameter/Author.java[tags=include;!getters-setters]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebridge/param/Author.java[tags=include;!getters-setters]
 ----
 <1> Apply the bridge using its custom annotation,
 setting the `sortField` parameter.
@@ -226,7 +226,7 @@ Just pass an instance of the binder. You can pass arguments either through the b
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebridge/parameter/TypeBridgeParameterIT.java[tags=programmatic]
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebridge/param/TypeBridgeParamIT.java[tags=programmatic]
 ----
 ====
 

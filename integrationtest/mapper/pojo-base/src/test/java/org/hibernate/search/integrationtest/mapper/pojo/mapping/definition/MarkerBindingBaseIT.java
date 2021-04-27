@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.BindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerBinderRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
@@ -45,7 +45,7 @@ public class MarkerBindingBaseIT {
 			MethodHandles.lookup(), backendMock );
 
 	@Test
-	public void withParameters_annotationMapping() {
+	public void withParams_annotationMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> {
 		} );
 		setupHelper.start().expectCustomBeans().setup( AnnotatedEntity.class );
@@ -55,7 +55,7 @@ public class MarkerBindingBaseIT {
 	}
 
 	@Test
-	public void withParameters_programmaticMapping() {
+	public void withParams_programmaticMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> {
 		} );
 		setupHelper.start()
@@ -86,12 +86,12 @@ public class MarkerBindingBaseIT {
 
 		@SuppressWarnings("uncheked")
 		private static Integer extractScale(BindingContext context) {
-			Integer scale = (Integer) context.parameter( "scale" );
+			Integer scale = (Integer) context.param( "scale" );
 			if ( scale != null ) {
 				return scale;
 			}
 
-			String stringScale = (String) context.parameter( "stringScale" );
+			String stringScale = (String) context.param( "stringScale" );
 			return Integer.parseInt( stringScale );
 		}
 	}
@@ -123,11 +123,11 @@ public class MarkerBindingBaseIT {
 		Integer id;
 
 		@MarkerBinding(binder = @MarkerBinderRef(type = ParametricBinder.class,
-				params = @Parameter(name = "stringScale", value = "3")))
+				params = @Param(name = "stringScale", value = "3")))
 		private Integer scale3Property;
 
 		@MarkerBinding(binder = @MarkerBinderRef(type = ParametricBinder.class,
-				params = @Parameter(name = "stringScale", value = "2")))
+				params = @Param(name = "stringScale", value = "2")))
 		private Integer scale2Property;
 	}
 

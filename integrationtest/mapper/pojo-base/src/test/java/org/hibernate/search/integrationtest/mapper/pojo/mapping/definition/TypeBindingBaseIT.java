@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.Parameter;
+import org.hibernate.search.mapper.pojo.common.annotation.Param;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
@@ -109,7 +109,7 @@ public class TypeBindingBaseIT {
 	}
 
 	@Test
-	public void customBridge_withParameters_annotationMapping() {
+	public void customBridge_withParams_annotationMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> {
 			b.field( "quotient", Integer.class );
 			b.field( "reminder", Integer.class );
@@ -137,7 +137,7 @@ public class TypeBindingBaseIT {
 	}
 
 	@Test
-	public void customBridge_withParameters_programmaticMapping() {
+	public void customBridge_withParams_programmaticMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> {
 			b.field( "quotient", Integer.class );
 			b.field( "reminder", Integer.class );
@@ -206,18 +206,18 @@ public class TypeBindingBaseIT {
 
 	@SuppressWarnings("uncheked")
 	private static Integer extractBase(TypeBindingContext context) {
-		Integer base = (Integer) context.parameter( "base" );
+		Integer base = (Integer) context.param( "base" );
 		if ( base != null ) {
 			return base;
 		}
 
-		String stringBase = (String) context.parameter( "stringBase" );
+		String stringBase = (String) context.param( "stringBase" );
 		return Integer.parseInt( stringBase );
 	}
 
 	@Indexed(index = INDEX_NAME)
 	@TypeBinding(binder = @TypeBinderRef(type = ParametricBinder.class,
-			params = @Parameter(name = "stringBase", value = "7")))
+			params = @Param(name = "stringBase", value = "7")))
 	private static class AnnotatedEntity {
 		@DocumentId
 		Integer id;
