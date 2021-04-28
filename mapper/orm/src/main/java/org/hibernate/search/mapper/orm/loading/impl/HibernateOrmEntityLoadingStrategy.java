@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 /**
@@ -34,7 +34,7 @@ public interface HibernateOrmEntityLoadingStrategy<E, I> {
 	@Override
 	int hashCode();
 
-	<E2> PojoLoader<E2> createLoader(Set<LoadingIndexedTypeContext<? extends E2>> targetEntityTypeContexts,
+	<E2> PojoSelectionEntityLoader<E2> createLoader(Set<LoadingIndexedTypeContext<? extends E2>> targetEntityTypeContexts,
 			LoadingSessionContext sessionContext, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions);
 

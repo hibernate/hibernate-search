@@ -19,12 +19,12 @@ import org.hibernate.query.Query;
  *
  * @param <E> A common supertype of loaded entities.
  */
-class HibernateOrmEntityIdEntityLoader<E> extends AbstractHibernateOrmEntityLoader<E> {
+class HibernateOrmSelectionEntityByIdLoader<E> extends AbstractHibernateOrmSelectionEntityLoader<E> {
 
 	private final PersistenceContextLookupStrategy persistenceContextLookup;
 	private final EntityLoadingCacheLookupStrategyImplementor cacheLookupStrategyImplementor;
 
-	HibernateOrmEntityIdEntityLoader(EntityPersister rootEntityPersister,
+	HibernateOrmSelectionEntityByIdLoader(EntityPersister rootEntityPersister,
 			TypeQueryFactory<E, ?> queryFactory, LoadingSessionContext sessionContext,
 			PersistenceContextLookupStrategy persistenceContextLookup,
 			EntityLoadingCacheLookupStrategyImplementor cacheLookupStrategyImplementor,

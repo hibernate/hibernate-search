@@ -15,7 +15,7 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
@@ -75,7 +75,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 	}
 
 	@Override
-	public <E2> PojoLoader<E2> createLoader(Set<LoadingIndexedTypeContext<? extends E2>> targetEntityTypeContexts,
+	public <E2> PojoSelectionEntityLoader<E2> createLoader(Set<LoadingIndexedTypeContext<? extends E2>> targetEntityTypeContexts,
 			LoadingSessionContext sessionContext,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
 		if ( targetEntityTypeContexts.size() != 1 ) {
@@ -85,7 +85,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 		return doCreate( targetEntityTypeContexts.iterator().next(), sessionContext, cacheLookupStrategy, loadingOptions );
 	}
 
-	private <E2> PojoLoader<E2> doCreate(LoadingIndexedTypeContext<?> targetEntityTypeContext,
+	private <E2> PojoSelectionEntityLoader<E2> doCreate(LoadingIndexedTypeContext<?> targetEntityTypeContext,
 			LoadingSessionContext sessionContext,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions) {
@@ -98,7 +98,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 		 * so this loader will actually return entities of type E2.
 		 */
 		@SuppressWarnings("unchecked")
-		PojoLoader<E2> result = new HibernateOrmNonEntityIdPropertyEntityLoader<>(
+		PojoSelectionEntityLoader<E2> result = new HibernateOrmSelectionEntityByNonIdPropertyLoader<>(
 				entityPersister, (LoadingIndexedTypeContext<E2>) targetEntityTypeContext,
 				(TypeQueryFactory<E2, ?>) queryFactory,
 				documentIdSourcePropertyName, documentIdSourceHandle,

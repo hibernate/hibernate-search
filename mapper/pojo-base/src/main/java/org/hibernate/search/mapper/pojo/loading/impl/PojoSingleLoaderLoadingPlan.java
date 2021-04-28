@@ -12,13 +12,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.engine.common.timing.spi.Deadline;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 
 public final class PojoSingleLoaderLoadingPlan<T> implements PojoLoadingPlan<T> {
 
-	private final PojoLoadingContext context;
+	private final PojoSelectionLoadingContext context;
 
 	private final Set<PojoLoadingTypeContext<? extends T>> expectedTypes = new LinkedHashSet<>();
 	private final List<Object> identifiers = new ArrayList<>();
@@ -26,7 +26,7 @@ public final class PojoSingleLoaderLoadingPlan<T> implements PojoLoadingPlan<T> 
 	private boolean singleConcreteTypeInEntityHierarchy;
 	private List<?> loaded;
 
-	public PojoSingleLoaderLoadingPlan(PojoLoadingContext context) {
+	public PojoSingleLoaderLoadingPlan(PojoSelectionLoadingContext context) {
 		this.context = context;
 	}
 
@@ -47,7 +47,7 @@ public final class PojoSingleLoaderLoadingPlan<T> implements PojoLoadingPlan<T> 
 			return;
 		}
 		try {
-			PojoLoader<? super T> loader = context.createLoader( expectedTypes );
+			PojoSelectionEntityLoader<? super T> loader = context.createLoader( expectedTypes );
 			singleConcreteTypeInEntityHierarchy = expectedTypes.size() == 1
 					&& expectedTypes.iterator().next().isSingleConcreteTypeInEntityHierarchy();
 			loaded = loader.loadBlocking( identifiers, deadline );
@@ -75,7 +75,7 @@ public final class PojoSingleLoaderLoadingPlan<T> implements PojoLoadingPlan<T> 
 	}
 
 	/**
-	 * Casts a loaded entity returned by {@link PojoLoader#loadBlocking(List, Deadline)}
+	 * Casts a loaded entity returned by {@link PojoSelectionEntityLoader#loadBlocking(List, Deadline)}
 	 * to the expected type, or returns {@code null} if it has an unexpected type.
 	 * <p>
 	 * Under some circumstances, the loading may return entities that do not have the exact type expected by users.
@@ -102,7 +102,7 @@ public final class PojoSingleLoaderLoadingPlan<T> implements PojoLoadingPlan<T> 
 	 *
 	 * @param <T2> The expected type for the entity instance.
 	 * @param expectedType The expected type for the entity instance. Must be one of the types passed
-	 * to {@link org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext#createLoader(Set)}
+	 * to {@link PojoSelectionLoadingContext#createLoader(Set)}
 	 * when creating this loader.
 	 * @param loadedObject A loaded object, i.e. an element from {@link #loaded}.
 	 * @return The given {@code loadedObject} if is an instance of {@code expectedType} exactly (not an instance of a subtype).

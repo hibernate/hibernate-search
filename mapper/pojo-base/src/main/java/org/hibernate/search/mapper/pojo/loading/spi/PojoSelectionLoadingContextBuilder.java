@@ -11,14 +11,14 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 
 /**
- * A builder for {@link PojoLoadingContext},
+ * A builder for {@link PojoSelectionLoadingContext},
  * allowing changes to the parameters of object loading,
  * for example while a query is being built.
  *
  * @param <LOS> The type of the initial step of the loading options definition DSL
  * accessible through {@link SearchQueryOptionsStep#loading(Consumer)}.
  */
-public interface PojoLoadingContextBuilder<LOS> {
+public interface PojoSelectionLoadingContextBuilder<LOS> {
 
 	/**
 	 * @return The inital step of the loading options definition DSL passed to user-defined consumers added through
@@ -29,6 +29,6 @@ public interface PojoLoadingContextBuilder<LOS> {
 	/**
 	 * @return The configured loading context.
 	 */
-	PojoLoadingContext build();
+	PojoSelectionLoadingContext build();
 
 }

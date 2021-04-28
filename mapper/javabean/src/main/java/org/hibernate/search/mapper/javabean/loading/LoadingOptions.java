@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.javabean.loading;
 
 public interface LoadingOptions {
 
-	<T> LoadingOptions registerLoader(Class<T> type, EntityLoader<T> loader);
+	<T> LoadingOptions registerLoader(Class<T> type, SelectionEntityLoader<T> loader);
 
 	<T> void massLoadingStrategy(Class<T> type, MassLoadingStrategy<T, ?> loadingStrategy);
 

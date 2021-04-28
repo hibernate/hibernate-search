@@ -15,19 +15,19 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 import org.hibernate.search.mapper.pojo.loading.impl.PojoLoadingPlan;
 import org.hibernate.search.mapper.pojo.loading.impl.PojoMultiLoaderLoadingPlan;
 import org.hibernate.search.mapper.pojo.loading.impl.PojoSingleLoaderLoadingPlan;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 
 public class PojoSearchLoadingContext<R, E> implements SearchLoadingContext<R, E> {
 	private final Map<String, PojoSearchLoadingIndexedTypeContext<? extends E>> targetTypesByEntityName;
 	private final DocumentReferenceConverter<R> documentReferenceConverter;
 	private final BridgeSessionContext sessionContext;
-	private final PojoLoadingContext delegate;
+	private final PojoSelectionLoadingContext delegate;
 
 	public PojoSearchLoadingContext(
 			Map<String, PojoSearchLoadingIndexedTypeContext<? extends E>> targetTypesByEntityName,
 			DocumentReferenceConverter<R> documentReferenceConverter,
 			BridgeSessionContext sessionContext,
-			PojoLoadingContext delegate) {
+			PojoSelectionLoadingContext delegate) {
 		this.targetTypesByEntityName = targetTypesByEntityName;
 		this.documentReferenceConverter = documentReferenceConverter;
 		this.sessionContext = sessionContext;
@@ -35,7 +35,7 @@ public class PojoSearchLoadingContext<R, E> implements SearchLoadingContext<R, E
 	}
 
 	@Override
-	public PojoLoadingContext unwrap() {
+	public PojoSelectionLoadingContext unwrap() {
 		return delegate;
 	}
 

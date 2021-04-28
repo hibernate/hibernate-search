@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
-import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmLoadingContext;
+import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmSelectionLoadingContext;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingContext;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexer;
@@ -42,7 +42,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 	}
 
 	public SearchQuerySelectStep<?, EntityReference, E, SearchLoadingOptionsStep, ?, ?> search(
-			HibernateOrmScopeSessionContext sessionContext, HibernateOrmLoadingContext.Builder loadingContextBuilder) {
+			HibernateOrmScopeSessionContext sessionContext, HibernateOrmSelectionLoadingContext.Builder loadingContextBuilder) {
 		return delegate.search( sessionContext, sessionContext.documentReferenceConverter(),
 				loadingContextBuilder );
 	}
