@@ -8,6 +8,8 @@ package org.hibernate.search.mapper.javabean.loading;
 
 import java.util.List;
 
+import org.hibernate.search.engine.common.timing.Deadline;
+
 /**
  * A loader for loading a small selection of entities, used in particular during search.
  * <p>
@@ -28,9 +30,12 @@ public interface SelectionEntityLoader<E> {
 	 * Loads the entities corresponding to the given identifiers, blocking the current thread while doing so.
 	 *
 	 * @param identifiers A list of identifiers for objects to load.
+	 * @param deadline The deadline for loading the entities, or {@code null} if there is no deadline.
+	 * Should be complied with on a best-effort basis: it's acceptable to ignore it,
+	 * but it means some timeouts in Hibernate Search will not work properly.
 	 * @return A list of entities, in the same order the identifiers were given.
 	 * {@code null} is inserted when an object is not found or has the wrong concrete type.
 	 */
-	List<E> load(List<?> identifiers);
+	List<E> load(List<?> identifiers, Deadline deadline);
 
 }

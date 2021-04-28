@@ -277,7 +277,7 @@ public class PojoIndexingPlanBaseIT {
 			session.indexingPlan().delete( IndexedEntity.class, 3, null );
 			session.indexingPlan().delete( IndexedEntity.class, 4, null );
 
-			when( loaderMock.load( Arrays.asList( 1, 2 ) ) )
+			when( loaderMock.load( Arrays.asList( 1, 2 ), null ) )
 					.thenReturn( Arrays.asList( entity1, entity2 ) );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -393,12 +393,12 @@ public class PojoIndexingPlanBaseIT {
 			loadedEntities.add( entity );
 			expectations.addOrUpdate( "10", b -> b.field( "value", "val10" ) );
 
-			when( loaderMock.load( idsToLoad ) ).thenReturn( loadedEntities );
+			when( loaderMock.load( idsToLoad, null ) ).thenReturn( loadedEntities );
 
 			expectations.createdThenExecuted();
 		}
 
-		verify( loaderMock ).load( any() );
+		verify( loaderMock ).load( any(), any() );
 	}
 
 	@Test
