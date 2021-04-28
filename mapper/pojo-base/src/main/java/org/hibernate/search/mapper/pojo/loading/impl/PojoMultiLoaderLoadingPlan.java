@@ -10,17 +10,17 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.search.engine.common.timing.spi.Deadline;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 
 public final class PojoMultiLoaderLoadingPlan<T> implements PojoLoadingPlan<T> {
 
-	private final PojoLoadingContext context;
+	private final PojoSelectionLoadingContext context;
 
 	private final Map<PojoLoadingTypeContext<? extends T>, PojoSingleLoaderLoadingPlan<T>> planByType = new LinkedHashMap<>();
 	private final Map<Object, PojoSingleLoaderLoadingPlan<T>> planByLoaderKey = new LinkedHashMap<>();
 
-	public PojoMultiLoaderLoadingPlan(PojoLoadingContext context) {
+	public PojoMultiLoaderLoadingPlan(PojoSelectionLoadingContext context) {
 		this.context = context;
 	}
 

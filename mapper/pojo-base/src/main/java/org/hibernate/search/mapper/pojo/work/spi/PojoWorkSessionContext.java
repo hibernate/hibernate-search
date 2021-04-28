@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.work.spi;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.spi.PojoImplicitReindexingResolverSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorSessionContext;
 
 /**
@@ -22,6 +22,6 @@ public interface PojoWorkSessionContext
 	@Override
 	PojoWorkMappingContext mappingContext();
 
-	PojoLoadingContext defaultLoadingContext();
+	PojoSelectionLoadingContext defaultLoadingContext();
 
 }

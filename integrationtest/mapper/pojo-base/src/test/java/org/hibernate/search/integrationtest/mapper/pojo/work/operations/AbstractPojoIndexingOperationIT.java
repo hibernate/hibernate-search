@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.loading.EntityLoader;
+import org.hibernate.search.mapper.javabean.loading.SelectionEntityLoader;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -84,7 +84,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 	protected SearchMapping mapping;
 
 	@SuppressWarnings("unchecked")
-	protected EntityLoader<IndexedEntity> loaderMock;
+	protected SelectionEntityLoader<IndexedEntity> loaderMock;
 
 	@Before
 	public void setup() {
@@ -106,7 +106,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 		MyRoutingBridge.previouslyIndexed = true;
 		MyRoutingBridge.previousValues = null;
 
-		loaderMock = Mockito.mock( EntityLoader.class );
+		loaderMock = Mockito.mock( SelectionEntityLoader.class );
 	}
 
 	protected final boolean isAdd() {

@@ -7,10 +7,10 @@
 package org.hibernate.search.mapper.javabean.loading.impl;
 
 import org.hibernate.search.mapper.javabean.loading.LoadingOptions;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContextBuilder;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContextBuilder;
 
-public interface JavaBeanLoadingContextBuilder extends PojoLoadingContextBuilder<LoadingOptions>,
+public interface JavaBeanSelectionLoadingContextBuilder extends PojoSelectionLoadingContextBuilder<LoadingOptions>,
 		PojoMassIndexingContextBuilder<LoadingOptions> {
 
 	@Override

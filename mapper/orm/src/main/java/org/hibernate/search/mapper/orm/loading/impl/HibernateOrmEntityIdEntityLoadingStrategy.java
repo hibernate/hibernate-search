@@ -16,7 +16,7 @@ import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 
 public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 		extends AbstractHibernateOrmLoadingStrategy<E, I> {
@@ -56,7 +56,7 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 	}
 
 	@Override
-	public <E2> PojoLoader<E2> createLoader(Set<LoadingIndexedTypeContext<? extends E2>> targetEntityTypeContexts,
+	public <E2> PojoSelectionEntityLoader<E2> createLoader(Set<LoadingIndexedTypeContext<? extends E2>> targetEntityTypeContexts,
 			LoadingSessionContext sessionContext, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions) {
 		if ( targetEntityTypeContexts.size() == 1 ) {
@@ -68,7 +68,7 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 			 * in particular runtime checks handling edge cases.
 			 */
 			@SuppressWarnings("unchecked")
-			PojoLoader<E2> result = (PojoLoader<E2>) doCreate( targetEntityTypeContext.entityPersister(), sessionContext,
+			PojoSelectionEntityLoader<E2> result = (PojoSelectionEntityLoader<E2>) doCreate( targetEntityTypeContext.entityPersister(), sessionContext,
 					cacheLookupStrategy, loadingOptions );
 			return result;
 		}
@@ -91,13 +91,13 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 		 * See PojoLoader.castToExactTypeOrNull() and its callers for more information.
 		 */
 		@SuppressWarnings("unchecked")
-		PojoLoader<E2> result = (PojoLoader<E2>) doCreate( commonSuperType, sessionContext, cacheLookupStrategy,
+		PojoSelectionEntityLoader<E2> result = (PojoSelectionEntityLoader<E2>) doCreate( commonSuperType, sessionContext, cacheLookupStrategy,
 				loadingOptions );
 
 		return result;
 	}
 
-	private PojoLoader<?> doCreate(EntityPersister entityPersister,
+	private PojoSelectionEntityLoader<?> doCreate(EntityPersister entityPersister,
 			LoadingSessionContext sessionContext, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions) {
 		if ( !rootEntityPersister.getMappedClass().isAssignableFrom( entityPersister.getMappedClass() ) ) {
@@ -142,7 +142,7 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 		// We must pass rootEntityPersister here, to avoid getting a WrongClassException when loading from the cache,
 		// even if we know we actually want instances from the most specific entity persister,
 		// because that exception cannot be recovered from.
-		return new HibernateOrmEntityIdEntityLoader<>( rootEntityPersister, queryFactory, sessionContext,
+		return new HibernateOrmSelectionEntityByIdLoader<>( rootEntityPersister, queryFactory, sessionContext,
 				persistenceContextLookup, cacheLookupStrategyImplementor, loadingOptions );
 	}
 

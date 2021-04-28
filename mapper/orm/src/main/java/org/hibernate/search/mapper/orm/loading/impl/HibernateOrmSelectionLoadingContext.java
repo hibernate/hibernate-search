@@ -21,15 +21,15 @@ import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContextBuilder;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public final class HibernateOrmLoadingContext implements PojoLoadingContext {
+public final class HibernateOrmSelectionLoadingContext implements PojoSelectionLoadingContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -38,7 +38,7 @@ public final class HibernateOrmLoadingContext implements PojoLoadingContext {
 	private final MutableEntityLoadingOptions loadingOptions;
 	private final EntityLoadingCacheLookupStrategy cacheLookupStrategy;
 
-	private HibernateOrmLoadingContext(Builder builder) {
+	private HibernateOrmSelectionLoadingContext(Builder builder) {
 		typeContextProvider = builder.typeContextProvider;
 		sessionContext = builder.sessionContext;
 		loadingOptions = builder.loadingOptions;
@@ -66,7 +66,7 @@ public final class HibernateOrmLoadingContext implements PojoLoadingContext {
 	}
 
 	@Override
-	public <T> PojoLoader<T> createLoader(Set<PojoLoadingTypeContext<? extends T>> expectedTypes) {
+	public <T> PojoSelectionEntityLoader<T> createLoader(Set<PojoLoadingTypeContext<? extends T>> expectedTypes) {
 		if ( expectedTypes.size() == 1 ) {
 			// Optimization: no need for the checks below if there's only one type.
 			LoadingIndexedTypeContext<? extends T> typeContext = typeContextProvider.indexedForExactType( expectedTypes.iterator().next().typeIdentifier() );
@@ -109,7 +109,7 @@ public final class HibernateOrmLoadingContext implements PojoLoadingContext {
 	}
 
 	public static final class Builder
-			implements PojoLoadingContextBuilder<SearchLoadingOptionsStep>, SearchLoadingOptionsStep {
+			implements PojoSelectionLoadingContextBuilder<SearchLoadingOptionsStep>, SearchLoadingOptionsStep {
 		private final LoadingIndexedTypeContextProvider typeContextProvider;
 		private final LoadingSessionContext sessionContext;
 		private final MutableEntityLoadingOptions loadingOptions;
@@ -153,8 +153,8 @@ public final class HibernateOrmLoadingContext implements PojoLoadingContext {
 		}
 
 		@Override
-		public PojoLoadingContext build() {
-			return new HibernateOrmLoadingContext( this );
+		public PojoSelectionLoadingContext build() {
+			return new HibernateOrmSelectionLoadingContext( this );
 		}
 	}
 }

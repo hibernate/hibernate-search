@@ -26,7 +26,7 @@ import org.hibernate.search.mapper.orm.automaticindexing.session.impl.Configured
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingEventSendingSessionContext;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
-import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmLoadingContext;
+import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmSelectionLoadingContext;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospector;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
@@ -40,7 +40,7 @@ import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanSessionContext;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
@@ -220,7 +220,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public PojoLoadingContext defaultLoadingContext() {
+	public PojoSelectionLoadingContext defaultLoadingContext() {
 		return loadingContextBuilder().build();
 	}
 
@@ -285,8 +285,8 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		return indexingPlanSynchronizationStrategy;
 	}
 
-	private HibernateOrmLoadingContext.Builder loadingContextBuilder() {
-		return new HibernateOrmLoadingContext.Builder( mappingContext, typeContextProvider, this );
+	private HibernateOrmSelectionLoadingContext.Builder loadingContextBuilder() {
+		return new HibernateOrmSelectionLoadingContext.Builder( mappingContext, typeContextProvider, this );
 	}
 
 	private void registerSynchronization(SessionImplementor sessionImplementor, Synchronization synchronization) {

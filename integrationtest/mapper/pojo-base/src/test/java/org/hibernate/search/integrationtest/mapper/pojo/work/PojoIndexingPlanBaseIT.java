@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.loading.EntityLoader;
+import org.hibernate.search.mapper.javabean.loading.SelectionEntityLoader;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
@@ -264,7 +264,7 @@ public class PojoIndexingPlanBaseIT {
 	@Test
 	public void nullEntity() {
 		@SuppressWarnings("unchecked")
-		EntityLoader<IndexedEntity> loaderMock = mock( EntityLoader.class );
+		SelectionEntityLoader<IndexedEntity> loaderMock = mock( SelectionEntityLoader.class );
 
 		try ( SearchSession session = mapping.createSessionWithOptions()
 				.loading( o -> o.registerLoader( IndexedEntity.class, loaderMock ) )
@@ -307,7 +307,7 @@ public class PojoIndexingPlanBaseIT {
 	@Test
 	public void nullEntity_state() {
 		@SuppressWarnings("unchecked")
-		EntityLoader<IndexedEntity> loaderMock = mock( EntityLoader.class );
+		SelectionEntityLoader<IndexedEntity> loaderMock = mock( SelectionEntityLoader.class );
 		List<Integer> idsToLoad = new ArrayList<>();
 		List<IndexedEntity> loadedEntities = new ArrayList<>();
 

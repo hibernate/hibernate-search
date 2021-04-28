@@ -25,7 +25,7 @@ import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
  *
  * @param <E> The type of loaded entities.
  */
-class HibernateOrmNonEntityIdPropertyEntityLoader<E> extends AbstractHibernateOrmEntityLoader<E> {
+class HibernateOrmSelectionEntityByNonIdPropertyLoader<E> extends AbstractHibernateOrmSelectionEntityLoader<E> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -33,7 +33,7 @@ class HibernateOrmNonEntityIdPropertyEntityLoader<E> extends AbstractHibernateOr
 	private final String documentIdSourcePropertyName;
 	private final ValueReadHandle<?> documentIdSourceHandle;
 
-	HibernateOrmNonEntityIdPropertyEntityLoader(EntityPersister entityPersister,
+	HibernateOrmSelectionEntityByNonIdPropertyLoader(EntityPersister entityPersister,
 			LoadingIndexedTypeContext<E> targetEntityTypeContext,
 			TypeQueryFactory<E, ?> queryFactory,
 			String documentIdSourcePropertyName,

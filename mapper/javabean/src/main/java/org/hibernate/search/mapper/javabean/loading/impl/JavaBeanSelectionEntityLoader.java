@@ -9,14 +9,14 @@ package org.hibernate.search.mapper.javabean.loading.impl;
 import java.util.List;
 
 import org.hibernate.search.engine.common.timing.spi.Deadline;
-import org.hibernate.search.mapper.javabean.loading.EntityLoader;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
+import org.hibernate.search.mapper.javabean.loading.SelectionEntityLoader;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 
-public class JavaBeanLoader<E> implements PojoLoader<E> {
+public class JavaBeanSelectionEntityLoader<E> implements PojoSelectionEntityLoader<E> {
 
-	private final EntityLoader<E> delegate;
+	private final SelectionEntityLoader<E> delegate;
 
-	public JavaBeanLoader(EntityLoader<E> delegate) {
+	public JavaBeanSelectionEntityLoader(SelectionEntityLoader<E> delegate) {
 		this.delegate = delegate;
 	}
 

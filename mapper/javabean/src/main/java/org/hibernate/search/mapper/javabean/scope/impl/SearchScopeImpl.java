@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
 import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexer;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchSession;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContextBuilder;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeSessionContext;
@@ -62,7 +62,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	public SearchQuerySelectStep<?, EntityReference, E, ?, ?, ?> search(PojoScopeSessionContext sessionContext,
 			DocumentReferenceConverter<EntityReference> documentReferenceConverter,
-			PojoLoadingContextBuilder<?> loadingContextBuilder) {
+			PojoSelectionLoadingContextBuilder<?> loadingContextBuilder) {
 		return delegate.search( sessionContext, documentReferenceConverter, loadingContextBuilder );
 	}
 

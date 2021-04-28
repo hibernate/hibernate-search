@@ -15,7 +15,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.javabean.loading.MassLoadingOptions;
-import org.hibernate.search.mapper.javabean.loading.EntityLoader;
+import org.hibernate.search.mapper.javabean.loading.SelectionEntityLoader;
 import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategy;
 import org.hibernate.search.mapper.javabean.loading.LoadingOptions;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
@@ -23,21 +23,22 @@ import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexi
 import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexingMappingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingLoadingStrategy;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public final class JavaBeanLoadingContext implements PojoLoadingContext, PojoMassIndexingContext, MassLoadingOptions {
+public final class JavaBeanLoadingContext
+		implements PojoSelectionLoadingContext, PojoMassIndexingContext, MassLoadingOptions {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final JavaBeanMassIndexingMappingContext mappingContext;
 	private final LoadingTypeContextProvider typeContextProvider;
 	private final DetachedBackendSessionContext sessionContext;
-	private final Map<PojoRawTypeIdentifier<?>, PojoLoader<?>> loaderByType;
+	private final Map<PojoRawTypeIdentifier<?>, PojoSelectionEntityLoader<?>> loaderByType;
 	private final Map<PojoRawTypeIdentifier<?>, MassLoadingStrategy<?, ?>> massLoadingStrategyByType;
 
 	private int batchSize = 10;
@@ -78,6 +79,7 @@ public final class JavaBeanLoadingContext implements PojoLoadingContext, PojoMas
 		return (T) contextData.get( contextType );
 	}
 
+
 	@Override
 	public void checkOpen() {
 		// Nothing to do: we're always "open"
@@ -95,13 +97,13 @@ public final class JavaBeanLoadingContext implements PojoLoadingContext, PojoMas
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> PojoLoader<? super T> createLoader(Set<PojoLoadingTypeContext<? extends T>> expectedTypes) {
+	public <T> PojoSelectionEntityLoader<? super T> createLoader(Set<PojoLoadingTypeContext<? extends T>> expectedTypes) {
 		PojoRawTypeIdentifier<? extends T> type = expectedTypes.iterator().next().typeIdentifier();
-		PojoLoader<? super T> loader = (PojoLoader<T>) loaderByType.get( type );
+		PojoSelectionEntityLoader<? super T> loader = (PojoSelectionEntityLoader<T>) loaderByType.get( type );
 		if ( loader == null ) {
-			for ( Map.Entry<PojoRawTypeIdentifier<?>, PojoLoader<?>> entry : loaderByType.entrySet() ) {
+			for ( Map.Entry<PojoRawTypeIdentifier<?>, PojoSelectionEntityLoader<?>> entry : loaderByType.entrySet() ) {
 				if ( entry.getKey().javaClass().isAssignableFrom( type.javaClass() ) ) {
-					loader = (PojoLoader<? super T>) entry.getValue();
+					loader = (PojoSelectionEntityLoader<? super T>) entry.getValue();
 					break;
 				}
 			}
@@ -132,11 +134,11 @@ public final class JavaBeanLoadingContext implements PojoLoadingContext, PojoMas
 		return new JavaBeanMassIndexingLoadingStrategy<>( mappingContext, typeContextProvider, strategy, this );
 	}
 
-	public static final class Builder implements JavaBeanLoadingContextBuilder, LoadingOptions {
+	public static final class Builder implements JavaBeanSelectionLoadingContextBuilder, LoadingOptions {
 		private final JavaBeanMassIndexingMappingContext mappingContext;
 		private final LoadingTypeContextProvider typeContextProvider;
 		private final DetachedBackendSessionContext sessionContext;
-		private Map<PojoRawTypeIdentifier<?>, PojoLoader<?>> loaderByType;
+		private Map<PojoRawTypeIdentifier<?>, PojoSelectionEntityLoader<?>> loaderByType;
 		private Map<PojoRawTypeIdentifier<?>, MassLoadingStrategy<?, ?>> massLoadingStrategyByType;
 
 		public Builder(JavaBeanMassIndexingMappingContext mappingContext,
@@ -153,14 +155,14 @@ public final class JavaBeanLoadingContext implements PojoLoadingContext, PojoMas
 		}
 
 		@Override
-		public <T> LoadingOptions registerLoader(Class<T> type, EntityLoader<T> loader) {
+		public <T> LoadingOptions registerLoader(Class<T> type, SelectionEntityLoader<T> loader) {
 			LoadingTypeContext<T> typeContext = typeContextProvider.indexedForExactClass( type );
 			PojoRawTypeIdentifier<T> typeIdentifier = typeContext != null
 					? typeContext.typeIdentifier() : PojoRawTypeIdentifier.of( type );
 			if ( loaderByType == null ) {
 				loaderByType = new LinkedHashMap<>();
 			}
-			loaderByType.put( typeIdentifier, new JavaBeanLoader<>( loader ) );
+			loaderByType.put( typeIdentifier, new JavaBeanSelectionEntityLoader<>( loader ) );
 			return this;
 		}
 

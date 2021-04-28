@@ -18,9 +18,9 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.loading.LoadingOptions;
+import org.hibernate.search.mapper.javabean.loading.impl.JavaBeanLoadingContext;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.scope.impl.SearchScopeImpl;
-import org.hibernate.search.mapper.javabean.loading.impl.JavaBeanLoadingContext;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
 import org.hibernate.search.mapper.javabean.work.SearchIndexer;
@@ -28,10 +28,10 @@ import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.javabean.work.impl.SearchIndexerImpl;
 import org.hibernate.search.mapper.javabean.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
-import org.hibernate.search.mapper.javabean.loading.impl.JavaBeanLoadingContextBuilder;
+import org.hibernate.search.mapper.javabean.loading.impl.JavaBeanSelectionLoadingContextBuilder;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexingSessionContext;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
@@ -163,7 +163,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public PojoLoadingContext defaultLoadingContext() {
+	public PojoSelectionLoadingContext defaultLoadingContext() {
 		return loadingContextBuilder().build();
 	}
 
@@ -176,7 +176,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 		return scope.search( this, this, loadingContextBuilder() );
 	}
 
-	public JavaBeanLoadingContextBuilder loadingContextBuilder() {
+	public JavaBeanSelectionLoadingContextBuilder loadingContextBuilder() {
 		JavaBeanLoadingContext.Builder builder = new JavaBeanLoadingContext.Builder( mappingContext, typeContextProvider,
 				mappingContext().detachedBackendSessionContext( tenantIdentifier() ) );
 		if ( loadingOptionsContributor != null ) {

@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * A loader for mass loading of entities, used in particular during mass indexing.
  * <p>
- * Compared to {@link PojoLoader}, this loader:
+ * Compared to {@link PojoSelectionEntityLoader}, this loader:
  * <ul>
  *     <li>Receives batches of identifiers from a {@link PojoMassIdentifierLoader}</li>
  *     <li>Is expected to load a very large number of entities in multiple small batches.</li>

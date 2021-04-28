@@ -26,7 +26,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContextBuilder;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.massindexing.impl.PojoDefaultMassIndexer;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
@@ -111,7 +111,7 @@ public final class PojoScopeDelegateImpl<R, E, C> implements PojoScopeDelegate<R
 	@Override
 	public <LOS> SearchQuerySelectStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
 			PojoScopeSessionContext sessionContext, DocumentReferenceConverter<R> documentReferenceConverter,
-			PojoLoadingContextBuilder<LOS> loadingContextBuilder) {
+			PojoSelectionLoadingContextBuilder<LOS> loadingContextBuilder) {
 		Map<String, PojoSearchLoadingIndexedTypeContext<? extends E>> targetTypesByEntityName = new LinkedHashMap<>();
 		for ( PojoScopeIndexedTypeContext<?, ? extends E> type : targetedTypeContexts ) {
 			targetTypesByEntityName.put( type.entityName(), type );

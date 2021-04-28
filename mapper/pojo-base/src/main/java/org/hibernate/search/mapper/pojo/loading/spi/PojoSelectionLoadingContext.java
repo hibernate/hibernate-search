@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 
-public interface PojoLoadingContext {
+public interface PojoSelectionLoadingContext {
 
 	/**
 	 * Check whether this context is still open, throwing an exception if it is not.
@@ -32,7 +32,7 @@ public interface PojoLoadingContext {
 	 * @param expectedTypes The expected types of loaded objects.
 	 * The types are guaranteed to have the same {@link #loaderKey(PojoLoadingTypeContext)}.
 	 * @return A loader.
-	 * @see PojoLoader
+	 * @see PojoSelectionEntityLoader
 	 */
-	<T> PojoLoader<? super T> createLoader(Set<PojoLoadingTypeContext<? extends T>> expectedTypes);
+	<T> PojoSelectionEntityLoader<? super T> createLoader(Set<PojoLoadingTypeContext<? extends T>> expectedTypes);
 }

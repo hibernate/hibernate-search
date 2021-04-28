@@ -15,9 +15,9 @@ import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
 import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoader;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 
-abstract class AbstractHibernateOrmEntityLoader<E> implements PojoLoader<E> {
+abstract class AbstractHibernateOrmSelectionEntityLoader<E> implements PojoSelectionEntityLoader<E> {
 	protected static final String IDS_PARAMETER_NAME = "ids";
 
 	protected final EntityPersister entityPersister;
@@ -26,7 +26,7 @@ abstract class AbstractHibernateOrmEntityLoader<E> implements PojoLoader<E> {
 	protected final boolean singleConcreteTypeInHierarchy;
 	protected final TypeQueryFactory<E, ?> queryFactory;
 
-	public AbstractHibernateOrmEntityLoader(EntityPersister entityPersister, TypeQueryFactory<E, ?> queryFactory,
+	public AbstractHibernateOrmSelectionEntityLoader(EntityPersister entityPersister, TypeQueryFactory<E, ?> queryFactory,
 			LoadingSessionContext sessionContext, MutableEntityLoadingOptions loadingOptions) {
 		this.entityPersister = entityPersister;
 		this.sessionContext = sessionContext;

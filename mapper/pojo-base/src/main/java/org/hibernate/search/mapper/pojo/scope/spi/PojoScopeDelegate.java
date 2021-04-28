@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContextBuilder;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
@@ -37,7 +37,7 @@ public interface PojoScopeDelegate<R, E, C> {
 
 	<LOS> SearchQuerySelectStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
 			PojoScopeSessionContext sessionContext, DocumentReferenceConverter<R> documentReferenceConverter,
-			PojoLoadingContextBuilder<LOS> loadingContextBuilder);
+			PojoSelectionLoadingContextBuilder<LOS> loadingContextBuilder);
 
 	SearchPredicateFactory predicate();
 
