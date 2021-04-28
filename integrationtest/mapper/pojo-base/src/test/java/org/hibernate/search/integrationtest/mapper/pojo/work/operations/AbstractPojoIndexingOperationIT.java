@@ -143,7 +143,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 	}
 
 	protected final void expectLoading(List<Integer> ids, List<IndexedEntity> entities) {
-		when( loaderMock.load( ids ) ).thenReturn( entities );
+		when( loaderMock.load( ids, null ) ).thenReturn( entities );
 	}
 
 	protected final void expectOperation(CompletableFuture<?> futureFromBackend, int id, String providedRoutingKey, String value) {
