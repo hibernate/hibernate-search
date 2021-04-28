@@ -258,6 +258,36 @@ public class GenericFieldIT {
 	}
 
 	@Test
+	public void customBridge_withParams_paramDefinedTwice() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@GenericField(valueBinder = @ValueBinderRef(type = ParametricBridge.ParametricBinder.class,
+					params = { @Param(name = "stringBase", value = "4"), @Param(name = "stringBase", value = "4") }))
+			Integer value;
+
+			IndexedEntity(Integer id, Integer value) {
+				this.id = id;
+				this.value = value;
+			}
+		}
+
+		assertThatThrownBy(
+				() -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".value" )
+						.annotationContextAnyParameters( GenericField.class )
+						.failure( "Conflicting usage of @Param annotation for parameter name: 'stringBase'. " +
+								"Can't assign both value '4' and '4'" )
+						.build()
+				);
+	}
+
+	@Test
 	public void customBridge_withParams_programmaticMapping() {
 		class IndexedEntity {
 			Integer id;

@@ -686,6 +686,21 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
+	public void params_paramDefinedTwice() {
+		assertThatThrownBy(
+				() -> setupHelper.start().expectCustomBeans().setup( AnnotatedRoutedSameParamTwiceEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( AnnotatedRoutedSameParamTwiceEntity.class.getName() )
+						.annotationContextAnyParameters( Indexed.class )
+						.failure( "Conflicting usage of @Param annotation for parameter name: 'stringModulus'. " +
+								"Can't assign both value '7' and '7'" )
+						.build()
+				);
+	}
+
+	@Test
 	public void params_programmaticMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> { } );
 		SearchMapping mapping = setupHelper.start().expectCustomBeans()
@@ -732,6 +747,19 @@ public class RoutingBridgeBaseIT {
 		int value;
 
 		AnnotatedRoutedNoParamEntity(int id, int value) {
+			this.id = id;
+			this.value = value;
+		}
+	}
+
+	@Indexed(index = INDEX_NAME, routingBinder = @RoutingBinderRef(type = ParametricBinder.class,
+			params = { @Param(name = "stringModulus", value = "7"), @Param(name = "stringModulus", value = "7") }))
+	class AnnotatedRoutedSameParamTwiceEntity {
+		@DocumentId
+		int id;
+		int value;
+
+		AnnotatedRoutedSameParamTwiceEntity(int id, int value) {
 			this.id = id;
 			this.value = value;
 		}

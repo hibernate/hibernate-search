@@ -151,6 +151,21 @@ public class TypeBindingBaseIT {
 	}
 
 	@Test
+	public void customBridge_withParams_paramDefinedTwice() {
+		assertThatThrownBy(
+				() -> setupHelper.start().expectCustomBeans().setup( AnnotatedSameParamTwiceEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( AnnotatedSameParamTwiceEntity.class.getName() )
+						.annotationContextAnyParameters( TypeBinding.class )
+						.failure( "Conflicting usage of @Param annotation for parameter name: 'stringBase'. " +
+								"Can't assign both value '7' and '7'" )
+						.build()
+				);
+	}
+
+	@Test
 	public void customBridge_withParams_programmaticMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> {
 			b.field( "quotient", Integer.class );
@@ -256,6 +271,23 @@ public class TypeBindingBaseIT {
 		int value2;
 
 		AnnotatedNoParamEntity(Integer id, int value1, int value2) {
+			this.id = id;
+			this.value1 = value1;
+			this.value2 = value2;
+		}
+	}
+
+	@Indexed(index = INDEX_NAME)
+	@TypeBinding(binder = @TypeBinderRef(type = ParametricBinder.class,
+			params = { @Param(name = "stringBase", value = "7"), @Param(name = "stringBase", value = "7") }))
+	private static class AnnotatedSameParamTwiceEntity {
+		@DocumentId
+		Integer id;
+
+		int value1;
+		int value2;
+
+		AnnotatedSameParamTwiceEntity(Integer id, int value1, int value2) {
 			this.id = id;
 			this.value1 = value1;
 			this.value2 = value2;
