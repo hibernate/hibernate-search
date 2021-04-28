@@ -404,6 +404,39 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
+	public void customBridge_withParams_paramDefinedTwice() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId(identifierBinder = @IdentifierBinderRef(type = ParametricBridge.ParametricBinder.class,
+					params = {
+							@Param(name = "fixedPrefix", value = "fixed-prefix-"),
+							@Param(name = "fixedPrefix", value = "fixed-prefix-")
+					}))
+			Integer id;
+			@GenericField
+			String value;
+
+			IndexedEntity(Integer id, String value) {
+				this.id = id;
+				this.value = value;
+			}
+		}
+
+		assertThatThrownBy(
+				() -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".id" )
+						.annotationContextAnyParameters( DocumentId.class )
+						.failure( "Conflicting usage of @Param annotation for parameter name: 'fixedPrefix'. " +
+								"Can't assign both value 'fixed-prefix-' and 'fixed-prefix-'" )
+						.build()
+				);
+	}
+
+	@Test
 	public void customBridge_withParams_programmaticMapping() {
 		class IndexedEntity {
 			Integer id;
