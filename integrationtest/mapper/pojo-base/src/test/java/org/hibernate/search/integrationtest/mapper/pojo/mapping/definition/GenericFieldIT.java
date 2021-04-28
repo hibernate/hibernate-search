@@ -231,6 +231,33 @@ public class GenericFieldIT {
 	}
 
 	@Test
+	public void customBridge_withParams_paramNotDefined() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId
+			Integer id;
+			@GenericField(valueBinder = @ValueBinderRef(type = ParametricBridge.ParametricBinder.class))
+			Integer value;
+
+			IndexedEntity(Integer id, Integer value) {
+				this.id = id;
+				this.value = value;
+			}
+		}
+
+		assertThatThrownBy(
+				() -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".value" )
+						.failure( "Param with name 'stringBase' has not been defined for the binder." )
+						.build()
+				);
+	}
+
+	@Test
 	public void customBridge_withParams_programmaticMapping() {
 		class IndexedEntity {
 			Integer id;

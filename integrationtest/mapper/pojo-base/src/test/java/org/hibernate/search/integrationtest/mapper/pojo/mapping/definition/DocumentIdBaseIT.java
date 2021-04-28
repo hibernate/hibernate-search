@@ -377,6 +377,33 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
+	public void customBridge_withParams_paramNotDefined() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			@DocumentId(identifierBinder = @IdentifierBinderRef(type = ParametricBridge.ParametricBinder.class))
+			Integer id;
+			@GenericField
+			String value;
+
+			IndexedEntity(Integer id, String value) {
+				this.id = id;
+				this.value = value;
+			}
+		}
+
+		assertThatThrownBy(
+				() -> setupHelper.start().expectCustomBeans().setup( IndexedEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".id" )
+						.failure( "Param with name 'fixedPrefix' has not been defined for the binder." )
+						.build()
+				);
+	}
+
+	@Test
 	public void customBridge_withParams_programmaticMapping() {
 		class IndexedEntity {
 			Integer id;
