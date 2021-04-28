@@ -118,6 +118,8 @@ You can pass string parameters to the `@TypeBinderRef` annotation and then use t
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/typebridge/param/context/FullNameBinder.java[tags=include]
 ----
 <1> Use the binding context to get the parameter value.
+Getting the param using the `param` method assumes that the param has been defined.
+Alternatively it is possible to use `optionalParam` to get the `java.util.Optional` of the param.
 <2> In the `bind` method, use the value of parameters.
 Here use the `sortField` parameter to decide whether to add a additional, sortable field,
 but we could pass parameters for any purpose:
