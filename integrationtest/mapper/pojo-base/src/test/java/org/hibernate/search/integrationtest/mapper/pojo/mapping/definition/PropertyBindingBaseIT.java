@@ -136,6 +136,21 @@ public class PropertyBindingBaseIT {
 		}
 		backendMock.verifyExpectationsMet();
 	}
+
+	@Test
+	public void customBridge_withParams_paramNotDefined() {
+		assertThatThrownBy(
+				() -> setupHelper.start().expectCustomBeans().setup( AnnotatedNoParamEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( AnnotatedNoParamEntity.class.getName() )
+						.pathContext( ".value" )
+						.failure( "Param with name 'stringBase' has not been defined for the binder." )
+						.build()
+				);
+	}
+
 	@Test
 	public void customBridge_withParams_programmaticMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> {
@@ -216,6 +231,20 @@ public class PropertyBindingBaseIT {
 		int value;
 
 		AnnotatedEntity(Integer id, int value) {
+			this.id = id;
+			this.value = value;
+		}
+	}
+
+	@Indexed(index = INDEX_NAME)
+	private static class AnnotatedNoParamEntity {
+		@DocumentId
+		Integer id;
+
+		@PropertyBinding(binder = @PropertyBinderRef(type = ParametricBinder.class))
+		int value;
+
+		AnnotatedNoParamEntity(Integer id, int value) {
 			this.id = id;
 			this.value = value;
 		}

@@ -138,6 +138,19 @@ public class TypeBindingBaseIT {
 	}
 
 	@Test
+	public void customBridge_withParams_paramNotDefined() {
+		assertThatThrownBy(
+				() -> setupHelper.start().expectCustomBeans().setup( AnnotatedNoParamEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( AnnotatedNoParamEntity.class.getName() )
+						.failure( "Param with name 'stringBase' has not been defined for the binder." )
+						.build()
+				);
+	}
+
+	@Test
 	public void customBridge_withParams_programmaticMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> {
 			b.field( "quotient", Integer.class );
@@ -227,6 +240,22 @@ public class TypeBindingBaseIT {
 		int value2;
 
 		AnnotatedEntity(Integer id, int value1, int value2) {
+			this.id = id;
+			this.value1 = value1;
+			this.value2 = value2;
+		}
+	}
+
+	@Indexed(index = INDEX_NAME)
+	@TypeBinding(binder = @TypeBinderRef(type = ParametricBinder.class))
+	private static class AnnotatedNoParamEntity {
+		@DocumentId
+		Integer id;
+
+		int value1;
+		int value2;
+
+		AnnotatedNoParamEntity(Integer id, int value1, int value2) {
 			this.id = id;
 			this.value1 = value1;
 			this.value2 = value2;

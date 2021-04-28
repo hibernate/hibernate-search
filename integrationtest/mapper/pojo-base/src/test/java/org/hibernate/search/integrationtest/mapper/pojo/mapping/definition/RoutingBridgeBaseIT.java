@@ -673,6 +673,19 @@ public class RoutingBridgeBaseIT {
 	}
 
 	@Test
+	public void params_paramNotDefined() {
+		assertThatThrownBy(
+				() -> setupHelper.start().expectCustomBeans().setup( AnnotatedRoutedNoParamEntity.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( AnnotatedRoutedNoParamEntity.class.getName() )
+						.failure( "Param with name 'stringModulus' has not been defined for the binder." )
+						.build()
+				);
+	}
+
+	@Test
 	public void params_programmaticMapping() {
 		backendMock.expectSchema( INDEX_NAME, b -> { } );
 		SearchMapping mapping = setupHelper.start().expectCustomBeans()
@@ -707,6 +720,18 @@ public class RoutingBridgeBaseIT {
 		int value;
 
 		AnnotatedRoutedEntity(int id, int value) {
+			this.id = id;
+			this.value = value;
+		}
+	}
+
+	@Indexed(index = INDEX_NAME, routingBinder = @RoutingBinderRef(type = ParametricBinder.class))
+	class AnnotatedRoutedNoParamEntity {
+		@DocumentId
+		int id;
+		int value;
+
+		AnnotatedRoutedNoParamEntity(int id, int value) {
 			this.id = id;
 			this.value = value;
 		}
