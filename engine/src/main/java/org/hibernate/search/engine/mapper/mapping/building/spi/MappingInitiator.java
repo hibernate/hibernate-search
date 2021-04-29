@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
+import org.hibernate.search.engine.mapper.model.spi.TypeMetadataContributorProvider;
+
 /**
  * An object responsible for initiating a mapping by contributing its basic configuration (indexed types, type metadata),
  * then creating the mapper based on the configuration processed by the engine.

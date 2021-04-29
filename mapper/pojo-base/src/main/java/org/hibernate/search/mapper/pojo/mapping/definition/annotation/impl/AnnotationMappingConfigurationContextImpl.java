@@ -13,7 +13,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataDiscoverer;
+import org.hibernate.search.engine.mapper.model.spi.TypeMetadataDiscoverer;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;

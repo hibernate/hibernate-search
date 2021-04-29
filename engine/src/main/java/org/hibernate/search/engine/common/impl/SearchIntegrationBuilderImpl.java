@@ -7,18 +7,10 @@
 package org.hibernate.search.engine.common.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -30,6 +22,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.BackendsInfo;
 import org.hibernate.search.engine.common.timing.impl.DefaultTimingSource;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
+import org.hibernate.search.engine.mapper.model.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
@@ -50,8 +43,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingAbortedException;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataDiscoverer;
+import org.hibernate.search.engine.mapper.model.spi.TypeMetadataDiscoverer;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
@@ -319,11 +311,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 		private final MappingKey<PBM, ?> mappingKey;
 		private final MappingInitiator<C, PBM> mappingInitiator;
 
-		// Use a LinkedHashMap for deterministic iteration
-		private final Map<MappableTypeModel, TypeMappingContribution<C>> contributionByType = new LinkedHashMap<>();
-		private final List<TypeMetadataDiscoverer<C>> metadataDiscoverers = new ArrayList<>();
-
-		private final Set<MappableTypeModel> typesSubmittedToDiscoverers = new HashSet<>();
+		private TypeMetadataContributorProvider<C> metadataContributorProvider;
 
 		private Mapper<PBM> mapper; // Initially null, set in createMapper()
 
@@ -335,12 +323,13 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 		}
 
 		void collect() {
-			mappingInitiator.configure( buildContext, new MappingConfigurationCollectorImpl() );
+			TypeMetadataContributorProvider.Builder<C> builder = TypeMetadataContributorProvider.builder();
+			mappingInitiator.configure( buildContext, new MappingConfigurationCollectorImpl( builder ) );
+			metadataContributorProvider = builder.build();
 		}
 
 		void createMapper() {
-			TypeMetadataContributorProviderImpl contributorProvider = new TypeMetadataContributorProviderImpl();
-			mapper = mappingInitiator.createMapper( buildContext, contributorProvider );
+			mapper = mappingInitiator.createMapper( buildContext, metadataContributorProvider );
 		}
 
 		void determineIndexedTypes(BackendsInfo backendsInfo) {
@@ -359,31 +348,6 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			catch (MappingAbortedException e) {
 				handleMappingAborted( e );
 			}
-		}
-
-		private TypeMappingContribution<C> getOrCreateContribution(MappableTypeModel typeModel) {
-			TypeMappingContribution<C> contribution = contributionByType.get( typeModel );
-			if ( contribution == null ) {
-				contribution = new TypeMappingContribution<>();
-				contributionByType.put( typeModel, contribution );
-			}
-			return contribution;
-		}
-
-		private TypeMappingContribution<C> getContributionIncludingAutomaticallyDiscovered(
-				MappableTypeModel typeModel) {
-			if ( !typesSubmittedToDiscoverers.contains( typeModel ) ) {
-				// Allow automatic discovery of metadata the first time we encounter each type
-				for ( TypeMetadataDiscoverer<C> metadataDiscoverer : metadataDiscoverers ) {
-					Optional<C> discoveredContributor = metadataDiscoverer.discover( typeModel );
-					if ( discoveredContributor.isPresent() ) {
-						getOrCreateContribution( typeModel )
-								.collectContributor( discoveredContributor.get() );
-					}
-				}
-				typesSubmittedToDiscoverers.add( typeModel );
-			}
-			return contributionByType.get( typeModel );
 		}
 
 		public void closeOnFailure() {
@@ -420,52 +384,22 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 		}
 
 		private class MappingConfigurationCollectorImpl implements MappingConfigurationCollector<C> {
+			private final TypeMetadataContributorProvider.Builder<C> builder;
+
+			private MappingConfigurationCollectorImpl(TypeMetadataContributorProvider.Builder<C> builder) {
+				this.builder = builder;
+			}
+
 			@Override
 			public void collectContributor(MappableTypeModel typeModel, C contributor) {
-				getOrCreateContribution( typeModel ).collectContributor( contributor );
+				builder.contributor( typeModel, contributor );
 			}
 
 			@Override
 			public void collectDiscoverer(TypeMetadataDiscoverer<C> metadataDiscoverer) {
-				metadataDiscoverers.add( metadataDiscoverer );
+				builder.discoverer( metadataDiscoverer );
 			}
 		}
 
-		private class TypeMetadataContributorProviderImpl implements TypeMetadataContributorProvider<C> {
-
-			@Override
-			public Set<C> get(MappableTypeModel typeModel) {
-				return typeModel.descendingSuperTypes()
-						.map( MappingBuildingState.this::getContributionIncludingAutomaticallyDiscovered )
-						.filter( Objects::nonNull )
-						.flatMap( TypeMappingContribution::getContributors )
-
-						// Using a LinkedHashSet because it seems the order matters.
-						// Otherwise, AutomaticIndexingPolymorphicOriginalSideAssociationIT could fail
-						// because of PojoTypeAdditionalMetadataProvider#createTypeAdditionalMetadata
-						.collect( Collectors.toCollection( LinkedHashSet::new ) );
-			}
-
-			@Override
-			public Set<? extends MappableTypeModel> typesContributedTo() {
-				// Use a LinkedHashSet for deterministic iteration
-				return Collections.unmodifiableSet( new LinkedHashSet<>( contributionByType.keySet() ) );
-			}
-		}
-	}
-
-	private static class TypeMappingContribution<C> {
-		private final List<C> contributors = new ArrayList<>();
-
-		TypeMappingContribution() {
-		}
-
-		void collectContributor(C contributor) {
-			this.contributors.add( contributor );
-		}
-
-		Stream<C> getContributors() {
-			return contributors.stream();
-		}
 	}
 }
