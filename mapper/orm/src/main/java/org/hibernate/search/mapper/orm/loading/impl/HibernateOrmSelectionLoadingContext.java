@@ -7,24 +7,21 @@
 package org.hibernate.search.mapper.orm.loading.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.persistence.EntityGraph;
 
-import org.hibernate.AssertionFailure;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.graph.GraphSemantic;
 import org.hibernate.graph.RootGraph;
-import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContextBuilder;
-import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingStrategy;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -61,43 +58,9 @@ public final class HibernateOrmSelectionLoadingContext implements PojoSelectionL
 	}
 
 	@Override
-	public Object loaderKey(PojoLoadingTypeContext<?> type) {
-		return typeContextProvider.indexedForExactType( type.typeIdentifier() ).loadingStrategy();
-	}
-
-	@Override
-	public <T> PojoSelectionEntityLoader<T> createLoader(Set<PojoLoadingTypeContext<? extends T>> expectedTypes) {
-		if ( expectedTypes.size() == 1 ) {
-			// Optimization: no need for the checks below if there's only one type.
-			LoadingIndexedTypeContext<? extends T> typeContext = typeContextProvider.indexedForExactType( expectedTypes.iterator().next().typeIdentifier() );
-			return typeContext.loadingStrategy().createLoader( Collections.singleton( typeContext ), sessionContext,
-					cacheLookupStrategy, loadingOptions );
-		}
-
-		HibernateOrmEntityLoadingStrategy<?, ?> loadingStrategy = null;
-		Set<LoadingIndexedTypeContext<? extends T>> typeContexts = new HashSet<>();
-		for ( PojoLoadingTypeContext<? extends T> type : expectedTypes ) {
-			LoadingIndexedTypeContext<? extends T> typeContext = typeContextProvider.indexedForExactType( type.typeIdentifier() );
-			typeContexts.add( typeContext );
-			HibernateOrmEntityLoadingStrategy<?, ?> thisTypeLoadingStrategy = typeContext.loadingStrategy();
-			if ( loadingStrategy == null ) {
-				loadingStrategy = thisTypeLoadingStrategy;
-			}
-			else if ( !loadingStrategy.equals( thisTypeLoadingStrategy ) ) {
-				throw new AssertionFailure(
-						"Some types among the targeted entity types have a different (incompatible) entity loading strategy."
-								+ " Offending entity names: "
-								+ typeContexts.stream()
-										.map( LoadingIndexedTypeContext::entityPersister )
-										.map( EntityPersister::getEntityName )
-										.collect( Collectors.toList() )
-				);
-			}
-		}
-		if ( loadingStrategy == null ) {
-			throw new AssertionFailure( "Attempt to create a loader targeting no type at all." );
-		}
-		return loadingStrategy.createLoader( typeContexts, sessionContext, cacheLookupStrategy, loadingOptions );
+	public <T> PojoSelectionLoadingStrategy<? super T> loadingStrategy(PojoLoadingTypeContext<T> type) {
+		return new HibernateOrmSelectionLoadingStrategy<>(
+				typeContextProvider.indexedForExactType( type.typeIdentifier() ).loadingStrategy() );
 	}
 
 	public SessionImplementor sessionImplementor() {
@@ -156,5 +119,44 @@ public final class HibernateOrmSelectionLoadingContext implements PojoSelectionL
 		public PojoSelectionLoadingContext build() {
 			return new HibernateOrmSelectionLoadingContext( this );
 		}
+	}
+
+	private class HibernateOrmSelectionLoadingStrategy<E, I> implements PojoSelectionLoadingStrategy<E> {
+
+		private final HibernateOrmEntityLoadingStrategy<E, I> delegate;
+
+		public HibernateOrmSelectionLoadingStrategy(HibernateOrmEntityLoadingStrategy<E, I> delegate) {
+			this.delegate = delegate;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if ( this == o ) {
+				return true;
+			}
+			if ( o == null || getClass() != o.getClass() ) {
+				return false;
+			}
+			HibernateOrmSelectionLoadingStrategy<?, ?> that = (HibernateOrmSelectionLoadingStrategy<?, ?>) o;
+			return delegate.equals( that.delegate );
+		}
+
+		@Override
+		public int hashCode() {
+			return delegate.hashCode();
+		}
+
+		@Override
+		public PojoSelectionEntityLoader<E> createLoader(
+				Set<? extends PojoLoadingTypeContext<? extends E>> expectedTypes) {
+			Set<LoadingIndexedTypeContext<? extends E>> typeContexts = new HashSet<>();
+			for ( PojoLoadingTypeContext<? extends E> type : expectedTypes ) {
+				LoadingIndexedTypeContext<? extends E> typeContext =
+						typeContextProvider.indexedForExactType( type.typeIdentifier() );
+				typeContexts.add( typeContext );
+			}
+			return delegate.createLoader( typeContexts, sessionContext, cacheLookupStrategy, loadingOptions );
+		}
+
 	}
 }

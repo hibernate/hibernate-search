@@ -20,19 +20,12 @@ public interface PojoSelectionLoadingContext {
 	PojoRuntimeIntrospector runtimeIntrospector();
 
 	/**
+	 * @param <T> The type of entities that will have to be loaded.
 	 * @param type The type of entities that will have to be loaded.
-	 * @return A "loader key". The loader key allows grouping together types with the same key,
-	 * to create a single loader for multiple types.
-	 * The main reason to use the same loader key for multiple types is better performance.
+	 * @return A loading strategy.
+	 * Note that different types with the same strategy will be grouped together and loaded with a single loader.
+	 * @see PojoSelectionLoadingStrategy#createLoader(Set)
 	 */
-	Object loaderKey(PojoLoadingTypeContext<?> type);
+	<T> PojoSelectionLoadingStrategy<? super T> loadingStrategy(PojoLoadingTypeContext<T> type);
 
-	/**
-	 * @param <T> The exposed type of loaded entities.
-	 * @param expectedTypes The expected types of loaded objects.
-	 * The types are guaranteed to have the same {@link #loaderKey(PojoLoadingTypeContext)}.
-	 * @return A loader.
-	 * @see PojoSelectionEntityLoader
-	 */
-	<T> PojoSelectionEntityLoader<? super T> createLoader(Set<PojoLoadingTypeContext<? extends T>> expectedTypes);
 }

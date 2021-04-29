@@ -12,27 +12,28 @@ import java.util.Map;
 import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingStrategy;
 
 public final class PojoMultiLoaderLoadingPlan<T> implements PojoLoadingPlan<T> {
 
 	private final PojoSelectionLoadingContext context;
 
-	private final Map<PojoLoadingTypeContext<? extends T>, PojoSingleLoaderLoadingPlan<T>> planByType = new LinkedHashMap<>();
-	private final Map<Object, PojoSingleLoaderLoadingPlan<T>> planByLoaderKey = new LinkedHashMap<>();
+	private final Map<PojoLoadingTypeContext<? extends T>, PojoSingleLoaderLoadingPlan<?>> planByType = new LinkedHashMap<>();
+	private final Map<PojoSelectionLoadingStrategy<?>, PojoSingleLoaderLoadingPlan<?>> planByLoadingStrategy = new LinkedHashMap<>();
 
 	public PojoMultiLoaderLoadingPlan(PojoSelectionLoadingContext context) {
 		this.context = context;
 	}
 
 	@Override
-	public int planLoading(PojoLoadingTypeContext<? extends T> expectedType, Object identifier) {
+	public <T2 extends T> int planLoading(PojoLoadingTypeContext<T2> expectedType, Object identifier) {
 		return delegate( expectedType ).planLoading( expectedType, identifier );
 	}
 
 	@Override
 	public void loadBlocking(Deadline deadline) {
 		context.checkOpen();
-		for ( PojoSingleLoaderLoadingPlan<T> delegate : planByLoaderKey.values() ) {
+		for ( PojoSingleLoaderLoadingPlan<?> delegate : planByLoadingStrategy.values() ) {
 			delegate.loadBlocking( deadline );
 		}
 	}
@@ -45,25 +46,26 @@ public final class PojoMultiLoaderLoadingPlan<T> implements PojoLoadingPlan<T> {
 	@Override
 	public void clear() {
 		planByType.clear();
-		planByLoaderKey.clear();
+		planByLoadingStrategy.clear();
 	}
 
-	private PojoSingleLoaderLoadingPlan<T> delegate(PojoLoadingTypeContext<? extends T> type) {
-		PojoSingleLoaderLoadingPlan<T> delegate = planByType.get( type );
+	@SuppressWarnings("unchecked")
+	private <T2 extends T> PojoSingleLoaderLoadingPlan<? super T2> delegate(PojoLoadingTypeContext<T2> type) {
+		PojoSingleLoaderLoadingPlan<? super T2> delegate = (PojoSingleLoaderLoadingPlan<? super T2>) planByType.get( type );
 		if ( delegate != null ) {
 			return delegate;
 		}
 
-		Object loaderKey = context.loaderKey( type );
-		delegate = planByLoaderKey.get( loaderKey );
+		PojoSelectionLoadingStrategy<? super T2> loadingStrategy = context.loadingStrategy( type );
+		delegate = (PojoSingleLoaderLoadingPlan<? super T2>) planByLoadingStrategy.get( loadingStrategy );
 		if ( delegate != null ) {
 			planByType.put( type, delegate );
 			return delegate;
 		}
 
-		delegate = new PojoSingleLoaderLoadingPlan<>( context );
+		delegate = new PojoSingleLoaderLoadingPlan<>( context, loadingStrategy );
 		planByType.put( type, delegate );
-		planByLoaderKey.put( loaderKey, delegate );
+		planByLoadingStrategy.put( loadingStrategy, delegate );
 		return delegate;
 	}
 }

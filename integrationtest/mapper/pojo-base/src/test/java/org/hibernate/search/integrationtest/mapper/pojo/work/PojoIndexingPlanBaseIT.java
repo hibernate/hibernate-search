@@ -267,7 +267,7 @@ public class PojoIndexingPlanBaseIT {
 		SelectionEntityLoader<IndexedEntity> loaderMock = mock( SelectionEntityLoader.class );
 
 		try ( SearchSession session = mapping.createSessionWithOptions()
-				.loading( o -> o.registerLoader( IndexedEntity.class, loaderMock ) )
+				.loading( o -> o.selectionLoadingStrategy( IndexedEntity.class, (includedTypes, options) -> loaderMock ) )
 				.build() ) {
 			IndexedEntity entity1 = new IndexedEntity( 1 );
 			IndexedEntity entity2 = new IndexedEntity( 2 );
@@ -312,7 +312,7 @@ public class PojoIndexingPlanBaseIT {
 		List<IndexedEntity> loadedEntities = new ArrayList<>();
 
 		try ( SearchSession session = mapping.createSessionWithOptions()
-				.loading( o -> o.registerLoader( IndexedEntity.class, loaderMock ) )
+				.loading( o -> o.selectionLoadingStrategy( IndexedEntity.class, (includedTypes, options) -> loaderMock ) )
 				.build() ) {
 			IndexedEntity entity;
 

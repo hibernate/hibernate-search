@@ -288,7 +288,6 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoReindexingCol
 	public PojoLoadingPlan<Object> loadingPlan() {
 		if ( loadingPlan == null ) {
 			loadingPlan = new PojoMultiLoaderLoadingPlan<>( sessionContext.defaultLoadingContext() );
-
 		}
 		return loadingPlan;
 	}

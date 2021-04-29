@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.mapper.javabean.loading.LoadingOptions;
+import org.hibernate.search.mapper.javabean.loading.dsl.SelectionLoadingOptionsStep;
 
 public interface SearchSessionBuilder {
 
@@ -37,7 +37,7 @@ public interface SearchSessionBuilder {
 	 * @param loadingOptionsContributor The default loading options.
 	 * @return {@code this} for method chaining.
 	 */
-	SearchSessionBuilder loading(Consumer<LoadingOptions> loadingOptionsContributor);
+	SearchSessionBuilder loading(Consumer<SelectionLoadingOptionsStep> loadingOptionsContributor);
 
 	/**
 	 * @return The resulting session.

@@ -34,7 +34,7 @@ public interface PojoSelectionEntityLoader<E> {
 	 * @param deadline The deadline for loading the entities, or null if there is no deadline.
 	 * @return A list of entities, in the same order the references were given.
 	 * {@code null} is inserted when an object is not found or has an excluded types
-	 * (see {@link PojoSelectionLoadingContext#createLoader(Set)}).
+	 * (see {@link PojoSelectionLoadingStrategy#createLoader(Set)}).
 	 */
 	List<?> loadBlocking(List<?> identifiers, Deadline deadline);
 
