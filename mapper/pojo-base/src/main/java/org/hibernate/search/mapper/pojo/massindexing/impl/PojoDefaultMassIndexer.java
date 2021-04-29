@@ -69,10 +69,6 @@ public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
 		return this;
 	}
 
-	public int typesToIndexInParallel() {
-		return typesToIndexInParallel;
-	}
-
 	@Override
 	public PojoDefaultMassIndexer<O> threadsToLoadObjects(int numberOfThreads) {
 		if ( numberOfThreads < 1 ) {
@@ -82,18 +78,10 @@ public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
 		return this;
 	}
 
-	public int threadsToLoadObjects() {
-		return documentBuilderThreads;
-	}
-
 	@Override
 	public PojoDefaultMassIndexer<O> mergeSegmentsOnFinish(boolean enable) {
 		this.mergeSegmentsOnFinish = enable;
 		return this;
-	}
-
-	public boolean mergeSegmentsOnFinish() {
-		return mergeSegmentsOnFinish;
 	}
 
 	@Override
@@ -102,18 +90,10 @@ public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
 		return this;
 	}
 
-	public boolean mergeSegmentsAfterPurge() {
-		return mergeSegmentsAfterPurge;
-	}
-
 	@Override
 	public PojoDefaultMassIndexer<O> dropAndCreateSchemaOnStart(boolean enable) {
 		this.dropAndCreateSchemaOnStart = enable;
 		return this;
-	}
-
-	public boolean dropAndCreateSchemaOnStart() {
-		return dropAndCreateSchemaOnStart;
 	}
 
 	@Override
@@ -122,18 +102,10 @@ public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
 		return this;
 	}
 
-	public boolean purgeAtStart() {
-		return purgeAtStart;
-	}
-
 	@Override
 	public PojoDefaultMassIndexer<O> monitor(MassIndexingMonitor monitor) {
 		this.monitor = monitor;
 		return this;
-	}
-
-	public MassIndexingMonitor monitor() {
-		return monitor;
 	}
 
 	@Override
