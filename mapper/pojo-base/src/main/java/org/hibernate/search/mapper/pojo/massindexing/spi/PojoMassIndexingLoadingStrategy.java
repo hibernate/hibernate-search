@@ -14,9 +14,8 @@ import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntityLoader;
  *
  * @param <E> The type of loaded entities.
  * @param <I> The type of entity identifiers.
- * @param <O> The type of options for mass loading.
  */
-public interface PojoMassIndexingLoadingStrategy<E, I, O> {
+public interface PojoMassIndexingLoadingStrategy<E, I> {
 
 	/**
 	 * @param obj Another strategy
@@ -35,17 +34,14 @@ public interface PojoMassIndexingLoadingStrategy<E, I, O> {
 
 	/**
 	 * @param context A context, used to retrieve information about targeted types and to create the sink.
-	 * @param options Options passed to the mass indexer.
 	 * @return An entity identifier loader.
 	 */
-	PojoMassIdentifierLoader createIdentifierLoader(
-			PojoMassIndexingIdentifierLoadingContext<E, I> context, O options);
+	PojoMassIdentifierLoader createIdentifierLoader(PojoMassIndexingIdentifierLoadingContext<E, I> context);
 
 	/**
 	 * @param context A context, used to retrieve information about targeted types and to create the sink.
-	 * @param options Options passed to the mass indexer.
 	 * @return An entity loader.
 	 */
-	PojoMassEntityLoader<I> createEntityLoader(PojoMassIndexingEntityLoadingContext<E> context, O options);
+	PojoMassEntityLoader<I> createEntityLoader(PojoMassIndexingEntityLoadingContext<E> context);
 
 }

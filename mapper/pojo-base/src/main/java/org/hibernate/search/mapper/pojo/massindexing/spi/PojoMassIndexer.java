@@ -18,9 +18,8 @@ import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
  * indexedEmbedded properties are scrolled from database.
  *
  * @author Sanne Grinovero
- * @param <O> The options type.
  */
-public interface PojoMassIndexer<O> {
+public interface PojoMassIndexer {
 
 	/**
 	 * Sets the number of entity types to be indexed in parallel.
@@ -30,7 +29,7 @@ public interface PojoMassIndexer<O> {
 	 * @param threadsToIndexObjects  number of entity types to be indexed in parallel
 	 * @return {@code this} for method chaining
 	 */
-	PojoMassIndexer<O> typesToIndexInParallel(int threadsToIndexObjects);
+	PojoMassIndexer typesToIndexInParallel(int threadsToIndexObjects);
 
 	/**
 	 * Sets the number of threads to be used to load
@@ -38,7 +37,7 @@ public interface PojoMassIndexer<O> {
 	 * @param numberOfThreads the number of threads
 	 * @return {@code this} for method chaining
 	 */
-	PojoMassIndexer<O> threadsToLoadObjects(int numberOfThreads);
+	PojoMassIndexer threadsToLoadObjects(int numberOfThreads);
 
 	/**
 	 * Merges each index into a single segment after indexing.
@@ -47,7 +46,7 @@ public interface PojoMassIndexer<O> {
 	 * @param enable {@code true} to enable this operation, {@code false} to disable it.
 	 * @return {@code this} for method chaining
 	 */
-	PojoMassIndexer<O> mergeSegmentsOnFinish(boolean enable);
+	PojoMassIndexer mergeSegmentsOnFinish(boolean enable);
 
 	/**
 	 * Merges each index into a single segment after the initial index purge, just before indexing.
@@ -58,7 +57,7 @@ public interface PojoMassIndexer<O> {
 	 * @param enable {@code true} to enable this operation, {@code false} to disable it.
 	 * @return {@code this} for method chaining
 	 */
-	PojoMassIndexer<O> mergeSegmentsAfterPurge(boolean enable);
+	PojoMassIndexer mergeSegmentsAfterPurge(boolean enable);
 
 	/**
 	 * Drops the indexes and their schema (if they exist) and re-creates them before indexing.
@@ -77,7 +76,7 @@ public interface PojoMassIndexer<O> {
 	 * @param dropAndCreateSchema if {@code true} the indexes and their schema will be dropped then re-created before starting the indexing
 	 * @return {@code this} for method chaining
 	 */
-	PojoMassIndexer<O> dropAndCreateSchemaOnStart(boolean dropAndCreateSchema);
+	PojoMassIndexer dropAndCreateSchemaOnStart(boolean dropAndCreateSchema);
 
 	/**
 	 * Removes all entities from the indexes before indexing.
@@ -89,28 +88,26 @@ public interface PojoMassIndexer<O> {
 	 * @param purgeAll if {@code true} all entities will be removed from the indexes before starting the indexing
 	 * @return {@code this} for method chaining
 	 */
-	PojoMassIndexer<O> purgeAllOnStart(boolean purgeAll);
+	PojoMassIndexer purgeAllOnStart(boolean purgeAll);
 
 	/**
 	 * Starts the indexing process in background (asynchronous).
 	 * <p>
 	 * May only be called once.
-	 * @param options The mass indexing options.
 	 * @return a {@link java.util.concurrent.CompletionStage} to react to the completion of the indexing task.
 	 * Call {@link CompletionStage#toCompletableFuture()} on the returned object
 	 * to convert it to a {@link CompletableFuture} (which implements {@link java.util.concurrent.Future}).
 	 */
-	CompletionStage<?> start(O options);
+	CompletionStage<?> start();
 
 	/**
 	 * Starts the indexing process, and then block until it's finished.
 	 * <p>
 	 * May only be called once.
-	 * @param options The mass indexing options.
 	 * @throws InterruptedException if the current thread is interrupted
 	 * while waiting.
 	 */
-	void startAndWait(O options) throws InterruptedException;
+	void startAndWait() throws InterruptedException;
 
 	/**
 	 * Sets the {@link MassIndexingMonitor}.
@@ -120,7 +117,7 @@ public interface PojoMassIndexer<O> {
 	 * @param monitor The monitor that will track mass indexing progress.
 	 * @return {@code this} for method chaining
 	 */
-	PojoMassIndexer<O> monitor(MassIndexingMonitor monitor);
+	PojoMassIndexer monitor(MassIndexingMonitor monitor);
 
 	/**
 	 * Sets the {@link MassIndexingFailureHandler}.
@@ -131,5 +128,5 @@ public interface PojoMassIndexer<O> {
 	 * @param failureHandler The handler for failures occurring during mass indexing.
 	 * @return {@code this} for method chaining
 	 */
-	PojoMassIndexer<O> failureHandler(MassIndexingFailureHandler failureHandler);
+	PojoMassIndexer failureHandler(MassIndexingFailureHandler failureHandler);
 }

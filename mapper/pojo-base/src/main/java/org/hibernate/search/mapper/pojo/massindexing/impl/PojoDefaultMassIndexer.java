@@ -26,9 +26,8 @@ import org.hibernate.search.util.common.impl.Futures;
  * subset, always including all subtypes.
  *
  * @author Sanne Grinovero
- * @param <O> The options type.
  */
-public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
+public class PojoDefaultMassIndexer implements PojoMassIndexer {
 
 	private final PojoMassIndexingMappingContext mappingContext;
 
@@ -45,9 +44,9 @@ public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
 
 	private MassIndexingFailureHandler failureHandler;
 	private MassIndexingMonitor monitor;
-	private final List<PojoMassIndexingIndexedTypeGroup<?, O>> typeGroupsToIndex;
+	private final List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex;
 
-	public PojoDefaultMassIndexer(PojoMassIndexingContext<O> indexingContext,
+	public PojoDefaultMassIndexer(PojoMassIndexingContext indexingContext,
 			PojoMassIndexingMappingContext mappingContext,
 			PojoMassIndexingTypeContextProvider typeContextProvider,
 			Set<? extends PojoMassIndexingIndexedTypeContext<?>> targetedIndexedTypes,
@@ -61,7 +60,7 @@ public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
 	}
 
 	@Override
-	public PojoDefaultMassIndexer<O> typesToIndexInParallel(int numberOfThreads) {
+	public PojoDefaultMassIndexer typesToIndexInParallel(int numberOfThreads) {
 		if ( numberOfThreads < 1 ) {
 			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
 		}
@@ -70,7 +69,7 @@ public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
 	}
 
 	@Override
-	public PojoDefaultMassIndexer<O> threadsToLoadObjects(int numberOfThreads) {
+	public PojoDefaultMassIndexer threadsToLoadObjects(int numberOfThreads) {
 		if ( numberOfThreads < 1 ) {
 			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
 		}
@@ -79,38 +78,38 @@ public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
 	}
 
 	@Override
-	public PojoDefaultMassIndexer<O> mergeSegmentsOnFinish(boolean enable) {
+	public PojoDefaultMassIndexer mergeSegmentsOnFinish(boolean enable) {
 		this.mergeSegmentsOnFinish = enable;
 		return this;
 	}
 
 	@Override
-	public PojoDefaultMassIndexer<O> mergeSegmentsAfterPurge(boolean enable) {
+	public PojoDefaultMassIndexer mergeSegmentsAfterPurge(boolean enable) {
 		this.mergeSegmentsAfterPurge = enable;
 		return this;
 	}
 
 	@Override
-	public PojoDefaultMassIndexer<O> dropAndCreateSchemaOnStart(boolean enable) {
+	public PojoDefaultMassIndexer dropAndCreateSchemaOnStart(boolean enable) {
 		this.dropAndCreateSchemaOnStart = enable;
 		return this;
 	}
 
 	@Override
-	public PojoDefaultMassIndexer<O> purgeAllOnStart(boolean enable) {
+	public PojoDefaultMassIndexer purgeAllOnStart(boolean enable) {
 		this.purgeAtStart = enable;
 		return this;
 	}
 
 	@Override
-	public PojoDefaultMassIndexer<O> monitor(MassIndexingMonitor monitor) {
+	public PojoDefaultMassIndexer monitor(MassIndexingMonitor monitor) {
 		this.monitor = monitor;
 		return this;
 	}
 
 	@Override
-	public CompletableFuture<?> start(O options) {
-		PojoMassIndexingBatchCoordinator<O> coordinator = createCoordinator( options );
+	public CompletableFuture<?> start() {
+		PojoMassIndexingBatchCoordinator coordinator = createCoordinator();
 		ExecutorService executor = mappingContext.threadPoolProvider()
 				.newFixedThreadPool( 1,
 						PojoMassIndexingBatchIndexingWorkspace.THREAD_NAME_PREFIX + "Coordinator" );
@@ -124,21 +123,21 @@ public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
 	}
 
 	@Override
-	public void startAndWait(O options) throws InterruptedException {
-		PojoMassIndexingBatchCoordinator<O> coordinator = createCoordinator( options );
+	public void startAndWait() throws InterruptedException {
+		PojoMassIndexingBatchCoordinator coordinator = createCoordinator();
 		coordinator.run();
 		if ( Thread.interrupted() ) {
 			throw new InterruptedException();
 		}
 	}
 
-	private PojoMassIndexingBatchCoordinator<O> createCoordinator(O options) {
+	private PojoMassIndexingBatchCoordinator createCoordinator() {
 		PojoMassIndexingNotifier notifier = new PojoMassIndexingNotifier(
 				getOrCreateFailureHandler(),
 				getOrCreateMonitor()
 		);
-		return new PojoMassIndexingBatchCoordinator<>(
-				options, mappingContext,
+		return new PojoMassIndexingBatchCoordinator(
+				mappingContext,
 				notifier,
 				typeGroupsToIndex, scopeSchemaManager, scopeWorkspace,
 				typesToIndexInParallel, documentBuilderThreads,
@@ -148,7 +147,7 @@ public class PojoDefaultMassIndexer<O> implements PojoMassIndexer<O> {
 	}
 
 	@Override
-	public PojoDefaultMassIndexer<O> failureHandler(MassIndexingFailureHandler failureHandler) {
+	public PojoDefaultMassIndexer failureHandler(MassIndexingFailureHandler failureHandler) {
 		this.failureHandler = failureHandler;
 		return this;
 	}

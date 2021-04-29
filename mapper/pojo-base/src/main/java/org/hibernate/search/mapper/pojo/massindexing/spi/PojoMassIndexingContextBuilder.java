@@ -23,5 +23,5 @@ public interface PojoMassIndexingContextBuilder<LOS> {
 	/**
 	 * @return The configured loading context.
 	 */
-	PojoMassIndexingContext<?> build();
+	PojoMassIndexingContext build();
 }

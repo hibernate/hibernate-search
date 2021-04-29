@@ -18,7 +18,6 @@ import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmLoadingContext;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingContext;
-import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassIndexingOptions;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexer;
 import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
@@ -99,12 +98,12 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 
 	public MassIndexer massIndexer(DetachedBackendSessionContext detachedSessionContext) {
 		HibernateOrmMassIndexingContext massIndexingContext = new HibernateOrmMassIndexingContext( mappingContext,
-						mappingContext.typeContextProvider() );
+						mappingContext.typeContextProvider(), detachedSessionContext );
 
-		PojoMassIndexer<HibernateOrmMassIndexingOptions> massIndexerDelegate = delegate
+		PojoMassIndexer massIndexerDelegate = delegate
 				.massIndexer( massIndexingContext, detachedSessionContext );
 
-		return new HibernateOrmMassIndexer( massIndexerDelegate, detachedSessionContext );
+		return new HibernateOrmMassIndexer( massIndexerDelegate, massIndexingContext );
 	}
 
 	@Override

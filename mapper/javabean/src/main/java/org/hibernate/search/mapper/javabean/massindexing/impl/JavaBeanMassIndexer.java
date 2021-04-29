@@ -6,33 +6,22 @@
  */
 package org.hibernate.search.mapper.javabean.massindexing.impl;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CompletionStage;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+
+import org.hibernate.search.mapper.javabean.loading.impl.JavaBeanLoadingContext;
 import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
-import org.hibernate.search.mapper.javabean.loading.MassLoadingOptions;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 
-public class JavaBeanMassIndexer implements MassIndexer, MassLoadingOptions {
+public class JavaBeanMassIndexer implements MassIndexer {
 
-	private final PojoMassIndexer<MassLoadingOptions> delegate;
-	private final DetachedBackendSessionContext sessionContext;
+	private final PojoMassIndexer delegate;
+	private final JavaBeanLoadingContext context;
 
-	private int objectLoadingBatchSize = 10;
-	private final Map<Class<?>, Object> contextData = new HashMap<>();
-
-	public JavaBeanMassIndexer(PojoMassIndexer<MassLoadingOptions> delegate,
-			DetachedBackendSessionContext sessionContext) {
+	public JavaBeanMassIndexer(PojoMassIndexer delegate, JavaBeanLoadingContext context) {
 		this.delegate = delegate;
-		this.sessionContext = sessionContext;
-	}
-
-	@Override
-	public String tenantIdentifier() {
-		return sessionContext.tenantIdentifier();
+		this.context = context;
 	}
 
 	@Override
@@ -49,16 +38,8 @@ public class JavaBeanMassIndexer implements MassIndexer, MassLoadingOptions {
 
 	@Override
 	public MassIndexer batchSizeToLoadObjects(int batchSize) {
-		if ( batchSize < 1 ) {
-			throw new IllegalArgumentException( "batchSize must be at least 1" );
-		}
-		this.objectLoadingBatchSize = batchSize;
+		context.batchSize( batchSize );
 		return this;
-	}
-
-	@Override
-	public int batchSize() {
-		return objectLoadingBatchSize;
 	}
 
 	@Override
@@ -87,12 +68,12 @@ public class JavaBeanMassIndexer implements MassIndexer, MassLoadingOptions {
 
 	@Override
 	public CompletionStage start() {
-		return delegate.start( this );
+		return delegate.start();
 	}
 
 	@Override
 	public void startAndWait() throws InterruptedException {
-		delegate.startAndWait( this );
+		delegate.startAndWait();
 	}
 
 	@Override
@@ -109,13 +90,7 @@ public class JavaBeanMassIndexer implements MassIndexer, MassLoadingOptions {
 
 	@Override
 	public <T> MassIndexer context(Class<T> contextType, T context) {
-		contextData.put( contextType, context );
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T> T context(Class<T> contextType) {
-		return (T) contextData.get( contextType );
+		this.context.context( contextType, context );
 		return this;
 	}
 

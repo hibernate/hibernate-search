@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierSink;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 /**
- * The context passed to {@link PojoMassIndexingLoadingStrategy#createIdentifierLoader(PojoMassIndexingIdentifierLoadingContext, Object)}.
+ * The context passed to {@link PojoMassIndexingLoadingStrategy#createIdentifierLoader(PojoMassIndexingIdentifierLoadingContext)}.
  *
  * @param <E> The type of loaded entities.
  * @param <I> The type of entity identifiers.

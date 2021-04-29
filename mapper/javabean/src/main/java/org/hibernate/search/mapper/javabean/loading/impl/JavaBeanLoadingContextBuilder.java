@@ -14,6 +14,6 @@ public interface JavaBeanLoadingContextBuilder extends PojoLoadingContextBuilder
 		PojoMassIndexingContextBuilder<LoadingOptions> {
 
 	@Override
-	JavaBeanSearchLoadingContext build();
+	JavaBeanLoadingContext build();
 
 }

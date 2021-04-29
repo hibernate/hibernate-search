@@ -27,9 +27,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @author Sanne Grinovero
  * @param <E> The type of indexed entities.
  * @param <I> The type of identifiers.
- * @param <O> The type of mass indexing options.
  */
-public class PojoMassIndexingBatchIndexingWorkspace<E, I, O> extends PojoMassIndexingFailureHandledRunnable {
+public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexingFailureHandledRunnable {
 
 	public static final String THREAD_NAME_PREFIX = "Mass indexing - ";
 
@@ -38,22 +37,20 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I, O> extends PojoMassInd
 	private final List<CompletableFuture<?>> identifierProducingFutures = new ArrayList<>();
 	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
 	private final PojoMassIndexingMappingContext mappingContext;
-	private final PojoMassIndexingIndexedTypeGroup<E, ?> typeGroup;
-	private final PojoMassIndexingLoadingStrategy<E, I, O> loadingStrategy;
-	private final O options;
+	private final PojoMassIndexingIndexedTypeGroup<E> typeGroup;
+	private final PojoMassIndexingLoadingStrategy<E, I> loadingStrategy;
 
 	private final int entityExtractingThreads;
 
 	PojoMassIndexingBatchIndexingWorkspace(PojoMassIndexingMappingContext mappingContext,
 			PojoMassIndexingNotifier notifier,
-			PojoMassIndexingIndexedTypeGroup<E, ?> typeGroup,
-			PojoMassIndexingLoadingStrategy<E, I, O> loadingStrategy,
-			O options, int entityExtractingThreads) {
+			PojoMassIndexingIndexedTypeGroup<E> typeGroup,
+			PojoMassIndexingLoadingStrategy<E, I> loadingStrategy,
+			int entityExtractingThreads) {
 		super( notifier );
 		this.mappingContext = mappingContext;
 		this.typeGroup = typeGroup;
 		this.loadingStrategy = loadingStrategy;
-		this.options = options;
 		this.entityExtractingThreads = entityExtractingThreads;
 	}
 
@@ -97,7 +94,7 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I, O> extends PojoMassInd
 
 	private void startProducingPrimaryKeys(PojoProducerConsumerQueue<List<I>> identifierQueue) {
 		final Runnable runnable = new PojoMassIndexingEntityIdentifierLoadingRunnable<>( getNotifier(), typeGroup,
-				loadingStrategy, options, identifierQueue );
+				loadingStrategy, identifierQueue );
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
 		final ThreadPoolExecutor identifierProducingExecutor = mappingContext.threadPoolProvider().newFixedThreadPool(
 				1,
@@ -113,7 +110,7 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I, O> extends PojoMassInd
 
 	private void startIndexing(PojoProducerConsumerQueue<List<I>> identifierQueue) {
 		final Runnable runnable = new PojoMassIndexingEntityLoadingRunnable<>( getNotifier(), typeGroup,
-				loadingStrategy, options, identifierQueue );
+				loadingStrategy, identifierQueue );
 		final ThreadPoolExecutor indexingExecutor = mappingContext.threadPoolProvider().newFixedThreadPool(
 				entityExtractingThreads,
 				THREAD_NAME_PREFIX + typeGroup.notifiedGroupName() + " - Entity loading"

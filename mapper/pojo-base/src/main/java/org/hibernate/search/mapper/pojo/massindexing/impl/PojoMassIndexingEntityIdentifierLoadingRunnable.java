@@ -19,24 +19,22 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I, O>
+public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 		extends PojoMassIndexingFailureHandledRunnable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoMassIndexingIndexedTypeGroup<E, ?> typeGroup;
-	private final PojoMassIndexingLoadingStrategy<E, I, O> loadingStrategy;
-	private final O options;
+	private final PojoMassIndexingIndexedTypeGroup<E> typeGroup;
+	private final PojoMassIndexingLoadingStrategy<E, I> loadingStrategy;
 	private final PojoProducerConsumerQueue<List<I>> identifierQueue;
 
 	public PojoMassIndexingEntityIdentifierLoadingRunnable(PojoMassIndexingNotifier notifier,
-			PojoMassIndexingIndexedTypeGroup<E, ?> typeGroup,
-			PojoMassIndexingLoadingStrategy<E, I, O> loadingStrategy,
-			O options, PojoProducerConsumerQueue<List<I>> identifierQueue) {
+			PojoMassIndexingIndexedTypeGroup<E> typeGroup,
+			PojoMassIndexingLoadingStrategy<E, I> loadingStrategy,
+			PojoProducerConsumerQueue<List<I>> identifierQueue) {
 		super( notifier );
 		this.loadingStrategy = loadingStrategy;
 		this.typeGroup = typeGroup;
-		this.options = options;
 		this.identifierQueue = identifierQueue;
 	}
 
@@ -44,7 +42,7 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I, O>
 	protected void runWithFailureHandler() {
 		log.trace( "started" );
 		LoadingContext context = new LoadingContext();
-		try ( PojoMassIdentifierLoader loader = loadingStrategy.createIdentifierLoader( context, options ) ) {
+		try ( PojoMassIdentifierLoader loader = loadingStrategy.createIdentifierLoader( context ) ) {
 			long totalCount = loader.totalCount();
 			getNotifier().notifyAddedTotalCount( totalCount );
 			do {

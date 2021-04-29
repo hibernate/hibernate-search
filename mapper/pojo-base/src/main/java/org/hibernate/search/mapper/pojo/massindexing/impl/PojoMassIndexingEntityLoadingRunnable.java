@@ -26,24 +26,22 @@ import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class PojoMassIndexingEntityLoadingRunnable<E, I, O>
+public class PojoMassIndexingEntityLoadingRunnable<E, I>
 		extends PojoMassIndexingFailureHandledRunnable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoMassIndexingIndexedTypeGroup<E, ?> typeGroup;
-	private final PojoMassIndexingLoadingStrategy<E, I, O> loadingStrategy;
-	private final O options;
+	private final PojoMassIndexingIndexedTypeGroup<E> typeGroup;
+	private final PojoMassIndexingLoadingStrategy<E, I> loadingStrategy;
 	private final PojoProducerConsumerQueue<List<I>> identifierQueue;
 
 	protected PojoMassIndexingEntityLoadingRunnable(PojoMassIndexingNotifier notifier,
-			PojoMassIndexingIndexedTypeGroup<E, ?> typeGroup,
-			PojoMassIndexingLoadingStrategy<E, I, O> loadingStrategy,
-			O options, PojoProducerConsumerQueue<List<I>> identifierQueue) {
+			PojoMassIndexingIndexedTypeGroup<E> typeGroup,
+			PojoMassIndexingLoadingStrategy<E, I> loadingStrategy,
+			PojoProducerConsumerQueue<List<I>> identifierQueue) {
 		super( notifier );
 		this.typeGroup = typeGroup;
 		this.loadingStrategy = loadingStrategy;
-		this.options = options;
 		this.identifierQueue = identifierQueue;
 	}
 
@@ -51,7 +49,7 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I, O>
 	protected void runWithFailureHandler() {
 		log.trace( "started" );
 		LoadingContext context = new LoadingContext();
-		try ( PojoMassEntityLoader<I> entityLoader = loadingStrategy.createEntityLoader( context, options ) ) {
+		try ( PojoMassEntityLoader<I> entityLoader = loadingStrategy.createEntityLoader( context ) ) {
 			List<I> idList;
 			do {
 				idList = identifierQueue.take();

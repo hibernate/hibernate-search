@@ -153,9 +153,8 @@ public final class PojoScopeDelegateImpl<R, E, C> implements PojoScopeDelegate<R
 	}
 
 	@Override
-	public <O> PojoMassIndexer<O> massIndexer(PojoMassIndexingContext<O> context,
-			DetachedBackendSessionContext detachedSession) {
-		return new PojoDefaultMassIndexer<>( context, mappingContext, indexedTypeContextProvider, targetedTypeContexts,
+	public PojoMassIndexer massIndexer(PojoMassIndexingContext context, DetachedBackendSessionContext detachedSession) {
+		return new PojoDefaultMassIndexer( context, mappingContext, indexedTypeContextProvider, targetedTypeContexts,
 				schemaManager(), workspace( detachedSession ) );
 	}
 

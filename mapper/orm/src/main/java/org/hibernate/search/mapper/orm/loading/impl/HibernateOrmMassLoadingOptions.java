@@ -8,12 +8,12 @@ package org.hibernate.search.mapper.orm.loading.impl;
 
 import org.hibernate.CacheMode;
 
-public interface HibernateOrmMassIndexingOptions {
+public interface HibernateOrmMassLoadingOptions {
 
 	/**
 	 * @return the transaction timeout
 	 */
-	Integer transactionTimeout();
+	Integer idLoadingTransactionTimeout();
 
 	/**
 	 * @return the {@link CacheMode}
@@ -21,14 +21,9 @@ public interface HibernateOrmMassIndexingOptions {
 	CacheMode cacheMode();
 
 	/**
-	 * @return the tenant identifier.
-	 */
-	String tenantIdentifier();
-
-	/**
 	 * @return how many entities to load and index in each batch.
 	 */
-	int batchSizeToLoadObjects();
+	int objectLoadingBatchSize();
 
 	/**
 	 * @return the objects limit used to load the root entities.

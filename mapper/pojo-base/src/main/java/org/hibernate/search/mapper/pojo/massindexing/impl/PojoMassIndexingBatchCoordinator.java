@@ -27,12 +27,10 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMapping
  * and IndexWriters.
  *
  * @author Sanne Grinovero
- * @param <O> The mass indexing options.
  */
-public class PojoMassIndexingBatchCoordinator<O> extends PojoMassIndexingFailureHandledRunnable {
+public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHandledRunnable {
 
-	private final O options;
-	private final List<PojoMassIndexingIndexedTypeGroup<?, O>> typeGroupsToIndex;
+	private final List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex;
 
 	private final PojoScopeSchemaManager scopeSchemaManager;
 	private final PojoScopeWorkspace scopeWorkspace;
@@ -46,15 +44,13 @@ public class PojoMassIndexingBatchCoordinator<O> extends PojoMassIndexingFailure
 	private final boolean purgeAtStart;
 	private final boolean mergeSegmentsAfterPurge;
 
-	public PojoMassIndexingBatchCoordinator(O options,
-			PojoMassIndexingMappingContext mappingContext,
+	public PojoMassIndexingBatchCoordinator(PojoMassIndexingMappingContext mappingContext,
 			PojoMassIndexingNotifier notifier,
-			List<PojoMassIndexingIndexedTypeGroup<?, O>> typeGroupsToIndex,
+			List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex,
 			PojoScopeSchemaManager scopeSchemaManager, PojoScopeWorkspace scopeWorkspace,
 			int typesToIndexInParallel, int documentBuilderThreads, boolean mergeSegmentsOnFinish,
 			boolean dropAndCreateSchemaOnStart, boolean purgeAtStart, boolean mergeSegmentsAfterPurge) {
 		super( notifier );
-		this.options = options;
 		this.mappingContext = mappingContext;
 		this.typeGroupsToIndex = typeGroupsToIndex;
 
@@ -126,7 +122,7 @@ public class PojoMassIndexingBatchCoordinator<O> extends PojoMassIndexingFailure
 				.newFixedThreadPool( typesToIndexInParallel,
 						PojoMassIndexingBatchIndexingWorkspace.THREAD_NAME_PREFIX + "Workspace" );
 
-		for ( PojoMassIndexingIndexedTypeGroup<?, O> typeGroup : typeGroupsToIndex ) {
+		for ( PojoMassIndexingIndexedTypeGroup<?> typeGroup : typeGroupsToIndex ) {
 			indexingFutures.add( Futures.runAsync( createBatchIndexingWorkspace( typeGroup ), executor ) );
 		}
 		executor.shutdown();
@@ -137,12 +133,12 @@ public class PojoMassIndexingBatchCoordinator<O> extends PojoMassIndexingFailure
 		);
 	}
 
-	private <E> PojoMassIndexingBatchIndexingWorkspace<E, ?, O> createBatchIndexingWorkspace(
-			PojoMassIndexingIndexedTypeGroup<E, O> typeGroup) {
+	private <E> PojoMassIndexingBatchIndexingWorkspace<E, ?> createBatchIndexingWorkspace(
+			PojoMassIndexingIndexedTypeGroup<E> typeGroup) {
 		return new PojoMassIndexingBatchIndexingWorkspace<>(
 				mappingContext, getNotifier(), typeGroup,
 				typeGroup.loadingStrategy(),
-				options, documentBuilderThreads );
+				documentBuilderThreads );
 	}
 
 	/**

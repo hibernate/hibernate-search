@@ -27,13 +27,13 @@ public final class HibernateOrmMassEntityLoader<E, I> implements PojoMassEntityL
 
 	private final TransactionManager transactionManager;
 	private final HibernateOrmQueryLoader<E, ?> typeQueryLoader;
-	private final HibernateOrmMassIndexingOptions options;
+	private final HibernateOrmMassLoadingOptions options;
 	private final PojoMassEntitySink<E> sink;
 	private final SessionImplementor session;
 
 	public HibernateOrmMassEntityLoader(TransactionManager transactionManager,
 			HibernateOrmQueryLoader<E, ?> typeGroupLoader,
-			HibernateOrmMassIndexingOptions options,
+			HibernateOrmMassLoadingOptions options,
 			PojoMassEntitySink<E> sink,
 			SessionImplementor session) {
 		this.transactionManager = transactionManager;
@@ -50,7 +50,7 @@ public final class HibernateOrmMassEntityLoader<E, I> implements PojoMassEntityL
 
 	@Override
 	public void load(List<I> identifiers) {
-		beginTransaction( options.transactionTimeout() );
+		beginTransaction( options.idLoadingTransactionTimeout() );
 		try {
 			Query<E> query = typeQueryLoader.createLoadingQuery( session, ID_PARAMETER_NAME )
 					.setParameter( ID_PARAMETER_NAME, identifiers )
