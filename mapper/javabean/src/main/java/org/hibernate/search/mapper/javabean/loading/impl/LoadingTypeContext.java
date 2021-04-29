@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.mapper.javabean.loading.impl;
 
+import java.util.Optional;
+
+import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategy;
+import org.hibernate.search.mapper.javabean.loading.SelectionLoadingStrategy;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface LoadingTypeContext<E> {
@@ -13,5 +17,9 @@ public interface LoadingTypeContext<E> {
 	PojoRawTypeIdentifier<E> typeIdentifier();
 
 	String name();
+
+	Optional<SelectionLoadingStrategy<? super E>> selectionLoadingStrategy();
+
+	Optional<MassLoadingStrategy<? super E, ?>> massLoadingStrategy();
 
 }

@@ -10,9 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 
 import java.lang.invoke.MethodHandles;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
@@ -70,9 +68,6 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 
 	private SearchMapping mapping;
 
-	private Map<Integer, H1_Root_NotIndexed> h1map = new LinkedHashMap<>();
-	private Map<Integer, H2_Root_Indexed> h2map = new LinkedHashMap<>();
-
 	@Before
 	public void setup() {
 		backendMock.expectAnySchema( H1_B_Indexed.NAME );
@@ -80,7 +75,13 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 		backendMock.expectAnySchema( H2_A_C_Indexed.NAME );
 		backendMock.expectAnySchema( H2_B_Indexed.NAME );
 		backendMock.expectAnySchema( H2_B_E_Indexed.NAME );
+
+		FailingMassIndexingStrategy<H1_Root_NotIndexed> h1LoadingStrategy = failingStrategy();
+		FailingMassIndexingStrategy<H2_Root_Indexed> h2LoadingStrategy = failingStrategy();
 		mapping = setupHelper.start()
+				.withConfiguration( b -> b
+						.addEntityType( H1_Root_NotIndexed.class, c -> c.massLoadingStrategy( h1LoadingStrategy ) )
+						.addEntityType( H2_Root_Indexed.class, c -> c.massLoadingStrategy( h2LoadingStrategy ) ) )
 				.setup(
 						H1_Root_NotIndexed.class, H1_A_NotIndexed.class, H1_B_Indexed.class,
 						H2_Root_Indexed.class,
@@ -93,7 +94,7 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 
 	@Test
 	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
-		try ( SearchSession searchSession = createSession() ) {
+		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
 
 			backendMock.expectIndexScaleWorks( H1_B_Indexed.NAME, searchSession.tenantIdentifier() )
@@ -128,7 +129,7 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 
 	@Test
 	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
-		try ( SearchSession searchSession = createSession() ) {
+		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H1_B_Indexed.class );
 
 			backendMock.expectIndexScaleWorks( H1_B_Indexed.NAME, searchSession.tenantIdentifier() )
@@ -163,7 +164,7 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 
 	@Test
 	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
-		try ( SearchSession searchSession = createSession() ) {
+		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );
 
 			backendMock.expectIndexScaleWorks( H2_Root_Indexed.NAME, searchSession.tenantIdentifier() )
@@ -213,7 +214,7 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 
 	@Test
 	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
-		try ( SearchSession searchSession = createSession() ) {
+		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H2_B_Indexed.class );
 
 			backendMock.expectIndexScaleWorks( H2_B_Indexed.NAME, searchSession.tenantIdentifier() )
@@ -252,14 +253,7 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 
 	}
 
-	private SearchSession createSession() {
-		return mapping.createSessionWithOptions().loading( (o) -> {
-			o.massLoadingStrategy( H1_Root_NotIndexed.class, failingStrategy() );
-			o.massLoadingStrategy( H2_Root_Indexed.class, failingStrategy() );
-		} ).build();
-	}
-
-	public static FailingMassIndexingStrategy failingStrategy() {
+	public static <E> FailingMassIndexingStrategy<E> failingStrategy() {
 		return new FailingMassIndexingStrategy<>();
 	}
 

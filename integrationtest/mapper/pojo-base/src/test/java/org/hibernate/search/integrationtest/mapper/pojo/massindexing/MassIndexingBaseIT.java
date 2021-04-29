@@ -6,11 +6,12 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.massindexing;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Fail.fail;
+
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Fail.fail;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -51,13 +52,17 @@ public class MassIndexingBaseIT {
 
 	private SearchMapping mapping;
 
-	private Map<Integer, Book> booksmap = new LinkedHashMap<>();
+	private final Map<Integer, Book> booksmap = new LinkedHashMap<>();
 
 	@Before
 	public void setup() {
 		backendMock.expectAnySchema( Book.INDEX );
 
 		mapping = setupHelper.start()
+				.withConfiguration( b -> {
+					b.addEntityType( Book.class, c -> c
+							.massLoadingStrategy( MassLoadingStrategies.from( booksmap ) ) );
+				} )
 				.setup( Book.class );
 
 		backendMock.verifyExpectationsMet();
@@ -67,7 +72,7 @@ public class MassIndexingBaseIT {
 
 	@Test
 	public void defaultMassIndexerStartAndWait() throws Exception {
-		try ( SearchSession searchSession = createSessionFromMap() ) {
+		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer();
 
 			// add operations on indexes can follow any random order,
@@ -111,7 +116,7 @@ public class MassIndexingBaseIT {
 
 	@Test
 	public void dropAndCreateSchemaOnStart() {
-		try ( SearchSession searchSession = createSessionFromMap() ) {
+		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer().dropAndCreateSchemaOnStart( true );
 
 			// add operations on indexes can follow any random order,
@@ -158,7 +163,7 @@ public class MassIndexingBaseIT {
 
 	@Test
 	public void mergeSegmentsOnFinish() {
-		try ( SearchSession searchSession = createSessionFromMap() ) {
+		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer().mergeSegmentsOnFinish( true );
 
 			// add operations on indexes can follow any random order,
@@ -204,7 +209,7 @@ public class MassIndexingBaseIT {
 
 	@Test
 	public void reuseSearchSessionAfterJavaBeanSessionIsClosed_createMassIndexer() {
-		SearchSession searchSession = createSessionFromMap();
+		SearchSession searchSession = mapping.createSession();
 		// a SearchSession instance is created lazily,
 		// so we need to use it to have an instance of it
 		searchSession.massIndexer();
@@ -220,7 +225,7 @@ public class MassIndexingBaseIT {
 	@Test
 	public void lazyCreateSearchSessionAfterJavaBeanSessionIsClosed_createMassIndexer() {
 		// Search session is not created, since we don't use it
-		SearchSession searchSession = createSessionFromMap();
+		SearchSession searchSession = mapping.createSession();
 		searchSession.close();
 
 		assertThatThrownBy( () -> {
@@ -228,12 +233,6 @@ public class MassIndexingBaseIT {
 		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Unable to access search session", "is closed" );
-	}
-
-	private SearchSession createSessionFromMap() {
-		return mapping.createSessionWithOptions().loading( (o) -> {
-			o.massLoadingStrategy( Book.class, MassLoadingStrategies.from( booksmap ) );
-		} ).build();
 	}
 
 	private void initData() {

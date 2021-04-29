@@ -22,6 +22,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.loading.SelectionEntityLoader;
+import org.hibernate.search.mapper.javabean.loading.SelectionLoadingStrategy;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -31,7 +32,7 @@ import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import org.mockito.Mockito;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
@@ -83,8 +84,8 @@ public abstract class AbstractPojoIndexingOperationIT {
 
 	protected SearchMapping mapping;
 
-	@SuppressWarnings("unchecked")
-	protected SelectionEntityLoader<IndexedEntity> loaderMock;
+	@Mock
+	private SelectionEntityLoader<IndexedEntity> loaderMock;
 
 	@Before
 	public void setup() {
@@ -97,6 +98,9 @@ public abstract class AbstractPojoIndexingOperationIT {
 						b.programmaticMapping().type( IndexedEntity.class )
 								.indexed().routingBinder( routingBinder );
 					}
+					b.addEntityType( IndexedEntity.class, context -> context
+							.selectionLoadingStrategy( (SelectionLoadingStrategy<IndexedEntity>)
+									(includedTypes, options) -> loaderMock ) );
 				} )
 				.setup( IndexedEntity.class );
 
@@ -105,8 +109,6 @@ public abstract class AbstractPojoIndexingOperationIT {
 		MyRoutingBridge.indexed = true;
 		MyRoutingBridge.previouslyIndexed = true;
 		MyRoutingBridge.previousValues = null;
-
-		loaderMock = Mockito.mock( SelectionEntityLoader.class );
 	}
 
 	protected final boolean isAdd() {
@@ -130,7 +132,6 @@ public abstract class AbstractPojoIndexingOperationIT {
 				.commitStrategy( commitStrategy )
 				.refreshStrategy( refreshStrategy )
 				.tenantId( tenantId )
-				.loading( o -> o.selectionLoadingStrategy( IndexedEntity.class, (includedTypes, options) -> loaderMock ) )
 				.build();
 	}
 

@@ -42,16 +42,22 @@ public class MassIndexingComplexHierarchyIT {
 
 	private SearchMapping mapping;
 
-	private Map<Integer, H1_Root_NotIndexed> h1map = new LinkedHashMap<>();
-	private Map<Integer, H2_Root_Indexed> h2map = new LinkedHashMap<>();
-
 	@Before
 	public void setup() {
+		Map<Integer, H1_Root_NotIndexed> h1map = new LinkedHashMap<>();
+		Map<Integer, H2_Root_Indexed> h2map = new LinkedHashMap<>();
+
 		backendMock.expectAnySchema( H1_B_Indexed.NAME );
 		backendMock.expectAnySchema( H2_Root_Indexed.NAME );
 		backendMock.expectAnySchema( H2_A_C_Indexed.NAME );
 		backendMock.expectAnySchema( H2_B_Indexed.NAME );
 		mapping = setupHelper.start()
+				.withConfiguration( b -> {
+					b.addEntityType( H1_Root_NotIndexed.class, c -> c
+							.massLoadingStrategy( MassLoadingStrategies.from( h1map ) ) );
+					b.addEntityType( H2_Root_Indexed.class, c -> c
+							.massLoadingStrategy( MassLoadingStrategies.from( h2map ) ) );
+				} )
 				.setup(
 						H1_Root_NotIndexed.class, H1_A_NotIndexed.class, H1_B_Indexed.class,
 						H2_Root_Indexed.class,
@@ -74,7 +80,7 @@ public class MassIndexingComplexHierarchyIT {
 
 	@Test
 	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
-		try ( SearchSession searchSession = createSession() ) {
+		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
 
 			backendMock.expectWorks( H1_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
@@ -101,7 +107,7 @@ public class MassIndexingComplexHierarchyIT {
 
 	@Test
 	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
-		try ( SearchSession searchSession = createSession() ) {
+		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H1_B_Indexed.class );
 
 			backendMock.expectWorks( H1_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
@@ -128,7 +134,7 @@ public class MassIndexingComplexHierarchyIT {
 
 	@Test
 	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
-		try ( SearchSession searchSession = createSession() ) {
+		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );
 
 			backendMock.expectWorks( H2_Root_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
@@ -173,7 +179,7 @@ public class MassIndexingComplexHierarchyIT {
 
 	@Test
 	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
-		try ( SearchSession searchSession = createSession() ) {
+		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer( H2_B_Indexed.class );
 
 			backendMock.expectWorks( H2_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
@@ -196,13 +202,6 @@ public class MassIndexingComplexHierarchyIT {
 		}
 
 		backendMock.verifyExpectationsMet();
-	}
-
-	private SearchSession createSession() {
-		return mapping.createSessionWithOptions().loading( (o) -> {
-			o.massLoadingStrategy( H1_Root_NotIndexed.class, MassLoadingStrategies.from( h1map ) );
-			o.massLoadingStrategy( H2_Root_Indexed.class, MassLoadingStrategies.from( h2map ) );
-		} ).build();
 	}
 
 	public static class H1_Root_NotIndexed {

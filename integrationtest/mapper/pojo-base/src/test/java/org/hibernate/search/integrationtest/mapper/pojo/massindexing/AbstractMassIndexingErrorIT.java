@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.massindexing;
 
-import java.lang.invoke.MethodHandles;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
 
+import java.lang.invoke.MethodHandles;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -21,10 +21,16 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
-import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategies;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.rule.ThreadSpy;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 
@@ -33,13 +39,6 @@ import org.junit.Test;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.awaitility.Awaitility;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
-import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
-import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategies;
-import org.hibernate.search.mapper.javabean.session.SearchSession;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.util.impl.integrationtest.common.rule.ThreadSpy;
 
 public abstract class AbstractMassIndexingErrorIT {
 
@@ -60,7 +59,7 @@ public abstract class AbstractMassIndexingErrorIT {
 	@Rule
 	public ThreadSpy threadSpy = new ThreadSpy();
 
-	private Map<Integer, Book> booksmap = new LinkedHashMap<>();
+	private final Map<Integer, Book> booksmap = new LinkedHashMap<>();
 
 	@Test
 	public void indexing() {
@@ -71,7 +70,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		expectNoFailureHandling();
 
 		doMassIndexingWithError(
-				session( mapping ).massIndexer( Object.class ),
+				mapping.createSession().massIndexer( Object.class ),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
 						.hasMessage( errorMessage ),
@@ -92,7 +91,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		expectNoFailureHandling();
 
 		doMassIndexingWithError(
-				session( mapping ).massIndexer( Object.class ),
+				mapping.createSession().massIndexer( Object.class ),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
 						.hasMessage( errorMessage ),
@@ -115,7 +114,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		expectNoFailureHandling();
 
 		doMassIndexingWithError(
-				session( mapping ).massIndexer( Object.class ),
+				mapping.createSession().massIndexer( Object.class ),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
 						.hasMessage( errorMessage ),
@@ -137,7 +136,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		expectNoFailureHandling();
 
 		doMassIndexingWithError(
-				session( mapping ).massIndexer( Object.class ).dropAndCreateSchemaOnStart( true ),
+				mapping.createSession().massIndexer( Object.class ).dropAndCreateSchemaOnStart( true ),
 				ThreadExpectation.NOT_CREATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
 						.hasMessage( errorMessage ),
@@ -156,7 +155,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		expectNoFailureHandling();
 
 		doMassIndexingWithError(
-				session( mapping ).massIndexer( Object.class ),
+				mapping.createSession().massIndexer( Object.class ),
 				ThreadExpectation.NOT_CREATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
 						.hasMessage( errorMessage ),
@@ -175,7 +174,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		expectNoFailureHandling();
 
 		doMassIndexingWithError(
-				session( mapping ).massIndexer( Object.class ),
+				mapping.createSession().massIndexer( Object.class ),
 				ThreadExpectation.NOT_CREATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
 						.hasMessage( errorMessage ),
@@ -195,7 +194,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		expectNoFailureHandling();
 
 		doMassIndexingWithError(
-				session( mapping ).massIndexer( Object.class )
+				mapping.createSession().massIndexer( Object.class )
 						.mergeSegmentsOnFinish( true ),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
@@ -218,7 +217,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		expectNoFailureHandling();
 
 		doMassIndexingWithError(
-				session( mapping ).massIndexer( Object.class ),
+				mapping.createSession().massIndexer( Object.class ),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
 						.hasMessage( errorMessage ),
@@ -240,7 +239,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		expectNoFailureHandling();
 
 		doMassIndexingWithError(
-				session( mapping ).massIndexer( Object.class ),
+				mapping.createSession().massIndexer( Object.class ),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
 						.hasMessage( errorMessage ),
@@ -445,6 +444,10 @@ public abstract class AbstractMassIndexingErrorIT {
 				.expectCustomBeans()
 				.withPropertyRadical( EngineSettings.Radicals.BACKGROUND_FAILURE_HANDLER, getBackgroundFailureHandlerReference() )
 				.withPropertyRadical( EngineSpiSettings.Radicals.THREAD_PROVIDER, threadSpy.getThreadProvider() )
+				.withConfiguration( b -> {
+					b.addEntityType( Book.class, c -> c
+							.massLoadingStrategy( MassLoadingStrategies.from( booksmap ) ) );
+				} )
 				.setup( Book.class );
 
 		backendMock.verifyExpectationsMet();
@@ -456,12 +459,6 @@ public abstract class AbstractMassIndexingErrorIT {
 		assertAfterSetup();
 
 		return mapping;
-	}
-
-	private SearchSession session(SearchMapping mapping) {
-		return mapping.createSessionWithOptions().loading( (o) -> {
-			o.massLoadingStrategy( Book.class, MassLoadingStrategies.from( booksmap ) );
-		} ).build();
 	}
 
 	private void persist(Book book) {

@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.mapper.pojo.work;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -20,6 +19,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.loading.SelectionEntityLoader;
+import org.hibernate.search.mapper.javabean.loading.SelectionLoadingStrategy;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
@@ -36,6 +36,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
@@ -59,6 +60,9 @@ public class PojoIndexingPlanBaseIT {
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
+	@Mock
+	private SelectionEntityLoader<IndexedEntity> loaderMock;
+
 	private SearchMapping mapping;
 
 	@Before
@@ -70,6 +74,10 @@ public class PojoIndexingPlanBaseIT {
 		);
 
 		mapping = setupHelper.start()
+				.withConfiguration( builder -> builder
+						.addEntityType( IndexedEntity.class, context -> context
+								.selectionLoadingStrategy( (SelectionLoadingStrategy<IndexedEntity>)
+										(includedTypes, options) -> loaderMock ) ) )
 				.setup( IndexedEntity.class, ContainedEntity.class );
 
 		backendMock.verifyExpectationsMet();
@@ -263,12 +271,7 @@ public class PojoIndexingPlanBaseIT {
 	 */
 	@Test
 	public void nullEntity() {
-		@SuppressWarnings("unchecked")
-		SelectionEntityLoader<IndexedEntity> loaderMock = mock( SelectionEntityLoader.class );
-
-		try ( SearchSession session = mapping.createSessionWithOptions()
-				.loading( o -> o.selectionLoadingStrategy( IndexedEntity.class, (includedTypes, options) -> loaderMock ) )
-				.build() ) {
+		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity( 1 );
 			IndexedEntity entity2 = new IndexedEntity( 2 );
 
@@ -306,14 +309,10 @@ public class PojoIndexingPlanBaseIT {
 	 */
 	@Test
 	public void nullEntity_state() {
-		@SuppressWarnings("unchecked")
-		SelectionEntityLoader<IndexedEntity> loaderMock = mock( SelectionEntityLoader.class );
 		List<Integer> idsToLoad = new ArrayList<>();
 		List<IndexedEntity> loadedEntities = new ArrayList<>();
 
-		try ( SearchSession session = mapping.createSessionWithOptions()
-				.loading( o -> o.selectionLoadingStrategy( IndexedEntity.class, (includedTypes, options) -> loaderMock ) )
-				.build() ) {
+		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity;
 
 			BackendMock.DocumentWorkCallListContext expectations = backendMock.expectWorks( IndexedEntity.INDEX );

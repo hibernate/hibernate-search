@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.loading.spi;
 
+import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -24,8 +25,18 @@ public interface PojoSelectionLoadingContext {
 	 * @param type The type of entities that will have to be loaded.
 	 * @return A loading strategy.
 	 * Note that different types with the same strategy will be grouped together and loaded with a single loader.
+	 * @throws org.hibernate.search.util.common.SearchException if the given type cannot be loaded and thus has no loading strategy.
 	 * @see PojoSelectionLoadingStrategy#createLoader(Set)
 	 */
 	<T> PojoSelectionLoadingStrategy<? super T> loadingStrategy(PojoLoadingTypeContext<T> type);
+
+	/**
+	 * @param <T> The type of entities that will have to be loaded.
+	 * @param type The type of entities that will have to be loaded.
+	 * @return A loading strategy, or {@link Optional#empty()} if the given type cannot be loaded and thus has no loading strategy.
+	 * Note that different types with the same strategy will be grouped together and loaded with a single loader.
+	 * @see PojoSelectionLoadingStrategy#createLoader(Set)
+	 */
+	<T> Optional<PojoSelectionLoadingStrategy<? super T>> loadingStrategyOptional(PojoLoadingTypeContext<T> type);
 
 }
