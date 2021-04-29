@@ -10,46 +10,51 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.javabean.loading.MassLoadingOptions;
-import org.hibernate.search.mapper.javabean.loading.SelectionEntityLoader;
 import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategy;
-import org.hibernate.search.mapper.javabean.loading.LoadingOptions;
+import org.hibernate.search.mapper.javabean.loading.SelectionLoadingOptions;
+import org.hibernate.search.mapper.javabean.loading.SelectionLoadingStrategy;
+import org.hibernate.search.mapper.javabean.loading.dsl.SelectionLoadingOptionsStep;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexingLoadingStrategy;
 import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexingMappingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
-import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingLoadingStrategy;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingStrategy;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingContext;
+import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingLoadingStrategy;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class JavaBeanLoadingContext
-		implements PojoSelectionLoadingContext, PojoMassIndexingContext, MassLoadingOptions {
+		implements PojoSelectionLoadingContext, PojoMassIndexingContext, MassLoadingOptions, SelectionLoadingOptions {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final JavaBeanMassIndexingMappingContext mappingContext;
 	private final LoadingTypeContextProvider typeContextProvider;
-	private final DetachedBackendSessionContext sessionContext;
-	private final Map<PojoRawTypeIdentifier<?>, PojoSelectionEntityLoader<?>> loaderByType;
+	private final JavaBeanLoadingSessionContext sessionContext;
+	private final Map<PojoRawTypeIdentifier<?>, SelectionLoadingStrategy<?>> selectionLoadingStrategyByType;
 	private final Map<PojoRawTypeIdentifier<?>, MassLoadingStrategy<?, ?>> massLoadingStrategyByType;
 
 	private int batchSize = 10;
-	private final Map<Class<?>, Object> contextData = new HashMap<>();
+	private final Map<Class<?>, Object> contextData;
 
 	private JavaBeanLoadingContext(Builder builder) {
 		this.mappingContext = builder.mappingContext;
 		this.typeContextProvider = builder.typeContextProvider;
 		this.sessionContext = builder.sessionContext;
-		this.loaderByType = builder.loaderByType == null ? Collections.emptyMap() : builder.loaderByType;
-		this.massLoadingStrategyByType = builder.massLoadingStrategyByType == null ? Collections.emptyMap() : builder.massLoadingStrategyByType;
+		this.selectionLoadingStrategyByType = builder.selectionLoadingStrategyByType == null ? Collections.emptyMap() :
+				builder.selectionLoadingStrategyByType;
+		this.massLoadingStrategyByType =
+				builder.massLoadingStrategyByType == null ? Collections.emptyMap() : builder.massLoadingStrategyByType;
+		this.contextData = builder.contextData;
 	}
 
 	@Override
@@ -87,36 +92,34 @@ public final class JavaBeanLoadingContext
 
 	@Override
 	public PojoRuntimeIntrospector runtimeIntrospector() {
-		return PojoRuntimeIntrospector.simple();
-	}
-
-	@Override
-	public Object loaderKey(PojoLoadingTypeContext<?> type) {
-		return type.typeIdentifier();
+		return sessionContext.runtimeIntrospector();
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> PojoSelectionEntityLoader<? super T> createLoader(Set<PojoLoadingTypeContext<? extends T>> expectedTypes) {
-		PojoRawTypeIdentifier<? extends T> type = expectedTypes.iterator().next().typeIdentifier();
-		PojoSelectionEntityLoader<? super T> loader = (PojoSelectionEntityLoader<T>) loaderByType.get( type );
-		if ( loader == null ) {
-			for ( Map.Entry<PojoRawTypeIdentifier<?>, PojoSelectionEntityLoader<?>> entry : loaderByType.entrySet() ) {
-				if ( entry.getKey().javaClass().isAssignableFrom( type.javaClass() ) ) {
-					loader = (PojoSelectionEntityLoader<? super T>) entry.getValue();
+	public <T> PojoSelectionLoadingStrategy<? super T> loadingStrategy(PojoLoadingTypeContext<T> type) {
+		PojoRawTypeIdentifier<T> typeId = type.typeIdentifier();
+		SelectionLoadingStrategy<? super T> strategy =
+				(SelectionLoadingStrategy<T>) selectionLoadingStrategyByType.get( typeId );
+		if ( strategy == null ) {
+			for ( Map.Entry<PojoRawTypeIdentifier<?>, SelectionLoadingStrategy<?>> entry :
+					selectionLoadingStrategyByType.entrySet() ) {
+				if ( entry.getKey().javaClass().isAssignableFrom( typeId.javaClass() ) ) {
+					strategy = (SelectionLoadingStrategy<? super T>) entry.getValue();
 					break;
 				}
 			}
 		}
-		if ( loader == null ) {
-			throw log.entityLoaderNotRegistered( type );
+		if ( strategy == null ) {
+			throw log.entityLoadingStrategyNotRegistered( typeId );
 		}
-		return loader;
+		return new JavaBeanSelectionLoadingStrategy<>( strategy );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> PojoMassIndexingLoadingStrategy<? super T, ?> loadingStrategy(PojoRawTypeIdentifier<T> expectedType) {
+	public <T> PojoMassIndexingLoadingStrategy<? super T, ?> loadingStrategy(
+			PojoRawTypeIdentifier<T> expectedType) {
 		MassLoadingStrategy<? super T, ?> strategy =
 				(MassLoadingStrategy<T, ?>) massLoadingStrategyByType.get( expectedType );
 		if ( strategy == null ) {
@@ -134,36 +137,36 @@ public final class JavaBeanLoadingContext
 		return new JavaBeanMassIndexingLoadingStrategy<>( mappingContext, typeContextProvider, strategy, this );
 	}
 
-	public static final class Builder implements JavaBeanSelectionLoadingContextBuilder, LoadingOptions {
+	public static final class Builder implements JavaBeanSelectionLoadingContextBuilder, SelectionLoadingOptionsStep {
 		private final JavaBeanMassIndexingMappingContext mappingContext;
 		private final LoadingTypeContextProvider typeContextProvider;
-		private final DetachedBackendSessionContext sessionContext;
-		private Map<PojoRawTypeIdentifier<?>, PojoSelectionEntityLoader<?>> loaderByType;
+		private final JavaBeanLoadingSessionContext sessionContext;
+		private Map<PojoRawTypeIdentifier<?>, SelectionLoadingStrategy<?>> selectionLoadingStrategyByType;
 		private Map<PojoRawTypeIdentifier<?>, MassLoadingStrategy<?, ?>> massLoadingStrategyByType;
+		private final Map<Class<?>, Object> contextData = new HashMap<>();
 
 		public Builder(JavaBeanMassIndexingMappingContext mappingContext,
-				LoadingTypeContextProvider typeContextProvider,
-				DetachedBackendSessionContext sessionContext) {
+				LoadingTypeContextProvider typeContextProvider, JavaBeanLoadingSessionContext sessionContext) {
 			this.mappingContext = mappingContext;
 			this.typeContextProvider = typeContextProvider;
 			this.sessionContext = sessionContext;
 		}
 
 		@Override
-		public LoadingOptions toAPI() {
+		public SelectionLoadingOptionsStep toAPI() {
 			return this;
 		}
 
 		@Override
-		public <T> LoadingOptions registerLoader(Class<T> type, SelectionEntityLoader<T> loader) {
+		public <T> void selectionLoadingStrategy(Class<T> type, SelectionLoadingStrategy<T> loadingStrategy) {
 			LoadingTypeContext<T> typeContext = typeContextProvider.indexedForExactClass( type );
 			PojoRawTypeIdentifier<T> typeIdentifier = typeContext != null
 					? typeContext.typeIdentifier() : PojoRawTypeIdentifier.of( type );
-			if ( loaderByType == null ) {
-				loaderByType = new LinkedHashMap<>();
+			if ( selectionLoadingStrategyByType == null ) {
+				selectionLoadingStrategyByType = new LinkedHashMap<>();
 			}
-			loaderByType.put( typeIdentifier, new JavaBeanSelectionEntityLoader<>( loader ) );
-			return this;
+
+			selectionLoadingStrategyByType.put( typeIdentifier, loadingStrategy );
 		}
 
 		@Override
@@ -179,8 +182,52 @@ public final class JavaBeanLoadingContext
 		}
 
 		@Override
+		public <T> void context(Class<T> contextType, T context) {
+			contextData.put( contextType, context );
+		}
+
+		@Override
 		public JavaBeanLoadingContext build() {
 			return new JavaBeanLoadingContext( this );
+		}
+	}
+
+	private class JavaBeanSelectionLoadingStrategy<E> implements PojoSelectionLoadingStrategy<E> {
+
+		private final SelectionLoadingStrategy<E> delegate;
+
+		private JavaBeanSelectionLoadingStrategy(SelectionLoadingStrategy<E> delegate) {
+			this.delegate = delegate;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if ( this == o ) {
+				return true;
+			}
+			if ( o == null || getClass() != o.getClass() ) {
+				return false;
+			}
+			JavaBeanSelectionLoadingStrategy<?> that = (JavaBeanSelectionLoadingStrategy<?>) o;
+			return delegate.equals( that.delegate );
+		}
+
+		@Override
+		public int hashCode() {
+			return delegate.hashCode();
+		}
+
+		@Override
+		public PojoSelectionEntityLoader<E> createLoader(
+				Set<? extends PojoLoadingTypeContext<? extends E>> expectedTypes) {
+			Set<PojoRawTypeIdentifier<? extends E>> includedTypeIdentifiers = new LinkedHashSet<>();
+			for ( PojoLoadingTypeContext<? extends E> expectedType : expectedTypes ) {
+				includedTypeIdentifiers.add( expectedType.typeIdentifier() );
+			}
+			JavaBeanLoadingTypeGroup<E> includedTypes = new JavaBeanLoadingTypeGroup<>(
+					typeContextProvider, includedTypeIdentifiers, sessionContext.runtimeIntrospector() );
+			return new JavaBeanSelectionEntityLoader<>(
+					delegate.createEntityLoader( includedTypes, JavaBeanLoadingContext.this ) );
 		}
 	}
 }

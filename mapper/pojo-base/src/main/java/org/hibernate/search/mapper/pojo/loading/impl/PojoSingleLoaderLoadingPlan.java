@@ -15,10 +15,12 @@ import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingStrategy;
 
-public final class PojoSingleLoaderLoadingPlan<T> implements PojoLoadingPlan<T> {
+final class PojoSingleLoaderLoadingPlan<T> implements PojoLoadingPlan<T> {
 
 	private final PojoSelectionLoadingContext context;
+	private final PojoSelectionLoadingStrategy<T> loadingStrategy;
 
 	private final Set<PojoLoadingTypeContext<? extends T>> expectedTypes = new LinkedHashSet<>();
 	private final List<Object> identifiers = new ArrayList<>();
@@ -26,12 +28,14 @@ public final class PojoSingleLoaderLoadingPlan<T> implements PojoLoadingPlan<T> 
 	private boolean singleConcreteTypeInEntityHierarchy;
 	private List<?> loaded;
 
-	public PojoSingleLoaderLoadingPlan(PojoSelectionLoadingContext context) {
+	PojoSingleLoaderLoadingPlan(PojoSelectionLoadingContext context,
+			PojoSelectionLoadingStrategy<T> loadingStrategy) {
 		this.context = context;
+		this.loadingStrategy = loadingStrategy;
 	}
 
 	@Override
-	public int planLoading(PojoLoadingTypeContext<? extends T> expectedType, Object identifier) {
+	public <T2 extends T> int planLoading(PojoLoadingTypeContext<T2> expectedType, Object identifier) {
 		expectedTypes.add( expectedType );
 		identifiers.add( identifier );
 		return identifiers.size() - 1;
@@ -47,7 +51,7 @@ public final class PojoSingleLoaderLoadingPlan<T> implements PojoLoadingPlan<T> 
 			return;
 		}
 		try {
-			PojoSelectionEntityLoader<? super T> loader = context.createLoader( expectedTypes );
+			PojoSelectionEntityLoader<T> loader = loadingStrategy.createLoader( expectedTypes );
 			singleConcreteTypeInEntityHierarchy = expectedTypes.size() == 1
 					&& expectedTypes.iterator().next().isSingleConcreteTypeInEntityHierarchy();
 			loaded = loader.loadBlocking( identifiers, deadline );
@@ -102,7 +106,7 @@ public final class PojoSingleLoaderLoadingPlan<T> implements PojoLoadingPlan<T> 
 	 *
 	 * @param <T2> The expected type for the entity instance.
 	 * @param expectedType The expected type for the entity instance. Must be one of the types passed
-	 * to {@link PojoSelectionLoadingContext#createLoader(Set)}
+	 * to {@link PojoSelectionLoadingStrategy#createLoader(Set)}
 	 * when creating this loader.
 	 * @param loadedObject A loaded object, i.e. an element from {@link #loaded}.
 	 * @return The given {@code loadedObject} if is an instance of {@code expectedType} exactly (not an instance of a subtype).

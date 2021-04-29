@@ -13,8 +13,6 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 import org.hibernate.search.mapper.pojo.loading.impl.PojoLoadingPlan;
-import org.hibernate.search.mapper.pojo.loading.impl.PojoMultiLoaderLoadingPlan;
-import org.hibernate.search.mapper.pojo.loading.impl.PojoSingleLoaderLoadingPlan;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
 
 public class PojoSearchLoadingContext<R, E> implements SearchLoadingContext<R, E> {
@@ -41,28 +39,8 @@ public class PojoSearchLoadingContext<R, E> implements SearchLoadingContext<R, E
 
 	@Override
 	public ProjectionHitMapper<R, E> createProjectionHitMapper() {
-		PojoLoadingPlan<E> loadingPlan;
-		if ( hasCommonLoaderKey() ) {
-			loadingPlan = new PojoSingleLoaderLoadingPlan<>( delegate );
-		}
-		else {
-			loadingPlan = new PojoMultiLoaderLoadingPlan<>( delegate );
-		}
+		PojoLoadingPlan<E> loadingPlan = PojoLoadingPlan.create( delegate, targetTypesByEntityName.values() );
 		return new PojoProjectionHitMapper<>( targetTypesByEntityName, documentReferenceConverter, sessionContext,
 				loadingPlan );
-	}
-
-	private boolean hasCommonLoaderKey() {
-		Object loaderKey = null;
-		for ( PojoSearchLoadingIndexedTypeContext<? extends E> typeContext : targetTypesByEntityName.values() ) {
-			Object thisTypeLoaderKey = delegate.loaderKey( typeContext );
-			if ( loaderKey == null ) {
-				loaderKey = thisTypeLoaderKey;
-			}
-			else if ( !loaderKey.equals( thisTypeLoaderKey ) ) {
-				return false;
-			}
-		}
-		return true;
 	}
 }

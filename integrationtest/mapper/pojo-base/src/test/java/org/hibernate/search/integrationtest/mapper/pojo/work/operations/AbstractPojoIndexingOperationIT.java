@@ -130,7 +130,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 				.commitStrategy( commitStrategy )
 				.refreshStrategy( refreshStrategy )
 				.tenantId( tenantId )
-				.loading( o -> o.registerLoader( IndexedEntity.class, loaderMock ) )
+				.loading( o -> o.selectionLoadingStrategy( IndexedEntity.class, (includedTypes, options) -> loaderMock ) )
 				.build();
 	}
 

@@ -17,7 +17,8 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
-import org.hibernate.search.mapper.javabean.loading.LoadingOptions;
+import org.hibernate.search.mapper.javabean.loading.dsl.SelectionLoadingOptionsStep;
+import org.hibernate.search.mapper.javabean.loading.impl.JavaBeanLoadingSessionContext;
 import org.hibernate.search.mapper.javabean.loading.impl.JavaBeanLoadingContext;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.scope.impl.SearchScopeImpl;
@@ -41,7 +42,8 @@ import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class JavaBeanSearchSession extends AbstractPojoSearchSession
-		implements SearchSession, JavaBeanMassIndexingSessionContext, DocumentReferenceConverter<EntityReference> {
+		implements SearchSession, JavaBeanMassIndexingSessionContext, JavaBeanLoadingSessionContext,
+				DocumentReferenceConverter<EntityReference> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -52,7 +54,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
-	private final Consumer<LoadingOptions> loadingOptionsContributor;
+	private final Consumer<SelectionLoadingOptionsStep> loadingOptionsContributor;
 
 	private SearchIndexingPlanImpl indexingPlan;
 	private SearchIndexer indexer;
@@ -177,8 +179,8 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 	}
 
 	public JavaBeanSelectionLoadingContextBuilder loadingContextBuilder() {
-		JavaBeanLoadingContext.Builder builder = new JavaBeanLoadingContext.Builder( mappingContext, typeContextProvider,
-				mappingContext().detachedBackendSessionContext( tenantIdentifier() ) );
+		JavaBeanLoadingContext.Builder builder =
+				new JavaBeanLoadingContext.Builder( mappingContext, typeContextProvider, this );
 		if ( loadingOptionsContributor != null ) {
 			loadingOptionsContributor.accept( builder );
 		}
@@ -192,7 +194,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 		private String tenantId;
 		private DocumentCommitStrategy commitStrategy = DocumentCommitStrategy.FORCE;
 		private DocumentRefreshStrategy refreshStrategy = DocumentRefreshStrategy.NONE;
-		private Consumer<LoadingOptions> loadingOptionsContributor;
+		private Consumer<SelectionLoadingOptionsStep> loadingOptionsContributor;
 
 		public Builder(JavaBeanSearchSessionMappingContext mappingContext,
 				JavaBeanSearchSessionTypeContextProvider typeContextProvider) {
@@ -219,7 +221,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 		}
 
 		@Override
-		public SearchSessionBuilder loading(Consumer<LoadingOptions> loadingOptionsContributor) {
+		public SearchSessionBuilder loading(Consumer<SelectionLoadingOptionsStep> loadingOptionsContributor) {
 			this.loadingOptionsContributor = loadingOptionsContributor;
 			return this;
 		}

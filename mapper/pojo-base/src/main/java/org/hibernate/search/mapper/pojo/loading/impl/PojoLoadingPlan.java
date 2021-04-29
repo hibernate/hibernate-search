@@ -6,8 +6,12 @@
  */
 package org.hibernate.search.mapper.pojo.loading.impl;
 
+import java.util.Collection;
+
 import org.hibernate.search.engine.common.timing.spi.Deadline;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContext;
+import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingStrategy;
 
 /**
  * A mutable plan to load POJO entities from an external source (database, ...).
@@ -15,14 +19,33 @@ import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
  */
 public interface PojoLoadingPlan<T> {
 
+	@SuppressWarnings("unchecked")
+	static <T> PojoLoadingPlan<T> create(PojoSelectionLoadingContext context,
+			Collection<? extends PojoLoadingTypeContext<? extends T>> targetTypes) {
+		PojoSelectionLoadingStrategy<?> strategy = null;
+		for ( PojoLoadingTypeContext<? extends T> typeContext : targetTypes ) {
+			PojoSelectionLoadingStrategy<?> thisTypeStrategy = context.loadingStrategy( typeContext );
+			if ( strategy == null ) {
+				strategy = thisTypeStrategy;
+			}
+			else if ( !strategy.equals( thisTypeStrategy ) ) {
+				return new PojoMultiLoaderLoadingPlan<>( context );
+			}
+		}
+		// We determined that all target types use the same strategy.
+		// We can safely use a single-loader loading plan.
+		return new PojoSingleLoaderLoadingPlan<>( context, (PojoSelectionLoadingStrategy<T>) strategy );
+	}
+
 	/**
 	 * Plans the loading of an entity instance.
-	 * @param expectedType The exact expected type of the entity instance.
+	 * @param <T2> The exact expected type for the entity instance.
+	 * @param expectedType The exact expected type for the entity instance.
 	 * @param identifier The entity identifier.
 	 * @return An ordinal to pass later to {@link #retrieve(PojoLoadingTypeContext, int)}.
 	 * @see #loadBlocking(Deadline)
 	 */
-	int planLoading(PojoLoadingTypeContext<? extends T> expectedType, Object identifier);
+	<T2 extends T> int planLoading(PojoLoadingTypeContext<T2> expectedType, Object identifier);
 
 	/**
 	 * Loads the entities whose identifiers were passed to {@link #planLoading(PojoLoadingTypeContext, Object)},
