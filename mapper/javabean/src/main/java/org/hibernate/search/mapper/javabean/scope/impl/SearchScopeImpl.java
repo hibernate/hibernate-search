@@ -17,9 +17,9 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.entity.SearchIndexedEntity;
+import org.hibernate.search.mapper.javabean.loading.impl.JavaBeanLoadingContext;
 import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
 import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexer;
-import org.hibernate.search.mapper.javabean.loading.MassLoadingOptions;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchSession;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingContextBuilder;
@@ -69,8 +69,8 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 	public MassIndexer massIndexer(JavaBeanSearchSession session) {
 		DetachedBackendSessionContext detachedSession = session.mappingContext()
 				.detachedBackendSessionContext( session.tenantIdentifier() );
-		PojoMassIndexer<MassLoadingOptions> massIndexerDelegate = delegate.massIndexer(
-				session.loadingContextBuilder().build(), detachedSession );
-		return new JavaBeanMassIndexer( massIndexerDelegate, detachedSession );
+		JavaBeanLoadingContext context = session.loadingContextBuilder().build();
+		PojoMassIndexer massIndexerDelegate = delegate.massIndexer( context, detachedSession );
+		return new JavaBeanMassIndexer( massIndexerDelegate, context );
 	}
 }

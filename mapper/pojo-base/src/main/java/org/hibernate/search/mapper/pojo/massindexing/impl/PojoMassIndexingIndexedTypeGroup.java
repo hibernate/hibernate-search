@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSession
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.AssertionFailure;
 
-public class PojoMassIndexingIndexedTypeGroup<E, O> {
+public class PojoMassIndexingIndexedTypeGroup<E> {
 
 	/**
 	 * Group indexed types by their closest common supertype,
@@ -33,24 +33,23 @@ public class PojoMassIndexingIndexedTypeGroup<E, O> {
 	 * For example, without this, we could end up reindexing type B in one thread,
 	 * and its superclass A (which will include all instances of B) in another.
 	 *
-	 * @param <O> The type of mass indexing options.
 	 * @param indexingContext A conficuration contextural information.
 	 * @param mappingContext A mappings contextural information.
 	 * @param indexedTypeContexts A set of indexed types to group together.
 	 * @return One or more type groups that are guaranteed to be disjoint.
 	 */
-	public static <O> List<PojoMassIndexingIndexedTypeGroup<?, O>> disjoint(PojoMassIndexingContext<O> indexingContext,
+	public static List<PojoMassIndexingIndexedTypeGroup<?>> disjoint(PojoMassIndexingContext indexingContext,
 			PojoMassIndexingMappingContext mappingContext,
 			PojoMassIndexingTypeContextProvider typeContextProvider,
 			Set<? extends PojoMassIndexingIndexedTypeContext<?>> indexedTypeContexts) {
-		List<PojoMassIndexingIndexedTypeGroup<?, O>> typeGroups = new ArrayList<>();
+		List<PojoMassIndexingIndexedTypeGroup<?>> typeGroups = new ArrayList<>();
 		for ( PojoMassIndexingIndexedTypeContext<?> typeContext : indexedTypeContexts ) {
-			PojoMassIndexingIndexedTypeGroup<?, O> typeGroup = PojoMassIndexingIndexedTypeGroup.single( indexingContext,
+			PojoMassIndexingIndexedTypeGroup<?> typeGroup = PojoMassIndexingIndexedTypeGroup.single( indexingContext,
 					mappingContext, typeContextProvider, typeContext );
 			// First try to merge this new type group with an existing one
-			ListIterator<PojoMassIndexingIndexedTypeGroup<?, O>> iterator = typeGroups.listIterator();
+			ListIterator<PojoMassIndexingIndexedTypeGroup<?>> iterator = typeGroups.listIterator();
 			while ( iterator.hasNext() ) {
-				PojoMassIndexingIndexedTypeGroup<?, O> mergeResult = iterator.next().mergeOrNull( typeGroup );
+				PojoMassIndexingIndexedTypeGroup<?> mergeResult = iterator.next().mergeOrNull( typeGroup );
 				if ( mergeResult != null ) {
 					// We found an existing group that can be merged with this one.
 					// Remove that group, we'll add the merge result to the list later.
@@ -64,26 +63,26 @@ public class PojoMassIndexingIndexedTypeGroup<E, O> {
 		return typeGroups;
 	}
 
-	private static <E, O> PojoMassIndexingIndexedTypeGroup<? super E, O> single(PojoMassIndexingContext<O> indexingContext,
+	private static <E> PojoMassIndexingIndexedTypeGroup<? super E> single(PojoMassIndexingContext indexingContext,
 			PojoMassIndexingMappingContext mappingContext,
 			PojoMassIndexingTypeContextProvider typeContextProvider,
 			PojoMassIndexingIndexedTypeContext<E> typeContext) {
-		PojoMassIndexingLoadingStrategy<? super E, ?, O> strategy =
+		PojoMassIndexingLoadingStrategy<? super E, ?> strategy =
 				indexingContext.loadingStrategy( typeContext.typeIdentifier() );
 		return new PojoMassIndexingIndexedTypeGroup<>( strategy, typeContext, indexingContext, mappingContext,
 				typeContextProvider, Collections.singleton( typeContext ) );
 	}
 
-	private final PojoMassIndexingLoadingStrategy<E, ?, O> loadingStrategy;
+	private final PojoMassIndexingLoadingStrategy<E, ?> loadingStrategy;
 	private final PojoMassIndexingIndexedTypeContext<? extends E> commonSuperType;
-	private final PojoMassIndexingContext<?> indexingContext;
+	private final PojoMassIndexingContext indexingContext;
 	private final PojoMassIndexingMappingContext mappingContext;
 	private final PojoMassIndexingTypeContextProvider typeContextProvider;
 	private final Set<PojoMassIndexingIndexedTypeContext<? extends E>> includedTypes;
 
-	private PojoMassIndexingIndexedTypeGroup(PojoMassIndexingLoadingStrategy<E, ?, O> loadingStrategy,
+	private PojoMassIndexingIndexedTypeGroup(PojoMassIndexingLoadingStrategy<E, ?> loadingStrategy,
 			PojoMassIndexingIndexedTypeContext<? extends E> commonSuperType,
-			PojoMassIndexingContext<?> indexingContext,
+			PojoMassIndexingContext indexingContext,
 			PojoMassIndexingMappingContext mappingContext,
 			PojoMassIndexingTypeContextProvider typeContextProvider,
 			Set<PojoMassIndexingIndexedTypeContext<? extends E>> includedTypes) {
@@ -131,7 +130,7 @@ public class PojoMassIndexingIndexedTypeGroup<E, O> {
 				typeContext.toEntitySupplier( sessionContext, entity ) );
 	}
 
-	public PojoMassIndexingLoadingStrategy<E, ?, O> loadingStrategy() {
+	public PojoMassIndexingLoadingStrategy<E, ?> loadingStrategy() {
 		return loadingStrategy;
 	}
 
@@ -147,7 +146,7 @@ public class PojoMassIndexingIndexedTypeGroup<E, O> {
 	 * a supertype or subtype of this group's {@code commonSuperType}.
 	 */
 	@SuppressWarnings("unchecked") // The casts are guarded by reflection checks
-	private PojoMassIndexingIndexedTypeGroup<?, O> mergeOrNull(PojoMassIndexingIndexedTypeGroup<?, O> other) {
+	private PojoMassIndexingIndexedTypeGroup<?> mergeOrNull(PojoMassIndexingIndexedTypeGroup<?> other) {
 		if ( !loadingStrategy.equals( other.loadingStrategy ) ) {
 			return null;
 		}
@@ -157,10 +156,10 @@ public class PojoMassIndexingIndexedTypeGroup<E, O> {
 		// If one is the supertype of the other, make sure to load them in the same group:
 		// if all subtypes are included in a group, it should perform better.
 		if ( isFirstSuperTypeOfSecond( commonSuperType, other.commonSuperType ) ) {
-			return withAdditionalTypes( ((PojoMassIndexingIndexedTypeGroup<? extends E, O>) other).includedTypes );
+			return withAdditionalTypes( ((PojoMassIndexingIndexedTypeGroup<? extends E>) other).includedTypes );
 		}
 		else if ( isFirstSuperTypeOfSecond( other.commonSuperType, commonSuperType ) ) {
-			return ((PojoMassIndexingIndexedTypeGroup<? super E, O>) other).withAdditionalTypes( includedTypes );
+			return ((PojoMassIndexingIndexedTypeGroup<? super E>) other).withAdditionalTypes( includedTypes );
 		}
 		else {
 			return null;
@@ -174,7 +173,7 @@ public class PojoMassIndexingIndexedTypeGroup<E, O> {
 				.orElse( false );
 	}
 
-	private PojoMassIndexingIndexedTypeGroup<E, O> withAdditionalTypes(
+	private PojoMassIndexingIndexedTypeGroup<E> withAdditionalTypes(
 			Set<? extends PojoMassIndexingIndexedTypeContext<? extends E>> otherIncludedSubTypes) {
 		Set<PojoMassIndexingIndexedTypeContext<? extends E>> mergedIncludedSubTypes
 				= new LinkedHashSet<>( includedTypes );

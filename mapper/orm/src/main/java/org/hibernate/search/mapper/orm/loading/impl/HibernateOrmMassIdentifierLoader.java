@@ -33,7 +33,7 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
 
 	private final TransactionManager transactionManager;
 	private final TransactionCoordinatorBuilder transactionCoordinatorBuilder;
-	private final HibernateOrmMassIndexingOptions options;
+	private final HibernateOrmMassLoadingOptions options;
 	private final PojoMassIdentifierSink<I> sink;
 	private final SharedSessionContractImplementor session;
 	private final long totalCount;
@@ -44,7 +44,7 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
 	public HibernateOrmMassIdentifierLoader(TransactionManager transactionManager,
 			TransactionCoordinatorBuilder transactionCoordinatorBuilder,
 			HibernateOrmQueryLoader<E, I> typeQueryLoader,
-			HibernateOrmMassIndexingOptions options,
+			HibernateOrmMassLoadingOptions options,
 			PojoMassIdentifierSink<I> sink,
 			SharedSessionContractImplementor session) {
 		this.transactionManager = transactionManager;
@@ -55,7 +55,7 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
 
 		this.wrapInJtaTransaction = wrapInJtaTransaction();
 
-		beginTransaction( options.transactionTimeout() );
+		beginTransaction( options.idLoadingTransactionTimeout() );
 
 		try {
 			long objectsLimit = options.objectsLimit();
@@ -101,7 +101,7 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
 
 	@Override
 	public void loadNext() {
-		int batchSize = options.batchSizeToLoadObjects();
+		int batchSize = options.objectLoadingBatchSize();
 		ArrayList<I> destinationList = new ArrayList<>( batchSize );
 		while ( destinationList.size() < batchSize && totalLoaded < totalCount && results.next() ) {
 			@SuppressWarnings("unchecked")

@@ -24,18 +24,20 @@ import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingLoading
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSessionContext;
 
 public class JavaBeanMassIndexingLoadingStrategy<E, I>
-		implements PojoMassIndexingLoadingStrategy<E, I, MassLoadingOptions> {
+		implements PojoMassIndexingLoadingStrategy<E, I> {
 
 	private final JavaBeanMassIndexingMappingContext mappingContext;
 	private final LoadingTypeContextProvider typeContextProvider;
 	private final MassLoadingStrategy<E, I> delegate;
+	private final MassLoadingOptions options;
 
 	public JavaBeanMassIndexingLoadingStrategy(JavaBeanMassIndexingMappingContext mappingContext,
 			LoadingTypeContextProvider typeContextProvider,
-			MassLoadingStrategy<E, I> delegate) {
+			MassLoadingStrategy<E, I> delegate, MassLoadingOptions options) {
 		this.mappingContext = mappingContext;
 		this.typeContextProvider = typeContextProvider;
 		this.delegate = delegate;
+		this.options = options;
 	}
 
 	@Override
@@ -56,8 +58,7 @@ public class JavaBeanMassIndexingLoadingStrategy<E, I>
 	}
 
 	@Override
-	public PojoMassIdentifierLoader createIdentifierLoader(
-			PojoMassIndexingIdentifierLoadingContext<E, I> context, MassLoadingOptions options) {
+	public PojoMassIdentifierLoader createIdentifierLoader(PojoMassIndexingIdentifierLoadingContext<E, I> context) {
 		PojoMassIndexingSessionContext sessionContext = mappingContext.sessionContext();
 		JavaBeanLoadingTypeGroup<E> includedTypes = new JavaBeanLoadingTypeGroup<>(
 				typeContextProvider, context.includedTypes(), sessionContext.runtimeIntrospector() );
@@ -66,8 +67,7 @@ public class JavaBeanMassIndexingLoadingStrategy<E, I>
 	}
 
 	@Override
-	public PojoMassEntityLoader<I> createEntityLoader(PojoMassIndexingEntityLoadingContext<E> context,
-			MassLoadingOptions options) {
+	public PojoMassEntityLoader<I> createEntityLoader(PojoMassIndexingEntityLoadingContext<E> context) {
 		PojoMassIndexingSessionContext sessionContext = mappingContext.sessionContext();
 		JavaBeanLoadingTypeGroup<E> includedTypes = new JavaBeanLoadingTypeGroup<>(
 				typeContextProvider, context.includedTypes(), sessionContext.runtimeIntrospector() );

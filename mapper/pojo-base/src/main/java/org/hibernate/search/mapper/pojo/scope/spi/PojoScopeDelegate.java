@@ -51,6 +51,5 @@ public interface PojoScopeDelegate<R, E, C> {
 
 	PojoScopeSchemaManager schemaManager();
 
-	<O> PojoMassIndexer<O> massIndexer(PojoMassIndexingContext<O> context,
-			DetachedBackendSessionContext detachedSession);
+	PojoMassIndexer massIndexer(PojoMassIndexingContext context, DetachedBackendSessionContext detachedSession);
 }

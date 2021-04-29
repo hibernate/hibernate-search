@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.loading.LoadingOptions;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.scope.impl.SearchScopeImpl;
-import org.hibernate.search.mapper.javabean.loading.impl.JavaBeanSearchLoadingContext;
+import org.hibernate.search.mapper.javabean.loading.impl.JavaBeanLoadingContext;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
 import org.hibernate.search.mapper.javabean.work.SearchIndexer;
@@ -177,7 +177,8 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 	}
 
 	public JavaBeanLoadingContextBuilder loadingContextBuilder() {
-		JavaBeanSearchLoadingContext.Builder builder = new JavaBeanSearchLoadingContext.Builder( mappingContext, typeContextProvider );
+		JavaBeanLoadingContext.Builder builder = new JavaBeanLoadingContext.Builder( mappingContext, typeContextProvider,
+				mappingContext().detachedBackendSessionContext( tenantIdentifier() ) );
 		if ( loadingOptionsContributor != null ) {
 			loadingOptionsContributor.accept( builder );
 		}
