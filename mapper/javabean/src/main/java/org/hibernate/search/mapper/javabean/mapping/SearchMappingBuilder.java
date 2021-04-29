@@ -11,10 +11,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
@@ -27,6 +27,7 @@ import org.hibernate.search.mapper.javabean.impl.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingKey;
+import org.hibernate.search.mapper.javabean.mapping.metadata.EntityConfigurer;
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
@@ -107,8 +108,7 @@ public final class SearchMappingBuilder {
 	 * @return {@code this}, for call chaining.
 	 */
 	public SearchMappingBuilder addEntityType(Class<?> type, String entityName) {
-		mappingInitiator.addEntityType( type, entityName );
-		return this;
+		return addEntityType( type, entityName, null );
 	}
 
 	/**
@@ -120,6 +120,34 @@ public final class SearchMappingBuilder {
 		for ( Class<?> type : types ) {
 			addEntityType( type );
 		}
+		return this;
+	}
+
+	/**
+	 * Register a type as an entity type with the default name, its simple class name.
+	 * @param <E> The entity type.
+	 * @param type The type to be considered as an entity type, i.e. a type that may be indexed
+	 * and whose instances be added/updated/deleted through the {@link SearchSession#indexingPlan() indexing plan}.
+	 * @param configurer The configurer, to provide additional information about the entity type.
+	 *
+	 * @return {@code this}, for call chaining.
+	 */
+	public <E> SearchMappingBuilder addEntityType(Class<E> type, EntityConfigurer<E> configurer) {
+		return addEntityType( type, type.getSimpleName(), configurer );
+	}
+
+	/**
+	 * Register a type as an entity type with the given name.
+	 * @param <E> The entity type.
+	 * @param type The type to be considered as an entity type, i.e. a type that may be indexed
+	 * and whose instances be added/updated/deleted through the {@link SearchSession#indexingPlan() indexing plan}.
+	 * @param entityName The name of the entity.
+	 * @param configurer The configurer, to provide additional information about the entity type.
+	 *
+	 * @return {@code this}, for call chaining.
+	 */
+	public <E> SearchMappingBuilder addEntityType(Class<E> type, String entityName, EntityConfigurer<E> configurer) {
+		mappingInitiator.addEntityType( type, entityName, configurer );
 		return this;
 	}
 

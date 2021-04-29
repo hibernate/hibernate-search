@@ -39,13 +39,17 @@ public class MassIndexingPrimitiveIdIT {
 
 	private SearchMapping mapping;
 
-	private Map<Integer, EntityWithPrimitiveId> entitymap = new LinkedHashMap<>();
+	private final Map<Integer, EntityWithPrimitiveId> entitymap = new LinkedHashMap<>();
 
 	@Before
 	public void setup() {
 		backendMock.expectAnySchema( EntityWithPrimitiveId.INDEX );
 
 		mapping = setupHelper.start()
+				.withConfiguration( b -> {
+					b.addEntityType( EntityWithPrimitiveId.class, c -> c
+							.massLoadingStrategy( MassLoadingStrategies.from( entitymap ) ) );
+				} )
 				.setup( EntityWithPrimitiveId.class );
 
 		backendMock.verifyExpectationsMet();
@@ -55,7 +59,7 @@ public class MassIndexingPrimitiveIdIT {
 
 	@Test
 	public void entityWithPrimitiveId() {
-		try ( SearchSession searchSession = createSessionFromMap() ) {
+		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer().mergeSegmentsOnFinish( true );
 
 			// add operations on indexes can follow any random order,
@@ -90,12 +94,6 @@ public class MassIndexingPrimitiveIdIT {
 		}
 
 		backendMock.verifyExpectationsMet();
-	}
-
-	private SearchSession createSessionFromMap() {
-		return mapping.createSessionWithOptions().loading( (o) -> {
-			o.massLoadingStrategy( EntityWithPrimitiveId.class, MassLoadingStrategies.from( entitymap ) );
-		} ).build();
 	}
 
 	private void initData() {

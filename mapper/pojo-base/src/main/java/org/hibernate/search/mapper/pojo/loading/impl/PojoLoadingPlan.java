@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.loading.impl;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import org.hibernate.search.engine.common.timing.Deadline;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
@@ -24,7 +25,15 @@ public interface PojoLoadingPlan<T> {
 			Collection<? extends PojoLoadingTypeContext<? extends T>> targetTypes) {
 		PojoSelectionLoadingStrategy<?> strategy = null;
 		for ( PojoLoadingTypeContext<? extends T> typeContext : targetTypes ) {
-			PojoSelectionLoadingStrategy<?> thisTypeStrategy = context.loadingStrategy( typeContext );
+			Optional<? extends PojoSelectionLoadingStrategy<?>> thisTypeStrategyOptional =
+					context.loadingStrategyOptional( typeContext );
+			if ( !thisTypeStrategyOptional.isPresent() ) {
+				// One of the types cannot be loaded -- something is wrong.
+				// Forget about the optimization, and fail later,
+				// if the backend actually attempts loading this type that cannot be loaded.
+				return new PojoMultiLoaderLoadingPlan<>( context );
+			}
+			PojoSelectionLoadingStrategy<?> thisTypeStrategy = thisTypeStrategyOptional.get();
 			if ( strategy == null ) {
 				strategy = thisTypeStrategy;
 			}

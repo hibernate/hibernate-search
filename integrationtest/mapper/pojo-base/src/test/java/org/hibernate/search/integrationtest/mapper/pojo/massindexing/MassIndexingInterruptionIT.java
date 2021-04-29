@@ -32,7 +32,6 @@ import org.awaitility.Awaitility;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
-import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 
 /**
@@ -55,7 +54,7 @@ public class MassIndexingInterruptionIT {
 
 	private SearchMapping mapping;
 
-	private Map<Integer, Book> booksmap = new LinkedHashMap<>();
+	private final Map<Integer, Book> booksmap = new LinkedHashMap<>();
 
 	@Before
 	public void setup() {
@@ -63,6 +62,10 @@ public class MassIndexingInterruptionIT {
 
 		mapping = setupHelper.start()
 				.withPropertyRadical( EngineSpiSettings.Radicals.THREAD_PROVIDER, threadSpy.getThreadProvider() )
+				.withConfiguration( b -> {
+					b.addEntityType( Book.class, c -> c
+							.massLoadingStrategy( MassLoadingStrategies.from( booksmap ) ) );
+				} )
 				.setup( Book.class );
 
 		backendMock.verifyExpectationsMet();
@@ -127,8 +130,7 @@ public class MassIndexingInterruptionIT {
 	}
 
 	private MassIndexer prepareMassIndexingThatWillNotTerminate() {
-		MassIndexer indexer = createSessionFromMap()
-				.massIndexer()
+		MassIndexer indexer = mapping.createSession().massIndexer()
 				.typesToIndexInParallel( 1 )
 				.threadsToLoadObjects( 1 );
 
@@ -185,12 +187,6 @@ public class MassIndexingInterruptionIT {
 						.isEqualTo( Thread.State.TERMINATED )
 						)
 		);
-	}
-
-	private SearchSession createSessionFromMap() {
-		return mapping.createSessionWithOptions().loading( (o) -> {
-			o.massLoadingStrategy( Book.class, MassLoadingStrategies.from( booksmap ) );
-		} ).build();
 	}
 
 	private void initData() {

@@ -6,15 +6,9 @@
  */
 package org.hibernate.search.mapper.javabean.loading.dsl;
 
-import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategy;
 import org.hibernate.search.mapper.javabean.loading.SelectionLoadingOptions;
-import org.hibernate.search.mapper.javabean.loading.SelectionLoadingStrategy;
 
 public interface SelectionLoadingOptionsStep {
-
-	<T> void selectionLoadingStrategy(Class<T> type, SelectionLoadingStrategy<T> loadingStrategy);
-
-	<T> void massLoadingStrategy(Class<T> type, MassLoadingStrategy<T, ?> loadingStrategy);
 
 	/**
 	 * Sets context for use by selection loading strategies.

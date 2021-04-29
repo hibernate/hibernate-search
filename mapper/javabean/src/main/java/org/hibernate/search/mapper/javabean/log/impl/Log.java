@@ -7,7 +7,9 @@
 package org.hibernate.search.mapper.javabean.log.impl;
 
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
+import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
@@ -28,8 +30,13 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 3, value = "Unable to retrieve type model for class '%1$s'.")
 	SearchException errorRetrievingTypeModel(@FormatWith(ClassFormatter.class) Class<?> clazz, @Cause Exception cause);
 
+	@Message(id = ID_OFFSET + 5, value = "Entity type '%1$s' has multiple, conflicting defintions in the mapping builder.")
+	SearchException multipleEntityTypeDefinitions(@FormatWith(MappableTypeModelFormatter.class) PojoRawTypeModel<?> type);
+
 	@Message(id = ID_OFFSET + 6, value = "Multiple entity types configured with the same name '%1$s': '%2$s', '%3$s'")
-	SearchException multipleEntityTypesWithSameName(String entityName, Class<?> previousType, Class<?> type);
+	SearchException multipleEntityTypesWithSameName(String entityName,
+			@FormatWith(MappableTypeModelFormatter.class) PojoRawTypeModel<?> previousType,
+			@FormatWith(MappableTypeModelFormatter.class) PojoRawTypeModel<?> type);
 
 	@Message(id = ID_OFFSET + 7,
 			value = "Type with name '%1$s' does not exist: the JavaBean mapper does not support named types."

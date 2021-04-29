@@ -58,6 +58,10 @@ public class MassIndexingMonitorIT {
 
 		SearchMapping mapping = setupHelper.start()
 				.withPropertyRadical( EngineSettings.BACKGROUND_FAILURE_HANDLER, failureHandler )
+				.withConfiguration( b -> {
+					b.addEntityType( Book.class, c -> c
+							.massLoadingStrategy( MassLoadingStrategies.from( booksmap ) ) );
+				} )
 				.setup( Book.class );
 
 		backendMock.verifyExpectationsMet();
@@ -71,7 +75,7 @@ public class MassIndexingMonitorIT {
 	public void simple() {
 		SearchMapping mapping = setup( null );
 
-		try ( SearchSession searchSession = createSessionFromMap( mapping ) ) {
+		try ( SearchSession searchSession = mapping.createSession() ) {
 			MassIndexer indexer = searchSession.massIndexer();
 
 			CompletableFuture<?> indexingFuture = new CompletableFuture<>();
@@ -127,12 +131,6 @@ public class MassIndexingMonitorIT {
 		assertThat( staticCounters.get( StaticCountersMonitor.ADDED ) ).isEqualTo( 2 );
 		assertThat( staticCounters.get( StaticCountersMonitor.TOTAL ) ).isEqualTo( 3 );
 		assertThat( staticCounters.get( StaticCountersMonitor.INDEXING_COMPLETED ) ).isEqualTo( 1 );
-	}
-
-	private SearchSession createSessionFromMap(SearchMapping mapping) {
-		return mapping.createSessionWithOptions().loading( (o) -> {
-			o.massLoadingStrategy( Book.class, MassLoadingStrategies.from( booksmap ) );
-		} ).build();
 	}
 
 	private void initData() {

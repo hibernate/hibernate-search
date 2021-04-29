@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.mapper.javabean.loading.impl.LoadingTypeContextProvider;
+import org.hibernate.search.mapper.javabean.mapping.metadata.impl.JavaBeanEntityTypeMetadata;
 import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -74,9 +75,10 @@ class JavaBeanTypeContextContainer implements JavaBeanSearchSessionTypeContextPr
 		Builder() {
 		}
 
-		<E> JavaBeanIndexedTypeContext.Builder<E> addIndexed(PojoRawTypeModel<E> typeModel, String entityName) {
+		<E> JavaBeanIndexedTypeContext.Builder<E> addIndexed(PojoRawTypeModel<E> typeModel, String entityName,
+				JavaBeanEntityTypeMetadata<E> metadata) {
 			JavaBeanIndexedTypeContext.Builder<E> builder =
-					new JavaBeanIndexedTypeContext.Builder<>( typeModel.typeIdentifier(), entityName );
+					new JavaBeanIndexedTypeContext.Builder<>( typeModel.typeIdentifier(), entityName, metadata );
 			indexedTypeContextBuilders.add( builder );
 			return builder;
 		}

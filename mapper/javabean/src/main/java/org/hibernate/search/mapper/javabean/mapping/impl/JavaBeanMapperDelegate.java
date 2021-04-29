@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.javabean.mapping.impl;
 
+import org.hibernate.search.mapper.javabean.mapping.metadata.impl.JavaBeanEntityTypeMetadataProvider;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
@@ -15,8 +16,13 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 public final class JavaBeanMapperDelegate
 		implements PojoMapperDelegate<JavaBeanMappingPartialBuildState> {
 
+	private final JavaBeanEntityTypeMetadataProvider metadataProvider;
 	private final JavaBeanTypeContextContainer.Builder typeContextContainerBuilder =
 			new JavaBeanTypeContextContainer.Builder();
+
+	public JavaBeanMapperDelegate(JavaBeanEntityTypeMetadataProvider metadataProvider) {
+		this.metadataProvider = metadataProvider;
+	}
 
 	@Override
 	public void closeOnFailure() {
@@ -26,7 +32,7 @@ public final class JavaBeanMapperDelegate
 	@Override
 	public <E> PojoIndexedTypeExtendedMappingCollector createIndexedTypeExtendedMappingCollector(
 			PojoRawTypeModel<E> rawTypeModel, String entityName) {
-		return typeContextContainerBuilder.addIndexed( rawTypeModel, entityName );
+		return typeContextContainerBuilder.addIndexed( rawTypeModel, entityName, metadataProvider.get( rawTypeModel ) );
 	}
 
 	@Override

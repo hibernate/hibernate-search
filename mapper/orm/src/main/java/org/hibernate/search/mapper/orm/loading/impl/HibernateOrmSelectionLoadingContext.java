@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.loading.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import javax.persistence.EntityGraph;
 
@@ -61,6 +62,12 @@ public final class HibernateOrmSelectionLoadingContext implements PojoSelectionL
 	public <T> PojoSelectionLoadingStrategy<? super T> loadingStrategy(PojoLoadingTypeContext<T> type) {
 		return new HibernateOrmSelectionLoadingStrategy<>(
 				typeContextProvider.indexedForExactType( type.typeIdentifier() ).loadingStrategy() );
+	}
+
+	@Override
+	public <T> Optional<PojoSelectionLoadingStrategy<? super T>> loadingStrategyOptional(PojoLoadingTypeContext<T> type) {
+		// With the ORM mapper, all (indexed) types can be loaded.
+		return Optional.of( loadingStrategy( type ) );
 	}
 
 	public SessionImplementor sessionImplementor() {
