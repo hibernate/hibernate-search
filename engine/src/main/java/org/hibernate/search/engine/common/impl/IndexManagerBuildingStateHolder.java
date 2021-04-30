@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
@@ -60,12 +59,14 @@ class IndexManagerBuildingStateHolder {
 		this.rootBuildContext = rootBuildContext;
 	}
 
-	void createBackends(Set<Optional<String>> backendNames) {
-		for ( Optional<String> backendNameOptional : backendNames ) {
+	void createBackends(Map<Optional<String>, Boolean> backendNames) {
+		for ( Map.Entry<Optional<String>, Boolean> entry : backendNames.entrySet() ) {
+			Optional<String> backendNameOptional = entry.getKey();
 			String backendName = backendNameOptional.orElse( null );
 			EventContext eventContext = EventContexts.fromBackendName( backendName );
 			BackendInitialBuildState backendBuildState;
 			try {
+				// TODO HSEARCH-4163 Use multiTenancyEnabled (the entry value!)
 				backendBuildState = createBackend( backendNameOptional, eventContext );
 			}
 			catch (RuntimeException e) {

@@ -224,7 +224,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			checkingRootFailures = false;
 
 			// Step #3: determine indexed types and the necessary backends
-			Set<Optional<String>> backendNames = new LinkedHashSet<>();
+			Map<Optional<String>, Boolean> backendNames = new LinkedHashMap<>();
 			for ( MappingBuildingState<?, ?> mappingBuildingState : mappingBuildingStates ) {
 				mappingBuildingState.determineIndexedTypes( backendNames );
 			}
@@ -342,8 +342,11 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			mapper = mappingInitiator.createMapper( buildContext, contributorProvider );
 		}
 
-		void determineIndexedTypes(Set<Optional<String>> backendNames) {
-			mapper.prepareIndexedTypes( backendNames::add );
+		void determineIndexedTypes(Map<Optional<String>, Boolean> backendNames) {
+			mapper.prepareIndexedTypes( (backendName, multiTenancyEnabled) ->
+					backendNames.merge( backendName, multiTenancyEnabled,
+							(enabled1, enabled2) -> enabled1 || enabled2
+					) );
 		}
 
 		void mapIndexedTypes(MappedIndexManagerFactory indexManagerFactory) {

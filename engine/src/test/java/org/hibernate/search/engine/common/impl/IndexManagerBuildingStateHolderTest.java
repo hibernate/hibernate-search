@@ -31,7 +31,6 @@ import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
 import org.junit.Before;
@@ -111,7 +110,7 @@ public class IndexManagerBuildingStateHolderTest {
 				backendPropertySourceCapture.capture()
 		) )
 				.thenReturn( backendMock );
-		holder.createBackends( CollectionHelper.asSet( Optional.empty() ) );
+		holder.createBackends( Collections.singletonMap( Optional.empty(), false ) );
 		verifyNoOtherBackendInteractionsAndReset();
 
 		when( backendMock.createIndexManagerBuilder(
@@ -177,7 +176,7 @@ public class IndexManagerBuildingStateHolderTest {
 				backendPropertySourceCapture.capture()
 		) )
 				.thenReturn( backendMock );
-		holder.createBackends( CollectionHelper.asSet( Optional.of( "myBackend" ) ) );
+		holder.createBackends( Collections.singletonMap( Optional.of( "myBackend" ), false ) );
 		verifyNoOtherBackendInteractionsAndReset();
 
 		when( backendMock.createIndexManagerBuilder(
@@ -249,7 +248,7 @@ public class IndexManagerBuildingStateHolderTest {
 				.thenReturn( rootFailureCollectorMock );
 		when( rootFailureCollectorMock.withContext( EventContexts.defaultBackend() ) )
 				.thenReturn( backendFailureCollectorMock );
-		holder.createBackends( CollectionHelper.asSet( Optional.empty() ) );
+		holder.createBackends( Collections.singletonMap( Optional.empty(), false ) );
 		verify( backendFailureCollectorMock ).add( throwableCaptor.capture() );
 		verifyNoOtherBackendInteractionsAndReset();
 
@@ -282,7 +281,7 @@ public class IndexManagerBuildingStateHolderTest {
 				.thenReturn( rootFailureCollectorMock );
 		when( rootFailureCollectorMock.withContext( EventContexts.defaultBackend() ) )
 				.thenReturn( backendFailureCollectorMock );
-		holder.createBackends( CollectionHelper.asSet( Optional.empty() ) );
+		holder.createBackends( Collections.singletonMap( Optional.empty(), false ) );
 		verify( backendFailureCollectorMock ).add( throwableCaptor.capture() );
 		verifyNoOtherBackendInteractionsAndReset();
 
