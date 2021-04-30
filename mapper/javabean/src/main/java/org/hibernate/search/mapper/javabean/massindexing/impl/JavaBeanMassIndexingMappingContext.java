@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.javabean.massindexing.impl;
 
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingMappingContext;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 
 public interface JavaBeanMassIndexingMappingContext extends PojoMassIndexingMappingContext {
 
@@ -16,6 +16,6 @@ public interface JavaBeanMassIndexingMappingContext extends PojoMassIndexingMapp
 	 */
 	JavaBeanMassIndexingSessionContext sessionContext();
 
-	DetachedBackendSessionContext detachedBackendSessionContext(String tenantId);
+	PojoRuntimeIntrospector runtimeIntrospector();
 
 }

@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.javabean.loading.MassLoadingOptions;
 import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategy;
 import org.hibernate.search.mapper.javabean.loading.SelectionLoadingOptions;
@@ -38,7 +39,7 @@ public final class JavaBeanLoadingContext
 
 	private final JavaBeanMassIndexingMappingContext mappingContext;
 	private final LoadingTypeContextProvider typeContextProvider;
-	private final JavaBeanLoadingSessionContext sessionContext;
+	private final DetachedBackendSessionContext sessionContext;
 
 	private int batchSize = 10;
 	private final Map<Class<?>, Object> contextData;
@@ -85,7 +86,7 @@ public final class JavaBeanLoadingContext
 
 	@Override
 	public PojoRuntimeIntrospector runtimeIntrospector() {
-		return sessionContext.runtimeIntrospector();
+		return mappingContext.runtimeIntrospector();
 	}
 
 	@Override
@@ -117,11 +118,11 @@ public final class JavaBeanLoadingContext
 	public static final class Builder implements JavaBeanSelectionLoadingContextBuilder, SelectionLoadingOptionsStep {
 		private final JavaBeanMassIndexingMappingContext mappingContext;
 		private final LoadingTypeContextProvider typeContextProvider;
-		private final JavaBeanLoadingSessionContext sessionContext;
+		private final DetachedBackendSessionContext sessionContext;
 		private final Map<Class<?>, Object> contextData = new HashMap<>();
 
 		public Builder(JavaBeanMassIndexingMappingContext mappingContext,
-				LoadingTypeContextProvider typeContextProvider, JavaBeanLoadingSessionContext sessionContext) {
+				LoadingTypeContextProvider typeContextProvider, DetachedBackendSessionContext sessionContext) {
 			this.mappingContext = mappingContext;
 			this.typeContextProvider = typeContextProvider;
 			this.sessionContext = sessionContext;

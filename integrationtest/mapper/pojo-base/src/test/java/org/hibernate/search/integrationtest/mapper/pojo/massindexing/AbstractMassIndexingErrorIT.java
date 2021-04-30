@@ -70,7 +70,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		expectNoFailureHandling();
 
 		doMassIndexingWithError(
-				mapping.createSession().massIndexer( Object.class ),
+				mapping.scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
 						.hasMessage( errorMessage ),
@@ -91,7 +91,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		expectNoFailureHandling();
 
 		doMassIndexingWithError(
-				mapping.createSession().massIndexer( Object.class ),
+				mapping.scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
 						.hasMessage( errorMessage ),
@@ -114,7 +114,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		expectNoFailureHandling();
 
 		doMassIndexingWithError(
-				mapping.createSession().massIndexer( Object.class ),
+				mapping.scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
 						.hasMessage( errorMessage ),
@@ -136,7 +136,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		expectNoFailureHandling();
 
 		doMassIndexingWithError(
-				mapping.createSession().massIndexer( Object.class ).dropAndCreateSchemaOnStart( true ),
+				mapping.scope( Object.class ).massIndexer().dropAndCreateSchemaOnStart( true ),
 				ThreadExpectation.NOT_CREATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
 						.hasMessage( errorMessage ),
@@ -155,7 +155,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		expectNoFailureHandling();
 
 		doMassIndexingWithError(
-				mapping.createSession().massIndexer( Object.class ),
+				mapping.scope( Object.class ).massIndexer(),
 				ThreadExpectation.NOT_CREATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
 						.hasMessage( errorMessage ),
@@ -174,7 +174,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		expectNoFailureHandling();
 
 		doMassIndexingWithError(
-				mapping.createSession().massIndexer( Object.class ),
+				mapping.scope( Object.class ).massIndexer(),
 				ThreadExpectation.NOT_CREATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
 						.hasMessage( errorMessage ),
@@ -194,7 +194,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		expectNoFailureHandling();
 
 		doMassIndexingWithError(
-				mapping.createSession().massIndexer( Object.class )
+				mapping.scope( Object.class ).massIndexer()
 						.mergeSegmentsOnFinish( true ),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
@@ -217,7 +217,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		expectNoFailureHandling();
 
 		doMassIndexingWithError(
-				mapping.createSession().massIndexer( Object.class ),
+				mapping.scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
 						.hasMessage( errorMessage ),
@@ -239,7 +239,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		expectNoFailureHandling();
 
 		doMassIndexingWithError(
-				mapping.createSession().massIndexer( Object.class ),
+				mapping.scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
 						.hasMessage( errorMessage ),

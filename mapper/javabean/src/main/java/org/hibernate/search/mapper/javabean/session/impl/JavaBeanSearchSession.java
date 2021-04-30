@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -93,7 +94,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 	@Override
 	public MassIndexer massIndexer(Collection<? extends Class<?>> types) {
 		chackActiveAndThrow();
-		return scope( types ).massIndexer( this );
+		return scope( types ).massIndexer( DetachedBackendSessionContext.of( this ) );
 	}
 
 	@Override
@@ -108,7 +109,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public PojoRuntimeIntrospector runtimeIntrospector() {
-		return PojoRuntimeIntrospector.simple();
+		return mappingContext.runtimeIntrospector();
 	}
 
 	@Override
@@ -178,9 +179,8 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 		return scope.search( this, this, loadingContextBuilder() );
 	}
 
-	public JavaBeanSelectionLoadingContextBuilder loadingContextBuilder() {
-		JavaBeanLoadingContext.Builder builder =
-				new JavaBeanLoadingContext.Builder( mappingContext, typeContextProvider, this );
+	private JavaBeanSelectionLoadingContextBuilder loadingContextBuilder() {
+		JavaBeanLoadingContext.Builder builder = mappingContext.loadingContextBuilder( DetachedBackendSessionContext.of( this ) );
 		if ( loadingOptionsContributor != null ) {
 			loadingOptionsContributor.accept( builder );
 		}
