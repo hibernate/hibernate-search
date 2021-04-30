@@ -130,7 +130,7 @@ public class MassIndexingInterruptionIT {
 	}
 
 	private MassIndexer prepareMassIndexingThatWillNotTerminate() {
-		MassIndexer indexer = mapping.createSession().massIndexer()
+		MassIndexer indexer = mapping.scope( Object.class ).massIndexer()
 				.typesToIndexInParallel( 1 )
 				.threadsToLoadObjects( 1 );
 

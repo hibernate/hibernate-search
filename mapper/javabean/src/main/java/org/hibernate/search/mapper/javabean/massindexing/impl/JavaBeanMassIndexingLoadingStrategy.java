@@ -59,9 +59,8 @@ public class JavaBeanMassIndexingLoadingStrategy<E, I>
 
 	@Override
 	public PojoMassIdentifierLoader createIdentifierLoader(PojoMassIndexingIdentifierLoadingContext<E, I> context) {
-		PojoMassIndexingSessionContext sessionContext = mappingContext.sessionContext();
 		JavaBeanLoadingTypeGroup<E> includedTypes = new JavaBeanLoadingTypeGroup<>(
-				typeContextProvider, context.includedTypes(), sessionContext.runtimeIntrospector() );
+				typeContextProvider, context.includedTypes(), mappingContext.runtimeIntrospector() );
 		MassIdentifierSink<I> sink = new JavaBeanMassIdentifierSink<>( context.createSink() );
 		return new JavaBeanMassIdentifierLoader( delegate.createIdentifierLoader( includedTypes, sink, options ) );
 	}
@@ -70,7 +69,7 @@ public class JavaBeanMassIndexingLoadingStrategy<E, I>
 	public PojoMassEntityLoader<I> createEntityLoader(PojoMassIndexingEntityLoadingContext<E> context) {
 		PojoMassIndexingSessionContext sessionContext = mappingContext.sessionContext();
 		JavaBeanLoadingTypeGroup<E> includedTypes = new JavaBeanLoadingTypeGroup<>(
-				typeContextProvider, context.includedTypes(), sessionContext.runtimeIntrospector() );
+				typeContextProvider, context.includedTypes(), mappingContext.runtimeIntrospector() );
 		MassEntitySink<E> sink = new JavaBeanMassEntitySink<>( context.createSink( sessionContext ) );
 		return new JavaBeanMassEntityLoader<>( delegate.createEntityLoader( includedTypes, sink, options ) );
 	}

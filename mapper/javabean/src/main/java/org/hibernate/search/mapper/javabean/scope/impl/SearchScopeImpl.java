@@ -21,7 +21,6 @@ import org.hibernate.search.mapper.javabean.loading.impl.JavaBeanLoadingContext;
 import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
 import org.hibernate.search.mapper.javabean.massindexing.impl.JavaBeanMassIndexer;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
-import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchSession;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionLoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexer;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
@@ -29,9 +28,12 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeSessionContext;
 
 public class SearchScopeImpl<E> implements SearchScope<E> {
 
+	private final JavaBeanScopeMappingContext mappingContext;
 	private final PojoScopeDelegate<EntityReference, E, JavaBeanScopeIndexedTypeContext<? extends E>> delegate;
 
-	public SearchScopeImpl(PojoScopeDelegate<EntityReference, E, JavaBeanScopeIndexedTypeContext<? extends E>> delegate) {
+	public SearchScopeImpl(JavaBeanScopeMappingContext mappingContext,
+			PojoScopeDelegate<EntityReference, E, JavaBeanScopeIndexedTypeContext<? extends E>> delegate) {
+		this.mappingContext = mappingContext;
 		this.delegate = delegate;
 	}
 
@@ -66,11 +68,19 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 		return delegate.search( sessionContext, documentReferenceConverter, loadingContextBuilder );
 	}
 
-	public MassIndexer massIndexer(JavaBeanSearchSession session) {
-		DetachedBackendSessionContext detachedSession = session.mappingContext()
-				.detachedBackendSessionContext( session.tenantIdentifier() );
-		JavaBeanLoadingContext context = session.loadingContextBuilder().build();
-		PojoMassIndexer massIndexerDelegate = delegate.massIndexer( context, detachedSession );
+	@Override
+	public MassIndexer massIndexer() {
+		return massIndexer( (String) null );
+	}
+
+	@Override
+	public MassIndexer massIndexer(String tenantId) {
+		return massIndexer( mappingContext.detachedBackendSessionContext( tenantId ) );
+	}
+
+	public MassIndexer massIndexer(DetachedBackendSessionContext sessionContext) {
+		JavaBeanLoadingContext context = mappingContext.loadingContextBuilder( sessionContext ).build();
+		PojoMassIndexer massIndexerDelegate = delegate.massIndexer( context, sessionContext );
 		return new JavaBeanMassIndexer( massIndexerDelegate, context );
 	}
 }

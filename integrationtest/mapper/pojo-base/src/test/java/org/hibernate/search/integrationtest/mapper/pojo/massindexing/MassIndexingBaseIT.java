@@ -208,6 +208,47 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
+	public void fromMappingWithoutSession() {
+		MassIndexer indexer = mapping.scope( Object.class ).massIndexer();
+
+		// add operations on indexes can follow any random order,
+		// since they are executed by different threads
+		backendMock.expectWorks(
+				Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+		)
+				.add( "1", b -> b
+						.field( "title", TITLE_1 )
+						.field( "author", AUTHOR_1 )
+				)
+				.add( "2", b -> b
+						.field( "title", TITLE_2 )
+						.field( "author", AUTHOR_2 )
+				)
+				.add( "3", b -> b
+						.field( "title", TITLE_3 )
+						.field( "author", AUTHOR_3 )
+				)
+				.createdThenExecuted();
+
+		// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
+		// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
+		backendMock.expectIndexScaleWorks( Book.INDEX )
+				.purge()
+				.mergeSegments()
+				.flush()
+				.refresh();
+
+		try {
+			indexer.startAndWait();
+		}
+		catch (InterruptedException e) {
+			fail( "Unexpected InterruptedException: " + e.getMessage() );
+		}
+
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
 	public void reuseSearchSessionAfterJavaBeanSessionIsClosed_createMassIndexer() {
 		SearchSession searchSession = mapping.createSession();
 		// a SearchSession instance is created lazily,

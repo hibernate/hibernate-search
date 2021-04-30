@@ -20,6 +20,7 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.javabean.entity.SearchIndexedEntity;
+import org.hibernate.search.mapper.javabean.loading.impl.JavaBeanLoadingContext;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
@@ -34,6 +35,7 @@ import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSessionIndexedT
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -61,6 +63,11 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 	@Override
 	public EntityReferenceFactory<EntityReference> entityReferenceFactory() {
 		return this;
+	}
+
+	@Override
+	public PojoRuntimeIntrospector runtimeIntrospector() {
+		return PojoRuntimeIntrospector.simple();
 	}
 
 	@Override
@@ -103,8 +110,9 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 		}
 
 		// Explicit type parameter is necessary here for ECJ (Eclipse compiler)
-		return new SearchScopeImpl<T>( delegate().createPojoScope( this, typeIdentifiers,
-				typeContextContainer::indexedForExactType ) );
+		return new SearchScopeImpl<T>( this,
+				delegate().createPojoScope( this, typeIdentifiers,
+						typeContextContainer::indexedForExactType ) );
 	}
 
 	@Override
@@ -128,6 +136,11 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 	@Override
 	public Collection<SearchIndexedEntity<?>> allIndexedEntities() {
 		return Collections.unmodifiableCollection( typeContextContainer.allIndexed() );
+	}
+
+	@Override
+	public JavaBeanLoadingContext.Builder loadingContextBuilder(DetachedBackendSessionContext sessionContext) {
+		return new JavaBeanLoadingContext.Builder( this, typeContextContainer, sessionContext );
 	}
 
 	public void setIntegration(SearchIntegration integration) {
