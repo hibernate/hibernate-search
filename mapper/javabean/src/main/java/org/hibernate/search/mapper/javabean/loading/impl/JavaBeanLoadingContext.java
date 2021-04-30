@@ -112,7 +112,7 @@ public final class JavaBeanLoadingContext
 			throw log.entityLoadingStrategyNotRegistered( typeContext.typeIdentifier() );
 		}
 		return new JavaBeanMassIndexingLoadingStrategy<>( mappingContext, typeContextProvider,
-				strategyOptional.get(), this );
+				strategyOptional.get(), sessionContext, this );
 	}
 
 	public static final class Builder implements JavaBeanSelectionLoadingContextBuilder, SelectionLoadingOptionsStep {

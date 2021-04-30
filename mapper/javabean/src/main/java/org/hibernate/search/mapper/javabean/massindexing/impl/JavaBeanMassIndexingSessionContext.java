@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.mapper.javabean.massindexing.impl;
 
+import org.hibernate.search.mapper.javabean.loading.impl.JavaBeanLoadingSessionContext;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSessionContext;
 
-public interface JavaBeanMassIndexingSessionContext extends PojoMassIndexingSessionContext {
+public interface JavaBeanMassIndexingSessionContext
+		extends PojoMassIndexingSessionContext, JavaBeanLoadingSessionContext {
 
 }

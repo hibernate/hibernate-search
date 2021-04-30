@@ -10,18 +10,24 @@ import java.util.List;
 
 import org.hibernate.search.mapper.javabean.loading.MassEntityLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntityLoader;
+import org.hibernate.search.util.common.impl.Closer;
 
 public class JavaBeanMassEntityLoader<I> implements PojoMassEntityLoader<I> {
 
+	private final JavaBeanLoadingSessionContext session;
 	private final MassEntityLoader<I> delegate;
 
-	public JavaBeanMassEntityLoader(MassEntityLoader<I> delegate) {
+	public JavaBeanMassEntityLoader(JavaBeanLoadingSessionContext session, MassEntityLoader<I> delegate) {
+		this.session = session;
 		this.delegate = delegate;
 	}
 
 	@Override
 	public void close() {
-		delegate.close();
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( MassEntityLoader::close, delegate );
+			closer.push( JavaBeanLoadingSessionContext::close, session );
+		}
 	}
 
 	@Override

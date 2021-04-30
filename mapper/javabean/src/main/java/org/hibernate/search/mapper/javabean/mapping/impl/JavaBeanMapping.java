@@ -143,16 +143,6 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 		return new JavaBeanLoadingContext.Builder( this, typeContextContainer, sessionContext );
 	}
 
-	public void setIntegration(SearchIntegration integration) {
-		this.integration = integration;
-	}
-
-	private SearchSessionBuilder createSearchManagerBuilder() {
-		return new JavaBeanSearchSession.Builder(
-				this, typeContextContainer
-		);
-	}
-
 	@Override
 	public ThreadPoolProvider threadPoolProvider() {
 		return delegate().threadPoolProvider();
@@ -164,12 +154,22 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 	}
 
 	@Override
-	public JavaBeanMassIndexingSessionContext sessionContext() {
-		return (JavaBeanMassIndexingSessionContext) createSession();
+	public JavaBeanMassIndexingSessionContext createSession(DetachedBackendSessionContext sessionContext) {
+		return createSearchManagerBuilder().tenantId( sessionContext.tenantIdentifier() ).build();
 	}
 
 	@Override
 	public DetachedBackendSessionContext detachedBackendSessionContext(String tenantId) {
 		return DetachedBackendSessionContext.of( this, tenantId );
+	}
+
+	public void setIntegration(SearchIntegration integration) {
+		this.integration = integration;
+	}
+
+	private JavaBeanSearchSession.Builder createSearchManagerBuilder() {
+		return new JavaBeanSearchSession.Builder(
+				this, typeContextContainer
+		);
 	}
 }
