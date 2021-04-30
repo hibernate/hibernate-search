@@ -8,7 +8,10 @@ package org.hibernate.search.mapper.javabean.loading.impl;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 
-public interface JavaBeanLoadingSessionContext {
+public interface JavaBeanLoadingSessionContext extends AutoCloseable {
+
+	@Override
+	void close();
 
 	String tenantIdentifier();
 
