@@ -10,13 +10,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
 
 import java.lang.invoke.MethodHandles;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubLoadingContext;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubMassLoadingStrategy;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategies;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
@@ -52,7 +52,7 @@ public class MassIndexingBaseIT {
 
 	private SearchMapping mapping;
 
-	private final Map<Integer, Book> booksmap = new LinkedHashMap<>();
+	private final StubLoadingContext loadingContext = new StubLoadingContext();
 
 	@Before
 	public void setup() {
@@ -61,7 +61,7 @@ public class MassIndexingBaseIT {
 		mapping = setupHelper.start()
 				.withConfiguration( b -> {
 					b.addEntityType( Book.class, c -> c
-							.massLoadingStrategy( MassLoadingStrategies.from( booksmap ) ) );
+							.massLoadingStrategy( new StubMassLoadingStrategy<>( Book.PERSISTENCE_KEY ) ) );
 				} )
 				.setup( Book.class );
 
@@ -73,7 +73,9 @@ public class MassIndexingBaseIT {
 	@Test
 	public void defaultMassIndexerStartAndWait() throws Exception {
 		try ( SearchSession searchSession = mapping.createSession() ) {
-			MassIndexer indexer = searchSession.massIndexer();
+			MassIndexer indexer = searchSession.massIndexer()
+					// Simulate passing information to connect to a DB, ...
+					.context( StubLoadingContext.class, loadingContext );
 
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
@@ -117,7 +119,10 @@ public class MassIndexingBaseIT {
 	@Test
 	public void dropAndCreateSchemaOnStart() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
-			MassIndexer indexer = searchSession.massIndexer().dropAndCreateSchemaOnStart( true );
+			MassIndexer indexer = searchSession.massIndexer()
+					// Simulate passing information to connect to a DB, ...
+					.context( StubLoadingContext.class, loadingContext )
+					.dropAndCreateSchemaOnStart( true );
 
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
@@ -164,7 +169,10 @@ public class MassIndexingBaseIT {
 	@Test
 	public void mergeSegmentsOnFinish() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
-			MassIndexer indexer = searchSession.massIndexer().mergeSegmentsOnFinish( true );
+			MassIndexer indexer = searchSession.massIndexer()
+					// Simulate passing information to connect to a DB, ...
+					.context( StubLoadingContext.class, loadingContext )
+					.mergeSegmentsOnFinish( true );
 
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
@@ -209,7 +217,9 @@ public class MassIndexingBaseIT {
 
 	@Test
 	public void fromMappingWithoutSession() {
-		MassIndexer indexer = mapping.scope( Object.class ).massIndexer();
+		MassIndexer indexer = mapping.scope( Object.class ).massIndexer()
+				// Simulate passing information to connect to a DB, ...
+				.context( StubLoadingContext.class, loadingContext );
 
 		// add operations on indexes can follow any random order,
 		// since they are executed by different threads
@@ -283,13 +293,15 @@ public class MassIndexingBaseIT {
 	}
 
 	private void persist(Book book) {
-		booksmap.put( book.id, book );
+		loadingContext.persistenceMap( Book.PERSISTENCE_KEY ).put( book.id, book );
 	}
 
 	@Indexed(index = Book.INDEX)
 	public static class Book {
 
 		public static final String INDEX = "Book";
+		public static final PersistenceTypeKey<Book, Integer> PERSISTENCE_KEY =
+				new PersistenceTypeKey<>( Book.class, Integer.class );
 
 		@DocumentId
 		private Integer id;

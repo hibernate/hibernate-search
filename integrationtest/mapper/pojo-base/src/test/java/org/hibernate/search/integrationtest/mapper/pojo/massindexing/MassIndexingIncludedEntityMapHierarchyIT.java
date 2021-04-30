@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.javabean.loading.LoadingTypeGroup;
+import org.hibernate.search.mapper.javabean.loading.MassEntityLoader;
+import org.hibernate.search.mapper.javabean.loading.MassEntitySink;
 import org.hibernate.search.mapper.javabean.loading.MassIdentifierLoader;
 import org.hibernate.search.mapper.javabean.loading.MassIdentifierSink;
-import org.hibernate.search.mapper.javabean.loading.MassEntityLoader;
 import org.hibernate.search.mapper.javabean.loading.MassLoadingOptions;
-import org.hibernate.search.mapper.javabean.loading.LoadingTypeGroup;
-import org.hibernate.search.mapper.javabean.loading.MassEntitySink;
 import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategy;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;

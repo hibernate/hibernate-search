@@ -6,26 +6,26 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.massindexing;
 
-import java.lang.invoke.MethodHandles;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 
+import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.cfg.EngineSettings;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubLoadingContext;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubMassLoadingStrategy;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
-import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategies;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
@@ -51,7 +51,7 @@ public class MassIndexingMonitorIT {
 	@Rule
 	public StaticCounters staticCounters = new StaticCounters();
 
-	private Map<Integer, Book> booksmap = new LinkedHashMap<>();
+	private final StubLoadingContext loadingContext = new StubLoadingContext();
 
 	private SearchMapping setup(String failureHandler) {
 		backendMock.expectAnySchema( Book.INDEX );
@@ -60,7 +60,7 @@ public class MassIndexingMonitorIT {
 				.withPropertyRadical( EngineSettings.BACKGROUND_FAILURE_HANDLER, failureHandler )
 				.withConfiguration( b -> {
 					b.addEntityType( Book.class, c -> c
-							.massLoadingStrategy( MassLoadingStrategies.from( booksmap ) ) );
+							.massLoadingStrategy( new StubMassLoadingStrategy<>( Book.PERSISTENCE_KEY ) ) );
 				} )
 				.setup( Book.class );
 
@@ -76,7 +76,9 @@ public class MassIndexingMonitorIT {
 		SearchMapping mapping = setup( null );
 
 		try ( SearchSession searchSession = mapping.createSession() ) {
-			MassIndexer indexer = searchSession.massIndexer();
+			MassIndexer indexer = searchSession.massIndexer()
+					// Simulate passing information to connect to a DB, ...
+					.context( StubLoadingContext.class, loadingContext );
 
 			CompletableFuture<?> indexingFuture = new CompletableFuture<>();
 			indexingFuture.completeExceptionally( new SimulatedFailure( "Indexing error" ) );
@@ -140,13 +142,15 @@ public class MassIndexingMonitorIT {
 	}
 
 	private void persist(Book book) {
-		booksmap.put( book.id, book );
+		loadingContext.persistenceMap( Book.PERSISTENCE_KEY ).put( book.id, book );
 	}
 
 	@Indexed(index = Book.INDEX)
 	public static class Book {
 
 		public static final String INDEX = "Book";
+		public static final PersistenceTypeKey<Book, Integer> PERSISTENCE_KEY =
+				new PersistenceTypeKey<>( Book.class, Integer.class );
 
 		@DocumentId
 		private Integer id;

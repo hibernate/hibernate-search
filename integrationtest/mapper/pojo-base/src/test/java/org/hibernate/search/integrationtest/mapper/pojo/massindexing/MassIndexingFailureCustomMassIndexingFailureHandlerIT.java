@@ -15,8 +15,9 @@ import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureContext;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.util.common.SearchException;
 
-import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.Rule;
+
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
