@@ -134,7 +134,7 @@ public interface SearchSession extends AutoCloseable {
 	SearchIndexer indexer();
 
 	/**
-	 * @return The tanand identifier for this session.
+	 * @return The tenant identifier for this session.
 	 */
 	String tenantIdentifier();
 
