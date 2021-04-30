@@ -157,7 +157,7 @@ public interface Log extends BasicLogger {
 	SearchException synchronizationAfterTransactionFailure(String causeMessage, @Cause Throwable cause);
 
 	@Message(id = ID_OFFSET + 25, value = "Unable to handle transaction: %1$s")
-	SearchException massIndexingTransactionHandlingException(String causeMessage, @Cause Throwable cause);
+	SearchException transactionHandlingException(String causeMessage, @Cause Throwable cause);
 
 	@Message(id = ID_OFFSET + 27,
 			value = "Unknown type: '%1$s'. Available named types: %2$s."

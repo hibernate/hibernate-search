@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.automaticindexing.spi;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.common.EntityReference;
@@ -17,7 +18,7 @@ public interface AutomaticIndexingMappingContext {
 	/**
 	 * @return The Hibernate ORM {@link SessionFactory}.
 	 */
-	SessionFactory sessionFactory();
+	SessionFactoryImplementor sessionFactory();
 
 	/**
 	 * @return A failure handler, to report indexing errors in background processes.

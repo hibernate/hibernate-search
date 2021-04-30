@@ -8,18 +8,11 @@ package org.hibernate.search.mapper.orm.loading.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.NotSupportedException;
-import javax.transaction.RollbackException;
-import javax.transaction.Status;
-import javax.transaction.SystemException;
-import javax.transaction.TransactionManager;
 
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.resource.transaction.spi.TransactionCoordinatorBuilder;
+import org.hibernate.search.mapper.orm.common.impl.TransactionHelper;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassIdentifierSink;
@@ -31,31 +24,24 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final TransactionManager transactionManager;
-	private final TransactionCoordinatorBuilder transactionCoordinatorBuilder;
 	private final HibernateOrmMassLoadingOptions options;
 	private final PojoMassIdentifierSink<I> sink;
 	private final SharedSessionContractImplementor session;
+	private final TransactionHelper transactionHelper;
 	private final long totalCount;
-	private final boolean wrapInJtaTransaction;
 	private long totalLoaded = 0;
 	private final ScrollableResults results;
 
-	public HibernateOrmMassIdentifierLoader(TransactionManager transactionManager,
-			TransactionCoordinatorBuilder transactionCoordinatorBuilder,
-			HibernateOrmQueryLoader<E, I> typeQueryLoader,
+	public HibernateOrmMassIdentifierLoader(HibernateOrmQueryLoader<E, I> typeQueryLoader,
 			HibernateOrmMassLoadingOptions options,
 			PojoMassIdentifierSink<I> sink,
 			SharedSessionContractImplementor session) {
-		this.transactionManager = transactionManager;
-		this.transactionCoordinatorBuilder = transactionCoordinatorBuilder;
 		this.options = options;
 		this.sink = sink;
 		this.session = session;
+		this.transactionHelper = new TransactionHelper( session.getFactory() );
 
-		this.wrapInJtaTransaction = wrapInJtaTransaction();
-
-		beginTransaction( options.idLoadingTransactionTimeout() );
+		transactionHelper.begin( session, options.idLoadingTransactionTimeout() );
 
 		try {
 			long objectsLimit = options.objectsLimit();
@@ -80,7 +66,7 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
-					.push( HibernateOrmMassIdentifierLoader::commitTransaction, this );
+					.push( h -> h.rollback( session ), transactionHelper );
 			throw e;
 		}
 	}
@@ -88,8 +74,8 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( HibernateOrmMassIdentifierLoader::commitTransaction, this );
 			closer.push( ScrollableResults::close, results );
+			closer.push( h -> h.commit( session ), transactionHelper );
 			closer.push( SharedSessionContractImplementor::close, session );
 		}
 	}
@@ -121,64 +107,6 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
 			}
 			sink.accept( destinationList );
 		}
-	}
-
-	private void beginTransaction(Integer transactionTimeout) {
-		try {
-			if ( wrapInJtaTransaction ) {
-				if ( transactionTimeout != null ) {
-					transactionManager.setTransactionTimeout( transactionTimeout );
-				}
-				transactionManager.begin();
-			}
-			else {
-				session.accessTransaction().begin();
-			}
-		}
-		// Just let runtime exceptions fall through
-		catch (NotSupportedException | SystemException e) {
-			throw log.massIndexingTransactionHandlingException( e.getMessage(), e );
-		}
-	}
-
-	private void commitTransaction() {
-		try {
-			if ( wrapInJtaTransaction ) {
-				transactionManager.commit();
-			}
-			else {
-				session.accessTransaction().commit();
-			}
-		}
-		// Just let runtime exceptions fall through
-		catch (SystemException | RollbackException | HeuristicMixedException | HeuristicRollbackException e) {
-			throw log.massIndexingTransactionHandlingException( e.getMessage(), e );
-		}
-	}
-
-	private boolean wrapInJtaTransaction() {
-		if ( !transactionCoordinatorBuilder.isJta() ) {
-			//Today we only require a TransactionManager on JTA based transaction factories
-			log.trace( "TransactionFactory does not require a TransactionManager: don't wrap in a JTA transaction" );
-			return false;
-		}
-		if ( transactionManager == null ) {
-			//no TM, nothing to do OR configuration mistake
-			log.trace( "No TransactionManager found, do not start a surrounding JTA transaction" );
-			return false;
-		}
-		try {
-			if ( transactionManager.getStatus() == Status.STATUS_NO_TRANSACTION ) {
-				log.trace( "No Transaction in progress, needs to start a JTA transaction" );
-				return true;
-			}
-		}
-		catch (SystemException e) {
-			log.cannotGuessTransactionStatus( e );
-			return false;
-		}
-		log.trace( "Transaction in progress, no need to start a JTA transaction" );
-		return false;
 	}
 
 }
