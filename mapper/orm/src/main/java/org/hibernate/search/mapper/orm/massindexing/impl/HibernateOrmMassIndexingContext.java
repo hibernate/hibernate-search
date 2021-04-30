@@ -6,15 +6,11 @@
  */
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
-import javax.transaction.TransactionManager;
-
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
-import org.hibernate.resource.transaction.spi.TransactionCoordinatorBuilder;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmEntityLoadingStrategy;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassEntityLoader;
@@ -110,17 +106,6 @@ public final class HibernateOrmMassIndexingContext
 		return idFetchSize;
 	}
 
-	private static TransactionManager lookupTransactionManager(SessionFactoryImplementor sessionFactory) {
-		return sessionFactory.getServiceRegistry()
-				.getService( JtaPlatform.class )
-				.retrieveTransactionManager();
-	}
-
-	private static TransactionCoordinatorBuilder lookupTransactionCoordinatorBuilder(
-			SessionFactoryImplementor sessionFactory) {
-		return sessionFactory.getServiceRegistry().getService( TransactionCoordinatorBuilder.class );
-	}
-
 	private final class HibernateOrmMassIndexingLoadingStrategy<E, I> implements PojoMassIndexingLoadingStrategy<E, I> {
 
 		private final HibernateOrmEntityLoadingStrategy<E, I> delegate;
@@ -149,9 +134,6 @@ public final class HibernateOrmMassIndexingContext
 		@Override
 		public PojoMassIdentifierLoader createIdentifierLoader(PojoMassIndexingIdentifierLoadingContext<E, I> context) {
 			SessionFactoryImplementor sessionFactory = mappingContext.sessionFactory();
-			TransactionManager transactionManager = lookupTransactionManager( sessionFactory );
-			TransactionCoordinatorBuilder transactionCoordinatorBuilder = lookupTransactionCoordinatorBuilder(
-					sessionFactory );
 			HibernateOrmQueryLoader<E, I> typeQueryLoader = delegate.createQueryLoader( context.includedTypes() );
 			SharedSessionContractImplementor session = (SharedSessionContractImplementor) sessionFactory
 					.withStatelessOptions()
@@ -159,9 +141,8 @@ public final class HibernateOrmMassIndexingContext
 					.openStatelessSession();
 			try {
 				PojoMassIdentifierSink<I> sink = context.createSink();
-				return new HibernateOrmMassIdentifierLoader<>( transactionManager, transactionCoordinatorBuilder,
-						typeQueryLoader, HibernateOrmMassIndexingContext.this, sink, session
-				);
+				return new HibernateOrmMassIdentifierLoader<>( typeQueryLoader,
+						HibernateOrmMassIndexingContext.this, sink, session );
 			}
 			catch (RuntimeException e) {
 				new SuppressingCloser( e ).push( SharedSessionContractImplementor::close, session );
@@ -172,7 +153,6 @@ public final class HibernateOrmMassIndexingContext
 		@Override
 		public PojoMassEntityLoader<I> createEntityLoader(PojoMassIndexingEntityLoadingContext<E> context) {
 			SessionFactoryImplementor sessionFactory = mappingContext.sessionFactory();
-			TransactionManager transactionManager = lookupTransactionManager( sessionFactory );
 			HibernateOrmQueryLoader<E, ?> typeQueryLoader = delegate.createQueryLoader( context.includedTypes() );
 			SessionImplementor session = (SessionImplementor) sessionFactory
 					.withOptions()
@@ -184,7 +164,7 @@ public final class HibernateOrmMassIndexingContext
 				session.setDefaultReadOnly( true );
 
 				PojoMassEntitySink<E> sink = context.createSink( mappingContext.sessionContext( session ) );
-				return new HibernateOrmMassEntityLoader<>( transactionManager, typeQueryLoader,
+				return new HibernateOrmMassEntityLoader<>( typeQueryLoader,
 						HibernateOrmMassIndexingContext.this, sink, session );
 			}
 			catch (RuntimeException e) {

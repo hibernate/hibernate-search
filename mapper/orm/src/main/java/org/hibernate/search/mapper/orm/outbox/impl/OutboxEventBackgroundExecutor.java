@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.outbox.impl;
 
-import static org.hibernate.search.mapper.orm.common.impl.TransactionUtils.withinTransaction;
-
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.HashSet;
@@ -20,11 +18,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.hibernate.Session;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.query.Query;
 import org.hibernate.search.engine.backend.orchestration.spi.SingletonTask;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
+import org.hibernate.search.mapper.orm.common.impl.TransactionHelper;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
@@ -61,7 +62,7 @@ public class OutboxEventBackgroundExecutor {
 		failureHandler = mapping.failureHandler();
 		processingTask = new SingletonTask(
 				"Delayed commit for " + OutboxPollingAutomaticIndexingStrategy.NAME,
-				new HibernateOrmOutboxWorker(),
+				new HibernateOrmOutboxWorker( mapping.sessionFactory() ),
 				new HibernateOrmOutboxScheduler( executor ),
 				failureHandler
 		);
@@ -83,6 +84,12 @@ public class OutboxEventBackgroundExecutor {
 
 	private class HibernateOrmOutboxWorker implements SingletonTask.Worker {
 
+		private final TransactionHelper transactionHelper;
+
+		public HibernateOrmOutboxWorker(SessionFactoryImplementor sessionFactory) {
+			transactionHelper = new TransactionHelper( sessionFactory );
+		}
+
 		@Override
 		public CompletableFuture<?> work() {
 			if ( mapping.sessionFactory().isClosed() ) {
@@ -91,8 +98,9 @@ public class OutboxEventBackgroundExecutor {
 				return CompletableFuture.completedFuture( null );
 			}
 
-			try ( Session session = mapping.sessionFactory().openSession() ) {
-				return withinTransaction( session, () -> {
+			try ( SessionImplementor session = (SessionImplementor) mapping.sessionFactory().openSession() ) {
+				transactionHelper.begin( session, null );
+				try {
 					List<OutboxEvent> outboxes = finder.findOutboxEvents( session, batchSize );
 					if ( outboxes.isEmpty() ) {
 						// Nothing to do, try again later (complete() will be called, re-scheduling the polling for later)
@@ -111,9 +119,20 @@ public class OutboxEventBackgroundExecutor {
 					List<Integer> ids = eventProcessing.processEvents();
 					createOutboxRetries( failureHandler, session, eventProcessing );
 					deleteOutboxes( session, ids );
+				}
+				catch (Exception e) {
+					try {
+						transactionHelper.rollback( session );
+					}
+					catch (RuntimeException e2) {
+						e.addSuppressed( e2 );
+					}
+					throw e;
+				}
 
-					return CompletableFuture.completedFuture( null );
-				} );
+				transactionHelper.commit( session );
+
+				return CompletableFuture.completedFuture( null );
 			}
 		}
 
