@@ -21,7 +21,7 @@ public class JavaBeanSelectionEntityLoader<E> implements PojoSelectionEntityLoad
 	}
 
 	@Override
-	public List<?> loadBlocking(List<?> identifiers, Deadline deadline) {
+	public List<E> loadBlocking(List<?> identifiers, Deadline deadline) {
 		return delegate.load( identifiers, deadline );
 	}
 

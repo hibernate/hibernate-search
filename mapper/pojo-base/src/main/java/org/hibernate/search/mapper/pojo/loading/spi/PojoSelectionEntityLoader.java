@@ -38,6 +38,6 @@ public interface PojoSelectionEntityLoader<E> {
 	 * {@code null} is inserted when an object is not found or has an excluded types
 	 * (see {@link PojoSelectionLoadingStrategy#createLoader(Set)}).
 	 */
-	List<?> loadBlocking(List<?> identifiers, Deadline deadline);
+	List<E> loadBlocking(List<?> identifiers, Deadline deadline);
 
 }

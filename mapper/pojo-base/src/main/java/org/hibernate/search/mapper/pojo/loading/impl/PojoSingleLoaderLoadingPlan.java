@@ -26,7 +26,7 @@ final class PojoSingleLoaderLoadingPlan<T> implements PojoLoadingPlan<T> {
 	private final List<Object> identifiers = new ArrayList<>();
 
 	private boolean singleConcreteTypeInEntityHierarchy;
-	private List<?> loaded;
+	private List<T> loaded;
 
 	PojoSingleLoaderLoadingPlan(PojoSelectionLoadingContext context,
 			PojoSelectionLoadingStrategy<T> loadingStrategy) {
@@ -64,7 +64,7 @@ final class PojoSingleLoaderLoadingPlan<T> implements PojoLoadingPlan<T> {
 
 	@Override
 	public <T2 extends T> T2 retrieve(PojoLoadingTypeContext<T2> expectedType, int ordinal) {
-		Object retrieved = loaded.get( ordinal );
+		T retrieved = loaded.get( ordinal );
 		if ( retrieved == null ) {
 			return null; // Couldn't be loaded.
 		}
@@ -114,7 +114,7 @@ final class PojoSingleLoaderLoadingPlan<T> implements PojoLoadingPlan<T> {
 	 */
 	// The cast is safe because we use reflection to check it.
 	@SuppressWarnings("unchecked")
-	private <T2 extends T> T2 castToExactTypeOrNull(PojoLoadingTypeContext<T2> expectedType, Object loadedObject) {
+	private <T2 extends T> T2 castToExactTypeOrNull(PojoLoadingTypeContext<T2> expectedType, T loadedObject) {
 		if ( singleConcreteTypeInEntityHierarchy ) {
 			// The loaded object will always be an instance of the exact same type,
 			// and we can only get passed that exact type.

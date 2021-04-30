@@ -35,9 +35,10 @@ class HibernateOrmSelectionEntityByIdLoader<E> extends AbstractHibernateOrmSelec
 	}
 
 	@Override
-	protected List<Object> doLoadEntities(List<?> allIds, Long timeout) {
+	@SuppressWarnings("unchecked")
+	protected List<E> doLoadEntities(List<?> allIds, Long timeout) {
 		EntityKey[] keys = toEntityKeys( allIds );
-		List<Object> loadedEntities = createListContainingNulls( allIds.size() );
+		List<E> loadedEntities = createListContainingNulls( allIds.size() );
 
 		int fetchSize = loadingOptions.fetchSize();
 
@@ -45,7 +46,7 @@ class HibernateOrmSelectionEntityByIdLoader<E> extends AbstractHibernateOrmSelec
 		for ( int i = 0; i < keys.length; i++ ) {
 			EntityKey key = keys[i];
 			if ( cacheLookupStrategyImplementor != null ) {
-				Object cacheHit = cacheLookupStrategyImplementor.lookup( key );
+				E cacheHit = (E) cacheLookupStrategyImplementor.lookup( key );
 				if ( cacheHit != null ) {
 					loadedEntities.set( i, cacheHit );
 					keys[i] = null; // Make sure we won't include this key in the query.
@@ -78,7 +79,7 @@ class HibernateOrmSelectionEntityByIdLoader<E> extends AbstractHibernateOrmSelec
 				// Already loaded through a cache; skip.
 				continue;
 			}
-			Object loaded = persistenceContextLookup.lookup( key );
+			E loaded = (E) persistenceContextLookup.lookup( key );
 			loadedEntities.set( i, loaded );
 		}
 
