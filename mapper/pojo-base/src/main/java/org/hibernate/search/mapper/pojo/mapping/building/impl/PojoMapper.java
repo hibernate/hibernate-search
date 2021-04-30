@@ -13,7 +13,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
@@ -142,7 +142,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	}
 
 	@Override
-	public void prepareIndexedTypes(Consumer<Optional<String>> backendNameCollector) {
+	public void prepareIndexedTypes(BiConsumer<Optional<String>, Boolean> backendNameCollector) {
 		Collection<? extends MappableTypeModel> encounteredTypes = contributorProvider.typesContributedTo();
 		for ( MappableTypeModel mappableTypeModel : encounteredTypes ) {
 			try {
@@ -166,7 +166,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	}
 
 	private void prepareEntityOrIndexedType(PojoRawTypeModel<?> rawTypeModel,
-			Consumer<Optional<String>> backendNameCollector) {
+			BiConsumer<Optional<String>, Boolean> backendNameCollector) {
 		PojoTypeAdditionalMetadata metadata = typeAdditionalMetadataProvider.get( rawTypeModel );
 
 		if ( metadata.isEntity() ) {
@@ -180,7 +180,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				throw log.missingEntityTypeMetadata( rawTypeModel );
 			}
 			PojoIndexedTypeAdditionalMetadata indexedTypeMetadata = indexedTypeMetadataOptional.get();
-			backendNameCollector.accept( indexedTypeMetadata.backendName() );
+			backendNameCollector.accept( indexedTypeMetadata.backendName(), multiTenancyEnabled );
 			indexedEntityTypes.add( rawTypeModel );
 		}
 	}

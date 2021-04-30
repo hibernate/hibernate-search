@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
@@ -50,7 +50,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 	}
 
 	@Override
-	public void prepareIndexedTypes(Consumer<Optional<String>> backendNameCollector) {
+	public void prepareIndexedTypes(BiConsumer<Optional<String>, Boolean> backendNameCollector) {
 		contributorProvider.typesContributedTo()
 				.forEach( type -> {
 					try {
@@ -63,9 +63,9 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 				} );
 	}
 
-	private void prepareType(MappableTypeModel type, Consumer<Optional<String>> backendNameCollector) {
+	private void prepareType(MappableTypeModel type, BiConsumer<Optional<String>, Boolean> backendNameCollector) {
 		getMappedIndex( type )
-				.ifPresent( mappedIndex -> backendNameCollector.accept( mappedIndex.backendName() ) );
+				.ifPresent( mappedIndex -> backendNameCollector.accept( mappedIndex.backendName(), false ) );
 	}
 
 	@Override
