@@ -6,19 +6,23 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.massindexing;
 
-import java.lang.invoke.MethodHandles;
-import java.util.LinkedHashMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
-import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategies;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubLoadingContext;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubMassLoadingStrategy;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -29,10 +33,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import org.awaitility.Awaitility;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
-import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 
 /**
  * Test interruption of a currently executing {@link MassIndexer}.
@@ -54,7 +54,7 @@ public class MassIndexingInterruptionIT {
 
 	private SearchMapping mapping;
 
-	private final Map<Integer, Book> booksmap = new LinkedHashMap<>();
+	private final StubLoadingContext loadingContext = new StubLoadingContext();
 
 	@Before
 	public void setup() {
@@ -64,7 +64,7 @@ public class MassIndexingInterruptionIT {
 				.withPropertyRadical( EngineSpiSettings.Radicals.THREAD_PROVIDER, threadSpy.getThreadProvider() )
 				.withConfiguration( b -> {
 					b.addEntityType( Book.class, c -> c
-							.massLoadingStrategy( MassLoadingStrategies.from( booksmap ) ) );
+							.massLoadingStrategy( new StubMassLoadingStrategy<>( Book.PERSISTENCE_KEY ) ) );
 				} )
 				.setup( Book.class );
 
@@ -131,6 +131,8 @@ public class MassIndexingInterruptionIT {
 
 	private MassIndexer prepareMassIndexingThatWillNotTerminate() {
 		MassIndexer indexer = mapping.scope( Object.class ).massIndexer()
+				// Simulate passing information to connect to a DB, ...
+				.context( StubLoadingContext.class, loadingContext )
 				.typesToIndexInParallel( 1 )
 				.threadsToLoadObjects( 1 );
 
@@ -194,13 +196,15 @@ public class MassIndexingInterruptionIT {
 	}
 
 	private void persist(Book book) {
-		booksmap.put( book.id, book );
+		loadingContext.persistenceMap( Book.PERSISTENCE_KEY ).put( book.id, book );
 	}
 
 	@Indexed(index = Book.INDEX)
 	public static class Book {
 
 		public static final String INDEX = "Book";
+		public static final PersistenceTypeKey<Book, Integer> PERSISTENCE_KEY =
+				new PersistenceTypeKey<>( Book.class, Integer.class );
 
 		@DocumentId
 		private Integer id;

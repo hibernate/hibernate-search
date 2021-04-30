@@ -6,13 +6,11 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.massindexing;
 
-import java.lang.invoke.MethodHandles;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
 
+import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -21,10 +19,16 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
-import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategies;
-import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubLoadingContext;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubMassLoadingStrategy;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -37,10 +41,6 @@ import org.junit.Test;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.awaitility.Awaitility;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
-import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 
 public abstract class AbstractMassIndexingFailureIT {
 
@@ -61,7 +61,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	@Rule
 	public ThreadSpy threadSpy = new ThreadSpy();
 
-	private Map<Integer, Book> booksmap = new LinkedHashMap<>();
+	private final StubLoadingContext loadingContext = new StubLoadingContext();
 
 	@Test
 	public void indexing() {
@@ -482,6 +482,9 @@ public abstract class AbstractMassIndexingFailureIT {
 		Book.failOnBook2GetTitle.set( ExecutionExpectation.FAIL.equals( book2GetTitleExpectation ) );
 		AssertionError assertionError = null;
 		try {
+			// Simulate passing information to connect to a DB, ...
+			massIndexer.context( StubLoadingContext.class, loadingContext );
+
 			MassIndexingFailureHandler massIndexingFailureHandler = getMassIndexingFailureHandler();
 			if ( massIndexingFailureHandler != null ) {
 				massIndexer.failureHandler( massIndexingFailureHandler );
@@ -643,7 +646,7 @@ public abstract class AbstractMassIndexingFailureIT {
 				.withPropertyRadical( EngineSpiSettings.Radicals.THREAD_PROVIDER, threadSpy.getThreadProvider() )
 				.withConfiguration( b -> {
 					b.addEntityType( Book.class, c -> c
-							.massLoadingStrategy( MassLoadingStrategies.from( booksmap ) ) );
+							.massLoadingStrategy( new StubMassLoadingStrategy<>( Book.PERSISTENCE_KEY ) ) );
 				} )
 				.setup( Book.class );
 
@@ -659,7 +662,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	private void persist(Book book) {
-		booksmap.put( book.id, book );
+		loadingContext.persistenceMap( Book.PERSISTENCE_KEY ).put( book.id, book );
 	}
 
 	private enum ExecutionExpectation {
@@ -677,6 +680,8 @@ public abstract class AbstractMassIndexingFailureIT {
 	public static class Book {
 
 		public static final String NAME = "Book";
+		public static final PersistenceTypeKey<Book, Integer> PERSISTENCE_KEY =
+				new PersistenceTypeKey<>( Book.class, Integer.class );
 
 		private static final AtomicBoolean failOnBook2GetId = new AtomicBoolean( false );
 		private static final AtomicBoolean failOnBook2GetTitle = new AtomicBoolean( false );

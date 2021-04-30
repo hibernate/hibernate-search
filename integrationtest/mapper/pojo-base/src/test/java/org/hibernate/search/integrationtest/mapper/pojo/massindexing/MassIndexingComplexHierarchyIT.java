@@ -6,15 +6,17 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.massindexing;
 
-import java.lang.invoke.MethodHandles;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import static org.assertj.core.api.Fail.fail;
+
+import java.lang.invoke.MethodHandles;
+import java.util.Map;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubLoadingContext;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubMassLoadingStrategy;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategies;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
@@ -42,11 +44,10 @@ public class MassIndexingComplexHierarchyIT {
 
 	private SearchMapping mapping;
 
+	private final StubLoadingContext loadingContext = new StubLoadingContext();
+
 	@Before
 	public void setup() {
-		Map<Integer, H1_Root_NotIndexed> h1map = new LinkedHashMap<>();
-		Map<Integer, H2_Root_Indexed> h2map = new LinkedHashMap<>();
-
 		backendMock.expectAnySchema( H1_B_Indexed.NAME );
 		backendMock.expectAnySchema( H2_Root_Indexed.NAME );
 		backendMock.expectAnySchema( H2_A_C_Indexed.NAME );
@@ -54,9 +55,9 @@ public class MassIndexingComplexHierarchyIT {
 		mapping = setupHelper.start()
 				.withConfiguration( b -> {
 					b.addEntityType( H1_Root_NotIndexed.class, c -> c
-							.massLoadingStrategy( MassLoadingStrategies.from( h1map ) ) );
+							.massLoadingStrategy( new StubMassLoadingStrategy<>( H1_Root_NotIndexed.PERSISTENCE_KEY ) ) );
 					b.addEntityType( H2_Root_Indexed.class, c -> c
-							.massLoadingStrategy( MassLoadingStrategies.from( h2map ) ) );
+							.massLoadingStrategy( new StubMassLoadingStrategy<>( H2_Root_Indexed.PERSISTENCE_KEY ) ) );
 				} )
 				.setup(
 						H1_Root_NotIndexed.class, H1_A_NotIndexed.class, H1_B_Indexed.class,
@@ -67,10 +68,12 @@ public class MassIndexingComplexHierarchyIT {
 
 		backendMock.verifyExpectationsMet();
 
+		Map<Integer, H1_Root_NotIndexed> h1map = loadingContext.persistenceMap( H1_Root_NotIndexed.PERSISTENCE_KEY );
 		h1map.put( 1, new H1_Root_NotIndexed( 1 ) );
 		h1map.put( 2, new H1_A_NotIndexed( 2 ) );
 		h1map.put( 3, new H1_B_Indexed( 3 ) );
 
+		Map<Integer, H2_Root_Indexed> h2map = loadingContext.persistenceMap( H2_Root_Indexed.PERSISTENCE_KEY );
 		h2map.put( 1, new H2_Root_Indexed( 1 ) );
 		h2map.put( 2, new H2_A_NotIndexed( 2 ) );
 		h2map.put( 3, new H2_A_C_Indexed( 3 ) );
@@ -81,7 +84,9 @@ public class MassIndexingComplexHierarchyIT {
 	@Test
 	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
-			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
+			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class )
+					// Simulate passing information to connect to a DB, ...
+					.context( StubLoadingContext.class, loadingContext );
 
 			backendMock.expectWorks( H1_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "3", b -> b.field( "rootText", "text3" )
@@ -108,7 +113,9 @@ public class MassIndexingComplexHierarchyIT {
 	@Test
 	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
-			MassIndexer indexer = searchSession.massIndexer( H1_B_Indexed.class );
+			MassIndexer indexer = searchSession.massIndexer( H1_B_Indexed.class )
+					// Simulate passing information to connect to a DB, ...
+					.context( StubLoadingContext.class, loadingContext );
 
 			backendMock.expectWorks( H1_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "3", b -> b.field( "rootText", "text3" )
@@ -135,7 +142,9 @@ public class MassIndexingComplexHierarchyIT {
 	@Test
 	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
-			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );
+			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class )
+					// Simulate passing information to connect to a DB, ...
+					.context( StubLoadingContext.class, loadingContext );
 
 			backendMock.expectWorks( H2_Root_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "1", b -> b.field( "rootText", "text1" ) )
@@ -180,7 +189,9 @@ public class MassIndexingComplexHierarchyIT {
 	@Test
 	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnIndexedSubclass() {
 		try ( SearchSession searchSession = mapping.createSession() ) {
-			MassIndexer indexer = searchSession.massIndexer( H2_B_Indexed.class );
+			MassIndexer indexer = searchSession.massIndexer( H2_B_Indexed.class )
+					// Simulate passing information to connect to a DB, ...
+					.context( StubLoadingContext.class, loadingContext );
 
 			backendMock.expectWorks( H2_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "4", b -> b.field( "rootText", "text4" )
@@ -207,6 +218,8 @@ public class MassIndexingComplexHierarchyIT {
 	public static class H1_Root_NotIndexed {
 
 		public static final String NAME = "H1_Root_NotIndexed";
+		public static final PersistenceTypeKey<H1_Root_NotIndexed, Integer> PERSISTENCE_KEY =
+				new PersistenceTypeKey<>( H1_Root_NotIndexed.class, Integer.class );
 
 		@DocumentId
 		private Integer id;
@@ -260,6 +273,8 @@ public class MassIndexingComplexHierarchyIT {
 	public static class H2_Root_Indexed {
 
 		public static final String NAME = "H2_Root_Indexed";
+		public static final PersistenceTypeKey<H2_Root_Indexed, Integer> PERSISTENCE_KEY =
+				new PersistenceTypeKey<>( H2_Root_Indexed.class, Integer.class );
 
 		@DocumentId
 		private Integer id;

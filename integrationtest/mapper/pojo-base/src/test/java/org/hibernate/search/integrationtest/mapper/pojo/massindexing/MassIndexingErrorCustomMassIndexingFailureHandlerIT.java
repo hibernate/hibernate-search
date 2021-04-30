@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.massindexing;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
+
 import org.junit.Rule;
 
 import org.mockito.Mock;
