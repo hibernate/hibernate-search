@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading;
 
+import java.util.List;
+
 import org.hibernate.search.mapper.javabean.loading.LoadingTypeGroup;
 import org.hibernate.search.mapper.javabean.loading.MassEntityLoader;
 import org.hibernate.search.mapper.javabean.loading.MassEntitySink;
@@ -55,7 +57,20 @@ public class StubMassLoadingStrategy<E, I> implements MassLoadingStrategy<E, I> 
 		StubLoadingContext context = options.context( StubLoadingContext.class );
 		// Important: get the map from the context, not from this strategy's constructor,
 		// because in real-world scenarios that's where the information (connection, ...) will come from.
-		MassLoadingStrategy<E, I> delegate = MassLoadingStrategies.from( context.persistenceMap( key ) );
-		return delegate.createEntityLoader( includedTypes, sink, options );
+		MassLoadingStrategy<E, I> delegateStrategy = MassLoadingStrategies.from( context.persistenceMap( key ) );
+		MassEntityLoader<I> delegateLoader = delegateStrategy.createEntityLoader( includedTypes, sink, options );
+		return new MassEntityLoader<I>() {
+			@Override
+			public void close() {
+				delegateLoader.close();
+			}
+
+			@Override
+			public void load(List<I> identifiers) {
+				context.loaderCalls()
+						.add( new StubLoadingContext.LoaderCall( StubMassLoadingStrategy.this, identifiers ) );
+				delegateLoader.load( identifiers );
+			}
+		};
 	}
 }
