@@ -37,7 +37,7 @@ abstract class AbstractHibernateOrmSelectionEntityLoader<E> implements PojoSelec
 	}
 
 	@Override
-	public final List<?> loadBlocking(List<?> identifiers, Deadline deadline) {
+	public final List<E> loadBlocking(List<?> identifiers, Deadline deadline) {
 		Long timeout = deadline == null ? null : deadline.checkRemainingTimeMillis();
 		try {
 			return doLoadEntities( identifiers, timeout );
@@ -52,7 +52,7 @@ abstract class AbstractHibernateOrmSelectionEntityLoader<E> implements PojoSelec
 		}
 	}
 
-	abstract List<?> doLoadEntities(List<?> allIds, Long timeout);
+	abstract List<E> doLoadEntities(List<?> allIds, Long timeout);
 
 	final Query<E> createQuery(int fetchSize, Long timeout) {
 		Query<E> query = queryFactory.createQueryForLoadByUniqueProperty( sessionContext.session(), IDS_PARAMETER_NAME );
