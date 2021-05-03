@@ -52,6 +52,16 @@ public class RealBackendDatabaseMultitenancyIT {
 	}
 
 	@Test
+	public void multiTenancyStrategy_enabledByMapping() {
+		sessionFactory = setupHelper.start()
+				.withProperty( "hibernate.search.automatic_indexing.synchronization.strategy", "sync" )
+				.tenants( TENANT_ID_1, TENANT_ID_2 )
+				.setup( IndexedEntity.class );
+
+		checkMultitenancy();
+	}
+
+	@Test
 	public void multiTenancyStrategy_none() {
 		try {
 			setupHelper.start()
