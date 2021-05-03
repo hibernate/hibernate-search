@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiConsumer;
 
+import org.hibernate.search.engine.mapper.mapping.building.spi.BackendsInfo;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingMapperContext;
@@ -19,9 +19,9 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManage
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingAbortedException;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -50,11 +50,11 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 	}
 
 	@Override
-	public void prepareIndexedTypes(BiConsumer<Optional<String>, Boolean> backendNameCollector) {
+	public void prepareIndexedTypes(BackendsInfo backendsInfo) {
 		contributorProvider.typesContributedTo()
 				.forEach( type -> {
 					try {
-						prepareType( type, backendNameCollector );
+						prepareType( type, backendsInfo );
 					}
 					catch (RuntimeException e) {
 						failureCollector.withContext( EventContexts.fromType( type ) )
@@ -63,9 +63,9 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 				} );
 	}
 
-	private void prepareType(MappableTypeModel type, BiConsumer<Optional<String>, Boolean> backendNameCollector) {
+	private void prepareType(MappableTypeModel type, BackendsInfo backendsInfo) {
 		getMappedIndex( type )
-				.ifPresent( mappedIndex -> backendNameCollector.accept( mappedIndex.backendName(), false ) );
+				.ifPresent( mappedIndex -> backendsInfo.collect( mappedIndex.backendName(), multiTenancyEnabled ) );
 	}
 
 	@Override

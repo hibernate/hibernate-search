@@ -13,8 +13,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiConsumer;
 
+import org.hibernate.search.engine.mapper.mapping.building.spi.BackendsInfo;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -142,7 +142,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	}
 
 	@Override
-	public void prepareIndexedTypes(BiConsumer<Optional<String>, Boolean> backendNameCollector) {
+	public void prepareIndexedTypes(BackendsInfo backendsInfo) {
 		Collection<? extends MappableTypeModel> encounteredTypes = contributorProvider.typesContributedTo();
 		for ( MappableTypeModel mappableTypeModel : encounteredTypes ) {
 			try {
@@ -154,7 +154,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				}
 
 				PojoRawTypeModel<?> rawTypeModel = (PojoRawTypeModel<?>) mappableTypeModel;
-				prepareEntityOrIndexedType( rawTypeModel, backendNameCollector );
+				prepareEntityOrIndexedType( rawTypeModel, backendsInfo );
 			}
 			catch (RuntimeException e) {
 				failureCollector.withContext( EventContexts.fromType( mappableTypeModel ) )
@@ -165,8 +165,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		log.detectedEntityTypes( entityTypes, indexedEntityTypes );
 	}
 
-	private void prepareEntityOrIndexedType(PojoRawTypeModel<?> rawTypeModel,
-			BiConsumer<Optional<String>, Boolean> backendNameCollector) {
+	private void prepareEntityOrIndexedType(PojoRawTypeModel<?> rawTypeModel, BackendsInfo backendsInfo) {
 		PojoTypeAdditionalMetadata metadata = typeAdditionalMetadataProvider.get( rawTypeModel );
 
 		if ( metadata.isEntity() ) {
@@ -180,7 +179,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				throw log.missingEntityTypeMetadata( rawTypeModel );
 			}
 			PojoIndexedTypeAdditionalMetadata indexedTypeMetadata = indexedTypeMetadataOptional.get();
-			backendNameCollector.accept( indexedTypeMetadata.backendName(), multiTenancyEnabled );
+			backendsInfo.collect( indexedTypeMetadata.backendName(), multiTenancyEnabled );
 			indexedEntityTypes.add( rawTypeModel );
 		}
 	}

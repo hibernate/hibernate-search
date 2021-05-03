@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
-import java.util.Optional;
-import java.util.function.BiConsumer;
-
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 
 /**
@@ -30,17 +27,17 @@ public interface Mapper<MPBS extends MappingPartialBuildState> {
 	 * <p>
 	 * Called exactly once just before {@link #mapIndexedTypes(MappedIndexManagerFactory)}.
 	 *
-	 * @param backendNameCollector A collector of backend names, {@code Optional.empty()} means "the default backend".
+	 * @param backendsInfo A collector of backend names and other info.
 	 */
-	void prepareIndexedTypes(BiConsumer<Optional<String>, Boolean> backendNameCollector);
+	void prepareIndexedTypes(BackendsInfo backendsInfo);
 
 	/**
 	 * Begin the creation of a mapping for all indexed types.
 	 * <p>
-	 * Called exactly once just after {@link #prepareIndexedTypes(BiConsumer)} and before {@link #prepareBuild()}.
+	 * Called exactly once just after {@link #prepareIndexedTypes(BackendsInfo)} and before {@link #prepareBuild()}.
 	 *
 	 * @param indexManagerFactory A factory for index managers,
-	 * supporting all the backends declared in {@link #prepareIndexedTypes(BiConsumer)}.
+	 * supporting all the backends declared in {@link #prepareIndexedTypes(BackendsInfo)}.
 	 */
 	void mapIndexedTypes(MappedIndexManagerFactory indexManagerFactory);
 

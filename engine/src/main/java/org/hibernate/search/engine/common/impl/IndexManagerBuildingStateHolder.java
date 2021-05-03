@@ -23,6 +23,7 @@ import org.hibernate.search.engine.cfg.impl.EngineConfigurationUtils;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
+import org.hibernate.search.engine.mapper.mapping.building.spi.BackendsInfo;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -59,14 +60,14 @@ class IndexManagerBuildingStateHolder {
 		this.rootBuildContext = rootBuildContext;
 	}
 
-	void createBackends(Map<Optional<String>, Boolean> backendNames) {
-		for ( Map.Entry<Optional<String>, Boolean> entry : backendNames.entrySet() ) {
-			Optional<String> backendNameOptional = entry.getKey();
+	void createBackends(BackendsInfo backendsInfo) {
+		for ( BackendsInfo.BackendInfo backendInfo : backendsInfo.values() ) {
+			Optional<String> backendNameOptional = backendInfo.name();
 			String backendName = backendNameOptional.orElse( null );
 			EventContext eventContext = EventContexts.fromBackendName( backendName );
 			BackendInitialBuildState backendBuildState;
 			try {
-				// TODO HSEARCH-4163 Use multiTenancyEnabled (the entry value!)
+				// TODO HSEARCH-4163 Use backendInfo#multiTenancyEnabled (the entry value!)
 				backendBuildState = createBackend( backendNameOptional, eventContext );
 			}
 			catch (RuntimeException e) {
