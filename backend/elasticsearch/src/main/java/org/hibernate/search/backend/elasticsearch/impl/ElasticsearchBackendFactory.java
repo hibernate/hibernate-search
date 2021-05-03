@@ -32,6 +32,7 @@ import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -45,10 +46,9 @@ import com.google.gson.GsonBuilder;
 
 public class ElasticsearchBackendFactory implements BackendFactory {
 
-	private static final ConfigurationProperty<MultiTenancyStrategyName> MULTI_TENANCY_STRATEGY =
+	private static final OptionalConfigurationProperty<MultiTenancyStrategyName> MULTI_TENANCY_STRATEGY =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.MULTI_TENANCY_STRATEGY )
 					.as( MultiTenancyStrategyName.class, MultiTenancyStrategyName::of )
-					.withDefault( ElasticsearchBackendSettings.Defaults.MULTI_TENANCY_STRATEGY )
 					.build();
 
 	private static final ConfigurationProperty<Boolean> LOG_JSON_PRETTY_PRINTING =
@@ -131,7 +131,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					threads, link,
 					typeFactoryProvider,
 					userFacingGson,
-					getMultiTenancyStrategy( propertySource ),
+					getMultiTenancyStrategy( propertySource, buildContext ),
 					indexLayoutStrategyHolder,
 					createTypeNameMapping( propertySource, indexLayoutStrategyHolder.get() ),
 					buildContext.failureHandler(), buildContext.timingSource()
@@ -147,10 +147,16 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		}
 	}
 
-	private MultiTenancyStrategy getMultiTenancyStrategy(ConfigurationPropertySource propertySource) {
-		MultiTenancyStrategyName multiTenancyStrategyName = MULTI_TENANCY_STRATEGY.get( propertySource );
+	private MultiTenancyStrategy getMultiTenancyStrategy(ConfigurationPropertySource propertySource,
+			BackendBuildContext buildContext) {
+		Optional<MultiTenancyStrategyName> multiTenancyStrategyName = MULTI_TENANCY_STRATEGY.get( propertySource );
+		if ( !multiTenancyStrategyName.isPresent() ) {
+			// the default depends on mapping
+			return buildContext.multiTenancyEnabled() ?
+					new DiscriminatorMultiTenancyStrategy() : new NoMultiTenancyStrategy();
+		}
 
-		switch ( multiTenancyStrategyName ) {
+		switch ( multiTenancyStrategyName.get() ) {
 			case NONE:
 				return new NoMultiTenancyStrategy();
 			case DISCRIMINATOR:

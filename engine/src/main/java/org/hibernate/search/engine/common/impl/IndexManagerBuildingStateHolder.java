@@ -67,8 +67,7 @@ class IndexManagerBuildingStateHolder {
 			EventContext eventContext = EventContexts.fromBackendName( backendName );
 			BackendInitialBuildState backendBuildState;
 			try {
-				// TODO HSEARCH-4163 Use backendInfo#multiTenancyEnabled (the entry value!)
-				backendBuildState = createBackend( backendNameOptional, eventContext );
+				backendBuildState = createBackend( backendNameOptional, backendInfo.multiTenancyEnabled(), eventContext );
 			}
 			catch (RuntimeException e) {
 				rootBuildContext.getFailureCollector().withContext( eventContext ).add( e );
@@ -117,17 +116,17 @@ class IndexManagerBuildingStateHolder {
 		closer.pushAll( BackendInitialBuildState::closeOnFailure, backendBuildStateByName.values() );
 	}
 
-	private BackendInitialBuildState createBackend(Optional<String> backendNameOptional, EventContext eventContext) {
+	private BackendInitialBuildState createBackend(Optional<String> backendNameOptional, boolean multiTenancyEnabled,
+			EventContext eventContext) {
 		ConfigurationPropertySourceExtractor backendPropertySourceExtractor =
 				EngineConfigurationUtils.extractorForBackend( backendNameOptional );
 		ConfigurationPropertySource backendPropertySource = backendPropertySourceExtractor.extract( propertySource );
 		try ( BeanHolder<? extends BackendFactory> backendFactoryHolder =
 				BACKEND_TYPE.<BeanHolder<? extends BackendFactory>>getAndMap( backendPropertySource, beanResolver::resolve )
 						.orElseGet( () -> createDefaultBackendFactory( backendPropertySource ) ) ) {
-			BackendBuildContext backendBuildContext = new BackendBuildContextImpl( rootBuildContext );
+			BackendBuildContext backendBuildContext = new BackendBuildContextImpl( rootBuildContext, multiTenancyEnabled );
 
-			BackendImplementor backend = backendFactoryHolder.get()
-					.create( eventContext, backendBuildContext, backendPropertySource );
+			BackendImplementor backend = backendFactoryHolder.get().create( eventContext, backendBuildContext, backendPropertySource );
 			return new BackendInitialBuildState( eventContext, backendPropertySourceExtractor, backendBuildContext,
 					backend );
 		}

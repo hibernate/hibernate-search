@@ -101,6 +101,12 @@ public final class LuceneBackendSettings {
 
 		public static final Version LUCENE_VERSION = Version.LATEST;
 
+		/**
+		 * @deprecated The default for this property is now dynamic and depends on the mapper.
+		 * If the multi-tenancy is enabled in the mapper, the default is {@link MultiTenancyStrategyName#DISCRIMINATOR}.
+		 * Otherwise, the default is still {@link MultiTenancyStrategyName#NONE}.
+		 */
+		@Deprecated
 		public static final MultiTenancyStrategyName MULTI_TENANCY_STRATEGY = MultiTenancyStrategyName.NONE;
 	}
 }

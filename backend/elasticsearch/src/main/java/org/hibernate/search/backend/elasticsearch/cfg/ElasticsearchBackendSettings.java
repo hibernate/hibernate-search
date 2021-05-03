@@ -306,7 +306,15 @@ public final class ElasticsearchBackendSettings {
 		public static final int DISCOVERY_REFRESH_INTERVAL = 10;
 		public static final boolean LOG_JSON_PRETTY_PRINTING = false;
 		public static final boolean VERSION_CHECK_ENABLED = true;
+
+		/**
+		 * @deprecated The default for this property is now dynamic and depends on the mapper.
+		 * If the multi-tenancy is enabled in the mapper, the default is {@link MultiTenancyStrategyName#DISCRIMINATOR}.
+		 * Otherwise, the default is still {@link MultiTenancyStrategyName#NONE}.
+		 */
+		@Deprecated
 		public static final MultiTenancyStrategyName MULTI_TENANCY_STRATEGY = MultiTenancyStrategyName.NONE;
+
 		public static final TypeNameMappingStrategyName MAPPING_TYPE_NAME_STRATEGY = TypeNameMappingStrategyName.DISCRIMINATOR;
 		public static final BeanReference<IndexLayoutStrategy> LAYOUT_STRATEGY =
 				BeanReference.of( IndexLayoutStrategy.class, SimpleIndexLayoutStrategy.NAME );

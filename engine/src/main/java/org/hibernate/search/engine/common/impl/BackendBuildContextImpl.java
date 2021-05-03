@@ -10,8 +10,15 @@ import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 
 class BackendBuildContextImpl extends DelegatingBuildContext implements BackendBuildContext {
 
-	BackendBuildContextImpl(RootBuildContext delegate) {
+	private boolean multiTenancyEnabled;
+
+	BackendBuildContextImpl(RootBuildContext delegate, boolean multiTenancyEnabled) {
 		super( delegate );
+		this.multiTenancyEnabled = multiTenancyEnabled;
 	}
 
+	@Override
+	public boolean multiTenancyEnabled() {
+		return multiTenancyEnabled;
+	}
 }
