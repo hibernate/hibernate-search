@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.PersistenceTypeKey;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubLoadingContext;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubMassLoadingStrategy;
@@ -414,7 +415,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		);
 	}
 
-	protected abstract String getBackgroundFailureHandlerReference();
+	protected abstract FailureHandler getBackgroundFailureHandlerReference();
 
 	protected abstract MassIndexingFailureHandler getMassIndexingFailureHandler();
 
