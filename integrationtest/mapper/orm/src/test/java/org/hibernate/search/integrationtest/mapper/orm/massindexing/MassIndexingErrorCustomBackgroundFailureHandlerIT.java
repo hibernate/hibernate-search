@@ -6,22 +6,29 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verifyNoInteractions;
 
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubFailureHandler;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.Rule;
+
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 public class MassIndexingErrorCustomBackgroundFailureHandlerIT extends AbstractMassIndexingErrorIT {
 
 	@Rule
-	public StaticCounters staticCounters = new StaticCounters();
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+
+	@Mock
+	private FailureHandler failureHandler;
 
 	@Override
-	protected String getBackgroundFailureHandlerReference() {
-		return StubFailureHandler.class.getName();
+	protected FailureHandler getBackgroundFailureHandlerReference() {
+		return failureHandler;
 	}
 
 	@Override
@@ -30,28 +37,12 @@ public class MassIndexingErrorCustomBackgroundFailureHandlerIT extends AbstractM
 	}
 
 	@Override
-	protected void assertBeforeSetup() {
-		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 0 );
-	}
-
-	@Override
-	protected void assertAfterSetup() {
-		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 0 );
-	}
-
-	@Override
 	protected void expectNoFailureHandling() {
-		// We'll check in the assert*() method, see below.
+		// No expected call
 	}
 
 	@Override
 	protected void assertNoFailureHandling() {
-		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 0 );
+		verifyNoInteractions( failureHandler );
 	}
 }

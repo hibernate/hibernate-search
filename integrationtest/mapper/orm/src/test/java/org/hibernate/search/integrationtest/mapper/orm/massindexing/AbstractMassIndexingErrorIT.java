@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
@@ -40,9 +41,6 @@ import org.junit.Test;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.awaitility.Awaitility;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
 
 public abstract class AbstractMassIndexingErrorIT {
 
@@ -52,9 +50,6 @@ public abstract class AbstractMassIndexingErrorIT {
 	public static final String AUTHOR_2 = "James Joyce";
 	public static final String TITLE_3 = "Frankenstein";
 	public static final String AUTHOR_3 = "Mary Shelley";
-
-	@Rule
-	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
 
 	@Rule
 	public BackendMock backendMock = new BackendMock();
@@ -257,7 +252,7 @@ public abstract class AbstractMassIndexingErrorIT {
 		assertNoFailureHandling();
 	}
 
-	protected abstract String getBackgroundFailureHandlerReference();
+	protected abstract FailureHandler getBackgroundFailureHandlerReference();
 
 	protected abstract MassIndexingFailureHandler getMassIndexingFailureHandler();
 

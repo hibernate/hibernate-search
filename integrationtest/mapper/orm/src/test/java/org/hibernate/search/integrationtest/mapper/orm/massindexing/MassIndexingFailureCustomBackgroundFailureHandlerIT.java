@@ -7,40 +7,46 @@
 package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
+import org.hibernate.search.engine.reporting.FailureContext;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubFailureHandler;
-import org.hibernate.search.util.impl.test.rule.StaticCounters;
+import org.hibernate.search.util.common.SearchException;
 
 import org.junit.Rule;
+
+import org.assertj.core.api.InstanceOfAssertFactories;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends AbstractMassIndexingFailureIT {
 
 	@Rule
-	public StaticCounters staticCounters = new StaticCounters();
+	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
+
+	@Mock
+	private FailureHandler failureHandler;
+
+	@Captor
+	private ArgumentCaptor<FailureContext> genericFailureContextCapture;
+	@Captor
+	private ArgumentCaptor<EntityIndexingFailureContext> entityFailureContextCapture;
 
 	@Override
-	protected String getBackgroundFailureHandlerReference() {
-		return StubFailureHandler.class.getName();
+	protected FailureHandler getBackgroundFailureHandlerReference() {
+		return failureHandler;
 	}
 
 	@Override
 	protected MassIndexingFailureHandler getMassIndexingFailureHandler() {
 		return null;
-	}
-
-	@Override
-	protected void assertBeforeSetup() {
-		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 0 );
-	}
-
-	@Override
-	protected void assertAfterSetup() {
-		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 0 );
 	}
 
 	@Override
@@ -52,9 +58,20 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 	@Override
 	protected void assertEntityIndexingFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
-		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 1 );
+		verify( failureHandler ).handle( entityFailureContextCapture.capture() );
+		verifyNoMoreInteractions( failureHandler );
+
+		EntityIndexingFailureContext context = entityFailureContextCapture.getValue();
+		assertThat( context.throwable() )
+				.isInstanceOf( SimulatedFailure.class )
+				.hasMessage( exceptionMessage );
+		assertThat( context.failingOperation() ).asString()
+				.isEqualTo( failingOperationAsString );
+		assertThat( context.entityReferences() )
+				.hasSize( 1 )
+				.element( 0 )
+				.asString()
+				.isEqualTo( entityReferenceAsString );
 	}
 
 	@Override
@@ -66,9 +83,23 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 	@Override
 	protected void assertEntityIdGetterFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
-		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 1 );
+		verify( failureHandler ).handle( entityFailureContextCapture.capture() );
+		verifyNoMoreInteractions( failureHandler );
+
+		EntityIndexingFailureContext context = entityFailureContextCapture.getValue();
+		assertThat( context.throwable() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Exception while invoking" )
+				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
+				.isInstanceOf( SimulatedFailure.class )
+				.hasMessageContaining( exceptionMessage );
+		assertThat( context.failingOperation() ).asString()
+				.isEqualTo( failingOperationAsString );
+		assertThat( context.entityReferences() )
+				.hasSize( 1 )
+				.element( 0 )
+				.asString()
+				.isEqualTo( entityReferenceAsString );
 	}
 
 	@Override
@@ -80,9 +111,26 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 	@Override
 	protected void assertEntityNonIdGetterFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
-		// Same expectations as for the ID getter
-		assertEntityIdGetterFailureHandling( entityName, entityReferenceAsString, exceptionMessage,
-				failingOperationAsString );
+		verify( failureHandler ).handle( entityFailureContextCapture.capture() );
+		verifyNoMoreInteractions( failureHandler );
+
+		EntityIndexingFailureContext context = entityFailureContextCapture.getValue();
+		assertThat( context.throwable() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Exception while building document for entity '%s'", entityReferenceAsString )
+				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Exception while invoking" )
+				.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
+				.isInstanceOf( SimulatedFailure.class )
+				.hasMessageContaining( exceptionMessage );
+		assertThat( context.failingOperation() ).asString()
+				.isEqualTo( failingOperationAsString );
+		assertThat( context.entityReferences() )
+				.hasSize( 1 )
+				.element( 0 )
+				.asString()
+				.isEqualTo( entityReferenceAsString );
 	}
 
 	@Override
@@ -96,8 +144,15 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 	protected void assertMassIndexerOperationFailureHandling(
 			Class<? extends Throwable> exceptionType, String exceptionMessage,
 			String failingOperationAsString) {
-		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
+		verify( failureHandler ).handle( genericFailureContextCapture.capture() );
+		verifyNoMoreInteractions( failureHandler );
+
+		FailureContext context = genericFailureContextCapture.getValue();
+		assertThat( context.throwable() )
+				.isInstanceOf( exceptionType )
+				.hasMessageContaining( exceptionMessage );
+		assertThat( context.failingOperation() ).asString()
+				.isEqualTo( failingOperationAsString );
 	}
 
 	@Override
@@ -113,8 +168,27 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 			String entityReferenceAsString,
 			String failingEntityIndexingExceptionMessage, String failingEntityIndexingOperationAsString,
 			String failingMassIndexerOperationExceptionMessage, String failingMassIndexerOperationAsString) {
-		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 1 );
+		verify( failureHandler ).handle( entityFailureContextCapture.capture() );
+		verify( failureHandler ).handle( genericFailureContextCapture.capture() );
+		verifyNoMoreInteractions( failureHandler );
+
+		EntityIndexingFailureContext entityFailureContext = entityFailureContextCapture.getValue();
+		assertThat( entityFailureContext.throwable() )
+				.isInstanceOf( SimulatedFailure.class )
+				.hasMessage( failingEntityIndexingExceptionMessage );
+		assertThat( entityFailureContext.failingOperation() ).asString()
+				.isEqualTo( failingEntityIndexingOperationAsString );
+		assertThat( entityFailureContext.entityReferences() )
+				.hasSize( 1 )
+				.element( 0 )
+				.asString()
+				.isEqualTo( entityReferenceAsString );
+
+		FailureContext massIndexerOperationFailureContext = genericFailureContextCapture.getValue();
+		assertThat( massIndexerOperationFailureContext.throwable() )
+				.isInstanceOf( SimulatedFailure.class )
+				.hasMessage( failingMassIndexerOperationExceptionMessage );
+		assertThat( massIndexerOperationFailureContext.failingOperation() ).asString()
+				.isEqualTo( failingMassIndexerOperationAsString );
 	}
 }
