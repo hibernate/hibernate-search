@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.massindexing;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Fail.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
@@ -27,17 +26,12 @@ import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureContext;
-import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
@@ -59,12 +53,6 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 
 	@Rule
 	public final MockitoRule mockito = MockitoJUnit.rule().strictness( Strictness.STRICT_STUBS );
-
-	@Mock
-	private MassIndexingFailureHandler failureHandler;
-
-	private ArgumentCaptor<MassIndexingFailureContext> failureContext = ArgumentCaptor
-			.forClass( MassIndexingFailureContext.class );
 
 	private SearchMapping mapping;
 
@@ -99,20 +87,9 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 
 			backendMock.expectIndexScaleWorks( H1_B_Indexed.NAME, searchSession.tenantIdentifier() )
 					.purge()
-					.mergeSegments()
-					.flush()
-					.refresh();
+					.mergeSegments();
 
-			indexer.failureHandler( failureHandler );
-			try {
-				indexer.startAndWait();
-			}
-			catch (InterruptedException e) {
-				fail( "Unexpected InterruptedException: " + e.getMessage() );
-			}
-
-			Mockito.verify( failureHandler ).handle( failureContext.capture() );
-			assertThat( failureContext.getValue().throwable() )
+			assertThatThrownBy( indexer::startAndWait )
 					.isInstanceOf( SimulatedFailure.class )
 					.hasMessageStartingWith( H1_B_Indexed.NAME )
 					.hasMessageNotContaining( H1_Root_NotIndexed.NAME )
@@ -134,20 +111,9 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 
 			backendMock.expectIndexScaleWorks( H1_B_Indexed.NAME, searchSession.tenantIdentifier() )
 					.purge()
-					.mergeSegments()
-					.flush()
-					.refresh();
+					.mergeSegments();
 
-			indexer.failureHandler( failureHandler );
-			try {
-				indexer.startAndWait();
-			}
-			catch (InterruptedException e) {
-				fail( "Unexpected InterruptedException: " + e.getMessage() );
-			}
-
-			Mockito.verify( failureHandler ).handle( failureContext.capture() );
-			assertThat( failureContext.getValue().throwable() )
+			assertThatThrownBy( indexer::startAndWait )
 					.isInstanceOf( SimulatedFailure.class )
 					.hasMessageStartingWith( H1_B_Indexed.NAME )
 					.hasMessageNotContaining( H1_Root_NotIndexed.NAME )
@@ -169,35 +135,18 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 
 			backendMock.expectIndexScaleWorks( H2_Root_Indexed.NAME, searchSession.tenantIdentifier() )
 					.purge()
-					.mergeSegments()
-					.flush()
-					.refresh();
+					.mergeSegments();
 			backendMock.expectIndexScaleWorks( H2_A_C_Indexed.NAME, searchSession.tenantIdentifier() )
 					.purge()
-					.mergeSegments()
-					.flush()
-					.refresh();
+					.mergeSegments();
 			backendMock.expectIndexScaleWorks( H2_B_Indexed.NAME, searchSession.tenantIdentifier() )
 					.purge()
-					.mergeSegments()
-					.flush()
-					.refresh();
+					.mergeSegments();
 			backendMock.expectIndexScaleWorks( H2_B_E_Indexed.NAME, searchSession.tenantIdentifier() )
 					.purge()
-					.mergeSegments()
-					.flush()
-					.refresh();
+					.mergeSegments();
 
-			indexer.failureHandler( failureHandler );
-			try {
-				indexer.startAndWait();
-			}
-			catch (InterruptedException e) {
-				fail( "Unexpected InterruptedException: " + e.getMessage() );
-			}
-
-			Mockito.verify( failureHandler ).handle( failureContext.capture() );
-			assertThat( failureContext.getValue().throwable() )
+			assertThatThrownBy( indexer::startAndWait )
 					.isInstanceOf( SimulatedFailure.class )
 					.hasMessageStartingWith( H2_Root_Indexed.NAME )
 					.hasMessageNotContaining( H1_Root_NotIndexed.NAME )
@@ -219,25 +168,12 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 
 			backendMock.expectIndexScaleWorks( H2_B_Indexed.NAME, searchSession.tenantIdentifier() )
 					.purge()
-					.mergeSegments()
-					.flush()
-					.refresh();
+					.mergeSegments();
 			backendMock.expectIndexScaleWorks( H2_B_E_Indexed.NAME, searchSession.tenantIdentifier() )
 					.purge()
-					.mergeSegments()
-					.flush()
-					.refresh();
+					.mergeSegments();
 
-			indexer.failureHandler( failureHandler );
-			try {
-				indexer.startAndWait();
-			}
-			catch (InterruptedException e) {
-				fail( "Unexpected InterruptedException: " + e.getMessage() );
-			}
-
-			Mockito.verify( failureHandler ).handle( failureContext.capture() );
-			assertThat( failureContext.getValue().throwable() )
+			assertThatThrownBy( indexer::startAndWait )
 					.isInstanceOf( SimulatedFailure.class )
 					.hasMessageStartingWith( H2_B_Indexed.NAME )
 					.hasMessageNotContaining( H1_Root_NotIndexed.NAME )
