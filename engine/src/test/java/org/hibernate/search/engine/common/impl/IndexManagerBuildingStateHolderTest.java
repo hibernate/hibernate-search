@@ -24,6 +24,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.mapper.mapping.building.spi.BackendsInfo;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanRetrieval;
@@ -110,7 +111,7 @@ public class IndexManagerBuildingStateHolderTest {
 				backendPropertySourceCapture.capture()
 		) )
 				.thenReturn( backendMock );
-		holder.createBackends( Collections.singletonMap( Optional.empty(), false ) );
+		holder.createBackends( defaultNoMultiTenancy() );
 		verifyNoOtherBackendInteractionsAndReset();
 
 		when( backendMock.createIndexManagerBuilder(
@@ -176,7 +177,7 @@ public class IndexManagerBuildingStateHolderTest {
 				backendPropertySourceCapture.capture()
 		) )
 				.thenReturn( backendMock );
-		holder.createBackends( Collections.singletonMap( Optional.of( "myBackend" ), false ) );
+		holder.createBackends( namedNoMultiTenancy( "myBackend" ) );
 		verifyNoOtherBackendInteractionsAndReset();
 
 		when( backendMock.createIndexManagerBuilder(
@@ -248,7 +249,7 @@ public class IndexManagerBuildingStateHolderTest {
 				.thenReturn( rootFailureCollectorMock );
 		when( rootFailureCollectorMock.withContext( EventContexts.defaultBackend() ) )
 				.thenReturn( backendFailureCollectorMock );
-		holder.createBackends( Collections.singletonMap( Optional.empty(), false ) );
+		holder.createBackends( defaultNoMultiTenancy() );
 		verify( backendFailureCollectorMock ).add( throwableCaptor.capture() );
 		verifyNoOtherBackendInteractionsAndReset();
 
@@ -281,7 +282,7 @@ public class IndexManagerBuildingStateHolderTest {
 				.thenReturn( rootFailureCollectorMock );
 		when( rootFailureCollectorMock.withContext( EventContexts.defaultBackend() ) )
 				.thenReturn( backendFailureCollectorMock );
-		holder.createBackends( Collections.singletonMap( Optional.empty(), false ) );
+		holder.createBackends( defaultNoMultiTenancy() );
 		verify( backendFailureCollectorMock ).add( throwableCaptor.capture() );
 		verifyNoOtherBackendInteractionsAndReset();
 
@@ -299,4 +300,15 @@ public class IndexManagerBuildingStateHolderTest {
 		reset( verifiedMocks.toArray() );
 	}
 
+	public static BackendsInfo defaultNoMultiTenancy() {
+		BackendsInfo result = new BackendsInfo();
+		result.collect( Optional.empty(), false );
+		return result;
+	}
+
+	public static BackendsInfo namedNoMultiTenancy(String name) {
+		BackendsInfo result = new BackendsInfo();
+		result.collect( Optional.of( name ), false );
+		return result;
+	}
 }

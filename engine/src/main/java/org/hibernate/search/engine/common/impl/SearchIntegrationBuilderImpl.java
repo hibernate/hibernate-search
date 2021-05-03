@@ -26,6 +26,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.engine.common.resources.impl.EngineThreads;
+import org.hibernate.search.engine.mapper.mapping.building.spi.BackendsInfo;
 import org.hibernate.search.engine.common.timing.impl.DefaultTimingSource;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
@@ -224,16 +225,16 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			checkingRootFailures = false;
 
 			// Step #3: determine indexed types and the necessary backends
-			Map<Optional<String>, Boolean> backendNames = new LinkedHashMap<>();
+			BackendsInfo backendsInfo = new BackendsInfo();
 			for ( MappingBuildingState<?, ?> mappingBuildingState : mappingBuildingStates ) {
-				mappingBuildingState.determineIndexedTypes( backendNames );
+				mappingBuildingState.determineIndexedTypes( backendsInfo );
 			}
 			checkingRootFailures = true;
 			failureCollector.checkNoFailure();
 			checkingRootFailures = false;
 
 			// Step #4: create backends that will be necessary for mappers
-			indexManagerBuildingStateHolder.createBackends( backendNames );
+			indexManagerBuildingStateHolder.createBackends( backendsInfo );
 			checkingRootFailures = true;
 			failureCollector.checkNoFailure();
 			checkingRootFailures = false;
@@ -342,11 +343,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			mapper = mappingInitiator.createMapper( buildContext, contributorProvider );
 		}
 
-		void determineIndexedTypes(Map<Optional<String>, Boolean> backendNames) {
-			mapper.prepareIndexedTypes( (backendName, multiTenancyEnabled) ->
-					backendNames.merge( backendName, multiTenancyEnabled,
-							(enabled1, enabled2) -> enabled1 || enabled2
-					) );
+		void determineIndexedTypes(BackendsInfo backendsInfo) {
+			mapper.prepareIndexedTypes( backendsInfo );
 		}
 
 		void mapIndexedTypes(MappedIndexManagerFactory indexManagerFactory) {
