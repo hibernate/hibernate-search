@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.realbackend.multitenant;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -24,6 +24,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
+import org.junit.AssumptionViolatedException;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -52,20 +53,28 @@ public class RealBackendDatabaseMultitenancyIT {
 
 	@Test
 	public void multiTenancyStrategy_none() {
-		assertThatThrownBy(
-				() -> setupHelper.start()
-						.withProperty( "hibernate.search.backend.multi_tenancy.strategy", "none" )
-						.tenants( TENANT_ID_1, TENANT_ID_2 )
-						.setup( IndexedEntity.class )
-		)
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( IndexedEntity.class.getName() )
-						.defaultBackendContext()
-						.failure( "Invalid backend configuration: " +
-								"index 'indexed' requires multi-tenancy but no multi-tenancy strategy is set" )
-						.build()
-				);
+		try {
+			setupHelper.start()
+					.withProperty( "hibernate.search.backend.multi_tenancy.strategy", "none" )
+					.tenants( TENANT_ID_1, TENANT_ID_2 )
+					.setup( IndexedEntity.class );
+
+			fail( "This method should never have been called" );
+		}
+		catch (AssumptionViolatedException e) {
+			// do not catch this kind of exception
+			throw e;
+		}
+		catch (Exception e) {
+			assertThat( e ).isInstanceOf( SearchException.class )
+					.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+							.typeContext( IndexedEntity.class.getName() )
+							.defaultBackendContext()
+							.failure( "Invalid backend configuration: " +
+									"index 'indexed' requires multi-tenancy but no multi-tenancy strategy is set" )
+							.build()
+					);
+		}
 	}
 
 	private void checkMultitenancy() {
