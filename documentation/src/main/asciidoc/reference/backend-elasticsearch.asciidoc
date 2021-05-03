@@ -462,6 +462,23 @@ include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/la
 ----
 ====
 
+=== Retrieving the read and write index names
+
+Index or alias names used to read and write can be retrieved from the <<mapper-orm-mapping-inspect,metamodel>>.
+
+.Retrieving the index names from an Elasticsearch index manager
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/indexmanager/ElasticsearchIndexManagerIT.java[tags=readWriteName]
+----
+<1> Retrieve the `SearchMapping`.
+<2> Retrieve the `IndexManager`.
+<3> Narrow down the index manager to the `ElasticsearchIndexManager` type.
+<4> Get the index descriptor.
+<5> Get the index (or alias) read and write names.
+====
+
 [[backend-elasticsearch-schema]]
 == Schema ("mapping")
 
@@ -1094,3 +1111,5 @@ Hibernate Search may one day switch to another client with a different Java type
 without prior notice.
 If that happens, the snippet of code above will throw an exception.
 ====
+
+
