@@ -53,10 +53,9 @@ public class LuceneBackendFactory implements BackendFactory {
 					.as( Version.class, LuceneBackendFactory::parseLuceneVersion )
 					.build();
 
-	private static final ConfigurationProperty<MultiTenancyStrategyName> MULTI_TENANCY_STRATEGY =
+	private static final OptionalConfigurationProperty<MultiTenancyStrategyName> MULTI_TENANCY_STRATEGY =
 			ConfigurationProperty.forKey( LuceneBackendSettings.MULTI_TENANCY_STRATEGY )
 					.as( MultiTenancyStrategyName.class, MultiTenancyStrategyName::of )
-					.withDefault( LuceneBackendSettings.Defaults.MULTI_TENANCY_STRATEGY )
 					.build();
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends LuceneAnalysisConfigurer>> ANALYSIS_CONFIGURER =
@@ -79,7 +78,7 @@ public class LuceneBackendFactory implements BackendFactory {
 
 			Version luceneVersion = getLuceneVersion( eventContext, propertySource );
 
-			MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( propertySource );
+			MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( propertySource, buildContext );
 
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry = getAnalysisDefinitionRegistry(
 					buildContext, propertySource, luceneVersion
@@ -129,10 +128,16 @@ public class LuceneBackendFactory implements BackendFactory {
 		return luceneVersion;
 	}
 
-	private MultiTenancyStrategy getMultiTenancyStrategy(ConfigurationPropertySource propertySource) {
-		MultiTenancyStrategyName multiTenancyStrategyName = MULTI_TENANCY_STRATEGY.get( propertySource );
+	private MultiTenancyStrategy getMultiTenancyStrategy(ConfigurationPropertySource propertySource,
+			BackendBuildContext buildContext) {
+		Optional<MultiTenancyStrategyName> multiTenancyStrategyName = MULTI_TENANCY_STRATEGY.get( propertySource );
+		if ( !multiTenancyStrategyName.isPresent() ) {
+			// the default depends on mapping
+			return buildContext.multiTenancyEnabled() ?
+					new DiscriminatorMultiTenancyStrategy() : new NoMultiTenancyStrategy();
+		}
 
-		switch ( multiTenancyStrategyName ) {
+		switch ( multiTenancyStrategyName.get() ) {
 			case NONE:
 				return new NoMultiTenancyStrategy();
 			case DISCRIMINATOR:

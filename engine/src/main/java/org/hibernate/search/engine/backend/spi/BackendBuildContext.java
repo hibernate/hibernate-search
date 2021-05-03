@@ -30,4 +30,6 @@ public interface BackendBuildContext {
 
 	TimingSource timingSource();
 
+	boolean multiTenancyEnabled();
+
 }

@@ -40,6 +40,7 @@ public class MultiTenancyMismatchIT {
 	public void backend_multi_tenancy_disabled_but_indexes_requiring_multi_tenancy_throws_exception() {
 		assertThatThrownBy( () -> setupHelper.start()
 				.withIndex( index )
+				.withBackendProperty( "multi_tenancy.strategy", "none" )
 				.withMultiTenancy()
 				.setup()
 		)
