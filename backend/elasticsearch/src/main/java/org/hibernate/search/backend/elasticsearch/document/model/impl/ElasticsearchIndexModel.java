@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.elasticsearch.metamodel.ElasticsearchIndexDescriptor;
 import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.LowLevelIndexMetadataBuilder;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
@@ -22,14 +23,13 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.I
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexContext;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
-import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSearchIndexContext {
+public class ElasticsearchIndexModel implements ElasticsearchIndexDescriptor, ElasticsearchSearchIndexContext {
 
 	private final IndexNames names;
 	private final String mappedTypeName;
@@ -161,5 +161,15 @@ public class ElasticsearchIndexModel implements IndexDescriptor, ElasticsearchSe
 			}
 		}
 		return field;
+	}
+
+	@Override
+	public String readName() {
+		return names.read().toString();
+	}
+
+	@Override
+	public String writeName() {
+		return names.write().toString();
 	}
 }
