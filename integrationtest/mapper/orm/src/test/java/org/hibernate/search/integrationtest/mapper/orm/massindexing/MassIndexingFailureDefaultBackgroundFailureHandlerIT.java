@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
@@ -21,7 +22,7 @@ public class MassIndexingFailureDefaultBackgroundFailureHandlerIT extends Abstra
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Override
-	protected String getBackgroundFailureHandlerReference() {
+	protected FailureHandler getBackgroundFailureHandlerReference() {
 		return null;
 	}
 

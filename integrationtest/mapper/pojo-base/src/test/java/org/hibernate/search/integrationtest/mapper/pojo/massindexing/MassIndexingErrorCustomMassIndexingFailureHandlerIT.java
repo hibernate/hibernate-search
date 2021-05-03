@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.massindexing;
 
 import static org.mockito.Mockito.verifyNoInteractions;
 
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
 
 import org.junit.Rule;
@@ -26,7 +27,7 @@ public class MassIndexingErrorCustomMassIndexingFailureHandlerIT extends Abstrac
 	private MassIndexingFailureHandler failureHandler;
 
 	@Override
-	protected String getBackgroundFailureHandlerReference() {
+	protected FailureHandler getBackgroundFailureHandlerReference() {
 		return null;
 	}
 

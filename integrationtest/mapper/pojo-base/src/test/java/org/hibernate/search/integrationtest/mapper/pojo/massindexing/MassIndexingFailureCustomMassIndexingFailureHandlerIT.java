@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingEntityFailureContext;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureContext;
 import org.hibernate.search.mapper.pojo.massindexing.MassIndexingFailureHandler;
@@ -39,7 +40,7 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 	private ArgumentCaptor<MassIndexingEntityFailureContext> entityFailureContextCapture;
 
 	@Override
-	protected String getBackgroundFailureHandlerReference() {
+	protected FailureHandler getBackgroundFailureHandlerReference() {
 		return null;
 	}
 
