@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.pojo.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -153,6 +154,45 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 				.hasMessageContaining( exceptionMessage );
 		assertThat( context.failingOperation() ).asString()
 				.isEqualTo( failingOperationAsString );
+	}
+
+	@Override
+	protected void expectMassIndexerIdentifierLoadingFailureHandling(
+			Class<? extends Throwable> exceptionType, String exceptionMessage,
+			String failingOperationAsString) {
+		// We'll check in the assert*() method, see below.
+	}
+
+	@Override
+	protected void assertMassIndexerIdentifierLoadingFailureHandling(
+			Class<? extends Throwable> exceptionType, String exceptionMessage,
+			String failingOperationAsString) {
+		verify( failureHandler, times( 3 ) ).handle( genericFailureContextCapture.capture() );
+		verifyNoMoreInteractions( failureHandler );
+
+		// Original failure
+		FailureContext context = genericFailureContextCapture.getAllValues().get( 0 );
+		assertThat( context.throwable() )
+				.isInstanceOf( exceptionType )
+				.hasMessageContaining( exceptionMessage );
+		assertThat( context.failingOperation() ).asString()
+				.isEqualTo( failingOperationAsString );
+
+		// ... bubbling up to the workspace
+		context = genericFailureContextCapture.getAllValues().get( 1 );
+		assertThat( context.throwable() )
+				.isInstanceOf( exceptionType )
+				.hasMessageContaining( exceptionMessage );
+		assertThat( context.failingOperation() ).asString()
+				.isEqualTo( "MassIndexer operation" );
+
+		// ... bubbling up to the mass indexer
+		context = genericFailureContextCapture.getAllValues().get( 2 );
+		assertThat( context.throwable() )
+				.isInstanceOf( exceptionType )
+				.hasMessageContaining( exceptionMessage );
+		assertThat( context.failingOperation() ).asString()
+				.isEqualTo( "MassIndexer operation" );
 	}
 
 	@Override

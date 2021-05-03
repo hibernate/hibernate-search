@@ -122,6 +122,35 @@ public class MassIndexingFailureDefaultBackgroundFailureHandlerIT extends Abstra
 	}
 
 	@Override
+	protected void expectMassIndexerIdentifierLoadingFailureHandling(Class<? extends Throwable> exceptionType,
+			String exceptionMessage, String failingOperationAsString) {
+		// Original failure
+		logged.expectEvent(
+				Level.ERROR,
+				ExceptionMatcherBuilder.isException( exceptionType )
+						.withMessage( exceptionMessage )
+						.build(),
+				failingOperationAsString
+		)
+				.once();
+		// ... bubbling up to the workspace and mass indexer
+		logged.expectEvent(
+				Level.ERROR,
+				ExceptionMatcherBuilder.isException( exceptionType )
+						.withMessage( exceptionMessage )
+						.build(),
+				"MassIndexer operation"
+		)
+				.times( 2 );
+	}
+
+	@Override
+	protected void assertMassIndexerIdentifierLoadingFailureHandling(Class<? extends Throwable> exceptionType,
+			String exceptionMessage, String failingOperationAsString) {
+
+	}
+
+	@Override
 	protected void expectEntityIndexingAndMassIndexerOperationFailureHandling(String entityName,
 			String entityReferenceAsString,
 			String failingEntityIndexingExceptionMessage, String failingEntityIndexingOperationAsString,

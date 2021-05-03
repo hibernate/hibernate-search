@@ -66,9 +66,10 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 		startIndexing( identifierQueue );
 		startProducingPrimaryKeys( identifierQueue );
 		// Wait for indexing to finish.
-		Futures.unwrappedExceptionGet(
-				CompletableFuture.allOf( indexingFutures.toArray( new CompletableFuture[0] ) )
-		);
+		List<CompletableFuture<?>> allFutures = new ArrayList<>();
+		allFutures.addAll( identifierProducingFutures );
+		allFutures.addAll( indexingFutures );
+		Futures.unwrappedExceptionGet( CompletableFuture.allOf( allFutures.toArray( new CompletableFuture[0] ) ) );
 		log.debugf( "Indexing for %s is done", typeGroup.notifiedGroupName() );
 	}
 

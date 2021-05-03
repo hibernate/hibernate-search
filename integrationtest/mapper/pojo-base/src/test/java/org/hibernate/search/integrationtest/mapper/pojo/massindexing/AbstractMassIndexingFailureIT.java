@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -24,6 +25,13 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.Pers
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubLoadingContext;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.loading.StubMassLoadingStrategy;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.javabean.loading.LoadingTypeGroup;
+import org.hibernate.search.mapper.javabean.loading.MassEntityLoader;
+import org.hibernate.search.mapper.javabean.loading.MassEntitySink;
+import org.hibernate.search.mapper.javabean.loading.MassIdentifierLoader;
+import org.hibernate.search.mapper.javabean.loading.MassIdentifierSink;
+import org.hibernate.search.mapper.javabean.loading.MassLoadingOptions;
+import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategy;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -63,6 +71,32 @@ public abstract class AbstractMassIndexingFailureIT {
 	public ThreadSpy threadSpy = new ThreadSpy();
 
 	private final StubLoadingContext loadingContext = new StubLoadingContext();
+
+	@Test
+	public void identifierLoading() {
+		String exceptionMessage = "ID loading error";
+
+		SearchMapping mapping = setupWithThrowingIdentifierLoading( exceptionMessage );
+
+		expectMassIndexerIdentifierLoadingFailureHandling(
+				SimulatedFailure.class, exceptionMessage,
+				"Fetching identifiers of entities to index for entity '" + Book.NAME + "' during mass indexing"
+		);
+
+		doMassIndexingWithFailure(
+				mapping.scope( Object.class ).massIndexer(),
+				ThreadExpectation.CREATED_AND_TERMINATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
+						.hasMessage( exceptionMessage ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED )
+		);
+
+		assertMassIndexerIdentifierLoadingFailureHandling(
+				SimulatedFailure.class, exceptionMessage,
+				"Fetching identifiers of entities to index for entity '" + Book.NAME + "' during mass indexing"
+		);
+	}
 
 	@Test
 	public void indexing() {
@@ -451,6 +485,14 @@ public abstract class AbstractMassIndexingFailureIT {
 			Class<? extends Throwable> exceptionType, String exceptionMessage,
 			String failingOperationAsString);
 
+	protected abstract void expectMassIndexerIdentifierLoadingFailureHandling(
+			Class<? extends Throwable> exceptionType, String exceptionMessage,
+			String failingOperationAsString);
+
+	protected abstract void assertMassIndexerIdentifierLoadingFailureHandling(
+			Class<? extends Throwable> exceptionType, String exceptionMessage,
+			String failingOperationAsString);
+
 	protected abstract void expectEntityIndexingAndMassIndexerOperationFailureHandling(
 			String entityName, String entityReferenceAsString,
 			String failingEntityIndexingExceptionMessage, String failingEntityIndexingOperationAsString,
@@ -636,7 +678,52 @@ public abstract class AbstractMassIndexingFailureIT {
 		};
 	}
 
+	private SearchMapping setupWithThrowingIdentifierLoading(String exceptionMessage) {
+		return setup( new MassLoadingStrategy<Book, Integer>() {
+			@Override
+			public MassIdentifierLoader createIdentifierLoader(LoadingTypeGroup<Book> includedTypes,
+					MassIdentifierSink<Integer> sink, MassLoadingOptions options) {
+				return new MassIdentifierLoader() {
+					@Override
+					public void close() {
+						// Nothing to do
+					}
+
+					@Override
+					public long totalCount() {
+						return 100;
+					}
+
+					@Override
+					public void loadNext() {
+						throw new SimulatedFailure( exceptionMessage );
+					}
+				};
+			}
+
+			@Override
+			public MassEntityLoader<Integer> createEntityLoader(LoadingTypeGroup<Book> includedTypes,
+					MassEntitySink<Book> sink, MassLoadingOptions options) {
+				return new MassEntityLoader<Integer>() {
+					@Override
+					public void close() {
+						// Nothing to do
+					}
+
+					@Override
+					public void load(List<Integer> identifiers) {
+						throw new UnsupportedOperationException( "Should not be called" );
+					}
+				};
+			}
+		} );
+	}
+
 	private SearchMapping setup() {
+		return setup( new StubMassLoadingStrategy<>( Book.PERSISTENCE_KEY ) );
+	}
+
+	private SearchMapping setup(MassLoadingStrategy<Book, Integer> loadingStrategy) {
 		assertBeforeSetup();
 
 		backendMock.expectAnySchema( Book.NAME );
@@ -646,8 +733,7 @@ public abstract class AbstractMassIndexingFailureIT {
 				.withPropertyRadical( EngineSettings.Radicals.BACKGROUND_FAILURE_HANDLER, getBackgroundFailureHandlerReference() )
 				.withPropertyRadical( EngineSpiSettings.Radicals.THREAD_PROVIDER, threadSpy.getThreadProvider() )
 				.withConfiguration( b -> {
-					b.addEntityType( Book.class, c -> c
-							.massLoadingStrategy( new StubMassLoadingStrategy<>( Book.PERSISTENCE_KEY ) ) );
+					b.addEntityType( Book.class, c -> c .massLoadingStrategy( loadingStrategy ) );
 				} )
 				.setup( Book.class );
 
