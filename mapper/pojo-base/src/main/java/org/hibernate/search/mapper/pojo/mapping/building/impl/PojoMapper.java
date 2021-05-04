@@ -211,7 +211,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		String indexName = indexedTypeMetadata.indexName().orElse( entityName );
 
 		MappedIndexManagerBuilder indexManagerBuilder = indexManagerFactory.createMappedIndexManager( this,
-				indexedTypeMetadata.backendName(), indexName, entityName, multiTenancyEnabled );
+				indexedTypeMetadata.backendName(), indexName, entityName );
 
 		Optional<RoutingBinder> routingBinderOptional = indexedTypeMetadata.routingBinder();
 		BoundRoutingBridge<E> routingBridge = null;

@@ -178,11 +178,8 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 	@Override
 	public IndexManagerBuilder createIndexManagerBuilder(
 			String hibernateSearchIndexName,
-			String mappedTypeName, boolean multiTenancyEnabled, BackendBuildContext buildContext,
+			String mappedTypeName, BackendBuildContext buildContext,
 			ConfigurationPropertySource propertySource) {
-		if ( multiTenancyEnabled && !multiTenancyStrategy.isMultiTenancySupported() ) {
-			throw log.multiTenancyRequiredButNotSupportedByBackend( hibernateSearchIndexName, eventContext );
-		}
 
 		EventContext indexEventContext = EventContexts.fromIndexName( hibernateSearchIndexName );
 

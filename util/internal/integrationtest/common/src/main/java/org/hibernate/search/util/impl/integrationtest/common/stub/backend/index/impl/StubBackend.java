@@ -78,7 +78,7 @@ public class StubBackend implements BackendImplementor, Backend {
 
 	@Override
 	public IndexManagerBuilder createIndexManagerBuilder(String indexName,
-			String mappedTypeName, boolean isMultiTenancyEnabled, BackendBuildContext context,
+			String mappedTypeName, BackendBuildContext context,
 			ConfigurationPropertySource propertySource) {
 		return new StubIndexManagerBuilder( this, indexName, mappedTypeName );
 	}
