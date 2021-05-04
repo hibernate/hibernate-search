@@ -33,6 +33,7 @@ import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.DurationInSecondsAndFractionsFormatter;
+import org.hibernate.search.util.common.logging.impl.EventContextFormatter;
 import org.hibernate.search.util.common.logging.impl.EventContextNoPrefixFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -755,5 +756,17 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 142,
 			value = "'%1$s' can be used in some of the targeted indexes, but not all of them.")
 	SearchException partialSupportForQueryElementInCompositeIndexElement(String queryElementName);
+
+	@Message(id = ID_OFFSET + 148,
+			value = "Invalid backend configuration: mapping requires multi-tenancy"
+					+ " but no multi-tenancy strategy is set. %1$s.")
+	SearchException multiTenancyRequiredButExplicitlyDisabledByBackend(
+			@FormatWith(EventContextFormatter.class) EventContext context);
+
+	@Message(id = ID_OFFSET + 149,
+			value = "Invalid backend configuration: mapping not requires multi-tenancy"
+					+ " but multi-tenancy strategy is set. %1$s.")
+	SearchException multiTenancyNotRequiredButExplicitlyEnabledByTheBackend(
+			@FormatWith(EventContextFormatter.class) EventContext context);
 
 }

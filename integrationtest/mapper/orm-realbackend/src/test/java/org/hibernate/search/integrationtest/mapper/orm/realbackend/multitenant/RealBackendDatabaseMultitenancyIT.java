@@ -78,10 +78,9 @@ public class RealBackendDatabaseMultitenancyIT {
 		catch (Exception e) {
 			assertThat( e ).isInstanceOf( SearchException.class )
 					.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-							.typeContext( IndexedEntity.class.getName() )
 							.defaultBackendContext()
 							.failure( "Invalid backend configuration: " +
-									"index 'indexed' requires multi-tenancy but no multi-tenancy strategy is set" )
+									"mapping requires multi-tenancy but no multi-tenancy strategy is set" )
 							.build()
 					);
 		}
