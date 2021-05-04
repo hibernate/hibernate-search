@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outbox;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outbox.OutboxPollingNoProcessingIT.findOutboxEntries;
 import static org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outbox.OutboxPollingNoProcessingIT.verifyOutboxEntry;
 
 import java.util.List;
@@ -15,7 +14,6 @@ import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.outbox.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -38,15 +36,18 @@ public class OutboxPollingAutomaticIndexingStrategyLifecycleIT {
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.automaticIndexingStrategy( AutomaticIndexingStrategyExpectations.outboxPolling() );
 
+	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
+
 	@Before
 	public void cleanUp() {
-		SessionFactory sessionFactory = startSearchCleanupSqlData();
+		SessionFactory sessionFactory = setupWithCleanup();
 		sessionFactory.close();
 	}
 
 	@Test
 	public void stopWhileOutboxEventsIsBeingProcessed() {
-		SessionFactory sessionFactory = startSearchWithOutboxPolling();
+		SessionFactory sessionFactory = setup();
+		backendMock.verifyExpectationsMet();
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			for ( int i = 1; i <= 1000; i++ ) {
@@ -64,29 +65,31 @@ public class OutboxPollingAutomaticIndexingStrategyLifecycleIT {
 		} );
 
 		// wait for the first call is processed (partial progressing)
+		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.awaitFirstDocumentWorkCall();
+
 		// stop Search on partial progressing
 		sessionFactory.close();
 
-		sessionFactory = startSearchWithoutOutboxPolling();
-		List<OutboxEvent> outboxEntries;
-		try ( Session session = sessionFactory.openSession() ) {
-			outboxEntries = findOutboxEntries( session );
-		}
-
 		// verify some entities have not been processed
-		assertThat( outboxEntries ).isNotEmpty();
+		outboxEventFinder.hideAllEvents();
+		sessionFactory = setup();
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			assertThat( outboxEventFinder.findOutboxEventsNoFilter( session ) ).isNotEmpty();
+		} );
 		sessionFactory.close();
 
 		// process the entities restarting Search:
-		startSearchWithOutboxPolling();
+		sessionFactory = setup();
+		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 
 		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
 	public void processCreateUpdateDelete() {
-		SessionFactory sessionFactory = startSearchWithoutOutboxPolling();
+		SessionFactory sessionFactory = setup();
+		backendMock.verifyExpectationsMet();
 
 		int id = 1;
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -108,18 +111,19 @@ public class OutboxPollingAutomaticIndexingStrategyLifecycleIT {
 		} );
 
 		sessionFactory.close();
-		sessionFactory = startSearchWithoutOutboxPolling();
+		sessionFactory = setup();
 
-		try ( Session session = sessionFactory.openSession() ) {
-			List<OutboxEvent> outboxEntries = findOutboxEntries( session );
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 			assertThat( outboxEntries ).hasSize( 3 );
 			verifyOutboxEntry( outboxEntries.get( 0 ), IndexedEntity.NAME, "1", OutboxEvent.Type.ADD, null );
 			verifyOutboxEntry( outboxEntries.get( 1 ), IndexedEntity.NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE, null );
 			verifyOutboxEntry( outboxEntries.get( 2 ), IndexedEntity.NAME, "1", OutboxEvent.Type.DELETE, null );
-		}
+		} );
 
-		sessionFactory.close();
-		startSearchWithOutboxPolling();
+		// The events were hidden until now, to ensure they were not processed in separate batches.
+		// Make them visible to Hibernate Search now.
+		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 
 		backendMock.expectWorks( IndexedEntity.NAME )
 				.add( "1", b -> b.field( "indexedField", "value for the field" ) )
@@ -128,29 +132,20 @@ public class OutboxPollingAutomaticIndexingStrategyLifecycleIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-	private SessionFactory startSearchWithoutOutboxPolling() {
+	private SessionFactory setup() {
 		SessionFactory sessionFactory;
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b.field( "indexedField", String.class ) );
 		sessionFactory = ormSetupHelper.start()
-				.withProperty( "hibernate.search.automatic_indexing.process_outbox_table", "false" )
+				.withProperty( "hibernate.search.automatic_indexing.outbox_event_finder", outboxEventFinder )
 				.withProperty( "hibernate.hbm2ddl.auto", "update" )
 				.setup( IndexedEntity.class );
 		return sessionFactory;
 	}
 
-	private SessionFactory startSearchWithOutboxPolling() {
+	private SessionFactory setupWithCleanup() {
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b.field( "indexedField", String.class ) );
 		SessionFactory sessionFactory = ormSetupHelper.start()
-				.withProperty( "hibernate.hbm2ddl.auto", "update" )
-				.setup( IndexedEntity.class );
-		backendMock.verifyExpectationsMet();
-		return sessionFactory;
-	}
-
-	private SessionFactory startSearchCleanupSqlData() {
-		backendMock.expectSchema( IndexedEntity.NAME, b -> b.field( "indexedField", String.class ) );
-		SessionFactory sessionFactory = ormSetupHelper.start()
-				.withProperty( "hibernate.search.automatic_indexing.process_outbox_table", "false" )
+				.withProperty( "hibernate.search.automatic_indexing.outbox_event_finder", outboxEventFinder )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 		return sessionFactory;
@@ -192,4 +187,5 @@ public class OutboxPollingAutomaticIndexingStrategyLifecycleIT {
 			this.indexedField = indexedField;
 		}
 	}
+
 }

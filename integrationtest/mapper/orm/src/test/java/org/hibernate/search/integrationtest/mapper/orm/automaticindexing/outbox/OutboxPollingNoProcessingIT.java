@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
@@ -45,6 +44,8 @@ public class OutboxPollingNoProcessingIT {
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.automaticIndexingStrategy( AutomaticIndexingStrategyExpectations.outboxPolling() );
+
+	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
 
 	private SessionFactory sessionFactory;
 
@@ -86,7 +87,7 @@ public class OutboxPollingNoProcessingIT {
 							routedIndexedEntityMapping.property( "text" ).fullTextField();
 						}
 				)
-				.withProperty( "hibernate.search.automatic_indexing.process_outbox_table", "false" )
+				.withProperty( "hibernate.search.automatic_indexing.outbox_event_finder", outboxEventFinder )
 				.setup( IndexedEntity.class, AnotherIndexedEntity.class, RoutedIndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
@@ -99,7 +100,7 @@ public class OutboxPollingNoProcessingIT {
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			List<OutboxEvent> outboxEntries = findOutboxEntries( session );
+			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 1 );
 			verifyOutboxEntry( outboxEntries.get( 0 ), INDEX_NAME, "1", OutboxEvent.Type.ADD, null );
@@ -111,7 +112,7 @@ public class OutboxPollingNoProcessingIT {
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			List<OutboxEvent> outboxEntries = findOutboxEntries( session );
+			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
 			verifyOutboxEntry( outboxEntries.get( 1 ), INDEX_NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE, null );
@@ -123,7 +124,7 @@ public class OutboxPollingNoProcessingIT {
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			List<OutboxEvent> outboxEntries = findOutboxEntries( session );
+			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 3 );
 			verifyOutboxEntry( outboxEntries.get( 2 ), INDEX_NAME, "1", OutboxEvent.Type.DELETE, null );
@@ -140,7 +141,7 @@ public class OutboxPollingNoProcessingIT {
 		}
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			List<OutboxEvent> outboxEntries = findOutboxEntries( session );
+			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 7 );
 			for ( int i = 0; i < 7; i++ ) {
@@ -162,7 +163,7 @@ public class OutboxPollingNoProcessingIT {
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			List<OutboxEvent> outboxEntries = findOutboxEntries( session );
+			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
 			verifyOutboxEntry( outboxEntries.get( 0 ), INDEX_NAME, "1", OutboxEvent.Type.ADD, null );
@@ -180,7 +181,7 @@ public class OutboxPollingNoProcessingIT {
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			List<OutboxEvent> outboxEntries = findOutboxEntries( session );
+			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 1 );
 			verifyOutboxEntry(
@@ -194,17 +195,13 @@ public class OutboxPollingNoProcessingIT {
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			List<OutboxEvent> outboxEntries = findOutboxEntries( session );
+			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
 			verifyOutboxEntry(
 					outboxEntries.get( 1 ), RoutedIndexedEntity.INDEX_NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE, "Red",
 					"Blue", "Green", "Yellow", "White" ); // previous routing keys
 		} );
-	}
-
-	static List<OutboxEvent> findOutboxEntries(Session session) {
-		return session.createQuery( "select e from OutboxEvent e order by id", OutboxEvent.class ).list();
 	}
 
 	static void verifyOutboxEntry(OutboxEvent outboxEvent, String entityName, String entityId,

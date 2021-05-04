@@ -43,6 +43,7 @@ public class OutboxEventBackgroundExecutor {
 	}
 
 	private final AutomaticIndexingMappingContext mapping;
+	private final OutboxEventFinder finder;
 	private final int pollingInterval;
 	private final int batchSize;
 	private final AtomicReference<Status> status = new AtomicReference<>( Status.STOPPED );
@@ -50,8 +51,10 @@ public class OutboxEventBackgroundExecutor {
 	private final SingletonTask processingTask;
 
 	public OutboxEventBackgroundExecutor(AutomaticIndexingMappingContext mapping, ScheduledExecutorService executor,
+			OutboxEventFinder finder,
 			int pollingInterval, int batchSize) {
 		this.mapping = mapping;
+		this.finder = finder;
 		this.pollingInterval = pollingInterval;
 		this.batchSize = batchSize;
 
@@ -90,7 +93,7 @@ public class OutboxEventBackgroundExecutor {
 
 			try ( Session session = mapping.sessionFactory().openSession() ) {
 				return withinTransaction( session, () -> {
-					List<OutboxEvent> outboxes = findOutboxes( session );
+					List<OutboxEvent> outboxes = finder.findOutboxEvents( session, batchSize );
 					if ( outboxes.isEmpty() ) {
 						// Nothing to do, try again later (complete() will be called, re-scheduling the polling for later)
 						return CompletableFuture.completedFuture( null );
@@ -136,13 +139,6 @@ public class OutboxEventBackgroundExecutor {
 		public Future<?> schedule(Runnable runnable) {
 			return delegate.schedule( runnable, pollingInterval, TimeUnit.MILLISECONDS );
 		}
-	}
-
-	private List<OutboxEvent> findOutboxes(Session session) {
-		Query<OutboxEvent> query = session.createQuery(
-				"select e from OutboxEvent e order by e.id", OutboxEvent.class );
-		query.setMaxResults( batchSize );
-		return query.list();
 	}
 
 	private static void createOutboxRetries(FailureHandler failureHandler, Session session,
