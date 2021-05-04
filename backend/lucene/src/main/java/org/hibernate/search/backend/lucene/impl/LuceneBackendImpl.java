@@ -49,7 +49,6 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 	private final LuceneSyncWorkOrchestratorImpl readOrchestrator;
-	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	private final IndexManagerBackendContext indexManagerBackendContext;
 
@@ -70,7 +69,6 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 		this.readOrchestrator = new LuceneSyncWorkOrchestratorImpl(
 				"Lucene read work orchestrator - " + eventContext.render(), similarity, cachingContext
 		);
-		this.multiTenancyStrategy = multiTenancyStrategy;
 
 		this.indexManagerBackendContext = new IndexManagerBackendContext(
 				this, eventContext, threads, similarity,
@@ -134,11 +132,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 	@Override
 	public IndexManagerBuilder createIndexManagerBuilder(
 			String indexName, String mappedTypeName,
-			boolean multiTenancyEnabled,
 			BackendBuildContext context, ConfigurationPropertySource propertySource) {
-		if ( multiTenancyEnabled && !multiTenancyStrategy.isMultiTenancySupported() ) {
-			throw log.multiTenancyRequiredButNotSupportedByBackend( indexName, eventContext );
-		}
 
 		LuceneIndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder = new LuceneIndexSchemaRootNodeBuilder(
 				EventContexts.fromIndexName( indexName ), mappedTypeName, analysisDefinitionRegistry

@@ -89,8 +89,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 					this,
 					mappedIndex.backendName(),
 					mappedIndex.name(),
-					type.name(),
-					multiTenancyEnabled
+					type.name()
 			);
 			indexManagerBuilders.put( (StubTypeModel) type, indexManagerBuilder );
 			mappedIndex.bind( indexManagerBuilder.rootBindingContext() );

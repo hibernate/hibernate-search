@@ -236,11 +236,6 @@ public interface Log extends BasicLogger {
 	SearchException ioExceptionOnQueryExecution(Query luceneQuery, String causeMessage,
 			@Param EventContext context, @Cause IOException cause);
 
-	@Message(id = ID_OFFSET + 29,
-			value = "Invalid backend configuration: index '%1$s' requires multi-tenancy"
-					+ " but no multi-tenancy strategy is set.")
-	SearchException multiTenancyRequiredButNotSupportedByBackend(String indexName, @Param EventContext context);
-
 	@Message(id = ID_OFFSET + 30,
 			value = "Invalid multi-tenancy strategy name: '%1$s'. Valid names are: %2$s.")
 	SearchException invalidMultiTenancyStrategyName(String invalidRepresentation, List<String> validRepresentations);

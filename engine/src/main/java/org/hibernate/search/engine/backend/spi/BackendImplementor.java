@@ -55,7 +55,6 @@ public interface BackendImplementor {
 	 * This is the type name that will be assigned to search query hits for this index,
 	 * allowing the mapper to resolve the type of each hit in multi-index searches.
 	 * Each index is mapped to one and only one type.
-	 * @param multiTenancyEnabled {@code true} if multi-tenancy is enabled for this index, {@code false} otherwise.
 	 * @param context The build context
 	 * @param propertySource A configuration property source, appropriately masked so that the backend
 	 * doesn't need to care about Hibernate Search prefixes (hibernate.search.*, etc.). All the properties
@@ -65,7 +64,7 @@ public interface BackendImplementor {
 	 * @return A builder for index managers targeting this backend.
 	 */
 	IndexManagerBuilder createIndexManagerBuilder(String indexName,
-			String mappedTypeName, boolean multiTenancyEnabled, BackendBuildContext context,
+			String mappedTypeName, BackendBuildContext context,
 			ConfigurationPropertySource propertySource);
 
 }

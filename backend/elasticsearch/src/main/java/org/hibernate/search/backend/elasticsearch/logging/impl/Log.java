@@ -254,11 +254,6 @@ public interface Log extends BasicLogger {
 			value = "Invalid search sort: '%1$s'. You must build the sort from an Elasticsearch search scope.")
 	SearchException cannotMixElasticsearchSearchSortWithOtherSorts(SearchSort sort);
 
-	@Message(id = ID_OFFSET + 14,
-			value = "Invalid backend configuration: index '%1$s' requires multi-tenancy"
-					+ " but no multi-tenancy strategy is set.")
-	SearchException multiTenancyRequiredButNotSupportedByBackend(String indexName, @Param EventContext context);
-
 	@Message(id = ID_OFFSET + 15, value = "Invalid multi-tenancy strategy name: '%1$s'."
 			+ " Valid names are: %2$s.")
 	SearchException invalidMultiTenancyStrategyName(String invalidRepresentation, List<String> validRepresentations);

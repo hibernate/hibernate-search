@@ -118,7 +118,6 @@ public class IndexManagerBuildingStateHolderTest {
 		when( backendMock.createIndexManagerBuilder(
 				eq( "myIndex" ),
 				eq( "myType" ),
-				eq( false ),
 				any(),
 				indexPropertySourceCapture.capture()
 		) )
@@ -126,7 +125,7 @@ public class IndexManagerBuildingStateHolderTest {
 		when( indexManagerBuilderMock.schemaRootNodeBuilder() )
 				.thenReturn( indexSchemaRootNodeBuilderMock );
 		holder.getIndexManagerBuildingState(
-				Optional.empty(), "myIndex", "myType", false
+				Optional.empty(), "myIndex", "myType"
 		);
 		verifyNoOtherBackendInteractionsAndReset();
 
@@ -184,7 +183,6 @@ public class IndexManagerBuildingStateHolderTest {
 		when( backendMock.createIndexManagerBuilder(
 				eq( "myIndex" ),
 				eq( "myType" ),
-				eq( false ),
 				any(),
 				indexPropertySourceCapture.capture()
 		) )
@@ -192,7 +190,7 @@ public class IndexManagerBuildingStateHolderTest {
 		when( indexManagerBuilderMock.schemaRootNodeBuilder() )
 				.thenReturn( indexSchemaRootNodeBuilderMock );
 		holder.getIndexManagerBuildingState(
-				Optional.of( "myBackend" ), "myIndex", "myType", false
+				Optional.of( "myBackend" ), "myIndex", "myType"
 		);
 		verifyNoOtherBackendInteractionsAndReset();
 
