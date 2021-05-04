@@ -37,7 +37,7 @@ public class MultiTenancyMismatchIT {
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
 	@Test
-	public void backend_multi_tenancy_disabled_but_indexes_requiring_multi_tenancy_throws_exception() {
+	public void multiTenancyDisabled_requiredByTheMapper() {
 		assertThatThrownBy( () -> setupHelper.start()
 				.withIndex( index )
 				.withBackendProperty( "multi_tenancy.strategy", "none" )
@@ -47,8 +47,25 @@ public class MultiTenancyMismatchIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Invalid backend configuration",
-						"index '" + index.name() + "'", "requires multi-tenancy",
-						"no multi-tenancy strategy is set"
+						"mapping requires multi-tenancy",
+						"no multi-tenancy strategy is set",
+						"default backend"
+				);
+	}
+
+	@Test
+	public void multiTenancyEnabled_disabledInTheMapper() {
+		assertThatThrownBy( () -> setupHelper.start()
+				.withIndex( index )
+				.withBackendProperty( "multi_tenancy.strategy", "discriminator" )
+				.setup()
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Invalid backend configuration",
+						"mapping not requires multi-tenancy",
+						"multi-tenancy strategy is set",
+						"default backend"
 				);
 	}
 

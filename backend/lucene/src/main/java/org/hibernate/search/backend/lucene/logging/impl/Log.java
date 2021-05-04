@@ -659,4 +659,16 @@ public interface Log extends BasicLogger {
 			value = "'%1$s' can be used in some of the targeted indexes, but not all of them.")
 	SearchException partialSupportForQueryElementInCompositeIndexElement(String queryElementName);
 
+	@Message(id = ID_OFFSET + 148,
+			value = "Invalid backend configuration: mapping requires multi-tenancy"
+					+ " but no multi-tenancy strategy is set. %1$s.")
+	SearchException multiTenancyRequiredButExplicitlyDisabledByBackend(
+			@FormatWith(EventContextFormatter.class) EventContext context);
+
+	@Message(id = ID_OFFSET + 149,
+			value = "Invalid backend configuration: mapping not requires multi-tenancy"
+					+ " but multi-tenancy strategy is set. %1$s.")
+	SearchException multiTenancyNotRequiredButExplicitlyEnabledByTheBackend(
+			@FormatWith(EventContextFormatter.class) EventContext context);
+
 }
