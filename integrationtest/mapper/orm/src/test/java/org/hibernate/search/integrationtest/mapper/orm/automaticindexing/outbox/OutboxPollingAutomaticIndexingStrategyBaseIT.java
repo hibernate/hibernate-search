@@ -28,8 +28,6 @@ import org.junit.runner.RunWith;
 		// > Sending events outside of transactions, during a flush, doesn't work for some reason;
 		//   entities are only visible from other sessions after the original session is closed.
 		"!org.hibernate.search.integrationtest.mapper.orm.automaticindexing.session.AutomaticIndexingOutOfTransactionIT",
-		// > tested in a different class: OutboxAutomaticIndexingBridgeExplicitReindexingFunctionalIT
-		"!org.hibernate.search.integrationtest.mapper.orm.automaticindexing.bridge.AutomaticIndexingBridgeExplicitReindexingFunctionalIT",
 		// > already executed with the outbox table strategy
 		"!org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outboxtable..*"
 })

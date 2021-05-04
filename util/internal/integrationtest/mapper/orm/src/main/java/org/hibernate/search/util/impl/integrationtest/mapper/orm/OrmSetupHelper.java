@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.util.common.impl.Closer;
@@ -95,6 +96,10 @@ public final class OrmSetupHelper
 
 	public boolean areEntitiesProcessedInSession() {
 		return automaticIndexingStrategyExpectations.sync;
+	}
+
+	public boolean areIndexingEventsPushedAsEntities() {
+		return AutomaticIndexingStrategyNames.OUTBOX_POLLING.equals( automaticIndexingStrategyExpectations.strategyName );
 	}
 
 	@Override
