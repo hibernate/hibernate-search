@@ -123,10 +123,16 @@ public class LuceneIndexingNestedIT {
 	}
 
 	private void setup(MultiTenancyStrategyName multiTenancyStrategyName) throws IOException {
-		setupHelper.start()
+		SearchSetupHelper.SetupContext setupContext = setupHelper.start()
 				.withBackendProperty( LuceneBackendSettings.MULTI_TENANCY_STRATEGY, multiTenancyStrategyName )
-				.withIndex( index )
-				.setup();
+				.withIndex( index );
+
+		if ( MultiTenancyStrategyName.DISCRIMINATOR.equals( multiTenancyStrategyName ) ) {
+			// make the mapping consistent with the backend
+			setupContext.withMultiTenancy();
+		}
+
+		setupContext.setup();
 
 		assertThat( countWithField( "field1" ) ).isEqualTo( 0 );
 
