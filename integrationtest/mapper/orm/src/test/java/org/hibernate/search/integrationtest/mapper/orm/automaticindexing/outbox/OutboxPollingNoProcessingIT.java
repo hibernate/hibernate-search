@@ -16,11 +16,9 @@ import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.outbox.impl.OutboxEvent;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
@@ -34,9 +32,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 public class OutboxPollingNoProcessingIT {
-
-	private static final String INDEX_NAME = "IndexedEntity";
-	private static final String ANOTHER_INDEX_NAME = "AnotherIndexedEntity";
 
 	@Rule
 	public BackendMock backendMock = new BackendMock();
@@ -52,41 +47,19 @@ public class OutboxPollingNoProcessingIT {
 	@Before
 	public void setup() {
 		backendMock.expectSchema(
-				INDEX_NAME,
+				IndexedEntity.NAME,
 				b -> b.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 		backendMock.expectSchema(
-				ANOTHER_INDEX_NAME,
+				AnotherIndexedEntity.NAME,
 				b -> b.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 		backendMock.expectSchema(
-				RoutedIndexedEntity.INDEX_NAME,
+				RoutedIndexedEntity.NAME,
 				b -> b.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 
 		sessionFactory = ormSetupHelper.start()
-				.withProperty(
-						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
-						(HibernateOrmSearchMappingConfigurer) context -> {
-							ProgrammaticMappingConfigurationContext mapping = context.programmaticMapping();
-							TypeMappingStep indexedEntityMapping = mapping.type( IndexedEntity.class );
-							indexedEntityMapping.indexed().index( INDEX_NAME );
-							indexedEntityMapping.property( "id" ).documentId();
-							indexedEntityMapping.property( "text" ).fullTextField();
-
-							TypeMappingStep anotherIndexedEntityMapping = mapping.type( AnotherIndexedEntity.class );
-							anotherIndexedEntityMapping.indexed().index( ANOTHER_INDEX_NAME );
-							anotherIndexedEntityMapping.property( "id" ).documentId();
-							anotherIndexedEntityMapping.property( "text" ).fullTextField();
-
-							TypeMappingStep routedIndexedEntityMapping = mapping.type( RoutedIndexedEntity.class );
-							routedIndexedEntityMapping.indexed()
-									.index( RoutedIndexedEntity.INDEX_NAME )
-									.routingBinder( new CustomRoutingBridge.CustomRoutingBinder() );
-							routedIndexedEntityMapping.property( "id" ).documentId();
-							routedIndexedEntityMapping.property( "text" ).fullTextField();
-						}
-				)
 				.withProperty( "hibernate.search.automatic_indexing.outbox_event_finder", outboxEventFinder )
 				.setup( IndexedEntity.class, AnotherIndexedEntity.class, RoutedIndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -103,7 +76,7 @@ public class OutboxPollingNoProcessingIT {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 1 );
-			verifyOutboxEntry( outboxEntries.get( 0 ), INDEX_NAME, "1", OutboxEvent.Type.ADD, null );
+			verifyOutboxEntry( outboxEntries.get( 0 ), IndexedEntity.NAME, "1", OutboxEvent.Type.ADD, null );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -115,7 +88,7 @@ public class OutboxPollingNoProcessingIT {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
-			verifyOutboxEntry( outboxEntries.get( 1 ), INDEX_NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE, null );
+			verifyOutboxEntry( outboxEntries.get( 1 ), IndexedEntity.NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE, null );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -127,7 +100,7 @@ public class OutboxPollingNoProcessingIT {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 3 );
-			verifyOutboxEntry( outboxEntries.get( 2 ), INDEX_NAME, "1", OutboxEvent.Type.DELETE, null );
+			verifyOutboxEntry( outboxEntries.get( 2 ), IndexedEntity.NAME, "1", OutboxEvent.Type.DELETE, null );
 		} );
 	}
 
@@ -145,7 +118,7 @@ public class OutboxPollingNoProcessingIT {
 
 			assertThat( outboxEntries ).hasSize( 7 );
 			for ( int i = 0; i < 7; i++ ) {
-				verifyOutboxEntry( outboxEntries.get( i ), INDEX_NAME, ( i + 1 ) + "", OutboxEvent.Type.ADD, null );
+				verifyOutboxEntry( outboxEntries.get( i ), IndexedEntity.NAME, ( i + 1 ) + "", OutboxEvent.Type.ADD, null );
 			}
 		} );
 	}
@@ -166,8 +139,8 @@ public class OutboxPollingNoProcessingIT {
 			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
 
 			assertThat( outboxEntries ).hasSize( 2 );
-			verifyOutboxEntry( outboxEntries.get( 0 ), INDEX_NAME, "1", OutboxEvent.Type.ADD, null );
-			verifyOutboxEntry( outboxEntries.get( 1 ), ANOTHER_INDEX_NAME, "1", OutboxEvent.Type.ADD, null );
+			verifyOutboxEntry( outboxEntries.get( 0 ), IndexedEntity.NAME, "1", OutboxEvent.Type.ADD, null );
+			verifyOutboxEntry( outboxEntries.get( 1 ), AnotherIndexedEntity.NAME, "1", OutboxEvent.Type.ADD, null );
 		} );
 	}
 
@@ -185,7 +158,7 @@ public class OutboxPollingNoProcessingIT {
 
 			assertThat( outboxEntries ).hasSize( 1 );
 			verifyOutboxEntry(
-					outboxEntries.get( 0 ), RoutedIndexedEntity.INDEX_NAME, "1", OutboxEvent.Type.ADD, "Blue" );
+					outboxEntries.get( 0 ), RoutedIndexedEntity.NAME, "1", OutboxEvent.Type.ADD, "Blue" );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -199,7 +172,7 @@ public class OutboxPollingNoProcessingIT {
 
 			assertThat( outboxEntries ).hasSize( 2 );
 			verifyOutboxEntry(
-					outboxEntries.get( 1 ), RoutedIndexedEntity.INDEX_NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE, "Red",
+					outboxEntries.get( 1 ), RoutedIndexedEntity.NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE, "Red",
 					"Blue", "Green", "Yellow", "White" ); // previous routing keys
 		} );
 	}
@@ -224,11 +197,15 @@ public class OutboxPollingNoProcessingIT {
 		assertThat( routesDescriptor.previousRoutes() ).isEqualTo( descriptors );
 	}
 
-	@Entity(name = INDEX_NAME)
+	@Entity(name = IndexedEntity.NAME)
+	@Indexed
 	public static class IndexedEntity {
+
+		static final String NAME = "IndexedEntity";
 
 		@Id
 		private Integer id;
+		@FullTextField
 		private String text;
 
 		public IndexedEntity() {
@@ -252,11 +229,15 @@ public class OutboxPollingNoProcessingIT {
 		}
 	}
 
-	@Entity(name = ANOTHER_INDEX_NAME)
+	@Entity(name = AnotherIndexedEntity.NAME)
+	@Indexed
 	public static class AnotherIndexedEntity {
+
+		static final String NAME = "AnotherIndexedEntity";
 
 		@Id
 		private Integer id;
+		@FullTextField
 		private String text;
 
 		public AnotherIndexedEntity() {
