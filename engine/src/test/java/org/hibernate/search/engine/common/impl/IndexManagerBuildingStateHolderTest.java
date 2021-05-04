@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.common.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
@@ -293,6 +294,28 @@ public class IndexManagerBuildingStateHolderTest {
 						"configuration property 'somePrefix.backend.type' is not set,"
 								+ " and there isn't any backend in the classpath",
 						"Check that you added the desired backend to your project's dependencies" );
+	}
+
+	@Test
+	public void differentMultiTenancyNamedBackend() {
+		assertThatThrownBy( () -> {
+			BackendsInfo result = new BackendsInfo();
+			result.collect( Optional.of( "backend-name" ), true );
+			result.collect( Optional.of( "backend-name" ), false );
+		} ).hasMessageContaining(
+				"Different mappings trying to define two backends with the same name 'backend-name' " +
+						"but having different expectations on multi-tenancy." );
+	}
+
+	@Test
+	public void differentMultiTenancyDefaultBackend() {
+		assertThatThrownBy( () -> {
+			BackendsInfo result = new BackendsInfo();
+			result.collect( Optional.empty(), false );
+			result.collect( Optional.empty(), true );
+		} ).hasMessageContaining(
+				"Different mappings trying to define default backends " +
+						"having different expectations on multi-tenancy." );
 	}
 
 	private void verifyNoOtherBackendInteractionsAndReset() {
