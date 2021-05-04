@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.orm.outbox.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendWorkThreadingExpectations;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.AutomaticIndexingStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
@@ -35,10 +35,8 @@ public class OutboxPollingAutomaticIndexingStrategyLifecycleIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
-
-	private final BackendWorkThreadingExpectations threadingExpectations = BackendWorkThreadingExpectations.async(
-			".*Outbox table.*" );
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
+			.automaticIndexingStrategy( AutomaticIndexingStrategyExpectations.outboxPolling() );
 
 	@Before
 	public void cleanUp() {
@@ -134,7 +132,6 @@ public class OutboxPollingAutomaticIndexingStrategyLifecycleIT {
 		SessionFactory sessionFactory;
 		backendMock.expectSchema( IndexedEntity.NAME, b -> b.field( "indexedField", String.class ) );
 		sessionFactory = ormSetupHelper.start()
-				.withProperty( "hibernate.search.automatic_indexing.strategy", "outbox-polling" )
 				.withProperty( "hibernate.search.automatic_indexing.process_outbox_table", "false" )
 				.withProperty( "hibernate.hbm2ddl.auto", "update" )
 				.setup( IndexedEntity.class );
@@ -142,10 +139,8 @@ public class OutboxPollingAutomaticIndexingStrategyLifecycleIT {
 	}
 
 	private SessionFactory startSearchWithOutboxPolling() {
-		backendMock.expectSchema( IndexedEntity.NAME, b -> b.field( "indexedField", String.class ) )
-				.indexingWorkThreadingExpectations( threadingExpectations );
+		backendMock.expectSchema( IndexedEntity.NAME, b -> b.field( "indexedField", String.class ) );
 		SessionFactory sessionFactory = ormSetupHelper.start()
-				.withProperty( "hibernate.search.automatic_indexing.strategy", "outbox-polling" )
 				.withProperty( "hibernate.hbm2ddl.auto", "update" )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -153,10 +148,8 @@ public class OutboxPollingAutomaticIndexingStrategyLifecycleIT {
 	}
 
 	private SessionFactory startSearchCleanupSqlData() {
-		backendMock.expectSchema( IndexedEntity.NAME, b -> b.field( "indexedField", String.class ) )
-				.indexingWorkThreadingExpectations( threadingExpectations );
+		backendMock.expectSchema( IndexedEntity.NAME, b -> b.field( "indexedField", String.class ) );
 		SessionFactory sessionFactory = ormSetupHelper.start()
-				.withProperty( "hibernate.search.automatic_indexing.strategy", "outbox-polling" )
 				.withProperty( "hibernate.search.automatic_indexing.process_outbox_table", "false" )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();

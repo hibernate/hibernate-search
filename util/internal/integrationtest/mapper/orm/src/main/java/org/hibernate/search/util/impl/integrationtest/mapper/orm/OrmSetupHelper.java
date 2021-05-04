@@ -27,16 +27,15 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.multitenancy.im
 public final class OrmSetupHelper
 		extends MappingSetupHelper<OrmSetupHelper.SetupContext, SimpleSessionFactoryBuilder, SessionFactory> {
 
-	public static void automaticIndexingStrategyExpectations(
+	public static void defaultAutomaticIndexingStrategy(
 			AutomaticIndexingStrategyExpectations automaticIndexingStrategyExpectations) {
-		OrmSetupHelper.automaticIndexingStrategyExpectations = automaticIndexingStrategyExpectations;
+		OrmSetupHelper.defaultAutomaticIndexingStrategyExpectations = automaticIndexingStrategyExpectations;
 	}
 
-	private static AutomaticIndexingStrategyExpectations automaticIndexingStrategyExpectations =
+	private static AutomaticIndexingStrategyExpectations defaultAutomaticIndexingStrategyExpectations =
 			AutomaticIndexingStrategyExpectations.defaults();
 
 	public static OrmSetupHelper withBackendMock(BackendMock backendMock) {
-		backendMock.indexingWorkThreadingExpectations( automaticIndexingStrategyExpectations.indexingWorkThreadingExpectations );
 		return new OrmSetupHelper(
 				BackendSetupStrategy.withSingleBackendMock( backendMock ),
 				Collections.singleton( backendMock ),
@@ -79,12 +78,19 @@ public final class OrmSetupHelper
 
 	private final Collection<BackendMock> backendMocks;
 	private final SchemaManagementStrategyName schemaManagementStrategyName;
+	private AutomaticIndexingStrategyExpectations automaticIndexingStrategyExpectations =
+			defaultAutomaticIndexingStrategyExpectations;
 
 	private OrmSetupHelper(BackendSetupStrategy backendSetupStrategy, Collection<BackendMock> backendMocks,
 			SchemaManagementStrategyName schemaManagementStrategyName) {
 		super( backendSetupStrategy );
 		this.backendMocks = backendMocks;
 		this.schemaManagementStrategyName = schemaManagementStrategyName;
+	}
+
+	public OrmSetupHelper automaticIndexingStrategy(AutomaticIndexingStrategyExpectations automaticIndexingStrategyExpectations) {
+		this.automaticIndexingStrategyExpectations = automaticIndexingStrategyExpectations;
+		return this;
 	}
 
 	public boolean areEntitiesProcessedInSession() {
@@ -122,7 +128,8 @@ public final class OrmSetupHelper
 			withProperty( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY, schemaManagementStrategyName );
 			// Set the automatic indexing strategy according to the expectations
 			withProperty( "hibernate.search.automatic_indexing.strategy",
-					automaticIndexingStrategyExpectations.strategyClassName );
+					automaticIndexingStrategyExpectations.strategyName
+			);
 			// Ensure overridden properties will be applied
 			withConfiguration( builder -> overriddenProperties.forEach( builder::setProperty ) );
 		}

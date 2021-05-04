@@ -42,13 +42,12 @@ public class LocalHeapQueueAutomaticIndexingStrategyBaseIT {
 	@BeforeClass
 	public static void beforeAll() {
 		// Force the automatic indexing strategy
-		OrmSetupHelper.automaticIndexingStrategyExpectations( AutomaticIndexingStrategyExpectations.async(
-				LocalHeapQueueAutomaticIndexingStrategy.class.getName(), ".*Local heap queue.*" ) );
+		OrmSetupHelper.defaultAutomaticIndexingStrategy( AutomaticIndexingStrategyExpectations.localHeapQueue() );
 	}
 
 	@AfterClass
 	public static void afterAll() {
-		OrmSetupHelper.automaticIndexingStrategyExpectations( AutomaticIndexingStrategyExpectations.defaults() );
+		OrmSetupHelper.defaultAutomaticIndexingStrategy( AutomaticIndexingStrategyExpectations.defaults() );
 	}
 
 	// For checkstyle.

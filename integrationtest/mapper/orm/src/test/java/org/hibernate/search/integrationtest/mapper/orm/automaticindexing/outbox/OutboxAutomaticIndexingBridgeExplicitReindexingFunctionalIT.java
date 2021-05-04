@@ -29,7 +29,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.rule.BackendWorkThreadingExpectations;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.AutomaticIndexingStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -48,14 +48,12 @@ import org.junit.Test;
 @TestForIssue(jiraKey = "HSEARCH-3297")
 public class OutboxAutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 
-	private final BackendWorkThreadingExpectations threadingExpectations = BackendWorkThreadingExpectations.async(
-			".*Outbox table.*" );
-
 	@Rule
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
+			.automaticIndexingStrategy( AutomaticIndexingStrategyExpectations.outboxPolling() );
 
 	private SessionFactory sessionFactory;
 
@@ -65,8 +63,7 @@ public class OutboxAutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 				.objectField( "typeBridge", b2 -> b2
 						.field( "includedInTypeBridge", String.class )
 				)
-		)
-				.indexingWorkThreadingExpectations( threadingExpectations );
+		);
 
 		sessionFactory = ormSetupHelper.start()
 				.withProperty(
@@ -79,7 +76,6 @@ public class OutboxAutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 							}
 						}
 				)
-				.withProperty( "hibernate.search.automatic_indexing.strategy", "outbox-polling" )
 				.setup(
 						IndexedEntity.class,
 						ContainedEntity.class

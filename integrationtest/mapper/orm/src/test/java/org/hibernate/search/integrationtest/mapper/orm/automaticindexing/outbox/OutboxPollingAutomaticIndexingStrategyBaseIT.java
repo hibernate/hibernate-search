@@ -38,13 +38,12 @@ public class OutboxPollingAutomaticIndexingStrategyBaseIT {
 	@BeforeClass
 	public static void beforeAll() {
 		// Force the automatic indexing strategy
-		OrmSetupHelper.automaticIndexingStrategyExpectations( AutomaticIndexingStrategyExpectations.async(
-				AutomaticIndexingStrategyNames.OUTBOX_POLLING, ".*Outbox table.*" ) );
+		OrmSetupHelper.defaultAutomaticIndexingStrategy( AutomaticIndexingStrategyExpectations.outboxPolling() );
 	}
 
 	@AfterClass
 	public static void afterAll() {
-		OrmSetupHelper.automaticIndexingStrategyExpectations( AutomaticIndexingStrategyExpectations.defaults() );
+		OrmSetupHelper.defaultAutomaticIndexingStrategy( AutomaticIndexingStrategyExpectations.defaults() );
 	}
 
 	// For checkstyle.

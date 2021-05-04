@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm;
 
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendWorkThreadingExpectations;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.automaticindexing.LocalHeapQueueAutomaticIndexingStrategy;
 
 public final class AutomaticIndexingStrategyExpectations {
 
@@ -14,18 +16,26 @@ public final class AutomaticIndexingStrategyExpectations {
 		return new AutomaticIndexingStrategyExpectations( null, true, BackendWorkThreadingExpectations.sync() );
 	}
 
-	public static AutomaticIndexingStrategyExpectations async(String strategyClassName, String threadNamePattern) {
-		return new AutomaticIndexingStrategyExpectations( strategyClassName, false,
+	public static AutomaticIndexingStrategyExpectations localHeapQueue() {
+		return async( LocalHeapQueueAutomaticIndexingStrategy.class.getName(), ".*Local heap queue.*" );
+	}
+
+	public static AutomaticIndexingStrategyExpectations outboxPolling() {
+		return async( AutomaticIndexingStrategyNames.OUTBOX_POLLING, ".*Outbox table.*" );
+	}
+
+	private static AutomaticIndexingStrategyExpectations async(String strategyName, String threadNamePattern) {
+		return new AutomaticIndexingStrategyExpectations( strategyName, false,
 				BackendWorkThreadingExpectations.async( threadNamePattern ) );
 	}
 
-	final String strategyClassName;
+	final String strategyName;
 	final boolean sync;
 	final BackendWorkThreadingExpectations indexingWorkThreadingExpectations;
 
-	private AutomaticIndexingStrategyExpectations(String strategyClassName, boolean sync,
+	private AutomaticIndexingStrategyExpectations(String strategyName, boolean sync,
 			BackendWorkThreadingExpectations indexingWorkThreadingExpectations) {
-		this.strategyClassName = strategyClassName;
+		this.strategyName = strategyName;
 		this.sync = sync;
 		this.indexingWorkThreadingExpectations = indexingWorkThreadingExpectations;
 	}
