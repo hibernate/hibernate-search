@@ -408,4 +408,12 @@ public interface Log extends BasicLogger {
 			+ " the required identifier must be a superclass of the actual identifier.")
 	SearchException wrongRequiredIdentifierType(@FormatWith(ClassFormatter.class) Class<?> requiredIdentifierType,
 			@FormatWith(ClassFormatter.class) Class<?> actualIdentifierType);
+
+	@Message(id = ID_OFFSET + 96, value = "Different mappings trying to define two backends " +
+			"with the same name '%1$s' but having different expectations on multi-tenancy.")
+	SearchException differentMultiTenancyNamedBackend(String backendName);
+
+	@Message(id = ID_OFFSET + 97, value = "Different mappings trying to define default backends " +
+			"having different expectations on multi-tenancy.")
+	SearchException differentMultiTenancyDefaultBackend();
 }
