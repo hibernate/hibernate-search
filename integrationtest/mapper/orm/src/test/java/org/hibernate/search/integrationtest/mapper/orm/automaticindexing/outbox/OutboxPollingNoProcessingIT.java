@@ -26,6 +26,7 @@ import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.AutomaticIndexingStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
@@ -42,7 +43,8 @@ public class OutboxPollingNoProcessingIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
+			.automaticIndexingStrategy( AutomaticIndexingStrategyExpectations.outboxPolling() );
 
 	private SessionFactory sessionFactory;
 
@@ -84,7 +86,6 @@ public class OutboxPollingNoProcessingIT {
 							routedIndexedEntityMapping.property( "text" ).fullTextField();
 						}
 				)
-				.withProperty( "hibernate.search.automatic_indexing.strategy", "outbox-polling" )
 				.withProperty( "hibernate.search.automatic_indexing.process_outbox_table", "false" )
 				.setup( IndexedEntity.class, AnotherIndexedEntity.class, RoutedIndexedEntity.class );
 		backendMock.verifyExpectationsMet();

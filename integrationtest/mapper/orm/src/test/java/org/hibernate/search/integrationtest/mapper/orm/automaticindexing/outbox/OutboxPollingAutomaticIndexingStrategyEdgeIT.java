@@ -33,9 +33,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.AutomaticIndexi
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -50,22 +48,11 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 	public BackendMock backendMock = new BackendMock();
 
 	@Rule
-	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
+			.automaticIndexingStrategy( AutomaticIndexingStrategyExpectations.outboxPolling() );
 
 	private SessionFactory sessionFactory;
 	private TestFailureHandler failureHandler;
-
-	@BeforeClass
-	public static void beforeAll() {
-		// Force the automatic indexing strategy
-		OrmSetupHelper.automaticIndexingStrategyExpectations( AutomaticIndexingStrategyExpectations.async(
-				AutomaticIndexingStrategyNames.OUTBOX_POLLING, ".*Outbox table.*" ) );
-	}
-
-	@AfterClass
-	public static void afterAll() {
-		OrmSetupHelper.automaticIndexingStrategyExpectations( AutomaticIndexingStrategyExpectations.defaults() );
-	}
 
 	@Before
 	public void setup() {
