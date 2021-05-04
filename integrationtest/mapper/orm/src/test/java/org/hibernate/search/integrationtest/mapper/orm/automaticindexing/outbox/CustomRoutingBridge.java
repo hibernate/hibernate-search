@@ -30,7 +30,7 @@ public class CustomRoutingBridge implements RoutingBridge<RoutedIndexedEntity> {
 		}
 	}
 
-	public static final class CustomRoutingBinder implements RoutingBinder {
+	public static final class Binder implements RoutingBinder {
 
 		@Override
 		public void bind(RoutingBindingContext context) {

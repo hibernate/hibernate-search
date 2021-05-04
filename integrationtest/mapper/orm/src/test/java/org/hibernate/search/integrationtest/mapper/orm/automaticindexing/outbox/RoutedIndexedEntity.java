@@ -9,18 +9,24 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outbox
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-@Entity(name = RoutedIndexedEntity.INDEX_NAME)
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingBinderRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+
+@Entity(name = RoutedIndexedEntity.NAME)
+@Indexed(routingBinder = @RoutingBinderRef(type = CustomRoutingBridge.Binder.class))
 public class RoutedIndexedEntity {
 
 	public enum Color {
 		Red, Blue, Green, Yellow, White
 	}
 
-	public static final String INDEX_NAME = "RoutedIndexedEntity";
+	public static final String NAME = "RoutedIndexedEntity";
 
 	@Id
 	private Integer id;
 
+	@FullTextField
 	private String text;
 
 	private Color color;
