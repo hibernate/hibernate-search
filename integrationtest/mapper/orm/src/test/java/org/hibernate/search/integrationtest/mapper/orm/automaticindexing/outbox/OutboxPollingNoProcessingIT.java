@@ -150,8 +150,7 @@ public class OutboxPollingNoProcessingIT {
 	public void routingKeys() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			RoutedIndexedEntity indexedPojo = new RoutedIndexedEntity( 1, "Using some text here",
-					RoutedIndexedEntity.Color.Blue
-			);
+					RoutedIndexedEntity.Status.FIRST );
 			session.save( indexedPojo );
 		} );
 
@@ -160,13 +159,14 @@ public class OutboxPollingNoProcessingIT {
 
 			assertThat( outboxEntries ).hasSize( 1 );
 			verifyOutboxEntry(
-					outboxEntries.get( 0 ), RoutedIndexedEntity.NAME, "1", OutboxEvent.Type.ADD, "Blue" );
+					outboxEntries.get( 0 ), RoutedIndexedEntity.NAME, "1", OutboxEvent.Type.ADD,
+					"FIRST" );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			RoutedIndexedEntity entity = session.load( RoutedIndexedEntity.class, 1 );
 			entity.setText( "Change the test of this entity!" );
-			entity.setColor( RoutedIndexedEntity.Color.Red );
+			entity.setStatus( RoutedIndexedEntity.Status.SECOND );
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -174,8 +174,9 @@ public class OutboxPollingNoProcessingIT {
 
 			assertThat( outboxEntries ).hasSize( 2 );
 			verifyOutboxEntry(
-					outboxEntries.get( 1 ), RoutedIndexedEntity.NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE, "Red",
-					"Blue", "Green", "Yellow", "White" ); // previous routing keys
+					outboxEntries.get( 1 ), RoutedIndexedEntity.NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE,
+					"SECOND",
+					"FIRST" ); // previous routing keys
 		} );
 	}
 
