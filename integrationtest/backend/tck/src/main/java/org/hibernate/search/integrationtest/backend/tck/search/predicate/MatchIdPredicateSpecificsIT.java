@@ -9,7 +9,9 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
@@ -30,6 +32,9 @@ import org.junit.Test;
 
 public class MatchIdPredicateSpecificsIT {
 
+	// it should be more than the default max clause count of the boolean queries
+	private static final int LOT_OF_TERMS_SIZE = 2000;
+
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
 	private static final String DOCUMENT_3 = "document3";
@@ -47,9 +52,19 @@ public class MatchIdPredicateSpecificsIT {
 			StubMappedIndex.ofAdvancedNonRetrievable( ctx -> ctx.idDslConverter( new IncompatibleIdConverter() ) )
 					.name( "incompatibleIdConverter" );
 
+	// only one of which is matching
+	private static final List<String> lotsOfTerms = new ArrayList<>();
+
 	@BeforeClass
 	public static void setup() {
 		setupHelper.start().withIndexes( mainIndex, compatibleIdConverterIndex, incompatibleIdConverterIndex ).setup();
+
+		for ( int i = 1; i <= LOT_OF_TERMS_SIZE; i++ ) {
+			if ( i == 3 ) {
+				lotsOfTerms.add( "document" + i );
+			}
+			lotsOfTerms.add( "wrong-document" + i );
+		}
 
 		initData();
 	}
@@ -93,6 +108,14 @@ public class MatchIdPredicateSpecificsIT {
 				.where( f -> f.id()
 						.matchingAny( Arrays.asList( DOCUMENT_1, DOCUMENT_3 ) ) ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1, DOCUMENT_3 );
+	}
+
+	@Test
+	public void matchingAny_lotsOfTerms() {
+		assertThatQuery( mainIndex.query()
+				.where( f -> f.id()
+						.matchingAny( lotsOfTerms ) ) )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_3 );
 	}
 
 	@Test
