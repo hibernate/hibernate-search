@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
@@ -17,11 +18,9 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.BooleanClause.Occur;
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TermInSetQuery;
+import org.apache.lucene.util.BytesRef;
 
 public class LuceneMatchIdPredicate extends AbstractLuceneSearchPredicate {
 
@@ -41,15 +40,8 @@ public class LuceneMatchIdPredicate extends AbstractLuceneSearchPredicate {
 
 	@Override
 	protected Query doToQuery(PredicateRequestContext context) {
-		BooleanQuery.Builder builder = new BooleanQuery.Builder();
-		for ( String value : values ) {
-			builder.add( termQuery( value ), Occur.SHOULD );
-		}
-		return builder.build();
-	}
-
-	private TermQuery termQuery( String value ) {
-		return new TermQuery( new Term( MetadataFields.idFieldName(), value ) );
+		List<BytesRef> bytesRefs = values.stream().map( BytesRef::new ).collect( Collectors.toList() );
+		return new TermInSetQuery( MetadataFields.idFieldName(), bytesRefs );
 	}
 
 	static class Builder extends AbstractBuilder implements MatchIdPredicateBuilder {
