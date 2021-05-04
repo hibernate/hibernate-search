@@ -46,16 +46,19 @@ public class IndexIndexingPlanIT {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private static final String MULTI_TENANCY_LABEL = "Multi-tenancy enabled explicitly";
+	public static final String NO_MULTI_TENANCY_LABEL = "No multi-tenancy";
+
 	@Parameterized.Parameters(name = "{0}")
 	public static Object[][] parameters() {
 		return new Object[][] {
 				{
-						"No multi-tenancy",
+						NO_MULTI_TENANCY_LABEL,
 						(Function<TckBackendHelper, TckBackendSetupStrategy<?>>) TckBackendHelper::createDefaultBackendSetupStrategy,
 						new StubBackendSessionContext()
 				},
 				{
-						"Multi-tenancy enabled explicitly",
+						MULTI_TENANCY_LABEL,
 						(Function<TckBackendHelper, TckBackendSetupStrategy<?>>) TckBackendHelper::createMultiTenancyBackendSetupStrategy,
 						new StubBackendSessionContext( "tenant_1" )
 				}
@@ -69,15 +72,23 @@ public class IndexIndexingPlanIT {
 
 	private final SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( IndexBinding::new );
 
+	private final String label;
+
 	public IndexIndexingPlanIT(String label, Function<TckBackendHelper, TckBackendSetupStrategy<?>> setupStrategyFunction,
 			StubBackendSessionContext sessionContext) {
 		this.setupHelper = new SearchSetupHelper( setupStrategyFunction );
 		this.sessionContext = sessionContext;
+		this.label = label;
 	}
 
 	@Before
 	public void setup() {
-		setupHelper.start().withIndex( index ).setup();
+		SearchSetupHelper.SetupContext setupContext = setupHelper.start().withIndex( index );
+		if ( MULTI_TENANCY_LABEL.equals( label ) ) {
+			setupContext.withMultiTenancy();
+		}
+
+		setupContext.setup();
 	}
 
 	@Test
