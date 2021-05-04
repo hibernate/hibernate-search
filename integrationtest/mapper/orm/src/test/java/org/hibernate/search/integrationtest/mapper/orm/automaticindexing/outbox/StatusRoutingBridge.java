@@ -12,21 +12,31 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingBinde
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingBridgeRouteContext;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutes;
 
-public class CustomRoutingBridge implements RoutingBridge<RoutedIndexedEntity> {
+public class StatusRoutingBridge implements RoutingBridge<RoutedIndexedEntity> {
 
 	@Override
 	public void route(DocumentRoutes routes, Object entityIdentifier, RoutedIndexedEntity indexedEntity,
 			RoutingBridgeRouteContext context) {
-		routes.addRoute().routingKey( indexedEntity.getColorName() );
+		routes.addRoute().routingKey( indexedEntity.getStatus().name() );
 	}
 
 	@Override
 	public void previousRoutes(DocumentRoutes routes, Object entityIdentifier, RoutedIndexedEntity indexedEntity,
 			RoutingBridgeRouteContext context) {
-		for ( RoutedIndexedEntity.Color color : RoutedIndexedEntity.Color.values() ) {
-			// we simply don’t know what the previous route id of the book was,
-			// so we tell Hibernate Search to follow all possible routes
-			routes.addRoute().routingKey( color.name() );
+		// Let's assume that business rules mandate that status change always happens in the same direction:
+		// first => second => third
+		// and that we never "skip" a step in a given transaction.
+		// Then we know what the previous routes can be.
+		switch ( indexedEntity.getStatus() ) {
+			case FIRST:
+				routes.notIndexed();
+				break;
+			case SECOND:
+				routes.addRoute().routingKey( RoutedIndexedEntity.Status.FIRST.name() );
+				break;
+			case THIRD:
+				routes.addRoute().routingKey( RoutedIndexedEntity.Status.SECOND.name() );
+				break;
 		}
 	}
 
@@ -35,7 +45,7 @@ public class CustomRoutingBridge implements RoutingBridge<RoutedIndexedEntity> {
 		@Override
 		public void bind(RoutingBindingContext context) {
 			context.dependencies().use( "text" );
-			context.bridge( RoutedIndexedEntity.class, new CustomRoutingBridge() );
+			context.bridge( RoutedIndexedEntity.class, new StatusRoutingBridge() );
 		}
 	}
 }

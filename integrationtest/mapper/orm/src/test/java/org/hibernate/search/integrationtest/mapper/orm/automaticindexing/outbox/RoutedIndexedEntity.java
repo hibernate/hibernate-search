@@ -14,11 +14,11 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextFi
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 @Entity(name = RoutedIndexedEntity.NAME)
-@Indexed(routingBinder = @RoutingBinderRef(type = CustomRoutingBridge.Binder.class))
+@Indexed(routingBinder = @RoutingBinderRef(type = StatusRoutingBridge.Binder.class))
 public class RoutedIndexedEntity {
 
-	public enum Color {
-		Red, Blue, Green, Yellow, White
+	public enum Status {
+		FIRST, SECOND, THIRD
 	}
 
 	public static final String NAME = "RoutedIndexedEntity";
@@ -29,15 +29,15 @@ public class RoutedIndexedEntity {
 	@FullTextField
 	private String text;
 
-	private Color color;
+	private Status status;
 
 	public RoutedIndexedEntity() {
 	}
 
-	public RoutedIndexedEntity(Integer id, String text, Color color) {
+	public RoutedIndexedEntity(Integer id, String text, Status status) {
 		this.id = id;
 		this.text = text;
-		this.color = color;
+		this.status = status;
 	}
 
 	public Integer getId() {
@@ -52,15 +52,12 @@ public class RoutedIndexedEntity {
 		this.text = text;
 	}
 
-	public Color getColor() {
-		return color;
+	public Status getStatus() {
+		return status;
 	}
 
-	public void setColor(Color color) {
-		this.color = color;
+	public void setStatus(Status status) {
+		this.status = status;
 	}
 
-	public String getColorName() {
-		return ( color == null ) ? Color.White.name() : color.name();
-	}
 }
