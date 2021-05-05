@@ -82,8 +82,29 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 			if ( !isDelete() ) {
 				expectLoading( Collections.singletonList( 42 ), Collections.singletonList( IndexedEntity.of( 1 ) ) );
 			}
-			// Since we don't provide any previous routes, we don't expect additional deletes.
-			expectOperation( futureFromBackend, 42, "UE-123", "1" );
+			expectOperation( futureFromBackend,
+					worksBeforeInSamePlan -> {
+						if ( !isAdd() ) {
+							// For operations other than add,
+							// expect a delete for the previous routes (if different).
+							if ( isImplicitRoutingEnabled() ) {
+								// If implicit routing is enabled, the provided current route
+								// is assumed out-of-date and turned into a previous route.
+								worksBeforeInSamePlan
+										.delete( b -> addWorkInfo( b, tenantId, "42", "UE-123" ) );
+
+								// If implicit routing is enabled, previous routes are also taken from the routing bridge.
+								MyRoutingBridge.previousValues = Arrays.asList( "1", "foo", "3" );
+								worksBeforeInSamePlan
+										// "1" is ignored as it's the current value
+										.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "foo" ) ) )
+										.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "3" ) ) );
+							}
+							// else: if implicit routing is disabled,
+							// since we don't provide any previous routes, we don't expect additional deletes.
+						}
+					},
+					42, "UE-123", "1" );
 			operation.addTo( indexingPlan, 42,
 					DocumentRoutesDescriptor.of( DocumentRouteDescriptor.of( "UE-123" ), Collections.emptyList() ) );
 			// The session will wait for completion of the indexing plan upon closing,
@@ -110,6 +131,19 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 							worksBeforeInSamePlan
 									.delete( b -> addWorkInfo( b, tenantId, "42", "UE-121" ) )
 									.delete( b -> addWorkInfo( b, tenantId, "42", "UE-122" ) );
+							if ( isImplicitRoutingEnabled() ) {
+								// If implicit routing is enabled, the provided current route
+								// is assumed out-of-date and turned into a previous route.
+								worksBeforeInSamePlan
+										.delete( b -> addWorkInfo( b, tenantId, "42", "UE-123" ) );
+
+								// If implicit routing is enabled, previous routes are also taken from the routing bridge.
+								MyRoutingBridge.previousValues = Arrays.asList( "1", "foo", "3" );
+								worksBeforeInSamePlan
+										// "1" is ignored as it's the current value
+										.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "foo" ) ) )
+										.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "3" ) ) );
+							}
 						}
 					},
 					42, "UE-123", "1"

@@ -158,14 +158,11 @@ public abstract class AbstractPojoIndexingOperationIT {
 		);
 		worksBefore.accept( context );
 		String expectedRoutingKey;
-		if ( providedRoutingKey != null ) {
-			expectedRoutingKey = providedRoutingKey;
-		}
-		else if ( isImplicitRoutingEnabled() ) {
+		if ( isImplicitRoutingEnabled() ) {
 			expectedRoutingKey = MyRoutingBridge.toRoutingKey( tenantId, id, value );
 		}
 		else {
-			expectedRoutingKey = null;
+			expectedRoutingKey = providedRoutingKey;
 		}
 		operation.expect( context, tenantId, String.valueOf( id ), expectedRoutingKey, value );
 		context.createdThenExecuted( futureFromBackend );

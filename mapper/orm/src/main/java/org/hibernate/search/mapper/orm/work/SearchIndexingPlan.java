@@ -72,7 +72,7 @@ public interface SearchIndexingPlan {
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * @param providedRoutingKey The routing key to route the purge request to the appropriate index shard.
-	 * Leave null if sharding is disabled or if you don't use a custom {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
+	 * Leave {@code null} if sharding is disabled or does not rely on custom routing keys.
 	 * @throws org.hibernate.search.util.common.SearchException If the entity type is not indexed directly
 	 * ({@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed}).
 	 */
@@ -92,7 +92,7 @@ public interface SearchIndexingPlan {
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * @param providedRoutingKey The routing key to route the purge request to the appropriate index shard.
-	 * Leave {@code null} if sharding is disabled or if you don't use a custom {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
+	 * Leave {@code null} if sharding is disabled or does not rely on custom routing keys.
 	 * @throws org.hibernate.search.util.common.SearchException If the entity type is not indexed directly
 	 * ({@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed}).
 	 */

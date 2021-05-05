@@ -46,8 +46,11 @@ public interface PojoIndexingPlan {
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
 	 * @param providedRoutes The route to the current index shard.
-	 * Leave {@code null} if sharding is disabled
-	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
+	 * Only required if custom routing is enabled
+	 * and the {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge} is missing.
+	 * If a {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge} is assigned to the entity type,
+	 * the routes will be computed using that bridge instead,
+	 * and provided routes will be ignored.
 	 * @param entity The entity to add to the index.
 	 */
 	void add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
@@ -61,8 +64,12 @@ public interface PojoIndexingPlan {
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
 	 * @param providedRoutes The routes to the current and previous index shards.
-	 * Leave {@code null} if sharding is disabled
-	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
+	 * Only required if custom routing is enabled
+	 * and the {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge} is missing
+	 * or unable to provide all the correct previous routes.
+	 * If a {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge} is assigned to the entity type,
+	 * the routes will be computed using that bridge instead,
+	 * and provided routes (current and previous) will all be appended to the generated "previous routes".
 	 * @param entity The entity to update in the index.
 	 */
 	void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
@@ -78,8 +85,12 @@ public interface PojoIndexingPlan {
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
 	 * @param providedRoutes The routes to the current and previous index shards.
-	 * Leave {@code null} if sharding is disabled
-	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}.
+	 * Only required if custom routing is enabled
+	 * and the {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge} is missing
+	 * or unable to provide all the correct previous routes.
+	 * If a {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge} is assigned to the entity type,
+	 * the routes will be computed using that bridge instead,
+	 * and provided routes (current and previous) will all be appended to the generated "previous routes".
 	 * @param entity The entity to update in the index.
 	 * @param dirtyPaths The paths to consider dirty, as a {@link BitSet}.
 	 * You can build such a {@link BitSet} by obtaining the
@@ -102,10 +113,14 @@ public interface PojoIndexingPlan {
 	 * If the provided ID is {@code null},
 	 * Hibernate Search will attempt to extract the ID from the entity (which must be non-{@code null} in that case).
 	 * @param providedRoutes The routes to the current and previous index shards.
-	 * Leave {@code null} if sharding is disabled,
-	 * or if you don't use a custom {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge},
-	 * or to have Hibernate Search compute the value through the assigned {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge}
-	 * (requires a non-null {@code entity}).
+	 * Only required if custom routing is enabled
+	 * and {@code entity} is null,
+	 * or the {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge} is missing
+	 * or unable to provide all the correct previous routes.
+	 * If a {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge} is assigned to the entity type,
+	 * and {@code entity} is non-null,
+	 * the routes will be computed using that bridge instead,
+	 * and provided routes (current and previous) will all be appended to the generated "previous routes".
 	 * @param entity The entity to delete from the index. May be {@code null} if {@code providedId} is non-{@code null}.
 	 * @throws IllegalArgumentException If both {@code providedId} and {@code entity} are {@code null}.
 	 */

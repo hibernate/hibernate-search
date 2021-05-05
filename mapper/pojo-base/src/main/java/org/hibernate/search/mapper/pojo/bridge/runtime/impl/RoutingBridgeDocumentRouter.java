@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -47,9 +48,7 @@ public final class RoutingBridgeDocumentRouter<E> implements DocumentRouter<E> {
 	public DocumentRouteDescriptor currentRoute(Object entityIdentifier, Supplier<? extends E> entitySupplier,
 			DocumentRoutesDescriptor providedRoutes,
 			BridgeSessionContext context) {
-		if ( providedRoutes != null ) {
-			return NoOpDocumentRouter.INSTANCE.currentRoute( entityIdentifier, entitySupplier, providedRoutes, context );
-		}
+		// Provided routes are ignored: they will only be used to determine previous routes.
 		return new CurrentDocumentRoutes()
 				.currentRoute( entityIdentifier, entitySupplier.get(), context );
 	}
@@ -58,14 +57,11 @@ public final class RoutingBridgeDocumentRouter<E> implements DocumentRouter<E> {
 	public DocumentRoutesDescriptor routes(Object entityIdentifier, Supplier<? extends E> entitySupplier,
 			DocumentRoutesDescriptor providedRoutes,
 			BridgeSessionContext context) {
-		if ( providedRoutes != null ) {
-			return NoOpDocumentRouter.INSTANCE.routes( entityIdentifier, entitySupplier, providedRoutes, context );
-		}
 		E entity = entitySupplier.get();
 		DocumentRouteDescriptor currentRoute = new CurrentDocumentRoutes()
 				.currentRoute( entityIdentifier, entity, context );
 		Collection<DocumentRouteDescriptor> previousRoutes = new PreviousDocumentRoutes()
-				.previousDifferentRoutes( currentRoute, entityIdentifier, entity, context );
+				.previousDifferentRoutes( currentRoute, entityIdentifier, entity, providedRoutes, context );
 		return DocumentRoutesDescriptor.of( currentRoute, previousRoutes );
 	}
 
@@ -121,8 +117,8 @@ public final class RoutingBridgeDocumentRouter<E> implements DocumentRouter<E> {
 			skip = true;
 		}
 
-		List<DocumentRouteDescriptor> previousDifferentRoutes(DocumentRouteDescriptor currentRoute,
-				Object entityIdentifier, E entity, BridgeSessionContext context) {
+		Collection<DocumentRouteDescriptor> previousDifferentRoutes(DocumentRouteDescriptor currentRoute,
+				Object entityIdentifier, E entity, DocumentRoutesDescriptor providedRoutes, BridgeSessionContext context) {
 			routingBridgeHolder.get()
 					.previousRoutes( this, entityIdentifier, entity, context.routingBridgeRouteContext() );
 			if ( skip ) {
@@ -132,15 +128,18 @@ public final class RoutingBridgeDocumentRouter<E> implements DocumentRouter<E> {
 				throw log.noPreviousRoute( routingBridgeHolder.get() );
 			}
 
-			List<DocumentRouteDescriptor> result = new ArrayList<>( previousRoutes.size() );
-			for ( DocumentRouteImpl previousRoute : previousRoutes ) {
-				DocumentRouteDescriptor descriptor = previousRoute.toDescriptor();
-				if ( descriptor.equals( currentRoute ) ) {
-					// Exclude previous routes that are the same as the current one
-					continue;
-				}
-				result.add( descriptor );
+			Collection<DocumentRouteDescriptor> result = new LinkedHashSet<>( previousRoutes.size() );
+			if ( providedRoutes != null ) {
+				// If there are any provided routes, we add them all to the previous routes
+				// (including the provided "current" route, which is assumed out-of-date)
+				result.addAll( providedRoutes.previousRoutes() );
+				result.add( providedRoutes.currentRoute() );
 			}
+			for ( DocumentRouteImpl previousRoute : previousRoutes ) {
+				result.add( previousRoute.toDescriptor() );
+			}
+			// Exclude previous routes that are the same as the current one
+			result.remove( currentRoute );
 			return result;
 		}
 	}
