@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.realbackend.multitenant;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -23,8 +23,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.test.AssertionAndAssumptionViolationFallThrough;
 
-import org.junit.AssumptionViolatedException;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -63,27 +63,20 @@ public class RealBackendDatabaseMultitenancyIT {
 
 	@Test
 	public void multiTenancyStrategy_none() {
-		try {
-			setupHelper.start()
-					.withProperty( "hibernate.search.backend.multi_tenancy.strategy", "none" )
-					.tenants( TENANT_ID_1, TENANT_ID_2 )
-					.setup( IndexedEntity.class );
-
-			fail( "This method should never have been called" );
-		}
-		catch (AssumptionViolatedException e) {
-			// do not catch this kind of exception
-			throw e;
-		}
-		catch (Exception e) {
-			assertThat( e ).isInstanceOf( SearchException.class )
-					.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-							.defaultBackendContext()
-							.failure( "Invalid backend configuration: " +
-									"mapping requires multi-tenancy but no multi-tenancy strategy is set" )
-							.build()
-					);
-		}
+		assertThatThrownBy( () ->
+				setupHelper.start()
+						.withProperty( "hibernate.search.backend.multi_tenancy.strategy", "none" )
+						.tenants( TENANT_ID_1, TENANT_ID_2 )
+						.setup( IndexedEntity.class ) )
+				// This is necessary to correctly rethrow assumption failures (when not using H2)
+				.satisfies( AssertionAndAssumptionViolationFallThrough.get() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.defaultBackendContext()
+						.failure( "Invalid backend configuration: " +
+								"mapping requires multi-tenancy but no multi-tenancy strategy is set" )
+						.build()
+				);
 	}
 
 	private void checkMultitenancy() {
