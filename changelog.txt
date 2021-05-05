@@ -1,6 +1,17 @@
 Hibernate Search Changelog
 ==========================
 
+5.10.11.Final (05-05-2021)
+-------------------------
+
+** Improvement
+    * HSEARCH-3672 Backport to 5.x: manage the version of Jackson 2 to the latest available version
+    * HSEARCH-3650 Migrate to Apache Avro 1.10.0+
+
+** Task
+    * HSEARCH-4191 Get rid of master/slave in Git repository, documentation where possible, etc.
+    * HSEARCH-4190 Backport Jenkinsfile improvements to 5.10/5.11
+
 5.10.10.Final (18-11-2020)
 -------------------------
 
