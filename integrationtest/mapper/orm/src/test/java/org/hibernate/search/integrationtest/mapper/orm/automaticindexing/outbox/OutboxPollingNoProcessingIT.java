@@ -9,6 +9,8 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outbox
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.Entity;
@@ -190,9 +192,9 @@ public class OutboxPollingNoProcessingIT {
 		assertThat( routesDescriptor ).isNotNull();
 		assertThat( routesDescriptor.currentRoute().routingKey() ).isEqualTo( currentRoute );
 
-		List<DocumentRouteDescriptor> descriptors = Arrays.stream( previousRoutes )
+		Collection<DocumentRouteDescriptor> descriptors = Arrays.stream( previousRoutes )
 				.map( routingKey -> DocumentRouteDescriptor.of( routingKey ) )
-				.collect( Collectors.toList() );
+				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 
 		assertThat( routesDescriptor.previousRoutes() ).isEqualTo( descriptors );
 	}

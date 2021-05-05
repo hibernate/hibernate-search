@@ -197,8 +197,13 @@ public class OutboxEventBackgroundExecutor {
 			DocumentRoutesDescriptor routes = SerializationUtils.deserialize(
 					DocumentRoutesDescriptor.class, event.getDocumentRoutes() );
 
-			// always override the current route
-			// TODO HSEARCH-4186 See if the algorithm makes sense
+			// Which route becomes the current one doesn't really matter,
+			// because it will be considered a "previous" route when actually indexing later,
+			// and the current route will be re-computed using the routing bridge.
+			// This whole loop is mostly important to keep track of previous routes
+			// that the routing bridge might not generate properly at indexing time,
+			// because the state of the entity will not be available (deletes)
+			// or will have changed too much (multiple subsequent updates changing the route multiple times).
 			currentRoute = routes.currentRoute();
 			previousRoutes.add( routes.currentRoute() );
 			previousRoutes.addAll( routes.previousRoutes() );

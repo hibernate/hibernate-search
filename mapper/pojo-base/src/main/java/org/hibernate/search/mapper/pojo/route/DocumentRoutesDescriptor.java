@@ -15,7 +15,7 @@ import org.hibernate.search.util.common.impl.Contracts;
 public final class DocumentRoutesDescriptor implements Serializable {
 
 	public static DocumentRoutesDescriptor of(DocumentRouteDescriptor currentRoute) {
-		return of( currentRoute, Collections.emptyList() );
+		return of( currentRoute, Collections.emptySet() );
 	}
 
 	public static DocumentRoutesDescriptor of(DocumentRouteDescriptor currentRoute,
