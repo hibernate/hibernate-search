@@ -63,7 +63,7 @@ public class MultiTenancyMismatchIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Invalid backend configuration",
-						"mapping not requires multi-tenancy",
+						"mapping requires single-tenancy",
 						"multi-tenancy strategy is set",
 						"default backend"
 				);

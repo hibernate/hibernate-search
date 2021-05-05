@@ -759,7 +759,7 @@ public interface Log extends BasicLogger {
 			@FormatWith(EventContextFormatter.class) EventContext context);
 
 	@Message(id = ID_OFFSET + 149,
-			value = "Invalid backend configuration: mapping not requires multi-tenancy"
+			value = "Invalid backend configuration: mapping requires single-tenancy"
 					+ " but multi-tenancy strategy is set. %1$s.")
 	SearchException multiTenancyNotRequiredButExplicitlyEnabledByTheBackend(
 			@FormatWith(EventContextFormatter.class) EventContext context);
