@@ -1,6 +1,23 @@
 Hibernate Search Changelog
 ==========================
 
+5.11.9.Final (05-05-2021)
+-------------------------
+
+** Improvement
+    * HSEARCH-3672 Backport to 5.x: manage the version of Jackson 2 to the latest available version
+    * HSEARCH-3650 Migrate to Apache Avro 1.10.0+
+
+** Task
+    * HSEARCH-4210 Skip forbiddenapis on JDK17+
+    * HSEARCH-4196 Upgrade to ORM 5.4.30.Final
+    * HSEARCH-4191 Get rid of master/slave in Git repository, documentation where possible, etc.
+    * HSEARCH-4190 Backport Jenkinsfile improvements to 5.10/5.11
+    * HSEARCH-4189 Test Hibernate Search against JDK 17
+    * HSEARCH-4160 Upgrade to Byteman 4.0.14
+    * HSEARCH-4154 Upgrade to Hibernate ORM 5.4.28.Final
+    * HSEARCH-4131 Upgrade to Hibernate ORM 5.4.27.Final
+
 5.11.8.Final (05-01-2021)
 -------------------------
 
