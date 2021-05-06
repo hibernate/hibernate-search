@@ -136,7 +136,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					threads, link,
 					typeFactoryProvider,
 					userFacingGson,
-					getMultiTenancyStrategy( propertySource, eventContext, buildContext ),
+					getMultiTenancyStrategy( propertySource, buildContext ),
 					indexLayoutStrategyHolder,
 					createTypeNameMapping( propertySource, indexLayoutStrategyHolder.get() ),
 					buildContext.failureHandler(), buildContext.timingSource()
@@ -153,24 +153,24 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 	}
 
 	private MultiTenancyStrategy getMultiTenancyStrategy(ConfigurationPropertySource propertySource,
-			EventContext eventContext, BackendBuildContext buildContext) {
-		Optional<MultiTenancyStrategyName> multiTenancyStrategyName = MULTI_TENANCY_STRATEGY.get( propertySource );
-		if ( !multiTenancyStrategyName.isPresent() ) {
-			// the default depends on mapping
-			return buildContext.multiTenancyEnabled() ?
-					new DiscriminatorMultiTenancyStrategy() : new NoMultiTenancyStrategy();
-		}
-
-		MultiTenancyStrategyName multiTenancyStrategy = multiTenancyStrategyName.get();
-		// check multiTenancyStrategy mismatch: required by the mapper vs explicitly configured with properties
-		if ( MultiTenancyStrategyName.NONE.equals( multiTenancyStrategy ) &&
-				buildContext.multiTenancyEnabled() ) {
-			throw log.multiTenancyRequiredButExplicitlyDisabledByBackend( eventContext );
-		}
-		if ( MultiTenancyStrategyName.DISCRIMINATOR.equals( multiTenancyStrategy ) &&
-				!buildContext.multiTenancyEnabled() ) {
-			throw log.multiTenancyNotRequiredButExplicitlyEnabledByTheBackend( eventContext );
-		}
+			BackendBuildContext buildContext) {
+		MultiTenancyStrategyName multiTenancyStrategy = MULTI_TENANCY_STRATEGY.getAndMap(
+				propertySource, optionalName -> {
+					if ( MultiTenancyStrategyName.NONE.equals( optionalName )
+							&& buildContext.multiTenancyEnabled() ) {
+						throw log.multiTenancyRequiredButExplicitlyDisabledByBackend();
+					}
+					if ( MultiTenancyStrategyName.DISCRIMINATOR.equals( optionalName )
+							&& !buildContext.multiTenancyEnabled() ) {
+						throw log.multiTenancyNotRequiredButExplicitlyEnabledByTheBackend();
+					}
+					return optionalName;
+				} ).orElseGet( () -> {
+			// set dynamic default
+			return ( buildContext.multiTenancyEnabled() ) ?
+					MultiTenancyStrategyName.DISCRIMINATOR :
+					MultiTenancyStrategyName.NONE;
+		} );
 
 		switch ( multiTenancyStrategy ) {
 			case NONE:
@@ -180,7 +180,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			default:
 				throw new AssertionFailure( String.format(
 						Locale.ROOT, "Unsupported multi-tenancy strategy '%1$s'",
-						multiTenancyStrategyName
+						multiTenancyStrategy
 				) );
 		}
 	}
