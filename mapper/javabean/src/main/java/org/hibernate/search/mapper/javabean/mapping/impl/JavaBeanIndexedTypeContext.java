@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.javabean.loading.impl.LoadingTypeContext;
 import org.hibernate.search.mapper.javabean.mapping.metadata.impl.JavaBeanEntityTypeMetadata;
 import org.hibernate.search.mapper.javabean.scope.impl.JavaBeanScopeIndexedTypeContext;
 import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSessionIndexedTypeContext;
-import org.hibernate.search.mapper.pojo.bridge.runtime.spi.IdentifierMapping;
+import org.hibernate.search.mapper.pojo.identity.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
