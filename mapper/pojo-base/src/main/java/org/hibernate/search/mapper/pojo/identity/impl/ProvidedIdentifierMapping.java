@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
+package org.hibernate.search.mapper.pojo.identity.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.function.Supplier;
@@ -18,7 +18,7 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-public class ProvidedIdentifierMapping implements IdentifierMappingImplementor<Object, Object> {
+public final class ProvidedIdentifierMapping implements IdentifierMappingImplementor<Object, Object> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

@@ -20,6 +20,7 @@ import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.Abstract
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundTypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
+import org.hibernate.search.mapper.pojo.identity.impl.PojoIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;

@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.massindexing.impl;
 
 import java.util.function.Supplier;
 
-import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierMappingImplementor;
+import org.hibernate.search.mapper.pojo.identity.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 

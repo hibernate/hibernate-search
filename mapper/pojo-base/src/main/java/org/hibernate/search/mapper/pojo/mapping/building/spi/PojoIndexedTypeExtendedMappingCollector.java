@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.mapper.pojo.bridge.runtime.spi.IdentifierMapping;
+import org.hibernate.search.mapper.pojo.identity.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
 /**

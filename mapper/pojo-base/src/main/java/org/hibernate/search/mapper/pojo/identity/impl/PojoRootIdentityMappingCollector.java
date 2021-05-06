@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.mapping.building.impl;
+package org.hibernate.search.mapper.pojo.identity.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
@@ -20,18 +20,15 @@ import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
-import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierMappingImplementor;
-import org.hibernate.search.mapper.pojo.bridge.runtime.impl.PropertyIdentifierMapping;
-import org.hibernate.search.mapper.pojo.bridge.runtime.impl.ProvidedIdentifierMapping;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.processing.building.impl.PojoIdentityMappingCollector;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class PojoRootIdentityMappingCollector<E> implements PojoIdentityMappingCollector {
+public final class PojoRootIdentityMappingCollector<E> implements PojoIdentityMappingCollector {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoRawTypeModel<E> typeModel;
@@ -41,11 +38,11 @@ class PojoRootIdentityMappingCollector<E> implements PojoIdentityMappingCollecto
 	private final BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge;
 	private final BeanResolver beanResolver;
 
-	IdentifierMappingImplementor<?, E> identifierMapping;
-	Optional<PojoPropertyModel<?>> documentIdSourceProperty;
-	BoundRoutingBridge<E> routingBridge;
+	public IdentifierMappingImplementor<?, E> identifierMapping;
+	public Optional<PojoPropertyModel<?>> documentIdSourceProperty;
+	public BoundRoutingBridge<E> routingBridge;
 
-	PojoRootIdentityMappingCollector(PojoRawTypeModel<E> typeModel,
+	public PojoRootIdentityMappingCollector(PojoRawTypeModel<E> typeModel,
 			PojoMappingHelper mappingHelper,
 			IndexedEntityBindingContext bindingContext,
 			BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge,
@@ -59,7 +56,7 @@ class PojoRootIdentityMappingCollector<E> implements PojoIdentityMappingCollecto
 		this.routingBridge = routingBridge;
 	}
 
-	void closeOnFailure() {
+	public void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( IdentifierMappingImplementor::close, identifierMapping );
 			closer.push( RoutingBridge::close, routingBridge, BoundRoutingBridge::getBridge );
@@ -81,7 +78,7 @@ class PojoRootIdentityMappingCollector<E> implements PojoIdentityMappingCollecto
 		this.documentIdSourceProperty = Optional.of( propertyModel );
 	}
 
-	void applyDefaults() {
+	public void applyDefaults() {
 		if ( identifierMapping != null ) {
 			return;
 		}
