@@ -419,7 +419,7 @@ public class PropertyBridgeBaseIT {
 
 		try ( SearchSession session = mapping.createSession() ) {
 			session.indexingPlan().add( entity );
-			session.indexingPlan().add( containedLevel2Entity );
+			session.indexingPlan().add( 1, null, containedLevel2Entity );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", "constant" ) )
@@ -429,7 +429,7 @@ public class PropertyBridgeBaseIT {
 
 		try ( SearchSession session = mapping.createSession() ) {
 			containedLevel2Entity.stringProperty = "some string";
-			session.indexingPlan().addOrUpdate( containedLevel2Entity, new String[] { "stringProperty" } );
+			session.indexingPlan().addOrUpdate( 1, null, containedLevel2Entity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.addOrUpdate( "1", b -> b.field( "someField", "constant" ) )

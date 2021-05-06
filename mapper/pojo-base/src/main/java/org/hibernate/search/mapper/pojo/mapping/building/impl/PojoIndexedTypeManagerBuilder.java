@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -22,7 +23,9 @@ import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.NoOpDocumentRouter;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.RoutingBridgeDocumentRouter;
+import org.hibernate.search.mapper.pojo.identity.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.identity.impl.PojoRootIdentityMappingCollector;
+import org.hibernate.search.mapper.pojo.identity.impl.IdentityMappingMode;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
@@ -69,7 +72,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 		this.identityMappingCollector = new PojoRootIdentityMappingCollector<>(
 				typeModel,
 				mappingHelper,
-				indexManagerBuilder.rootBindingContext(),
+				Optional.of( indexManagerBuilder.rootBindingContext() ),
 				providedIdentifierBridge,
 				beanResolver
 		);
@@ -124,15 +127,8 @@ class PojoIndexedTypeManagerBuilder<E> {
 			throw new AssertionFailure( "Internal error - preBuild should be called before buildAndAddTo" );
 		}
 
-		identityMappingCollector.applyDefaults();
-
-		if ( identityMappingCollector.documentIdSourceProperty.isPresent() ) {
-			extendedMappingCollector.documentIdSourceProperty(
-					identityMappingCollector.documentIdSourceProperty.get()
-			);
-		}
-
-		extendedMappingCollector.identifierMapping( identityMappingCollector.identifierMapping );
+		IdentifierMappingImplementor<?, E> identifierMapping = identityMappingCollector
+				.buildAndContributeTo( extendedMappingCollector, IdentityMappingMode.REQUIRED );
 
 		PojoPathsDefinition pathsDefinition = typeAdditionalMetadata
 				.getEntityTypeMetadata().orElseThrow( () -> log.missingEntityTypeMetadata( typeModel ) )
@@ -149,7 +145,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 		PojoIndexedTypeManager<?, E> typeManager = new PojoIndexedTypeManager<>(
 				entityName, typeModel.typeIdentifier(), typeModel.caster(),
 				reindexingResolverBuildingHelper.isSingleConcreteTypeInEntityHierarchy( typeModel ),
-				identityMappingCollector.identifierMapping,
+				identifierMapping,
 				routingBridge == null ? NoOpDocumentRouter.INSTANCE
 						: new RoutingBridgeDocumentRouter<>( routingBridge.getBridgeHolder() ),
 				preBuiltIndexingProcessor,

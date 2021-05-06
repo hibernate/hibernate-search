@@ -61,7 +61,7 @@ public final class HibernateOrmSelectionLoadingContext implements PojoSelectionL
 	@Override
 	public <T> PojoSelectionLoadingStrategy<? super T> loadingStrategy(PojoLoadingTypeContext<T> type) {
 		return new HibernateOrmSelectionLoadingStrategy<>(
-				typeContextProvider.indexedForExactType( type.typeIdentifier() ).loadingStrategy() );
+				typeContextProvider.forExactType( type.typeIdentifier() ).loadingStrategy() );
 	}
 
 	@Override
@@ -156,10 +156,10 @@ public final class HibernateOrmSelectionLoadingContext implements PojoSelectionL
 		@Override
 		public PojoSelectionEntityLoader<E> createLoader(
 				Set<? extends PojoLoadingTypeContext<? extends E>> expectedTypes) {
-			Set<LoadingIndexedTypeContext<? extends E>> typeContexts = new HashSet<>();
+			Set<LoadingTypeContext<? extends E>> typeContexts = new HashSet<>();
 			for ( PojoLoadingTypeContext<? extends E> type : expectedTypes ) {
-				LoadingIndexedTypeContext<? extends E> typeContext =
-						typeContextProvider.indexedForExactType( type.typeIdentifier() );
+				LoadingTypeContext<? extends E> typeContext =
+						typeContextProvider.forExactType( type.typeIdentifier() );
 				typeContexts.add( typeContext );
 			}
 			return delegate.createLoader( typeContexts, sessionContext, cacheLookupStrategy, loadingOptions );

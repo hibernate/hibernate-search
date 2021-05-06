@@ -14,7 +14,6 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
-import org.hibernate.search.mapper.pojo.identity.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.DocumentRouter;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
@@ -23,13 +22,9 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
  * @param <I> The identifier type for the mapped entity type.
  * @param <E> The entity type mapped to the index.
  */
-public interface PojoWorkIndexedTypeContext<I, E> extends PojoWorkTypeContext<E> {
+public interface PojoWorkIndexedTypeContext<I, E> extends PojoWorkTypeContext<I, E> {
 
 	String entityName();
-
-	IdentifierMappingImplementor<I, E> identifierMapping();
-
-	String toDocumentIdentifier(PojoWorkSessionContext sessionContext, I identifier);
 
 	DocumentRouter<? super E> router();
 

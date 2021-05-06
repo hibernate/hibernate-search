@@ -57,7 +57,7 @@ public interface PojoIndexModelBinder {
 			BoundContainerExtractorPath<C, V> boundExtractorPath);
 
 	<I> BoundIdentifierBridge<I> bindIdentifier(
-			IndexedEntityBindingContext bindingContext,
+			Optional<IndexedEntityBindingContext> bindingContext,
 			BoundPojoModelPathPropertyNode<?, I> modelPath, IdentifierBinder binder,
 			Map<String, Object> params);
 

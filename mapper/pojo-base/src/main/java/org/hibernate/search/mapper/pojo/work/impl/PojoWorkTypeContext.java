@@ -10,13 +10,19 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
+import org.hibernate.search.mapper.pojo.identity.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoLoadingTypeContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 /**
- * @param <E> The contained entity type.
+ * @param <I> The identifier type for the entity type.
+ * @param <E> The entity type.
  */
-public interface PojoWorkTypeContext<E> extends PojoLoadingTypeContext<E> {
+public interface PojoWorkTypeContext<I, E> extends PojoLoadingTypeContext<E> {
+
+	IdentifierMappingImplementor<I, E> identifierMapping();
+
+	String toDocumentIdentifier(PojoWorkSessionContext sessionContext, I identifier);
 
 	Supplier<E> toEntitySupplier(PojoWorkSessionContext sessionContext, Object entity);
 

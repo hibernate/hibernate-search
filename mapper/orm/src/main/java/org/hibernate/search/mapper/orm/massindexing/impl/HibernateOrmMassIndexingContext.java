@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassEntityLoader
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassIdentifierLoader;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmMassLoadingOptions;
 import org.hibernate.search.mapper.orm.loading.impl.HibernateOrmQueryLoader;
-import org.hibernate.search.mapper.orm.loading.impl.LoadingIndexedTypeContext;
+import org.hibernate.search.mapper.orm.loading.impl.LoadingTypeContext;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntityLoader;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoMassEntitySink;
@@ -52,7 +52,7 @@ public final class HibernateOrmMassIndexingContext
 
 	@Override
 	public <T> PojoMassIndexingLoadingStrategy<? super T, ?> loadingStrategy(PojoRawTypeIdentifier<T> expectedType) {
-		LoadingIndexedTypeContext<T> typeContext = typeContextProvider.indexedForExactType( expectedType );
+		LoadingTypeContext<T> typeContext = typeContextProvider.forExactType( expectedType );
 		return new HibernateOrmMassIndexingLoadingStrategy<>( typeContext.loadingStrategy() );
 	}
 

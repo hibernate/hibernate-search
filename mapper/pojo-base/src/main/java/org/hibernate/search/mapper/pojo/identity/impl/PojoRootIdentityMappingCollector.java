@@ -19,6 +19,9 @@ import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundIdentifierBridg
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -30,17 +33,17 @@ public final class PojoRootIdentityMappingCollector<E> implements PojoIdentityMa
 
 	private final PojoRawTypeModel<E> typeModel;
 	private final PojoMappingHelper mappingHelper;
-	private final IndexedEntityBindingContext bindingContext;
+	private final Optional<IndexedEntityBindingContext> bindingContext;
 
 	private final BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge;
 	private final BeanResolver beanResolver;
 
-	public IdentifierMappingImplementor<?, E> identifierMapping;
-	public Optional<PojoPropertyModel<?>> documentIdSourceProperty;
+	private IdentifierMappingImplementor<?, E> identifierMapping;
+	private PojoPropertyModel<?> documentIdSourceProperty;
 
 	public PojoRootIdentityMappingCollector(PojoRawTypeModel<E> typeModel,
 			PojoMappingHelper mappingHelper,
-			IndexedEntityBindingContext bindingContext,
+			Optional<IndexedEntityBindingContext> bindingContext,
 			BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge,
 			BeanResolver beanResolver) {
 		this.typeModel = typeModel;
@@ -56,6 +59,10 @@ public final class PojoRootIdentityMappingCollector<E> implements PojoIdentityMa
 		}
 	}
 
+	public PojoMappingCollectorTypeNode toMappingCollectorRootNode() {
+		return new IdentityMappingCollectorTypeNode<>( BoundPojoModelPath.root( typeModel ), mappingHelper, this );
+	}
+
 	@Override
 	public <T> void identifierBridge(BoundPojoModelPathPropertyNode<?, T> modelPath,
 			IdentifierBinder binder, Map<String, Object> params) {
@@ -67,10 +74,23 @@ public final class PojoRootIdentityMappingCollector<E> implements PojoIdentityMa
 				propertyModel.handle(),
 				boundIdentifierBridge.getBridgeHolder()
 		);
-		this.documentIdSourceProperty = Optional.of( propertyModel );
+		this.documentIdSourceProperty = propertyModel;
 	}
 
-	public void applyDefaults() {
+	public IdentifierMappingImplementor<?, E> buildAndContributeTo(
+			PojoTypeExtendedMappingCollector extendedMappingCollector, IdentityMappingMode mode) {
+		applyDefaults( mode );
+
+		if ( documentIdSourceProperty != null ) {
+			extendedMappingCollector.documentIdSourceProperty( documentIdSourceProperty );
+		}
+
+		extendedMappingCollector.identifierMapping( identifierMapping );
+
+		return identifierMapping;
+	}
+
+	private void applyDefaults(IdentityMappingMode mode) {
 		if ( identifierMapping != null ) {
 			return;
 		}
@@ -78,19 +98,23 @@ public final class PojoRootIdentityMappingCollector<E> implements PojoIdentityMa
 		// Assume a provided ID if requested
 		if ( providedIdentifierBridge != null ) {
 			identifierMapping = ProvidedIdentifierMapping.get( beanResolver.resolve( providedIdentifierBridge ) );
-			documentIdSourceProperty = Optional.empty();
+			documentIdSourceProperty = null;
 			return;
 		}
 
-		// Fall back to the entity ID if possible
-		Optional<BoundPojoModelPathPropertyNode<E, ?>> entityIdPropertyPath = mappingHelper.indexModelBinder()
-				.createEntityIdPropertyPath( typeModel );
-		if ( entityIdPropertyPath.isPresent() ) {
-			identifierBridge( entityIdPropertyPath.get(), null, Collections.emptyMap() );
-			return;
+		if ( IdentityMappingMode.REQUIRED.equals( mode ) ) {
+			// Fall back to the entity ID if possible
+			Optional<BoundPojoModelPathPropertyNode<E, ?>> entityIdPropertyPath = mappingHelper.indexModelBinder()
+					.createEntityIdPropertyPath( typeModel );
+			if ( entityIdPropertyPath.isPresent() ) {
+				identifierBridge( entityIdPropertyPath.get(), null, Collections.emptyMap() );
+			}
+			else {
+				throw log.missingIdentifierMapping( typeModel );
+			}
 		}
-
-		throw log.missingIdentifierMapping( typeModel );
+		else {
+			identifierMapping = new UnconfiguredIdentifierMapping<>( typeModel.typeIdentifier() );
+		}
 	}
-
 }

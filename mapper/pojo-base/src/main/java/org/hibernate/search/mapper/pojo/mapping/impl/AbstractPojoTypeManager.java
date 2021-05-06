@@ -13,6 +13,7 @@ import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
+import org.hibernate.search.mapper.pojo.identity.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -25,26 +26,29 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
+ * @param <I> The identifier type for the entity type.
  * @param <E> The entity type.
  */
-public class AbstractPojoTypeManager<E>
-		implements AutoCloseable, ToStringTreeAppendable,
-				PojoWorkTypeContext<E> {
+public class AbstractPojoTypeManager<I, E>
+		implements AutoCloseable, ToStringTreeAppendable, PojoWorkTypeContext<I, E> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final String entityName;
 	protected final PojoRawTypeIdentifier<E> typeIdentifier;
 	protected final PojoCaster<E> caster;
 	private final boolean singleConcreteTypeInEntityHierarchy;
+	protected final IdentifierMappingImplementor<I, E> identifierMapping;
 	protected final PojoImplicitReindexingResolver<E> reindexingResolver;
 
 	public AbstractPojoTypeManager(String entityName, PojoRawTypeIdentifier<E> typeIdentifier,
 			PojoCaster<E> caster, boolean singleConcreteTypeInEntityHierarchy,
+			IdentifierMappingImplementor<I, E> identifierMapping,
 			PojoImplicitReindexingResolver<E> reindexingResolver) {
 		this.entityName = entityName;
 		this.typeIdentifier = typeIdentifier;
 		this.caster = caster;
 		this.singleConcreteTypeInEntityHierarchy = singleConcreteTypeInEntityHierarchy;
+		this.identifierMapping = identifierMapping;
 		this.reindexingResolver = reindexingResolver;
 	}
 
@@ -56,7 +60,7 @@ public class AbstractPojoTypeManager<E>
 		if ( o == null || getClass() != o.getClass() ) {
 			return false;
 		}
-		AbstractPojoTypeManager<?> that = (AbstractPojoTypeManager<?>) o;
+		AbstractPojoTypeManager<?, ?> that = (AbstractPojoTypeManager<?, ?>) o;
 		return typeIdentifier.equals( that.typeIdentifier );
 	}
 
@@ -79,6 +83,7 @@ public class AbstractPojoTypeManager<E>
 	public void appendTo(ToStringTreeBuilder builder) {
 		builder.attribute( "entityName", entityName )
 				.attribute( "typeIdentifier", typeIdentifier )
+				.attribute( "identifierMapping", identifierMapping )
 				.attribute( "reindexingResolver", reindexingResolver );
 	}
 
@@ -94,6 +99,16 @@ public class AbstractPojoTypeManager<E>
 	@Override
 	public final boolean isSingleConcreteTypeInEntityHierarchy() {
 		return singleConcreteTypeInEntityHierarchy;
+	}
+
+	@Override
+	public IdentifierMappingImplementor<I, E> identifierMapping() {
+		return identifierMapping;
+	}
+
+	@Override
+	public String toDocumentIdentifier(PojoWorkSessionContext sessionContext, I identifier) {
+		return identifierMapping.toDocumentIdentifier( identifier, sessionContext.mappingContext() );
 	}
 
 	@Override

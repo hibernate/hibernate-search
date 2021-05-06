@@ -24,6 +24,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorRegistry;
+import org.hibernate.search.mapper.pojo.identity.impl.IdentityMappingMode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMapper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
@@ -41,6 +42,7 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 	private final PojoBootstrapIntrospector introspector;
 
 	private BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge;
+	private IdentityMappingMode containedEntityIdentityMappingMode = IdentityMappingMode.OPTIONAL;
 	private TenancyMode tenancyMode = TenancyMode.SINGLE_TENANCY;
 	private ReindexOnUpdate defaultReindexOnUpdate = ReindexOnUpdate.DEFAULT;
 
@@ -95,6 +97,10 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 		this.providedIdentifierBridge = providedIdentifierBridge;
 	}
 
+	public void containedEntityIdentityMappingRequired(boolean required) {
+		this.containedEntityIdentityMappingMode = required ? IdentityMappingMode.REQUIRED : IdentityMappingMode.OPTIONAL;
+	}
+
 	public void multiTenancyEnabled(boolean multiTenancyEnabled) {
 		this.tenancyMode = multiTenancyEnabled ? TenancyMode.MULTI_TENANCY : TenancyMode.SINGLE_TENANCY;
 	}
@@ -130,7 +136,7 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 				introspector,
 				extractorBinder, bridgeResolver,
 				providedIdentifierBridge,
-				tenancyMode,
+				containedEntityIdentityMappingMode, tenancyMode,
 				defaultReindexOnUpdate,
 				createMapperDelegate()
 		);

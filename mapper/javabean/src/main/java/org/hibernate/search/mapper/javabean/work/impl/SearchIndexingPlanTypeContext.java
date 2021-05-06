@@ -6,9 +6,10 @@
  */
 package org.hibernate.search.mapper.javabean.work.impl;
 
+import org.hibernate.search.mapper.javabean.loading.impl.LoadingTypeContext;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 
-public interface SearchIndexingPlanTypeContext {
+public interface SearchIndexingPlanTypeContext<E> extends LoadingTypeContext<E> {
 
 	PojoPathFilter dirtyFilter();
 

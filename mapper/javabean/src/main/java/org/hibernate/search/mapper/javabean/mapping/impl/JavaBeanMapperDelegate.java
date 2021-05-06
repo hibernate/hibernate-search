@@ -38,7 +38,7 @@ public final class JavaBeanMapperDelegate
 	@Override
 	public <E> PojoContainedTypeExtendedMappingCollector createContainedTypeExtendedMappingCollector(
 			PojoRawTypeModel<E> rawTypeModel, String entityName) {
-		return typeContextContainerBuilder.addContained( rawTypeModel, entityName );
+		return typeContextContainerBuilder.addContained( rawTypeModel, entityName, metadataProvider.get( rawTypeModel ) );
 	}
 
 	@Override

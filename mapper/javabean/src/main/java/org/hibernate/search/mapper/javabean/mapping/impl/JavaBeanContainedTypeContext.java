@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.javabean.mapping.impl;
 
+import org.hibernate.search.mapper.javabean.mapping.metadata.impl.JavaBeanEntityTypeMetadata;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
@@ -16,8 +17,8 @@ class JavaBeanContainedTypeContext<E> extends AbstractJavaBeanTypeContext<E> {
 	}
 
 	static class Builder<E> extends AbstractBuilder<E> implements PojoContainedTypeExtendedMappingCollector {
-		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String entityName) {
-			super( typeIdentifier, entityName );
+		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String entityName, JavaBeanEntityTypeMetadata<E> metadata) {
+			super( typeIdentifier, entityName, metadata );
 		}
 
 		JavaBeanContainedTypeContext<E> build() {

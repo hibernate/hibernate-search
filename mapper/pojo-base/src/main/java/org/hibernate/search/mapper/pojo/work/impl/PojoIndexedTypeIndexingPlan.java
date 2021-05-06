@@ -82,11 +82,6 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 	}
 
 	@Override
-	I toIdentifier(Object providedId, Supplier<E> entitySupplier) {
-		return typeContext.identifierMapping().getIdentifier( providedId, entitySupplier );
-	}
-
-	@Override
 	protected IndexedEntityState createState(I identifier) {
 		return new IndexedEntityState( identifier );
 	}

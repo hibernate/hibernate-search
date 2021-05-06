@@ -79,9 +79,11 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		}
 	}
 
-	abstract PojoWorkTypeContext<E> typeContext();
+	abstract PojoWorkTypeContext<I, E> typeContext();
 
-	abstract I toIdentifier(Object providedId, Supplier<E> entitySupplier);
+	I toIdentifier(Object providedId, Supplier<E> entitySupplier) {
+		return typeContext().identifierMapping().getIdentifier( providedId, entitySupplier );
+	}
 
 	final S getState(I identifier) {
 		S state = statesPerId.get( identifier );

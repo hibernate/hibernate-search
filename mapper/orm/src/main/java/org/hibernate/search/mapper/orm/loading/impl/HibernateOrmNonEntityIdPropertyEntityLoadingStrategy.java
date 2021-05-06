@@ -75,7 +75,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 	}
 
 	@Override
-	public <E2> PojoSelectionEntityLoader<E2> createLoader(Set<LoadingIndexedTypeContext<? extends E2>> targetEntityTypeContexts,
+	public <E2> PojoSelectionEntityLoader<E2> createLoader(Set<LoadingTypeContext<? extends E2>> targetEntityTypeContexts,
 			LoadingSessionContext sessionContext,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
 		if ( targetEntityTypeContexts.size() != 1 ) {
@@ -85,7 +85,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 		return doCreate( targetEntityTypeContexts.iterator().next(), sessionContext, cacheLookupStrategy, loadingOptions );
 	}
 
-	private <E2> PojoSelectionEntityLoader<E2> doCreate(LoadingIndexedTypeContext<?> targetEntityTypeContext,
+	private <E2> PojoSelectionEntityLoader<E2> doCreate(LoadingTypeContext<?> targetEntityTypeContext,
 			LoadingSessionContext sessionContext,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions) {
@@ -99,7 +99,7 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 		 */
 		@SuppressWarnings("unchecked")
 		PojoSelectionEntityLoader<E2> result = new HibernateOrmSelectionEntityByNonIdPropertyLoader<>(
-				entityPersister, (LoadingIndexedTypeContext<E2>) targetEntityTypeContext,
+				entityPersister, (LoadingTypeContext<E2>) targetEntityTypeContext,
 				(TypeQueryFactory<E2, ?>) queryFactory,
 				documentIdSourcePropertyName, documentIdSourceHandle,
 				sessionContext, loadingOptions
@@ -129,13 +129,13 @@ public class HibernateOrmNonEntityIdPropertyEntityLoadingStrategy<E, I>
 		);
 	}
 
-	private AssertionFailure multipleTypesException(Set<? extends LoadingIndexedTypeContext<?>> targetEntityTypeContexts) {
+	private AssertionFailure multipleTypesException(Set<? extends LoadingTypeContext<?>> targetEntityTypeContexts) {
 		return new AssertionFailure(
 				"Attempt to use a criteria-based entity loader with multiple target entity types."
 						+ " Expected entity name: " + entityPersister.getEntityName()
 						+ " Targeted entity names: "
 						+ targetEntityTypeContexts.stream()
-						.map( LoadingIndexedTypeContext::entityPersister )
+						.map( LoadingTypeContext::entityPersister )
 						.map( EntityPersister::getEntityName )
 						.collect( Collectors.toList() )
 		);
