@@ -11,14 +11,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.RoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundIdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
@@ -40,27 +37,22 @@ public final class PojoRootIdentityMappingCollector<E> implements PojoIdentityMa
 
 	public IdentifierMappingImplementor<?, E> identifierMapping;
 	public Optional<PojoPropertyModel<?>> documentIdSourceProperty;
-	public BoundRoutingBridge<E> routingBridge;
 
 	public PojoRootIdentityMappingCollector(PojoRawTypeModel<E> typeModel,
 			PojoMappingHelper mappingHelper,
 			IndexedEntityBindingContext bindingContext,
 			BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge,
-			BoundRoutingBridge<E> routingBridge,
 			BeanResolver beanResolver) {
 		this.typeModel = typeModel;
 		this.mappingHelper = mappingHelper;
 		this.bindingContext = bindingContext;
 		this.providedIdentifierBridge = providedIdentifierBridge;
 		this.beanResolver = beanResolver;
-		this.routingBridge = routingBridge;
 	}
 
 	public void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( IdentifierMappingImplementor::close, identifierMapping );
-			closer.push( RoutingBridge::close, routingBridge, BoundRoutingBridge::getBridge );
-			closer.push( BeanHolder::close, routingBridge, BoundRoutingBridge::getBridgeHolder );
 		}
 	}
 
