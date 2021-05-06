@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.bridge.binding.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
+import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -32,7 +33,7 @@ public class DefaultIdentifierBindingContext<I> extends AbstractBindingContext
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoBootstrapIntrospector introspector;
-	private final IndexedEntityBindingContext indexedEntityBindingContext;
+	private final Optional<IndexedEntityBindingContext> indexedEntityBindingContext;
 
 	private final PojoGenericTypeModel<I> identifierTypeModel;
 	private final PojoModelValue<I> bridgedElement;
@@ -41,7 +42,7 @@ public class DefaultIdentifierBindingContext<I> extends AbstractBindingContext
 
 	public DefaultIdentifierBindingContext(BeanResolver beanResolver,
 			PojoBootstrapIntrospector introspector,
-			IndexedEntityBindingContext indexedEntityBindingContext,
+			Optional<IndexedEntityBindingContext> indexedEntityBindingContext,
 			PojoGenericTypeModel<I> valueTypeModel, Map<String, Object> params) {
 		super( beanResolver, params );
 		this.introspector = introspector;
@@ -122,12 +123,14 @@ public class DefaultIdentifierBindingContext<I> extends AbstractBindingContext
 			abortBridge( closer, bridgeHolder );
 		}
 
-		BoundIdentifierBridge<I> complete(IndexedEntityBindingContext indexedEntityBindingContext) {
-			indexedEntityBindingContext.idDslConverter(
-					new PojoIdentifierBridgeDocumentIdentifierValueConverter<>(
-							bridgeHolder.get(), expectedValueType
-					)
-			);
+		BoundIdentifierBridge<I> complete(Optional<IndexedEntityBindingContext> indexedEntityBindingContext) {
+			if ( indexedEntityBindingContext.isPresent() ) {
+				indexedEntityBindingContext.get().idDslConverter(
+						new PojoIdentifierBridgeDocumentIdentifierValueConverter<>(
+								bridgeHolder.get(), expectedValueType
+						)
+				);
+			}
 
 			return new BoundIdentifierBridge<>( bridgeHolder );
 		}

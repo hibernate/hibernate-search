@@ -40,7 +40,6 @@ class JavaBeanTypeContextContainer implements JavaBeanSearchSessionTypeContextPr
 		}
 	}
 
-	@Override
 	@SuppressWarnings("unchecked")
 	public <E> JavaBeanIndexedTypeContext<E> indexedForExactType(PojoRawTypeIdentifier<E> typeIdentifier) {
 		return (JavaBeanIndexedTypeContext<E>) indexedTypeContexts.get( typeIdentifier );
@@ -83,9 +82,10 @@ class JavaBeanTypeContextContainer implements JavaBeanSearchSessionTypeContextPr
 			return builder;
 		}
 
-		<E> JavaBeanContainedTypeContext.Builder<E> addContained(PojoRawTypeModel<E> typeModel, String entityName) {
+		<E> JavaBeanContainedTypeContext.Builder<E> addContained(PojoRawTypeModel<E> typeModel, String entityName,
+				JavaBeanEntityTypeMetadata<E> metadata) {
 			JavaBeanContainedTypeContext.Builder<E> builder =
-					new JavaBeanContainedTypeContext.Builder<>( typeModel.typeIdentifier(), entityName );
+					new JavaBeanContainedTypeContext.Builder<>( typeModel.typeIdentifier(), entityName, metadata );
 			containedTypeContextBuilders.add( builder );
 			return builder;
 		}

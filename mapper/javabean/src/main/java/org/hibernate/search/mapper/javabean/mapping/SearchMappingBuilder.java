@@ -165,6 +165,11 @@ public final class SearchMappingBuilder {
 		return this;
 	}
 
+	public SearchMappingBuilder containedEntityIdentityMappingRequired(boolean required) {
+		mappingInitiator.containedEntityIdentityMappingRequired( required );
+		return this;
+	}
+
 	public SearchMappingBuilder annotatedTypeDiscoveryEnabled(boolean annotatedTypeDiscoveryEnabled) {
 		mappingInitiator.annotatedTypeDiscoveryEnabled( annotatedTypeDiscoveryEnabled );
 		return this;

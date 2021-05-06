@@ -6,38 +6,22 @@
  */
 package org.hibernate.search.mapper.javabean.mapping.impl;
 
-import java.util.Optional;
-
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategy;
-import org.hibernate.search.mapper.javabean.loading.SelectionLoadingStrategy;
-import org.hibernate.search.mapper.javabean.loading.impl.LoadingTypeContext;
 import org.hibernate.search.mapper.javabean.mapping.metadata.impl.JavaBeanEntityTypeMetadata;
 import org.hibernate.search.mapper.javabean.scope.impl.JavaBeanScopeIndexedTypeContext;
 import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSessionIndexedTypeContext;
-import org.hibernate.search.mapper.pojo.identity.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 class JavaBeanIndexedTypeContext<E> extends AbstractJavaBeanTypeContext<E>
-		implements JavaBeanScopeIndexedTypeContext<E>, JavaBeanSessionIndexedTypeContext<E>, LoadingTypeContext<E> {
+		implements JavaBeanScopeIndexedTypeContext<E>, JavaBeanSessionIndexedTypeContext<E> {
 
-	private final JavaBeanEntityTypeMetadata<E> metadata;
-	private final IdentifierMapping identifierMapping;
 	private final MappedIndexManager indexManager;
 
 	private JavaBeanIndexedTypeContext(Builder<E> builder) {
 		super( builder );
-		this.metadata = builder.metadata;
-		this.identifierMapping = builder.identifierMapping;
 		this.indexManager = builder.indexManager;
-	}
-
-	@Override
-	public IdentifierMapping identifierMapping() {
-		return identifierMapping;
 	}
 
 	@Override
@@ -45,34 +29,11 @@ class JavaBeanIndexedTypeContext<E> extends AbstractJavaBeanTypeContext<E>
 		return indexManager.toAPI();
 	}
 
-	@Override
-	public Optional<SelectionLoadingStrategy<? super E>> selectionLoadingStrategy() {
-		return metadata.selectionLoadingStrategy;
-	}
-
-	@Override
-	public Optional<MassLoadingStrategy<? super E, ?>> massLoadingStrategy() {
-		return metadata.massLoadingStrategy;
-	}
-
 	static class Builder<E> extends AbstractBuilder<E> implements PojoIndexedTypeExtendedMappingCollector {
-		private final JavaBeanEntityTypeMetadata<E> metadata;
-		private IdentifierMapping identifierMapping;
 		private MappedIndexManager indexManager;
 
 		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String entityName, JavaBeanEntityTypeMetadata<E> metadata) {
-			super( typeIdentifier, entityName );
-			this.metadata = metadata;
-		}
-
-		@Override
-		public void documentIdSourceProperty(PojoPropertyModel<?> documentIdSourceProperty) {
-			// Nothing to do
-		}
-
-		@Override
-		public void identifierMapping(IdentifierMapping identifierMapping) {
-			this.identifierMapping = identifierMapping;
+			super( typeIdentifier, entityName, metadata );
 		}
 
 		@Override

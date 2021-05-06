@@ -29,12 +29,12 @@ class HibernateOrmSelectionEntityByNonIdPropertyLoader<E> extends AbstractHibern
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LoadingIndexedTypeContext<E> targetEntityTypeContext;
+	private final LoadingTypeContext<E> targetEntityTypeContext;
 	private final String documentIdSourcePropertyName;
 	private final ValueReadHandle<?> documentIdSourceHandle;
 
 	HibernateOrmSelectionEntityByNonIdPropertyLoader(EntityPersister entityPersister,
-			LoadingIndexedTypeContext<E> targetEntityTypeContext,
+			LoadingTypeContext<E> targetEntityTypeContext,
 			TypeQueryFactory<E, ?> queryFactory,
 			String documentIdSourcePropertyName,
 			ValueReadHandle<?> documentIdSourceHandle,

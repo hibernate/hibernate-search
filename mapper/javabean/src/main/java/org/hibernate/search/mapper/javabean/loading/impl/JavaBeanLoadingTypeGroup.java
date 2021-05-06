@@ -29,7 +29,7 @@ public final class JavaBeanLoadingTypeGroup<E> implements LoadingTypeGroup<E> {
 		this.introspector = introspector;
 		this.includedTypes = new LinkedHashSet<>();
 		for ( PojoRawTypeIdentifier<? extends E> includedTypeIdentifier : includedTypeIdentifiers ) {
-			includedTypes.add( typeContextProvider.indexedForExactType( includedTypeIdentifier ) );
+			includedTypes.add( typeContextProvider.forExactType( includedTypeIdentifier ) );
 		}
 	}
 
@@ -44,7 +44,7 @@ public final class JavaBeanLoadingTypeGroup<E> implements LoadingTypeGroup<E> {
 	@Override
 	public boolean includesInstance(Object entity) {
 		PojoRawTypeIdentifier<?> targetType = introspector.detectEntityType( entity );
-		LoadingTypeContext<?> typeContextOrNull = typeContextProvider.indexedForExactType( targetType );
+		LoadingTypeContext<?> typeContextOrNull = typeContextProvider.forExactType( targetType );
 		if ( typeContextOrNull == null ) {
 			return false;
 		}

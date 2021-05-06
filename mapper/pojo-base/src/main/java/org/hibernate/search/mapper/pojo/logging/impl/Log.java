@@ -234,7 +234,7 @@ public interface Log extends BasicLogger {
 			value = "Type manager for contained type '%1$s': %2$s")
 	void containedTypeManager(
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
-			@FormatWith(ToStringTreeAppendableMultilineFormatter.class) PojoContainedTypeManager<?> typeManager);
+			@FormatWith(ToStringTreeAppendableMultilineFormatter.class) PojoContainedTypeManager<?, ?> typeManager);
 
 	@Message(id = ID_OFFSET + 20,
 			value = "Unable to find the inverse side of the association on type '%2$s' at path '%3$s'."
@@ -631,5 +631,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 104, value = "Param with name '%1$s' has not been defined for the binder.")
 	SearchException paramNotDefined(String name);
+
+	@Message(id = ID_OFFSET + 105, value = "Cannot work with the identifier of entities of type '%1$s':"
+			+ " identifier mapping (@DocumentId, ...) is not configured for this type.")
+	SearchException cannotWorkWithIdentifierBecauseUnconfiguredIdentifierMapping(PojoRawTypeIdentifier<?> typeIdentifier);
 
 }

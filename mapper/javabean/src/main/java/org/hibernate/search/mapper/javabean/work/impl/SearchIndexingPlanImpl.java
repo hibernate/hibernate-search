@@ -69,7 +69,7 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	public void addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity,
 			String... dirtyPathsAsStrings) {
 		PojoRawTypeIdentifier<?> typeIdentifier = getTypeIdentifier( entity );
-		SearchIndexingPlanTypeContext typeContext = typeContextProvider.forExactType( typeIdentifier );
+		SearchIndexingPlanTypeContext<?> typeContext = typeContextProvider.forExactType( typeIdentifier );
 		BitSet dirtyPaths = typeContext == null ? null : typeContext.dirtyFilter().filter( dirtyPathsAsStrings );
 		delegate.addOrUpdate( typeIdentifier, providedId, providedRoutes, entity, dirtyPaths );
 	}

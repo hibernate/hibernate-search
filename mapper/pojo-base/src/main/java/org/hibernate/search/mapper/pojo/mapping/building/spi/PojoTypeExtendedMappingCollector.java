@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
+import org.hibernate.search.mapper.pojo.identity.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
+import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
 /**
  * A collector of extended mapping information.
@@ -15,6 +17,10 @@ import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
  * necessary to implement their {@link org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextProvider}.
  */
 public interface PojoTypeExtendedMappingCollector {
+
+	void documentIdSourceProperty(PojoPropertyModel<?> documentIdSourceProperty);
+
+	void identifierMapping(IdentifierMapping identifierMapping);
 
 	void dirtyFilter(PojoPathFilter dirtyFilter);
 

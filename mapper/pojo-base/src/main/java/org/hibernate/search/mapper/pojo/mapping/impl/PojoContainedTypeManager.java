@@ -7,19 +7,23 @@
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
+import org.hibernate.search.mapper.pojo.identity.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeContainedTypeContext;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkContainedTypeContext;
 
 /**
+ * @param <I> The identifier type for the contained entity type.
  * @param <E> The contained entity type.
  */
-public class PojoContainedTypeManager<E> extends AbstractPojoTypeManager<E>
-		implements PojoWorkContainedTypeContext<E>, PojoScopeContainedTypeContext<E> {
+public class PojoContainedTypeManager<I, E> extends AbstractPojoTypeManager<I, E>
+		implements PojoWorkContainedTypeContext<I, E>, PojoScopeContainedTypeContext<I, E> {
 	public PojoContainedTypeManager(String entityName, PojoRawTypeIdentifier<E> typeIdentifier,
 			PojoCaster<E> caster, boolean singleConcreteTypeInEntityHierarchy,
+			IdentifierMappingImplementor<I, E> identifierMapping,
 			PojoImplicitReindexingResolver<E> reindexingResolver) {
-		super( entityName, typeIdentifier, caster, singleConcreteTypeInEntityHierarchy, reindexingResolver );
+		super( entityName, typeIdentifier, caster, singleConcreteTypeInEntityHierarchy,
+				identifierMapping, reindexingResolver );
 	}
 }

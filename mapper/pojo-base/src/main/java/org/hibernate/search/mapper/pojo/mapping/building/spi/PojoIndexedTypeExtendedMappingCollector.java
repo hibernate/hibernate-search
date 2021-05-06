@@ -7,8 +7,6 @@
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.mapper.pojo.identity.spi.IdentifierMapping;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
 /**
  * A collector of extended mapping information.
@@ -17,10 +15,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
  * necessary to implement their {@link org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextProvider}.
  */
 public interface PojoIndexedTypeExtendedMappingCollector extends PojoTypeExtendedMappingCollector {
-
-	void documentIdSourceProperty(PojoPropertyModel<?> documentIdSourceProperty);
-
-	void identifierMapping(IdentifierMapping identifierMapping);
 
 	void indexManager(MappedIndexManager indexManager);
 

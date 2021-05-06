@@ -34,7 +34,7 @@ public interface HibernateOrmEntityLoadingStrategy<E, I> {
 	@Override
 	int hashCode();
 
-	<E2> PojoSelectionEntityLoader<E2> createLoader(Set<LoadingIndexedTypeContext<? extends E2>> targetEntityTypeContexts,
+	<E2> PojoSelectionEntityLoader<E2> createLoader(Set<LoadingTypeContext<? extends E2>> targetEntityTypeContexts,
 			LoadingSessionContext sessionContext, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions);
 

@@ -10,6 +10,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface LoadingIndexedTypeContextProvider {
 
-	<E> LoadingIndexedTypeContext<E> indexedForExactType(PojoRawTypeIdentifier<E> typeIdentifier);
+	<E> LoadingTypeContext<E> forExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 
 }

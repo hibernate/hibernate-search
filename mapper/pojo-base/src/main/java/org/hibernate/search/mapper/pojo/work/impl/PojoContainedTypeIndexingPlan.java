@@ -6,43 +6,37 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
-import java.util.function.Supplier;
-
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 /**
+ * @param <I> The identifier type for the contained entity type.
  * @param <E> The contained entity type.
  */
-public class PojoContainedTypeIndexingPlan<E>
-		extends AbstractPojoTypeIndexingPlan<Object, E, PojoContainedTypeIndexingPlan<E>.ContainedEntityState> {
+public class PojoContainedTypeIndexingPlan<I, E>
+		extends AbstractPojoTypeIndexingPlan<I, E, PojoContainedTypeIndexingPlan<I, E>.ContainedEntityState> {
 
-	private final PojoWorkContainedTypeContext<E> typeContext;
+	private final PojoWorkContainedTypeContext<I, E> typeContext;
 
-	public PojoContainedTypeIndexingPlan(PojoWorkContainedTypeContext<E> typeContext,
+	public PojoContainedTypeIndexingPlan(PojoWorkContainedTypeContext<I, E> typeContext,
 			PojoWorkSessionContext sessionContext, PojoIndexingPlanImpl root) {
 		super( sessionContext, root );
 		this.typeContext = typeContext;
 	}
 
 	@Override
-	PojoWorkContainedTypeContext<E> typeContext() {
+	PojoWorkContainedTypeContext<I, E> typeContext() {
 		return typeContext;
 	}
 
 	@Override
-	Object toIdentifier(Object providedId, Supplier<E> entitySupplier) {
-		return providedId;
-	}
-
-	@Override
-	protected ContainedEntityState createState(Object identifier) {
+	protected ContainedEntityState createState(I identifier) {
 		return new ContainedEntityState( identifier );
 	}
 
 	class ContainedEntityState
-			extends AbstractPojoTypeIndexingPlan<Object, E, ContainedEntityState>.AbstractEntityState {
-		private ContainedEntityState(Object identifier) {
+			extends AbstractPojoTypeIndexingPlan<I, E, ContainedEntityState>.AbstractEntityState {
+		private ContainedEntityState(I identifier) {
 			super( identifier );
 		}
 

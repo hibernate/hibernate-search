@@ -92,7 +92,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 	@Override
 	public <I> BoundIdentifierBridge<I> bindIdentifier(
-			IndexedEntityBindingContext indexedEntityBindingContext,
+			Optional<IndexedEntityBindingContext> indexedEntityBindingContext,
 			BoundPojoModelPathPropertyNode<?, I> modelPath,
 			IdentifierBinder binder, Map<String, Object> params) {
 		PojoGenericTypeModel<I> identifierTypeModel = modelPath.valueWithoutExtractors().getTypeModel();

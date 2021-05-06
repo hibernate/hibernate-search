@@ -99,14 +99,14 @@ public final class JavaBeanLoadingContext
 	public <T> Optional<PojoSelectionLoadingStrategy<? super T>> loadingStrategyOptional(
 			PojoLoadingTypeContext<T> type) {
 		PojoRawTypeIdentifier<T> typeId = type.typeIdentifier();
-		return typeContextProvider.indexedForExactType( typeId ).selectionLoadingStrategy()
+		return typeContextProvider.forExactType( typeId ).selectionLoadingStrategy()
 				.map( JavaBeanSelectionLoadingStrategy::new );
 	}
 
 	@Override
 	public <T> PojoMassIndexingLoadingStrategy<? super T, ?> loadingStrategy(
 			PojoRawTypeIdentifier<T> expectedType) {
-		LoadingTypeContext<T> typeContext = typeContextProvider.indexedForExactType( expectedType );
+		LoadingTypeContext<T> typeContext = typeContextProvider.forExactType( expectedType );
 		Optional<MassLoadingStrategy<? super T, ?>> strategyOptional = typeContext.massLoadingStrategy();
 		if ( !strategyOptional.isPresent() ) {
 			throw log.entityLoadingStrategyNotRegistered( typeContext.typeIdentifier() );

@@ -56,11 +56,11 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 	}
 
 	@Override
-	public <E2> PojoSelectionEntityLoader<E2> createLoader(Set<LoadingIndexedTypeContext<? extends E2>> targetEntityTypeContexts,
+	public <E2> PojoSelectionEntityLoader<E2> createLoader(Set<LoadingTypeContext<? extends E2>> targetEntityTypeContexts,
 			LoadingSessionContext sessionContext, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions) {
 		if ( targetEntityTypeContexts.size() == 1 ) {
-			LoadingIndexedTypeContext<? extends E2> targetEntityTypeContext =
+			LoadingTypeContext<? extends E2> targetEntityTypeContext =
 					targetEntityTypeContexts.iterator().next();
 			/*
 			 * This cast is safe: the loader will only return instances of E2.
@@ -147,10 +147,10 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 	}
 
 	private static EntityPersister toMostSpecificCommonEntitySuperType(SessionImplementor session,
-			Iterable<? extends LoadingIndexedTypeContext<?>> targetEntityTypeContexts) {
+			Iterable<? extends LoadingTypeContext<?>> targetEntityTypeContexts) {
 		MetamodelImplementor metamodel = session.getSessionFactory().getMetamodel();
 		EntityPersister result = null;
-		for ( LoadingIndexedTypeContext<?> targetTypeContext : targetEntityTypeContexts ) {
+		for ( LoadingTypeContext<?> targetTypeContext : targetEntityTypeContexts ) {
 			EntityPersister type = targetTypeContext.entityPersister();
 			if ( result == null ) {
 				result = type;
@@ -171,13 +171,13 @@ public class HibernateOrmEntityIdEntityLoadingStrategy<E, I>
 	}
 
 	private AssertionFailure invalidTypesException(
-			Set<? extends LoadingIndexedTypeContext<?>> targetEntityTypeContexts) {
+			Set<? extends LoadingTypeContext<?>> targetEntityTypeContexts) {
 		return new AssertionFailure(
 				"Some types among the targeted entity types are not subclasses of the expected root entity type."
 				+ " Expected entity name: " + rootEntityPersister.getEntityName()
 				+ " Targeted entity names: "
 				+ targetEntityTypeContexts.stream()
-						.map( LoadingIndexedTypeContext::entityPersister )
+						.map( LoadingTypeContext::entityPersister )
 						.map( EntityPersister::getEntityName )
 						.collect( Collectors.toList() )
 		);

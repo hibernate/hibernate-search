@@ -37,10 +37,9 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  * @param <I> The identifier type for the mapped entity type.
  * @param <E> The entity type mapped to the index.
  */
-public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<E>
+public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<I, E>
 		implements PojoWorkIndexedTypeContext<I, E>, PojoScopeIndexedTypeContext<I, E>,
-		PojoMassIndexingIndexedTypeContext<E> {
-	private final IdentifierMappingImplementor<I, E> identifierMapping;
+				PojoMassIndexingIndexedTypeContext<E> {
 	private final DocumentRouter<? super E> documentRouter;
 	private final PojoIndexingProcessor<E> processor;
 	private final MappedIndexManager indexManager;
@@ -51,8 +50,8 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<E>
 			DocumentRouter<? super E> documentRouter,
 			PojoIndexingProcessor<E> processor, MappedIndexManager indexManager,
 			PojoImplicitReindexingResolver<E> reindexingResolver) {
-		super( entityName, typeIdentifier, caster, singleConcreteTypeInEntityHierarchy, reindexingResolver );
-		this.identifierMapping = identifierMapping;
+		super( entityName, typeIdentifier, caster, singleConcreteTypeInEntityHierarchy,
+				identifierMapping, reindexingResolver );
 		this.documentRouter = documentRouter;
 		this.processor = processor;
 		this.indexManager = indexManager;
@@ -77,16 +76,6 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<E>
 				.attribute( "documentRouter", documentRouter )
 				.attribute( "processor", processor )
 				.attribute( "reindexingResolver", reindexingResolver );
-	}
-
-	@Override
-	public IdentifierMappingImplementor<I, E> identifierMapping() {
-		return identifierMapping;
-	}
-
-	@Override
-	public String toDocumentIdentifier(PojoWorkSessionContext sessionContext, I identifier) {
-		return identifierMapping.toDocumentIdentifier( identifier, sessionContext.mappingContext() );
 	}
 
 	@Override

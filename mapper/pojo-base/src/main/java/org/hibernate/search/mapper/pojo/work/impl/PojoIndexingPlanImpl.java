@@ -48,7 +48,7 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoReindexingCol
 
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeIndexingPlan<?, ?>> indexedTypeDelegates = new LinkedHashMap<>();
-	private final Map<PojoRawTypeIdentifier<?>, PojoContainedTypeIndexingPlan<?>> containedTypeDelegates = new LinkedHashMap<>();
+	private final Map<PojoRawTypeIdentifier<?>, PojoContainedTypeIndexingPlan<?, ?>> containedTypeDelegates = new LinkedHashMap<>();
 
 	private boolean isProcessing = false;
 	private boolean mayRequireLoading = false;
@@ -132,7 +132,7 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoReindexingCol
 		isProcessing = true;
 		try {
 			if ( mayRequireLoading ) {
-				for ( PojoContainedTypeIndexingPlan<?> delegate : containedTypeDelegates.values() ) {
+				for ( PojoContainedTypeIndexingPlan<?, ?> delegate : containedTypeDelegates.values() ) {
 					delegate.planLoading();
 				}
 				for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : indexedTypeDelegates.values() ) {
@@ -145,7 +145,7 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoReindexingCol
 			// The caller may choose to disable reindexing resolution.
 			// See PojoMappingDelegateImpl#createEventProcessingPlan.
 			if ( enableReindexingResolution ) {
-				for ( PojoContainedTypeIndexingPlan<?> delegate : containedTypeDelegates.values() ) {
+				for ( PojoContainedTypeIndexingPlan<?, ?> delegate : containedTypeDelegates.values() ) {
 					delegate.resolveDirty();
 				}
 				// We need to iterate on a "frozen snapshot" of the indexedTypeDelegates values because of HSEARCH-3857
@@ -252,10 +252,10 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoReindexingCol
 			return delegate;
 		}
 		else {
-			Optional<? extends PojoWorkContainedTypeContext<?>> containedTypeContextOptional =
+			Optional<? extends PojoWorkContainedTypeContext<?, ?>> containedTypeContextOptional =
 					containedTypeContextProvider.forExactType( typeIdentifier );
 			if ( containedTypeContextOptional.isPresent() ) {
-				PojoContainedTypeIndexingPlan<?> delegate = createDelegate( containedTypeContextOptional.get() );
+				PojoContainedTypeIndexingPlan<?, ?> delegate = createDelegate( containedTypeContextOptional.get() );
 				containedTypeDelegates.put( typeIdentifier, delegate );
 				return delegate;
 			}
@@ -307,7 +307,7 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoReindexingCol
 		}
 	}
 
-	private PojoContainedTypeIndexingPlan<?> createDelegate(PojoWorkContainedTypeContext<?> typeContext) {
+	private PojoContainedTypeIndexingPlan<?, ?> createDelegate(PojoWorkContainedTypeContext<?, ?> typeContext) {
 		return new PojoContainedTypeIndexingPlan<>( typeContext, sessionContext, this );
 	}
 }

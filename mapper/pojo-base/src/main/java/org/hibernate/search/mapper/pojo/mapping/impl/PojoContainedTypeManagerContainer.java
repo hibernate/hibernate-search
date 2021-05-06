@@ -26,8 +26,8 @@ public class PojoContainedTypeManagerContainer
 		return new Builder();
 	}
 
-	private final Map<PojoRawTypeIdentifier<?>, PojoContainedTypeManager<?>> byExactType;
-	private final Set<PojoContainedTypeManager<?>> all;
+	private final Map<PojoRawTypeIdentifier<?>, PojoContainedTypeManager<?, ?>> byExactType;
+	private final Set<PojoContainedTypeManager<?, ?>> all;
 
 	private PojoContainedTypeManagerContainer(Builder builder) {
 		this.byExactType = new HashMap<>( builder.byExactClass );
@@ -36,24 +36,24 @@ public class PojoContainedTypeManagerContainer
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <E> Optional<? extends PojoContainedTypeManager<E>> forExactType(
+	public <E> Optional<? extends PojoContainedTypeManager<?, E>> forExactType(
 			PojoRawTypeIdentifier<E> typeIdentifier) {
-		return Optional.ofNullable( (PojoContainedTypeManager<E>) byExactType.get( typeIdentifier ) );
+		return Optional.ofNullable( (PojoContainedTypeManager<?, E>) byExactType.get( typeIdentifier ) );
 	}
 
-	Set<PojoContainedTypeManager<?>> all() {
+	Set<PojoContainedTypeManager<?, ?>> all() {
 		return all;
 	}
 
 	public static class Builder {
 
 		// Use a LinkedHashMap for deterministic iteration
-		private final Map<PojoRawTypeIdentifier<?>, PojoContainedTypeManager<?>> byExactClass = new LinkedHashMap<>();
+		private final Map<PojoRawTypeIdentifier<?>, PojoContainedTypeManager<?, ?>> byExactClass = new LinkedHashMap<>();
 
 		private Builder() {
 		}
 
-		public <E> void add(PojoRawTypeModel<E> typeModel, PojoContainedTypeManager<E> typeManager) {
+		public <E> void add(PojoRawTypeModel<E> typeModel, PojoContainedTypeManager<?, E> typeManager) {
 			byExactClass.put( typeModel.typeIdentifier(), typeManager );
 		}
 

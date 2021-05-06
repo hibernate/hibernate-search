@@ -13,6 +13,6 @@ import org.hibernate.search.mapper.pojo.identity.spi.IdentifierMapping;
  */
 public interface HibernateOrmSessionIndexedTypeContext<E> extends HibernateOrmSessionTypeContext<E> {
 
-	IdentifierMapping getIdentifierMapping();
+	IdentifierMapping identifierMapping();
 
 }

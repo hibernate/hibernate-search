@@ -281,7 +281,7 @@ public class TypeBridgeBaseIT {
 
 		try ( SearchSession session = mapping.createSession() ) {
 			session.indexingPlan().add( entity );
-			session.indexingPlan().add( containedEntity );
+			session.indexingPlan().add( 1, null, containedEntity );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", "constant" ) )
@@ -292,7 +292,7 @@ public class TypeBridgeBaseIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			containedEntity.stringProperty = "some string";
 
-			session.indexingPlan().addOrUpdate( containedEntity, new String[] { "stringProperty" } );
+			session.indexingPlan().addOrUpdate( 1, null, containedEntity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.addOrUpdate( "1", b -> b.field( "someField", "constant" ) )
