@@ -78,8 +78,7 @@ public class LuceneBackendFactory implements BackendFactory {
 
 			Version luceneVersion = getLuceneVersion( eventContext, propertySource );
 
-			MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy(
-					propertySource, eventContext, buildContext );
+			MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( propertySource, buildContext );
 
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry = getAnalysisDefinitionRegistry(
 					buildContext, propertySource, luceneVersion
@@ -130,24 +129,24 @@ public class LuceneBackendFactory implements BackendFactory {
 	}
 
 	private MultiTenancyStrategy getMultiTenancyStrategy(ConfigurationPropertySource propertySource,
-			EventContext eventContext, BackendBuildContext buildContext) {
-		Optional<MultiTenancyStrategyName> multiTenancyStrategyName = MULTI_TENANCY_STRATEGY.get( propertySource );
-		if ( !multiTenancyStrategyName.isPresent() ) {
-			// the default depends on mapping
-			return buildContext.multiTenancyEnabled() ?
-					new DiscriminatorMultiTenancyStrategy() : new NoMultiTenancyStrategy();
-		}
-
-		MultiTenancyStrategyName multiTenancyStrategy = multiTenancyStrategyName.get();
-		// check multiTenancyStrategy mismatch: required by the mapper vs explicitly configured with properties
-		if ( MultiTenancyStrategyName.NONE.equals( multiTenancyStrategy ) &&
-				buildContext.multiTenancyEnabled() ) {
-			throw log.multiTenancyRequiredButExplicitlyDisabledByBackend( eventContext );
-		}
-		if ( MultiTenancyStrategyName.DISCRIMINATOR.equals( multiTenancyStrategy ) &&
-				!buildContext.multiTenancyEnabled() ) {
-			throw log.multiTenancyNotRequiredButExplicitlyEnabledByTheBackend( eventContext );
-		}
+			BackendBuildContext buildContext) {
+		MultiTenancyStrategyName multiTenancyStrategy = MULTI_TENANCY_STRATEGY.getAndMap(
+				propertySource, optionalName -> {
+					if ( MultiTenancyStrategyName.NONE.equals( optionalName )
+							&& buildContext.multiTenancyEnabled() ) {
+						throw log.multiTenancyRequiredButExplicitlyDisabledByBackend();
+					}
+					if ( MultiTenancyStrategyName.DISCRIMINATOR.equals( optionalName )
+							&& !buildContext.multiTenancyEnabled() ) {
+						throw log.multiTenancyNotRequiredButExplicitlyEnabledByTheBackend();
+					}
+					return optionalName;
+				} ).orElseGet( () -> {
+			// set dynamic default
+			return ( buildContext.multiTenancyEnabled() ) ?
+					MultiTenancyStrategyName.DISCRIMINATOR :
+					MultiTenancyStrategyName.NONE;
+		} );
 
 		switch ( multiTenancyStrategy ) {
 			case NONE:
@@ -156,8 +155,8 @@ public class LuceneBackendFactory implements BackendFactory {
 				return new DiscriminatorMultiTenancyStrategy();
 			default:
 				throw new AssertionFailure( String.format(
-						Locale.ROOT, "Unsupported multi-tenancy strategy '%1$s'.",
-						multiTenancyStrategyName
+						Locale.ROOT, "Unsupported multi-tenancy strategy '%1$s'",
+						multiTenancyStrategy
 				) );
 		}
 	}

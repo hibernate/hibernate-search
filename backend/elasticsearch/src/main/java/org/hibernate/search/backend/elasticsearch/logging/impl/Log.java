@@ -33,7 +33,6 @@ import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.DurationInSecondsAndFractionsFormatter;
-import org.hibernate.search.util.common.logging.impl.EventContextFormatter;
 import org.hibernate.search.util.common.logging.impl.EventContextNoPrefixFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -754,14 +753,12 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 148,
 			value = "Invalid backend configuration: mapping requires multi-tenancy"
-					+ " but no multi-tenancy strategy is set. %1$s.")
-	SearchException multiTenancyRequiredButExplicitlyDisabledByBackend(
-			@FormatWith(EventContextFormatter.class) EventContext context);
+					+ " but no multi-tenancy strategy is set.")
+	SearchException multiTenancyRequiredButExplicitlyDisabledByBackend();
 
 	@Message(id = ID_OFFSET + 149,
 			value = "Invalid backend configuration: mapping requires single-tenancy"
-					+ " but multi-tenancy strategy is set. %1$s.")
-	SearchException multiTenancyNotRequiredButExplicitlyEnabledByTheBackend(
-			@FormatWith(EventContextFormatter.class) EventContext context);
+					+ " but multi-tenancy strategy is set.")
+	SearchException multiTenancyNotRequiredButExplicitlyEnabledByTheBackend();
 
 }
