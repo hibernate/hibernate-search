@@ -16,6 +16,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.model.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
+import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgesConfigurationContext;
@@ -40,7 +41,7 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 	private final PojoBootstrapIntrospector introspector;
 
 	private BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge;
-	private boolean multiTenancyEnabled;
+	private TenancyMode tenancyMode = TenancyMode.SINGLE_TENANCY;
 	private ReindexOnUpdate defaultReindexOnUpdate = ReindexOnUpdate.DEFAULT;
 
 	private final AnnotationMappingConfigurationContextImpl annotationMappingConfiguration;
@@ -95,7 +96,7 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 	}
 
 	public void multiTenancyEnabled(boolean multiTenancyEnabled) {
-		this.multiTenancyEnabled = multiTenancyEnabled;
+		this.tenancyMode = multiTenancyEnabled ? TenancyMode.MULTI_TENANCY : TenancyMode.SINGLE_TENANCY;
 	}
 
 	public void defaultReindexOnUpdate(ReindexOnUpdate defaultReindexOnUpdate) {
@@ -129,7 +130,7 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 				introspector,
 				extractorBinder, bridgeResolver,
 				providedIdentifierBridge,
-				multiTenancyEnabled,
+				tenancyMode,
 				defaultReindexOnUpdate,
 				createMapperDelegate()
 		);

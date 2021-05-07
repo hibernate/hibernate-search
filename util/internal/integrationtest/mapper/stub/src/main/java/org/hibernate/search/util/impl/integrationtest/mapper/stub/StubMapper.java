@@ -25,23 +25,24 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 
 class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityBindingMapperContext {
 
 	private final ContextualFailureCollector failureCollector;
 	private final TypeMetadataContributorProvider<StubMappedIndex> contributorProvider;
 
-	private final boolean multiTenancyEnabled;
+	private final TenancyMode tenancyMode;
 
 	private final Map<StubTypeModel, MappedIndexManagerBuilder> indexManagerBuilders = new HashMap<>();
 	private final Map<IndexedEmbeddedDefinition, IndexedEmbeddedPathTracker> pathTrackers = new HashMap<>();
 
 	StubMapper(MappingBuildContext buildContext,
 			TypeMetadataContributorProvider<StubMappedIndex> contributorProvider,
-			boolean multiTenancyEnabled) {
+			TenancyMode tenancyMode) {
 		this.failureCollector = buildContext.failureCollector();
 		this.contributorProvider = contributorProvider;
-		this.multiTenancyEnabled = multiTenancyEnabled;
+		this.tenancyMode = tenancyMode;
 	}
 
 	@Override
@@ -65,7 +66,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 
 	private void prepareType(MappableTypeModel type, BackendsInfo backendsInfo) {
 		getMappedIndex( type )
-				.ifPresent( mappedIndex -> backendsInfo.collect( mappedIndex.backendName(), multiTenancyEnabled ) );
+				.ifPresent( mappedIndex -> backendsInfo.collect( mappedIndex.backendName(), tenancyMode ) );
 	}
 
 	@Override

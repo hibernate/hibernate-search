@@ -30,6 +30,7 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.mapper.mapping.building.impl.IndexManagerBuildingState;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -67,7 +68,7 @@ class IndexManagerBuildingStateHolder {
 			EventContext eventContext = EventContexts.fromBackendName( backendName );
 			BackendInitialBuildState backendBuildState;
 			try {
-				backendBuildState = createBackend( backendNameOptional, backendInfo.multiTenancyEnabled(), eventContext );
+				backendBuildState = createBackend( backendNameOptional, backendInfo.tenancyStrategy(), eventContext );
 			}
 			catch (RuntimeException e) {
 				rootBuildContext.getFailureCollector().withContext( eventContext ).add( e );
@@ -116,7 +117,7 @@ class IndexManagerBuildingStateHolder {
 		closer.pushAll( BackendInitialBuildState::closeOnFailure, backendBuildStateByName.values() );
 	}
 
-	private BackendInitialBuildState createBackend(Optional<String> backendNameOptional, boolean multiTenancyEnabled,
+	private BackendInitialBuildState createBackend(Optional<String> backendNameOptional, TenancyMode tenancyMode,
 			EventContext eventContext) {
 		ConfigurationPropertySourceExtractor backendPropertySourceExtractor =
 				EngineConfigurationUtils.extractorForBackend( backendNameOptional );
@@ -124,7 +125,7 @@ class IndexManagerBuildingStateHolder {
 		try ( BeanHolder<? extends BackendFactory> backendFactoryHolder =
 				BACKEND_TYPE.<BeanHolder<? extends BackendFactory>>getAndMap( backendPropertySource, beanResolver::resolve )
 						.orElseGet( () -> createDefaultBackendFactory( backendPropertySource ) ) ) {
-			BackendBuildContext backendBuildContext = new BackendBuildContextImpl( rootBuildContext, multiTenancyEnabled );
+			BackendBuildContext backendBuildContext = new BackendBuildContextImpl( rootBuildContext, tenancyMode );
 
 			BackendImplementor backend = backendFactoryHolder.get().create( eventContext, backendBuildContext, backendPropertySource );
 			return new BackendInitialBuildState( eventContext, backendPropertySourceExtractor, backendBuildContext,
