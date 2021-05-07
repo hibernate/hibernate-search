@@ -39,10 +39,10 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
 			if ( !isDelete() ) {
-				expectLoading( 1 );
+				expectIndexedEntityLoading( 1 );
 			}
 			expectOperation( futureFromBackend, 1, null, "1" );
-			operation.addTo( indexingPlan, 1 );
+			operation.addWithoutInstanceTo( indexingPlan, IndexedEntity.class, 1 );
 			// The session will wait for completion of the indexing plan upon closing,
 			// so we need to complete it now.
 			futureFromBackend.complete( null );
@@ -57,8 +57,8 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
 			// Only add and update perform implicit loading, and if they cannot load the entity,
 			// they are just skipped, assuming a delete event will come later.
-			expectLoading( Collections.singletonList( 1 ), Collections.singletonList( null ) );
-			operation.addTo( indexingPlan, 1 );
+			expectIndexedEntityLoading( Collections.singletonList( 1 ), Collections.singletonList( null ) );
+			operation.addWithoutInstanceTo( indexingPlan, IndexedEntity.class, 1 );
 		}
 	}
 
@@ -66,7 +66,7 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 	public void nullProvidedId() {
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
-			assertThatThrownBy( () -> operation.addTo( indexingPlan, null, (DocumentRoutesDescriptor) null ) )
+			assertThatThrownBy( () -> operation.addWithoutInstanceTo( indexingPlan, IndexedEntity.class, null, null ) )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll( "Invalid indexing request",
 							"if the entity is null, the identifier must be provided explicitly" );
@@ -80,7 +80,7 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
 
 			if ( !isDelete() ) {
-				expectLoading( Collections.singletonList( 42 ), Collections.singletonList( IndexedEntity.of( 1 ) ) );
+				expectIndexedEntityLoading( Collections.singletonList( 42 ), Collections.singletonList( IndexedEntity.of( 1 ) ) );
 			}
 			expectOperation( futureFromBackend,
 					worksBeforeInSamePlan -> {
@@ -105,7 +105,7 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 						}
 					},
 					42, "UE-123", "1" );
-			operation.addTo( indexingPlan, 42,
+			operation.addWithoutInstanceTo( indexingPlan, IndexedEntity.class, 42,
 					DocumentRoutesDescriptor.of( DocumentRouteDescriptor.of( "UE-123" ), Collections.emptyList() ) );
 			// The session will wait for completion of the indexing plan upon closing,
 			// so we need to complete it now.
@@ -120,7 +120,7 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
 
 			if ( !isDelete() ) {
-				expectLoading( Collections.singletonList( 42 ), Collections.singletonList( IndexedEntity.of( 1 ) ) );
+				expectIndexedEntityLoading( Collections.singletonList( 42 ), Collections.singletonList( IndexedEntity.of( 1 ) ) );
 			}
 			expectOperation(
 					futureFromBackend,
@@ -148,7 +148,7 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 					},
 					42, "UE-123", "1"
 			);
-			operation.addTo( indexingPlan, 42,
+			operation.addWithoutInstanceTo( indexingPlan, IndexedEntity.class, 42,
 					DocumentRoutesDescriptor.of( DocumentRouteDescriptor.of( "UE-123" ),
 							Arrays.asList( DocumentRouteDescriptor.of( "UE-121" ),
 									DocumentRouteDescriptor.of( "UE-122" ),
@@ -168,7 +168,7 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
 
-			expectLoading( 1 );
+			expectIndexedEntityLoading( 1 );
 			MyRoutingBridge.previousValues = Arrays.asList( "foo" );
 			expectOperation(
 					futureFromBackend,
@@ -183,7 +183,7 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 					// And only then, expect the actual operation.
 					1, null, "1"
 			);
-			operation.addTo( indexingPlan, 1 );
+			operation.addWithoutInstanceTo( indexingPlan, IndexedEntity.class, 1 );
 			// The session will wait for completion of the indexing plan upon closing,
 			// so we need to complete it now.
 			futureFromBackend.complete( null );
@@ -199,7 +199,7 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
 
-			expectLoading( 1 );
+			expectIndexedEntityLoading( 1 );
 			MyRoutingBridge.previousValues = Arrays.asList( "1", "foo", "3" );
 			expectOperation(
 					futureFromBackend,
@@ -216,7 +216,7 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 					// And only then, expect the actual operation.
 					1, null, "1"
 			);
-			operation.addTo( indexingPlan, 1 );
+			operation.addWithoutInstanceTo( indexingPlan, IndexedEntity.class, 1 );
 			// The session will wait for completion of the indexing plan upon closing,
 			// so we need to complete it now.
 			futureFromBackend.complete( null );
@@ -231,11 +231,11 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
 
-			expectLoading( 1 );
+			expectIndexedEntityLoading( 1 );
 			MyRoutingBridge.indexed = false;
 			MyRoutingBridge.previouslyIndexed = false;
 			// We don't expect the actual operation, which should be skipped because the entity is not indexed.
-			operation.addTo( indexingPlan, 1 );
+			operation.addWithoutInstanceTo( indexingPlan, IndexedEntity.class, 1 );
 		}
 	}
 
@@ -248,7 +248,7 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
 
-			expectLoading( 1 );
+			expectIndexedEntityLoading( 1 );
 			MyRoutingBridge.indexed = false;
 			MyRoutingBridge.previouslyIndexed = true;
 			if ( !isAdd() ) {
@@ -259,7 +259,7 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 						.createdThenExecuted( futureFromBackend );
 			}
 			// However, we don't expect the actual operation, which should be skipped because the entity is not indexed.
-			operation.addTo( indexingPlan, 1 );
+			operation.addWithoutInstanceTo( indexingPlan, IndexedEntity.class, 1 );
 			// The session will wait for completion of the indexing plan upon closing,
 			// so we need to complete it now.
 			futureFromBackend.complete( null );
@@ -275,7 +275,7 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 		try ( SearchSession session = createSession() ) {
 			SearchIndexingPlan indexingPlan = session.indexingPlan();
 
-			expectLoading( 1 );
+			expectIndexedEntityLoading( 1 );
 			MyRoutingBridge.indexed = false;
 			MyRoutingBridge.previouslyIndexed = true;
 			MyRoutingBridge.previousValues = Arrays.asList( "1", "foo", "3" );
@@ -291,7 +291,7 @@ public class PojoIndexingPlanOperationNullEntityIT extends AbstractPojoIndexingO
 						.createdThenExecuted( futureFromBackend );
 			}
 			// However, we don't expect the actual operation, which should be skipped because the entity is not indexed.
-			operation.addTo( indexingPlan, 1 );
+			operation.addWithoutInstanceTo( indexingPlan, IndexedEntity.class, 1 );
 			// The session will wait for completion of the indexing plan upon closing,
 			// so we need to complete it now.
 			futureFromBackend.complete( null );

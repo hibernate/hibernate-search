@@ -20,18 +20,19 @@ public enum PojoIndexingOperation {
 	ADD {
 		@Override
 		void expect(BackendMock.DocumentWorkCallListContext context, String tenantId,
-				String id, String routingKey, String value) {
-			context.add( b -> addWorkInfoAndDocument( b, tenantId, id, routingKey, value ) );
+				String id, String routingKey, String value, String containedValue) {
+			context.add( b -> addWorkInfoAndDocument( b, tenantId, id, routingKey, value, containedValue ) );
 		}
 
 		@Override
-		void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes, IndexedEntity entity) {
+		<T> void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes, T entity) {
 			indexingPlan.add( providedId, providedRoutes, entity );
 		}
 
 		@Override
-		void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes) {
-			indexingPlan.add( IndexedEntity.class, providedId, providedRoutes );
+		<T> void addWithoutInstanceTo(SearchIndexingPlan indexingPlan, Class<T> entityClass, Object providedId,
+				DocumentRoutesDescriptor providedRoutes) {
+			indexingPlan.add( entityClass, providedId, providedRoutes );
 		}
 
 		@Override
@@ -48,19 +49,20 @@ public enum PojoIndexingOperation {
 	ADD_OR_UPDATE {
 		@Override
 		void expect(BackendMock.DocumentWorkCallListContext context, String tenantId,
-				String id, String routingKey, String value) {
-			context.addOrUpdate( b -> addWorkInfoAndDocument( b, tenantId, id, routingKey, value ) );
+				String id, String routingKey, String value, String containedValue) {
+			context.addOrUpdate( b -> addWorkInfoAndDocument( b, tenantId, id, routingKey, value, containedValue ) );
 		}
 
 		@Override
-		void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes,
-				IndexedEntity entity) {
+		<T> void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes,
+				T entity) {
 			indexingPlan.addOrUpdate( providedId, providedRoutes, entity );
 		}
 
 		@Override
-		void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes) {
-			indexingPlan.addOrUpdate( IndexedEntity.class, providedId, providedRoutes );
+		<T> void addWithoutInstanceTo(SearchIndexingPlan indexingPlan, Class<T> entityClass, Object providedId,
+				DocumentRoutesDescriptor providedRoutes) {
+			indexingPlan.addOrUpdate( entityClass, providedId, providedRoutes );
 		}
 
 		@Override
@@ -77,19 +79,20 @@ public enum PojoIndexingOperation {
 	DELETE {
 		@Override
 		void expect(BackendMock.DocumentWorkCallListContext context, String tenantId,
-				String id, String routingKey, String value) {
+				String id, String routingKey, String value, String containedValue) {
 			context.delete( b -> addWorkInfo( b, tenantId, id, routingKey ) );
 		}
 
 		@Override
-		void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes,
-				IndexedEntity entity) {
+		<T> void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes,
+				T entity) {
 			indexingPlan.delete( providedId, providedRoutes, entity );
 		}
 
 		@Override
-		void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes) {
-			indexingPlan.delete( IndexedEntity.class, providedId, providedRoutes );
+		<T> void addWithoutInstanceTo(SearchIndexingPlan indexingPlan, Class<T> entityClass, Object providedId,
+				DocumentRoutesDescriptor providedRoutes) {
+			indexingPlan.delete( entityClass, providedId, providedRoutes );
 		}
 
 		@Override
@@ -105,20 +108,21 @@ public enum PojoIndexingOperation {
 	};
 
 	abstract void expect(BackendMock.DocumentWorkCallListContext context, String tenantId,
-			String id, String routingKey, String value);
+			String id, String routingKey, String value, String containedValue);
 
-	final void addTo(SearchIndexingPlan indexingPlan, Object providedId, IndexedEntity entity) {
+	final <T> void addTo(SearchIndexingPlan indexingPlan, Object providedId, T entity) {
 		addTo( indexingPlan, providedId, null, entity );
 	}
 
-	abstract void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes,
-			IndexedEntity entity);
+	abstract <T> void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes,
+			T entity);
 
-	final void addTo(SearchIndexingPlan indexingPlan, Object providedId) {
-		addTo( indexingPlan, providedId, (DocumentRoutesDescriptor) null );
+	final <T> void addWithoutInstanceTo(SearchIndexingPlan indexingPlan, Class<T> entityClass, Object providedId) {
+		addWithoutInstanceTo( indexingPlan, entityClass, providedId, null );
 	}
 
-	abstract void addTo(SearchIndexingPlan indexingPlan, Object providedId, DocumentRoutesDescriptor providedRoutes);
+	abstract <T> void addWithoutInstanceTo(SearchIndexingPlan indexingPlan, Class<T> entityClass, Object providedId,
+			DocumentRoutesDescriptor providedRoutes);
 
 	final CompletionStage<?> execute(SearchIndexer indexer, Object providedId, IndexedEntity entity) {
 		return execute( indexer, providedId, null, entity );
@@ -142,10 +146,16 @@ public enum PojoIndexingOperation {
 	}
 
 	static void addWorkInfoAndDocument(StubDocumentWork.Builder builder, String tenantId,
-			String identifier, String routingKey, String value) {
+			String identifier, String routingKey, String value, String containedValue) {
 		builder.tenantIdentifier( tenantId );
 		builder.identifier( identifier );
 		builder.routingKey( routingKey );
-		builder.document( StubDocumentNode.document().field( "value", value ).build() );
+		StubDocumentNode.Builder documentBuilder = StubDocumentNode.document();
+		documentBuilder.field( "value", value );
+		if ( containedValue != null ) {
+			documentBuilder.objectField( "contained", b -> b
+					.field( "value", containedValue ) );
+		}
+		builder.document( documentBuilder.build() );
 	}
 }
