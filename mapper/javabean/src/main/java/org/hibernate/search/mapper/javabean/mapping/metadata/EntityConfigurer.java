@@ -20,6 +20,6 @@ public interface EntityConfigurer<E> {
 	 * Configures the entity, in particular loading, using the given {@code context}.
 	 * @param context A context exposing methods to configure the entity.
 	 */
-	void configure(EntityConfigurationContext<? extends E> context);
+	void configure(EntityConfigurationContext<E> context);
 
 }

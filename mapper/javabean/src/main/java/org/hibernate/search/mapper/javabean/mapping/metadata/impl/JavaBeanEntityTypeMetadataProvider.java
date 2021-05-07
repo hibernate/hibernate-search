@@ -12,7 +12,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.engine.mapper.model.spi.TypeMetadataContributorProvider;
+import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategy;
+import org.hibernate.search.mapper.javabean.loading.SelectionLoadingStrategy;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
+import org.hibernate.search.mapper.javabean.mapping.metadata.EntityConfigurationContext;
 import org.hibernate.search.mapper.javabean.mapping.metadata.EntityConfigurer;
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -92,9 +95,24 @@ public class JavaBeanEntityTypeMetadataProvider {
 			for ( EntityConfigurer<?> configurer : contributorProvider.get( definition.type ) ) {
 				@SuppressWarnings("unchecked") // By constructions, all configurers returned here apply to supertypes of E
 				EntityConfigurer<? super E> castConfigurer = (EntityConfigurer<? super E>) configurer;
-				castConfigurer.configure( builder );
+				castConfigurer.configure( toConfigurationContext( builder ) );
 			}
 			return builder.build();
+		}
+
+		private static <E, E2 extends E> EntityConfigurationContext<E> toConfigurationContext(
+				JavaBeanEntityTypeMetadata.Builder<E2> builder) {
+			return new EntityConfigurationContext<E>() {
+				@Override
+				public void selectionLoadingStrategy(SelectionLoadingStrategy<? super E> strategy) {
+					builder.selectionLoadingStrategy( strategy );
+				}
+
+				@Override
+				public void massLoadingStrategy(MassLoadingStrategy<? super E, ?> strategy) {
+					builder.massLoadingStrategy( strategy );
+				}
+			};
 		}
 	}
 
