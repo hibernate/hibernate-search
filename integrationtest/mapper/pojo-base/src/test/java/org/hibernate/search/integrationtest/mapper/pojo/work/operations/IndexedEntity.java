@@ -6,12 +6,15 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.work.operations;
 
-import org.hibernate.search.integrationtest.mapper.pojo.work.PojoIndexingPlanBaseIT;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 
-@Indexed(index = PojoIndexingPlanBaseIT.IndexedEntity.INDEX)
+@Indexed(index = IndexedEntity.INDEX)
 public final class IndexedEntity {
 
 	public static final String INDEX = "IndexedEntity";
@@ -28,4 +31,8 @@ public final class IndexedEntity {
 
 	@GenericField
 	String value;
+
+	@IndexedEmbedded
+	@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "containing")))
+	ContainedEntity contained;
 }

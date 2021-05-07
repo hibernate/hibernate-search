@@ -85,12 +85,17 @@ public abstract class AbstractPojoIndexingOperationIT {
 	protected SearchMapping mapping;
 
 	@Mock
-	private SelectionEntityLoader<IndexedEntity> loaderMock;
+	private SelectionEntityLoader<IndexedEntity> indexedEntityLoaderMock;
+
+	@Mock
+	private SelectionEntityLoader<ContainedEntity> containedEntityLoaderMock;
 
 	@Before
 	public void setup() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
-				.field( "value", String.class ) );
+				.field( "value", String.class )
+				.objectField( "contained", b2 -> b2
+						.field( "value", String.class ) ) );
 
 		mapping = setupHelper.start()
 				.withConfiguration( b -> {
@@ -100,7 +105,10 @@ public abstract class AbstractPojoIndexingOperationIT {
 					}
 					b.addEntityType( IndexedEntity.class, context -> context
 							.selectionLoadingStrategy( (SelectionLoadingStrategy<IndexedEntity>)
-									(includedTypes, options) -> loaderMock ) );
+									(includedTypes, options) -> indexedEntityLoaderMock ) );
+					b.addEntityType( ContainedEntity.class, context -> context
+							.selectionLoadingStrategy( (SelectionLoadingStrategy<ContainedEntity>)
+									(includedTypes, options) -> containedEntityLoaderMock ) );
 				} )
 				.setup( IndexedEntity.class );
 
@@ -135,16 +143,28 @@ public abstract class AbstractPojoIndexingOperationIT {
 				.build();
 	}
 
-	protected final void expectLoading(Integer ... ids) {
+	protected final void expectIndexedEntityLoading(Integer ... ids) {
 		List<IndexedEntity> entities = new ArrayList<>();
 		for ( Integer id : ids ) {
 			entities.add( IndexedEntity.of( id ) );
 		}
-		expectLoading( Arrays.asList( ids ), entities );
+		expectIndexedEntityLoading( Arrays.asList( ids ), entities );
 	}
 
-	protected final void expectLoading(List<Integer> ids, List<IndexedEntity> entities) {
-		when( loaderMock.load( ids, null ) ).thenReturn( entities );
+	protected final void expectIndexedEntityLoading(List<Integer> ids, List<IndexedEntity> entities) {
+		when( indexedEntityLoaderMock.load( ids, null ) ).thenReturn( entities );
+	}
+
+	protected final void expectContainedEntityLoading(Integer ... ids) {
+		List<ContainedEntity> entities = new ArrayList<>();
+		for ( Integer id : ids ) {
+			entities.add( ContainedEntity.of( id ) );
+		}
+		expectContainedEntityLoading( Arrays.asList( ids ), entities );
+	}
+
+	protected final void expectContainedEntityLoading(List<Integer> ids, List<ContainedEntity> entities) {
+		when( containedEntityLoaderMock.load( ids, null ) ).thenReturn( entities );
 	}
 
 	protected final void expectOperation(CompletableFuture<?> futureFromBackend, int id, String providedRoutingKey, String value) {
@@ -165,7 +185,30 @@ public abstract class AbstractPojoIndexingOperationIT {
 		else {
 			expectedRoutingKey = providedRoutingKey;
 		}
-		operation.expect( context, tenantId, String.valueOf( id ), expectedRoutingKey, value );
+		operation.expect( context, tenantId, String.valueOf( id ), expectedRoutingKey, value, null );
+		context.createdThenExecuted( futureFromBackend );
+	}
+
+	protected final void expectUpdateCausedByContained(CompletableFuture<?> futureFromBackend, int id,
+			String value, String containedValue) {
+		expectUpdateCausedByContained( futureFromBackend, ignored -> { }, id, value, containedValue );
+	}
+
+	protected final void expectUpdateCausedByContained(CompletableFuture<?> futureFromBackend,
+			Consumer<BackendMock.DocumentWorkCallListContext> worksBefore,
+			int id, String value, String containedValue) {
+		BackendMock.DocumentWorkCallListContext context = backendMock.expectWorks(
+				IndexedEntity.INDEX, commitStrategy, refreshStrategy
+		);
+		worksBefore.accept( context );
+		String expectedRoutingKey;
+		if ( isImplicitRoutingEnabled() ) {
+			expectedRoutingKey = MyRoutingBridge.toRoutingKey( tenantId, id, value );
+		}
+		else {
+			expectedRoutingKey = null;
+		}
+		PojoIndexingOperation.ADD_OR_UPDATE.expect( context, tenantId, String.valueOf( id ), expectedRoutingKey, value, containedValue );
 		context.createdThenExecuted( futureFromBackend );
 	}
 
