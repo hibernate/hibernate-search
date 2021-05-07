@@ -7,18 +7,19 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 
 class BackendBuildContextImpl extends DelegatingBuildContext implements BackendBuildContext {
 
-	private boolean multiTenancyEnabled;
+	private final TenancyMode tenancyMode;
 
-	BackendBuildContextImpl(RootBuildContext delegate, boolean multiTenancyEnabled) {
+	BackendBuildContextImpl(RootBuildContext delegate, TenancyMode tenancyMode) {
 		super( delegate );
-		this.multiTenancyEnabled = multiTenancyEnabled;
+		this.tenancyMode = tenancyMode;
 	}
 
 	@Override
 	public boolean multiTenancyEnabled() {
-		return multiTenancyEnabled;
+		return TenancyMode.MULTI_TENANCY.equals( tenancyMode );
 	}
 }

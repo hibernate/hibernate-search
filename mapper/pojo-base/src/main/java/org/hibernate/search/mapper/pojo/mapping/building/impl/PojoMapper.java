@@ -30,6 +30,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBui
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingBridge;
@@ -74,7 +75,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	private final ContextualFailureCollector failureCollector;
 	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
 	private final BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge;
-	private final boolean multiTenancyEnabled;
+	private final TenancyMode tenancyMode;
 	private final ReindexOnUpdate defaultReindexOnUpdate;
 
 	private final FailureHandler failureHandler;
@@ -102,11 +103,11 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			ContainerExtractorBinder extractorBinder,
 			BridgeResolver bridgeResolver,
 			BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge,
-			boolean multiTenancyEnabled, ReindexOnUpdate defaultReindexOnUpdate,
+			TenancyMode tenancyMode, ReindexOnUpdate defaultReindexOnUpdate,
 			PojoMapperDelegate<MPBS> delegate) {
 		this.failureCollector = buildContext.failureCollector();
 		this.contributorProvider = contributorProvider;
-		this.multiTenancyEnabled = multiTenancyEnabled;
+		this.tenancyMode = tenancyMode;
 		this.defaultReindexOnUpdate = defaultReindexOnUpdate;
 
 		this.failureHandler = buildContext.failureHandler();
@@ -179,7 +180,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				throw log.missingEntityTypeMetadata( rawTypeModel );
 			}
 			PojoIndexedTypeAdditionalMetadata indexedTypeMetadata = indexedTypeMetadataOptional.get();
-			backendsInfo.collect( indexedTypeMetadata.backendName(), multiTenancyEnabled );
+			backendsInfo.collect( indexedTypeMetadata.backendName(), tenancyMode );
 			indexedEntityTypes.add( rawTypeModel );
 		}
 	}

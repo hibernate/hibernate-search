@@ -32,6 +32,7 @@ import org.hibernate.search.engine.environment.bean.BeanRetrieval;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
+import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
@@ -112,7 +113,7 @@ public class IndexManagerBuildingStateHolderTest {
 				backendPropertySourceCapture.capture()
 		) )
 				.thenReturn( backendMock );
-		holder.createBackends( defaultNoMultiTenancy() );
+		holder.createBackends( defaultSingleTenancy() );
 		verifyNoOtherBackendInteractionsAndReset();
 
 		when( backendMock.createIndexManagerBuilder(
@@ -177,7 +178,7 @@ public class IndexManagerBuildingStateHolderTest {
 				backendPropertySourceCapture.capture()
 		) )
 				.thenReturn( backendMock );
-		holder.createBackends( namedNoMultiTenancy( "myBackend" ) );
+		holder.createBackends( namedSingleTenancy( "myBackend" ) );
 		verifyNoOtherBackendInteractionsAndReset();
 
 		when( backendMock.createIndexManagerBuilder(
@@ -248,7 +249,7 @@ public class IndexManagerBuildingStateHolderTest {
 				.thenReturn( rootFailureCollectorMock );
 		when( rootFailureCollectorMock.withContext( EventContexts.defaultBackend() ) )
 				.thenReturn( backendFailureCollectorMock );
-		holder.createBackends( defaultNoMultiTenancy() );
+		holder.createBackends( defaultSingleTenancy() );
 		verify( backendFailureCollectorMock ).add( throwableCaptor.capture() );
 		verifyNoOtherBackendInteractionsAndReset();
 
@@ -281,7 +282,7 @@ public class IndexManagerBuildingStateHolderTest {
 				.thenReturn( rootFailureCollectorMock );
 		when( rootFailureCollectorMock.withContext( EventContexts.defaultBackend() ) )
 				.thenReturn( backendFailureCollectorMock );
-		holder.createBackends( defaultNoMultiTenancy() );
+		holder.createBackends( defaultSingleTenancy() );
 		verify( backendFailureCollectorMock ).add( throwableCaptor.capture() );
 		verifyNoOtherBackendInteractionsAndReset();
 
@@ -295,22 +296,22 @@ public class IndexManagerBuildingStateHolderTest {
 	}
 
 	@Test
-	public void differentMultiTenancyNamedBackend() {
+	public void differentTenancyModeNamedBackend() {
 		assertThatThrownBy( () -> {
 			BackendsInfo result = new BackendsInfo();
-			result.collect( Optional.of( "backend-name" ), true );
-			result.collect( Optional.of( "backend-name" ), false );
+			result.collect( Optional.of( "backend-name" ), TenancyMode.MULTI_TENANCY );
+			result.collect( Optional.of( "backend-name" ), TenancyMode.SINGLE_TENANCY );
 		} ).hasMessageContaining(
 				"Different mappings trying to define two backends with the same name 'backend-name' " +
 						"but having different expectations on multi-tenancy." );
 	}
 
 	@Test
-	public void differentMultiTenancyDefaultBackend() {
+	public void differentTenancyModeDefaultBackend() {
 		assertThatThrownBy( () -> {
 			BackendsInfo result = new BackendsInfo();
-			result.collect( Optional.empty(), false );
-			result.collect( Optional.empty(), true );
+			result.collect( Optional.empty(), TenancyMode.SINGLE_TENANCY );
+			result.collect( Optional.empty(), TenancyMode.MULTI_TENANCY );
 		} ).hasMessageContaining(
 				"Different mappings trying to define default backends " +
 						"having different expectations on multi-tenancy." );
@@ -321,15 +322,15 @@ public class IndexManagerBuildingStateHolderTest {
 		reset( verifiedMocks.toArray() );
 	}
 
-	public static BackendsInfo defaultNoMultiTenancy() {
+	public static BackendsInfo defaultSingleTenancy() {
 		BackendsInfo result = new BackendsInfo();
-		result.collect( Optional.empty(), false );
+		result.collect( Optional.empty(), TenancyMode.SINGLE_TENANCY );
 		return result;
 	}
 
-	public static BackendsInfo namedNoMultiTenancy(String name) {
+	public static BackendsInfo namedSingleTenancy(String name) {
 		BackendsInfo result = new BackendsInfo();
-		result.collect( Optional.of( name ), false );
+		result.collect( Optional.of( name ), TenancyMode.SINGLE_TENANCY );
 		return result;
 	}
 }

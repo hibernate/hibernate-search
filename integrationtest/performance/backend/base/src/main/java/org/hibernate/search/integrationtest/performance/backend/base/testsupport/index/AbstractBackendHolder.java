@@ -20,6 +20,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
+import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.filesystem.TemporaryFileHolder;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInitiator;
@@ -63,7 +64,7 @@ public abstract class AbstractBackendHolder {
 		SearchIntegrationBuilder integrationBuilder =
 				SearchIntegration.builder( propertySource, unusedPropertyChecker );
 
-		StubMappingInitiator initiator = new StubMappingInitiator( false );
+		StubMappingInitiator initiator = new StubMappingInitiator( TenancyMode.SINGLE_TENANCY );
 		StubMappingKey mappingKey = new StubMappingKey();
 		integrationBuilder.addMappingInitiator( mappingKey, initiator );
 

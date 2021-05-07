@@ -14,14 +14,15 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurat
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.model.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
+import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 
 public class StubMappingInitiator implements MappingInitiator<StubMappedIndex, StubMappingPartialBuildState> {
 
-	private final boolean multiTenancyEnabled;
+	private final TenancyMode tenancyMode;
 	private final List<StubMappedIndex> mappedIndexes = new ArrayList<>();
 
-	public StubMappingInitiator(boolean multiTenancyEnabled) {
-		this.multiTenancyEnabled = multiTenancyEnabled;
+	public StubMappingInitiator(TenancyMode tenancyMode) {
+		this.tenancyMode = tenancyMode;
 	}
 
 	public void add(StubMappedIndex mappedIndex) {
@@ -39,7 +40,7 @@ public class StubMappingInitiator implements MappingInitiator<StubMappedIndex, S
 	@Override
 	public Mapper<StubMappingPartialBuildState> createMapper(MappingBuildContext buildContext,
 			TypeMetadataContributorProvider<StubMappedIndex> contributorProvider) {
-		return new StubMapper( buildContext, contributorProvider, multiTenancyEnabled );
+		return new StubMapper( buildContext, contributorProvider, tenancyMode );
 	}
 
 }

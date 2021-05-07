@@ -27,6 +27,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
+import org.hibernate.search.engine.tenancy.spi.TenancyMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
@@ -159,7 +160,7 @@ public class SearchSetupHelper implements TestRule {
 		private BeanProvider beanManagerBeanProvider = new ForbiddenBeanProvider();
 
 		private final List<StubMappedIndex> mappedIndexes = new ArrayList<>();
-		private boolean multiTenancyEnabled = false;
+		private TenancyMode tenancyMode = TenancyMode.SINGLE_TENANCY;
 		private StubMappingSchemaManagementStrategy schemaManagementStrategy = StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP;
 
 		SetupContext(String defaultBackendName, AllAwareConfigurationPropertySource basePropertySource) {
@@ -218,7 +219,7 @@ public class SearchSetupHelper implements TestRule {
 		}
 
 		public SetupContext withMultiTenancy() {
-			multiTenancyEnabled = true;
+			tenancyMode = TenancyMode.MULTI_TENANCY;
 			return this;
 		}
 
@@ -233,7 +234,7 @@ public class SearchSetupHelper implements TestRule {
 
 			integrationBuilder.beanManagerBeanProvider( beanManagerBeanProvider );
 
-			StubMappingInitiator initiator = new StubMappingInitiator( multiTenancyEnabled );
+			StubMappingInitiator initiator = new StubMappingInitiator( tenancyMode );
 			mappedIndexes.forEach( initiator::add );
 			StubMappingKey mappingKey = new StubMappingKey();
 			integrationBuilder.addMappingInitiator( mappingKey, initiator );
