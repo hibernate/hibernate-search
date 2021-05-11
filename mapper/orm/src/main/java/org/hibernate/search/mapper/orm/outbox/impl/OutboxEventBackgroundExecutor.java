@@ -106,6 +106,7 @@ public class OutboxEventBackgroundExecutor {
 					List<OutboxEvent> events = finder.findOutboxEvents( session, batchSize );
 					if ( events.isEmpty() ) {
 						// Nothing to do, try again later (complete() will be called, re-scheduling the polling for later)
+						transactionHelper.commit( session );
 						return CompletableFuture.completedFuture( null );
 					}
 
