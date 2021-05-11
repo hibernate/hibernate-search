@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.Session;
+import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventSendingPlan;
@@ -49,10 +50,29 @@ public class OutboxTableSendingPlan implements AutomaticIndexingQueueEventSendin
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> sendAndReport(
 			EntityReferenceFactory<R> entityReferenceFactory) {
+		if ( session.isOpen() ) {
+			return sendAndReportOnSession( session, entityReferenceFactory );
+		}
+
+		// See https://hibernate.atlassian.net/browse/HSEARCH-4198
+		// When JTA is enabled with Spring, the shouldReleaseBeforeCompletion strategy is used by default.
+		// Solution inspired by org.hibernate.envers.internal.synchronization.AuditProcess#doBeforeTransactionCompletion.
+		try ( Session temporarySession = session.sessionWithOptions()
+				.connection()
+				.autoClose( false )
+				.connectionHandlingMode(
+						PhysicalConnectionHandlingMode.DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION )
+				.openSession() ) {
+			return sendAndReportOnSession( temporarySession, entityReferenceFactory );
+		}
+	}
+
+	private <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> sendAndReportOnSession(
+			Session currentSession, EntityReferenceFactory<R> entityReferenceFactory) {
 		MultiEntityOperationExecutionReport.Builder<R> builder = MultiEntityOperationExecutionReport.builder();
 		for ( OutboxEvent event : events ) {
 			try {
-				session.persist( event );
+				currentSession.persist( event );
 			}
 			catch (RuntimeException e) {
 				builder.throwable( e );
@@ -60,7 +80,7 @@ public class OutboxTableSendingPlan implements AutomaticIndexingQueueEventSendin
 						entityReferenceFactory, event.getEntityName(), event.getOriginalEntityId() );
 			}
 		}
-		session.flush();
+		currentSession.flush();
 		return CompletableFuture.completedFuture( builder.build() );
 	}
 }
