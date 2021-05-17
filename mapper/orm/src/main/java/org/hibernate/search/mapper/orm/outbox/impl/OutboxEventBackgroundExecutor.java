@@ -93,7 +93,9 @@ public class OutboxEventBackgroundExecutor {
 		@Override
 		public CompletableFuture<?> work() {
 			if ( mapping.sessionFactory().isClosed() ) {
-				// TODO HHH-14541 Check for this issue
+				// Work around HHH-14541, which is not currently fixed in ORM 5.4.
+				// Even if a fix gets backported, the bug will still be present in older 5.4 versions,
+				// so we'd better keep this workaround.
 				log.sessionFactoryIsClosedOnOutboxProcessing();
 				return CompletableFuture.completedFuture( null );
 			}
@@ -111,7 +113,7 @@ public class OutboxEventBackgroundExecutor {
 					// Make sure we will process the next batch ASAP
 					// Since the worker is already working,
 					// calling ensureScheduled() will lead to immediate re-execution right after we're done
-					processingTask.ensureScheduled();
+					ensureScheduled();
 
 					log.tracef( "Processing %d outbox events for '%s'", events.size(),
 							OutboxPollingAutomaticIndexingStrategy.NAME );
@@ -141,10 +143,18 @@ public class OutboxEventBackgroundExecutor {
 
 		@Override
 		public void complete() {
+			// Make sure we poll again in a few seconds.
+			// Since the worker is no longer working at this point,
+			// calling ensureScheduled() will lead to delayed re-execution.
+			ensureScheduled();
+		}
+
+		private void ensureScheduled() {
+			// Only schedule the task while the Hibernate Search is started;
+			// as soon as Hibernate Search stops,
+			// we will finish processing the current batch of events and leave
+			// the remaining events to be processed when the application restarts.
 			if ( status.get() == Status.STARTED ) {
-				// Make sure we poll again in a few seconds
-				// Since the worker is no longer working,
-				// calling ensureScheduled() will lead to delayed re-execution
 				processingTask.ensureScheduled();
 			}
 		}
