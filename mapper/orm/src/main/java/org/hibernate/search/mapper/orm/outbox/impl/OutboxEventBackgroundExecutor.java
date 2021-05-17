@@ -101,8 +101,8 @@ public class OutboxEventBackgroundExecutor {
 			try ( SessionImplementor session = (SessionImplementor) mapping.sessionFactory().openSession() ) {
 				transactionHelper.begin( session, null );
 				try {
-					List<OutboxEvent> outboxes = finder.findOutboxEvents( session, batchSize );
-					if ( outboxes.isEmpty() ) {
+					List<OutboxEvent> events = finder.findOutboxEvents( session, batchSize );
+					if ( events.isEmpty() ) {
 						// Nothing to do, try again later (complete() will be called, re-scheduling the polling for later)
 						return CompletableFuture.completedFuture( null );
 					}
@@ -113,9 +113,12 @@ public class OutboxEventBackgroundExecutor {
 					// calling ensureScheduled() will lead to immediate re-execution right after we're done
 					processingTask.ensureScheduled();
 
+					log.tracef( "Processing %d outbox events for '%s'", events.size(),
+							OutboxPollingAutomaticIndexingStrategy.NAME );
+
 					// Process the events
 					OutboxEventProcessingPlan eventProcessing = new OutboxEventProcessingPlan(
-							mapping, session, outboxes );
+							mapping, session, events );
 					List<Integer> ids = eventProcessing.processEvents();
 					createOutboxRetries( failureHandler, session, eventProcessing );
 					deleteOutboxes( session, ids );
