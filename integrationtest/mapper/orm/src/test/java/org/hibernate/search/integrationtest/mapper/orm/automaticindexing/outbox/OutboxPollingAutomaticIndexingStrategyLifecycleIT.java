@@ -27,6 +27,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.awaitility.Awaitility;
+
 public class OutboxPollingAutomaticIndexingStrategyLifecycleIT {
 
 	@Rule
@@ -125,11 +127,18 @@ public class OutboxPollingAutomaticIndexingStrategyLifecycleIT {
 		// Make them visible to Hibernate Search now.
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 
-		backendMock.expectWorks( IndexedEntity.NAME )
-				.add( "1", b -> b.field( "indexedField", "value for the field" ) )
-				.delete( "1" );
+		SessionFactory finalSessionFactory = sessionFactory;
+		Awaitility.await().untilAsserted( () -> thereAreNoMoreOutboxEntities( finalSessionFactory ) );
 
+		// No works are expected to be executed by the time the outbox events are processed
 		backendMock.verifyExpectationsMet();
+	}
+
+	private void thereAreNoMoreOutboxEntities(SessionFactory sessionFactory) {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
+			assertThat( outboxEntries ).isEmpty();
+		} );
 	}
 
 	private SessionFactory setup() {
