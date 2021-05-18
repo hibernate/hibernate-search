@@ -1,0 +1,188 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outbox;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outbox.OutboxPollingNoProcessingIT.verifyOutboxEntry;
+import static org.junit.Assume.assumeTrue;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
+import javax.persistence.Basic;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.dialect.H2Dialect;
+import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
+import org.hibernate.engine.jdbc.spi.JdbcCoordinator;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.search.mapper.orm.outbox.impl.OutboxEvent;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.AutomaticIndexingStrategyExpectations;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
+import org.awaitility.Awaitility;
+
+public class OutboxPollingOutOfOrderIdsIT {
+
+	private static final String OUTBOX_TABLE_UPDATE_ID = "UPDATE HIBERNATE_SEARCH_OUTBOX_TABLE SET ID = ? WHERE ID = ?";
+
+	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder();
+
+	@Rule
+	public BackendMock backendMock = new BackendMock();
+
+	@Rule
+	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
+			.automaticIndexingStrategy( AutomaticIndexingStrategyExpectations.outboxPolling() );
+
+	private SessionFactory sessionFactory;
+
+	@Before
+	public void before() {
+		backendMock.expectSchema( IndexedEntity.INDEX, b -> b.field( "indexedField", String.class ) );
+		sessionFactory = ormSetupHelper.start()
+				.withProperty( "hibernate.search.automatic_indexing.outbox_event_finder", outboxEventFinder )
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void processCreateUpdateDelete() {
+		// An entity is created, updated, then deleted in separate transactions,
+		// but the delete event has ID 1, the update event has ID 2, and the add event has ID 3.
+
+		int id = 1;
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity = new IndexedEntity();
+			entity.setId( id );
+			entity.setIndexedField( "value for the field" );
+			session.persist( entity );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity = session.load( IndexedEntity.class, id );
+			entity.setIndexedField( "another value for the field" );
+			session.merge( entity );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity = session.load( IndexedEntity.class, id );
+			session.delete( entity );
+		} );
+
+		OrmUtils.withinSession( sessionFactory, session -> {
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			assertThat( events ).hasSize( 3 );
+			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD, null );
+			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD_OR_UPDATE, null );
+			verifyOutboxEntry( events.get( 2 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.DELETE, null );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			// change the ids
+			updateOutboxTableRow( session, 1, 4 );
+			updateOutboxTableRow( session, 3, 1 );
+			updateOutboxTableRow( session, 4, 3 );
+		} );
+
+		OrmUtils.withinSession( sessionFactory, session -> {
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			assertThat( events ).hasSize( 3 );
+			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.DELETE, null );
+			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD_OR_UPDATE, null );
+			verifyOutboxEntry( events.get( 2 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD, null );
+		} );
+
+		// The events were hidden until now, to ensure they were not processed in separate batches.
+		// Make them visible to Hibernate Search now.
+		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+
+		SessionFactory finalSessionFactory = sessionFactory;
+		Awaitility.await().untilAsserted( () -> thereAreNoMoreOutboxEntities( finalSessionFactory ) );
+
+		// No works are expected to be executed by the time the outbox events are processed
+		backendMock.verifyExpectationsMet();
+	}
+
+	private void updateOutboxTableRow(Session session, Integer oldId, Integer newId) {
+		try {
+			SharedSessionContractImplementor implementor = session.unwrap( SharedSessionContractImplementor.class );
+
+			JdbcCoordinator jdbc = implementor.getJdbcCoordinator();
+			JdbcEnvironment env = implementor.getJdbcServices().getJdbcEnvironment();
+			assumeTrue( "This test uses SQL directly which can currently only be set up with H2",
+					env.getDialect() instanceof H2Dialect
+			);
+
+			try ( PreparedStatement ps = jdbc.getStatementPreparer().prepareStatement( OUTBOX_TABLE_UPDATE_ID ) ) {
+				ps.setInt( 1, newId );
+				ps.setInt( 2, oldId );
+
+				jdbc.getResultSetReturn().executeUpdate( ps );
+			}
+		}
+		catch ( SQLException exception ) {
+			fail( "Unexpected SQL exception: " + exception );
+		}
+	}
+
+	private void thereAreNoMoreOutboxEntities(SessionFactory sessionFactory) {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
+			assertThat( outboxEntries ).isEmpty();
+		} );
+	}
+
+	@Entity(name = IndexedEntity.INDEX)
+	@Indexed(index = IndexedEntity.INDEX)
+	public static class IndexedEntity {
+		static final String INDEX = "IndexedEntity";
+
+		@Id
+		private Integer id;
+
+		@Basic
+		@GenericField
+		private String indexedField;
+
+		public IndexedEntity() {
+		}
+
+		public IndexedEntity(Integer id, String indexedField) {
+			this.id = id;
+			this.indexedField = indexedField;
+		}
+
+		public Integer getId() {
+			return id;
+		}
+
+		public void setId(Integer id) {
+			this.id = id;
+		}
+
+		public String getIndexedField() {
+			return indexedField;
+		}
+
+		public void setIndexedField(String indexedField) {
+			this.indexedField = indexedField;
+		}
+	}
+}
