@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outbox
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.search.integrationtest.mapper.orm.automaticindexing.outbox.OutboxPollingNoProcessingIT.verifyOutboxEntry;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 import static org.junit.Assume.assumeTrue;
 
 import java.sql.PreparedStatement;
@@ -28,6 +29,7 @@ import org.hibernate.search.mapper.orm.outbox.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.AutomaticIndexingStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
@@ -56,10 +58,11 @@ public class OutboxPollingOutOfOrderIdsIT {
 
 	@Before
 	public void before() {
-		backendMock.expectSchema( IndexedEntity.INDEX, b -> b.field( "indexedField", String.class ) );
+		backendMock.expectAnySchema( IndexedEntity.INDEX )
+				.expectAnySchema( RoutedIndexedEntity.NAME );
 		sessionFactory = ormSetupHelper.start()
 				.withProperty( "hibernate.search.automatic_indexing.outbox_event_finder", outboxEventFinder )
-				.setup( IndexedEntity.class );
+				.setup( IndexedEntity.class, RoutedIndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
@@ -97,7 +100,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			// change the ids
+			// change the ids 1 <--> 3
 			updateOutboxTableRow( session, 1, 4 );
 			updateOutboxTableRow( session, 3, 1 );
 			updateOutboxTableRow( session, 4, 3 );
@@ -199,7 +202,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			// change the ids
+			// change the ids 2 <--> 3
 			updateOutboxTableRow( session, 2, 4 );
 			updateOutboxTableRow( session, 3, 2 );
 			updateOutboxTableRow( session, 4, 3 );
@@ -215,6 +218,130 @@ public class OutboxPollingOutOfOrderIdsIT {
 
 		backendMock.expectWorks( IndexedEntity.INDEX )
 				.addOrUpdate( "1", b -> b.field( "indexedField", "value for the field" ) )
+				.createdThenExecuted();
+		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void processDifferentRoutesUpdates() {
+		// An entity is updated twice in two separate transactions,
+		// resulting in two events with different routing keys
+
+		withinTransaction( sessionFactory, session -> {
+			RoutedIndexedEntity entity = new RoutedIndexedEntity( 1, "first", RoutedIndexedEntity.Status.FIRST );
+			session.persist( entity );
+		} );
+
+		backendMock.expectWorks( RoutedIndexedEntity.NAME )
+				.add( b -> b.identifier( "1" ).routingKey( "FIRST" )
+						.document( StubDocumentNode.document()
+								.field( "text", "first" )
+								.build() ) )
+				.createdThenExecuted();
+		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		backendMock.verifyExpectationsMet();
+
+		// Update the current routing key (but don't trigger indexing yet: events are being filtered)
+		withinTransaction( sessionFactory, session -> {
+			RoutedIndexedEntity entity = session.find( RoutedIndexedEntity.class, 1 );
+			entity.setStatus( RoutedIndexedEntity.Status.SECOND );
+			entity.setText( "second" );
+		} );
+
+		// Update the current routing key again (but don't trigger indexing yet: events are being filtered)
+		withinTransaction( sessionFactory, session -> {
+			RoutedIndexedEntity entity = session.find( RoutedIndexedEntity.class, 1 );
+			entity.setStatus( RoutedIndexedEntity.Status.THIRD );
+			entity.setText( "third" );
+		} );
+
+		backendMock.expectWorks( RoutedIndexedEntity.NAME )
+				.delete( b -> b.identifier( "1" ).routingKey( "FIRST" ) )
+				.delete( b -> b.identifier( "1" ).routingKey( "SECOND" ) )
+				.addOrUpdate( b -> b.identifier( "1" ).routingKey( "THIRD" )
+						.document( StubDocumentNode.document()
+								.field( "text", "third" )
+								.build() ) )
+				.createdThenExecuted();
+		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void processDifferentRoutesUpdates_outOfOrder() {
+		// An entity is updated twice in two separate transactions,
+		// resulting in two events with different routing keys,
+		// but the second update event has ID 1, and the first update has ID 2.
+
+		withinTransaction( sessionFactory, session -> {
+			RoutedIndexedEntity entity = new RoutedIndexedEntity( 1, "first", RoutedIndexedEntity.Status.FIRST );
+			session.persist( entity );
+		} );
+
+		backendMock.expectWorks( RoutedIndexedEntity.NAME )
+				.add( b -> b.identifier( "1" ).routingKey( "FIRST" )
+						.document( StubDocumentNode.document()
+								.field( "text", "first" )
+								.build() ) )
+				.createdThenExecuted();
+		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		backendMock.verifyExpectationsMet();
+
+		// Update the current routing key (but don't trigger indexing yet: events are being filtered)
+		withinTransaction( sessionFactory, session -> {
+			RoutedIndexedEntity entity = session.find( RoutedIndexedEntity.class, 1 );
+			entity.setStatus( RoutedIndexedEntity.Status.SECOND );
+			entity.setText( "second" );
+		} );
+
+		// Update the current routing key again (but don't trigger indexing yet: events are being filtered)
+		withinTransaction( sessionFactory, session -> {
+			RoutedIndexedEntity entity = session.find( RoutedIndexedEntity.class, 1 );
+			entity.setStatus( RoutedIndexedEntity.Status.THIRD );
+			entity.setText( "third" );
+		} );
+
+		OrmUtils.withinSession( sessionFactory, session -> {
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			assertThat( events ).hasSize( 2 );
+			// right order
+			verifyOutboxEntry( events.get( 0 ), RoutedIndexedEntity.NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE,
+					"SECOND", "FIRST"
+			);
+			verifyOutboxEntry( events.get( 1 ), RoutedIndexedEntity.NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE,
+					"THIRD", "SECOND"
+			);
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			// change the ids 2 <--> 3
+			updateOutboxTableRow( session, 2, 4 );
+			updateOutboxTableRow( session, 3, 2 );
+			updateOutboxTableRow( session, 4, 3 );
+		} );
+
+		OrmUtils.withinSession( sessionFactory, session -> {
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			assertThat( events ).hasSize( 2 );
+			// out-of-order now
+			verifyOutboxEntry( events.get( 0 ), RoutedIndexedEntity.NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE,
+					"THIRD", "SECOND"
+			);
+			verifyOutboxEntry( events.get( 1 ), RoutedIndexedEntity.NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE,
+					"SECOND", "FIRST"
+			);
+		} );
+
+		backendMock.expectWorks( RoutedIndexedEntity.NAME )
+				// Compared with the in-order test we have just this change SECOND <--> FIRST.
+				// That seems to be reasonable.
+				.delete( b -> b.identifier( "1" ).routingKey( "SECOND" ) )
+				.delete( b -> b.identifier( "1" ).routingKey( "FIRST" ) )
+				.addOrUpdate( b -> b.identifier( "1" ).routingKey( "THIRD" )
+						.document( StubDocumentNode.document()
+								.field( "text", "third" )
+								.build() ) )
 				.createdThenExecuted();
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
