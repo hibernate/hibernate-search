@@ -148,7 +148,7 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
  *         settingsId: ...
  */
 
-@Field final String MAVEN_TOOL = 'Apache Maven 3.6'
+@Field final String MAVEN_TOOL = 'Apache Maven 3.8'
 
 // Default node pattern, to be used for resource-intensive stages.
 // Should not include the controller node.
