@@ -33,6 +33,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -89,6 +90,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
 			assertThat( events ).hasSize( 3 );
+			// right order
 			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD, null );
 			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD_OR_UPDATE, null );
 			verifyOutboxEntry( events.get( 2 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.DELETE, null );
@@ -104,6 +106,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
 			assertThat( events ).hasSize( 3 );
+			// out-of-order now
 			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.DELETE, null );
 			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD_OR_UPDATE, null );
 			verifyOutboxEntry( events.get( 2 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD, null );
@@ -120,13 +123,111 @@ public class OutboxPollingOutOfOrderIdsIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@Test
+	public void processDeleteRecreate_rightOrder() {
+		// An entity is deleted, then re-created in separate transactions.
+
+		int id = 1;
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity = new IndexedEntity();
+			entity.setId( id );
+			entity.setIndexedField( "value for the field" );
+			session.persist( entity );
+		} );
+
+		backendMock.expectWorks( IndexedEntity.INDEX )
+				.add( "1", b -> b.field( "indexedField", "value for the field" ) )
+				.createdThenExecuted();
+		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity = session.load( IndexedEntity.class, id );
+			session.remove( entity );
+		} );
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity = new IndexedEntity();
+			entity.setId( id );
+			entity.setIndexedField( "value for the field" );
+			session.persist( entity );
+		} );
+
+		backendMock.expectWorks( IndexedEntity.INDEX )
+				.addOrUpdate( "1", b -> b.field( "indexedField", "value for the field" ) )
+				.createdThenExecuted();
+		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	@Ignore("Probably we need to create an issue for it")
+	public void processDeleteRecreate_outOfOrder() {
+		// An entity is deleted, then re-created in separate transactions,
+		// but the add event has ID 1, the and the delete event has ID 2.
+
+		int id = 1;
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity = new IndexedEntity();
+			entity.setId( id );
+			entity.setIndexedField( "value for the field" );
+			session.persist( entity );
+		} );
+
+		backendMock.expectWorks( IndexedEntity.INDEX )
+				.add( "1", b -> b.field( "indexedField", "value for the field" ) )
+				.createdThenExecuted();
+		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity = session.load( IndexedEntity.class, id );
+			session.remove( entity );
+		} );
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity = new IndexedEntity();
+			entity.setId( id );
+			entity.setIndexedField( "value for the field" );
+			session.persist( entity );
+		} );
+
+		OrmUtils.withinSession( sessionFactory, session -> {
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			assertThat( events ).hasSize( 2 );
+			// right order
+			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.DELETE, null );
+			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD, null );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			// change the ids
+			updateOutboxTableRow( session, 2, 4 );
+			updateOutboxTableRow( session, 3, 2 );
+			updateOutboxTableRow( session, 4, 3 );
+		} );
+
+		OrmUtils.withinSession( sessionFactory, session -> {
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			assertThat( events ).hasSize( 2 );
+			// out-of-order now
+			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD, null );
+			verifyOutboxEntry( events.get( 1 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.DELETE, null );
+		} );
+
+		backendMock.expectWorks( IndexedEntity.INDEX )
+				.addOrUpdate( "1", b -> b.field( "indexedField", "value for the field" ) )
+				.createdThenExecuted();
+		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		backendMock.verifyExpectationsMet();
+	}
+
 	private void updateOutboxTableRow(Session session, Integer oldId, Integer newId) {
 		try {
 			SharedSessionContractImplementor implementor = session.unwrap( SharedSessionContractImplementor.class );
 
 			JdbcCoordinator jdbc = implementor.getJdbcCoordinator();
 			JdbcEnvironment env = implementor.getJdbcServices().getJdbcEnvironment();
-			assumeTrue( "This test uses SQL directly which can currently only be set up with H2",
+			assumeTrue(
+					"This test uses SQL directly which can currently only be set up with H2",
 					env.getDialect() instanceof H2Dialect
 			);
 
@@ -137,7 +238,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 				jdbc.getResultSetReturn().executeUpdate( ps );
 			}
 		}
-		catch ( SQLException exception ) {
+		catch (SQLException exception) {
 			fail( "Unexpected SQL exception: " + exception );
 		}
 	}
