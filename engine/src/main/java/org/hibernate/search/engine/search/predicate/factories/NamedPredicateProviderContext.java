@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.search.predicate.dsl.NamedPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
@@ -30,7 +31,8 @@ public interface NamedPredicateProviderContext {
 	/**
 	 * @param name The name of the parameter.
 	 * @return The value provided to {@link NamedPredicateOptionsStep#param(String, Object)} for this parameter.
-	 * @see NamedPredicateOptionsStep#param(java.lang.String, java.lang.Object)
+	 * @throws SearchException no value was provided for this parameter.
+	 * @see NamedPredicateOptionsStep#param(String, Object)
 	 */
 	Object param(String name);
 
@@ -38,6 +40,7 @@ public interface NamedPredicateProviderContext {
 	 * @param name The name of the parameter.
 	 * @return An optional containing the value provided to {@link NamedPredicateOptionsStep#param(String, Object)}
 	 * for this parameter, or {@code Optional.empty()} if no value was provided for this parameter.
+	 * @see NamedPredicateOptionsStep#param(String, Object)
 	 */
 	Optional<Object> paramOptional(String name);
 

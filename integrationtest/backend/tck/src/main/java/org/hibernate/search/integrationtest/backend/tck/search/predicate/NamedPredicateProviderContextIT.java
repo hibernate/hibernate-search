@@ -10,6 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 
+import java.util.Optional;
+
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
@@ -47,7 +49,7 @@ public class NamedPredicateProviderContextIT {
 
 	@Test
 	public void param() {
-		Object[] givenParams = new Object[] { "string", new Object(), 5L, null };
+		Object[] givenParams = new Object[] { "string", new Object(), 5L, Optional.empty() };
 		Object[] receivedParams = new Object[givenParams.length];
 
 		assertThatQuery( index.query()
@@ -60,7 +62,7 @@ public class NamedPredicateProviderContextIT {
 							receivedParams[0] = context.param( "param1" );
 							receivedParams[1] = context.param( "param2" );
 							receivedParams[2] = context.param( "param3" );
-							receivedParams[3] = context.param( "param5" );
+							receivedParams[3] = context.paramOptional( "param5" );
 							return context.predicate().matchAll().toPredicate();
 						} ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );
@@ -70,13 +72,13 @@ public class NamedPredicateProviderContextIT {
 
 	@Test
 	public void param_absent() {
-		Object[] expectedParams = new Object[] { null };
+		Object[] expectedParams = new Object[] { Optional.empty() };
 		Object[] actualsParams = new Object[1];
 
 		assertThatQuery( index.query()
 				.where( f -> f.named( "stub-predicate" )
 						.param( "impl", (NamedPredicateProvider) context -> {
-							actualsParams[0] = context.param( "absent" );
+							actualsParams[0] = context.paramOptional( "absent" );
 							return context.predicate().matchAll().toPredicate();
 						} ) ) )
 				.hasDocRefHitsAnyOrder( index.typeName(), DOCUMENT_1 );

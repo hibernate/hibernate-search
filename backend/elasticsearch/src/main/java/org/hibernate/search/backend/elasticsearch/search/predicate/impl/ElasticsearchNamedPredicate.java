@@ -130,7 +130,12 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 		@Override
 		public Object param(String name) {
 			Contracts.assertNotNull( name, "name" );
-			return params.get( name );
+
+			Object value = params.get( name );
+			if ( value == null ) {
+				throw log.paramNotDefined( name );
+			}
+			return value;
 		}
 
 		@Override
