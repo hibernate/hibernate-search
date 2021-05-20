@@ -15,6 +15,7 @@ import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
+import org.hibernate.search.util.common.AssertionFailure;
 
 /**
  * A {@link PojoTypeIndexingPlanDelegate} that sends indexing events to an external queue,
@@ -27,46 +28,46 @@ final class PojoTypeIndexingPlanEventQueueDelegate<I, E> implements PojoTypeInde
 
 	private final PojoWorkIndexedTypeContext<I, E> typeContext;
 	private final PojoWorkSessionContext sessionContext;
-	private final PojoIndexingQueueEventSendingPlan delegate;
+	private final PojoIndexingQueueEventSendingPlan sendingPlan;
 
 	PojoTypeIndexingPlanEventQueueDelegate(PojoWorkIndexedTypeContext<I, E> typeContext,
 			PojoWorkSessionContext sessionContext,
-			PojoIndexingQueueEventSendingPlan delegate) {
+			PojoIndexingQueueEventSendingPlan sendingPlan) {
 		this.typeContext = typeContext;
 		this.sessionContext = sessionContext;
-		this.delegate = delegate;
+		this.sendingPlan = sendingPlan;
 	}
 
 	@Override
 	public void add(I identifier, Supplier<E> entitySupplier, DocumentRouteDescriptor route) {
-		delegate.add( typeContext.entityName(), identifier,
+		sendingPlan.add( typeContext.entityName(), identifier,
 				typeContext.identifierMapping().toDocumentIdentifier( identifier, sessionContext.mappingContext() ),
 				DocumentRoutesDescriptor.of( route ) );
 	}
 
 	@Override
 	public void addOrUpdate(I identifier, DocumentRoutesDescriptor routes, Supplier<E> entitySupplier) {
-		delegate.addOrUpdate( typeContext.entityName(), identifier,
+		sendingPlan.addOrUpdate( typeContext.entityName(), identifier,
 				typeContext.identifierMapping().toDocumentIdentifier( identifier, sessionContext.mappingContext() ),
 				routes );
 	}
 
 	@Override
 	public void delete(I identifier, DocumentRoutesDescriptor routes, Supplier<E> entitySupplier) {
-		delegate.delete( typeContext.entityName(), identifier,
+		sendingPlan.delete( typeContext.entityName(), identifier,
 				typeContext.identifierMapping().toDocumentIdentifier( identifier, sessionContext.mappingContext() ),
 				routes );
 	}
 
 	@Override
 	public void discard() {
-		delegate.discard();
+		throw new AssertionFailure( "discard() should be handled at the strategy level" );
 	}
 
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
 			EntityReferenceFactory<R> entityReferenceFactory) {
-		return delegate.sendAndReport( entityReferenceFactory );
+		throw new AssertionFailure( "executeAndReport() should be handled at the strategy level" );
 	}
 
 }

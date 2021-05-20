@@ -19,8 +19,8 @@ public class PojoContainedTypeIndexingPlan<I, E>
 	private final PojoWorkContainedTypeContext<I, E> typeContext;
 
 	public PojoContainedTypeIndexingPlan(PojoWorkContainedTypeContext<I, E> typeContext,
-			PojoWorkSessionContext sessionContext, PojoIndexingPlanImpl root) {
-		super( sessionContext, root );
+			PojoWorkSessionContext sessionContext) {
+		super( sessionContext );
 		this.typeContext = typeContext;
 	}
 

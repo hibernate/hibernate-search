@@ -15,6 +15,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
+import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.DocumentRouter;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.NoOpDocumentRouter;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
@@ -32,9 +33,8 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 	private final PojoTypeIndexingPlanDelegate<I, E> delegate;
 
 	public PojoIndexedTypeIndexingPlan(PojoWorkIndexedTypeContext<I, E> typeContext,
-			PojoWorkSessionContext sessionContext, PojoIndexingPlanImpl root,
-			PojoTypeIndexingPlanDelegate<I, E> delegate) {
-		super( sessionContext, root );
+			PojoWorkSessionContext sessionContext, PojoTypeIndexingPlanDelegate<I, E> delegate) {
+		super( sessionContext );
 		this.typeContext = typeContext;
 		this.delegate = delegate;
 	}
@@ -46,11 +46,11 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 	}
 
 	@Override
-	void resolveDirty() {
+	void resolveDirty(PojoLoadingPlanProvider loadingPlanProvider, PojoReindexingCollector collector) {
 		// We need to iterate on a "frozen snapshot" of the states because of HSEARCH-3857
 		List<IndexedEntityState> frozenIndexingPlansPerId = new ArrayList<>( statesPerId.values() );
 		for ( IndexedEntityState plan : frozenIndexingPlansPerId ) {
-			plan.resolveDirty();
+			plan.resolveDirty( loadingPlanProvider, collector );
 		}
 	}
 
@@ -62,9 +62,11 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 		this.statesPerId.clear();
 	}
 
-	void process() {
+	void process(PojoLoadingPlanProvider loadingPlanProvider) {
 		try {
-			statesPerId.values().forEach( IndexedEntityState::sendCommandsToDelegate );
+			for ( IndexedEntityState state : statesPerId.values() ) {
+				state.sendCommandsToDelegate( loadingPlanProvider );
+			}
 		}
 		finally {
 			statesPerId.clear();
@@ -128,13 +130,14 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 				this.providedRoutes = routes;
 			}
 			else {
-				Set<DocumentRouteDescriptor> mergedPrevious = new LinkedHashSet<>( this.providedRoutes.previousRoutes() );
+				Set<DocumentRouteDescriptor> mergedPrevious = new LinkedHashSet<>(
+						this.providedRoutes.previousRoutes() );
 				mergedPrevious.addAll( routes.previousRoutes() );
 				this.providedRoutes = DocumentRoutesDescriptor.of( routes.currentRoute(), mergedPrevious );
 			}
 		}
 
-		void sendCommandsToDelegate() {
+		void sendCommandsToDelegate(PojoLoadingPlanProvider loadingPlanProvider) {
 			switch ( currentStatus ) {
 				case UNKNOWN:
 					// No operation was called on this state.
@@ -143,12 +146,12 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 				case PRESENT:
 					switch ( initialStatus ) {
 						case ABSENT:
-							delegateAdd();
+							delegateAdd( loadingPlanProvider );
 							return;
 						case PRESENT:
 						case UNKNOWN:
 							if ( updatedBecauseOfContained || isDirty( typeContext.dirtySelfFilter() ) ) {
-								delegateAddOrUpdate();
+								delegateAddOrUpdate( loadingPlanProvider );
 							}
 							return;
 					}
@@ -168,8 +171,8 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 			}
 		}
 
-		private void delegateAdd() {
-			Supplier<E> entitySupplier = entitySupplierOrLoad();
+		private void delegateAdd(PojoLoadingPlanProvider loadingPlanProvider) {
+			Supplier<E> entitySupplier = entitySupplierOrLoad( loadingPlanProvider );
 			if ( entitySupplier == null ) {
 				// We couldn't retrieve the entity.
 				// Assume it was deleted and there's nothing to add.
@@ -188,8 +191,8 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 			delegate.add( identifier, entitySupplier, currentRoute );
 		}
 
-		private void delegateAddOrUpdate() {
-			Supplier<E> entitySupplier = entitySupplierOrLoad();
+		private void delegateAddOrUpdate(PojoLoadingPlanProvider loadingPlanProvider) {
+			Supplier<E> entitySupplier = entitySupplierOrLoad( loadingPlanProvider );
 			if ( entitySupplier == null ) {
 				// We couldn't retrieve the entity.
 				// Assume it was deleted and there's nothing to add or update.
@@ -208,7 +211,7 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 		}
 
 		private void delegateDelete() {
-			Supplier<E> entitySupplier = entitySupplierOrLoad();
+			Supplier<E> entitySupplier = entitySupplierNoLoad();
 
 			DocumentRouter<? super E> router;
 			if ( entitySupplier != null ) {

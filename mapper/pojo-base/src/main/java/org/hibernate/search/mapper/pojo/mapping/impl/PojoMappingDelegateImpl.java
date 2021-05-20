@@ -15,7 +15,11 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.mapper.pojo.work.impl.PojoIndexingPlanEventProcessingStrategy;
+import org.hibernate.search.mapper.pojo.work.impl.PojoIndexingPlanEventSendingStrategy;
+import org.hibernate.search.mapper.pojo.work.impl.PojoIndexingPlanImpl;
 import org.hibernate.search.mapper.pojo.work.impl.PojoIndexingQueueEventProcessingPlanImpl;
+import org.hibernate.search.mapper.pojo.work.impl.PojoIndexingPlanLocalStrategy;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
@@ -25,7 +29,6 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeMappingContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextProvider;
 import org.hibernate.search.mapper.pojo.work.impl.PojoIndexerImpl;
-import org.hibernate.search.mapper.pojo.work.impl.PojoIndexingPlanImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
@@ -101,25 +104,22 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	@Override
 	public PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext context,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		return new PojoIndexingPlanImpl( indexedTypeManagers, containedTypeManagers,
-				context, commitStrategy, refreshStrategy, true );
+		return new PojoIndexingPlanImpl( indexedTypeManagers, containedTypeManagers, context,
+				new PojoIndexingPlanLocalStrategy( commitStrategy, refreshStrategy ) );
 	}
 
 	@Override
-	public PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext context, PojoIndexingQueueEventSendingPlan sink) {
-		return new PojoIndexingPlanImpl( indexedTypeManagers, containedTypeManagers, context, sink );
+	public PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext context, PojoIndexingQueueEventSendingPlan sendingPlan) {
+		return new PojoIndexingPlanImpl( indexedTypeManagers, containedTypeManagers, context,
+				new PojoIndexingPlanEventSendingStrategy( sendingPlan ) );
 	}
 
 	@Override
 	public PojoIndexingQueueEventProcessingPlan createEventProcessingPlan(PojoWorkSessionContext context,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return new PojoIndexingQueueEventProcessingPlanImpl( indexedTypeManagers, context,
-				new PojoIndexingPlanImpl( indexedTypeManagers, containedTypeManagers,
-						context, commitStrategy, refreshStrategy,
-						// When processing indexing events sent from a queue,
-						// Reindexing resolution is performed before the events are sent to the queue,
-						// so we don't do it again when processing the events.
-						false ) );
+				new PojoIndexingPlanImpl( indexedTypeManagers, containedTypeManagers, context,
+						new PojoIndexingPlanEventProcessingStrategy( commitStrategy, refreshStrategy ) ) );
 	}
 
 	@Override

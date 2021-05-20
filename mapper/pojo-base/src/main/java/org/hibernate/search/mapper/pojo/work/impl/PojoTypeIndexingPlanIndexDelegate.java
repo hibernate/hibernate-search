@@ -29,13 +29,13 @@ final class PojoTypeIndexingPlanIndexDelegate<I, E> implements PojoTypeIndexingP
 
 	private final PojoWorkIndexedTypeContext<I, E> typeContext;
 	private final PojoWorkSessionContext sessionContext;
-	private final IndexIndexingPlan delegate;
+	private final IndexIndexingPlan indexPlan;
 
 	PojoTypeIndexingPlanIndexDelegate(PojoWorkIndexedTypeContext<I, E> typeContext,
-			PojoWorkSessionContext sessionContext, IndexIndexingPlan delegate) {
+			PojoWorkSessionContext sessionContext, IndexIndexingPlan indexPlan) {
 		this.typeContext = typeContext;
 		this.sessionContext = sessionContext;
-		this.delegate = delegate;
+		this.indexPlan = indexPlan;
 	}
 
 	@Override
@@ -43,7 +43,7 @@ final class PojoTypeIndexingPlanIndexDelegate<I, E> implements PojoTypeIndexingP
 		String documentIdentifier = typeContext.toDocumentIdentifier( sessionContext, identifier );
 		DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
 				route.routingKey(), identifier );
-		delegate.add( referenceProvider,
+		indexPlan.add( referenceProvider,
 				typeContext.toDocumentContributor( sessionContext, identifier, entitySupplier ) );
 	}
 
@@ -59,7 +59,7 @@ final class PojoTypeIndexingPlanIndexDelegate<I, E> implements PojoTypeIndexingP
 		}
 		DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
 				routes.currentRoute().routingKey(), identifier );
-		delegate.addOrUpdate( referenceProvider,
+		indexPlan.addOrUpdate( referenceProvider,
 				typeContext.toDocumentContributor( sessionContext, identifier, entitySupplier ) );
 	}
 
@@ -75,18 +75,18 @@ final class PojoTypeIndexingPlanIndexDelegate<I, E> implements PojoTypeIndexingP
 		}
 		DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
 				routes.currentRoute().routingKey(), identifier );
-		delegate.delete( referenceProvider );
+		indexPlan.delete( referenceProvider );
 	}
 
 	@Override
 	public void discard() {
-		delegate.discard();
+		indexPlan.discard();
 	}
 
 	@Override
 	public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
 			EntityReferenceFactory<R> entityReferenceFactory) {
-		return delegate.executeAndReport( entityReferenceFactory );
+		return indexPlan.executeAndReport( entityReferenceFactory );
 	}
 
 	private void delegateDeletePrevious(I identifier, String documentIdentifier,
@@ -94,7 +94,7 @@ final class PojoTypeIndexingPlanIndexDelegate<I, E> implements PojoTypeIndexingP
 		for ( DocumentRouteDescriptor route : previousRoutes ) {
 			DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
 					route.routingKey(), identifier );
-			delegate.delete( referenceProvider );
+			indexPlan.delete( referenceProvider );
 		}
 	}
 
