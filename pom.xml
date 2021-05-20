@@ -324,7 +324,7 @@
         <version.processor.plugin>3.3.3</version.processor.plugin>
         <version.project-info.plugin>3.1.2</version.project-info.plugin>
         <version.release.plugin>2.5.3</version.release.plugin>
-        <version.resources.plugin>3.0.2</version.resources.plugin>
+        <version.resources.plugin>3.2.0</version.resources.plugin>
         <version.shade.plugin>3.2.4</version.shade.plugin>
         <version.site.plugin>3.9.1</version.site.plugin>
         <version.source.plugin>3.2.1</version.source.plugin>
