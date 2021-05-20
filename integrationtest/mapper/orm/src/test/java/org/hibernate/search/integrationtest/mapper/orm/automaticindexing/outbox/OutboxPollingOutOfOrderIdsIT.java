@@ -163,7 +163,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 	}
 
 	@Test
-	@Ignore("Probably we need to create an issue for it")
+	@Ignore("HSEARCH-4228 Ensure correct processing of events even if their IDs are out of order")
 	public void processDeleteRecreate_outOfOrder() {
 		// An entity is deleted, then re-created in separate transactions,
 		// but the add event has ID 1, the and the delete event has ID 2.
