@@ -46,7 +46,8 @@ public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndex
 	public void addOrUpdate(String entityName, String serializedId, DocumentRoutesDescriptor routes) {
 		PojoWorkIndexedTypeContext<?, ?> typeContext = typeContext( entityName );
 		Object id = typeContext.identifierMapping().fromDocumentIdentifier( serializedId, sessionContext );
-		delegate.addOrUpdate( typeContext.typeIdentifier(), id, routes, null );
+		delegate.addOrUpdate( typeContext.typeIdentifier(), id, routes, null,
+				true, true, null );
 	}
 
 	@Override

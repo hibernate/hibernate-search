@@ -42,19 +42,12 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		state.providedRoutes( providedRoutes );
 	}
 
-	void addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
+	void addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity, BitSet dirtyPaths,
+			boolean forceSelfDirty, boolean forceContainingDirty) {
 		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
 		I identifier = toIdentifier( providedId, entitySupplier );
 		S state = getState( identifier );
-		state.addOrUpdate( entitySupplier );
-		state.providedRoutes( providedRoutes );
-	}
-
-	void addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity, BitSet dirtyPaths) {
-		Supplier<E> entitySupplier = typeContext().toEntitySupplier( sessionContext, entity );
-		I identifier = toIdentifier( providedId, entitySupplier );
-		S state = getState( identifier );
-		state.addOrUpdate( entitySupplier, dirtyPaths );
+		state.addOrUpdate( entitySupplier, dirtyPaths, forceSelfDirty, forceContainingDirty );
 		state.providedRoutes( providedRoutes );
 	}
 
@@ -105,7 +98,8 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		EntityStatus currentStatus = EntityStatus.UNKNOWN;
 
 		private boolean shouldResolveToReindex;
-		private boolean considerAllDirty;
+		private boolean forceSelfDirty;
+		private boolean forceContainingDirty;
 		private BitSet dirtyPaths;
 
 		AbstractEntityState(I identifier) {
@@ -117,9 +111,13 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 			return sessionContext;
 		}
 
+		public boolean isDirtyForAddOrUpdate(PojoPathFilter filter) {
+			return forceSelfDirty || dirtyPaths != null && filter.test( dirtyPaths );
+		}
+
 		@Override
-		public boolean isDirty(PojoPathFilter filter) {
-			return considerAllDirty || dirtyPaths != null && filter.test( dirtyPaths );
+		public boolean isDirtyForReindexingResolution(PojoPathFilter filter) {
+			return forceContainingDirty || dirtyPaths != null && filter.test( dirtyPaths );
 		}
 
 		void add(Supplier<E> entitySupplier) {
@@ -129,21 +127,21 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 				initialStatus = EntityStatus.ABSENT;
 			}
 			currentStatus = EntityStatus.PRESENT;
-			considerAllDirty = true;
+			forceSelfDirty = true;
+			forceContainingDirty = true;
 			dirtyPaths = null;
 		}
 
-		void addOrUpdate(Supplier<E> entitySupplier) {
+		void addOrUpdate(Supplier<E> entitySupplier, BitSet dirtyPaths,
+				boolean forceSelfDirty, boolean forceContainingDirty) {
 			doAddOrUpdate( entitySupplier );
 			shouldResolveToReindex = true;
-			considerAllDirty = true;
-			dirtyPaths = null;
-		}
-
-		void addOrUpdate(Supplier<E> entitySupplier, BitSet dirtyPaths) {
-			doAddOrUpdate( entitySupplier );
-			shouldResolveToReindex = true;
-			if ( !considerAllDirty ) {
+			this.forceSelfDirty = this.forceSelfDirty || forceSelfDirty;
+			this.forceContainingDirty = this.forceContainingDirty || forceContainingDirty;
+			if ( this.forceSelfDirty && this.forceContainingDirty ) {
+				this.dirtyPaths = null;
+			}
+			else {
 				addDirtyPaths( dirtyPaths );
 			}
 		}
@@ -165,7 +163,8 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 
 			// Reindexing does not make sense for a deleted entity
 			shouldResolveToReindex = false;
-			considerAllDirty = false;
+			forceSelfDirty = false;
+			forceContainingDirty = false;
 			dirtyPaths = null;
 		}
 

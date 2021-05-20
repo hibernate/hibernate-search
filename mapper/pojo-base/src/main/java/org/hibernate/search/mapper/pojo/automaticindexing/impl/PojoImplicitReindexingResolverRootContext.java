@@ -28,6 +28,6 @@ public interface PojoImplicitReindexingResolverRootContext {
 	 * @param filter A path filter for dirty paths.
 	 * @return Whether the root is dirty according to the given filter.
 	 */
-	boolean isDirty(PojoPathFilter filter);
+	boolean isDirtyForReindexingResolution(PojoPathFilter filter);
 
 }

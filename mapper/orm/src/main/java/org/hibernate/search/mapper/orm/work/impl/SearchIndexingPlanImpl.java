@@ -25,7 +25,8 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	@Override
 	public void addOrUpdate(Object entity) {
 		delegate( true )
-				.addOrUpdate( getTypeIdentifier( entity ), null, null, entity );
+				.addOrUpdate( getTypeIdentifier( entity ), null, null, entity,
+						true, true, null );
 	}
 
 	@Override

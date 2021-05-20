@@ -150,7 +150,7 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 							return;
 						case PRESENT:
 						case UNKNOWN:
-							if ( updatedBecauseOfContained || isDirty( typeContext.dirtySelfFilter() ) ) {
+							if ( updatedBecauseOfContained || isDirtyForAddOrUpdate( typeContext.dirtySelfFilter() ) ) {
 								delegateAddOrUpdate( loadingPlanProvider );
 							}
 							return;

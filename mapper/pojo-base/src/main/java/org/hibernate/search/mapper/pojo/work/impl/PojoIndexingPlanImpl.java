@@ -70,23 +70,13 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoLoadingPlanPr
 
 	@Override
 	public void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
-			DocumentRoutesDescriptor providedRoutes,
-			Object entity) {
+			DocumentRoutesDescriptor providedRoutes, Object entity,
+			boolean forceSelfDirty, boolean forceContainingDirty, BitSet dirtyPaths) {
 		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegate( typeIdentifier );
 		if ( ! mayRequireLoading && entity == null ) {
 			mayRequireLoading = true;
 		}
-		delegate.addOrUpdate( providedId, providedRoutes, entity );
-	}
-
-	@Override
-	public void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
-			DocumentRoutesDescriptor providedRoutes, Object entity, BitSet dirtyPaths) {
-		AbstractPojoTypeIndexingPlan<?, ?, ?> delegate = getDelegate( typeIdentifier );
-		if ( ! mayRequireLoading && entity == null ) {
-			mayRequireLoading = true;
-		}
-		delegate.addOrUpdate( providedId, providedRoutes, entity, dirtyPaths );
+		delegate.addOrUpdate( providedId, providedRoutes, entity, dirtyPaths, forceSelfDirty, forceContainingDirty );
 	}
 
 	@Override
