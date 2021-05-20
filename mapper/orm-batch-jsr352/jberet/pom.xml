@@ -19,6 +19,10 @@
     <name>Hibernate Search Batch JSR-352 JBeret</name>
     <description>Hibernate Search Batch JSR-352 integration - for JBeret</description>
 
+    <properties>
+        <java.module.name>org.hibernate.search.batch.jsr352.jberet</java.module.name>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
