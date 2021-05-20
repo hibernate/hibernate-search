@@ -26,7 +26,7 @@ import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
  */
 interface PojoTypeIndexingPlanDelegate<I, E> {
 
-	void add(I identifier, Supplier<E> entitySupplier, DocumentRouteDescriptor route);
+	void add(I identifier, DocumentRouteDescriptor route, Supplier<E> entitySupplier);
 
 	void addOrUpdate(I identifier, DocumentRoutesDescriptor routes, Supplier<E> entitySupplier);
 

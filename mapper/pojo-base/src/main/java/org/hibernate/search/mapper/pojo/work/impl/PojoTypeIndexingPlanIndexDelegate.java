@@ -39,7 +39,7 @@ final class PojoTypeIndexingPlanIndexDelegate<I, E> implements PojoTypeIndexingP
 	}
 
 	@Override
-	public void add(I identifier, Supplier<E> entitySupplier, DocumentRouteDescriptor route) {
+	public void add(I identifier, DocumentRouteDescriptor route, Supplier<E> entitySupplier) {
 		String documentIdentifier = typeContext.toDocumentIdentifier( sessionContext, identifier );
 		DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
 				route.routingKey(), identifier );

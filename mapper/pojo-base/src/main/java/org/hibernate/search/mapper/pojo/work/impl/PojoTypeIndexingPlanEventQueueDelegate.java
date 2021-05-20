@@ -39,7 +39,7 @@ final class PojoTypeIndexingPlanEventQueueDelegate<I, E> implements PojoTypeInde
 	}
 
 	@Override
-	public void add(I identifier, Supplier<E> entitySupplier, DocumentRouteDescriptor route) {
+	public void add(I identifier, DocumentRouteDescriptor route, Supplier<E> entitySupplier) {
 		sendingPlan.add( typeContext.entityName(), identifier,
 				typeContext.identifierMapping().toDocumentIdentifier( identifier, sessionContext.mappingContext() ),
 				DocumentRoutesDescriptor.of( route ) );

@@ -188,7 +188,7 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 				// There's nothing to do.
 				return;
 			}
-			delegate.add( identifier, entitySupplier, currentRoute );
+			delegate.add( identifier, currentRoute, entitySupplier );
 		}
 
 		private void delegateAddOrUpdate(PojoLoadingPlanProvider loadingPlanProvider) {
