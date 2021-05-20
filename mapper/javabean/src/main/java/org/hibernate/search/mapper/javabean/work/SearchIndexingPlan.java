@@ -108,13 +108,13 @@ public interface SearchIndexingPlan {
 	void addOrUpdate(Class<?> entityClass, Object providedId, DocumentRoutesDescriptor providedRoutes);
 
 	/**
-	 * Update an entity in the index, or add it if it's absent from the index,
-	 * but try to avoid reindexing if the given dirty paths
-	 * are known not to impact the indexed form of that entity.
+	 * Consider an entity updated,
+	 * and perform reindexing of this entity as well as containing entities as necessary.
 	 * <p>
 	 * Assumes that the entity may already be present in the index.
 	 * <p>
-	 * Shorthand for {@code addOrUpdate(null, null, entity, dirtyPaths)}; see {@link #addOrUpdate(Object, DocumentRoutesDescriptor, Object, String...)}.
+	 * Shorthand for {@code addOrUpdate(null, null, entity, false, false, dirtyPaths)};
+	 * see {@link #addOrUpdate(Object, DocumentRoutesDescriptor, Object, boolean, boolean, String...)}.
 	 *
 	 * @param entity The entity to update in the index.
 	 * @param dirtyPaths The paths to consider dirty, formatted using the dot-notation
@@ -123,10 +123,16 @@ public interface SearchIndexingPlan {
 	void addOrUpdate(Object entity, String... dirtyPaths);
 
 	/**
-	 * Update an entity in the index, or add it if it's absent from the index,
-	 * but try to avoid reindexing if the given dirty paths
-	 * are known not to impact the indexed form of that entity.
-	 *  @param providedId A value to extract the document ID from.
+	 * Consider an entity updated,
+	 * and perform reindexing of this entity as well as containing entities as necessary,
+	 * taking into account {@code dirtyPaths}.
+	 * <p>
+	 * Assumes that the entity may already be present in the index.
+	 * <p>
+	 * Shorthand for {@code addOrUpdate(providedId, providedRoutes, entity, false, false, dirtyPaths)};
+	 * see {@link #addOrUpdate(Object, DocumentRoutesDescriptor, Object, boolean, boolean, String...)}.
+	 *
+	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
 	 * @param providedRoutes The routes to the current and previous index shards.
@@ -140,6 +146,31 @@ public interface SearchIndexingPlan {
 	 * @param dirtyPaths The paths to consider dirty, formatted using the dot-notation
 	 */
 	void addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity, String... dirtyPaths);
+
+	/**
+	 * Consider an entity updated,
+	 * and perform reindexing of this entity as well as containing entities as necessary,
+	 * taking into account {@code dirtyPaths}, {@code forceSelfDirty} and {@code forceContainingDirty}.
+	 * <p>
+	 * Assumes that the entity may already be present in the index.
+	 *
+	 * @param providedId A value to extract the document ID from.
+	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
+	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
+	 * @param providedRoutes The routes to the current and previous index shards.
+	 * Only required if custom routing is enabled
+	 * and the {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge} is missing
+	 * or unable to provide all the correct previous routes.
+	 * If a {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge} is assigned to the entity type,
+	 * the routes will be computed using that bridge instead,
+	 * and provided routes (current and previous) will all be appended to the generated "previous routes".
+	 * @param entity The entity to update in the index.
+	 * @param forceSelfDirty If {@code true}, forces reindexing of this entity regardless of the dirty paths.
+	 * @param forceContainingDirty If {@code true}, forces the resolution of containing entities as dirty
+	 * @param dirtyPaths The paths to consider dirty, formatted using the dot-notation
+	 */
+	void addOrUpdate(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity,
+			boolean forceSelfDirty, boolean forceContainingDirty, String... dirtyPaths);
 
 	/**
 	 * Delete an entity from the index.

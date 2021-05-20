@@ -39,7 +39,8 @@ public interface PojoIndexingPlan {
 	 * <p>
 	 * <strong>Note:</strong> depending on the backend, this may lead to errors or duplicate entries in the index
 	 * if the entity was actually already present in the index before this call.
-	 * When in doubt, you should rather use {@link #addOrUpdate(PojoRawTypeIdentifier, Object, DocumentRoutesDescriptor, Object)}.
+	 * When in doubt, you should rather use
+	 * {@link #addOrUpdate(PojoRawTypeIdentifier, Object, DocumentRoutesDescriptor, Object, boolean, boolean, BitSet)}.
 	 *
 	 * @param typeIdentifier The identifier of the entity type.
 	 * @param providedId A value to extract the document ID from.
@@ -57,7 +58,9 @@ public interface PojoIndexingPlan {
 			DocumentRoutesDescriptor providedRoutes, Object entity);
 
 	/**
-	 * Update an entity in the index, or add it if it's absent from the index.
+	 * Consider an entity updated,
+	 * and perform reindexing of this entity as well as containing entities as necessary,
+	 * taking into account {@code dirtyPaths}, {@code forceSelfDirty} and {@code forceContainingDirty}.
 	 *
 	 * @param typeIdentifier The identifier of the entity type.
 	 * @param providedId A value to extract the document ID from.
@@ -71,34 +74,16 @@ public interface PojoIndexingPlan {
 	 * the routes will be computed using that bridge instead,
 	 * and provided routes (current and previous) will all be appended to the generated "previous routes".
 	 * @param entity The entity to update in the index.
-	 */
-	void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
-			DocumentRoutesDescriptor providedRoutes, Object entity);
-
-	/**
-	 * Update an entity in the index, or add it if it's absent from the index,
-	 * but try to avoid reindexing if the given dirty paths
-	 * are known not to impact the indexed form of that entity.
-	 *
-	 * @param typeIdentifier The identifier of the entity type.
-	 * @param providedId A value to extract the document ID from.
-	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
-	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
-	 * @param providedRoutes The routes to the current and previous index shards.
-	 * Only required if custom routing is enabled
-	 * and the {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge} is missing
-	 * or unable to provide all the correct previous routes.
-	 * If a {@link org.hibernate.search.mapper.pojo.bridge.RoutingBridge} is assigned to the entity type,
-	 * the routes will be computed using that bridge instead,
-	 * and provided routes (current and previous) will all be appended to the generated "previous routes".
-	 * @param entity The entity to update in the index.
+	 * @param forceSelfDirty If {@code true}, forces reindexing of this entity regardless of the dirty paths.
+	 * @param forceContainingDirty If {@code true}, forces the resolution of containing entities as dirty
 	 * @param dirtyPaths The paths to consider dirty, as a {@link BitSet}.
 	 * You can build such a {@link BitSet} by obtaining the
 	 * {@link org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMappingCollector#dirtyFilter(PojoPathFilter) dirty filter}
 	 * for the entity type and calling one of the {@code filter} methods.
 	 */
 	void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId,
-			DocumentRoutesDescriptor providedRoutes, Object entity, BitSet dirtyPaths);
+			DocumentRoutesDescriptor providedRoutes, Object entity,
+			boolean forceSelfDirty, boolean forceContainingDirty, BitSet dirtyPaths);
 
 	/**
 	 * Delete an entity from the index.

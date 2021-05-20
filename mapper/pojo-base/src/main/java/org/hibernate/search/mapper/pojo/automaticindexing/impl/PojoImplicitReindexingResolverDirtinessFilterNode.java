@@ -46,7 +46,7 @@ public class PojoImplicitReindexingResolverDirtinessFilterNode<T> extends PojoIm
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			T dirty, PojoImplicitReindexingResolverRootContext context) {
-		if ( context.isDirty( dirtyPathFilter ) ) {
+		if ( context.isDirtyForReindexingResolution( dirtyPathFilter ) ) {
 			nested.resolveEntitiesToReindex( collector, dirty, context );
 		}
 	}

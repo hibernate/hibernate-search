@@ -220,6 +220,16 @@ public class PojoIndexingPlanBaseIT {
 					.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
+
+		// Update with irrelevant dirty path, but forcing the dirtiness of self
+		try ( SearchSession session = mapping.createSession() ) {
+			session.indexingPlan().addOrUpdate( null, null, indexed,
+					true, false, "notIndexed" );
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.addOrUpdate( "1", b -> b.field( "value", "val1" ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
@@ -255,6 +265,21 @@ public class PojoIndexingPlanBaseIT {
 			contained.value = "val4";
 			contained.notIndexed = "bar";
 			session.indexingPlan().addOrUpdate( 2, null, contained, "value", "notIndexed" );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.addOrUpdate( "1", b -> b
+							.field( "value", "val1" )
+							.objectField( "contained", b2 -> b2
+									.field( "value", "val4" ) ) )
+					.createdThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+
+		// Update with irrelevant dirty path, but forcing the dirtiness of containing entities
+		try ( SearchSession session = mapping.createSession() ) {
+			contained.notIndexed = "foobar";
+			session.indexingPlan().addOrUpdate( 2, null, contained,
+					false, true, "notIndexed" );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.addOrUpdate( "1", b -> b

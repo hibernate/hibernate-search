@@ -143,10 +143,12 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		PojoIndexingPlan plan = getCurrentIndexingPlan( event.getSession() );
 		Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
 		if ( dirtyPaths != null ) {
-			plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, entity, dirtyPaths );
+			plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, entity,
+					false, false, dirtyPaths );
 		}
 		else {
-			plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, entity );
+			plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, entity,
+					true, true, null );
 		}
 	}
 
@@ -277,10 +279,13 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		PojoIndexingPlan plan = getCurrentIndexingPlan( event.getSession() );
 		Object providedId = typeContext.toIndexingPlanProvidedId( event.getAffectedOwnerIdOrNull() );
 		if ( dirtyPaths != null ) {
-			plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, ownerEntity, dirtyPaths );
+			plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, ownerEntity,
+					false, false, dirtyPaths
+			);
 		}
 		else {
-			plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, ownerEntity );
+			plan.addOrUpdate( typeContext.typeIdentifier(), providedId, null, ownerEntity,
+					true, true, null );
 		}
 	}
 
