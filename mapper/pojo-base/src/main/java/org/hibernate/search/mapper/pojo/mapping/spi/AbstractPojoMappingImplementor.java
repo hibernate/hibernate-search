@@ -83,8 +83,8 @@ public abstract class AbstractPojoMappingImplementor<M>
 	}
 
 	@Override
-	public PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext context, PojoIndexingQueueEventSendingPlan sink) {
-		return delegate.createIndexingPlan( context, sink );
+	public PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext context, PojoIndexingQueueEventSendingPlan sendingPlan) {
+		return delegate.createIndexingPlan( context, sendingPlan );
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverRootContext;
+import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.automaticindexing.spi.PojoImplicitReindexingResolverSessionContext;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
@@ -25,14 +26,12 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeIndexingPlan<I, E, S>.AbstractEntityState> {
 
 	final PojoWorkSessionContext sessionContext;
-	final PojoIndexingPlanImpl root;
 
 	// Use a LinkedHashMap for deterministic iteration
 	final Map<I, S> statesPerId = new LinkedHashMap<>();
 
-	AbstractPojoTypeIndexingPlan(PojoWorkSessionContext sessionContext, PojoIndexingPlanImpl root) {
+	AbstractPojoTypeIndexingPlan(PojoWorkSessionContext sessionContext) {
 		this.sessionContext = sessionContext;
-		this.root = root;
 	}
 
 	void add(Object providedId, DocumentRoutesDescriptor providedRoutes, Object entity) {
@@ -67,15 +66,15 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 		state.providedRoutes( providedRoutes );
 	}
 
-	void planLoading() {
+	void planLoading(PojoLoadingPlanProvider loadingPlanProvider) {
 		for ( S state : statesPerId.values() ) {
-			state.planLoading();
+			state.planLoading( loadingPlanProvider );
 		}
 	}
 
-	void resolveDirty() {
+	void resolveDirty(PojoLoadingPlanProvider loadingPlanProvider, PojoReindexingCollector collector) {
 		for ( S state : statesPerId.values() ) {
-			state.resolveDirty();
+			state.resolveDirty( loadingPlanProvider, collector );
 		}
 	}
 
@@ -172,29 +171,34 @@ abstract class AbstractPojoTypeIndexingPlan<I, E, S extends AbstractPojoTypeInde
 
 		abstract void providedRoutes(DocumentRoutesDescriptor routes);
 
-		void planLoading() {
+		void planLoading(PojoLoadingPlanProvider loadingPlanProvider) {
 			if ( EntityStatus.PRESENT == currentStatus && entitySupplier == null ) {
-				loadingOrdinal = root.loadingPlan().planLoading( typeContext(), identifier );
+				loadingOrdinal = loadingPlanProvider.loadingPlan().planLoading( typeContext(), identifier );
 			}
 		}
 
-		void resolveDirty() {
+		void resolveDirty(PojoLoadingPlanProvider loadingPlanProvider, PojoReindexingCollector collector) {
 			if ( shouldResolveToReindex ) {
 				shouldResolveToReindex = false; // Avoid infinite looping
-				Supplier<E> entitySupplier = entitySupplierOrLoad();
+				Supplier<E> entitySupplier = entitySupplierOrLoad( loadingPlanProvider );
 				if ( entitySupplier == null ) {
 					// We couldn't retrieve the entity.
 					// Assume it was deleted and there's nothing to resolve.
 					return;
 				}
-				typeContext().resolveEntitiesToReindex( root, sessionContext, identifier,
-						entitySupplier, this );
+				typeContext().resolveEntitiesToReindex( collector, sessionContext, identifier,
+						entitySupplier, this
+				);
 			}
 		}
 
-		Supplier<E> entitySupplierOrLoad() {
+		Supplier<E> entitySupplierNoLoad() {
+			return entitySupplier;
+		}
+
+		Supplier<E> entitySupplierOrLoad(PojoLoadingPlanProvider loadingPlanProvider) {
 			if ( entitySupplier == null && loadingOrdinal != null ) {
-				E loaded = root.loadingPlan().retrieve( typeContext(), loadingOrdinal );
+				E loaded = loadingPlanProvider.loadingPlan().retrieve( typeContext(), loadingOrdinal );
 				entitySupplier = typeContext().toEntitySupplier( sessionContext, loaded );
 				loadingOrdinal = null;
 			}
