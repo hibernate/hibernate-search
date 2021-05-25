@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -39,6 +40,16 @@ final class PojoTypeIndexingPlanIndexDelegate<I, E> implements PojoTypeIndexingP
 	}
 
 	@Override
+	public boolean isDirtyForAddOrUpdate(boolean forceSelfDirty, boolean forceContainingDirty, BitSet dirtyPathsOrNull) {
+		// We will execute the addOrUpdate below
+		// if the dirty paths require the entity itself to be reindexed,
+		// but not if they only require reindexing some containing entities.
+		// Contained entities will be handled through reindexing resolution.
+		return forceSelfDirty
+				|| dirtyPathsOrNull != null && typeContext.dirtySelfFilter().test( dirtyPathsOrNull );
+	}
+
+	@Override
 	public void add(I identifier, DocumentRouteDescriptor route, Supplier<E> entitySupplier) {
 		String documentIdentifier = typeContext.toDocumentIdentifier( sessionContext, identifier );
 		DocumentReferenceProvider referenceProvider = new PojoDocumentReferenceProvider( documentIdentifier,
@@ -48,7 +59,9 @@ final class PojoTypeIndexingPlanIndexDelegate<I, E> implements PojoTypeIndexingP
 	}
 
 	@Override
-	public void addOrUpdate(I identifier, DocumentRoutesDescriptor routes, Supplier<E> entitySupplier) {
+	public void addOrUpdate(I identifier, DocumentRoutesDescriptor routes, Supplier<E> entitySupplier,
+			boolean forceSelfDirty, boolean forceContainingDirty, BitSet dirtyPaths,
+			boolean updatedBecauseOfContained, boolean updateBecauseOfDirty) {
 		String documentIdentifier = typeContext.toDocumentIdentifier( sessionContext, identifier );
 		delegateDeletePrevious( identifier, documentIdentifier, routes.previousRoutes() );
 		if ( routes.currentRoute() == null ) {

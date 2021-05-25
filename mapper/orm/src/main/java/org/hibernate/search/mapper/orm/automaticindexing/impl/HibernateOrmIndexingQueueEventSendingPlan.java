@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventSendingPlan;
-import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 
 public class HibernateOrmIndexingQueueEventSendingPlan implements PojoIndexingQueueEventSendingPlan {
@@ -23,18 +23,20 @@ public class HibernateOrmIndexingQueueEventSendingPlan implements PojoIndexingQu
 	}
 
 	@Override
-	public void add(String entityName, Object identifier, String serializedId, DocumentRoutesDescriptor routes) {
-		delegate.add( entityName, identifier, serializedId, routes );
+	public void add(String entityName, Object identifier, String serializedId, PojoIndexingQueueEventPayload payload) {
+		delegate.add( entityName, identifier, serializedId, payload );
 	}
 
 	@Override
-	public void addOrUpdate(String entityName, Object identifier, String serializedId, DocumentRoutesDescriptor routes) {
-		delegate.addOrUpdate( entityName, identifier, serializedId, routes );
+	public void addOrUpdate(String entityName, Object identifier, String serializedId,
+			PojoIndexingQueueEventPayload payload) {
+		delegate.addOrUpdate( entityName, identifier, serializedId, payload );
 	}
 
 	@Override
-	public void delete(String entityName, Object identifier, String serializedId, DocumentRoutesDescriptor routes) {
-		delegate.delete( entityName, identifier, serializedId, routes );
+	public void delete(String entityName, Object identifier, String serializedId,
+			PojoIndexingQueueEventPayload payload) {
+		delegate.delete( entityName, identifier, serializedId, payload );
 	}
 
 	@Override

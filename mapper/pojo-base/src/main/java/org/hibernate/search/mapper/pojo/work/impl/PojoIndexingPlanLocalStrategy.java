@@ -22,8 +22,8 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
  * A strategy for handling indexing locally (as opposed to sending events to a remote processor).
  */
 public class PojoIndexingPlanLocalStrategy implements PojoIndexingPlanStrategy {
-	private final DocumentCommitStrategy commitStrategy;
-	private final DocumentRefreshStrategy refreshStrategy;
+	final DocumentCommitStrategy commitStrategy;
+	final DocumentRefreshStrategy refreshStrategy;
 
 	public PojoIndexingPlanLocalStrategy(DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy) {
@@ -65,5 +65,13 @@ public class PojoIndexingPlanLocalStrategy implements PojoIndexingPlanStrategy {
 				typeContext.createIndexingPlan( sessionContext, commitStrategy, refreshStrategy );
 		return new PojoIndexedTypeIndexingPlan<>( typeContext, sessionContext,
 				new PojoTypeIndexingPlanIndexDelegate<>( typeContext, sessionContext, indexIndexingPlan ) );
+	}
+
+	@Override
+	public <I, E> PojoContainedTypeIndexingPlan<I, E> createDelegate(PojoWorkContainedTypeContext<I, E> typeContext,
+			PojoWorkSessionContext sessionContext) {
+		return new PojoContainedTypeIndexingPlan<>( typeContext, sessionContext,
+				// Null delegate: we will perform reindexing resolution locally.
+				null );
 	}
 }

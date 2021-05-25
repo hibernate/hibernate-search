@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
-import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 
 /**
  * A set of indexing events to be sent to an external queue.
@@ -27,10 +27,10 @@ public interface AutomaticIndexingQueueEventSendingPlan {
 	 * @param entityName The name of the entity type.
 	 * @param identifier The non-serialized entity identifier, to report sending errors.
 	 * @param serializedId The serialized entity identifier.
-	 * @param routes The document routes.
-	 * @see AutomaticIndexingQueueEventProcessingPlan#add(String, String, DocumentRoutesDescriptor)
+	 * @param payload A payload to be forwarded as-is to the processing plan.
+	 * @see AutomaticIndexingQueueEventProcessingPlan#add(String, String, PojoIndexingQueueEventPayload)
 	 */
-	void add(String entityName, Object identifier, String serializedId, DocumentRoutesDescriptor routes);
+	void add(String entityName, Object identifier, String serializedId, PojoIndexingQueueEventPayload payload);
 
 	/**
 	 * Appends an "add-or-update" event to the plan, to be sent {@link #sendAndReport(EntityReferenceFactory) later}
@@ -39,10 +39,10 @@ public interface AutomaticIndexingQueueEventSendingPlan {
 	 * @param entityName The name of the entity type.
 	 * @param identifier The non-serialized entity identifier, to report sending errors.
 	 * @param serializedId The serialized entity identifier.
-	 * @param routes The document routes.
-	 * @see AutomaticIndexingQueueEventProcessingPlan#addOrUpdate(String, String, DocumentRoutesDescriptor)
+	 * @param payload A payload to be forwarded as-is to the processing plan.
+	 * @see AutomaticIndexingQueueEventProcessingPlan#addOrUpdate(String, String, PojoIndexingQueueEventPayload)
 	 */
-	void addOrUpdate(String entityName, Object identifier, String serializedId, DocumentRoutesDescriptor routes);
+	void addOrUpdate(String entityName, Object identifier, String serializedId, PojoIndexingQueueEventPayload payload);
 
 	/**
 	 * Appends a "delete" event to the plan, to be sent {@link #sendAndReport(EntityReferenceFactory) later}
@@ -51,10 +51,10 @@ public interface AutomaticIndexingQueueEventSendingPlan {
 	 * @param entityName The name of the entity type.
 	 * @param identifier The non-serialized entity identifier, to report sending errors.
 	 * @param serializedId The serialized entity identifier.
-	 * @param routes The document routes.
-	 * @see AutomaticIndexingQueueEventProcessingPlan#delete(String, String, DocumentRoutesDescriptor)
+	 * @param payload A payload to be forwarded as-is to the processing plan.
+	 * @see AutomaticIndexingQueueEventProcessingPlan#delete(String, String, PojoIndexingQueueEventPayload)
 	 */
-	void delete(String entityName, Object identifier, String serializedId, DocumentRoutesDescriptor routes);
+	void delete(String entityName, Object identifier, String serializedId, PojoIndexingQueueEventPayload payload);
 
 	/**
 	 * Discards all events that were added to this plan, without sending them.

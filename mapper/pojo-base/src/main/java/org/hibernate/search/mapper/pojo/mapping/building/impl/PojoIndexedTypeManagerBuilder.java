@@ -33,7 +33,8 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathFilterProvider;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinals;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.processing.building.impl.PojoIndexingProcessorOriginalTypeNodeBuilder;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
@@ -130,11 +131,13 @@ class PojoIndexedTypeManagerBuilder<E> {
 		IdentifierMappingImplementor<?, E> identifierMapping = identityMappingCollector
 				.buildAndContributeTo( extendedMappingCollector, IdentityMappingMode.REQUIRED );
 
-		PojoPathsDefinition pathsDefinition = typeAdditionalMetadata
-				.getEntityTypeMetadata().orElseThrow( () -> log.missingEntityTypeMetadata( typeModel ) )
-				.getPathsDefinition();
+		PojoPathOrdinals pathOrdinals = new PojoPathOrdinals();
+		PojoPathFilterProvider pathFilterProvider = new PojoPathFilterProvider( pathOrdinals,
+				typeAdditionalMetadata.getEntityTypeMetadata()
+						.orElseThrow( () -> log.missingEntityTypeMetadata( typeModel ) )
+						.getPathsDefinition() );
 		PojoImplicitReindexingResolver<E> reindexingResolver =
-				reindexingResolverBuildingHelper.build( typeModel, pathsDefinition );
+				reindexingResolverBuildingHelper.build( typeModel, pathFilterProvider );
 
 		extendedMappingCollector.dirtyFilter( reindexingResolver.dirtySelfOrContainingFilter() );
 
@@ -148,6 +151,7 @@ class PojoIndexedTypeManagerBuilder<E> {
 				identifierMapping,
 				routingBridge == null ? NoOpDocumentRouter.INSTANCE
 						: new RoutingBridgeDocumentRouter<>( routingBridge.getBridgeHolder() ),
+				pathOrdinals,
 				preBuiltIndexingProcessor,
 				indexManager,
 				reindexingResolver

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.DocumentRouter;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.NoOpDocumentRouter;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
@@ -19,14 +21,20 @@ public class PojoContainedTypeIndexingPlan<I, E>
 	private final PojoWorkContainedTypeContext<I, E> typeContext;
 
 	public PojoContainedTypeIndexingPlan(PojoWorkContainedTypeContext<I, E> typeContext,
-			PojoWorkSessionContext sessionContext) {
-		super( sessionContext );
+			PojoWorkSessionContext sessionContext, PojoTypeIndexingPlanDelegate<I, E> delegate) {
+		super( sessionContext, delegate );
 		this.typeContext = typeContext;
 	}
 
 	@Override
 	PojoWorkContainedTypeContext<I, E> typeContext() {
 		return typeContext;
+	}
+
+	@Override
+	DocumentRouter<? super E> router() {
+		// The routes don't make sense for contained types, because they aren't indexed.
+		return NoOpDocumentRouter.INSTANCE;
 	}
 
 	@Override
@@ -42,8 +50,29 @@ public class PojoContainedTypeIndexingPlan<I, E>
 
 		@Override
 		void providedRoutes(DocumentRoutesDescriptor routes) {
-			// The routes don't make sense for contained types.
+			// The routes don't make sense for contained types, because they aren't indexed.
 			// Ignore non-null values, for backwards compatibility.
+		}
+
+		@Override
+		DocumentRoutesDescriptor providedRoutes() {
+			// The routes don't make sense for contained types, because they aren't indexed.
+			return null;
+		}
+
+		@Override
+		void delegateAdd(PojoLoadingPlanProvider loadingPlanProvider) {
+			// No event when a contained entity is created:
+			// it does not affect any other entity unless they are modified to refer to that contained entity,
+			// in which case they get an event of their own.
+		}
+
+		@Override
+		void delegateDelete() {
+			// No event when a contained entity is deleted:
+			// if other entities used to refer to that contained entity,
+			// they should be updated to not refer to it anymore,
+			// in which case they get an event of their own.
 		}
 	}
 

@@ -47,7 +47,8 @@ public interface PojoMappingDelegate extends AutoCloseable {
 	PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext context, PojoIndexingQueueEventSendingPlan sendingPlan);
 
 	PojoIndexingQueueEventProcessingPlan createEventProcessingPlan(PojoWorkSessionContext context,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			PojoIndexingQueueEventSendingPlan sendingPlan);
 
 	PojoIndexer createIndexer(PojoWorkSessionContext context);
 }

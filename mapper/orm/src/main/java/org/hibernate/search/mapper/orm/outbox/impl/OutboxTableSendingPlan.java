@@ -15,7 +15,8 @@ import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventSendingPlan;
-import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
+import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
 public class OutboxTableSendingPlan implements AutomaticIndexingQueueEventSendingPlan {
 
@@ -27,19 +28,26 @@ public class OutboxTableSendingPlan implements AutomaticIndexingQueueEventSendin
 	}
 
 	@Override
-	public void add(String entityName, Object identifier, String serializedId, DocumentRoutesDescriptor routes) {
-		events.add( new OutboxEvent( OutboxEvent.Type.ADD, entityName, serializedId, routes, identifier ) );
+	public void add(String entityName, Object identifier, String serializedId, PojoIndexingQueueEventPayload payload) {
+		events.add( new OutboxEvent( OutboxEvent.Type.ADD, entityName, serializedId,
+				SerializationUtils.serialize( payload ), identifier
+		) );
 	}
 
 	@Override
 	public void addOrUpdate(String entityName, Object identifier, String serializedId,
-			DocumentRoutesDescriptor routes) {
-		events.add( new OutboxEvent( OutboxEvent.Type.ADD_OR_UPDATE, entityName, serializedId, routes, identifier ) );
+			PojoIndexingQueueEventPayload payload) {
+		events.add( new OutboxEvent( OutboxEvent.Type.ADD_OR_UPDATE, entityName, serializedId,
+				SerializationUtils.serialize( payload ), identifier
+		) );
 	}
 
 	@Override
-	public void delete(String entityName, Object identifier, String serializedId, DocumentRoutesDescriptor routes) {
-		events.add( new OutboxEvent( OutboxEvent.Type.DELETE, entityName, serializedId, routes, identifier ) );
+	public void delete(String entityName, Object identifier, String serializedId,
+			PojoIndexingQueueEventPayload payload) {
+		events.add( new OutboxEvent( OutboxEvent.Type.DELETE, entityName, serializedId,
+				SerializationUtils.serialize( payload ), identifier
+		) );
 	}
 
 	@Override

@@ -29,4 +29,7 @@ interface PojoIndexingPlanStrategy {
 
 	<I, E> PojoIndexedTypeIndexingPlan<I, E> createDelegate(PojoWorkIndexedTypeContext<I, E> typeContext,
 			PojoWorkSessionContext sessionContext);
+
+	<I, E> PojoContainedTypeIndexingPlan<I, E> createDelegate(PojoWorkContainedTypeContext<I, E> typeContext,
+			PojoWorkSessionContext sessionContext);
 }

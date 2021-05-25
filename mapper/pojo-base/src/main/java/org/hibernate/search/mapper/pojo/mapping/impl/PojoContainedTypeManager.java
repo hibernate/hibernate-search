@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.identity.impl.IdentifierMappingImplementor;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinals;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeContainedTypeContext;
@@ -21,9 +22,9 @@ public class PojoContainedTypeManager<I, E> extends AbstractPojoTypeManager<I, E
 		implements PojoWorkContainedTypeContext<I, E>, PojoScopeContainedTypeContext<I, E> {
 	public PojoContainedTypeManager(String entityName, PojoRawTypeIdentifier<E> typeIdentifier,
 			PojoCaster<E> caster, boolean singleConcreteTypeInEntityHierarchy,
-			IdentifierMappingImplementor<I, E> identifierMapping,
+			IdentifierMappingImplementor<I, E> identifierMapping, PojoPathOrdinals pathOrdinals,
 			PojoImplicitReindexingResolver<E> reindexingResolver) {
 		super( entityName, typeIdentifier, caster, singleConcreteTypeInEntityHierarchy,
-				identifierMapping, reindexingResolver );
+				identifierMapping, pathOrdinals, reindexingResolver );
 	}
 }

@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.model.path.impl;
 
 import java.util.BitSet;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 
@@ -23,15 +22,7 @@ final class PojoPathFilterImpl implements PojoPathFilter {
 
 	@Override
 	public String toString() {
-		return toString( acceptedPaths );
-	}
-
-	@Override
-	public String toString(BitSet pathSelection) {
-		return "{"
-				+ pathSelection.stream().mapToObj( ordinals::toPath )
-				.collect( Collectors.joining( ", " ) )
-				+ "}";
+		return ordinals.toPathSet( acceptedPaths ).toString();
 	}
 
 	@Override

@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventProcessingPlan;
 import org.hibernate.search.mapper.orm.common.EntityReference;
-import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
 
 public class AutomaticIndexingQueueEventProcessingPlanImpl implements AutomaticIndexingQueueEventProcessingPlan {
@@ -27,18 +27,18 @@ public class AutomaticIndexingQueueEventProcessingPlanImpl implements AutomaticI
 	}
 
 	@Override
-	public void add(String entityName, String serializedId, DocumentRoutesDescriptor routes) {
-		delegate.add( entityName, serializedId, routes );
+	public void add(String entityName, String serializedId, PojoIndexingQueueEventPayload payload) {
+		delegate.add( entityName, serializedId, payload );
 	}
 
 	@Override
-	public void addOrUpdate(String entityName, String serializedId, DocumentRoutesDescriptor routes) {
-		delegate.addOrUpdate( entityName, serializedId, routes );
+	public void addOrUpdate(String entityName, String serializedId, PojoIndexingQueueEventPayload payload) {
+		delegate.addOrUpdate( entityName, serializedId, payload );
 	}
 
 	@Override
-	public void delete(String entityName, String serializedId, DocumentRoutesDescriptor routes) {
-		delegate.delete( entityName, serializedId, routes );
+	public void delete(String entityName, String serializedId, PojoIndexingQueueEventPayload payload) {
+		delegate.delete( entityName, serializedId, payload );
 	}
 
 	@Override

@@ -15,6 +15,8 @@ import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReind
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.identity.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinals;
+import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -38,17 +40,19 @@ public class AbstractPojoTypeManager<I, E>
 	protected final PojoCaster<E> caster;
 	private final boolean singleConcreteTypeInEntityHierarchy;
 	protected final IdentifierMappingImplementor<I, E> identifierMapping;
+	private final PojoPathOrdinals pathOrdinals;
 	protected final PojoImplicitReindexingResolver<E> reindexingResolver;
 
 	public AbstractPojoTypeManager(String entityName, PojoRawTypeIdentifier<E> typeIdentifier,
 			PojoCaster<E> caster, boolean singleConcreteTypeInEntityHierarchy,
-			IdentifierMappingImplementor<I, E> identifierMapping,
+			IdentifierMappingImplementor<I, E> identifierMapping, PojoPathOrdinals pathOrdinals,
 			PojoImplicitReindexingResolver<E> reindexingResolver) {
 		this.entityName = entityName;
 		this.typeIdentifier = typeIdentifier;
 		this.caster = caster;
 		this.singleConcreteTypeInEntityHierarchy = singleConcreteTypeInEntityHierarchy;
 		this.identifierMapping = identifierMapping;
+		this.pathOrdinals = pathOrdinals;
 		this.reindexingResolver = reindexingResolver;
 	}
 
@@ -92,6 +96,7 @@ public class AbstractPojoTypeManager<I, E>
 		return typeIdentifier;
 	}
 
+	@Override
 	public String entityName() {
 		return entityName;
 	}
@@ -109,6 +114,16 @@ public class AbstractPojoTypeManager<I, E>
 	@Override
 	public String toDocumentIdentifier(PojoWorkSessionContext sessionContext, I identifier) {
 		return identifierMapping.toDocumentIdentifier( identifier, sessionContext.mappingContext() );
+	}
+
+	@Override
+	public PojoPathOrdinals pathOrdinals() {
+		return pathOrdinals;
+	}
+
+	@Override
+	public PojoPathFilter dirtySelfOrContainingFilter() {
+		return reindexingResolver.dirtySelfOrContainingFilter();
 	}
 
 	@Override

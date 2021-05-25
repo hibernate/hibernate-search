@@ -23,6 +23,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextFi
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.AutomaticIndexingStrategyExpectations;
@@ -186,9 +187,9 @@ public class OutboxPollingNoProcessingIT {
 		assertThat( outboxEvent.getEntityId() ).isEqualTo( entityId );
 		assertThat( outboxEvent.getType() ).isEqualTo( type );
 
-		byte[] documentRoutes = outboxEvent.getDocumentRoutes();
-		DocumentRoutesDescriptor routesDescriptor = SerializationUtils.deserialize(
-				DocumentRoutesDescriptor.class, documentRoutes );
+		PojoIndexingQueueEventPayload payload = SerializationUtils.deserialize(
+				PojoIndexingQueueEventPayload.class, outboxEvent.getPayload() );
+		DocumentRoutesDescriptor routesDescriptor = payload.routes;
 
 		assertThat( routesDescriptor ).isNotNull();
 		assertThat( routesDescriptor.currentRoute().routingKey() ).isEqualTo( currentRoute );

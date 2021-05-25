@@ -20,15 +20,15 @@ public class LocalHeapQueueIndexingEvent implements BatchedWork<LocalHeapQueuePr
 	final String entityName;
 	final transient Object identifier;
 	final String serializedId;
-	final byte[] routes;
+	final byte[] payload;
 
 	public LocalHeapQueueIndexingEvent(Type eventType, String entityName, Object identifier, String serializedId,
-			byte[] routes) {
+			byte[] payload) {
 		this.eventType = eventType;
 		this.entityName = entityName;
 		this.identifier = identifier;
 		this.serializedId = serializedId;
-		this.routes = routes;
+		this.payload = payload;
 	}
 
 	@Override

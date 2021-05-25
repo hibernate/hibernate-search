@@ -49,6 +49,14 @@ public final class DocumentRoutesDescriptor implements Serializable {
 		this.previousRoutes = previousRoutes;
 	}
 
+	@Override
+	public String toString() {
+		return "DocumentRoutesDescriptor{" +
+				"currentRoute=" + currentRoute +
+				", previousRoutes=" + previousRoutes +
+				'}';
+	}
+
 	public DocumentRouteDescriptor currentRoute() {
 		return currentRoute;
 	}

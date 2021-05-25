@@ -25,8 +25,11 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
 import org.hibernate.search.mapper.orm.common.impl.TransactionHelper;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
+import org.hibernate.search.mapper.pojo.work.spi.UpdateCauseDescriptor;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
 public class OutboxEventBackgroundExecutor {
 
@@ -196,6 +199,12 @@ public class OutboxEventBackgroundExecutor {
 					// but the event marked as failed due to some general failure in this batch of events.
 					// Let's make sure the next try will not create a duplicate document.
 					failedEvent.setType( OutboxEvent.Type.ADD_OR_UPDATE );
+					// Add an update cause that forces reindexing
+					PojoIndexingQueueEventPayload oldPayload =
+							SerializationUtils.deserialize( PojoIndexingQueueEventPayload.class, failedEvent.getPayload() );
+					PojoIndexingQueueEventPayload newPayload = new PojoIndexingQueueEventPayload( oldPayload.routes,
+							new UpdateCauseDescriptor( true, false, null, false ) );
+					failedEvent.setPayload( SerializationUtils.serialize( newPayload ) );
 				}
 
 				log.automaticIndexingRetry( failedEvent.getId(),

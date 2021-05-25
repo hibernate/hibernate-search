@@ -24,8 +24,6 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
  */
 public interface PojoWorkIndexedTypeContext<I, E> extends PojoWorkTypeContext<I, E> {
 
-	String entityName();
-
 	DocumentRouter<? super E> router();
 
 	PojoDocumentContributor<E> toDocumentContributor(PojoWorkSessionContext sessionContext, I identifier,
