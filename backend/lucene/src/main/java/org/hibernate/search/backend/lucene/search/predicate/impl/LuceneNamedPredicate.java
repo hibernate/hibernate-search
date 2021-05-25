@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory;
@@ -127,6 +128,12 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 		public Object param(String name) {
 			Contracts.assertNotNull( name, "name" );
 			return params.get( name );
+		}
+
+		@Override
+		public Optional<Object> paramOptional(String name) {
+			Contracts.assertNotNull( name, "name" );
+			return Optional.ofNullable( params.get( name ) );
 		}
 
 		@Override

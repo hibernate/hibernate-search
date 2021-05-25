@@ -18,6 +18,8 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 import com.google.gson.JsonObject;
 import java.util.LinkedHashMap;
+import java.util.Optional;
+
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProviderContext;
 import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
@@ -129,6 +131,12 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 		public Object param(String name) {
 			Contracts.assertNotNull( name, "name" );
 			return params.get( name );
+		}
+
+		@Override
+		public Optional<Object> paramOptional(String name) {
+			Contracts.assertNotNull( name, "name" );
+			return Optional.ofNullable( params.get( name ) );
 		}
 
 		@Override
