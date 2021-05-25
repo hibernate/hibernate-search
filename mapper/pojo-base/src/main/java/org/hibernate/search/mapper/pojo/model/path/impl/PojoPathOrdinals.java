@@ -7,14 +7,26 @@
 package org.hibernate.search.mapper.pojo.model.path.impl;
 
 import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-final class PojoPathOrdinals {
+public final class PojoPathOrdinals {
 
 	private final Map<String, Integer> ordinalByPath = new HashMap<>();
 	private final List<String> pathByOrdinal = new ArrayList<>();
+
+	@Override
+	public String toString() {
+		return "PojoPathOrdinals{"
+				+ "ordinalByPath=" + ordinalByPath
+				+ '}';
+	}
 
 	public Integer toOrdinal(String path) {
 		return ordinalByPath.get( path );
@@ -22,6 +34,26 @@ final class PojoPathOrdinals {
 
 	public String toPath(int ordinal) {
 		return ordinal < pathByOrdinal.size() ? pathByOrdinal.get( ordinal ) : null;
+	}
+
+	public BitSet toPathSelection(Collection<String> paths) {
+		BitSet bitSet = null;
+		for ( String path : paths ) {
+			Integer ordinal = toOrdinal( path );
+			if ( ordinal == null ) {
+				continue;
+			}
+			if ( bitSet == null ) {
+				bitSet = new BitSet();
+			}
+			bitSet.set( ordinal );
+		}
+		return bitSet;
+	}
+
+	public Set<String> toPathSet(BitSet pathSelection) {
+		return pathSelection.stream().mapToObj( this::toPath )
+				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 	}
 
 	public int toExistingOrNewOrdinal(String path) {

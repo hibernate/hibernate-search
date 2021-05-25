@@ -156,9 +156,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 			backendMock.verifyExpectationsMet();
 
 			// Only the indexed and contained entity should have been loaded
-			// (plus the OutboxEvent entity, if we're using the outbox-polling strategy).
-			assertThat( session.getStatistics().getEntityCount() )
-					.isEqualTo( 2 + ( ormSetupHelper.areIndexingEventsPushedAsEntities() ? 1 : 0 ) );
+			assertThat( session.getStatistics().getEntityCount() ).isEqualTo( 2 );
 		} );
 
 		// Remove one contained entity.

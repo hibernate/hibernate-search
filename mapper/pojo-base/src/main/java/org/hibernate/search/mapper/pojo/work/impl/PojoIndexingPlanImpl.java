@@ -117,6 +117,9 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoLoadingPlanPr
 					delegate.resolveDirty( this, this );
 				}
 			}
+			for ( PojoContainedTypeIndexingPlan<?, ?> delegate : containedTypeDelegates.values() ) {
+				delegate.process( this );
+			}
 			for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : indexedTypeDelegates.values() ) {
 				delegate.process( this );
 			}
@@ -248,6 +251,6 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan, PojoLoadingPlanPr
 	}
 
 	private PojoContainedTypeIndexingPlan<?, ?> createDelegate(PojoWorkContainedTypeContext<?, ?> typeContext) {
-		return new PojoContainedTypeIndexingPlan<>( typeContext, sessionContext );
+		return strategy.createDelegate( typeContext, sessionContext );
 	}
 }

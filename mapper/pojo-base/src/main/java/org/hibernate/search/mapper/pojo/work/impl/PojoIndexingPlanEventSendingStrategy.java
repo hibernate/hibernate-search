@@ -27,7 +27,9 @@ public class PojoIndexingPlanEventSendingStrategy implements PojoIndexingPlanStr
 
 	@Override
 	public boolean shouldResolveDirty() {
-		return true;
+		// We will resolve dirty entities to reindex in the background process
+		// that consumes the events we're sending.
+		return false;
 	}
 
 	@Override
@@ -49,6 +51,14 @@ public class PojoIndexingPlanEventSendingStrategy implements PojoIndexingPlanStr
 			PojoWorkSessionContext sessionContext) {
 		// Will send indexing events to an external queue.
 		return new PojoIndexedTypeIndexingPlan<>( typeContext, sessionContext,
+				new PojoTypeIndexingPlanEventQueueDelegate<>( typeContext, sessionContext, sendingPlan ) );
+	}
+
+	@Override
+	public <I, E> PojoContainedTypeIndexingPlan<I, E> createDelegate(PojoWorkContainedTypeContext<I, E> typeContext,
+			PojoWorkSessionContext sessionContext) {
+		// Will send indexing events to an external queue.
+		return new PojoContainedTypeIndexingPlan<>( typeContext, sessionContext,
 				new PojoTypeIndexingPlanEventQueueDelegate<>( typeContext, sessionContext, sendingPlan ) );
 	}
 }

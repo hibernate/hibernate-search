@@ -26,7 +26,6 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAd
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathFilterProvider;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.impl.Closer;
@@ -86,10 +85,9 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 	}
 
 	public <T> PojoImplicitReindexingResolver<T> build(PojoRawTypeModel<T> typeModel,
-			PojoPathsDefinition pathsDefinition) {
-		return buildOptional( typeModel, pathsDefinition )
+			PojoPathFilterProvider pathFilterProvider) {
+		return buildOptional( typeModel, pathFilterProvider )
 				.orElseGet( () -> {
-					PojoPathFilterProvider pathFilterProvider = new PojoPathFilterProvider( pathsDefinition );
 					PojoPathFilter emptyFilter = pathFilterProvider
 							.create( Collections.emptySet() );
 					return new PojoImplicitReindexingResolverImpl<>(
@@ -100,7 +98,7 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 	}
 
 	public <T> Optional<PojoImplicitReindexingResolver<T>> buildOptional(PojoRawTypeModel<T> typeModel,
-			PojoPathsDefinition pathsDefinition) {
+			PojoPathFilterProvider pathFilterProvider) {
 		@SuppressWarnings("unchecked") // We know builders have this type, by construction
 		PojoImplicitReindexingResolverBuilder<T> builder =
 				(PojoImplicitReindexingResolverBuilder<T>) builderByType.get( typeModel );
@@ -108,7 +106,6 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 			return Optional.empty();
 		}
 		else {
-			PojoPathFilterProvider pathFilterProvider = new PojoPathFilterProvider( pathsDefinition );
 			return builder.build( pathFilterProvider );
 		}
 	}

@@ -20,7 +20,7 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventProcessingPlan;
 import org.hibernate.search.mapper.orm.common.EntityReference;
-import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
@@ -77,24 +77,20 @@ public class OutboxEventProcessingPlan {
 
 	private void addEventsToThePlan() {
 		for ( OutboxEvent event : events ) {
-			DocumentRoutesDescriptor routes = getRoutes( event );
+			PojoIndexingQueueEventPayload payload = SerializationUtils.deserialize( PojoIndexingQueueEventPayload.class, event.getPayload() );
 
 			switch ( event.getType() ) {
 				case ADD:
-					processingPlan.add( event.getEntityName(), event.getEntityId(), routes );
+					processingPlan.add( event.getEntityName(), event.getEntityId(), payload );
 					break;
 				case ADD_OR_UPDATE:
-					processingPlan.addOrUpdate( event.getEntityName(), event.getEntityId(), routes );
+					processingPlan.addOrUpdate( event.getEntityName(), event.getEntityId(), payload );
 					break;
 				case DELETE:
-					processingPlan.delete( event.getEntityName(), event.getEntityId(), routes );
+					processingPlan.delete( event.getEntityName(), event.getEntityId(), payload );
 					break;
 			}
 		}
-	}
-
-	private DocumentRoutesDescriptor getRoutes(OutboxEvent event) {
-		return SerializationUtils.deserialize( DocumentRoutesDescriptor.class, event.getDocumentRoutes() );
 	}
 
 	private void reportMapperFailure(Throwable throwable) {

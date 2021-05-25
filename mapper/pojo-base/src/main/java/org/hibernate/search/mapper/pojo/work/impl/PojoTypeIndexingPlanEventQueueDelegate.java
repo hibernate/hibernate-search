@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
+import java.util.BitSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -13,8 +14,10 @@ import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
+import org.hibernate.search.mapper.pojo.work.spi.UpdateCauseDescriptor;
 import org.hibernate.search.util.common.AssertionFailure;
 
 /**
@@ -26,11 +29,11 @@ import org.hibernate.search.util.common.AssertionFailure;
  */
 final class PojoTypeIndexingPlanEventQueueDelegate<I, E> implements PojoTypeIndexingPlanDelegate<I, E> {
 
-	private final PojoWorkIndexedTypeContext<I, E> typeContext;
+	private final PojoWorkTypeContext<I, E> typeContext;
 	private final PojoWorkSessionContext sessionContext;
 	private final PojoIndexingQueueEventSendingPlan sendingPlan;
 
-	PojoTypeIndexingPlanEventQueueDelegate(PojoWorkIndexedTypeContext<I, E> typeContext,
+	PojoTypeIndexingPlanEventQueueDelegate(PojoWorkTypeContext<I, E> typeContext,
 			PojoWorkSessionContext sessionContext,
 			PojoIndexingQueueEventSendingPlan sendingPlan) {
 		this.typeContext = typeContext;
@@ -39,24 +42,42 @@ final class PojoTypeIndexingPlanEventQueueDelegate<I, E> implements PojoTypeInde
 	}
 
 	@Override
-	public void add(I identifier, DocumentRouteDescriptor route, Supplier<E> entitySupplier) {
-		sendingPlan.add( typeContext.entityName(), identifier,
-				typeContext.identifierMapping().toDocumentIdentifier( identifier, sessionContext.mappingContext() ),
-				DocumentRoutesDescriptor.of( route ) );
+	public boolean isDirtyForAddOrUpdate(boolean forceSelfDirty, boolean forceContainingDirty, BitSet dirtyPathsOrNull) {
+		// We will execute the addOrUpdate below
+		// if the dirty paths require the entity itself OR a containing entity to be reindexed.
+		// In both cases, we will send an event so that the reindexing is done in a background process.
+		return forceSelfDirty || forceContainingDirty
+				|| dirtyPathsOrNull != null && typeContext.dirtySelfOrContainingFilter().test( dirtyPathsOrNull );
 	}
 
 	@Override
-	public void addOrUpdate(I identifier, DocumentRoutesDescriptor routes, Supplier<E> entitySupplier) {
-		sendingPlan.addOrUpdate( typeContext.entityName(), identifier,
+	public void add(I identifier, DocumentRouteDescriptor route, Supplier<E> entitySupplier) {
+		sendingPlan.add( typeContext.entityName(), identifier,
 				typeContext.identifierMapping().toDocumentIdentifier( identifier, sessionContext.mappingContext() ),
-				routes );
+				new PojoIndexingQueueEventPayload( DocumentRoutesDescriptor.of( route ), null ) );
+	}
+
+	@Override
+	public void addOrUpdate(I identifier, DocumentRoutesDescriptor routes, Supplier<E> entitySupplier,
+			boolean forceSelfDirty, boolean forceContainingDirty, BitSet dirtyPaths,
+			boolean updatedBecauseOfContained, boolean updateBecauseOfDirty) {
+		UpdateCauseDescriptor cause = new UpdateCauseDescriptor(
+				forceSelfDirty, forceContainingDirty,
+				dirtyPaths == null ? null : typeContext.pathOrdinals().toPathSet( dirtyPaths ),
+				updatedBecauseOfContained
+		);
+		sendingPlan.addOrUpdate(
+				typeContext.entityName(), identifier,
+				typeContext.identifierMapping().toDocumentIdentifier( identifier, sessionContext.mappingContext() ),
+				new PojoIndexingQueueEventPayload( routes, cause )
+		);
 	}
 
 	@Override
 	public void delete(I identifier, DocumentRoutesDescriptor routes, Supplier<E> entitySupplier) {
 		sendingPlan.delete( typeContext.entityName(), identifier,
 				typeContext.identifierMapping().toDocumentIdentifier( identifier, sessionContext.mappingContext() ),
-				routes );
+				new PojoIndexingQueueEventPayload( routes, null ) );
 	}
 
 	@Override

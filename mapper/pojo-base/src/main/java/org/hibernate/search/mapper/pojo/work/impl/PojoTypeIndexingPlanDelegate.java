@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
+import java.util.BitSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -26,9 +27,13 @@ import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
  */
 interface PojoTypeIndexingPlanDelegate<I, E> {
 
+	boolean isDirtyForAddOrUpdate(boolean forceSelfDirty, boolean forceContainingDirty, BitSet dirtyPathsOrNull);
+
 	void add(I identifier, DocumentRouteDescriptor route, Supplier<E> entitySupplier);
 
-	void addOrUpdate(I identifier, DocumentRoutesDescriptor routes, Supplier<E> entitySupplier);
+	void addOrUpdate(I identifier, DocumentRoutesDescriptor routes, Supplier<E> entitySupplier,
+			boolean forceSelfDirty, boolean forceContainingDirty, BitSet dirtyPaths,
+			boolean updatedBecauseOfContained, boolean updateBecauseOfDirty);
 
 	void delete(I identifier, DocumentRoutesDescriptor routes, Supplier<E> entitySupplier);
 

@@ -18,13 +18,6 @@ import java.util.BitSet;
 public interface PojoPathFilter {
 
 	/**
-	 * For debugging: turns a path selection into a string.
-	 * @param pathSelection A {@link BitSet} returned by one of the {@code filter} methods.
-	 * @return A string representation of {@code pathSelection}.
-	 */
-	String toString(BitSet pathSelection);
-
-	/**
 	 * Determines if any path in the given set of paths of is accepted by this filter.
 	 * <p>
 	 * This method is optimized to be called very often.

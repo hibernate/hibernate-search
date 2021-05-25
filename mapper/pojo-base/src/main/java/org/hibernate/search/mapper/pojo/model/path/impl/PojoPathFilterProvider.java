@@ -20,10 +20,11 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
  */
 public final class PojoPathFilterProvider {
 
+	private final PojoPathOrdinals ordinals;
 	private final PojoPathsDefinition definitions;
-	private final PojoPathOrdinals ordinals = new PojoPathOrdinals();
 
-	public PojoPathFilterProvider(PojoPathsDefinition definitions) {
+	public PojoPathFilterProvider(PojoPathOrdinals ordinals, PojoPathsDefinition definitions) {
+		this.ordinals = ordinals;
 		this.definitions = definitions;
 		for ( String path : definitions.preDefinedOrdinals() ) {
 			ordinals.toExistingOrNewOrdinal( path );

@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQu
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategyPreStopContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategyStartContext;
-import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
@@ -72,25 +72,28 @@ public class LocalHeapQueueAutomaticIndexingStrategy implements AutomaticIndexin
 		private final List<LocalHeapQueueIndexingEvent> content = new ArrayList<>();
 
 		@Override
-		public void add(String entityName, Object identifier, String serializedId, DocumentRoutesDescriptor routes) {
-			plan( LocalHeapQueueIndexingEvent.Type.ADD, entityName, identifier, serializedId, routes );
+		public void add(String entityName, Object identifier, String serializedId,
+				PojoIndexingQueueEventPayload payload) {
+			plan( LocalHeapQueueIndexingEvent.Type.ADD, entityName, identifier, serializedId, payload );
 		}
 
 		@Override
-		public void addOrUpdate(String entityName, Object identifier, String serializedId, DocumentRoutesDescriptor routes) {
-			plan( LocalHeapQueueIndexingEvent.Type.ADD_OR_UPDATE, entityName, identifier, serializedId, routes );
+		public void addOrUpdate(String entityName, Object identifier, String serializedId,
+				PojoIndexingQueueEventPayload payload) {
+			plan( LocalHeapQueueIndexingEvent.Type.ADD_OR_UPDATE, entityName, identifier, serializedId, payload );
 		}
 
 		@Override
-		public void delete(String entityName, Object identifier, String serializedId, DocumentRoutesDescriptor routes) {
-			plan( LocalHeapQueueIndexingEvent.Type.DELETE, entityName, identifier, serializedId, routes );
+		public void delete(String entityName, Object identifier, String serializedId,
+				PojoIndexingQueueEventPayload payload) {
+			plan( LocalHeapQueueIndexingEvent.Type.DELETE, entityName, identifier, serializedId, payload );
 		}
 
-		private void plan(LocalHeapQueueIndexingEvent.Type eventType, String entityName, Object identifier, String serializedId,
-				DocumentRoutesDescriptor routes) {
+		private void plan(LocalHeapQueueIndexingEvent.Type eventType, String entityName, Object identifier,
+				String serializedId, PojoIndexingQueueEventPayload payload) {
 			checkAcceptsEvents();
 			content.add( new LocalHeapQueueIndexingEvent( eventType, entityName, identifier, serializedId,
-					SerializationUtils.serialize( routes ) ) );
+					SerializationUtils.serialize( payload ) ) );
 		}
 
 		@Override

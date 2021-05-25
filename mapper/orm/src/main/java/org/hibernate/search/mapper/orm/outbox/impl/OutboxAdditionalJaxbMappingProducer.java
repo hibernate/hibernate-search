@@ -55,7 +55,7 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 	"		 </property>\n" +
 	"        <property name=\"entityName\" type=\"string\" />\n" +
 	"        <property name=\"entityId\" type=\"string\" />\n" +
-	"        <property name=\"documentRoutes\" type=\"binary\" length=\"8192\" />\n" +
+	"        <property name=\"payload\" type=\"binary\" length=\"8192\" />\n" +
 	"        <property name=\"retries\" type=\"integer\" />\n" +
 	"    </class>\n" +
 	"</hibernate-mapping>\n";

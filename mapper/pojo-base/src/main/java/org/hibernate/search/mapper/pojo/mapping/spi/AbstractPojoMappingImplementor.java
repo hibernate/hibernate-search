@@ -94,8 +94,9 @@ public abstract class AbstractPojoMappingImplementor<M>
 
 	@Override
 	public PojoIndexingQueueEventProcessingPlan createIndexingQueueEventProcessingPlan(PojoWorkSessionContext context,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		return delegate.createEventProcessingPlan( context, commitStrategy, refreshStrategy );
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			PojoIndexingQueueEventSendingPlan sendingPlan) {
+		return delegate.createEventProcessingPlan( context, commitStrategy, refreshStrategy, sendingPlan );
 	}
 
 	protected final PojoMappingDelegate delegate() {

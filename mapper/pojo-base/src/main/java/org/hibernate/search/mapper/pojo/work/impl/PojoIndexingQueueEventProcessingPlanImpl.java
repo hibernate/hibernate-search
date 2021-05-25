@@ -14,10 +14,11 @@ import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.mapper.pojo.identity.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
+import org.hibernate.search.mapper.pojo.work.spi.UpdateCauseDescriptor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndexingQueueEventProcessingPlan {
@@ -39,25 +40,32 @@ public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndex
 	}
 
 	@Override
-	public void add(String entityName, String serializedId, DocumentRoutesDescriptor routes) {
+	public void add(String entityName, String serializedId, PojoIndexingQueueEventPayload payload) {
 		PojoWorkTypeContext<?, ?> typeContext = typeContext( entityName );
 		Object id = typeContext.identifierMapping().fromDocumentIdentifier( serializedId, sessionContext );
-		delegate.add( typeContext.typeIdentifier(), id, routes, null );
+		delegate.add( typeContext.typeIdentifier(), id, payload.routes, null );
 	}
 
 	@Override
-	public void addOrUpdate(String entityName, String serializedId, DocumentRoutesDescriptor routes) {
+	public void addOrUpdate(String entityName, String serializedId, PojoIndexingQueueEventPayload payload) {
 		PojoWorkTypeContext<?, ?> typeContext = typeContext( entityName );
 		Object id = typeContext.identifierMapping().fromDocumentIdentifier( serializedId, sessionContext );
-		delegate.addOrUpdate( typeContext.typeIdentifier(), id, routes, null,
-				true, true, null );
+		UpdateCauseDescriptor cause = payload.updateCause;
+		delegate.addOrUpdate( typeContext.typeIdentifier(), id, payload.routes, null,
+				// Force the reindexing now if the entity was marked as dirty because of a contained entity;
+				// this is to avoid sending events forever and to force the processing of "updateBecauseofContained" now.
+				// See org.hibernate.search.mapper.pojo.work.impl.PojoTypeIndexingPlanIndexOrEventQueueDelegate.addOrUpdate
+				cause.updatedBecauseOfContained() || cause.forceSelfDirty(),
+				cause.forceContainingDirty(),
+				cause.dirtyPaths() == null ? null : typeContext.pathOrdinals().toPathSelection( cause.dirtyPaths() )
+		);
 	}
 
 	@Override
-	public void delete(String entityName, String serializedId, DocumentRoutesDescriptor routes) {
+	public void delete(String entityName, String serializedId, PojoIndexingQueueEventPayload payload) {
 		PojoWorkTypeContext<?, ?> typeContext = typeContext( entityName );
 		Object id = typeContext.identifierMapping().fromDocumentIdentifier( serializedId, sessionContext );
-		delegate.delete( typeContext.typeIdentifier(), id, routes, null );
+		delegate.delete( typeContext.typeIdentifier(), id, payload.routes, null );
 	}
 
 	@Override

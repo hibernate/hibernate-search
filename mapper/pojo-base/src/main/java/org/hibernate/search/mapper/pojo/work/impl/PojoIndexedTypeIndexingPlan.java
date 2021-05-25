@@ -10,14 +10,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
-import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
-import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.DocumentRouter;
-import org.hibernate.search.mapper.pojo.bridge.runtime.impl.NoOpDocumentRouter;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
@@ -30,13 +26,11 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 		extends AbstractPojoTypeIndexingPlan<I, E, PojoIndexedTypeIndexingPlan<I, E>.IndexedEntityState> {
 
 	private final PojoWorkIndexedTypeContext<I, E> typeContext;
-	private final PojoTypeIndexingPlanDelegate<I, E> delegate;
 
 	public PojoIndexedTypeIndexingPlan(PojoWorkIndexedTypeContext<I, E> typeContext,
 			PojoWorkSessionContext sessionContext, PojoTypeIndexingPlanDelegate<I, E> delegate) {
-		super( sessionContext );
+		super( sessionContext, delegate );
 		this.typeContext = typeContext;
-		this.delegate = delegate;
 	}
 
 	void updateBecauseOfContained(Object entity) {
@@ -49,38 +43,19 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 	void resolveDirty(PojoLoadingPlanProvider loadingPlanProvider, PojoReindexingCollector collector) {
 		// We need to iterate on a "frozen snapshot" of the states because of HSEARCH-3857
 		List<IndexedEntityState> frozenIndexingPlansPerId = new ArrayList<>( statesPerId.values() );
-		for ( IndexedEntityState plan : frozenIndexingPlansPerId ) {
-			plan.resolveDirty( loadingPlanProvider, collector );
+		for ( IndexedEntityState state : frozenIndexingPlansPerId ) {
+			state.resolveDirty( loadingPlanProvider, collector );
 		}
-	}
-
-	void discard() {
-		delegate.discard();
-	}
-
-	void discardNotProcessed() {
-		this.statesPerId.clear();
-	}
-
-	void process(PojoLoadingPlanProvider loadingPlanProvider) {
-		try {
-			for ( IndexedEntityState state : statesPerId.values() ) {
-				state.sendCommandsToDelegate( loadingPlanProvider );
-			}
-		}
-		finally {
-			statesPerId.clear();
-		}
-	}
-
-	<R> CompletableFuture<MultiEntityOperationExecutionReport<R>> executeAndReport(
-			EntityReferenceFactory<R> entityReferenceFactory) {
-		return delegate.executeAndReport( entityReferenceFactory );
 	}
 
 	@Override
 	PojoWorkIndexedTypeContext<I, E> typeContext() {
 		return typeContext;
+	}
+
+	@Override
+	DocumentRouter<? super E> router() {
+		return typeContext.router();
 	}
 
 	@Override
@@ -93,32 +68,8 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 
 		private DocumentRoutesDescriptor providedRoutes;
 
-		private boolean updatedBecauseOfContained;
-
 		private IndexedEntityState(I identifier) {
 			super( identifier );
-		}
-
-		void updateBecauseOfContained(Supplier<E> entitySupplier) {
-			if ( currentStatus == EntityStatus.ABSENT ) {
-				// This entity was deleted, but a containing entity still has a reference to it.
-				// Someone probably just forgot to clear an association.
-				// Just ignore the call.
-				return;
-			}
-			doAddOrUpdate( entitySupplier );
-			updatedBecauseOfContained = true;
-			// We don't want contained entities that haven't been modified to trigger an update of their
-			// containing entities.
-			// Thus we don't set 'shouldResolveToReindex' to true here, but leave it as is.
-		}
-
-		@Override
-		void delete(Supplier<E> entitySupplier) {
-			super.delete( entitySupplier );
-
-			// Reindexing does not make sense for a deleted entity
-			updatedBecauseOfContained = false;
 		}
 
 		@Override
@@ -137,100 +88,9 @@ public class PojoIndexedTypeIndexingPlan<I, E>
 			}
 		}
 
-		void sendCommandsToDelegate(PojoLoadingPlanProvider loadingPlanProvider) {
-			switch ( currentStatus ) {
-				case UNKNOWN:
-					// No operation was called on this state.
-					// Don't do anything.
-					return;
-				case PRESENT:
-					switch ( initialStatus ) {
-						case ABSENT:
-							delegateAdd( loadingPlanProvider );
-							return;
-						case PRESENT:
-						case UNKNOWN:
-							if ( updatedBecauseOfContained || isDirtyForAddOrUpdate( typeContext.dirtySelfFilter() ) ) {
-								delegateAddOrUpdate( loadingPlanProvider );
-							}
-							return;
-					}
-					break;
-				case ABSENT:
-					switch ( initialStatus ) {
-						case ABSENT:
-							// The entity was added, then deleted in the same plan.
-							// Don't do anything.
-							return;
-						case UNKNOWN:
-						case PRESENT:
-							delegateDelete();
-							return;
-					}
-					break;
-			}
-		}
-
-		private void delegateAdd(PojoLoadingPlanProvider loadingPlanProvider) {
-			Supplier<E> entitySupplier = entitySupplierOrLoad( loadingPlanProvider );
-			if ( entitySupplier == null ) {
-				// We couldn't retrieve the entity.
-				// Assume it was deleted and there's nothing to add.
-				// A delete event should follow at some point.
-				return;
-			}
-
-			DocumentRouteDescriptor currentRoute = typeContext.router()
-					.currentRoute( identifier, entitySupplier, providedRoutes, sessionContext );
-			// We don't care about previous routes: the add() operation expects that the document isn't in the index yet.
-			if ( currentRoute == null ) {
-				// The routing bridge decided the entity should not be indexed.
-				// There's nothing to do.
-				return;
-			}
-			delegate.add( identifier, currentRoute, entitySupplier );
-		}
-
-		private void delegateAddOrUpdate(PojoLoadingPlanProvider loadingPlanProvider) {
-			Supplier<E> entitySupplier = entitySupplierOrLoad( loadingPlanProvider );
-			if ( entitySupplier == null ) {
-				// We couldn't retrieve the entity.
-				// Assume it was deleted and there's nothing to add or update.
-				// A delete event should follow at some point.
-				return;
-			}
-
-			DocumentRoutesDescriptor routes = typeContext.router()
-					.routes( identifier, entitySupplier, providedRoutes, sessionContext );
-			if ( routes.currentRoute() == null && routes.previousRoutes().isEmpty() ) {
-				// The routing bridge decided the entity should not be indexed, and that it wasn't indexed previously.
-				// There's nothing to do.
-				return;
-			}
-			delegate.addOrUpdate( identifier, routes, entitySupplier );
-		}
-
-		private void delegateDelete() {
-			Supplier<E> entitySupplier = entitySupplierNoLoad();
-
-			DocumentRouter<? super E> router;
-			if ( entitySupplier != null ) {
-				router = typeContext.router();
-			}
-			else {
-				// Purge: entity is not available and we can't route according to its state.
-				// We can use the provided routing keys, though, which is what the no-op router does.
-				router = NoOpDocumentRouter.INSTANCE;
-			}
-
-			DocumentRoutesDescriptor routes = router
-					.routes( identifier, entitySupplier, providedRoutes, sessionContext );
-			if ( routes.currentRoute() == null && routes.previousRoutes().isEmpty() ) {
-				// The routing bridge decided the entity should not be indexed, and that it wasn't indexed previously.
-				// There's nothing to do.
-				return;
-			}
-			delegate.delete( identifier, routes, entitySupplier );
+		@Override
+		DocumentRoutesDescriptor providedRoutes() {
+			return providedRoutes;
 		}
 	}
 

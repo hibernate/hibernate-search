@@ -10,9 +10,6 @@ import java.util.Arrays;
 import java.util.Objects;
 import javax.persistence.Transient;
 
-import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
-import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
-
 public final class OutboxEvent {
 
 	public enum Type {
@@ -24,7 +21,7 @@ public final class OutboxEvent {
 
 	private String entityName;
 	private String entityId;
-	private byte[] documentRoutes;
+	private byte[] payload;
 	private int retries = 0;
 
 	@Transient
@@ -33,20 +30,20 @@ public final class OutboxEvent {
 	public OutboxEvent() {
 	}
 
-	public OutboxEvent(Type type, String entityName, String entityId, DocumentRoutesDescriptor documentRoutesDescriptor,
+	public OutboxEvent(Type type, String entityName, String entityId, byte[] payload,
 			Object originalEntityId) {
 		this.type = type;
 		this.entityName = entityName;
 		this.entityId = entityId;
-		this.documentRoutes = SerializationUtils.serialize( documentRoutesDescriptor );
+		this.payload = payload;
 		this.originalEntityId = originalEntityId;
 	}
 
-	public OutboxEvent(Type type, String entityName, String entityId, byte[] documentRoutes, int retries) {
+	public OutboxEvent(Type type, String entityName, String entityId, byte[] payload, int retries) {
 		this.type = type;
 		this.entityName = entityName;
 		this.entityId = entityId;
-		this.documentRoutes = documentRoutes;
+		this.payload = payload;
 		this.retries = retries;
 		this.originalEntityId = null;
 	}
@@ -83,12 +80,12 @@ public final class OutboxEvent {
 		this.entityId = entityId;
 	}
 
-	public byte[] getDocumentRoutes() {
-		return documentRoutes;
+	public byte[] getPayload() {
+		return payload;
 	}
 
-	public void setDocumentRoutes(byte[] documentRoutes) {
-		this.documentRoutes = documentRoutes;
+	public void setPayload(byte[] payload) {
+		this.payload = payload;
 	}
 
 	public int getRetries() {
@@ -121,13 +118,13 @@ public final class OutboxEvent {
 		}
 		OutboxEvent event = (OutboxEvent) o;
 		return type == event.type && Objects.equals( entityName, event.entityName ) && Objects.equals(
-				entityId, event.entityId ) && Arrays.equals( documentRoutes, event.documentRoutes );
+				entityId, event.entityId ) && Arrays.equals( payload, event.payload );
 	}
 
 	@Override
 	public int hashCode() {
 		int result = Objects.hash( type, entityName, entityId );
-		result = 31 * result + Arrays.hashCode( documentRoutes );
+		result = 31 * result + Arrays.hashCode( payload );
 		return result;
 	}
 

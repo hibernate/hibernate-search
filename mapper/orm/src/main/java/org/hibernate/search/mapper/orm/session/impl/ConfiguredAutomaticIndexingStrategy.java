@@ -34,7 +34,6 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.impl.AutomaticIndexingStrategyPreStopContextImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
-import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -198,11 +197,13 @@ public final class ConfiguredAutomaticIndexingStrategy {
 		}
 	}
 
-	public PojoIndexingQueueEventProcessingPlan createIndexingQueueEventProcessingPlan(PojoWorkSessionContext context,
+	public PojoIndexingQueueEventProcessingPlan createIndexingQueueEventProcessingPlan(HibernateOrmSearchSession context,
 			ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
+		AutomaticIndexingQueueEventSendingPlan delegate = senderFactory.apply( context );
 		return mappingContext.createIndexingQueueEventProcessingPlan( context,
 				synchronizationStrategy.getDocumentCommitStrategy(),
-				synchronizationStrategy.getDocumentRefreshStrategy() );
+				synchronizationStrategy.getDocumentRefreshStrategy(),
+				new HibernateOrmIndexingQueueEventSendingPlan( delegate ) );
 	}
 
 	private ConfiguredAutomaticIndexingSynchronizationStrategy configure(

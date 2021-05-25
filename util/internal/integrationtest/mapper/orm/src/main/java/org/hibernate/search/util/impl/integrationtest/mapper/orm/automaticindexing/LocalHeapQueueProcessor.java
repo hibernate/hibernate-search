@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMa
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventProcessingPlan;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
@@ -45,17 +45,17 @@ public class LocalHeapQueueProcessor implements BatchedWorkProcessor {
 	}
 
 	public void process(LocalHeapQueueIndexingEvent event) {
-		DocumentRoutesDescriptor routes = SerializationUtils.deserialize(
-				DocumentRoutesDescriptor.class, event.routes );
+		PojoIndexingQueueEventPayload payload = SerializationUtils.deserialize(
+				PojoIndexingQueueEventPayload.class, event.payload );
 		switch ( event.eventType ) {
 			case ADD:
-				plan.add( event.entityName, event.serializedId, routes );
+				plan.add( event.entityName, event.serializedId, payload );
 				break;
 			case ADD_OR_UPDATE:
-				plan.addOrUpdate( event.entityName, event.serializedId, routes );
+				plan.addOrUpdate( event.entityName, event.serializedId, payload );
 				break;
 			case DELETE:
-				plan.delete( event.entityName, event.serializedId, routes );
+				plan.delete( event.entityName, event.serializedId, payload );
 				break;
 		}
 		eventsInBatch.add( event );

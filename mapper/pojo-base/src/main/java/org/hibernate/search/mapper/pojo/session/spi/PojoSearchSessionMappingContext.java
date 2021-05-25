@@ -29,6 +29,7 @@ public interface PojoSearchSessionMappingContext extends PojoWorkMappingContext,
 	PojoIndexer createIndexer(PojoWorkSessionContext context);
 
 	PojoIndexingQueueEventProcessingPlan createIndexingQueueEventProcessingPlan(PojoWorkSessionContext context,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			PojoIndexingQueueEventSendingPlan sendingPlan);
 
 }

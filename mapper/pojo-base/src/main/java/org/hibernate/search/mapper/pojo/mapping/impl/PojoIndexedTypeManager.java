@@ -22,6 +22,7 @@ import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReind
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.DocumentRouter;
 import org.hibernate.search.mapper.pojo.identity.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.massindexing.impl.PojoMassIndexingIndexedTypeContext;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinals;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -47,11 +48,11 @@ public class PojoIndexedTypeManager<I, E> extends AbstractPojoTypeManager<I, E>
 	public PojoIndexedTypeManager(String entityName, PojoRawTypeIdentifier<E> typeIdentifier,
 			PojoCaster<E> caster, boolean singleConcreteTypeInEntityHierarchy,
 			IdentifierMappingImplementor<I, E> identifierMapping,
-			DocumentRouter<? super E> documentRouter,
+			DocumentRouter<? super E> documentRouter, PojoPathOrdinals pathOrdinals,
 			PojoIndexingProcessor<E> processor, MappedIndexManager indexManager,
 			PojoImplicitReindexingResolver<E> reindexingResolver) {
 		super( entityName, typeIdentifier, caster, singleConcreteTypeInEntityHierarchy,
-				identifierMapping, reindexingResolver );
+				identifierMapping, pathOrdinals, reindexingResolver );
 		this.documentRouter = documentRouter;
 		this.processor = processor;
 		this.indexManager = indexManager;

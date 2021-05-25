@@ -116,10 +116,11 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 
 	@Override
 	public PojoIndexingQueueEventProcessingPlan createEventProcessingPlan(PojoWorkSessionContext context,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
+			PojoIndexingQueueEventSendingPlan sendingPlan) {
 		return new PojoIndexingQueueEventProcessingPlanImpl( indexedTypeManagers, containedTypeManagers, context,
 				new PojoIndexingPlanImpl( indexedTypeManagers, containedTypeManagers, context,
-						new PojoIndexingPlanEventProcessingStrategy( commitStrategy, refreshStrategy ) ) );
+						new PojoIndexingPlanEventProcessingStrategy( commitStrategy, refreshStrategy, sendingPlan ) ) );
 	}
 
 	@Override

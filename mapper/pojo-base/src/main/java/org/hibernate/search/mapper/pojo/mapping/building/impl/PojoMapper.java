@@ -61,7 +61,8 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAd
 import org.hibernate.search.mapper.pojo.model.dependency.impl.PojoRoutingIndexingDependencyConfigurationContextImpl;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelTypeRootElement;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
-import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathsDefinition;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathFilterProvider;
+import org.hibernate.search.mapper.pojo.model.path.impl.PojoPathOrdinals;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
@@ -366,9 +367,11 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				.getEntityTypeMetadata()
 				// This should not be possible since this method is only called for entity types (see caller)
 				.orElseThrow( () -> new AssertionFailure( "Missing metadata for entity type '" + entityType ) );
-		PojoPathsDefinition pathsDefinition = entityTypeMetadata.getPathsDefinition();
+		PojoPathOrdinals pathOrdinals = new PojoPathOrdinals();
+		PojoPathFilterProvider pathFilterProvider =
+				new PojoPathFilterProvider( pathOrdinals, entityTypeMetadata.getPathsDefinition() );
 		Optional<? extends PojoImplicitReindexingResolver<T>> reindexingResolverOptional =
-				reindexingResolverBuildingHelper.buildOptional( entityType, pathsDefinition );
+				reindexingResolverBuildingHelper.buildOptional( entityType, pathFilterProvider );
 		if ( reindexingResolverOptional.isPresent() ) {
 			String entityName = entityTypeMetadata.getEntityName();
 
@@ -390,7 +393,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			PojoContainedTypeManager<?, T> typeManager = new PojoContainedTypeManager<>(
 					entityName, entityType.typeIdentifier(), entityType.caster(),
 					reindexingResolverBuildingHelper.isSingleConcreteTypeInEntityHierarchy( entityType ),
-					identifierMapping, reindexingResolver
+					identifierMapping, pathOrdinals, reindexingResolver
 			);
 			log.containedTypeManager( entityType, typeManager );
 			containedTypeManagerContainerBuilder.add( entityType, typeManager );

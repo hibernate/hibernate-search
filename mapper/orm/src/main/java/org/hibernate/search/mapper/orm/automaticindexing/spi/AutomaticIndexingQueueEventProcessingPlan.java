@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.common.spi.MultiEntityOperationExecutionReport;
 import org.hibernate.search.mapper.orm.common.EntityReference;
-import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 
 public interface AutomaticIndexingQueueEventProcessingPlan {
 
@@ -19,30 +19,30 @@ public interface AutomaticIndexingQueueEventProcessingPlan {
 	 *
 	 * @param entityName The name of the entity type.
 	 * @param serializedId The serialized entity identifier.
-	 * @param routes The document routes.
-	 * @see AutomaticIndexingQueueEventSendingPlan#add(String, Object, String, DocumentRoutesDescriptor)
+	 * @param payload The payload as passed to the sending plan.
+	 * @see AutomaticIndexingQueueEventSendingPlan#add(String, Object, String, PojoIndexingQueueEventPayload)
 	 */
-	void add(String entityName, String serializedId, DocumentRoutesDescriptor routes);
+	void add(String entityName, String serializedId, PojoIndexingQueueEventPayload payload);
 
 	/**
 	 * Appends an "add-or-update" event to the plan, received from a {@link AutomaticIndexingQueueEventSendingPlan}.
 	 *
 	 * @param entityName The name of the entity type.
 	 * @param serializedId The serialized entity identifier.
-	 * @param routes The document routes.
-	 * @see AutomaticIndexingQueueEventSendingPlan#addOrUpdate(String, Object, String, DocumentRoutesDescriptor)
+	 * @param payload The payload as passed to the sending plan.
+	 * @see AutomaticIndexingQueueEventSendingPlan#addOrUpdate(String, Object, String, PojoIndexingQueueEventPayload)
 	 */
-	void addOrUpdate(String entityName, String serializedId, DocumentRoutesDescriptor routes);
+	void addOrUpdate(String entityName, String serializedId, PojoIndexingQueueEventPayload payload);
 
 	/**
 	 * Appends a "delete" event to the plan, received from a {@link AutomaticIndexingQueueEventSendingPlan}.
 	 *
 	 * @param entityName The name of the entity type.
 	 * @param serializedId The serialized entity identifier.
-	 * @param routes The document routes.
-	 * @see AutomaticIndexingQueueEventSendingPlan#delete(String, Object, String, DocumentRoutesDescriptor)
+	 * @param payload The payload as passed to the sending plan.
+	 * @see AutomaticIndexingQueueEventSendingPlan#delete(String, Object, String, PojoIndexingQueueEventPayload)
 	 */
-	void delete(String entityName, String serializedId, DocumentRoutesDescriptor routes);
+	void delete(String entityName, String serializedId, PojoIndexingQueueEventPayload payload);
 
 	/**
 	 * Writes all pending changes to the index now,

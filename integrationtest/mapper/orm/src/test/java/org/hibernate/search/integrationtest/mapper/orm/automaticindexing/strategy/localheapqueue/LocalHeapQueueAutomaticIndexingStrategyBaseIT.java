@@ -37,7 +37,13 @@ import org.junit.runner.RunWith;
 		"!org.hibernate.search.integrationtest.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyIT",
 		// > Sending events outside of transactions, during a flush, doesn't work for some reason;
 		//   entities are only visible from other sessions after the original session is closed.
-		"!org.hibernate.search.integrationtest.mapper.orm.automaticindexing.session.AutomaticIndexingOutOfTransactionIT"
+		"!org.hibernate.search.integrationtest.mapper.orm.automaticindexing.session.AutomaticIndexingOutOfTransactionIT",
+		// > We do not send events for the creation of contained entities,
+		//   and as a result one particular use case involving queries instead of associations
+		//   cannot work.
+		//   We will address that someday with explicit support for queries;
+		//   see https://hibernate.atlassian.net/browse/HSEARCH-1937 .
+		"!org.hibernate.search.integrationtest.mapper.orm.automaticindexing.bridge.AutomaticIndexingBridgeExplicitReindexingFunctionalIT"
 })
 public class LocalHeapQueueAutomaticIndexingStrategyBaseIT {
 
