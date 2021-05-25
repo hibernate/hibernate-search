@@ -50,6 +50,8 @@ but you are obviously free to implement it in a separate java file.
 which is the entry point to the <<search-dsl-predicate,predicate DSL>>,
 used to create predicates.
 <3> The provider can access parameters that are passed when calling the named predicates.
+Getting the param using the `param` method assumes that the param has been defined.
+Alternatively it is possible to use `paramOptional` to get the `java.util.Optional` of the param.
 <4> The provider uses the predicate factory to create predicates.
 In this example, this implementation transforms a pattern with a custom format into three patterns,
 one for each field populated by the bridge.
