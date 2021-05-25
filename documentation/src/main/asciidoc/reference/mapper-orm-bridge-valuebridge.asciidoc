@@ -313,7 +313,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/valueb
 ----
 <1> Use the binding context to get the parameter values.
 Getting the param using the `param` method assumes that the param has been defined.
-Alternatively it is possible to use `optionalParam` to get the `java.util.Optional` of the param.
+Alternatively it is possible to use `paramOptional` to get the `java.util.Optional` of the param.
 <2> Pass them as arguments to the bridge constructor.
 
 [source, JAVA, indent=0, subs="+callouts"]
