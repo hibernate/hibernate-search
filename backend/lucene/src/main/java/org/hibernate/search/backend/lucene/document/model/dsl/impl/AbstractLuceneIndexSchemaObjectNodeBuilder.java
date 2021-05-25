@@ -122,7 +122,7 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 				continue;
 			}
 			result.put( PredicateTypeKeys.named( entry.getKey() ),
-					new LuceneNamedPredicate.Factory( options.provider ) );
+					new LuceneNamedPredicate.Factory( options.provider, entry.getKey() ) );
 		}
 		return result;
 	}

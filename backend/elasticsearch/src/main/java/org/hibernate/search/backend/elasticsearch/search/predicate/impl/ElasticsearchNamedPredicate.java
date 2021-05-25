@@ -53,9 +53,11 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 	public static class Factory
 			extends AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<NamedPredicateBuilder> {
 		private final NamedPredicateProvider provider;
+		private final String predicateName;
 
-		public Factory(NamedPredicateProvider provider) {
+		public Factory(NamedPredicateProvider provider, String predicateName) {
 			this.provider = provider;
+			this.predicateName = predicateName;
 		}
 
 		@Override
@@ -70,20 +72,23 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 		@Override
 		public NamedPredicateBuilder create(ElasticsearchSearchContext searchContext,
 				ElasticsearchSearchCompositeIndexSchemaElementContext field) {
-			return new Builder( provider, searchContext, field );
+			return new Builder( provider, predicateName, searchContext, field );
 		}
 	}
 
 	private static class Builder extends AbstractBuilder implements NamedPredicateBuilder {
 		private final NamedPredicateProvider provider;
+		private final String predicateName;
 		private final ElasticsearchSearchCompositeIndexSchemaElementContext field;
 		private SearchPredicateFactory factory;
 		private final Map<String, Object> params = new LinkedHashMap<>();
 
-		Builder(NamedPredicateProvider provider, ElasticsearchSearchContext searchContext,
+		Builder(NamedPredicateProvider provider, String predicateName,
+				ElasticsearchSearchContext searchContext,
 				ElasticsearchSearchCompositeIndexSchemaElementContext field) {
 			super( searchContext, field );
 			this.provider = provider;
+			this.predicateName = predicateName;
 			this.field = field;
 		}
 
@@ -100,7 +105,7 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 		@Override
 		public SearchPredicate build() {
 			ElasticsearchNamedPredicateProviderContext ctx = new ElasticsearchNamedPredicateProviderContext(
-					factory, field, params );
+					factory, field, predicateName, params );
 
 			ElasticsearchSearchPredicate providedPredicate = ElasticsearchSearchPredicate.from(
 					searchContext, provider.create( ctx ) );
@@ -113,12 +118,15 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 
 		private final SearchPredicateFactory factory;
 		private final ElasticsearchSearchCompositeIndexSchemaElementContext field;
+		private final String predicateName;
 		private final Map<String, Object> params;
 
 		ElasticsearchNamedPredicateProviderContext(SearchPredicateFactory factory,
-				ElasticsearchSearchCompositeIndexSchemaElementContext field, Map<String, Object> params) {
+				ElasticsearchSearchCompositeIndexSchemaElementContext field, String predicateName,
+				Map<String, Object> params) {
 			this.factory = factory;
 			this.field = field;
+			this.predicateName = predicateName;
 			this.params = params;
 		}
 
@@ -133,7 +141,7 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 
 			Object value = params.get( name );
 			if ( value == null ) {
-				throw log.paramNotDefined( name );
+				throw log.paramNotDefined( name, predicateName, field.eventContext() );
 			}
 			return value;
 		}

@@ -120,7 +120,7 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 				continue;
 			}
 			result.put( PredicateTypeKeys.named( entry.getKey() ),
-					new ElasticsearchNamedPredicate.Factory( options.provider ) );
+					new ElasticsearchNamedPredicate.Factory( options.provider, entry.getKey() ) );
 		}
 		return result;
 	}

@@ -664,7 +664,8 @@ public interface Log extends BasicLogger {
 					+ " but multi-tenancy strategy is set.")
 	SearchException multiTenancyNotRequiredButExplicitlyEnabledByTheBackend();
 
-	@Message(id = ID_OFFSET + 150, value = "Param with name '%1$s' has not been defined for the named predicate.")
-	SearchException paramNotDefined(String name);
+	@Message(id = ID_OFFSET + 150,
+			value = "Param with name '%1$s' has not been defined for the named predicate '%2$s'.")
+	SearchException paramNotDefined(String name, String predicateName, @Param EventContext context);
 
 }
