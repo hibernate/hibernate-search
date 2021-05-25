@@ -51,9 +51,11 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 	public static class Factory
 			extends AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<NamedPredicateBuilder> {
 		private final NamedPredicateProvider provider;
+		private final String predicateName;
 
-		public Factory(NamedPredicateProvider provider) {
+		public Factory(NamedPredicateProvider provider, String predicateName) {
 			this.provider = provider;
+			this.predicateName = predicateName;
 		}
 
 		@Override
@@ -68,20 +70,22 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 		@Override
 		public NamedPredicateBuilder create(LuceneSearchContext searchContext,
 				LuceneSearchCompositeIndexSchemaElementContext field) {
-			return new Builder( provider, searchContext, field );
+			return new Builder( provider, predicateName, searchContext, field );
 		}
 	}
 
 	private static class Builder extends AbstractBuilder implements NamedPredicateBuilder {
 		private final NamedPredicateProvider provider;
+		private final String predicateName;
 		private final LuceneSearchCompositeIndexSchemaElementContext field;
 		private SearchPredicateFactory factory;
 		private final Map<String, Object> params = new LinkedHashMap<>();
 
-		Builder(NamedPredicateProvider provider, LuceneSearchContext searchContext,
+		Builder(NamedPredicateProvider provider, String predicateName, LuceneSearchContext searchContext,
 				LuceneSearchCompositeIndexSchemaElementContext field) {
 			super( searchContext, field );
 			this.provider = provider;
+			this.predicateName = predicateName;
 			this.field = field;
 		}
 
@@ -98,7 +102,7 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 		@Override
 		public SearchPredicate build() {
 			LuceneNamedPredicateProviderContext ctx = new LuceneNamedPredicateProviderContext(
-					factory, field, params );
+					factory, field, predicateName, params );
 
 			LuceneSearchPredicate providedPredicate = LuceneSearchPredicate.from( searchContext, provider.create( ctx ) );
 
@@ -110,12 +114,15 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 
 		private final SearchPredicateFactory factory;
 		private final LuceneSearchCompositeIndexSchemaElementContext field;
+		private final String predicateName;
 		private final Map<String, Object> params;
 
 		LuceneNamedPredicateProviderContext(SearchPredicateFactory factory,
-				LuceneSearchCompositeIndexSchemaElementContext field, Map<String, Object> params) {
+				LuceneSearchCompositeIndexSchemaElementContext field,
+				String predicateName, Map<String, Object> params) {
 			this.factory = factory;
 			this.field = field;
+			this.predicateName = predicateName;
 			this.params = params;
 		}
 
@@ -130,7 +137,7 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 
 			Object value = params.get( name );
 			if ( value == null ) {
-				throw log.paramNotDefined( name );
+				throw log.paramNotDefined( name, predicateName, field.eventContext() );
 			}
 			return value;
 		}
