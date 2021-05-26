@@ -98,8 +98,11 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 				new HibernateOrmMetatadaContributor( basicTypeMetadataProvider, introspector )
 		);
 
-		// TODO HSEARCH-4141 use this to call containedEntityIdentityMappingRequired()
 		automaticIndexingStrategy = ConfiguredAutomaticIndexingStrategy.create( beanResolver, propertySource );
+		// If the automatic indexing strategy uses an event queue,
+		// it will need to send events relative to contained entities,
+		// and thus contained entities need to have an identity mapping.
+		containedEntityIdentityMappingRequired( automaticIndexingStrategy.usesEventQueue() );
 
 		// Enable annotation mapping if necessary
 		boolean processAnnotations = MAPPING_PROCESS_ANNOTATIONS.get( propertySource );

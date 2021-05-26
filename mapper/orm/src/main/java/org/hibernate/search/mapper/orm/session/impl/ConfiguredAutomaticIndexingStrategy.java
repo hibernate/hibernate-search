@@ -95,6 +95,10 @@ public final class ConfiguredAutomaticIndexingStrategy {
 		enlistsInTransaction = builder.enlistsInTransaction;
 	}
 
+	public boolean usesEventQueue() {
+		return senderFactory != null;
+	}
+
 	// Do everything related to runtime configuration or that doesn't involve I/O
 	public void preStart(HibernateOrmSearchSessionMappingContext mappingContext,
 			AutomaticIndexingStrategyStartContext startContext,
@@ -102,7 +106,7 @@ public final class ConfiguredAutomaticIndexingStrategy {
 		this.mappingContext = mappingContext;
 		defaultSynchronizationStrategyHolder =
 				AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.getAndTransform( startContext.configurationPropertySource(), referenceOptional -> {
-					if ( senderFactory != null ) {
+					if ( usesEventQueue() ) {
 						// If we send events to a queue, we're mostly asynchronous
 						// and thus configuring the synchronization strategy does not make sense.
 						if ( referenceOptional.isPresent() ) {
@@ -157,7 +161,7 @@ public final class ConfiguredAutomaticIndexingStrategy {
 
 	public ConfiguredAutomaticIndexingSynchronizationStrategy configureOverriddenSynchronizationStrategy(
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
-		if ( senderFactory != null ) {
+		if ( usesEventQueue() ) {
 			throw log.cannotConfigureSynchronizationStrategyWithIndexingEventQueue();
 		}
 		ConfiguredAutomaticIndexingSynchronizationStrategy.Builder builder =
@@ -169,7 +173,7 @@ public final class ConfiguredAutomaticIndexingStrategy {
 
 	public PojoIndexingPlan createIndexingPlan(HibernateOrmSearchSession context,
 			ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
-		if ( senderFactory != null ) {
+		if ( usesEventQueue() ) {
 			AutomaticIndexingQueueEventSendingPlan delegate = senderFactory.apply( context );
 			return mappingContext.createIndexingPlan( context, new HibernateOrmIndexingQueueEventSendingPlan( delegate ) );
 		}
