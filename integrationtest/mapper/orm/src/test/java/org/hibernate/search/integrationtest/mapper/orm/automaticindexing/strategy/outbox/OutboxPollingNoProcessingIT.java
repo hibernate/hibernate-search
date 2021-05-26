@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.strategy.outbox;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -182,23 +183,25 @@ public class OutboxPollingNoProcessingIT {
 	}
 
 	static void verifyOutboxEntry(OutboxEvent outboxEvent, String entityName, String entityId,
-			OutboxEvent.Type type, String currentRoute, String... previousRoutes) {
-		assertThat( outboxEvent.getEntityName() ).isEqualTo( entityName );
-		assertThat( outboxEvent.getEntityId() ).isEqualTo( entityId );
-		assertThat( outboxEvent.getType() ).isEqualTo( type );
+			OutboxEvent.Type type, String currentRouteRoutingKey, String... previousRoutesRoutingKeys) {
+		assertSoftly( softly -> {
+			softly.assertThat( outboxEvent.getEntityName() ).isEqualTo( entityName );
+			softly.assertThat( outboxEvent.getEntityId() ).isEqualTo( entityId );
+			softly.assertThat( outboxEvent.getType() ).isEqualTo( type );
 
-		PojoIndexingQueueEventPayload payload = SerializationUtils.deserialize(
-				PojoIndexingQueueEventPayload.class, outboxEvent.getPayload() );
-		DocumentRoutesDescriptor routesDescriptor = payload.routes;
+			PojoIndexingQueueEventPayload payload = SerializationUtils.deserialize(
+					PojoIndexingQueueEventPayload.class, outboxEvent.getPayload() );
+			DocumentRoutesDescriptor routesDescriptor = payload.routes;
 
-		assertThat( routesDescriptor ).isNotNull();
-		assertThat( routesDescriptor.currentRoute().routingKey() ).isEqualTo( currentRoute );
+			softly.assertThat( routesDescriptor ).isNotNull();
+			softly.assertThat( routesDescriptor.currentRoute().routingKey() ).isEqualTo( currentRouteRoutingKey );
 
-		Collection<DocumentRouteDescriptor> descriptors = Arrays.stream( previousRoutes )
-				.map( routingKey -> DocumentRouteDescriptor.of( routingKey ) )
-				.collect( Collectors.toCollection( LinkedHashSet::new ) );
+			Collection<DocumentRouteDescriptor> descriptors = Arrays.stream( previousRoutesRoutingKeys )
+					.map( DocumentRouteDescriptor::of )
+					.collect( Collectors.toCollection( LinkedHashSet::new ) );
 
-		assertThat( routesDescriptor.previousRoutes() ).isEqualTo( descriptors );
+			softly.assertThat( routesDescriptor.previousRoutes() ).isEqualTo( descriptors );
+		} );
 	}
 
 	@Entity(name = IndexedEntity.NAME)
