@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.mapping.impl;
 
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
+import org.hibernate.search.mapper.orm.session.impl.ConfiguredAutomaticIndexingStrategy;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
@@ -17,9 +18,12 @@ public final class HibernateOrmMapperDelegate
 		implements PojoMapperDelegate<HibernateOrmMappingPartialBuildState> {
 
 	private final HibernateOrmTypeContextContainer.Builder typeContextContainerBuilder;
+	private final ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy;
 
-	HibernateOrmMapperDelegate(HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider) {
+	HibernateOrmMapperDelegate(HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
+			ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy) {
 		typeContextContainerBuilder = new HibernateOrmTypeContextContainer.Builder( basicTypeMetadataProvider );
+		this.automaticIndexingStrategy = automaticIndexingStrategy;
 	}
 
 	@Override
@@ -41,6 +45,7 @@ public final class HibernateOrmMapperDelegate
 
 	@Override
 	public HibernateOrmMappingPartialBuildState prepareBuild(PojoMappingDelegate mappingDelegate) {
-		return new HibernateOrmMappingPartialBuildState( mappingDelegate, typeContextContainerBuilder );
+		return new HibernateOrmMappingPartialBuildState( mappingDelegate, typeContextContainerBuilder,
+				automaticIndexingStrategy );
 	}
 }

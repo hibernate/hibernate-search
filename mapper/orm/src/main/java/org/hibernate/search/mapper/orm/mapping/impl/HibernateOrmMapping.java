@@ -24,23 +24,18 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
-import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
-import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.automaticindexing.impl.AutomaticIndexingQueueEventProcessingPlanImpl;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQueueEventProcessingPlan;
-import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategy;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
@@ -70,8 +65,6 @@ import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaMan
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class HibernateOrmMapping extends AbstractPojoMappingImplementor<HibernateOrmMapping>
@@ -81,15 +74,6 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 				AutomaticIndexingMappingContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	@SuppressWarnings("deprecation")
-	private static final ConfigurationProperty<BeanReference<? extends AutomaticIndexingStrategy>> AUTOMATIC_INDEXING_STRATEGY =
-			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY )
-					.asBeanReference( AutomaticIndexingStrategy.class )
-					.substitute( org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.NONE, AutomaticIndexingStrategyNames.NONE )
-					.substitute( org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName.SESSION, AutomaticIndexingStrategyNames.SESSION )
-					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_STRATEGY )
-					.build();
 
 	private static final ConfigurationProperty<EntityLoadingCacheLookupStrategy> QUERY_LOADING_CACHE_LOOKUP_STRATEGY =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.QUERY_LOADING_CACHE_LOOKUP_STRATEGY )
@@ -111,55 +95,43 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	public static MappingImplementor<HibernateOrmMapping> create(
 			PojoMappingDelegate mappingDelegate, HibernateOrmTypeContextContainer typeContextContainer,
-			SessionFactoryImplementor sessionFactory, ConfigurationPropertySource propertySource,
-			BeanResolver beanResolver) {
-		BeanHolder<? extends AutomaticIndexingStrategy> automaticIndexingStrategyHolder =
-				AUTOMATIC_INDEXING_STRATEGY.getAndTransform( propertySource, beanResolver::resolve );
+			ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy,
+			SessionFactoryImplementor sessionFactory, ConfigurationPropertySource propertySource) {
+		EntityLoadingCacheLookupStrategy cacheLookupStrategy =
+				QUERY_LOADING_CACHE_LOOKUP_STRATEGY.get( propertySource );
 
-		try {
-			EntityLoadingCacheLookupStrategy cacheLookupStrategy =
-					QUERY_LOADING_CACHE_LOOKUP_STRATEGY.get( propertySource );
+		int fetchSize = QUERY_LOADING_FETCH_SIZE.get( propertySource );
 
-			int fetchSize = QUERY_LOADING_FETCH_SIZE.get( propertySource );
+		SchemaManagementStrategyName schemaManagementStrategyName = SCHEMA_MANAGEMENT_STRATEGY.get( propertySource );
+		SchemaManagementListener schemaManagementListener = new SchemaManagementListener( schemaManagementStrategyName );
 
-			SchemaManagementStrategyName schemaManagementStrategyName = SCHEMA_MANAGEMENT_STRATEGY.get( propertySource );
-			SchemaManagementListener schemaManagementListener = new SchemaManagementListener( schemaManagementStrategyName );
-
-			return new HibernateOrmMapping(
-					mappingDelegate, typeContextContainer, sessionFactory,
-					automaticIndexingStrategyHolder,
-					cacheLookupStrategy, fetchSize,
-					schemaManagementListener
-			);
-		}
-		catch (RuntimeException e) {
-			new SuppressingCloser( e )
-					.push( automaticIndexingStrategyHolder );
-			throw e;
-		}
+		return new HibernateOrmMapping(
+				mappingDelegate, typeContextContainer, sessionFactory,
+				automaticIndexingStrategy,
+				cacheLookupStrategy, fetchSize,
+				schemaManagementListener
+		);
 	}
 
 	private final SessionFactoryImplementor sessionFactory;
 	private final HibernateOrmTypeContextContainer typeContextContainer;
-	private final BeanHolder<? extends AutomaticIndexingStrategy> automaticIndexingStrategyHolder;
+	private final ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy;
 	private final EntityLoadingCacheLookupStrategy cacheLookupStrategy;
 	private final int fetchSize;
 
 	private final SchemaManagementListener schemaManagementListener;
 
-	private ConfiguredAutomaticIndexingStrategy configuredAutomaticIndexingStrategy;
-
 	private HibernateOrmMapping(PojoMappingDelegate mappingDelegate,
 			HibernateOrmTypeContextContainer typeContextContainer,
 			SessionFactoryImplementor sessionFactory,
-			BeanHolder<? extends AutomaticIndexingStrategy> automaticIndexingStrategyHolder,
+			ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			int fetchSize,
 			SchemaManagementListener schemaManagementListener) {
 		super( mappingDelegate );
 		this.typeContextContainer = typeContextContainer;
 		this.sessionFactory = sessionFactory;
-		this.automaticIndexingStrategyHolder = automaticIndexingStrategyHolder;
+		this.automaticIndexingStrategy = automaticIndexingStrategy;
 		this.cacheLookupStrategy = cacheLookupStrategy;
 		this.fetchSize = fetchSize;
 		this.schemaManagementListener = schemaManagementListener;
@@ -167,7 +139,11 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public CompletableFuture<?> start(MappingStartContext context) {
-		configureAutomaticIndexing( context );
+		AutomaticIndexingStrategyStartContextImpl automaticIndexingStrategyStartContext =
+				new AutomaticIndexingStrategyStartContextImpl( this, context );
+
+		// This may fail and normally doesn't involve I/O, so do it first
+		automaticIndexingStrategy.preStart( this, automaticIndexingStrategyStartContext, this );
 
 		Optional<SearchScopeImpl<Object>> scopeOptional = createAllScope();
 		if ( !scopeOptional.isPresent() ) {
@@ -179,19 +155,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		// Schema management
 		PojoScopeSchemaManager schemaManager = scope.schemaManagerDelegate();
 		return schemaManagementListener.onStart( context, schemaManager )
-				.thenCompose( ignored -> automaticIndexingStrategyHolder.get()
-						.start( new AutomaticIndexingStrategyStartContextImpl( this, context ) ) );
-	}
-
-	private void configureAutomaticIndexing(MappingStartContext context) {
-		ConfigurationPropertySource propertySource = context.configurationPropertySource();
-
-		ConfiguredAutomaticIndexingStrategy.Builder builder = new ConfiguredAutomaticIndexingStrategy.Builder(
-				this );
-		automaticIndexingStrategyHolder.get().configure( builder );
-		this.configuredAutomaticIndexingStrategy = builder.build( context.beanResolver(), propertySource );
-
-		configuredAutomaticIndexingStrategy.registerListeners( sessionFactory, this, propertySource );
+				.thenCompose( ignored -> automaticIndexingStrategy.start( automaticIndexingStrategyStartContext ) );
 	}
 
 	@Override
@@ -202,19 +166,13 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 			return CompletableFuture.completedFuture( null );
 		}
 		PojoScopeSchemaManager schemaManager = scope.get().schemaManagerDelegate();
-		return automaticIndexingStrategyHolder.get()
-				.preStop( new AutomaticIndexingStrategyPreStopContextImpl( context ) )
+		return automaticIndexingStrategy.preStop( new AutomaticIndexingStrategyPreStopContextImpl( context ) )
 				.thenCompose( ignored -> schemaManagementListener.onStop( context, schemaManager ) );
 	}
 
 	@Override
 	protected void doStop() {
-		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( ConfiguredAutomaticIndexingStrategy::close, configuredAutomaticIndexingStrategy );
-			configuredAutomaticIndexingStrategy = null;
-			closer.push( AutomaticIndexingStrategy::stop, automaticIndexingStrategyHolder, BeanHolder::get );
-			closer.push( BeanHolder::close, automaticIndexingStrategyHolder );
-		}
+		automaticIndexingStrategy.stop();
 	}
 
 	@Override
@@ -395,7 +353,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		}
 
 		return new HibernateOrmSearchSession.Builder( this, typeContextContainer,
-				configuredAutomaticIndexingStrategy, sessionImplementor );
+				automaticIndexingStrategy, sessionImplementor );
 	}
 
 	private SearchIntegration searchIntegration() {

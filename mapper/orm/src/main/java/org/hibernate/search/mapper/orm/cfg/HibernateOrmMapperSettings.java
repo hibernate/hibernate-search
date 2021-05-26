@@ -183,8 +183,8 @@ public final class HibernateOrmMapperSettings {
 		public static final String AUTOMATIC_INDEXING = "automatic_indexing";
 		public static final String AUTOMATIC_INDEXING_PREFIX = AUTOMATIC_INDEXING + ".";
 		public static final String AUTOMATIC_INDEXING_STRATEGY = AUTOMATIC_INDEXING_PREFIX + "strategy";
-		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = AUTOMATIC_INDEXING_PREFIX + "synchronization.strategy";
-		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = AUTOMATIC_INDEXING_PREFIX + "enable_dirty_check";
+		public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.SYNCHRONIZATION_STRATEGY;
+		public static final String AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.ENABLE_DIRTY_CHECK;
 		public static final String AUTOMATIC_INDEXING_POLLING_INTERVAL = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.POLLING_INTERVAL;
 		public static final String AUTOMATIC_INDEXING_BATCH_SIZE = AUTOMATIC_INDEXING_PREFIX + AutomaticIndexingRadicals.BATCH_SIZE;
 		public static final String QUERY_LOADING_CACHE_LOOKUP_STRATEGY = "query.loading.cache_lookup.strategy";
@@ -202,6 +202,8 @@ public final class HibernateOrmMapperSettings {
 		private AutomaticIndexingRadicals() {
 		}
 
+		public static final String SYNCHRONIZATION_STRATEGY = "synchronization.strategy";
+		public static final String ENABLE_DIRTY_CHECK = "enable_dirty_check";
 		public static final String POLLING_INTERVAL = "polling_interval";
 		public static final String BATCH_SIZE = "batch_size";
 	}

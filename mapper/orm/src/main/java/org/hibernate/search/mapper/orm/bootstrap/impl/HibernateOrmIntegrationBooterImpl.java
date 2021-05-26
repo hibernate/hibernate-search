@@ -22,9 +22,10 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.resource.beans.container.spi.BeanContainer;
 import org.hibernate.resource.beans.container.spi.ExtendedBeanManager;
 import org.hibernate.resource.beans.spi.ManagedBeanRegistry;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.AllAwareConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
@@ -32,14 +33,13 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBooter;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBooterBehavior;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingInitiator;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingKey;
+import org.hibernate.search.mapper.orm.mapping.impl.HibernateSearchContextProviderService;
 import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
@@ -70,6 +70,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			ConfigurationProperty.forKey( HibernateOrmMapperSpiSettings.INTEGRATION_PARTIAL_BUILD_STATE )
 					.as( HibernateOrmIntegrationPartialBuildState.class, HibernateOrmIntegrationPartialBuildState::parse )
 					.build();
+
 	private final Metadata metadata;
 	private final ServiceRegistryImplementor serviceRegistry;
 	private final ReflectionManager reflectionManager;
@@ -229,13 +230,14 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	}
 
 	private HibernateOrmIntegrationPartialBuildState doBootFirstPhase() {
+		HibernateOrmMappingInitiator mappingInitiator = null;
 		BeanProvider beanProvider = null;
 		SearchIntegrationPartialBuildState searchIntegrationPartialBuildState = null;
 		try {
 			SearchIntegrationBuilder builder = SearchIntegration.builder( rootPropertySource, propertyChecker );
 
 			HibernateOrmMappingKey mappingKey = new HibernateOrmMappingKey();
-			HibernateOrmMappingInitiator mappingInitiator = HibernateOrmMappingInitiator.create(
+			mappingInitiator = HibernateOrmMappingInitiator.create(
 					metadata, reflectionManager, valueReadHandleFactory, ormConfigurationService );
 			builder.addMappingInitiator( mappingKey, mappingInitiator );
 
@@ -266,6 +268,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
+					.push( HibernateOrmMappingInitiator::closeOnFailure, mappingInitiator )
 					.push( SearchIntegrationPartialBuildState::closeOnFailure, searchIntegrationPartialBuildState )
 					.push( BeanProvider::close, beanProvider );
 			throw e;
