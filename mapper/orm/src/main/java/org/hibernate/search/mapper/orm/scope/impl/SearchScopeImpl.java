@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.scope.impl;
 
 import java.util.Set;
 
+import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -109,6 +110,11 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 	@Override
 	public Set<? extends SearchIndexedEntity<? extends E>> includedTypes() {
 		return delegate.includedIndexedTypes();
+	}
+
+	@Override
+	public <T> T extension(IndexScopeExtension<T> extension) {
+		return delegate.extension( extension );
 	}
 
 	public PojoScopeSchemaManager schemaManagerDelegate() {

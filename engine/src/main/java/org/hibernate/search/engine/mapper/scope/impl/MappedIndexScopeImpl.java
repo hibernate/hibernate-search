@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.mapper.scope.impl;
 
+import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
@@ -75,5 +76,10 @@ class MappedIndexScopeImpl<C, R, E> implements MappedIndexScope<R, E> {
 		return new DefaultSearchAggregationFactory(
 				SearchAggregationDslContextImpl.root( delegate.searchAggregationFactory(), predicate() )
 		);
+	}
+
+	@Override
+	public <T> T extension(IndexScopeExtension<T> extension) {
+		return delegate.extension( extension );
 	}
 }
