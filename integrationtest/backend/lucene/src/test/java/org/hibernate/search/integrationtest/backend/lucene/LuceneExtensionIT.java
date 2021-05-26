@@ -28,15 +28,18 @@ import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.document.LatLonPoint;
 import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StringField;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Explanation;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
 import org.apache.lucene.search.SortedSetSortField;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
@@ -810,6 +813,25 @@ public class LuceneExtensionIT {
 						"Lucene index managers can only be unwrapped to '"
 								+ LuceneIndexManager.class.getName() + "'"
 				);
+	}
+
+	@Test
+	public void indexReaderAccessor() throws Exception {
+		StubMappingScope scope = mainIndex.createScope();
+
+		try ( IndexReader indexReader = scope.extension( LuceneExtension.get() ).openIndexReader() ) {
+			IndexSearcher searcher = new IndexSearcher( indexReader );
+			TopDocs topDocs = searcher.search( new MatchAllDocsQuery(), 1000 );
+			assertThat( topDocs.scoreDocs ).hasSize( 15 );
+		}
+
+		scope = mainIndex.createScope( otherIndex );
+
+		try ( IndexReader indexReader = scope.extension( LuceneExtension.get() ).openIndexReader() ) {
+			IndexSearcher searcher = new IndexSearcher( indexReader );
+			TopDocs topDocs = searcher.search( new MatchAllDocsQuery(), 1000 );
+			assertThat( topDocs.scoreDocs ).hasSize( 30 );
+		}
 	}
 
 	private void initData() {
