@@ -16,12 +16,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.analysis.AnalyzerNames;
 import org.hibernate.search.mapper.orm.outbox.impl.OutboxEvent;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
 import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
@@ -30,6 +32,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.AutomaticIndexingStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,27 +53,35 @@ public class OutboxPollingNoProcessingIT {
 
 	@Before
 	public void setup() {
-		backendMock.expectSchema(
-				IndexedEntity.NAME,
-				b -> b.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
+		backendMock.expectSchema( IndexedEntity.NAME, b -> b
+				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
-		backendMock.expectSchema(
-				AnotherIndexedEntity.NAME,
-				b -> b.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
+		backendMock.expectSchema( AnotherIndexedEntity.NAME, b -> b
+				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
-		backendMock.expectSchema(
-				RoutedIndexedEntity.NAME,
-				b -> b.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
+		backendMock.expectSchema( RoutedIndexedEntity.NAME, b -> b
+				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
+		);
+		backendMock.expectSchema( IndexedAndContainingEntity.NAME, b -> b
+				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
+				.objectField( "contained", b2 -> b2
+						.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) ) )
+				.objectField( "indexedAndContained", b2 -> b2
+						.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) ) )
+		);
+		backendMock.expectSchema( IndexedAndContainedEntity.NAME, b -> b
+				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 
 		sessionFactory = ormSetupHelper.start()
 				.withProperty( "hibernate.search.automatic_indexing.outbox_event_finder", outboxEventFinder )
-				.setup( IndexedEntity.class, AnotherIndexedEntity.class, RoutedIndexedEntity.class );
+				.setup( IndexedEntity.class, AnotherIndexedEntity.class, RoutedIndexedEntity.class,
+						IndexedAndContainingEntity.class, ContainedEntity.class, IndexedAndContainedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
-	public void insertUpdateDelete() {
+	public void insertUpdateDelete_indexed() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity indexedPojo = new IndexedEntity( 1, "Using some text here" );
 			session.save( indexedPojo );
@@ -105,6 +116,107 @@ public class OutboxPollingNoProcessingIT {
 
 			assertThat( outboxEntries ).hasSize( 3 );
 			verifyOutboxEntry( outboxEntries.get( 2 ), IndexedEntity.NAME, "1", OutboxEvent.Type.DELETE, null );
+		} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4141")
+	public void insertUpdateDelete_contained() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
+			ContainedEntity contained = new ContainedEntity( 2, "initial" );
+			containing.setContained( contained );
+			contained.setContaining( containing );
+			session.persist( containing );
+			session.persist( contained );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
+
+			// No event when a contained entity is created:
+			// it does not affect any other entity unless they are modified to refer to that contained entity,
+			// in which case they get an event of their own.
+			assertThat( outboxEntries ).hasSize( 1 );
+			verifyOutboxEntry( outboxEntries.get( 0 ), IndexedAndContainingEntity.NAME, "1",
+					OutboxEvent.Type.ADD, null );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity entity = session.load( ContainedEntity.class, 2 );
+			entity.setText( "updated" );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
+
+			assertThat( outboxEntries ).hasSize( 2 );
+			verifyOutboxEntry( outboxEntries.get( 1 ), ContainedEntity.NAME, "2",
+					OutboxEvent.Type.ADD_OR_UPDATE, null );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity entity = session.load( ContainedEntity.class, 2 );
+			session.delete( entity );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
+
+			// No event when a contained entity is deleted:
+			// if other entities used to refer to that contained entity,
+			// they should be updated to not refer to it anymore,
+			// in which case they get an event of their own.
+			assertThat( outboxEntries ).hasSize( 2 );
+		} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4141")
+	public void insertUpdateDelete_indexedAndContained() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
+			IndexedAndContainedEntity indexedAndContained = new IndexedAndContainedEntity( 2, "initial" );
+			containing.setIndexedAndContained( indexedAndContained );
+			indexedAndContained.setContaining( containing );
+			session.persist( containing );
+			session.persist( indexedAndContained );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
+
+			assertThat( outboxEntries ).hasSize( 2 );
+			verifyOutboxEntry( outboxEntries.get( 0 ), IndexedAndContainingEntity.NAME, "1",
+					OutboxEvent.Type.ADD, null );
+			verifyOutboxEntry( outboxEntries.get( 1 ), IndexedAndContainedEntity.NAME, "2",
+					OutboxEvent.Type.ADD, null );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedAndContainedEntity entity = session.load( IndexedAndContainedEntity.class, 2 );
+			entity.setText( "updated" );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
+
+			assertThat( outboxEntries ).hasSize( 3 );
+			verifyOutboxEntry( outboxEntries.get( 2 ), IndexedAndContainedEntity.NAME, "2",
+					OutboxEvent.Type.ADD_OR_UPDATE, null );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedAndContainedEntity entity = session.load( IndexedAndContainedEntity.class, 2 );
+			session.delete( entity );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
+
+			assertThat( outboxEntries ).hasSize( 4 );
+			verifyOutboxEntry( outboxEntries.get( 3 ), IndexedAndContainedEntity.NAME, "2",
+					OutboxEvent.Type.DELETE, null );
 		} );
 	}
 
@@ -265,6 +377,147 @@ public class OutboxPollingNoProcessingIT {
 
 		public void setText(String text) {
 			this.text = text;
+		}
+	}
+
+	@Entity(name = IndexedAndContainingEntity.NAME)
+	@Indexed
+	public static class IndexedAndContainingEntity {
+
+		static final String NAME = "IndexedAndContainingEntity";
+
+		@Id
+		private Integer id;
+		@FullTextField
+		private String text;
+		@OneToOne(mappedBy = "containing")
+		@IndexedEmbedded
+		private ContainedEntity contained;
+		@OneToOne(mappedBy = "containing")
+		@IndexedEmbedded
+		private IndexedAndContainedEntity indexedAndContained;
+
+		public IndexedAndContainingEntity() {
+		}
+
+		public IndexedAndContainingEntity(Integer id, String text) {
+			this.id = id;
+			this.text = text;
+		}
+
+		public Integer getId() {
+			return id;
+		}
+
+		public String getText() {
+			return text;
+		}
+
+		public void setText(String text) {
+			this.text = text;
+		}
+
+		public ContainedEntity getContained() {
+			return contained;
+		}
+
+		public void setContained(
+				ContainedEntity contained) {
+			this.contained = contained;
+		}
+
+		public IndexedAndContainedEntity getIndexedAndContained() {
+			return indexedAndContained;
+		}
+
+		public void setIndexedAndContained(
+				IndexedAndContainedEntity indexedAndContained) {
+			this.indexedAndContained = indexedAndContained;
+		}
+	}
+
+	@Entity(name = ContainedEntity.NAME)
+	public static class ContainedEntity {
+
+		static final String NAME = "ContainedEntity";
+
+		@Id
+		private Integer id;
+		@FullTextField
+		private String text;
+		@OneToOne
+		private IndexedAndContainingEntity containing;
+
+		public ContainedEntity() {
+		}
+
+		public ContainedEntity(Integer id, String text) {
+			this.id = id;
+			this.text = text;
+		}
+
+		public Integer getId() {
+			return id;
+		}
+
+		public String getText() {
+			return text;
+		}
+
+		public void setText(String text) {
+			this.text = text;
+		}
+
+		public IndexedAndContainingEntity getContaining() {
+			return containing;
+		}
+
+		public void setContaining(
+				IndexedAndContainingEntity containing) {
+			this.containing = containing;
+		}
+	}
+
+	@Entity(name = IndexedAndContainedEntity.NAME)
+	@Indexed
+	public static class IndexedAndContainedEntity {
+
+		static final String NAME = "IndexedAndContainedEntity";
+
+		@Id
+		private Integer id;
+		@FullTextField
+		private String text;
+		@OneToOne
+		private IndexedAndContainingEntity containing;
+
+		public IndexedAndContainedEntity() {
+		}
+
+		public IndexedAndContainedEntity(Integer id, String text) {
+			this.id = id;
+			this.text = text;
+		}
+
+		public Integer getId() {
+			return id;
+		}
+
+		public String getText() {
+			return text;
+		}
+
+		public void setText(String text) {
+			this.text = text;
+		}
+
+		public IndexedAndContainingEntity getContaining() {
+			return containing;
+		}
+
+		public void setContaining(
+				IndexedAndContainingEntity containing) {
+			this.containing = containing;
 		}
 	}
 }
