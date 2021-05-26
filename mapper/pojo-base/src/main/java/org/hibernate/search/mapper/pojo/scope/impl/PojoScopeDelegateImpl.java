@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
+import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
@@ -156,6 +157,11 @@ public final class PojoScopeDelegateImpl<R, E, C> implements PojoScopeDelegate<R
 	public PojoMassIndexer massIndexer(PojoMassIndexingContext context, DetachedBackendSessionContext detachedSession) {
 		return new PojoDefaultMassIndexer( context, mappingContext, indexedTypeContextProvider, targetedTypeContexts,
 				schemaManager(), workspace( detachedSession ) );
+	}
+
+	@Override
+	public <T> T extension(IndexScopeExtension<T> extension) {
+		return getIndexScope().extension( extension );
 	}
 
 	private MappedIndexScope<R, E> getIndexScope() {

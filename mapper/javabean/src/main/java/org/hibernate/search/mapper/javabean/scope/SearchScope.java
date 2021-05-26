@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.javabean.scope;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
@@ -21,6 +22,7 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
+import org.hibernate.search.util.common.SearchException;
 
 /**
  * Represents a set of types and the corresponding indexes,
@@ -124,5 +126,16 @@ public interface SearchScope<E> {
 	 * @return A set containing one {@link SearchIndexedEntity} for each indexed entity in this scope.
 	 */
 	Set<? extends SearchIndexedEntity<? extends E>> includedTypes();
+
+	/**
+	 * Extend the current search scope with the given extension,
+	 * resulting in an extended search scope offering backend-specific utilities.
+	 *
+	 * @param extension The extension to apply.
+	 * @param <T> The type of search scope provided by the extension.
+	 * @return The extended search scope.
+	 * @throws SearchException If the extension cannot be applied (wrong underlying technology, ...).
+	 */
+	<T> T extension(IndexScopeExtension<T> extension);
 
 }

@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.scope.spi;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
+import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -52,4 +53,6 @@ public interface PojoScopeDelegate<R, E, C> {
 	PojoScopeSchemaManager schemaManager();
 
 	PojoMassIndexer massIndexer(PojoMassIndexingContext context, DetachedBackendSessionContext detachedSession);
+
+	<T> T extension(IndexScopeExtension<T> extension);
 }

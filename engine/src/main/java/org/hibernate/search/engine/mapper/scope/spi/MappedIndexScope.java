@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.mapper.scope.spi;
 
+import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -47,4 +48,5 @@ public interface MappedIndexScope<R, E> {
 
 	SearchAggregationFactory aggregation();
 
+	<T> T extension(IndexScopeExtension<T> extension);
 }
