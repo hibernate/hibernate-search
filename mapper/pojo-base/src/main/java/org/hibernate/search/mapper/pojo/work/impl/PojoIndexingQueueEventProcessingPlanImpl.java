@@ -24,27 +24,30 @@ public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndex
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoWorkIndexedTypeContextProvider typeContextProvider;
+	private final PojoWorkIndexedTypeContextProvider indexedTypeContextProvider;
+	private final PojoWorkContainedTypeContextProvider containedTypeContextProvider;
 	private final PojoWorkSessionContext sessionContext;
 	private final PojoIndexingPlan delegate;
 
-	public PojoIndexingQueueEventProcessingPlanImpl(PojoWorkIndexedTypeContextProvider typeContextProvider,
+	public PojoIndexingQueueEventProcessingPlanImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
+			PojoWorkContainedTypeContextProvider containedTypeContextProvider,
 			PojoWorkSessionContext sessionContext, PojoIndexingPlan delegate) {
-		this.typeContextProvider = typeContextProvider;
+		this.indexedTypeContextProvider = indexedTypeContextProvider;
+		this.containedTypeContextProvider = containedTypeContextProvider;
 		this.sessionContext = sessionContext;
 		this.delegate = delegate;
 	}
 
 	@Override
 	public void add(String entityName, String serializedId, DocumentRoutesDescriptor routes) {
-		PojoWorkIndexedTypeContext<?, ?> typeContext = typeContext( entityName );
+		PojoWorkTypeContext<?, ?> typeContext = typeContext( entityName );
 		Object id = typeContext.identifierMapping().fromDocumentIdentifier( serializedId, sessionContext );
 		delegate.add( typeContext.typeIdentifier(), id, routes, null );
 	}
 
 	@Override
 	public void addOrUpdate(String entityName, String serializedId, DocumentRoutesDescriptor routes) {
-		PojoWorkIndexedTypeContext<?, ?> typeContext = typeContext( entityName );
+		PojoWorkTypeContext<?, ?> typeContext = typeContext( entityName );
 		Object id = typeContext.identifierMapping().fromDocumentIdentifier( serializedId, sessionContext );
 		delegate.addOrUpdate( typeContext.typeIdentifier(), id, routes, null,
 				true, true, null );
@@ -52,7 +55,7 @@ public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndex
 
 	@Override
 	public void delete(String entityName, String serializedId, DocumentRoutesDescriptor routes) {
-		PojoWorkIndexedTypeContext<?, ?> typeContext = typeContext( entityName );
+		PojoWorkTypeContext<?, ?> typeContext = typeContext( entityName );
 		Object id = typeContext.identifierMapping().fromDocumentIdentifier( serializedId, sessionContext );
 		delegate.delete( typeContext.typeIdentifier(), id, routes, null );
 	}
@@ -73,14 +76,17 @@ public final class PojoIndexingQueueEventProcessingPlanImpl implements PojoIndex
 
 	@Override
 	public Object toIdentifier(String entityName, String serializedId) {
-		PojoWorkIndexedTypeContext<?, ?> typeContext = typeContext( entityName );
+		PojoWorkTypeContext<?, ?> typeContext = typeContext( entityName );
 		return typeContext.identifierMapping().fromDocumentIdentifier( serializedId, sessionContext );
 	}
 
-	private PojoWorkIndexedTypeContext<?, ?> typeContext(String entityName) {
-		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> optional = typeContextProvider.forEntityName( entityName );
+	private PojoWorkTypeContext<?, ?> typeContext(String entityName) {
+		Optional<? extends PojoWorkTypeContext<?, ?>> optional = indexedTypeContextProvider.forEntityName( entityName );
 		if ( !optional.isPresent() ) {
-			throw log.nonIndexedTypeInIndexingEvent( entityName );
+			optional = containedTypeContextProvider.forEntityName( entityName );
+			if ( !optional.isPresent() ) {
+				throw log.nonIndexedTypeInIndexingEvent( entityName );
+			}
 		}
 		return optional.get();
 	}

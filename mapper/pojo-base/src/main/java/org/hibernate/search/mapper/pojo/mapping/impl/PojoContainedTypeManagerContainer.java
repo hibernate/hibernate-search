@@ -27,10 +27,15 @@ public class PojoContainedTypeManagerContainer
 	}
 
 	private final Map<PojoRawTypeIdentifier<?>, PojoContainedTypeManager<?, ?>> byExactType;
+	private final Map<String, PojoContainedTypeManager<?, ?>> byEntityName;
 	private final Set<PojoContainedTypeManager<?, ?>> all;
 
 	private PojoContainedTypeManagerContainer(Builder builder) {
-		this.byExactType = new HashMap<>( builder.byExactClass );
+		this.byExactType = new HashMap<>( builder.byExactType );
+		this.byEntityName = new LinkedHashMap<>( builder.byExactType.size() );
+		for ( PojoContainedTypeManager<?, ?> typeManager : builder.byExactType.values() ) {
+			byEntityName.put( typeManager.entityName(), typeManager );
+		}
 		this.all = Collections.unmodifiableSet( new LinkedHashSet<>( byExactType.values() ) );
 	}
 
@@ -41,6 +46,11 @@ public class PojoContainedTypeManagerContainer
 		return Optional.ofNullable( (PojoContainedTypeManager<?, E>) byExactType.get( typeIdentifier ) );
 	}
 
+	@Override
+	public Optional<? extends PojoContainedTypeManager<?, ?>> forEntityName(String entityName) {
+		return Optional.ofNullable( (PojoContainedTypeManager<?, ?>) byEntityName.get( entityName ) );
+	}
+
 	Set<PojoContainedTypeManager<?, ?>> all() {
 		return all;
 	}
@@ -48,18 +58,18 @@ public class PojoContainedTypeManagerContainer
 	public static class Builder {
 
 		// Use a LinkedHashMap for deterministic iteration
-		private final Map<PojoRawTypeIdentifier<?>, PojoContainedTypeManager<?, ?>> byExactClass = new LinkedHashMap<>();
+		private final Map<PojoRawTypeIdentifier<?>, PojoContainedTypeManager<?, ?>> byExactType = new LinkedHashMap<>();
 
 		private Builder() {
 		}
 
 		public <E> void add(PojoRawTypeModel<E> typeModel, PojoContainedTypeManager<?, E> typeManager) {
-			byExactClass.put( typeModel.typeIdentifier(), typeManager );
+			byExactType.put( typeModel.typeIdentifier(), typeManager );
 		}
 
 		public void closeOnFailure() {
 			try ( Closer<RuntimeException> closer = new Closer<>() ) {
-				closer.pushAll( PojoContainedTypeManager::close, byExactClass.values() );
+				closer.pushAll( PojoContainedTypeManager::close, byExactType.values() );
 			}
 		}
 

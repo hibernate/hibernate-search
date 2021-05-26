@@ -14,4 +14,6 @@ public interface PojoWorkContainedTypeContextProvider {
 
 	<E> Optional<? extends PojoWorkContainedTypeContext<?, E>> forExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 
+	Optional<? extends PojoWorkContainedTypeContext<?,?>> forEntityName(String entityName);
+
 }
