@@ -8,19 +8,24 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingFinalizationContext;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
+import org.hibernate.search.mapper.orm.session.impl.ConfiguredAutomaticIndexingStrategy;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
+import org.hibernate.search.util.common.impl.Closer;
 
 public class HibernateOrmMappingPartialBuildState implements MappingPartialBuildState {
 
 	private final PojoMappingDelegate mappingDelegate;
 	private final HibernateOrmTypeContextContainer.Builder typeContextContainerBuilder;
+	private final ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy;
 
 	HibernateOrmMappingPartialBuildState(PojoMappingDelegate mappingDelegate,
-			HibernateOrmTypeContextContainer.Builder typeContextContainerBuilder) {
+			HibernateOrmTypeContextContainer.Builder typeContextContainerBuilder,
+			ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy) {
 		this.mappingDelegate = mappingDelegate;
 		this.typeContextContainerBuilder = typeContextContainerBuilder;
+		this.automaticIndexingStrategy = automaticIndexingStrategy;
 	}
 
 	public MappingImplementor<HibernateOrmMapping> bindToSessionFactory(
@@ -28,15 +33,18 @@ public class HibernateOrmMappingPartialBuildState implements MappingPartialBuild
 			SessionFactoryImplementor sessionFactoryImplementor) {
 		return HibernateOrmMapping.create(
 				mappingDelegate, typeContextContainerBuilder.build( sessionFactoryImplementor ),
+				automaticIndexingStrategy,
 				sessionFactoryImplementor,
-				context.configurationPropertySource(),
-				context.beanResolver()
+				context.configurationPropertySource()
 		);
 	}
 
 	@Override
 	public void closeOnFailure() {
-		mappingDelegate.close();
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( ConfiguredAutomaticIndexingStrategy::stop, automaticIndexingStrategy );
+			closer.push( PojoMappingDelegate::close, mappingDelegate );
+		}
 	}
 
 }

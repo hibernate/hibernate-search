@@ -24,6 +24,7 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationC
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospector;
+import org.hibernate.search.mapper.orm.session.impl.ConfiguredAutomaticIndexingStrategy;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
@@ -57,6 +58,8 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 	private final HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider;
 	private final HibernateOrmBootstrapIntrospector introspector;
 
+	private ConfiguredAutomaticIndexingStrategy automaticIndexingStrategy;
+
 	private HibernateOrmMappingInitiator(HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
 			HibernateOrmBootstrapIntrospector introspector, ConfigurationService ormConfigurationService) {
 		super( introspector );
@@ -79,14 +82,24 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		);
 	}
 
+	public void closeOnFailure() {
+		if ( automaticIndexingStrategy != null ) {
+			automaticIndexingStrategy.stop();
+		}
+	}
+
 	@Override
 	public void configure(MappingBuildContext buildContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
+		BeanResolver beanResolver = buildContext.beanResolver();
 		ConfigurationPropertySource propertySource = buildContext.configurationPropertySource();
 
 		addConfigurationContributor(
 				new HibernateOrmMetatadaContributor( basicTypeMetadataProvider, introspector )
 		);
+
+		// TODO HSEARCH-4141 use this to call containedEntityIdentityMappingRequired()
+		automaticIndexingStrategy = ConfiguredAutomaticIndexingStrategy.create( beanResolver, propertySource );
 
 		// Enable annotation mapping if necessary
 		boolean processAnnotations = MAPPING_PROCESS_ANNOTATIONS.get( propertySource );
@@ -102,7 +115,6 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		}
 
 		// Apply the user-provided mapping configurer if necessary
-		final BeanResolver beanResolver = buildContext.beanResolver();
 		MAPPING_CONFIGURER.getAndMap( propertySource, beanResolver::resolve )
 				.ifPresent( holder -> {
 					try ( BeanHolder<? extends HibernateOrmSearchMappingConfigurer> configurerHolder = holder ) {
@@ -115,6 +127,6 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 
 	@Override
 	protected PojoMapperDelegate<HibernateOrmMappingPartialBuildState> createMapperDelegate() {
-		return new HibernateOrmMapperDelegate( basicTypeMetadataProvider );
+		return new HibernateOrmMapperDelegate( basicTypeMetadataProvider, automaticIndexingStrategy );
 	}
 }
