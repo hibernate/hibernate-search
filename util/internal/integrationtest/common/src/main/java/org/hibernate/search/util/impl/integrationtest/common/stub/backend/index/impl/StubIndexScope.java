@@ -23,7 +23,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.StubSearchSortBuilderFactory;
 
-class StubIndexScope implements IndexScope<StubQueryElementCollector> {
+public class StubIndexScope implements IndexScope<StubQueryElementCollector> {
 	private final StubSearchPredicateBuilderFactory predicateFactory;
 	private final StubSearchSortBuilderFactory sortFactory;
 	private final StubSearchProjectionBuilderFactory projectionFactory;
