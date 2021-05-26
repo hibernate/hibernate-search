@@ -30,8 +30,7 @@ public class LocalHeapQueueProcessor implements BatchedWorkProcessor {
 
 	private Session session;
 	private AutomaticIndexingQueueEventProcessingPlan plan;
-	private CompletableFuture<MultiEntityOperationExecutionReport<EntityReference>> batchReportFuture;
-	private List<LocalHeapQueueIndexingEvent> eventsInBatch = new ArrayList<>();
+	private final List<LocalHeapQueueIndexingEvent> eventsInBatch = new ArrayList<>();
 
 	public LocalHeapQueueProcessor(AutomaticIndexingMappingContext mapping) {
 		this.mapping = mapping;
@@ -43,7 +42,6 @@ public class LocalHeapQueueProcessor implements BatchedWorkProcessor {
 			session = mapping.sessionFactory().openSession();
 			plan = mapping.createIndexingQueueEventProcessingPlan( session );
 		}
-		batchReportFuture = new CompletableFuture<>();
 	}
 
 	public void process(LocalHeapQueueIndexingEvent event) {
@@ -106,7 +104,7 @@ public class LocalHeapQueueProcessor implements BatchedWorkProcessor {
 		else if ( report.throwable().isPresent() ) {
 			// Something failed, but we know which entities are affected.
 			Throwable reportThrowable = report.throwable().get();
-			reportSpecificEntitiesIndexingFailure( throwable, report.failingEntityReferences() );
+			reportSpecificEntitiesIndexingFailure( reportThrowable, report.failingEntityReferences() );
 		}
 	}
 
