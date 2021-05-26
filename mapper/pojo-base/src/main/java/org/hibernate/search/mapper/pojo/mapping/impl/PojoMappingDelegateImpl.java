@@ -117,7 +117,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	@Override
 	public PojoIndexingQueueEventProcessingPlan createEventProcessingPlan(PojoWorkSessionContext context,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		return new PojoIndexingQueueEventProcessingPlanImpl( indexedTypeManagers, context,
+		return new PojoIndexingQueueEventProcessingPlanImpl( indexedTypeManagers, containedTypeManagers, context,
 				new PojoIndexingPlanImpl( indexedTypeManagers, containedTypeManagers, context,
 						new PojoIndexingPlanEventProcessingStrategy( commitStrategy, refreshStrategy ) ) );
 	}
