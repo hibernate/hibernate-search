@@ -67,8 +67,7 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 		ConfigurationService service = serviceRegistry.getService( ConfigurationService.class );
 
 		Object customIndexingStrategy = service.getSettings().get( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY );
-		if ( customIndexingStrategy == null ||
-				!AutomaticIndexingStrategyNames.OUTBOX_POLLING.equals( customIndexingStrategy ) ) {
+		if ( !AutomaticIndexingStrategyNames.OUTBOX_POLLING.equals( customIndexingStrategy ) ) {
 			return Collections.emptyList();
 		}
 
@@ -79,7 +78,6 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 		BufferedInputStream bufferedInputStream = new BufferedInputStream( byteArrayInputStream );
 		Binding binding = mappingBinder.bind( bufferedInputStream, origin );
 
-		@SuppressWarnings("unchecked")
 		JaxbHbmHibernateMapping root = (JaxbHbmHibernateMapping) binding.getRoot();
 
 		MappingDocument mappingDocument = new MappingDocument( root, origin, buildingContext );
