@@ -30,8 +30,7 @@ public class OutboxEventProcessingPlan {
 	private final FailureHandler failureHandler;
 	private final EntityReferenceFactory<EntityReference> entityReferenceFactory;
 	private final List<OutboxEvent> events;
-	private final Map<OutboxEventReference, List<OutboxEvent>> failedEvents = new HashMap<>();
-	private final List<Integer> eventsIds;
+	private final List<OutboxEvent> failedEvents = new ArrayList<>();
 
 	public OutboxEventProcessingPlan(AutomaticIndexingMappingContext mapping, Session session,
 			List<OutboxEvent> events) {
@@ -39,10 +38,9 @@ public class OutboxEventProcessingPlan {
 		this.failureHandler = mapping.failureHandler();
 		this.entityReferenceFactory = mapping.entityReferenceFactory();
 		this.events = events;
-		this.eventsIds = new ArrayList<>( events.size() );
 	}
 
-	List<Integer> processEvents() {
+	void processEvents() {
 		try {
 			addEventsToThePlan();
 			reportBackendResult( Futures.unwrappedExceptionGet( processingPlan.executeAndReport() ) );
@@ -53,11 +51,13 @@ public class OutboxEventProcessingPlan {
 			}
 			reportMapperFailure( throwable );
 		}
-
-		return eventsIds;
 	}
 
-	Map<OutboxEventReference, List<OutboxEvent>> getFailedEvents() {
+	List<OutboxEvent> getEvents() {
+		return events;
+	}
+
+	List<OutboxEvent> getFailedEvents() {
 		return failedEvents;
 	}
 
@@ -77,9 +77,6 @@ public class OutboxEventProcessingPlan {
 
 	private void addEventsToThePlan() {
 		for ( OutboxEvent event : events ) {
-			// Do this first, so that we're sure to delete the event after it's been processed.
-			// In case of failure, a new "retry" event is created.
-			eventsIds.add( event.getId() );
 			DocumentRoutesDescriptor routes = getRoutes( event );
 
 			switch ( event.getType() ) {
@@ -104,7 +101,7 @@ public class OutboxEventProcessingPlan {
 		try {
 			// Something failed, but we don't know what.
 			// Assume all events failed.
-			reportAllEventsFailure( throwable, getEventsByReferences() );
+			reportAllEventsFailure( throwable );
 		}
 		catch (Throwable t) {
 			throwable.addSuppressed( t );
@@ -129,7 +126,7 @@ public class OutboxEventProcessingPlan {
 			);
 
 			builder.entityReference( entityReference );
-			failedEvents.put( outboxEventReference, eventsMap.get( outboxEventReference ) );
+			failedEvents.addAll( eventsMap.get( outboxEventReference ) );
 		}
 		failureHandler.handle( builder.build() );
 	}
@@ -144,16 +141,14 @@ public class OutboxEventProcessingPlan {
 		}
 	}
 
-	private void reportAllEventsFailure(Throwable throwable, Map<OutboxEventReference, List<OutboxEvent>> eventsMap) {
-		failedEvents.putAll( eventsMap );
+	private void reportAllEventsFailure(Throwable throwable) {
+		failedEvents.addAll( events );
 		EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
 		builder.throwable( throwable );
 		builder.failingOperation( "Processing an outbox event." );
 
-		for ( List<OutboxEvent> events : eventsMap.values() ) {
-			for ( OutboxEvent event : events ) {
-				builder.entityReference( entityReference( event.getEntityName(), event.getEntityId(), throwable ) );
-			}
+		for ( OutboxEvent event : events ) {
+			builder.entityReference( entityReference( event.getEntityName(), event.getEntityId(), throwable ) );
 		}
 		failureHandler.handle( builder.build() );
 	}

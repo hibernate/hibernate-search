@@ -40,7 +40,13 @@ class FilteringOutboxEventFinder implements OutboxEventFinder {
 				"select e from OutboxEvent e where e.id in :ids order by e.id", OutboxEvent.class );
 		query.setMaxResults( maxResults );
 		query.setParameter( "ids", allowedIds );
-		return query.list();
+		List<OutboxEvent> returned = query.list();
+		// Only return each event once.
+		// This is important because in the case of a retry, the same event will be reused.
+		for ( OutboxEvent outboxEvent : returned ) {
+			allowedIds.remove( outboxEvent.getId() );
+		}
+		return returned;
 	}
 
 	public synchronized FilteringOutboxEventFinder enableFilter(boolean enable) {
