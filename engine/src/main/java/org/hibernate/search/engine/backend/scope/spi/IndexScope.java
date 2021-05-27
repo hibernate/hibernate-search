@@ -6,11 +6,13 @@
  */
 package org.hibernate.search.engine.backend.scope.spi;
 
+import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
+import org.hibernate.search.util.common.SearchException;
 
 /**
  * The scope of an index-related operation, aware of the targeted indexes and of the underlying technology (backend).
@@ -28,5 +30,18 @@ public interface IndexScope<C> {
 	SearchProjectionBuilderFactory searchProjectionFactory();
 
 	SearchAggregationBuilderFactory<? super C> searchAggregationFactory();
+
+	/**
+	 * Extend the current index scope with the given extension,
+	 * resulting in an extended index scope offering backend-specific utilities.
+	 *
+	 * @param extension The extension to apply.
+	 * @param <T> The type of index scope provided by the extension.
+	 * @return The extended index scope.
+	 * @throws SearchException If the extension cannot be applied (wrong underlying technology, ...).
+	 */
+	default <T> T extension(IndexScopeExtension<T> extension) {
+		return extension.extendOrFail( this );
+	}
 
 }
