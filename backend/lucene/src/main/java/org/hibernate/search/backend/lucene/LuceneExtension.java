@@ -21,6 +21,7 @@ import org.hibernate.search.backend.lucene.search.query.dsl.impl.LuceneSearchQue
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScope;
+import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryExtension;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactory;
@@ -80,7 +81,8 @@ public final class LuceneExtension<H, R, E, LOS>
 		SearchSortFactoryExtension<LuceneSearchSortFactory>,
 		SearchProjectionFactoryExtension<LuceneSearchProjectionFactory<R, E>, R, E>,
 		SearchAggregationFactoryExtension<LuceneSearchAggregationFactory>,
-		IndexFieldTypeFactoryExtension<LuceneIndexFieldTypeFactory> {
+		IndexFieldTypeFactoryExtension<LuceneIndexFieldTypeFactory>,
+		IndexScopeExtension<org.hibernate.search.backend.lucene.scope.LuceneIndexScope> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -226,6 +228,19 @@ public final class LuceneExtension<H, R, E, LOS>
 	public LuceneIndexFieldTypeFactory extendOrFail(IndexFieldTypeFactory original) {
 		if ( original instanceof LuceneIndexFieldTypeFactory ) {
 			return (LuceneIndexFieldTypeFactory) original;
+		}
+		else {
+			throw log.luceneExtensionOnUnknownType( original );
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public org.hibernate.search.backend.lucene.scope.LuceneIndexScope extendOrFail(IndexScope<?> original) {
+		if ( original instanceof org.hibernate.search.backend.lucene.scope.LuceneIndexScope ) {
+			return (org.hibernate.search.backend.lucene.scope.LuceneIndexScope) original;
 		}
 		else {
 			throw log.luceneExtensionOnUnknownType( original );

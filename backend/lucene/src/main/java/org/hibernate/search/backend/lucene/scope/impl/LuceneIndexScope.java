@@ -6,6 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.scope.impl;
 
+import java.util.Collection;
+import java.util.Set;
+
+import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HibernateSearchMultiReader;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
@@ -19,9 +24,12 @@ import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 
+import org.apache.lucene.index.IndexReader;
+
 
 public class LuceneIndexScope
-		implements IndexScope<LuceneSearchQueryElementCollector> {
+		implements IndexScope<LuceneSearchQueryElementCollector>,
+		org.hibernate.search.backend.lucene.scope.LuceneIndexScope {
 
 	private final LuceneSearchContext searchContext;
 	private final LuceneSearchPredicateBuilderFactoryImpl searchPredicateFactory;
@@ -73,5 +81,12 @@ public class LuceneIndexScope
 	@Override
 	public SearchAggregationBuilderFactory<? super LuceneSearchQueryElementCollector> searchAggregationFactory() {
 		return searchAggregationFactory;
+	}
+
+	@Override
+	public IndexReader openIndexReader(Set<String> routingKeys) {
+		Set<String> indexNames = searchContext.indexes().indexNames();
+		Collection<? extends LuceneSearchIndexContext> indexManagerContexts = searchContext.indexes().elements();
+		return HibernateSearchMultiReader.open( indexNames, indexManagerContexts, routingKeys );
 	}
 }
