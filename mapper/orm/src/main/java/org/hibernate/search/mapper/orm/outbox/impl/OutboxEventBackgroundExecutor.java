@@ -194,6 +194,7 @@ public class OutboxEventBackgroundExecutor {
 					minRetries + 1
 			);
 			session.persist( eventRetry );
+			log.automaticIndexingRetry( eventRetry.getEntityName(), eventRetry.getEntityId(), eventRetry.getRetries() );
 		}
 	}
 

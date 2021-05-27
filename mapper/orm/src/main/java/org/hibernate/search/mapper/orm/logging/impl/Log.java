@@ -234,4 +234,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 45, value = "Max '%1$s' retries exhausted to process the event. Event will be lost.")
 	SearchException maxRetryExhausted(int retries);
 
+	@LogMessage(level = WARN)
+	@Message(id = ID_OFFSET + 46, value = "Automatic indexing failed for entity of type '%1$s' with ID '%2$s'. Will try again soon. Attempts so far: %3$d.")
+	void automaticIndexingRetry(String entityName, String entityId, int attempts);
 }
