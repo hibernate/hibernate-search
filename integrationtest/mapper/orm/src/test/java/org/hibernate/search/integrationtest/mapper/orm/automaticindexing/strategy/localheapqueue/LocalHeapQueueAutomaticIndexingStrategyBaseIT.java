@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.localheapqueue;
+package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.strategy.localheapqueue;
 
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.AutomaticIndexingStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
@@ -30,7 +30,9 @@ import org.junit.runner.RunWith;
 @ClasspathSuite.ClassnameFilters({
 		// Just execute all automatic indexing tests
 		"org.hibernate.search.integrationtest.mapper.orm.automaticindexing..*",
-		// ... except these tests that just cannot work with the local-heap queue strategy
+		// ... except tests designed for a particular strategy:
+		"!org.hibernate.search.integrationtest.mapper.orm.automaticindexing.strategy..*",
+		// ... and except these tests that just cannot work with the local-heap queue strategy:
 		// > Synchronization strategies can only be used with the "session" automatic indexing strategy
 		"!org.hibernate.search.integrationtest.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyIT",
 		// > Sending events outside of transactions, during a flush, doesn't work for some reason;
