@@ -7,10 +7,8 @@
 package org.hibernate.search.mapper.orm.outbox.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -27,11 +25,8 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingMappingContext;
 import org.hibernate.search.mapper.orm.common.impl.TransactionHelper;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.route.DocumentRouteDescriptor;
-import org.hibernate.search.mapper.pojo.route.DocumentRoutesDescriptor;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
 public class OutboxEventBackgroundExecutor {
 
@@ -122,9 +117,8 @@ public class OutboxEventBackgroundExecutor {
 					// Process the events
 					OutboxEventProcessingPlan eventProcessing = new OutboxEventProcessingPlan(
 							mapping, session, events );
-					List<Integer> ids = eventProcessing.processEvents();
-					createOutboxRetries( failureHandler, session, eventProcessing );
-					deleteOutboxes( session, ids );
+					eventProcessing.processEvents();
+					updateOrDeleteEvents( failureHandler, session, eventProcessing );
 				}
 				catch (Exception e) {
 					try {
@@ -174,85 +168,47 @@ public class OutboxEventBackgroundExecutor {
 		}
 	}
 
-	private static void createOutboxRetries(FailureHandler failureHandler, Session session,
+	private static void updateOrDeleteEvents(FailureHandler failureHandler, Session session,
 			OutboxEventProcessingPlan processingPlan) {
-		for ( Map.Entry<OutboxEventReference, List<OutboxEvent>> entry : processingPlan.getFailedEvents().entrySet() ) {
-			int minRetries = minRetries( entry.getValue() );
-			if ( minRetries >= MAX_RETRIES ) {
+		List<Integer> eventToDeleteIds = new ArrayList<>();
+		for ( OutboxEvent event : processingPlan.getEvents() ) {
+			eventToDeleteIds.add( event.getId() );
+		}
+
+		for ( OutboxEvent failedEvent : processingPlan.getFailedEvents() ) {
+			if ( failedEvent.getRetries() >= MAX_RETRIES ) {
 				EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
 				SearchException exception = log.maxRetryExhausted( MAX_RETRIES );
 				builder.throwable( exception );
 				builder.failingOperation( "Processing an outbox event." );
 				builder.entityReference( processingPlan.entityReference(
-						entry.getKey().getEntityName(), entry.getKey().getEntityId(), exception ) );
+						failedEvent.getEntityName(), failedEvent.getEntityId(), exception ) );
 				failureHandler.handle( builder.build() );
-				continue;
 			}
-			OutboxEvent eventRetry = new OutboxEvent(
-					mergeTypes( entry.getValue() ), entry.getKey().getEntityName(), entry.getKey().getEntityId(),
-					mergeDocumentRoutes( entry.getValue() ),
-					minRetries + 1
-			);
-			session.persist( eventRetry );
-			log.automaticIndexingRetry( eventRetry.getEntityName(), eventRetry.getEntityId(), eventRetry.getRetries() );
-		}
-	}
+			else {
+				// This is slow, but we don't expect failures often, so that's fine.
+				eventToDeleteIds.remove( failedEvent.getId() );
 
-	private static int minRetries(List<OutboxEvent> events) {
-		int min = MAX_RETRIES;
-		for ( OutboxEvent event : events ) {
-			min = Math.min( event.getRetries(), min );
-		}
-		return min;
-	}
+				failedEvent.setRetries( failedEvent.getRetries() + 1 );
+				if ( OutboxEvent.Type.ADD.equals( failedEvent.getType() ) ) {
+					// The document may have been added,
+					// but the event marked as failed due to some general failure in this batch of events.
+					// Let's make sure the next try will not create a duplicate document.
+					failedEvent.setType( OutboxEvent.Type.ADD_OR_UPDATE );
+				}
 
-	private static void deleteOutboxes(Session session, List<Integer> ids) {
+				log.automaticIndexingRetry( failedEvent.getId(),
+						failedEvent.getEntityName(), failedEvent.getEntityId(), failedEvent.getRetries() );
+			}
+		}
+
 		Query<?> query = session.createQuery( "delete from OutboxEvent e where e.id in :ids" );
-		query.setParameter( "ids", ids );
+		query.setParameter( "ids", eventToDeleteIds );
 		query.executeUpdate();
 
 		session.flush();
 		session.clear();
 	}
 
-	private static byte[] mergeDocumentRoutes(List<OutboxEvent> events) {
-		if ( events.isEmpty() ) {
-			return null;
-		}
-
-		if ( events.size() == 1 ) {
-			return events.get( 0 ).getDocumentRoutes();
-		}
-
-		DocumentRouteDescriptor currentRoute = null;
-		Collection<DocumentRouteDescriptor> previousRoutes = new HashSet<>();
-
-		for ( OutboxEvent event : events ) {
-			DocumentRoutesDescriptor routes = SerializationUtils.deserialize(
-					DocumentRoutesDescriptor.class, event.getDocumentRoutes() );
-
-			// Which route becomes the current one doesn't really matter,
-			// because it will be considered a "previous" route when actually indexing later,
-			// and the current route will be re-computed using the routing bridge.
-			// This whole loop is mostly important to keep track of previous routes
-			// that the routing bridge might not generate properly at indexing time,
-			// because the state of the entity will not be available (deletes)
-			// or will have changed too much (multiple subsequent updates changing the route multiple times).
-			currentRoute = routes.currentRoute();
-			previousRoutes.add( routes.currentRoute() );
-			previousRoutes.addAll( routes.previousRoutes() );
-		}
-
-		return SerializationUtils.serialize( DocumentRoutesDescriptor.of( currentRoute, previousRoutes ) );
-	}
-
-	private static OutboxEvent.Type mergeTypes(List<OutboxEvent> events) {
-		for ( OutboxEvent event : events ) {
-			if ( !OutboxEvent.Type.DELETE.equals( event.getType() ) ) {
-				return OutboxEvent.Type.ADD_OR_UPDATE;
-			}
-		}
-		return OutboxEvent.Type.DELETE;
-	}
 }
 
