@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.strate
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.AutomaticIndexingStrategyExpectations;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,6 +53,10 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock )
 			.automaticIndexingStrategy( AutomaticIndexingStrategyExpectations.outboxPolling() );
 
+	private final FilteringOutboxEventFinder outboxEventFinder = new FilteringOutboxEventFinder()
+			// Disable the filter by default: only some of the tests actually need it.
+			.enableFilter( false );
+
 	private SessionFactory sessionFactory;
 	private TestFailureHandler failureHandler;
 
@@ -60,6 +66,7 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 		failureHandler = new TestFailureHandler();
 		sessionFactory = ormSetupHelper.start()
 				.withProperty( "hibernate.search.background_failure_handler", failureHandler )
+				.withProperty( "hibernate.search.automatic_indexing.outbox_event_finder", outboxEventFinder )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
@@ -198,6 +205,70 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 
 		EntityIndexingFailureContext entityFailure = entityFailures.get( 0 );
 		checkId2EntityEventFailure( entityFailure );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4230")
+	public void backendFailure_failedDeleteThenAdd() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setIndexedField( "initialValue" );
+			session.persist( entity1 );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.add( "1", b -> b
+							.field( "indexedField", "initialValue" ) )
+					.createdThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		outboxEventFinder.enableFilter( true );
+
+		// Delete the entity (but don't trigger indexing yet: events are being filtered)
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = session.load( IndexedEntity.class, 1 );
+			session.delete( entity1 );
+		} );
+
+		// Remember the events at this point
+		List<Integer> eventIdsUpToDelete = new ArrayList<>();
+		withinTransaction( sessionFactory, session -> {
+			eventIdsUpToDelete.addAll( outboxEventFinder.findOutboxEventIdsNoFilter( session ) );
+		} );
+
+		// Re-create the entity (but don't trigger indexing yet: events are being filtered)
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedEntity entity1 = new IndexedEntity();
+			entity1.setId( 1 );
+			entity1.setIndexedField( "updatedValue" );
+			session.persist( entity1 );
+		} );
+
+		// This is the point of this test:
+		// simulate the processing of the delete (which fails) then the second add (which succeeds),
+		// and also the processing of the delete event's retry (which succeeds).
+		// The retry needs to be processed before the add, otherwise the entity will be missing from the index.
+
+		// Delete (failure, schedules a retry)
+		CompletableFuture<?> failingFuture = new CompletableFuture<>();
+		failingFuture.completeExceptionally( new SimulatedFailure( "Delete work on #1 failed!" ) );
+		backendMock.expectWorks( IndexedEntity.INDEX )
+				.delete( "1" )
+				.createdThenExecuted( failingFuture );
+		outboxEventFinder.showOnlyEvents( eventIdsUpToDelete );
+		backendMock.verifyExpectationsMet();
+
+		List<EntityIndexingFailureContext> entityFailures = failureHandler.entityFailures.get( 1 );
+		awaitFor( () -> assertThat( entityFailures ).hasSize( 1 ) );
+
+		// Delete retry + add
+		backendMock.expectWorks( IndexedEntity.INDEX )
+				.addOrUpdate( "1", b -> b
+						.field( "indexedField", "updatedValue" ) )
+				.createdThenExecuted();
+		outboxEventFinder.enableFilter( false );
+		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
