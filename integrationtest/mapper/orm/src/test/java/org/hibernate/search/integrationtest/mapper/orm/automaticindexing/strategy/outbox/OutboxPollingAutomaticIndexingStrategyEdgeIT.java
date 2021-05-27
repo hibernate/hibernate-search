@@ -337,75 +337,6 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 	}
 
 	@Test
-	public void backendFailure_threeFailuresOfTheSameIndexingWork() {
-		OrmUtils.withinTransaction( sessionFactory, session -> {
-			IndexedEntity entity1 = new IndexedEntity();
-			entity1.setId( 1 );
-			entity1.setIndexedField( "initialValue" );
-			session.persist( entity1 );
-
-			IndexedEntity entity2 = new IndexedEntity();
-			entity2.setId( 2 );
-			entity2.setIndexedField( "initialValue" );
-			session.persist( entity2 );
-
-			IndexedEntity entity3 = new IndexedEntity();
-			entity3.setId( 3 );
-			entity3.setIndexedField( "initialValue" );
-			session.persist( entity3 );
-
-			CompletableFuture<?> failingFuture = new CompletableFuture<>();
-			failingFuture.completeExceptionally( new SimulatedFailure( "Indexing work #2 failed!" ) );
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.add( "1", b -> b
-							.field( "indexedField", "initialValue" )
-					)
-					.add( "3", b -> b
-							.field( "indexedField", "initialValue" )
-					)
-					.createdThenExecuted();
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.add( "2", b -> b
-							.field( "indexedField", "initialValue" )
-					)
-					.createdThenExecuted( failingFuture );
-
-			// retry:
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.addOrUpdate( "2", b -> b
-							.field( "indexedField", "initialValue" )
-					)
-					.createdThenExecuted( failingFuture );
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.addOrUpdate( "2", b -> b
-							.field( "indexedField", "initialValue" )
-					)
-					.createdThenExecuted( failingFuture );
-
-			// finally it works:
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.addOrUpdate( "2", b -> b
-							.field( "indexedField", "initialValue" )
-					)
-					.createdThenExecuted();
-
-		} );
-		backendMock.verifyExpectationsMet();
-
-		assertThat( failureHandler.genericFailures ).isEmpty();
-
-		List<EntityIndexingFailureContext> entityFailures = failureHandler.entityFailures.get( 2 );
-		awaitFor( () -> assertThat( entityFailures ).hasSize( 3 ) );
-
-		for ( int i = 0; i < 3; i++ ) {
-			EntityIndexingFailureContext entityFailure = entityFailures.get( i );
-			checkId2EntityEventFailure( entityFailure );
-		}
-	}
-
-	@Test
 	public void backendFailure_numberOfTrialsExhausted() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
@@ -452,11 +383,6 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 							.field( "indexedField", "initialValue" )
 					)
 					.createdThenExecuted( failingFuture );
-			backendMock.expectWorks( IndexedEntity.INDEX )
-					.addOrUpdate( "2", b -> b
-							.field( "indexedField", "initialValue" )
-					)
-					.createdThenExecuted( failingFuture );
 
 			// no more retry
 		} );
@@ -465,14 +391,14 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 		assertThat( failureHandler.genericFailures ).isEmpty();
 
 		List<EntityIndexingFailureContext> entityFailures = failureHandler.entityFailures.get( 2 );
-		awaitFor( () -> assertThat( entityFailures ).hasSize( 5 ) );
+		awaitFor( () -> assertThat( entityFailures ).hasSize( 4 ) );
 
-		for ( int i = 0; i < 4; i++ ) {
+		for ( int i = 0; i < 3; i++ ) {
 			EntityIndexingFailureContext entityFailure = entityFailures.get( i );
 			checkId2EntityEventFailure( entityFailure );
 		}
 
-		EntityIndexingFailureContext entityFailure = entityFailures.get( 4 );
+		EntityIndexingFailureContext entityFailure = entityFailures.get( 3 );
 		assertThat( entityFailure.failingOperation() ).isEqualTo( "Processing an outbox event." );
 		assertThat( entityFailure.throwable() )
 				.isInstanceOf( SearchException.class )

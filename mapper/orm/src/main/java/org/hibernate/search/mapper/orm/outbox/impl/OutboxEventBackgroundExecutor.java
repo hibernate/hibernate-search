@@ -176,7 +176,8 @@ public class OutboxEventBackgroundExecutor {
 		}
 
 		for ( OutboxEvent failedEvent : processingPlan.getFailedEvents() ) {
-			if ( failedEvent.getRetries() >= MAX_RETRIES ) {
+			int attempts = failedEvent.getRetries() + 1;
+			if ( attempts >= MAX_RETRIES ) {
 				EntityIndexingFailureContext.Builder builder = EntityIndexingFailureContext.builder();
 				SearchException exception = log.maxRetryExhausted( MAX_RETRIES );
 				builder.throwable( exception );
@@ -189,7 +190,7 @@ public class OutboxEventBackgroundExecutor {
 				// This is slow, but we don't expect failures often, so that's fine.
 				eventToDeleteIds.remove( failedEvent.getId() );
 
-				failedEvent.setRetries( failedEvent.getRetries() + 1 );
+				failedEvent.setRetries( attempts );
 				if ( OutboxEvent.Type.ADD.equals( failedEvent.getType() ) ) {
 					// The document may have been added,
 					// but the event marked as failed due to some general failure in this batch of events.
@@ -198,7 +199,7 @@ public class OutboxEventBackgroundExecutor {
 				}
 
 				log.automaticIndexingRetry( failedEvent.getId(),
-						failedEvent.getEntityName(), failedEvent.getEntityId(), failedEvent.getRetries() );
+						failedEvent.getEntityName(), failedEvent.getEntityId(), attempts );
 			}
 		}
 
