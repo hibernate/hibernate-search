@@ -1217,3 +1217,34 @@ include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/indexmana
 <4> Compute the index size and get the result.
 <5> An asynchronous version of the method is also available.
 ====
+
+== Retrieving low-level Lucene `IndexReader`
+
+The low-level `IndexReader` can be retrieved from the `LuceneIndexScope`.
+
+.Retrieving the index reader from a Lucene index scope
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/lowlevel/LuceneLowLevelIndexReaderIT.java[tags=indexReader]
+----
+<1> Retrieve the `SearchMapping`.
+<2> Retrieve the `LuceneIndexScope` extending the search scope with the `LuceneExtension`.
+<3> Open an instance of `IndexReader`. Optionally it is possible to provide the routing keys
+to filter the visibility of the returning index reader using the method `openIndexReader(Set<String>)`.
+====
+
+[NOTE]
+====
+The returned IndexReader is read only; writing directly to the index is discouraged.
+====
+
+[IMPORTANT]
+====
+The returned IndexReader instance must be closed after its use by the client.
+====
+
+[WARNING]
+====
+This api bypasses the filtering by tenantId, so results from all tenants will be always visible.
+====
