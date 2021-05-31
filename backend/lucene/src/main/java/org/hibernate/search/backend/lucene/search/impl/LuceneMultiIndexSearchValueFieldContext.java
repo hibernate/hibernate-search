@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.search.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -125,12 +124,6 @@ public class LuceneMultiIndexSearchValueFieldContext<F>
 	public ProjectionConverter<F, F> rawProjectionConverter() {
 		return getFromTypeIfCompatible( LuceneSearchValueFieldTypeContext::rawProjectionConverter,
 				ProjectionConverter::isCompatibleWith, "rawProjectionConverter" );
-	}
-
-	@Override
-	public Optional<String> searchAnalyzerName() {
-		return getFromTypeIfCompatible( LuceneSearchValueFieldTypeContext::searchAnalyzerName, Object::equals,
-				"searchAnalyzer" );
 	}
 
 	@Override
