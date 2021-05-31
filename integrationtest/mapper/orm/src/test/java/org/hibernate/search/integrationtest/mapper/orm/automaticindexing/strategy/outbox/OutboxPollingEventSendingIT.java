@@ -38,7 +38,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class OutboxPollingNoProcessingIT {
+public class OutboxPollingEventSendingIT {
 
 	@Rule
 	public BackendMock backendMock = new BackendMock();
@@ -71,6 +71,7 @@ public class OutboxPollingNoProcessingIT {
 		);
 		backendMock.expectSchema( IndexedAndContainedEntity.NAME, b -> b
 				.field( "text", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
+				.field( "nonIndexedEmbeddedText", String.class, f -> f.analyzerName( AnalyzerNames.DEFAULT ) )
 		);
 
 		sessionFactory = ormSetupHelper.start()
@@ -217,6 +218,210 @@ public class OutboxPollingNoProcessingIT {
 			assertThat( outboxEntries ).hasSize( 4 );
 			verifyOutboxEntry( outboxEntries.get( 3 ), IndexedAndContainedEntity.NAME, "2",
 					OutboxEvent.Type.DELETE, null );
+		} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4141")
+	public void updateIndexedEmbeddedField_contained() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
+			ContainedEntity contained = new ContainedEntity( 2, "initial" );
+			containing.setContained( contained );
+			contained.setContaining( containing );
+			session.persist( containing );
+			session.persist( contained );
+		} );
+
+		// Wait for insert processing to happen
+		backendMock.expectWorks( IndexedAndContainingEntity.NAME )
+				.add( "1", b -> b
+						.field( "text", "initial" )
+						.objectField( "contained", b2 -> b2
+								.field( "text", "initial" ) ) )
+				.createdThenExecuted();
+		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		backendMock.verifyExpectationsMet();
+		// Processing the insert events shouldn't yield more events
+		backendMock.indexingWorkThreadingExpectations().awaitIndexingAssertions( () -> {
+			OrmUtils.withinTransaction( sessionFactory, session -> {
+				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
+				assertThat( outboxEntries ).isEmpty();
+			} );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity entity = session.load( ContainedEntity.class, 2 );
+			entity.setText( "updated" );
+		} );
+
+		// Processing the update event should yield more events for containing entities
+		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		backendMock.indexingWorkThreadingExpectations().awaitIndexingAssertions( () -> {
+			OrmUtils.withinTransaction( sessionFactory, session -> {
+				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
+				assertThat( outboxEntries ).hasSize( 1 );
+				verifyOutboxEntry( outboxEntries.get( 0 ), IndexedAndContainingEntity.NAME, "1",
+						OutboxEvent.Type.ADD_OR_UPDATE, null );
+			} );
+		} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4141")
+	public void updateIndexedEmbeddedField_indexedAndContained() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
+			IndexedAndContainedEntity contained = new IndexedAndContainedEntity( 2, "initial" );
+			containing.setIndexedAndContained( contained );
+			contained.setContaining( containing );
+			session.persist( containing );
+			session.persist( contained );
+		} );
+
+		// Wait for insert processing to happen
+		backendMock.expectWorks( IndexedAndContainingEntity.NAME )
+				.add( "1", b -> b
+						.field( "text", "initial" )
+						.objectField( "indexedAndContained", b2 -> b2
+								.field( "text", "initial" ) ) )
+				.createdThenExecuted();
+		backendMock.expectWorks( IndexedAndContainedEntity.NAME )
+				.add( "2", b -> b
+						.field( "text", "initial" )
+						.field( "nonIndexedEmbeddedText", "initial" ) )
+				.createdThenExecuted();
+		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		backendMock.verifyExpectationsMet();
+		// Processing the insert events shouldn't yield more events
+		backendMock.indexingWorkThreadingExpectations().awaitIndexingAssertions( () -> {
+			OrmUtils.withinTransaction( sessionFactory, session -> {
+				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
+				assertThat( outboxEntries ).isEmpty();
+			} );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedAndContainedEntity entity = session.load( IndexedAndContainedEntity.class, 2 );
+			entity.setText( "updated" );
+		} );
+
+		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		backendMock.expectWorks( IndexedAndContainedEntity.NAME )
+				.addOrUpdate( "2", b -> b
+						.field( "text", "updated" )
+						.field( "nonIndexedEmbeddedText", "initial" ) )
+				.createdThenExecuted();
+		backendMock.verifyExpectationsMet();
+		// Processing the update event should yield more events for containing entities
+		backendMock.indexingWorkThreadingExpectations().awaitIndexingAssertions( () -> {
+			OrmUtils.withinTransaction( sessionFactory, session -> {
+				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
+				assertThat( outboxEntries ).hasSize( 1 );
+				verifyOutboxEntry( outboxEntries.get( 0 ), IndexedAndContainingEntity.NAME, "1",
+						OutboxEvent.Type.ADD_OR_UPDATE, null );
+			} );
+		} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4141")
+	public void updateNonIndexedEmbeddedField_contained() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
+			ContainedEntity contained = new ContainedEntity( 2, "initial" );
+			containing.setContained( contained );
+			contained.setContaining( containing );
+			session.persist( containing );
+			session.persist( contained );
+		} );
+
+		// Wait for insert processing to happen
+		backendMock.expectWorks( IndexedAndContainingEntity.NAME )
+				.add( "1", b -> b
+						.field( "text", "initial" )
+						.objectField( "contained", b2 -> b2
+								.field( "text", "initial" ) ) )
+				.createdThenExecuted();
+		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		backendMock.verifyExpectationsMet();
+		// Processing the insert events shouldn't yield more events
+		backendMock.indexingWorkThreadingExpectations().awaitIndexingAssertions( () -> {
+			OrmUtils.withinTransaction( sessionFactory, session -> {
+				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
+				assertThat( outboxEntries ).isEmpty();
+			} );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			ContainedEntity entity = session.load( ContainedEntity.class, 2 );
+			entity.setNonIndexedEmbeddedText( "updated" );
+		} );
+
+		// Processing this update event shouldn't yield more events,
+		// because the changed field is not indexed-embedded.
+		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		backendMock.indexingWorkThreadingExpectations().awaitIndexingAssertions( () -> {
+			OrmUtils.withinTransaction( sessionFactory, session -> {
+				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
+				assertThat( outboxEntries ).isEmpty();
+			} );
+		} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4141")
+	public void updateNonIndexedEmbeddedField_indexedAndContained() {
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedAndContainingEntity containing = new IndexedAndContainingEntity( 1, "initial" );
+			IndexedAndContainedEntity contained = new IndexedAndContainedEntity( 2, "initial" );
+			containing.setIndexedAndContained( contained );
+			contained.setContaining( containing );
+			session.persist( containing );
+			session.persist( contained );
+		} );
+
+		// Wait for insert processing to happen
+		backendMock.expectWorks( IndexedAndContainingEntity.NAME )
+				.add( "1", b -> b
+						.field( "text", "initial" )
+						.objectField( "indexedAndContained", b2 -> b2
+								.field( "text", "initial" ) ) )
+				.createdThenExecuted();
+		backendMock.expectWorks( IndexedAndContainedEntity.NAME )
+				.add( "2", b -> b
+						.field( "text", "initial" )
+						.field( "nonIndexedEmbeddedText", "initial" ) )
+				.createdThenExecuted();
+		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		backendMock.verifyExpectationsMet();
+		// Processing the insert events shouldn't yield more events
+		backendMock.indexingWorkThreadingExpectations().awaitIndexingAssertions( () -> {
+			OrmUtils.withinTransaction( sessionFactory, session -> {
+				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
+				assertThat( outboxEntries ).isEmpty();
+			} );
+		} );
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			IndexedAndContainedEntity entity = session.load( IndexedAndContainedEntity.class, 2 );
+			entity.setNonIndexedEmbeddedText( "updated" );
+		} );
+
+		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
+		backendMock.expectWorks( IndexedAndContainedEntity.NAME )
+				.addOrUpdate( "2", b -> b
+						.field( "text", "initial" )
+						.field( "nonIndexedEmbeddedText", "updated" ) )
+				.createdThenExecuted();
+		backendMock.verifyExpectationsMet();
+		// Processing this update event shouldn't yield more events,
+		// because the changed field is not indexed-embedded.
+		backendMock.indexingWorkThreadingExpectations().awaitIndexingAssertions( () -> {
+			OrmUtils.withinTransaction( sessionFactory, session -> {
+				List<OutboxEvent> outboxEntries = outboxEventFinder.findOutboxEventsNoFilter( session );
+				assertThat( outboxEntries ).isEmpty();
+			} );
 		} );
 	}
 
@@ -391,10 +596,10 @@ public class OutboxPollingNoProcessingIT {
 		@FullTextField
 		private String text;
 		@OneToOne(mappedBy = "containing")
-		@IndexedEmbedded
+		@IndexedEmbedded(includePaths = "text")
 		private ContainedEntity contained;
 		@OneToOne(mappedBy = "containing")
-		@IndexedEmbedded
+		@IndexedEmbedded(includePaths = "text")
 		private IndexedAndContainedEntity indexedAndContained;
 
 		public IndexedAndContainingEntity() {
@@ -445,6 +650,8 @@ public class OutboxPollingNoProcessingIT {
 		private Integer id;
 		@FullTextField
 		private String text;
+		@FullTextField
+		private String nonIndexedEmbeddedText;
 		@OneToOne
 		private IndexedAndContainingEntity containing;
 
@@ -454,6 +661,7 @@ public class OutboxPollingNoProcessingIT {
 		public ContainedEntity(Integer id, String text) {
 			this.id = id;
 			this.text = text;
+			this.nonIndexedEmbeddedText = text;
 		}
 
 		public Integer getId() {
@@ -466,6 +674,14 @@ public class OutboxPollingNoProcessingIT {
 
 		public void setText(String text) {
 			this.text = text;
+		}
+
+		public String getNonIndexedEmbeddedText() {
+			return nonIndexedEmbeddedText;
+		}
+
+		public void setNonIndexedEmbeddedText(String nonIndexedEmbeddedText) {
+			this.nonIndexedEmbeddedText = nonIndexedEmbeddedText;
 		}
 
 		public IndexedAndContainingEntity getContaining() {
@@ -488,6 +704,8 @@ public class OutboxPollingNoProcessingIT {
 		private Integer id;
 		@FullTextField
 		private String text;
+		@FullTextField
+		private String nonIndexedEmbeddedText;
 		@OneToOne
 		private IndexedAndContainingEntity containing;
 
@@ -497,6 +715,7 @@ public class OutboxPollingNoProcessingIT {
 		public IndexedAndContainedEntity(Integer id, String text) {
 			this.id = id;
 			this.text = text;
+			this.nonIndexedEmbeddedText = text;
 		}
 
 		public Integer getId() {
@@ -509,6 +728,14 @@ public class OutboxPollingNoProcessingIT {
 
 		public void setText(String text) {
 			this.text = text;
+		}
+
+		public String getNonIndexedEmbeddedText() {
+			return nonIndexedEmbeddedText;
+		}
+
+		public void setNonIndexedEmbeddedText(String nonIndexedEmbeddedText) {
+			this.nonIndexedEmbeddedText = nonIndexedEmbeddedText;
 		}
 
 		public IndexedAndContainingEntity getContaining() {
