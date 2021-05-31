@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.search.impl;
 
-import java.util.Optional;
-
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -51,8 +49,6 @@ public interface LuceneSearchValueFieldTypeContext<F> {
 	}
 
 	<T> LuceneSearchValueFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key);
-
-	Optional<String> searchAnalyzerName();
 
 	Analyzer searchAnalyzerOrNormalizer();
 
