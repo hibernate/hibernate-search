@@ -62,20 +62,20 @@ public final class PojoProjectionHitMapper<R, E> implements ProjectionHitMapper<
 		loadingPlan.loadBlocking( deadline );
 		if ( targetTypesByEntityName.size() == 1 ) {
 			// Optimization, see planLoading().
-			return new PojoSingleTypeLoadingResult<>( documentReferenceConverter,
+			return new SingleTypeLoadingResult<>( documentReferenceConverter,
 					targetTypesByEntityName.values().iterator().next(), loadingPlan );
 		}
 		else {
-			return new PojoMultiTypeLoadingResult<>( documentReferenceConverter, loadingPlan );
+			return new MultiTypeLoadingResult<>( documentReferenceConverter, loadingPlan );
 		}
 	}
 
-	private static class PojoSingleTypeLoadingResult<R, E> implements LoadingResult<R, E> {
+	private static class SingleTypeLoadingResult<R, E> implements LoadingResult<R, E> {
 		private final DocumentReferenceConverter<R> documentReferenceConverter;
 		private final PojoSearchLoadingIndexedTypeContext<? extends E> type;
 		private final PojoLoadingPlan<E> loadingPlan;
 
-		private PojoSingleTypeLoadingResult(DocumentReferenceConverter<R> documentReferenceConverter,
+		private SingleTypeLoadingResult(DocumentReferenceConverter<R> documentReferenceConverter,
 				PojoSearchLoadingIndexedTypeContext<? extends E> type,
 				PojoLoadingPlan<E> loadingPlan) {
 			this.documentReferenceConverter = documentReferenceConverter;
@@ -94,11 +94,11 @@ public final class PojoProjectionHitMapper<R, E> implements ProjectionHitMapper<
 		}
 	}
 
-	private static class PojoMultiTypeLoadingResult<R, E> implements LoadingResult<R, E> {
+	private static class MultiTypeLoadingResult<R, E> implements LoadingResult<R, E> {
 		private final DocumentReferenceConverter<R> documentReferenceConverter;
 		private final PojoLoadingPlan<E> loadingPlan;
 
-		private PojoMultiTypeLoadingResult(DocumentReferenceConverter<R> documentReferenceConverter,
+		private MultiTypeLoadingResult(DocumentReferenceConverter<R> documentReferenceConverter,
 				PojoLoadingPlan<E> loadingPlan) {
 			this.documentReferenceConverter = documentReferenceConverter;
 			this.loadingPlan = loadingPlan;

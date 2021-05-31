@@ -43,7 +43,7 @@ public final class PojoIdentifierBridgeDocumentIdentifierValueConverter<I> imple
 
 	@Override
 	public String convertToDocument(I value, ToDocumentIdentifierValueConvertContext context) {
-		IdentifierBridgeToDocumentIdentifierContext extension = context.extension( PojoToDocumentIdentifierBridgeContextExtension.INSTANCE );
+		IdentifierBridgeToDocumentIdentifierContext extension = context.extension( ContextExtension.INSTANCE );
 		return bridge.toDocumentIdentifier( value, extension );
 	}
 
@@ -61,8 +61,8 @@ public final class PojoIdentifierBridgeDocumentIdentifierValueConverter<I> imple
 
 	@Override
 	public I convertToSource(String documentId, FromDocumentIdentifierValueConvertContext context) {
-		IdentifierBridgeFromDocumentIdentifierContext identifierContext = context.extension(
-				PojoFromDocumentIdentifierBridgeContextExtension.INSTANCE );
+		IdentifierBridgeFromDocumentIdentifierContext identifierContext =
+				context.extension( ContextExtension.INSTANCE );
 
 		return bridge.fromDocumentIdentifier( documentId, identifierContext );
 	}
@@ -78,9 +78,10 @@ public final class PojoIdentifierBridgeDocumentIdentifierValueConverter<I> imple
 				&& bridge.isCompatibleWith( castedOther.bridge );
 	}
 
-	private static class PojoToDocumentIdentifierBridgeContextExtension
-			implements ToDocumentIdentifierValueConvertContextExtension<IdentifierBridgeToDocumentIdentifierContext> {
-		private static final PojoToDocumentIdentifierBridgeContextExtension INSTANCE = new PojoToDocumentIdentifierBridgeContextExtension();
+	private static class ContextExtension
+			implements ToDocumentIdentifierValueConvertContextExtension<IdentifierBridgeToDocumentIdentifierContext>,
+					FromDocumentIdentifierValueConvertContextExtension<IdentifierBridgeFromDocumentIdentifierContext> {
+		private static final ContextExtension INSTANCE = new ContextExtension();
 
 		@Override
 		public Optional<IdentifierBridgeToDocumentIdentifierContext> extendOptional(
@@ -94,11 +95,6 @@ public final class PojoIdentifierBridgeDocumentIdentifierValueConverter<I> imple
 				return Optional.empty();
 			}
 		}
-	}
-
-	private static class PojoFromDocumentIdentifierBridgeContextExtension
-			implements FromDocumentIdentifierValueConvertContextExtension<IdentifierBridgeFromDocumentIdentifierContext> {
-		private static final PojoFromDocumentIdentifierBridgeContextExtension INSTANCE = new PojoFromDocumentIdentifierBridgeContextExtension();
 
 		@Override
 		public Optional<IdentifierBridgeFromDocumentIdentifierContext> extendOptional(
