@@ -464,19 +464,32 @@
     </constraint>
 
     <constraint id="hsearch:TypesShouldUseImplSuffixWithRestraint">
+        <requiresConcept refId="java:Deprecated" />
         <requiresConcept refId="hsearch:TypeMetadata" />
+        <requiresConcept refId="hsearch:Anonymous" />
+        <requiresConcept refId="hsearch:Generated" />
         <requiresConcept refId="hsearch:Main" />
         <requiresConcept refId="hsearch:HibernateSearch" />
         <description>
             The 'Impl' suffix should only be used when naming classes that are the only implementation
             for a given Hibernate Search interface (excluding its own subclasses).
             Whenever multiple implementations exist, a more meaningful name should be given to the implementation.
+            Exceptions are allowed when:
+            - the implementing type is an anonymous type or a generated type;
+            - or the implementing type is deprecated;
+            - or the implemented type is deprecated;
+            - or the implementing type is an inner/nested type.
         </description>
         <cypher><![CDATA[
             // Hibernate Search classes named "<prefix>Impl"
             MATCH (implementingTypeEndingWithImpl:Class:Main:HibernateSearch)
             WHERE
                 implementingTypeEndingWithImpl.nameWithoutContainingTypeName =~ ".*Impl$"
+                // Exceptions
+                AND NOT implementingTypeEndingWithImpl:Anonymous
+                AND NOT implementingTypeEndingWithImpl:Deprecated
+                AND NOT implementingTypeEndingWithImpl:Generated
+                AND NOT implementingTypeEndingWithImpl.nameWithoutContainingTypeName <> implementingTypeEndingWithImpl.name
             // The interface they implement, named "<prefix>" (if any)
             OPTIONAL MATCH (implementingTypeEndingWithImpl)-[:IMPLEMENTS|EXTENDS *]->(implementedType:Interface:HibernateSearch)
             WHERE
@@ -488,10 +501,11 @@
             WITH implementingTypeEndingWithImpl, implementedType, count(distinct topLevelImplementingType) AS topLevelImplementingTypeCount
             WHERE
                 implementedType IS NULL OR topLevelImplementingTypeCount > 1
+                // Exceptions
+                AND NOT implementedType:Deprecated
             RETURN implementingTypeEndingWithImpl, implementedType
         ]]></cypher>
     </constraint>
-
 
     <constraint id="hsearch:AbstractTypesShouldUseAbstractPrefix">
         <requiresConcept refId="hsearch:TypeMetadata" />
@@ -542,7 +556,7 @@
             - the misnamed type is an anonymous type or a generated type;
             - or the misnamed type is deprecated;
             - or the implemented type is deprecated;
-            - or the misnamed type is an inner/nested type whose name ends with ".*Builder"
+            - or the implementing type is an inner/nested type;
             and its surrounding type does use the module-specific keyword;
             - or the implemented type is in a util module,
             in which case the implemented interface may just be a detail.
@@ -562,7 +576,7 @@
                 AND NOT externalParentType:Deprecated
                 AND NOT misnamedType:Generated
                 AND NOT (
-                        misnamedType.nameWithoutContainingTypeName ENDS WITH "Builder"
+                        misnamedType.nameWithoutContainingTypeName <> misnamedType.name
                         AND misnamedType.name =~ ("^(Abstract)?\\Q" + misnamedTypeArtifact.moduleSpecificKeyword + "\\E.*")
                 )
                 AND NOT externalParentTypeArtifact.name STARTS WITH "hibernate-search-util-"
