@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.strategy.outbox;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.search.integrationtest.mapper.orm.automaticindexing.strategy.outbox.OutboxPollingNoProcessingIT.verifyOutboxEntry;
+import static org.hibernate.search.integrationtest.mapper.orm.automaticindexing.strategy.outbox.OutboxPollingEventSendingIT.verifyOutboxEntry;
 
 import java.util.List;
 import javax.persistence.Basic;

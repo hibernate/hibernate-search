@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing.strate
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.hibernate.search.integrationtest.mapper.orm.automaticindexing.strategy.outbox.OutboxPollingNoProcessingIT.verifyOutboxEntry;
+import static org.hibernate.search.integrationtest.mapper.orm.automaticindexing.strategy.outbox.OutboxPollingEventSendingIT.verifyOutboxEntry;
 import static org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils.withinTransaction;
 import static org.junit.Assume.assumeTrue;
 

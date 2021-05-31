@@ -79,7 +79,7 @@ public class BackendMock implements TestRule {
 		indexingWorkThreadingExpectations = expectations;
 	}
 
-	private BackendWorkThreadingExpectations indexingWorkThreadingExpectations() {
+	public BackendWorkThreadingExpectations indexingWorkThreadingExpectations() {
 		return indexingWorkThreadingExpectations;
 	}
 
