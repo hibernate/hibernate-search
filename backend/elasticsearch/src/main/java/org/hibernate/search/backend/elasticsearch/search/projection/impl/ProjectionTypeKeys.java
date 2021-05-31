@@ -8,13 +8,14 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 
 public final class ProjectionTypeKeys {
 
 	private ProjectionTypeKeys() {
 	}
 
-	public static final SearchQueryElementTypeKey<ElasticsearchFieldProjection.TypeSelector<?>> FIELD = key( "field" );
+	public static final SearchQueryElementTypeKey<FieldProjectionBuilder.TypeSelector> FIELD = key( "field" );
 	public static final SearchQueryElementTypeKey<DistanceToFieldProjectionBuilder> DISTANCE = key( "distance" );
 
 	private static <T> SearchQueryElementTypeKey<T> key(String name) {

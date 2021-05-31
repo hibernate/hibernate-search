@@ -148,7 +148,7 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		return result;
 	}
 
-	public abstract static class AbstractTypeSelector<F> {
+	abstract static class AbstractTypeSelector<F> implements TermsAggregationBuilder.TypeSelector {
 		protected final LuceneSearchContext searchContext;
 		protected final LuceneSearchValueFieldContext<F> field;
 
@@ -157,6 +157,7 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 			this.field = field;
 		}
 
+		@Override
 		public abstract <K> AbstractBuilder<F, ?, K> type(Class<K> expectedType, ValueConvert convert);
 	}
 

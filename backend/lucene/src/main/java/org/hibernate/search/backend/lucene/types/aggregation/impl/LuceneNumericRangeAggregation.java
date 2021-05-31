@@ -86,8 +86,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 	}
 
 	public static class Factory<F>
-			extends
-			AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<TypeSelector<?>, F, AbstractLuceneNumericFieldCodec<F, ?>> {
+			extends AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<RangeAggregationBuilder.TypeSelector, F, AbstractLuceneNumericFieldCodec<F, ?>> {
 		public Factory(AbstractLuceneNumericFieldCodec<F, ?> codec) {
 			super( codec );
 		}
@@ -98,7 +97,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		}
 	}
 
-	public static class TypeSelector<F> {
+	public static class TypeSelector<F> implements RangeAggregationBuilder.TypeSelector {
 		private final AbstractLuceneNumericFieldCodec<F, ?> codec;
 		private final LuceneSearchContext searchContext;
 		private final LuceneSearchValueFieldContext<F> field;
@@ -110,6 +109,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 			this.field = field;
 		}
 
+		@Override
 		public <K> Builder<F, ?, K> type(Class<K> expectedType, ValueConvert convert) {
 			return new Builder<>( codec, searchContext, field,
 					field.type().dslConverter( convert ).withInputType( expectedType, field ) );

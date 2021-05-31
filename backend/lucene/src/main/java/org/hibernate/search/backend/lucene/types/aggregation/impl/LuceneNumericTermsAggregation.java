@@ -18,6 +18,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldCon
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 
 import org.apache.lucene.facet.FacetResult;
@@ -98,8 +99,7 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 	}
 
 	public static class Factory<F>
-			extends
-			AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<AbstractTypeSelector<?>, F, AbstractLuceneNumericFieldCodec<F, ?>> {
+			extends AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<TermsAggregationBuilder.TypeSelector, F, AbstractLuceneNumericFieldCodec<F, ?>> {
 		public Factory(AbstractLuceneNumericFieldCodec<F, ?> codec) {
 			super( codec );
 		}
@@ -110,7 +110,7 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 		}
 	}
 
-	public static class TypeSelector<F> extends AbstractTypeSelector<F> {
+	private static class TypeSelector<F> extends AbstractTypeSelector<F> {
 		private final AbstractLuceneNumericFieldCodec<F, ?> codec;
 
 		private TypeSelector(AbstractLuceneNumericFieldCodec<F, ?> codec,
@@ -126,7 +126,7 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 		}
 	}
 
-	public static class Builder<F, E extends Number, K>
+	private static class Builder<F, E extends Number, K>
 			extends AbstractBuilder<F, E, K> {
 
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
