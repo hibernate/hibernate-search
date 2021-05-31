@@ -74,7 +74,7 @@ public class ElasticsearchRangeAggregation<F, K>
 	}
 
 	public static class Factory<F>
-			extends AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory<TypeSelector<?>, F> {
+			extends AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory<RangeAggregationBuilder.TypeSelector, F> {
 		public Factory(ElasticsearchFieldCodec<F> codec) {
 			super( codec );
 		}
@@ -86,7 +86,7 @@ public class ElasticsearchRangeAggregation<F, K>
 		}
 	}
 
-	public static class TypeSelector<F> {
+	private static class TypeSelector<F> implements RangeAggregationBuilder.TypeSelector {
 		private final ElasticsearchFieldCodec<F> codec;
 		private final ElasticsearchSearchContext searchContext;
 		private final ElasticsearchSearchValueFieldContext<F> field;
@@ -98,13 +98,14 @@ public class ElasticsearchRangeAggregation<F, K>
 			this.field = field;
 		}
 
+		@Override
 		public <T> Builder<F, T> type(Class<T> expectedType, ValueConvert convert) {
 			return new Builder<>( codec, searchContext, field,
 					field.type().dslConverter( convert ).withInputType( expectedType, field ) );
 		}
 	}
 
-	public static class Builder<F, K> extends AbstractBuilder<Range<K>, Long>
+	private static class Builder<F, K> extends AbstractBuilder<Range<K>, Long>
 			implements RangeAggregationBuilder<K> {
 
 		private final ElasticsearchFieldCodec<F> codec;

@@ -6,9 +6,14 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 
 public interface FieldProjectionBuilder<T> extends SearchProjectionBuilder<T> {
+
+	interface TypeSelector {
+		<T> FieldProjectionBuilder<T> type(Class<T> expectedType, ValueConvert convert);
+	}
 
 	@Override
 	default SearchProjection<T> build() {

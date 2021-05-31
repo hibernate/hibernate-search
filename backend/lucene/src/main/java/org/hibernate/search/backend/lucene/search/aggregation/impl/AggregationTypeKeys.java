@@ -7,16 +7,16 @@
 package org.hibernate.search.backend.lucene.search.aggregation.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.SearchQueryElementTypeKey;
-import org.hibernate.search.backend.lucene.types.aggregation.impl.AbstractLuceneFacetsBasedTermsAggregation;
-import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneNumericRangeAggregation;
+import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
+import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 
 public final class AggregationTypeKeys {
 
 	private AggregationTypeKeys() {
 	}
 
-	public static final SearchQueryElementTypeKey<AbstractLuceneFacetsBasedTermsAggregation.AbstractTypeSelector<?>> TERMS = key( "terms" );
-	public static final SearchQueryElementTypeKey<LuceneNumericRangeAggregation.TypeSelector<?>> RANGE = key( "range" );
+	public static final SearchQueryElementTypeKey<TermsAggregationBuilder.TypeSelector> TERMS = key( "terms" );
+	public static final SearchQueryElementTypeKey<RangeAggregationBuilder.TypeSelector> RANGE = key( "range" );
 
 	private static <T> SearchQueryElementTypeKey<T> key(String name) {
 		return SearchQueryElementTypeKey.of( "aggregation", name );

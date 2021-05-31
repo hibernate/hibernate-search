@@ -8,13 +8,14 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 
 public final class ProjectionTypeKeys {
 
 	private ProjectionTypeKeys() {
 	}
 
-	public static final SearchQueryElementTypeKey<LuceneFieldProjection.TypeSelector<?>> FIELD = key( "field" );
+	public static final SearchQueryElementTypeKey<FieldProjectionBuilder.TypeSelector> FIELD = key( "field" );
 	public static final SearchQueryElementTypeKey<DistanceToFieldProjectionBuilder> DISTANCE = key( "distance" );
 
 	private static <T> SearchQueryElementTypeKey<T> key(String name) {

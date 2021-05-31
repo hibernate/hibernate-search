@@ -158,7 +158,7 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 	}
 
 	public static class Factory<F>
-			extends AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory<TypeSelector<?>, F> {
+			extends AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory<FieldProjectionBuilder.TypeSelector, F> {
 		public Factory(ElasticsearchFieldCodec<F> codec) {
 			super( codec );
 		}
@@ -170,7 +170,7 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 		}
 	}
 
-	public static class TypeSelector<F> {
+	public static class TypeSelector<F> implements FieldProjectionBuilder.TypeSelector {
 		private final ElasticsearchFieldCodec<F> codec;
 		private final ElasticsearchSearchContext searchContext;
 		private final ElasticsearchSearchValueFieldContext<F> field;
@@ -182,6 +182,7 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 			this.field = field;
 		}
 
+		@Override
 		public <V> Builder<F, V> type(Class<V> expectedType, ValueConvert convert) {
 			return new Builder<>( codec, searchContext, field,
 					field.type().projectionConverter( convert ).withConvertedType( expectedType, field ) );

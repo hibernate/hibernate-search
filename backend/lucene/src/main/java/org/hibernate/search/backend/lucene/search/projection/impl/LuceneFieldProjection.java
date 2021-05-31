@@ -86,8 +86,7 @@ public class LuceneFieldProjection<E, P, F, V> extends AbstractLuceneProjection<
 	}
 
 	public static class Factory<F>
-			extends
-			AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<TypeSelector<?>, F, LuceneFieldCodec<F>> {
+			extends AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<FieldProjectionBuilder.TypeSelector, F, LuceneFieldCodec<F>> {
 		public Factory(LuceneFieldCodec<F> codec) {
 			super( codec );
 		}
@@ -98,7 +97,7 @@ public class LuceneFieldProjection<E, P, F, V> extends AbstractLuceneProjection<
 		}
 	}
 
-	public static class TypeSelector<F> {
+	private static class TypeSelector<F> implements FieldProjectionBuilder.TypeSelector {
 		private final LuceneFieldCodec<F> codec;
 		private final LuceneSearchContext searchContext;
 		private final LuceneSearchValueFieldContext<F> field;
@@ -110,13 +109,14 @@ public class LuceneFieldProjection<E, P, F, V> extends AbstractLuceneProjection<
 			this.field = field;
 		}
 
+		@Override
 		public <V> Builder<F, V> type(Class<V> expectedType, ValueConvert convert) {
 			return new Builder<>( codec, searchContext, field,
 					field.type().projectionConverter( convert ).withConvertedType( expectedType, field ) );
 		}
 	}
 
-	public static class Builder<F, V> extends AbstractLuceneProjection.AbstractBuilder<V>
+	private static class Builder<F, V> extends AbstractLuceneProjection.AbstractBuilder<V>
 			implements FieldProjectionBuilder<V> {
 
 		private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

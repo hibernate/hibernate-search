@@ -8,10 +8,15 @@ package org.hibernate.search.engine.search.aggregation.spi;
 
 import java.util.Map;
 
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.util.common.data.Range;
 
 public interface RangeAggregationBuilder<K> extends SearchAggregationBuilder<Map<Range<K>, Long>> {
+
+	interface TypeSelector {
+		<K> RangeAggregationBuilder<K> type(Class<K> expectedType, ValueConvert convert);
+	}
 
 	void filter(SearchPredicate filter);
 

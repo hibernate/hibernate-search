@@ -80,7 +80,7 @@ public class ElasticsearchTermsAggregation<F, K>
 	}
 
 	public static class Factory<F>
-			extends AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory<TypeSelector<?>, F> {
+			extends AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory<TermsAggregationBuilder.TypeSelector, F> {
 		public Factory(ElasticsearchFieldCodec<F> codec) {
 			super( codec );
 		}
@@ -92,7 +92,7 @@ public class ElasticsearchTermsAggregation<F, K>
 		}
 	}
 
-	public static class TypeSelector<F> {
+	private static class TypeSelector<F> implements TermsAggregationBuilder.TypeSelector {
 		private final ElasticsearchFieldCodec<F> codec;
 		private final ElasticsearchSearchContext searchContext;
 		private final ElasticsearchSearchValueFieldContext<F> field;
@@ -104,13 +104,14 @@ public class ElasticsearchTermsAggregation<F, K>
 			this.field = field;
 		}
 
+		@Override
 		public <T> Builder<F, T> type(Class<T> expectedType, ValueConvert convert) {
 			return new Builder<>( codec, searchContext, field,
 					field.type().projectionConverter( convert ).withConvertedType( expectedType, field ) );
 		}
 	}
 
-	public static class Builder<F, K> extends AbstractBuilder<K, Long>
+	private static class Builder<F, K> extends AbstractBuilder<K, Long>
 			implements TermsAggregationBuilder<K> {
 
 		private final ElasticsearchFieldCodec<F> codec;
