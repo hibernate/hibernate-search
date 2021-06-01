@@ -34,7 +34,8 @@ public class LocalHeapQueueIndexingEvent implements BatchedWork<LocalHeapQueuePr
 	@Override
 	public String toString() {
 		return "LocalHeapQueueIndexingEvent{" +
-				"eventType=" + eventType +
+				"id=" + System.identityHashCode( this ) +
+				", eventType=" + eventType +
 				", entityName='" + entityName + '\'' +
 				", identifier=" + identifier +
 				'}';

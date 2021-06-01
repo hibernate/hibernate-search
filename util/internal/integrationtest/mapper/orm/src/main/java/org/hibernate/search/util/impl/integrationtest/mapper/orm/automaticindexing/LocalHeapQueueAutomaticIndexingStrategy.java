@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.orm.automaticindexing;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -20,11 +21,15 @@ import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingQu
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategyPreStopContext;
 import org.hibernate.search.mapper.orm.automaticindexing.spi.AutomaticIndexingStrategyStartContext;
+import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventPayload;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.serialization.spi.SerializationUtils;
 
 public class LocalHeapQueueAutomaticIndexingStrategy implements AutomaticIndexingStrategy {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final int MAX_TASKS_PER_BATCH = 10;
 	private static final String NAME = "Local heap queue automatic indexing";
@@ -92,8 +97,10 @@ public class LocalHeapQueueAutomaticIndexingStrategy implements AutomaticIndexin
 		private void plan(LocalHeapQueueIndexingEvent.Type eventType, String entityName, Object identifier,
 				String serializedId, PojoIndexingQueueEventPayload payload) {
 			checkAcceptsEvents();
-			content.add( new LocalHeapQueueIndexingEvent( eventType, entityName, identifier, serializedId,
-					SerializationUtils.serialize( payload ) ) );
+			LocalHeapQueueIndexingEvent event = new LocalHeapQueueIndexingEvent( eventType, entityName, identifier,
+					serializedId, SerializationUtils.serialize( payload ) );
+			log.tracef( "Planning to send %s from %s", event, this );
+			content.add( event );
 		}
 
 		@Override
@@ -105,6 +112,7 @@ public class LocalHeapQueueAutomaticIndexingStrategy implements AutomaticIndexin
 		public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> sendAndReport(
 				EntityReferenceFactory<R> entityReferenceFactory) {
 			MultiEntityOperationExecutionReport.Builder<R> builder = MultiEntityOperationExecutionReport.builder();
+			log.tracef( "Sending %s from %s", content, this );
 			for ( LocalHeapQueueIndexingEvent event : content ) {
 				try {
 					executor.submit( event );
