@@ -15,7 +15,7 @@ import org.apache.lucene.index.IndexReader;
  * The {@code LuceneIndexScope} exposes {@link IndexReader}s directly, making it possible to query the Lucene
  * indexes directly bypassing Hibernate Search.
  * <p>
- * The returned IndexReader instances are always read-only and must be closed
+ * The returned IndexReader instances must be closed
  * using the {@link IndexReader#close()} method.
  * <p>
  * This API is intended for power users intending to extract information directly.
@@ -25,20 +25,14 @@ import org.apache.lucene.index.IndexReader;
 public interface LuceneIndexScope {
 
 	/**
-	 * Opens an IndexReader on all indexes containing the entities of the search scope.
-	 * In the simplest case if the scope has one entity, it will map to a single index; if the entity
-	 * uses a sharding strategy or if multiple entities using different index names are selected,
-	 * the single IndexReader will act as a MultiReader on the aggregate of these indexes.
-	 * This MultiReader is not filtered by Hibernate Search, so it might contain information
-	 * relevant to different types as well.
-	 * <p>
-	 * The returned IndexReader is read only; writing directly to the index is discouraged.
+	 * Opens an IndexReader for all indexes containing the entities of the search scope.
 	 * <p>
 	 * The instance must be closed after its use by the client of this class using {@link IndexReader#close()}.
 	 * <p>
-	 * By default, if routing is not configured, all shards will be queried.
-	 * If you need to filter by routing keys use {@link #openIndexReader(Set)}.
-	 * This api bypasses the filtering by tenantId, so results from all tenants will be always visible.
+	 * If sharding is enabled, the returned reader will read all shards.
+	 * If you need to read specific shards only, use {@link #openIndexReader(Set)}.
+	 * <p>
+	 * <strong>WARNING:</strong> Even if multi-tenancy is enabled, the returned reader exposes documents of *all* tenants.
 	 *
 	 * @return an IndexReader containing the entities of the index scope
 	 */
@@ -47,19 +41,12 @@ public interface LuceneIndexScope {
 	}
 
 	/**
-	 * Opens an IndexReader on all indexes containing the entities of the search scope.
-	 * In the simplest case if the scope has one entity, it will map to a single index; if the entity
-	 * uses a sharding strategy or if multiple entities using different index names are selected,
-	 * the single IndexReader will act as a MultiReader on the aggregate of these indexes.
-	 * This MultiReader is not filtered by Hibernate Search, so it might contain information
-	 * relevant to different types as well.
-	 * <p>
-	 * The returned IndexReader is read only; writing directly to the index is discouraged.
+	 * Opens an IndexReader on shards assigned to the given routing keys
+	 * for all indexes containing the entities of the search scope.
 	 * <p>
 	 * The instance must be closed after its use by the client of this class using {@link IndexReader#close()}.
 	 * <p>
-	 * Only the shards having keys contained in {@code routingKeys} will be visible to the reader.
-	 * This api bypasses the filtering by tenantId, so results from all tenants will be always visible.
+	 * <strong>WARNING:</strong> Even if multi-tenancy is enabled, the returned reader exposes documents of *all* tenants.
 	 *
 	 * @param routingKeys A collection containing zero, one or multiple string keys.
 	 * @return an IndexReader containing the entities of the index scope
