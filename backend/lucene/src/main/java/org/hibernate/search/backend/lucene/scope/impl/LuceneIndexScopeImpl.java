@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HibernateSearchMultiReader;
+import org.hibernate.search.backend.lucene.scope.LuceneIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregationBuilderFactory;
@@ -27,9 +28,8 @@ import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuild
 import org.apache.lucene.index.IndexReader;
 
 
-public class LuceneIndexScope
-		implements IndexScope<LuceneSearchQueryElementCollector>,
-		org.hibernate.search.backend.lucene.scope.LuceneIndexScope {
+public class LuceneIndexScopeImpl
+		implements IndexScope<LuceneSearchQueryElementCollector>, LuceneIndexScope {
 
 	private final LuceneSearchContext searchContext;
 	private final LuceneSearchPredicateBuilderFactoryImpl searchPredicateFactory;
@@ -38,7 +38,7 @@ public class LuceneIndexScope
 	private final LuceneSearchProjectionBuilderFactory searchProjectionFactory;
 	private final LuceneSearchAggregationBuilderFactory searchAggregationFactory;
 
-	public LuceneIndexScope(SearchBackendContext backendContext,
+	public LuceneIndexScopeImpl(SearchBackendContext backendContext,
 			BackendMappingContext mappingContext,
 			LuceneSearchIndexesContext indexes) {
 		this.searchContext = backendContext.createSearchContext( mappingContext, indexes );

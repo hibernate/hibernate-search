@@ -11,7 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScope;
+import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScopeImpl;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeSearchIndexesContext;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
@@ -49,7 +49,7 @@ class LuceneIndexScopeBuilder implements IndexScopeBuilder {
 	public IndexScope<?> build() {
 		LuceneScopeSearchIndexesContext model = new LuceneScopeSearchIndexesContext( indexManagers );
 
-		return new LuceneIndexScope( backendContext, mappingContext, model );
+		return new LuceneIndexScopeImpl( backendContext, mappingContext, model );
 	}
 
 	@Override

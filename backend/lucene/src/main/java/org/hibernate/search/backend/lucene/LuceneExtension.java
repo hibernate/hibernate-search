@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
+import org.hibernate.search.backend.lucene.scope.LuceneIndexScope;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.search.aggregation.dsl.LuceneSearchAggregationFactory;
 import org.hibernate.search.backend.lucene.search.aggregation.dsl.impl.LuceneSearchAggregationFactoryImpl;
@@ -20,7 +21,7 @@ import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQuerySel
 import org.hibernate.search.backend.lucene.search.query.dsl.impl.LuceneSearchQuerySelectStepImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
-import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScope;
+import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScopeImpl;
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryExtension;
@@ -82,7 +83,7 @@ public final class LuceneExtension<H, R, E, LOS>
 		SearchProjectionFactoryExtension<LuceneSearchProjectionFactory<R, E>, R, E>,
 		SearchAggregationFactoryExtension<LuceneSearchAggregationFactory>,
 		IndexFieldTypeFactoryExtension<LuceneIndexFieldTypeFactory>,
-		IndexScopeExtension<org.hibernate.search.backend.lucene.scope.LuceneIndexScope> {
+		IndexScopeExtension<LuceneIndexScope> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -123,9 +124,9 @@ public final class LuceneExtension<H, R, E, LOS>
 			IndexScope<?> indexScope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
-		if ( indexScope instanceof LuceneIndexScope ) {
+		if ( indexScope instanceof LuceneIndexScopeImpl ) {
 			return Optional.of( new LuceneSearchQuerySelectStepImpl<>(
-					(LuceneIndexScope) indexScope, sessionContext, loadingContextBuilder
+					(LuceneIndexScopeImpl) indexScope, sessionContext, loadingContextBuilder
 			) );
 		}
 		else {
@@ -238,9 +239,9 @@ public final class LuceneExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public org.hibernate.search.backend.lucene.scope.LuceneIndexScope extendOrFail(IndexScope<?> original) {
-		if ( original instanceof org.hibernate.search.backend.lucene.scope.LuceneIndexScope ) {
-			return (org.hibernate.search.backend.lucene.scope.LuceneIndexScope) original;
+	public LuceneIndexScope extendOrFail(IndexScope<?> original) {
+		if ( original instanceof LuceneIndexScope ) {
+			return (LuceneIndexScope) original;
 		}
 		else {
 			throw log.luceneExtensionOnUnknownType( original );
