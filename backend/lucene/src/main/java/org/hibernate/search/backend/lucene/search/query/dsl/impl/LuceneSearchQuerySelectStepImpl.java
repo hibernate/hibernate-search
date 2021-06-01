@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryOpt
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryWhereStep;
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQuerySelectStep;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
-import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScope;
+import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScopeImpl;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -38,11 +38,11 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 				>
 		implements LuceneSearchQuerySelectStep<R, E, LOS> {
 
-	private final LuceneIndexScope indexScope;
+	private final LuceneIndexScopeImpl indexScope;
 	private final BackendSessionContext sessionContext;
 	private final SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder;
 
-	public LuceneSearchQuerySelectStepImpl(LuceneIndexScope indexScope,
+	public LuceneSearchQuerySelectStepImpl(LuceneIndexScopeImpl indexScope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		this.indexScope = indexScope;
@@ -99,7 +99,7 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 	}
 
 	@Override
-	protected LuceneIndexScope indexScope() {
+	protected LuceneIndexScopeImpl indexScope() {
 		return indexScope;
 	}
 
