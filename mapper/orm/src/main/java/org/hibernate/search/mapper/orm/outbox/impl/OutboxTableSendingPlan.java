@@ -77,18 +77,23 @@ public class OutboxTableSendingPlan implements AutomaticIndexingQueueEventSendin
 
 	private <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> sendAndReportOnSession(
 			Session currentSession, EntityReferenceFactory<R> entityReferenceFactory) {
-		MultiEntityOperationExecutionReport.Builder<R> builder = MultiEntityOperationExecutionReport.builder();
-		for ( OutboxEvent event : events ) {
-			try {
-				currentSession.persist( event );
+		try {
+			MultiEntityOperationExecutionReport.Builder<R> builder = MultiEntityOperationExecutionReport.builder();
+			for ( OutboxEvent event : events ) {
+				try {
+					currentSession.persist( event );
+				}
+				catch (RuntimeException e) {
+					builder.throwable( e );
+					builder.failingEntityReference(
+							entityReferenceFactory, event.getEntityName(), event.getOriginalEntityId() );
+				}
 			}
-			catch (RuntimeException e) {
-				builder.throwable( e );
-				builder.failingEntityReference(
-						entityReferenceFactory, event.getEntityName(), event.getOriginalEntityId() );
-			}
+			currentSession.flush();
+			return CompletableFuture.completedFuture( builder.build() );
 		}
-		currentSession.flush();
-		return CompletableFuture.completedFuture( builder.build() );
+		finally {
+			events.clear();
+		}
 	}
 }

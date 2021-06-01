@@ -111,19 +111,24 @@ public class LocalHeapQueueAutomaticIndexingStrategy implements AutomaticIndexin
 		@Override
 		public <R> CompletableFuture<MultiEntityOperationExecutionReport<R>> sendAndReport(
 				EntityReferenceFactory<R> entityReferenceFactory) {
-			MultiEntityOperationExecutionReport.Builder<R> builder = MultiEntityOperationExecutionReport.builder();
-			log.tracef( "Sending %s from %s", content, this );
-			for ( LocalHeapQueueIndexingEvent event : content ) {
-				try {
-					executor.submit( event );
-					checkAcceptsEvents();
+			try {
+				MultiEntityOperationExecutionReport.Builder<R> builder = MultiEntityOperationExecutionReport.builder();
+				log.tracef( "Sending %s from %s", content, this );
+				for ( LocalHeapQueueIndexingEvent event : content ) {
+					try {
+						executor.submit( event );
+						checkAcceptsEvents();
+					}
+					catch (RuntimeException | InterruptedException e) {
+						builder.throwable( e );
+						builder.failingEntityReference( entityReferenceFactory, event.entityName, event.identifier );
+					}
 				}
-				catch (RuntimeException | InterruptedException e) {
-					builder.throwable( e );
-					builder.failingEntityReference( entityReferenceFactory, event.entityName, event.identifier );
-				}
+				return CompletableFuture.completedFuture( builder.build() );
 			}
-			return CompletableFuture.completedFuture( builder.build() );
+			finally {
+				content.clear();
+			}
 		}
 
 		private void checkAcceptsEvents() {
