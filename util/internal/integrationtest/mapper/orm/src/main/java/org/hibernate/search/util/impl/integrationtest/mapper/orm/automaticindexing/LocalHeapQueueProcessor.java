@@ -40,8 +40,8 @@ public class LocalHeapQueueProcessor implements BatchedWorkProcessor {
 	public void beginBatch() {
 		if ( session == null ) {
 			session = mapping.sessionFactory().openSession();
-			plan = mapping.createIndexingQueueEventProcessingPlan( session );
 		}
+		plan = mapping.createIndexingQueueEventProcessingPlan( session );
 	}
 
 	public void process(LocalHeapQueueIndexingEvent event) {
