@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.search.impl;
 
 import java.util.List;
 
+import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
 
 /**

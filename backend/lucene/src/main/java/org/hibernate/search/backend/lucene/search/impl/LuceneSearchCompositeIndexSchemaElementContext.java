@@ -8,6 +8,8 @@ package org.hibernate.search.backend.lucene.search.impl;
 
 import java.util.Map;
 
+import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
+
 /**
  * Information about a composite index element targeted by search; either the index root or an object field.
  * <p>
@@ -21,6 +23,7 @@ public interface LuceneSearchCompositeIndexSchemaElementContext extends LuceneSe
 
 	boolean nested();
 
-	<T> LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key);
+	<T> LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(
+			SearchQueryElementTypeKey<T> key);
 
 }

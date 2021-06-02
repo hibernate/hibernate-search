@@ -13,6 +13,7 @@ import org.hibernate.search.engine.search.sort.spi.CompositeSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
+import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
