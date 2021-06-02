@@ -93,6 +93,8 @@ public class LuceneFieldProjection<E, P, F, V> extends AbstractLuceneProjection<
 
 		@Override
 		public TypeSelector<?> create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+			// Fail early if the nested structure differs in the case of multi-index search.
+			field.nestedPathHierarchy();
 			return new TypeSelector<>( codec, scope, field );
 		}
 	}

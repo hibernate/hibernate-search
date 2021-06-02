@@ -191,12 +191,6 @@ public interface Log extends BasicLogger {
 			value = "Invalid search predicate: '%1$s'. You must build the predicate from a Lucene search scope.")
 	SearchException cannotMixLuceneSearchQueryWithOtherPredicates(SearchPredicate predicate);
 
-	@Message(id = ID_OFFSET + 13,
-			value = "Invalid target field: object field '%1$s' is flattened."
-					+ " If you want to use a 'nested' predicate on this field, set its structure to 'NESTED'."
-					+ " Do not forget to reindex all your data after changing the structure.")
-	SearchException nonNestedFieldForNestedQuery(String absoluteFieldPath, @Param EventContext context);
-
 	@Message(id = ID_OFFSET + 14,
 			value = "Invalid search sort: '%1$s'. You must build the sort from a Lucene search scope.")
 	SearchException cannotMixLuceneSearchSortWithOtherSorts(SearchSort sort);
@@ -617,7 +611,9 @@ public interface Log extends BasicLogger {
 	void deprecatedFileSystemAccessStrategy(String accessStrategyName,
 			@FormatWith(EventContextFormatter.class) EventContext eventContext);
 
-	@Message(id = ID_OFFSET + 139, value = "Cannot use '%2$s' on %1$s.")
+	@Message(id = ID_OFFSET + 139, value = "Cannot use '%2$s' on %1$s."
+			+ " If you are trying to use the 'nested' predicate, set the field structure to 'NESTED' and reindex all your data."
+			+ " If you are trying to use another predicate, it probably isn't available for this field")
 	SearchException cannotUseQueryElementForCompositeIndexElement(
 			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext, String queryElementName,
 			@Param EventContext elementContextAsParam);

@@ -222,11 +222,12 @@ public class ElasticsearchDistanceToFieldProjection<E, P> extends AbstractElasti
 	}
 
 	public static class Factory
-			extends
-			AbstractElasticsearchSearchValueFieldQueryElementFactory<DistanceToFieldProjectionBuilder, GeoPoint> {
+			extends AbstractElasticsearchSearchValueFieldQueryElementFactory<DistanceToFieldProjectionBuilder, GeoPoint> {
 		@Override
 		public Builder create(ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<GeoPoint> field) {
+			// Check the compatibility of nested structure in the case of multi-index search.
+			field.nestedPathHierarchy();
 			return new Builder( scope, field );
 		}
 	}
