@@ -134,7 +134,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 		LuceneSearchCompositeIndexSchemaElementContext field = indexes.field( absoluteFieldPath ).toObjectField();
 		if ( !field.nested() ) {
 			throw log.nonNestedFieldForNestedQuery( absoluteFieldPath,
-					EventContexts.fromIndexNames( indexes.indexNames() ) );
+					EventContexts.fromIndexNames( indexes.hibernateSearchIndexNames() ) );
 		}
 		return field.queryElement( PredicateTypeKeys.NESTED, searchContext );
 	}

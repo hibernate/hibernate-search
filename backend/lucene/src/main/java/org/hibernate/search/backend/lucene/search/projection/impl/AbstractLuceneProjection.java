@@ -20,7 +20,7 @@ abstract class AbstractLuceneProjection<E, P> implements LuceneSearchProjection<
 	}
 
 	AbstractLuceneProjection(LuceneSearchContext searchContext) {
-		this.indexNames = searchContext.indexes().indexNames();
+		this.indexNames = searchContext.indexes().hibernateSearchIndexNames();
 	}
 
 	@Override

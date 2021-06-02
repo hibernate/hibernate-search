@@ -48,7 +48,7 @@ abstract class AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext
 	}
 
 	private EventContext indexesEventContext() {
-		return EventContexts.fromIndexNames( indexesContext.indexNames() );
+		return EventContexts.fromIndexNames( indexesContext.hibernateSearchIndexNames() );
 	}
 
 	protected abstract EventContext relativeEventContext();

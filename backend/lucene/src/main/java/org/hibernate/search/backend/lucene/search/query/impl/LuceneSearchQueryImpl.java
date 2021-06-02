@@ -117,7 +117,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	@Override
 	public LuceneSearchScroll<H> scroll(int chunkSize) {
-		Set<String> indexNames = searchContext.indexes().indexNames();
+		Set<String> indexNames = searchContext.indexes().hibernateSearchIndexNames();
 		HibernateSearchMultiReader indexReader = HibernateSearchMultiReader.open(
 				indexNames, searchContext.indexes().elements(), routingKeys );
 		return new LuceneSearchScrollImpl<>( queryOrchestrator, workFactory, searchContext, routingKeys, timeoutManager,
@@ -202,7 +202,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	private <T> T doSubmit(ReadWork<T> work) {
 		return queryOrchestrator.submit(
-				searchContext.indexes().indexNames(),
+				searchContext.indexes().hibernateSearchIndexNames(),
 				searchContext.indexes().elements(),
 				routingKeys,
 				work

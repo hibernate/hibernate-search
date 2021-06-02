@@ -64,7 +64,7 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 	}
 
 	@Override
-	public Set<String> indexNames() {
+	public Set<String> hibernateSearchIndexNames() {
 		return indexNames;
 	}
 

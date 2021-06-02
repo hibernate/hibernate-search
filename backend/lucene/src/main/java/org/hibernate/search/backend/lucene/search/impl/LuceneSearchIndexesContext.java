@@ -19,7 +19,7 @@ public interface LuceneSearchIndexesContext {
 
 	Map<String, ? extends LuceneSearchIndexContext> mappedTypeNameToIndex();
 
-	Set<String> indexNames();
+	Set<String> hibernateSearchIndexNames();
 
 	DocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
 
