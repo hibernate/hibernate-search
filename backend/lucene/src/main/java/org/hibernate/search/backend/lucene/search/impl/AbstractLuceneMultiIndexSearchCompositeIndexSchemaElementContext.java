@@ -25,14 +25,14 @@ abstract class AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneSearchIndexesContext indexesContext;
+	private final LuceneSearchContext searchContext;
 	private final List<LuceneSearchCompositeIndexSchemaElementContext> fieldForEachIndex;
 
 	private Map<String, LuceneSearchIndexSchemaElementContext> staticChildrenByName;
 
-	public AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext(LuceneSearchIndexesContext indexesContext,
+	public AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext(LuceneSearchContext searchContext,
 			List<LuceneSearchCompositeIndexSchemaElementContext> elementForEachIndex) {
-		this.indexesContext = indexesContext;
+		this.searchContext = searchContext;
 		this.fieldForEachIndex = elementForEachIndex;
 	}
 
@@ -48,7 +48,7 @@ abstract class AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext
 	}
 
 	private EventContext indexesEventContext() {
-		return EventContexts.fromIndexNames( indexesContext.hibernateSearchIndexNames() );
+		return EventContexts.fromIndexNames( searchContext.hibernateSearchIndexNames() );
 	}
 
 	protected abstract EventContext relativeEventContext();
@@ -80,7 +80,7 @@ abstract class AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext
 				Object::equals, "staticChildren" );
 
 		Map<String, LuceneSearchIndexSchemaElementContext> result = new TreeMap<>();
-		Function<String, LuceneSearchIndexSchemaElementContext> createChildFieldContext = indexesContext::field;
+		Function<String, LuceneSearchIndexSchemaElementContext> createChildFieldContext = searchContext::field;
 		for ( LuceneSearchCompositeIndexSchemaElementContext fieldContext : fieldForEachIndex ) {
 			for ( LuceneSearchIndexSchemaElementContext child : fieldContext.staticChildrenByName().values() ) {
 				try {

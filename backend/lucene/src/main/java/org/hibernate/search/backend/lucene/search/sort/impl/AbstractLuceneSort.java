@@ -20,7 +20,7 @@ public abstract class AbstractLuceneSort implements LuceneSearchSort {
 	}
 
 	protected AbstractLuceneSort(LuceneSearchContext searchContext) {
-		indexNames = searchContext.indexes().hibernateSearchIndexNames();
+		indexNames = searchContext.hibernateSearchIndexNames();
 	}
 
 	@Override

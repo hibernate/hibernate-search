@@ -91,7 +91,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		this.timeoutManager = timeoutManager;
 		this.scrollTimeout = scrollTimeout;
 		this.totalHitCountThreshold = totalHitCountThreshold;
-		this.maxResultWindow = searchContext.indexes().maxResultWindow();
+		this.maxResultWindow = searchContext.maxResultWindow();
 	}
 
 	@Override
@@ -178,7 +178,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		}
 
 		CountWorkBuilder builder = workFactory.count();
-		for ( ElasticsearchSearchIndexContext index : searchContext.indexes().elements() ) {
+		for ( ElasticsearchSearchIndexContext index : searchContext.indexes() ) {
 			builder.index( index.names().read() );
 		}
 		builder.query( filteredPayload )
@@ -210,7 +210,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		Contracts.assertNotNull( id, "id" );
 
 		Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex =
-				searchContext.indexes().mappedTypeNameToIndex();
+				searchContext.mappedTypeNameToIndex();
 		if ( mappedTypeNameToIndex.size() != 1 ) {
 			throw log.explainRequiresTypeName( mappedTypeNameToIndex.keySet() );
 		}
@@ -224,7 +224,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		Contracts.assertNotNull( id, "id" );
 
 		Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex =
-				searchContext.indexes().mappedTypeNameToIndex();
+				searchContext.mappedTypeNameToIndex();
 		ElasticsearchSearchIndexContext index = mappedTypeNameToIndex.get( typeName );
 		if ( index == null ) {
 			throw log.explainRequiresTypeTargetedByQuery( mappedTypeNameToIndex.keySet(), typeName );
@@ -236,7 +236,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private SearchWorkBuilder<ElasticsearchLoadableSearchResult<H>> searchWorkBuilder() {
 		SearchWorkBuilder<ElasticsearchLoadableSearchResult<H>> builder =
 				workFactory.search( payload, searchResultExtractor );
-		for ( ElasticsearchSearchIndexContext index : searchContext.indexes().elements() ) {
+		for ( ElasticsearchSearchIndexContext index : searchContext.indexes() ) {
 			builder.index( index.names().read() );
 		}
 		builder

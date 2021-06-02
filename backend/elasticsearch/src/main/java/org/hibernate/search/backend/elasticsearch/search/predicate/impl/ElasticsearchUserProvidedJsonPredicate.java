@@ -20,7 +20,7 @@ class ElasticsearchUserProvidedJsonPredicate implements ElasticsearchSearchPredi
 
 	ElasticsearchUserProvidedJsonPredicate(ElasticsearchSearchContext searchContext,
 			JsonObject json) {
-		indexNames = searchContext.indexes().hibernateSearchIndexNames();
+		indexNames = searchContext.hibernateSearchIndexNames();
 		this.json = json;
 	}
 

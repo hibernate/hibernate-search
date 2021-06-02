@@ -11,32 +11,32 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class LuceneDifferentNestedObjectCompatibilityChecker {
 
-	public static LuceneDifferentNestedObjectCompatibilityChecker empty(LuceneSearchIndexesContext indexes) {
-		return new LuceneDifferentNestedObjectCompatibilityChecker( indexes, null, Collections.emptyList() );
+	public static LuceneDifferentNestedObjectCompatibilityChecker empty(LuceneSearchContext searchContext) {
+		return new LuceneDifferentNestedObjectCompatibilityChecker( searchContext, null, Collections.emptyList() );
 	}
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneSearchIndexesContext indexes;
+	private final LuceneSearchContext searchContext;
 	private final String fieldPath;
 	private final List<String> nestedPathHierarchy;
 
-	private LuceneDifferentNestedObjectCompatibilityChecker(LuceneSearchIndexesContext indexes, String fieldPath,
+	private LuceneDifferentNestedObjectCompatibilityChecker(LuceneSearchContext searchContext, String fieldPath,
 			List<String> nestedPathHierarchy) {
-		this.indexes = indexes;
+		this.searchContext = searchContext;
 		this.fieldPath = fieldPath;
 		this.nestedPathHierarchy = nestedPathHierarchy;
 	}
 
 	public LuceneDifferentNestedObjectCompatibilityChecker combineAndCheck(String incomingFieldPath) {
-		List<String> incomingNestedPathHierarchy = indexes.field( incomingFieldPath ).nestedPathHierarchy();
+		List<String> incomingNestedPathHierarchy = searchContext.field( incomingFieldPath ).nestedPathHierarchy();
 		if ( fieldPath == null ) {
-			return new LuceneDifferentNestedObjectCompatibilityChecker( indexes, incomingFieldPath, incomingNestedPathHierarchy );
+			return new LuceneDifferentNestedObjectCompatibilityChecker( searchContext, incomingFieldPath, incomingNestedPathHierarchy );
 		}
 
 		if ( !nestedPathHierarchy.equals( incomingNestedPathHierarchy ) ) {

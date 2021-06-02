@@ -68,9 +68,9 @@ public interface LuceneSearchProjection<E, P> extends SearchProjection<P> {
 			throw log.cannotMixLuceneSearchQueryWithOtherProjections( projection );
 		}
 		LuceneSearchProjection<?, P> casted = (LuceneSearchProjection<?, P>) projection;
-		if ( !searchContext.indexes().hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
+		if ( !searchContext.hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
 			throw log.projectionDefinedOnDifferentIndexes( projection, casted.indexNames(),
-					searchContext.indexes().hibernateSearchIndexNames() );
+					searchContext.hibernateSearchIndexNames() );
 		}
 		return casted;
 	}

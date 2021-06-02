@@ -60,7 +60,7 @@ public class ElasticsearchIdProjection<I> extends AbstractElasticsearchProjectio
 				Class<I> identifierType) {
 			super( searchContext );
 
-			DocumentIdentifierValueConverter<?> identifierValueConverter = searchContext.indexes().idDslConverter(
+			DocumentIdentifierValueConverter<?> identifierValueConverter = searchContext.idDslConverter(
 					ValueConvert.YES );
 
 			// check expected identifier type:

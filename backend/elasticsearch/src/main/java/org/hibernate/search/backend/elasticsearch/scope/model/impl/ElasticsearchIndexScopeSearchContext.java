@@ -14,38 +14,75 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
+import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMultiIndexSearchObjectFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMultiIndexSearchRootContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMultiIndexSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexSchemaElementContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexSchemaElementContext;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.StringDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSearchIndexesContext {
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+public final class ElasticsearchIndexScopeSearchContext implements ElasticsearchSearchContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final StringDocumentIdentifierValueConverter RAW_ID_CONVERTER =
 			new StringDocumentIdentifierValueConverter();
 
+	// Mapping context
+	private final ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext;
+	private final ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext;
+
+	// Backend context
+	private final Gson userFacingGson;
+	private final ElasticsearchSearchSyntax searchSyntax;
+	private final MultiTenancyStrategy multiTenancyStrategy;
+	private final TimingSource timingSource;
+
+	// Targeted indexes
 	private final Set<ElasticsearchIndexModel> indexModels;
 	private final Set<String> hibernateSearchIndexNames;
 	private final Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex;
 	private final int maxResultWindow;
 
-	public ElasticsearchScopeSearchIndexesContext(Set<ElasticsearchIndexModel> indexModels) {
+	public ElasticsearchIndexScopeSearchContext(BackendMappingContext mappingContext,
+			Gson userFacingGson, ElasticsearchSearchSyntax searchSyntax,
+			MultiTenancyStrategy multiTenancyStrategy,
+			TimingSource timingSource,
+			Set<ElasticsearchIndexModel> indexModels) {
+		this.toDocumentIdentifierValueConvertContext = new ToDocumentIdentifierValueConvertContextImpl(
+				mappingContext );
+		this.toDocumentFieldValueConvertContext = new ToDocumentFieldValueConvertContextImpl( mappingContext );
+		this.userFacingGson = userFacingGson;
+		this.searchSyntax = searchSyntax;
+		this.multiTenancyStrategy = multiTenancyStrategy;
+		this.timingSource = timingSource;
+
 		this.indexModels = indexModels;
 		// Use LinkedHashMap/LinkedHashSet to ensure stable order when generating requests
 		this.hibernateSearchIndexNames = new LinkedHashSet<>();
@@ -66,7 +103,51 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 	}
 
 	@Override
-	public Collection<ElasticsearchSearchIndexContext> elements() {
+	public ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext() {
+		return toDocumentIdentifierValueConvertContext;
+	}
+
+	@Override
+	public ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext() {
+		return toDocumentFieldValueConvertContext;
+	}
+
+	@Override
+	public Gson userFacingGson() {
+		return userFacingGson;
+	}
+
+	@Override
+	public ElasticsearchSearchSyntax searchSyntax() {
+		return searchSyntax;
+	}
+
+	@Override
+	public DocumentIdHelper documentIdHelper() {
+		return multiTenancyStrategy.documentIdHelper();
+	}
+
+	@Override
+	public JsonObject filterOrNull(String tenantId) {
+		return multiTenancyStrategy.filterOrNull( tenantId );
+	}
+
+	@Override
+	public TimeoutManager createTimeoutManager(Long timeout,
+			TimeUnit timeUnit, boolean exceptionOnTimeout) {
+		if ( timeout != null && timeUnit != null ) {
+			if ( exceptionOnTimeout ) {
+				return TimeoutManager.hardTimeout( timingSource, timeout, timeUnit );
+			}
+			else {
+				return TimeoutManager.softTimeout( timingSource, timeout, timeUnit );
+			}
+		}
+		return TimeoutManager.noTimeout( timingSource );
+	}
+
+	@Override
+	public Collection<ElasticsearchSearchIndexContext> indexes() {
 		return mappedTypeNameToIndex.values();
 	}
 
@@ -100,7 +181,7 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 
 	@Override
 	public ElasticsearchSearchCompositeIndexSchemaElementContext root() {
-		if ( elements().size() == 1 ) {
+		if ( indexes().size() == 1 ) {
 			return indexModels.iterator().next().root();
 		}
 		else {
@@ -115,7 +196,7 @@ public class ElasticsearchScopeSearchIndexesContext implements ElasticsearchSear
 	@Override
 	public ElasticsearchSearchIndexSchemaElementContext field(String absoluteFieldPath) {
 		ElasticsearchSearchIndexSchemaElementContext resultOrNull;
-		if ( elements().size() == 1 ) {
+		if ( indexes().size() == 1 ) {
 			resultOrNull = indexModels.iterator().next().fieldOrNull( absoluteFieldPath );
 		}
 		else {

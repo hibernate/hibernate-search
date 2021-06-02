@@ -14,36 +14,69 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchObjectFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchRootContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexSchemaElementContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexSchemaElementContext;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.StringDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesContext {
+import org.apache.lucene.search.Query;
+
+public final class LuceneIndexScopeSearchContext implements LuceneSearchContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final StringDocumentIdentifierValueConverter RAW_ID_CONVERTER =
 			new StringDocumentIdentifierValueConverter();
 
+	// Mapping context
+	private final ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext;
+	private final ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext;
+
+	// Backend context
+	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
+	private final MultiTenancyStrategy multiTenancyStrategy;
+
+	// Global timing source
+	private final TimingSource timingSource;
+
+	// Targeted indexes
 	private final Map<String, LuceneScopeIndexManagerContext> mappedTypeNameToIndex;
 	private final Set<String> indexNames;
 
-	public LuceneScopeSearchIndexesContext(Set<? extends LuceneScopeIndexManagerContext> indexManagerContexts) {
+	public LuceneIndexScopeSearchContext(BackendMappingContext mappingContext,
+			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
+			MultiTenancyStrategy multiTenancyStrategy,
+			TimingSource timingSource,
+			Set<? extends LuceneScopeIndexManagerContext> indexManagerContexts) {
+		this.toDocumentIdentifierValueConvertContext = new ToDocumentIdentifierValueConvertContextImpl( mappingContext );
+		this.toDocumentFieldValueConvertContext = new ToDocumentFieldValueConvertContextImpl( mappingContext );
+		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
+		this.multiTenancyStrategy = multiTenancyStrategy;
+		this.timingSource = timingSource;
 		// Use LinkedHashMap/LinkedHashSet to ensure stable order when generating requests
 		this.mappedTypeNameToIndex = new LinkedHashMap<>();
 		this.indexNames = new LinkedHashSet<>();
@@ -54,7 +87,32 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 	}
 
 	@Override
-	public Collection<LuceneScopeIndexManagerContext> elements() {
+	public ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext() {
+		return toDocumentIdentifierValueConvertContext;
+	}
+
+	@Override
+	public ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext() {
+		return toDocumentFieldValueConvertContext;
+	}
+
+	@Override
+	public LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry() {
+		return analysisDefinitionRegistry;
+	}
+
+	@Override
+	public Query filterOrNull(String tenantId) {
+		return multiTenancyStrategy.filterOrNull( tenantId );
+	}
+
+	@Override
+	public TimeoutManager createTimeoutManager(Long timeout, TimeUnit timeUnit, boolean exceptionOnTimeout) {
+		return TimeoutManager.of( timingSource, timeout, timeUnit, exceptionOnTimeout );
+	}
+
+	@Override
+	public Collection<LuceneScopeIndexManagerContext> indexes() {
 		return mappedTypeNameToIndex.values();
 	}
 
@@ -74,7 +132,7 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 			return RAW_ID_CONVERTER;
 		}
 		DocumentIdentifierValueConverter<?> converter = null;
-		for ( LuceneScopeIndexManagerContext index : elements() ) {
+		for ( LuceneScopeIndexManagerContext index : indexes() ) {
 			DocumentIdentifierValueConverter<?> converterForIndex = index.model().idDslConverter();
 			if ( converter == null ) {
 				converter = converterForIndex;
@@ -88,12 +146,12 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 
 	@Override
 	public LuceneSearchCompositeIndexSchemaElementContext root() {
-		if ( elements().size() == 1 ) {
-			return elements().iterator().next().model().root();
+		if ( indexes().size() == 1 ) {
+			return indexes().iterator().next().model().root();
 		}
 		else {
 			List<LuceneSearchCompositeIndexSchemaElementContext> rootForEachIndex = new ArrayList<>();
-			for ( LuceneScopeIndexManagerContext index : elements() ) {
+			for ( LuceneScopeIndexManagerContext index : indexes() ) {
 				rootForEachIndex.add( index.model().root() );
 			}
 			return new LuceneMultiIndexSearchRootContext( this, rootForEachIndex );
@@ -103,8 +161,8 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 	@Override
 	public LuceneSearchIndexSchemaElementContext field(String absoluteFieldPath) {
 		LuceneSearchIndexSchemaElementContext resultOrNull;
-		if ( elements().size() == 1 ) {
-			resultOrNull = elements().iterator().next().model().fieldOrNull( absoluteFieldPath );
+		if ( indexes().size() == 1 ) {
+			resultOrNull = indexes().iterator().next().model().fieldOrNull( absoluteFieldPath );
 		}
 		else {
 			resultOrNull = createMultiIndexFieldContext( absoluteFieldPath );
@@ -117,7 +175,7 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 
 	@Override
 	public boolean hasNestedDocuments() {
-		for ( LuceneScopeIndexManagerContext element : elements() ) {
+		for ( LuceneScopeIndexManagerContext element : indexes() ) {
 			if ( element.model().hasNestedDocuments() ) {
 				return true;
 			}
@@ -135,7 +193,7 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 		LuceneScopeIndexManagerContext indexOfFirstField = null;
 		AbstractLuceneIndexSchemaFieldNode firstField = null;
 
-		for ( LuceneScopeIndexManagerContext index : elements() ) {
+		for ( LuceneScopeIndexManagerContext index : indexes() ) {
 			LuceneIndexModel indexModel = index.model();
 			AbstractLuceneIndexSchemaFieldNode fieldForCurrentIndex = indexModel.fieldOrNull( absoluteFieldPath );
 			if ( fieldForCurrentIndex == null ) {
@@ -169,4 +227,5 @@ public class LuceneScopeSearchIndexesContext implements LuceneSearchIndexesConte
 					(List) fieldForEachIndex );
 		}
 	}
+
 }

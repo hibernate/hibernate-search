@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.scope.impl;
 
+import java.util.Set;
+
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilderFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
@@ -29,13 +31,9 @@ public class ElasticsearchIndexScope
 	private final ElasticsearchSearchAggregationBuilderFactory searchAggregationFactory;
 	private final ElasticsearchSearchQueryBuilderFactory searchQueryFactory;
 
-	public ElasticsearchIndexScope(
-			BackendMappingContext mappingContext,
-			SearchBackendContext backendContext,
-			ElasticsearchSearchIndexesContext searchIndexesContext) {
-		this.searchContext = backendContext.createSearchContext(
-				mappingContext, searchIndexesContext
-		);
+	public ElasticsearchIndexScope(BackendMappingContext mappingContext, SearchBackendContext backendContext,
+			Set<ElasticsearchIndexModel> indexModels) {
+		this.searchContext = backendContext.createSearchContext( mappingContext, indexModels );
 		this.searchPredicateFactory = new ElasticsearchSearchPredicateBuilderFactoryImpl( searchContext );
 		this.searchSortFactory = new ElasticsearchSearchSortBuilderFactoryImpl( searchContext );
 		this.searchProjectionFactory = new ElasticsearchSearchProjectionBuilderFactory(
@@ -52,7 +50,7 @@ public class ElasticsearchIndexScope
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "indexNames=" ).append( searchContext.indexes().hibernateSearchIndexNames() )
+				.append( "indexNames=" ).append( searchContext.hibernateSearchIndexNames() )
 				.append( "]" )
 				.toString();
 	}

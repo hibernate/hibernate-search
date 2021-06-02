@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.CompositeSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
@@ -20,11 +19,9 @@ import com.google.gson.JsonObject;
 public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchSearchSortBuilderFactory {
 
 	private final ElasticsearchSearchContext searchContext;
-	private final ElasticsearchSearchIndexesContext indexes;
 
 	public ElasticsearchSearchSortBuilderFactoryImpl(ElasticsearchSearchContext searchContext) {
 		this.searchContext = searchContext;
-		this.indexes = searchContext.indexes();
 	}
 
 	@Override
@@ -40,12 +37,12 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 
 	@Override
 	public FieldSortBuilder field(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).queryElement( SortTypeKeys.FIELD, searchContext );
+		return searchContext.field( absoluteFieldPath ).queryElement( SortTypeKeys.FIELD, searchContext );
 	}
 
 	@Override
 	public DistanceSortBuilder distance(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).queryElement( SortTypeKeys.DISTANCE, searchContext );
+		return searchContext.field( absoluteFieldPath ).queryElement( SortTypeKeys.DISTANCE, searchContext );
 	}
 
 	@Override

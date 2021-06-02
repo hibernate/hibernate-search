@@ -54,7 +54,7 @@ public class LuceneMatchIdPredicate extends AbstractLuceneSearchPredicate {
 		@Override
 		public void value(Object value, ValueConvert valueConvert) {
 			DocumentIdentifierValueConverter<?> dslToDocumentIdConverter =
-					searchContext.indexes().idDslConverter( valueConvert );
+					searchContext.idDslConverter( valueConvert );
 			ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext =
 					searchContext.toDocumentIdentifierValueConvertContext();
 			values.add( dslToDocumentIdConverter.convertToDocumentUnknown( value, toDocumentIdentifierValueConvertContext ) );

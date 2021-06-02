@@ -18,7 +18,6 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchDifferentNestedObjectCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -142,8 +141,6 @@ public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsear
 
 	public static class Builder extends AbstractBuilder implements SimpleQueryStringPredicateBuilder {
 
-		private final ElasticsearchSearchIndexesContext indexes;
-
 		private final Map<String, ElasticsearchSimpleQueryStringPredicateBuilderFieldState> fields = new LinkedHashMap<>();
 		private JsonPrimitive defaultOperator = OR_OPERATOR_KEYWORD_JSON;
 		private String simpleQueryString;
@@ -153,8 +150,7 @@ public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsear
 
 		Builder(ElasticsearchSearchContext searchContext) {
 			super( searchContext );
-			this.indexes = searchContext.indexes();
-			this.nestedCompatibilityChecker = ElasticsearchDifferentNestedObjectCompatibilityChecker.empty( indexes );
+			this.nestedCompatibilityChecker = ElasticsearchDifferentNestedObjectCompatibilityChecker.empty( searchContext );
 		}
 
 		@Override
@@ -178,7 +174,7 @@ public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsear
 		public FieldState field(String absoluteFieldPath) {
 			ElasticsearchSimpleQueryStringPredicateBuilderFieldState field = fields.get( absoluteFieldPath );
 			if ( field == null ) {
-				field = indexes.field( absoluteFieldPath )
+				field = searchContext.field( absoluteFieldPath )
 						.queryElement( ElasticsearchPredicateTypeKeys.SIMPLE_QUERY_STRING, searchContext );
 				nestedCompatibilityChecker = nestedCompatibilityChecker.combineAndCheck( absoluteFieldPath );
 				fields.put( absoluteFieldPath, field );

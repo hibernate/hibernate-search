@@ -13,7 +13,6 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexSchemaElementContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
@@ -35,11 +34,9 @@ import org.apache.lucene.search.Explanation;
 public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
 
 	private final LuceneSearchContext searchContext;
-	private final LuceneSearchIndexesContext indexes;
 
 	public LuceneSearchProjectionBuilderFactory(LuceneSearchContext searchContext) {
 		this.searchContext = searchContext;
-		this.indexes = searchContext.indexes();
 	}
 
 	@Override
@@ -49,7 +46,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	@Override
 	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType, ValueConvert convert) {
-		LuceneSearchIndexSchemaElementContext field = indexes.field( absoluteFieldPath );
+		LuceneSearchIndexSchemaElementContext field = searchContext.field( absoluteFieldPath );
 		// Fail early if the nested structure differs in the case of multi-index search.
 		field.nestedPathHierarchy();
 		return field.queryElement( ProjectionTypeKeys.FIELD, searchContext )
@@ -78,7 +75,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	@Override
 	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath) {
-		LuceneSearchIndexSchemaElementContext field = indexes.field( absoluteFieldPath );
+		LuceneSearchIndexSchemaElementContext field = searchContext.field( absoluteFieldPath );
 		// Fail early if the nested structure differs in the case of multi-index search.
 		field.nestedPathHierarchy();
 		return field.queryElement( ProjectionTypeKeys.DISTANCE, searchContext );

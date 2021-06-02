@@ -13,7 +13,6 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexSchemaElementContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
@@ -34,14 +33,12 @@ import com.google.gson.JsonObject;
 public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
 
 	private final ElasticsearchSearchContext searchContext;
-	private final ElasticsearchSearchIndexesContext indexes;
 	private final DocumentReferenceExtractionHelper documentReferenceExtractionHelper;
 	private final ProjectionExtractionHelper<String> idProjectionExtractionHelper;
 
 	public ElasticsearchSearchProjectionBuilderFactory(SearchProjectionBackendContext searchProjectionBackendContext,
 			ElasticsearchSearchContext searchContext) {
 		this.searchContext = searchContext;
-		this.indexes = searchContext.indexes();
 		this.documentReferenceExtractionHelper = searchProjectionBackendContext.createDocumentReferenceExtractionHelper( searchContext );
 		this.idProjectionExtractionHelper = searchProjectionBackendContext.idProjectionExtractionHelper();
 	}
@@ -53,10 +50,10 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 	@Override
 	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType, ValueConvert convert) {
-		ElasticsearchSearchIndexSchemaElementContext field = indexes.field( absoluteFieldPath );
+		ElasticsearchSearchIndexSchemaElementContext field = searchContext.field( absoluteFieldPath );
 		// Check the compatibility of nested structure in the case of multi-index search.
 		field.nestedPathHierarchy();
-		return indexes.field( absoluteFieldPath ).queryElement( ProjectionTypeKeys.FIELD, searchContext )
+		return searchContext.field( absoluteFieldPath ).queryElement( ProjectionTypeKeys.FIELD, searchContext )
 				.type( expectedType, convert );
 	}
 
@@ -82,7 +79,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 	@Override
 	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath) {
-		ElasticsearchSearchIndexSchemaElementContext field = indexes.field( absoluteFieldPath );
+		ElasticsearchSearchIndexSchemaElementContext field = searchContext.field( absoluteFieldPath );
 		// Check the compatibility of nested structure in the case of multi-index search.
 		field.nestedPathHierarchy();
 		return field.queryElement( ProjectionTypeKeys.DISTANCE, searchContext );

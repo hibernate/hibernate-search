@@ -11,8 +11,8 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HibernateSearchMultiReader;
 import org.hibernate.search.backend.lucene.scope.LuceneIndexScope;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexManagerContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
@@ -40,8 +40,8 @@ public class LuceneIndexScopeImpl
 
 	public LuceneIndexScopeImpl(SearchBackendContext backendContext,
 			BackendMappingContext mappingContext,
-			LuceneSearchIndexesContext indexes) {
-		this.searchContext = backendContext.createSearchContext( mappingContext, indexes );
+			Set<? extends LuceneScopeIndexManagerContext> indexManagerContexts) {
+		this.searchContext = backendContext.createSearchContext( mappingContext, indexManagerContexts );
 		this.searchPredicateFactory = new LuceneSearchPredicateBuilderFactoryImpl( searchContext );
 		this.searchSortFactory = new LuceneSearchSortBuilderFactoryImpl( searchContext );
 		this.searchProjectionFactory = new LuceneSearchProjectionBuilderFactory( searchContext );
@@ -53,7 +53,7 @@ public class LuceneIndexScopeImpl
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "indexNames=" ).append( searchContext.indexes().hibernateSearchIndexNames() )
+				.append( "indexNames=" ).append( searchContext.hibernateSearchIndexNames() )
 				.append( "]" )
 				.toString();
 	}
@@ -85,8 +85,8 @@ public class LuceneIndexScopeImpl
 
 	@Override
 	public IndexReader openIndexReader(Set<String> routingKeys) {
-		Set<String> indexNames = searchContext.indexes().hibernateSearchIndexNames();
-		Collection<? extends LuceneSearchIndexContext> indexManagerContexts = searchContext.indexes().elements();
+		Set<String> indexNames = searchContext.hibernateSearchIndexNames();
+		Collection<? extends LuceneSearchIndexContext> indexManagerContexts = searchContext.indexes();
 		return HibernateSearchMultiReader.open( indexNames, indexManagerContexts, routingKeys );
 	}
 }

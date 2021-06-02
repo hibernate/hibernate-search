@@ -31,9 +31,9 @@ public interface ElasticsearchSearchPredicate extends SearchPredicate {
 			throw log.cannotMixElasticsearchSearchQueryWithOtherPredicates( predicate );
 		}
 		ElasticsearchSearchPredicate casted = (ElasticsearchSearchPredicate) predicate;
-		if ( !searchContext.indexes().hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
+		if ( !searchContext.hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
 			throw log.predicateDefinedOnDifferentIndexes( predicate, casted.indexNames(),
-					searchContext.indexes().hibernateSearchIndexNames() );
+					searchContext.hibernateSearchIndexNames() );
 		}
 		return casted;
 	}

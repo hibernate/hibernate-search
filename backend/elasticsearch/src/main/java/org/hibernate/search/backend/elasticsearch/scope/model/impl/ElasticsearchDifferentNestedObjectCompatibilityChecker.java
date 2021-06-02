@@ -11,33 +11,33 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class ElasticsearchDifferentNestedObjectCompatibilityChecker {
 
 	public static ElasticsearchDifferentNestedObjectCompatibilityChecker empty(
-			ElasticsearchSearchIndexesContext indexes) {
-		return new ElasticsearchDifferentNestedObjectCompatibilityChecker( indexes, null, Collections.emptyList() );
+			ElasticsearchSearchContext searchContext) {
+		return new ElasticsearchDifferentNestedObjectCompatibilityChecker( searchContext, null, Collections.emptyList() );
 	}
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchSearchIndexesContext indexes;
+	private final ElasticsearchSearchContext searchContext;
 	private final String fieldPath;
 	private final List<String> nestedPathHierarchy;
 
-	private ElasticsearchDifferentNestedObjectCompatibilityChecker(ElasticsearchSearchIndexesContext indexes,
+	private ElasticsearchDifferentNestedObjectCompatibilityChecker(ElasticsearchSearchContext searchContext,
 			String fieldPath, List<String> nestedPathHierarchy) {
-		this.indexes = indexes;
+		this.searchContext = searchContext;
 		this.fieldPath = fieldPath;
 		this.nestedPathHierarchy = nestedPathHierarchy;
 	}
 
 	public ElasticsearchDifferentNestedObjectCompatibilityChecker combineAndCheck(String incomingFieldPath) {
-		List<String> incomingNestedPathHierarchy = indexes.field( incomingFieldPath ).nestedPathHierarchy();
+		List<String> incomingNestedPathHierarchy = searchContext.field( incomingFieldPath ).nestedPathHierarchy();
 		if ( fieldPath == null ) {
-			return new ElasticsearchDifferentNestedObjectCompatibilityChecker( indexes, incomingFieldPath,
+			return new ElasticsearchDifferentNestedObjectCompatibilityChecker( searchContext, incomingFieldPath,
 					incomingNestedPathHierarchy );
 		}
 

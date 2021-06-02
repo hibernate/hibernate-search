@@ -20,7 +20,7 @@ public abstract class AbstractElasticsearchSort implements ElasticsearchSearchSo
 	}
 
 	protected AbstractElasticsearchSort(ElasticsearchSearchContext searchContext) {
-		indexNames = searchContext.indexes().hibernateSearchIndexNames();
+		indexNames = searchContext.hibernateSearchIndexNames();
 	}
 
 	@Override

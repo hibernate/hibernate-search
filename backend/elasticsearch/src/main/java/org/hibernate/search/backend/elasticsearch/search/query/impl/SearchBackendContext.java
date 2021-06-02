@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
+import java.util.Set;
+
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionBackendContext;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
@@ -30,7 +32,7 @@ public interface SearchBackendContext {
 	SearchProjectionBackendContext getSearchProjectionBackendContext();
 
 	ElasticsearchSearchContext createSearchContext(BackendMappingContext mappingContext,
-			ElasticsearchSearchIndexesContext indexes);
+			Set<ElasticsearchIndexModel> indexModels);
 
 	<H> ElasticsearchSearchQueryBuilder<H> createSearchQueryBuilder(
 			ElasticsearchSearchContext searchContext,
