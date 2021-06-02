@@ -41,9 +41,9 @@ public class LuceneSearchAggregationBuilderFactory
 		}
 
 		LuceneSearchAggregation<A> casted = (LuceneSearchAggregation<A>) aggregation;
-		if ( !indexes.indexNames().equals( casted.getIndexNames() ) ) {
+		if ( !indexes.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
 			throw log.aggregationDefinedOnDifferentIndexes(
-				aggregation, casted.getIndexNames(), indexes.indexNames()
+				aggregation, casted.getIndexNames(), indexes.hibernateSearchIndexNames()
 			);
 		}
 

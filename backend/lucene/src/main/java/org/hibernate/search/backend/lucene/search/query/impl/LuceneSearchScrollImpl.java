@@ -72,7 +72,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 			indexReader.close();
 		}
 		catch (IOException | RuntimeException e) {
-			log.unableToCloseIndexReader( EventContexts.fromIndexNames( searchContext.indexes().indexNames() ), e );
+			log.unableToCloseIndexReader( EventContexts.fromIndexNames( searchContext.indexes().hibernateSearchIndexNames() ), e );
 		}
 	}
 
@@ -114,7 +114,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 		}
 		catch (IOException e) {
 			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(), e.getMessage(),
-					EventContexts.fromIndexNames( searchContext.indexes().indexNames() ), e );
+					EventContexts.fromIndexNames( searchContext.indexes().hibernateSearchIndexNames() ), e );
 		}
 
 		/*
@@ -134,7 +134,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 
 	private <T> T doSubmitWithIndexReader(ReadWork<T> work, HibernateSearchMultiReader indexReader) {
 		return queryOrchestrator.submit(
-				searchContext.indexes().indexNames(),
+				searchContext.indexes().hibernateSearchIndexNames(),
 				searchContext.indexes().elements(),
 				routingKeys,
 				work, indexReader

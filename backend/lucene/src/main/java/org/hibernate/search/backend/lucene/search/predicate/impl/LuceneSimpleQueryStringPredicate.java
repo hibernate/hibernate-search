@@ -123,7 +123,7 @@ public class LuceneSimpleQueryStringPredicate extends AbstractLuceneNestablePred
 		public void analyzer(String analyzerName) {
 			this.overrideAnalyzer = analysisDefinitionRegistry.getAnalyzerDefinition( analyzerName );
 			if ( overrideAnalyzer == null ) {
-				throw log.unknownAnalyzer( analyzerName, EventContexts.fromIndexNames( indexes.indexNames() ) );
+				throw log.unknownAnalyzer( analyzerName, EventContexts.fromIndexNames( indexes.hibernateSearchIndexNames() ) );
 			}
 		}
 

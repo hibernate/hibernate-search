@@ -26,8 +26,8 @@ public interface LuceneSearchSort extends SearchSort {
 			throw log.cannotMixLuceneSearchSortWithOtherSorts( sort );
 		}
 		LuceneSearchSort casted = (LuceneSearchSort) sort;
-		if ( !searchContext.indexes().indexNames().equals( casted.indexNames() ) ) {
-			throw log.sortDefinedOnDifferentIndexes( sort, casted.indexNames(), searchContext.indexes().indexNames() );
+		if ( !searchContext.indexes().hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
+			throw log.sortDefinedOnDifferentIndexes( sort, casted.indexNames(), searchContext.indexes().hibernateSearchIndexNames() );
 		}
 		return casted;
 	}

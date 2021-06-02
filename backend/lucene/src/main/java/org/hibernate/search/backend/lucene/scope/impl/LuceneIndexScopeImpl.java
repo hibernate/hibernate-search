@@ -53,7 +53,7 @@ public class LuceneIndexScopeImpl
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "indexNames=" ).append( searchContext.indexes().indexNames() )
+				.append( "indexNames=" ).append( searchContext.indexes().hibernateSearchIndexNames() )
 				.append( "]" )
 				.toString();
 	}
@@ -85,7 +85,7 @@ public class LuceneIndexScopeImpl
 
 	@Override
 	public IndexReader openIndexReader(Set<String> routingKeys) {
-		Set<String> indexNames = searchContext.indexes().indexNames();
+		Set<String> indexNames = searchContext.indexes().hibernateSearchIndexNames();
 		Collection<? extends LuceneSearchIndexContext> indexManagerContexts = searchContext.indexes().elements();
 		return HibernateSearchMultiReader.open( indexNames, indexManagerContexts, routingKeys );
 	}

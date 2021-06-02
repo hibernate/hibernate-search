@@ -31,9 +31,9 @@ public interface LuceneSearchPredicate extends SearchPredicate {
 			throw log.cannotMixLuceneSearchQueryWithOtherPredicates( predicate );
 		}
 		LuceneSearchPredicate casted = (LuceneSearchPredicate) predicate;
-		if ( !searchContext.indexes().indexNames().equals( casted.indexNames() ) ) {
+		if ( !searchContext.indexes().hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
 			throw log.predicateDefinedOnDifferentIndexes( predicate, casted.indexNames(),
-					searchContext.indexes().indexNames() );
+					searchContext.indexes().hibernateSearchIndexNames() );
 		}
 		return casted;
 	}
