@@ -136,8 +136,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 			throw log.nonNestedFieldForNestedQuery( absoluteFieldPath,
 					EventContexts.fromIndexNames( indexes.indexNames() ) );
 		}
-		return new LuceneNestedPredicate.Builder( searchContext, absoluteFieldPath,
-				field.nestedPathHierarchy() );
+		return field.queryElement( PredicateTypeKeys.NESTED, searchContext );
 	}
 
 	@Override

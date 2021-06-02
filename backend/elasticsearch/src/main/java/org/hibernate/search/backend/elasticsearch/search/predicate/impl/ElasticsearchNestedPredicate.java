@@ -6,10 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
-import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
@@ -17,7 +18,7 @@ import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import com.google.gson.JsonObject;
 
 
-class ElasticsearchNestedPredicate extends AbstractElasticsearchSingleFieldPredicate {
+public class ElasticsearchNestedPredicate extends AbstractElasticsearchSingleFieldPredicate {
 
 	private static final JsonAccessor<String> PATH_ACCESSOR = JsonAccessor.root().property( "path" ).asString();
 	private static final JsonAccessor<JsonObject> QUERY_ACCESSOR = JsonAccessor.root().property( "query" ).asObject();
@@ -37,7 +38,8 @@ class ElasticsearchNestedPredicate extends AbstractElasticsearchSingleFieldPredi
 		PredicateRequestContext nestedContext = context.withNestedPath( absoluteFieldPath );
 
 		wrap( indexNames(), absoluteFieldPath, outerObject, innerObject,
-				nestedPredicate.toJsonQuery( nestedContext ) );
+				nestedPredicate.toJsonQuery( nestedContext )
+		);
 
 		return outerObject;
 	}
@@ -54,18 +56,28 @@ class ElasticsearchNestedPredicate extends AbstractElasticsearchSingleFieldPredi
 		outerObject.add( "nested", innerObject );
 	}
 
-	static class Builder extends AbstractBuilder implements NestedPredicateBuilder {
+	public static class Factory
+			extends AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<NestedPredicateBuilder> {
+		@Override
+		public NestedPredicateBuilder create(ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchCompositeIndexSchemaElementContext field) {
+			return new Builder( searchContext, field );
+		}
+	}
+
+	private static class Builder extends AbstractBuilder implements NestedPredicateBuilder {
 		private ElasticsearchSearchPredicate nestedPredicate;
 
-		Builder(ElasticsearchSearchContext searchContext, String absoluteFieldPath,
-				List<String> nestedPathHierarchy) {
-			// The given list includes absoluteFieldPath at the end, but here we don't want it to be included.
-			super( searchContext, absoluteFieldPath, nestedPathHierarchy.subList( 0, nestedPathHierarchy.size() - 1 ) );
+		Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchCompositeIndexSchemaElementContext field) {
+			super( searchContext, field.absolutePath(),
+					// nestedPathHierarchy includes absoluteFieldPath at the end, but here we don't want it to be included.
+					field.nestedPathHierarchy().subList( 0, field.nestedPathHierarchy().size() - 1 ) );
 		}
 
 		@Override
 		public void nested(SearchPredicate nestedPredicate) {
-			ElasticsearchSearchPredicate elasticsearchPredicate = ElasticsearchSearchPredicate.from( searchContext, nestedPredicate );
+			ElasticsearchSearchPredicate elasticsearchPredicate = ElasticsearchSearchPredicate.from(
+					searchContext, nestedPredicate );
 			elasticsearchPredicate.checkNestableWithin( absoluteFieldPath );
 			this.nestedPredicate = elasticsearchPredicate;
 		}

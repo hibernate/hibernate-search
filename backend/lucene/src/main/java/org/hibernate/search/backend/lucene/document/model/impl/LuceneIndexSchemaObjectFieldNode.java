@@ -15,6 +15,7 @@ import java.util.Map;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneNestedPredicate;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectExistsPredicate;
@@ -30,14 +31,6 @@ import org.hibernate.search.util.common.reporting.EventContext;
 public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaFieldNode
 		implements IndexObjectFieldDescriptor, LuceneIndexSchemaObjectNode,
 				IndexObjectFieldTypeDescriptor, LuceneSearchCompositeIndexSchemaElementContext {
-
-	private static final Map<SearchQueryElementTypeKey<?>, LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>>
-			DEFAULT_QUERY_ELEMENT_FACTORIES;
-	static {
-		Map<SearchQueryElementTypeKey<?>, LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>> map = new HashMap<>();
-		map.put( PredicateTypeKeys.EXISTS, LuceneObjectExistsPredicate.Factory.INSTANCE );
-		DEFAULT_QUERY_ELEMENT_FACTORIES = Collections.unmodifiableMap( map );
-	}
 
 	private final List<String> nestedPathHierarchy;
 
@@ -61,13 +54,12 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 		this.structure = structure;
 		// We expect the children to be added to the list externally, just after the constructor call.
 		this.staticChildrenByName = Collections.unmodifiableMap( notYetInitializedStaticChildren );
-		if ( queryElementFactories.isEmpty() ) {
-			this.queryElementFactories = DEFAULT_QUERY_ELEMENT_FACTORIES;
+		this.queryElementFactories = new HashMap<>();
+		this.queryElementFactories.put( PredicateTypeKeys.EXISTS, LuceneObjectExistsPredicate.Factory.INSTANCE );
+		if ( ObjectStructure.NESTED.equals( structure ) ) {
+			this.queryElementFactories.put( PredicateTypeKeys.NESTED, LuceneNestedPredicate.Factory.INSTANCE );
 		}
-		else {
-			this.queryElementFactories = new HashMap<>( DEFAULT_QUERY_ELEMENT_FACTORIES );
-			this.queryElementFactories.putAll( queryElementFactories );
-		}
+		this.queryElementFactories.putAll( queryElementFactories );
 	}
 
 	@Override

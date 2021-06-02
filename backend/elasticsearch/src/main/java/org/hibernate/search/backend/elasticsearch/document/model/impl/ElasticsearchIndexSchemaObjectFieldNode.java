@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchNestedPredicate;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchExistsPredicate;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
@@ -35,14 +36,6 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 				IndexObjectFieldTypeDescriptor, ElasticsearchSearchCompositeIndexSchemaElementContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private static final Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>>
-			DEFAULT_QUERY_ELEMENT_FACTORIES;
-	static {
-		Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>> map = new HashMap<>();
-		map.put( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.ObjectFieldFactory() );
-		DEFAULT_QUERY_ELEMENT_FACTORIES = Collections.unmodifiableMap( map );
-	}
 
 	private final List<String> nestedPathHierarchy;
 
@@ -67,13 +60,12 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 		this.structure = ObjectStructure.DEFAULT.equals( structure ) ? ObjectStructure.FLATTENED : structure;
 		// We expect the children to be added to the list externally, just after the constructor call.
 		this.staticChildrenByName = Collections.unmodifiableMap( notYetInitializedStaticChildren );
-		if ( queryElementFactories.isEmpty() ) {
-			this.queryElementFactories = DEFAULT_QUERY_ELEMENT_FACTORIES;
+		this.queryElementFactories = new HashMap<>();
+		this.queryElementFactories.put( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.ObjectFieldFactory() );
+		if ( ObjectStructure.NESTED.equals( structure ) ) {
+			this.queryElementFactories.put( PredicateTypeKeys.NESTED, new ElasticsearchNestedPredicate.Factory() );
 		}
-		else {
-			this.queryElementFactories = new HashMap<>( DEFAULT_QUERY_ELEMENT_FACTORIES );
-			this.queryElementFactories.putAll( queryElementFactories );
-		}
+		this.queryElementFactories.putAll( queryElementFactories );
 	}
 
 	@Override

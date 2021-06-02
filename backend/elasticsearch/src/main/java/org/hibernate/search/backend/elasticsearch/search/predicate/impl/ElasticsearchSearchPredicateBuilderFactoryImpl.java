@@ -134,8 +134,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 			throw log.nonNestedFieldForNestedQuery( absoluteFieldPath,
 					EventContexts.fromIndexNames( indexes.hibernateSearchIndexNames() ) );
 		}
-		return new ElasticsearchNestedPredicate.Builder( searchContext, absoluteFieldPath,
-				field.nestedPathHierarchy() );
+		return field.queryElement( PredicateTypeKeys.NESTED, searchContext );
 	}
 
 	@Override
