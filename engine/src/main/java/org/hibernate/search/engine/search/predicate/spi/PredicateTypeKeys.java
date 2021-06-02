@@ -21,6 +21,7 @@ public final class PredicateTypeKeys {
 		return key( "named:" + name );
 	}
 
+	public static final SearchQueryElementTypeKey<NestedPredicateBuilder> NESTED = key( "nested" );
 	public static final SearchQueryElementTypeKey<MatchPredicateBuilder> MATCH = key( "match" );
 	public static final SearchQueryElementTypeKey<RangePredicateBuilder> RANGE = key( "range" );
 	public static final SearchQueryElementTypeKey<ExistsPredicateBuilder> EXISTS = key( "exists" );
