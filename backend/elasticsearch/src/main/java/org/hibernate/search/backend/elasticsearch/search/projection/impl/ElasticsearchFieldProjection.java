@@ -166,6 +166,8 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 		@Override
 		public TypeSelector<?> create(ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<F> field) {
+			// Check the compatibility of nested structure in the case of multi-index search.
+			field.nestedPathHierarchy();
 			return new TypeSelector<>( codec, scope, field );
 		}
 	}

@@ -12,7 +12,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexSchemaElementContext;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
@@ -46,10 +45,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	@Override
 	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType, ValueConvert convert) {
-		LuceneSearchIndexSchemaElementContext field = scope.field( absoluteFieldPath );
-		// Fail early if the nested structure differs in the case of multi-index search.
-		field.nestedPathHierarchy();
-		return field.queryElement( ProjectionTypeKeys.FIELD, scope )
+		return scope.field( absoluteFieldPath ).queryElement( ProjectionTypeKeys.FIELD, scope )
 				.type( expectedType, convert );
 	}
 
@@ -75,10 +71,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	@Override
 	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath) {
-		LuceneSearchIndexSchemaElementContext field = scope.field( absoluteFieldPath );
-		// Fail early if the nested structure differs in the case of multi-index search.
-		field.nestedPathHierarchy();
-		return field.queryElement( ProjectionTypeKeys.DISTANCE, scope );
+		return scope.field( absoluteFieldPath ).queryElement( ProjectionTypeKeys.DISTANCE, scope );
 	}
 
 	@Override

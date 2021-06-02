@@ -175,14 +175,15 @@ public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProject
 	}
 
 	public static class Factory
-			extends
-			AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<DistanceToFieldProjectionBuilder, GeoPoint, LuceneFieldCodec<GeoPoint>> {
+			extends AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<DistanceToFieldProjectionBuilder, GeoPoint, LuceneFieldCodec<GeoPoint>> {
 		public Factory(LuceneFieldCodec<GeoPoint> codec) {
 			super( codec );
 		}
 
 		@Override
 		public Builder create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<GeoPoint> field) {
+			// Fail early if the nested structure differs in the case of multi-index search.
+			field.nestedPathHierarchy();
 			return new Builder( codec, scope, field );
 		}
 	}
