@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-public class StubCompositeBiFunctionSearchProjection<P1, P2, P> implements StubCompositeSearchProjection<P> {
+class StubCompositeBiFunctionSearchProjection<P1, P2, P> implements StubCompositeSearchProjection<P> {
 
 	private final BiFunction<P1, P2, P> transformer;
 
@@ -20,7 +20,7 @@ public class StubCompositeBiFunctionSearchProjection<P1, P2, P> implements StubC
 
 	private final StubSearchProjection<P2> projection2;
 
-	public StubCompositeBiFunctionSearchProjection(BiFunction<P1, P2, P> transformer,
+	StubCompositeBiFunctionSearchProjection(BiFunction<P1, P2, P> transformer,
 			StubSearchProjection<P1> projection1, StubSearchProjection<P2> projection2) {
 		this.transformer = transformer;
 		this.projection1 = projection1;

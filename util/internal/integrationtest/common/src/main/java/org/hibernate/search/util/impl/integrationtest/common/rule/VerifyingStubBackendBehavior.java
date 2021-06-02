@@ -33,14 +33,14 @@ import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResultTotal;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchScrollResult;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchScroll;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubSearchScroll;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubSearchWork;
 
 class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
@@ -202,13 +202,13 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	@Override
-	public void defineSchema(String indexName, StubIndexSchemaNode rootSchemaNode) {
+	public void defineSchema(String indexName, StubIndexModel indexModel) {
 		if ( ignoreSchema ) {
 			return;
 		}
 		getSchemaDefinitionCalls( indexName )
 				.verify(
-						new SchemaDefinitionCall( indexName, rootSchemaNode ),
+						new SchemaDefinitionCall( indexName, indexModel ),
 						SchemaDefinitionCall::verify,
 						noExpectationsBehavior( () -> null )
 				);

@@ -12,7 +12,6 @@ import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.TermVector;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -21,73 +20,71 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNode;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl.StubFieldConverter;
 
-public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode> {
+/**
+ * A representation of the index schema as simplified data (a tree with attributes for each node).
+ * <p>
+ * Used in assertions to easily compare the expected schema against the actual schema.
+ */
+public final class StubIndexSchemaDataNode extends StubTreeNode<StubIndexSchemaDataNode> {
 
-	private enum Type {
+	public enum Kind {
 		ROOT,
 		OBJECT_FIELD,
 		NAMED_PREDICATE,
-		NON_OBJECT_FIELD,
+		VALUE_FIELD,
 		OBJECT_FIELD_TEMPLATE,
-		NON_OBJECT_FIELD_TEMPLATE
+		VALUE_FIELD_TEMPLATE
 	}
 
 	public static Builder schema() {
-		return new Builder( null, null, Type.ROOT );
+		return new Builder( null, null, Kind.ROOT );
 	}
 
 	public static Builder objectField(Builder parent, String relativeFieldName, ObjectStructure structure) {
-		return new Builder( parent, relativeFieldName, Type.OBJECT_FIELD )
+		return new Builder( parent, relativeFieldName, Kind.OBJECT_FIELD )
 				.objectStructure( structure );
 	}
 
 	public static Builder field(Builder parent, String relativeFieldName) {
-		return new Builder( parent, relativeFieldName, Type.NON_OBJECT_FIELD );
+		return new Builder( parent, relativeFieldName, Kind.VALUE_FIELD );
 	}
 
 	public static Builder objectFieldTemplate(Builder parent, String templateName, ObjectStructure structure) {
-		return new Builder( parent, templateName, Type.OBJECT_FIELD_TEMPLATE )
+		return new Builder( parent, templateName, Kind.OBJECT_FIELD_TEMPLATE )
 				.objectStructure( structure );
 	}
 
 	public static Builder fieldTemplate(Builder parent, String templateName) {
-		return new Builder( parent, templateName, Type.NON_OBJECT_FIELD_TEMPLATE );
+		return new Builder( parent, templateName, Kind.VALUE_FIELD_TEMPLATE );
 	}
 
 	public static Builder namedPredicate(Builder parent, String relativeNamedPredicateName) {
-		return new Builder( parent, relativeNamedPredicateName, Type.NAMED_PREDICATE );
+		return new Builder( parent, relativeNamedPredicateName, Kind.NAMED_PREDICATE );
 	}
 
 	/*
 	 * The following properties are purposely ignored when comparing two nodes,
 	 * to make it easier to define nodes that should be matched.
 	 */
-	private final StubFieldConverter<?> converter;
-	private final DocumentIdentifierValueConverter<?> idDslConverter;
+	private final Kind kind;
 
-	private StubIndexSchemaNode(Builder builder) {
+	private StubIndexSchemaDataNode(Builder builder) {
 		super( builder );
-		this.converter = builder.converter;
-		this.idDslConverter = builder.idDslConverter;
+		this.kind = builder.kind;
 	}
 
-	public DocumentIdentifierValueConverter<?> getIdDslConverter() {
-		return idDslConverter;
+	public Kind kind() {
+		return kind;
 	}
 
-	public StubFieldConverter<?> getConverter() {
-		return converter;
-	}
+	public static class Builder extends AbstractBuilder<StubIndexSchemaDataNode> implements IndexSchemaBuildContext {
+		private final Kind kind;
 
-	public static class Builder extends AbstractBuilder<StubIndexSchemaNode> implements IndexSchemaBuildContext {
-		private StubFieldConverter<?> converter;
-		private DocumentIdentifierValueConverter<?> idDslConverter;
-
-		private Builder(Builder parent, String relativeFieldName, Type type) {
+		private Builder(Builder parent, String relativeFieldName, Kind kind) {
 			super( parent, relativeFieldName );
-			attribute( "type", type );
+			this.kind = kind;
+			attribute( "structureType", kind );
 		}
 
 		@Override
@@ -95,21 +92,21 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 			return EventContexts.fromIndexFieldAbsolutePath( getAbsolutePath() );
 		}
 
-		public Builder field(String relativeFieldName, Class<?> inputType) {
-			return field( relativeFieldName, inputType, b -> {
+		public Builder field(String relativeFieldName, Class<?> valueClass) {
+			return field( relativeFieldName, valueClass, b -> {
 			} );
 		}
 
-		public Builder field(String relativeFieldName, Class<?> inputType, Consumer<Builder> contributor) {
-			Builder builder = StubIndexSchemaNode.field( this, relativeFieldName )
-				.inputType( inputType );
+		public Builder field(String relativeFieldName, Class<?> valueClass, Consumer<Builder> contributor) {
+			Builder builder = StubIndexSchemaDataNode.field( this, relativeFieldName )
+					.valueClass( valueClass );
 			contributor.accept( builder );
 			child( builder );
 			return this;
 		}
 
 		public Builder namedPredicate(String relativeNamedPredicateName, Consumer<Builder> contributor) {
-			Builder builder = StubIndexSchemaNode.namedPredicate( this, relativeNamedPredicateName );
+			Builder builder = StubIndexSchemaDataNode.namedPredicate( this, relativeNamedPredicateName );
 			contributor.accept( builder );
 			child( builder );
 			return this;
@@ -120,15 +117,15 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 		}
 
 		public Builder objectField(String relativeFieldName, ObjectStructure structure, Consumer<Builder> contributor) {
-			Builder builder = StubIndexSchemaNode.objectField( this, relativeFieldName, structure );
+			Builder builder = StubIndexSchemaDataNode.objectField( this, relativeFieldName, structure );
 			contributor.accept( builder );
 			child( builder );
 			return this;
 		}
 
 		public Builder fieldTemplate(String relativeFieldName, Class<?> inputType, Consumer<Builder> contributor) {
-			Builder builder = StubIndexSchemaNode.fieldTemplate( this, relativeFieldName )
-					.inputType( inputType );
+			Builder builder = StubIndexSchemaDataNode.fieldTemplate( this, relativeFieldName )
+					.valueClass( inputType );
 			contributor.accept( builder );
 			child( builder );
 			return this;
@@ -139,14 +136,14 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 		}
 
 		public Builder objectFieldTemplate(String relativeFieldName, ObjectStructure structure, Consumer<Builder> contributor) {
-			Builder builder = StubIndexSchemaNode.objectFieldTemplate( this, relativeFieldName, structure );
+			Builder builder = StubIndexSchemaDataNode.objectFieldTemplate( this, relativeFieldName, structure );
 			contributor.accept( builder );
 			child( builder );
 			return this;
 		}
 
 		@Override
-		public void child(AbstractBuilder<StubIndexSchemaNode> nodeBuilder) {
+		public void child(AbstractBuilder<StubIndexSchemaDataNode> nodeBuilder) {
 			super.child( nodeBuilder );
 		}
 
@@ -155,13 +152,8 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 			return this;
 		}
 
-		public Builder idDslConverter(DocumentIdentifierValueConverter<?> idDslConverter) {
-			this.idDslConverter = idDslConverter;
-			return this;
-		}
-
-		public Builder inputType(Class<?> inputType) {
-			attribute( "inputType", inputType );
+		public Builder valueClass(Class<?> valueClass) {
+			attribute( "valueClass", valueClass );
 			return this;
 		}
 
@@ -240,19 +232,14 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 			return this;
 		}
 
-		public Builder converter(StubFieldConverter<?> converter) {
-			this.converter = converter;
-			return this;
-		}
-
 		public Builder matchingPathGlob(String pathGlob) {
 			attribute( "matchingPathGlob", pathGlob );
 			return this;
 		}
 
 		@Override
-		public StubIndexSchemaNode build() {
-			return new StubIndexSchemaNode( this );
+		public StubIndexSchemaDataNode build() {
+			return new StubIndexSchemaDataNode( this );
 		}
 	}
 }

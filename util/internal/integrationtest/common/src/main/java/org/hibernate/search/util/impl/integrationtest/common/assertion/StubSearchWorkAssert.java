@@ -10,7 +10,7 @@ import static org.junit.Assert.fail;
 
 import java.util.Objects;
 
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubSearchWork;
 
 public class StubSearchWorkAssert {
 

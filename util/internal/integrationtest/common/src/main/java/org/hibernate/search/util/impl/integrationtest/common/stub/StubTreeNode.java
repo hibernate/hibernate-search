@@ -19,10 +19,12 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
 public abstract class StubTreeNode<N extends StubTreeNode<N>> implements ToStringTreeAppendable {
 
+	private final String absolutePath;
 	private final Map<String, List<Object>> attributes;
 	private final Map<String, List<N>> children;
 
 	protected StubTreeNode(AbstractBuilder<N> builder) {
+		this.absolutePath = builder.absolutePath;
 		this.attributes = Collections.unmodifiableMap(
 				builder.attributes.entrySet().stream()
 						.collect( StreamHelper.toMap(
@@ -72,6 +74,10 @@ public abstract class StubTreeNode<N extends StubTreeNode<N>> implements ToStrin
 				builder.endList();
 			}
 		}
+	}
+
+	public String absolutePath() {
+		return absolutePath;
 	}
 
 	public Map<String, List<Object>> getAttributes() {

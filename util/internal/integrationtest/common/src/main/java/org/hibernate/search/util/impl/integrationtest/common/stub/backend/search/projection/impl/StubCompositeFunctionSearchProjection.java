@@ -11,13 +11,13 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-public class StubCompositeFunctionSearchProjection<P1, P> implements StubCompositeSearchProjection<P> {
+class StubCompositeFunctionSearchProjection<P1, P> implements StubCompositeSearchProjection<P> {
 
 	private final Function<P1, P> transformer;
 
 	private final StubSearchProjection<P1> projection;
 
-	public StubCompositeFunctionSearchProjection(Function<P1, P> transformer,
+	StubCompositeFunctionSearchProjection(Function<P1, P> transformer,
 			StubSearchProjection<P1> projection) {
 		this.transformer = transformer;
 		this.projection = projection;

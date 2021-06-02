@@ -26,12 +26,13 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubSearchWork;
 
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -129,14 +130,14 @@ public class BackendMock implements TestRule {
 		return this;
 	}
 
-	public BackendMock expectSchema(String indexName, Consumer<StubIndexSchemaNode.Builder> contributor) {
+	public BackendMock expectSchema(String indexName, Consumer<StubIndexSchemaDataNode.Builder> contributor) {
 		return expectSchema( indexName, contributor, ignored -> { } );
 	}
 
-	public BackendMock expectSchema(String indexName, Consumer<StubIndexSchemaNode.Builder> contributor,
-			Consumer<StubIndexSchemaNode> capture) {
+	public BackendMock expectSchema(String indexName, Consumer<StubIndexSchemaDataNode.Builder> contributor,
+			Consumer<StubIndexModel> capture) {
 		CallQueue<SchemaDefinitionCall> callQueue = backendBehavior().getSchemaDefinitionCalls( indexName );
-		StubIndexSchemaNode.Builder builder = StubIndexSchemaNode.schema();
+		StubIndexSchemaDataNode.Builder builder = StubIndexSchemaDataNode.schema();
 		contributor.accept( builder );
 		callQueue.expectOutOfOrder( new SchemaDefinitionCall( indexName, builder.build(), capture ) );
 		return this;
@@ -144,7 +145,7 @@ public class BackendMock implements TestRule {
 
 	public BackendMock expectAnySchema(String indexName) {
 		CallQueue<SchemaDefinitionCall> callQueue = backendBehavior().getSchemaDefinitionCalls( indexName );
-		callQueue.expectOutOfOrder( new SchemaDefinitionCall( indexName, null ) );
+		callQueue.expectOutOfOrder( new SchemaDefinitionCall( indexName, null, null ) );
 		return this;
 	}
 

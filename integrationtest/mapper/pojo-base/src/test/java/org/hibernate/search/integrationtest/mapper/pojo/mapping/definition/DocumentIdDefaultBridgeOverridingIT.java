@@ -29,7 +29,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumen
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -62,7 +62,7 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 	private final PropertyTypeDescriptor<I> typeDescriptor;
 	private final DefaultIdentifierBridgeExpectations<I> expectations;
 	private SearchMapping mapping;
-	private StubIndexSchemaNode rootSchemaNode;
+	private StubIndexModel indexModel;
 
 	public DocumentIdDefaultBridgeOverridingIT(PropertyTypeDescriptor<I> typeDescriptor,
 			Optional<DefaultIdentifierBridgeExpectations<I>> expectations) {
@@ -78,7 +78,7 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 		backendMock.expectSchema(
 				DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,
 				b -> { },
-				schema -> this.rootSchemaNode = schema
+				indexModel -> this.indexModel = indexModel
 		);
 		mapping = setupHelper.start()
 				.withAnnotatedEntityType( expectations.getTypeWithIdentifierBridge1(),
@@ -164,7 +164,7 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		DocumentIdentifierValueConverter<I> dslToIndexConverter =
-				(DocumentIdentifierValueConverter<I>) rootSchemaNode.getIdDslConverter();
+				(DocumentIdentifierValueConverter<I>) indexModel.idDslConverter();
 		ToDocumentIdentifierValueConvertContextImpl convertContext =
 				new ToDocumentIdentifierValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
 

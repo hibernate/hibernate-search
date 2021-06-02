@@ -8,33 +8,43 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
+import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubQueryElementCollector;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
 
 public class StubSearchAggregationBuilderFactory
 		implements SearchAggregationBuilderFactory<StubQueryElementCollector> {
+
+	private final StubSearchIndexScope scope;
+
+	public StubSearchAggregationBuilderFactory(StubSearchIndexScope scope) {
+		this.scope = scope;
+	}
 
 	@Override
 	public <A> void contribute(StubQueryElementCollector collector, AggregationKey<A> key,
 			SearchAggregation<A> aggregation) {
 		// Just check the type and simulate collection
-		StubSearchAggregation.class.cast( aggregation );
+		((StubSearchAggregation) aggregation).simulateBuild();
 		collector.simulateCollectCall();
 	}
 
 	@Override
 	public <T> TermsAggregationBuilder<T> createTermsAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
-		return new StubTermsAggregationBuilder<>();
+		return scope.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.TERMS, scope )
+				.type( expectedType, convert );
 	}
 
 	@Override
 	public <T> RangeAggregationBuilder<T> createRangeAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
-		return new StubRangeAggregationBuilder<>();
+		return scope.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.RANGE, scope )
+				.type( expectedType, convert );
 	}
 
 }

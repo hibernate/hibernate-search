@@ -11,23 +11,27 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.St
 import java.util.Objects;
 import java.util.function.Consumer;
 
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
 
 class SchemaDefinitionCall extends Call<SchemaDefinitionCall> {
 
 	private final String indexName;
-	private final StubIndexSchemaNode schemaNode;
-	private final Consumer<StubIndexSchemaNode> capture;
+	private final StubIndexSchemaDataNode schemaNode;
+	private final StubIndexModel model;
+	private final Consumer<StubIndexModel> capture;
 
-	SchemaDefinitionCall(String indexName, StubIndexSchemaNode schemaNode) {
+	SchemaDefinitionCall(String indexName, StubIndexModel model) {
 		this.indexName = indexName;
-		this.schemaNode = schemaNode;
+		this.schemaNode = model.root().schemaData();
+		this.model = model;
 		this.capture = null;
 	}
 
-	SchemaDefinitionCall(String indexName, StubIndexSchemaNode schemaNode, Consumer<StubIndexSchemaNode> capture) {
+	SchemaDefinitionCall(String indexName, StubIndexSchemaDataNode schemaNode, Consumer<StubIndexModel> capture) {
 		this.indexName = indexName;
 		this.schemaNode = schemaNode;
+		this.model = null;
 		this.capture = capture;
 	}
 
@@ -37,7 +41,7 @@ class SchemaDefinitionCall extends Call<SchemaDefinitionCall> {
 					.as( "Schema for index '" + indexName + "' did not match:\n" )
 					.matches( schemaNode );
 			return () -> {
-				capture.accept( actualCall.schemaNode );
+				capture.accept( actualCall.model );
 				return null;
 			};
 		}

@@ -11,22 +11,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.Backend;
+import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
+import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.index.IndexManager;
-import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
-import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
-import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
-import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 public class StubIndexManager implements IndexManagerImplementor, IndexManager {
@@ -37,18 +37,17 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 	private final StubBackend backend;
 	private final String name;
 	private final String mappedTypeName;
-	private final StubIndexSchemaNode rootSchemaNode;
+	private final StubIndexModel model;
 
 	private State state = State.STOPPED;
 
-	StubIndexManager(StubBackend backend, String name, String mappedTypeName,
-			StubIndexSchemaNode rootSchemaNode) {
+	StubIndexManager(StubBackend backend, String name, String mappedTypeName, StubIndexModel model) {
 		StaticCounters.get().increment( INSTANCE_COUNTER_KEY );
 		this.backend = backend;
 		this.name = name;
 		this.mappedTypeName = mappedTypeName;
-		this.rootSchemaNode = rootSchemaNode;
-		backend.getBehavior().defineSchema( name, rootSchemaNode );
+		this.model = model;
+		backend.getBehavior().defineSchema( name, model );
 	}
 
 	@Override
@@ -117,13 +116,13 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 	@Override
 	public IndexScopeBuilder createScopeBuilder(BackendMappingContext mappingContext) {
 		checkStarted();
-		return new StubIndexScope.Builder( backend, mappingContext, name, rootSchemaNode );
+		return new StubIndexScope.Builder( backend, mappingContext, model );
 	}
 
 	@Override
 	public void addTo(IndexScopeBuilder builder) {
 		checkStarted();
-		((StubIndexScope.Builder) builder ).add( backend, name, rootSchemaNode );
+		((StubIndexScope.Builder) builder ).add( backend, model );
 	}
 
 	@Override
@@ -157,6 +156,6 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 	private enum State {
 		STOPPED,
 		STARTED,
-		STOPPING;
+		STOPPING
 	}
 }
