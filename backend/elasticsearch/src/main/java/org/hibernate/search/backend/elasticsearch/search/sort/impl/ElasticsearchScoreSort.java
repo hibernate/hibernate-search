@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 
@@ -36,8 +36,8 @@ class ElasticsearchScoreSort extends AbstractElasticsearchReversibleSort {
 
 	static class Builder extends AbstractBuilder implements ScoreSortBuilder {
 
-		Builder(ElasticsearchSearchContext searchContext) {
-			super( searchContext );
+		Builder(ElasticsearchSearchIndexScope scope) {
+			super( scope );
 		}
 
 		@Override

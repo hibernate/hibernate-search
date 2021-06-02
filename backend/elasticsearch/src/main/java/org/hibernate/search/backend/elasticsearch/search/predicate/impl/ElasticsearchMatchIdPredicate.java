@@ -12,7 +12,7 @@ import java.util.List;
 import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -52,7 +52,7 @@ public class ElasticsearchMatchIdPredicate extends AbstractElasticsearchPredicat
 
 	private ElasticsearchMatchIdPredicate(Builder builder) {
 		super( builder );
-		documentIdHelper = builder.searchContext.documentIdHelper();
+		documentIdHelper = builder.scope.documentIdHelper();
 		values = builder.values;
 		// Ensure illegal attempts to mutate the predicate will fail
 		builder.values = null;
@@ -86,16 +86,16 @@ public class ElasticsearchMatchIdPredicate extends AbstractElasticsearchPredicat
 
 		private List<String> values = new ArrayList<>();
 
-		Builder(ElasticsearchSearchContext searchContext) {
-			super( searchContext );
+		Builder(ElasticsearchSearchIndexScope scope) {
+			super( scope );
 		}
 
 		@Override
 		public void value(Object value, ValueConvert valueConvert) {
 			DocumentIdentifierValueConverter<?> dslToDocumentIdConverter =
-					searchContext.idDslConverter( valueConvert );
+					scope.idDslConverter( valueConvert );
 			ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext =
-					searchContext.toDocumentIdentifierValueConvertContext();
+					scope.toDocumentIdentifierValueConvertContext();
 			values.add( dslToDocumentIdConverter.convertToDocumentUnknown( value, toDocumentIdentifierValueConvertContext ) );
 		}
 

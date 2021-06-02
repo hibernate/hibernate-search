@@ -12,7 +12,7 @@ import java.util.List;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexSchemaElementContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicate;
@@ -69,8 +69,8 @@ public class LuceneObjectExistsPredicate extends AbstractLuceneSingleFieldPredic
 		}
 
 		@Override
-		public ExistsPredicateBuilder create(LuceneSearchContext searchContext, LuceneSearchCompositeIndexSchemaElementContext field) {
-			Builder builder = new Builder( searchContext, field );
+		public ExistsPredicateBuilder create(LuceneSearchIndexScope scope, LuceneSearchCompositeIndexSchemaElementContext field) {
+			Builder builder = new Builder( scope, field );
 			for ( LuceneSearchIndexSchemaElementContext child : field.staticChildrenByName().values() ) {
 				builder.addChild( child );
 			}
@@ -81,8 +81,8 @@ public class LuceneObjectExistsPredicate extends AbstractLuceneSingleFieldPredic
 	private static class Builder extends AbstractBuilder implements ExistsPredicateBuilder {
 		private List<LuceneSearchPredicate> children = new ArrayList<>();
 
-		public Builder(LuceneSearchContext searchContext, LuceneSearchCompositeIndexSchemaElementContext field) {
-			super( searchContext, field );
+		public Builder(LuceneSearchIndexScope scope, LuceneSearchCompositeIndexSchemaElementContext field) {
+			super( scope, field );
 		}
 
 		public void addChild(LuceneSearchIndexSchemaElementContext child) {
@@ -91,8 +91,8 @@ public class LuceneObjectExistsPredicate extends AbstractLuceneSingleFieldPredic
 				//  We align on that behavior... for now.
 				return;
 			}
-			children.add( LuceneSearchPredicate.from( searchContext,
-					child.queryElement( PredicateTypeKeys.EXISTS, searchContext ).build() ) );
+			children.add( LuceneSearchPredicate.from( scope,
+					child.queryElement( PredicateTypeKeys.EXISTS, scope ).build() ) );
 		}
 
 		@Override

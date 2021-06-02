@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
@@ -86,27 +86,27 @@ public class ElasticsearchTermsAggregation<F, K>
 		}
 
 		@Override
-		public TypeSelector<?> create(ElasticsearchSearchContext searchContext,
+		public TypeSelector<?> create(ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<F> field) {
-			return new TypeSelector<>( codec, searchContext, field );
+			return new TypeSelector<>( codec, scope, field );
 		}
 	}
 
 	private static class TypeSelector<F> implements TermsAggregationBuilder.TypeSelector {
 		private final ElasticsearchFieldCodec<F> codec;
-		private final ElasticsearchSearchContext searchContext;
+		private final ElasticsearchSearchIndexScope scope;
 		private final ElasticsearchSearchValueFieldContext<F> field;
 
 		private TypeSelector(ElasticsearchFieldCodec<F> codec,
-				ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<F> field) {
+				ElasticsearchSearchIndexScope scope, ElasticsearchSearchValueFieldContext<F> field) {
 			this.codec = codec;
-			this.searchContext = searchContext;
+			this.scope = scope;
 			this.field = field;
 		}
 
 		@Override
 		public <T> Builder<F, T> type(Class<T> expectedType, ValueConvert convert) {
-			return new Builder<>( codec, searchContext, field,
+			return new Builder<>( codec, scope, field,
 					field.type().projectionConverter( convert ).withConvertedType( expectedType, field ) );
 		}
 	}
@@ -121,10 +121,10 @@ public class ElasticsearchTermsAggregation<F, K>
 		private int minDocCount = 1;
 		private int size = 100;
 
-		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchContext searchContext,
+		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<F> field,
 				ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
-			super( searchContext, field );
+			super( scope, field );
 			this.codec = codec;
 			this.fromFieldValueConverter = fromFieldValueConverter;
 		}
@@ -141,12 +141,12 @@ public class ElasticsearchTermsAggregation<F, K>
 
 		@Override
 		public void orderByTermAscending() {
-			order( searchContext.searchSyntax().getTermAggregationOrderByTermToken(), "asc" );
+			order( scope.searchSyntax().getTermAggregationOrderByTermToken(), "asc" );
 		}
 
 		@Override
 		public void orderByTermDescending() {
-			order( searchContext.searchSyntax().getTermAggregationOrderByTermToken(), "desc" );
+			order( scope.searchSyntax().getTermAggregationOrderByTermToken(), "desc" );
 		}
 
 		@Override

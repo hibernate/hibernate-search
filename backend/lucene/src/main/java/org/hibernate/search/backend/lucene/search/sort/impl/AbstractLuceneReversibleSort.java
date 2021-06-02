@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 
 public abstract class AbstractLuceneReversibleSort extends AbstractLuceneSort {
@@ -21,8 +21,8 @@ public abstract class AbstractLuceneReversibleSort extends AbstractLuceneSort {
 	public abstract static class AbstractBuilder extends AbstractLuceneSort.AbstractBuilder {
 		protected SortOrder order;
 
-		protected AbstractBuilder(LuceneSearchContext searchContext) {
-			super( searchContext );
+		protected AbstractBuilder(LuceneSearchIndexScope scope) {
+			super( scope );
 		}
 
 		public void order(SortOrder order) {

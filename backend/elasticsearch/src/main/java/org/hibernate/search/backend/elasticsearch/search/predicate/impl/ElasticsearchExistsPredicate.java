@@ -10,7 +10,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexSchemaElementContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
@@ -40,24 +40,24 @@ public class ElasticsearchExistsPredicate extends AbstractElasticsearchSingleFie
 	public static class Factory<F>
 			extends AbstractElasticsearchSearchValueFieldQueryElementFactory<ExistsPredicateBuilder, F> {
 		@Override
-		public ExistsPredicateBuilder create(ElasticsearchSearchContext searchContext,
+		public ExistsPredicateBuilder create(ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<F> field) {
-			return new Builder( searchContext, field );
+			return new Builder( scope, field );
 		}
 	}
 
 	public static class ObjectFieldFactory
 			extends AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<ExistsPredicateBuilder> {
 		@Override
-		public ExistsPredicateBuilder create(ElasticsearchSearchContext searchContext,
+		public ExistsPredicateBuilder create(ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchCompositeIndexSchemaElementContext field) {
-			return new Builder( searchContext, field );
+			return new Builder( scope, field );
 		}
 	}
 
 	private static class Builder extends AbstractBuilder implements ExistsPredicateBuilder {
-		Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchIndexSchemaElementContext field) {
-			super( searchContext, field );
+		Builder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexSchemaElementContext field) {
+			super( scope, field );
 		}
 
 		@Override

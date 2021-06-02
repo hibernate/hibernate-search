@@ -30,15 +30,15 @@ import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.function.TriFunction;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubScopeModel;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubSearchIndexScope;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl.StubFieldConverter;
 
 public class StubSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
 
-	private final StubScopeModel scopeModel;
+	private final StubSearchIndexScope scope;
 
-	public StubSearchProjectionBuilderFactory(StubScopeModel scopeModel) {
-		this.scopeModel = scopeModel;
+	public StubSearchProjectionBuilderFactory(StubSearchIndexScope scope) {
+		this.scope = scope;
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 
 	@Override
 	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz, ValueConvert convert) {
-		StubFieldConverter<?> converter = scopeModel.getFieldConverter( absoluteFieldPath );
+		StubFieldConverter<?> converter = scope.getFieldConverter( absoluteFieldPath );
 		return new FieldProjectionBuilder<T>() {
 			@Override
 			public SearchProjection<T> build() {
@@ -85,7 +85,7 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 
 	@Override
 	public <I> IdProjectionBuilder<I> id(Class<I> identifierType) {
-		return new StubIdSearchProjection.Builder<>( scopeModel.idDslConverter(), identifierType );
+		return new StubIdSearchProjection.Builder<>( scope.idDslConverter(), identifierType );
 	}
 
 	@Override

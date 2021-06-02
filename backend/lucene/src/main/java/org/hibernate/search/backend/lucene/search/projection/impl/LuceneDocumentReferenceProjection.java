@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.DocumentReferenceCollector;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -17,8 +17,8 @@ import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjec
 
 class LuceneDocumentReferenceProjection extends AbstractLuceneProjection<DocumentReference, DocumentReference> {
 
-	private LuceneDocumentReferenceProjection(LuceneSearchContext searchContext) {
-		super( searchContext );
+	private LuceneDocumentReferenceProjection(LuceneSearchIndexScope scope) {
+		super( scope );
 	}
 
 	@Override
@@ -46,13 +46,13 @@ class LuceneDocumentReferenceProjection extends AbstractLuceneProjection<Documen
 	public static class Builder extends AbstractLuceneProjection.AbstractBuilder<DocumentReference>
 			implements DocumentReferenceProjectionBuilder {
 
-		public Builder(LuceneSearchContext searchContext) {
-			super( searchContext );
+		public Builder(LuceneSearchIndexScope scope) {
+			super( scope );
 		}
 
 		@Override
 		public SearchProjection<DocumentReference> build() {
-			return new LuceneDocumentReferenceProjection( searchContext );
+			return new LuceneDocumentReferenceProjection( scope );
 		}
 	}
 }

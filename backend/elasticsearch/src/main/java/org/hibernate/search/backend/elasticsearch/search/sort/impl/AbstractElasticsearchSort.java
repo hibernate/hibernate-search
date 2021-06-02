@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilder;
 
 public abstract class AbstractElasticsearchSort implements ElasticsearchSearchSort {
@@ -16,11 +16,11 @@ public abstract class AbstractElasticsearchSort implements ElasticsearchSearchSo
 	protected final Set<String> indexNames;
 
 	protected AbstractElasticsearchSort(AbstractBuilder builder) {
-		this( builder.searchContext );
+		this( builder.scope );
 	}
 
-	protected AbstractElasticsearchSort(ElasticsearchSearchContext searchContext) {
-		indexNames = searchContext.hibernateSearchIndexNames();
+	protected AbstractElasticsearchSort(ElasticsearchSearchIndexScope scope) {
+		indexNames = scope.hibernateSearchIndexNames();
 	}
 
 	@Override
@@ -30,10 +30,10 @@ public abstract class AbstractElasticsearchSort implements ElasticsearchSearchSo
 
 	public abstract static class AbstractBuilder implements SearchSortBuilder {
 
-		protected final ElasticsearchSearchContext searchContext;
+		protected final ElasticsearchSearchIndexScope scope;
 
-		protected AbstractBuilder(ElasticsearchSearchContext searchContext) {
-			this.searchContext = searchContext;
+		protected AbstractBuilder(ElasticsearchSearchIndexScope scope) {
+			this.scope = scope;
 		}
 	}
 }

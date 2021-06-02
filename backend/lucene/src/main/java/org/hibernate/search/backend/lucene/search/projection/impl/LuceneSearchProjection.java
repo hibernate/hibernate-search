@@ -11,7 +11,7 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -63,14 +63,14 @@ public interface LuceneSearchProjection<E, P> extends SearchProjection<P> {
 	P transform(LoadingResult<?, ?> loadingResult, E extractedData,
 			SearchProjectionTransformContext context);
 
-	static <P> LuceneSearchProjection<?, P> from(LuceneSearchContext searchContext, SearchProjection<P> projection) {
+	static <P> LuceneSearchProjection<?, P> from(LuceneSearchIndexScope scope, SearchProjection<P> projection) {
 		if ( !( projection instanceof LuceneSearchProjection ) ) {
 			throw log.cannotMixLuceneSearchQueryWithOtherProjections( projection );
 		}
 		LuceneSearchProjection<?, P> casted = (LuceneSearchProjection<?, P>) projection;
-		if ( !searchContext.hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
+		if ( !scope.hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
 			throw log.projectionDefinedOnDifferentIndexes( projection, casted.indexNames(),
-					searchContext.hibernateSearchIndexNames() );
+					scope.hibernateSearchIndexNames() );
 		}
 		return casted;
 	}

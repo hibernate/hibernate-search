@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexContext;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
@@ -52,7 +52,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final ElasticsearchParallelWorkOrchestrator queryOrchestrator;
-	private final ElasticsearchSearchContext searchContext;
+	private final ElasticsearchSearchIndexScope scope;
 	private final BackendSessionContext sessionContext;
 	private final SearchLoadingContext<?, ?> loadingContext;
 	private final Set<String> routingKeys;
@@ -71,7 +71,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 	ElasticsearchSearchQueryImpl(ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchParallelWorkOrchestrator queryOrchestrator,
-			ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchIndexScope scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContext<?, ?> loadingContext,
 			Set<String> routingKeys,
@@ -81,7 +81,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			TimeoutManager timeoutManager, Integer scrollTimeout, Long totalHitCountThreshold) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
-		this.searchContext = searchContext;
+		this.scope = scope;
 		this.sessionContext = sessionContext;
 		this.loadingContext = loadingContext;
 		this.routingKeys = routingKeys;
@@ -91,7 +91,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		this.timeoutManager = timeoutManager;
 		this.scrollTimeout = scrollTimeout;
 		this.totalHitCountThreshold = totalHitCountThreshold;
-		this.maxResultWindow = searchContext.maxResultWindow();
+		this.maxResultWindow = scope.maxResultWindow();
 	}
 
 	@Override
@@ -178,7 +178,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		}
 
 		CountWorkBuilder builder = workFactory.count();
-		for ( ElasticsearchSearchIndexContext index : searchContext.indexes() ) {
+		for ( ElasticsearchSearchIndexContext index : scope.indexes() ) {
 			builder.index( index.names().read() );
 		}
 		builder.query( filteredPayload )
@@ -210,7 +210,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		Contracts.assertNotNull( id, "id" );
 
 		Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex =
-				searchContext.mappedTypeNameToIndex();
+				scope.mappedTypeNameToIndex();
 		if ( mappedTypeNameToIndex.size() != 1 ) {
 			throw log.explainRequiresTypeName( mappedTypeNameToIndex.keySet() );
 		}
@@ -224,7 +224,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		Contracts.assertNotNull( id, "id" );
 
 		Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex =
-				searchContext.mappedTypeNameToIndex();
+				scope.mappedTypeNameToIndex();
 		ElasticsearchSearchIndexContext index = mappedTypeNameToIndex.get( typeName );
 		if ( index == null ) {
 			throw log.explainRequiresTypeTargetedByQuery( mappedTypeNameToIndex.keySet(), typeName );
@@ -236,7 +236,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private SearchWorkBuilder<ElasticsearchLoadableSearchResult<H>> searchWorkBuilder() {
 		SearchWorkBuilder<ElasticsearchLoadableSearchResult<H>> builder =
 				workFactory.search( payload, searchResultExtractor );
-		for ( ElasticsearchSearchIndexContext index : searchContext.indexes() ) {
+		for ( ElasticsearchSearchIndexContext index : scope.indexes() ) {
 			builder.index( index.names().read() );
 		}
 		builder
@@ -290,15 +290,15 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private URLEncodedString toElasticsearchId(ElasticsearchSearchIndexContext index, Object id) {
 		DocumentIdentifierValueConverter<?> converter = index.idDslConverter();
 		ToDocumentIdentifierValueConvertContext convertContext =
-				searchContext.toDocumentIdentifierValueConvertContext();
+				scope.toDocumentIdentifierValueConvertContext();
 		String documentId = converter.convertToDocumentUnknown( id, convertContext );
-		return URLEncodedString.fromString( searchContext.documentIdHelper()
+		return URLEncodedString.fromString( scope.documentIdHelper()
 				.toElasticsearchId( sessionContext.tenantIdentifier(), documentId ) );
 	}
 
 	@Override
 	public void failAfter(long timeout, TimeUnit timeUnit) {
 		// replace the timeout manager on already created query instance
-		timeoutManager = searchContext.createTimeoutManager( timeout, timeUnit, true );
+		timeoutManager = scope.createTimeoutManager( timeout, timeUnit, true );
 	}
 }

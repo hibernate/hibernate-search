@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -61,14 +61,14 @@ public interface ElasticsearchSearchProjection<E, P> extends SearchProjection<P>
 	 */
 	P transform(LoadingResult<?, ?> loadingResult, E extractedData, SearchProjectionTransformContext context);
 
-	static <P> ElasticsearchSearchProjection<?, P> from(ElasticsearchSearchContext searchContext, SearchProjection<P> projection) {
+	static <P> ElasticsearchSearchProjection<?, P> from(ElasticsearchSearchIndexScope scope, SearchProjection<P> projection) {
 		if ( !( projection instanceof ElasticsearchSearchProjection ) ) {
 			throw log.cannotMixElasticsearchSearchQueryWithOtherProjections( projection );
 		}
 		ElasticsearchSearchProjection<?, P> casted = (ElasticsearchSearchProjection<?, P>) projection;
-		if ( !searchContext.hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
+		if ( !scope.hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
 			throw log.projectionDefinedOnDifferentIndexes( projection, casted.indexNames(),
-					searchContext.hibernateSearchIndexNames() );
+					scope.hibernateSearchIndexNames() );
 		}
 		return casted;
 	}

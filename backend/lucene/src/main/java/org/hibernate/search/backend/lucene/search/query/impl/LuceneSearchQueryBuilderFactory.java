@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneCompositeListProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
@@ -25,15 +25,15 @@ public class LuceneSearchQueryBuilderFactory
 
 	private final SearchBackendContext searchBackendContext;
 
-	private final LuceneSearchContext searchContext;
+	private final LuceneSearchIndexScope scope;
 
 	private final LuceneSearchProjectionBuilderFactory searchProjectionFactory;
 
 	public LuceneSearchQueryBuilderFactory(SearchBackendContext searchBackendContext,
-			LuceneSearchContext searchContext,
+			LuceneSearchIndexScope scope,
 			LuceneSearchProjectionBuilderFactory searchProjectionFactory) {
 		this.searchBackendContext = searchBackendContext;
-		this.searchContext = searchContext;
+		this.scope = scope;
 		this.searchProjectionFactory = searchProjectionFactory;
 	}
 
@@ -54,7 +54,7 @@ public class LuceneSearchQueryBuilderFactory
 			BackendSessionContext sessionContext, SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			SearchProjection<P> projection) {
 		return createSearchQueryBuilder( sessionContext, loadingContextBuilder,
-				LuceneSearchProjection.from( searchContext, projection ) );
+				LuceneSearchProjection.from( scope, projection ) );
 	}
 
 	@Override
@@ -68,17 +68,17 @@ public class LuceneSearchQueryBuilderFactory
 		List<LuceneSearchProjection<?, ?>> children = new ArrayList<>( projections.length );
 
 		for ( SearchProjection<?> projection : projections ) {
-			children.add( LuceneSearchProjection.from( searchContext, projection ) );
+			children.add( LuceneSearchProjection.from( scope, projection ) );
 		}
 
-		return new LuceneCompositeListProjection<>( searchContext, Function.identity(), children );
+		return new LuceneCompositeListProjection<>( scope, Function.identity(), children );
 	}
 
 	private <H> LuceneSearchQueryBuilder<H> createSearchQueryBuilder(
 			BackendSessionContext sessionContext, SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			LuceneSearchProjection<?, H> rootProjection) {
 		return searchBackendContext.createSearchQueryBuilder(
-				searchContext, sessionContext, loadingContextBuilder, rootProjection
+				scope, sessionContext, loadingContextBuilder, rootProjection
 		);
 	}
 }

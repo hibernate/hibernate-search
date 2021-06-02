@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
@@ -37,8 +37,8 @@ public class LuceneNumericMatchPredicate extends AbstractLuceneLeafSingleFieldPr
 		}
 
 		@Override
-		public Builder<F, E> create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
-			return new Builder<>( codec, searchContext, field );
+		public Builder<F, E> create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+			return new Builder<>( codec, scope, field );
 		}
 	}
 
@@ -47,9 +47,9 @@ public class LuceneNumericMatchPredicate extends AbstractLuceneLeafSingleFieldPr
 
 		private E value;
 
-		private Builder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchContext searchContext,
+		private Builder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchIndexScope scope,
 				LuceneSearchValueFieldContext<F> field) {
-			super( searchContext, field );
+			super( scope, field );
 			this.codec = codec;
 		}
 

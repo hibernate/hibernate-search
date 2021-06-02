@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.scope.LuceneIndexScope;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexManagerContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregationBuilderFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactoryImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
@@ -31,7 +31,7 @@ import org.apache.lucene.index.IndexReader;
 public class LuceneIndexScopeImpl
 		implements IndexScope<LuceneSearchQueryElementCollector>, LuceneIndexScope {
 
-	private final LuceneSearchContext searchContext;
+	private final LuceneSearchIndexScope scope;
 	private final LuceneSearchPredicateBuilderFactoryImpl searchPredicateFactory;
 	private final LuceneSearchSortBuilderFactoryImpl searchSortFactory;
 	private final LuceneSearchQueryBuilderFactory searchQueryFactory;
@@ -41,19 +41,19 @@ public class LuceneIndexScopeImpl
 	public LuceneIndexScopeImpl(SearchBackendContext backendContext,
 			BackendMappingContext mappingContext,
 			Set<? extends LuceneScopeIndexManagerContext> indexManagerContexts) {
-		this.searchContext = backendContext.createSearchContext( mappingContext, indexManagerContexts );
-		this.searchPredicateFactory = new LuceneSearchPredicateBuilderFactoryImpl( searchContext );
-		this.searchSortFactory = new LuceneSearchSortBuilderFactoryImpl( searchContext );
-		this.searchProjectionFactory = new LuceneSearchProjectionBuilderFactory( searchContext );
-		this.searchAggregationFactory = new LuceneSearchAggregationBuilderFactory( searchContext );
-		this.searchQueryFactory = new LuceneSearchQueryBuilderFactory( backendContext, searchContext, this.searchProjectionFactory );
+		this.scope = backendContext.createSearchContext( mappingContext, indexManagerContexts );
+		this.searchPredicateFactory = new LuceneSearchPredicateBuilderFactoryImpl( scope );
+		this.searchSortFactory = new LuceneSearchSortBuilderFactoryImpl( scope );
+		this.searchProjectionFactory = new LuceneSearchProjectionBuilderFactory( scope );
+		this.searchAggregationFactory = new LuceneSearchAggregationBuilderFactory( scope );
+		this.searchQueryFactory = new LuceneSearchQueryBuilderFactory( backendContext, scope, this.searchProjectionFactory );
 	}
 
 	@Override
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "indexNames=" ).append( searchContext.hibernateSearchIndexNames() )
+				.append( "indexNames=" ).append( scope.hibernateSearchIndexNames() )
 				.append( "]" )
 				.toString();
 	}
@@ -85,8 +85,8 @@ public class LuceneIndexScopeImpl
 
 	@Override
 	public IndexReader openIndexReader(Set<String> routingKeys) {
-		Set<String> indexNames = searchContext.hibernateSearchIndexNames();
-		Collection<? extends LuceneSearchIndexContext> indexManagerContexts = searchContext.indexes();
+		Set<String> indexNames = scope.hibernateSearchIndexNames();
+		Collection<? extends LuceneSearchIndexContext> indexManagerContexts = scope.indexes();
 		return HibernateSearchMultiReader.open( indexNames, indexManagerContexts, routingKeys );
 	}
 }

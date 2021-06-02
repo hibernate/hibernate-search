@@ -20,7 +20,7 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregation;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DistanceSortKey;
@@ -56,7 +56,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private final ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory;
 	private final ElasticsearchParallelWorkOrchestrator queryOrchestrator;
 
-	private final ElasticsearchSearchContext searchContext;
+	private final ElasticsearchSearchIndexScope scope;
 	private final BackendSessionContext sessionContext;
 
 	private final PredicateRequestContext rootPredicateContext;
@@ -79,7 +79,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 			ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory,
 			ElasticsearchParallelWorkOrchestrator queryOrchestrator,
-			ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchIndexScope scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<?, H> rootProjection,
@@ -88,7 +88,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 		this.searchResultExtractorFactory = searchResultExtractorFactory;
 		this.queryOrchestrator = queryOrchestrator;
 
-		this.searchContext = searchContext;
+		this.scope = scope;
 		this.sessionContext = sessionContext;
 		this.routingKeys = new HashSet<>();
 
@@ -180,7 +180,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 		JsonObject payload = new JsonObject();
 
 		JsonArray filters = new JsonArray();
-		JsonObject filter = searchContext.filterOrNull( sessionContext.tenantIdentifier() );
+		JsonObject filter = scope.filterOrNull( sessionContext.tenantIdentifier() );
 		if ( filter != null ) {
 			filters.add( filter );
 		}
@@ -200,7 +200,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 		SearchLoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
 
 		ElasticsearchSearchQueryRequestContext requestContext = new ElasticsearchSearchQueryRequestContext(
-				searchContext, sessionContext, loadingContext, rootPredicateContext, distanceSorts
+				scope, sessionContext, loadingContext, rootPredicateContext, distanceSorts
 		);
 
 		rootProjection.request( payload, requestContext );
@@ -219,7 +219,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 			REQUEST_SOURCE_ACCESSOR.set( payload, new JsonPrimitive( Boolean.FALSE ) );
 		}
 
-		TimeoutManager timeoutManager = searchContext.createTimeoutManager(
+		TimeoutManager timeoutManager = scope.createTimeoutManager(
 				timeoutValue, timeoutUnit, exceptionOnTimeout );
 
 		ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor =
@@ -231,7 +231,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 		return new ElasticsearchSearchQueryImpl<>(
 				workFactory, queryOrchestrator,
-				searchContext, sessionContext, loadingContext, routingKeys,
+				scope, sessionContext, loadingContext, routingKeys,
 				payload, requestTransformer,
 				searchResultExtractor,
 				timeoutManager,

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 
 import com.google.gson.JsonPrimitive;
 
@@ -14,8 +14,8 @@ class ElasticsearchIndexOrderSort extends AbstractElasticsearchSort {
 
 	private static final JsonPrimitive DOC_SORT_KEYWORD_JSON = new JsonPrimitive( "_doc" );
 
-	ElasticsearchIndexOrderSort(ElasticsearchSearchContext searchContext) {
-		super( searchContext );
+	ElasticsearchIndexOrderSort(ElasticsearchSearchIndexScope scope) {
+		super( scope );
 	}
 
 	@Override

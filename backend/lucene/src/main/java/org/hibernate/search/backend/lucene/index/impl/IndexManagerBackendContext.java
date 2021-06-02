@@ -28,9 +28,9 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrch
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.backend.lucene.schema.management.impl.LuceneIndexSchemaManager;
 import org.hibernate.search.backend.lucene.schema.management.impl.SchemaManagementIndexManagerContext;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneIndexScopeSearchContext;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSearchIndexScopeImpl;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexManagerContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
@@ -146,9 +146,9 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	}
 
 	@Override
-	public LuceneSearchContext createSearchContext(BackendMappingContext mappingContext,
+	public LuceneSearchIndexScope createSearchContext(BackendMappingContext mappingContext,
 			Set<? extends LuceneScopeIndexManagerContext> indexManagerContexts) {
-		return new LuceneIndexScopeSearchContext(
+		return new LuceneSearchIndexScopeImpl(
 				mappingContext, analysisDefinitionRegistry, multiTenancyStrategy,
 				timingSource,
 				indexManagerContexts
@@ -157,7 +157,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 
 	@Override
 	public <H> LuceneSearchQueryBuilder<H> createSearchQueryBuilder(
-			LuceneSearchContext searchContext,
+			LuceneSearchIndexScope scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			LuceneSearchProjection<?, H> rootProjection) {
@@ -166,7 +166,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		return new LuceneSearchQueryBuilder<>(
 				workFactory,
 				readOrchestrator,
-				searchContext,
+				scope,
 				sessionContext,
 				loadingContextBuilder,
 				rootProjection

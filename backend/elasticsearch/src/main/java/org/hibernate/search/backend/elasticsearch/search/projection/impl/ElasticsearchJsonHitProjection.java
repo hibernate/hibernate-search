@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -16,8 +16,8 @@ import com.google.gson.JsonObject;
 
 class ElasticsearchJsonHitProjection extends AbstractElasticsearchProjection<JsonObject, JsonObject> {
 
-	private ElasticsearchJsonHitProjection(ElasticsearchSearchContext searchContext) {
-		super( searchContext );
+	private ElasticsearchJsonHitProjection(ElasticsearchSearchIndexScope scope) {
+		super( scope );
 	}
 
 	@Override
@@ -46,8 +46,8 @@ class ElasticsearchJsonHitProjection extends AbstractElasticsearchProjection<Jso
 
 		private final ElasticsearchJsonHitProjection projection;
 
-		Builder(ElasticsearchSearchContext searchContext) {
-			this.projection = new ElasticsearchJsonHitProjection( searchContext );
+		Builder(ElasticsearchSearchIndexScope scope) {
+			this.projection = new ElasticsearchJsonHitProjection( scope );
 		}
 
 		@Override

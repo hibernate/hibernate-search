@@ -51,14 +51,14 @@ abstract class AbstractElasticsearchMultiIndexSearchCompositeIndexSchemaElementC
 	protected abstract EventContext relativeEventContext();
 
 	@Override
-	public <T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchContext searchContext) {
+	public <T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchIndexScope scope) {
 		ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
 		if ( factory == null ) {
 			throw log.cannotUseQueryElementForCompositeIndexElement( relativeEventContext(), key.toString(),
 					indexesEventContext() );
 		}
 		try {
-			return factory.create( searchContext, this );
+			return factory.create( scope, this );
 		}
 		catch (SearchException e) {
 			throw log.cannotUseQueryElementForCompositeIndexElementBecauseCreationException( relativeEventContext(), key.toString(),

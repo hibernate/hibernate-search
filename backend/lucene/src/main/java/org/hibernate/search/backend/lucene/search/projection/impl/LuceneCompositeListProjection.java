@@ -10,16 +10,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 
 public class LuceneCompositeListProjection<P>
 		extends AbstractLuceneCompositeProjection<P> {
 
 	private final Function<List<?>, P> transformer;
 
-	public LuceneCompositeListProjection(LuceneSearchContext searchContext, Function<List<?>, P> transformer,
+	public LuceneCompositeListProjection(LuceneSearchIndexScope scope, Function<List<?>, P> transformer,
 			List<LuceneSearchProjection<?, ?>> children) {
-		super( searchContext, children.toArray( new LuceneSearchProjection<?, ?>[0] ) );
+		super( scope, children.toArray( new LuceneSearchProjection<?, ?>[0] ) );
 		this.transformer = transformer;
 	}
 

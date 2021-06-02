@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
@@ -80,27 +80,27 @@ public class ElasticsearchRangeAggregation<F, K>
 		}
 
 		@Override
-		public TypeSelector<?> create(ElasticsearchSearchContext searchContext,
+		public TypeSelector<?> create(ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<F> field) {
-			return new TypeSelector<>( codec, searchContext, field );
+			return new TypeSelector<>( codec, scope, field );
 		}
 	}
 
 	private static class TypeSelector<F> implements RangeAggregationBuilder.TypeSelector {
 		private final ElasticsearchFieldCodec<F> codec;
-		private final ElasticsearchSearchContext searchContext;
+		private final ElasticsearchSearchIndexScope scope;
 		private final ElasticsearchSearchValueFieldContext<F> field;
 
 		private TypeSelector(ElasticsearchFieldCodec<F> codec,
-				ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<F> field) {
+				ElasticsearchSearchIndexScope scope, ElasticsearchSearchValueFieldContext<F> field) {
 			this.codec = codec;
-			this.searchContext = searchContext;
+			this.scope = scope;
 			this.field = field;
 		}
 
 		@Override
 		public <T> Builder<F, T> type(Class<T> expectedType, ValueConvert convert) {
-			return new Builder<>( codec, searchContext, field,
+			return new Builder<>( codec, scope, field,
 					field.type().dslConverter( convert ).withInputType( expectedType, field ) );
 		}
 	}
@@ -114,9 +114,9 @@ public class ElasticsearchRangeAggregation<F, K>
 		private final List<Range<K>> rangesInOrder = new ArrayList<>();
 		private final JsonArray rangesJson = new JsonArray();
 
-		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchContext searchContext,
+		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<F> field, DslConverter<? super K, F> toFieldValueConverter) {
-			super( searchContext, field );
+			super( scope, field );
 			this.codec = codec;
 			this.toFieldValueConverter = toFieldValueConverter;
 		}
@@ -152,7 +152,7 @@ public class ElasticsearchRangeAggregation<F, K>
 
 		private JsonElement convertToFieldValue(K value) {
 			try {
-				F converted = toFieldValueConverter.convert( value, searchContext.toDocumentFieldValueConvertContext() );
+				F converted = toFieldValueConverter.convert( value, scope.toDocumentFieldValueConvertContext() );
 				return codec.encode( converted );
 			}
 			catch (RuntimeException e) {

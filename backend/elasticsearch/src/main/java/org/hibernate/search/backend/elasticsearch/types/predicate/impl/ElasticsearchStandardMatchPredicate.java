@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
@@ -62,9 +62,9 @@ public class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSi
 		}
 
 		@Override
-		public MatchPredicateBuilder create(ElasticsearchSearchContext searchContext,
+		public MatchPredicateBuilder create(ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<F> field) {
-			return new Builder<>( codec, searchContext, field );
+			return new Builder<>( codec, scope, field );
 		}
 	}
 
@@ -75,9 +75,9 @@ public class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSi
 
 		private JsonElement value;
 
-		Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchContext searchContext,
+		Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<F> field) {
-			super( searchContext, field );
+			super( scope, field );
 			this.field = field;
 			this.codec = codec;
 		}
@@ -101,7 +101,7 @@ public class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSi
 		public void value(Object value, ValueConvert convert) {
 			DslConverter<?, ? extends F> dslToIndexConverter = field.type().dslConverter( convert );
 			try {
-				F converted = dslToIndexConverter.convertUnknown( value, searchContext.toDocumentFieldValueConvertContext() );
+				F converted = dslToIndexConverter.convertUnknown( value, scope.toDocumentFieldValueConvertContext() );
 				this.value = codec.encode( converted );
 			}
 			catch (RuntimeException e) {

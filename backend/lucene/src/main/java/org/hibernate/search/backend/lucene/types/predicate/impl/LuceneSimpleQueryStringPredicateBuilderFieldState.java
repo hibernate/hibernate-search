@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 
@@ -40,7 +40,7 @@ public final class LuceneSimpleQueryStringPredicateBuilderFieldState
 			extends
 			AbstractLuceneSearchValueFieldQueryElementFactory<LuceneSimpleQueryStringPredicateBuilderFieldState, String> {
 		@Override
-		public LuceneSimpleQueryStringPredicateBuilderFieldState create(LuceneSearchContext searchContext,
+		public LuceneSimpleQueryStringPredicateBuilderFieldState create(LuceneSearchIndexScope scope,
 				LuceneSearchValueFieldContext<String> field) {
 			return new LuceneSimpleQueryStringPredicateBuilderFieldState( field );
 		}

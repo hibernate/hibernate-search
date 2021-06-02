@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 
 import com.google.gson.JsonObject;
@@ -23,7 +23,7 @@ public abstract class AbstractElasticsearchPredicate implements ElasticsearchSea
 	private final boolean withConstantScore;
 
 	protected AbstractElasticsearchPredicate(AbstractBuilder builder) {
-		indexNames = builder.searchContext.hibernateSearchIndexNames();
+		indexNames = builder.scope.hibernateSearchIndexNames();
 		boost = builder.boost;
 		withConstantScore = builder.withConstantScore;
 	}
@@ -64,13 +64,13 @@ public abstract class AbstractElasticsearchPredicate implements ElasticsearchSea
 	}
 
 	protected abstract static class AbstractBuilder implements SearchPredicateBuilder {
-		protected final ElasticsearchSearchContext searchContext;
+		protected final ElasticsearchSearchIndexScope scope;
 
 		private Float boost;
 		private boolean withConstantScore = false;
 
-		AbstractBuilder(ElasticsearchSearchContext searchContext) {
-			this.searchContext = searchContext;
+		AbstractBuilder(ElasticsearchSearchIndexScope scope) {
+			this.scope = scope;
 		}
 
 		@Override

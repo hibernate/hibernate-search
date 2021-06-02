@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
@@ -76,9 +76,9 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 		}
 
 		@Override
-		public RangePredicateBuilder create(ElasticsearchSearchContext searchContext,
+		public RangePredicateBuilder create(ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<F> field) {
-			return new Builder<>( codec, searchContext, field );
+			return new Builder<>( codec, scope, field );
 		}
 	}
 
@@ -89,9 +89,9 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 
 		private Range<JsonElement> range;
 
-		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchContext searchContext,
+		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<F> field) {
-			super( searchContext, field );
+			super( scope, field );
 			this.codec = codec;
 			this.field = field;
 		}
@@ -123,7 +123,7 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 			DslConverter<?, ? extends F> toFieldValueConverter = field.type().dslConverter( convert );
 			try {
 				F converted = toFieldValueConverter.convertUnknown(
-						value, searchContext.toDocumentFieldValueConvertContext()
+						value, scope.toDocumentFieldValueConvertContext()
 				);
 				return codec.encode( converted );
 			}

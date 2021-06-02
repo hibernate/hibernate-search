@@ -18,7 +18,6 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.aggregation.impl.StubSearchAggregationBuilderFactory;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubScopeModel;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl.StubSearchPredicateBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.StubSearchSortBuilderFactory;
@@ -34,12 +33,12 @@ public class StubIndexScope implements IndexScope<StubQueryElementCollector> {
 		Set<String> immutableIndexNames = Collections.unmodifiableSet( new LinkedHashSet<>( builder.indexNames ) );
 		Set<StubIndexSchemaNode> immutableRootSchemaNodes =
 				Collections.unmodifiableSet( new LinkedHashSet<>( builder.rootSchemaNodes ) );
-		StubScopeModel model = new StubScopeModel( immutableIndexNames, immutableRootSchemaNodes );
+		StubSearchIndexScope scope = new StubSearchIndexScope( immutableIndexNames, immutableRootSchemaNodes );
 		this.predicateFactory = new StubSearchPredicateBuilderFactory();
 		this.sortFactory = new StubSearchSortBuilderFactory();
-		this.projectionFactory = new StubSearchProjectionBuilderFactory( model );
+		this.projectionFactory = new StubSearchProjectionBuilderFactory( scope );
 		this.aggregationFactory = new StubSearchAggregationBuilderFactory();
-		this.queryFactory = new StubSearchQueryBuilderFactory( builder.backend, model );
+		this.queryFactory = new StubSearchQueryBuilderFactory( builder.backend, scope );
 	}
 
 	@Override

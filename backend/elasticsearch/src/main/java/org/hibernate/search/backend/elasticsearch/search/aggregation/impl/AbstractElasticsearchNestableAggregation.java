@@ -12,7 +12,7 @@ import java.util.List;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
@@ -121,8 +121,8 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 		protected final List<String> nestedPathHierarchy;
 		private ElasticsearchSearchPredicate filter;
 
-		public AbstractBuilder(ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<?> field) {
-			super( searchContext );
+		public AbstractBuilder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchValueFieldContext<?> field) {
+			super( scope );
 			this.field = field;
 			this.nestedPathHierarchy = field.nestedPathHierarchy();
 		}
@@ -131,7 +131,7 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 			if ( nestedPathHierarchy.isEmpty() ) {
 				throw log.cannotFilterAggregationOnRootDocumentField( field.absolutePath(), field.eventContext() );
 			}
-			ElasticsearchSearchPredicate elasticsearchFilter = ElasticsearchSearchPredicate.from( searchContext, filter );
+			ElasticsearchSearchPredicate elasticsearchFilter = ElasticsearchSearchPredicate.from( scope, filter );
 			elasticsearchFilter.checkNestableWithin( nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 ) );
 			this.filter = elasticsearchFilter;
 		}

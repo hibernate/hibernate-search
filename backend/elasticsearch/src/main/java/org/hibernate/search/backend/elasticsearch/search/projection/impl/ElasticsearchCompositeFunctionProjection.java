@@ -8,17 +8,17 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.function.Function;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 
 class ElasticsearchCompositeFunctionProjection<P1, P>
 		extends AbstractElasticsearchCompositeProjection<P> {
 
 	private final Function<P1, P> transformer;
 
-	ElasticsearchCompositeFunctionProjection(ElasticsearchSearchContext searchContext,
+	ElasticsearchCompositeFunctionProjection(ElasticsearchSearchIndexScope scope,
 			Function<P1, P> transformer,
 			ElasticsearchSearchProjection<?, P1> projection) {
-		super( searchContext, projection );
+		super( scope, projection );
 		this.transformer = transformer;
 	}
 

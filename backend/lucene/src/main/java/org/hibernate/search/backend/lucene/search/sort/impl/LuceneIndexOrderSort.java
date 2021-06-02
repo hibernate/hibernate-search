@@ -6,14 +6,14 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 
 import org.apache.lucene.search.SortField;
 
 class LuceneIndexOrderSort extends AbstractLuceneSort {
 
-	LuceneIndexOrderSort(LuceneSearchContext searchContext) {
-		super( searchContext );
+	LuceneIndexOrderSort(LuceneSearchIndexScope scope) {
+		super( scope );
 	}
 
 	@Override

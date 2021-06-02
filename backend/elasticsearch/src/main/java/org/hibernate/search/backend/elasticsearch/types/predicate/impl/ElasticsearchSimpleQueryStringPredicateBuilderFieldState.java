@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 
@@ -47,7 +47,7 @@ public final class ElasticsearchSimpleQueryStringPredicateBuilderFieldState
 			AbstractElasticsearchSearchValueFieldQueryElementFactory<ElasticsearchSimpleQueryStringPredicateBuilderFieldState, String> {
 		@Override
 		public ElasticsearchSimpleQueryStringPredicateBuilderFieldState create(
-				ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<String> field) {
+				ElasticsearchSearchIndexScope scope, ElasticsearchSearchValueFieldContext<String> field) {
 			return new ElasticsearchSimpleQueryStringPredicateBuilderFieldState( field );
 		}
 	}

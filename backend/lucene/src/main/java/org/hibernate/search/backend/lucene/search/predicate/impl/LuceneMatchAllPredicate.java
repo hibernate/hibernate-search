@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 
@@ -31,8 +31,8 @@ class LuceneMatchAllPredicate extends AbstractLuceneSearchPredicate {
 	}
 
 	static class Builder extends AbstractBuilder implements MatchAllPredicateBuilder {
-		Builder(LuceneSearchContext searchContext) {
-			super( searchContext );
+		Builder(LuceneSearchIndexScope scope) {
+			super( scope );
 		}
 
 		@Override

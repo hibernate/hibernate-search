@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexSchemaElementContext;
 
 public abstract class AbstractElasticsearchSingleFieldPredicate extends AbstractElasticsearchNestablePredicate {
@@ -37,13 +37,13 @@ public abstract class AbstractElasticsearchSingleFieldPredicate extends Abstract
 		protected final String absoluteFieldPath;
 		private final List<String> nestedPathHierarchy;
 
-		protected AbstractBuilder(ElasticsearchSearchContext searchContext, ElasticsearchSearchIndexSchemaElementContext field) {
-			this( searchContext, field.absolutePath(), field.nestedPathHierarchy() );
+		protected AbstractBuilder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexSchemaElementContext field) {
+			this( scope, field.absolutePath(), field.nestedPathHierarchy() );
 		}
 
-		protected AbstractBuilder(ElasticsearchSearchContext searchContext, String absoluteFieldPath,
+		protected AbstractBuilder(ElasticsearchSearchIndexScope scope, String absoluteFieldPath,
 				List<String> nestedPathHierarchy) {
-			super( searchContext );
+			super( scope );
 			this.absoluteFieldPath = absoluteFieldPath;
 			this.nestedPathHierarchy = nestedPathHierarchy;
 		}

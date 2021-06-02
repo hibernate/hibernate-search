@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 
 import com.google.gson.JsonObject;
 
@@ -34,8 +34,8 @@ class ElasticsearchUserProvidedJsonAggregation extends AbstractElasticsearchAggr
 
 		private final JsonObject json;
 
-		Builder(ElasticsearchSearchContext searchContext, JsonObject json) {
-			super( searchContext );
+		Builder(ElasticsearchSearchIndexScope scope, JsonObject json) {
+			super( scope );
 			this.json = json;
 		}
 

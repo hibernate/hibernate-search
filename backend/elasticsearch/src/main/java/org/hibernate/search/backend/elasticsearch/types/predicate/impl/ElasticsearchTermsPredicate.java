@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
@@ -103,9 +103,9 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 		}
 
 		@Override
-		public TermsPredicateBuilder create(ElasticsearchSearchContext searchContext,
+		public TermsPredicateBuilder create(ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<F> field) {
-			return new Builder<>( codec, searchContext, field );
+			return new Builder<>( codec, scope, field );
 		}
 	}
 
@@ -118,9 +118,9 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 		private JsonElement[] terms;
 		private boolean allMatch;
 
-		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchContext searchContext,
+		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<F> field) {
-			super( searchContext, field );
+			super( scope, field );
 			// Score is always constant for this query
 			constantScore();
 
@@ -170,7 +170,7 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 
 		private JsonElement encode(Object term, DslConverter<?, F> dslConverter) {
 			try {
-				F converted = dslConverter.convertUnknown( term, searchContext.toDocumentFieldValueConvertContext() );
+				F converted = dslConverter.convertUnknown( term, scope.toDocumentFieldValueConvertContext() );
 				return codec.encode( converted );
 			}
 			catch (RuntimeException e) {

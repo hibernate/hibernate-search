@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -26,14 +26,14 @@ public interface LuceneSearchPredicate extends SearchPredicate {
 
 	Query toQuery(PredicateRequestContext context);
 
-	static LuceneSearchPredicate from(LuceneSearchContext searchContext, SearchPredicate predicate) {
+	static LuceneSearchPredicate from(LuceneSearchIndexScope scope, SearchPredicate predicate) {
 		if ( !( predicate instanceof LuceneSearchPredicate ) ) {
 			throw log.cannotMixLuceneSearchQueryWithOtherPredicates( predicate );
 		}
 		LuceneSearchPredicate casted = (LuceneSearchPredicate) predicate;
-		if ( !searchContext.hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
+		if ( !scope.hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
 			throw log.predicateDefinedOnDifferentIndexes( predicate, casted.indexNames(),
-					searchContext.hibernateSearchIndexNames() );
+					scope.hibernateSearchIndexNames() );
 		}
 		return casted;
 	}

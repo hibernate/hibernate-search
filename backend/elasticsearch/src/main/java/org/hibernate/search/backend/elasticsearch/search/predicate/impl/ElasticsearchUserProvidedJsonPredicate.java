@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 
 import com.google.gson.JsonObject;
 
@@ -18,9 +18,9 @@ class ElasticsearchUserProvidedJsonPredicate implements ElasticsearchSearchPredi
 	private final Set<String> indexNames;
 	private final JsonObject json;
 
-	ElasticsearchUserProvidedJsonPredicate(ElasticsearchSearchContext searchContext,
+	ElasticsearchUserProvidedJsonPredicate(ElasticsearchSearchIndexScope scope,
 			JsonObject json) {
-		indexNames = searchContext.hibernateSearchIndexNames();
+		indexNames = scope.hibernateSearchIndexNames();
 		this.json = json;
 	}
 

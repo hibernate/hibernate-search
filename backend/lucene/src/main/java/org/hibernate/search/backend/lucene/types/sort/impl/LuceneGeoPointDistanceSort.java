@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneGeoPointDistanceComparatorSource;
@@ -35,9 +35,9 @@ public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort 
 	public static class Factory
 			extends AbstractLuceneSearchValueFieldQueryElementFactory<DistanceSortBuilder, GeoPoint> {
 		@Override
-		public DistanceSortBuilder create(LuceneSearchContext searchContext,
+		public DistanceSortBuilder create(LuceneSearchIndexScope scope,
 				LuceneSearchValueFieldContext<GeoPoint> field) {
-			return new Builder( searchContext, field );
+			return new Builder( scope, field );
 		}
 	}
 
@@ -45,8 +45,8 @@ public class LuceneGeoPointDistanceSort extends AbstractLuceneDocumentValueSort 
 		private GeoPoint center;
 		private Object missingValue;
 
-		private Builder(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<GeoPoint> field) {
-			super( searchContext, field );
+		private Builder(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<GeoPoint> field) {
+			super( scope, field );
 		}
 
 		@Override

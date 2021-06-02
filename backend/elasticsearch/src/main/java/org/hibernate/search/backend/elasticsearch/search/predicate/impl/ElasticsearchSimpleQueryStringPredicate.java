@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchDifferentNestedObjectCompatibilityChecker;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -148,9 +148,9 @@ public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsear
 		private EnumSet<SimpleQueryFlag> flags;
 		private ElasticsearchDifferentNestedObjectCompatibilityChecker nestedCompatibilityChecker;
 
-		Builder(ElasticsearchSearchContext searchContext) {
-			super( searchContext );
-			this.nestedCompatibilityChecker = ElasticsearchDifferentNestedObjectCompatibilityChecker.empty( searchContext );
+		Builder(ElasticsearchSearchIndexScope scope) {
+			super( scope );
+			this.nestedCompatibilityChecker = ElasticsearchDifferentNestedObjectCompatibilityChecker.empty( scope );
 		}
 
 		@Override
@@ -174,8 +174,8 @@ public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsear
 		public FieldState field(String absoluteFieldPath) {
 			ElasticsearchSimpleQueryStringPredicateBuilderFieldState field = fields.get( absoluteFieldPath );
 			if ( field == null ) {
-				field = searchContext.field( absoluteFieldPath )
-						.queryElement( ElasticsearchPredicateTypeKeys.SIMPLE_QUERY_STRING, searchContext );
+				field = scope.field( absoluteFieldPath )
+						.queryElement( ElasticsearchPredicateTypeKeys.SIMPLE_QUERY_STRING, scope );
 				nestedCompatibilityChecker = nestedCompatibilityChecker.combineAndCheck( absoluteFieldPath );
 				fields.put( absoluteFieldPath, field );
 			}

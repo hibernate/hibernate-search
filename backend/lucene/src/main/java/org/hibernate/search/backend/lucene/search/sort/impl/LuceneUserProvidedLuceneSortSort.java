@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 
 import org.apache.lucene.search.Sort;
 
@@ -15,8 +15,8 @@ class LuceneUserProvidedLuceneSortSort extends AbstractLuceneSort {
 
 	private final Sort luceneSort;
 
-	LuceneUserProvidedLuceneSortSort(LuceneSearchContext searchContext, Sort luceneSort) {
-		super( searchContext );
+	LuceneUserProvidedLuceneSortSort(LuceneSearchIndexScope scope, Sort luceneSort) {
+		super( scope );
 		this.luceneSort = luceneSort;
 	}
 

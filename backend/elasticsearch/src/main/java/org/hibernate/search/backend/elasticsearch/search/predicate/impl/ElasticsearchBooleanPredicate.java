@@ -15,7 +15,7 @@ import java.util.TreeMap;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -143,8 +143,8 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 
 		private Map<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
-		Builder(ElasticsearchSearchContext searchContext) {
-			super( searchContext );
+		Builder(ElasticsearchSearchIndexScope scope) {
+			super( scope );
 		}
 
 		@Override
@@ -152,7 +152,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			if ( mustClauses == null ) {
 				mustClauses = new ArrayList<>();
 			}
-			mustClauses.add( ElasticsearchSearchPredicate.from( searchContext, clause ) );
+			mustClauses.add( ElasticsearchSearchPredicate.from( scope, clause ) );
 		}
 
 		@Override
@@ -160,7 +160,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			if ( mustNotClauses == null ) {
 				mustNotClauses = new ArrayList<>();
 			}
-			mustNotClauses.add( ElasticsearchSearchPredicate.from( searchContext, clause ) );
+			mustNotClauses.add( ElasticsearchSearchPredicate.from( scope, clause ) );
 		}
 
 		@Override
@@ -168,7 +168,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			if ( shouldClauses == null ) {
 				shouldClauses = new ArrayList<>();
 			}
-			shouldClauses.add( ElasticsearchSearchPredicate.from( searchContext, clause ) );
+			shouldClauses.add( ElasticsearchSearchPredicate.from( scope, clause ) );
 		}
 
 		@Override
@@ -176,7 +176,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 			if ( filterClauses == null ) {
 				filterClauses = new ArrayList<>();
 			}
-			filterClauses.add( ElasticsearchSearchPredicate.from( searchContext, clause ) );
+			filterClauses.add( ElasticsearchSearchPredicate.from( scope, clause ) );
 		}
 
 		@Override

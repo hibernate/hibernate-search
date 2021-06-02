@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 import com.google.gson.JsonObject;
@@ -70,9 +70,9 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 		}
 
 		@Override
-		public NamedPredicateBuilder create(ElasticsearchSearchContext searchContext,
+		public NamedPredicateBuilder create(ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchCompositeIndexSchemaElementContext field) {
-			return new Builder( provider, predicateName, searchContext, field );
+			return new Builder( provider, predicateName, scope, field );
 		}
 	}
 
@@ -84,9 +84,9 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 		private final Map<String, Object> params = new LinkedHashMap<>();
 
 		Builder(NamedPredicateProvider provider, String predicateName,
-				ElasticsearchSearchContext searchContext,
+				ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchCompositeIndexSchemaElementContext field) {
-			super( searchContext, field );
+			super( scope, field );
 			this.provider = provider;
 			this.predicateName = predicateName;
 			this.field = field;
@@ -108,7 +108,7 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 					factory, field, predicateName, params );
 
 			ElasticsearchSearchPredicate providedPredicate = ElasticsearchSearchPredicate.from(
-					searchContext, provider.create( ctx ) );
+					scope, provider.create( ctx ) );
 
 			return new ElasticsearchNamedPredicate( this, providedPredicate );
 		}

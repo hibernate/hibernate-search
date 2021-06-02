@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 
 public final class SearchProjectionBackendContext {
 
@@ -22,8 +22,9 @@ public final class SearchProjectionBackendContext {
 		this.idProjectionExtractionHelper = idProjectionExtractionHelper;
 	}
 
-	DocumentReferenceExtractionHelper createDocumentReferenceExtractionHelper(ElasticsearchSearchContext context) {
-		Set<String> mappedTypeNames = context.mappedTypeNameToIndex().keySet();
+	DocumentReferenceExtractionHelper createDocumentReferenceExtractionHelper(
+			ElasticsearchSearchIndexScope scope) {
+		Set<String> mappedTypeNames = scope.mappedTypeNameToIndex().keySet();
 		ProjectionExtractionHelper<String> mappedTypeNameHelper;
 		if ( mappedTypeNames.size() == 1 ) {
 			// Only one type targeted by the search: use a simpler implementation that will always work.

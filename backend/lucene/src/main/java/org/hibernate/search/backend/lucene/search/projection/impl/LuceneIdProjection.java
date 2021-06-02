@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.IdentifierCollector;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
@@ -20,9 +20,9 @@ public class LuceneIdProjection<I> extends AbstractLuceneProjection<String, I> {
 
 	private final DocumentIdentifierValueConverter<? extends I> identifierValueConverter;
 
-	private LuceneIdProjection(LuceneSearchContext searchContext,
+	private LuceneIdProjection(LuceneSearchIndexScope scope,
 			DocumentIdentifierValueConverter<? extends I> identifierValueConverter) {
-		super( searchContext );
+		super( scope );
 		this.identifierValueConverter = identifierValueConverter;
 	}
 
@@ -54,18 +54,18 @@ public class LuceneIdProjection<I> extends AbstractLuceneProjection<String, I> {
 
 		private final LuceneIdProjection<I> projection;
 
-		public Builder(LuceneSearchContext searchContext, Class<I> identifierType) {
-			super( searchContext );
+		public Builder(LuceneSearchIndexScope scope, Class<I> identifierType) {
+			super( scope );
 
 			DocumentIdentifierValueConverter<?> identifierValueConverter =
-					searchContext.idDslConverter( ValueConvert.YES );
+					scope.idDslConverter( ValueConvert.YES );
 
 			// check expected identifier type:
 			identifierValueConverter.checkSourceTypeAssignableTo( identifierType );
 			@SuppressWarnings("uncheked") // just checked
 			DocumentIdentifierValueConverter<? extends I> casted = (DocumentIdentifierValueConverter<? extends I>) identifierValueConverter;
 
-			projection = new LuceneIdProjection<>( searchContext, casted );
+			projection = new LuceneIdProjection<>( scope, casted );
 		}
 
 		@Override

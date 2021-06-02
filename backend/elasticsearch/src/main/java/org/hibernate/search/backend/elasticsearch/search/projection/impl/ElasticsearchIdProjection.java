@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
@@ -21,10 +21,10 @@ public class ElasticsearchIdProjection<I> extends AbstractElasticsearchProjectio
 	private final ProjectionExtractionHelper<String> extractionHelper;
 	private final DocumentIdentifierValueConverter<? extends I> identifierValueConverter;
 
-	private ElasticsearchIdProjection(ElasticsearchSearchContext searchContext,
+	private ElasticsearchIdProjection(ElasticsearchSearchIndexScope scope,
 			ProjectionExtractionHelper<String> extractionHelper,
 			DocumentIdentifierValueConverter<? extends I> identifierValueConverter) {
-		super( searchContext );
+		super( scope );
 		this.extractionHelper = extractionHelper;
 		this.identifierValueConverter = identifierValueConverter;
 	}
@@ -56,11 +56,11 @@ public class ElasticsearchIdProjection<I> extends AbstractElasticsearchProjectio
 
 		private final ElasticsearchIdProjection<I> projection;
 
-		Builder(ElasticsearchSearchContext searchContext, ProjectionExtractionHelper<String> extractionHelper,
+		Builder(ElasticsearchSearchIndexScope scope, ProjectionExtractionHelper<String> extractionHelper,
 				Class<I> identifierType) {
-			super( searchContext );
+			super( scope );
 
-			DocumentIdentifierValueConverter<?> identifierValueConverter = searchContext.idDslConverter(
+			DocumentIdentifierValueConverter<?> identifierValueConverter = scope.idDslConverter(
 					ValueConvert.YES );
 
 			// check expected identifier type:
@@ -68,7 +68,7 @@ public class ElasticsearchIdProjection<I> extends AbstractElasticsearchProjectio
 			@SuppressWarnings("uncheked") // just checked
 			DocumentIdentifierValueConverter<? extends I> casted = (DocumentIdentifierValueConverter<? extends I>) identifierValueConverter;
 
-			this.projection = new ElasticsearchIdProjection<>( searchContext, extractionHelper, casted );
+			this.projection = new ElasticsearchIdProjection<>( scope, extractionHelper, casted );
 		}
 
 		@Override

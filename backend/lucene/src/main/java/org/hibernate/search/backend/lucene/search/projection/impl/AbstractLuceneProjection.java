@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 
 abstract class AbstractLuceneProjection<E, P> implements LuceneSearchProjection<E, P> {
@@ -16,11 +16,11 @@ abstract class AbstractLuceneProjection<E, P> implements LuceneSearchProjection<
 	private final Set<String> indexNames;
 
 	AbstractLuceneProjection(AbstractBuilder<?> builder) {
-		this( builder.searchContext );
+		this( builder.scope );
 	}
 
-	AbstractLuceneProjection(LuceneSearchContext searchContext) {
-		this.indexNames = searchContext.hibernateSearchIndexNames();
+	AbstractLuceneProjection(LuceneSearchIndexScope scope) {
+		this.indexNames = scope.hibernateSearchIndexNames();
 	}
 
 	@Override
@@ -29,10 +29,10 @@ abstract class AbstractLuceneProjection<E, P> implements LuceneSearchProjection<
 	}
 
 	abstract static class AbstractBuilder<P> implements SearchProjectionBuilder<P> {
-		protected final LuceneSearchContext searchContext;
+		protected final LuceneSearchIndexScope scope;
 
-		AbstractBuilder(LuceneSearchContext searchContext) {
-			this.searchContext = searchContext;
+		AbstractBuilder(LuceneSearchIndexScope scope) {
+			this.scope = scope;
 		}
 	}
 

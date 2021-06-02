@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -27,8 +27,8 @@ public class LuceneGeoPointSpatialWithinCirclePredicate extends AbstractLuceneLe
 	public static class Factory
 			extends AbstractLuceneSearchValueFieldQueryElementFactory<SpatialWithinCirclePredicateBuilder, GeoPoint> {
 		@Override
-		public Builder create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<GeoPoint> field) {
-			return new Builder( searchContext, field );
+		public Builder create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<GeoPoint> field) {
+			return new Builder( scope, field );
 		}
 	}
 
@@ -36,8 +36,8 @@ public class LuceneGeoPointSpatialWithinCirclePredicate extends AbstractLuceneLe
 		protected GeoPoint center;
 		protected double radiusInMeters;
 
-		private Builder(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<GeoPoint> field) {
-			super( searchContext, field );
+		private Builder(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<GeoPoint> field) {
+			super( scope, field );
 		}
 
 		@Override

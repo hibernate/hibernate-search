@@ -10,17 +10,17 @@ package org.hibernate.search.backend.lucene.search.impl;
  * A factory for query elements (predicates, sorts, projections, aggregations, ...)
  * targeting composite index elements (either the root or an object field).
  *
- * @param <T> The type returned by {@link #create(LuceneSearchContext, LuceneSearchCompositeIndexSchemaElementContext)}.
+ * @param <T> The type returned by {@link #create(LuceneSearchIndexScope, LuceneSearchCompositeIndexSchemaElementContext)}.
  * Can be the type of the query element, or an intermediary builder type.
  */
 public interface LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> {
 
 	/**
-	 * @param searchContext The search context, i.e. information regarding the targeted indexes.
+	 * @param scope The search context, i.e. information regarding the targeted indexes.
 	 * @param field The targeted field.
 	 * @return The query element, or an intermediary builder (depending on the factory type).
 	 */
-	T create(LuceneSearchContext searchContext, LuceneSearchCompositeIndexSchemaElementContext field);
+	T create(LuceneSearchIndexScope scope, LuceneSearchCompositeIndexSchemaElementContext field);
 
 	/**
 	 * Checks whether this factory and the given factory can be used interchangeably.

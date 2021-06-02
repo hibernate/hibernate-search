@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDef
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneDifferentNestedObjectCompatibilityChecker;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexSchemaElementContext;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -76,10 +76,10 @@ public class LuceneSimpleQueryStringPredicate extends AbstractLuceneNestablePred
 		private EnumSet<SimpleQueryFlag> flags;
 		private LuceneDifferentNestedObjectCompatibilityChecker nestedCompatibilityChecker;
 
-		Builder(LuceneSearchContext searchContext) {
-			super( searchContext );
-			this.analysisDefinitionRegistry = searchContext.analysisDefinitionRegistry();
-			this.nestedCompatibilityChecker = LuceneDifferentNestedObjectCompatibilityChecker.empty( searchContext );
+		Builder(LuceneSearchIndexScope scope) {
+			super( scope );
+			this.analysisDefinitionRegistry = scope.analysisDefinitionRegistry();
+			this.nestedCompatibilityChecker = LuceneDifferentNestedObjectCompatibilityChecker.empty( scope );
 		}
 
 		@Override
@@ -103,8 +103,8 @@ public class LuceneSimpleQueryStringPredicate extends AbstractLuceneNestablePred
 		public FieldState field(String absoluteFieldPath) {
 			LuceneSimpleQueryStringPredicateBuilderFieldState field = fields.get( absoluteFieldPath );
 			if ( field == null ) {
-				LuceneSearchIndexSchemaElementContext fieldContext = searchContext.field( absoluteFieldPath );
-				field = fieldContext.queryElement( LucenePredicateTypeKeys.SIMPLE_QUERY_STRING, searchContext );
+				LuceneSearchIndexSchemaElementContext fieldContext = scope.field( absoluteFieldPath );
+				field = fieldContext.queryElement( LucenePredicateTypeKeys.SIMPLE_QUERY_STRING, scope );
 				nestedCompatibilityChecker = nestedCompatibilityChecker.combineAndCheck( absoluteFieldPath );
 				fields.put( absoluteFieldPath, field );
 			}
@@ -120,7 +120,7 @@ public class LuceneSimpleQueryStringPredicate extends AbstractLuceneNestablePred
 		public void analyzer(String analyzerName) {
 			this.overrideAnalyzer = analysisDefinitionRegistry.getAnalyzerDefinition( analyzerName );
 			if ( overrideAnalyzer == null ) {
-				throw log.unknownAnalyzer( analyzerName, EventContexts.fromIndexNames( searchContext.hibernateSearchIndexNames() ) );
+				throw log.unknownAnalyzer( analyzerName, EventContexts.fromIndexNames( scope.hibernateSearchIndexNames() ) );
 			}
 		}
 

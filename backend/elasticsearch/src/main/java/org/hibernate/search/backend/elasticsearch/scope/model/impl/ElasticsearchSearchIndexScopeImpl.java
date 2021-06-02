@@ -26,7 +26,7 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMulti
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMultiIndexSearchRootContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMultiIndexSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexSchemaElementContext;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
@@ -47,7 +47,7 @@ import org.hibernate.search.util.common.reporting.EventContext;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-public final class ElasticsearchIndexScopeSearchContext implements ElasticsearchSearchContext {
+public final class ElasticsearchSearchIndexScopeImpl implements ElasticsearchSearchIndexScope {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -70,7 +70,7 @@ public final class ElasticsearchIndexScopeSearchContext implements Elasticsearch
 	private final Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex;
 	private final int maxResultWindow;
 
-	public ElasticsearchIndexScopeSearchContext(BackendMappingContext mappingContext,
+	public ElasticsearchSearchIndexScopeImpl(BackendMappingContext mappingContext,
 			Gson userFacingGson, ElasticsearchSearchSyntax searchSyntax,
 			MultiTenancyStrategy multiTenancyStrategy,
 			TimingSource timingSource,

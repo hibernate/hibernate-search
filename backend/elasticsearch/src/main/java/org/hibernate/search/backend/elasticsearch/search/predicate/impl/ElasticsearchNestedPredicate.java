@@ -11,7 +11,7 @@ import java.util.Set;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 
@@ -59,17 +59,17 @@ public class ElasticsearchNestedPredicate extends AbstractElasticsearchSingleFie
 	public static class Factory
 			extends AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<NestedPredicateBuilder> {
 		@Override
-		public NestedPredicateBuilder create(ElasticsearchSearchContext searchContext,
+		public NestedPredicateBuilder create(ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchCompositeIndexSchemaElementContext field) {
-			return new Builder( searchContext, field );
+			return new Builder( scope, field );
 		}
 	}
 
 	private static class Builder extends AbstractBuilder implements NestedPredicateBuilder {
 		private ElasticsearchSearchPredicate nestedPredicate;
 
-		Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchCompositeIndexSchemaElementContext field) {
-			super( searchContext, field.absolutePath(),
+		Builder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchCompositeIndexSchemaElementContext field) {
+			super( scope, field.absolutePath(),
 					// nestedPathHierarchy includes absoluteFieldPath at the end, but here we don't want it to be included.
 					field.nestedPathHierarchy().subList( 0, field.nestedPathHierarchy().size() - 1 ) );
 		}
@@ -77,7 +77,7 @@ public class ElasticsearchNestedPredicate extends AbstractElasticsearchSingleFie
 		@Override
 		public void nested(SearchPredicate nestedPredicate) {
 			ElasticsearchSearchPredicate elasticsearchPredicate = ElasticsearchSearchPredicate.from(
-					searchContext, nestedPredicate );
+					scope, nestedPredicate );
 			elasticsearchPredicate.checkNestableWithin( absoluteFieldPath );
 			this.nestedPredicate = elasticsearchPredicate;
 		}

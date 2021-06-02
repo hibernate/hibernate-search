@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationRequestContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DistanceSortKey;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionRequestContext;
@@ -34,19 +34,19 @@ import com.google.gson.JsonObject;
  */
 class ElasticsearchSearchQueryRequestContext implements SearchProjectionRequestContext, AggregationRequestContext {
 
-	private final ElasticsearchSearchContext searchContext;
+	private final ElasticsearchSearchIndexScope scope;
 	private final BackendSessionContext sessionContext;
 	private final SearchLoadingContext<?, ?> loadingContext;
 	private final PredicateRequestContext rootPredicateContext;
 	private final Map<DistanceSortKey, Integer> distanceSorts;
 
 	ElasticsearchSearchQueryRequestContext(
-			ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchIndexScope scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContext<?, ?> loadingContext,
 			PredicateRequestContext rootPredicateContext,
 			Map<DistanceSortKey, Integer> distanceSorts) {
-		this.searchContext = searchContext;
+		this.scope = scope;
 		this.sessionContext = sessionContext;
 		this.loadingContext = loadingContext;
 		this.rootPredicateContext = rootPredicateContext;
@@ -69,7 +69,7 @@ class ElasticsearchSearchQueryRequestContext implements SearchProjectionRequestC
 
 	@Override
 	public ElasticsearchSearchSyntax getSearchSyntax() {
-		return searchContext.searchSyntax();
+		return scope.searchSyntax();
 	}
 
 	ElasticsearchSearchQueryExtractContext createExtractContext(JsonObject responseBody) {

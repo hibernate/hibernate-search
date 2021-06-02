@@ -19,9 +19,9 @@ public final class LuceneMultiIndexSearchRootContext extends
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public LuceneMultiIndexSearchRootContext(LuceneSearchContext searchContext,
+	public LuceneMultiIndexSearchRootContext(LuceneSearchIndexScope scope,
 			List<LuceneSearchCompositeIndexSchemaElementContext> rootForEachIndex) {
-		super( searchContext, rootForEachIndex );
+		super( scope, rootForEachIndex );
 	}
 
 	@Override

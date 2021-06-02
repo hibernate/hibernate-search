@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -15,8 +15,8 @@ import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 
 class LuceneScoreProjection extends AbstractLuceneProjection<Float, Float> {
 
-	private LuceneScoreProjection(LuceneSearchContext searchContext) {
-		super( searchContext );
+	private LuceneScoreProjection(LuceneSearchIndexScope scope) {
+		super( scope );
 	}
 
 	@Override
@@ -44,13 +44,13 @@ class LuceneScoreProjection extends AbstractLuceneProjection<Float, Float> {
 	public static class Builder extends AbstractLuceneProjection.AbstractBuilder<Float>
 			implements ScoreProjectionBuilder {
 
-		public Builder(LuceneSearchContext searchContext) {
-			super( searchContext );
+		public Builder(LuceneSearchIndexScope scope) {
+			super( scope );
 		}
 
 		@Override
 		public SearchProjection<Float> build() {
-			return new LuceneScoreProjection( searchContext );
+			return new LuceneScoreProjection( scope );
 		}
 	}
 }

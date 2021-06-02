@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.aggregation.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
@@ -24,10 +24,10 @@ public class LuceneSearchAggregationBuilderFactory
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneSearchContext searchContext;
+	private final LuceneSearchIndexScope scope;
 
-	public LuceneSearchAggregationBuilderFactory(LuceneSearchContext searchContext) {
-		this.searchContext = searchContext;
+	public LuceneSearchAggregationBuilderFactory(LuceneSearchIndexScope scope) {
+		this.scope = scope;
 	}
 
 	@Override
@@ -38,9 +38,9 @@ public class LuceneSearchAggregationBuilderFactory
 		}
 
 		LuceneSearchAggregation<A> casted = (LuceneSearchAggregation<A>) aggregation;
-		if ( !searchContext.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
+		if ( !scope.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
 			throw log.aggregationDefinedOnDifferentIndexes(
-				aggregation, casted.getIndexNames(), searchContext.hibernateSearchIndexNames()
+				aggregation, casted.getIndexNames(), scope.hibernateSearchIndexNames()
 			);
 		}
 
@@ -50,14 +50,14 @@ public class LuceneSearchAggregationBuilderFactory
 	@Override
 	public <T> TermsAggregationBuilder<T> createTermsAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
-		return searchContext.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.TERMS, searchContext )
+		return scope.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.TERMS, scope )
 				.type( expectedType, convert );
 	}
 
 	@Override
 	public <T> RangeAggregationBuilder<T> createRangeAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
-		return searchContext.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.RANGE, searchContext )
+		return scope.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.RANGE, scope )
 				.type( expectedType, convert );
 	}
 }

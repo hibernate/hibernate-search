@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -26,8 +26,8 @@ public class LuceneTextRegexpPredicate extends AbstractLuceneLeafSingleFieldPred
 	public static class Factory<F>
 			extends AbstractLuceneSearchValueFieldQueryElementFactory<RegexpPredicateBuilder, F> {
 		@Override
-		public Builder<F> create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
-			return new Builder<>( searchContext, field );
+		public Builder<F> create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+			return new Builder<>( scope, field );
 		}
 	}
 
@@ -35,8 +35,8 @@ public class LuceneTextRegexpPredicate extends AbstractLuceneLeafSingleFieldPred
 
 		private String pattern;
 
-		private Builder(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
-			super( searchContext, field );
+		private Builder(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+			super( scope, field );
 		}
 
 		@Override
