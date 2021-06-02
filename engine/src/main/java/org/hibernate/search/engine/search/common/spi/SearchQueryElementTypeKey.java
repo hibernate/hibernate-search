@@ -8,6 +8,7 @@ package org.hibernate.search.engine.search.common.spi;
 
 import java.util.Objects;
 
+@SuppressWarnings("unused")
 public final class SearchQueryElementTypeKey<T> {
 
 	public static <T> SearchQueryElementTypeKey<T> of(String namespace, String name) {
