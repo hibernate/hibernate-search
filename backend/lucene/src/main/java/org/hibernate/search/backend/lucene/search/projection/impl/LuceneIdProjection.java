@@ -57,8 +57,8 @@ public class LuceneIdProjection<I> extends AbstractLuceneProjection<String, I> {
 		public Builder(LuceneSearchContext searchContext, Class<I> identifierType) {
 			super( searchContext );
 
-			DocumentIdentifierValueConverter<?> identifierValueConverter = searchContext.indexes()
-					.idDslConverter( ValueConvert.YES );
+			DocumentIdentifierValueConverter<?> identifierValueConverter =
+					searchContext.idDslConverter( ValueConvert.YES );
 
 			// check expected identifier type:
 			identifierValueConverter.checkSourceTypeAssignableTo( identifierType );

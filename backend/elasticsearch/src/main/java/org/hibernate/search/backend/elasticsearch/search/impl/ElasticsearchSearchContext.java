@@ -6,90 +6,49 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
-import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
-import org.hibernate.search.engine.common.timing.spi.TimingSource;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-public final class ElasticsearchSearchContext {
+public interface ElasticsearchSearchContext {
 
-	// Mapping context
-	private final ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext;
-	private final ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext;
+	ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext();
 
-	// Backend context
-	private final Gson userFacingGson;
-	private final ElasticsearchSearchSyntax searchSyntax;
-	private final MultiTenancyStrategy multiTenancyStrategy;
-	private final TimingSource timingSource;
+	ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext();
 
-	// Targeted indexes
-	private final ElasticsearchSearchIndexesContext indexes;
+	Gson userFacingGson();
 
-	public ElasticsearchSearchContext(BackendMappingContext mappingContext,
-			Gson userFacingGson, ElasticsearchSearchSyntax searchSyntax,
-			MultiTenancyStrategy multiTenancyStrategy,
-			ElasticsearchSearchIndexesContext indexes,
-			TimingSource timingSource) {
-		this.toDocumentIdentifierValueConvertContext = new ToDocumentIdentifierValueConvertContextImpl(
-				mappingContext );
-		this.toDocumentFieldValueConvertContext = new ToDocumentFieldValueConvertContextImpl( mappingContext );
-		this.userFacingGson = userFacingGson;
-		this.searchSyntax = searchSyntax;
-		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.timingSource = timingSource;
-		this.indexes = indexes;
-	}
+	ElasticsearchSearchSyntax searchSyntax();
 
-	public ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext() {
-		return toDocumentIdentifierValueConvertContext;
-	}
+	DocumentIdHelper documentIdHelper();
 
-	public ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext() {
-		return toDocumentFieldValueConvertContext;
-	}
+	JsonObject filterOrNull(String tenantId);
 
-	public Gson userFacingGson() {
-		return userFacingGson;
-	}
+	TimeoutManager createTimeoutManager(Long timeout, TimeUnit timeUnit, boolean exceptionOnTimeout);
 
-	public ElasticsearchSearchSyntax searchSyntax() {
-		return searchSyntax;
-	}
+	Collection<ElasticsearchSearchIndexContext> indexes();
 
-	public DocumentIdHelper documentIdHelper() {
-		return multiTenancyStrategy.documentIdHelper();
-	}
+	Set<String> hibernateSearchIndexNames();
 
-	public ElasticsearchSearchIndexesContext indexes() {
-		return indexes;
-	}
+	Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex();
 
-	public JsonObject filterOrNull(String tenantId) {
-		return multiTenancyStrategy.filterOrNull( tenantId );
-	}
+	DocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
 
-	public TimeoutManager createTimeoutManager(Long timeout,
-			TimeUnit timeUnit, boolean exceptionOnTimeout) {
-		if ( timeout != null && timeUnit != null ) {
-			if ( exceptionOnTimeout ) {
-				return TimeoutManager.hardTimeout( timingSource, timeout, timeUnit );
-			}
-			else {
-				return TimeoutManager.softTimeout( timingSource, timeout, timeUnit );
-			}
-		}
-		return TimeoutManager.noTimeout( timingSource );
-	}
+	ElasticsearchSearchCompositeIndexSchemaElementContext root();
+
+	ElasticsearchSearchIndexSchemaElementContext field(String absoluteFieldPath);
+
+	int maxResultWindow();
 }

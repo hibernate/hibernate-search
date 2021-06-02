@@ -6,71 +6,44 @@
  */
 package org.hibernate.search.backend.lucene.search.impl;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
-import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
-import org.hibernate.search.engine.common.timing.spi.TimingSource;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 import org.apache.lucene.search.Query;
 
-public final class LuceneSearchContext {
+public interface LuceneSearchContext {
 
-	// Mapping context
-	private final ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext;
-	private final ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext;
+	ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext();
 
-	// Backend context
-	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
-	private final MultiTenancyStrategy multiTenancyStrategy;
+	ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext();
 
-	// Global timing source
-	private final TimingSource timingSource;
+	LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry();
 
-	// Targeted indexes
-	private final LuceneSearchIndexesContext indexes;
+	Query filterOrNull(String tenantId);
 
-	public LuceneSearchContext(BackendMappingContext mappingContext,
-			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
-			MultiTenancyStrategy multiTenancyStrategy,
-			TimingSource timingSource,
-			LuceneSearchIndexesContext indexes) {
-		this.toDocumentIdentifierValueConvertContext = new ToDocumentIdentifierValueConvertContextImpl( mappingContext );
-		this.toDocumentFieldValueConvertContext = new ToDocumentFieldValueConvertContextImpl( mappingContext );
-		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
-		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.timingSource = timingSource;
-		this.indexes = indexes;
-	}
+	TimeoutManager createTimeoutManager(Long timeout, TimeUnit timeUnit, boolean exceptionOnTimeout);
 
-	public ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext() {
-		return toDocumentIdentifierValueConvertContext;
-	}
+	Collection<? extends LuceneSearchIndexContext> indexes();
 
-	public ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext() {
-		return toDocumentFieldValueConvertContext;
-	}
+	Map<String, ? extends LuceneSearchIndexContext> mappedTypeNameToIndex();
 
-	public LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry() {
-		return analysisDefinitionRegistry;
-	}
+	Set<String> hibernateSearchIndexNames();
 
-	public LuceneSearchIndexesContext indexes() {
-		return indexes;
-	}
+	DocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
 
-	public Query filterOrNull(String tenantId) {
-		return multiTenancyStrategy.filterOrNull( tenantId );
-	}
+	LuceneSearchCompositeIndexSchemaElementContext root();
 
-	public TimeoutManager createTimeoutManager(Long timeout, TimeUnit timeUnit, boolean exceptionOnTimeout) {
-		return TimeoutManager.of( timingSource, timeout, timeUnit, exceptionOnTimeout );
-	}
+	LuceneSearchIndexSchemaElementContext field(String absoluteFieldPath);
+
+	boolean hasNestedDocuments();
 
 }

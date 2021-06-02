@@ -11,7 +11,6 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexSchemaElementContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -42,11 +41,9 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneSearchContext searchContext;
-	private final LuceneSearchIndexesContext indexes;
 
 	public LuceneSearchPredicateBuilderFactoryImpl(LuceneSearchContext searchContext) {
 		this.searchContext = searchContext;
-		this.indexes = searchContext.indexes();
 	}
 
 	@Override
@@ -72,69 +69,69 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public MatchPredicateBuilder match(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.MATCH, searchContext );
+		return searchContext.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.MATCH, searchContext );
 	}
 
 	@Override
 	public RangePredicateBuilder range(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.RANGE, searchContext );
+		return searchContext.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.RANGE, searchContext );
 	}
 
 	@Override
 	public PhrasePredicateBuilder phrase(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.PHRASE, searchContext );
+		return searchContext.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.PHRASE, searchContext );
 	}
 
 	@Override
 	public WildcardPredicateBuilder wildcard(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.WILDCARD, searchContext );
+		return searchContext.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.WILDCARD, searchContext );
 	}
 
 	@Override
 	public RegexpPredicateBuilder regexp(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.REGEXP, searchContext );
+		return searchContext.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.REGEXP, searchContext );
 	}
 
 	@Override
 	public TermsPredicateBuilder terms(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.TERMS, searchContext );
+		return searchContext.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.TERMS, searchContext );
 	}
 
 	@Override
 	public SimpleQueryStringPredicateBuilder simpleQueryString() {
-		return new LuceneSimpleQueryStringPredicate.Builder( searchContext, indexes );
+		return new LuceneSimpleQueryStringPredicate.Builder( searchContext );
 	}
 
 	@Override
 	public ExistsPredicateBuilder exists(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.EXISTS, searchContext );
+		return searchContext.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.EXISTS, searchContext );
 	}
 
 	@Override
 	public SpatialWithinCirclePredicateBuilder spatialWithinCircle(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath )
+		return searchContext.field( absoluteFieldPath )
 				.queryElement( PredicateTypeKeys.SPATIAL_WITHIN_CIRCLE, searchContext );
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder spatialWithinPolygon(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath )
+		return searchContext.field( absoluteFieldPath )
 				.queryElement( PredicateTypeKeys.SPATIAL_WITHIN_POLYGON, searchContext );
 	}
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder spatialWithinBoundingBox(
 			String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath )
+		return searchContext.field( absoluteFieldPath )
 				.queryElement( PredicateTypeKeys.SPATIAL_WITHIN_BOUNDING_BOX, searchContext );
 	}
 
 	@Override
 	public NestedPredicateBuilder nested(String absoluteFieldPath) {
-		LuceneSearchCompositeIndexSchemaElementContext field = indexes.field( absoluteFieldPath ).toObjectField();
+		LuceneSearchCompositeIndexSchemaElementContext field = searchContext.field( absoluteFieldPath ).toObjectField();
 		if ( !field.nested() ) {
 			throw log.nonNestedFieldForNestedQuery( absoluteFieldPath,
-					EventContexts.fromIndexNames( indexes.hibernateSearchIndexNames() ) );
+					EventContexts.fromIndexNames( searchContext.hibernateSearchIndexNames() ) );
 		}
 		return field.queryElement( PredicateTypeKeys.NESTED, searchContext );
 	}
@@ -142,7 +139,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	@Override
 	public NamedPredicateBuilder named(String absoluteFieldPath, String name) {
 		LuceneSearchIndexSchemaElementContext targetElementContext =
-				absoluteFieldPath == null ? indexes.root() : indexes.field( absoluteFieldPath );
+				absoluteFieldPath == null ? searchContext.root() : searchContext.field( absoluteFieldPath );
 		return targetElementContext.queryElement( PredicateTypeKeys.named( name ), searchContext );
 	}
 

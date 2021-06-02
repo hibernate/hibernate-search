@@ -27,9 +27,9 @@ public interface ElasticsearchSearchSort extends SearchSort {
 			throw log.cannotMixElasticsearchSearchSortWithOtherSorts( sort );
 		}
 		ElasticsearchSearchSort casted = (ElasticsearchSearchSort) sort;
-		if ( !searchContext.indexes().hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
+		if ( !searchContext.hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
 			throw log.sortDefinedOnDifferentIndexes( sort, casted.indexNames(),
-					searchContext.indexes().hibernateSearchIndexNames() );
+					searchContext.hibernateSearchIndexNames() );
 		}
 		return casted;
 	}

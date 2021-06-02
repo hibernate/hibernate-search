@@ -20,7 +20,7 @@ public abstract class AbstractElasticsearchProjection<E, P> implements Elasticse
 	}
 
 	protected AbstractElasticsearchProjection(ElasticsearchSearchContext searchContext) {
-		indexNames = searchContext.indexes().hibernateSearchIndexNames();
+		indexNames = searchContext.hibernateSearchIndexNames();
 	}
 
 	@Override

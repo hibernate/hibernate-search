@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
@@ -29,11 +28,9 @@ public class ElasticsearchSearchAggregationBuilderFactory
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchSearchContext searchContext;
-	private final ElasticsearchSearchIndexesContext indexes;
 
 	public ElasticsearchSearchAggregationBuilderFactory(ElasticsearchSearchContext searchContext) {
 		this.searchContext = searchContext;
-		this.indexes = searchContext.indexes();
 	}
 
 	@Override
@@ -44,9 +41,9 @@ public class ElasticsearchSearchAggregationBuilderFactory
 		}
 
 		ElasticsearchSearchAggregation<A> casted = (ElasticsearchSearchAggregation<A>) aggregation;
-		if ( !indexes.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
+		if ( !searchContext.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
 			throw log.aggregationDefinedOnDifferentIndexes(
-					aggregation, casted.getIndexNames(), indexes.hibernateSearchIndexNames()
+					aggregation, casted.getIndexNames(), searchContext.hibernateSearchIndexNames()
 			);
 		}
 
@@ -56,14 +53,14 @@ public class ElasticsearchSearchAggregationBuilderFactory
 	@Override
 	public <T> TermsAggregationBuilder<T> createTermsAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
-		return indexes.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.TERMS, searchContext )
+		return searchContext.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.TERMS, searchContext )
 				.type( expectedType, convert );
 	}
 
 	@Override
 	public <T> RangeAggregationBuilder<T> createRangeAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
-		return indexes.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.RANGE, searchContext )
+		return searchContext.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.RANGE, searchContext )
 				.type( expectedType, convert );
 	}
 

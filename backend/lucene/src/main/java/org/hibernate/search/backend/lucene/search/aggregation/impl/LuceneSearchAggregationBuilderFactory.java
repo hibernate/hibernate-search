@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
@@ -26,11 +25,9 @@ public class LuceneSearchAggregationBuilderFactory
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneSearchContext searchContext;
-	private final LuceneSearchIndexesContext indexes;
 
 	public LuceneSearchAggregationBuilderFactory(LuceneSearchContext searchContext) {
 		this.searchContext = searchContext;
-		this.indexes = searchContext.indexes();
 	}
 
 	@Override
@@ -41,9 +38,9 @@ public class LuceneSearchAggregationBuilderFactory
 		}
 
 		LuceneSearchAggregation<A> casted = (LuceneSearchAggregation<A>) aggregation;
-		if ( !indexes.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
+		if ( !searchContext.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
 			throw log.aggregationDefinedOnDifferentIndexes(
-				aggregation, casted.getIndexNames(), indexes.hibernateSearchIndexNames()
+				aggregation, casted.getIndexNames(), searchContext.hibernateSearchIndexNames()
 			);
 		}
 
@@ -53,14 +50,14 @@ public class LuceneSearchAggregationBuilderFactory
 	@Override
 	public <T> TermsAggregationBuilder<T> createTermsAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
-		return indexes.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.TERMS, searchContext )
+		return searchContext.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.TERMS, searchContext )
 				.type( expectedType, convert );
 	}
 
 	@Override
 	public <T> RangeAggregationBuilder<T> createRangeAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
-		return indexes.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.RANGE, searchContext )
+		return searchContext.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.RANGE, searchContext )
 				.type( expectedType, convert );
 	}
 }

@@ -117,9 +117,9 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	@Override
 	public LuceneSearchScroll<H> scroll(int chunkSize) {
-		Set<String> indexNames = searchContext.indexes().hibernateSearchIndexNames();
+		Set<String> indexNames = searchContext.hibernateSearchIndexNames();
 		HibernateSearchMultiReader indexReader = HibernateSearchMultiReader.open(
-				indexNames, searchContext.indexes().elements(), routingKeys );
+				indexNames, searchContext.indexes(), routingKeys );
 		return new LuceneSearchScrollImpl<>( queryOrchestrator, workFactory, searchContext, routingKeys, timeoutManager,
 				searcher, totalHitCountThreshold( true ), indexReader, chunkSize );
 	}
@@ -129,7 +129,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		Contracts.assertNotNull( id, "id" );
 
 		Map<String, ? extends LuceneSearchIndexContext> mappedTypeNameToIndex =
-				searchContext.indexes().mappedTypeNameToIndex();
+				searchContext.mappedTypeNameToIndex();
 		if ( mappedTypeNameToIndex.size() != 1 ) {
 			throw log.explainRequiresTypeName( mappedTypeNameToIndex.keySet() );
 		}
@@ -149,7 +149,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		Contracts.assertNotNull( id, "id" );
 
 		Map<String, ? extends LuceneSearchIndexContext> mappedTypeNameToIndex =
-				searchContext.indexes().mappedTypeNameToIndex();
+				searchContext.mappedTypeNameToIndex();
 		LuceneSearchIndexContext index = mappedTypeNameToIndex.get( typeName );
 		if ( !mappedTypeNameToIndex.containsKey( typeName ) ) {
 			throw log.explainRequiresTypeTargetedByQuery( mappedTypeNameToIndex.keySet(), typeName );
@@ -202,8 +202,8 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	private <T> T doSubmit(ReadWork<T> work) {
 		return queryOrchestrator.submit(
-				searchContext.indexes().hibernateSearchIndexNames(),
-				searchContext.indexes().elements(),
+				searchContext.hibernateSearchIndexNames(),
+				searchContext.indexes(),
 				routingKeys,
 				work
 		);

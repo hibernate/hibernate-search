@@ -26,7 +26,7 @@ public abstract class AbstractLuceneBucketAggregation<K, V> extends AbstractLuce
 
 	AbstractLuceneBucketAggregation(AbstractBuilder<K, V> builder) {
 		super( builder );
-		this.indexNames = builder.searchContext.indexes().hibernateSearchIndexNames();
+		this.indexNames = builder.searchContext.hibernateSearchIndexNames();
 		this.absoluteFieldPath = builder.field.absolutePath();
 	}
 

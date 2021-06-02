@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexScope;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeSearchIndexesContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
@@ -52,9 +51,7 @@ class ElasticsearchIndexScopeBuilder implements IndexScopeBuilder {
 		// Use LinkedHashSet to ensure stable order when generating requests
 		Set<ElasticsearchIndexModel> indexModels = indexManagers.stream().map( ElasticsearchIndexManagerImpl::model )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
-		ElasticsearchScopeSearchIndexesContext searchIndexesContext =
-				new ElasticsearchScopeSearchIndexesContext( indexModels );
-		return new ElasticsearchIndexScope( mappingContext, backendContext, searchIndexesContext );
+		return new ElasticsearchIndexScope( mappingContext, backendContext, indexModels );
 	}
 
 	@Override

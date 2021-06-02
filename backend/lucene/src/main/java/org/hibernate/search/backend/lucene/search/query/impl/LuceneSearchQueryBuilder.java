@@ -174,7 +174,7 @@ public class LuceneSearchQueryBuilder<H>
 
 		BooleanQuery.Builder luceneQueryBuilder = new BooleanQuery.Builder();
 		luceneQueryBuilder.add( luceneQuery, Occur.MUST );
-		if ( searchContext.indexes().hasNestedDocuments() ) {
+		if ( searchContext.hasNestedDocuments() ) {
 			// HSEARCH-4018: this filter has a (small) cost, so we only add it if necessary.
 			luceneQueryBuilder.add( Queries.mainDocumentQuery(), Occur.FILTER );
 		}

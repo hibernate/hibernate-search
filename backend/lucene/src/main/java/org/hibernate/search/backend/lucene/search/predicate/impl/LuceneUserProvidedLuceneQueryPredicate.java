@@ -19,7 +19,7 @@ class LuceneUserProvidedLuceneQueryPredicate implements LuceneSearchPredicate {
 	private final Query luceneQuery;
 
 	LuceneUserProvidedLuceneQueryPredicate(LuceneSearchContext searchContext, Query luceneQuery) {
-		this.indexNames = searchContext.indexes().hibernateSearchIndexNames();
+		this.indexNames = searchContext.hibernateSearchIndexNames();
 		this.luceneQuery = luceneQuery;
 	}
 

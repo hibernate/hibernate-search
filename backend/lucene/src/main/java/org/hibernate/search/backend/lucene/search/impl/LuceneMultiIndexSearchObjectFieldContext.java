@@ -17,9 +17,9 @@ public final class LuceneMultiIndexSearchObjectFieldContext extends
 
 	private final String absolutePath;
 
-	public LuceneMultiIndexSearchObjectFieldContext(LuceneSearchIndexesContext indexesContext,
+	public LuceneMultiIndexSearchObjectFieldContext(LuceneSearchContext searchContext,
 			String absolutePath, List<LuceneSearchCompositeIndexSchemaElementContext> fieldForEachIndex) {
-		super( indexesContext, fieldForEachIndex );
+		super( searchContext, fieldForEachIndex );
 		this.absolutePath = absolutePath;
 	}
 

@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexesContext;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.CompositeSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
@@ -22,11 +21,9 @@ import org.apache.lucene.search.SortField;
 public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuilderFactory {
 
 	private final LuceneSearchContext searchContext;
-	private final LuceneSearchIndexesContext indexes;
 
 	public LuceneSearchSortBuilderFactoryImpl(LuceneSearchContext searchContext) {
 		this.searchContext = searchContext;
-		this.indexes = searchContext.indexes();
 	}
 
 	@Override
@@ -42,12 +39,12 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 
 	@Override
 	public FieldSortBuilder field(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).queryElement( SortTypeKeys.FIELD, searchContext );
+		return searchContext.field( absoluteFieldPath ).queryElement( SortTypeKeys.FIELD, searchContext );
 	}
 
 	@Override
 	public DistanceSortBuilder distance(String absoluteFieldPath) {
-		return indexes.field( absoluteFieldPath ).queryElement( SortTypeKeys.DISTANCE, searchContext );
+		return searchContext.field( absoluteFieldPath ).queryElement( SortTypeKeys.DISTANCE, searchContext );
 	}
 
 	@Override

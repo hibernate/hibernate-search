@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchBatchingWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
@@ -20,8 +22,8 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetad
 import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSerialWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchIndexScopeSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexesContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionBackendContext;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
@@ -137,12 +139,13 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 
 	@Override
 	public ElasticsearchSearchContext createSearchContext(BackendMappingContext mappingContext,
-			ElasticsearchSearchIndexesContext indexes) {
-		return new ElasticsearchSearchContext(
+			Set<ElasticsearchIndexModel> indexModels) {
+		return new ElasticsearchIndexScopeSearchContext(
 				mappingContext,
 				userFacingGson, link.getSearchSyntax(),
 				multiTenancyStrategy,
-				indexes, timingSource
+				timingSource,
+				indexModels
 		);
 	}
 

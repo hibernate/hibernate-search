@@ -23,7 +23,7 @@ public abstract class AbstractElasticsearchPredicate implements ElasticsearchSea
 	private final boolean withConstantScore;
 
 	protected AbstractElasticsearchPredicate(AbstractBuilder builder) {
-		indexNames = builder.searchContext.indexes().hibernateSearchIndexNames();
+		indexNames = builder.searchContext.hibernateSearchIndexNames();
 		boost = builder.boost;
 		withConstantScore = builder.withConstantScore;
 	}

@@ -23,7 +23,7 @@ public abstract class AbstractLuceneSearchPredicate implements LuceneSearchPredi
 	private final boolean constantScore;
 
 	protected AbstractLuceneSearchPredicate(AbstractBuilder builder) {
-		indexNames = builder.searchContext.indexes().hibernateSearchIndexNames();
+		indexNames = builder.searchContext.hibernateSearchIndexNames();
 		boost = builder.boost;
 		constantScore = builder.constantScore;
 	}
