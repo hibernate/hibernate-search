@@ -18,9 +18,9 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.SearchQueryElementTypeKey;
+import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneNamedPredicate;
-import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateTypeKeys;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;

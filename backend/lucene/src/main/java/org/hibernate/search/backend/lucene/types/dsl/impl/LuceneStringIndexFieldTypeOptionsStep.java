@@ -11,11 +11,12 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
-import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationTypeKeys;
-import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateTypeKeys;
+import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LucenePredicateTypeKeys;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjection;
-import org.hibernate.search.backend.lucene.search.projection.impl.ProjectionTypeKeys;
-import org.hibernate.search.backend.lucene.search.sort.impl.SortTypeKeys;
+import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
+import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneTextTermsAggregation;
 import org.hibernate.search.backend.lucene.types.codec.impl.DocValues;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
@@ -181,7 +182,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 			builder.queryElementFactory( PredicateTypeKeys.PHRASE, new LuceneTextPhrasePredicate.Factory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.WILDCARD, new LuceneTextWildcardPredicate.Factory<>() );
 			builder.queryElementFactory( PredicateTypeKeys.REGEXP, new LuceneTextRegexpPredicate.Factory<>() );
-			builder.queryElementFactory( PredicateTypeKeys.SIMPLE_QUERY_STRING,
+			builder.queryElementFactory( LucenePredicateTypeKeys.SIMPLE_QUERY_STRING,
 					new LuceneSimpleQueryStringPredicateBuilderFieldState.Factory() );
 		}
 

@@ -17,7 +17,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexSchemaEl
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateTypeKeys;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
+import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
+
 /**
  * Information about a composite index element targeted by search; either the index root or an object field.
  * <p>

@@ -8,11 +8,11 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchExistsPredicate;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateTypeKeys;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchDistanceToFieldProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldProjection;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionTypeKeys;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.SortTypeKeys;
+import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
+import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchGeoPointSpatialWithinBoundingBoxPredicate;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchGeoPointSpatialWithinCirclePredicate;

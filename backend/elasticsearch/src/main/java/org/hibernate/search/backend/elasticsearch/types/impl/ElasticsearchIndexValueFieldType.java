@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Da
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldTypeContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.SearchQueryElementTypeKey;
+import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
 import org.hibernate.search.engine.backend.types.IndexFieldType;

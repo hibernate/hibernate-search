@@ -12,7 +12,7 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldTypeContext;
-import org.hibernate.search.backend.lucene.search.impl.SearchQueryElementTypeKey;
+import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
