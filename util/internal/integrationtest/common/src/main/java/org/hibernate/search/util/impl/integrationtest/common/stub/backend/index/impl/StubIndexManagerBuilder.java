@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRoo
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexSchemaRootNodeBuilder;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.dsl.impl.StubIndexSchemaRootNodeBuilder;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 public class StubIndexManagerBuilder implements IndexManagerBuilder {
@@ -59,6 +59,6 @@ public class StubIndexManagerBuilder implements IndexManagerBuilder {
 		}
 		StaticCounters.get().increment( BUILD_COUNTER_KEY );
 		closed = true;
-		return new StubIndexManager( backend, name, mappedTypeName, schemaRootNodeBuilder.build() );
+		return new StubIndexManager( backend, name, mappedTypeName, schemaRootNodeBuilder.buildModel() );
 	}
 }

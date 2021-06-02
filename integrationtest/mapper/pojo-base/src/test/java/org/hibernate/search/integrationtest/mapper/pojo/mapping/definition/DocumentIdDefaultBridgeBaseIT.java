@@ -31,7 +31,7 @@ import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -58,10 +58,10 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
-	private DefaultIdentifierBridgeExpectations<I> expectations;
+	private final DefaultIdentifierBridgeExpectations<I> expectations;
 	private SearchMapping mapping;
-	private StubIndexSchemaNode index1RootSchemaNode;
-	private StubIndexSchemaNode index2RootSchemaNode;
+	private StubIndexModel index1Model;
+	private StubIndexModel index2Model;
 
 	public DocumentIdDefaultBridgeBaseIT(PropertyTypeDescriptor<I> typeDescriptor,
 			Optional<DefaultIdentifierBridgeExpectations<I>> expectations) {
@@ -76,12 +76,12 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 		backendMock.expectSchema(
 				DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,
 				b -> { },
-				schema -> this.index1RootSchemaNode = schema
+				indexModel -> this.index1Model = indexModel
 		);
 		backendMock.expectSchema(
 				DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME,
 				b -> { },
-				schema -> this.index2RootSchemaNode = schema
+				indexModel -> this.index2Model = indexModel
 		);
 		mapping = setupHelper.start()
 				.withAnnotatedEntityType( expectations.getTypeWithIdentifierBridge1(), DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME )
@@ -184,9 +184,9 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		DocumentIdentifierValueConverter<I> dslToIndexConverter =
-				(DocumentIdentifierValueConverter<I>) index1RootSchemaNode.getIdDslConverter();
+				(DocumentIdentifierValueConverter<I>) index1Model.idDslConverter();
 		DocumentIdentifierValueConverter<?> compatibleDslToIndexConverter =
-				index2RootSchemaNode.getIdDslConverter();
+				index2Model.idDslConverter();
 		ToDocumentIdentifierValueConvertContextImpl convertContext =
 				new ToDocumentIdentifierValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
 
@@ -224,7 +224,7 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		DocumentIdentifierValueConverter<I> documentIdentifierValueConverter =
-				(DocumentIdentifierValueConverter<I>) index1RootSchemaNode.getIdDslConverter();
+				(DocumentIdentifierValueConverter<I>) index1Model.idDslConverter();
 
 		// convert must behave appropriately on valid input
 		try ( SearchSession searchSession = mapping.createSession() ) {

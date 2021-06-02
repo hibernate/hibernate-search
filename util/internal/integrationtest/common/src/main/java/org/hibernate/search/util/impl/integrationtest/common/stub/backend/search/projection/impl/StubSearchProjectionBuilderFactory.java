@@ -13,8 +13,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
@@ -22,16 +22,12 @@ import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder
 import org.hibernate.search.engine.search.projection.spi.EntityReferenceProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.IdProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
-import org.hibernate.search.engine.search.projection.spi.SingleValuedProjectionAccumulator;
-import org.hibernate.search.engine.spatial.DistanceUnit;
-import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.function.TriFunction;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubSearchIndexScope;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl.StubFieldConverter;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
 
 public class StubSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
 
@@ -53,24 +49,8 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 
 	@Override
 	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz, ValueConvert convert) {
-		StubFieldConverter<?> converter = scope.getFieldConverter( absoluteFieldPath );
-		return new FieldProjectionBuilder<T>() {
-			@Override
-			public SearchProjection<T> build() {
-				return new StubFieldSearchProjection<>( clazz, converter );
-			}
-
-			@Override
-			@SuppressWarnings("unchecked")
-			public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<T, P> accumulatorProvider) {
-				if ( accumulatorProvider == SingleValuedProjectionAccumulator.provider() ) {
-					return (SearchProjection<P>) build();
-				}
-				else {
-					throw new AssertionFailure( "Multi-valued projections are not supported in the stub backend." );
-				}
-			}
-		};
+		return scope.field( absoluteFieldPath ).queryElement( ProjectionTypeKeys.FIELD, scope )
+				.type( clazz, convert );
 	}
 
 	@Override
@@ -100,28 +80,7 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 
 	@Override
 	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath) {
-		return new DistanceToFieldProjectionBuilder() {
-			@Override
-			public void center(GeoPoint center) {
-				// No-op
-			}
-
-			@Override
-			public void unit(DistanceUnit unit) {
-				// No-op
-			}
-
-			@Override
-			@SuppressWarnings("unchecked")
-			public <P> SearchProjection<P> build(ProjectionAccumulator.Provider<Double, P> accumulatorProvider) {
-				if ( accumulatorProvider == SingleValuedProjectionAccumulator.<Double>provider() ) {
-					return (SearchProjection<P>) build();
-				}
-				else {
-					throw new AssertionFailure( "Multi-valued projections are not supported in the stub backend." );
-				}
-			}
-		};
+		return new StubDistanceToFieldSearchProjection.Builder();
 	}
 
 	@Override
@@ -184,4 +143,5 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 		}
 		return (StubSearchProjection<U>) projection;
 	}
+
 }

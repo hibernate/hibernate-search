@@ -28,7 +28,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedVal
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexNode;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -63,7 +63,7 @@ public class FieldDefaultBridgeOverridingIT<V, F> {
 	private final PropertyTypeDescriptor<V> typeDescriptor;
 	private final DefaultValueBridgeExpectations<V, F> expectations;
 	private SearchMapping mapping;
-	private StubIndexSchemaNode fieldSchemaNode;
+	private StubIndexNode indexField;
 
 	public FieldDefaultBridgeOverridingIT(PropertyTypeDescriptor<V> typeDescriptor, Optional<DefaultValueBridgeExpectations<V, F>> expectations) {
 		assumeTrue(
@@ -84,7 +84,7 @@ public class FieldDefaultBridgeOverridingIT<V, F> {
 								f -> f.indexNullAs( new FieldTypeForOverridingDefaultBridge( "NULL_AS" ) ) );
 					}
 				},
-				schema -> this.fieldSchemaNode = schema.getChildren().get( FIELD_NAME ).get( 0 )
+				indexModel -> this.indexField = indexModel.fieldOrNull( FIELD_NAME )
 		);
 		mapping = setupHelper.start()
 				.withAnnotatedEntityType( expectations.getTypeWithValueBridge1(),
@@ -142,7 +142,7 @@ public class FieldDefaultBridgeOverridingIT<V, F> {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		DslConverter<V, ?> dslConverter =
-				(DslConverter<V, ?>) fieldSchemaNode.getConverter().getDslConverter();
+				(DslConverter<V, ?>) indexField.type().dslConverter();
 		ToDocumentFieldValueConvertContext toDocumentConvertContext =
 				new ToDocumentFieldValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
 

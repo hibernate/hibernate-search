@@ -36,7 +36,7 @@ import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexNode;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -68,8 +68,8 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 	private final PropertyTypeDescriptor<V> typeDescriptor;
 	private final DefaultValueBridgeExpectations<V, F> expectations;
 	private SearchMapping mapping;
-	private StubIndexSchemaNode index1FieldSchemaNode;
-	private StubIndexSchemaNode index2FieldSchemaNode;
+	private StubIndexNode index1Field;
+	private StubIndexNode index2Field;
 
 	public FieldDefaultBridgeBaseIT(PropertyTypeDescriptor<V> typeDescriptor, Optional<DefaultValueBridgeExpectations<V, F>> expectations) {
 		assumeTrue(
@@ -89,7 +89,7 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 						b.field( FIELD_INDEXNULLAS_NAME, expectations.getIndexFieldJavaType(), f -> f.indexNullAs( expectations.getNullAsValueBridge1() ) );
 					}
 				},
-				schema -> this.index1FieldSchemaNode = schema.getChildren().get( FIELD_NAME ).get( 0 )
+				indexModel -> this.index1Field = indexModel.fieldOrNull( FIELD_NAME )
 		);
 		backendMock.expectSchema(
 				DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME, b -> {
@@ -99,7 +99,7 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 						b.field( FIELD_INDEXNULLAS_NAME, expectations.getIndexFieldJavaType(), f -> f.indexNullAs( expectations.getNullAsValueBridge2() ) );
 					}
 				},
-				schema -> this.index2FieldSchemaNode = schema.getChildren().get( FIELD_NAME ).get( 0 )
+				indexModel -> this.index2Field = indexModel.fieldOrNull( FIELD_NAME )
 		);
 		mapping = setupHelper.start()
 				.withAnnotatedEntityType( expectations.getTypeWithValueBridge1(), DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME )
@@ -168,9 +168,9 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		DslConverter<V, ?> dslConverter =
-				(DslConverter<V, ?>) index1FieldSchemaNode.getConverter().getDslConverter();
+				(DslConverter<V, ?>) index1Field.type().dslConverter();
 		DslConverter<?, ?> compatibleDslConverter =
-				index2FieldSchemaNode.getConverter().getDslConverter();
+				index2Field.type().dslConverter();
 		DslConverter<?, ?> incompatibleDslConverter =
 				new DslConverter<>( typeDescriptor.getJavaType(), new IncompatibleToDocumentFieldValueConverter<>() );
 		ToDocumentFieldValueConvertContext toDocumentConvertContext =
@@ -217,9 +217,9 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		ProjectionConverter<F, V> indexToProjectionConverter =
-				(ProjectionConverter<F, V>) index1FieldSchemaNode.getConverter().getProjectionConverter();
+				(ProjectionConverter<F, V>) index1Field.type().projectionConverter();
 		ProjectionConverter<?, ?> compatibleIndexToProjectionConverter =
-				index2FieldSchemaNode.getConverter().getProjectionConverter();
+				index2Field.type().projectionConverter();
 		ProjectionConverter<?, ?> incompatibleIndexToProjectionConverter =
 				new ProjectionConverter<>( typeDescriptor.getJavaType(), new IncompatibleFromDocumentFieldValueConverter<>() );
 

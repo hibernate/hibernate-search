@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -106,7 +106,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 
 	@Before
 	public void setup() {
-		Consumer<StubIndexSchemaNode.Builder> associationFieldContributor = b -> {
+		Consumer<StubIndexSchemaDataNode.Builder> associationFieldContributor = b -> {
 			if ( primitives.isMultiValuedAssociation() ) {
 				b.multiValued( true );
 			}

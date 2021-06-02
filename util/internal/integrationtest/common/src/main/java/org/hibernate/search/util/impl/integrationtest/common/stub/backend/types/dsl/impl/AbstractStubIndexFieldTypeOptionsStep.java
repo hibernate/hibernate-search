@@ -14,18 +14,15 @@ import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl.StubFieldConverter;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.impl.StubIndexFieldType;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.impl.StubIndexValueFieldType;
 
 abstract class AbstractStubIndexFieldTypeOptionsStep<S extends AbstractStubIndexFieldTypeOptionsStep<?, F>, F>
 		implements IndexFieldTypeOptionsStep<S, F> {
 
-	final List<Consumer<StubIndexSchemaNode.Builder>> modifiers;
+	final List<Consumer<StubIndexSchemaDataNode.Builder>> modifiers;
 	private final Class<F> inputType;
 
 	private DslConverter<?, ? extends F> dslConverter;
@@ -34,18 +31,6 @@ abstract class AbstractStubIndexFieldTypeOptionsStep<S extends AbstractStubIndex
 	AbstractStubIndexFieldTypeOptionsStep(Class<F> inputType) {
 		this.modifiers = new ArrayList<>();
 		this.inputType = inputType;
-		modifiers.add(
-				b -> b.converter( new StubFieldConverter<>(
-						inputType,
-						dslConverter == null
-								? new DslConverter<>( inputType, new PassThroughToDocumentFieldValueConverter<>() )
-								: dslConverter,
-						projectionConverter == null
-								? new ProjectionConverter<>(
-								inputType, new PassThroughFromDocumentFieldValueConverter<>() )
-								: projectionConverter
-				) )
-		);
 	}
 
 	abstract S thisAsS();
@@ -64,7 +49,7 @@ abstract class AbstractStubIndexFieldTypeOptionsStep<S extends AbstractStubIndex
 
 	@Override
 	public IndexFieldType<F> toIndexFieldType() {
-		return new StubIndexFieldType<>( inputType, modifiers );
+		return new StubIndexValueFieldType( inputType, dslConverter, projectionConverter, modifiers );
 	}
 
 }

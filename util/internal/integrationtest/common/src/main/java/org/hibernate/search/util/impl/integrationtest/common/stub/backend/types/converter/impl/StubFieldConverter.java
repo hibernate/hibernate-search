@@ -27,15 +27,11 @@ public class StubFieldConverter<F> {
 		return projectionConverter.convert( type.cast( indexValue ), context );
 	}
 
-	public boolean isConvertIndexToProjectionCompatibleWith(StubFieldConverter<?> other) {
-		return projectionConverter.isCompatibleWith( other.projectionConverter );
-	}
-
-	public DslConverter<?, ? extends F> getDslConverter() {
+	public DslConverter<?, ? extends F> dslConverter() {
 		return dslConverter;
 	}
 
-	public ProjectionConverter<? super F, ?> getProjectionConverter() {
+	public ProjectionConverter<? super F, ?> projectionConverter() {
 		return projectionConverter;
 	}
 }

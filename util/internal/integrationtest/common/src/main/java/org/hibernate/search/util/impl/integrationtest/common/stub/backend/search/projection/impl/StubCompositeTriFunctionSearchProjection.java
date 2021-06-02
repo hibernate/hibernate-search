@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.util.common.function.TriFunction;
 
-public class StubCompositeTriFunctionSearchProjection<P1, P2, P3, P> implements StubCompositeSearchProjection<P> {
+class StubCompositeTriFunctionSearchProjection<P1, P2, P3, P> implements StubCompositeSearchProjection<P> {
 
 	private final TriFunction<P1, P2, P3, P> transformer;
 
@@ -22,7 +22,7 @@ public class StubCompositeTriFunctionSearchProjection<P1, P2, P3, P> implements 
 
 	private final StubSearchProjection<P3> projection3;
 
-	public StubCompositeTriFunctionSearchProjection(TriFunction<P1, P2, P3, P> transformer,
+	StubCompositeTriFunctionSearchProjection(TriFunction<P1, P2, P3, P> transformer,
 			StubSearchProjection<P1> projection1, StubSearchProjection<P2> projection2,
 			StubSearchProjection<P3> projection3) {
 		this.transformer = transformer;

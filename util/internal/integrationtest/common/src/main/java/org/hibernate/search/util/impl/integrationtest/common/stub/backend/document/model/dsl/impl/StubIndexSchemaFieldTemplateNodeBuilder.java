@@ -4,29 +4,29 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl;
+package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.dsl.impl;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
 
 class StubIndexSchemaFieldTemplateNodeBuilder
 		implements IndexSchemaFieldTemplateOptionsStep<StubIndexSchemaFieldTemplateNodeBuilder> {
 
-	private final StubIndexSchemaNode.Builder builder;
+	private final StubIndexSchemaDataNode.Builder schemaDataNodeBuilder;
 
-	StubIndexSchemaFieldTemplateNodeBuilder(StubIndexSchemaNode.Builder builder) {
-		this.builder = builder;
+	StubIndexSchemaFieldTemplateNodeBuilder(StubIndexSchemaDataNode.Builder schemaDataNodeBuilder) {
+		this.schemaDataNodeBuilder = schemaDataNodeBuilder;
 	}
 
 	@Override
 	public StubIndexSchemaFieldTemplateNodeBuilder matchingPathGlob(String pathGlob) {
-		builder.matchingPathGlob( pathGlob );
+		schemaDataNodeBuilder.matchingPathGlob( pathGlob );
 		return this;
 	}
 
 	@Override
 	public StubIndexSchemaFieldTemplateNodeBuilder multiValued() {
-		builder.multiValued( true );
+		schemaDataNodeBuilder.multiValued( true );
 		return this;
 	}
 }
