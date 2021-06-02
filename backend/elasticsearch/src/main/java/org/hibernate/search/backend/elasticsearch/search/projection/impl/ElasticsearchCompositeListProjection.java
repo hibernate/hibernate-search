@@ -10,17 +10,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 
 public class ElasticsearchCompositeListProjection<P>
 		extends AbstractElasticsearchCompositeProjection<P> {
 
 	private final Function<List<?>, P> transformer;
 
-	public ElasticsearchCompositeListProjection(ElasticsearchSearchContext searchContext,
+	public ElasticsearchCompositeListProjection(ElasticsearchSearchIndexScope scope,
 			Function<List<?>, P> transformer,
 			List<ElasticsearchSearchProjection<?, ?>> children) {
-		super( searchContext, children.toArray( new ElasticsearchSearchProjection<?, ?>[0] ) );
+		super( scope, children.toArray( new ElasticsearchSearchProjection<?, ?>[0] ) );
 		this.transformer = transformer;
 	}
 

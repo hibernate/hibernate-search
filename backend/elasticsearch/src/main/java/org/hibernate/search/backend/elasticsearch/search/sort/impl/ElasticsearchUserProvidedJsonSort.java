@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 
 import com.google.gson.JsonObject;
 
@@ -15,8 +15,8 @@ class ElasticsearchUserProvidedJsonSort extends AbstractElasticsearchSort {
 
 	private final JsonObject json;
 
-	ElasticsearchUserProvidedJsonSort(ElasticsearchSearchContext searchContext, JsonObject json) {
-		super( searchContext );
+	ElasticsearchUserProvidedJsonSort(ElasticsearchSearchIndexScope scope, JsonObject json) {
+		super( scope );
 		this.json = json;
 	}
 

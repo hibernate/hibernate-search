@@ -25,7 +25,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchObj
 import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchRootContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexSchemaElementContext;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
@@ -45,7 +45,7 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.search.Query;
 
-public final class LuceneIndexScopeSearchContext implements LuceneSearchContext {
+public final class LuceneSearchIndexScopeImpl implements LuceneSearchIndexScope {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -67,7 +67,7 @@ public final class LuceneIndexScopeSearchContext implements LuceneSearchContext 
 	private final Map<String, LuceneScopeIndexManagerContext> mappedTypeNameToIndex;
 	private final Set<String> indexNames;
 
-	public LuceneIndexScopeSearchContext(BackendMappingContext mappingContext,
+	public LuceneSearchIndexScopeImpl(BackendMappingContext mappingContext,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy,
 			TimingSource timingSource,

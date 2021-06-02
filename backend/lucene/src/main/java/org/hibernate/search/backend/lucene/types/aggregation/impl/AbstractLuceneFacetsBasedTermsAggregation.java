@@ -17,7 +17,7 @@ import java.util.Set;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.FacetsCollectorFactory;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
@@ -149,11 +149,11 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 	}
 
 	abstract static class AbstractTypeSelector<F> implements TermsAggregationBuilder.TypeSelector {
-		protected final LuceneSearchContext searchContext;
+		protected final LuceneSearchIndexScope scope;
 		protected final LuceneSearchValueFieldContext<F> field;
 
-		protected AbstractTypeSelector(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
-			this.searchContext = searchContext;
+		protected AbstractTypeSelector(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+			this.scope = scope;
 			this.field = field;
 		}
 
@@ -171,9 +171,9 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		private int minDocCount = 1;
 		private int maxTermCount = 100;
 
-		AbstractBuilder(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field,
+		AbstractBuilder(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field,
 				ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
-			super( searchContext, field );
+			super( scope, field );
 			this.fromFieldValueConverter = fromFieldValueConverter;
 		}
 

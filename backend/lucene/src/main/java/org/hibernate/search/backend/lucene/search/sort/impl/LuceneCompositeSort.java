@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.sort.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.CompositeSortBuilder;
 
@@ -33,13 +33,13 @@ class LuceneCompositeSort extends AbstractLuceneSort {
 	static class Builder extends AbstractBuilder implements CompositeSortBuilder {
 		private List<LuceneSearchSort> elements = new ArrayList<>();
 
-		Builder(LuceneSearchContext searchContext) {
-			super( searchContext );
+		Builder(LuceneSearchIndexScope scope) {
+			super( scope );
 		}
 
 		@Override
 		public void add(SearchSort sort) {
-			elements.add( LuceneSearchSort.from( searchContext, sort ) );
+			elements.add( LuceneSearchSort.from( scope, sort ) );
 		}
 
 		@Override

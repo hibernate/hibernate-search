@@ -20,7 +20,7 @@ import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
@@ -92,26 +92,26 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		}
 
 		@Override
-		public TypeSelector<?> create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
-			return new TypeSelector<>( codec, searchContext, field );
+		public TypeSelector<?> create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+			return new TypeSelector<>( codec, scope, field );
 		}
 	}
 
 	public static class TypeSelector<F> implements RangeAggregationBuilder.TypeSelector {
 		private final AbstractLuceneNumericFieldCodec<F, ?> codec;
-		private final LuceneSearchContext searchContext;
+		private final LuceneSearchIndexScope scope;
 		private final LuceneSearchValueFieldContext<F> field;
 
 		private TypeSelector(AbstractLuceneNumericFieldCodec<F, ?> codec,
-				LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
+				LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
 			this.codec = codec;
-			this.searchContext = searchContext;
+			this.scope = scope;
 			this.field = field;
 		}
 
 		@Override
 		public <K> Builder<F, ?, K> type(Class<K> expectedType, ValueConvert convert) {
-			return new Builder<>( codec, searchContext, field,
+			return new Builder<>( codec, scope, field,
 					field.type().dslConverter( convert ).withInputType( expectedType, field ) );
 		}
 	}
@@ -127,9 +127,9 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		private final List<Range<E>> encodedRangesInOrder = new ArrayList<>();
 
 		public Builder(AbstractLuceneNumericFieldCodec<F, E> codec,
-				LuceneSearchContext searchContext, LuceneSearchValueFieldContext<?> field,
+				LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<?> field,
 				DslConverter<? super K, F> toFieldValueConverter) {
-			super( searchContext, field );
+			super( scope, field );
 			this.codec = codec;
 			this.toFieldValueConverter = toFieldValueConverter;
 		}
@@ -147,7 +147,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 		private E convertAndEncode(K value) {
 			try {
-				F converted = toFieldValueConverter.convert( value, searchContext.toDocumentFieldValueConvertContext() );
+				F converted = toFieldValueConverter.convert( value, scope.toDocumentFieldValueConvertContext() );
 				return codec.encode( converted );
 			}
 			catch (RuntimeException e) {

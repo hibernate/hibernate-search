@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
@@ -27,10 +27,10 @@ public class ElasticsearchSearchAggregationBuilderFactory
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchSearchContext searchContext;
+	private final ElasticsearchSearchIndexScope scope;
 
-	public ElasticsearchSearchAggregationBuilderFactory(ElasticsearchSearchContext searchContext) {
-		this.searchContext = searchContext;
+	public ElasticsearchSearchAggregationBuilderFactory(ElasticsearchSearchIndexScope scope) {
+		this.scope = scope;
 	}
 
 	@Override
@@ -41,9 +41,9 @@ public class ElasticsearchSearchAggregationBuilderFactory
 		}
 
 		ElasticsearchSearchAggregation<A> casted = (ElasticsearchSearchAggregation<A>) aggregation;
-		if ( !searchContext.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
+		if ( !scope.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
 			throw log.aggregationDefinedOnDifferentIndexes(
-					aggregation, casted.getIndexNames(), searchContext.hibernateSearchIndexNames()
+					aggregation, casted.getIndexNames(), scope.hibernateSearchIndexNames()
 			);
 		}
 
@@ -53,22 +53,22 @@ public class ElasticsearchSearchAggregationBuilderFactory
 	@Override
 	public <T> TermsAggregationBuilder<T> createTermsAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
-		return searchContext.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.TERMS, searchContext )
+		return scope.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.TERMS, scope )
 				.type( expectedType, convert );
 	}
 
 	@Override
 	public <T> RangeAggregationBuilder<T> createRangeAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
 			ValueConvert convert) {
-		return searchContext.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.RANGE, searchContext )
+		return scope.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.RANGE, scope )
 				.type( expectedType, convert );
 	}
 
 	public SearchAggregationBuilder<JsonObject> fromJson(JsonObject jsonObject) {
-		return new ElasticsearchUserProvidedJsonAggregation.Builder( searchContext, jsonObject );
+		return new ElasticsearchUserProvidedJsonAggregation.Builder( scope, jsonObject );
 	}
 
 	public SearchAggregationBuilder<JsonObject> fromJson(String jsonString) {
-		return fromJson( searchContext.userFacingGson().fromJson( jsonString, JsonObject.class ) );
+		return fromJson( scope.userFacingGson().fromJson( jsonString, JsonObject.class ) );
 	}
 }

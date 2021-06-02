@@ -11,7 +11,7 @@ import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
@@ -61,10 +61,10 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 
 		protected Object missingValue = SortMissingValue.MISSING_LAST;
 
-		protected AbstractBuilder(LuceneSearchContext searchContext,
+		protected AbstractBuilder(LuceneSearchIndexScope scope,
 				LuceneSearchValueFieldContext<F> field, C codec,
 				Object sortMissingValueFirstPlaceholder, Object sortMissingValueLastPlaceholder) {
-			super( searchContext, field );
+			super( scope, field );
 			this.field = field;
 			this.codec = codec;
 			this.sortMissingValueFirstPlaceholder = sortMissingValueFirstPlaceholder;
@@ -85,7 +85,7 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 		public void missingAs(Object value, ValueConvert convert) {
 			DslConverter<?, ? extends F> dslToIndexConverter = field.type().dslConverter( convert );
 			try {
-				F converted = dslToIndexConverter.convertUnknown( value, searchContext.toDocumentFieldValueConvertContext() );
+				F converted = dslToIndexConverter.convertUnknown( value, scope.toDocumentFieldValueConvertContext() );
 				missingValue = encodeMissingAs( converted );
 			}
 			catch (RuntimeException e) {
@@ -126,16 +126,16 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 		}
 
 		@Override
-		public FieldSortBuilder create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
-			return new NumericFieldBuilder<>( codec, searchContext, field );
+		public FieldSortBuilder create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+			return new NumericFieldBuilder<>( codec, scope, field );
 		}
 	}
 
 	private static class NumericFieldBuilder<F, E extends Number>
 			extends AbstractBuilder<F, E, AbstractLuceneNumericFieldCodec<F, E>> {
-		private NumericFieldBuilder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchContext searchContext,
+		private NumericFieldBuilder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchIndexScope scope,
 				LuceneSearchValueFieldContext<F> field) {
-			super( searchContext, field, codec, codec.getDomain().getMinValue(), codec.getDomain().getMaxValue() );
+			super( scope, field, codec, codec.getDomain().getMinValue(), codec.getDomain().getMaxValue() );
 		}
 
 		@Override
@@ -152,15 +152,15 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 		}
 
 		@Override
-		public FieldSortBuilder create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
-			return new TextFieldBuilder<>( codec, searchContext, field );
+		public FieldSortBuilder create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+			return new TextFieldBuilder<>( codec, scope, field );
 		}
 	}
 
 	private static class TextFieldBuilder<F> extends AbstractBuilder<F, String, LuceneStandardFieldCodec<F, String>> {
-		private TextFieldBuilder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchContext searchContext,
+		private TextFieldBuilder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchIndexScope scope,
 				LuceneSearchValueFieldContext<F> field) {
-			super( searchContext, field, codec, SortField.STRING_FIRST, SortField.STRING_LAST );
+			super( scope, field, codec, SortField.STRING_FIRST, SortField.STRING_LAST );
 		}
 
 		@Override
@@ -205,16 +205,16 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 		}
 
 		@Override
-		public FieldSortBuilder create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
-			return new TemporalFieldBuilder<>( codec, searchContext, field );
+		public FieldSortBuilder create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+			return new TemporalFieldBuilder<>( codec, scope, field );
 		}
 	}
 
 	private static class TemporalFieldBuilder<F extends TemporalAccessor, E extends Number>
 			extends NumericFieldBuilder<F, E> {
-		private TemporalFieldBuilder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchContext searchContext,
+		private TemporalFieldBuilder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchIndexScope scope,
 				LuceneSearchValueFieldContext<F> field) {
-			super( codec, searchContext, field );
+			super( codec, scope, field );
 		}
 
 		@Override

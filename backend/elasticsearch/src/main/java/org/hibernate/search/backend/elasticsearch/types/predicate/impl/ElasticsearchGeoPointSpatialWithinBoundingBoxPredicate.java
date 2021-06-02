@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
@@ -68,8 +68,8 @@ public class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicate extends Abst
 		}
 
 		@Override
-		public Builder create(ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<GeoPoint> field) {
-			return new Builder( codec, searchContext, field );
+		public Builder create(ElasticsearchSearchIndexScope scope, ElasticsearchSearchValueFieldContext<GeoPoint> field) {
+			return new Builder( codec, scope, field );
 		}
 	}
 
@@ -79,9 +79,9 @@ public class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicate extends Abst
 		private JsonElement topLeft;
 		private JsonElement bottomRight;
 
-		private Builder(ElasticsearchFieldCodec<GeoPoint> codec, ElasticsearchSearchContext searchContext,
+		private Builder(ElasticsearchFieldCodec<GeoPoint> codec, ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<GeoPoint> field) {
-			super( searchContext, field );
+			super( scope, field );
 			this.codec = codec;
 		}
 

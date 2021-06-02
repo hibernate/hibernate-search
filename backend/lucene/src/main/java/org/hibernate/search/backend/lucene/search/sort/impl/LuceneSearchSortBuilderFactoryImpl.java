@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.CompositeSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
@@ -20,50 +20,50 @@ import org.apache.lucene.search.SortField;
 
 public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuilderFactory {
 
-	private final LuceneSearchContext searchContext;
+	private final LuceneSearchIndexScope scope;
 
-	public LuceneSearchSortBuilderFactoryImpl(LuceneSearchContext searchContext) {
-		this.searchContext = searchContext;
+	public LuceneSearchSortBuilderFactoryImpl(LuceneSearchIndexScope scope) {
+		this.scope = scope;
 	}
 
 	@Override
 	public void contribute(LuceneSearchSortCollector collector, SearchSort sort) {
-		LuceneSearchSort luceneSort = LuceneSearchSort.from( searchContext, sort );
+		LuceneSearchSort luceneSort = LuceneSearchSort.from( scope, sort );
 		luceneSort.toSortFields( collector );
 	}
 
 	@Override
 	public ScoreSortBuilder score() {
-		return new LuceneScoreSort.Builder( searchContext );
+		return new LuceneScoreSort.Builder( scope );
 	}
 
 	@Override
 	public FieldSortBuilder field(String absoluteFieldPath) {
-		return searchContext.field( absoluteFieldPath ).queryElement( SortTypeKeys.FIELD, searchContext );
+		return scope.field( absoluteFieldPath ).queryElement( SortTypeKeys.FIELD, scope );
 	}
 
 	@Override
 	public DistanceSortBuilder distance(String absoluteFieldPath) {
-		return searchContext.field( absoluteFieldPath ).queryElement( SortTypeKeys.DISTANCE, searchContext );
+		return scope.field( absoluteFieldPath ).queryElement( SortTypeKeys.DISTANCE, scope );
 	}
 
 	@Override
 	public SearchSort indexOrder() {
-		return new LuceneIndexOrderSort( searchContext );
+		return new LuceneIndexOrderSort( scope );
 	}
 
 	@Override
 	public CompositeSortBuilder composite() {
-		return new LuceneCompositeSort.Builder( searchContext );
+		return new LuceneCompositeSort.Builder( scope );
 	}
 
 	@Override
 	public LuceneSearchSort fromLuceneSortField(SortField luceneSortField) {
-		return new LuceneUserProvidedLuceneSortFieldSort( searchContext, luceneSortField );
+		return new LuceneUserProvidedLuceneSortFieldSort( scope, luceneSortField );
 	}
 
 	@Override
 	public LuceneSearchSort fromLuceneSort(Sort luceneSort) {
-		return new LuceneUserProvidedLuceneSortSort( searchContext, luceneSort );
+		return new LuceneUserProvidedLuceneSortSort( scope, luceneSort );
 	}
 }

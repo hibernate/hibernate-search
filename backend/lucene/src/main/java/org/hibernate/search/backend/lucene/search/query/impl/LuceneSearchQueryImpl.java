@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HibernateSearchMultiReader;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestrator;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
@@ -46,7 +46,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	private final LuceneSyncWorkOrchestrator queryOrchestrator;
 	private final LuceneWorkFactory workFactory;
-	private final LuceneSearchContext searchContext;
+	private final LuceneSearchIndexScope scope;
 	private final BackendSessionContext sessionContext;
 	private final SearchLoadingContext<?, ?> loadingContext;
 	private final Set<String> routingKeys;
@@ -58,7 +58,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private TimeoutManager timeoutManager;
 
 	LuceneSearchQueryImpl(LuceneSyncWorkOrchestrator queryOrchestrator,
-			LuceneWorkFactory workFactory, LuceneSearchContext searchContext,
+			LuceneWorkFactory workFactory, LuceneSearchIndexScope scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContext<?, ?> loadingContext,
 			Set<String> routingKeys,
@@ -68,7 +68,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 			Long totalHitCountThreshold) {
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
-		this.searchContext = searchContext;
+		this.scope = scope;
 		this.sessionContext = sessionContext;
 		this.loadingContext = loadingContext;
 		this.routingKeys = routingKeys;
@@ -117,10 +117,10 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	@Override
 	public LuceneSearchScroll<H> scroll(int chunkSize) {
-		Set<String> indexNames = searchContext.hibernateSearchIndexNames();
+		Set<String> indexNames = scope.hibernateSearchIndexNames();
 		HibernateSearchMultiReader indexReader = HibernateSearchMultiReader.open(
-				indexNames, searchContext.indexes(), routingKeys );
-		return new LuceneSearchScrollImpl<>( queryOrchestrator, workFactory, searchContext, routingKeys, timeoutManager,
+				indexNames, scope.indexes(), routingKeys );
+		return new LuceneSearchScrollImpl<>( queryOrchestrator, workFactory, scope, routingKeys, timeoutManager,
 				searcher, totalHitCountThreshold( true ), indexReader, chunkSize );
 	}
 
@@ -129,7 +129,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		Contracts.assertNotNull( id, "id" );
 
 		Map<String, ? extends LuceneSearchIndexContext> mappedTypeNameToIndex =
-				searchContext.mappedTypeNameToIndex();
+				scope.mappedTypeNameToIndex();
 		if ( mappedTypeNameToIndex.size() != 1 ) {
 			throw log.explainRequiresTypeName( mappedTypeNameToIndex.keySet() );
 		}
@@ -149,7 +149,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		Contracts.assertNotNull( id, "id" );
 
 		Map<String, ? extends LuceneSearchIndexContext> mappedTypeNameToIndex =
-				searchContext.mappedTypeNameToIndex();
+				scope.mappedTypeNameToIndex();
 		LuceneSearchIndexContext index = mappedTypeNameToIndex.get( typeName );
 		if ( !mappedTypeNameToIndex.containsKey( typeName ) ) {
 			throw log.explainRequiresTypeTargetedByQuery( mappedTypeNameToIndex.keySet(), typeName );
@@ -168,7 +168,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	@Override
 	public void failAfter(long timeout, TimeUnit timeUnit) {
 		// replace the timeout manager on already created query instance
-		timeoutManager = searchContext.createTimeoutManager( timeout, timeUnit, true );
+		timeoutManager = scope.createTimeoutManager( timeout, timeUnit, true );
 		searcher.setTimeoutManager( timeoutManager );
 	}
 
@@ -191,7 +191,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	private Explanation doExplain(String typeName, String id) {
 		timeoutManager.start();
-		Query filter = searchContext.filterOrNull( sessionContext.tenantIdentifier() );
+		Query filter = scope.filterOrNull( sessionContext.tenantIdentifier() );
 		ReadWork<Explanation> work = workFactory.explain(
 				searcher, typeName, id, filter
 		);
@@ -202,8 +202,8 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	private <T> T doSubmit(ReadWork<T> work) {
 		return queryOrchestrator.submit(
-				searchContext.hibernateSearchIndexNames(),
-				searchContext.indexes(),
+				scope.hibernateSearchIndexNames(),
+				scope.indexes(),
 				routingKeys,
 				work
 		);
@@ -223,7 +223,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private String toDocumentId(LuceneSearchIndexContext index, Object id) {
 		DocumentIdentifierValueConverter<?> converter = index.idDslConverter();
 		ToDocumentIdentifierValueConvertContext convertContext =
-				searchContext.toDocumentIdentifierValueConvertContext();
+				scope.toDocumentIdentifierValueConvertContext();
 		return converter.convertToDocumentUnknown( id, convertContext );
 	}
 }

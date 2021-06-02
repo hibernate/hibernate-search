@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
@@ -64,9 +64,9 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 		}
 
 		@Override
-		public MatchPredicateBuilder create(ElasticsearchSearchContext searchContext,
+		public MatchPredicateBuilder create(ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<String> field) {
-			return new Builder( codec, searchContext, field );
+			return new Builder( codec, scope, field );
 		}
 	}
 
@@ -75,9 +75,9 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 		private Integer prefixLength;
 		private String analyzer;
 
-		private Builder(ElasticsearchFieldCodec<String> codec, ElasticsearchSearchContext searchContext,
+		private Builder(ElasticsearchFieldCodec<String> codec, ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<String> field) {
-			super( codec, searchContext, field );
+			super( codec, scope, field );
 		}
 
 		@Override

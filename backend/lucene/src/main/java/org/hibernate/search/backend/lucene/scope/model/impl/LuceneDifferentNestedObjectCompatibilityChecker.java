@@ -11,32 +11,32 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class LuceneDifferentNestedObjectCompatibilityChecker {
 
-	public static LuceneDifferentNestedObjectCompatibilityChecker empty(LuceneSearchContext searchContext) {
-		return new LuceneDifferentNestedObjectCompatibilityChecker( searchContext, null, Collections.emptyList() );
+	public static LuceneDifferentNestedObjectCompatibilityChecker empty(LuceneSearchIndexScope scope) {
+		return new LuceneDifferentNestedObjectCompatibilityChecker( scope, null, Collections.emptyList() );
 	}
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneSearchContext searchContext;
+	private final LuceneSearchIndexScope scope;
 	private final String fieldPath;
 	private final List<String> nestedPathHierarchy;
 
-	private LuceneDifferentNestedObjectCompatibilityChecker(LuceneSearchContext searchContext, String fieldPath,
+	private LuceneDifferentNestedObjectCompatibilityChecker(LuceneSearchIndexScope scope, String fieldPath,
 			List<String> nestedPathHierarchy) {
-		this.searchContext = searchContext;
+		this.scope = scope;
 		this.fieldPath = fieldPath;
 		this.nestedPathHierarchy = nestedPathHierarchy;
 	}
 
 	public LuceneDifferentNestedObjectCompatibilityChecker combineAndCheck(String incomingFieldPath) {
-		List<String> incomingNestedPathHierarchy = searchContext.field( incomingFieldPath ).nestedPathHierarchy();
+		List<String> incomingNestedPathHierarchy = scope.field( incomingFieldPath ).nestedPathHierarchy();
 		if ( fieldPath == null ) {
-			return new LuceneDifferentNestedObjectCompatibilityChecker( searchContext, incomingFieldPath, incomingNestedPathHierarchy );
+			return new LuceneDifferentNestedObjectCompatibilityChecker( scope, incomingFieldPath, incomingNestedPathHierarchy );
 		}
 
 		if ( !nestedPathHierarchy.equals( incomingNestedPathHierarchy ) ) {

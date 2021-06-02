@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 
 import org.apache.lucene.search.Query;
 
@@ -18,8 +18,8 @@ class LuceneUserProvidedLuceneQueryPredicate implements LuceneSearchPredicate {
 	private final Set<String> indexNames;
 	private final Query luceneQuery;
 
-	LuceneUserProvidedLuceneQueryPredicate(LuceneSearchContext searchContext, Query luceneQuery) {
-		this.indexNames = searchContext.hibernateSearchIndexNames();
+	LuceneUserProvidedLuceneQueryPredicate(LuceneSearchIndexScope scope, Query luceneQuery) {
+		this.indexNames = scope.hibernateSearchIndexNames();
 		this.luceneQuery = luceneQuery;
 	}
 

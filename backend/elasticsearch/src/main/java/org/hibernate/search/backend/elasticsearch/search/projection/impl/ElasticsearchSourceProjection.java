@@ -11,7 +11,7 @@ import java.util.Optional;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -25,8 +25,8 @@ class ElasticsearchSourceProjection extends AbstractElasticsearchProjection<Json
 	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
 	private static final JsonPrimitive WILDCARD_ALL = new JsonPrimitive( "*" );
 
-	private ElasticsearchSourceProjection(ElasticsearchSearchContext searchContext) {
-		super( searchContext );
+	private ElasticsearchSourceProjection(ElasticsearchSearchIndexScope scope) {
+		super( scope );
 	}
 
 	@Override
@@ -61,9 +61,9 @@ class ElasticsearchSourceProjection extends AbstractElasticsearchProjection<Json
 
 		private final ElasticsearchSourceProjection projection;
 
-		Builder(ElasticsearchSearchContext searchContext) {
-			super( searchContext );
-			this.projection = new ElasticsearchSourceProjection( searchContext );
+		Builder(ElasticsearchSearchIndexScope scope) {
+			super( scope );
+			this.projection = new ElasticsearchSourceProjection( scope );
 		}
 
 		@Override

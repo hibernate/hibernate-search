@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDef
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -38,8 +38,8 @@ public class LuceneTextPhrasePredicate extends AbstractLuceneLeafSingleFieldPred
 	public static class Factory<F>
 			extends AbstractLuceneSearchValueFieldQueryElementFactory<PhrasePredicateBuilder, F> {
 		@Override
-		public Builder<F> create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
-			return new Builder<>( searchContext, field );
+		public Builder<F> create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+			return new Builder<>( scope, field );
 		}
 	}
 
@@ -52,9 +52,9 @@ public class LuceneTextPhrasePredicate extends AbstractLuceneLeafSingleFieldPred
 
 		private Analyzer overrideAnalyzer;
 
-		private Builder(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
-			super( searchContext, field );
-			this.analysisDefinitionRegistry = searchContext.analysisDefinitionRegistry();
+		private Builder(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+			super( scope, field );
+			this.analysisDefinitionRegistry = scope.analysisDefinitionRegistry();
 		}
 
 		@Override

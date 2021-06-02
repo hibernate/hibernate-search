@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexSchemaElementContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -39,115 +39,115 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchSearchContext searchContext;
+	private final ElasticsearchSearchIndexScope scope;
 
-	public ElasticsearchSearchPredicateBuilderFactoryImpl(ElasticsearchSearchContext searchContext) {
-		this.searchContext = searchContext;
+	public ElasticsearchSearchPredicateBuilderFactoryImpl(ElasticsearchSearchIndexScope scope) {
+		this.scope = scope;
 	}
 
 	@Override
 	public void contribute(ElasticsearchSearchPredicateCollector collector, SearchPredicate predicate) {
-		ElasticsearchSearchPredicate lucenePredicate = ElasticsearchSearchPredicate.from( searchContext, predicate );
+		ElasticsearchSearchPredicate lucenePredicate = ElasticsearchSearchPredicate.from( scope, predicate );
 		collector.collectPredicate( lucenePredicate.toJsonQuery( collector.getRootPredicateContext() ) );
 	}
 
 	@Override
 	public MatchAllPredicateBuilder matchAll() {
-		return new ElasticsearchMatchAllPredicate.Builder( searchContext );
+		return new ElasticsearchMatchAllPredicate.Builder( scope );
 	}
 
 	@Override
 	public MatchIdPredicateBuilder id() {
-		return new ElasticsearchMatchIdPredicate.Builder( searchContext );
+		return new ElasticsearchMatchIdPredicate.Builder( scope );
 	}
 
 	@Override
 	public BooleanPredicateBuilder bool() {
-		return new ElasticsearchBooleanPredicate.Builder( searchContext );
+		return new ElasticsearchBooleanPredicate.Builder( scope );
 	}
 
 	@Override
 	public MatchPredicateBuilder match(String absoluteFieldPath) {
-		return searchContext.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.MATCH, searchContext );
+		return scope.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.MATCH, scope );
 	}
 
 	@Override
 	public RangePredicateBuilder range(String absoluteFieldPath) {
-		return searchContext.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.RANGE, searchContext );
+		return scope.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.RANGE, scope );
 	}
 
 	@Override
 	public PhrasePredicateBuilder phrase(String absoluteFieldPath) {
-		return searchContext.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.PHRASE, searchContext );
+		return scope.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.PHRASE, scope );
 	}
 
 	@Override
 	public WildcardPredicateBuilder wildcard(String absoluteFieldPath) {
-		return searchContext.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.WILDCARD, searchContext );
+		return scope.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.WILDCARD, scope );
 	}
 
 	@Override
 	public RegexpPredicateBuilder regexp(String absoluteFieldPath) {
-		return searchContext.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.REGEXP, searchContext );
+		return scope.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.REGEXP, scope );
 	}
 
 	@Override
 	public TermsPredicateBuilder terms(String absoluteFieldPath) {
-		return searchContext.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.TERMS, searchContext );
+		return scope.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.TERMS, scope );
 	}
 
 	@Override
 	public SimpleQueryStringPredicateBuilder simpleQueryString() {
-		return new ElasticsearchSimpleQueryStringPredicate.Builder( searchContext );
+		return new ElasticsearchSimpleQueryStringPredicate.Builder( scope );
 	}
 
 	@Override
 	public ExistsPredicateBuilder exists(String absoluteFieldPath) {
-		return searchContext.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.EXISTS, searchContext );
+		return scope.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.EXISTS, scope );
 	}
 
 	@Override
 	public SpatialWithinCirclePredicateBuilder spatialWithinCircle(String absoluteFieldPath) {
-		return searchContext.field( absoluteFieldPath )
-				.queryElement( PredicateTypeKeys.SPATIAL_WITHIN_CIRCLE, searchContext );
+		return scope.field( absoluteFieldPath )
+				.queryElement( PredicateTypeKeys.SPATIAL_WITHIN_CIRCLE, scope );
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder spatialWithinPolygon(String absoluteFieldPath) {
-		return searchContext.field( absoluteFieldPath )
-				.queryElement( PredicateTypeKeys.SPATIAL_WITHIN_POLYGON, searchContext );
+		return scope.field( absoluteFieldPath )
+				.queryElement( PredicateTypeKeys.SPATIAL_WITHIN_POLYGON, scope );
 	}
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder spatialWithinBoundingBox(String absoluteFieldPath) {
-		return searchContext.field( absoluteFieldPath )
-				.queryElement( PredicateTypeKeys.SPATIAL_WITHIN_BOUNDING_BOX, searchContext );
+		return scope.field( absoluteFieldPath )
+				.queryElement( PredicateTypeKeys.SPATIAL_WITHIN_BOUNDING_BOX, scope );
 	}
 
 	@Override
 	public NestedPredicateBuilder nested(String absoluteFieldPath) {
-		ElasticsearchSearchCompositeIndexSchemaElementContext field = searchContext.field( absoluteFieldPath ).toObjectField();
+		ElasticsearchSearchCompositeIndexSchemaElementContext field = scope.field( absoluteFieldPath ).toObjectField();
 		if ( !field.nested() ) {
 			throw log.nonNestedFieldForNestedQuery( absoluteFieldPath,
-					EventContexts.fromIndexNames( searchContext.hibernateSearchIndexNames() ) );
+					EventContexts.fromIndexNames( scope.hibernateSearchIndexNames() ) );
 		}
-		return field.queryElement( PredicateTypeKeys.NESTED, searchContext );
+		return field.queryElement( PredicateTypeKeys.NESTED, scope );
 	}
 
 	@Override
 	public NamedPredicateBuilder named(String absoluteFieldPath, String name) {
 		ElasticsearchSearchIndexSchemaElementContext targetElementContext =
-				absoluteFieldPath == null ? searchContext.root() : searchContext.field( absoluteFieldPath );
-		return targetElementContext.queryElement( PredicateTypeKeys.named( name ), searchContext );
+				absoluteFieldPath == null ? scope.root() : scope.field( absoluteFieldPath );
+		return targetElementContext.queryElement( PredicateTypeKeys.named( name ), scope );
 	}
 
 	@Override
 	public ElasticsearchSearchPredicate fromJson(JsonObject jsonObject) {
-		return new ElasticsearchUserProvidedJsonPredicate( searchContext, jsonObject );
+		return new ElasticsearchUserProvidedJsonPredicate( scope, jsonObject );
 	}
 
 	@Override
 	public ElasticsearchSearchPredicate fromJson(String jsonString) {
-		return fromJson( searchContext.userFacingGson().fromJson( jsonString, JsonObject.class ) );
+		return fromJson( scope.userFacingGson().fromJson( jsonString, JsonObject.class ) );
 	}
 }

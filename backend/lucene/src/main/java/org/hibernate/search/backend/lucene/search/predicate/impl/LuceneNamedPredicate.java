@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 import org.apache.lucene.search.Query;
@@ -68,9 +68,9 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 		}
 
 		@Override
-		public NamedPredicateBuilder create(LuceneSearchContext searchContext,
+		public NamedPredicateBuilder create(LuceneSearchIndexScope scope,
 				LuceneSearchCompositeIndexSchemaElementContext field) {
-			return new Builder( provider, predicateName, searchContext, field );
+			return new Builder( provider, predicateName, scope, field );
 		}
 	}
 
@@ -81,9 +81,9 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 		private SearchPredicateFactory factory;
 		private final Map<String, Object> params = new LinkedHashMap<>();
 
-		Builder(NamedPredicateProvider provider, String predicateName, LuceneSearchContext searchContext,
+		Builder(NamedPredicateProvider provider, String predicateName, LuceneSearchIndexScope scope,
 				LuceneSearchCompositeIndexSchemaElementContext field) {
-			super( searchContext, field );
+			super( scope, field );
 			this.provider = provider;
 			this.predicateName = predicateName;
 			this.field = field;
@@ -104,7 +104,7 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 			LuceneNamedPredicateProviderContext ctx = new LuceneNamedPredicateProviderContext(
 					factory, field, predicateName, params );
 
-			LuceneSearchPredicate providedPredicate = LuceneSearchPredicate.from( searchContext, provider.create( ctx ) );
+			LuceneSearchPredicate providedPredicate = LuceneSearchPredicate.from( scope, provider.create( ctx ) );
 
 			return new LuceneNamedPredicate( this, providedPredicate );
 		}

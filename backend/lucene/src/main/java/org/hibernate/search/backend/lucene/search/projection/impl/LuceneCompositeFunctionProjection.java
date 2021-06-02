@@ -8,16 +8,16 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 
 class LuceneCompositeFunctionProjection<P1, P>
 		extends AbstractLuceneCompositeProjection<P> {
 
 	private final Function<P1, P> transformer;
 
-	LuceneCompositeFunctionProjection(LuceneSearchContext searchContext, Function<P1, P> transformer,
+	LuceneCompositeFunctionProjection(LuceneSearchIndexScope scope, Function<P1, P> transformer,
 			LuceneSearchProjection<?, P1> projection) {
-		super( searchContext, projection );
+		super( scope, projection );
 		this.transformer = transformer;
 	}
 

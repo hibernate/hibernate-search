@@ -23,7 +23,7 @@ import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRe
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionRequestContext;
@@ -53,7 +53,7 @@ public class LuceneSearchQueryBuilder<H>
 	private final LuceneWorkFactory workFactory;
 	private final LuceneSyncWorkOrchestrator queryOrchestrator;
 
-	private final LuceneSearchContext searchContext;
+	private final LuceneSearchIndexScope scope;
 	private final BackendSessionContext sessionContext;
 	private final Set<String> routingKeys;
 
@@ -73,14 +73,14 @@ public class LuceneSearchQueryBuilder<H>
 	public LuceneSearchQueryBuilder(
 			LuceneWorkFactory workFactory,
 			LuceneSyncWorkOrchestrator queryOrchestrator,
-			LuceneSearchContext searchContext,
+			LuceneSearchIndexScope scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			LuceneSearchProjection<?, H> rootProjection) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 
-		this.searchContext = searchContext;
+		this.scope = scope;
 		this.sessionContext = sessionContext;
 		this.routingKeys = new HashSet<>();
 
@@ -174,7 +174,7 @@ public class LuceneSearchQueryBuilder<H>
 
 		BooleanQuery.Builder luceneQueryBuilder = new BooleanQuery.Builder();
 		luceneQueryBuilder.add( luceneQuery, Occur.MUST );
-		if ( searchContext.hasNestedDocuments() ) {
+		if ( scope.hasNestedDocuments() ) {
 			// HSEARCH-4018: this filter has a (small) cost, so we only add it if necessary.
 			luceneQueryBuilder.add( Queries.mainDocumentQuery(), Occur.FILTER );
 		}
@@ -183,7 +183,7 @@ public class LuceneSearchQueryBuilder<H>
 			luceneQueryBuilder.add( routingKeysQuery, Occur.FILTER );
 		}
 
-		Query filter = searchContext.filterOrNull( sessionContext.tenantIdentifier() );
+		Query filter = scope.filterOrNull( sessionContext.tenantIdentifier() );
 		if ( filter != null ) {
 			luceneQueryBuilder.add( filter, BooleanClause.Occur.FILTER );
 		}
@@ -218,7 +218,7 @@ public class LuceneSearchQueryBuilder<H>
 		}
 		ExtractionRequirements extractionRequirements = extractionRequirementsBuilder.build();
 
-		TimeoutManager timeoutManager = searchContext.createTimeoutManager( timeout, timeUnit, exceptionOnTimeout );
+		TimeoutManager timeoutManager = scope.createTimeoutManager( timeout, timeUnit, exceptionOnTimeout );
 
 		LuceneSearcherImpl<H> searcher = new LuceneSearcherImpl<>(
 				requestContext,
@@ -230,7 +230,7 @@ public class LuceneSearchQueryBuilder<H>
 
 		return new LuceneSearchQueryImpl<>(
 				queryOrchestrator, workFactory,
-				searchContext,
+				scope,
 				sessionContext,
 				loadingContext,
 				routingKeys,

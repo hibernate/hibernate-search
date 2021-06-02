@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.Arrays;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -21,9 +21,9 @@ abstract class AbstractElasticsearchCompositeProjection<P>
 
 	private final ElasticsearchSearchProjection<?, ?>[] children;
 
-	AbstractElasticsearchCompositeProjection(ElasticsearchSearchContext searchContext,
+	AbstractElasticsearchCompositeProjection(ElasticsearchSearchIndexScope scope,
 			ElasticsearchSearchProjection<?, ?> ... children) {
-		super( searchContext );
+		super( scope );
 		this.children = children;
 	}
 

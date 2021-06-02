@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.util.common.function.TriFunction;
 
 class LuceneCompositeTriFunctionProjection<P1, P2, P3, P>
@@ -15,10 +15,10 @@ class LuceneCompositeTriFunctionProjection<P1, P2, P3, P>
 
 	private final TriFunction<P1, P2, P3, P> transformer;
 
-	LuceneCompositeTriFunctionProjection(LuceneSearchContext searchContext, TriFunction<P1, P2, P3, P> transformer,
+	LuceneCompositeTriFunctionProjection(LuceneSearchIndexScope scope, TriFunction<P1, P2, P3, P> transformer,
 			LuceneSearchProjection<?, P1> projection1, LuceneSearchProjection<?, P2> projection2,
 			LuceneSearchProjection<?, P3> projection3) {
-		super( searchContext, projection1, projection2, projection3 );
+		super( scope, projection1, projection2, projection3 );
 		this.transformer = transformer;
 	}
 

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 
 import org.apache.lucene.search.SortField;
 
@@ -15,8 +15,8 @@ class LuceneUserProvidedLuceneSortFieldSort extends AbstractLuceneSort {
 
 	private final SortField luceneSortField;
 
-	LuceneUserProvidedLuceneSortFieldSort(LuceneSearchContext searchContext, SortField luceneSortField) {
-		super( searchContext );
+	LuceneUserProvidedLuceneSortFieldSort(LuceneSearchIndexScope scope, SortField luceneSortField) {
+		super( scope );
 		this.luceneSortField = luceneSortField;
 	}
 

@@ -25,14 +25,14 @@ abstract class AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneSearchContext searchContext;
+	private final LuceneSearchIndexScope scope;
 	private final List<LuceneSearchCompositeIndexSchemaElementContext> fieldForEachIndex;
 
 	private Map<String, LuceneSearchIndexSchemaElementContext> staticChildrenByName;
 
-	public AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext(LuceneSearchContext searchContext,
+	public AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext(LuceneSearchIndexScope scope,
 			List<LuceneSearchCompositeIndexSchemaElementContext> elementForEachIndex) {
-		this.searchContext = searchContext;
+		this.scope = scope;
 		this.fieldForEachIndex = elementForEachIndex;
 	}
 
@@ -48,20 +48,20 @@ abstract class AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext
 	}
 
 	private EventContext indexesEventContext() {
-		return EventContexts.fromIndexNames( searchContext.hibernateSearchIndexNames() );
+		return EventContexts.fromIndexNames( scope.hibernateSearchIndexNames() );
 	}
 
 	protected abstract EventContext relativeEventContext();
 
 	@Override
-	public <T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchContext searchContext) {
+	public <T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchIndexScope scope) {
 		LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
 		if ( factory == null ) {
 			throw log.cannotUseQueryElementForCompositeIndexElement( relativeEventContext(), key.toString(),
 					indexesEventContext() );
 		}
 		try {
-			return factory.create( searchContext, this );
+			return factory.create( scope, this );
 		}
 		catch (SearchException e) {
 			throw log.cannotUseQueryElementForCompositeIndexElementBecauseCreationException( relativeEventContext(), key.toString(),
@@ -80,7 +80,7 @@ abstract class AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext
 				Object::equals, "staticChildren" );
 
 		Map<String, LuceneSearchIndexSchemaElementContext> result = new TreeMap<>();
-		Function<String, LuceneSearchIndexSchemaElementContext> createChildFieldContext = searchContext::field;
+		Function<String, LuceneSearchIndexSchemaElementContext> createChildFieldContext = scope::field;
 		for ( LuceneSearchCompositeIndexSchemaElementContext fieldContext : fieldForEachIndex ) {
 			for ( LuceneSearchIndexSchemaElementContext child : fieldContext.staticChildrenByName().values() ) {
 				try {

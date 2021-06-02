@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -20,9 +20,9 @@ class ElasticsearchDocumentReferenceProjection
 
 	private final DocumentReferenceExtractionHelper helper;
 
-	private ElasticsearchDocumentReferenceProjection(ElasticsearchSearchContext searchContext,
+	private ElasticsearchDocumentReferenceProjection(ElasticsearchSearchIndexScope scope,
 			DocumentReferenceExtractionHelper helper) {
-		super( searchContext );
+		super( scope );
 		this.helper = helper;
 	}
 
@@ -53,9 +53,9 @@ class ElasticsearchDocumentReferenceProjection
 
 		private final ElasticsearchDocumentReferenceProjection projection;
 
-		Builder(ElasticsearchSearchContext searchContext, DocumentReferenceExtractionHelper helper) {
-			super( searchContext );
-			this.projection = new ElasticsearchDocumentReferenceProjection( searchContext, helper );
+		Builder(ElasticsearchSearchIndexScope scope, DocumentReferenceExtractionHelper helper) {
+			super( scope );
+			this.projection = new ElasticsearchDocumentReferenceProjection( scope, helper );
 		}
 
 		@Override

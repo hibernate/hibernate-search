@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 
 import org.apache.lucene.search.BoostQuery;
@@ -23,7 +23,7 @@ public abstract class AbstractLuceneSearchPredicate implements LuceneSearchPredi
 	private final boolean constantScore;
 
 	protected AbstractLuceneSearchPredicate(AbstractBuilder builder) {
-		indexNames = builder.searchContext.hibernateSearchIndexNames();
+		indexNames = builder.scope.hibernateSearchIndexNames();
 		boost = builder.boost;
 		constantScore = builder.constantScore;
 	}
@@ -52,13 +52,13 @@ public abstract class AbstractLuceneSearchPredicate implements LuceneSearchPredi
 	protected abstract Query doToQuery(PredicateRequestContext context);
 
 	public abstract static class AbstractBuilder implements SearchPredicateBuilder {
-		protected final LuceneSearchContext searchContext;
+		protected final LuceneSearchIndexScope scope;
 
 		private Float boost;
 		private boolean constantScore;
 
-		protected AbstractBuilder(LuceneSearchContext searchContext) {
-			this.searchContext = searchContext;
+		protected AbstractBuilder(LuceneSearchIndexScope scope) {
+			this.scope = scope;
 		}
 
 		@Override

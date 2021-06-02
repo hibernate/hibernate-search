@@ -10,7 +10,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
@@ -61,9 +61,9 @@ public class ElasticsearchTextPhrasePredicate extends AbstractElasticsearchSingl
 	public static class Factory
 			extends AbstractElasticsearchSearchValueFieldQueryElementFactory<PhrasePredicateBuilder, String> {
 		@Override
-		public PhrasePredicateBuilder create(ElasticsearchSearchContext searchContext,
+		public PhrasePredicateBuilder create(ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<String> field) {
-			return new Builder( searchContext, field );
+			return new Builder( scope, field );
 		}
 	}
 
@@ -73,9 +73,9 @@ public class ElasticsearchTextPhrasePredicate extends AbstractElasticsearchSingl
 		private JsonElement phrase;
 		private String analyzer;
 
-		private Builder(ElasticsearchSearchContext searchContext,
+		private Builder(ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<String> field) {
-			super( searchContext, field );
+			super( scope, field );
 			this.field = field;
 		}
 

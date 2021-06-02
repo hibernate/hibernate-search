@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -21,13 +21,13 @@ public interface LuceneSearchSort extends SearchSort {
 
 	void toSortFields(LuceneSearchSortCollector collector);
 
-	static LuceneSearchSort from(LuceneSearchContext searchContext, SearchSort sort) {
+	static LuceneSearchSort from(LuceneSearchIndexScope scope, SearchSort sort) {
 		if ( !( sort instanceof LuceneSearchSort ) ) {
 			throw log.cannotMixLuceneSearchSortWithOtherSorts( sort );
 		}
 		LuceneSearchSort casted = (LuceneSearchSort) sort;
-		if ( !searchContext.hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
-			throw log.sortDefinedOnDifferentIndexes( sort, casted.indexNames(), searchContext.hibernateSearchIndexNames() );
+		if ( !scope.hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
+			throw log.sortDefinedOnDifferentIndexes( sort, casted.indexNames(), scope.hibernateSearchIndexNames() );
 		}
 		return casted;
 	}

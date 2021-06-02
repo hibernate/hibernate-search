@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.types.predicate.parse.impl.LuceneWildcardExpressionHelper;
@@ -29,8 +29,8 @@ public class LuceneTextWildcardPredicate extends AbstractLuceneLeafSingleFieldPr
 	public static class Factory<F>
 			extends AbstractLuceneSearchValueFieldQueryElementFactory<WildcardPredicateBuilder, F> {
 		@Override
-		public Builder<F> create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
-			return new Builder<>( searchContext, field );
+		public Builder<F> create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+			return new Builder<>( scope, field );
 		}
 	}
 
@@ -40,8 +40,8 @@ public class LuceneTextWildcardPredicate extends AbstractLuceneLeafSingleFieldPr
 
 		private String pattern;
 
-		private Builder(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
-			super( searchContext, field );
+		private Builder(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+			super( scope, field );
 			this.analyzerOrNormalizer = field.type().searchAnalyzerOrNormalizer();
 		}
 

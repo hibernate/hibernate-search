@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
@@ -53,14 +53,14 @@ public abstract class AbstractLuceneDocumentValueSort extends AbstractLuceneReve
 		private SortMode mode;
 		protected Query nestedFilter;
 
-		protected AbstractBuilder(LuceneSearchContext searchContext,
+		protected AbstractBuilder(LuceneSearchIndexScope scope,
 				LuceneSearchValueFieldContext<?> field) {
-			this( searchContext, field.absolutePath(), field.nestedDocumentPath() );
+			this( scope, field.absolutePath(), field.nestedDocumentPath() );
 		}
 
-		protected AbstractBuilder(LuceneSearchContext searchContext,
+		protected AbstractBuilder(LuceneSearchIndexScope scope,
 				String absoluteFieldPath, String nestedDocumentPath) {
-			super( searchContext );
+			super( scope );
 			this.absoluteFieldPath = absoluteFieldPath;
 			this.nestedDocumentPath = nestedDocumentPath;
 		}
@@ -76,7 +76,7 @@ public abstract class AbstractLuceneDocumentValueSort extends AbstractLuceneReve
 			if ( nestedDocumentPath == null ) {
 				throw log.cannotFilterSortOnRootDocumentField( absoluteFieldPath, getEventContext() );
 			}
-			LuceneSearchPredicate luceneFilter = LuceneSearchPredicate.from( searchContext, filter );
+			LuceneSearchPredicate luceneFilter = LuceneSearchPredicate.from( scope, filter );
 			luceneFilter.checkNestableWithin( nestedDocumentPath );
 			PredicateRequestContext filterContext = new PredicateRequestContext( nestedDocumentPath );
 			this.nestedFilter = luceneFilter.toQuery( filterContext );

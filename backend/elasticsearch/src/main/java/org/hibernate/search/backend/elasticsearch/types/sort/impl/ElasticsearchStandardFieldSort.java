@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
@@ -83,8 +83,8 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 		}
 
 		@Override
-		public Builder<F> create(ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<F> field) {
-			return new Builder<>( codec, searchContext, field );
+		public Builder<F> create(ElasticsearchSearchIndexScope scope, ElasticsearchSearchValueFieldContext<F> field) {
+			return new Builder<>( codec, scope, field );
 		}
 	}
 
@@ -93,9 +93,9 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 
 		private JsonElement missing;
 
-		protected Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchContext searchContext,
+		protected Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<F> field) {
-			super( searchContext, field );
+			super( scope, field );
 			this.codec = codec;
 		}
 
@@ -113,7 +113,7 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 		public void missingAs(Object value, ValueConvert convert) {
 			DslConverter<?, ? extends F> dslToIndexConverter = field.type().dslConverter( convert );
 			try {
-				F converted = dslToIndexConverter.convertUnknown( value, searchContext.toDocumentFieldValueConvertContext() );
+				F converted = dslToIndexConverter.convertUnknown( value, scope.toDocumentFieldValueConvertContext() );
 				this.missing = codec.encodeForMissing( converted );
 			}
 			catch (RuntimeException e) {
@@ -133,16 +133,16 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 		}
 
 		@Override
-		public TemporalFieldBuilder<F> create(ElasticsearchSearchContext searchContext,
+		public TemporalFieldBuilder<F> create(ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<F> field) {
-			return new TemporalFieldBuilder<>( codec, searchContext, field );
+			return new TemporalFieldBuilder<>( codec, scope, field );
 		}
 	}
 
 	private static class TemporalFieldBuilder<F extends TemporalAccessor> extends Builder<F> {
-		private TemporalFieldBuilder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchContext searchContext,
+		private TemporalFieldBuilder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<F> field) {
-			super( codec, searchContext, field );
+			super( codec, scope, field );
 		}
 
 		@Override
@@ -167,16 +167,16 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 		}
 
 		@Override
-		public TextFieldBuilder create(ElasticsearchSearchContext searchContext,
+		public TextFieldBuilder create(ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<String> field) {
-			return new TextFieldBuilder( codec, searchContext, field );
+			return new TextFieldBuilder( codec, scope, field );
 		}
 	}
 
 	private static class TextFieldBuilder extends Builder<String> {
-		private TextFieldBuilder(ElasticsearchFieldCodec<String> codec, ElasticsearchSearchContext searchContext,
+		private TextFieldBuilder(ElasticsearchFieldCodec<String> codec, ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<String> field) {
-			super( codec, searchContext, field );
+			super( codec, scope, field );
 		}
 
 		@Override

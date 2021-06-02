@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexSchemaElementContext;
 
 public abstract class AbstractLuceneSingleFieldPredicate extends AbstractLuceneNestablePredicate {
@@ -37,14 +37,14 @@ public abstract class AbstractLuceneSingleFieldPredicate extends AbstractLuceneN
 		protected final String absoluteFieldPath;
 		private final List<String> nestedPathHierarchy;
 
-		protected AbstractBuilder(LuceneSearchContext searchContext,
+		protected AbstractBuilder(LuceneSearchIndexScope scope,
 				LuceneSearchIndexSchemaElementContext targetElementContext) {
-			this( searchContext, targetElementContext.absolutePath(), targetElementContext.nestedPathHierarchy() );
+			this( scope, targetElementContext.absolutePath(), targetElementContext.nestedPathHierarchy() );
 		}
 
-		protected AbstractBuilder(LuceneSearchContext searchContext, String absoluteFieldPath,
+		protected AbstractBuilder(LuceneSearchIndexScope scope, String absoluteFieldPath,
 				List<String> nestedPathHierarchy) {
-			super( searchContext );
+			super( scope );
 			this.absoluteFieldPath = absoluteFieldPath;
 			this.nestedPathHierarchy = nestedPathHierarchy;
 		}

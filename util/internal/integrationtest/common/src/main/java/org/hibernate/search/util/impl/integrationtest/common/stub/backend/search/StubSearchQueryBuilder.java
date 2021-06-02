@@ -13,25 +13,25 @@ import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilde
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubScopeModel;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubSearchIndexScope;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
 
 public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H, StubQueryElementCollector> {
 
 	private final StubBackend backend;
-	private final StubScopeModel scopeModel;
+	private final StubSearchIndexScope scope;
 	private final StubSearchWork.Builder workBuilder;
 	private final StubSearchProjectionContext projectionContext;
 	private final SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder;
 	private final StubSearchProjection<H> rootProjection;
 
-	public StubSearchQueryBuilder(StubBackend backend, StubScopeModel scopeModel,
+	public StubSearchQueryBuilder(StubBackend backend, StubSearchIndexScope scope,
 			StubSearchWork.ResultType resultType,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder, StubSearchProjection<H> rootProjection) {
 		this.backend = backend;
-		this.scopeModel = scopeModel;
+		this.scope = scope;
 		this.workBuilder = StubSearchWork.builder( resultType );
 		this.projectionContext = new StubSearchProjectionContext( sessionContext );
 		this.loadingContextBuilder = loadingContextBuilder;
@@ -66,7 +66,7 @@ public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H, StubQuer
 	@Override
 	public SearchQuery<H> build() {
 		return new StubSearchQuery<>(
-				backend, scopeModel.getIndexNames(), workBuilder, projectionContext,
+				backend, scope.getIndexNames(), workBuilder, projectionContext,
 				loadingContextBuilder.build(), rootProjection
 		);
 	}

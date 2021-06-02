@@ -22,8 +22,8 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetad
 import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSerialWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchIndexScopeSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchSearchIndexScopeImpl;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionBackendContext;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
@@ -138,9 +138,9 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	}
 
 	@Override
-	public ElasticsearchSearchContext createSearchContext(BackendMappingContext mappingContext,
+	public ElasticsearchSearchIndexScope createSearchContext(BackendMappingContext mappingContext,
 			Set<ElasticsearchIndexModel> indexModels) {
-		return new ElasticsearchIndexScopeSearchContext(
+		return new ElasticsearchSearchIndexScopeImpl(
 				mappingContext,
 				userFacingGson, link.getSearchSyntax(),
 				multiTenancyStrategy,
@@ -151,7 +151,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 
 	@Override
 	public <H> ElasticsearchSearchQueryBuilder<H> createSearchQueryBuilder(
-			ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchIndexScope scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<?, H> rootProjection) {
@@ -159,7 +159,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		return new ElasticsearchSearchQueryBuilder<>(
 				link.getWorkBuilderFactory(), link.getSearchResultExtractorFactory(),
 				generalPurposeOrchestrator,
-				searchContext, sessionContext, loadingContextBuilder, rootProjection,
+				scope, sessionContext, loadingContextBuilder, rootProjection,
 				link.getScrollTimeout()
 		);
 	}

@@ -12,7 +12,7 @@ import java.util.List;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
@@ -83,9 +83,9 @@ abstract class AbstractElasticsearchDocumentValueSort extends AbstractElasticsea
 		private JsonPrimitive mode;
 		private ElasticsearchSearchPredicate filter;
 
-		AbstractBuilder(ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<F> field) {
-			super( searchContext );
-			this.searchSyntax = searchContext.searchSyntax();
+		AbstractBuilder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchValueFieldContext<F> field) {
+			super( scope );
+			this.searchSyntax = scope.searchSyntax();
 			this.field = field;
 			this.nestedPathHierarchy = field.nestedPathHierarchy();
 		}
@@ -121,7 +121,7 @@ abstract class AbstractElasticsearchDocumentValueSort extends AbstractElasticsea
 			if ( nestedPathHierarchy.isEmpty() ) {
 				throw log.cannotFilterSortOnRootDocumentField( field.absolutePath(), field.eventContext() );
 			}
-			ElasticsearchSearchPredicate elasticsearchFilter = ElasticsearchSearchPredicate.from( searchContext, filter );
+			ElasticsearchSearchPredicate elasticsearchFilter = ElasticsearchSearchPredicate.from( scope, filter );
 			elasticsearchFilter.checkNestableWithin( nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 ) );
 			this.filter = elasticsearchFilter;
 		}

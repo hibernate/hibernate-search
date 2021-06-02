@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.CompositeSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
@@ -18,50 +18,50 @@ import com.google.gson.JsonObject;
 
 public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchSearchSortBuilderFactory {
 
-	private final ElasticsearchSearchContext searchContext;
+	private final ElasticsearchSearchIndexScope scope;
 
-	public ElasticsearchSearchSortBuilderFactoryImpl(ElasticsearchSearchContext searchContext) {
-		this.searchContext = searchContext;
+	public ElasticsearchSearchSortBuilderFactoryImpl(ElasticsearchSearchIndexScope scope) {
+		this.scope = scope;
 	}
 
 	@Override
 	public void contribute(ElasticsearchSearchSortCollector collector, SearchSort sort) {
-		ElasticsearchSearchSort elasticsearchSort = ElasticsearchSearchSort.from( searchContext, sort );
+		ElasticsearchSearchSort elasticsearchSort = ElasticsearchSearchSort.from( scope, sort );
 		elasticsearchSort.toJsonSorts( collector );
 	}
 
 	@Override
 	public ScoreSortBuilder score() {
-		return new ElasticsearchScoreSort.Builder( searchContext );
+		return new ElasticsearchScoreSort.Builder( scope );
 	}
 
 	@Override
 	public FieldSortBuilder field(String absoluteFieldPath) {
-		return searchContext.field( absoluteFieldPath ).queryElement( SortTypeKeys.FIELD, searchContext );
+		return scope.field( absoluteFieldPath ).queryElement( SortTypeKeys.FIELD, scope );
 	}
 
 	@Override
 	public DistanceSortBuilder distance(String absoluteFieldPath) {
-		return searchContext.field( absoluteFieldPath ).queryElement( SortTypeKeys.DISTANCE, searchContext );
+		return scope.field( absoluteFieldPath ).queryElement( SortTypeKeys.DISTANCE, scope );
 	}
 
 	@Override
 	public SearchSort indexOrder() {
-		return new ElasticsearchIndexOrderSort( searchContext );
+		return new ElasticsearchIndexOrderSort( scope );
 	}
 
 	@Override
 	public CompositeSortBuilder composite() {
-		return new ElasticsearchCompositeSort.Builder( searchContext );
+		return new ElasticsearchCompositeSort.Builder( scope );
 	}
 
 	@Override
 	public ElasticsearchSearchSort fromJson(JsonObject jsonObject) {
-		return new ElasticsearchUserProvidedJsonSort( searchContext, jsonObject );
+		return new ElasticsearchUserProvidedJsonSort( scope, jsonObject );
 	}
 
 	@Override
 	public ElasticsearchSearchSort fromJson(String jsonString) {
-		return fromJson( searchContext.userFacingGson().fromJson( jsonString, JsonObject.class ) );
+		return fromJson( scope.userFacingGson().fromJson( jsonString, JsonObject.class ) );
 	}
 }

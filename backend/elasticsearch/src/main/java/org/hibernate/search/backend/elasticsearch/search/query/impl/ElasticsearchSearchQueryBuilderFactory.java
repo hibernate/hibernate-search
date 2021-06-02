@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchCompositeListProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
@@ -25,14 +25,14 @@ public class ElasticsearchSearchQueryBuilderFactory
 
 	private final SearchBackendContext searchBackendContext;
 
-	private final ElasticsearchSearchContext searchContext;
+	private final ElasticsearchSearchIndexScope scope;
 
 	private final ElasticsearchSearchProjectionBuilderFactory searchProjectionFactory;
 
-	public ElasticsearchSearchQueryBuilderFactory(SearchBackendContext searchBackendContext, ElasticsearchSearchContext searchContext,
+	public ElasticsearchSearchQueryBuilderFactory(SearchBackendContext searchBackendContext, ElasticsearchSearchIndexScope scope,
 			ElasticsearchSearchProjectionBuilderFactory searchProjectionFactory) {
 		this.searchBackendContext = searchBackendContext;
-		this.searchContext = searchContext;
+		this.scope = scope;
 		this.searchProjectionFactory = searchProjectionFactory;
 	}
 
@@ -59,7 +59,7 @@ public class ElasticsearchSearchQueryBuilderFactory
 			BackendSessionContext sessionContext, SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			SearchProjection<P> projection) {
 		return createSearchQueryBuilder( sessionContext, loadingContextBuilder,
-				ElasticsearchSearchProjection.from( searchContext, projection ) );
+				ElasticsearchSearchProjection.from( scope, projection ) );
 	}
 
 	@Override
@@ -73,17 +73,17 @@ public class ElasticsearchSearchQueryBuilderFactory
 		List<ElasticsearchSearchProjection<?, ?>> children = new ArrayList<>( projections.length );
 
 		for ( SearchProjection<?> projection : projections ) {
-			children.add( ElasticsearchSearchProjection.from( searchContext, projection ) );
+			children.add( ElasticsearchSearchProjection.from( scope, projection ) );
 		}
 
-		return new ElasticsearchCompositeListProjection<>( searchContext, Function.identity(), children );
+		return new ElasticsearchCompositeListProjection<>( scope, Function.identity(), children );
 	}
 
 	private <H> ElasticsearchSearchQueryBuilder<H> createSearchQueryBuilder(
 			BackendSessionContext sessionContext, SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<?, H> rootProjection) {
 		return searchBackendContext.createSearchQueryBuilder(
-				searchContext,
+				scope,
 				sessionContext,
 				loadingContextBuilder, rootProjection
 		);

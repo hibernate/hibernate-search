@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexSchemaElementContext;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -32,57 +32,57 @@ import com.google.gson.JsonObject;
 
 public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
 
-	private final ElasticsearchSearchContext searchContext;
+	private final ElasticsearchSearchIndexScope scope;
 	private final DocumentReferenceExtractionHelper documentReferenceExtractionHelper;
 	private final ProjectionExtractionHelper<String> idProjectionExtractionHelper;
 
 	public ElasticsearchSearchProjectionBuilderFactory(SearchProjectionBackendContext searchProjectionBackendContext,
-			ElasticsearchSearchContext searchContext) {
-		this.searchContext = searchContext;
-		this.documentReferenceExtractionHelper = searchProjectionBackendContext.createDocumentReferenceExtractionHelper( searchContext );
+			ElasticsearchSearchIndexScope scope) {
+		this.scope = scope;
+		this.documentReferenceExtractionHelper = searchProjectionBackendContext.createDocumentReferenceExtractionHelper( scope );
 		this.idProjectionExtractionHelper = searchProjectionBackendContext.idProjectionExtractionHelper();
 	}
 
 	@Override
 	public DocumentReferenceProjectionBuilder documentReference() {
-		return new ElasticsearchDocumentReferenceProjection.Builder( searchContext, documentReferenceExtractionHelper );
+		return new ElasticsearchDocumentReferenceProjection.Builder( scope, documentReferenceExtractionHelper );
 	}
 
 	@Override
 	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType, ValueConvert convert) {
-		ElasticsearchSearchIndexSchemaElementContext field = searchContext.field( absoluteFieldPath );
+		ElasticsearchSearchIndexSchemaElementContext field = scope.field( absoluteFieldPath );
 		// Check the compatibility of nested structure in the case of multi-index search.
 		field.nestedPathHierarchy();
-		return searchContext.field( absoluteFieldPath ).queryElement( ProjectionTypeKeys.FIELD, searchContext )
+		return scope.field( absoluteFieldPath ).queryElement( ProjectionTypeKeys.FIELD, scope )
 				.type( expectedType, convert );
 	}
 
 	@Override
 	public <E> EntityProjectionBuilder<E> entity() {
-		return new ElasticsearchEntityProjection.Builder<>( searchContext, documentReferenceExtractionHelper );
+		return new ElasticsearchEntityProjection.Builder<>( scope, documentReferenceExtractionHelper );
 	}
 
 	@Override
 	public <R> EntityReferenceProjectionBuilder<R> entityReference() {
-		return new ElasticsearchEntityReferenceProjection.Builder<>( searchContext, documentReferenceExtractionHelper );
+		return new ElasticsearchEntityReferenceProjection.Builder<>( scope, documentReferenceExtractionHelper );
 	}
 
 	@Override
 	public <I> IdProjectionBuilder<I> id(Class<I> identifierType) {
-		return new ElasticsearchIdProjection.Builder<>( searchContext, idProjectionExtractionHelper, identifierType );
+		return new ElasticsearchIdProjection.Builder<>( scope, idProjectionExtractionHelper, identifierType );
 	}
 
 	@Override
 	public ScoreProjectionBuilder score() {
-		return new ElasticsearchScoreProjection.Builder( searchContext );
+		return new ElasticsearchScoreProjection.Builder( scope );
 	}
 
 	@Override
 	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath) {
-		ElasticsearchSearchIndexSchemaElementContext field = searchContext.field( absoluteFieldPath );
+		ElasticsearchSearchIndexSchemaElementContext field = scope.field( absoluteFieldPath );
 		// Check the compatibility of nested structure in the case of multi-index search.
 		field.nestedPathHierarchy();
-		return field.queryElement( ProjectionTypeKeys.DISTANCE, searchContext );
+		return field.queryElement( ProjectionTypeKeys.DISTANCE, scope );
 	}
 
 	@Override
@@ -94,7 +94,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 		}
 
 		return new ElasticsearchCompositeListProjection.Builder<>(
-				new ElasticsearchCompositeListProjection<>( searchContext, transformer, typedProjections )
+				new ElasticsearchCompositeListProjection<>( scope, transformer, typedProjections )
 		);
 	}
 
@@ -102,7 +102,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	public <P1, P> CompositeProjectionBuilder<P> composite(Function<P1, P> transformer,
 			SearchProjection<P1> projection) {
 		return new ElasticsearchCompositeFunctionProjection.Builder<>(
-				new ElasticsearchCompositeFunctionProjection<>( searchContext, transformer,
+				new ElasticsearchCompositeFunctionProjection<>( scope, transformer,
 						toImplementation( projection ) )
 		);
 	}
@@ -111,7 +111,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	public <P1, P2, P> CompositeProjectionBuilder<P> composite(BiFunction<P1, P2, P> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
 		return new ElasticsearchCompositeBiFunctionProjection.Builder<>(
-				new ElasticsearchCompositeBiFunctionProjection<>( searchContext, transformer,
+				new ElasticsearchCompositeBiFunctionProjection<>( scope, transformer,
 						toImplementation( projection1 ), toImplementation( projection2 ) )
 		);
 	}
@@ -120,25 +120,25 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	public <P1, P2, P3, P> CompositeProjectionBuilder<P> composite(TriFunction<P1, P2, P3, P> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
 		return new ElasticsearchCompositeTriFunctionProjection.Builder<>(
-				new ElasticsearchCompositeTriFunctionProjection<>( searchContext, transformer,
+				new ElasticsearchCompositeTriFunctionProjection<>( scope, transformer,
 						toImplementation( projection1 ), toImplementation( projection2 ),
 						toImplementation( projection3 ) )
 		);
 	}
 
 	public SearchProjectionBuilder<JsonObject> source() {
-		return new ElasticsearchSourceProjection.Builder( searchContext );
+		return new ElasticsearchSourceProjection.Builder( scope );
 	}
 
 	public SearchProjectionBuilder<JsonObject> explanation() {
-		return new ElasticsearchExplanationProjection.Builder( searchContext );
+		return new ElasticsearchExplanationProjection.Builder( scope );
 	}
 
 	public SearchProjectionBuilder<JsonObject> jsonHit() {
-		return new ElasticsearchJsonHitProjection.Builder( searchContext );
+		return new ElasticsearchJsonHitProjection.Builder( scope );
 	}
 
 	private <T> ElasticsearchSearchProjection<?, T> toImplementation(SearchProjection<T> projection) {
-		return ElasticsearchSearchProjection.from( searchContext, projection );
+		return ElasticsearchSearchProjection.from( scope, projection );
 	}
 }

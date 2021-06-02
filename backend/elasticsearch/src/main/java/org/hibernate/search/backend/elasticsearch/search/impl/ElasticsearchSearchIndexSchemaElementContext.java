@@ -29,6 +29,6 @@ public interface ElasticsearchSearchIndexSchemaElementContext extends EventConte
 
 	// Query elements: predicates, sorts, projections, aggregations, ...
 
-	<T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchContext searchContext);
+	<T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchIndexScope scope);
 
 }

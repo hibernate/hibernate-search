@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -26,14 +26,14 @@ public interface ElasticsearchSearchPredicate extends SearchPredicate {
 
 	JsonObject toJsonQuery(PredicateRequestContext context);
 
-	static ElasticsearchSearchPredicate from(ElasticsearchSearchContext searchContext, SearchPredicate predicate) {
+	static ElasticsearchSearchPredicate from(ElasticsearchSearchIndexScope scope, SearchPredicate predicate) {
 		if ( !( predicate instanceof ElasticsearchSearchPredicate ) ) {
 			throw log.cannotMixElasticsearchSearchQueryWithOtherPredicates( predicate );
 		}
 		ElasticsearchSearchPredicate casted = (ElasticsearchSearchPredicate) predicate;
-		if ( !searchContext.hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
+		if ( !scope.hibernateSearchIndexNames().equals( casted.indexNames() ) ) {
 			throw log.predicateDefinedOnDifferentIndexes( predicate, casted.indexNames(),
-					searchContext.hibernateSearchIndexNames() );
+					scope.hibernateSearchIndexNames() );
 		}
 		return casted;
 	}

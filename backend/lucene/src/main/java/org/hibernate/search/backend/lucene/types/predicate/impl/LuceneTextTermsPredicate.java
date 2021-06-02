@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
@@ -42,8 +42,8 @@ public class LuceneTextTermsPredicate extends AbstractLuceneLeafSingleFieldPredi
 		}
 
 		@Override
-		public Builder<F> create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
-			return new Builder<>( codec, searchContext, field );
+		public Builder<F> create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+			return new Builder<>( codec, scope, field );
 		}
 	}
 
@@ -54,9 +54,9 @@ public class LuceneTextTermsPredicate extends AbstractLuceneLeafSingleFieldPredi
 		private List<String> terms;
 		private boolean allMatch;
 
-		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchContext searchContext,
+		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchIndexScope scope,
 				LuceneSearchValueFieldContext<F> field) {
-			super( searchContext, field );
+			super( scope, field );
 			// Score is always constant for this query
 			constantScore();
 

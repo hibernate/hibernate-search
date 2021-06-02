@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningTextMu
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.TextMultiValueFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
@@ -99,19 +99,19 @@ public class LuceneTextTermsAggregation<K>
 	public static class Factory
 			extends AbstractLuceneSearchValueFieldQueryElementFactory<TermsAggregationBuilder.TypeSelector, String> {
 		@Override
-		public TypeSelector create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<String> field) {
-			return new TypeSelector( searchContext, field );
+		public TypeSelector create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<String> field) {
+			return new TypeSelector( scope, field );
 		}
 	}
 
 	private static class TypeSelector extends AbstractTypeSelector<String> {
-		private TypeSelector(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<String> field) {
-			super( searchContext, field );
+		private TypeSelector(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<String> field) {
+			super( scope, field );
 		}
 
 		@Override
 		public <K> Builder<K> type(Class<K> expectedType, ValueConvert convert) {
-			return new Builder<>( searchContext, field,
+			return new Builder<>( scope, field,
 					field.type().projectionConverter( convert ).withConvertedType( expectedType, field ) );
 		}
 	}
@@ -119,9 +119,9 @@ public class LuceneTextTermsAggregation<K>
 	private static class Builder<K>
 			extends AbstractBuilder<String, String, K> {
 
-		private Builder(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<String> field,
+		private Builder(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<String> field,
 				ProjectionConverter<String, ? extends K> fromFieldValueConverter) {
-			super( searchContext, field, fromFieldValueConverter );
+			super( scope, field, fromFieldValueConverter );
 		}
 
 		@Override

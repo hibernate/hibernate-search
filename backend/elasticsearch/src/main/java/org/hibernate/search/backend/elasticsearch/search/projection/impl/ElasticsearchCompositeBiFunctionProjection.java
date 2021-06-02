@@ -8,17 +8,17 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.function.BiFunction;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 
 class ElasticsearchCompositeBiFunctionProjection<P1, P2, P>
 		extends AbstractElasticsearchCompositeProjection<P> {
 
 	private final BiFunction<P1, P2, P> transformer;
 
-	ElasticsearchCompositeBiFunctionProjection(ElasticsearchSearchContext searchContext,
+	ElasticsearchCompositeBiFunctionProjection(ElasticsearchSearchIndexScope scope,
 			BiFunction<P1, P2, P> transformer,
 			ElasticsearchSearchProjection<?, P1> projection1, ElasticsearchSearchProjection<?, P2> projection2) {
-		super( searchContext, projection1, projection2 );
+		super( scope, projection1, projection2 );
 		this.transformer = transformer;
 	}
 

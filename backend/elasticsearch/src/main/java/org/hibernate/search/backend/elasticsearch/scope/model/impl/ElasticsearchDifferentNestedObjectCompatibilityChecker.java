@@ -11,33 +11,33 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class ElasticsearchDifferentNestedObjectCompatibilityChecker {
 
 	public static ElasticsearchDifferentNestedObjectCompatibilityChecker empty(
-			ElasticsearchSearchContext searchContext) {
-		return new ElasticsearchDifferentNestedObjectCompatibilityChecker( searchContext, null, Collections.emptyList() );
+			ElasticsearchSearchIndexScope scope) {
+		return new ElasticsearchDifferentNestedObjectCompatibilityChecker( scope, null, Collections.emptyList() );
 	}
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchSearchContext searchContext;
+	private final ElasticsearchSearchIndexScope scope;
 	private final String fieldPath;
 	private final List<String> nestedPathHierarchy;
 
-	private ElasticsearchDifferentNestedObjectCompatibilityChecker(ElasticsearchSearchContext searchContext,
+	private ElasticsearchDifferentNestedObjectCompatibilityChecker(ElasticsearchSearchIndexScope scope,
 			String fieldPath, List<String> nestedPathHierarchy) {
-		this.searchContext = searchContext;
+		this.scope = scope;
 		this.fieldPath = fieldPath;
 		this.nestedPathHierarchy = nestedPathHierarchy;
 	}
 
 	public ElasticsearchDifferentNestedObjectCompatibilityChecker combineAndCheck(String incomingFieldPath) {
-		List<String> incomingNestedPathHierarchy = searchContext.field( incomingFieldPath ).nestedPathHierarchy();
+		List<String> incomingNestedPathHierarchy = scope.field( incomingFieldPath ).nestedPathHierarchy();
 		if ( fieldPath == null ) {
-			return new ElasticsearchDifferentNestedObjectCompatibilityChecker( searchContext, incomingFieldPath,
+			return new ElasticsearchDifferentNestedObjectCompatibilityChecker( scope, incomingFieldPath,
 					incomingNestedPathHierarchy );
 		}
 

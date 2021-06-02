@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.CompositeSortBuilder;
 
@@ -34,13 +34,13 @@ public class ElasticsearchCompositeSort extends AbstractElasticsearchSort {
 	public static class Builder extends AbstractBuilder implements CompositeSortBuilder {
 		private List<ElasticsearchSearchSort> elements = new ArrayList<>();
 
-		protected Builder(ElasticsearchSearchContext searchContext) {
-			super( searchContext );
+		protected Builder(ElasticsearchSearchIndexScope scope) {
+			super( scope );
 		}
 
 		@Override
 		public void add(SearchSort sort) {
-			elements.add( ElasticsearchSearchSort.from( searchContext, sort ) );
+			elements.add( ElasticsearchSearchSort.from( scope, sort ) );
 		}
 
 		@Override

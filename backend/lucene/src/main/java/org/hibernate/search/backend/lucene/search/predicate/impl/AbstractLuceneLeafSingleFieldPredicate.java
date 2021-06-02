@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
@@ -40,8 +40,8 @@ public abstract class AbstractLuceneLeafSingleFieldPredicate extends AbstractLuc
 			extends AbstractLuceneSingleFieldPredicate.AbstractBuilder {
 		protected final LuceneSearchValueFieldContext<F> field;
 
-		protected AbstractBuilder(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
-			super( searchContext, field );
+		protected AbstractBuilder(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+			super( scope, field );
 			this.field = field;
 		}
 
@@ -51,7 +51,7 @@ public abstract class AbstractLuceneLeafSingleFieldPredicate extends AbstractLuc
 			DslConverter<?, ? extends F> toFieldValueConverter = field.type().dslConverter( convert );
 			try {
 				F converted = toFieldValueConverter.convertUnknown( value,
-						searchContext.toDocumentFieldValueConvertContext() );
+						scope.toDocumentFieldValueConvertContext() );
 				return codec.encode( converted );
 			}
 			catch (RuntimeException e) {

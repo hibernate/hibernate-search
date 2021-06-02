@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -20,8 +20,8 @@ class ElasticsearchExplanationProjection extends AbstractElasticsearchProjection
 	private static final JsonAccessor<Boolean> REQUEST_EXPLAIN_ACCESSOR = JsonAccessor.root().property( "explain" ).asBoolean();
 	private static final JsonObjectAccessor HIT_EXPLANATION_ACCESSOR = JsonAccessor.root().property( "_explanation" ).asObject();
 
-	private ElasticsearchExplanationProjection(ElasticsearchSearchContext searchContext) {
-		super( searchContext );
+	private ElasticsearchExplanationProjection(ElasticsearchSearchIndexScope scope) {
+		super( scope );
 	}
 
 	@Override
@@ -51,9 +51,9 @@ class ElasticsearchExplanationProjection extends AbstractElasticsearchProjection
 
 		private final ElasticsearchExplanationProjection projection;
 
-		Builder(ElasticsearchSearchContext searchContext) {
-			super( searchContext );
-			this.projection = new ElasticsearchExplanationProjection( searchContext );
+		Builder(ElasticsearchSearchIndexScope scope) {
+			super( scope );
+			this.projection = new ElasticsearchExplanationProjection( scope );
 		}
 
 		@Override

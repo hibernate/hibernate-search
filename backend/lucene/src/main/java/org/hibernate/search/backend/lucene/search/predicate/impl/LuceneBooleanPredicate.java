@@ -14,7 +14,7 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -123,8 +123,8 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 
 		private NavigableMap<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
-		Builder(LuceneSearchContext searchContext) {
-			super( searchContext );
+		Builder(LuceneSearchIndexScope scope) {
+			super( scope );
 		}
 
 		@Override
@@ -132,7 +132,7 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 			if ( mustClauses == null ) {
 				mustClauses = new ArrayList<>();
 			}
-			mustClauses.add( LuceneSearchPredicate.from( searchContext, clause ) );
+			mustClauses.add( LuceneSearchPredicate.from( scope, clause ) );
 		}
 
 		@Override
@@ -140,7 +140,7 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 			if ( mustNotClauses == null ) {
 				mustNotClauses = new ArrayList<>();
 			}
-			mustNotClauses.add( LuceneSearchPredicate.from( searchContext, clause ) );
+			mustNotClauses.add( LuceneSearchPredicate.from( scope, clause ) );
 		}
 
 		@Override
@@ -148,7 +148,7 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 			if ( shouldClauses == null ) {
 				shouldClauses = new ArrayList<>();
 			}
-			shouldClauses.add( LuceneSearchPredicate.from( searchContext, clause ) );
+			shouldClauses.add( LuceneSearchPredicate.from( scope, clause ) );
 		}
 
 		@Override
@@ -156,7 +156,7 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 			if ( filterClauses == null ) {
 				filterClauses = new ArrayList<>();
 			}
-			filterClauses.add( LuceneSearchPredicate.from( searchContext, clause ) );
+			filterClauses.add( LuceneSearchPredicate.from( scope, clause ) );
 		}
 
 		@Override

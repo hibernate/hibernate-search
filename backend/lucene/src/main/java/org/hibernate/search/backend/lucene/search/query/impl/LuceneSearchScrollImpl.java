@@ -14,7 +14,7 @@ import java.util.Set;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HibernateSearchMultiReader;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestrator;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchScroll;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchScrollResult;
@@ -32,7 +32,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 	// shared with its query instance:
 	private final LuceneSyncWorkOrchestrator queryOrchestrator;
 	private final LuceneWorkFactory workFactory;
-	private final LuceneSearchContext searchContext;
+	private final LuceneSearchIndexScope scope;
 	private final Set<String> routingKeys;
 	private final TimeoutManager timeoutManager;
 	private final LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher;
@@ -48,7 +48,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 	private int currentPageOffset = 0;
 
 	public LuceneSearchScrollImpl(LuceneSyncWorkOrchestrator queryOrchestrator,
-			LuceneWorkFactory workFactory, LuceneSearchContext searchContext,
+			LuceneWorkFactory workFactory, LuceneSearchIndexScope scope,
 			Set<String> routingKeys,
 			TimeoutManager timeoutManager,
 			LuceneSearcher<LuceneLoadableSearchResult<H>, LuceneExtractableSearchResult<H>> searcher,
@@ -56,7 +56,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 			HibernateSearchMultiReader indexReader, int chunkSize) {
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
-		this.searchContext = searchContext;
+		this.scope = scope;
 		this.routingKeys = routingKeys;
 		this.timeoutManager = timeoutManager;
 		this.searcher = searcher;
@@ -72,7 +72,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 			indexReader.close();
 		}
 		catch (IOException | RuntimeException e) {
-			log.unableToCloseIndexReader( EventContexts.fromIndexNames( searchContext.hibernateSearchIndexNames() ), e );
+			log.unableToCloseIndexReader( EventContexts.fromIndexNames( scope.hibernateSearchIndexNames() ), e );
 		}
 	}
 
@@ -114,7 +114,7 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 		}
 		catch (IOException e) {
 			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQueryForExceptions(), e.getMessage(),
-					EventContexts.fromIndexNames( searchContext.hibernateSearchIndexNames() ), e );
+					EventContexts.fromIndexNames( scope.hibernateSearchIndexNames() ), e );
 		}
 
 		/*
@@ -134,8 +134,8 @@ public class LuceneSearchScrollImpl<H> implements LuceneSearchScroll<H> {
 
 	private <T> T doSubmitWithIndexReader(ReadWork<T> work, HibernateSearchMultiReader indexReader) {
 		return queryOrchestrator.submit(
-				searchContext.hibernateSearchIndexNames(),
-				searchContext.indexes(),
+				scope.hibernateSearchIndexNames(),
+				scope.indexes(),
 				routingKeys,
 				work, indexReader
 		);

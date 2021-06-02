@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 
@@ -62,23 +62,23 @@ public class LuceneNestedPredicate extends AbstractLuceneSingleFieldPredicate {
 		}
 
 		@Override
-		public NestedPredicateBuilder create(LuceneSearchContext searchContext, LuceneSearchCompositeIndexSchemaElementContext field) {
-			return new Builder( searchContext, field );
+		public NestedPredicateBuilder create(LuceneSearchIndexScope scope, LuceneSearchCompositeIndexSchemaElementContext field) {
+			return new Builder( scope, field );
 		}
 	}
 
 	private static class Builder extends AbstractBuilder implements NestedPredicateBuilder {
 		private LuceneSearchPredicate nestedPredicate;
 
-		Builder(LuceneSearchContext searchContext, LuceneSearchCompositeIndexSchemaElementContext field) {
-			super( searchContext, field.absolutePath(),
+		Builder(LuceneSearchIndexScope scope, LuceneSearchCompositeIndexSchemaElementContext field) {
+			super( scope, field.absolutePath(),
 					// nestedPathHierarchy includes absoluteFieldPath at the end, but here we don't want it to be included.
 					field.nestedPathHierarchy().subList( 0, field.nestedPathHierarchy().size() - 1 ) );
 		}
 
 		@Override
 		public void nested(SearchPredicate nestedPredicate) {
-			LuceneSearchPredicate luceneNestedPredicate = LuceneSearchPredicate.from( searchContext, nestedPredicate );
+			LuceneSearchPredicate luceneNestedPredicate = LuceneSearchPredicate.from( scope, nestedPredicate );
 			luceneNestedPredicate.checkNestableWithin( absoluteFieldPath );
 			this.nestedPredicate = luceneNestedPredicate;
 		}

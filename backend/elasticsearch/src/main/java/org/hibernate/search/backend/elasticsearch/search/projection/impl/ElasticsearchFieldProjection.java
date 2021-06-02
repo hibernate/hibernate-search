@@ -18,7 +18,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnexpectedJsonElementTypeException;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
@@ -56,15 +56,15 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 	private final ProjectionAccumulator<F, V, E, P> accumulator;
 
 	private ElasticsearchFieldProjection(Builder<F, V> builder, ProjectionAccumulator<F, V, E, P> accumulator) {
-		this( builder.searchContext, builder.field.absolutePath(), builder.field.absolutePathComponents(),
+		this( builder.scope, builder.field.absolutePath(), builder.field.absolutePathComponents(),
 				builder.codec::decode, builder.converter, accumulator );
 	}
 
-	ElasticsearchFieldProjection(ElasticsearchSearchContext searchContext,
+	ElasticsearchFieldProjection(ElasticsearchSearchIndexScope scope,
 			String absoluteFieldPath, String[] absoluteFieldPathComponents,
 			Function<JsonElement, F> decodeFunction, ProjectionConverter<? super F, ? extends V> converter,
 			ProjectionAccumulator<F, V, E, P> accumulator) {
-		super( searchContext );
+		super( scope );
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.absoluteFieldPathComponents = absoluteFieldPathComponents;
 		this.decodeFunction = decodeFunction;
@@ -164,27 +164,27 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 		}
 
 		@Override
-		public TypeSelector<?> create(ElasticsearchSearchContext searchContext,
+		public TypeSelector<?> create(ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<F> field) {
-			return new TypeSelector<>( codec, searchContext, field );
+			return new TypeSelector<>( codec, scope, field );
 		}
 	}
 
 	public static class TypeSelector<F> implements FieldProjectionBuilder.TypeSelector {
 		private final ElasticsearchFieldCodec<F> codec;
-		private final ElasticsearchSearchContext searchContext;
+		private final ElasticsearchSearchIndexScope scope;
 		private final ElasticsearchSearchValueFieldContext<F> field;
 
 		private TypeSelector(ElasticsearchFieldCodec<F> codec,
-				ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<F> field) {
+				ElasticsearchSearchIndexScope scope, ElasticsearchSearchValueFieldContext<F> field) {
 			this.codec = codec;
-			this.searchContext = searchContext;
+			this.scope = scope;
 			this.field = field;
 		}
 
 		@Override
 		public <V> Builder<F, V> type(Class<V> expectedType, ValueConvert convert) {
-			return new Builder<>( codec, searchContext, field,
+			return new Builder<>( codec, scope, field,
 					field.type().projectionConverter( convert ).withConvertedType( expectedType, field ) );
 		}
 	}
@@ -195,15 +195,15 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 
 		private final ElasticsearchFieldCodec<F> codec;
 
-		private final ElasticsearchSearchContext searchContext;
+		private final ElasticsearchSearchIndexScope scope;
 		private final ElasticsearchSearchValueFieldContext<F> field;
 
 		private final ProjectionConverter<F, ? extends V> converter;
 
-		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchContext searchContext,
+		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<F> field, ProjectionConverter<F, ? extends V> converter) {
 			this.codec = codec;
-			this.searchContext = searchContext;
+			this.scope = scope;
 			this.field = field;
 			this.converter = converter;
 		}

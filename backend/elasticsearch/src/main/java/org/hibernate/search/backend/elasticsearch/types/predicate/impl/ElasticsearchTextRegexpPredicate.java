@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
@@ -48,17 +48,17 @@ public class ElasticsearchTextRegexpPredicate extends AbstractElasticsearchSingl
 	public static class Factory
 			extends AbstractElasticsearchSearchValueFieldQueryElementFactory<RegexpPredicateBuilder, String> {
 		@Override
-		public RegexpPredicateBuilder create(ElasticsearchSearchContext searchContext,
+		public RegexpPredicateBuilder create(ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<String> field) {
-			return new Builder( searchContext, field );
+			return new Builder( scope, field );
 		}
 	}
 
 	private static class Builder extends AbstractBuilder implements RegexpPredicateBuilder {
 		private JsonPrimitive pattern;
 
-		private Builder(ElasticsearchSearchContext searchContext, ElasticsearchSearchValueFieldContext<String> field) {
-			super( searchContext, field );
+		private Builder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchValueFieldContext<String> field) {
+			super( scope, field );
 		}
 
 		@Override

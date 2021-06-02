@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilder;
 
 public abstract class AbstractElasticsearchAggregation<A> implements ElasticsearchSearchAggregation<A> {
@@ -16,7 +16,7 @@ public abstract class AbstractElasticsearchAggregation<A> implements Elasticsear
 	private final Set<String> indexNames;
 
 	AbstractElasticsearchAggregation(AbstractBuilder<A> builder) {
-		this.indexNames = builder.searchContext.hibernateSearchIndexNames();
+		this.indexNames = builder.scope.hibernateSearchIndexNames();
 	}
 
 	@Override
@@ -26,10 +26,10 @@ public abstract class AbstractElasticsearchAggregation<A> implements Elasticsear
 
 	public abstract static class AbstractBuilder<A> implements SearchAggregationBuilder<A> {
 
-		protected final ElasticsearchSearchContext searchContext;
+		protected final ElasticsearchSearchIndexScope scope;
 
-		public AbstractBuilder(ElasticsearchSearchContext searchContext) {
-			this.searchContext = searchContext;
+		public AbstractBuilder(ElasticsearchSearchIndexScope scope) {
+			this.scope = scope;
 		}
 
 		@Override

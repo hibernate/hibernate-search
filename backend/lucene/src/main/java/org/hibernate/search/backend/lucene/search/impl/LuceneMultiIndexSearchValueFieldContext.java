@@ -95,12 +95,12 @@ public class LuceneMultiIndexSearchValueFieldContext<F>
 	}
 
 	@Override
-	public <T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchContext searchContext) {
+	public <T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchIndexScope scope) {
 		LuceneSearchValueFieldQueryElementFactory<T, F> factory = type().queryElementFactory( key );
 		if ( factory == null ) {
 			throw log.cannotUseQueryElementForField( absolutePath(), key.toString(), eventContext() );
 		}
-		return factory.create( searchContext, this );
+		return factory.create( scope, this );
 	}
 
 	@Override

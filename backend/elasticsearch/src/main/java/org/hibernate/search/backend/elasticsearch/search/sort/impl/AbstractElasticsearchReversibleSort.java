@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 
 import com.google.gson.JsonElement;
@@ -54,8 +54,8 @@ public abstract class AbstractElasticsearchReversibleSort extends AbstractElasti
 
 		protected SortOrder order;
 
-		protected AbstractBuilder(ElasticsearchSearchContext searchContext) {
-			super( searchContext );
+		protected AbstractBuilder(ElasticsearchSearchIndexScope scope) {
+			super( scope );
 		}
 
 		public void order(SortOrder order) {

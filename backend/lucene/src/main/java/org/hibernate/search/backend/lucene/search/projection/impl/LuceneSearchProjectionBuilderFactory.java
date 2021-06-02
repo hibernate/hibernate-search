@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexSchemaElementContext;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -33,52 +33,52 @@ import org.apache.lucene.search.Explanation;
 
 public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
 
-	private final LuceneSearchContext searchContext;
+	private final LuceneSearchIndexScope scope;
 
-	public LuceneSearchProjectionBuilderFactory(LuceneSearchContext searchContext) {
-		this.searchContext = searchContext;
+	public LuceneSearchProjectionBuilderFactory(LuceneSearchIndexScope scope) {
+		this.scope = scope;
 	}
 
 	@Override
 	public DocumentReferenceProjectionBuilder documentReference() {
-		return new LuceneDocumentReferenceProjection.Builder( searchContext );
+		return new LuceneDocumentReferenceProjection.Builder( scope );
 	}
 
 	@Override
 	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType, ValueConvert convert) {
-		LuceneSearchIndexSchemaElementContext field = searchContext.field( absoluteFieldPath );
+		LuceneSearchIndexSchemaElementContext field = scope.field( absoluteFieldPath );
 		// Fail early if the nested structure differs in the case of multi-index search.
 		field.nestedPathHierarchy();
-		return field.queryElement( ProjectionTypeKeys.FIELD, searchContext )
+		return field.queryElement( ProjectionTypeKeys.FIELD, scope )
 				.type( expectedType, convert );
 	}
 
 	@Override
 	public <E> EntityProjectionBuilder<E> entity() {
-		return new LuceneEntityProjection.Builder<>( searchContext );
+		return new LuceneEntityProjection.Builder<>( scope );
 	}
 
 	@Override
 	public <R> EntityReferenceProjectionBuilder<R> entityReference() {
-		return new LuceneEntityReferenceProjection.Builder<>( searchContext );
+		return new LuceneEntityReferenceProjection.Builder<>( scope );
 	}
 
 	@Override
 	public <I> IdProjectionBuilder<I> id(Class<I> identifierType) {
-		return new LuceneIdProjection.Builder<>( searchContext, identifierType );
+		return new LuceneIdProjection.Builder<>( scope, identifierType );
 	}
 
 	@Override
 	public ScoreProjectionBuilder score() {
-		return new LuceneScoreProjection.Builder( searchContext );
+		return new LuceneScoreProjection.Builder( scope );
 	}
 
 	@Override
 	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath) {
-		LuceneSearchIndexSchemaElementContext field = searchContext.field( absoluteFieldPath );
+		LuceneSearchIndexSchemaElementContext field = scope.field( absoluteFieldPath );
 		// Fail early if the nested structure differs in the case of multi-index search.
 		field.nestedPathHierarchy();
-		return field.queryElement( ProjectionTypeKeys.DISTANCE, searchContext );
+		return field.queryElement( ProjectionTypeKeys.DISTANCE, scope );
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 		}
 
 		return new AbstractLuceneCompositeProjection.Builder<>(
-				new LuceneCompositeListProjection<>( searchContext, transformer, typedProjections )
+				new LuceneCompositeListProjection<>( scope, transformer, typedProjections )
 		);
 	}
 
@@ -98,7 +98,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	public <P1, P> CompositeProjectionBuilder<P> composite(Function<P1, P> transformer,
 			SearchProjection<P1> projection) {
 		return new AbstractLuceneCompositeProjection.Builder<>(
-				new LuceneCompositeFunctionProjection<>( searchContext, transformer, toImplementation( projection ) )
+				new LuceneCompositeFunctionProjection<>( scope, transformer, toImplementation( projection ) )
 		);
 	}
 
@@ -106,7 +106,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	public <P1, P2, P> CompositeProjectionBuilder<P> composite(BiFunction<P1, P2, P> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
 		return new AbstractLuceneCompositeProjection.Builder<>(
-				new LuceneCompositeBiFunctionProjection<>( searchContext, transformer, toImplementation( projection1 ),
+				new LuceneCompositeBiFunctionProjection<>( scope, transformer, toImplementation( projection1 ),
 						toImplementation( projection2 ) )
 		);
 	}
@@ -115,20 +115,20 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	public <P1, P2, P3, P> CompositeProjectionBuilder<P> composite(TriFunction<P1, P2, P3, P> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
 		return new AbstractLuceneCompositeProjection.Builder<>(
-				new LuceneCompositeTriFunctionProjection<>( searchContext, transformer, toImplementation( projection1 ),
+				new LuceneCompositeTriFunctionProjection<>( scope, transformer, toImplementation( projection1 ),
 						toImplementation( projection2 ), toImplementation( projection3 ) )
 		);
 	}
 
 	public SearchProjectionBuilder<Document> document() {
-		return new LuceneDocumentProjection.Builder( searchContext );
+		return new LuceneDocumentProjection.Builder( scope );
 	}
 
 	public SearchProjectionBuilder<Explanation> explanation() {
-		return new LuceneExplanationProjection.Builder( searchContext );
+		return new LuceneExplanationProjection.Builder( scope );
 	}
 
 	private <T> LuceneSearchProjection<?, T> toImplementation(SearchProjection<T> projection) {
-		return LuceneSearchProjection.from( searchContext, projection );
+		return LuceneSearchProjection.from( scope, projection );
 	}
 }

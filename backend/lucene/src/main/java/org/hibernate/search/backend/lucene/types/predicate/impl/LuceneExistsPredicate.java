@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -28,8 +28,8 @@ public class LuceneExistsPredicate extends AbstractLuceneLeafSingleFieldPredicat
 
 	private abstract static class AbstractBuilder<F> extends AbstractLuceneLeafSingleFieldPredicate.AbstractBuilder<F>
 			implements ExistsPredicateBuilder {
-		private AbstractBuilder(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
-			super( searchContext, field );
+		private AbstractBuilder(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+			super( scope, field );
 			// Score is always constant for this query
 			constantScore();
 		}
@@ -46,14 +46,14 @@ public class LuceneExistsPredicate extends AbstractLuceneLeafSingleFieldPredicat
 	public static class NormsBasedFactory
 			extends AbstractLuceneSearchValueFieldQueryElementFactory<ExistsPredicateBuilder, String> {
 		@Override
-		public NormsBasedBuilder create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<String> field) {
-			return new NormsBasedBuilder( searchContext, field );
+		public NormsBasedBuilder create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<String> field) {
+			return new NormsBasedBuilder( scope, field );
 		}
 	}
 
 	private static class NormsBasedBuilder extends AbstractBuilder<String> implements ExistsPredicateBuilder {
-		private NormsBasedBuilder(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<String> field) {
-			super( searchContext, field );
+		private NormsBasedBuilder(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<String> field) {
+			super( scope, field );
 		}
 
 		@Override
@@ -65,14 +65,14 @@ public class LuceneExistsPredicate extends AbstractLuceneLeafSingleFieldPredicat
 	public static class DocValuesBasedFactory<F>
 			extends AbstractLuceneSearchValueFieldQueryElementFactory<ExistsPredicateBuilder, F> {
 		@Override
-		public DocValuesBasedBuilder<F> create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
-			return new DocValuesBasedBuilder<>( searchContext, field );
+		public DocValuesBasedBuilder<F> create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+			return new DocValuesBasedBuilder<>( scope, field );
 		}
 	}
 
 	private static class DocValuesBasedBuilder<F> extends AbstractBuilder<F> implements ExistsPredicateBuilder {
-		private DocValuesBasedBuilder(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
-			super( searchContext, field );
+		private DocValuesBasedBuilder(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+			super( scope, field );
 		}
 
 		@Override
@@ -84,14 +84,14 @@ public class LuceneExistsPredicate extends AbstractLuceneLeafSingleFieldPredicat
 	public static class DefaultFactory<F>
 			extends AbstractLuceneSearchValueFieldQueryElementFactory<ExistsPredicateBuilder, F> {
 		@Override
-		public DefaultBuilder<F> create(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
-			return new DefaultBuilder<>( searchContext, field );
+		public DefaultBuilder<F> create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+			return new DefaultBuilder<>( scope, field );
 		}
 	}
 
 	private static class DefaultBuilder<F> extends AbstractBuilder<F> implements ExistsPredicateBuilder {
-		private DefaultBuilder(LuceneSearchContext searchContext, LuceneSearchValueFieldContext<F> field) {
-			super( searchContext, field );
+		private DefaultBuilder(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+			super( scope, field );
 		}
 
 		@Override

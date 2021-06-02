@@ -29,6 +29,6 @@ public interface LuceneSearchIndexSchemaElementContext extends EventContextProvi
 
 	// Query elements: predicates, sorts, projections, aggregations, ...
 
-	<T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchContext searchContext);
+	<T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchIndexScope scope);
 
 }
