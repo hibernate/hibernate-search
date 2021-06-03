@@ -237,5 +237,5 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET + 46, value = "Automatic indexing failed for event #%1$s on entity of type '%2$s' with ID '%3$s'."
 			+ " Will try again soon. Attempts so far: %4$d.")
-	void automaticIndexingRetry(Integer eventId, String entityName, String entityId, int attempts);
+	void automaticIndexingRetry(Long eventId, String entityName, String entityId, int attempts);
 }

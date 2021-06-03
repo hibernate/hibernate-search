@@ -16,7 +16,7 @@ public final class OutboxEvent {
 		ADD, ADD_OR_UPDATE, DELETE
 	}
 
-	private Integer id;
+	private Long id;
 	private Type type;
 
 	private String entityName;
@@ -48,11 +48,11 @@ public final class OutboxEvent {
 		this.originalEntityId = null;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

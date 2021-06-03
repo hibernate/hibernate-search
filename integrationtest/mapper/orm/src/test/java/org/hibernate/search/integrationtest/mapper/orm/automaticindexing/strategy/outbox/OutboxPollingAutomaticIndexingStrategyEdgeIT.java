@@ -232,7 +232,7 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 		} );
 
 		// Remember the events at this point
-		List<Integer> eventIdsUpToDelete = new ArrayList<>();
+		List<Long> eventIdsUpToDelete = new ArrayList<>();
 		withinTransaction( sessionFactory, session -> {
 			eventIdsUpToDelete.addAll( outboxEventFinder.findOutboxEventIdsNoFilter( session ) );
 		} );
