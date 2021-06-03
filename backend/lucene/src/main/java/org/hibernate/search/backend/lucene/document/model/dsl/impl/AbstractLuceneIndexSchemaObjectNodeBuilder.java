@@ -17,7 +17,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneNamedPredicate;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
@@ -111,11 +111,13 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 
 	abstract String getAbsolutePath();
 
-	final Map<SearchQueryElementTypeKey<?>, LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>> buildQueryElementFactoryMap() {
+	final Map<SearchQueryElementTypeKey<?>, AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>>
+			buildQueryElementFactoryMap() {
 		if ( namedPredicates.isEmpty() ) {
 			return Collections.emptyMap();
 		}
-		Map<SearchQueryElementTypeKey<?>, LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>> result = new HashMap<>();
+		Map<SearchQueryElementTypeKey<?>, AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>>
+				result = new HashMap<>();
 		for ( Map.Entry<String, LuceneIndexSchemaNamedPredicateOptions> entry : namedPredicates.entrySet() ) {
 			LuceneIndexSchemaNamedPredicateOptions options = entry.getValue();
 			if ( IndexFieldInclusion.EXCLUDED.equals( options.inclusion ) ) {

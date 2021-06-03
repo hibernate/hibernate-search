@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchValueFieldQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
@@ -44,7 +44,7 @@ public final class ElasticsearchSimpleQueryStringPredicateBuilderFieldState
 
 	public static class Factory
 			extends
-			AbstractElasticsearchSearchValueFieldQueryElementFactory<ElasticsearchSimpleQueryStringPredicateBuilderFieldState, String> {
+			AbstractElasticsearchValueFieldSearchQueryElementFactory<ElasticsearchSimpleQueryStringPredicateBuilderFieldState, String> {
 		@Override
 		public ElasticsearchSimpleQueryStringPredicateBuilderFieldState create(
 				ElasticsearchSearchIndexScope scope, ElasticsearchSearchValueFieldContext<String> field) {

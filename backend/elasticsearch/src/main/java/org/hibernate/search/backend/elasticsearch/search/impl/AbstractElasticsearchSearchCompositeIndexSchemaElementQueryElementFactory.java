@@ -12,12 +12,12 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public abstract class AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T>
-		implements ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> {
+		implements ElasticsearchSearchQueryElementFactory<T, ElasticsearchSearchCompositeIndexSchemaElementContext> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
-	public void checkCompatibleWith(ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?> other) {
+	public void checkCompatibleWith(ElasticsearchSearchQueryElementFactory<?, ?> other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			throw log.differentImplementationClassForQueryElement( getClass(), other.getClass() );
 		}

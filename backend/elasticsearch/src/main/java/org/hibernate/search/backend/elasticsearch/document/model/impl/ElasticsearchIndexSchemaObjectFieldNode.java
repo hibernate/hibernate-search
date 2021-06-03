@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchNestedPredicate;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
@@ -42,12 +42,14 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 	private final ObjectStructure structure;
 
 	private final Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByName;
-	private final Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>> queryElementFactories;
+	private final Map<SearchQueryElementTypeKey<?>, AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>>
+			queryElementFactories;
 
 	public ElasticsearchIndexSchemaObjectFieldNode(ElasticsearchIndexSchemaObjectNode parent, String relativeFieldName,
 			IndexFieldInclusion inclusion, ObjectStructure structure, boolean multiValued,
 			Map<String, AbstractElasticsearchIndexSchemaFieldNode> notYetInitializedStaticChildren,
-			Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>> queryElementFactories) {
+			Map<SearchQueryElementTypeKey<?>, AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>>
+					queryElementFactories) {
 		super( parent, relativeFieldName, inclusion, multiValued );
 		// at the root object level the nestedPathHierarchy is empty
 		List<String> theNestedPathHierarchy = parent.nestedPathHierarchy();
@@ -136,7 +138,7 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 
 	@Override
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchIndexScope scope) {
-		ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
+		AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
 		if ( factory == null ) {
 			EventContext eventContext = eventContext();
 			throw log.cannotUseQueryElementForCompositeIndexElement( eventContext, key.toString(), eventContext );
@@ -153,8 +155,8 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 
 	@Override
 	@SuppressWarnings("unchecked") // The cast is safe because the key type always matches the value type.
-	public <T> ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
-		return (ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T>) queryElementFactories.get( key );
+	public <T> AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
+		return (AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T>) queryElementFactories.get( key );
 	}
 
 }

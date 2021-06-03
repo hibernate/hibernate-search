@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneNestedPredicate;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
@@ -37,12 +37,14 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 	private final ObjectStructure structure;
 
 	private final Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByName;
-	private final Map<SearchQueryElementTypeKey<?>, LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>> queryElementFactories;
+	private final Map<SearchQueryElementTypeKey<?>, AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>>
+			queryElementFactories;
 
 	public LuceneIndexSchemaObjectFieldNode(LuceneIndexSchemaObjectNode parent, String relativeName,
 			IndexFieldInclusion inclusion, ObjectStructure structure, boolean multiValued, boolean dynamic,
 			Map<String, AbstractLuceneIndexSchemaFieldNode> notYetInitializedStaticChildren,
-			Map<SearchQueryElementTypeKey<?>, LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>> queryElementFactories) {
+			Map<SearchQueryElementTypeKey<?>, AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>>
+					queryElementFactories) {
 		super( parent, relativeName, inclusion, multiValued, dynamic );
 		List<String> theNestedPathHierarchy = parent.nestedPathHierarchy();
 		if ( ObjectStructure.NESTED.equals( structure ) ) {
@@ -130,7 +132,7 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 
 	@Override
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchIndexScope scope) {
-		LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
+		AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
 		if ( factory == null ) {
 			EventContext eventContext = eventContext();
 			throw log.cannotUseQueryElementForCompositeIndexElement( eventContext, key.toString(), eventContext );
@@ -147,8 +149,8 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 
 	@Override
 	@SuppressWarnings("unchecked") // The cast is safe because the key type always matches the value type.
-	public <T> LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
-		return (LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T>) queryElementFactories.get( key );
+	public <T> AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
+		return (AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T>) queryElementFactories.get( key );
 	}
 
 	public ObjectStructure structure() {

@@ -12,12 +12,12 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public abstract class AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T>
-		implements LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> {
+		implements LuceneSearchQueryElementFactory<T, LuceneSearchCompositeIndexSchemaElementContext> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
-	public void checkCompatibleWith(LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?> other) {
+	public void checkCompatibleWith(LuceneSearchQueryElementFactory<?, ?> other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			throw log.differentImplementationClassForQueryElement( getClass(), other.getClass() );
 		}

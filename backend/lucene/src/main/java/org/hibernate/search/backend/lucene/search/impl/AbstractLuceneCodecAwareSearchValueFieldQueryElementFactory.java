@@ -24,7 +24,7 @@ public abstract class AbstractLuceneCodecAwareSearchValueFieldQueryElementFactor
 	}
 
 	@Override
-	public void checkCompatibleWith(LuceneSearchValueFieldQueryElementFactory<?, ?> other) {
+	public void checkCompatibleWith(LuceneSearchQueryElementFactory<?, ?> other) {
 		super.checkCompatibleWith( other );
 		AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<?, ?, ?> castedOther =
 				(AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<?, ?, ?>) other;

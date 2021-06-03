@@ -8,15 +8,15 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import java.util.List;
 
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldQueryElementFactory;
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 
@@ -76,7 +76,7 @@ public class ElasticsearchIndexSchemaValueFieldNode<F> extends AbstractElasticse
 
 	@Override
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchIndexScope scope) {
-		ElasticsearchSearchValueFieldQueryElementFactory<T, F> factory = type().queryElementFactory( key );
+		AbstractElasticsearchValueFieldSearchQueryElementFactory<T, F> factory = type().queryElementFactory( key );
 		if ( factory == null ) {
 			throw log.cannotUseQueryElementForField( absolutePath(), key.toString(), eventContext() );
 		}

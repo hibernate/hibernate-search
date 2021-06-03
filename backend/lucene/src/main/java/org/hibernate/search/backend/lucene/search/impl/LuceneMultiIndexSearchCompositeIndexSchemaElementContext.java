@@ -81,7 +81,7 @@ public final class LuceneMultiIndexSearchCompositeIndexSchemaElementContext
 
 	@Override
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchIndexScope scope) {
-		LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
+		AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
 		if ( factory == null ) {
 			throw log.cannotUseQueryElementForCompositeIndexElement( relativeEventContext(), key.toString(),
 					indexesEventContext() );
@@ -131,10 +131,10 @@ public final class LuceneMultiIndexSearchCompositeIndexSchemaElementContext
 	}
 
 	@Override
-	public <T> LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
-		LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = null;
+	public <T> AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
+		AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = null;
 		for ( LuceneSearchCompositeIndexSchemaElementContext fieldContext : fieldForEachIndex ) {
-			LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factoryForFieldContext =
+			AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factoryForFieldContext =
 					fieldContext.queryElementFactory( key );
 			if ( factory == null ) {
 				factory = factoryForFieldContext;
@@ -162,8 +162,8 @@ public final class LuceneMultiIndexSearchCompositeIndexSchemaElementContext
 	}
 
 	private <T> void checkFactoryCompatibility(SearchQueryElementTypeKey<T> key,
-			LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory1,
-			LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory2) {
+			AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory1,
+			AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory2) {
 		if ( factory1 == null && factory2 == null ) {
 			return;
 		}

@@ -13,29 +13,29 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchNamedPredicate;
-import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
-import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -109,11 +109,13 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 		return templateBuilder;
 	}
 
-	final Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>> buildQueryElementFactoryMap() {
+	final Map<SearchQueryElementTypeKey<?>, AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>>
+			buildQueryElementFactoryMap() {
 		if ( namedPredicates.isEmpty() ) {
 			return Collections.emptyMap();
 		}
-		Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>> result = new HashMap<>();
+		Map<SearchQueryElementTypeKey<?>, AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>>
+				result = new HashMap<>();
 		for ( Map.Entry<String, ElasticsearchIndexSchemaNamedPredicateOptions> entry : namedPredicates.entrySet() ) {
 			ElasticsearchIndexSchemaNamedPredicateOptions options = entry.getValue();
 			if ( IndexFieldInclusion.EXCLUDED.equals( options.inclusion ) ) {

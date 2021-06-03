@@ -69,9 +69,9 @@ public class LuceneObjectExistsPredicate extends AbstractLuceneSingleFieldPredic
 		}
 
 		@Override
-		public ExistsPredicateBuilder create(LuceneSearchIndexScope scope, LuceneSearchCompositeIndexSchemaElementContext field) {
-			Builder builder = new Builder( scope, field );
-			for ( LuceneSearchIndexSchemaElementContext child : field.staticChildrenByName().values() ) {
+		public ExistsPredicateBuilder create(LuceneSearchIndexScope scope, LuceneSearchCompositeIndexSchemaElementContext element) {
+			Builder builder = new Builder( scope, element );
+			for ( LuceneSearchIndexSchemaElementContext child : element.staticChildrenByName().values() ) {
 				builder.addChild( child );
 			}
 			return builder;

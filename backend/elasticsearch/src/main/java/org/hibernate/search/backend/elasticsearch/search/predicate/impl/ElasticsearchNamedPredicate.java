@@ -12,8 +12,8 @@ import java.util.Map;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementFactory;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 import com.google.gson.JsonObject;
@@ -61,7 +61,7 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 		}
 
 		@Override
-		public void checkCompatibleWith(ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?> other) {
+		public void checkCompatibleWith(ElasticsearchSearchQueryElementFactory<?, ?> other) {
 			super.checkCompatibleWith( other );
 			Factory castedOther = (Factory) other;
 			if ( !provider.equals( castedOther.provider ) ) {
@@ -71,8 +71,8 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 
 		@Override
 		public NamedPredicateBuilder create(ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchCompositeIndexSchemaElementContext field) {
-			return new Builder( provider, predicateName, scope, field );
+				ElasticsearchSearchCompositeIndexSchemaElementContext element) {
+			return new Builder( provider, predicateName, scope, element );
 		}
 	}
 
