@@ -11,7 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchValueFieldQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
@@ -53,7 +53,7 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 	}
 
 	public static class Factory
-			extends AbstractElasticsearchSearchValueFieldQueryElementFactory<DistanceSortBuilder, GeoPoint> {
+			extends AbstractElasticsearchValueFieldSearchQueryElementFactory<DistanceSortBuilder, GeoPoint> {
 		@Override
 		public DistanceSortBuilder create(ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<GeoPoint> field) {

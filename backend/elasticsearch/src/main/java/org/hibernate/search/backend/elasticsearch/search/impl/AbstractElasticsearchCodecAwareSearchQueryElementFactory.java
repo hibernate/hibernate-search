@@ -12,22 +12,22 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public abstract class AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory<T, F>
-		extends AbstractElasticsearchSearchValueFieldQueryElementFactory<T, F> {
+public abstract class AbstractElasticsearchCodecAwareSearchQueryElementFactory<T, F>
+		extends AbstractElasticsearchValueFieldSearchQueryElementFactory<T, F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final ElasticsearchFieldCodec<F> codec;
 
-	protected AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory(ElasticsearchFieldCodec<F> codec) {
+	protected AbstractElasticsearchCodecAwareSearchQueryElementFactory(ElasticsearchFieldCodec<F> codec) {
 		this.codec = codec;
 	}
 
 	@Override
-	public void checkCompatibleWith(ElasticsearchSearchValueFieldQueryElementFactory<?, ?> other) {
+	public void checkCompatibleWith(ElasticsearchSearchQueryElementFactory<?, ?> other) {
 		super.checkCompatibleWith( other );
-		AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory<?, ?> castedOther =
-				(AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory<?, ?>) other;
+		AbstractElasticsearchCodecAwareSearchQueryElementFactory<?, ?> castedOther =
+				(AbstractElasticsearchCodecAwareSearchQueryElementFactory<?, ?>) other;
 		if ( !codec.isCompatibleWith( castedOther.codec ) ) {
 			throw log.differentFieldCodecForQueryElement( codec, castedOther.codec );
 		}

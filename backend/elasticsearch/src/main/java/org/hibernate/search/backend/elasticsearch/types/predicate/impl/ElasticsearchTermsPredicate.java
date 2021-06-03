@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
@@ -96,7 +96,7 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 	}
 
 	public static class Factory<F>
-			extends AbstractElasticsearchCodecAwareSearchValueFieldQueryElementFactory<TermsPredicateBuilder, F> {
+			extends AbstractElasticsearchCodecAwareSearchQueryElementFactory<TermsPredicateBuilder, F> {
 
 		public Factory(ElasticsearchFieldCodec<F> codec) {
 			super( codec );

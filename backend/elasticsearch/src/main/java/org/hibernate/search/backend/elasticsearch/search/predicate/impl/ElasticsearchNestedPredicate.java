@@ -60,8 +60,8 @@ public class ElasticsearchNestedPredicate extends AbstractElasticsearchSingleFie
 			extends AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<NestedPredicateBuilder> {
 		@Override
 		public NestedPredicateBuilder create(ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchCompositeIndexSchemaElementContext field) {
-			return new Builder( scope, field );
+				ElasticsearchSearchCompositeIndexSchemaElementContext element) {
+			return new Builder( scope, element );
 		}
 	}
 

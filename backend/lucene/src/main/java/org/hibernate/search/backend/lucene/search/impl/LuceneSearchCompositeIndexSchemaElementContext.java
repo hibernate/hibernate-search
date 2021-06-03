@@ -23,7 +23,7 @@ public interface LuceneSearchCompositeIndexSchemaElementContext extends LuceneSe
 
 	boolean nested();
 
-	<T> LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(
+	<T> AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(
 			SearchQueryElementTypeKey<T> key);
 
 }

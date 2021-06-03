@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchValueFieldQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexSchemaElementContext;
@@ -38,7 +38,7 @@ public class ElasticsearchExistsPredicate extends AbstractElasticsearchSingleFie
 	}
 
 	public static class Factory<F>
-			extends AbstractElasticsearchSearchValueFieldQueryElementFactory<ExistsPredicateBuilder, F> {
+			extends AbstractElasticsearchValueFieldSearchQueryElementFactory<ExistsPredicateBuilder, F> {
 		@Override
 		public ExistsPredicateBuilder create(ElasticsearchSearchIndexScope scope,
 				ElasticsearchSearchValueFieldContext<F> field) {
@@ -50,8 +50,8 @@ public class ElasticsearchExistsPredicate extends AbstractElasticsearchSingleFie
 			extends AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<ExistsPredicateBuilder> {
 		@Override
 		public ExistsPredicateBuilder create(ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchCompositeIndexSchemaElementContext field) {
-			return new Builder( scope, field );
+				ElasticsearchSearchCompositeIndexSchemaElementContext element) {
+			return new Builder( scope, element );
 		}
 	}
 

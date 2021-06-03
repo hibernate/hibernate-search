@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
@@ -29,10 +29,12 @@ public class LuceneIndexSchemaRootNode
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByName;
-	private final Map<SearchQueryElementTypeKey<?>, LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>> queryElementFactories;
+	private final Map<SearchQueryElementTypeKey<?>, AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>>
+			queryElementFactories;
 
 	public LuceneIndexSchemaRootNode(Map<String, AbstractLuceneIndexSchemaFieldNode> notYetInitializedStaticChildren,
-			Map<SearchQueryElementTypeKey<?>, LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>> queryElementFactories) {
+			Map<SearchQueryElementTypeKey<?>, AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>>
+					queryElementFactories) {
 		// We expect the children to be added to the list externally, just after the constructor call.
 		this.staticChildrenByName = Collections.unmodifiableMap( notYetInitializedStaticChildren );
 		this.queryElementFactories = queryElementFactories;
@@ -115,7 +117,7 @@ public class LuceneIndexSchemaRootNode
 
 	@Override
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchIndexScope scope) {
-		LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
+		AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
 		if ( factory == null ) {
 			EventContext eventContext = eventContext();
 			throw log.cannotUseQueryElementForCompositeIndexElement( eventContext, key.toString(), eventContext );
@@ -132,7 +134,7 @@ public class LuceneIndexSchemaRootNode
 
 	@Override
 	@SuppressWarnings("unchecked") // The cast is safe because the key type always matches the value type.
-	public <T> LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
-		return (LuceneSearchCompositeIndexSchemaElementQueryElementFactory<T>) queryElementFactories.get( key );
+	public <T> AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
+		return (AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T>) queryElementFactories.get( key );
 	}
 }

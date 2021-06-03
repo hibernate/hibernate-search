@@ -59,5 +59,5 @@ public interface ElasticsearchSearchValueFieldTypeContext<F> {
 
 	boolean hasNormalizerOnAtLeastOneIndex();
 
-	<T> ElasticsearchSearchValueFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key);
+	<T> AbstractElasticsearchValueFieldSearchQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key);
 }

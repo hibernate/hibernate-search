@@ -97,7 +97,7 @@ public class ElasticsearchMultiIndexSearchValueFieldContext<F>
 
 	@Override
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchIndexScope scope) {
-		ElasticsearchSearchValueFieldQueryElementFactory<T, F> factory = type().queryElementFactory( key );
+		ElasticsearchSearchQueryElementFactory<T, ElasticsearchSearchValueFieldContext<F>> factory = type().queryElementFactory( key );
 		if ( factory == null ) {
 			throw log.cannotUseQueryElementForField( absolutePath(), key.toString(), eventContext() );
 		}
@@ -157,11 +157,12 @@ public class ElasticsearchMultiIndexSearchValueFieldContext<F>
 	}
 
 	@Override
-	public <T> ElasticsearchSearchValueFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key) {
-		ElasticsearchSearchValueFieldQueryElementFactory<T, F> factory = null;
+	public <T> AbstractElasticsearchValueFieldSearchQueryElementFactory<T, F> queryElementFactory(
+			SearchQueryElementTypeKey<T> key) {
+		AbstractElasticsearchValueFieldSearchQueryElementFactory<T, F> factory = null;
 		for ( ElasticsearchSearchValueFieldContext<F> fieldContext : fieldForEachIndex ) {
 			ElasticsearchSearchValueFieldTypeContext<F> fieldType = fieldContext.type();
-			ElasticsearchSearchValueFieldQueryElementFactory<T, F> factoryForFieldContext =
+			AbstractElasticsearchValueFieldSearchQueryElementFactory<T, F> factoryForFieldContext =
 					fieldType.queryElementFactory( key );
 			if ( factory == null ) {
 				factory = factoryForFieldContext;
@@ -205,8 +206,8 @@ public class ElasticsearchMultiIndexSearchValueFieldContext<F>
 	}
 
 	private <T> void checkFactoryCompatibility(SearchQueryElementTypeKey<T> key,
-			ElasticsearchSearchValueFieldQueryElementFactory<T, F> factory1,
-			ElasticsearchSearchValueFieldQueryElementFactory<T, F> factory2) {
+			ElasticsearchSearchQueryElementFactory<T, ElasticsearchSearchValueFieldContext<F>> factory1,
+			ElasticsearchSearchQueryElementFactory<T, ElasticsearchSearchValueFieldContext<F>> factory2) {
 		if ( factory1 == null && factory2 == null ) {
 			return;
 		}
@@ -228,10 +229,10 @@ public class ElasticsearchMultiIndexSearchValueFieldContext<F>
 		}
 	}
 
-	private <T> void checkAttributeCompatibility(BiPredicate<T, T> compatiblityChecker, String attributeName,
+	private <T> void checkAttributeCompatibility(BiPredicate<T, T> compatibilityChecker, String attributeName,
 			T attribute1, T attribute2) {
 		try {
-			if ( !compatiblityChecker.test( attribute1, attribute2 ) ) {
+			if ( !compatibilityChecker.test( attribute1, attribute2 ) ) {
 				throw log.differentIndexElementAttribute( attributeName, attribute1, attribute2 );
 			}
 		}

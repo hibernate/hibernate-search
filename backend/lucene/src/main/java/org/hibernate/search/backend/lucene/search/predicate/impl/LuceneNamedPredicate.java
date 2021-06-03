@@ -14,8 +14,8 @@ import java.util.Optional;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementFactory;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 import org.apache.lucene.search.Query;
@@ -59,7 +59,7 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 		}
 
 		@Override
-		public void checkCompatibleWith(LuceneSearchCompositeIndexSchemaElementQueryElementFactory<?> other) {
+		public void checkCompatibleWith(LuceneSearchQueryElementFactory<?, ?> other) {
 			super.checkCompatibleWith( other );
 			Factory castedOther = (Factory) other;
 			if ( !provider.equals( castedOther.provider ) ) {
@@ -69,8 +69,8 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 
 		@Override
 		public NamedPredicateBuilder create(LuceneSearchIndexScope scope,
-				LuceneSearchCompositeIndexSchemaElementContext field) {
-			return new Builder( provider, predicateName, scope, field );
+				LuceneSearchCompositeIndexSchemaElementContext element) {
+			return new Builder( provider, predicateName, scope, element );
 		}
 	}
 

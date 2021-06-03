@@ -62,8 +62,8 @@ public class LuceneNestedPredicate extends AbstractLuceneSingleFieldPredicate {
 		}
 
 		@Override
-		public NestedPredicateBuilder create(LuceneSearchIndexScope scope, LuceneSearchCompositeIndexSchemaElementContext field) {
-			return new Builder( scope, field );
+		public NestedPredicateBuilder create(LuceneSearchIndexScope scope, LuceneSearchCompositeIndexSchemaElementContext element) {
+			return new Builder( scope, element );
 		}
 	}
 

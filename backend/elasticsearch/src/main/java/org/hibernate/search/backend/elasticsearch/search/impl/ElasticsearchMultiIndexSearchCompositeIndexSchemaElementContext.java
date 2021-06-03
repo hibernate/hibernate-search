@@ -69,7 +69,7 @@ public final class ElasticsearchMultiIndexSearchCompositeIndexSchemaElementConte
 
 	@Override
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchIndexScope scope) {
-		ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
+		AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
 		if ( factory == null ) {
 			throw log.cannotUseQueryElementForCompositeIndexElement( relativeEventContext(), key.toString(),
 					indexesEventContext() );
@@ -99,10 +99,10 @@ public final class ElasticsearchMultiIndexSearchCompositeIndexSchemaElementConte
 	}
 
 	@Override
-	public <T> ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
-		ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = null;
+	public <T> AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
+		AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = null;
 		for ( ElasticsearchSearchCompositeIndexSchemaElementContext fieldContext : fieldForEachIndex ) {
-			ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> factoryForFieldContext =
+			AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> factoryForFieldContext =
 					fieldContext.queryElementFactory( key );
 			if ( factory == null ) {
 				factory = factoryForFieldContext;
@@ -130,8 +130,8 @@ public final class ElasticsearchMultiIndexSearchCompositeIndexSchemaElementConte
 	}
 
 	private <T> void checkFactoryCompatibility(SearchQueryElementTypeKey<T> key,
-			ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> factory1,
-			ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> factory2) {
+			AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> factory1,
+			AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> factory2) {
 		if ( factory1 == null && factory2 == null ) {
 			return;
 		}

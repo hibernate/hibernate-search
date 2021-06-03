@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
@@ -29,11 +29,13 @@ public class ElasticsearchIndexSchemaRootNode implements ElasticsearchIndexSchem
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByName;
-	private final Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>> queryElementFactories;
+	private final Map<SearchQueryElementTypeKey<?>, AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>>
+			queryElementFactories;
 
 	public ElasticsearchIndexSchemaRootNode(
 			Map<String, AbstractElasticsearchIndexSchemaFieldNode> notYetInitializedStaticChildren,
-			Map<SearchQueryElementTypeKey<?>, ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>> queryElementFactories) {
+			Map<SearchQueryElementTypeKey<?>,
+					AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>> queryElementFactories) {
 		// We expect the children to be added to the list externally, just after the constructor call.
 		this.staticChildrenByName = Collections.unmodifiableMap( notYetInitializedStaticChildren );
 		this.queryElementFactories = queryElementFactories;
@@ -111,7 +113,7 @@ public class ElasticsearchIndexSchemaRootNode implements ElasticsearchIndexSchem
 
 	@Override
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchIndexScope scope) {
-		ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
+		AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
 		if ( factory == null ) {
 			EventContext eventContext = eventContext();
 			throw log.cannotUseQueryElementForCompositeIndexElement( eventContext, key.toString(), eventContext );
@@ -128,7 +130,7 @@ public class ElasticsearchIndexSchemaRootNode implements ElasticsearchIndexSchem
 
 	@Override
 	@SuppressWarnings("unchecked") // The cast is safe because the key type always matches the value type.
-	public <T> ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
-		return (ElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T>) queryElementFactories.get( key );
+	public <T> AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
+		return (AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T>) queryElementFactories.get( key );
 	}
 }
