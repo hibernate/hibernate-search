@@ -40,7 +40,7 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 	"\n" +
 	"<hibernate-mapping>\n" +
 	"    <class name=\"" + OutboxEvent.class.getName() + "\" table=\"" + OUTBOX_TABLE_NAME + "\">\n" +
-	"        <id name=\"id\" column=\"ID\" type=\"integer\">\n" +
+	"        <id name=\"id\" column=\"ID\" type=\"long\">\n" +
 	"            <generator class=\"org.hibernate.id.enhanced.SequenceStyleGenerator\">\n" +
 	"                <param name=\"sequence_name\">" + OUTBOX_TABLE_NAME + "_GENERATOR</param>\n" +
 	"                <param name=\"table_name\">" + OUTBOX_TABLE_NAME + "_GENERATOR</param>\n" +

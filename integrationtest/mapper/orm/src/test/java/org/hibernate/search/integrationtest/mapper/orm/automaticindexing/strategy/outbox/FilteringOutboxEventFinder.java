@@ -28,7 +28,7 @@ class FilteringOutboxEventFinder implements OutboxEventFinder {
 	private final DefaultOutboxEventFinder defaultFinder = new DefaultOutboxEventFinder();
 
 	private boolean filter = true;
-	private final Set<Integer> allowedIds = new HashSet<>();
+	private final Set<Long> allowedIds = new HashSet<>();
 
 	@Override
 	public synchronized List<OutboxEvent> findOutboxEvents(Session session, int maxResults) {
@@ -59,7 +59,7 @@ class FilteringOutboxEventFinder implements OutboxEventFinder {
 		withinTransaction( sessionFactory, session -> showOnlyEvents( findOutboxEventIdsNoFilter( session ) ) );
 	}
 
-	public synchronized void showOnlyEvents(List<Integer> eventIds) {
+	public synchronized void showOnlyEvents(List<Long> eventIds) {
 		checkFiltering();
 		allowedIds.clear();
 		allowedIds.addAll( eventIds );
@@ -77,10 +77,10 @@ class FilteringOutboxEventFinder implements OutboxEventFinder {
 		return query.list();
 	}
 
-	public List<Integer> findOutboxEventIdsNoFilter(Session session) {
+	public List<Long> findOutboxEventIdsNoFilter(Session session) {
 		checkFiltering();
-		Query<Integer> query = session.createQuery(
-				"select e.id from OutboxEvent e order by e.id", Integer.class );
+		Query<Long> query = session.createQuery(
+				"select e.id from OutboxEvent e order by e.id", Long.class );
 		return query.list();
 	}
 

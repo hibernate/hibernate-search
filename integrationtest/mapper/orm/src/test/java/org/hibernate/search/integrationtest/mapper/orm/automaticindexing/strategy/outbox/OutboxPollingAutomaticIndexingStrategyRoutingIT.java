@@ -69,7 +69,7 @@ public class OutboxPollingAutomaticIndexingStrategyRoutingIT {
 		} );
 
 		// Remember the events at this point
-		List<Integer> eventIdsAtSecondStatus = new ArrayList<>();
+		List<Long> eventIdsAtSecondStatus = new ArrayList<>();
 		withinTransaction( sessionFactory, session -> {
 			eventIdsAtSecondStatus.addAll( outboxEventFinder.findOutboxEventIdsNoFilter( session ) );
 		} );

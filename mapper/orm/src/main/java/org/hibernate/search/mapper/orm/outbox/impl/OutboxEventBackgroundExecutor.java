@@ -173,7 +173,7 @@ public class OutboxEventBackgroundExecutor {
 
 	private static void updateOrDeleteEvents(FailureHandler failureHandler, Session session,
 			OutboxEventProcessingPlan processingPlan) {
-		List<Integer> eventToDeleteIds = new ArrayList<>();
+		List<Long> eventToDeleteIds = new ArrayList<>();
 		for ( OutboxEvent event : processingPlan.getEvents() ) {
 			eventToDeleteIds.add( event.getId() );
 		}
