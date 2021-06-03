@@ -37,7 +37,7 @@ class FilteringOutboxEventFinder implements OutboxEventFinder {
 		}
 
 		Query<OutboxEvent> query = session.createQuery(
-				"select e from OutboxEvent e where e.id in :ids order by e.id", OutboxEvent.class );
+				"select e from OutboxEvent e where e.id in :ids order by e.moment", OutboxEvent.class );
 		query.setMaxResults( maxResults );
 		query.setParameter( "ids", allowedIds );
 		List<OutboxEvent> returned = query.list();
@@ -73,14 +73,14 @@ class FilteringOutboxEventFinder implements OutboxEventFinder {
 	public List<OutboxEvent> findOutboxEventsNoFilter(Session session) {
 		checkFiltering();
 		Query<OutboxEvent> query = session.createQuery(
-				"select e from OutboxEvent e order by e.id", OutboxEvent.class );
+				"select e from OutboxEvent e order by e.moment", OutboxEvent.class );
 		return query.list();
 	}
 
 	public List<Long> findOutboxEventIdsNoFilter(Session session) {
 		checkFiltering();
 		Query<Long> query = session.createQuery(
-				"select e.id from OutboxEvent e order by e.id", Long.class );
+				"select e.id from OutboxEvent e order by e.moment", Long.class );
 		return query.list();
 	}
 
