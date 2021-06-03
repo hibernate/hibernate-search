@@ -152,7 +152,8 @@ public class ExistsPredicateObjectsSpecificsIT {
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
 						"Attribute 'nestedPathHierarchy' differs:", " vs. " )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexNames( mainIndex.name(), invertedIndex.name() )
+						EventContexts.fromIndexNames( mainIndex.name(), invertedIndex.name() ),
+						EventContexts.fromIndexFieldAbsolutePath( fieldPath )
 				) );
 	}
 
@@ -168,7 +169,8 @@ public class ExistsPredicateObjectsSpecificsIT {
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
 						"Attribute 'staticChildren' differs" )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexNames( mainIndex.name(), differentFieldsIndex.name() )
+						EventContexts.fromIndexNames( mainIndex.name(), differentFieldsIndex.name() ),
+						EventContexts.fromIndexFieldAbsolutePath( fieldPath )
 				) );
 	}
 
@@ -238,7 +240,8 @@ public class ExistsPredicateObjectsSpecificsIT {
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
 						"Attribute 'nestedPathHierarchy' differs:", " vs. " )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexNames( invertedIndex.name(), mainIndex.name() )
+						EventContexts.fromIndexNames( invertedIndex.name(), mainIndex.name() ),
+						EventContexts.fromIndexFieldAbsolutePath( fieldPath )
 				) );
 	}
 
@@ -254,7 +257,8 @@ public class ExistsPredicateObjectsSpecificsIT {
 						"Inconsistent configuration for field '" + fieldPath + "' in a search query across multiple indexes",
 						"Attribute 'staticChildren' differs" )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexNames( differentFieldsIndex.name(), mainIndex.name() )
+						EventContexts.fromIndexNames( differentFieldsIndex.name(), mainIndex.name() ),
+						EventContexts.fromIndexFieldAbsolutePath( fieldPath )
 				) );
 	}
 

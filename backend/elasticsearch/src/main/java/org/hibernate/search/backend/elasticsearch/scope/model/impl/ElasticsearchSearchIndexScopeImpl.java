@@ -188,7 +188,7 @@ public final class ElasticsearchSearchIndexScopeImpl implements ElasticsearchSea
 			for ( ElasticsearchIndexModel indexModel : indexModels ) {
 				rootForEachIndex.add( indexModel.root() );
 			}
-			return new ElasticsearchMultiIndexSearchCompositeIndexSchemaElementContext( hibernateSearchIndexNames,
+			return new ElasticsearchMultiIndexSearchCompositeIndexSchemaElementContext( this,
 					null, rootForEachIndex );
 		}
 	}
@@ -249,11 +249,11 @@ public final class ElasticsearchSearchIndexScopeImpl implements ElasticsearchSea
 		}
 
 		if ( fieldForEachIndex.get( 0 ).isComposite() ) {
-			return new ElasticsearchMultiIndexSearchCompositeIndexSchemaElementContext( hibernateSearchIndexNames,
-					absoluteFieldPath, (List) fieldForEachIndex );
+			return new ElasticsearchMultiIndexSearchCompositeIndexSchemaElementContext( this, absoluteFieldPath,
+					(List) fieldForEachIndex );
 		}
 		else {
-			return new ElasticsearchMultiIndexSearchValueFieldContext<>( hibernateSearchIndexNames, absoluteFieldPath,
+			return new ElasticsearchMultiIndexSearchValueFieldContext<>( this, absoluteFieldPath,
 					(List) fieldForEachIndex );
 		}
 	}

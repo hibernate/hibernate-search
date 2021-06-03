@@ -8,35 +8,31 @@ package org.hibernate.search.backend.lucene.search.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
-import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.analysis.Analyzer;
 
 public class LuceneMultiIndexSearchValueFieldContext<F>
+		extends AbstractLuceneMultiIndexSearchIndexSchemaElementContext<LuceneSearchValueFieldContext<F>>
 		implements LuceneSearchValueFieldContext<F>, LuceneSearchValueFieldTypeContext<F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Set<String> indexNames;
-	private final String absolutePath;
-	private final List<LuceneSearchValueFieldContext<F>> fieldForEachIndex;
+	public LuceneMultiIndexSearchValueFieldContext(LuceneSearchIndexScope scope, String absolutePath,
+			List<LuceneSearchValueFieldContext<F>> elementForEachIndex) {
+		super( scope, absolutePath, elementForEachIndex );
+	}
 
-	public LuceneMultiIndexSearchValueFieldContext(Set<String> indexNames, String absolutePath,
-			List<LuceneSearchValueFieldContext<F>> fieldForEachIndex) {
-		this.indexNames = indexNames;
-		this.absolutePath = absolutePath;
-		this.fieldForEachIndex = fieldForEachIndex;
+	@Override
+	protected LuceneSearchValueFieldContext<F> self() {
+		return this;
 	}
 
 	@Override
@@ -50,25 +46,14 @@ public class LuceneMultiIndexSearchValueFieldContext<F>
 	}
 
 	@Override
-	public String absolutePath() {
-		return absolutePath;
-	}
-
-	@Override
 	public String nestedDocumentPath() {
-		return getFromFieldIfCompatible( LuceneSearchValueFieldContext::nestedDocumentPath, Object::equals,
+		return getFromElementIfCompatible( LuceneSearchValueFieldContext::nestedDocumentPath, Object::equals,
 				"nestedDocumentPath" );
 	}
 
 	@Override
-	public List<String> nestedPathHierarchy() {
-		return getFromFieldIfCompatible( LuceneSearchValueFieldContext::nestedPathHierarchy, Object::equals,
-				"nestedPathHierarchy" );
-	}
-
-	@Override
 	public boolean multiValuedInRoot() {
-		for ( LuceneSearchValueFieldContext<F> field : fieldForEachIndex ) {
+		for ( LuceneSearchValueFieldContext<F> field : elementForEachIndex ) {
 			if ( field.multiValuedInRoot() ) {
 				return true;
 			}
@@ -82,25 +67,19 @@ public class LuceneMultiIndexSearchValueFieldContext<F>
 	}
 
 	@Override
-	public EventContext eventContext() {
-		return indexesEventContext().append( relativeEventContext() );
-	}
-
-	private EventContext indexesEventContext() {
-		return EventContexts.fromIndexNames( indexNames );
-	}
-
-	private EventContext relativeEventContext() {
-		return EventContexts.fromIndexFieldAbsolutePath( absolutePath );
+	protected String missingSupportHint(String queryElementName) {
+		return log.missingSupportHintForValueField( queryElementName );
 	}
 
 	@Override
-	public <T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchIndexScope scope) {
-		AbstractLuceneSearchValueFieldQueryElementFactory<T, F> factory = type().queryElementFactory( key );
-		if ( factory == null ) {
-			throw log.cannotUseQueryElementForField( absolutePath(), key.toString(), eventContext() );
-		}
-		return factory.create( scope, this );
+	protected String partialSupportHint() {
+		return log.partialSupportHintForValueField();
+	}
+
+	@Override
+	protected <T> LuceneSearchQueryElementFactory<T, LuceneSearchValueFieldContext<F>> queryElementFactory(
+			LuceneSearchValueFieldContext<F> indexElement, SearchQueryElementTypeKey<T> key) {
+		return indexElement.type().queryElementFactory( key );
 	}
 
 	@Override
@@ -133,87 +112,20 @@ public class LuceneMultiIndexSearchValueFieldContext<F>
 				"searchAnalyzerOrNormalizer" );
 	}
 
-	@Override
-	public <T> AbstractLuceneSearchValueFieldQueryElementFactory<T, F> queryElementFactory(SearchQueryElementTypeKey<T> key) {
-		AbstractLuceneSearchValueFieldQueryElementFactory<T, F> factory = null;
-		for ( LuceneSearchValueFieldContext<F> fieldContext : fieldForEachIndex ) {
-			LuceneSearchValueFieldTypeContext<F> fieldType = fieldContext.type();
-			AbstractLuceneSearchValueFieldQueryElementFactory<T, F> factoryForFieldContext =
-					fieldType.queryElementFactory( key );
-			if ( factory == null ) {
-				factory = factoryForFieldContext;
-			}
-			else {
-				checkFactoryCompatibility( key, factory, factoryForFieldContext );
-			}
-		}
-		return factory;
-	}
-
-	private <T> T getFromFieldIfCompatible(Function<LuceneSearchValueFieldContext<F>, T> getter,
-			BiPredicate<T, T> compatibilityChecker, String attributeName) {
-		T attribute = null;
-		for ( LuceneSearchValueFieldContext<F> fieldContext : fieldForEachIndex ) {
-			T attributeForFieldContext = getter.apply( fieldContext );
-			if ( attribute == null ) {
-				attribute = attributeForFieldContext;
-			}
-			else {
-				checkAttributeCompatibility( compatibilityChecker, attributeName, attribute, attributeForFieldContext );
-			}
-		}
-		return attribute;
-	}
-
 	private <T> T getFromTypeIfCompatible(Function<LuceneSearchValueFieldTypeContext<F>, T> getter,
 			BiPredicate<T, T> compatibilityChecker, String attributeName) {
 		T attribute = null;
-		for ( LuceneSearchValueFieldContext<F> fieldContext : fieldForEachIndex ) {
-			LuceneSearchValueFieldTypeContext<F> fieldType = fieldContext.type();
-			T attributeForFieldContext = getter.apply( fieldType );
+		for ( LuceneSearchValueFieldContext<F> indexElement : elementForEachIndex ) {
+			LuceneSearchValueFieldTypeContext<F> fieldType = indexElement.type();
+			T attributeForIndexElement = getter.apply( fieldType );
 			if ( attribute == null ) {
-				attribute = attributeForFieldContext;
+				attribute = attributeForIndexElement;
 			}
 			else {
-				checkAttributeCompatibility( compatibilityChecker, attributeName, attribute, attributeForFieldContext );
+				checkAttributeCompatibility( compatibilityChecker, attributeName, attribute, attributeForIndexElement );
 			}
 		}
 		return attribute;
 	}
 
-	private <T> void checkFactoryCompatibility(SearchQueryElementTypeKey<T> key,
-			AbstractLuceneSearchValueFieldQueryElementFactory<T, F> factory1, AbstractLuceneSearchValueFieldQueryElementFactory<T, F> factory2) {
-		if ( factory1 == null && factory2 == null ) {
-			return;
-		}
-		try {
-			try {
-				if ( factory1 == null || factory2 == null ) {
-					throw log.partialSupportForQueryElement( key.toString() );
-				}
-
-				factory1.checkCompatibleWith( factory2 );
-			}
-			catch (SearchException e) {
-				throw log.inconsistentSupportForQueryElement( key.toString(), e.getMessage(), e );
-			}
-		}
-		catch (SearchException e) {
-			throw log.inconsistentConfigurationForIndexElementForSearch( relativeEventContext(), e.getMessage(),
-					indexesEventContext(), e );
-		}
-	}
-
-	private <T> void checkAttributeCompatibility(BiPredicate<T, T> compatibilityChecker, String attributeName,
-			T attribute1, T attribute2) {
-		try {
-			if ( !compatibilityChecker.test( attribute1, attribute2 ) ) {
-				throw log.differentIndexElementAttribute( attributeName, attribute1, attribute2 );
-			}
-		}
-		catch (SearchException e) {
-			throw log.inconsistentConfigurationForIndexElementForSearch( relativeEventContext(), e.getMessage(),
-					indexesEventContext(), e );
-		}
-	}
 }

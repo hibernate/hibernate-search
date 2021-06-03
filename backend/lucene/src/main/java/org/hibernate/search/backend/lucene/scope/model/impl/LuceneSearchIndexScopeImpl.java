@@ -222,7 +222,7 @@ public final class LuceneSearchIndexScopeImpl implements LuceneSearchIndexScope 
 					(List) fieldForEachIndex );
 		}
 		else {
-			return new LuceneMultiIndexSearchValueFieldContext<>( indexNames, absoluteFieldPath,
+			return new LuceneMultiIndexSearchValueFieldContext<>( this, absoluteFieldPath,
 					(List) fieldForEachIndex );
 		}
 	}

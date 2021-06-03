@@ -19,7 +19,7 @@ public interface ElasticsearchSearchCompositeIndexSchemaElementContext extends E
 
 	boolean nested();
 
-	<T> AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(
-			SearchQueryElementTypeKey<T> key);
+	<T> ElasticsearchSearchQueryElementFactory<T, ElasticsearchSearchCompositeIndexSchemaElementContext>
+			queryElementFactory(SearchQueryElementTypeKey<T> key);
 
 }

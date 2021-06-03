@@ -9,35 +9,30 @@ package org.hibernate.search.backend.elasticsearch.search.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.JsonPrimitive;
 
 public class ElasticsearchMultiIndexSearchValueFieldContext<F>
+		extends AbstractElasticsearchMultiIndexSearchIndexSchemaElementContext<ElasticsearchSearchValueFieldContext<F>>
 		implements ElasticsearchSearchValueFieldContext<F>, ElasticsearchSearchValueFieldTypeContext<F> {
-
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Set<String> indexNames;
-	private final String absolutePath;
-	private final List<ElasticsearchSearchValueFieldContext<F>> fieldForEachIndex;
+	public ElasticsearchMultiIndexSearchValueFieldContext(ElasticsearchSearchIndexScope scope, String absolutePath,
+			List<ElasticsearchSearchValueFieldContext<F>> elementForEachIndex) {
+		super( scope, absolutePath, elementForEachIndex );
+	}
 
-	public ElasticsearchMultiIndexSearchValueFieldContext(Set<String> indexNames, String absolutePath,
-			List<ElasticsearchSearchValueFieldContext<F>> fieldForEachIndex) {
-		this.indexNames = indexNames;
-		this.absolutePath = absolutePath;
-		this.fieldForEachIndex = fieldForEachIndex;
+	@Override
+	protected ElasticsearchSearchValueFieldContext<F> self() {
+		return this;
 	}
 
 	@Override
@@ -51,25 +46,14 @@ public class ElasticsearchMultiIndexSearchValueFieldContext<F>
 	}
 
 	@Override
-	public String absolutePath() {
-		return absolutePath;
-	}
-
-	@Override
 	public String[] absolutePathComponents() {
 		// The path is the same for all fields, so we just pick the first one.
-		return fieldForEachIndex.get( 0 ).absolutePathComponents();
-	}
-
-	@Override
-	public List<String> nestedPathHierarchy() {
-		return getFromFieldIfCompatible( ElasticsearchSearchValueFieldContext::nestedPathHierarchy, Object::equals,
-				"nestedPathHierarchy" );
+		return elementForEachIndex.get( 0 ).absolutePathComponents();
 	}
 
 	@Override
 	public boolean multiValuedInRoot() {
-		for ( ElasticsearchSearchValueFieldContext<F> field : fieldForEachIndex ) {
+		for ( ElasticsearchSearchValueFieldContext<F> field : elementForEachIndex ) {
 			if ( field.multiValuedInRoot() ) {
 				return true;
 			}
@@ -83,25 +67,19 @@ public class ElasticsearchMultiIndexSearchValueFieldContext<F>
 	}
 
 	@Override
-	public EventContext eventContext() {
-		return indexesEventContext().append( relativeEventContext() );
-	}
-
-	private EventContext indexesEventContext() {
-		return EventContexts.fromIndexNames( indexNames );
-	}
-
-	private EventContext relativeEventContext() {
-		return EventContexts.fromIndexFieldAbsolutePath( absolutePath );
+	protected String missingSupportHint(String queryElementName) {
+		return log.missingSupportHintForValueField( queryElementName );
 	}
 
 	@Override
-	public <T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchIndexScope scope) {
-		ElasticsearchSearchQueryElementFactory<T, ElasticsearchSearchValueFieldContext<F>> factory = type().queryElementFactory( key );
-		if ( factory == null ) {
-			throw log.cannotUseQueryElementForField( absolutePath(), key.toString(), eventContext() );
-		}
-		return factory.create( scope, this );
+	protected String partialSupportHint() {
+		return log.partialSupportHintForValueField();
+	}
+
+	@Override
+	protected <T> ElasticsearchSearchQueryElementFactory<T, ElasticsearchSearchValueFieldContext<F>> queryElementFactory(
+			ElasticsearchSearchValueFieldContext<F> indexElement, SearchQueryElementTypeKey<T> key) {
+		return indexElement.type().queryElementFactory( key );
 	}
 
 	@Override
@@ -148,97 +126,27 @@ public class ElasticsearchMultiIndexSearchValueFieldContext<F>
 
 	@Override
 	public boolean hasNormalizerOnAtLeastOneIndex() {
-		for ( ElasticsearchSearchValueFieldContext<F> fieldContext : fieldForEachIndex ) {
-			if ( fieldContext.type().hasNormalizerOnAtLeastOneIndex() ) {
+		for ( ElasticsearchSearchValueFieldContext<F> indexElement : elementForEachIndex ) {
+			if ( indexElement.type().hasNormalizerOnAtLeastOneIndex() ) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	@Override
-	public <T> AbstractElasticsearchValueFieldSearchQueryElementFactory<T, F> queryElementFactory(
-			SearchQueryElementTypeKey<T> key) {
-		AbstractElasticsearchValueFieldSearchQueryElementFactory<T, F> factory = null;
-		for ( ElasticsearchSearchValueFieldContext<F> fieldContext : fieldForEachIndex ) {
-			ElasticsearchSearchValueFieldTypeContext<F> fieldType = fieldContext.type();
-			AbstractElasticsearchValueFieldSearchQueryElementFactory<T, F> factoryForFieldContext =
-					fieldType.queryElementFactory( key );
-			if ( factory == null ) {
-				factory = factoryForFieldContext;
-			}
-			else {
-				checkFactoryCompatibility( key, factory, factoryForFieldContext );
-			}
-		}
-		return factory;
-	}
-
-	private <T> T getFromFieldIfCompatible(Function<ElasticsearchSearchValueFieldContext<F>, T> getter,
-			BiPredicate<T, T> compatiblityChecker, String attributeName) {
-		T attribute = null;
-		for ( ElasticsearchSearchValueFieldContext<F> fieldContext : fieldForEachIndex ) {
-			T attributeForFieldContext = getter.apply( fieldContext );
-			if ( attribute == null ) {
-				attribute = attributeForFieldContext;
-			}
-			else {
-				checkAttributeCompatibility( compatiblityChecker, attributeName, attribute, attributeForFieldContext );
-			}
-		}
-		return attribute;
-	}
-
 	private <T> T getFromTypeIfCompatible(Function<ElasticsearchSearchValueFieldTypeContext<F>, T> getter,
 			BiPredicate<T, T> compatiblityChecker, String attributeName) {
 		T attribute = null;
-		for ( ElasticsearchSearchValueFieldContext<F> fieldContext : fieldForEachIndex ) {
-			ElasticsearchSearchValueFieldTypeContext<F> fieldType = fieldContext.type();
-			T attributeForFieldContext = getter.apply( fieldType );
+		for ( ElasticsearchSearchValueFieldContext<F> indexElement : elementForEachIndex ) {
+			ElasticsearchSearchValueFieldTypeContext<F> fieldType = indexElement.type();
+			T attributeForIndexElement = getter.apply( fieldType );
 			if ( attribute == null ) {
-				attribute = attributeForFieldContext;
+				attribute = attributeForIndexElement;
 			}
 			else {
-				checkAttributeCompatibility( compatiblityChecker, attributeName, attribute, attributeForFieldContext );
+				checkAttributeCompatibility( compatiblityChecker, attributeName, attribute, attributeForIndexElement );
 			}
 		}
 		return attribute;
-	}
-
-	private <T> void checkFactoryCompatibility(SearchQueryElementTypeKey<T> key,
-			ElasticsearchSearchQueryElementFactory<T, ElasticsearchSearchValueFieldContext<F>> factory1,
-			ElasticsearchSearchQueryElementFactory<T, ElasticsearchSearchValueFieldContext<F>> factory2) {
-		if ( factory1 == null && factory2 == null ) {
-			return;
-		}
-		try {
-			try {
-				if ( factory1 == null || factory2 == null ) {
-					throw log.partialSupportForQueryElement( key.toString() );
-				}
-
-				factory1.checkCompatibleWith( factory2 );
-			}
-			catch (SearchException e) {
-				throw log.inconsistentSupportForQueryElement( key.toString(), e.getMessage(), e );
-			}
-		}
-		catch (SearchException e) {
-			throw log.inconsistentConfigurationForIndexElementForSearch( relativeEventContext(), e.getMessage(),
-					indexesEventContext(), e );
-		}
-	}
-
-	private <T> void checkAttributeCompatibility(BiPredicate<T, T> compatibilityChecker, String attributeName,
-			T attribute1, T attribute2) {
-		try {
-			if ( !compatibilityChecker.test( attribute1, attribute2 ) ) {
-				throw log.differentIndexElementAttribute( attributeName, attribute1, attribute2 );
-			}
-		}
-		catch (SearchException e) {
-			throw log.inconsistentConfigurationForIndexElementForSearch( relativeEventContext(), e.getMessage(),
-					indexesEventContext(), e );
-		}
 	}
 }
