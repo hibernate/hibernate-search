@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import java.util.List;
 
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldQueryElementFactory;
@@ -34,6 +35,11 @@ public class ElasticsearchIndexSchemaValueFieldNode<F> extends AbstractElasticse
 	}
 
 	@Override
+	public boolean isComposite() {
+		return false;
+	}
+
+	@Override
 	public boolean isObjectField() {
 		return false;
 	}
@@ -41,6 +47,11 @@ public class ElasticsearchIndexSchemaValueFieldNode<F> extends AbstractElasticse
 	@Override
 	public boolean isValueField() {
 		return true;
+	}
+
+	@Override
+	public ElasticsearchSearchCompositeIndexSchemaElementContext toComposite() {
+		throw log.invalidIndexElementTypeValueFieldIsNotObjectField( absolutePath );
 	}
 
 	@Override

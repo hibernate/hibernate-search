@@ -14,26 +14,49 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-abstract class AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext
+public final class LuceneMultiIndexSearchCompositeIndexSchemaElementContext
 		implements LuceneSearchCompositeIndexSchemaElementContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneSearchIndexScope scope;
+	private final String absolutePath;
 	private final List<LuceneSearchCompositeIndexSchemaElementContext> fieldForEachIndex;
 
 	private Map<String, LuceneSearchIndexSchemaElementContext> staticChildrenByName;
 
-	public AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext(LuceneSearchIndexScope scope,
-			List<LuceneSearchCompositeIndexSchemaElementContext> elementForEachIndex) {
+	public LuceneMultiIndexSearchCompositeIndexSchemaElementContext(LuceneSearchIndexScope scope,
+			String absolutePath, List<LuceneSearchCompositeIndexSchemaElementContext> elementForEachIndex) {
 		this.scope = scope;
+		this.absolutePath = absolutePath;
 		this.fieldForEachIndex = elementForEachIndex;
+	}
+
+	@Override
+	public boolean isComposite() {
+		return true;
+	}
+
+	@Override
+	public LuceneSearchCompositeIndexSchemaElementContext toComposite() {
+		return this;
+	}
+
+	@Override
+	public String absolutePath() {
+		return absolutePath;
+	}
+
+	@Override
+	public String absolutePath(String relativeFieldName) {
+		return FieldPaths.compose( absolutePath, relativeFieldName );
 	}
 
 	@Override
@@ -51,7 +74,10 @@ abstract class AbstractLuceneMultiIndexSearchCompositeIndexSchemaElementContext
 		return EventContexts.fromIndexNames( scope.hibernateSearchIndexNames() );
 	}
 
-	protected abstract EventContext relativeEventContext();
+	protected EventContext relativeEventContext() {
+		return absolutePath == null ? EventContexts.indexSchemaRoot()
+				: EventContexts.fromIndexFieldAbsolutePath( absolutePath );
+	}
 
 	@Override
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchIndexScope scope) {

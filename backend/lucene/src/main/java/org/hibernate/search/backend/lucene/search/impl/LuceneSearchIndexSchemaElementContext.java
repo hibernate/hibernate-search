@@ -19,9 +19,9 @@ import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
  */
 public interface LuceneSearchIndexSchemaElementContext extends EventContextProvider {
 
-	boolean isObjectField();
+	boolean isComposite();
 
-	LuceneSearchCompositeIndexSchemaElementContext toObjectField();
+	LuceneSearchCompositeIndexSchemaElementContext toComposite();
 
 	String absolutePath();
 

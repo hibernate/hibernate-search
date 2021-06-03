@@ -44,6 +44,11 @@ public class LuceneIndexSchemaRootNode
 	}
 
 	@Override
+	public boolean isComposite() {
+		return true;
+	}
+
+	@Override
 	public boolean isRoot() {
 		return true;
 	}
@@ -51,6 +56,11 @@ public class LuceneIndexSchemaRootNode
 	@Override
 	public boolean isObjectField() {
 		return false;
+	}
+
+	@Override
+	public LuceneIndexSchemaRootNode toComposite() {
+		return this;
 	}
 
 	@Override

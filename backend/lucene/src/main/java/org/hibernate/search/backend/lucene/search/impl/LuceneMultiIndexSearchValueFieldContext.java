@@ -40,12 +40,12 @@ public class LuceneMultiIndexSearchValueFieldContext<F>
 	}
 
 	@Override
-	public boolean isObjectField() {
+	public boolean isComposite() {
 		return false;
 	}
 
 	@Override
-	public LuceneSearchCompositeIndexSchemaElementContext toObjectField() {
+	public LuceneSearchCompositeIndexSchemaElementContext toComposite() {
 		throw log.invalidIndexElementTypeValueFieldIsNotObjectField( absolutePath );
 	}
 
