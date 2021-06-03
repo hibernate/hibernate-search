@@ -78,7 +78,8 @@ public class ElasticsearchIndexSchemaValueFieldNode<F> extends AbstractElasticse
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchIndexScope scope) {
 		AbstractElasticsearchValueFieldSearchQueryElementFactory<T, F> factory = type().queryElementFactory( key );
 		if ( factory == null ) {
-			throw log.cannotUseQueryElementForField( absolutePath(), key.toString(), eventContext() );
+			throw log.cannotUseQueryElementForIndexElement( eventContext(), key.toString(),
+					log.missingSupportHintForValueField( key.toString() ), eventContext() );
 		}
 		return factory.create( scope, this );
 	}

@@ -135,14 +135,15 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 		AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
 		if ( factory == null ) {
 			EventContext eventContext = eventContext();
-			throw log.cannotUseQueryElementForCompositeIndexElement( eventContext, key.toString(), eventContext );
+			throw log.cannotUseQueryElementForIndexElement( eventContext, key.toString(),
+					log.missingSupportHintForCompositeIndexElement(), eventContext );
 		}
 		try {
 			return factory.create( scope, this );
 		}
 		catch (SearchException e) {
 			EventContext eventContext = eventContext();
-			throw log.cannotUseQueryElementForCompositeIndexElementBecauseCreationException( eventContext, key.toString(),
+			throw log.cannotUseQueryElementForIndexElementBecauseCreationException( eventContext, key.toString(),
 					e.getMessage(), e, eventContext );
 		}
 	}

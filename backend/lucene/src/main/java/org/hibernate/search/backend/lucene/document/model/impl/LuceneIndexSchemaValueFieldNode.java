@@ -95,7 +95,8 @@ public class LuceneIndexSchemaValueFieldNode<F> extends AbstractLuceneIndexSchem
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchIndexScope scope) {
 		AbstractLuceneSearchValueFieldQueryElementFactory<T, F> factory = type().queryElementFactory( key );
 		if ( factory == null ) {
-			throw log.cannotUseQueryElementForField( absolutePath(), key.toString(), eventContext() );
+			throw log.cannotUseQueryElementForIndexElement( eventContext(), key.toString(),
+					log.missingSupportHintForValueField( key.toString() ), eventContext() );
 		}
 		return factory.create( scope, this );
 	}

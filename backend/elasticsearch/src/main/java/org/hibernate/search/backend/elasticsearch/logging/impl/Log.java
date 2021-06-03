@@ -620,10 +620,18 @@ public interface Log extends BasicLogger {
 					+ " Make sure to call '.multi()' when you create the projection.")
 	SearchException invalidSingleValuedProjectionOnMultiValuedField(String absolutePath, @Param EventContext context);
 
-	@Message(id = ID_OFFSET + 114, value = "Cannot use '%2$s' on field '%1$s'."
-			+ " Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)."
-			+ " If it already is, then '%2$s' is not available for fields of this type.")
-	SearchException cannotUseQueryElementForField(String absoluteFieldPath, String queryElementName, @Param EventContext context);
+	@Message(id = ID_OFFSET + 114, value = "Cannot use '%2$s' on %1$s. %3$s" )
+	SearchException cannotUseQueryElementForIndexElement(
+			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext, String queryElementName,
+			String hint, @Param EventContext context);
+
+	@Message(value = "Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)."
+			+ " If it already is, then '%1$s' is not available for fields of this type.")
+	String missingSupportHintForValueField(String queryElementName);
+
+	@Message(value = "If you are trying to use the 'nested' predicate, set the field structure to 'NESTED' and reindex all your data."
+			+ " If you are trying to use another predicate, it probably isn't available for this field")
+	String missingSupportHintForCompositeIndexElement();
 
 	@Message(id = ID_OFFSET + 115,
 			value = "Inconsistent support for '%1$s': %2$s")
@@ -644,10 +652,17 @@ public interface Log extends BasicLogger {
 	SearchException differentFieldCodecForQueryElement(Object codec1, Object codec2);
 
 	@Message(id = ID_OFFSET + 119,
-			value = "'%1$s' can be used in some of the targeted indexes, but not all of them."
-					+ " Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant) in all indexes,"
-					+ " and that the field has the same type in all indexes.")
-	SearchException partialSupportForQueryElement(String queryElementName);
+			value = "'%1$s' can be used in some of the targeted indexes, but not all of them. %2$s")
+	SearchException partialSupportForQueryElement(String queryElementName, String hint);
+
+	@Message(value = "Make sure the field is marked as searchable/sortable/projectable/aggregable"
+			+ " (whichever is relevant) in all indexes,"
+			+ " and that the field has the same type in all indexes.")
+	String partialSupportHintForValueField();
+
+	@Message(value = "If you are trying to use the 'nested' predicate,"
+			+ " set the field structure is to 'NESTED' in all indexes, then reindex all your data.")
+	String partialSupportHintForCompositeIndexElement();
 
 	@Message(id = ID_OFFSET + 121, value = "Invalid dynamic type: '%1$s'."
 			+ " Valid values are: %2$s.")
@@ -657,15 +672,8 @@ public interface Log extends BasicLogger {
 			value = "This field is a value field in some indexes, but an object field in other indexes.")
 	SearchException conflictingFieldModel();
 
-	@Message(id = ID_OFFSET + 123, value = "Cannot use '%2$s' on %1$s."
-			+ " If you are trying to use the 'nested' predicate, set the field structure to 'NESTED' and reindex all your data."
-			+ " If you are trying to use another predicate, it probably isn't available for this field")
-	SearchException cannotUseQueryElementForCompositeIndexElement(
-			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext, String queryElementName,
-			@Param EventContext elementContextAsParam);
-
 	@Message(id = ID_OFFSET + 124, value = "Cannot use '%2$s' on %1$s: %3$s")
-	SearchException cannotUseQueryElementForCompositeIndexElementBecauseCreationException(
+	SearchException cannotUseQueryElementForIndexElementBecauseCreationException(
 			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext,
 			String queryElementName, String causeMessage, @Cause SearchException cause,
 			@Param EventContext elementContextAsParam);
@@ -742,10 +750,6 @@ public interface Log extends BasicLogger {
 					+ " but you cannot override the version that was provided when the backend was created.")
 	SearchException incompatibleElasticsearchVersionOnStart(ElasticsearchVersion versionOnCreation,
 			ElasticsearchVersion versionOnStart);
-
-	@Message(id = ID_OFFSET + 142,
-			value = "'%1$s' can be used in some of the targeted indexes, but not all of them.")
-	SearchException partialSupportForQueryElementInCompositeIndexElement(String queryElementName);
 
 	@Message(id = ID_OFFSET + 148,
 			value = "Invalid backend configuration: mapping requires multi-tenancy"

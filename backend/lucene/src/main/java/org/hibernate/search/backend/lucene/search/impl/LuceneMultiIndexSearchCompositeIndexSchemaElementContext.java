@@ -6,37 +6,29 @@
  */
 package org.hibernate.search.backend.lucene.search.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.function.BiPredicate;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.reporting.EventContext;
 
 public final class LuceneMultiIndexSearchCompositeIndexSchemaElementContext
+		extends AbstractLuceneMultiIndexSearchIndexSchemaElementContext<LuceneSearchCompositeIndexSchemaElementContext>
 		implements LuceneSearchCompositeIndexSchemaElementContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private final LuceneSearchIndexScope scope;
-	private final String absolutePath;
-	private final List<LuceneSearchCompositeIndexSchemaElementContext> fieldForEachIndex;
 
 	private Map<String, LuceneSearchIndexSchemaElementContext> staticChildrenByName;
 
 	public LuceneMultiIndexSearchCompositeIndexSchemaElementContext(LuceneSearchIndexScope scope,
 			String absolutePath, List<LuceneSearchCompositeIndexSchemaElementContext> elementForEachIndex) {
-		this.scope = scope;
-		this.absolutePath = absolutePath;
-		this.fieldForEachIndex = elementForEachIndex;
+		super( scope, absolutePath, elementForEachIndex );
+	}
+
+	@Override
+	protected LuceneSearchCompositeIndexSchemaElementContext self() {
+		return this;
 	}
 
 	@Override
@@ -50,49 +42,8 @@ public final class LuceneMultiIndexSearchCompositeIndexSchemaElementContext
 	}
 
 	@Override
-	public String absolutePath() {
-		return absolutePath;
-	}
-
-	@Override
 	public String absolutePath(String relativeFieldName) {
 		return FieldPaths.compose( absolutePath, relativeFieldName );
-	}
-
-	@Override
-	public List<String> nestedPathHierarchy() {
-		return getFromElementIfCompatible( LuceneSearchCompositeIndexSchemaElementContext::nestedPathHierarchy, Object::equals,
-				"nestedPathHierarchy" );
-	}
-
-	@Override
-	public EventContext eventContext() {
-		return indexesEventContext().append( relativeEventContext() );
-	}
-
-	private EventContext indexesEventContext() {
-		return EventContexts.fromIndexNames( scope.hibernateSearchIndexNames() );
-	}
-
-	protected EventContext relativeEventContext() {
-		return absolutePath == null ? EventContexts.indexSchemaRoot()
-				: EventContexts.fromIndexFieldAbsolutePath( absolutePath );
-	}
-
-	@Override
-	public <T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchIndexScope scope) {
-		AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = queryElementFactory( key );
-		if ( factory == null ) {
-			throw log.cannotUseQueryElementForCompositeIndexElement( relativeEventContext(), key.toString(),
-					indexesEventContext() );
-		}
-		try {
-			return factory.create( scope, this );
-		}
-		catch (SearchException e) {
-			throw log.cannotUseQueryElementForCompositeIndexElementBecauseCreationException( relativeEventContext(), key.toString(),
-					e.getMessage(), e, indexesEventContext() );
-		}
 	}
 
 	@Override
@@ -107,8 +58,8 @@ public final class LuceneMultiIndexSearchCompositeIndexSchemaElementContext
 
 		Map<String, LuceneSearchIndexSchemaElementContext> result = new TreeMap<>();
 		Function<String, LuceneSearchIndexSchemaElementContext> createChildFieldContext = scope::field;
-		for ( LuceneSearchCompositeIndexSchemaElementContext fieldContext : fieldForEachIndex ) {
-			for ( LuceneSearchIndexSchemaElementContext child : fieldContext.staticChildrenByName().values() ) {
+		for ( LuceneSearchCompositeIndexSchemaElementContext indexElement : elementForEachIndex ) {
+			for ( LuceneSearchIndexSchemaElementContext child : indexElement.staticChildrenByName().values() ) {
 				try {
 					result.computeIfAbsent( child.absolutePath(), createChildFieldContext );
 				}
@@ -127,74 +78,24 @@ public final class LuceneMultiIndexSearchCompositeIndexSchemaElementContext
 
 	@Override
 	public boolean nested() {
-		return getFromElementIfCompatible( LuceneSearchCompositeIndexSchemaElementContext::nested, Object::equals, "nested" );
+		return getFromElementIfCompatible( LuceneSearchCompositeIndexSchemaElementContext::nested, Object::equals,
+				"nested" );
 	}
 
 	@Override
-	public <T> AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
-		AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory = null;
-		for ( LuceneSearchCompositeIndexSchemaElementContext fieldContext : fieldForEachIndex ) {
-			AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factoryForFieldContext =
-					fieldContext.queryElementFactory( key );
-			if ( factory == null ) {
-				factory = factoryForFieldContext;
-			}
-			else {
-				checkFactoryCompatibility( key, factory, factoryForFieldContext );
-			}
-		}
-		return factory;
+	protected String missingSupportHint(String queryElementName) {
+		return log.missingSupportHintForCompositeIndexElement();
 	}
 
-	private <T> T getFromElementIfCompatible(Function<LuceneSearchCompositeIndexSchemaElementContext, T> getter,
-			BiPredicate<T, T> compatibilityChecker, String attributeName) {
-		T attribute = null;
-		for ( LuceneSearchCompositeIndexSchemaElementContext fieldContext : fieldForEachIndex ) {
-			T attributeForFieldContext = getter.apply( fieldContext );
-			if ( attribute == null ) {
-				attribute = attributeForFieldContext;
-			}
-			else {
-				checkAttributeCompatibility( compatibilityChecker, attributeName, attribute, attributeForFieldContext );
-			}
-		}
-		return attribute;
+	@Override
+	protected String partialSupportHint() {
+		return log.partialSupportHintForCompositeIndexElement();
 	}
 
-	private <T> void checkFactoryCompatibility(SearchQueryElementTypeKey<T> key,
-			AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory1,
-			AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<T> factory2) {
-		if ( factory1 == null && factory2 == null ) {
-			return;
-		}
-		try {
-			try {
-				if ( factory1 == null || factory2 == null ) {
-					throw log.partialSupportForQueryElementInCompositeIndexElement( key.toString() );
-				}
-
-				factory1.checkCompatibleWith( factory2 );
-			}
-			catch (SearchException e) {
-				throw log.inconsistentSupportForQueryElement( key.toString(), e.getMessage(), e );
-			}
-		}
-		catch (SearchException e) {
-			throw log.inconsistentConfigurationForIndexElementForSearch( relativeEventContext(), e.getMessage(),
-					indexesEventContext(), e );
-		}
+	@Override
+	protected <T> LuceneSearchQueryElementFactory<T, LuceneSearchCompositeIndexSchemaElementContext> queryElementFactory(
+			LuceneSearchCompositeIndexSchemaElementContext indexElement, SearchQueryElementTypeKey<T> key) {
+		return indexElement.queryElementFactory( key );
 	}
 
-	private <T> void checkAttributeCompatibility(BiPredicate<T, T> compatibilityChecker, String attributeName,
-			T attribute1, T attribute2) {
-		try {
-			if ( !compatibilityChecker.test( attribute1, attribute2 ) ) {
-				throw log.differentIndexElementAttribute( attributeName, attribute1, attribute2 );
-			}
-		}
-		catch (SearchException e) {
-			throw log.inconsistentConfigurationForIndexElementForSearch( relativeEventContext(), e.getMessage(),
-					indexesEventContext(), e );
-		}
-	}
 }
