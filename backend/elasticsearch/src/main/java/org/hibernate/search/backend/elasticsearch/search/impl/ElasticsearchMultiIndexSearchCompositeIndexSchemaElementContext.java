@@ -13,24 +13,38 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-abstract class AbstractElasticsearchMultiIndexSearchCompositeIndexSchemaElementContext
+public final class ElasticsearchMultiIndexSearchCompositeIndexSchemaElementContext
 		implements ElasticsearchSearchCompositeIndexSchemaElementContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Set<String> indexNames;
+	private final String absolutePath;
 	private final List<ElasticsearchSearchCompositeIndexSchemaElementContext> fieldForEachIndex;
 
-	public AbstractElasticsearchMultiIndexSearchCompositeIndexSchemaElementContext(Set<String> indexNames,
+	public ElasticsearchMultiIndexSearchCompositeIndexSchemaElementContext(Set<String> indexNames,
+			String absolutePath,
 			List<ElasticsearchSearchCompositeIndexSchemaElementContext> elementForEachIndex) {
 		this.indexNames = indexNames;
+		this.absolutePath = absolutePath;
 		this.fieldForEachIndex = elementForEachIndex;
+	}
+
+	@Override
+	public String absolutePath() {
+		return absolutePath;
+	}
+
+	@Override
+	public String absolutePath(String relativeFieldName) {
+		return FieldPaths.compose( absolutePath, relativeFieldName );
 	}
 
 	@Override
@@ -48,7 +62,10 @@ abstract class AbstractElasticsearchMultiIndexSearchCompositeIndexSchemaElementC
 		return EventContexts.fromIndexNames( indexNames );
 	}
 
-	protected abstract EventContext relativeEventContext();
+	private EventContext relativeEventContext() {
+		return absolutePath == null ? EventContexts.indexSchemaRoot()
+				: EventContexts.fromIndexFieldAbsolutePath( absolutePath );
+	}
 
 	@Override
 	public <T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchIndexScope scope) {
@@ -64,6 +81,16 @@ abstract class AbstractElasticsearchMultiIndexSearchCompositeIndexSchemaElementC
 			throw log.cannotUseQueryElementForCompositeIndexElementBecauseCreationException( relativeEventContext(), key.toString(),
 					e.getMessage(), e, eventContext() );
 		}
+	}
+
+	@Override
+	public boolean isComposite() {
+		return true;
+	}
+
+	@Override
+	public ElasticsearchSearchCompositeIndexSchemaElementContext toComposite() {
+		return this;
 	}
 
 	@Override

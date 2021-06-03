@@ -19,9 +19,9 @@ import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
  */
 public interface ElasticsearchSearchIndexSchemaElementContext extends EventContextProvider {
 
-	boolean isObjectField();
+	boolean isComposite();
 
-	ElasticsearchSearchCompositeIndexSchemaElementContext toObjectField();
+	ElasticsearchSearchCompositeIndexSchemaElementContext toComposite();
 
 	String absolutePath();
 

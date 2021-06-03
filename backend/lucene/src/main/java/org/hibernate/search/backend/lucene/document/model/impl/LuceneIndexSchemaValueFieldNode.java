@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldQueryElementFactory;
@@ -44,6 +45,11 @@ public class LuceneIndexSchemaValueFieldNode<F> extends AbstractLuceneIndexSchem
 	}
 
 	@Override
+	public boolean isComposite() {
+		return false;
+	}
+
+	@Override
 	public boolean isObjectField() {
 		return false;
 	}
@@ -51,6 +57,11 @@ public class LuceneIndexSchemaValueFieldNode<F> extends AbstractLuceneIndexSchem
 	@Override
 	public boolean isValueField() {
 		return true;
+	}
+
+	@Override
+	public LuceneSearchCompositeIndexSchemaElementContext toComposite() {
+		throw log.invalidIndexElementTypeValueFieldIsNotObjectField( absolutePath );
 	}
 
 	@Override

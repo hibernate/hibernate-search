@@ -45,6 +45,11 @@ public class ElasticsearchIndexSchemaRootNode implements ElasticsearchIndexSchem
 	}
 
 	@Override
+	public boolean isComposite() {
+		return true;
+	}
+
+	@Override
 	public boolean isRoot() {
 		return true;
 	}
@@ -52,6 +57,11 @@ public class ElasticsearchIndexSchemaRootNode implements ElasticsearchIndexSchem
 	@Override
 	public boolean isObjectField() {
 		return false;
+	}
+
+	@Override
+	public ElasticsearchIndexSchemaRootNode toComposite() {
+		return this;
 	}
 
 	@Override

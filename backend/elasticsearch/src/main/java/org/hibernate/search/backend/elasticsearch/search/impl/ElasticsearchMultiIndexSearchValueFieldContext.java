@@ -41,12 +41,12 @@ public class ElasticsearchMultiIndexSearchValueFieldContext<F>
 	}
 
 	@Override
-	public boolean isObjectField() {
+	public boolean isComposite() {
 		return false;
 	}
 
 	@Override
-	public ElasticsearchSearchCompositeIndexSchemaElementContext toObjectField() {
+	public ElasticsearchSearchCompositeIndexSchemaElementContext toComposite() {
 		throw log.invalidIndexElementTypeValueFieldIsNotObjectField( absolutePath );
 	}
 

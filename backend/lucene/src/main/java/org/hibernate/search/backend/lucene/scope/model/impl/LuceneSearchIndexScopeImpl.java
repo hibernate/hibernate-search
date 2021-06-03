@@ -21,8 +21,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneInd
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchObjectFieldContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchRootContext;
+import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchValueFieldContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
@@ -154,7 +153,7 @@ public final class LuceneSearchIndexScopeImpl implements LuceneSearchIndexScope 
 			for ( LuceneScopeIndexManagerContext index : indexes() ) {
 				rootForEachIndex.add( index.model().root() );
 			}
-			return new LuceneMultiIndexSearchRootContext( this, rootForEachIndex );
+			return new LuceneMultiIndexSearchCompositeIndexSchemaElementContext( this, null, rootForEachIndex );
 		}
 	}
 
@@ -203,7 +202,7 @@ public final class LuceneSearchIndexScopeImpl implements LuceneSearchIndexScope 
 				indexOfFirstField = index;
 				firstField = fieldForCurrentIndex;
 			}
-			else if ( firstField.isObjectField() != fieldForCurrentIndex.isObjectField() ) {
+			else if ( firstField.isComposite() != fieldForCurrentIndex.isComposite() ) {
 				SearchException cause = log.conflictingFieldModel();
 				throw log.inconsistentConfigurationForIndexElementForSearch(
 						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ), cause.getMessage(),
@@ -218,8 +217,8 @@ public final class LuceneSearchIndexScopeImpl implements LuceneSearchIndexScope 
 			return null;
 		}
 
-		if ( firstField.isObjectField() ) {
-			return new LuceneMultiIndexSearchObjectFieldContext( this, absoluteFieldPath,
+		if ( firstField.isComposite() ) {
+			return new LuceneMultiIndexSearchCompositeIndexSchemaElementContext( this, absoluteFieldPath,
 					(List) fieldForEachIndex );
 		}
 		else {

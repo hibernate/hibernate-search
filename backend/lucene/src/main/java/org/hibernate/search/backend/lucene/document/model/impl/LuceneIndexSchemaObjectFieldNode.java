@@ -68,6 +68,11 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 	}
 
 	@Override
+	public boolean isComposite() {
+		return true;
+	}
+
+	@Override
 	public boolean isRoot() {
 		return false;
 	}
@@ -80,6 +85,11 @@ public class LuceneIndexSchemaObjectFieldNode extends AbstractLuceneIndexSchemaF
 	@Override
 	public boolean isValueField() {
 		return false;
+	}
+
+	@Override
+	public LuceneIndexSchemaObjectFieldNode toComposite() {
+		return this;
 	}
 
 	@Override

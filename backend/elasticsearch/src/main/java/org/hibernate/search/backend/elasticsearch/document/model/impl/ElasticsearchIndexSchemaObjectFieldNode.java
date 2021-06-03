@@ -74,6 +74,11 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 	}
 
 	@Override
+	public boolean isComposite() {
+		return true;
+	}
+
+	@Override
 	public boolean isRoot() {
 		return false;
 	}
@@ -86,6 +91,11 @@ public class ElasticsearchIndexSchemaObjectFieldNode extends AbstractElasticsear
 	@Override
 	public boolean isValueField() {
 		return false;
+	}
+
+	@Override
+	public ElasticsearchIndexSchemaObjectFieldNode toComposite() {
+		return this;
 	}
 
 	@Override

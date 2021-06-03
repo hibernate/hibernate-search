@@ -22,8 +22,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMultiIndexSearchObjectFieldContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMultiIndexSearchRootContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMultiIndexSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchMultiIndexSearchValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
@@ -189,7 +188,8 @@ public final class ElasticsearchSearchIndexScopeImpl implements ElasticsearchSea
 			for ( ElasticsearchIndexModel indexModel : indexModels ) {
 				rootForEachIndex.add( indexModel.root() );
 			}
-			return new ElasticsearchMultiIndexSearchRootContext( hibernateSearchIndexNames, rootForEachIndex );
+			return new ElasticsearchMultiIndexSearchCompositeIndexSchemaElementContext( hibernateSearchIndexNames,
+					null, rootForEachIndex );
 		}
 	}
 
@@ -233,7 +233,7 @@ public final class ElasticsearchSearchIndexScopeImpl implements ElasticsearchSea
 				indexModelOfFirstField = indexModel;
 				firstField = fieldForCurrentIndex;
 			}
-			else if ( firstField.isObjectField() != fieldForCurrentIndex.isObjectField() ) {
+			else if ( firstField.isComposite() != fieldForCurrentIndex.isComposite() ) {
 				SearchException cause = log.conflictingFieldModel();
 				throw log.inconsistentConfigurationForIndexElementForSearch(
 						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ), cause.getMessage(),
@@ -248,9 +248,9 @@ public final class ElasticsearchSearchIndexScopeImpl implements ElasticsearchSea
 			return null;
 		}
 
-		if ( fieldForEachIndex.get( 0 ).isObjectField() ) {
-			return new ElasticsearchMultiIndexSearchObjectFieldContext( hibernateSearchIndexNames, absoluteFieldPath,
-					(List) fieldForEachIndex );
+		if ( fieldForEachIndex.get( 0 ).isComposite() ) {
+			return new ElasticsearchMultiIndexSearchCompositeIndexSchemaElementContext( hibernateSearchIndexNames,
+					absoluteFieldPath, (List) fieldForEachIndex );
 		}
 		else {
 			return new ElasticsearchMultiIndexSearchValueFieldContext<>( hibernateSearchIndexNames, absoluteFieldPath,
