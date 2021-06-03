@@ -49,6 +49,7 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 	"                <param name=\"increment_size\">1</param>\n" +
 	"            </generator>\n" +
 	"        </id>\n" +
+	"		 <timestamp source=\"db\" name=\"moment\" />\n" +
 	"		 <property name=\"type\" >\n" +
 	" 			 <type name=\"org.hibernate.type.EnumType\">\n" +
 	" 				 <param name=\"enumClass\">" + OutboxEvent.Type.class.getName() + "</param>\n" +

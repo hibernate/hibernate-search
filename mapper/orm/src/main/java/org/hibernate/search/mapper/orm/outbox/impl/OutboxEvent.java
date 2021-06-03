@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.outbox.impl;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Objects;
 import javax.persistence.Transient;
@@ -18,6 +19,7 @@ public final class OutboxEvent {
 
 	private Long id;
 	private Type type;
+	private Instant moment;
 
 	private String entityName;
 	private String entityId;
@@ -62,6 +64,14 @@ public final class OutboxEvent {
 
 	public void setType(Type type) {
 		this.type = type;
+	}
+
+	public Instant getMoment() {
+		return moment;
+	}
+
+	public void setMoment(Instant moment) {
+		this.moment = moment;
 	}
 
 	public String getEntityName() {
@@ -133,6 +143,7 @@ public final class OutboxEvent {
 		return "OutboxEvent{" +
 				"id=" + id +
 				", type=" + type +
+				", moment=" + moment +
 				", entityName='" + entityName + '\'' +
 				", entityId='" + entityId + '\'' +
 				", retries=" + retries +
