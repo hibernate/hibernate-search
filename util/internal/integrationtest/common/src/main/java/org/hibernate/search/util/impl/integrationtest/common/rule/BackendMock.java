@@ -308,7 +308,8 @@ public class BackendMock implements TestRule {
 		DISCARD,
 		EXECUTE,
 		CREATE_AND_DISCARD,
-		CREATE_AND_EXECUTE;
+		CREATE_AND_EXECUTE,
+		CREATE_AND_EXECUTE_OUT_OF_ORDER;
 	}
 
 	public class DocumentWorkCallListContext {
@@ -354,6 +355,10 @@ public class BackendMock implements TestRule {
 
 		public DocumentWorkCallListContext createAndExecuteFollowingWorks(CompletableFuture<?> executionFuture) {
 			return newContext( DocumentWorkCallKind.CREATE_AND_EXECUTE, executionFuture );
+		}
+
+		public DocumentWorkCallListContext createAndExecuteFollowingWorksOutOfOrder() {
+			return newContext( DocumentWorkCallKind.CREATE_AND_EXECUTE_OUT_OF_ORDER );
 		}
 
 		public DocumentWorkCallListContext createAndDiscardFollowingWorks() {
@@ -433,6 +438,10 @@ public class BackendMock implements TestRule {
 					expect( new DocumentWorkCreateCall( indexName, work ) );
 					expect( new DocumentWorkExecuteCall( indexName, work, executionFuture ) );
 					break;
+				case CREATE_AND_EXECUTE_OUT_OF_ORDER:
+					expectOutOfOrder( new DocumentWorkCreateCall( indexName, work ) );
+					expectOutOfOrder( new DocumentWorkExecuteCall( indexName, work, executionFuture ) );
+					break;
 			}
 			return this;
 		}
@@ -440,6 +449,11 @@ public class BackendMock implements TestRule {
 		private void expect(DocumentWorkCreateCall call) {
 			log.debugf( "Expecting %s", call );
 			backendBehavior().getDocumentWorkCreateCalls( call.documentKey() ).expectInOrder( call );
+		}
+
+		private void expectOutOfOrder(DocumentWorkCreateCall call) {
+			log.debugf( "Expecting %s", call );
+			backendBehavior().getDocumentWorkCreateCalls( call.documentKey() ).expectOutOfOrder( call );
 		}
 
 		private void expect(DocumentWorkDiscardCall call) {
@@ -450,6 +464,11 @@ public class BackendMock implements TestRule {
 		private void expect(DocumentWorkExecuteCall call) {
 			log.debugf( "Expecting %s", call );
 			backendBehavior().getDocumentWorkExecuteCalls( call.documentKey() ).expectInOrder( call );
+		}
+
+		private void expectOutOfOrder(DocumentWorkExecuteCall call) {
+			log.debugf( "Expecting %s", call );
+			backendBehavior().getDocumentWorkExecuteCalls( call.documentKey() ).expectOutOfOrder( call );
 		}
 	}
 
