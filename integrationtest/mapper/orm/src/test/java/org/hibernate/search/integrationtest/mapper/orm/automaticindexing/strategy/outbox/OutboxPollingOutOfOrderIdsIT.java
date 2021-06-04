@@ -256,14 +256,19 @@ public class OutboxPollingOutOfOrderIdsIT {
 			entity.setText( "third" );
 		} );
 
+		// Both orders FIRST then SECOND and SECOND then FIRST are reasonable
 		backendMock.expectWorks( RoutedIndexedEntity.NAME )
 				.delete( b -> b.identifier( "1" ).routingKey( "FIRST" ) )
 				.delete( b -> b.identifier( "1" ).routingKey( "SECOND" ) )
+				.createdThenExecutedOutOfOrder();
+
+		backendMock.expectWorks( RoutedIndexedEntity.NAME )
 				.addOrUpdate( b -> b.identifier( "1" ).routingKey( "THIRD" )
 						.document( StubDocumentNode.document()
 								.field( "text", "third" )
 								.build() ) )
 				.createdThenExecuted();
+
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 	}
@@ -333,16 +338,19 @@ public class OutboxPollingOutOfOrderIdsIT {
 			);
 		} );
 
+		// Both orders FIRST then SECOND and SECOND then FIRST are reasonable
 		backendMock.expectWorks( RoutedIndexedEntity.NAME )
-				// Compared with the in-order test we have just this change SECOND <--> FIRST.
-				// That seems to be reasonable.
-				.delete( b -> b.identifier( "1" ).routingKey( "SECOND" ) )
 				.delete( b -> b.identifier( "1" ).routingKey( "FIRST" ) )
+				.delete( b -> b.identifier( "1" ).routingKey( "SECOND" ) )
+				.createdThenExecutedOutOfOrder();
+
+		backendMock.expectWorks( RoutedIndexedEntity.NAME )
 				.addOrUpdate( b -> b.identifier( "1" ).routingKey( "THIRD" )
 						.document( StubDocumentNode.document()
 								.field( "text", "third" )
 								.build() ) )
 				.createdThenExecuted();
+
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 	}

@@ -383,8 +383,26 @@ public class BackendMock implements TestRule {
 			return this;
 		}
 
+		public DocumentWorkCallListContext createdThenExecutedOutOfOrder(CompletableFuture<?> future) {
+			log.debugf( "Expecting %d works to be created, then executed", works.size() );
+			// First expect all works to be created, then expect all works to be executed
+			Stream.concat(
+					works.stream()
+							.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.CREATE, work ) ),
+					works.stream()
+							.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work, future ) )
+			)
+					.forEach( call -> expectOutOfOrder( call ) );
+			works.clear();
+			return this;
+		}
+
 		public DocumentWorkCallListContext createdThenExecuted() {
 			return createdThenExecuted( CompletableFuture.completedFuture( null ) );
+		}
+
+		public DocumentWorkCallListContext createdThenExecutedOutOfOrder() {
+			return createdThenExecutedOutOfOrder( CompletableFuture.completedFuture( null ) );
 		}
 
 		public DocumentWorkCallListContext created() {
@@ -418,6 +436,10 @@ public class BackendMock implements TestRule {
 
 		private void expect(DocumentWorkCall call) {
 			backendBehavior().getDocumentWorkCalls( call.documentKey() ).expectInOrder( call );
+		}
+
+		private void expectOutOfOrder(DocumentWorkCall call) {
+			backendBehavior().getDocumentWorkCalls( call.documentKey() ).expectOutOfOrder( call );
 		}
 	}
 
