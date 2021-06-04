@@ -90,13 +90,10 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 	}
 
 	@Override
-	public void run(StatelessSession upperSession) {
+	public void run(StatelessSession upperSession) throws InterruptedException {
 		log.trace( "started" );
 		try {
 			inTransactionWrapper( upperSession );
-		}
-		catch (RuntimeException exception) {
-			notifier.notifyRunnableFailure( exception, log.massIndexerFetchingIds( type.jpaEntityName() ) );
 		}
 		finally {
 			destination.producerStopping();
@@ -104,7 +101,12 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 		log.trace( "finished" );
 	}
 
-	private void inTransactionWrapper(StatelessSession upperSession) {
+	@Override
+	public String operationName() {
+		return log.massIndexerFetchingIds( type.jpaEntityName() );
+	}
+
+	private void inTransactionWrapper(StatelessSession upperSession) throws InterruptedException {
 		StatelessSession session = upperSession;
 		if ( upperSession == null ) {
 			if ( tenantId == null ) {
@@ -128,10 +130,6 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 					transaction.commit();
 				}
 			}
-		}
-		catch (InterruptedException e) {
-			// just quit
-			Thread.currentThread().interrupt();
 		}
 		finally {
 			if ( upperSession == null ) {

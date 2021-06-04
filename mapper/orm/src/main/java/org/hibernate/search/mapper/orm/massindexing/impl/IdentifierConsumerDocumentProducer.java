@@ -44,7 +44,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *
  * @author Sanne Grinovero
  */
-public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
+public class IdentifierConsumerDocumentProducer<E, I> extends FailureHandledRunnable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -72,6 +72,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			CacheMode cacheMode,
 			Integer transactionTimeout
 			) {
+		super( notifier );
 		this.mappingContext = mappingContext;
 		this.tenantId = tenantId;
 		this.notifier = notifier;
@@ -89,7 +90,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 	}
 
 	@Override
-	public void run() {
+	protected void runWithFailureHandler() throws InterruptedException {
 		log.trace( "started" );
 		try ( SessionImplementor session = (SessionImplementor) mappingContext.sessionFactory()
 				.withOptions()
@@ -100,33 +101,36 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			session.setDefaultReadOnly( true );
 			loadAndIndexAllFromQueue( session );
 		}
-		catch (RuntimeException exception) {
-			notifier.notifyRunnableFailure(
-					exception,
-					log.massIndexingLoadingAndExtractingEntityData( type.jpaEntityName() )
-			);
-		}
 		log.trace( "finished" );
 	}
 
-	private void loadAndIndexAllFromQueue(SessionImplementor session) {
+	@Override
+	protected void cleanUpOnFailure() {
+		// Nothing to do
+	}
+
+	@Override
+	protected void cleanUpOnInterruption() {
+		// Nothing to do
+	}
+
+	@Override
+	protected String operationName() {
+		return log.massIndexingLoadingAndExtractingEntityData( type.jpaEntityName() );
+	}
+
+	private void loadAndIndexAllFromQueue(SessionImplementor session) throws InterruptedException {
 		HibernateOrmScopeSessionContext sessionContext = mappingContext.sessionContext( session );
 		PojoIndexer indexer = sessionContext.createIndexer();
-		try {
-			List<I> idList;
-			do {
-				idList = source.take();
-				if ( idList != null ) {
-					log.tracef( "received list of ids %s", idList );
-					loadAndIndexList( idList, sessionContext, indexer );
-				}
+		List<I> idList;
+		do {
+			idList = source.take();
+			if ( idList != null ) {
+				log.tracef( "received list of ids %s", idList );
+				loadAndIndexList( idList, sessionContext, indexer );
 			}
-			while ( idList != null );
 		}
-		catch (InterruptedException e) {
-			// just quit
-			Thread.currentThread().interrupt();
-		}
+		while ( idList != null );
 	}
 
 	private void loadAndIndexList(List<I> listIds, HibernateOrmMassIndexingSessionContext sessionContext,

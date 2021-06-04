@@ -13,6 +13,8 @@ import org.hibernate.StatelessSession;
  */
 public interface StatelessSessionAwareRunnable {
 
-	void run(StatelessSession session);
+	void run(StatelessSession session) throws InterruptedException;
+
+	String operationName();
 
 }
