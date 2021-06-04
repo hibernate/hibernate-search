@@ -50,9 +50,10 @@ public class OutboxPollingAutomaticIndexingStrategyLifecycleIT {
 	public void stopWhileOutboxEventsIsBeingProcessed() {
 		SessionFactory sessionFactory = setup();
 		backendMock.verifyExpectationsMet();
+		int size = 1000;
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			for ( int i = 1; i <= 1000; i++ ) {
+			for ( int i = 1; i <= size; i++ ) {
 				IndexedEntity entity = new IndexedEntity();
 				entity.setId( i );
 				entity.setIndexedField( "value for the field" );
@@ -60,14 +61,19 @@ public class OutboxPollingAutomaticIndexingStrategyLifecycleIT {
 			}
 
 			BackendMock.DocumentWorkCallListContext context = backendMock.expectWorks( IndexedEntity.NAME );
-			for ( int i = 1; i <= 1000; i++ ) {
+			for ( int i = 1; i <= size; i++ ) {
 				context.add( i + "", b -> b.field( "indexedField", "value for the field" ) );
 			}
 		} );
 
 		// wait for the first call is processed (partial progressing)
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
-		backendMock.awaitFirstDocumentWorkCall();
+		SessionFactory finalSessionFactory = sessionFactory;
+		backendMock.indexingWorkThreadingExpectations().awaitIndexingAssertions( () -> {
+			OrmUtils.withinTransaction( finalSessionFactory, session -> {
+				assertThat( outboxEventFinder.findOutboxEventIdsNoFilter( session ) ).hasSizeLessThan( size );
+			} );
+		} );
 
 		// stop Search on partial progressing
 		sessionFactory.close();
@@ -76,7 +82,10 @@ public class OutboxPollingAutomaticIndexingStrategyLifecycleIT {
 		outboxEventFinder.hideAllEvents();
 		sessionFactory = setup();
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			assertThat( outboxEventFinder.findOutboxEventsNoFilter( session ) ).isNotEmpty();
+			List<OutboxEvent> outboxEventsNoFilter = outboxEventFinder.findOutboxEventsNoFilter( session );
+			// partial processing, meaning that the events size is *strictly* between 0 and the full size:
+			assertThat( outboxEventsNoFilter ).isNotEmpty();
+			assertThat( outboxEventsNoFilter ).hasSizeLessThan( size );
 		} );
 		sessionFactory.close();
 
