@@ -16,7 +16,9 @@ import java.util.function.Consumer;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import org.hibernate.BaseSessionEventListener;
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.cfg.EngineSettings;
@@ -35,6 +37,8 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,6 +63,65 @@ public abstract class AbstractMassIndexingErrorIT {
 
 	@Rule
 	public ThreadSpy threadSpy = new ThreadSpy();
+
+	@Test
+	@TestForIssue(jiraKey = {"HSEARCH-4218", "HSEARCH-4236"})
+	public void identifierLoading() {
+		SessionFactory sessionFactory = setup( builder ->
+				builder.setProperty(
+						AvailableSettings.AUTO_SESSION_EVENTS_LISTENER,
+						JdbcStatementErrorOnIdLoadingThreadListener.class.getName()
+				)
+		);
+
+		String errorMessage = JdbcStatementErrorOnIdLoadingThreadListener.MESSAGE;
+
+		doMassIndexingWithError(
+				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
+				ThreadExpectation.CREATED_AND_TERMINATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
+						.hasMessageContainingAll( errorMessage ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED )
+		);
+
+		assertNoFailureHandling();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4236")
+	public void entityLoading() {
+		SessionFactory sessionFactory = setup( builder ->
+				builder.setProperty(
+						AvailableSettings.AUTO_SESSION_EVENTS_LISTENER,
+						JdbcStatementErrorOnEntityLoadingThreadListener.class.getName()
+				)
+		);
+
+		// We need more than 1000 batches in order to reproduce HSEARCH-4236.
+		// That's because of the size of the queue:
+		// see org.hibernate.search.mapper.orm.massindexing.impl.ProducerConsumerQueue.DEFAULT_BUFF_LENGTH
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			for ( int i = 4; i < 1500; i++ ) {
+				session.persist( new Book( i, "title " + i, "author " + i ) );
+			}
+		} );
+
+		String errorMessage = JdbcStatementErrorOnEntityLoadingThreadListener.MESSAGE;
+
+		doMassIndexingWithError(
+				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer()
+						.threadsToLoadObjects( 1 ) // Just to simplify the assertions
+						.batchSizeToLoadObjects( 1 ), // We need more than 1000 batches in order to reproduce HSEARCH-4236
+				ThreadExpectation.CREATED_AND_TERMINATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SimulatedError.class )
+						.hasMessageContainingAll( errorMessage ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED )
+		);
+
+		assertNoFailureHandling();
+	}
 
 	@Test
 	public void indexing() {
@@ -435,6 +498,10 @@ public abstract class AbstractMassIndexingErrorIT {
 	}
 
 	private SessionFactory setup() {
+		return setup( ignored -> { } );
+	}
+
+	private SessionFactory setup(Consumer<SimpleSessionFactoryBuilder> configuration) {
 		assertBeforeSetup();
 
 		backendMock.expectAnySchema( Book.NAME );
@@ -443,6 +510,7 @@ public abstract class AbstractMassIndexingErrorIT {
 				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY, AutomaticIndexingStrategyName.NONE )
 				.withPropertyRadical( EngineSettings.Radicals.BACKGROUND_FAILURE_HANDLER, getBackgroundFailureHandlerReference() )
 				.withPropertyRadical( EngineSpiSettings.Radicals.THREAD_PROVIDER, threadSpy.getThreadProvider() )
+				.withConfiguration( configuration )
 				.setup( Book.class );
 
 		backendMock.verifyExpectationsMet();
@@ -530,6 +598,28 @@ public abstract class AbstractMassIndexingErrorIT {
 	protected static class SimulatedError extends Error {
 		SimulatedError(String message) {
 			super( message );
+		}
+	}
+
+	public static class JdbcStatementErrorOnIdLoadingThreadListener extends BaseSessionEventListener {
+		private static final String MESSAGE = "Simulated JDBC statement error on ID loading";
+
+		@Override
+		public void jdbcExecuteStatementStart() {
+			if ( Thread.currentThread().getName().contains( "- ID loading" ) ) {
+				throw new SimulatedError( MESSAGE );
+			}
+		}
+	}
+
+	public static class JdbcStatementErrorOnEntityLoadingThreadListener extends BaseSessionEventListener {
+		private static final String MESSAGE = "Simulated JDBC statement error on entity loading";
+
+		@Override
+		public void jdbcExecuteStatementStart() {
+			if ( Thread.currentThread().getName().contains( "- Entity loading" ) ) {
+				throw new SimulatedError( MESSAGE );
+			}
 		}
 	}
 }
