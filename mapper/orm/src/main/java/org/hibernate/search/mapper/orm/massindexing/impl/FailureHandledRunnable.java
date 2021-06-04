@@ -28,10 +28,23 @@ abstract class FailureHandledRunnable implements Runnable {
 	@Override
 	public final void run() {
 		boolean interrupted = false;
-		boolean successful = false;
 		try {
 			runWithFailureHandler();
-			successful = true;
+		}
+		catch (MassIndexingOperationHandledFailureException e) {
+			// This exception has already been reported; just clean up then propagate it.
+			try {
+				cleanUpOnFailure();
+			}
+			catch (RuntimeException e2) {
+				e.addSuppressed( e2 );
+			}
+			catch (InterruptedException e2) {
+				interrupted = true;
+				e.addSuppressed( e2 );
+			}
+
+			throw e;
 		}
 		catch (InterruptedException e) {
 			interrupted = true;
@@ -61,7 +74,7 @@ abstract class FailureHandledRunnable implements Runnable {
 			notifyFailure( e );
 
 			// Also propagate the exception
-			throw e;
+			throw new MassIndexingOperationHandledFailureException( e );
 		}
 		catch (Error e) {
 			try {
@@ -78,7 +91,15 @@ abstract class FailureHandledRunnable implements Runnable {
 				e.addSuppressed( e2 );
 			}
 
-			// Just propagate the error
+			try {
+				notifyError( e );
+			}
+			// We always want to throw the original error, even of something was thrown in the try block.
+			catch (RuntimeException | Error e2) {
+				e.addSuppressed( e2 );
+			}
+
+			// Also propagate the error
 			throw e;
 		}
 		finally {
@@ -88,7 +109,7 @@ abstract class FailureHandledRunnable implements Runnable {
 			}
 		}
 
-		if ( successful ) {
+		if ( !interrupted ) {
 			// This may throw an exception, and we're fine with not catching it.
 			notifySuccess();
 		}
@@ -108,18 +129,24 @@ abstract class FailureHandledRunnable implements Runnable {
 		// Do nothing by default
 	}
 
+	protected void notifyError(Error error) {
+		notifier.notifyError( error );
+	}
+
 	protected void notifyInterrupted(InterruptedException exception) {
-		notifier.notifyRunnableFailure(
-				log.massIndexingThreadInterrupted( exception ),
-				log.massIndexerOperation()
-		);
+		// By default, just report the interruption to the coordinator...
+		notifier.notifyInterrupted( exception );
+		/// ... and to the caller.
+		throw new MassIndexingOperationHandledFailureException( exception );
+		// run() will reset the interrupt flag on this thread, so we don't need to do it here.
 	}
 
 	protected void notifyFailure(RuntimeException exception) {
-		notifier.notifyRunnableFailure(
-				exception,
-				log.massIndexerOperation()
-		);
+		notifier.notifyRunnableFailure( exception, operationName() );
+	}
+
+	protected String operationName() {
+		return log.massIndexerOperation();
 	}
 
 }

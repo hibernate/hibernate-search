@@ -218,9 +218,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 25, value = "Unable to handle transaction: %1$s")
 	SearchException massIndexingTransactionHandlingException(String causeMessage, @Cause Throwable cause);
 
-	@Message(id = ID_OFFSET + 26, value = "%1$s entities could not be indexed. See the logs for details."
+	@Message(id = ID_OFFSET + 26, value = "%1$s failure(s) occurred during mass indexing. See the logs for details."
 			+ " First failure on entity '%2$s': %3$s")
-	SearchException massIndexingEntityFailures(long finalFailureCount,
+	SearchException massIndexingFirstFailureOnEntity(long finalFailureCount,
 			EntityReference firstFailureEntity, String firstFailureMessage,
 			@Cause Throwable firstFailure);
 
@@ -296,4 +296,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 41, value = "No such bean in bean container '%1$s'.")
 	BeanNotFoundException beanNotFoundInBeanContainer(BeanContainer beanContainer);
+
+	@Message(id = ID_OFFSET + 42, value = "%1$s failure(s) occurred during mass indexing. See the logs for details."
+			+ " First failure: %2$s")
+	SearchException massIndexingFirstFailure(long finalFailureCount, String firstFailureMessage,
+			@Cause Throwable firstFailure);
 }

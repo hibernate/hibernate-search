@@ -156,15 +156,23 @@ public class MassIndexerImpl implements MassIndexer {
 		finally {
 			executor.shutdown();
 		}
-
 	}
 
 	@Override
 	public void startAndWait() throws InterruptedException {
 		BatchCoordinator coordinator = createCoordinator();
-		coordinator.run();
-		if ( Thread.interrupted() ) {
-			throw new InterruptedException();
+		try {
+			coordinator.run();
+		}
+		catch (Throwable t) {
+			if ( Thread.interrupted() ) {
+				InterruptedException exception = new InterruptedException();
+				exception.addSuppressed( t );
+				throw exception;
+			}
+			else {
+				throw t;
+			}
 		}
 	}
 

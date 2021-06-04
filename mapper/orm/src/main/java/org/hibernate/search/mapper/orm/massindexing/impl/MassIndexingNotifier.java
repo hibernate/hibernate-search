@@ -18,7 +18,6 @@ import org.hibernate.search.mapper.orm.massindexing.MassIndexingEntityFailureCon
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureContext;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingMonitor;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class MassIndexingNotifier {
@@ -28,9 +27,9 @@ class MassIndexingNotifier {
 	private final MassIndexingFailureHandler failureHandler;
 	private final MassIndexingMonitor monitor;
 
-	private final AtomicReference<RecordedEntityIndexingFailure> entityIndexingFirstFailure =
+	private final AtomicReference<RecordedFailure> firstFailure =
 			new AtomicReference<>( null );
-	private final LongAdder entityIndexingFailureCount = new LongAdder();
+	private final LongAdder failureCount = new LongAdder();
 
 	MassIndexingNotifier(MassIndexingFailureHandler failureHandler, MassIndexingMonitor monitor) {
 		this.failureHandler = failureHandler;
@@ -41,7 +40,27 @@ class MassIndexingNotifier {
 		monitor.addToTotalCount( totalCount );
 	}
 
+	void notifyError(Error error) {
+		// Don't report the error anywhere: an Error is serious enough that we want to report it directly by bubbling up.
+		// We're just recording that the first failure was an error so that later interruptions
+		// don't trigger logging.
+		RecordedFailure recordedFailure = new RecordedFailure( error );
+		firstFailure.compareAndSet( null, recordedFailure );
+	}
+
+	void notifyInterrupted(InterruptedException exception) {
+		RecordedFailure recordedFailure = new RecordedFailure( exception );
+		boolean isFirst = firstFailure.compareAndSet( null, recordedFailure );
+		if ( isFirst ) {
+			// Only log this once, and only if the interruption was the original failure.
+			log.interruptedBatchIndexing();
+		}
+		// else: don't report the interruption, as it was most likely caused by a previous failure
+	}
+
 	void notifyRunnableFailure(Exception exception, String operation) {
+		recordFailure( exception, true );
+
 		MassIndexingFailureContext.Builder contextBuilder = MassIndexingFailureContext.builder();
 		contextBuilder.throwable( exception );
 		contextBuilder.failingOperation( operation );
@@ -62,9 +81,8 @@ class MassIndexingNotifier {
 
 	<T> void notifyEntityIndexingFailure(HibernateOrmMassIndexingIndexedTypeContext<T> type,
 			HibernateOrmMassIndexingSessionContext sessionContext, T entity, Exception exception) {
-		RecordedEntityIndexingFailure recordedFailure = new RecordedEntityIndexingFailure( exception );
-		entityIndexingFirstFailure.compareAndSet( null, recordedFailure );
-		entityIndexingFailureCount.increment();
+		// Don't record these failures as suppressed beyond the first one, because there may be hundreds of them.
+		RecordedFailure recordedFailure = recordFailure( exception, false );
 
 		MassIndexingEntityFailureContext.Builder contextBuilder = MassIndexingEntityFailureContext.builder();
 		contextBuilder.throwable( exception );
@@ -80,45 +98,42 @@ class MassIndexingNotifier {
 		failureHandler.handle( contextBuilder.build() );
 	}
 
-	void notifyIndexingCompletedSuccessfully() {
+	void notifyIndexingCompleted() {
 		monitor.indexingCompleted();
 
-		SearchException entityIndexingException = createEntityIndexingExceptionOrNull();
-		if ( entityIndexingException != null ) {
-			throw entityIndexingException;
-		}
-	}
-
-	void notifyIndexingCompletedWithInterruption() {
-		log.interruptedBatchIndexing();
-		notifyIndexingCompletedSuccessfully();
-	}
-
-	void notifyIndexingCompletedWithFailure(Throwable throwable) {
-		// TODO HSEARCH-3729 Call a different method when indexing failed?
-		monitor.indexingCompleted();
-
-		SearchException entityIndexingException = createEntityIndexingExceptionOrNull();
-		if ( entityIndexingException != null ) {
-			throwable.addSuppressed( entityIndexingException );
-		}
-
-		MassIndexingFailureContext.Builder contextBuilder = MassIndexingFailureContext.builder();
-		contextBuilder.throwable( throwable );
-		contextBuilder.failingOperation( log.massIndexerOperation() );
-		failureHandler.handle( contextBuilder.build() );
-	}
-
-	private SearchException createEntityIndexingExceptionOrNull() {
-		RecordedEntityIndexingFailure firstFailure = entityIndexingFirstFailure.get();
+		RecordedFailure firstFailure = this.firstFailure.get();
 		if ( firstFailure == null ) {
-			return null;
+			return;
 		}
-		return log.massIndexingEntityFailures(
-				entityIndexingFailureCount.longValue(),
-				firstFailure.entityReference,
-				firstFailure.throwable.getMessage(), firstFailure.throwable
-		);
+
+		if ( firstFailure.throwable instanceof InterruptedException ) {
+			throw log.massIndexingThreadInterrupted(
+					(InterruptedException) firstFailure.throwable
+			);
+		}
+		else if ( firstFailure.entityReference != null ) {
+			throw log.massIndexingFirstFailureOnEntity(
+					failureCount.longValue(),
+					firstFailure.entityReference,
+					firstFailure.throwable.getMessage(), firstFailure.throwable
+			);
+		}
+		else {
+			throw log.massIndexingFirstFailure(
+					failureCount.longValue(),
+					firstFailure.throwable.getMessage(), firstFailure.throwable
+			);
+		}
+	}
+
+	private RecordedFailure recordFailure(Exception exception, boolean recordSuppressed) {
+		RecordedFailure recordedFailure = new RecordedFailure( exception );
+		boolean isFirst = firstFailure.compareAndSet( null, recordedFailure );
+		failureCount.increment();
+		if ( !isFirst && recordSuppressed ) {
+			firstFailure.get().throwable.addSuppressed( exception );
+		}
+		return recordedFailure;
 	}
 
 	private <T> EntityReference extractReferenceOrSuppress(HibernateOrmMassIndexingIndexedTypeContext<T> type,
@@ -137,11 +152,11 @@ class MassIndexingNotifier {
 		}
 	}
 
-	private static class RecordedEntityIndexingFailure {
-		private Throwable throwable;
-		private EntityReference entityReference;
+	private static class RecordedFailure {
+		private final Throwable throwable;
+		private volatile EntityReference entityReference;
 
-		RecordedEntityIndexingFailure(Throwable throwable) {
+		RecordedFailure(Throwable throwable) {
 			this.throwable = throwable;
 		}
 	}
