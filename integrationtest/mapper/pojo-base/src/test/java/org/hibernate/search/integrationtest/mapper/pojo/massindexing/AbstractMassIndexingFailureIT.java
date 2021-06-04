@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Fail.fail;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -44,6 +45,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.ThreadSpy;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -73,6 +75,7 @@ public abstract class AbstractMassIndexingFailureIT {
 	private final StubLoadingContext loadingContext = new StubLoadingContext();
 
 	@Test
+	@TestForIssue(jiraKey = {"HSEARCH-4218", "HSEARCH-4236"})
 	public void identifierLoading() {
 		String exceptionMessage = "ID loading error";
 
@@ -101,6 +104,43 @@ public abstract class AbstractMassIndexingFailureIT {
 		assertMassIndexerOperationFailureHandling(
 				SimulatedFailure.class, exceptionMessage,
 				"Fetching identifiers of entities to index for entity '" + Book.NAME + "' during mass indexing"
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4236")
+	public void entityLoading() {
+		String exceptionMessage = "Entity loading error";
+
+		SearchMapping mapping = setupWithThrowingEntityLoading( exceptionMessage );
+		String failingOperationAsString = "Loading and extracting entity data for entity '"
+				+ Book.NAME + "' during mass indexing";
+
+		expectMassIndexerOperationFailureHandling(
+				SimulatedFailure.class, exceptionMessage,
+				failingOperationAsString
+		);
+
+		doMassIndexingWithFailure(
+				mapping.scope( Object.class ).massIndexer()
+						.threadsToLoadObjects( 1 ) // Just to simplify the assertions
+						.batchSizeToLoadObjects( 1 ), // We need more than 1000 batches in order to reproduce HSEARCH-4236
+				ThreadExpectation.CREATED_AND_TERMINATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
+						.hasMessageContainingAll(
+								"1 failure(s) occurred during mass indexing",
+								"See the logs for details.",
+								"First failure: ",
+								exceptionMessage
+						)
+						.hasCauseInstanceOf( SimulatedFailure.class ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED )
+		);
+
+		assertMassIndexerOperationFailureHandling(
+				SimulatedFailure.class, exceptionMessage,
+				failingOperationAsString
 		);
 	}
 
@@ -743,6 +783,55 @@ public abstract class AbstractMassIndexingFailureIT {
 					@Override
 					public void load(List<Integer> identifiers) {
 						throw new UnsupportedOperationException( "Should not be called" );
+					}
+				};
+			}
+		} );
+	}
+
+	private SearchMapping setupWithThrowingEntityLoading(String exceptionMessage) {
+		return setup( new MassLoadingStrategy<Book, Integer>() {
+			@Override
+			public MassIdentifierLoader createIdentifierLoader(LoadingTypeGroup<Book> includedTypes,
+					MassIdentifierSink<Integer> sink, MassLoadingOptions options) {
+				return new MassIdentifierLoader() {
+					private int i = 0;
+
+					@Override
+					public void close() {
+						// Nothing to do
+					}
+
+					@Override
+					public long totalCount() {
+						// We need more than 1000 batches in order to reproduce HSEARCH-4236.
+						// That's because of the size of the queue:
+						// see org.hibernate.search.mapper.orm.massindexing.impl.PojoProducerConsumerQueue.DEFAULT_BUFF_LENGTH
+						return 1500;
+					}
+
+					@Override
+					public void loadNext() throws InterruptedException {
+						sink.accept( Collections.singletonList( i++ ) );
+						if ( i >= totalCount() ) {
+							sink.complete();
+						}
+					}
+				};
+			}
+
+			@Override
+			public MassEntityLoader<Integer> createEntityLoader(LoadingTypeGroup<Book> includedTypes,
+					MassEntitySink<Book> sink, MassLoadingOptions options) {
+				return new MassEntityLoader<Integer>() {
+					@Override
+					public void close() {
+						// Nothing to do
+					}
+
+					@Override
+					public void load(List<Integer> identifiers) {
+						throw new SimulatedFailure( exceptionMessage );
 					}
 				};
 			}

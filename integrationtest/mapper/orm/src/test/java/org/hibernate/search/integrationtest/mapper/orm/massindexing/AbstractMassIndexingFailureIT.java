@@ -16,7 +16,9 @@ import java.util.function.Consumer;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import org.hibernate.BaseSessionEventListener;
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.cfg.EngineSettings;
@@ -37,6 +39,8 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,6 +65,83 @@ public abstract class AbstractMassIndexingFailureIT {
 
 	@Rule
 	public ThreadSpy threadSpy = new ThreadSpy();
+
+	@Test
+	@TestForIssue(jiraKey = {"HSEARCH-4218", "HSEARCH-4236"})
+	public void identifierLoading() {
+		SessionFactory sessionFactory = setup( builder ->
+				builder.setProperty(
+						AvailableSettings.AUTO_SESSION_EVENTS_LISTENER,
+						JdbcStatementFailureOnIdLoadingThreadListener.class.getName()
+				)
+		);
+
+		String exceptionMessage = JdbcStatementFailureOnIdLoadingThreadListener.MESSAGE;
+		String failingOperationAsString = "Fetching identifiers of entities to index for entity '"
+				+ Book.NAME + "' during mass indexing";
+
+		expectMassIndexerOperationFailureHandling( SimulatedFailure.class, exceptionMessage, failingOperationAsString );
+
+		doMassIndexingWithFailure(
+				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
+				ThreadExpectation.CREATED_AND_TERMINATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
+						.hasMessageContainingAll(
+								"1 failure(s) occurred during mass indexing",
+								"See the logs for details.",
+								exceptionMessage
+						)
+						.hasCauseInstanceOf( SimulatedFailure.class ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED )
+		);
+
+		assertMassIndexerOperationFailureHandling( SimulatedFailure.class, exceptionMessage, failingOperationAsString );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4236")
+	public void entityLoading() {
+		SessionFactory sessionFactory = setup( builder ->
+				builder.setProperty(
+						AvailableSettings.AUTO_SESSION_EVENTS_LISTENER,
+						JdbcStatementFailureOnEntityLoadingThreadListener.class.getName()
+				)
+		);
+
+		// We need more than 1000 batches in order to reproduce HSEARCH-4236.
+		// That's because of the size of the queue:
+		// see org.hibernate.search.mapper.orm.massindexing.impl.PojoProducerConsumerQueue.DEFAULT_BUFF_LENGTH
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			for ( int i = 4; i < 1500; i++ ) {
+				session.persist( new Book( i, "title " + i, "author " + i ) );
+			}
+		} );
+
+		String exceptionMessage = JdbcStatementFailureOnEntityLoadingThreadListener.MESSAGE;
+		String failingOperationAsString = "Loading and extracting entity data for entity '"
+				+ Book.NAME + "' during mass indexing";
+
+		expectMassIndexerOperationFailureHandling( SimulatedFailure.class, exceptionMessage, failingOperationAsString );
+
+		doMassIndexingWithFailure(
+				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer()
+						.threadsToLoadObjects( 1 ) // Just to simplify the assertions
+						.batchSizeToLoadObjects( 1 ), // We need more than 1000 batches in order to reproduce HSEARCH-4236
+				ThreadExpectation.CREATED_AND_TERMINATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
+						.hasMessageContainingAll(
+								"1 failure(s) occurred during mass indexing",
+								"See the logs for details.",
+								exceptionMessage
+						)
+						.hasCauseInstanceOf( SimulatedFailure.class ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED )
+		);
+
+		assertMassIndexerOperationFailureHandling( SimulatedFailure.class, exceptionMessage, failingOperationAsString );
+	}
 
 	@Test
 	public void indexing() {
@@ -663,6 +744,10 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	private SessionFactory setup() {
+		return setup( ignored -> { } );
+	}
+
+	private SessionFactory setup(Consumer<SimpleSessionFactoryBuilder> configuration) {
 		assertBeforeSetup();
 
 		backendMock.expectAnySchema( Book.NAME );
@@ -671,6 +756,7 @@ public abstract class AbstractMassIndexingFailureIT {
 				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY, AutomaticIndexingStrategyNames.NONE )
 				.withPropertyRadical( EngineSettings.Radicals.BACKGROUND_FAILURE_HANDLER, getBackgroundFailureHandlerReference() )
 				.withPropertyRadical( EngineSpiSettings.Radicals.THREAD_PROVIDER, threadSpy.getThreadProvider() )
+				.withConfiguration( configuration )
 				.setup( Book.class );
 
 		backendMock.verifyExpectationsMet();
@@ -758,6 +844,28 @@ public abstract class AbstractMassIndexingFailureIT {
 	protected static class SimulatedFailure extends RuntimeException {
 		SimulatedFailure(String message) {
 			super( message );
+		}
+	}
+
+	public static class JdbcStatementFailureOnIdLoadingThreadListener extends BaseSessionEventListener {
+		private static final String MESSAGE = "Simulated JDBC statement failure on ID loading";
+
+		@Override
+		public void jdbcExecuteStatementStart() {
+			if ( Thread.currentThread().getName().contains( "- ID loading" ) ) {
+				throw new SimulatedFailure( MESSAGE );
+			}
+		}
+	}
+
+	public static class JdbcStatementFailureOnEntityLoadingThreadListener extends BaseSessionEventListener {
+		private static final String MESSAGE = "Simulated JDBC statement failure on entity loading";
+
+		@Override
+		public void jdbcExecuteStatementStart() {
+			if ( Thread.currentThread().getName().contains( "- Entity loading" ) ) {
+				throw new SimulatedFailure( MESSAGE );
+			}
 		}
 	}
 }
