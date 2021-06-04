@@ -77,6 +77,13 @@ class FilteringOutboxEventFinder implements OutboxEventFinder {
 		return query.list();
 	}
 
+	public List<OutboxEvent> findOutboxEventsNoFilterById(Session session) {
+		checkFiltering();
+		Query<OutboxEvent> query = session.createQuery(
+				"select e from OutboxEvent e order by e.id", OutboxEvent.class );
+		return query.list();
+	}
+
 	public List<Long> findOutboxEventIdsNoFilter(Session session) {
 		checkFiltering();
 		Query<Long> query = session.createQuery(
