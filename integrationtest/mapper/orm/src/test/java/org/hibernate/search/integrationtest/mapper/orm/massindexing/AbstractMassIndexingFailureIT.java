@@ -81,7 +81,7 @@ public abstract class AbstractMassIndexingFailureIT {
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
 						.hasMessageContainingAll(
-								"1 entities could not be indexed",
+								"1 failure(s) occurred during mass indexing",
 								"See the logs for details.",
 								"First failure on entity 'Book#2': ",
 								exceptionMessage
@@ -119,7 +119,7 @@ public abstract class AbstractMassIndexingFailureIT {
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
 						.hasMessageContainingAll(
-								"1 entities could not be indexed",
+								"1 failure(s) occurred during mass indexing",
 								"See the logs for details.",
 								"First failure on entity 'Book#2': ",
 								"Exception while invoking"
@@ -160,7 +160,7 @@ public abstract class AbstractMassIndexingFailureIT {
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
 						.hasMessageContainingAll(
-								"1 entities could not be indexed",
+								"1 failure(s) occurred during mass indexing",
 								"See the logs for details.",
 								"First failure on entity 'Book#2': ",
 								"Exception while invoking"
@@ -217,8 +217,14 @@ public abstract class AbstractMassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.NOT_CREATED,
-				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
-						.hasMessageContaining( exceptionMessage ),
+				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
+						.hasMessageContainingAll(
+								"1 failure(s) occurred during mass indexing",
+								"See the logs for details.",
+								"First failure: ",
+								exceptionMessage
+						)
+						.hasCauseInstanceOf( SimulatedFailure.class ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.FAIL )
 		);
 
@@ -237,8 +243,14 @@ public abstract class AbstractMassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.NOT_CREATED,
-				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
-						.hasMessageContaining( exceptionMessage ),
+				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
+						.hasMessageContainingAll(
+								"1 failure(s) occurred during mass indexing",
+								"See the logs for details.",
+								"First failure: ",
+								exceptionMessage
+						)
+						.hasCauseInstanceOf( SimulatedFailure.class ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.FAIL )
 		);
@@ -259,8 +271,14 @@ public abstract class AbstractMassIndexingFailureIT {
 				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer()
 						.mergeSegmentsOnFinish( true ),
 				ThreadExpectation.CREATED_AND_TERMINATED,
-				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
-						.hasMessageContaining( exceptionMessage ),
+				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
+						.hasMessageContainingAll(
+								"1 failure(s) occurred during mass indexing",
+								"See the logs for details.",
+								"First failure: ",
+								exceptionMessage
+						)
+						.hasCauseInstanceOf( SimulatedFailure.class ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
@@ -282,8 +300,14 @@ public abstract class AbstractMassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
-				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
-						.hasMessageContaining( exceptionMessage ),
+				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
+						.hasMessageContainingAll(
+								"1 failure(s) occurred during mass indexing",
+								"See the logs for details.",
+								"First failure: ",
+								exceptionMessage
+						)
+						.hasCauseInstanceOf( SimulatedFailure.class ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
@@ -305,8 +329,14 @@ public abstract class AbstractMassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
-				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
-						.hasMessageContaining( exceptionMessage ),
+				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
+						.hasMessageContainingAll(
+								"1 failure(s) occurred during mass indexing",
+								"See the logs for details.",
+								"First failure: ",
+								exceptionMessage
+						)
+						.hasCauseInstanceOf( SimulatedFailure.class ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
@@ -337,19 +367,20 @@ public abstract class AbstractMassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
-				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
-						.hasMessageContaining( failingMassIndexerOperationExceptionMessage )
-						// Indexing failure should also be mentioned as a suppressed exception
+				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
+						.hasMessageContainingAll(
+								"2 failure(s) occurred during mass indexing",
+								"See the logs for details.",
+								"First failure on entity 'Book#2': ",
+								failingEntityIndexingExceptionMessage
+						)
+						.hasCauseInstanceOf( SimulatedFailure.class )
+						// The mass indexer operation failure should also be mentioned as a suppressed exception
+						.extracting( Throwable::getCause )
 						.extracting( Throwable::getSuppressed ).asInstanceOf( InstanceOfAssertFactories.ARRAY )
 						.anySatisfy( suppressed -> assertThat( suppressed ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
-								.isInstanceOf( SearchException.class )
-								.hasMessageContainingAll(
-										"1 entities could not be indexed",
-										"See the logs for details.",
-										"First failure on entity 'Book#2': ",
-										failingEntityIndexingExceptionMessage
-								)
-								.hasCauseInstanceOf( SimulatedFailure.class )
+								.isInstanceOf( SimulatedFailure.class )
+								.hasMessageContaining( failingMassIndexerOperationExceptionMessage )
 						),
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
@@ -384,19 +415,20 @@ public abstract class AbstractMassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
-				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
-						.hasMessageContaining( failingMassIndexerOperationExceptionMessage )
-						// Indexing failure should also be mentioned as a suppressed exception
+				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
+						.hasMessageContainingAll(
+								"2 failure(s) occurred during mass indexing",
+								"See the logs for details.",
+								"First failure on entity 'Book#2': ",
+								failingEntityIndexingExceptionMessage
+						)
+						.hasCauseInstanceOf( SimulatedFailure.class )
+						// The mass indexer operation failure should also be mentioned as a suppressed exception
+						.extracting( Throwable::getCause )
 						.extracting( Throwable::getSuppressed ).asInstanceOf( InstanceOfAssertFactories.ARRAY )
 						.anySatisfy( suppressed -> assertThat( suppressed ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
-								.isInstanceOf( SearchException.class )
-								.hasMessageContainingAll(
-										"1 entities could not be indexed",
-										"See the logs for details.",
-										"First failure on entity 'Book#2': ",
-										failingEntityIndexingExceptionMessage
-								)
-								.hasCauseInstanceOf( SimulatedFailure.class )
+								.isInstanceOf( SimulatedFailure.class )
+								.hasMessageContaining( failingMassIndexerOperationExceptionMessage )
 						),
 				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
