@@ -56,7 +56,7 @@ public class OptionallyWrapInJTATransaction extends FailureHandledRunnable {
 	}
 
 	@Override
-	public void runWithFailureHandler() {
+	public void runWithFailureHandler() throws InterruptedException {
 		if ( wrapInTransaction ) {
 			try ( StatelessSession statelessSession = batchContext.factory.withStatelessOptions()
 					.tenantIdentifier( tenantId )
@@ -87,6 +87,11 @@ public class OptionallyWrapInJTATransaction extends FailureHandledRunnable {
 	@Override
 	protected void cleanUpOnFailure() {
 		rollback();
+	}
+
+	@Override
+	protected String operationName() {
+		return statelessSessionAwareRunnable.operationName();
 	}
 
 	private void rollback() {
