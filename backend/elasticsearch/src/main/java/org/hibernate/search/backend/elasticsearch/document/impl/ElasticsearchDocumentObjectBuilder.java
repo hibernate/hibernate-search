@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.gson.impl.GsonUtils;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
@@ -26,7 +26,6 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusio
 import org.hibernate.search.engine.backend.document.spi.NoOpDocumentElement;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 
@@ -133,13 +132,13 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 			return;
 		}
 
-		JsonAccessor<JsonElement> accessor = node.relativeAccessor();
 		ElasticsearchIndexValueFieldType<F> type = node.type();
 
-		if ( !node.multiValued() && accessor.hasExplicitValue( content ) ) {
+		String jsonPropertyName = node.relativeName();
+		if ( !node.multiValued() && content.has( jsonPropertyName ) ) {
 			throw log.multipleValuesForSingleValuedField( node.absolutePath() );
 		}
-		accessor.add( content, type.codec().encode( value ) );
+		GsonUtils.setOrAppendToArray( content, jsonPropertyName, type.codec().encode( value ) );
 	}
 
 	@SuppressWarnings("unchecked") // We check types explicitly using reflection
@@ -163,12 +162,11 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 			return NoOpDocumentElement.get();
 		}
 
-		JsonAccessor<JsonElement> accessor = node.relativeAccessor();
-
-		if ( !node.multiValued() && accessor.hasExplicitValue( content ) ) {
+		String jsonPropertyName = node.relativeName();
+		if ( !node.multiValued() && content.has( jsonPropertyName ) ) {
 			throw log.multipleValuesForSingleValuedField( node.absolutePath() );
 		}
-		accessor.add( content, value );
+		GsonUtils.setOrAppendToArray( content, jsonPropertyName, value );
 
 		if ( value == null ) {
 			return NoOpDocumentElement.get(); // Will not be used

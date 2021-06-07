@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.hibernate.search.backend.elasticsearch.gson.impl.GsonUtils;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
@@ -27,10 +28,10 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final JsonAccessor<JsonObject> MUST_ACCESSOR = JsonAccessor.root().property( "must" ).asObject();
-	private static final JsonAccessor<JsonObject> MUST_NOT_ACCESSOR = JsonAccessor.root().property( "must_not" ).asObject();
-	private static final JsonAccessor<JsonObject> SHOULD_ACCESSOR = JsonAccessor.root().property( "should" ).asObject();
-	private static final JsonAccessor<JsonObject> FILTER_ACCESSOR = JsonAccessor.root().property( "filter" ).asObject();
+	private static final String MUST_PROPERTY_NAME = "must";
+	private static final String MUST_NOT_PROPERTY_NAME = "must_not";
+	private static final String SHOULD_PROPERTY_NAME = "should";
+	private static final String FILTER_PROPERTY_NAME = "filter";
 
 	private static final JsonAccessor<String> MINIMUM_SHOULD_MATCH_ACCESSOR =
 			JsonAccessor.root().property( "minimum_should_match" ).asString();
@@ -68,10 +69,10 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 	@Override
 	protected JsonObject doToJsonQuery(PredicateRequestContext context,
 			JsonObject outerObject, JsonObject innerObject) {
-		contributeClauses( context, innerObject, MUST_ACCESSOR, mustClauses );
-		contributeClauses( context, innerObject, MUST_NOT_ACCESSOR, mustNotClauses );
-		contributeClauses( context, innerObject, SHOULD_ACCESSOR, shouldClauses );
-		contributeClauses( context, innerObject, FILTER_ACCESSOR, filterClauses );
+		contributeClauses( context, innerObject, MUST_PROPERTY_NAME, mustClauses );
+		contributeClauses( context, innerObject, MUST_NOT_PROPERTY_NAME, mustNotClauses );
+		contributeClauses( context, innerObject, SHOULD_PROPERTY_NAME, shouldClauses );
+		contributeClauses( context, innerObject, FILTER_PROPERTY_NAME, filterClauses );
 
 		if ( minimumShouldMatchConstraints != null ) {
 			MINIMUM_SHOULD_MATCH_ACCESSOR.set(
@@ -86,13 +87,13 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 	}
 
 	private void contributeClauses(PredicateRequestContext context, JsonObject innerObject,
-			JsonAccessor<JsonObject> occurAccessor, List<ElasticsearchSearchPredicate> clauses) {
+			String occurProperty, List<ElasticsearchSearchPredicate> clauses) {
 		if ( clauses == null ) {
 			return;
 		}
 
 		for ( ElasticsearchSearchPredicate clause : clauses ) {
-			occurAccessor.add( innerObject, clause.toJsonQuery( context ) );
+			GsonUtils.setOrAppendToArray( innerObject, occurProperty, clause.toJsonQuery( context ) );
 		}
 	}
 
