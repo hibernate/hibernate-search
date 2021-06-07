@@ -6,9 +6,13 @@
  */
 package org.hibernate.search.util.common.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A {@link CompletableFuture} that, upon cancellation,
@@ -16,6 +20,9 @@ import java.util.concurrent.Future;
  * @param <T> The return type of the future.
  */
 class CancellableExecutionCompletableFuture<T> extends CompletableFuture<T> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private final Future<?> future;
 
 	CancellableExecutionCompletableFuture(Runnable runnable, ExecutorService executor) {
@@ -30,8 +37,14 @@ class CancellableExecutionCompletableFuture<T> extends CompletableFuture<T> {
 		 * Thus we mark 'this' as cancelled *first*, so that any exception in the operation
 		 * from now on will be ignored.
 		 */
+		log.tracef( "Cancelling CompletableFuture %s (mayInterruptIfRunning = %s)", this, mayInterruptIfRunning );
 		super.cancel( mayInterruptIfRunning );
-		return future.cancel( mayInterruptIfRunning );
+		log.tracef( "Cancelling Future %s (mayInterruptIfRunning = %s)", future, mayInterruptIfRunning );
+		boolean cancelled = future.cancel( mayInterruptIfRunning );
+		if ( !cancelled ) {
+			log.debugf( "Could not cancel Future %s (mayInterruptIfRunning = %s)", future, mayInterruptIfRunning );
+		}
+		return cancelled;
 	}
 
 	private static class CompletingRunnable<T> implements Runnable {
@@ -41,6 +54,14 @@ class CancellableExecutionCompletableFuture<T> extends CompletableFuture<T> {
 		private CompletingRunnable(CompletableFuture<T> future, Runnable delegate) {
 			this.future = future;
 			this.delegate = delegate;
+		}
+
+		@Override
+		public String toString() {
+			return "CompletingRunnable[" +
+					"future=" + future +
+					", delegate=" + delegate +
+					']';
 		}
 
 		@Override
