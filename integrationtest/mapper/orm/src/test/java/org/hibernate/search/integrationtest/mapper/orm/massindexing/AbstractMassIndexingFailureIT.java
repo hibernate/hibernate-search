@@ -591,7 +591,6 @@ public abstract class AbstractMassIndexingFailureIT {
 			Runnable ... expectationSetters) {
 		Book.failOnBook2GetId.set( ExecutionExpectation.FAIL.equals( book2GetIdExpectation ) );
 		Book.failOnBook2GetTitle.set( ExecutionExpectation.FAIL.equals( book2GetTitleExpectation ) );
-		AssertionError assertionError = null;
 		try {
 			MassIndexingFailureHandler massIndexingFailureHandler = getMassIndexingFailureHandler();
 			if ( massIndexingFailureHandler != null ) {
@@ -620,35 +619,29 @@ public abstract class AbstractMassIndexingFailureIT {
 						.satisfies( thrownExpectation );
 			}
 			backendMock.verifyExpectationsMet();
-		}
-		catch (AssertionError e) {
-			assertionError = e;
-			throw e;
+
+			switch ( threadExpectation ) {
+				case CREATED_AND_TERMINATED:
+					Awaitility.await().untilAsserted(
+							() -> assertThat( threadSpy.getCreatedThreads( "mass index" ) )
+									.as( "Mass indexing threads" )
+									.isNotEmpty()
+									.allSatisfy( t -> assertThat( t )
+											.extracting( Thread::getState )
+											.isEqualTo( Thread.State.TERMINATED )
+									)
+					);
+					break;
+				case NOT_CREATED:
+					assertThat( threadSpy.getCreatedThreads( "mass index" ) )
+							.as( "Mass indexing threads" )
+							.isEmpty();
+					break;
+			}
 		}
 		finally {
 			Book.failOnBook2GetId.set( false );
 			Book.failOnBook2GetTitle.set( false );
-
-			if ( assertionError == null ) {
-				switch ( threadExpectation ) {
-					case CREATED_AND_TERMINATED:
-						Awaitility.await().untilAsserted(
-								() -> assertThat( threadSpy.getCreatedThreads( "mass index" ) )
-										.as( "Mass indexing threads" )
-										.isNotEmpty()
-										.allSatisfy( t -> assertThat( t )
-												.extracting( Thread::getState )
-												.isEqualTo( Thread.State.TERMINATED )
-										)
-						);
-						break;
-					case NOT_CREATED:
-						assertThat( threadSpy.getCreatedThreads( "mass index" ) )
-								.as( "Mass indexing threads" )
-								.isEmpty();
-						break;
-				}
-			}
 		}
 	}
 
