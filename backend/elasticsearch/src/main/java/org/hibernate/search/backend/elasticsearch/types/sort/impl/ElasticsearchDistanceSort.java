@@ -48,7 +48,7 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 		}
 
 		JsonObject outerObject = new JsonObject();
-		GEO_DISTANCE_ACCESSOR.add( outerObject, innerObject );
+		GEO_DISTANCE_ACCESSOR.set( outerObject, innerObject );
 		collector.collectDistanceSort( outerObject, absoluteFieldPath, center );
 	}
 

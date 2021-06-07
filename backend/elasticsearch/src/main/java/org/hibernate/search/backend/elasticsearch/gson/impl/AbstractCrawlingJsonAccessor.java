@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.gson.impl;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -38,11 +37,6 @@ abstract class AbstractCrawlingJsonAccessor<P extends JsonElement> extends Abstr
 	protected abstract JsonElement doGet(P parent);
 
 	@Override
-	public boolean hasExplicitValue(JsonObject root) {
-		return getParentAccessor().get( root ).map( this::doGet ).isPresent();
-	}
-
-	@Override
 	public void set(JsonObject root, JsonElement newValue) {
 		P parent = getParentAccessor().getOrCreate( root );
 		doSet( parent, newValue );
@@ -61,24 +55,6 @@ abstract class AbstractCrawlingJsonAccessor<P extends JsonElement> extends Abstr
 		}
 		else {
 			return currentValue;
-		}
-	}
-
-	@Override
-	public void add(JsonObject root, JsonElement newValue) {
-		P parent = getParentAccessor().getOrCreate( root );
-		JsonElement currentValue = doGet( parent );
-		if ( currentValue == null ) { // Do not overwrite JsonNull, because it might be there on purpose
-			doSet( parent, newValue );
-		}
-		else if ( JsonElementTypes.ARRAY.isInstance( currentValue ) ) {
-			JsonElementTypes.ARRAY.fromElement( currentValue ).add( newValue );
-		}
-		else {
-			JsonArray array = new JsonArray();
-			array.add( currentValue );
-			array.add( newValue );
-			doSet( parent, array );
 		}
 	}
 

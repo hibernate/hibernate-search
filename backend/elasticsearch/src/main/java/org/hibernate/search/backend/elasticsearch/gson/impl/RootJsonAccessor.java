@@ -29,12 +29,6 @@ class RootJsonAccessor implements JsonCompositeAccessor<JsonElement> {
 		return Optional.of( requireRoot( root ) );
 	}
 
-	@Override
-	public boolean hasExplicitValue(JsonObject root) {
-		requireRoot( root );
-		return true;
-	}
-
 	private JsonObject requireRoot(JsonObject root) {
 		if ( root == null ) {
 			throw new AssertionFailure( "A null root was encountered" );
@@ -47,11 +41,6 @@ class RootJsonAccessor implements JsonCompositeAccessor<JsonElement> {
 	@Override
 	public void set(JsonObject root, JsonElement value) {
 		throw new UnsupportedOperationException( "Cannot set the root element" );
-	}
-
-	@Override
-	public void add(JsonObject root, JsonElement value) {
-		throw new UnsupportedOperationException( "Cannot add a value to the root element" );
 	}
 
 	@Override

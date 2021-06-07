@@ -32,18 +32,8 @@ abstract class AbstractTypingJsonAccessor<T> extends AbstractNonRootJsonAccessor
 	}
 
 	@Override
-	public boolean hasExplicitValue(JsonObject root) {
-		return getParentAccessor().hasExplicitValue( root );
-	}
-
-	@Override
 	public void set(JsonObject root, T newValue) {
 		getParentAccessor().set( root, toElement( newValue ) );
-	}
-
-	@Override
-	public void add(JsonObject root, T newValue) {
-		getParentAccessor().add( root, toElement( newValue ) );
 	}
 
 	@Override

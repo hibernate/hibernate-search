@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexSchemaElementContext;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
@@ -18,8 +17,6 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-import com.google.gson.JsonElement;
-
 public abstract class AbstractElasticsearchIndexSchemaFieldNode
 		implements IndexFieldDescriptor, ElasticsearchSearchIndexSchemaElementContext {
 	protected static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -28,7 +25,6 @@ public abstract class AbstractElasticsearchIndexSchemaFieldNode
 	protected final String absolutePath;
 	protected final String[] absolutePathComponents;
 	protected final String relativeName;
-	protected final JsonAccessor<JsonElement> relativeAccessor;
 
 	protected final IndexFieldInclusion inclusion;
 	protected final boolean multiValued;
@@ -41,7 +37,6 @@ public abstract class AbstractElasticsearchIndexSchemaFieldNode
 		this.absolutePath = parent.absolutePath( relativeFieldName );
 		this.absolutePathComponents = FieldPaths.split( absolutePath );
 		this.relativeName = relativeFieldName;
-		this.relativeAccessor = JsonAccessor.root().property( relativeFieldName );
 		this.inclusion = inclusion;
 		this.multiValued = multiValued;
 		this.multiValuedInRoot = multiValued || parent.multiValuedInRoot();
@@ -70,10 +65,6 @@ public abstract class AbstractElasticsearchIndexSchemaFieldNode
 	@Override
 	public String relativeName() {
 		return relativeName;
-	}
-
-	public JsonAccessor<JsonElement> relativeAccessor() {
-		return relativeAccessor;
 	}
 
 	public IndexFieldInclusion inclusion() {
