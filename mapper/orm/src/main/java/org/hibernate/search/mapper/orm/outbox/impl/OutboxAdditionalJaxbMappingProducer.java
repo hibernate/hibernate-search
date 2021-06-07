@@ -49,7 +49,7 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 	"                <param name=\"increment_size\">1</param>\n" +
 	"            </generator>\n" +
 	"        </id>\n" +
-	" 		 <property name=\"moment\" generated=\"insert\">\n" +
+	" 		 <property name=\"moment\" generated=\"insert\" index=\"moment\">\n" +
 	"     		 <column sql-type=\"TIMESTAMP\" updatable=\"false\" default=\"CURRENT_TIMESTAMP\" />\n" +
 	" 		 </property>\n" +
 	"		 <property name=\"type\" >\n" +
