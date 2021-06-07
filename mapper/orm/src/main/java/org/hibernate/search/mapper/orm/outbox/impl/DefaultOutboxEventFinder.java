@@ -15,7 +15,7 @@ public final class DefaultOutboxEventFinder implements OutboxEventFinder {
 	@Override
 	public List<OutboxEvent> findOutboxEvents(Session session, int maxResults) {
 		Query<OutboxEvent> query = session.createQuery(
-				"select e from OutboxEvent e order by e.moment", OutboxEvent.class );
+				"select e from OutboxEvent e order by e.moment, e.id", OutboxEvent.class );
 		query.setMaxResults( maxResults );
 		return query.list();
 	}
