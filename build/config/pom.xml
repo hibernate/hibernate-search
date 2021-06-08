@@ -11,10 +11,11 @@
         <groupId>org.hibernate.search</groupId>
         <artifactId>hibernate-search-parent</artifactId>
         <version>6.1.0-SNAPSHOT</version>
+        <relativePath>../..</relativePath>
     </parent>
     <artifactId>hibernate-search-build-config</artifactId>
 
-    <name>Hibernate Search Build Config</name>
+    <name>Hibernate Search Build - Config</name>
     <description>Hibernate Search common build configuration files</description>
 
     <properties>
