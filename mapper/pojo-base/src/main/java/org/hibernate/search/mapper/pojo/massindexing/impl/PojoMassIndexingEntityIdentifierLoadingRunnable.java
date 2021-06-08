@@ -83,17 +83,10 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 		public PojoMassIdentifierSink<I> createSink() {
 			return new PojoMassIdentifierSink<I>() {
 				@Override
-				public void accept(List<? extends I> batch) {
-					try {
-						log.tracef( "produced a list of ids %s", batch );
-						List<I> copy = new ArrayList<>( batch );
-						identifierQueue.put( copy );
-					}
-					catch (InterruptedException e) {
-						// just quit
-						complete();
-						Thread.currentThread().interrupt();
-					}
+				public void accept(List<? extends I> batch) throws InterruptedException {
+					log.tracef( "produced a list of ids %s", batch );
+					List<I> copy = new ArrayList<>( batch );
+					identifierQueue.put( copy );
 				}
 
 				@Override

@@ -69,7 +69,7 @@ public class PojoMassIndexingBatchIndexingWorkspace<E, I> extends PojoMassIndexi
 		List<CompletableFuture<?>> allFutures = new ArrayList<>();
 		allFutures.addAll( identifierProducingFutures );
 		allFutures.addAll( indexingFutures );
-		Futures.unwrappedExceptionGet( CompletableFuture.allOf( allFutures.toArray( new CompletableFuture[0] ) ) );
+		Futures.unwrappedExceptionGet( Futures.firstFailureOrAllOf( allFutures ) );
 		log.debugf( "Indexing for %s is done", typeGroup.notifiedGroupName() );
 	}
 
