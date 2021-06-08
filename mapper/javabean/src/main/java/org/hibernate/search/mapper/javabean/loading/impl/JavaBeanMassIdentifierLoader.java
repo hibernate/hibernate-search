@@ -28,7 +28,7 @@ public class JavaBeanMassIdentifierLoader implements PojoMassIdentifierLoader {
 	}
 
 	@Override
-	public void loadNext() {
+	public void loadNext() throws InterruptedException {
 		delegate.loadNext();
 	}
 }

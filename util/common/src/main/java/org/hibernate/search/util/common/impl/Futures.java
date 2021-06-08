@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.common.impl;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
@@ -252,4 +253,21 @@ public final class Futures {
 		}
 	}
 
+	/**
+	 * @return a {@link CompletableFuture} that will complete either when one of the future completes exceptionally,
+	 * or when all futures complete successfully, whichever happens first.
+	 */
+	public static CompletableFuture<?> firstFailureOrAllOf(List<CompletableFuture<?>> allFutures) {
+		CompletableFuture<Void> firstFailureFuture = new CompletableFuture<>();
+		for ( CompletableFuture<?> future : allFutures ) {
+			future.exceptionally( handler( throwable -> {
+				firstFailureFuture.completeExceptionally( throwable );
+				return null;
+			} ) );
+		}
+		return CompletableFuture.anyOf(
+				firstFailureFuture,
+				CompletableFuture.allOf( allFutures.toArray( new CompletableFuture[0] ) )
+		);
+	}
 }

@@ -46,7 +46,7 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 	}
 
 	@Override
-	protected void runWithFailureHandler() {
+	protected void runWithFailureHandler() throws InterruptedException {
 		log.trace( "started" );
 		LoadingContext context = new LoadingContext();
 		try ( PojoMassEntityLoader<I> entityLoader = loadingStrategy.createEntityLoader( context ) ) {
@@ -60,10 +60,6 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 				}
 			}
 			while ( idList != null && !context.done );
-		}
-		catch (InterruptedException e) {
-			// just quit
-			Thread.currentThread().interrupt();
 		}
 		log.trace( "finished" );
 	}
