@@ -39,7 +39,7 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 	}
 
 	@Override
-	protected void runWithFailureHandler() {
+	protected void runWithFailureHandler() throws InterruptedException {
 		log.trace( "started" );
 		LoadingContext context = new LoadingContext();
 		try ( PojoMassIdentifierLoader loader = loadingStrategy.createIdentifierLoader( context ) ) {
@@ -67,9 +67,8 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 	}
 
 	@Override
-	protected void notifyFailure(RuntimeException exception) {
-		getNotifier().notifyRunnableFailure( exception,
-				log.massIndexerFetchingIds( typeGroup.notifiedGroupName() ) );
+	protected String operationName() {
+		return log.massIndexerFetchingIds( typeGroup.notifiedGroupName() );
 	}
 
 	private class LoadingContext implements PojoMassIndexingIdentifierLoadingContext<E, I> {

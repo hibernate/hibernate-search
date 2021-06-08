@@ -20,7 +20,7 @@ public class JavaBeanMassEntitySink<E> implements MassEntitySink<E> {
 	}
 
 	@Override
-	public void accept(List<? extends E> batch) {
+	public void accept(List<? extends E> batch) throws InterruptedException {
 		delegate.accept( batch );
 	}
 

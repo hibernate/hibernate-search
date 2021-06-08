@@ -86,7 +86,7 @@ public final class HibernateOrmMassIdentifierLoader<E, I> implements PojoMassIde
 	}
 
 	@Override
-	public void loadNext() {
+	public void loadNext() throws InterruptedException {
 		int batchSize = options.objectLoadingBatchSize();
 		ArrayList<I> destinationList = new ArrayList<>( batchSize );
 		while ( destinationList.size() < batchSize && totalLoaded < totalCount && results.next() ) {

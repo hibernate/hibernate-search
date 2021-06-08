@@ -614,9 +614,9 @@ public interface Log extends BasicLogger {
 	@Message(value = "Loading and extracting entity data for entity '%s' during mass indexing")
 	String massIndexingLoadingAndExtractingEntityData(String entityName);
 
-	@Message(id = ID_OFFSET + 101, value = "%1$s entities could not be indexed. See the logs for details."
+	@Message(id = ID_OFFSET + 101, value = "%1$s failure(s) occurred during mass indexing. See the logs for details."
 			+ " First failure on entity '%2$s': %3$s")
-	SearchException massIndexingEntityFailures(long finalFailureCount,
+	SearchException massIndexingFirstFailureOnEntity(long finalFailureCount,
 			Object firstFailureEntity, String firstFailureMessage,
 			@Cause Throwable firstFailure);
 
@@ -635,5 +635,10 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 105, value = "Cannot work with the identifier of entities of type '%1$s':"
 			+ " identifier mapping (@DocumentId, ...) is not configured for this type.")
 	SearchException cannotWorkWithIdentifierBecauseUnconfiguredIdentifierMapping(PojoRawTypeIdentifier<?> typeIdentifier);
+
+	@Message(id = ID_OFFSET + 42, value = "%1$s failure(s) occurred during mass indexing. See the logs for details."
+			+ " First failure: %2$s")
+	SearchException massIndexingFirstFailure(long finalFailureCount, String firstFailureMessage,
+			@Cause Throwable firstFailure);
 
 }

@@ -66,7 +66,7 @@ public class StubMassLoadingStrategy<E, I> implements MassLoadingStrategy<E, I> 
 			}
 
 			@Override
-			public void load(List<I> identifiers) {
+			public void load(List<I> identifiers) throws InterruptedException {
 				context.loaderCalls()
 						.add( new StubLoadingContext.LoaderCall( StubMassLoadingStrategy.this, identifiers ) );
 				delegateLoader.load( identifiers );

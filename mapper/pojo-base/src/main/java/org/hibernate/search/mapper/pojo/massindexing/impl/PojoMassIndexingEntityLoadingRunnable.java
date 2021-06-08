@@ -79,9 +79,8 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 	}
 
 	@Override
-	protected void notifyFailure(RuntimeException exception) {
-		getNotifier().notifyRunnableFailure( exception,
-				log.massIndexingLoadingAndExtractingEntityData( typeGroup.notifiedGroupName() ) );
+	protected String operationName() {
+		return log.massIndexingLoadingAndExtractingEntityData( typeGroup.notifiedGroupName() );
 	}
 
 	private void indexList(PojoMassIndexingSessionContext sessionContext, PojoIndexer indexer,
@@ -171,15 +170,8 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 			PojoIndexer indexer = sessionContext.createIndexer();
 			return new PojoMassEntitySink<E>() {
 				@Override
-				public void accept(List<? extends E> batch) {
-					try {
-						indexList( sessionContext, indexer, batch );
-					}
-					catch (InterruptedException e) {
-						// just quit
-						done = true;
-						Thread.currentThread().interrupt();
-					}
+				public void accept(List<? extends E> batch) throws InterruptedException {
+					indexList( sessionContext, indexer, batch );
 				}
 			};
 		}

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.javabean.loading.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -22,12 +21,8 @@ import org.hibernate.search.mapper.javabean.loading.MassEntityLoader;
 import org.hibernate.search.mapper.javabean.loading.MassLoadingOptions;
 import org.hibernate.search.mapper.javabean.loading.MassEntitySink;
 import org.hibernate.search.mapper.javabean.loading.MassLoadingStrategy;
-import org.hibernate.search.mapper.javabean.log.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class MapMassLoadingStrategy<E, I> implements MassLoadingStrategy<E, I> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<I, E> source;
 
@@ -71,16 +66,12 @@ public class MapMassLoadingStrategy<E, I> implements MassLoadingStrategy<E, I> {
 			}
 
 			@Override
-			public void loadNext() {
+			public void loadNext() throws InterruptedException {
 				int batchSize = options.batchSize();
 
 				List<I> destination = new ArrayList<>( batchSize );
 				while ( iterator.hasNext() && destination.size() < batchSize ) {
 					destination.add( iterator.next() );
-					if ( Thread.interrupted() ) {
-						throw log.contextInterruptedWhileProducingIdsForBatchIndexing(
-								includedTypes.toString() );
-					}
 				}
 				if ( destination.isEmpty() ) {
 					sink.complete();
@@ -102,7 +93,7 @@ public class MapMassLoadingStrategy<E, I> implements MassLoadingStrategy<E, I> {
 			}
 
 			@Override
-			public void load(List<I> identifiers) {
+			public void load(List<I> identifiers) throws InterruptedException {
 				sink.accept( identifiers.stream().map( source::get ).collect( Collectors.toList() ) );
 			}
 		};

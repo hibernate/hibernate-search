@@ -32,6 +32,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
@@ -90,6 +91,7 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 					.mergeSegments();
 
 			assertThatThrownBy( indexer::startAndWait )
+					.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
 					.isInstanceOf( SimulatedFailure.class )
 					.hasMessageStartingWith( H1_B_Indexed.NAME )
 					.hasMessageNotContaining( H1_Root_NotIndexed.NAME )
@@ -114,6 +116,7 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 					.mergeSegments();
 
 			assertThatThrownBy( indexer::startAndWait )
+					.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
 					.isInstanceOf( SimulatedFailure.class )
 					.hasMessageStartingWith( H1_B_Indexed.NAME )
 					.hasMessageNotContaining( H1_Root_NotIndexed.NAME )
@@ -147,6 +150,7 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 					.mergeSegments();
 
 			assertThatThrownBy( indexer::startAndWait )
+					.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
 					.isInstanceOf( SimulatedFailure.class )
 					.hasMessageStartingWith( H2_Root_Indexed.NAME )
 					.hasMessageNotContaining( H1_Root_NotIndexed.NAME )
@@ -174,6 +178,7 @@ public class MassIndexingIncludedEntityMapHierarchyIT {
 					.mergeSegments();
 
 			assertThatThrownBy( indexer::startAndWait )
+					.extracting( Throwable::getCause, InstanceOfAssertFactories.THROWABLE )
 					.isInstanceOf( SimulatedFailure.class )
 					.hasMessageStartingWith( H2_B_Indexed.NAME )
 					.hasMessageNotContaining( H1_Root_NotIndexed.NAME )
