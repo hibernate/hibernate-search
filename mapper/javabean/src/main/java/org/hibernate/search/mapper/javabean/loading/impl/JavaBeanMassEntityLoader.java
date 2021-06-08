@@ -31,7 +31,7 @@ public class JavaBeanMassEntityLoader<I> implements PojoMassEntityLoader<I> {
 	}
 
 	@Override
-	public void load(List<I> identifiers) {
+	public void load(List<I> identifiers) throws InterruptedException {
 		delegate.load( identifiers );
 	}
 

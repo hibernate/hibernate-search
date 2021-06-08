@@ -71,8 +71,15 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 		}
 
 		beforeBatch(); // purgeAll and mergeSegments if enabled
-		doBatchWork();
-		afterBatch(); // mergeSegments if enabled and flush
+		try {
+			doBatchWork();
+			afterBatch(); // mergeSegments if enabled and flush
+		}
+		catch (MassIndexingOperationHandledFailureException e) {
+			// Something is wrong, but it's already been reported.
+			// Just stop everything and rely on the notifier to throw the appropriate exception.
+			cleanUpOnFailure();
+		}
 	}
 
 	@Override
@@ -90,17 +97,20 @@ public class PojoMassIndexingBatchCoordinator extends PojoMassIndexingFailureHan
 
 	@Override
 	protected void notifySuccess() {
-		getNotifier().notifyIndexingCompletedSuccessfully();
+		getNotifier().notifyIndexingCompleted();
 	}
 
 	@Override
 	protected void notifyInterrupted(InterruptedException exception) {
-		getNotifier().notifyIndexingCompletedWithInterruption();
+		getNotifier().notifyInterrupted( exception );
+		getNotifier().notifyIndexingCompleted();
 	}
 
 	@Override
 	protected void notifyFailure(RuntimeException exception) {
-		getNotifier().notifyIndexingCompletedWithFailure( exception );
+		super.notifyFailure( exception );
+		// TODO HSEARCH-3729 Call a different method when indexing failed?
+		getNotifier().notifyIndexingCompleted();
 	}
 
 	private void cancelPendingTasks() {

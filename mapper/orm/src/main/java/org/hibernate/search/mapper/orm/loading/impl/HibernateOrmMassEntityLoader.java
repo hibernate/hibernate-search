@@ -43,7 +43,7 @@ public final class HibernateOrmMassEntityLoader<E, I> implements PojoMassEntityL
 	}
 
 	@Override
-	public void load(List<I> identifiers) {
+	public void load(List<I> identifiers) throws InterruptedException {
 		transactionHelper.begin( session, null );
 		try {
 			Query<E> query = typeQueryLoader.createLoadingQuery( session, ID_PARAMETER_NAME )

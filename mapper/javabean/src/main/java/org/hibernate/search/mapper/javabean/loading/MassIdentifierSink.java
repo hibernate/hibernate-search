@@ -28,8 +28,10 @@ public interface MassIdentifierSink<I> {
 	 * because they will be consumed asynchronously.
 	 *
 	 * @param batch The next batch of identifiers. Never {@code null}, never empty.
+	 * @throws InterruptedException If the thread was interrupted while handling the batch.
+	 * This exception should generally not be caught: just propagate it.
 	 */
-	void accept(List<? extends I> batch);
+	void accept(List<? extends I> batch) throws InterruptedException;
 
 	/**
 	 * Signals that no more identifiers are available.

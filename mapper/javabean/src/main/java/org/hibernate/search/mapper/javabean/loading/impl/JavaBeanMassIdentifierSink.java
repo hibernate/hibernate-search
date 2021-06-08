@@ -20,7 +20,7 @@ public class JavaBeanMassIdentifierSink<I> implements MassIdentifierSink<I> {
 	}
 
 	@Override
-	public void accept(List<? extends I> batch) {
+	public void accept(List<? extends I> batch) throws InterruptedException {
 		delegate.accept( batch );
 	}
 

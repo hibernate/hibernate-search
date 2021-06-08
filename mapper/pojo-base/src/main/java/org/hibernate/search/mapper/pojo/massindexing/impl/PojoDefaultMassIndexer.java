@@ -125,9 +125,18 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 	@Override
 	public void startAndWait() throws InterruptedException {
 		PojoMassIndexingBatchCoordinator coordinator = createCoordinator();
-		coordinator.run();
-		if ( Thread.interrupted() ) {
-			throw new InterruptedException();
+		try {
+			coordinator.run();
+		}
+		catch (Throwable t) {
+			if ( Thread.interrupted() ) {
+				InterruptedException exception = new InterruptedException();
+				exception.addSuppressed( t );
+				throw exception;
+			}
+			else {
+				throw t;
+			}
 		}
 	}
 

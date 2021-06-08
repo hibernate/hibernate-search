@@ -12,6 +12,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -25,6 +26,7 @@ import org.hibernate.search.mapper.javabean.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.ThreadSpy;
 
@@ -32,6 +34,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.awaitility.Awaitility;
 
 /**
@@ -74,12 +77,12 @@ public class MassIndexingInterruptionIT {
 	}
 
 	@Test
-	public void interrupt() {
+	public void interrupt_mainThread() {
 		int expectedThreadCount = 1 // Workspace
 				+ 1 // ID loading
 				+ 1; // Entity loading
 
-		AtomicBoolean interrupted = new AtomicBoolean( false );
+		AtomicReference<Throwable> thrown = new AtomicReference<>();
 		AtomicBoolean interruptFlagAfterInterruption = new AtomicBoolean( false );
 
 		Thread massIndexingThread = new Thread( () -> {
@@ -87,8 +90,8 @@ public class MassIndexingInterruptionIT {
 			try {
 				massIndexer.startAndWait();
 			}
-			catch (InterruptedException e) {
-				interrupted.set( true );
+			catch (Throwable t) {
+				thrown.set( t );
 				interruptFlagAfterInterruption.set( Thread.currentThread().isInterrupted() );
 			}
 		} );
@@ -105,9 +108,56 @@ public class MassIndexingInterruptionIT {
 			waitForMassIndexingThreadsToTerminate( expectedThreadCount );
 		} );
 
-		assertThat( interrupted ).isTrue();
+		assertThat( thrown.get() )
+				.isInstanceOf( InterruptedException.class )
+				.extracting( Throwable::getSuppressed, InstanceOfAssertFactories.ARRAY )
+				.hasSize( 1 )
+				.allSatisfy( t -> assertThat( t )
+						.asInstanceOf( InstanceOfAssertFactories.THROWABLE )
+						.hasMessageContaining( "Mass indexing received interrupt signal. The index is left in an unknown state!" ) );
 		// Most JDK methods unset the interrupt flag when they throw an InterruptedException:
 		// the MassIndexer should do the same.
+		assertThat( interruptFlagAfterInterruption ).isFalse();
+	}
+
+	@Test
+	public void interrupt_entityLoading() {
+		int expectedThreadCount = 1 // Workspace
+				+ 1 // ID loading
+				+ 1; // Entity loading
+
+		AtomicReference<Throwable> thrown = new AtomicReference<>();
+		AtomicBoolean interruptFlagAfterInterruption = new AtomicBoolean( false );
+
+		Thread massIndexingThread = new Thread( () -> {
+			MassIndexer massIndexer = prepareMassIndexingThatWillNotTerminate();
+			try {
+				massIndexer.startAndWait();
+			}
+			catch (Throwable t) {
+				thrown.set( t );
+				interruptFlagAfterInterruption.set( Thread.currentThread().isInterrupted() );
+			}
+		} );
+
+		massIndexingThread.start();
+
+		waitForMassIndexingThreadsToSpawn( expectedThreadCount );
+
+		// inLenientMode since with interrupt final flush, refresh and merge segment are invoked
+		backendMock.inLenientMode( () -> {
+			// Interrupt the entity loading thread
+			threadSpy.getCreatedThreads( "Entity Loading" ).get( 0 ).interrupt();
+
+			waitForMassIndexingThreadsToTerminate( expectedThreadCount );
+		} );
+
+		assertThat( thrown.get() )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Mass indexing received interrupt signal. The index is left in an unknown state!" )
+				.hasCauseInstanceOf( InterruptedException.class );
+
+		// The interrupt didn't occur on the mass indexing thread, so the interrupt flag shouldn't be set on that thread.
 		assertThat( interruptFlagAfterInterruption ).isFalse();
 	}
 

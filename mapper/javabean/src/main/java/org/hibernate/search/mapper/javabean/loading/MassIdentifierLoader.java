@@ -28,7 +28,9 @@ public interface MassIdentifierLoader extends AutoCloseable {
 	 * to notify the caller that there are no more identifiers to load.
 	 * <p>
 	 * Calls to the sink must be performed synchronously (before this method returns).
+	 * @throws InterruptedException If the thread was interrupted while performing I/O operations.
+	 * This will lead to aborting mass indexing completely.
 	 */
-	void loadNext();
+	void loadNext() throws InterruptedException;
 
 }

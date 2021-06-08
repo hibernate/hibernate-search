@@ -41,7 +41,9 @@ public interface MassEntityLoader<I> extends AutoCloseable {
 	 * Entities passed to the sink do not need to be the same order as {@code identifiers}.
 	 *
 	 * @param identifiers A list of identifiers of entities to load.
+	 * @throws InterruptedException If the thread was interrupted while performing I/O operations.
+	 * This will lead to aborting mass indexing completely.
 	 */
-	void load(List<I> identifiers);
+	void load(List<I> identifiers) throws InterruptedException;
 
 }
