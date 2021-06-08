@@ -70,6 +70,23 @@
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-annotations</artifactId>
         </dependency>
+
+        <!-- Work around Surefire clearing the interrupt status when forwarding stdout/stderr -->
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-build-surefire-extension</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+            <exclusions>
+                <!-- Work around dependency divergence reported by the Enforcer plugin.
+                     There really is divergence, but we really don't care as it's already there,
+                     caused by the Surefire booter itself. -->
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
     <build>
