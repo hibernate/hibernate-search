@@ -44,7 +44,7 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 		LoadingContext context = new LoadingContext();
 		try ( PojoMassIdentifierLoader loader = loadingStrategy.createIdentifierLoader( context ) ) {
 			long totalCount = loader.totalCount();
-			getNotifier().notifyAddedTotalCount( totalCount );
+			getNotifier().reportAddedTotalCount( totalCount );
 			do {
 				loader.loadNext();
 			}

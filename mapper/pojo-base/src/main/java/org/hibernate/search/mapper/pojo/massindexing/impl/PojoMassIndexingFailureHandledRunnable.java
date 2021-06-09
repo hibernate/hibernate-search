@@ -127,19 +127,19 @@ public abstract class PojoMassIndexingFailureHandledRunnable implements Runnable
 	}
 
 	protected void notifyError(Error error) {
-		notifier.notifyError( error );
+		notifier.reportError( error );
 	}
 
 	protected void notifyInterrupted(InterruptedException exception) {
 		// By default, just report the interruption to the coordinator...
-		notifier.notifyInterrupted( exception );
+		notifier.reportInterrupted( exception );
 		/// ... and to the caller.
 		throw new MassIndexingOperationHandledFailureException( exception );
 		// run() will reset the interrupt flag on this thread, so we don't need to do it here.
 	}
 
 	protected void notifyFailure(RuntimeException exception) {
-		notifier.notifyRunnableFailure( exception, operationName() );
+		notifier.reportRunnableFailure( exception, operationName() );
 	}
 
 	protected String operationName() {
