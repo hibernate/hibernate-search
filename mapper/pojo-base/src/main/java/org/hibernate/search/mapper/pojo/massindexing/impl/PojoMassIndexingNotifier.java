@@ -18,6 +18,10 @@ import org.hibernate.search.mapper.pojo.massindexing.MassIndexingMonitor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.mapper.pojo.massindexing.spi.PojoMassIndexingSessionContext;
 
+/**
+ * A central object to which various are reported,
+ * responsible for notifying the user about these events.
+ */
 public class PojoMassIndexingNotifier {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -35,11 +39,11 @@ public class PojoMassIndexingNotifier {
 		this.monitor = monitor;
 	}
 
-	void notifyAddedTotalCount(long totalCount) {
+	void reportAddedTotalCount(long totalCount) {
 		monitor.addToTotalCount( totalCount );
 	}
 
-	void notifyError(Error error) {
+	void reportError(Error error) {
 		// Don't report the error anywhere: an Error is serious enough that we want to report it directly by bubbling up.
 		// We're just recording that the first failure was an error so that later interruptions
 		// don't trigger logging.
@@ -47,7 +51,7 @@ public class PojoMassIndexingNotifier {
 		firstFailure.compareAndSet( null, recordedFailure );
 	}
 
-	void notifyInterrupted(InterruptedException exception) {
+	void reportInterrupted(InterruptedException exception) {
 		RecordedFailure recordedFailure = new RecordedFailure( exception );
 		boolean isFirst = firstFailure.compareAndSet( null, recordedFailure );
 		if ( isFirst ) {
@@ -57,7 +61,7 @@ public class PojoMassIndexingNotifier {
 		// else: don't report the interruption, as it was most likely caused by a previous failure
 	}
 
-	void notifyRunnableFailure(Exception exception, String operation) {
+	void reportRunnableFailure(Exception exception, String operation) {
 		recordFailure( exception, true );
 
 		MassIndexingFailureContext.Builder contextBuilder = MassIndexingFailureContext.builder();
@@ -66,19 +70,19 @@ public class PojoMassIndexingNotifier {
 		failureHandler.handle( contextBuilder.build() );
 	}
 
-	void notifyEntitiesLoaded(int size) {
+	void reportEntitiesLoaded(int size) {
 		monitor.entitiesLoaded( size );
 	}
 
-	void notifyDocumentBuilt() {
+	void reportDocumentBuilt() {
 		monitor.documentsBuilt( 1 );
 	}
 
-	void notifyDocumentsAdded(int size) {
+	void reportDocumentsAdded(int size) {
 		monitor.documentsAdded( size );
 	}
 
-	void notifyEntityIndexingFailure(PojoMassIndexingIndexedTypeGroup<?> typeGroup,
+	void reportEntityIndexingFailure(PojoMassIndexingIndexedTypeGroup<?> typeGroup,
 			PojoMassIndexingSessionContext sessionContext, Object entity, Exception exception) {
 		// Don't record these failures as suppressed beyond the first one, because there may be hundreds of them.
 		RecordedFailure recordedFailure = recordFailure( exception, false );
@@ -97,7 +101,7 @@ public class PojoMassIndexingNotifier {
 		failureHandler.handle( contextBuilder.build() );
 	}
 
-	void notifyIndexingCompleted() {
+	void reportIndexingCompleted() {
 		monitor.indexingCompleted();
 
 		RecordedFailure firstFailure = this.firstFailure.get();

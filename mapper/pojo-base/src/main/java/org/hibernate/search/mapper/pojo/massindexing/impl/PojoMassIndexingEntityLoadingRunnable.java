@@ -85,7 +85,7 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 			return;
 		}
 
-		getNotifier().notifyEntitiesLoaded( entities.size() );
+		getNotifier().reportEntitiesLoaded( entities.size() );
 		CompletableFuture<?>[] indexingFutures = new CompletableFuture<?>[entities.size()];
 
 		for ( int i = 0; i < entities.size(); i++ ) {
@@ -105,7 +105,7 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 
 			if ( future.isCompletedExceptionally() ) {
 				Object entity = entities.get( i );
-				getNotifier().notifyEntityIndexingFailure(
+				getNotifier().reportEntityIndexingFailure(
 						// We don't try to detect the exact entity type here,
 						// because that could fail if the type is not indexed
 						// (which should not happen, but well... failures should not happen to begin with).
@@ -118,7 +118,7 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 			}
 		}
 
-		getNotifier().notifyDocumentsAdded( successfulEntities );
+		getNotifier().reportDocumentsAdded( successfulEntities );
 	}
 
 	private CompletableFuture<?> index(PojoMassIndexingSessionContext sessionContext,
@@ -143,7 +143,7 @@ public class PojoMassIndexingEntityLoadingRunnable<E, I>
 		}
 
 		// Only if the above succeeded
-		getNotifier().notifyDocumentBuilt();
+		getNotifier().reportDocumentBuilt();
 
 		return future;
 	}
