@@ -219,7 +219,7 @@ public class IdentifierConsumerDocumentProducer<E, I> extends FailureHandledRunn
 			return;
 		}
 
-		notifier.notifyEntitiesLoaded( entities.size() );
+		notifier.reportEntitiesLoaded( entities.size() );
 		CompletableFuture<?>[] indexingFutures = new CompletableFuture<?>[entities.size()];
 
 		for ( int i = 0; i < entities.size(); i++ ) {
@@ -239,7 +239,7 @@ public class IdentifierConsumerDocumentProducer<E, I> extends FailureHandledRunn
 
 			if ( future.isCompletedExceptionally() ) {
 				E entity = entities.get( i );
-				notifier.notifyEntityIndexingFailure(
+				notifier.reportEntityIndexingFailure(
 						// We don't try to detect the exact entity type here,
 						// because that could fail if the type is not indexed
 						// (which should not happen, but well... failures should not happen to begin with).
@@ -252,7 +252,7 @@ public class IdentifierConsumerDocumentProducer<E, I> extends FailureHandledRunn
 			}
 		}
 
-		notifier.notifyDocumentsAdded( successfulEntities );
+		notifier.reportDocumentsAdded( successfulEntities );
 	}
 
 	private CompletableFuture<?> index(HibernateOrmMassIndexingSessionContext sessionContext,
@@ -277,7 +277,7 @@ public class IdentifierConsumerDocumentProducer<E, I> extends FailureHandledRunn
 		}
 
 		// Only if the above succeeded
-		notifier.notifyDocumentBuilt();
+		notifier.reportDocumentBuilt();
 
 		return future;
 	}
