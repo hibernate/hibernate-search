@@ -92,12 +92,12 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 	@Override
 	public void run(StatelessSession upperSession) throws InterruptedException {
 		log.trace( "started" );
-		try {
-			inTransactionWrapper( upperSession );
-		}
-		finally {
-			destination.producerStopping();
-		}
+		inTransactionWrapper( upperSession );
+		// Only do this when stopping normally,
+		// because this operation will block if the queue is full,
+		// resuming the thread only if the queue gets consumed (consumer still working)
+		// or if the thread is interrupted by the workspace (due to consumer failure).
+		destination.producerStopping();
 		log.trace( "finished" );
 	}
 
