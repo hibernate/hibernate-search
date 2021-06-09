@@ -146,7 +146,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 		if ( log.isDebugEnabled() ) {
 			log.debugf( "going to fetch %d primary keys", (Long) totalCount );
 		}
-		notifier.notifyAddedTotalCount( totalCount );
+		notifier.reportAddedTotalCount( totalCount );
 
 		ArrayList<I> destinationList = new ArrayList<>( batchSize );
 		long counter = 0;

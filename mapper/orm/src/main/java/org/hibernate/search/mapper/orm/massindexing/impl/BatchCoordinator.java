@@ -113,20 +113,20 @@ public class BatchCoordinator extends FailureHandledRunnable {
 
 	@Override
 	protected void notifySuccess() {
-		getNotifier().notifyIndexingCompleted();
+		getNotifier().reportIndexingCompleted();
 	}
 
 	@Override
 	protected void notifyInterrupted(InterruptedException exception) {
-		getNotifier().notifyInterrupted( exception );
-		getNotifier().notifyIndexingCompleted();
+		getNotifier().reportInterrupted( exception );
+		getNotifier().reportIndexingCompleted();
 	}
 
 	@Override
 	protected void notifyFailure(RuntimeException exception) {
 		super.notifyFailure( exception );
 		// TODO HSEARCH-3729 Call a different method when indexing failed?
-		getNotifier().notifyIndexingCompleted();
+		getNotifier().reportIndexingCompleted();
 	}
 
 	private void cancelPendingTasks() {
