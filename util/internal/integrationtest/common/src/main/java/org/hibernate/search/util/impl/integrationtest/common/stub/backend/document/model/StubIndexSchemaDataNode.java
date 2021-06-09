@@ -41,18 +41,16 @@ public final class StubIndexSchemaDataNode extends StubTreeNode<StubIndexSchemaD
 		return new Builder( null, null, Kind.ROOT );
 	}
 
-	public static Builder objectField(Builder parent, String relativeFieldName, ObjectStructure structure) {
-		return new Builder( parent, relativeFieldName, Kind.OBJECT_FIELD )
-				.objectStructure( structure );
+	public static Builder objectField(Builder parent, String relativeFieldName) {
+		return new Builder( parent, relativeFieldName, Kind.OBJECT_FIELD );
 	}
 
 	public static Builder field(Builder parent, String relativeFieldName) {
 		return new Builder( parent, relativeFieldName, Kind.VALUE_FIELD );
 	}
 
-	public static Builder objectFieldTemplate(Builder parent, String templateName, ObjectStructure structure) {
-		return new Builder( parent, templateName, Kind.OBJECT_FIELD_TEMPLATE )
-				.objectStructure( structure );
+	public static Builder objectFieldTemplate(Builder parent, String templateName) {
+		return new Builder( parent, templateName, Kind.OBJECT_FIELD_TEMPLATE );
 	}
 
 	public static Builder fieldTemplate(Builder parent, String templateName) {
@@ -84,7 +82,7 @@ public final class StubIndexSchemaDataNode extends StubTreeNode<StubIndexSchemaD
 		private Builder(Builder parent, String relativeFieldName, Kind kind) {
 			super( parent, relativeFieldName );
 			this.kind = kind;
-			attribute( "structureType", kind );
+			attribute( "kind", kind );
 		}
 
 		@Override
@@ -117,7 +115,7 @@ public final class StubIndexSchemaDataNode extends StubTreeNode<StubIndexSchemaD
 		}
 
 		public Builder objectField(String relativeFieldName, ObjectStructure structure, Consumer<Builder> contributor) {
-			Builder builder = StubIndexSchemaDataNode.objectField( this, relativeFieldName, structure );
+			Builder builder = StubIndexSchemaDataNode.objectField( this, relativeFieldName );
 			contributor.accept( builder );
 			child( builder );
 			return this;
@@ -132,11 +130,7 @@ public final class StubIndexSchemaDataNode extends StubTreeNode<StubIndexSchemaD
 		}
 
 		public Builder objectFieldTemplate(String relativeFieldName, Consumer<Builder> contributor) {
-			return objectFieldTemplate( relativeFieldName, ObjectStructure.DEFAULT, contributor );
-		}
-
-		public Builder objectFieldTemplate(String relativeFieldName, ObjectStructure structure, Consumer<Builder> contributor) {
-			Builder builder = StubIndexSchemaDataNode.objectFieldTemplate( this, relativeFieldName, structure );
+			Builder builder = StubIndexSchemaDataNode.objectFieldTemplate( this, relativeFieldName );
 			contributor.accept( builder );
 			child( builder );
 			return this;
@@ -157,7 +151,7 @@ public final class StubIndexSchemaDataNode extends StubTreeNode<StubIndexSchemaD
 			return this;
 		}
 
-		Builder objectStructure(ObjectStructure objectStructure) {
+		public Builder objectStructure(ObjectStructure objectStructure) {
 			attribute( "objectStructure", objectStructure );
 			return this;
 		}

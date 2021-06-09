@@ -288,15 +288,17 @@ public class IndexedEmbeddedBaseIT {
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> {
-				b.objectField( "default", ObjectStructure.DEFAULT, b2 -> {
+				b.objectField( "default", b2 -> {
 					b2.field( "default", String.class );
 					b2.field( "common", String.class );
 				} );
-				b.objectField( "flat", ObjectStructure.FLATTENED, b2 -> {
+				b.objectField( "flat", b2 -> {
+					b2.objectStructure( ObjectStructure.FLATTENED );
 					b2.field( "flat", String.class );
 					b2.field( "common", String.class );
 				} );
-				b.objectField( "nest", ObjectStructure.NESTED, b2 -> {
+				b.objectField( "nest", b2 -> {
+					b2.objectStructure( ObjectStructure.NESTED );
 					b2.field( "nest", String.class );
 					b2.field( "common", String.class );
 				} );
@@ -332,7 +334,7 @@ public class IndexedEmbeddedBaseIT {
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
-				.objectField( "level1", ObjectStructure.DEFAULT, b2 -> b2
+				.objectField( "level1", b2 -> b2
 						.multiValued( true )
 						.field( "level1SingleValuedProperty", String.class )
 						.field( "level1MultiValuedProperty", String.class, b3 -> b3.multiValued( true ) )
@@ -418,15 +420,15 @@ public class IndexedEmbeddedBaseIT {
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "level1_level1Property", String.class, b2 -> b2.multiValued( true ) )
 				.field( "level1_level2NoDotInPrefix_level2Property", String.class, b2 -> b2.multiValued( true ) )
-				.objectField( "level1_level2OneDotInPrefix", ObjectStructure.DEFAULT, b2 -> b2
+				.objectField( "level1_level2OneDotInPrefix", b2 -> b2
 						.multiValued( true )
 						// Not a direct child of level1: should be single-valued
 						.field( "level2Property", String.class )
 				)
-				.objectField( "level1_level2TwoDotsInPrefix", ObjectStructure.DEFAULT, b2 -> b2
+				.objectField( "level1_level2TwoDotsInPrefix", b2 -> b2
 						.multiValued( true )
 						// Not a direct child of level1: should be single-valued
-						.objectField( "level3", ObjectStructure.DEFAULT, b3 -> b3
+						.objectField( "level3", b3 -> b3
 								// Not a direct child of level1: should be single-valued
 								.field( "level2Property", String.class )
 						)
@@ -709,7 +711,8 @@ public class IndexedEmbeddedBaseIT {
 		}
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
-				.objectField( "level1", ObjectStructure.NESTED, b2 -> b2
+				.objectField( "level1", b2 -> b2
+						.objectStructure( ObjectStructure.NESTED )
 						.field( "level1Property", String.class )
 				)
 		);

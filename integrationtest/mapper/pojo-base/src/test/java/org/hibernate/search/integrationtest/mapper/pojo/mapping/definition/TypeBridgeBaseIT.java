@@ -713,7 +713,8 @@ public class TypeBridgeBaseIT {
 						.objectField( "stringFromBridge", b3 -> b3
 								.field( "value", String.class )
 						)
-						.objectField( "listFromBridge", ObjectStructure.NESTED, b3 -> b3
+						.objectField( "listFromBridge", b3 -> b3
+								.objectStructure( ObjectStructure.NESTED )
 								.multiValued( true )
 								.field( "value", Integer.class )
 						)
@@ -816,7 +817,8 @@ public class TypeBridgeBaseIT {
 						.fieldTemplate( "stringFromBridge_value", String.class, b3 -> b3
 								.matchingPathGlob( "*_string.value" )
 						)
-						.objectFieldTemplate( "listFromBridge", ObjectStructure.NESTED, b3 -> b3
+						.objectFieldTemplate( "listFromBridge", b3 -> b3
+								.objectStructure( ObjectStructure.NESTED )
 								.multiValued( true )
 								.matchingPathGlob( "*_list" )
 						)
