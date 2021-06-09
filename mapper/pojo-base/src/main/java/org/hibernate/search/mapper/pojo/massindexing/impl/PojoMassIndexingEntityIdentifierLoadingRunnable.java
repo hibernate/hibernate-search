@@ -49,8 +49,10 @@ public class PojoMassIndexingEntityIdentifierLoadingRunnable<E, I>
 				loader.loadNext();
 			}
 			while ( !context.done );
-		}
-		finally {
+			// Only do this when stopping normally,
+			// because this operation will block if the queue is full,
+			// resuming the thread only if the queue gets consumed (consumer still working)
+			// or if the thread is interrupted by the workspace (due to consumer failure).
 			identifierQueue.producerStopping();
 		}
 		log.trace( "finished" );
