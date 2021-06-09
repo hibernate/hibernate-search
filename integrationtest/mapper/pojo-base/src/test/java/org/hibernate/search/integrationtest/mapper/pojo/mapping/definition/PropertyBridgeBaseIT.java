@@ -869,7 +869,8 @@ public class PropertyBridgeBaseIT {
 				.objectField( "stringFromBridge", b2 -> b2
 						.field( "value", String.class )
 				)
-				.objectField( "listFromBridge", ObjectStructure.NESTED, b2 -> b2
+				.objectField( "listFromBridge", b2 -> b2
+						.objectStructure( ObjectStructure.NESTED )
 						.multiValued( true )
 						.field( "value", Integer.class )
 				)
@@ -966,7 +967,8 @@ public class PropertyBridgeBaseIT {
 				.fieldTemplate( "stringFromBridge_value", String.class, b2 -> b2
 						.matchingPathGlob( "*_string.value" )
 				)
-				.objectFieldTemplate( "listFromBridge", ObjectStructure.NESTED, b2 -> b2
+				.objectFieldTemplate( "listFromBridge", b2 -> b2
+						.objectStructure( ObjectStructure.NESTED )
 						.multiValued( true )
 						.matchingPathGlob( "*_list" )
 				)

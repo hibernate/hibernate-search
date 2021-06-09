@@ -56,7 +56,10 @@ abstract class AbstractStubIndexSchemaObjectNodeBuilder implements IndexSchemaOb
 	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
 			ObjectStructure structure) {
 		StubIndexSchemaDataNode.Builder childSchemaNodeBuilder =
-				StubIndexSchemaDataNode.objectField( schemaDataNodeBuilder, relativeFieldName, structure );
+				StubIndexSchemaDataNode.objectField( schemaDataNodeBuilder, relativeFieldName );
+		if ( structure != ObjectStructure.DEFAULT ) {
+			childSchemaNodeBuilder.objectStructure( structure );
+		}
 		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
 			getRootNodeBuilder().getBackendBehavior().onAddField(
 					getRootNodeBuilder().getIndexName(),
@@ -99,7 +102,10 @@ abstract class AbstractStubIndexSchemaObjectNodeBuilder implements IndexSchemaOb
 	public IndexSchemaFieldTemplateOptionsStep<?> addObjectFieldTemplate(String templateName,
 			ObjectStructure structure, String prefix, IndexFieldInclusion inclusion) {
 		StubIndexSchemaDataNode.Builder childBuilder =
-				StubIndexSchemaDataNode.objectFieldTemplate( schemaDataNodeBuilder, templateName, structure );
+				StubIndexSchemaDataNode.objectFieldTemplate( schemaDataNodeBuilder, templateName );
+		if ( structure != ObjectStructure.DEFAULT ) {
+			childBuilder.objectStructure( structure );
+		}
 		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
 			schemaDataNodeBuilder.child( childBuilder );
 		}
