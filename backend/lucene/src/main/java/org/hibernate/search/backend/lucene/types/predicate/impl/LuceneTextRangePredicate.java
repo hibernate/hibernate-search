@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
+import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -30,13 +30,13 @@ public class LuceneTextRangePredicate extends AbstractLuceneLeafSingleFieldPredi
 
 	public static class Factory<F>
 			extends
-			AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<RangePredicateBuilder, F, LuceneStandardFieldCodec<F, String>> {
+			AbstractLuceneCodecAwareSearchQueryElementFactory<RangePredicateBuilder, F, LuceneStandardFieldCodec<F, String>> {
 		public Factory(LuceneStandardFieldCodec<F, String> codec) {
 			super( codec );
 		}
 
 		@Override
-		public Builder<F> create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+		public Builder<F> create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
 			return new Builder<>( codec, scope, field );
 		}
 	}
@@ -47,7 +47,7 @@ public class LuceneTextRangePredicate extends AbstractLuceneLeafSingleFieldPredi
 		private Range<String> range;
 
 		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchIndexScope scope,
-				LuceneSearchValueFieldContext<F> field) {
+				LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			this.codec = codec;
 		}

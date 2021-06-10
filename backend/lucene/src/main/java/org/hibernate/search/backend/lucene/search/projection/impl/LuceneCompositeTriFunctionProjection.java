@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.util.common.function.TriFunction;
 
 class LuceneCompositeTriFunctionProjection<P1, P2, P3, P>

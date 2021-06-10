@@ -13,13 +13,13 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusio
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 
-public abstract class AbstractElasticsearchIndexSchemaFieldTemplate<N extends AbstractElasticsearchIndexSchemaFieldNode> {
+public abstract class AbstractElasticsearchIndexSchemaFieldTemplate<N extends AbstractElasticsearchIndexField> {
 
 	private final SimpleGlobPattern absolutePathGlob;
 	private final IndexFieldInclusion inclusion;
 	private final boolean multiValued;
 
-	AbstractElasticsearchIndexSchemaFieldTemplate(ElasticsearchIndexSchemaObjectNode declaringParent,
+	AbstractElasticsearchIndexSchemaFieldTemplate(ElasticsearchIndexCompositeNode declaringParent,
 			SimpleGlobPattern absolutePathGlob, IndexFieldInclusion inclusion,
 			boolean multiValued) {
 		this.absolutePathGlob = absolutePathGlob;
@@ -37,15 +37,15 @@ public abstract class AbstractElasticsearchIndexSchemaFieldTemplate<N extends Ab
 		}
 
 		RelativizedPath relativizedPath = FieldPaths.relativize( absolutePath );
-		ElasticsearchIndexSchemaObjectNode parent =
+		ElasticsearchIndexCompositeNode parent =
 				relativizedPath.parentPath
-						.<ElasticsearchIndexSchemaObjectNode>map( path ->
+						.<ElasticsearchIndexCompositeNode>map( path ->
 								model.fieldOrNull( path, IndexFieldFilter.ALL ).toObjectField() )
 						.orElseGet( model::root );
 
 		return createNode( parent, relativizedPath.relativePath, inclusion, multiValued );
 	}
 
-	protected abstract N createNode(ElasticsearchIndexSchemaObjectNode parent, String relativePath,
+	protected abstract N createNode(ElasticsearchIndexCompositeNode parent, String relativePath,
 			IndexFieldInclusion inclusion, boolean multiValued);
 }

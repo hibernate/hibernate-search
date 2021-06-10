@@ -12,10 +12,10 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCompositeNodeSearchQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexCompositeNodeContext;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchQueryElementFactory;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 import org.apache.lucene.search.Query;
@@ -49,7 +49,7 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 	}
 
 	public static class Factory
-			extends AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<NamedPredicateBuilder> {
+			extends AbstractLuceneCompositeNodeSearchQueryElementFactory<NamedPredicateBuilder> {
 		private final NamedPredicateProvider provider;
 		private final String predicateName;
 
@@ -69,24 +69,24 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 
 		@Override
 		public NamedPredicateBuilder create(LuceneSearchIndexScope scope,
-				LuceneSearchCompositeIndexSchemaElementContext element) {
-			return new Builder( provider, predicateName, scope, element );
+				LuceneSearchIndexCompositeNodeContext node) {
+			return new Builder( provider, predicateName, scope, node );
 		}
 	}
 
 	private static class Builder extends AbstractBuilder implements NamedPredicateBuilder {
 		private final NamedPredicateProvider provider;
 		private final String predicateName;
-		private final LuceneSearchCompositeIndexSchemaElementContext field;
+		private final LuceneSearchIndexCompositeNodeContext field;
 		private SearchPredicateFactory factory;
 		private final Map<String, Object> params = new LinkedHashMap<>();
 
 		Builder(NamedPredicateProvider provider, String predicateName, LuceneSearchIndexScope scope,
-				LuceneSearchCompositeIndexSchemaElementContext field) {
-			super( scope, field );
+				LuceneSearchIndexCompositeNodeContext node) {
+			super( scope, node );
 			this.provider = provider;
 			this.predicateName = predicateName;
-			this.field = field;
+			this.field = node;
 		}
 
 		@Override
@@ -113,12 +113,12 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 	private static class LuceneNamedPredicateProviderContext implements NamedPredicateProviderContext {
 
 		private final SearchPredicateFactory factory;
-		private final LuceneSearchCompositeIndexSchemaElementContext field;
+		private final LuceneSearchIndexCompositeNodeContext field;
 		private final String predicateName;
 		private final Map<String, Object> params;
 
 		LuceneNamedPredicateProviderContext(SearchPredicateFactory factory,
-				LuceneSearchCompositeIndexSchemaElementContext field,
+				LuceneSearchIndexCompositeNodeContext field,
 				String predicateName, Map<String, Object> params) {
 			this.factory = factory;
 			this.field = field;

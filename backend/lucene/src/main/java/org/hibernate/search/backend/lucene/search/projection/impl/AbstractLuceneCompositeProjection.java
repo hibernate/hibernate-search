@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 import java.util.Arrays;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;

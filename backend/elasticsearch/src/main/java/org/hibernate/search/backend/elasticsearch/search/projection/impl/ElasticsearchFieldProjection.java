@@ -17,9 +17,9 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnexpectedJsonElementTypeException;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
@@ -165,7 +165,7 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 
 		@Override
 		public TypeSelector<?> create(ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchValueFieldContext<F> field) {
+				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			// Check the compatibility of nested structure in the case of multi-index search.
 			field.nestedPathHierarchy();
 			return new TypeSelector<>( codec, scope, field );
@@ -175,10 +175,10 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 	public static class TypeSelector<F> implements FieldProjectionBuilder.TypeSelector {
 		private final ElasticsearchFieldCodec<F> codec;
 		private final ElasticsearchSearchIndexScope scope;
-		private final ElasticsearchSearchValueFieldContext<F> field;
+		private final ElasticsearchSearchIndexValueFieldContext<F> field;
 
 		private TypeSelector(ElasticsearchFieldCodec<F> codec,
-				ElasticsearchSearchIndexScope scope, ElasticsearchSearchValueFieldContext<F> field) {
+				ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<F> field) {
 			this.codec = codec;
 			this.scope = scope;
 			this.field = field;
@@ -198,12 +198,12 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 		private final ElasticsearchFieldCodec<F> codec;
 
 		private final ElasticsearchSearchIndexScope scope;
-		private final ElasticsearchSearchValueFieldContext<F> field;
+		private final ElasticsearchSearchIndexValueFieldContext<F> field;
 
 		private final ProjectionConverter<F, ? extends V> converter;
 
 		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchValueFieldContext<F> field, ProjectionConverter<F, ? extends V> converter) {
+				ElasticsearchSearchIndexValueFieldContext<F> field, ProjectionConverter<F, ? extends V> converter) {
 			this.codec = codec;
 			this.scope = scope;
 			this.field = field;

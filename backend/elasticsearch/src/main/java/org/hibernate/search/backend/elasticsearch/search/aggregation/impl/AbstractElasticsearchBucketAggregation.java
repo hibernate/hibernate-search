@@ -11,8 +11,8 @@ import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonElement;
@@ -87,7 +87,7 @@ public abstract class AbstractElasticsearchBucketAggregation<K, V>
 	public abstract static class AbstractBuilder<K, V>
 			extends AbstractElasticsearchNestableAggregation.AbstractBuilder<Map<K, V>> {
 
-		public AbstractBuilder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchValueFieldContext<?> field) {
+		public AbstractBuilder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<?> field) {
 			super( scope, field );
 		}
 

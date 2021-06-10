@@ -43,6 +43,6 @@ public interface StubSearchValueFieldTypeContext<F> {
 		}
 	}
 
-	<T> StubSearchQueryElementFactory<T>
+	<T> AbstractStubSearchQueryElementFactory<T>
 			queryElementFactory(SearchQueryElementTypeKey<T> key);
 }

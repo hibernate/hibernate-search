@@ -9,9 +9,9 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
+import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -31,13 +31,13 @@ public class LuceneNumericMatchPredicate extends AbstractLuceneLeafSingleFieldPr
 
 	public static class Factory<F, E extends Number>
 			extends
-			AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<MatchPredicateBuilder, F, AbstractLuceneNumericFieldCodec<F, E>> {
+			AbstractLuceneCodecAwareSearchQueryElementFactory<MatchPredicateBuilder, F, AbstractLuceneNumericFieldCodec<F, E>> {
 		public Factory(AbstractLuceneNumericFieldCodec<F, E> codec) {
 			super( codec );
 		}
 
 		@Override
-		public Builder<F, E> create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+		public Builder<F, E> create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
 			return new Builder<>( codec, scope, field );
 		}
 	}
@@ -48,7 +48,7 @@ public class LuceneNumericMatchPredicate extends AbstractLuceneLeafSingleFieldPr
 		private E value;
 
 		private Builder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchIndexScope scope,
-				LuceneSearchValueFieldContext<F> field) {
+				LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			this.codec = codec;
 		}

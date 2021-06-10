@@ -9,9 +9,9 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -62,19 +62,19 @@ public class ElasticsearchTextPhrasePredicate extends AbstractElasticsearchSingl
 			extends AbstractElasticsearchValueFieldSearchQueryElementFactory<PhrasePredicateBuilder, String> {
 		@Override
 		public PhrasePredicateBuilder create(ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchValueFieldContext<String> field) {
+				ElasticsearchSearchIndexValueFieldContext<String> field) {
 			return new Builder( scope, field );
 		}
 	}
 
 	private static class Builder extends AbstractBuilder implements PhrasePredicateBuilder {
-		private final ElasticsearchSearchValueFieldContext<String> field;
+		private final ElasticsearchSearchIndexValueFieldContext<String> field;
 		private Integer slop;
 		private JsonElement phrase;
 		private String analyzer;
 
 		private Builder(ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchValueFieldContext<String> field) {
+				ElasticsearchSearchIndexValueFieldContext<String> field) {
 			super( scope, field );
 			this.field = field;
 		}

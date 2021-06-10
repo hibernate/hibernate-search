@@ -12,9 +12,9 @@ import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDef
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.FuzzyQueryBuilder;
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
+import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -40,13 +40,13 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 
 	public static class Factory<F>
 			extends
-			AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<MatchPredicateBuilder, F, LuceneStandardFieldCodec<F, String>> {
+			AbstractLuceneCodecAwareSearchQueryElementFactory<MatchPredicateBuilder, F, LuceneStandardFieldCodec<F, String>> {
 		public Factory(LuceneStandardFieldCodec<F, String> codec) {
 			super( codec );
 		}
 
 		@Override
-		public Builder<F> create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+		public Builder<F> create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
 			return new Builder<>( codec, scope, field );
 		}
 	}
@@ -62,7 +62,7 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 
 		private Analyzer overrideAnalyzerOrNormalizer;
 
-		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			this.codec = codec;
 			this.analysisDefinitionRegistry = scope.analysisDefinitionRegistry();

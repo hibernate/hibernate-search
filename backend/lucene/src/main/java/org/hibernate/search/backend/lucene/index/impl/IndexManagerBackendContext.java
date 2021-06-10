@@ -30,7 +30,7 @@ import org.hibernate.search.backend.lucene.schema.management.impl.LuceneIndexSch
 import org.hibernate.search.backend.lucene.schema.management.impl.SchemaManagementIndexManagerContext;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSearchIndexScopeImpl;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexManagerContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;

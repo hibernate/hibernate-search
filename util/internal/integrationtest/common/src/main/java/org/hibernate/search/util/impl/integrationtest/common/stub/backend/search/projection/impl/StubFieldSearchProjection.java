@@ -15,10 +15,10 @@ import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.search.projection.spi.SingleValuedProjectionAccumulator;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexSchemaElementContext;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchValueFieldContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexNodeContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexValueFieldContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchQueryElementFactory;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.AbstractStubSearchQueryElementFactory;
 
 public class StubFieldSearchProjection<F, V> implements StubSearchProjection<V> {
 	private final Class<F> valueClass;
@@ -42,18 +42,18 @@ public class StubFieldSearchProjection<F, V> implements StubSearchProjection<V> 
 		return converter.valueType().cast( extractedData );
 	}
 
-	public static class Factory implements StubSearchQueryElementFactory<FieldProjectionBuilder.TypeSelector> {
+	public static class Factory extends AbstractStubSearchQueryElementFactory<FieldProjectionBuilder.TypeSelector> {
 		@Override
 		public FieldProjectionBuilder.TypeSelector create(StubSearchIndexScope scope,
-				StubSearchIndexSchemaElementContext element) {
-			return new TypeSelector<>( element.toValueField() );
+				StubSearchIndexNodeContext node) {
+			return new TypeSelector<>( node.toValueField() );
 		}
 	}
 
 	public static class TypeSelector<F> implements FieldProjectionBuilder.TypeSelector {
-		private final StubSearchValueFieldContext<F> field;
+		private final StubSearchIndexValueFieldContext<F> field;
 
-		public TypeSelector(StubSearchValueFieldContext<F> field) {
+		public TypeSelector(StubSearchIndexValueFieldContext<F> field) {
 			this.field = field;
 		}
 

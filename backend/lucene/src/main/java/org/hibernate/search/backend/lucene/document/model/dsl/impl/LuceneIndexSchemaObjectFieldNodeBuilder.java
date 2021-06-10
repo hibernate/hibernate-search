@@ -10,17 +10,15 @@ import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexField;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectField;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexObjectFieldReference;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -69,14 +67,14 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	@Override
-	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode,
-			Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByNameForParent) {
+	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexCompositeNode parentNode,
+			Map<String, AbstractLuceneIndexField> staticChildrenByNameForParent) {
 		if ( reference == null ) {
 			throw log.incompleteFieldDefinition( eventContext() );
 		}
 
-		Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByName = new TreeMap<>();
-		LuceneIndexSchemaObjectFieldNode node = new LuceneIndexSchemaObjectFieldNode(
+		Map<String, AbstractLuceneIndexField> staticChildrenByName = new TreeMap<>();
+		LuceneIndexObjectField node = new LuceneIndexObjectField(
 				parentNode, relativeFieldName, inclusion, structure, multiValued, false,
 				staticChildrenByName, buildQueryElementFactoryMap()
 		);

@@ -13,15 +13,14 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexField;
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldTemplate;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldTemplate;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldTemplate;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaRootNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexRoot;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactory;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIndexFieldTypeFactoryImpl;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
@@ -75,7 +74,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	public LuceneIndexModel build(String indexName) {
-		Map<String, AbstractLuceneIndexSchemaFieldNode> staticFields = new HashMap<>();
+		Map<String, AbstractLuceneIndexField> staticFields = new HashMap<>();
 		List<AbstractLuceneIndexSchemaFieldTemplate<?>> fieldTemplates = new ArrayList<>();
 		// Initializing a one-element array so that we can mutate the boolean below.
 		// Alternatively we could use AtomicBoolean, but we don't need concurrent access here.
@@ -83,12 +82,12 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 
 		LuceneIndexSchemaNodeCollector collector = new LuceneIndexSchemaNodeCollector() {
 			@Override
-			public void collect(String absoluteFieldPath, LuceneIndexSchemaValueFieldNode<?> node) {
+			public void collect(String absoluteFieldPath, LuceneIndexValueField<?> node) {
 				staticFields.put( absoluteFieldPath, node );
 			}
 
 			@Override
-			public void collect(String absolutePath, LuceneIndexSchemaObjectFieldNode node) {
+			public void collect(String absolutePath, LuceneIndexObjectField node) {
 				staticFields.put( absolutePath, node );
 				if ( isNested( node.structure() ) ) {
 					hasNestedDocument[0] = true;
@@ -109,8 +108,8 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 			}
 		};
 
-		Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByName = new TreeMap<>();
-		LuceneIndexSchemaRootNode rootNode = new LuceneIndexSchemaRootNode( staticChildrenByName, buildQueryElementFactoryMap() );
+		Map<String, AbstractLuceneIndexField> staticChildrenByName = new TreeMap<>();
+		LuceneIndexRoot rootNode = new LuceneIndexRoot( staticChildrenByName, buildQueryElementFactoryMap() );
 		contributeChildren( rootNode, collector, staticChildrenByName );
 
 		return new LuceneIndexModel(

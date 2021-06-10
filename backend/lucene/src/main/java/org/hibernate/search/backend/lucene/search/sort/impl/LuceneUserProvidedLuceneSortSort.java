@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 
 import org.apache.lucene.search.Sort;
 

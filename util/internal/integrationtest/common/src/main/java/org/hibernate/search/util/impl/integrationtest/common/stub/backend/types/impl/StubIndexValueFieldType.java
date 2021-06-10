@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocu
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchQueryElementFactory;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.AbstractStubSearchQueryElementFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchValueFieldTypeContext;
 
 public final class StubIndexValueFieldType<F> implements IndexFieldType<F>, StubSearchValueFieldTypeContext<F> {
@@ -74,7 +74,7 @@ public final class StubIndexValueFieldType<F> implements IndexFieldType<F>, Stub
 	}
 
 	@Override
-	public <T> StubSearchQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
+	public <T> AbstractStubSearchQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
 		return StubSearchQueryElementFactories.get( key );
 	}
 }

@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 
 class LuceneCompositeFunctionProjection<P1, P>
 		extends AbstractLuceneCompositeProjection<P> {

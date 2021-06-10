@@ -45,16 +45,16 @@ public class StubSearchIndexScope {
 	}
 
 	@SuppressWarnings("unchecked")
-	public StubSearchIndexSchemaElementContext field(String absoluteFieldPath) {
-		List<StubSearchIndexSchemaElementContext> fieldForEachIndex = new ArrayList<>();
-		StubSearchIndexSchemaElementContext firstField = null;
+	public StubSearchIndexNodeContext field(String absoluteFieldPath) {
+		List<StubSearchIndexNodeContext> fieldForEachIndex = new ArrayList<>();
+		StubSearchIndexNodeContext firstField = null;
 
 		for ( StubIndexModel model : indexModels ) {
 			StubIndexNode nodeForCurrentIndex = model.fieldOrNull( absoluteFieldPath );
 			if ( nodeForCurrentIndex == null ) {
 				continue;
 			}
-			StubSearchIndexSchemaElementContext fieldForCurrentIndex = nodeForCurrentIndex.toSearchContext();
+			StubSearchIndexNodeContext fieldForCurrentIndex = nodeForCurrentIndex.toSearchContext();
 			if ( firstField == null ) {
 				firstField = fieldForCurrentIndex;
 			}
@@ -70,11 +70,11 @@ public class StubSearchIndexScope {
 		}
 
 		if ( fieldForEachIndex.get( 0 ).isValueField() ) {
-			return new StubMultiIndexSearchValueFieldContext<>( this, absoluteFieldPath,
+			return new StubMultiIndexSearchIndexValueFieldContext<>( this, absoluteFieldPath,
 					(List) fieldForEachIndex );
 		}
 		else {
-			return new StubMultiIndexSearchCompositeIndexSchemaElementContext( this, absoluteFieldPath,
+			return new StubMultiIndexSearchIndexCompositeNodeContext( this, absoluteFieldPath,
 					(List) fieldForEachIndex );
 		}
 	}

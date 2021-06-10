@@ -10,9 +10,9 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
+import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
@@ -86,13 +86,14 @@ public class LuceneFieldProjection<E, P, F, V> extends AbstractLuceneProjection<
 	}
 
 	public static class Factory<F>
-			extends AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<FieldProjectionBuilder.TypeSelector, F, LuceneFieldCodec<F>> {
+			extends
+			AbstractLuceneCodecAwareSearchQueryElementFactory<FieldProjectionBuilder.TypeSelector, F, LuceneFieldCodec<F>> {
 		public Factory(LuceneFieldCodec<F> codec) {
 			super( codec );
 		}
 
 		@Override
-		public TypeSelector<?> create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+		public TypeSelector<?> create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
 			// Fail early if the nested structure differs in the case of multi-index search.
 			field.nestedPathHierarchy();
 			return new TypeSelector<>( codec, scope, field );
@@ -102,10 +103,10 @@ public class LuceneFieldProjection<E, P, F, V> extends AbstractLuceneProjection<
 	private static class TypeSelector<F> implements FieldProjectionBuilder.TypeSelector {
 		private final LuceneFieldCodec<F> codec;
 		private final LuceneSearchIndexScope scope;
-		private final LuceneSearchValueFieldContext<F> field;
+		private final LuceneSearchIndexValueFieldContext<F> field;
 
 		private TypeSelector(LuceneFieldCodec<F> codec,
-				LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+				LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
 			this.codec = codec;
 			this.scope = scope;
 			this.field = field;
@@ -125,12 +126,12 @@ public class LuceneFieldProjection<E, P, F, V> extends AbstractLuceneProjection<
 
 		private final LuceneFieldCodec<F> codec;
 
-		private final LuceneSearchValueFieldContext<F> field;
+		private final LuceneSearchIndexValueFieldContext<F> field;
 
 		private final ProjectionConverter<F, ? extends V> converter;
 
 		private Builder(LuceneFieldCodec<F> codec, LuceneSearchIndexScope scope,
-				LuceneSearchValueFieldContext<F> field, ProjectionConverter<F, ? extends V> converter) {
+				LuceneSearchIndexValueFieldContext<F> field, ProjectionConverter<F, ? extends V> converter) {
 			super( scope );
 			this.codec = codec;
 			this.field = field;

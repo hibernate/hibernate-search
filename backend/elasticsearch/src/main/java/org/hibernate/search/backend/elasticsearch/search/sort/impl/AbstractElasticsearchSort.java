@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilder;
 
 public abstract class AbstractElasticsearchSort implements ElasticsearchSearchSort {

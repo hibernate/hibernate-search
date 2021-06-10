@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.util.function.BiFunction;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 
 class LuceneCompositeBiFunctionProjection<P1, P2, P>
 		extends AbstractLuceneCompositeProjection<P> {

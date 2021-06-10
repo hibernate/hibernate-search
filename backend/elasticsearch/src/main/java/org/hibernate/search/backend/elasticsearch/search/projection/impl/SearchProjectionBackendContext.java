@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 
 public final class SearchProjectionBackendContext {
 

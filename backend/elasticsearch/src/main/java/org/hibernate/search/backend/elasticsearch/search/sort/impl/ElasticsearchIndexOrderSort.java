@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 
 import com.google.gson.JsonPrimitive;
 

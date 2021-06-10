@@ -12,9 +12,9 @@ import java.util.Optional;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -77,20 +77,20 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 
 		@Override
 		public RangePredicateBuilder create(ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchValueFieldContext<F> field) {
+				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			return new Builder<>( codec, scope, field );
 		}
 	}
 
 	private static class Builder<F> extends AbstractBuilder implements RangePredicateBuilder {
 
-		private final ElasticsearchSearchValueFieldContext<F> field;
+		private final ElasticsearchSearchIndexValueFieldContext<F> field;
 		private final ElasticsearchFieldCodec<F> codec;
 
 		private Range<JsonElement> range;
 
 		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchValueFieldContext<F> field) {
+				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			this.codec = codec;
 			this.field = field;

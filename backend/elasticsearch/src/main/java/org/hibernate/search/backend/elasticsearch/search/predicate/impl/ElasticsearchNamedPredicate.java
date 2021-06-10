@@ -10,10 +10,10 @@ import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCompositeNodeSearchQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexCompositeNodeContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchQueryElementFactory;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 import com.google.gson.JsonObject;
@@ -51,7 +51,7 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 	}
 
 	public static class Factory
-			extends AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<NamedPredicateBuilder> {
+			extends AbstractElasticsearchCompositeNodeSearchQueryElementFactory<NamedPredicateBuilder> {
 		private final NamedPredicateProvider provider;
 		private final String predicateName;
 
@@ -71,25 +71,25 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 
 		@Override
 		public NamedPredicateBuilder create(ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchCompositeIndexSchemaElementContext element) {
-			return new Builder( provider, predicateName, scope, element );
+				ElasticsearchSearchIndexCompositeNodeContext node) {
+			return new Builder( provider, predicateName, scope, node );
 		}
 	}
 
 	private static class Builder extends AbstractBuilder implements NamedPredicateBuilder {
 		private final NamedPredicateProvider provider;
 		private final String predicateName;
-		private final ElasticsearchSearchCompositeIndexSchemaElementContext field;
+		private final ElasticsearchSearchIndexCompositeNodeContext field;
 		private SearchPredicateFactory factory;
 		private final Map<String, Object> params = new LinkedHashMap<>();
 
 		Builder(NamedPredicateProvider provider, String predicateName,
 				ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchCompositeIndexSchemaElementContext field) {
-			super( scope, field );
+				ElasticsearchSearchIndexCompositeNodeContext node) {
+			super( scope, node );
 			this.provider = provider;
 			this.predicateName = predicateName;
-			this.field = field;
+			this.field = node;
 		}
 
 		@Override
@@ -117,12 +117,12 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 	private static class ElasticsearchNamedPredicateProviderContext implements NamedPredicateProviderContext {
 
 		private final SearchPredicateFactory factory;
-		private final ElasticsearchSearchCompositeIndexSchemaElementContext field;
+		private final ElasticsearchSearchIndexCompositeNodeContext field;
 		private final String predicateName;
 		private final Map<String, Object> params;
 
 		ElasticsearchNamedPredicateProviderContext(SearchPredicateFactory factory,
-				ElasticsearchSearchCompositeIndexSchemaElementContext field, String predicateName,
+				ElasticsearchSearchIndexCompositeNodeContext field, String predicateName,
 				Map<String, Object> params) {
 			this.factory = factory;
 			this.field = field;

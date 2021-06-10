@@ -10,8 +10,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -38,9 +38,9 @@ public abstract class AbstractLuceneLeafSingleFieldPredicate extends AbstractLuc
 
 	public abstract static class AbstractBuilder<F>
 			extends AbstractLuceneSingleFieldPredicate.AbstractBuilder {
-		protected final LuceneSearchValueFieldContext<F> field;
+		protected final LuceneSearchIndexValueFieldContext<F> field;
 
-		protected AbstractBuilder(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+		protected AbstractBuilder(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			this.field = field;
 		}

@@ -12,8 +12,8 @@ import java.util.List;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -117,11 +117,11 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 
 	public abstract static class AbstractBuilder<A> extends AbstractElasticsearchAggregation.AbstractBuilder<A> {
 
-		protected final ElasticsearchSearchValueFieldContext<?> field;
+		protected final ElasticsearchSearchIndexValueFieldContext<?> field;
 		protected final List<String> nestedPathHierarchy;
 		private ElasticsearchSearchPredicate filter;
 
-		public AbstractBuilder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchValueFieldContext<?> field) {
+		public AbstractBuilder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<?> field) {
 			super( scope );
 			this.field = field;
 			this.nestedPathHierarchy = field.nestedPathHierarchy();

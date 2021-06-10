@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
+import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
@@ -26,9 +26,9 @@ public class LuceneGeoPointSpatialWithinBoundingBoxPredicate extends AbstractLuc
 
 	public static class Factory
 			extends
-			AbstractLuceneSearchValueFieldQueryElementFactory<SpatialWithinBoundingBoxPredicateBuilder, GeoPoint> {
+			AbstractLuceneValueFieldSearchQueryElementFactory<SpatialWithinBoundingBoxPredicateBuilder, GeoPoint> {
 		@Override
-		public Builder create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<GeoPoint> field) {
+		public Builder create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<GeoPoint> field) {
 			return new Builder( scope, field );
 		}
 	}
@@ -36,7 +36,7 @@ public class LuceneGeoPointSpatialWithinBoundingBoxPredicate extends AbstractLuc
 	private static class Builder extends AbstractBuilder<GeoPoint> implements SpatialWithinBoundingBoxPredicateBuilder {
 		protected GeoBoundingBox boundingBox;
 
-		private Builder(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<GeoPoint> field) {
+		private Builder(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<GeoPoint> field) {
 			super( scope, field );
 		}
 

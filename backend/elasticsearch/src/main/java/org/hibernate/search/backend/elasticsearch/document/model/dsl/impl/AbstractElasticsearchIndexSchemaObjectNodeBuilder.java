@@ -12,14 +12,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexField;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexCompositeNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCompositeNodeSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchNamedPredicate;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
@@ -109,12 +107,12 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 		return templateBuilder;
 	}
 
-	final Map<SearchQueryElementTypeKey<?>, AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>>
+	final Map<SearchQueryElementTypeKey<?>, AbstractElasticsearchCompositeNodeSearchQueryElementFactory<?>>
 			buildQueryElementFactoryMap() {
 		if ( namedPredicates.isEmpty() ) {
 			return Collections.emptyMap();
 		}
-		Map<SearchQueryElementTypeKey<?>, AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<?>>
+		Map<SearchQueryElementTypeKey<?>, AbstractElasticsearchCompositeNodeSearchQueryElementFactory<?>>
 				result = new HashMap<>();
 		for ( Map.Entry<String, ElasticsearchIndexSchemaNamedPredicateOptions> entry : namedPredicates.entrySet() ) {
 			ElasticsearchIndexSchemaNamedPredicateOptions options = entry.getValue();
@@ -127,9 +125,9 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 		return result;
 	}
 
-	final void contributeChildren(AbstractTypeMapping mapping, ElasticsearchIndexSchemaObjectNode node,
+	final void contributeChildren(AbstractTypeMapping mapping, ElasticsearchIndexCompositeNode node,
 			ElasticsearchIndexSchemaNodeCollector collector,
-			Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByNameForParent) {
+			Map<String, AbstractElasticsearchIndexField> staticChildrenByNameForParent) {
 		for ( Map.Entry<String, ElasticsearchIndexSchemaNodeContributor> entry : fields.entrySet() ) {
 			ElasticsearchIndexSchemaNodeContributor propertyContributor = entry.getValue();
 			propertyContributor.contribute( collector, node, staticChildrenByNameForParent, mapping );

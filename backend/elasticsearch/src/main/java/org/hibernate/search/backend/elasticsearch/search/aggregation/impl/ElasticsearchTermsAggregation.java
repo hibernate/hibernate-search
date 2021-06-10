@@ -8,9 +8,9 @@ package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
@@ -87,7 +87,7 @@ public class ElasticsearchTermsAggregation<F, K>
 
 		@Override
 		public TypeSelector<?> create(ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchValueFieldContext<F> field) {
+				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			return new TypeSelector<>( codec, scope, field );
 		}
 	}
@@ -95,10 +95,10 @@ public class ElasticsearchTermsAggregation<F, K>
 	private static class TypeSelector<F> implements TermsAggregationBuilder.TypeSelector {
 		private final ElasticsearchFieldCodec<F> codec;
 		private final ElasticsearchSearchIndexScope scope;
-		private final ElasticsearchSearchValueFieldContext<F> field;
+		private final ElasticsearchSearchIndexValueFieldContext<F> field;
 
 		private TypeSelector(ElasticsearchFieldCodec<F> codec,
-				ElasticsearchSearchIndexScope scope, ElasticsearchSearchValueFieldContext<F> field) {
+				ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<F> field) {
 			this.codec = codec;
 			this.scope = scope;
 			this.field = field;
@@ -122,7 +122,7 @@ public class ElasticsearchTermsAggregation<F, K>
 		private int size = 100;
 
 		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchValueFieldContext<F> field,
+				ElasticsearchSearchIndexValueFieldContext<F> field,
 				ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
 			super( scope, field );
 			this.codec = codec;

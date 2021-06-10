@@ -12,8 +12,8 @@ import java.util.List;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.AbstractElasticsearchReversibleSort;
@@ -77,13 +77,13 @@ abstract class AbstractElasticsearchDocumentValueSort extends AbstractElasticsea
 
 	abstract static class AbstractBuilder<F> extends AbstractElasticsearchReversibleSort.AbstractBuilder {
 		private final ElasticsearchSearchSyntax searchSyntax;
-		protected final ElasticsearchSearchValueFieldContext<F> field;
+		protected final ElasticsearchSearchIndexValueFieldContext<F> field;
 		protected final List<String> nestedPathHierarchy;
 
 		private JsonPrimitive mode;
 		private ElasticsearchSearchPredicate filter;
 
-		AbstractBuilder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchValueFieldContext<F> field) {
+		AbstractBuilder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<F> field) {
 			super( scope );
 			this.searchSyntax = scope.searchSyntax();
 			this.field = field;

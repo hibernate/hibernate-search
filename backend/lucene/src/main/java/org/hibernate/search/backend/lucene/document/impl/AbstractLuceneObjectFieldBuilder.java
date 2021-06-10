@@ -7,13 +7,13 @@
 package org.hibernate.search.backend.lucene.document.impl;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectField;
 
 class AbstractLuceneObjectFieldBuilder extends AbstractLuceneDocumentElementBuilder {
 
 	private final AbstractLuceneDocumentElementBuilder parent;
 
-	AbstractLuceneObjectFieldBuilder(LuceneIndexModel model, LuceneIndexSchemaObjectFieldNode schemaNode,
+	AbstractLuceneObjectFieldBuilder(LuceneIndexModel model, LuceneIndexObjectField schemaNode,
 			AbstractLuceneDocumentElementBuilder parent, LuceneDocumentContentImpl documentContent) {
 		super( model, schemaNode, documentContent );
 		this.parent = parent;

@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectField;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -21,7 +21,7 @@ class LuceneFlattenedObjectFieldBuilder extends AbstractLuceneObjectFieldBuilder
 
 	private final Set<String> encounteredFields = new HashSet<>();
 
-	LuceneFlattenedObjectFieldBuilder(LuceneIndexModel model, LuceneIndexSchemaObjectFieldNode schemaNode,
+	LuceneFlattenedObjectFieldBuilder(LuceneIndexModel model, LuceneIndexObjectField schemaNode,
 			AbstractLuceneDocumentElementBuilder parent, LuceneDocumentContentImpl documentContent) {
 		// The document content is not ours: it's the parent's.
 		super( model, schemaNode, parent, documentContent );

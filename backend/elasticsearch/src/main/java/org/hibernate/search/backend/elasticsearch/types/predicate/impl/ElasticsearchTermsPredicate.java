@@ -13,9 +13,9 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
@@ -104,14 +104,14 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 
 		@Override
 		public TermsPredicateBuilder create(ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchValueFieldContext<F> field) {
+				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			return new Builder<>( codec, scope, field );
 		}
 	}
 
 	private static class Builder<F> extends AbstractBuilder implements TermsPredicateBuilder {
 
-		private final ElasticsearchSearchValueFieldContext<F> field;
+		private final ElasticsearchSearchIndexValueFieldContext<F> field;
 		private final ElasticsearchFieldCodec<F> codec;
 
 		private JsonElement term;
@@ -119,7 +119,7 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 		private boolean allMatch;
 
 		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchValueFieldContext<F> field) {
+				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			// Score is always constant for this query
 			constantScore();

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;

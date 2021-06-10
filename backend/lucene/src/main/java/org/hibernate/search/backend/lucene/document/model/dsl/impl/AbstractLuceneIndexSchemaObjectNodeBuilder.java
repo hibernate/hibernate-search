@@ -12,12 +12,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexField;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCompositeNodeSearchQueryElementFactory;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneNamedPredicate;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
@@ -111,12 +109,12 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 
 	abstract String getAbsolutePath();
 
-	final Map<SearchQueryElementTypeKey<?>, AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>>
+	final Map<SearchQueryElementTypeKey<?>, AbstractLuceneCompositeNodeSearchQueryElementFactory<?>>
 			buildQueryElementFactoryMap() {
 		if ( namedPredicates.isEmpty() ) {
 			return Collections.emptyMap();
 		}
-		Map<SearchQueryElementTypeKey<?>, AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<?>>
+		Map<SearchQueryElementTypeKey<?>, AbstractLuceneCompositeNodeSearchQueryElementFactory<?>>
 				result = new HashMap<>();
 		for ( Map.Entry<String, LuceneIndexSchemaNamedPredicateOptions> entry : namedPredicates.entrySet() ) {
 			LuceneIndexSchemaNamedPredicateOptions options = entry.getValue();
@@ -129,8 +127,8 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 		return result;
 	}
 
-	final void contributeChildren(LuceneIndexSchemaObjectNode node, LuceneIndexSchemaNodeCollector collector,
-			Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByNameForParent) {
+	final void contributeChildren(LuceneIndexCompositeNode node, LuceneIndexSchemaNodeCollector collector,
+			Map<String, AbstractLuceneIndexField> staticChildrenByNameForParent) {
 		for ( LuceneIndexSchemaNodeContributor contributor : fields.values() ) {
 			contributor.contribute( collector, node, staticChildrenByNameForParent );
 		}

@@ -11,9 +11,9 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -65,7 +65,7 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 
 		@Override
 		public MatchPredicateBuilder create(ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchValueFieldContext<String> field) {
+				ElasticsearchSearchIndexValueFieldContext<String> field) {
 			return new Builder( codec, scope, field );
 		}
 	}
@@ -76,7 +76,7 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 		private String analyzer;
 
 		private Builder(ElasticsearchFieldCodec<String> codec, ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchValueFieldContext<String> field) {
+				ElasticsearchSearchIndexValueFieldContext<String> field) {
 			super( codec, scope, field );
 		}
 

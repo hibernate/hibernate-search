@@ -11,9 +11,9 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCodecAwareSearchQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
@@ -63,20 +63,20 @@ public class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSi
 
 		@Override
 		public MatchPredicateBuilder create(ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchValueFieldContext<F> field) {
+				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			return new Builder<>( codec, scope, field );
 		}
 	}
 
 	static class Builder<F> extends AbstractBuilder implements MatchPredicateBuilder {
 
-		protected final ElasticsearchSearchValueFieldContext<F> field;
+		protected final ElasticsearchSearchIndexValueFieldContext<F> field;
 		private final ElasticsearchFieldCodec<F> codec;
 
 		private JsonElement value;
 
 		Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchValueFieldContext<F> field) {
+				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			this.field = field;
 			this.codec = codec;

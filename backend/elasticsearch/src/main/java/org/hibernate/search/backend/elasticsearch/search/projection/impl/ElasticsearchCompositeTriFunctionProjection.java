@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.util.common.function.TriFunction;
 
 class ElasticsearchCompositeTriFunctionProjection<P1, P2, P3, P>

@@ -7,9 +7,9 @@
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCompositeNodeSearchQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexCompositeNodeContext;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 
@@ -55,25 +55,25 @@ public class LuceneNestedPredicate extends AbstractLuceneSingleFieldPredicate {
 	}
 
 	public static class Factory
-			extends AbstractLuceneSearchCompositeIndexSchemaElementQueryElementFactory<NestedPredicateBuilder> {
+			extends AbstractLuceneCompositeNodeSearchQueryElementFactory<NestedPredicateBuilder> {
 		public static final Factory INSTANCE = new Factory();
 
 		private Factory() {
 		}
 
 		@Override
-		public NestedPredicateBuilder create(LuceneSearchIndexScope scope, LuceneSearchCompositeIndexSchemaElementContext element) {
-			return new Builder( scope, element );
+		public NestedPredicateBuilder create(LuceneSearchIndexScope scope, LuceneSearchIndexCompositeNodeContext node) {
+			return new Builder( scope, node );
 		}
 	}
 
 	private static class Builder extends AbstractBuilder implements NestedPredicateBuilder {
 		private LuceneSearchPredicate nestedPredicate;
 
-		Builder(LuceneSearchIndexScope scope, LuceneSearchCompositeIndexSchemaElementContext field) {
-			super( scope, field.absolutePath(),
+		Builder(LuceneSearchIndexScope scope, LuceneSearchIndexCompositeNodeContext node) {
+			super( scope, node.absolutePath(),
 					// nestedPathHierarchy includes absoluteFieldPath at the end, but here we don't want it to be included.
-					field.nestedPathHierarchy().subList( 0, field.nestedPathHierarchy().size() - 1 ) );
+					node.nestedPathHierarchy().subList( 0, node.nestedPathHierarchy().size() - 1 ) );
 		}
 
 		@Override

@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
+import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneLeafSingleFieldPredicate;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -31,13 +31,13 @@ public class LuceneNumericTermsPredicate extends AbstractLuceneLeafSingleFieldPr
 
 	public static class Factory<F, E extends Number>
 			extends
-			AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<TermsPredicateBuilder, F, AbstractLuceneNumericFieldCodec<F, E>> {
+			AbstractLuceneCodecAwareSearchQueryElementFactory<TermsPredicateBuilder, F, AbstractLuceneNumericFieldCodec<F, E>> {
 		public Factory(AbstractLuceneNumericFieldCodec<F, E> codec) {
 			super( codec );
 		}
 
 		@Override
-		public Builder<F, E> create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+		public Builder<F, E> create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
 			return new Builder<>( codec, scope, field );
 		}
 	}
@@ -50,7 +50,7 @@ public class LuceneNumericTermsPredicate extends AbstractLuceneLeafSingleFieldPr
 		private boolean allMatch;
 
 		private Builder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchIndexScope scope,
-				LuceneSearchValueFieldContext<F> field) {
+				LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			// Score is always constant for this query
 			constantScore();

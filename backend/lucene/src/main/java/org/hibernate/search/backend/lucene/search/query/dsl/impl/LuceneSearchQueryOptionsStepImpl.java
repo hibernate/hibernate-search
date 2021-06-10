@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.search.query.LuceneSearchScroll;
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryOptionsStep;
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryWhereStep;
 import org.hibernate.search.backend.lucene.search.sort.dsl.LuceneSearchSortFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScopeImpl;

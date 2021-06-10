@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexSchemaElementContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexNodeContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
@@ -124,7 +124,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public NamedPredicateBuilder named(String absoluteFieldPath, String name) {
-		ElasticsearchSearchIndexSchemaElementContext targetElementContext =
+		ElasticsearchSearchIndexNodeContext targetElementContext =
 				absoluteFieldPath == null ? scope.root() : scope.field( absoluteFieldPath );
 		return targetElementContext.queryElement( PredicateTypeKeys.named( name ), scope );
 	}
