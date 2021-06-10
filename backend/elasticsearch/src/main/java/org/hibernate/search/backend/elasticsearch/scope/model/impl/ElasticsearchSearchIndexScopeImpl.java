@@ -6,56 +6,39 @@
  */
 package org.hibernate.search.backend.elasticsearch.scope.model.impl;
 
-import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexField;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchMultiIndexSearchIndexCompositeNodeContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchMultiIndexSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexCompositeNodeContext;
-import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexNodeContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.StringDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.scope.spi.AbstractSearchIndexScope;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
-import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-public final class ElasticsearchSearchIndexScopeImpl implements ElasticsearchSearchIndexScope {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private static final StringDocumentIdentifierValueConverter RAW_ID_CONVERTER =
-			new StringDocumentIdentifierValueConverter();
-
-	// Mapping context
-	private final ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext;
-	private final ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext;
+public final class ElasticsearchSearchIndexScopeImpl
+		extends AbstractSearchIndexScope<
+						ElasticsearchSearchIndexScope,
+						ElasticsearchIndexModel,
+						ElasticsearchSearchIndexNodeContext,
+						ElasticsearchSearchIndexCompositeNodeContext
+				>
+		implements ElasticsearchSearchIndexScope {
 
 	// Backend context
 	private final Gson userFacingGson;
@@ -64,8 +47,6 @@ public final class ElasticsearchSearchIndexScopeImpl implements ElasticsearchSea
 	private final TimingSource timingSource;
 
 	// Targeted indexes
-	private final Set<ElasticsearchIndexModel> indexModels;
-	private final Set<String> hibernateSearchIndexNames;
 	private final Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex;
 	private final int maxResultWindow;
 
@@ -74,20 +55,15 @@ public final class ElasticsearchSearchIndexScopeImpl implements ElasticsearchSea
 			MultiTenancyStrategy multiTenancyStrategy,
 			TimingSource timingSource,
 			Set<ElasticsearchIndexModel> indexModels) {
-		this.toDocumentIdentifierValueConvertContext = new ToDocumentIdentifierValueConvertContextImpl(
-				mappingContext );
-		this.toDocumentFieldValueConvertContext = new ToDocumentFieldValueConvertContextImpl( mappingContext );
+		super( mappingContext, indexModels );
 		this.userFacingGson = userFacingGson;
 		this.searchSyntax = searchSyntax;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.timingSource = timingSource;
 
-		this.indexModels = indexModels;
 		// Use LinkedHashMap/LinkedHashSet to ensure stable order when generating requests
-		this.hibernateSearchIndexNames = new LinkedHashSet<>();
 		this.mappedTypeNameToIndex = new LinkedHashMap<>();
 		for ( ElasticsearchIndexModel model : indexModels ) {
-			hibernateSearchIndexNames.add( model.hibernateSearchName() );
 			mappedTypeNameToIndex.put( model.mappedTypeName(), model );
 		}
 
@@ -102,13 +78,8 @@ public final class ElasticsearchSearchIndexScopeImpl implements ElasticsearchSea
 	}
 
 	@Override
-	public ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext() {
-		return toDocumentIdentifierValueConvertContext;
-	}
-
-	@Override
-	public ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext() {
-		return toDocumentFieldValueConvertContext;
+	protected ElasticsearchSearchIndexScope self() {
+		return this;
 	}
 
 	@Override
@@ -151,61 +122,8 @@ public final class ElasticsearchSearchIndexScopeImpl implements ElasticsearchSea
 	}
 
 	@Override
-	public Set<String> hibernateSearchIndexNames() {
-		return hibernateSearchIndexNames;
-	}
-
-	@Override
 	public Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex() {
 		return mappedTypeNameToIndex;
-	}
-
-	@Override
-	public DocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert) {
-		if ( ValueConvert.NO.equals( valueConvert ) ) {
-			return RAW_ID_CONVERTER;
-		}
-		DocumentIdentifierValueConverter<?> converter = null;
-		for ( ElasticsearchIndexModel indexModel : indexModels ) {
-			DocumentIdentifierValueConverter<?> converterForIndex = indexModel.idDslConverter();
-			if ( converter == null ) {
-				converter = converterForIndex;
-			}
-			else if ( !converter.isCompatibleWith( converterForIndex ) ) {
-				throw log.inconsistentConfigurationForIdentifierForSearch( converter, converterForIndex, indexesEventContext() );
-			}
-		}
-		return converter;
-	}
-
-	@Override
-	public ElasticsearchSearchIndexCompositeNodeContext root() {
-		if ( indexes().size() == 1 ) {
-			return indexModels.iterator().next().root();
-		}
-		else {
-			List<ElasticsearchSearchIndexCompositeNodeContext> rootForEachIndex = new ArrayList<>();
-			for ( ElasticsearchIndexModel indexModel : indexModels ) {
-				rootForEachIndex.add( indexModel.root() );
-			}
-			return new ElasticsearchMultiIndexSearchIndexCompositeNodeContext( this,
-					null, rootForEachIndex );
-		}
-	}
-
-	@Override
-	public ElasticsearchSearchIndexNodeContext field(String absoluteFieldPath) {
-		ElasticsearchSearchIndexNodeContext resultOrNull;
-		if ( indexes().size() == 1 ) {
-			resultOrNull = indexModels.iterator().next().fieldOrNull( absoluteFieldPath );
-		}
-		else {
-			resultOrNull = createMultiIndexFieldContext( absoluteFieldPath );
-		}
-		if ( resultOrNull == null ) {
-			throw log.unknownFieldForSearch( absoluteFieldPath, indexesEventContext() );
-		}
-		return resultOrNull;
 	}
 
 	@Override
@@ -213,48 +131,26 @@ public final class ElasticsearchSearchIndexScopeImpl implements ElasticsearchSea
 		return maxResultWindow;
 	}
 
-	private EventContext indexesEventContext() {
-		return EventContexts.fromIndexNames( hibernateSearchIndexNames() );
+	@Override
+	protected ElasticsearchSearchIndexCompositeNodeContext createMultiIndexSearchRootContext(
+			List<ElasticsearchSearchIndexCompositeNodeContext> rootForEachIndex) {
+		return new ElasticsearchMultiIndexSearchIndexCompositeNodeContext( this, null,
+				rootForEachIndex );
 	}
 
-	@SuppressWarnings({"rawtypes", "unchecked"}) // We check types using reflection
-	private ElasticsearchSearchIndexNodeContext createMultiIndexFieldContext(String absoluteFieldPath) {
-		List<ElasticsearchSearchIndexNodeContext> fieldForEachIndex = new ArrayList<>();
-		ElasticsearchSearchIndexContext indexModelOfFirstField = null;
-		ElasticsearchIndexField firstField = null;
+	@Override
+	@SuppressWarnings("unchecked")
+	protected ElasticsearchSearchIndexNodeContext createMultiIndexSearchValueFieldContext(String absolutePath,
+			List<ElasticsearchSearchIndexNodeContext> fieldForEachIndex) {
+		return new ElasticsearchMultiIndexSearchIndexValueFieldContext<>( this, absolutePath,
+				(List) fieldForEachIndex );
+	}
 
-		for ( ElasticsearchIndexModel indexModel : indexModels ) {
-			ElasticsearchIndexField fieldForCurrentIndex =
-					indexModel.fieldOrNull( absoluteFieldPath );
-			if ( fieldForCurrentIndex == null ) {
-				continue;
-			}
-			if ( firstField == null ) {
-				indexModelOfFirstField = indexModel;
-				firstField = fieldForCurrentIndex;
-			}
-			else if ( firstField.isComposite() != fieldForCurrentIndex.isComposite() ) {
-				SearchException cause = log.conflictingFieldModel();
-				throw log.inconsistentConfigurationForIndexElementForSearch(
-						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ), cause.getMessage(),
-						EventContexts.fromIndexNames( indexModelOfFirstField.names().hibernateSearchIndex(),
-								indexModel.names().hibernateSearchIndex() ),
-						cause );
-			}
-			fieldForEachIndex.add( fieldForCurrentIndex );
-		}
-
-		if ( fieldForEachIndex.isEmpty() ) {
-			return null;
-		}
-
-		if ( fieldForEachIndex.get( 0 ).isComposite() ) {
-			return new ElasticsearchMultiIndexSearchIndexCompositeNodeContext( this, absoluteFieldPath,
-					(List) fieldForEachIndex );
-		}
-		else {
-			return new ElasticsearchMultiIndexSearchIndexValueFieldContext<>( this, absoluteFieldPath,
-					(List) fieldForEachIndex );
-		}
+	@Override
+	@SuppressWarnings("unchecked")
+	protected ElasticsearchSearchIndexNodeContext createMultiIndexSearchObjectFieldContext(String absolutePath,
+			List<ElasticsearchSearchIndexNodeContext> fieldForEachIndex) {
+		return new ElasticsearchMultiIndexSearchIndexCompositeNodeContext( this, absolutePath,
+				(List) fieldForEachIndex );
 	}
 }

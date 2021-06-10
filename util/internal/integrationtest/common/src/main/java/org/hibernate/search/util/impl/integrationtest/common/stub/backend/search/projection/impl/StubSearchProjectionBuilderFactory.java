@@ -65,7 +65,7 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 
 	@Override
 	public <I> IdProjectionBuilder<I> id(Class<I> identifierType) {
-		return new StubIdSearchProjection.Builder<>( scope.idDslConverter(), identifierType );
+		return new StubIdSearchProjection.Builder<>( scope.idDslConverter( ValueConvert.YES ), identifierType );
 	}
 
 	@Override

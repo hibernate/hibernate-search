@@ -13,8 +13,6 @@ import java.util.concurrent.TimeUnit;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
@@ -35,8 +33,6 @@ public interface LuceneSearchIndexScope extends SearchIndexScope<LuceneSearchInd
 	Collection<? extends LuceneSearchIndexContext> indexes();
 
 	Map<String, ? extends LuceneSearchIndexContext> mappedTypeNameToIndex();
-
-	DocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
 
 	@Override
 	LuceneSearchIndexCompositeNodeContext root();

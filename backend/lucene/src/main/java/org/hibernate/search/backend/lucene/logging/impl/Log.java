@@ -16,26 +16,22 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.lucene.search.Query;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.util.Version;
-
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.logging.spi.AggregationKeyFormatter;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.sort.SearchSort;
-import org.hibernate.search.engine.search.aggregation.AggregationKey;
-import org.hibernate.search.engine.search.aggregation.SearchAggregation;
-import org.hibernate.search.util.common.logging.impl.EventContextNoPrefixFormatter;
-import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.EventContextFormatter;
+import org.hibernate.search.util.common.logging.impl.EventContextNoPrefixFormatter;
+import org.hibernate.search.util.common.logging.impl.MessageConstants;
+import org.hibernate.search.util.common.reporting.EventContext;
+
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;
@@ -46,6 +42,10 @@ import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.Param;
 import org.jboss.logging.annotations.ValidIdRange;
 import org.jboss.logging.annotations.ValidIdRanges;
+
+import org.apache.lucene.search.Query;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.util.Version;
 
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 @ValidIdRanges({
@@ -173,10 +173,6 @@ public interface Log extends BasicLogger {
 	// New messages from Search 6 onwards
 	// -----------------------------------
 	int ID_OFFSET = MessageConstants.BACKEND_LUCENE_ID_RANGE_MIN;
-
-	@Message(id = ID_OFFSET + 0,
-			value = "Unknown field '%1$s'.")
-	SearchException unknownFieldForSearch(String absoluteFieldPath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 1,
 			value = "Path '%1$s' exists but does not point to a writable directory.")
@@ -320,11 +316,6 @@ public interface Log extends BasicLogger {
 	SearchException unableToDeleteAllEntriesFromIndex(Query query, String causeMessage, @Param EventContext context,
 			@Cause Exception cause);
 
-	@Message(id = ID_OFFSET + 68,
-			value = "Inconsistent configuration for the identifier in a search query across multiple indexes: converter differs: '%1$s' vs. '%2$s'.")
-	SearchException inconsistentConfigurationForIdentifierForSearch(DocumentIdentifierValueConverter<?> component1,
-			DocumentIdentifierValueConverter<?> component2, @Param EventContext context);
-
 	@Message(id = ID_OFFSET + 69,
 			value = "Unable to explain search query: %1$s")
 	SearchException ioExceptionOnExplain(String causeMessage, @Cause IOException cause);
@@ -458,10 +449,6 @@ public interface Log extends BasicLogger {
 				+ " but the indexing analyzer is missing."
 				+ " Assign an indexing analyzer and a search analyzer, or remove the search analyzer.")
 	SearchException searchAnalyzerWithoutAnalyzer(String searchAnalyzer, @Param EventContext context);
-
-	@Message(id = ID_OFFSET + 106,
-			value = "This field is a value field in some indexes, but an object field in other indexes.")
-	SearchException conflictingFieldModel();
 
 	@Message(id = ID_OFFSET + 108,
 			value = "Invalid I/O strategy name: '%1$s'. Valid names are: %2$s.")

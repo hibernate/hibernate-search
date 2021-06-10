@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanNotFoundException;
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoadingException;
@@ -481,5 +482,23 @@ public interface Log extends BasicLogger {
 			+ " set the field structure is to 'NESTED' in all indexes, then reindex all your data.")
 	String partialSupportHintForCompositeNode();
 
+	@Message(id = ID_OFFSET + 107,
+			value = "Inconsistent configuration for the identifier in a search query across multiple indexes: converter differs: '%1$s' vs. '%2$s'.")
+	SearchException inconsistentConfigurationForIdentifierForSearch(DocumentIdentifierValueConverter<?> component1,
+			DocumentIdentifierValueConverter<?> component2, @Param EventContext context);
+
+	@Message(id = ID_OFFSET + 108,
+			value = "Inconsistent configuration for %1$s in a search query across multiple indexes: %2$s")
+	SearchException inconsistentConfigurationForIndexElementForSearch(
+			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext, String causeMessage,
+			@Param EventContext elementContextAsParam, @Cause SearchException cause);
+
+	@Message(id = ID_OFFSET + 109,
+			value = "This field is a value field in some indexes, but an object field in other indexes.")
+	SearchException conflictingFieldModel();
+
+	@Message(id = ID_OFFSET + 110,
+			value = "Unknown field '%1$s'.")
+	SearchException unknownFieldForSearch(String absoluteFieldPath, @Param EventContext context);
 
 }

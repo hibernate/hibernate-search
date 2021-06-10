@@ -8,6 +8,9 @@ package org.hibernate.search.engine.search.common.spi;
 
 import java.util.Set;
 
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.search.common.ValueConvert;
+
 /**
  * Information about indexes targeted by search,
  * be it in a projection, a predicate, a sort, ...
@@ -17,6 +20,8 @@ import java.util.Set;
 public interface SearchIndexScope<S extends SearchIndexScope<S>> {
 
 	Set<String> hibernateSearchIndexNames();
+
+	DocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
 
 	SearchIndexCompositeNodeContext<S> root();
 
