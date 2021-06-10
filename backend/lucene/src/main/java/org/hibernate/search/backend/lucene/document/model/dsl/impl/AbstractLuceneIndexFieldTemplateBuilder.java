@@ -19,14 +19,14 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-abstract class AbstractLuceneIndexSchemaFieldTemplateBuilder<
-				S extends AbstractLuceneIndexSchemaFieldTemplateBuilder<S, T>,
+abstract class AbstractLuceneIndexFieldTemplateBuilder<
+				S extends AbstractLuceneIndexFieldTemplateBuilder<S, T>,
 				T extends AbstractLuceneIndexFieldTemplate<?>
 		>
 		implements IndexSchemaFieldTemplateOptionsStep<S>,
-				LuceneIndexSchemaNodeContributor, IndexSchemaBuildContext {
+		LuceneIndexNodeContributor, IndexSchemaBuildContext {
 
-	private final AbstractLuceneIndexSchemaObjectNodeBuilder parent;
+	private final AbstractLuceneIndexCompositeNodeBuilder parent;
 	protected final String absolutePath;
 	protected final IndexFieldInclusion inclusion;
 	private final String prefix;
@@ -34,7 +34,7 @@ abstract class AbstractLuceneIndexSchemaFieldTemplateBuilder<
 	private SimpleGlobPattern relativePathGlob;
 	private boolean multiValued = false;
 
-	AbstractLuceneIndexSchemaFieldTemplateBuilder(AbstractLuceneIndexSchemaObjectNodeBuilder parent,
+	AbstractLuceneIndexFieldTemplateBuilder(AbstractLuceneIndexCompositeNodeBuilder parent,
 			String templateName, IndexFieldInclusion inclusion, String prefix) {
 		this.parent = parent;
 		this.absolutePath = FieldPaths.compose( parent.getAbsolutePath(), templateName );
@@ -62,7 +62,7 @@ abstract class AbstractLuceneIndexSchemaFieldTemplateBuilder<
 	}
 
 	@Override
-	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexCompositeNode parentNode,
+	public void contribute(LuceneIndexNodeCollector collector, LuceneIndexCompositeNode parentNode,
 			Map<String, LuceneIndexField> staticChildrenByNameForParent) {
 		SimpleGlobPattern absolutePathGlob = FieldPaths.absolutize(
 				parent.getAbsolutePath(),
@@ -74,7 +74,7 @@ abstract class AbstractLuceneIndexSchemaFieldTemplateBuilder<
 
 	protected abstract S thisAsS();
 
-	protected abstract void doContribute(LuceneIndexSchemaNodeCollector collector,
+	protected abstract void doContribute(LuceneIndexNodeCollector collector,
 			LuceneIndexCompositeNode parentNode,
 			SimpleGlobPattern absolutePathGlob,
 			boolean multiValued);

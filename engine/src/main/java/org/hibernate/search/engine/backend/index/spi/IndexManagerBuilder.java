@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.backend.index.spi;
 
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 
 
 public interface IndexManagerBuilder {
@@ -20,11 +20,11 @@ public interface IndexManagerBuilder {
 	void closeOnFailure();
 
 	/**
-	 * @return An {@link IndexSchemaRootNodeBuilder} allowing to contribute metadata about the index schema.
+	 * @return An {@link IndexRootBuilder} allowing to contribute metadata about the index schema.
 	 * <p>
 	 * Never called after {@link #build()}.
 	 */
-	IndexSchemaRootNodeBuilder schemaRootNodeBuilder();
+	IndexRootBuilder schemaRootNodeBuilder();
 
 	/**
 	 * Build the mapping based on the {@link #schemaRootNodeBuilder()} metadata contributed} so far.

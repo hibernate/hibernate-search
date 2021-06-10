@@ -22,8 +22,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOp
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexObjectFieldBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexCompositeNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
@@ -31,18 +31,18 @@ import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProv
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
-		implements IndexSchemaObjectNodeBuilder, IndexSchemaBuildContext {
+abstract class AbstractLuceneIndexCompositeNodeBuilder
+		implements IndexCompositeNodeBuilder, IndexSchemaBuildContext {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final LuceneIndexCompositeNodeType.Builder typeBuilder;
 
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<String, LuceneIndexSchemaNodeContributor> fields = new LinkedHashMap<>();
-	private final Map<String, LuceneIndexSchemaNodeContributor> templates = new LinkedHashMap<>();
-	private final Map<String, LuceneIndexSchemaNamedPredicateOptions> namedPredicates = new LinkedHashMap<>();
+	private final Map<String, LuceneIndexNodeContributor> fields = new LinkedHashMap<>();
+	private final Map<String, LuceneIndexNodeContributor> templates = new LinkedHashMap<>();
+	private final Map<String, LuceneIndexNamedPredicateOptions> namedPredicates = new LinkedHashMap<>();
 
-	protected AbstractLuceneIndexSchemaObjectNodeBuilder(LuceneIndexCompositeNodeType.Builder typeBuilder) {
+	protected AbstractLuceneIndexCompositeNodeBuilder(LuceneIndexCompositeNodeType.Builder typeBuilder) {
 		this.typeBuilder = typeBuilder;
 	}
 
@@ -59,7 +59,7 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> addField(
 			String relativeFieldName, IndexFieldInclusion inclusion, IndexFieldType<F> indexFieldType) {
 		LuceneIndexValueFieldType<F> luceneIndexFieldType = (LuceneIndexValueFieldType<F>) indexFieldType;
-		LuceneIndexSchemaValueFieldNodeBuilder<F> childBuilder = new LuceneIndexSchemaValueFieldNodeBuilder<>(
+		LuceneIndexValueFieldBuilder<F> childBuilder = new LuceneIndexValueFieldBuilder<>(
 				this, relativeFieldName, inclusion, luceneIndexFieldType
 		);
 		putField( relativeFieldName, childBuilder );
@@ -67,10 +67,10 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 	}
 
 	@Override
-	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
+	public IndexObjectFieldBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
 			ObjectStructure structure) {
-		LuceneIndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
-				new LuceneIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, inclusion, structure );
+		LuceneIndexObjectFieldBuilder objectFieldBuilder =
+				new LuceneIndexObjectFieldBuilder( this, relativeFieldName, inclusion, structure );
 		putField( relativeFieldName, objectFieldBuilder );
 		return objectFieldBuilder;
 	}
@@ -78,7 +78,7 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 	@Override
 	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String name,
 			IndexFieldInclusion inclusion, NamedPredicateProvider provider) {
-		LuceneIndexSchemaNamedPredicateOptions options = new LuceneIndexSchemaNamedPredicateOptions(
+		LuceneIndexNamedPredicateOptions options = new LuceneIndexNamedPredicateOptions(
 				inclusion, provider );
 		putNamedPredicate( name, options );
 		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
@@ -93,7 +93,7 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 			IndexFieldInclusion inclusion, IndexFieldType<?> indexFieldType, String prefix) {
 		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
 		LuceneIndexValueFieldType<?> elasticsearchIndexFieldType = (LuceneIndexValueFieldType<?>) indexFieldType;
-		LuceneIndexSchemaValueFieldTemplateBuilder templateBuilder = new LuceneIndexSchemaValueFieldTemplateBuilder(
+		LuceneIndexValueFieldTemplateBuilder templateBuilder = new LuceneIndexValueFieldTemplateBuilder(
 				this, prefixedTemplateName, inclusion, elasticsearchIndexFieldType, prefix
 		);
 		putTemplate( prefixedTemplateName, templateBuilder );
@@ -104,46 +104,46 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 	public IndexSchemaFieldTemplateOptionsStep<?> addObjectFieldTemplate(String templateName,
 			ObjectStructure structure, String prefix, IndexFieldInclusion inclusion) {
 		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
-		LuceneIndexSchemaObjectFieldTemplateBuilder templateBuilder =
-				new LuceneIndexSchemaObjectFieldTemplateBuilder(
+		LuceneIndexObjectFieldTemplateBuilder templateBuilder =
+				new LuceneIndexObjectFieldTemplateBuilder(
 						this, prefixedTemplateName, inclusion, structure, prefix
 				);
 		putTemplate( prefixedTemplateName, templateBuilder );
 		return templateBuilder;
 	}
 
-	public abstract LuceneIndexSchemaRootNodeBuilder getRootNodeBuilder();
+	public abstract LuceneIndexRootBuilder getRootNodeBuilder();
 
 	abstract String getAbsolutePath();
 
-	final void contributeChildren(LuceneIndexCompositeNode node, LuceneIndexSchemaNodeCollector collector,
+	final void contributeChildren(LuceneIndexCompositeNode node, LuceneIndexNodeCollector collector,
 			Map<String, LuceneIndexField> staticChildrenByNameForParent) {
-		for ( LuceneIndexSchemaNodeContributor contributor : fields.values() ) {
+		for ( LuceneIndexNodeContributor contributor : fields.values() ) {
 			contributor.contribute( collector, node, staticChildrenByNameForParent );
 		}
 		// Contribute templates depth-first, so do ours after the children's.
 		// The reason is templates defined in children have more precise path globs and thus
 		// should be appear first in the list.
-		for ( LuceneIndexSchemaNodeContributor template : templates.values() ) {
+		for ( LuceneIndexNodeContributor template : templates.values() ) {
 			template.contribute( collector, node, staticChildrenByNameForParent );
 		}
 	}
 
-	private void putField(String name, LuceneIndexSchemaNodeContributor contributor) {
+	private void putField(String name, LuceneIndexNodeContributor contributor) {
 		Object previous = fields.putIfAbsent( name, contributor );
 		if ( previous != null ) {
 			throw log.indexSchemaNodeNameConflict( name, eventContext() );
 		}
 	}
 
-	private void putTemplate(String name, LuceneIndexSchemaNodeContributor contributor) {
+	private void putTemplate(String name, LuceneIndexNodeContributor contributor) {
 		Object previous = templates.putIfAbsent( name, contributor );
 		if ( previous != null ) {
 			throw log.indexSchemaFieldTemplateNameConflict( name, eventContext() );
 		}
 	}
 
-	private void putNamedPredicate(String name, LuceneIndexSchemaNamedPredicateOptions options) {
+	private void putNamedPredicate(String name, LuceneIndexNamedPredicateOptions options) {
 		Object previous = namedPredicates.putIfAbsent( name, options );
 		if ( previous != null ) {
 			throw log.indexSchemaNamedPredicateNameConflict( name, eventContext() );

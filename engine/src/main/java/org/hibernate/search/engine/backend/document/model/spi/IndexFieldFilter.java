@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.backend.document.model.spi;
 
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexObjectFieldBuilder;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 
 public enum IndexFieldFilter {
@@ -33,7 +33,7 @@ public enum IndexFieldFilter {
 	/**
 	 * @param field The field to filter.
 	 * @param inclusion The inclusion of that field (see
-	 * {@link IndexSchemaObjectFieldNodeBuilder#addField(String, IndexFieldInclusion, IndexFieldType)} for example).
+	 * {@link IndexObjectFieldBuilder#addField(String, IndexFieldInclusion, IndexFieldType)} for example).
 	 * @param <T> The type of {@code field}.
 	 * @return {@code field} if it is included; {@code null} otherwise.
 	 */

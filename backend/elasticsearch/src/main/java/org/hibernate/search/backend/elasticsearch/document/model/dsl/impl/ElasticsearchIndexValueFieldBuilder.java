@@ -25,12 +25,12 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-class ElasticsearchIndexSchemaValueFieldNodeBuilder<F>
-		implements IndexSchemaFieldOptionsStep<ElasticsearchIndexSchemaValueFieldNodeBuilder<F>, IndexFieldReference<F>>,
-				ElasticsearchIndexSchemaNodeContributor, IndexSchemaBuildContext {
+class ElasticsearchIndexValueFieldBuilder<F>
+		implements IndexSchemaFieldOptionsStep<ElasticsearchIndexValueFieldBuilder<F>, IndexFieldReference<F>>,
+		ElasticsearchIndexNodeContributor, IndexSchemaBuildContext {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final AbstractElasticsearchIndexSchemaObjectNodeBuilder parent;
+	private final AbstractElasticsearchIndexCompositeNodeBuilder parent;
 	private final String relativeFieldName;
 	private final String absoluteFieldPath;
 	private final IndexFieldInclusion inclusion;
@@ -39,7 +39,7 @@ class ElasticsearchIndexSchemaValueFieldNodeBuilder<F>
 
 	private ElasticsearchIndexFieldReference<F> reference;
 
-	ElasticsearchIndexSchemaValueFieldNodeBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
+	ElasticsearchIndexValueFieldBuilder(AbstractElasticsearchIndexCompositeNodeBuilder parent,
 			String relativeFieldName, IndexFieldInclusion inclusion, ElasticsearchIndexValueFieldType<F> type) {
 		this.parent = parent;
 		this.relativeFieldName = relativeFieldName;
@@ -55,7 +55,7 @@ class ElasticsearchIndexSchemaValueFieldNodeBuilder<F>
 	}
 
 	@Override
-	public ElasticsearchIndexSchemaValueFieldNodeBuilder<F> multiValued() {
+	public ElasticsearchIndexValueFieldBuilder<F> multiValued() {
 		this.multiValued = true;
 		return this;
 	}
@@ -70,7 +70,7 @@ class ElasticsearchIndexSchemaValueFieldNodeBuilder<F>
 	}
 
 	@Override
-	public void contribute(ElasticsearchIndexSchemaNodeCollector collector,
+	public void contribute(ElasticsearchIndexNodeCollector collector,
 			ElasticsearchIndexCompositeNode parentNode,
 			Map<String, ElasticsearchIndexField> staticChildrenByNameForParent,
 			AbstractTypeMapping parentMapping) {

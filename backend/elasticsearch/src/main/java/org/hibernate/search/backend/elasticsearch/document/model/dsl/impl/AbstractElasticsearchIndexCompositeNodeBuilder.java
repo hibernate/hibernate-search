@@ -23,8 +23,8 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexObjectFieldBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexCompositeNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
@@ -32,17 +32,17 @@ import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProv
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder {
+public abstract class AbstractElasticsearchIndexCompositeNodeBuilder implements IndexCompositeNodeBuilder {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final ElasticsearchIndexCompositeNodeType.Builder typeBuilder;
 
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<String, ElasticsearchIndexSchemaNodeContributor> fields = new LinkedHashMap<>();
-	private final Map<String, ElasticsearchIndexSchemaNodeContributor> templates = new LinkedHashMap<>();
-	private final Map<String, ElasticsearchIndexSchemaNamedPredicateOptions> namedPredicates = new LinkedHashMap<>();
+	private final Map<String, ElasticsearchIndexNodeContributor> fields = new LinkedHashMap<>();
+	private final Map<String, ElasticsearchIndexNodeContributor> templates = new LinkedHashMap<>();
+	private final Map<String, ElasticsearchIndexNamedPredicateOptions> namedPredicates = new LinkedHashMap<>();
 
-	protected AbstractElasticsearchIndexSchemaObjectNodeBuilder(
+	protected AbstractElasticsearchIndexCompositeNodeBuilder(
 			ElasticsearchIndexCompositeNodeType.Builder typeBuilder) {
 		this.typeBuilder = typeBuilder;
 	}
@@ -60,7 +60,7 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> addField(
 			String relativeFieldName, IndexFieldInclusion inclusion, IndexFieldType<F> indexFieldType) {
 		ElasticsearchIndexValueFieldType<F> fieldType = (ElasticsearchIndexValueFieldType<F>) indexFieldType;
-		ElasticsearchIndexSchemaValueFieldNodeBuilder<F> childBuilder = new ElasticsearchIndexSchemaValueFieldNodeBuilder<>(
+		ElasticsearchIndexValueFieldBuilder<F> childBuilder = new ElasticsearchIndexValueFieldBuilder<>(
 				this, relativeFieldName, inclusion, fieldType
 		);
 		putField( relativeFieldName, childBuilder );
@@ -68,10 +68,10 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	}
 
 	@Override
-	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
+	public IndexObjectFieldBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
 			ObjectStructure structure) {
-		ElasticsearchIndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
-				new ElasticsearchIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, inclusion, structure );
+		ElasticsearchIndexObjectFieldBuilder objectFieldBuilder =
+				new ElasticsearchIndexObjectFieldBuilder( this, relativeFieldName, inclusion, structure );
 		putField( relativeFieldName, objectFieldBuilder );
 		return objectFieldBuilder;
 	}
@@ -79,7 +79,7 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	@Override
 	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String name, IndexFieldInclusion inclusion,
 			NamedPredicateProvider provider) {
-		ElasticsearchIndexSchemaNamedPredicateOptions options = new ElasticsearchIndexSchemaNamedPredicateOptions(
+		ElasticsearchIndexNamedPredicateOptions options = new ElasticsearchIndexNamedPredicateOptions(
 			inclusion, provider );
 		putNamedPredicate( name, options );
 		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
@@ -94,7 +94,7 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 			IndexFieldInclusion inclusion, IndexFieldType<?> indexFieldType, String prefix) {
 		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
 		ElasticsearchIndexValueFieldType<?> fieldType = (ElasticsearchIndexValueFieldType<?>) indexFieldType;
-		ElasticsearchIndexSchemaValueFieldTemplateBuilder templateBuilder = new ElasticsearchIndexSchemaValueFieldTemplateBuilder(
+		ElasticsearchIndexValueFieldTemplateBuilder templateBuilder = new ElasticsearchIndexValueFieldTemplateBuilder(
 				this, prefixedTemplateName, inclusion, fieldType, prefix
 		);
 		putTemplate( prefixedTemplateName, templateBuilder );
@@ -105,8 +105,8 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	public IndexSchemaFieldTemplateOptionsStep<?> addObjectFieldTemplate(String templateName,
 			ObjectStructure structure, String prefix, IndexFieldInclusion inclusion) {
 		String prefixedTemplateName = FieldPaths.prefix( prefix, templateName );
-		ElasticsearchIndexSchemaObjectFieldTemplateBuilder templateBuilder =
-				new ElasticsearchIndexSchemaObjectFieldTemplateBuilder(
+		ElasticsearchIndexObjectFieldTemplateBuilder templateBuilder =
+				new ElasticsearchIndexObjectFieldTemplateBuilder(
 						this, prefixedTemplateName, inclusion, structure, prefix
 				);
 		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
@@ -116,21 +116,21 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	}
 
 	final void contributeChildren(AbstractTypeMapping mapping, ElasticsearchIndexCompositeNode node,
-			ElasticsearchIndexSchemaNodeCollector collector,
+			ElasticsearchIndexNodeCollector collector,
 			Map<String, ElasticsearchIndexField> staticChildrenByNameForParent) {
-		for ( Map.Entry<String, ElasticsearchIndexSchemaNodeContributor> entry : fields.entrySet() ) {
-			ElasticsearchIndexSchemaNodeContributor propertyContributor = entry.getValue();
+		for ( Map.Entry<String, ElasticsearchIndexNodeContributor> entry : fields.entrySet() ) {
+			ElasticsearchIndexNodeContributor propertyContributor = entry.getValue();
 			propertyContributor.contribute( collector, node, staticChildrenByNameForParent, mapping );
 		}
 		// Contribute templates depth-first, so do ours after the children's.
 		// The reason is templates defined in children have more precise path globs and thus
 		// should be appear first in the list.
-		for ( ElasticsearchIndexSchemaNodeContributor template : templates.values() ) {
+		for ( ElasticsearchIndexNodeContributor template : templates.values() ) {
 			template.contribute( collector, node, staticChildrenByNameForParent, mapping );
 		}
 	}
 
-	abstract ElasticsearchIndexSchemaRootNodeBuilder getRootNodeBuilder();
+	abstract ElasticsearchIndexRootBuilder getRootNodeBuilder();
 
 	abstract String getAbsolutePath();
 
@@ -138,21 +138,21 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 		return ( templates.isEmpty() ) ? defaultDynamicType : DynamicType.TRUE;
 	}
 
-	private void putField(String name, ElasticsearchIndexSchemaNodeContributor contributor) {
+	private void putField(String name, ElasticsearchIndexNodeContributor contributor) {
 		Object previous = fields.putIfAbsent( name, contributor );
 		if ( previous != null ) {
 			throw log.indexSchemaNodeNameConflict( name, eventContext() );
 		}
 	}
 
-	private void putTemplate(String name, ElasticsearchIndexSchemaNodeContributor contributor) {
+	private void putTemplate(String name, ElasticsearchIndexNodeContributor contributor) {
 		Object previous = templates.putIfAbsent( name, contributor );
 		if ( previous != null ) {
 			throw log.indexSchemaFieldTemplateNameConflict( name, eventContext() );
 		}
 	}
 
-	private void putNamedPredicate(String name, ElasticsearchIndexSchemaNamedPredicateOptions options) {
+	private void putNamedPredicate(String name, ElasticsearchIndexNamedPredicateOptions options) {
 		Object previous = namedPredicates.putIfAbsent( name, options );
 		if ( previous != null ) {
 			throw log.indexSchemaNamedPredicateNameConflict( name, eventContext() );

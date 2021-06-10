@@ -21,18 +21,18 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Pr
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexCompositeNodeType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexObjectFieldBuilder;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsearchIndexSchemaObjectNodeBuilder
-		implements IndexSchemaObjectFieldNodeBuilder, ElasticsearchIndexSchemaNodeContributor {
+class ElasticsearchIndexObjectFieldBuilder extends AbstractElasticsearchIndexCompositeNodeBuilder
+		implements IndexObjectFieldBuilder, ElasticsearchIndexNodeContributor {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final AbstractElasticsearchIndexSchemaObjectNodeBuilder parent;
+	private final AbstractElasticsearchIndexCompositeNodeBuilder parent;
 	private final String absoluteFieldPath;
 	private final String relativeFieldName;
 	private final IndexFieldInclusion inclusion;
@@ -41,7 +41,7 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 
 	private ElasticsearchIndexObjectFieldReference reference;
 
-	ElasticsearchIndexSchemaObjectFieldNodeBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
+	ElasticsearchIndexObjectFieldBuilder(AbstractElasticsearchIndexCompositeNodeBuilder parent,
 			String relativeFieldName, IndexFieldInclusion inclusion, ObjectStructure structure) {
 		super( new ElasticsearchIndexCompositeNodeType.Builder( structure ) );
 		this.parent = parent;
@@ -73,7 +73,7 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 	}
 
 	@Override
-	public void contribute(ElasticsearchIndexSchemaNodeCollector collector,
+	public void contribute(ElasticsearchIndexNodeCollector collector,
 			ElasticsearchIndexCompositeNode parentNode,
 			Map<String, ElasticsearchIndexField> staticChildrenByNameForParent,
 			AbstractTypeMapping parentMapping) {
@@ -103,7 +103,7 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 	}
 
 	@Override
-	ElasticsearchIndexSchemaRootNodeBuilder getRootNodeBuilder() {
+	ElasticsearchIndexRootBuilder getRootNodeBuilder() {
 		return parent.getRootNodeBuilder();
 	}
 

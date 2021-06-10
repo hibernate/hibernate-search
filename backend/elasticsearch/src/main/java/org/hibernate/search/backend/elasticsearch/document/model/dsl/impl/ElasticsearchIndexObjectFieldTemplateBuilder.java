@@ -18,26 +18,26 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
-class ElasticsearchIndexSchemaObjectFieldTemplateBuilder
-		extends AbstractElasticsearchIndexSchemaFieldTemplateBuilder<
-				ElasticsearchIndexSchemaObjectFieldTemplateBuilder, ElasticsearchIndexObjectFieldTemplate
-		> {
+class ElasticsearchIndexObjectFieldTemplateBuilder
+		extends AbstractElasticsearchIndexFieldTemplateBuilder<
+						ElasticsearchIndexObjectFieldTemplateBuilder, ElasticsearchIndexObjectFieldTemplate
+				> {
 
 	protected final ElasticsearchIndexCompositeNodeType.Builder typeBuilder;
 
-	ElasticsearchIndexSchemaObjectFieldTemplateBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
+	ElasticsearchIndexObjectFieldTemplateBuilder(AbstractElasticsearchIndexCompositeNodeBuilder parent,
 			String templateName, IndexFieldInclusion inclusion, ObjectStructure structure, String prefix) {
 		super( parent, templateName, inclusion, prefix );
 		this.typeBuilder = new ElasticsearchIndexCompositeNodeType.Builder( structure );
 	}
 
 	@Override
-	protected ElasticsearchIndexSchemaObjectFieldTemplateBuilder thisAsS() {
+	protected ElasticsearchIndexObjectFieldTemplateBuilder thisAsS() {
 		return this;
 	}
 
 	@Override
-	protected void doContribute(ElasticsearchIndexSchemaNodeCollector collector,
+	protected void doContribute(ElasticsearchIndexNodeCollector collector,
 			ElasticsearchIndexCompositeNode parentNode, IndexFieldInclusion inclusion,
 			SimpleGlobPattern absolutePathGlob, boolean multiValued) {
 		ElasticsearchIndexCompositeNodeType type = typeBuilder.build();

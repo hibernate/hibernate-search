@@ -9,23 +9,23 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.docum
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
 
-class StubIndexSchemaFieldTemplateNodeBuilder
-		implements IndexSchemaFieldTemplateOptionsStep<StubIndexSchemaFieldTemplateNodeBuilder> {
+class StubIndexFieldTemplateNodeBuilder
+		implements IndexSchemaFieldTemplateOptionsStep<StubIndexFieldTemplateNodeBuilder> {
 
 	private final StubIndexSchemaDataNode.Builder schemaDataNodeBuilder;
 
-	StubIndexSchemaFieldTemplateNodeBuilder(StubIndexSchemaDataNode.Builder schemaDataNodeBuilder) {
+	StubIndexFieldTemplateNodeBuilder(StubIndexSchemaDataNode.Builder schemaDataNodeBuilder) {
 		this.schemaDataNodeBuilder = schemaDataNodeBuilder;
 	}
 
 	@Override
-	public StubIndexSchemaFieldTemplateNodeBuilder matchingPathGlob(String pathGlob) {
+	public StubIndexFieldTemplateNodeBuilder matchingPathGlob(String pathGlob) {
 		schemaDataNodeBuilder.matchingPathGlob( pathGlob );
 		return this;
 	}
 
 	@Override
-	public StubIndexSchemaFieldTemplateNodeBuilder multiValued() {
+	public StubIndexFieldTemplateNodeBuilder multiValued() {
 		schemaDataNodeBuilder.multiValued( true );
 		return this;
 	}

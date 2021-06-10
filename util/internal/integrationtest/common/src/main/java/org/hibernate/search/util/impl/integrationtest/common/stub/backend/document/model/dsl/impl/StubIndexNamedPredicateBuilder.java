@@ -9,12 +9,12 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.docum
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
 
-class StubIndexSchemaNamedPredicateBuilder
+class StubIndexNamedPredicateBuilder
 	implements IndexSchemaNamedPredicateOptionsStep {
 
 	private final StubIndexSchemaDataNode.Builder schemaDataNodeBuilder;
 
-	StubIndexSchemaNamedPredicateBuilder(StubIndexSchemaDataNode.Builder schemaDataNodeBuilder) {
+	StubIndexNamedPredicateBuilder(StubIndexSchemaDataNode.Builder schemaDataNodeBuilder) {
 		this.schemaDataNodeBuilder = schemaDataNodeBuilder;
 	}
 

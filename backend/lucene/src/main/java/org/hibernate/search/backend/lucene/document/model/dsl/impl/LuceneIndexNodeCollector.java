@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObject
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueFieldTemplate;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueField;
 
-public interface LuceneIndexSchemaNodeCollector {
+public interface LuceneIndexNodeCollector {
 	void collect(String absolutePath, LuceneIndexObjectField node);
 
 	void collect(String absoluteFieldPath, LuceneIndexValueField<?> node);

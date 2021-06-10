@@ -9,9 +9,9 @@ package org.hibernate.search.backend.elasticsearch.index.impl;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
-import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
+import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexRootBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 
 
@@ -19,11 +19,11 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder {
 
 	private final IndexManagerBackendContext backendContext;
 
-	private final ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
+	private final ElasticsearchIndexRootBuilder schemaRootNodeBuilder;
 	private final List<DocumentMetadataContributor> documentMetadataContributors;
 
 	public ElasticsearchIndexManagerBuilder(IndexManagerBackendContext backendContext,
-			ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder,
+			ElasticsearchIndexRootBuilder schemaRootNodeBuilder,
 			List<DocumentMetadataContributor> documentMetadataContributors) {
 		this.backendContext = backendContext;
 
@@ -37,7 +37,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder {
 	}
 
 	@Override
-	public IndexSchemaRootNodeBuilder schemaRootNodeBuilder() {
+	public IndexRootBuilder schemaRootNodeBuilder() {
 		return schemaRootNodeBuilder;
 	}
 

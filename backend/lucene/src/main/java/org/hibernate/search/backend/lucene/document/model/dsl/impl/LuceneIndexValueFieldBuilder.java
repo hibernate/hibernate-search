@@ -24,12 +24,12 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-class LuceneIndexSchemaValueFieldNodeBuilder<F>
-		implements IndexSchemaFieldOptionsStep<LuceneIndexSchemaValueFieldNodeBuilder<F>, IndexFieldReference<F>>,
-				LuceneIndexSchemaNodeContributor, IndexSchemaBuildContext {
+class LuceneIndexValueFieldBuilder<F>
+		implements IndexSchemaFieldOptionsStep<LuceneIndexValueFieldBuilder<F>, IndexFieldReference<F>>,
+		LuceneIndexNodeContributor, IndexSchemaBuildContext {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final AbstractLuceneIndexSchemaObjectNodeBuilder parent;
+	private final AbstractLuceneIndexCompositeNodeBuilder parent;
 	private final String relativeFieldName;
 	private final String absoluteFieldPath;
 	private final IndexFieldInclusion inclusion;
@@ -38,7 +38,7 @@ class LuceneIndexSchemaValueFieldNodeBuilder<F>
 
 	private LuceneIndexFieldReference<F> reference;
 
-	LuceneIndexSchemaValueFieldNodeBuilder(AbstractLuceneIndexSchemaObjectNodeBuilder parent,
+	LuceneIndexValueFieldBuilder(AbstractLuceneIndexCompositeNodeBuilder parent,
 			String relativeFieldName, IndexFieldInclusion inclusion, LuceneIndexValueFieldType<F> type) {
 		this.parent = parent;
 		this.relativeFieldName = relativeFieldName;
@@ -54,7 +54,7 @@ class LuceneIndexSchemaValueFieldNodeBuilder<F>
 	}
 
 	@Override
-	public LuceneIndexSchemaValueFieldNodeBuilder<F> multiValued() {
+	public LuceneIndexValueFieldBuilder<F> multiValued() {
 		this.multiValued = true;
 		return this;
 	}
@@ -69,7 +69,7 @@ class LuceneIndexSchemaValueFieldNodeBuilder<F>
 	}
 
 	@Override
-	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexCompositeNode parentNode,
+	public void contribute(LuceneIndexNodeCollector collector, LuceneIndexCompositeNode parentNode,
 			Map<String, LuceneIndexField> staticChildrenByNameForParent) {
 		if ( reference == null ) {
 			throw log.incompleteFieldDefinition( eventContext() );

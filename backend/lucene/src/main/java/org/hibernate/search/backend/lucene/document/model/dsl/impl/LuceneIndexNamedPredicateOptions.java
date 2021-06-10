@@ -10,12 +10,12 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPr
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 
-public class LuceneIndexSchemaNamedPredicateOptions implements IndexSchemaNamedPredicateOptionsStep {
+public class LuceneIndexNamedPredicateOptions implements IndexSchemaNamedPredicateOptionsStep {
 
 	public final IndexFieldInclusion inclusion;
 	public final NamedPredicateProvider provider;
 
-	LuceneIndexSchemaNamedPredicateOptions(IndexFieldInclusion inclusion, NamedPredicateProvider provider) {
+	LuceneIndexNamedPredicateOptions(IndexFieldInclusion inclusion, NamedPredicateProvider provider) {
 		this.inclusion = inclusion;
 		this.provider = provider;
 	}

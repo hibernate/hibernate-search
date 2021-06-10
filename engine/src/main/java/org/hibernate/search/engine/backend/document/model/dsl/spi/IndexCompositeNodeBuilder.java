@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 
-public interface IndexSchemaObjectNodeBuilder extends IndexSchemaBuildContext {
+public interface IndexCompositeNodeBuilder extends IndexSchemaBuildContext {
 
 	/**
 	 * Create a new field and add it to the current builder.
@@ -48,7 +48,7 @@ public interface IndexSchemaObjectNodeBuilder extends IndexSchemaBuildContext {
 	 * @param structure The structure of the new object field
 	 * @return A builder for the new object field
 	 */
-	IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
+	IndexObjectFieldBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
 			ObjectStructure structure);
 
 	/**

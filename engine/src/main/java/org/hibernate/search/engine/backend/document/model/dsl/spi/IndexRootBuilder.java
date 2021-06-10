@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifie
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 
-public interface IndexSchemaRootNodeBuilder extends IndexSchemaObjectNodeBuilder {
+public interface IndexRootBuilder extends IndexCompositeNodeBuilder {
 
 	IndexFieldTypeFactory createTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider);
 

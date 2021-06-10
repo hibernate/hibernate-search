@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl;
 
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.dsl.impl.StubIndexSchemaRootNodeBuilder;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.dsl.impl.StubIndexRootBuilder;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 public class StubIndexManagerBuilder implements IndexManagerBuilder {
@@ -21,7 +21,7 @@ public class StubIndexManagerBuilder implements IndexManagerBuilder {
 
 	private final StubBackend backend;
 	private final String name;
-	private final StubIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
+	private final StubIndexRootBuilder schemaRootNodeBuilder;
 
 	private boolean closed = false;
 
@@ -29,7 +29,7 @@ public class StubIndexManagerBuilder implements IndexManagerBuilder {
 		StaticCounters.get().increment( INSTANCE_COUNTER_KEY );
 		this.backend = backend;
 		this.name = name;
-		this.schemaRootNodeBuilder = new StubIndexSchemaRootNodeBuilder( backend.getBehavior(), name, mappedTypeName );
+		this.schemaRootNodeBuilder = new StubIndexRootBuilder( backend.getBehavior(), name, mappedTypeName );
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public class StubIndexManagerBuilder implements IndexManagerBuilder {
 	}
 
 	@Override
-	public IndexSchemaRootNodeBuilder schemaRootNodeBuilder() {
+	public IndexRootBuilder schemaRootNodeBuilder() {
 		return schemaRootNodeBuilder;
 	}
 

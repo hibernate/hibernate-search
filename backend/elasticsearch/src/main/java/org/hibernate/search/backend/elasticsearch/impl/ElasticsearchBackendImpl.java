@@ -23,7 +23,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl.Elasti
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
-import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
+import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexRootBuilder;
 import org.hibernate.search.backend.elasticsearch.index.DynamicMapping;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
 import org.hibernate.search.backend.elasticsearch.index.impl.IndexManagerBackendContext;
@@ -227,12 +227,12 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 		return indexNames;
 	}
 
-	private ElasticsearchIndexSchemaRootNodeBuilder createIndexSchemaRootNodeBuilder(EventContext indexEventContext,
+	private ElasticsearchIndexRootBuilder createIndexSchemaRootNodeBuilder(EventContext indexEventContext,
 			IndexNames indexNames, String mappedTypeName,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, IndexSettings customIndexSettings,
 			DynamicMapping dynamicMapping) {
 
-		ElasticsearchIndexSchemaRootNodeBuilder builder = new ElasticsearchIndexSchemaRootNodeBuilder(
+		ElasticsearchIndexRootBuilder builder = new ElasticsearchIndexRootBuilder(
 				typeFactoryProvider,
 				indexEventContext,
 				indexNames,

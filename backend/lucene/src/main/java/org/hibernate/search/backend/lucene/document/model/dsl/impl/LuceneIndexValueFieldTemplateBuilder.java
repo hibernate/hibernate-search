@@ -12,26 +12,26 @@ import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
-class LuceneIndexSchemaValueFieldTemplateBuilder
-		extends AbstractLuceneIndexSchemaFieldTemplateBuilder<
-						LuceneIndexSchemaValueFieldTemplateBuilder, LuceneIndexValueFieldTemplate
+class LuceneIndexValueFieldTemplateBuilder
+		extends AbstractLuceneIndexFieldTemplateBuilder<
+						LuceneIndexValueFieldTemplateBuilder, LuceneIndexValueFieldTemplate
 				> {
 
 	private final LuceneIndexValueFieldType<?> type;
 
-	LuceneIndexSchemaValueFieldTemplateBuilder(AbstractLuceneIndexSchemaObjectNodeBuilder parent,
+	LuceneIndexValueFieldTemplateBuilder(AbstractLuceneIndexCompositeNodeBuilder parent,
 			String templateName, IndexFieldInclusion inclusion, LuceneIndexValueFieldType<?> type, String prefix) {
 		super( parent, templateName, inclusion, prefix );
 		this.type = type;
 	}
 
 	@Override
-	protected LuceneIndexSchemaValueFieldTemplateBuilder thisAsS() {
+	protected LuceneIndexValueFieldTemplateBuilder thisAsS() {
 		return this;
 	}
 
 	@Override
-	protected void doContribute(LuceneIndexSchemaNodeCollector collector,
+	protected void doContribute(LuceneIndexNodeCollector collector,
 			LuceneIndexCompositeNode parentNode, SimpleGlobPattern absolutePathGlob, boolean multiValued) {
 		LuceneIndexValueFieldTemplate fieldTemplate = new LuceneIndexValueFieldTemplate(
 				parentNode, absolutePathGlob, type, inclusion, multiValued
