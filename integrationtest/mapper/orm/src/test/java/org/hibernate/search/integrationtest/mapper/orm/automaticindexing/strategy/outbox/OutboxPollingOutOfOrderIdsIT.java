@@ -349,10 +349,16 @@ public class OutboxPollingOutOfOrderIdsIT {
 
 			JdbcCoordinator jdbc = implementor.getJdbcCoordinator();
 			JdbcEnvironment env = implementor.getJdbcServices().getJdbcEnvironment();
-			assumeTrue(
-					"This test uses SQL directly which can currently only be set up with H2",
-					env.getDialect() instanceof H2Dialect
-			);
+
+			String javaVersionString = System.getProperty( "java.version" );
+			if ( javaVersionString != null && !javaVersionString.trim().isEmpty() ) {
+				boolean oldJavaVersion = javaVersionString.startsWith( "1." );
+				assumeTrue(
+						"The H2 actual maximum available precision depends on operating system and JVM and can be 3 (milliseconds) or higher. " +
+								"Higher precision is not available before Java 9.",
+						!(oldJavaVersion && env.getDialect() instanceof H2Dialect)
+				);
+			}
 
 			try ( PreparedStatement ps = jdbc.getStatementPreparer().prepareStatement( OUTBOX_TABLE_UPDATE_ID ) ) {
 				ps.setInt( 1, newId );
