@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.search.common.impl;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
@@ -16,11 +15,12 @@ import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFie
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 import org.apache.lucene.search.Query;
 
-public interface LuceneSearchIndexScope {
+public interface LuceneSearchIndexScope extends SearchIndexScope<LuceneSearchIndexScope> {
 
 	ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext();
 
@@ -36,12 +36,12 @@ public interface LuceneSearchIndexScope {
 
 	Map<String, ? extends LuceneSearchIndexContext> mappedTypeNameToIndex();
 
-	Set<String> hibernateSearchIndexNames();
-
 	DocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
 
+	@Override
 	LuceneSearchIndexCompositeNodeContext root();
 
+	@Override
 	LuceneSearchIndexNodeContext field(String absoluteFieldPath);
 
 	boolean hasNestedDocuments();

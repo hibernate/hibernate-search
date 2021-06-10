@@ -6,75 +6,101 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.types.IndexFieldType;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.backend.types.spi.AbstractIndexValueFieldType;
+import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
+import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
+import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.aggregation.impl.StubSearchAggregation;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexValueFieldContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexValueFieldTypeContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.AbstractStubSearchQueryElementFactory;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchValueFieldTypeContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl.StubSearchPredicate;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubDistanceToFieldSearchProjection;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubFieldSearchProjection;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.impl.StubSearchSort;
 
-public final class StubIndexValueFieldType<F> implements IndexFieldType<F>, StubSearchValueFieldTypeContext<F> {
+public final class StubIndexValueFieldType<F>
+		extends AbstractIndexValueFieldType<
+						StubSearchIndexScope,
+						StubSearchIndexValueFieldContext<F>,
+						F
+				>
+		implements IndexFieldType<F>, StubSearchIndexValueFieldTypeContext<F> {
 
-	private final Class<F> valueClass;
-	private final DslConverter<F, F> rawDslConverter;
-	private final DslConverter<?, F> dslConverter;
-	private final ProjectionConverter<F, F> rawProjectionConverter;
-	private final ProjectionConverter<F, ?> projectionConverter;
 	private final List<Consumer<StubIndexSchemaDataNode.Builder>> modifiers;
 
-	public StubIndexValueFieldType(Class<F> valueClass,
-			DslConverter<?, F> dslConverter,
-			ProjectionConverter<F, ?> projectionConverter,
-			List<Consumer<StubIndexSchemaDataNode.Builder>> modifiers) {
-		this.valueClass = valueClass;
-		this.rawDslConverter = new DslConverter<>( valueClass, new PassThroughToDocumentFieldValueConverter<>() );
-		this.dslConverter = dslConverter != null ? dslConverter : rawDslConverter;
-		this.rawProjectionConverter = new ProjectionConverter<>(
-				valueClass, new PassThroughFromDocumentFieldValueConverter<>() );
-		this.projectionConverter = projectionConverter != null ? projectionConverter : rawProjectionConverter;
-		this.modifiers = modifiers;
+	public StubIndexValueFieldType(Builder<F> builder) {
+		super( builder );
+		this.modifiers = new ArrayList<>( builder.modifiers );
 	}
 
 	public void apply(StubIndexSchemaDataNode.Builder builder) {
-		builder.valueClass( valueClass );
+		builder.valueClass( valueClass() );
 		for ( Consumer<StubIndexSchemaDataNode.Builder> modifier : modifiers ) {
 			modifier.accept( builder );
 		}
 	}
 
-	@Override
-	public Class<F> valueClass() {
-		return valueClass;
+	public static class Builder<F>
+			extends AbstractIndexValueFieldType.Builder<
+							StubSearchIndexScope,
+							StubSearchIndexValueFieldContext<F>,
+							F
+					> {
+		private final List<Consumer<StubIndexSchemaDataNode.Builder>> modifiers = new ArrayList<>();
+
+		public Builder(Class<F> valueClass) {
+			super( valueClass );
+			stubFactories(
+					new StubSearchPredicate.Factory(),
+					PredicateTypeKeys.NESTED,
+					PredicateTypeKeys.MATCH,
+					PredicateTypeKeys.RANGE,
+					PredicateTypeKeys.EXISTS,
+					PredicateTypeKeys.PHRASE,
+					PredicateTypeKeys.WILDCARD,
+					PredicateTypeKeys.REGEXP,
+					PredicateTypeKeys.TERMS,
+					PredicateTypeKeys.SPATIAL_WITHIN_CIRCLE,
+					PredicateTypeKeys.SPATIAL_WITHIN_POLYGON,
+					PredicateTypeKeys.SPATIAL_WITHIN_BOUNDING_BOX
+			);
+			stubFactories(
+					new StubSearchSort.Factory(),
+					SortTypeKeys.FIELD,
+					SortTypeKeys.DISTANCE
+			);
+			queryElementFactory( ProjectionTypeKeys.FIELD, new StubFieldSearchProjection.Factory() );
+			queryElementFactory( ProjectionTypeKeys.DISTANCE, new StubDistanceToFieldSearchProjection.Factory() );
+			queryElementFactory( AggregationTypeKeys.TERMS, new StubSearchAggregation.TermsFactory() );
+			queryElementFactory( AggregationTypeKeys.RANGE, new StubSearchAggregation.RangeFactory() );
+		}
+
+		@SafeVarargs
+		private final <T> void stubFactories(AbstractStubSearchQueryElementFactory<T> factory,
+				SearchQueryElementTypeKey<? super T>... keys) {
+			for ( SearchQueryElementTypeKey<? super T> key : keys ) {
+				queryElementFactory( key, factory );
+			}
+		}
+
+		public void modifier(Consumer<StubIndexSchemaDataNode.Builder> modifier) {
+			modifiers.add( modifier );
+		}
+
+		@Override
+		public StubIndexValueFieldType<F> build() {
+			return new StubIndexValueFieldType<>( this );
+		}
 	}
 
-	@Override
-	public DslConverter<?, F> dslConverter() {
-		return dslConverter;
-	}
-
-	@Override
-	public DslConverter<F, F> rawDslConverter() {
-		return rawDslConverter;
-	}
-
-	@Override
-	public ProjectionConverter<F, ?> projectionConverter() {
-		return projectionConverter;
-	}
-
-	@Override
-	public ProjectionConverter<F, F> rawProjectionConverter() {
-		return rawProjectionConverter;
-	}
-
-	@Override
-	public <T> AbstractStubSearchQueryElementFactory<T> queryElementFactory(SearchQueryElementTypeKey<T> key) {
-		return StubSearchQueryElementFactories.get( key );
-	}
 }

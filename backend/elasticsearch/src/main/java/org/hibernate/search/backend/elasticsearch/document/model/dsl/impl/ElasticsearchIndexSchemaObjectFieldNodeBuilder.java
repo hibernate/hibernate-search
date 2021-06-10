@@ -11,19 +11,19 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexObjectFieldReference;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexField;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexObjectField;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexCompositeNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexField;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexObjectField;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexCompositeNodeType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
-import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -37,20 +37,19 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 	private final String relativeFieldName;
 	private final IndexFieldInclusion inclusion;
 
-	private final ObjectStructure structure;
 	private boolean multiValued = false;
 
 	private ElasticsearchIndexObjectFieldReference reference;
 
 	ElasticsearchIndexSchemaObjectFieldNodeBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
 			String relativeFieldName, IndexFieldInclusion inclusion, ObjectStructure structure) {
+		super( new ElasticsearchIndexCompositeNodeType.Builder( structure ) );
 		this.parent = parent;
 		String parentAbsolutePath = parent.getAbsolutePath();
 		this.absoluteFieldPath = parentAbsolutePath == null ? relativeFieldName
 				: FieldPaths.compose( parentAbsolutePath, relativeFieldName );
 		this.relativeFieldName = relativeFieldName;
 		this.inclusion = inclusion;
-		this.structure = structure;
 	}
 
 	@Override
@@ -76,17 +75,16 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 	@Override
 	public void contribute(ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexCompositeNode parentNode,
-			Map<String, AbstractElasticsearchIndexField> staticChildrenByNameForParent,
+			Map<String, ElasticsearchIndexField> staticChildrenByNameForParent,
 			AbstractTypeMapping parentMapping) {
 		if ( reference == null ) {
 			throw log.incompleteFieldDefinition( eventContext() );
 		}
 
-		Map<String, AbstractElasticsearchIndexField> staticChildrenByName = new TreeMap<>();
+		Map<String, ElasticsearchIndexField> staticChildrenByName = new TreeMap<>();
 		ElasticsearchIndexObjectField fieldNode = new ElasticsearchIndexObjectField(
-				parentNode, relativeFieldName, inclusion, structure, multiValued,
-				staticChildrenByName, buildQueryElementFactoryMap()
-		);
+				parentNode, relativeFieldName, typeBuilder.build(), inclusion, multiValued,
+				staticChildrenByName );
 
 		staticChildrenByNameForParent.put( relativeFieldName, fieldNode );
 		collector.collect( absoluteFieldPath, fieldNode );
@@ -95,7 +93,7 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 
 		DynamicType dynamicType = resolveSelfDynamicType( parentMapping.getDynamic() );
 
-		PropertyMapping mapping = createPropertyMapping( structure, dynamicType );
+		PropertyMapping mapping = fieldNode.type().createMapping( dynamicType );
 
 		if ( IndexFieldInclusion.INCLUDED.equals( fieldNode.inclusion() ) ) {
 			parentMapping.addProperty( relativeFieldName, mapping );
@@ -114,22 +112,4 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 		return absoluteFieldPath;
 	}
 
-	static PropertyMapping createPropertyMapping(ObjectStructure structure,
-			DynamicType dynamicType) {
-		PropertyMapping mapping = new PropertyMapping();
-		String dataType = DataTypes.OBJECT;
-		switch ( structure ) {
-			case DEFAULT:
-				break;
-			case FLATTENED:
-				dataType = DataTypes.OBJECT;
-				break;
-			case NESTED:
-				dataType = DataTypes.NESTED;
-				break;
-		}
-		mapping.setType( dataType );
-		mapping.setDynamic( dynamicType );
-		return mapping;
-	}
 }

@@ -6,24 +6,32 @@
  */
 package org.hibernate.search.backend.lucene.search.common.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.common.spi.FieldPaths;
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.engine.search.common.spi.AbstractMultiIndexSearchIndexCompositeNodeContext;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class LuceneMultiIndexSearchIndexCompositeNodeContext
-		extends AbstractLuceneMultiIndexSearchIndexNodeContext<LuceneSearchIndexCompositeNodeContext>
-		implements LuceneSearchIndexCompositeNodeContext {
+		extends AbstractMultiIndexSearchIndexCompositeNodeContext<
+						LuceneSearchIndexCompositeNodeContext,
+						LuceneSearchIndexScope,
+						LuceneSearchIndexCompositeNodeTypeContext
+				>
+		implements LuceneSearchIndexCompositeNodeContext, LuceneSearchIndexCompositeNodeTypeContext {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private Map<String, LuceneSearchIndexNodeContext> staticChildrenByName;
 
 	public LuceneMultiIndexSearchIndexCompositeNodeContext(LuceneSearchIndexScope scope,
-			String absolutePath, List<LuceneSearchIndexCompositeNodeContext> elementForEachIndex) {
-		super( scope, absolutePath, elementForEachIndex );
+			String absolutePath, List<? extends LuceneSearchIndexCompositeNodeContext> nodeForEachIndex) {
+		super( scope, absolutePath, nodeForEachIndex );
 	}
 
 	@Override
@@ -32,18 +40,13 @@ public final class LuceneMultiIndexSearchIndexCompositeNodeContext
 	}
 
 	@Override
-	public boolean isComposite() {
-		return true;
-	}
-
-	@Override
-	public LuceneSearchIndexCompositeNodeContext toComposite() {
+	protected LuceneSearchIndexCompositeNodeTypeContext selfAsNodeType() {
 		return this;
 	}
 
 	@Override
-	public String absolutePath(String relativeFieldName) {
-		return FieldPaths.compose( absolutePath, relativeFieldName );
+	protected LuceneSearchIndexCompositeNodeTypeContext typeOf(LuceneSearchIndexCompositeNodeContext indexElement) {
+		return indexElement.type();
 	}
 
 	@Override
@@ -53,12 +56,12 @@ public final class LuceneMultiIndexSearchIndexCompositeNodeContext
 		}
 
 		// TODO HSEARCH-4050 remove this unnecessary restriction?
-		getFromElementIfCompatible( field -> field.staticChildrenByName().keySet(),
+		fromNodeIfCompatible( field -> field.staticChildrenByName().keySet(),
 				Object::equals, "staticChildren" );
 
 		Map<String, LuceneSearchIndexNodeContext> result = new TreeMap<>();
 		Function<String, LuceneSearchIndexNodeContext> createChildFieldContext = scope::field;
-		for ( LuceneSearchIndexCompositeNodeContext indexElement : elementForEachIndex ) {
+		for ( LuceneSearchIndexCompositeNodeContext indexElement : nodeForEachIndex ) {
 			for ( LuceneSearchIndexNodeContext child : indexElement.staticChildrenByName().values() ) {
 				try {
 					result.computeIfAbsent( child.absolutePath(), createChildFieldContext );
@@ -74,28 +77,6 @@ public final class LuceneMultiIndexSearchIndexCompositeNodeContext
 		// and throw an exception again.
 		staticChildrenByName = result;
 		return staticChildrenByName;
-	}
-
-	@Override
-	public boolean nested() {
-		return getFromElementIfCompatible( LuceneSearchIndexCompositeNodeContext::nested, Object::equals,
-				"nested" );
-	}
-
-	@Override
-	protected String missingSupportHint(String queryElementName) {
-		return log.missingSupportHintForCompositeIndexElement();
-	}
-
-	@Override
-	protected String partialSupportHint() {
-		return log.partialSupportHintForCompositeIndexElement();
-	}
-
-	@Override
-	protected <T> LuceneSearchQueryElementFactory<T, LuceneSearchIndexCompositeNodeContext> queryElementFactory(
-			LuceneSearchIndexCompositeNodeContext indexElement, SearchQueryElementTypeKey<T> key) {
-		return indexElement.queryElementFactory( key );
 	}
 
 }

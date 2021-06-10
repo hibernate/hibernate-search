@@ -6,29 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.common.impl;
 
-import java.util.List;
+import org.hibernate.search.engine.search.common.spi.SearchIndexNodeContext;
 
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
-import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
-
-/**
- * Information about an index element targeted by search,
- * be it the index root, a value field or an object field.
- * <p>
- * This is used in predicates, projections, sorts, ...
- */
-public interface ElasticsearchSearchIndexNodeContext extends EventContextProvider {
-
-	boolean isComposite();
-
-	ElasticsearchSearchIndexCompositeNodeContext toComposite();
-
-	String absolutePath();
-
-	List<String> nestedPathHierarchy();
-
-	// Query elements: predicates, sorts, projections, aggregations, ...
-
-	<T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchIndexScope scope);
+public interface ElasticsearchSearchIndexNodeContext
+		extends SearchIndexNodeContext<ElasticsearchSearchIndexScope> {
 
 }

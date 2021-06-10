@@ -41,17 +41,17 @@ public class ElasticsearchIndexModel implements ElasticsearchIndexDescriptor, El
 
 	private final DocumentIdentifierValueConverter<?> idDslConverter;
 	private final ElasticsearchIndexRoot rootNode;
-	private final Map<String, AbstractElasticsearchIndexField> staticFields;
+	private final Map<String, ElasticsearchIndexField> staticFields;
 	private final List<IndexFieldDescriptor> includedStaticFields;
 	private final List<AbstractElasticsearchIndexSchemaFieldTemplate<?>> fieldTemplates;
-	private final ConcurrentMap<String, AbstractElasticsearchIndexField> dynamicFieldsCache = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, ElasticsearchIndexField> dynamicFieldsCache = new ConcurrentHashMap<>();
 
 	public ElasticsearchIndexModel(IndexNames names,
 			String mappedTypeName,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, IndexSettings customIndexSettings,
 			RootTypeMapping mapping, DocumentIdentifierValueConverter<?> idDslConverter,
 			ElasticsearchIndexRoot rootNode,
-			Map<String, AbstractElasticsearchIndexField> staticFields,
+			Map<String, ElasticsearchIndexField> staticFields,
 			List<AbstractElasticsearchIndexSchemaFieldTemplate<?>> fieldTemplates) {
 		this.names = names;
 		this.mappedTypeName = mappedTypeName;
@@ -105,12 +105,12 @@ public class ElasticsearchIndexModel implements ElasticsearchIndexDescriptor, El
 		return Optional.ofNullable( fieldOrNull( absolutePath ) );
 	}
 
-	public AbstractElasticsearchIndexField fieldOrNull(String absolutePath) {
+	public ElasticsearchIndexField fieldOrNull(String absolutePath) {
 		return fieldOrNull( absolutePath, IndexFieldFilter.INCLUDED_ONLY );
 	}
 
-	public AbstractElasticsearchIndexField fieldOrNull(String absolutePath, IndexFieldFilter filter) {
-		AbstractElasticsearchIndexField node = fieldOrNullIgnoringInclusion( absolutePath );
+	public ElasticsearchIndexField fieldOrNull(String absolutePath, IndexFieldFilter filter) {
+		ElasticsearchIndexField node = fieldOrNullIgnoringInclusion( absolutePath );
 		return node == null ? null : filter.filter( node, node.inclusion() );
 	}
 
@@ -139,8 +139,8 @@ public class ElasticsearchIndexModel implements ElasticsearchIndexDescriptor, El
 				.toString();
 	}
 
-	private AbstractElasticsearchIndexField fieldOrNullIgnoringInclusion(String absolutePath) {
-		AbstractElasticsearchIndexField field = staticFields.get( absolutePath );
+	private ElasticsearchIndexField fieldOrNullIgnoringInclusion(String absolutePath) {
+		ElasticsearchIndexField field = staticFields.get( absolutePath );
 		if ( field != null ) {
 			return field;
 		}
@@ -151,7 +151,7 @@ public class ElasticsearchIndexModel implements ElasticsearchIndexDescriptor, El
 		for ( AbstractElasticsearchIndexSchemaFieldTemplate<?> template : fieldTemplates ) {
 			field = template.createNodeIfMatching( this, absolutePath );
 			if ( field != null ) {
-				AbstractElasticsearchIndexField previous = dynamicFieldsCache.putIfAbsent( absolutePath, field );
+				ElasticsearchIndexField previous = dynamicFieldsCache.putIfAbsent( absolutePath, field );
 				if ( previous != null ) {
 					// Some other thread created the node before us.
 					// Keep the first created node, discard ours: they are identical.

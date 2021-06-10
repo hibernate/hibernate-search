@@ -6,34 +6,13 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexCompositeNodeContext;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexCompositeNodeType;
+import org.hibernate.search.engine.backend.document.model.spi.IndexCompositeNode;
 
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
-import org.hibernate.search.engine.backend.metamodel.IndexCompositeElementDescriptor;
-
-
-public interface LuceneIndexCompositeNode extends IndexCompositeElementDescriptor {
-
-	String absolutePath();
-
-	String absolutePath(String relativeFieldName);
-
-	IndexFieldInclusion inclusion();
-
-	List<String> nestedPathHierarchy();
-
-	@Override
-	default Collection<? extends AbstractLuceneIndexField> staticChildren() {
-		return staticChildrenByName().values();
-	}
-
-	@Override
-	Map<String, ? extends AbstractLuceneIndexField> staticChildrenByName();
-
-	boolean multiValuedInRoot();
-
-	boolean dynamic();
+public interface LuceneIndexCompositeNode
+		extends IndexCompositeNode<LuceneSearchIndexScope, LuceneIndexCompositeNodeType, LuceneIndexField>,
+				LuceneIndexNode, LuceneSearchIndexCompositeNodeContext {
 
 }

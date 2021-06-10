@@ -6,34 +6,40 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.dsl.impl;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
-import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubIndexObjectFieldReference;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexCompositeNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexField;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexObjectField;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.impl.StubIndexCompositeNodeType;
 
 class StubIndexSchemaObjectFieldNodeBuilder extends AbstractStubIndexSchemaObjectNodeBuilder
 		implements IndexSchemaObjectFieldNodeBuilder, StubIndexSchemaFieldBuilder {
 
 	private final AbstractStubIndexSchemaObjectNodeBuilder parent;
 	private final IndexFieldInclusion inclusion;
-	private final ObjectStructure objectStructure;
+	private final StubIndexCompositeNodeType type;
+
+	private boolean multiValued;
 
 	private IndexObjectFieldReference reference;
 
 	StubIndexSchemaObjectFieldNodeBuilder(AbstractStubIndexSchemaObjectNodeBuilder parent,
 			StubIndexSchemaDataNode.Builder schemaNodeBuilder, IndexFieldInclusion inclusion,
-			ObjectStructure objectStructure) {
+			StubIndexCompositeNodeType type) {
 		super( schemaNodeBuilder );
 		this.parent = parent;
 		this.inclusion = inclusion;
-		this.objectStructure = objectStructure;
+		this.type = type;
 	}
 
 	@Override
@@ -44,6 +50,7 @@ class StubIndexSchemaObjectFieldNodeBuilder extends AbstractStubIndexSchemaObjec
 
 	@Override
 	public void multiValued() {
+		multiValued = true;
 		schemaDataNodeBuilder.multiValued( true );
 	}
 
@@ -58,9 +65,12 @@ class StubIndexSchemaObjectFieldNodeBuilder extends AbstractStubIndexSchemaObjec
 	}
 
 	@Override
-	public StubIndexNode build(BiConsumer<String, StubIndexNode> fieldCollector) {
-		contributeChildren( fieldCollector );
-		return new StubIndexNode( schemaDataNodeBuilder.build(), null, objectStructure );
+	public StubIndexField build(StubIndexCompositeNode parent, BiConsumer<String, StubIndexField> fieldCollector) {
+		Map<String, StubIndexField> staticChildren = new LinkedHashMap<>();
+		StubIndexObjectField node = new StubIndexObjectField( parent, schemaDataNodeBuilder.getRelativeName(), type,
+				inclusion, multiValued, staticChildren, schemaDataNodeBuilder.build() );
+		contributeChildren( node, staticChildren, fieldCollector );
+		return node;
 	}
 
 	@Override

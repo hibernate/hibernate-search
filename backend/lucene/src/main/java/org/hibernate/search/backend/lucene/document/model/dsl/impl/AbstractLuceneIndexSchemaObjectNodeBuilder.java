@@ -7,41 +7,44 @@
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexField;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCompositeNodeSearchQueryElementFactory;
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneNamedPredicate;
-import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexCompositeNodeType;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
-import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 		implements IndexSchemaObjectNodeBuilder, IndexSchemaBuildContext {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	protected final LuceneIndexCompositeNodeType.Builder typeBuilder;
+
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, LuceneIndexSchemaNodeContributor> fields = new LinkedHashMap<>();
 	private final Map<String, LuceneIndexSchemaNodeContributor> templates = new LinkedHashMap<>();
 	private final Map<String, LuceneIndexSchemaNamedPredicateOptions> namedPredicates = new LinkedHashMap<>();
+
+	protected AbstractLuceneIndexSchemaObjectNodeBuilder(LuceneIndexCompositeNodeType.Builder typeBuilder) {
+		this.typeBuilder = typeBuilder;
+	}
 
 	@Override
 	public String toString() {
@@ -78,6 +81,10 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 		LuceneIndexSchemaNamedPredicateOptions options = new LuceneIndexSchemaNamedPredicateOptions(
 				inclusion, provider );
 		putNamedPredicate( name, options );
+		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+			typeBuilder.queryElementFactory( PredicateTypeKeys.named( name ),
+					new LuceneNamedPredicate.Factory( options.provider, name ) );
+		}
 		return options;
 	}
 
@@ -109,26 +116,8 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 
 	abstract String getAbsolutePath();
 
-	final Map<SearchQueryElementTypeKey<?>, AbstractLuceneCompositeNodeSearchQueryElementFactory<?>>
-			buildQueryElementFactoryMap() {
-		if ( namedPredicates.isEmpty() ) {
-			return Collections.emptyMap();
-		}
-		Map<SearchQueryElementTypeKey<?>, AbstractLuceneCompositeNodeSearchQueryElementFactory<?>>
-				result = new HashMap<>();
-		for ( Map.Entry<String, LuceneIndexSchemaNamedPredicateOptions> entry : namedPredicates.entrySet() ) {
-			LuceneIndexSchemaNamedPredicateOptions options = entry.getValue();
-			if ( IndexFieldInclusion.EXCLUDED.equals( options.inclusion ) ) {
-				continue;
-			}
-			result.put( PredicateTypeKeys.named( entry.getKey() ),
-					new LuceneNamedPredicate.Factory( options.provider, entry.getKey() ) );
-		}
-		return result;
-	}
-
 	final void contributeChildren(LuceneIndexCompositeNode node, LuceneIndexSchemaNodeCollector collector,
-			Map<String, AbstractLuceneIndexField> staticChildrenByNameForParent) {
+			Map<String, LuceneIndexField> staticChildrenByNameForParent) {
 		for ( LuceneIndexSchemaNodeContributor contributor : fields.values() ) {
 			contributor.contribute( collector, node, staticChildrenByNameForParent );
 		}

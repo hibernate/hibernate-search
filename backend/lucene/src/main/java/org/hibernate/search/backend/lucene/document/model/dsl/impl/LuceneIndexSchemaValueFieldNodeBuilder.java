@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldReference;
-import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexField;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -70,13 +70,12 @@ class LuceneIndexSchemaValueFieldNodeBuilder<F>
 
 	@Override
 	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexCompositeNode parentNode,
-			Map<String, AbstractLuceneIndexField> staticChildrenByNameForParent) {
+			Map<String, LuceneIndexField> staticChildrenByNameForParent) {
 		if ( reference == null ) {
 			throw log.incompleteFieldDefinition( eventContext() );
 		}
-		LuceneIndexValueField<F> fieldNode = new LuceneIndexValueField<>(
-				parentNode, relativeFieldName, inclusion, multiValued, false, type
-		);
+		LuceneIndexValueField<F> fieldNode = new LuceneIndexValueField<>( parentNode, relativeFieldName, type,
+				inclusion, multiValued, false );
 
 		staticChildrenByNameForParent.put( relativeFieldName, fieldNode );
 		collector.collect( fieldNode.absolutePath(), fieldNode );

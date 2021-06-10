@@ -20,35 +20,33 @@ abstract class AbstractStubStandardIndexFieldTypeOptionsStep<S extends AbstractS
 		super( inputType );
 	}
 
-	abstract S thisAsS();
-
 	@Override
 	public S projectable(Projectable projectable) {
-		modifiers.add( b -> b.projectable( projectable ) );
+		builder.modifier( b -> b.projectable( projectable ) );
 		return thisAsS();
 	}
 
 	@Override
 	public S sortable(Sortable sortable) {
-		modifiers.add( b -> b.sortable( sortable ) );
+		builder.modifier( b -> b.sortable( sortable ) );
 		return thisAsS();
 	}
 
 	@Override
 	public S indexNullAs(F indexNullAs) {
-		modifiers.add( b -> b.indexNullAs( indexNullAs ) );
+		builder.modifier( b -> b.indexNullAs( indexNullAs ) );
 		return thisAsS();
 	}
 
 	@Override
 	public S searchable(Searchable searchable) {
-		modifiers.add( b -> b.searchable( searchable ) );
+		builder.modifier( b -> b.searchable( searchable ) );
 		return thisAsS();
 	}
 
 	@Override
 	public S aggregable(Aggregable aggregable) {
-		modifiers.add( b -> b.aggregable( aggregable ) );
+		builder.modifier( b -> b.aggregable( aggregable ) );
 		return thisAsS();
 	}
 

@@ -6,29 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.search.common.impl;
 
-import java.util.List;
+import org.hibernate.search.engine.search.common.spi.SearchIndexNodeContext;
 
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
-import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
+public interface LuceneSearchIndexNodeContext
+		extends SearchIndexNodeContext<LuceneSearchIndexScope> {
 
-/**
- * Information about an index element targeted by search,
- * be it the index root, a value field or an object field.
- * <p>
- * This is used in predicates, projections, sorts, ...
- */
-public interface LuceneSearchIndexNodeContext extends EventContextProvider {
-
-	boolean isComposite();
-
+	@Override
 	LuceneSearchIndexCompositeNodeContext toComposite();
-
-	String absolutePath();
-
-	List<String> nestedPathHierarchy();
-
-	// Query elements: predicates, sorts, projections, aggregations, ...
-
-	<T> T queryElement(SearchQueryElementTypeKey<T> key, LuceneSearchIndexScope scope);
 
 }

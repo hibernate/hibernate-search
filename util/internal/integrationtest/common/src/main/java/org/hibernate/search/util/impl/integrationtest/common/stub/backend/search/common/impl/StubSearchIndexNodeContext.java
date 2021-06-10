@@ -6,18 +6,12 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl;
 
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
-import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
+import org.hibernate.search.engine.search.common.spi.SearchIndexNodeContext;
 
-public interface StubSearchIndexNodeContext extends EventContextProvider {
+public interface StubSearchIndexNodeContext
+		extends SearchIndexNodeContext<StubSearchIndexScope> {
 
-	boolean isValueField();
-
+	@Override
 	StubSearchIndexValueFieldContext<?> toValueField();
 
-	String absolutePath();
-
-	// Query elements: predicates, sorts, projections, aggregations, ...
-
-	<T> T queryElement(SearchQueryElementTypeKey<T> key, StubSearchIndexScope scope);
 }

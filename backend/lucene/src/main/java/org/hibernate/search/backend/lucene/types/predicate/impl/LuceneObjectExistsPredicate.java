@@ -86,7 +86,7 @@ public class LuceneObjectExistsPredicate extends AbstractLuceneSingleFieldPredic
 		}
 
 		public void addChild(LuceneSearchIndexNodeContext child) {
-			if ( child.isComposite() && child.toComposite().nested() ) {
+			if ( child.isComposite() && child.toComposite().type().nested() ) {
 				// TODO HSEARCH-3904 Elasticsearch ignores children that are nested object fields.
 				//  We align on that behavior... for now.
 				return;

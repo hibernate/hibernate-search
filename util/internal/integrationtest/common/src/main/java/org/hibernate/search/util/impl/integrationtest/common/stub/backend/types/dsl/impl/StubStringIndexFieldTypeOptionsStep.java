@@ -25,31 +25,31 @@ class StubStringIndexFieldTypeOptionsStep
 
 	@Override
 	public StubStringIndexFieldTypeOptionsStep analyzer(String analyzerName) {
-		modifiers.add( b -> b.analyzerName( analyzerName ) );
+		builder.modifier( b -> b.analyzerName( analyzerName ) );
 		return this;
 	}
 
 	@Override
 	public StubStringIndexFieldTypeOptionsStep searchAnalyzer(String searchAnalyzerName) {
-		modifiers.add( b -> b.searchAnalyzerName( searchAnalyzerName ) );
+		builder.modifier( b -> b.searchAnalyzerName( searchAnalyzerName ) );
 		return this;
 	}
 
 	@Override
 	public StubStringIndexFieldTypeOptionsStep normalizer(String normalizerName) {
-		modifiers.add( b -> b.normalizerName( normalizerName ) );
+		builder.modifier( b -> b.normalizerName( normalizerName ) );
 		return this;
 	}
 
 	@Override
 	public StubStringIndexFieldTypeOptionsStep norms(Norms norms) {
-		modifiers.add( b -> b.norms( norms ) );
+		builder.modifier( b -> b.norms( norms ) );
 		return this;
 	}
 
 	@Override
 	public StubStringIndexFieldTypeOptionsStep termVector(TermVector termVector) {
-		modifiers.add( b -> b.termVector( termVector ) );
+		builder.modifier( b -> b.termVector( termVector ) );
 		return this;
 	}
 }

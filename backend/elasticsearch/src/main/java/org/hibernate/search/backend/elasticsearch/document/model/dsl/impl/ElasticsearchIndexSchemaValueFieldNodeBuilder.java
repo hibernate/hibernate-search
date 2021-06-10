@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldReference;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexField;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexField;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexValueField;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexCompositeNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -72,15 +72,14 @@ class ElasticsearchIndexSchemaValueFieldNodeBuilder<F>
 	@Override
 	public void contribute(ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexCompositeNode parentNode,
-			Map<String, AbstractElasticsearchIndexField> staticChildrenByNameForParent,
+			Map<String, ElasticsearchIndexField> staticChildrenByNameForParent,
 			AbstractTypeMapping parentMapping) {
 		if ( reference == null ) {
 			throw log.incompleteFieldDefinition( eventContext() );
 		}
 
 		ElasticsearchIndexValueField<F> fieldNode = new ElasticsearchIndexValueField<>(
-				parentNode, relativeFieldName, inclusion, multiValued, type
-		);
+				parentNode, relativeFieldName, type, inclusion, multiValued );
 
 		staticChildrenByNameForParent.put( relativeFieldName, fieldNode );
 		collector.collect( absoluteFieldPath, fieldNode );

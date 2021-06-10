@@ -557,45 +557,11 @@ public interface Log extends BasicLogger {
 			value = "Unknown field '%1$s'.")
 	SearchException unknownFieldForIndexing(String absoluteFieldPath, @Param EventContext context);
 
-	@Message(id = ID_OFFSET + 128,
-			value = "Invalid type: the index root is not an object field.")
-	SearchException invalidIndexElementTypeRootIsNotObjectField();
-
-	@Message(id = ID_OFFSET + 129,
-			value = "Invalid type: '%1$s' is a value field, not an object field.")
-	SearchException invalidIndexElementTypeValueFieldIsNotObjectField(String absolutePath);
-
-	@Message(id = ID_OFFSET + 130,
-			value = "Invalid type: '%1$s' is an object field, not a value field.")
-	SearchException invalidIndexElementTypeObjectFieldIsNotValueField(String absolutePath);
-
 	@Message(id = ID_OFFSET + 131,
 			value = "Invalid cardinality for projection on field '%1$s': the projection is single-valued,"
 					+ " but this field is multi-valued."
 					+ " Make sure to call '.multi()' when you create the projection.")
 	SearchException invalidSingleValuedProjectionOnMultiValuedField(String absolutePath, @Param EventContext context);
-
-	@Message(id = ID_OFFSET + 132, value = "Cannot use '%2$s' on %1$s. %3$s" )
-	SearchException cannotUseQueryElementForIndexElement(
-			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext, String queryElementName,
-			String hint, @Param EventContext context);
-
-	@Message(value = "Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)."
-			+ " If it already is, then '%1$s' is not available for fields of this type.")
-	String missingSupportHintForValueField(String queryElementName);
-
-	@Message(value = "If you are trying to use the 'nested' predicate, set the field structure to 'NESTED' and reindex all your data."
-			+ " If you are trying to use another predicate, it probably isn't available for this field")
-	String missingSupportHintForCompositeIndexElement();
-
-	@Message(id = ID_OFFSET + 133,
-			value = "Inconsistent support for '%1$s': %2$s")
-	SearchException inconsistentSupportForQueryElement(String queryElementName,
-			String causeMessage, @Cause SearchException cause);
-
-	@Message(id = ID_OFFSET + 134,
-			value = "Attribute '%1$s' differs: '%2$s' vs. '%3$s'.")
-	SearchException differentIndexElementAttribute(String attributeName, Object component1, Object component2);
 
 	@Message(id = ID_OFFSET + 135,
 			value = "Implementation class differs: '%1$s' vs. '%2$s'.")
@@ -606,31 +572,12 @@ public interface Log extends BasicLogger {
 			value = "Field codec differs: '%1$s' vs. '%2$s'.")
 	SearchException differentFieldCodecForQueryElement(Object codec1, Object codec2);
 
-	@Message(id = ID_OFFSET + 137,
-			value = "'%1$s' can be used in some of the targeted indexes, but not all of them. %2$s")
-	SearchException partialSupportForQueryElement(String queryElementName, String hint);
-
-	@Message(value = "Make sure the field is marked as searchable/sortable/projectable/aggregable"
-			+ " (whichever is relevant) in all indexes,"
-			+ " and that the field has the same type in all indexes.")
-	String partialSupportHintForValueField();
-
-	@Message(value = "If you are trying to use the 'nested' predicate,"
-			+ " set the field structure is to 'NESTED' in all indexes, then reindex all your data.")
-	String partialSupportHintForCompositeIndexElement();
-
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET + 138, value = "Using deprecated filesystem access strategy '%1$s',"
 			+ " which will be removed in a future version of Lucene."
 			+ " %2$s")
 	void deprecatedFileSystemAccessStrategy(String accessStrategyName,
 			@FormatWith(EventContextFormatter.class) EventContext eventContext);
-
-	@Message(id = ID_OFFSET + 140, value = "Cannot use '%2$s' on %1$s: %3$s")
-	SearchException cannotUseQueryElementForIndexElementBecauseCreationException(
-			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext,
-			String queryElementName, String causeMessage, @Cause SearchException cause,
-			@Param EventContext elementContextAsParam);
 
 	@Message(id = ID_OFFSET + 141,
 			value = "Unable to compute size of index: %1$s")

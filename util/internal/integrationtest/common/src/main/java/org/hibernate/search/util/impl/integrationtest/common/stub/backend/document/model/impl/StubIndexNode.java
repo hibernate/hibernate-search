@@ -6,52 +6,23 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl;
 
-import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.engine.backend.document.model.spi.IndexNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexNodeContext;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSingleIndexSearchIndexCompositeNodeContext;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSingleIndexSearchIndexValueFieldContext;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.impl.StubIndexValueFieldType;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
 
-public class StubIndexNode {
+public interface StubIndexNode
+		extends IndexNode<StubSearchIndexScope>, StubSearchIndexNodeContext {
 
-	private final StubIndexValueFieldType<?> type;
-	private final ObjectStructure objectStructure;
-	private final StubIndexSchemaDataNode schemaData;
+	@Override
+	StubIndexCompositeNode toComposite();
 
-	public StubIndexNode(StubIndexSchemaDataNode schemaData, StubIndexValueFieldType<?> type, ObjectStructure objectStructure) {
-		this.schemaData = schemaData;
-		this.type = type;
-		this.objectStructure = objectStructure;
-	}
+	@Override
+	StubIndexObjectField toObjectField();
 
-	public StubIndexValueFieldType<?> type() {
-		return type;
-	}
+	@Override
+	StubIndexValueField<?> toValueField();
 
-	public ObjectStructure objectStructure() {
-		return objectStructure;
-	}
-
-	public StubIndexSchemaDataNode schemaData() {
-		return schemaData;
-	}
-
-	public StubSearchIndexNodeContext toSearchContext() {
-		StubIndexSchemaDataNode.Kind kind = schemaData.kind();
-		switch ( kind ) {
-			case ROOT:
-			case OBJECT_FIELD:
-				return new StubSingleIndexSearchIndexCompositeNodeContext( schemaData.absolutePath(), objectStructure );
-			case VALUE_FIELD:
-				return new StubSingleIndexSearchIndexValueFieldContext<>( schemaData.absolutePath(), type );
-			case NAMED_PREDICATE:
-			case OBJECT_FIELD_TEMPLATE:
-			case VALUE_FIELD_TEMPLATE:
-			default:
-				throw new SearchException( "Cannot create a search context for index schema element of kind " + kind );
-		}
-	}
+	StubIndexSchemaDataNode schemaData();
 
 }

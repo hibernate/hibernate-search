@@ -8,44 +8,39 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import java.util.List;
 
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
-import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.engine.search.common.spi.AbstractMultiIndexSearchIndexCompositeNodeContext;
 
 public final class StubMultiIndexSearchIndexCompositeNodeContext
-		extends AbstractStubMultiIndexSearchIndexNodeContext<StubSearchIndexCompositeNodeContext>
-		implements StubSearchIndexCompositeNodeContext {
+		extends AbstractMultiIndexSearchIndexCompositeNodeContext<
+		StubSearchIndexCompositeNodeContext,
+						StubSearchIndexScope,
+						StubSearchIndexCompositeNodeTypeContext
+				>
+		implements StubSearchIndexCompositeNodeContext, StubSearchIndexCompositeNodeTypeContext {
 
 	public StubMultiIndexSearchIndexCompositeNodeContext(StubSearchIndexScope scope,
-			String absolutePath,
-			List<StubSearchIndexCompositeNodeContext> elementForEachIndex) {
-		super( scope, absolutePath, elementForEachIndex );
+			String absolutePath, List<? extends StubSearchIndexCompositeNodeContext> nodeForEachIndex) {
+		super( scope, absolutePath, nodeForEachIndex );
 	}
 
 	@Override
-	public boolean isValueField() {
-		return false;
+	protected StubSearchIndexCompositeNodeContext self() {
+		return this;
+	}
+
+	@Override
+	protected StubSearchIndexCompositeNodeTypeContext selfAsNodeType() {
+		return this;
+	}
+
+	@Override
+	protected StubSearchIndexCompositeNodeTypeContext typeOf(
+			StubSearchIndexCompositeNodeContext indexElement) {
+		return indexElement.type();
 	}
 
 	@Override
 	public StubSearchIndexValueFieldContext<?> toValueField() {
-		throw new SearchException( "This is not a value field, but an object field" );
+		return (StubSearchIndexValueFieldContext<?>) super.toValueField();
 	}
-
-	@Override
-	public boolean nested() {
-		return getFromElementIfCompatible(
-				StubSearchIndexCompositeNodeContext::nested, Object::equals, "nested" );
-	}
-
-	@Override
-	public <T> T queryElement(SearchQueryElementTypeKey<T> key, StubSearchIndexScope scope) {
-		return queryElementFactory( key ).create( scope, this );
-	}
-
-	@Override
-	protected <T> AbstractStubSearchQueryElementFactory<T> queryElementFactory(
-			StubSearchIndexCompositeNodeContext indexElement, SearchQueryElementTypeKey<T> key) {
-		return indexElement.queryElementFactory( key );
-	}
-
 }

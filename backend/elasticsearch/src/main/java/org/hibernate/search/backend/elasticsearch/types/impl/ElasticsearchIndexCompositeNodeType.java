@@ -1,0 +1,55 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.backend.elasticsearch.types.impl;
+
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexCompositeNodeContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexCompositeNodeTypeContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchExistsPredicate;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchNestedPredicate;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.engine.backend.types.spi.AbstractIndexCompositeNodeType;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
+
+public class ElasticsearchIndexCompositeNodeType
+		extends AbstractIndexCompositeNodeType<
+						ElasticsearchSearchIndexScope, ElasticsearchSearchIndexCompositeNodeContext
+				>
+		implements ElasticsearchSearchIndexCompositeNodeTypeContext {
+
+	private ElasticsearchIndexCompositeNodeType(Builder builder) {
+		super( builder );
+	}
+
+	public PropertyMapping createMapping(DynamicType dynamicType) {
+		PropertyMapping mapping = new PropertyMapping();
+		mapping.setType( nested() ? DataTypes.NESTED : DataTypes.OBJECT );
+		mapping.setDynamic( dynamicType );
+		return mapping;
+	}
+
+	public static class Builder
+			extends AbstractIndexCompositeNodeType.Builder<
+							ElasticsearchSearchIndexScope, ElasticsearchSearchIndexCompositeNodeContext
+					> {
+		public Builder(ObjectStructure objectStructure) {
+			super( objectStructure );
+			queryElementFactory( PredicateTypeKeys.EXISTS, new ElasticsearchExistsPredicate.ObjectFieldFactory() );
+			if ( ObjectStructure.NESTED.equals( objectStructure ) ) {
+				queryElementFactory( PredicateTypeKeys.NESTED, new ElasticsearchNestedPredicate.Factory() );
+			}
+		}
+
+		@Override
+		public ElasticsearchIndexCompositeNodeType build() {
+			return new ElasticsearchIndexCompositeNodeType( this );
+		}
+	}
+}

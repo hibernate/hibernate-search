@@ -34,7 +34,7 @@ class LuceneIndexSchemaValueFieldTemplateBuilder
 	protected void doContribute(LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexCompositeNode parentNode, SimpleGlobPattern absolutePathGlob, boolean multiValued) {
 		LuceneIndexSchemaValueFieldTemplate fieldTemplate = new LuceneIndexSchemaValueFieldTemplate(
-				parentNode, inclusion, absolutePathGlob, multiValued, type
+				parentNode, absolutePathGlob, type, inclusion, multiValued
 		);
 
 		collector.collect( fieldTemplate );

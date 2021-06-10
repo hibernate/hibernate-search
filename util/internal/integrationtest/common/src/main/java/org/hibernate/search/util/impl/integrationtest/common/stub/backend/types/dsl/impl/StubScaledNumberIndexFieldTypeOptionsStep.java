@@ -19,20 +19,20 @@ public class StubScaledNumberIndexFieldTypeOptionsStep<F extends Number>
 	}
 
 	@Override
-	StubScaledNumberIndexFieldTypeOptionsStep thisAsS() {
+	StubScaledNumberIndexFieldTypeOptionsStep<F> thisAsS() {
 		return this;
 	}
 
 	@Override
-	public StubScaledNumberIndexFieldTypeOptionsStep decimalScale(int decimalScale) {
-		modifiers.add( b -> b.decimalScale( decimalScale ) );
+	public StubScaledNumberIndexFieldTypeOptionsStep<F> decimalScale(int decimalScale) {
+		builder.modifier( b -> b.decimalScale( decimalScale ) );
 		return this;
 	}
 
 	private void setDefaults(IndexFieldTypeDefaultsProvider defaultsProvider) {
 		Integer decimalScale = defaultsProvider.decimalScale();
 		if ( decimalScale != null ) {
-			modifiers.add( b -> b.defaultDecimalScale( decimalScale ) );
+			builder.modifier( b -> b.defaultDecimalScale( decimalScale ) );
 		}
 	}
 }

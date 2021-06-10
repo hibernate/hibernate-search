@@ -6,8 +6,12 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl;
 
-public interface StubSearchIndexValueFieldContext<F> extends StubSearchIndexNodeContext {
+import org.hibernate.search.engine.search.common.spi.SearchIndexValueFieldContext;
 
-	StubSearchValueFieldTypeContext<F> type();
+public interface StubSearchIndexValueFieldContext<F>
+		extends SearchIndexValueFieldContext<StubSearchIndexScope>, StubSearchIndexNodeContext {
+
+	@Override
+	StubSearchIndexValueFieldTypeContext<F> type();
 
 }

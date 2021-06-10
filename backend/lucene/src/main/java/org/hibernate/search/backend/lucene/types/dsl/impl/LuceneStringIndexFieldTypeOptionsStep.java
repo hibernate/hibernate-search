@@ -126,8 +126,10 @@ class LuceneStringIndexFieldTypeOptionsStep
 		DocValues docValues = resolvedSortable || resolvedAggregable ? DocValues.ENABLED : DocValues.DISABLED;
 
 		if ( analyzer != null ) {
-			builder.analyzer( analyzerName, analyzer );
-			builder.searchAnalyzer( searchAnalyzerName, searchAnalyzer );
+			builder.analyzerName( analyzerName );
+			builder.searchAnalyzerName( searchAnalyzerName );
+			builder.indexingAnalyzerOrNormalizer( analyzer );
+			builder.searchAnalyzerOrNormalizer( searchAnalyzer != null ? searchAnalyzer : analyzer );
 
 			if ( resolvedSortable ) {
 				throw log.cannotUseAnalyzerOnSortableField( analyzerName, buildContext.getEventContext() );
@@ -147,10 +149,14 @@ class LuceneStringIndexFieldTypeOptionsStep
 		}
 		else {
 			if ( normalizer != null ) {
-				builder.normalizer( normalizerName, normalizer );
+				builder.normalizerName( normalizerName );
+				builder.searchAnalyzerName( searchAnalyzerName );
+				builder.indexingAnalyzerOrNormalizer( normalizer );
+				builder.searchAnalyzerOrNormalizer( searchAnalyzer != null ? searchAnalyzer : normalizer );
 			}
 			else {
-				builder.analyzer( null, AnalyzerConstants.KEYWORD_ANALYZER );
+				builder.indexingAnalyzerOrNormalizer( AnalyzerConstants.KEYWORD_ANALYZER );
+				builder.searchAnalyzerOrNormalizer( AnalyzerConstants.KEYWORD_ANALYZER );
 			}
 
 			if ( searchAnalyzer != null ) {

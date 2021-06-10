@@ -4,14 +4,26 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl;
+package org.hibernate.search.engine.search.common.spi;
 
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 
-public interface StubSearchValueFieldTypeContext<F> {
+/**
+ * Information about the type of a value (non-object) field targeted by search,
+ * be it in a projection, a predicate, a sort, ...
+ *
+ * @param <SC> The type of the backend-specific search scope.
+ * @param <N> The type representing the targeted index node.
+ * @param <F> The indexed field value type.
+ */
+public interface SearchIndexValueFieldTypeContext<
+				SC extends SearchIndexScope<SC>,
+				N,
+				F
+		>
+		extends SearchIndexNodeTypeContext<SC, N> {
 
 	Class<F> valueClass();
 
@@ -43,6 +55,4 @@ public interface StubSearchValueFieldTypeContext<F> {
 		}
 	}
 
-	<T> AbstractStubSearchQueryElementFactory<T>
-			queryElementFactory(SearchQueryElementTypeKey<T> key);
 }
