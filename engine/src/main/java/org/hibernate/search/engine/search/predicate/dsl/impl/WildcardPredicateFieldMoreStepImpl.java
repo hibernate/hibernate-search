@@ -11,12 +11,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.common.impl.Contracts;
 
 
@@ -33,9 +34,9 @@ class WildcardPredicateFieldMoreStepImpl
 	WildcardPredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
-		SearchPredicateBuilderFactory<?> predicateFactory = commonState.getFactory();
+		SearchIndexScope<?> scope = commonState.scope();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			predicateBuilders.add( predicateFactory.wildcard( absoluteFieldPath ) );
+			predicateBuilders.add( scope.fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.WILDCARD ) );
 		}
 	}
 

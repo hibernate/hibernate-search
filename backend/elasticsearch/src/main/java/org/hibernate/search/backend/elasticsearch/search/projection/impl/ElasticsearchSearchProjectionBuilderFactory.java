@@ -12,16 +12,12 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.EntityReferenceProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.IdProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
@@ -48,12 +44,6 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	}
 
 	@Override
-	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType, ValueConvert convert) {
-		return scope.field( absoluteFieldPath ).queryElement( ProjectionTypeKeys.FIELD, scope )
-				.type( expectedType, convert );
-	}
-
-	@Override
 	public <E> EntityProjectionBuilder<E> entity() {
 		return new ElasticsearchEntityProjection.Builder<>( scope, documentReferenceExtractionHelper );
 	}
@@ -71,11 +61,6 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	@Override
 	public ScoreProjectionBuilder score() {
 		return new ElasticsearchScoreProjection.Builder( scope );
-	}
-
-	@Override
-	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath) {
-		return scope.field( absoluteFieldPath ).queryElement( ProjectionTypeKeys.DISTANCE, scope );
 	}
 
 	@Override

@@ -8,6 +8,7 @@ package org.hibernate.search.engine.search.aggregation.dsl.impl;
 
 import java.util.Map;
 
+import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationFieldStep;
@@ -28,8 +29,8 @@ public class TermsAggregationFieldStepImpl<PDF extends SearchPredicateFactory> i
 			ValueConvert convert) {
 		Contracts.assertNotNull( absoluteFieldPath, "absoluteFieldPath" );
 		Contracts.assertNotNull( type, "type" );
-		TermsAggregationBuilder<F> builder =
-				dslContext.builderFactory().createTermsAggregationBuilder( absoluteFieldPath, type, convert );
+		TermsAggregationBuilder<F> builder = dslContext.scope()
+				.fieldQueryElement( absoluteFieldPath, AggregationTypeKeys.TERMS ).type( type, convert );
 		return new TermsAggregationOptionsStepImpl<>( builder, dslContext );
 	}
 }

@@ -11,7 +11,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.util.common.function.TriFunction;
 
 /**
@@ -24,8 +23,6 @@ public interface SearchProjectionBuilderFactory {
 
 	DocumentReferenceProjectionBuilder documentReference();
 
-	<T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz, ValueConvert convert);
-
 	<E> EntityProjectionBuilder<E> entity();
 
 	<R> EntityReferenceProjectionBuilder<R> entityReference();
@@ -33,8 +30,6 @@ public interface SearchProjectionBuilderFactory {
 	<I> IdProjectionBuilder<I> id(Class<I> identifierType);
 
 	ScoreProjectionBuilder score();
-
-	DistanceToFieldProjectionBuilder distance(String absoluteFieldPath);
 
 	<P> CompositeProjectionBuilder<P> composite(Function<List<?>, P> transformer, SearchProjection<?>... projections);
 

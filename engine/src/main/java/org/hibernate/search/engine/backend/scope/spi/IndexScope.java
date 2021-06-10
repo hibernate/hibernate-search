@@ -8,6 +8,7 @@ package org.hibernate.search.engine.backend.scope.spi;
 
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
+import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
@@ -20,6 +21,8 @@ import org.hibernate.search.util.common.SearchException;
  * @param <C> The type of query element collector
  */
 public interface IndexScope<C> {
+
+	SearchIndexScope<?> searchScope();
 
 	SearchPredicateBuilderFactory<? super C> searchPredicateBuilderFactory();
 

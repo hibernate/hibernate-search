@@ -34,30 +34,6 @@ public interface SearchPredicateBuilderFactory<C> {
 
 	BooleanPredicateBuilder bool();
 
-	MatchPredicateBuilder match(String absoluteFieldPath);
-
-	RangePredicateBuilder range(String absoluteFieldPath);
-
-	PhrasePredicateBuilder phrase(String absoluteFieldPath);
-
-	WildcardPredicateBuilder wildcard(String absoluteFieldPath);
-
-	RegexpPredicateBuilder regexp(String absoluteFieldPath);
-
-	TermsPredicateBuilder terms(String absoluteFieldPath);
-
-	NestedPredicateBuilder nested(String absoluteFieldPath);
-
 	SimpleQueryStringPredicateBuilder simpleQueryString();
-
-	ExistsPredicateBuilder exists(String absoluteFieldPath);
-
-	SpatialWithinCirclePredicateBuilder spatialWithinCircle(String absoluteFieldPath);
-
-	SpatialWithinPolygonPredicateBuilder spatialWithinPolygon(String absoluteFieldPath);
-
-	SpatialWithinBoundingBoxPredicateBuilder spatialWithinBoundingBox(String absoluteFieldPath);
-
-	NamedPredicateBuilder named(String absoluteFieldPath, String name);
 
 }

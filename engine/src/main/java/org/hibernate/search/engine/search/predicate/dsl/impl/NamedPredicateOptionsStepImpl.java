@@ -6,12 +6,15 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl.impl;
 
+import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
+import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.NamedPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 
 public class NamedPredicateOptionsStepImpl
 	extends AbstractPredicateFinalStep
@@ -22,7 +25,10 @@ public class NamedPredicateOptionsStepImpl
 	public NamedPredicateOptionsStepImpl(SearchPredicateFactory predicateFactory,
 			SearchPredicateDslContext<?> dslContext, String absoluteFieldPath, String predicateName) {
 		super( dslContext );
-		this.builder = dslContext.builderFactory().named( absoluteFieldPath, predicateName );
+		SearchIndexScope<?> scope = dslContext.scope();
+		SearchQueryElementTypeKey<NamedPredicateBuilder> key = PredicateTypeKeys.named( predicateName );
+		this.builder = absoluteFieldPath == null ? scope.rootQueryElement( key )
+				: scope.fieldQueryElement( absoluteFieldPath, key );
 		builder.factory( predicateFactory );
 	}
 

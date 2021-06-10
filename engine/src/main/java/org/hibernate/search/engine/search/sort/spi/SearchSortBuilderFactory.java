@@ -29,10 +29,6 @@ public interface SearchSortBuilderFactory<C> {
 
 	ScoreSortBuilder score();
 
-	FieldSortBuilder field(String absoluteFieldPath);
-
-	DistanceSortBuilder distance(String absoluteFieldPath);
-
 	SearchSort indexOrder();
 
 	CompositeSortBuilder composite();

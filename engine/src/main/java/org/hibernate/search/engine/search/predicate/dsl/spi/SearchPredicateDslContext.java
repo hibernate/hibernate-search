@@ -6,15 +6,21 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl.spi;
 
+import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 /**
  * Represents the current context in the search DSL,
- * including in particular the predicate builder factory.
+ * including in particular the search scope and the predicate builder factory.
  *
  * @param <F> The type of predicate builder factory.
  */
 public interface SearchPredicateDslContext<F extends SearchPredicateBuilderFactory<?>> {
+
+	/**
+	 * @return The search scope.
+	 */
+	SearchIndexScope<?> scope();
 
 	/**
 	 * @return The aggregation builder factory. Will always return the exact same instance.

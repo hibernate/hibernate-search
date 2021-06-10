@@ -19,6 +19,7 @@ import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.dsl.spi.AbstractSortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
+import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 public class DistanceSortOptionsStepImpl<PDF extends SearchPredicateFactory>
@@ -33,7 +34,7 @@ public class DistanceSortOptionsStepImpl<PDF extends SearchPredicateFactory>
 			String absoluteFieldPath, GeoPoint center) {
 		super( dslContext );
 		this.dslContext = dslContext;
-		this.builder = dslContext.builderFactory().distance( absoluteFieldPath );
+		this.builder = dslContext.scope().fieldQueryElement( absoluteFieldPath, SortTypeKeys.DISTANCE );
 		builder.center( center );
 	}
 

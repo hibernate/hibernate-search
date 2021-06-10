@@ -9,10 +9,7 @@ package org.hibernate.search.backend.lucene.search.sort.impl;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.CompositeSortBuilder;
-import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
-import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
-import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
@@ -35,16 +32,6 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 	@Override
 	public ScoreSortBuilder score() {
 		return new LuceneScoreSort.Builder( scope );
-	}
-
-	@Override
-	public FieldSortBuilder field(String absoluteFieldPath) {
-		return scope.field( absoluteFieldPath ).queryElement( SortTypeKeys.FIELD, scope );
-	}
-
-	@Override
-	public DistanceSortBuilder distance(String absoluteFieldPath) {
-		return scope.field( absoluteFieldPath ).queryElement( SortTypeKeys.DISTANCE, scope );
 	}
 
 	@Override

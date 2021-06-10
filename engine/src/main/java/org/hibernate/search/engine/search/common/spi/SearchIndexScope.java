@@ -27,4 +27,8 @@ public interface SearchIndexScope<S extends SearchIndexScope<S>> {
 
 	SearchIndexNodeContext<S> field(String absoluteFieldPath);
 
+	<T> T rootQueryElement(SearchQueryElementTypeKey<T> key);
+
+	<T> T fieldQueryElement(String absoluteFieldPath, SearchQueryElementTypeKey<T> key);
+
 }

@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -48,8 +48,8 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<
 		super( dslContext );
 	}
 
-	public SearchPredicateBuilderFactory<?> getFactory() {
-		return dslContext.builderFactory();
+	public SearchIndexScope<?> scope() {
+		return dslContext.scope();
 	}
 
 	public void add(F fieldSetState) {
@@ -77,7 +77,7 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<
 			fieldSetState.contributePredicates( predicates::add );
 		}
 		if ( predicates.size() > 1 ) {
-			BooleanPredicateBuilder boolBuilder = getFactory().bool();
+			BooleanPredicateBuilder boolBuilder = dslContext.builderFactory().bool();
 			for ( SearchPredicate predicate : predicates ) {
 				boolBuilder.should( predicate );
 			}

@@ -41,7 +41,7 @@ public abstract class AbstractSearchQuerySelectStep<
 
 	protected final SearchProjectionFactory<R, E> createDefaultProjectionFactory() {
 		return new DefaultSearchProjectionFactory<>(
-				SearchProjectionDslContextImpl.root( indexScope().searchProjectionFactory() )
+				SearchProjectionDslContextImpl.root( indexScope().searchScope(), indexScope().searchProjectionFactory() )
 		);
 	}
 

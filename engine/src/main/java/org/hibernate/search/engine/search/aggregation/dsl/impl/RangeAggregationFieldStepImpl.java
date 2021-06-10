@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.aggregation.dsl.impl;
 
+import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationFieldStep;
@@ -25,8 +26,8 @@ public class RangeAggregationFieldStepImpl<PDF extends SearchPredicateFactory> i
 	public <F> RangeAggregationRangeStep<?, PDF, F> field(String absoluteFieldPath, Class<F> type, ValueConvert convert) {
 		Contracts.assertNotNull( absoluteFieldPath, "absoluteFieldPath" );
 		Contracts.assertNotNull( type, "type" );
-		RangeAggregationBuilder<F> builder =
-				dslContext.builderFactory().createRangeAggregationBuilder( absoluteFieldPath, type, convert );
+		RangeAggregationBuilder<F> builder = dslContext.scope()
+				.fieldQueryElement( absoluteFieldPath, AggregationTypeKeys.RANGE ).type( type, convert );
 		return new RangeAggregationRangeStepImpl<>( builder, dslContext );
 	}
 }

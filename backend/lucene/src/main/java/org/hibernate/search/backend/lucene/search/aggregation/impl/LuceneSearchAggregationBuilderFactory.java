@@ -12,11 +12,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
-import org.hibernate.search.engine.search.aggregation.spi.AggregationTypeKeys;
-import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
-import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class LuceneSearchAggregationBuilderFactory
@@ -47,17 +43,4 @@ public class LuceneSearchAggregationBuilderFactory
 		collector.collectAggregation( key, casted );
 	}
 
-	@Override
-	public <T> TermsAggregationBuilder<T> createTermsAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
-			ValueConvert convert) {
-		return scope.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.TERMS, scope )
-				.type( expectedType, convert );
-	}
-
-	@Override
-	public <T> RangeAggregationBuilder<T> createRangeAggregationBuilder(String absoluteFieldPath, Class<T> expectedType,
-			ValueConvert convert) {
-		return scope.field( absoluteFieldPath ).queryElement( AggregationTypeKeys.RANGE, scope )
-				.type( expectedType, convert );
-	}
 }

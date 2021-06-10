@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.sort.dsl.impl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
+import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
@@ -27,33 +28,41 @@ public final class SearchSortDslContextImpl<F extends SearchSortBuilderFactory<?
 		implements SearchSortDslContext<F, PDF> {
 
 	public static <F extends SearchSortBuilderFactory<?>, PDF extends SearchPredicateFactory>
-			SearchSortDslContext<F, ?> root(F factory, PDF predicateFactory) {
-		return new SearchSortDslContextImpl<>( factory, null, null, predicateFactory );
+			SearchSortDslContext<F, ?> root(SearchIndexScope<?> scope, F builderFactory, PDF predicateFactory) {
+		return new SearchSortDslContextImpl<>( scope, builderFactory, null, null, predicateFactory );
 	}
 
-	private final F factory;
+	private final SearchIndexScope<?> scope;
+	private final F builderFactory;
 	private final SearchSortDslContextImpl<F, ?> parent;
 	private final SearchSort sort;
 	private final PDF predicateFactory;
 
 	private SearchSort compositeSort;
 
-	private SearchSortDslContextImpl(F factory, SearchSortDslContextImpl<F, ?> parent, SearchSort sort,
+	private SearchSortDslContextImpl(SearchIndexScope<?> scope,
+			F builderFactory, SearchSortDslContextImpl<F, ?> parent, SearchSort sort,
 			PDF predicateFactory) {
-		this.factory = factory;
+		this.scope = scope;
+		this.builderFactory = builderFactory;
 		this.parent = parent;
 		this.sort = sort;
 		this.predicateFactory = predicateFactory;
 	}
 
 	@Override
+	public SearchIndexScope<?> scope() {
+		return scope;
+	}
+
+	@Override
 	public F builderFactory() {
-		return factory;
+		return builderFactory;
 	}
 
 	@Override
 	public SearchSortDslContext<?, PDF> append(SearchSort sort) {
-		return new SearchSortDslContextImpl<>( factory, this, sort, predicateFactory );
+		return new SearchSortDslContextImpl<>( scope, builderFactory, this, sort, predicateFactory );
 	}
 
 	@Override
@@ -65,7 +74,7 @@ public final class SearchSortDslContextImpl<F extends SearchSortBuilderFactory<?
 	public <PDF2 extends SearchPredicateFactory> SearchSortDslContext<F, PDF2> withExtendedPredicateFactory(
 			SearchPredicateFactoryExtension<PDF2> extension) {
 		return new SearchSortDslContextImpl<>(
-				factory, parent, sort,
+				scope, builderFactory, parent, sort,
 				predicateFactory.extension( extension )
 		);
 	}
@@ -81,14 +90,14 @@ public final class SearchSortDslContextImpl<F extends SearchSortBuilderFactory<?
 	private SearchSort createCompositeSort() {
 		if ( parent == null ) {
 			// No sort at all; just use an empty composite sort.
-			return factory.composite().build();
+			return builderFactory.composite().build();
 		}
 		else if ( parent.sort == null ) {
 			// Only one element
 			return sort;
 		}
 		else {
-			CompositeSortBuilder builder = factory.composite();
+			CompositeSortBuilder builder = builderFactory.composite();
 			collectSorts( builder );
 			return builder.build();
 		}
