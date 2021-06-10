@@ -8,7 +8,7 @@ package org.hibernate.search.engine.backend.document.model.dsl.spi;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 
-public interface IndexSchemaObjectFieldNodeBuilder extends IndexSchemaObjectNodeBuilder {
+public interface IndexObjectFieldBuilder extends IndexCompositeNodeBuilder {
 
 	/**
 	 * Mark the current node as multi-valued.

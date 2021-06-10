@@ -10,12 +10,12 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPr
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 
-public class ElasticsearchIndexSchemaNamedPredicateOptions implements IndexSchemaNamedPredicateOptionsStep {
+public class ElasticsearchIndexNamedPredicateOptions implements IndexSchemaNamedPredicateOptionsStep {
 
 	public final IndexFieldInclusion inclusion;
 	public final NamedPredicateProvider provider;
 
-	ElasticsearchIndexSchemaNamedPredicateOptions(IndexFieldInclusion inclusion, NamedPredicateProvider provider) {
+	ElasticsearchIndexNamedPredicateOptions(IndexFieldInclusion inclusion, NamedPredicateProvider provider) {
 		this.inclusion = inclusion;
 		this.provider = provider;
 	}

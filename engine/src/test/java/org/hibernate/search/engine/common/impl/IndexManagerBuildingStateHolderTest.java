@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
@@ -81,7 +81,7 @@ public class IndexManagerBuildingStateHolderTest {
 	private IndexManagerBuilder indexManagerBuilderMock;
 
 	@Mock
-	private IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilderMock;
+	private IndexRootBuilder indexRootBuilderMock;
 
 	private final List<Object> verifiedMocks = new ArrayList<>();
 
@@ -89,7 +89,8 @@ public class IndexManagerBuildingStateHolderTest {
 	public void setup() {
 		Collections.addAll( verifiedMocks,
 				rootFailureCollectorMock, backendFailureCollectorMock,
-				backendFactoryMock, backendMock, indexManagerBuilderMock, indexSchemaRootNodeBuilderMock );
+				backendFactoryMock, backendMock, indexManagerBuilderMock, indexRootBuilderMock
+		);
 	}
 
 	@Test
@@ -124,7 +125,7 @@ public class IndexManagerBuildingStateHolderTest {
 		) )
 				.thenReturn( indexManagerBuilderMock );
 		when( indexManagerBuilderMock.schemaRootNodeBuilder() )
-				.thenReturn( indexSchemaRootNodeBuilderMock );
+				.thenReturn( indexRootBuilderMock );
 		holder.getIndexManagerBuildingState(
 				Optional.empty(), "myIndex", "myType"
 		);
@@ -189,7 +190,7 @@ public class IndexManagerBuildingStateHolderTest {
 		) )
 				.thenReturn( indexManagerBuilderMock );
 		when( indexManagerBuilderMock.schemaRootNodeBuilder() )
-				.thenReturn( indexSchemaRootNodeBuilderMock );
+				.thenReturn( indexRootBuilderMock );
 		holder.getIndexManagerBuildingState(
 				Optional.of( "myBackend" ), "myIndex", "myType"
 		);

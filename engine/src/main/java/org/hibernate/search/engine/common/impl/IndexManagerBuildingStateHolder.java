@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
@@ -177,7 +177,7 @@ class IndexManagerBuildingStateHolder {
 			IndexManagerBuilder builder = backend.createIndexManagerBuilder(
 					indexName, mappedTypeName, backendBuildContext, indexPropertySource
 			);
-			IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.schemaRootNodeBuilder();
+			IndexRootBuilder schemaRootNodeBuilder = builder.schemaRootNodeBuilder();
 
 			state = new IndexManagerInitialBuildState( indexName, mappedTypeName, indexPropertySourceExtractor,
 					builder, schemaRootNodeBuilder );
@@ -201,14 +201,14 @@ class IndexManagerBuildingStateHolder {
 		private final String mappedTypeName;
 		private final ConfigurationPropertySourceExtractor propertySourceExtractor;
 		private final IndexManagerBuilder builder;
-		private final IndexSchemaRootNodeBuilder schemaRootNodeBuilder;
+		private final IndexRootBuilder schemaRootNodeBuilder;
 
 		private IndexManagerImplementor indexManager;
 
 		IndexManagerInitialBuildState(String indexName, String mappedTypeName,
 				ConfigurationPropertySourceExtractor propertySourceExtractor,
 				IndexManagerBuilder builder,
-				IndexSchemaRootNodeBuilder schemaRootNodeBuilder) {
+				IndexRootBuilder schemaRootNodeBuilder) {
 			this.indexName = indexName;
 			this.mappedTypeName = mappedTypeName;
 			this.propertySourceExtractor = propertySourceExtractor;
@@ -226,7 +226,7 @@ class IndexManagerBuildingStateHolder {
 		}
 
 		@Override
-		public IndexSchemaRootNodeBuilder getSchemaRootNodeBuilder() {
+		public IndexRootBuilder getSchemaRootNodeBuilder() {
 			return schemaRootNodeBuilder;
 		}
 

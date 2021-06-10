@@ -14,26 +14,26 @@ import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexV
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
-class ElasticsearchIndexSchemaValueFieldTemplateBuilder
-		extends AbstractElasticsearchIndexSchemaFieldTemplateBuilder<
-				ElasticsearchIndexSchemaValueFieldTemplateBuilder, ElasticsearchIndexValueFieldTemplate
-		> {
+class ElasticsearchIndexValueFieldTemplateBuilder
+		extends AbstractElasticsearchIndexFieldTemplateBuilder<
+						ElasticsearchIndexValueFieldTemplateBuilder, ElasticsearchIndexValueFieldTemplate
+				> {
 
 	private final ElasticsearchIndexValueFieldType<?> type;
 
-	ElasticsearchIndexSchemaValueFieldTemplateBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
+	ElasticsearchIndexValueFieldTemplateBuilder(AbstractElasticsearchIndexCompositeNodeBuilder parent,
 			String templateName, IndexFieldInclusion inclusion, ElasticsearchIndexValueFieldType<?> type, String prefix) {
 		super( parent, templateName, inclusion, prefix );
 		this.type = type;
 	}
 
 	@Override
-	protected ElasticsearchIndexSchemaValueFieldTemplateBuilder thisAsS() {
+	protected ElasticsearchIndexValueFieldTemplateBuilder thisAsS() {
 		return this;
 	}
 
 	@Override
-	protected void doContribute(ElasticsearchIndexSchemaNodeCollector collector,
+	protected void doContribute(ElasticsearchIndexNodeCollector collector,
 			ElasticsearchIndexCompositeNode parentNode, IndexFieldInclusion inclusion,
 			SimpleGlobPattern absolutePathGlob, boolean multiValued) {
 		ElasticsearchIndexValueFieldTemplate fieldTemplate = new ElasticsearchIndexValueFieldTemplate(

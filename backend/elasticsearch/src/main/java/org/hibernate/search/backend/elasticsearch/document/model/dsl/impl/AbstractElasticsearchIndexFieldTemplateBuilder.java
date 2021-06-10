@@ -20,14 +20,14 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-abstract class AbstractElasticsearchIndexSchemaFieldTemplateBuilder<
-				S extends AbstractElasticsearchIndexSchemaFieldTemplateBuilder<S, T>,
+abstract class AbstractElasticsearchIndexFieldTemplateBuilder<
+				S extends AbstractElasticsearchIndexFieldTemplateBuilder<S, T>,
 				T extends AbstractElasticsearchIndexFieldTemplate<?>
 		>
 		implements IndexSchemaFieldTemplateOptionsStep<S>,
-				ElasticsearchIndexSchemaNodeContributor, IndexSchemaBuildContext {
+		ElasticsearchIndexNodeContributor, IndexSchemaBuildContext {
 
-	private final AbstractElasticsearchIndexSchemaObjectNodeBuilder parent;
+	private final AbstractElasticsearchIndexCompositeNodeBuilder parent;
 	protected final String absolutePath;
 	private final IndexFieldInclusion inclusion;
 	private final String prefix;
@@ -35,7 +35,7 @@ abstract class AbstractElasticsearchIndexSchemaFieldTemplateBuilder<
 	private SimpleGlobPattern relativePathGlob;
 	private boolean multiValued = false;
 
-	AbstractElasticsearchIndexSchemaFieldTemplateBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
+	AbstractElasticsearchIndexFieldTemplateBuilder(AbstractElasticsearchIndexCompositeNodeBuilder parent,
 			String templateName, IndexFieldInclusion inclusion, String prefix) {
 		this.parent = parent;
 		this.absolutePath = FieldPaths.compose( parent.getAbsolutePath(), templateName );
@@ -63,7 +63,7 @@ abstract class AbstractElasticsearchIndexSchemaFieldTemplateBuilder<
 	}
 
 	@Override
-	public void contribute(ElasticsearchIndexSchemaNodeCollector collector,
+	public void contribute(ElasticsearchIndexNodeCollector collector,
 			ElasticsearchIndexCompositeNode parentNode,
 			Map<String, ElasticsearchIndexField> staticChildrenByNameForParent,
 			AbstractTypeMapping parentMapping) {
@@ -77,7 +77,7 @@ abstract class AbstractElasticsearchIndexSchemaFieldTemplateBuilder<
 
 	protected abstract S thisAsS();
 
-	protected abstract void doContribute(ElasticsearchIndexSchemaNodeCollector collector,
+	protected abstract void doContribute(ElasticsearchIndexNodeCollector collector,
 			ElasticsearchIndexCompositeNode parentNode,
 			IndexFieldInclusion inclusion,
 			SimpleGlobPattern absolutePathGlob,

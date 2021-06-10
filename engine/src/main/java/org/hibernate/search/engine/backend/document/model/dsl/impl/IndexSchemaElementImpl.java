@@ -17,8 +17,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTe
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexObjectFieldBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexCompositeNodeBuilder;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
 import org.hibernate.search.engine.logging.impl.Log;
@@ -27,7 +27,7 @@ import org.hibernate.search.util.common.impl.StringHelper;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 
-public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> implements IndexSchemaElement {
+public class IndexSchemaElementImpl<B extends IndexCompositeNodeBuilder> implements IndexSchemaElement {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final IndexFieldTypeFactory typeFactory;
@@ -93,7 +93,7 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 		IndexSchemaObjectField objectField = nestingContext.nest(
 				relativeFieldName,
 				(prefixedName, inclusion, nestedNestingContext) -> {
-					IndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
+					IndexObjectFieldBuilder objectFieldBuilder =
 							this.objectNodeBuilder.addObjectField( prefixedName, inclusion, structure );
 					return new IndexSchemaObjectFieldImpl( typeFactory, objectFieldBuilder,
 							nestedNestingContext, false );

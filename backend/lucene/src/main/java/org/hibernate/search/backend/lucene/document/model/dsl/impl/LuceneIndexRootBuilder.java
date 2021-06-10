@@ -25,7 +25,7 @@ import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactory
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIndexFieldTypeFactoryImpl;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexCompositeNodeType;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.StringDocumentIdentifierValueConverter;
@@ -33,8 +33,8 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDef
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaObjectNodeBuilder
-		implements IndexSchemaRootNodeBuilder, IndexSchemaBuildContext {
+public class LuceneIndexRootBuilder extends AbstractLuceneIndexCompositeNodeBuilder
+		implements IndexRootBuilder, IndexSchemaBuildContext {
 
 	private final EventContext indexEventContext;
 	private final String mappedTypeName;
@@ -42,7 +42,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 
 	private DocumentIdentifierValueConverter<?> idDslConverter;
 
-	public LuceneIndexSchemaRootNodeBuilder(EventContext indexEventContext,
+	public LuceneIndexRootBuilder(EventContext indexEventContext,
 			String mappedTypeName, LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry) {
 		super( new LuceneIndexCompositeNodeType.Builder( ObjectStructure.FLATTENED ) );
 		this.indexEventContext = indexEventContext;
@@ -71,7 +71,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	@Override
-	public LuceneIndexSchemaRootNodeBuilder getRootNodeBuilder() {
+	public LuceneIndexRootBuilder getRootNodeBuilder() {
 		return this;
 	}
 
@@ -82,7 +82,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 		// Alternatively we could use AtomicBoolean, but we don't need concurrent access here.
 		boolean[] hasNestedDocument = new boolean[1];
 
-		LuceneIndexSchemaNodeCollector collector = new LuceneIndexSchemaNodeCollector() {
+		LuceneIndexNodeCollector collector = new LuceneIndexNodeCollector() {
 			@Override
 			public void collect(String absoluteFieldPath, LuceneIndexValueField<?> node) {
 				staticFields.put( absoluteFieldPath, node );

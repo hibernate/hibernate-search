@@ -14,9 +14,9 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaElementImpl;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexObjectFieldBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexCompositeNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
@@ -26,18 +26,18 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDe
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingMapperContext;
 
-abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilder> implements IndexBindingContext {
+abstract class AbstractIndexBindingContext<B extends IndexCompositeNodeBuilder> implements IndexBindingContext {
 
 	private final IndexedEntityBindingMapperContext mapperContext;
-	private final IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder;
+	private final IndexRootBuilder indexRootBuilder;
 	final B indexSchemaObjectNodeBuilder;
 	final ConfiguredIndexSchemaNestingContext nestingContext;
 
 	AbstractIndexBindingContext(IndexedEntityBindingMapperContext mapperContext,
-			IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
+			IndexRootBuilder indexRootBuilder,
 			B indexSchemaObjectNodeBuilder, ConfiguredIndexSchemaNestingContext nestingContext) {
 		this.mapperContext = mapperContext;
-		this.indexSchemaRootNodeBuilder = indexSchemaRootNodeBuilder;
+		this.indexRootBuilder = indexRootBuilder;
 		this.indexSchemaObjectNodeBuilder = indexSchemaObjectNodeBuilder;
 		this.nestingContext = nestingContext;
 	}
@@ -54,7 +54,7 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 
 	@Override
 	public IndexFieldTypeFactory createTypeFactory(IndexFieldTypeDefaultsProvider defaultsProvider) {
-		return indexSchemaRootNodeBuilder.createTypeFactory( defaultsProvider );
+		return indexRootBuilder.createTypeFactory( defaultsProvider );
 	}
 
 	@Override
@@ -86,7 +86,7 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 				pathTracker,
 				new NestedContextBuilderImpl(
 						mapperContext,
-						indexSchemaRootNodeBuilder, indexSchemaObjectNodeBuilder,
+						indexRootBuilder, indexSchemaObjectNodeBuilder,
 						definition,
 						isParentMultivaluedAndWithoutObjectField() || multiValued
 				)
@@ -105,19 +105,19 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 			implements ConfiguredIndexSchemaNestingContext.NestedContextBuilder<IndexedEmbeddedBindingContext> {
 
 		private final IndexedEntityBindingMapperContext mapperContext;
-		private final IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder;
-		private IndexSchemaObjectNodeBuilder currentNodeBuilder;
+		private final IndexRootBuilder indexRootBuilder;
+		private IndexCompositeNodeBuilder currentNodeBuilder;
 		private final IndexedEmbeddedDefinition definition;
 		private final List<IndexObjectFieldReference> parentIndexObjectReferences = new ArrayList<>();
 		private boolean multiValued;
 
 		private NestedContextBuilderImpl(IndexedEntityBindingMapperContext mapperContext,
-				IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
-				IndexSchemaObjectNodeBuilder currentNodeBuilder,
+				IndexRootBuilder indexRootBuilder,
+				IndexCompositeNodeBuilder currentNodeBuilder,
 				IndexedEmbeddedDefinition definition,
 				boolean multiValued) {
 			this.mapperContext = mapperContext;
-			this.indexSchemaRootNodeBuilder = indexSchemaRootNodeBuilder;
+			this.indexRootBuilder = indexRootBuilder;
 			this.currentNodeBuilder = currentNodeBuilder;
 			this.definition = definition;
 			this.multiValued = multiValued;
@@ -125,7 +125,7 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 
 		@Override
 		public void appendObject(String objectName) {
-			IndexSchemaObjectFieldNodeBuilder nextNodeBuilder =
+			IndexObjectFieldBuilder nextNodeBuilder =
 					currentNodeBuilder.addObjectField( objectName, IndexFieldInclusion.INCLUDED,
 							definition.structure()
 					);
@@ -142,7 +142,7 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 		public IndexedEmbeddedBindingContext build(ConfiguredIndexSchemaNestingContext nestingContext) {
 			return new IndexedEmbeddedBindingContextImpl(
 					mapperContext,
-					indexSchemaRootNodeBuilder,
+					indexRootBuilder,
 					currentNodeBuilder, parentIndexObjectReferences, nestingContext,
 					multiValued
 			);

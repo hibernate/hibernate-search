@@ -13,9 +13,9 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
 
 
-public interface ElasticsearchIndexSchemaNodeContributor {
+public interface ElasticsearchIndexNodeContributor {
 
-	void contribute(ElasticsearchIndexSchemaNodeCollector collector, ElasticsearchIndexCompositeNode parentNode,
+	void contribute(ElasticsearchIndexNodeCollector collector, ElasticsearchIndexCompositeNode parentNode,
 			Map<String, ElasticsearchIndexField> staticChildrenByNameForParent,
 			AbstractTypeMapping parentMapping);
 

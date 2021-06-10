@@ -31,7 +31,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.I
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexCompositeNodeType;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.StringDocumentIdentifierValueConverter;
@@ -39,8 +39,8 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDef
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsearchIndexSchemaObjectNodeBuilder
-		implements IndexSchemaRootNodeBuilder {
+public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCompositeNodeBuilder
+		implements IndexRootBuilder {
 
 	private final ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider;
 	private final EventContext indexEventContext;
@@ -55,7 +55,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	private RoutingType routing = null;
 	private DocumentIdentifierValueConverter<?> idDslConverter;
 
-	public ElasticsearchIndexSchemaRootNodeBuilder(ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
+	public ElasticsearchIndexRootBuilder(ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
 			EventContext indexEventContext,
 			IndexNames indexNames, String mappedTypeName,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, IndexSettings customIndexSettings,
@@ -110,7 +110,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 		Map<String, ElasticsearchIndexField> staticFields = new HashMap<>();
 		List<AbstractElasticsearchIndexFieldTemplate<?>> fieldTemplates = new ArrayList<>();
 
-		ElasticsearchIndexSchemaNodeCollector collector = new ElasticsearchIndexSchemaNodeCollector() {
+		ElasticsearchIndexNodeCollector collector = new ElasticsearchIndexNodeCollector() {
 			@Override
 			public void collect(String absolutePath, ElasticsearchIndexObjectField node) {
 				staticFields.put( absolutePath, node );
@@ -148,7 +148,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	}
 
 	@Override
-	ElasticsearchIndexSchemaRootNodeBuilder getRootNodeBuilder() {
+	ElasticsearchIndexRootBuilder getRootNodeBuilder() {
 		return this;
 	}
 

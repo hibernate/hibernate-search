@@ -10,25 +10,25 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexCompositeNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingMapperContext;
 
 class IndexedEmbeddedBindingContextImpl
-		extends AbstractIndexBindingContext<IndexSchemaObjectNodeBuilder>
+		extends AbstractIndexBindingContext<IndexCompositeNodeBuilder>
 		implements IndexedEmbeddedBindingContext {
 	private final Collection<IndexObjectFieldReference> parentIndexObjectReferences;
 
 	private final boolean parentMultivaluedAndWithoutObjectField;
 
 	IndexedEmbeddedBindingContextImpl(IndexedEntityBindingMapperContext mapperContext,
-			IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
-			IndexSchemaObjectNodeBuilder indexSchemaObjectNodeBuilder,
+			IndexRootBuilder indexRootBuilder,
+			IndexCompositeNodeBuilder indexCompositeNodeBuilder,
 			Collection<IndexObjectFieldReference> parentIndexObjectReferences,
 			ConfiguredIndexSchemaNestingContext nestingContext,
 			boolean parentMultivaluedAndWithoutObjectField) {
-		super( mapperContext, indexSchemaRootNodeBuilder, indexSchemaObjectNodeBuilder, nestingContext );
+		super( mapperContext, indexRootBuilder, indexCompositeNodeBuilder, nestingContext );
 		this.parentIndexObjectReferences = Collections.unmodifiableCollection( parentIndexObjectReferences );
 		this.parentMultivaluedAndWithoutObjectField = parentMultivaluedAndWithoutObjectField;
 	}

@@ -17,7 +17,7 @@ import org.hibernate.search.backend.lucene.types.impl.LuceneIndexCompositeNodeTy
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexObjectFieldBuilder;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexObjectFieldReference;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
@@ -25,11 +25,11 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 
-class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaObjectNodeBuilder
-		implements IndexSchemaObjectFieldNodeBuilder, LuceneIndexSchemaNodeContributor {
+class LuceneIndexObjectFieldBuilder extends AbstractLuceneIndexCompositeNodeBuilder
+		implements IndexObjectFieldBuilder, LuceneIndexNodeContributor {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final AbstractLuceneIndexSchemaObjectNodeBuilder parent;
+	private final AbstractLuceneIndexCompositeNodeBuilder parent;
 	private final String absoluteFieldPath;
 	private final String relativeFieldName;
 	private final IndexFieldInclusion inclusion;
@@ -37,7 +37,7 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 
 	private LuceneIndexObjectFieldReference reference;
 
-	LuceneIndexSchemaObjectFieldNodeBuilder(AbstractLuceneIndexSchemaObjectNodeBuilder parent,
+	LuceneIndexObjectFieldBuilder(AbstractLuceneIndexCompositeNodeBuilder parent,
 			String relativeFieldName, IndexFieldInclusion inclusion, ObjectStructure structure) {
 		super( new LuceneIndexCompositeNodeType.Builder( structure ) );
 		this.parent = parent;
@@ -67,7 +67,7 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	@Override
-	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexCompositeNode parentNode,
+	public void contribute(LuceneIndexNodeCollector collector, LuceneIndexCompositeNode parentNode,
 			Map<String, LuceneIndexField> staticChildrenByNameForParent) {
 		if ( reference == null ) {
 			throw log.incompleteFieldDefinition( eventContext() );
@@ -88,7 +88,7 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	@Override
-	public LuceneIndexSchemaRootNodeBuilder getRootNodeBuilder() {
+	public LuceneIndexRootBuilder getRootNodeBuilder() {
 		return parent.getRootNodeBuilder();
 	}
 

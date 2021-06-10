@@ -13,26 +13,26 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
-class LuceneIndexSchemaObjectFieldTemplateBuilder
-		extends AbstractLuceneIndexSchemaFieldTemplateBuilder<
-						LuceneIndexSchemaObjectFieldTemplateBuilder, LuceneIndexObjectFieldTemplate
+class LuceneIndexObjectFieldTemplateBuilder
+		extends AbstractLuceneIndexFieldTemplateBuilder<
+					LuceneIndexObjectFieldTemplateBuilder, LuceneIndexObjectFieldTemplate
 				> {
 
 	private final LuceneIndexCompositeNodeType.Builder typeBuilder;
 
-	LuceneIndexSchemaObjectFieldTemplateBuilder(AbstractLuceneIndexSchemaObjectNodeBuilder parent,
+	LuceneIndexObjectFieldTemplateBuilder(AbstractLuceneIndexCompositeNodeBuilder parent,
 			String templateName, IndexFieldInclusion inclusion, ObjectStructure structure, String prefix) {
 		super( parent, templateName, inclusion, prefix );
 		this.typeBuilder = new LuceneIndexCompositeNodeType.Builder( structure );
 	}
 
 	@Override
-	protected LuceneIndexSchemaObjectFieldTemplateBuilder thisAsS() {
+	protected LuceneIndexObjectFieldTemplateBuilder thisAsS() {
 		return this;
 	}
 
 	@Override
-	protected void doContribute(LuceneIndexSchemaNodeCollector collector,
+	protected void doContribute(LuceneIndexNodeCollector collector,
 			LuceneIndexCompositeNode parentNode, SimpleGlobPattern absolutePathGlob, boolean multiValued) {
 		LuceneIndexObjectFieldTemplate fieldTemplate = new LuceneIndexObjectFieldTemplate(
 				parentNode, absolutePathGlob, typeBuilder.build(), inclusion, multiValued );

@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexObjectFieldBuilder;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -22,10 +22,10 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexObjectField;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.impl.StubIndexCompositeNodeType;
 
-class StubIndexSchemaObjectFieldNodeBuilder extends AbstractStubIndexSchemaObjectNodeBuilder
-		implements IndexSchemaObjectFieldNodeBuilder, StubIndexSchemaFieldBuilder {
+class StubIndexObjectFieldBuilder extends AbstractStubIndexCompositeNodeBuilder
+		implements IndexObjectFieldBuilder, StubIndexFieldBuilder {
 
-	private final AbstractStubIndexSchemaObjectNodeBuilder parent;
+	private final AbstractStubIndexCompositeNodeBuilder parent;
 	private final IndexFieldInclusion inclusion;
 	private final StubIndexCompositeNodeType type;
 
@@ -33,7 +33,7 @@ class StubIndexSchemaObjectFieldNodeBuilder extends AbstractStubIndexSchemaObjec
 
 	private IndexObjectFieldReference reference;
 
-	StubIndexSchemaObjectFieldNodeBuilder(AbstractStubIndexSchemaObjectNodeBuilder parent,
+	StubIndexObjectFieldBuilder(AbstractStubIndexCompositeNodeBuilder parent,
 			StubIndexSchemaDataNode.Builder schemaNodeBuilder, IndexFieldInclusion inclusion,
 			StubIndexCompositeNodeType type) {
 		super( schemaNodeBuilder );
@@ -74,7 +74,7 @@ class StubIndexSchemaObjectFieldNodeBuilder extends AbstractStubIndexSchemaObjec
 	}
 
 	@Override
-	StubIndexSchemaRootNodeBuilder getRootNodeBuilder() {
+	StubIndexRootBuilder getRootNodeBuilder() {
 		return parent.getRootNodeBuilder();
 	}
 }

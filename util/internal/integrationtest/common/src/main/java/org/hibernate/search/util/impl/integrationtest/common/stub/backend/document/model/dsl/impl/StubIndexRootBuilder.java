@@ -9,7 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.docum
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
@@ -24,19 +24,19 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.dsl.impl.StubIndexFieldTypeFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.impl.StubIndexCompositeNodeType;
 
-public class StubIndexSchemaRootNodeBuilder extends AbstractStubIndexSchemaObjectNodeBuilder
-		implements IndexSchemaRootNodeBuilder {
+public class StubIndexRootBuilder extends AbstractStubIndexCompositeNodeBuilder
+		implements IndexRootBuilder {
 
 	private final StubBackendBehavior backendBehavior;
 	private final String indexName;
 	private final String mappedTypeName;
 	private DocumentIdentifierValueConverter<?> idDslConverter;
 
-	public StubIndexSchemaRootNodeBuilder(StubBackendBehavior backendBehavior, String indexName, String mappedTypeName) {
+	public StubIndexRootBuilder(StubBackendBehavior backendBehavior, String indexName, String mappedTypeName) {
 		this( backendBehavior, indexName, mappedTypeName, StubIndexSchemaDataNode.schema() );
 	}
 
-	private StubIndexSchemaRootNodeBuilder(StubBackendBehavior backendBehavior, String indexName, String mappedTypeName,
+	private StubIndexRootBuilder(StubBackendBehavior backendBehavior, String indexName, String mappedTypeName,
 			StubIndexSchemaDataNode.Builder builder) {
 		super( builder );
 		this.backendBehavior = backendBehavior;
@@ -75,7 +75,7 @@ public class StubIndexSchemaRootNodeBuilder extends AbstractStubIndexSchemaObjec
 	}
 
 	@Override
-	StubIndexSchemaRootNodeBuilder getRootNodeBuilder() {
+	StubIndexRootBuilder getRootNodeBuilder() {
 		return this;
 	}
 

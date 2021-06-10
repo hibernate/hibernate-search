@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexValueField;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.NamedDynamicTemplate;
 
-public interface ElasticsearchIndexSchemaNodeCollector {
+public interface ElasticsearchIndexNodeCollector {
 
 	void collect(String absolutePath, ElasticsearchIndexObjectField node);
 

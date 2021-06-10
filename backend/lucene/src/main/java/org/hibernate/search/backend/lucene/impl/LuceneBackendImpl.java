@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaRootNodeBuilder;
+import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexRootBuilder;
 import org.hibernate.search.backend.lucene.index.impl.IndexManagerBackendContext;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerBuilder;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -134,7 +134,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 			String indexName, String mappedTypeName,
 			BackendBuildContext context, ConfigurationPropertySource propertySource) {
 
-		LuceneIndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder = new LuceneIndexSchemaRootNodeBuilder(
+		LuceneIndexRootBuilder indexRootBuilder = new LuceneIndexRootBuilder(
 				EventContexts.fromIndexName( indexName ), mappedTypeName, analysisDefinitionRegistry
 		);
 
@@ -145,7 +145,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 		 */
 		return new LuceneIndexManagerBuilder(
 				indexManagerBackendContext,
-				indexName, indexSchemaRootNodeBuilder
+				indexName, indexRootBuilder
 		);
 	}
 }

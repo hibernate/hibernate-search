@@ -14,8 +14,8 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaNamedPredicateOptionsStep;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexObjectFieldBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexCompositeNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
@@ -26,12 +26,12 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.impl.StubIndexCompositeNodeType;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.impl.StubIndexValueFieldType;
 
-abstract class AbstractStubIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder {
+abstract class AbstractStubIndexCompositeNodeBuilder implements IndexCompositeNodeBuilder {
 
 	protected final StubIndexSchemaDataNode.Builder schemaDataNodeBuilder;
-	private final Map<String, StubIndexSchemaFieldBuilder> fieldBuilders = new LinkedHashMap<>();
+	private final Map<String, StubIndexFieldBuilder> fieldBuilders = new LinkedHashMap<>();
 
-	AbstractStubIndexSchemaObjectNodeBuilder(StubIndexSchemaDataNode.Builder schemaDataNodeBuilder) {
+	AbstractStubIndexCompositeNodeBuilder(StubIndexSchemaDataNode.Builder schemaDataNodeBuilder) {
 		this.schemaDataNodeBuilder = schemaDataNodeBuilder;
 	}
 
@@ -48,14 +48,14 @@ abstract class AbstractStubIndexSchemaObjectNodeBuilder implements IndexSchemaOb
 			);
 			schemaDataNodeBuilder.child( childSchemaNodeBuilder );
 		}
-		StubIndexSchemaValueFieldNodeBuilder<F> childBuilder =
-				new StubIndexSchemaValueFieldNodeBuilder<>( childSchemaNodeBuilder, inclusion, stubType );
+		StubIndexValueFieldBuilder<F> childBuilder =
+				new StubIndexValueFieldBuilder<>( childSchemaNodeBuilder, inclusion, stubType );
 		fieldBuilders.put( relativeFieldName, childBuilder );
 		return childBuilder;
 	}
 
 	@Override
-	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
+	public IndexObjectFieldBuilder addObjectField(String relativeFieldName, IndexFieldInclusion inclusion,
 			ObjectStructure structure) {
 		StubIndexSchemaDataNode.Builder childSchemaNodeBuilder =
 				StubIndexSchemaDataNode.objectField( schemaDataNodeBuilder, relativeFieldName );
@@ -68,8 +68,8 @@ abstract class AbstractStubIndexSchemaObjectNodeBuilder implements IndexSchemaOb
 			);
 			schemaDataNodeBuilder.child( childSchemaNodeBuilder );
 		}
-		StubIndexSchemaObjectFieldNodeBuilder childBuilder =
-				new StubIndexSchemaObjectFieldNodeBuilder( this, childSchemaNodeBuilder, inclusion, type );
+		StubIndexObjectFieldBuilder childBuilder =
+				new StubIndexObjectFieldBuilder( this, childSchemaNodeBuilder, inclusion, type );
 		fieldBuilders.put( relativeFieldName, childBuilder );
 		return childBuilder;
 	}
@@ -83,7 +83,7 @@ abstract class AbstractStubIndexSchemaObjectNodeBuilder implements IndexSchemaOb
 		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
 			schemaDataNodeBuilder.child( childBuilder );
 		}
-		return new StubIndexSchemaNamedPredicateBuilder( childBuilder );
+		return new StubIndexNamedPredicateBuilder( childBuilder );
 	}
 
 	@Override
@@ -96,7 +96,7 @@ abstract class AbstractStubIndexSchemaObjectNodeBuilder implements IndexSchemaOb
 		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
 			schemaDataNodeBuilder.child( childBuilder );
 		}
-		return new StubIndexSchemaFieldTemplateNodeBuilder( childBuilder );
+		return new StubIndexFieldTemplateNodeBuilder( childBuilder );
 	}
 
 	@Override
@@ -109,18 +109,18 @@ abstract class AbstractStubIndexSchemaObjectNodeBuilder implements IndexSchemaOb
 		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
 			schemaDataNodeBuilder.child( childBuilder );
 		}
-		return new StubIndexSchemaFieldTemplateNodeBuilder( childBuilder );
+		return new StubIndexFieldTemplateNodeBuilder( childBuilder );
 	}
 
 	final void contributeChildren(StubIndexCompositeNode parent, Map<String, StubIndexField> staticChildren,
 			BiConsumer<String, StubIndexField> fieldCollector) {
-		for ( Map.Entry<String, StubIndexSchemaFieldBuilder> entry : fieldBuilders.entrySet() ) {
+		for ( Map.Entry<String, StubIndexFieldBuilder> entry : fieldBuilders.entrySet() ) {
 			StubIndexField field = entry.getValue().build( parent, fieldCollector );
 			staticChildren.put( entry.getKey(), field );
 			fieldCollector.accept( field.absolutePath(), field );
 		}
 	}
 
-	abstract StubIndexSchemaRootNodeBuilder getRootNodeBuilder();
+	abstract StubIndexRootBuilder getRootNodeBuilder();
 
 }

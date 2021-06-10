@@ -11,7 +11,7 @@ import java.util.function.BiConsumer;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexCompositeNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexField;
 
-interface StubIndexSchemaFieldBuilder {
+interface StubIndexFieldBuilder {
 
 	StubIndexField build(StubIndexCompositeNode parent, BiConsumer<String, StubIndexField> fieldCollector);
 
