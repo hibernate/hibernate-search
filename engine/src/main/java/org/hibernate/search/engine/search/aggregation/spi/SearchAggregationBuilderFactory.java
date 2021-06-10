@@ -8,7 +8,6 @@ package org.hibernate.search.engine.search.aggregation.spi;
 
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
-import org.hibernate.search.engine.search.common.ValueConvert;
 
 /**
  * A factory for search aggregation builders.
@@ -31,11 +30,5 @@ public interface SearchAggregationBuilderFactory<C> {
 	 * @param <A> The type of result for this aggregation.
 	 */
 	<A> void contribute(C collector, AggregationKey<A> key, SearchAggregation<A> aggregation);
-
-	<T> TermsAggregationBuilder<T> createTermsAggregationBuilder(String absoluteFieldPath,
-			Class<T> expectedType, ValueConvert convert);
-
-	<T> RangeAggregationBuilder<T> createRangeAggregationBuilder(String absoluteFieldPath,
-			Class<T> expectedType, ValueConvert convert);
 
 }

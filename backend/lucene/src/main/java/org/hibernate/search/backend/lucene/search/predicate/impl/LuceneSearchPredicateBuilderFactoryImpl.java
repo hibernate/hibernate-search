@@ -6,26 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexNodeContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.NamedPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
-import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.RegexpPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.TermsPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 
 import org.apache.lucene.search.Query;
 
@@ -60,75 +46,8 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	}
 
 	@Override
-	public MatchPredicateBuilder match(String absoluteFieldPath) {
-		return scope.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.MATCH, scope );
-	}
-
-	@Override
-	public RangePredicateBuilder range(String absoluteFieldPath) {
-		return scope.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.RANGE, scope );
-	}
-
-	@Override
-	public PhrasePredicateBuilder phrase(String absoluteFieldPath) {
-		return scope.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.PHRASE, scope );
-	}
-
-	@Override
-	public WildcardPredicateBuilder wildcard(String absoluteFieldPath) {
-		return scope.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.WILDCARD, scope );
-	}
-
-	@Override
-	public RegexpPredicateBuilder regexp(String absoluteFieldPath) {
-		return scope.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.REGEXP, scope );
-	}
-
-	@Override
-	public TermsPredicateBuilder terms(String absoluteFieldPath) {
-		return scope.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.TERMS, scope );
-	}
-
-	@Override
 	public SimpleQueryStringPredicateBuilder simpleQueryString() {
 		return new LuceneSimpleQueryStringPredicate.Builder( scope );
-	}
-
-	@Override
-	public ExistsPredicateBuilder exists(String absoluteFieldPath) {
-		return scope.field( absoluteFieldPath ).queryElement( PredicateTypeKeys.EXISTS, scope );
-	}
-
-	@Override
-	public SpatialWithinCirclePredicateBuilder spatialWithinCircle(String absoluteFieldPath) {
-		return scope.field( absoluteFieldPath )
-				.queryElement( PredicateTypeKeys.SPATIAL_WITHIN_CIRCLE, scope );
-	}
-
-	@Override
-	public SpatialWithinPolygonPredicateBuilder spatialWithinPolygon(String absoluteFieldPath) {
-		return scope.field( absoluteFieldPath )
-				.queryElement( PredicateTypeKeys.SPATIAL_WITHIN_POLYGON, scope );
-	}
-
-	@Override
-	public SpatialWithinBoundingBoxPredicateBuilder spatialWithinBoundingBox(
-			String absoluteFieldPath) {
-		return scope.field( absoluteFieldPath )
-				.queryElement( PredicateTypeKeys.SPATIAL_WITHIN_BOUNDING_BOX, scope );
-	}
-
-	@Override
-	public NestedPredicateBuilder nested(String absoluteFieldPath) {
-		return scope.field( absoluteFieldPath )
-				.queryElement( PredicateTypeKeys.NESTED, scope );
-	}
-
-	@Override
-	public NamedPredicateBuilder named(String absoluteFieldPath, String name) {
-		LuceneSearchIndexNodeContext targetElementContext =
-				absoluteFieldPath == null ? scope.root() : scope.field( absoluteFieldPath );
-		return targetElementContext.queryElement( PredicateTypeKeys.named( name ), scope );
 	}
 
 	@Override

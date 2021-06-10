@@ -20,11 +20,12 @@ import org.hibernate.search.backend.elasticsearch.search.sort.impl.Elasticsearch
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
+import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 
 public class ElasticsearchIndexScope
 		implements IndexScope<ElasticsearchSearchQueryElementCollector> {
 
-	private final ElasticsearchSearchIndexScope scope;
+	private final ElasticsearchSearchIndexScope searchScope;
 	private final ElasticsearchSearchPredicateBuilderFactoryImpl searchPredicateFactory;
 	private final ElasticsearchSearchSortBuilderFactoryImpl searchSortFactory;
 	private final ElasticsearchSearchProjectionBuilderFactory searchProjectionFactory;
@@ -33,26 +34,27 @@ public class ElasticsearchIndexScope
 
 	public ElasticsearchIndexScope(BackendMappingContext mappingContext, SearchBackendContext backendContext,
 			Set<ElasticsearchIndexModel> indexModels) {
-		this.scope = backendContext.createSearchContext( mappingContext, indexModels );
-		this.searchPredicateFactory = new ElasticsearchSearchPredicateBuilderFactoryImpl( scope );
-		this.searchSortFactory = new ElasticsearchSearchSortBuilderFactoryImpl( scope );
+		this.searchScope = backendContext.createSearchContext( mappingContext, indexModels );
+		this.searchPredicateFactory = new ElasticsearchSearchPredicateBuilderFactoryImpl( searchScope );
+		this.searchSortFactory = new ElasticsearchSearchSortBuilderFactoryImpl( searchScope );
 		this.searchProjectionFactory = new ElasticsearchSearchProjectionBuilderFactory(
-				backendContext.getSearchProjectionBackendContext(), scope
+				backendContext.getSearchProjectionBackendContext(), searchScope
 		);
-		this.searchAggregationFactory = new ElasticsearchSearchAggregationBuilderFactory( scope );
+		this.searchAggregationFactory = new ElasticsearchSearchAggregationBuilderFactory( searchScope );
 		this.searchQueryFactory = new ElasticsearchSearchQueryBuilderFactory(
-				backendContext, scope,
+				backendContext, searchScope,
 				this.searchProjectionFactory
 		);
 	}
 
 	@Override
 	public String toString() {
-		return new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "indexNames=" ).append( scope.hibernateSearchIndexNames() )
-				.append( "]" )
-				.toString();
+		return getClass().getSimpleName() + "[indexNames=" + searchScope.hibernateSearchIndexNames() + "]";
+	}
+
+	@Override
+	public SearchIndexScope<?> searchScope() {
+		return searchScope;
 	}
 
 	@Override

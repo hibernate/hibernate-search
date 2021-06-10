@@ -8,6 +8,7 @@ package org.hibernate.search.engine.search.sort.dsl.spi;
 
 import java.util.function.Function;
 
+import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
 import org.hibernate.search.engine.search.sort.SearchSort;
@@ -17,13 +18,18 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 /**
  * Represents the current context in the search DSL,
- * including in particular the sort builder factory
+ * including in particular the search scope, the sort builder factory
  * and the knowledge of previous sorts chained using {@link SortThenStep#then()}.
  *
  * @param <F> The type of sort factory.
  * @param <PDF> The type of factory used to create predicates in {@link FieldSortOptionsStep#filter(Function)}.
  */
 public interface SearchSortDslContext<F extends SearchSortBuilderFactory<?>, PDF extends SearchPredicateFactory> {
+
+	/**
+	 * @return The search scope.
+	 */
+	SearchIndexScope<?> scope();
 
 	/**
 	 * @return The sort builder factory. Will always return the exact same instance.

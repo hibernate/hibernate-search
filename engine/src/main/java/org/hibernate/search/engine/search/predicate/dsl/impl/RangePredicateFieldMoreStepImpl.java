@@ -15,13 +15,14 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.dsl.RangePredicateOptionsStep;
-import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldMoreStep;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldMoreStep;
+import org.hibernate.search.engine.search.predicate.dsl.RangePredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -45,9 +46,9 @@ class RangePredicateFieldMoreStepImpl
 		this.commonState = commonState;
 		this.commonState.add( this );
 		this.absoluteFieldPaths = absoluteFieldPaths;
-		SearchPredicateBuilderFactory<?> predicateFactory = commonState.getFactory();
+		SearchIndexScope<?> scope = commonState.scope();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			predicateBuilders.add( predicateFactory.range( absoluteFieldPath ) );
+			predicateBuilders.add( scope.fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.RANGE ) );
 		}
 	}
 

@@ -12,6 +12,7 @@ import org.hibernate.search.engine.search.predicate.dsl.ExistsPredicateOptionsSt
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 
 
 final class ExistsPredicateFieldStepImpl
@@ -27,7 +28,7 @@ final class ExistsPredicateFieldStepImpl
 
 	@Override
 	public ExistsPredicateOptionsStep<?> field(String absoluteFieldPath) {
-		this.builder = dslContext.builderFactory().exists( absoluteFieldPath );
+		this.builder = dslContext.scope().fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.EXISTS );
 		return this;
 	}
 

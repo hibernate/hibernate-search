@@ -20,6 +20,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
+import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 
 public class FieldSortOptionsStepImpl<PDF extends SearchPredicateFactory>
 		extends AbstractSortThenStep
@@ -32,7 +33,7 @@ public class FieldSortOptionsStepImpl<PDF extends SearchPredicateFactory>
 	public FieldSortOptionsStepImpl(SearchSortDslContext<?, ? extends PDF> dslContext, String absoluteFieldPath) {
 		super( dslContext );
 		this.dslContext = dslContext;
-		this.builder = dslContext.builderFactory().field( absoluteFieldPath );
+		this.builder = dslContext.scope().fieldQueryElement( absoluteFieldPath, SortTypeKeys.FIELD );
 	}
 
 	@Override

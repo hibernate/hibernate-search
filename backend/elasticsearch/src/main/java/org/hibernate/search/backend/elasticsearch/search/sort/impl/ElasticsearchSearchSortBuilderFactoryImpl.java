@@ -9,10 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.CompositeSortBuilder;
-import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
-import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
-import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 
 import com.google.gson.JsonObject;
 
@@ -33,16 +30,6 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 	@Override
 	public ScoreSortBuilder score() {
 		return new ElasticsearchScoreSort.Builder( scope );
-	}
-
-	@Override
-	public FieldSortBuilder field(String absoluteFieldPath) {
-		return scope.field( absoluteFieldPath ).queryElement( SortTypeKeys.FIELD, scope );
-	}
-
-	@Override
-	public DistanceSortBuilder distance(String absoluteFieldPath) {
-		return scope.field( absoluteFieldPath ).queryElement( SortTypeKeys.DISTANCE, scope );
 	}
 
 	@Override

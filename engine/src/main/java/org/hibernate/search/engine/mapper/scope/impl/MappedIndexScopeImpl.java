@@ -53,28 +53,28 @@ class MappedIndexScopeImpl<C, R, E> implements MappedIndexScope<R, E> {
 	@Override
 	public SearchPredicateFactory predicate() {
 		return new DefaultSearchPredicateFactory(
-				SearchPredicateDslContextImpl.root( delegate.searchPredicateBuilderFactory() )
+				SearchPredicateDslContextImpl.root( delegate.searchScope(), delegate.searchPredicateBuilderFactory() )
 		);
 	}
 
 	@Override
 	public SearchSortFactory sort() {
 		return new DefaultSearchSortFactory(
-				SearchSortDslContextImpl.root( delegate.searchSortBuilderFactory(), predicate() )
+				SearchSortDslContextImpl.root( delegate.searchScope(), delegate.searchSortBuilderFactory(), predicate() )
 		);
 	}
 
 	@Override
 	public SearchProjectionFactory<R, E> projection() {
 		return new DefaultSearchProjectionFactory<>(
-				SearchProjectionDslContextImpl.root( delegate.searchProjectionFactory() )
+				SearchProjectionDslContextImpl.root( delegate.searchScope(), delegate.searchProjectionFactory() )
 		);
 	}
 
 	@Override
 	public SearchAggregationFactory aggregation() {
 		return new DefaultSearchAggregationFactory(
-				SearchAggregationDslContextImpl.root( delegate.searchAggregationFactory(), predicate() )
+				SearchAggregationDslContextImpl.root( delegate.searchScope(), delegate.searchAggregationFactory(), predicate() )
 		);
 	}
 

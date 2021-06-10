@@ -24,6 +24,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.impl.StubSearchSortBuilderFactory;
 
 public class StubIndexScope implements IndexScope<StubQueryElementCollector> {
+	private final StubSearchIndexScope searchScope;
 	private final StubSearchPredicateBuilderFactory predicateFactory;
 	private final StubSearchSortBuilderFactory sortFactory;
 	private final StubSearchProjectionBuilderFactory projectionFactory;
@@ -33,12 +34,17 @@ public class StubIndexScope implements IndexScope<StubQueryElementCollector> {
 	private StubIndexScope(Builder builder) {
 		Set<StubIndexModel> immutableIndexModels =
 				Collections.unmodifiableSet( new LinkedHashSet<>( builder.indexModels ) );
-		StubSearchIndexScope scope = new StubSearchIndexScope( builder.mappingContext, immutableIndexModels );
-		this.predicateFactory = new StubSearchPredicateBuilderFactory( scope );
-		this.sortFactory = new StubSearchSortBuilderFactory( scope );
-		this.projectionFactory = new StubSearchProjectionBuilderFactory( scope );
-		this.aggregationFactory = new StubSearchAggregationBuilderFactory( scope );
-		this.queryFactory = new StubSearchQueryBuilderFactory( builder.backend, scope );
+		searchScope = new StubSearchIndexScope( builder.mappingContext, immutableIndexModels );
+		this.predicateFactory = new StubSearchPredicateBuilderFactory();
+		this.sortFactory = new StubSearchSortBuilderFactory();
+		this.projectionFactory = new StubSearchProjectionBuilderFactory( searchScope );
+		this.aggregationFactory = new StubSearchAggregationBuilderFactory();
+		this.queryFactory = new StubSearchQueryBuilderFactory( builder.backend, searchScope );
+	}
+
+	@Override
+	public StubSearchIndexScope searchScope() {
+		return searchScope;
 	}
 
 	@Override
@@ -86,7 +92,7 @@ public class StubIndexScope implements IndexScope<StubQueryElementCollector> {
 		}
 
 		@Override
-		public IndexScope<?> build() {
+		public StubIndexScope build() {
 			return new StubIndexScope( this );
 		}
 	}

@@ -13,13 +13,14 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateOptionsStep;
-import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldMoreStep;
+import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -39,9 +40,9 @@ class MatchPredicateFieldMoreStepImpl
 	MatchPredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
-		SearchPredicateBuilderFactory<?> predicateFactory = commonState.getFactory();
+		SearchIndexScope<?> scope = commonState.scope();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			predicateBuilders.add( predicateFactory.match( absoluteFieldPath ) );
+			predicateBuilders.add( scope.fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.MATCH ) );
 		}
 	}
 

@@ -31,7 +31,7 @@ import org.apache.lucene.index.IndexReader;
 public class LuceneIndexScopeImpl
 		implements IndexScope<LuceneSearchQueryElementCollector>, LuceneIndexScope {
 
-	private final LuceneSearchIndexScope scope;
+	private final LuceneSearchIndexScope searchScope;
 	private final LuceneSearchPredicateBuilderFactoryImpl searchPredicateFactory;
 	private final LuceneSearchSortBuilderFactoryImpl searchSortFactory;
 	private final LuceneSearchQueryBuilderFactory searchQueryFactory;
@@ -41,21 +41,22 @@ public class LuceneIndexScopeImpl
 	public LuceneIndexScopeImpl(SearchBackendContext backendContext,
 			BackendMappingContext mappingContext,
 			Set<? extends LuceneScopeIndexManagerContext> indexManagerContexts) {
-		this.scope = backendContext.createSearchContext( mappingContext, indexManagerContexts );
-		this.searchPredicateFactory = new LuceneSearchPredicateBuilderFactoryImpl( scope );
-		this.searchSortFactory = new LuceneSearchSortBuilderFactoryImpl( scope );
-		this.searchProjectionFactory = new LuceneSearchProjectionBuilderFactory( scope );
-		this.searchAggregationFactory = new LuceneSearchAggregationBuilderFactory( scope );
-		this.searchQueryFactory = new LuceneSearchQueryBuilderFactory( backendContext, scope, this.searchProjectionFactory );
+		this.searchScope = backendContext.createSearchContext( mappingContext, indexManagerContexts );
+		this.searchPredicateFactory = new LuceneSearchPredicateBuilderFactoryImpl( searchScope );
+		this.searchSortFactory = new LuceneSearchSortBuilderFactoryImpl( searchScope );
+		this.searchProjectionFactory = new LuceneSearchProjectionBuilderFactory( searchScope );
+		this.searchAggregationFactory = new LuceneSearchAggregationBuilderFactory( searchScope );
+		this.searchQueryFactory = new LuceneSearchQueryBuilderFactory( backendContext, searchScope, this.searchProjectionFactory );
 	}
 
 	@Override
 	public String toString() {
-		return new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "indexNames=" ).append( scope.hibernateSearchIndexNames() )
-				.append( "]" )
-				.toString();
+		return getClass().getSimpleName() + "[indexNames=" + searchScope.hibernateSearchIndexNames() + "]";
+	}
+
+	@Override
+	public LuceneSearchIndexScope searchScope() {
+		return searchScope;
 	}
 
 	@Override
@@ -85,8 +86,8 @@ public class LuceneIndexScopeImpl
 
 	@Override
 	public IndexReader openIndexReader(Set<String> routingKeys) {
-		Set<String> indexNames = scope.hibernateSearchIndexNames();
-		Collection<? extends LuceneSearchIndexContext> indexManagerContexts = scope.indexes();
+		Set<String> indexNames = searchScope.hibernateSearchIndexNames();
+		Collection<? extends LuceneSearchIndexContext> indexManagerContexts = searchScope.indexes();
 		return HibernateSearchMultiReader.open( indexNames, indexManagerContexts, routingKeys );
 	}
 }

@@ -26,6 +26,7 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.common.spi.SearchIndexCompositeNodeContext;
 import org.hibernate.search.engine.search.common.spi.SearchIndexNodeContext;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
+import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -167,6 +168,16 @@ public abstract class AbstractSearchIndexScope<
 		else {
 			return createMultiIndexSearchValueFieldContext( absoluteFieldPath, fieldForEachIndex );
 		}
+	}
+
+	@Override
+	public final <T> T rootQueryElement(SearchQueryElementTypeKey<T> key) {
+		return root().queryElement( key, self() );
+	}
+
+	@Override
+	public final <T> T fieldQueryElement(String absoluteFieldPath, SearchQueryElementTypeKey<T> key) {
+		return field( absoluteFieldPath ).queryElement( key, self() );
 	}
 
 	protected abstract C createMultiIndexSearchRootContext(List<C> rootForEachIndex);

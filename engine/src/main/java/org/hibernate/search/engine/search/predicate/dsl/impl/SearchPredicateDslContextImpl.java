@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.predicate.dsl.impl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
+import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
@@ -23,18 +24,25 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 public final class SearchPredicateDslContextImpl<F extends SearchPredicateBuilderFactory<?>>
 		implements SearchPredicateDslContext<F> {
 
-	public static <F extends SearchPredicateBuilderFactory<?>> SearchPredicateDslContext<F> root(F factory) {
-		return new SearchPredicateDslContextImpl<>( factory );
+	public static <F extends SearchPredicateBuilderFactory<?>> SearchPredicateDslContext<F> root(SearchIndexScope<?> scope, F builderFactory) {
+		return new SearchPredicateDslContextImpl<>( scope, builderFactory );
 	}
 
-	private final F factory;
+	private final SearchIndexScope<?> scope;
+	private final F builderFactory;
 
-	private SearchPredicateDslContextImpl(F factory) {
-		this.factory = factory;
+	private SearchPredicateDslContextImpl(SearchIndexScope<?> scope, F builderFactory) {
+		this.scope = scope;
+		this.builderFactory = builderFactory;
+	}
+
+	@Override
+	public SearchIndexScope<?> scope() {
+		return scope;
 	}
 
 	@Override
 	public F builderFactory() {
-		return factory;
+		return builderFactory;
 	}
 }

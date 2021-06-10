@@ -12,6 +12,7 @@ import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjecti
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.projection.spi.ListProjectionAccumulator;
+import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.SingleValuedProjectionAccumulator;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -21,7 +22,7 @@ public class DistanceToFieldProjectionValueStepImpl
 
 	DistanceToFieldProjectionValueStepImpl(SearchProjectionDslContext<?> dslContext, String absoluteFieldPath,
 			GeoPoint center) {
-		super( dslContext.builderFactory().distance( absoluteFieldPath ),
+		super( dslContext.scope().fieldQueryElement( absoluteFieldPath, ProjectionTypeKeys.DISTANCE ),
 				SingleValuedProjectionAccumulator.provider() );
 		distanceFieldProjectionBuilder.center( center );
 	}

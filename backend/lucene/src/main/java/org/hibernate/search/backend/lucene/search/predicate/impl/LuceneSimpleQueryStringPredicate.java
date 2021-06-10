@@ -20,7 +20,6 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneDifferentNestedObjectCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexNodeContext;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.BooleanOperator;
@@ -103,8 +102,7 @@ public class LuceneSimpleQueryStringPredicate extends AbstractLuceneNestablePred
 		public FieldState field(String absoluteFieldPath) {
 			LuceneSimpleQueryStringPredicateBuilderFieldState field = fields.get( absoluteFieldPath );
 			if ( field == null ) {
-				LuceneSearchIndexNodeContext fieldContext = scope.field( absoluteFieldPath );
-				field = fieldContext.queryElement( LucenePredicateTypeKeys.SIMPLE_QUERY_STRING, scope );
+				field = scope.fieldQueryElement( absoluteFieldPath, LucenePredicateTypeKeys.SIMPLE_QUERY_STRING );
 				nestedCompatibilityChecker = nestedCompatibilityChecker.combineAndCheck( absoluteFieldPath );
 				fields.put( absoluteFieldPath, field );
 			}

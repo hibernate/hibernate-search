@@ -16,13 +16,10 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.EntityReferenceProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.IdProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -48,12 +45,6 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	}
 
 	@Override
-	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz, ValueConvert convert) {
-		return scope.field( absoluteFieldPath ).queryElement( ProjectionTypeKeys.FIELD, scope )
-				.type( clazz, convert );
-	}
-
-	@Override
 	public <E> EntityProjectionBuilder<E> entity() {
 		return StubEntitySearchProjection::get;
 	}
@@ -76,11 +67,6 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 				return StubDefaultSearchProjection.get();
 			}
 		};
-	}
-
-	@Override
-	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath) {
-		return new StubDistanceToFieldSearchProjection.Builder();
 	}
 
 	@Override

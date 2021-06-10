@@ -13,12 +13,13 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PhrasePredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.PhrasePredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -38,9 +39,9 @@ class PhrasePredicateFieldMoreStepImpl
 	PhrasePredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
-		SearchPredicateBuilderFactory<?> predicateFactory = commonState.getFactory();
+		SearchIndexScope<?> scope = commonState.scope();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			predicateBuilders.add( predicateFactory.phrase( absoluteFieldPath ) );
+			predicateBuilders.add( scope.fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.PHRASE ) );
 		}
 	}
 

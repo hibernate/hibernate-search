@@ -11,10 +11,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SpatialWithinPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.SpatialWithinPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
+import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
@@ -91,24 +93,30 @@ class SpatialWithinPredicateFieldMoreStepImpl
 	}
 
 	private void generateWithinCircleQueryBuilders(GeoPoint center, double radius, DistanceUnit unit) {
+		SearchIndexScope<?> scope = commonState.scope();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			SpatialWithinCirclePredicateBuilder predicateBuilder = commonState.getFactory().spatialWithinCircle( absoluteFieldPath );
+			SpatialWithinCirclePredicateBuilder predicateBuilder =
+					scope.fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.SPATIAL_WITHIN_CIRCLE );
 			predicateBuilder.circle( center, radius, unit );
 			predicateBuilders.add( predicateBuilder );
 		}
 	}
 
 	private void generateWithinPolygonQueryBuilders(GeoPolygon polygon) {
+		SearchIndexScope<?> scope = commonState.scope();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			SpatialWithinPolygonPredicateBuilder predicateBuilder = commonState.getFactory().spatialWithinPolygon( absoluteFieldPath );
+			SpatialWithinPolygonPredicateBuilder predicateBuilder =
+					scope.fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.SPATIAL_WITHIN_POLYGON );
 			predicateBuilder.polygon( polygon );
 			predicateBuilders.add( predicateBuilder );
 		}
 	}
 
 	private void generateWithinBoundingBoxQueryBuilders(GeoBoundingBox boundingBox) {
+		SearchIndexScope<?> scope = commonState.scope();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			SpatialWithinBoundingBoxPredicateBuilder predicateBuilder = commonState.getFactory().spatialWithinBoundingBox( absoluteFieldPath );
+			SpatialWithinBoundingBoxPredicateBuilder predicateBuilder =
+					scope.fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.SPATIAL_WITHIN_BOUNDING_BOX );
 			predicateBuilder.boundingBox( boundingBox );
 			predicateBuilders.add( predicateBuilder );
 		}
