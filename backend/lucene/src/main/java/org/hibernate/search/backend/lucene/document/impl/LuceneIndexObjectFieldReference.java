@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.backend.lucene.document.impl;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectField;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 
 
 public class LuceneIndexObjectFieldReference implements IndexObjectFieldReference {
 
-	private LuceneIndexSchemaObjectFieldNode schemaNode;
+	private LuceneIndexObjectField schemaNode;
 
 	@Override
 	public String toString() {
@@ -20,11 +20,11 @@ public class LuceneIndexObjectFieldReference implements IndexObjectFieldReferenc
 				+ "[absolutePath=" + ( schemaNode == null ? null : schemaNode.absolutePath() ) + "]";
 	}
 
-	public void setSchemaNode(LuceneIndexSchemaObjectFieldNode schemaNode) {
+	public void setSchemaNode(LuceneIndexObjectField schemaNode) {
 		this.schemaNode = schemaNode;
 	}
 
-	LuceneIndexSchemaObjectFieldNode getSchemaNode() {
+	LuceneIndexObjectField getSchemaNode() {
 		return schemaNode;
 	}
 }

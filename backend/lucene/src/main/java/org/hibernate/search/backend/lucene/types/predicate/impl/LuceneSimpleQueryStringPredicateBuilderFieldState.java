@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
+import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -16,10 +16,10 @@ import org.apache.lucene.analysis.Analyzer;
 public final class LuceneSimpleQueryStringPredicateBuilderFieldState
 	implements SimpleQueryStringPredicateBuilder.FieldState {
 
-	private final LuceneSearchValueFieldContext<?> field;
+	private final LuceneSearchIndexValueFieldContext<?> field;
 	private Float boost;
 
-	private LuceneSimpleQueryStringPredicateBuilderFieldState(LuceneSearchValueFieldContext<?> field) {
+	private LuceneSimpleQueryStringPredicateBuilderFieldState(LuceneSearchIndexValueFieldContext<?> field) {
 		this.field = field;
 	}
 
@@ -38,10 +38,10 @@ public final class LuceneSimpleQueryStringPredicateBuilderFieldState
 
 	public static class Factory
 			extends
-			AbstractLuceneSearchValueFieldQueryElementFactory<LuceneSimpleQueryStringPredicateBuilderFieldState, String> {
+			AbstractLuceneValueFieldSearchQueryElementFactory<LuceneSimpleQueryStringPredicateBuilderFieldState, String> {
 		@Override
 		public LuceneSimpleQueryStringPredicateBuilderFieldState create(LuceneSearchIndexScope scope,
-				LuceneSearchValueFieldContext<String> field) {
+				LuceneSearchIndexValueFieldContext<String> field) {
 			return new LuceneSimpleQueryStringPredicateBuilderFieldState( field );
 		}
 	}

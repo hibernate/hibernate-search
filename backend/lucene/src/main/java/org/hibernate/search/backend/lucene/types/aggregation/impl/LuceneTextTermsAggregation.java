@@ -14,9 +14,9 @@ import java.util.TreeSet;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningTextMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.TextMultiValueFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
+import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneValueFieldSearchQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -97,15 +97,15 @@ public class LuceneTextTermsAggregation<K>
 	}
 
 	public static class Factory
-			extends AbstractLuceneSearchValueFieldQueryElementFactory<TermsAggregationBuilder.TypeSelector, String> {
+			extends AbstractLuceneValueFieldSearchQueryElementFactory<TermsAggregationBuilder.TypeSelector, String> {
 		@Override
-		public TypeSelector create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<String> field) {
+		public TypeSelector create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<String> field) {
 			return new TypeSelector( scope, field );
 		}
 	}
 
 	private static class TypeSelector extends AbstractTypeSelector<String> {
-		private TypeSelector(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<String> field) {
+		private TypeSelector(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<String> field) {
 			super( scope, field );
 		}
 
@@ -119,7 +119,7 @@ public class LuceneTextTermsAggregation<K>
 	private static class Builder<K>
 			extends AbstractBuilder<String, String, K> {
 
-		private Builder(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<String> field,
+		private Builder(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<String> field,
 				ProjectionConverter<String, ? extends K> fromFieldValueConverter) {
 			super( scope, field, fromFieldValueConverter );
 		}

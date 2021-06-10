@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.sort.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.CompositeSortBuilder;
 

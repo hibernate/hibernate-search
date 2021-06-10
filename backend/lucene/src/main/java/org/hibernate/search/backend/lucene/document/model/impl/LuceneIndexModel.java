@@ -36,12 +36,12 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 
 	private final DocumentIdentifierValueConverter<?> idDslConverter;
 
-	private final LuceneIndexSchemaRootNode rootNode;
-	private final Map<String, AbstractLuceneIndexSchemaFieldNode> staticFields;
+	private final LuceneIndexRoot rootNode;
+	private final Map<String, AbstractLuceneIndexField> staticFields;
 	private final List<IndexFieldDescriptor> includedStaticFields;
 	private final List<AbstractLuceneIndexSchemaFieldTemplate<?>> fieldTemplates;
 	private final boolean hasNestedDocuments;
-	private final ConcurrentMap<String, AbstractLuceneIndexSchemaFieldNode> dynamicFieldsCache = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, AbstractLuceneIndexField> dynamicFieldsCache = new ConcurrentHashMap<>();
 
 	private final IndexingScopedAnalyzer indexingAnalyzer;
 	private final SearchScopedAnalyzer searchAnalyzer;
@@ -49,8 +49,8 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 	public LuceneIndexModel(String indexName,
 			String mappedTypeName,
 			DocumentIdentifierValueConverter<?> idDslConverter,
-			LuceneIndexSchemaRootNode rootNode,
-			Map<String, AbstractLuceneIndexSchemaFieldNode> staticFields,
+			LuceneIndexRoot rootNode,
+			Map<String, AbstractLuceneIndexField> staticFields,
 			List<AbstractLuceneIndexSchemaFieldTemplate<?>> fieldTemplates,
 			boolean hasNestedDocuments) {
 		this.indexName = indexName;
@@ -78,7 +78,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 	}
 
 	@Override
-	public LuceneIndexSchemaRootNode root() {
+	public LuceneIndexRoot root() {
 		return rootNode;
 	}
 
@@ -87,12 +87,12 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 		return Optional.ofNullable( fieldOrNull( absolutePath ) );
 	}
 
-	public AbstractLuceneIndexSchemaFieldNode fieldOrNull(String absolutePath) {
+	public AbstractLuceneIndexField fieldOrNull(String absolutePath) {
 		return fieldOrNull( absolutePath, IndexFieldFilter.INCLUDED_ONLY );
 	}
 
-	public AbstractLuceneIndexSchemaFieldNode fieldOrNull(String absolutePath, IndexFieldFilter filter) {
-		AbstractLuceneIndexSchemaFieldNode field = fieldOrNullIgnoringInclusion( absolutePath );
+	public AbstractLuceneIndexField fieldOrNull(String absolutePath, IndexFieldFilter filter) {
+		AbstractLuceneIndexField field = fieldOrNullIgnoringInclusion( absolutePath );
 		return field == null ? null : filter.filter( field, field.inclusion() );
 	}
 
@@ -134,8 +134,8 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 				.toString();
 	}
 
-	private AbstractLuceneIndexSchemaFieldNode fieldOrNullIgnoringInclusion(String absolutePath) {
-		AbstractLuceneIndexSchemaFieldNode field = staticFields.get( absolutePath );
+	private AbstractLuceneIndexField fieldOrNullIgnoringInclusion(String absolutePath) {
+		AbstractLuceneIndexField field = staticFields.get( absolutePath );
 		if ( field != null ) {
 			return field;
 		}
@@ -146,7 +146,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 		for ( AbstractLuceneIndexSchemaFieldTemplate<?> template : fieldTemplates ) {
 			field = template.createNodeIfMatching( this, absolutePath );
 			if ( field != null ) {
-				AbstractLuceneIndexSchemaFieldNode previous = dynamicFieldsCache.putIfAbsent( absolutePath, field );
+				AbstractLuceneIndexField previous = dynamicFieldsCache.putIfAbsent( absolutePath, field );
 				if ( previous != null ) {
 					// Some other thread created the node before us.
 					// Keep the first created node, discard ours: they are identical.
@@ -171,7 +171,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 
 		@Override
 		protected Analyzer getWrappedAnalyzer(String fieldName) {
-			AbstractLuceneIndexSchemaFieldNode field = fieldOrNull( fieldName, IndexFieldFilter.ALL );
+			AbstractLuceneIndexField field = fieldOrNull( fieldName, IndexFieldFilter.ALL );
 			if ( field == null ) {
 				return AnalyzerConstants.KEYWORD_ANALYZER;
 			}
@@ -197,7 +197,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 
 		@Override
 		protected Analyzer getWrappedAnalyzer(String fieldName) {
-			AbstractLuceneIndexSchemaFieldNode field = fieldOrNull( fieldName, IndexFieldFilter.ALL );
+			AbstractLuceneIndexField field = fieldOrNull( fieldName, IndexFieldFilter.ALL );
 			if ( field == null ) {
 				return AnalyzerConstants.KEYWORD_ANALYZER;
 			}

@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilder;
 
 /**
@@ -38,7 +38,7 @@ public abstract class AbstractLuceneBucketAggregation<K, V> extends AbstractLuce
 	public abstract static class AbstractBuilder<K, V> extends AbstractLuceneNestableAggregation.AbstractBuilder<Map<K, V>>
 			implements SearchAggregationBuilder<Map<K, V>> {
 
-		public AbstractBuilder(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<?> field) {
+		public AbstractBuilder(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<?> field) {
 			super( scope, field );
 		}
 

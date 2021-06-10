@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexSchemaElementContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexNodeContext;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
@@ -126,7 +126,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public NamedPredicateBuilder named(String absoluteFieldPath, String name) {
-		LuceneSearchIndexSchemaElementContext targetElementContext =
+		LuceneSearchIndexNodeContext targetElementContext =
 				absoluteFieldPath == null ? scope.root() : scope.field( absoluteFieldPath );
 		return targetElementContext.queryElement( PredicateTypeKeys.named( name ), scope );
 	}

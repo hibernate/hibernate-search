@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.function.BiFunction;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 
 class ElasticsearchCompositeBiFunctionProjection<P1, P2, P>
 		extends AbstractElasticsearchCompositeProjection<P> {

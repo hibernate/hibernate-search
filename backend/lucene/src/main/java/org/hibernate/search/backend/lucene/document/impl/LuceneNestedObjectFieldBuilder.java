@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.document.impl;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectField;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 
@@ -18,7 +18,7 @@ import org.apache.lucene.document.Document;
 
 class LuceneNestedObjectFieldBuilder extends AbstractLuceneObjectFieldBuilder {
 
-	LuceneNestedObjectFieldBuilder(LuceneIndexModel model, LuceneIndexSchemaObjectFieldNode schemaNode,
+	LuceneNestedObjectFieldBuilder(LuceneIndexModel model, LuceneIndexObjectField schemaNode,
 			AbstractLuceneDocumentElementBuilder parent) {
 		super( model, schemaNode, parent, new LuceneDocumentContentImpl() );
 	}

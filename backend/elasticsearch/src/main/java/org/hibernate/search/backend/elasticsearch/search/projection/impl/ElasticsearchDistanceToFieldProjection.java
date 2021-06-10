@@ -12,9 +12,9 @@ import java.util.regex.Pattern;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.util.impl.SloppyMath;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
@@ -226,7 +226,7 @@ public class ElasticsearchDistanceToFieldProjection<E, P> extends AbstractElasti
 			AbstractElasticsearchValueFieldSearchQueryElementFactory<DistanceToFieldProjectionBuilder, GeoPoint> {
 		@Override
 		public Builder create(ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchValueFieldContext<GeoPoint> field) {
+				ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
 			// Check the compatibility of nested structure in the case of multi-index search.
 			field.nestedPathHierarchy();
 			return new Builder( scope, field );
@@ -236,12 +236,12 @@ public class ElasticsearchDistanceToFieldProjection<E, P> extends AbstractElasti
 	public static class Builder extends AbstractElasticsearchProjection.AbstractBuilder<Double>
 			implements DistanceToFieldProjectionBuilder {
 
-		private final ElasticsearchSearchValueFieldContext<GeoPoint> field;
+		private final ElasticsearchSearchIndexValueFieldContext<GeoPoint> field;
 
 		private GeoPoint center;
 		private DistanceUnit unit = DistanceUnit.METERS;
 
-		private Builder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchValueFieldContext<GeoPoint> field) {
+		private Builder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
 			super( scope );
 			this.field = field;
 		}

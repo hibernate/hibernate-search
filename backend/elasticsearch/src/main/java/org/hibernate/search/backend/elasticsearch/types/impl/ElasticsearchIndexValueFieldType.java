@@ -12,8 +12,8 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldTypeContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldTypeContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
@@ -28,7 +28,7 @@ import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import com.google.gson.JsonPrimitive;
 
 public class ElasticsearchIndexValueFieldType<F>
-		implements IndexValueFieldTypeDescriptor, IndexFieldType<F>, ElasticsearchSearchValueFieldTypeContext<F> {
+		implements IndexValueFieldTypeDescriptor, IndexFieldType<F>, ElasticsearchSearchIndexValueFieldTypeContext<F> {
 	private final Class<F> valueType;
 	private final JsonPrimitive elasticsearchTypeAsJson;
 	private final DslConverter<F, F> rawDslConverter;

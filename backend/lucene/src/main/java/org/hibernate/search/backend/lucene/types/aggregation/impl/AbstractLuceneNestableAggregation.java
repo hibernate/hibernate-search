@@ -12,8 +12,8 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilder;
@@ -45,11 +45,11 @@ public abstract class AbstractLuceneNestableAggregation<A> implements LuceneSear
 	public abstract static class AbstractBuilder<A> implements SearchAggregationBuilder<A> {
 
 		protected final LuceneSearchIndexScope scope;
-		protected final LuceneSearchValueFieldContext<?> field;
+		protected final LuceneSearchIndexValueFieldContext<?> field;
 		private final String nestedDocumentPath;
 		private Query nestedFilter;
 
-		public AbstractBuilder(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<?> field) {
+		public AbstractBuilder(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<?> field) {
 			this.scope = scope;
 			this.field = field;
 			this.nestedDocumentPath = field.nestedDocumentPath();

@@ -14,11 +14,11 @@ import java.util.Collections;
 
 
 public class LuceneIndexSchemaObjectFieldTemplate
-		extends AbstractLuceneIndexSchemaFieldTemplate<LuceneIndexSchemaObjectFieldNode> {
+		extends AbstractLuceneIndexSchemaFieldTemplate<LuceneIndexObjectField> {
 
 	private final ObjectStructure structure;
 
-	public LuceneIndexSchemaObjectFieldTemplate(LuceneIndexSchemaObjectNode declaringParent, IndexFieldInclusion inclusion,
+	public LuceneIndexSchemaObjectFieldTemplate(LuceneIndexCompositeNode declaringParent, IndexFieldInclusion inclusion,
 			SimpleGlobPattern absolutePathGlob, boolean multiValued,
 			ObjectStructure structure) {
 		super( declaringParent, inclusion, absolutePathGlob, multiValued );
@@ -26,9 +26,9 @@ public class LuceneIndexSchemaObjectFieldTemplate
 	}
 
 	@Override
-	protected LuceneIndexSchemaObjectFieldNode createNode(LuceneIndexSchemaObjectNode parent,
+	protected LuceneIndexObjectField createNode(LuceneIndexCompositeNode parent,
 			String relativePath, IndexFieldInclusion inclusion, boolean multiValued) {
-		return new LuceneIndexSchemaObjectFieldNode(
+		return new LuceneIndexObjectField(
 				parent, relativePath, inclusion, structure, multiValued, true,
 				Collections.emptyMap(), Collections.emptyMap()
 		);

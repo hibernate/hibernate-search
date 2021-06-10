@@ -10,9 +10,9 @@ import java.lang.invoke.MethodHandles;
 import java.time.temporal.TemporalAccessor;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
+import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
@@ -39,7 +39,7 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 	}
 
 	abstract static class AbstractFactory<F, E, C extends LuceneStandardFieldCodec<F, E>>
-			extends AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<FieldSortBuilder, F, C> {
+			extends AbstractLuceneCodecAwareSearchQueryElementFactory<FieldSortBuilder, F, C> {
 		protected AbstractFactory(C codec) {
 			super( codec );
 		}
@@ -54,7 +54,7 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 	abstract static class AbstractBuilder<F, E, C extends LuceneStandardFieldCodec<F, E>>
 			extends AbstractLuceneDocumentValueSort.AbstractBuilder
 			implements FieldSortBuilder {
-		protected final LuceneSearchValueFieldContext<F> field;
+		protected final LuceneSearchIndexValueFieldContext<F> field;
 		protected final C codec;
 		private final Object sortMissingValueFirstPlaceholder;
 		private final Object sortMissingValueLastPlaceholder;
@@ -62,7 +62,7 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 		protected Object missingValue = SortMissingValue.MISSING_LAST;
 
 		protected AbstractBuilder(LuceneSearchIndexScope scope,
-				LuceneSearchValueFieldContext<F> field, C codec,
+				LuceneSearchIndexValueFieldContext<F> field, C codec,
 				Object sortMissingValueFirstPlaceholder, Object sortMissingValueLastPlaceholder) {
 			super( scope, field );
 			this.field = field;
@@ -126,7 +126,7 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 		}
 
 		@Override
-		public FieldSortBuilder create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+		public FieldSortBuilder create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
 			return new NumericFieldBuilder<>( codec, scope, field );
 		}
 	}
@@ -134,7 +134,7 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 	private static class NumericFieldBuilder<F, E extends Number>
 			extends AbstractBuilder<F, E, AbstractLuceneNumericFieldCodec<F, E>> {
 		private NumericFieldBuilder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchIndexScope scope,
-				LuceneSearchValueFieldContext<F> field) {
+				LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field, codec, codec.getDomain().getMinValue(), codec.getDomain().getMaxValue() );
 		}
 
@@ -152,14 +152,14 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 		}
 
 		@Override
-		public FieldSortBuilder create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+		public FieldSortBuilder create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
 			return new TextFieldBuilder<>( codec, scope, field );
 		}
 	}
 
 	private static class TextFieldBuilder<F> extends AbstractBuilder<F, String, LuceneStandardFieldCodec<F, String>> {
 		private TextFieldBuilder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchIndexScope scope,
-				LuceneSearchValueFieldContext<F> field) {
+				LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field, codec, SortField.STRING_FIRST, SortField.STRING_LAST );
 		}
 
@@ -205,7 +205,7 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 		}
 
 		@Override
-		public FieldSortBuilder create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+		public FieldSortBuilder create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
 			return new TemporalFieldBuilder<>( codec, scope, field );
 		}
 	}
@@ -213,7 +213,7 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 	private static class TemporalFieldBuilder<F extends TemporalAccessor, E extends Number>
 			extends NumericFieldBuilder<F, E> {
 		private TemporalFieldBuilder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchIndexScope scope,
-				LuceneSearchValueFieldContext<F> field) {
+				LuceneSearchIndexValueFieldContext<F> field) {
 			super( codec, scope, field );
 		}
 

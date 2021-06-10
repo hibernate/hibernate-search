@@ -10,9 +10,9 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -68,7 +68,7 @@ public class ElasticsearchGeoPointSpatialWithinPolygonPredicate extends Abstract
 			extends
 			AbstractElasticsearchValueFieldSearchQueryElementFactory<SpatialWithinPolygonPredicateBuilder, GeoPoint> {
 		@Override
-		public Builder create(ElasticsearchSearchIndexScope scope, ElasticsearchSearchValueFieldContext<GeoPoint> field) {
+		public Builder create(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
 			return new Builder( scope, field );
 		}
 	}
@@ -76,7 +76,7 @@ public class ElasticsearchGeoPointSpatialWithinPolygonPredicate extends Abstract
 	private static class Builder extends AbstractBuilder implements SpatialWithinPolygonPredicateBuilder {
 		private double[] coordinates;
 
-		private Builder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchValueFieldContext<GeoPoint> field) {
+		private Builder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
 			super( scope, field );
 		}
 

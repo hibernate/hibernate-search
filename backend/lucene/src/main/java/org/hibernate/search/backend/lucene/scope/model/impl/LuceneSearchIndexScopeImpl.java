@@ -17,16 +17,16 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchCompositeIndexSchemaElementContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneMultiIndexSearchValueFieldContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchCompositeIndexSchemaElementContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexSchemaElementContext;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneMultiIndexSearchIndexCompositeNodeContext;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneMultiIndexSearchIndexValueFieldContext;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexCompositeNodeContext;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexContext;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexNodeContext;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
@@ -144,22 +144,22 @@ public final class LuceneSearchIndexScopeImpl implements LuceneSearchIndexScope 
 	}
 
 	@Override
-	public LuceneSearchCompositeIndexSchemaElementContext root() {
+	public LuceneSearchIndexCompositeNodeContext root() {
 		if ( indexes().size() == 1 ) {
 			return indexes().iterator().next().model().root();
 		}
 		else {
-			List<LuceneSearchCompositeIndexSchemaElementContext> rootForEachIndex = new ArrayList<>();
+			List<LuceneSearchIndexCompositeNodeContext> rootForEachIndex = new ArrayList<>();
 			for ( LuceneScopeIndexManagerContext index : indexes() ) {
 				rootForEachIndex.add( index.model().root() );
 			}
-			return new LuceneMultiIndexSearchCompositeIndexSchemaElementContext( this, null, rootForEachIndex );
+			return new LuceneMultiIndexSearchIndexCompositeNodeContext( this, null, rootForEachIndex );
 		}
 	}
 
 	@Override
-	public LuceneSearchIndexSchemaElementContext field(String absoluteFieldPath) {
-		LuceneSearchIndexSchemaElementContext resultOrNull;
+	public LuceneSearchIndexNodeContext field(String absoluteFieldPath) {
+		LuceneSearchIndexNodeContext resultOrNull;
 		if ( indexes().size() == 1 ) {
 			resultOrNull = indexes().iterator().next().model().fieldOrNull( absoluteFieldPath );
 		}
@@ -187,14 +187,14 @@ public final class LuceneSearchIndexScopeImpl implements LuceneSearchIndexScope 
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"}) // We check types using reflection
-	private LuceneSearchIndexSchemaElementContext createMultiIndexFieldContext(String absoluteFieldPath) {
-		List<LuceneSearchIndexSchemaElementContext> fieldForEachIndex = new ArrayList<>();
+	private LuceneSearchIndexNodeContext createMultiIndexFieldContext(String absoluteFieldPath) {
+		List<LuceneSearchIndexNodeContext> fieldForEachIndex = new ArrayList<>();
 		LuceneScopeIndexManagerContext indexOfFirstField = null;
-		AbstractLuceneIndexSchemaFieldNode firstField = null;
+		AbstractLuceneIndexField firstField = null;
 
 		for ( LuceneScopeIndexManagerContext index : indexes() ) {
 			LuceneIndexModel indexModel = index.model();
-			AbstractLuceneIndexSchemaFieldNode fieldForCurrentIndex = indexModel.fieldOrNull( absoluteFieldPath );
+			AbstractLuceneIndexField fieldForCurrentIndex = indexModel.fieldOrNull( absoluteFieldPath );
 			if ( fieldForCurrentIndex == null ) {
 				continue;
 			}
@@ -218,11 +218,11 @@ public final class LuceneSearchIndexScopeImpl implements LuceneSearchIndexScope 
 		}
 
 		if ( firstField.isComposite() ) {
-			return new LuceneMultiIndexSearchCompositeIndexSchemaElementContext( this, absoluteFieldPath,
+			return new LuceneMultiIndexSearchIndexCompositeNodeContext( this, absoluteFieldPath,
 					(List) fieldForEachIndex );
 		}
 		else {
-			return new LuceneMultiIndexSearchValueFieldContext<>( this, absoluteFieldPath,
+			return new LuceneMultiIndexSearchIndexValueFieldContext<>( this, absoluteFieldPath,
 					(List) fieldForEachIndex );
 		}
 	}

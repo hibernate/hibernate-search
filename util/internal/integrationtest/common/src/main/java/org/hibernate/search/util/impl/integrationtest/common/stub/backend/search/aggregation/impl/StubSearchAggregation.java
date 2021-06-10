@@ -14,9 +14,9 @@ import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilde
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.util.common.data.Range;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexSchemaElementContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexNodeContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchQueryElementFactory;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.AbstractStubSearchQueryElementFactory;
 
 public class StubSearchAggregation<A> implements SearchAggregation<A> {
 
@@ -27,18 +27,20 @@ public class StubSearchAggregation<A> implements SearchAggregation<A> {
 		// No-op, just simulates a call on this object
 	}
 
-	public static class TermsFactory implements StubSearchQueryElementFactory<TermsAggregationBuilder.TypeSelector> {
+	public static class TermsFactory extends
+			AbstractStubSearchQueryElementFactory<TermsAggregationBuilder.TypeSelector> {
 		@Override
 		public TermsAggregationBuilder.TypeSelector create(StubSearchIndexScope scope,
-				StubSearchIndexSchemaElementContext element) {
+				StubSearchIndexNodeContext node) {
 			return new TermsTypeSelector();
 		}
 	}
 
-	public static class RangeFactory implements StubSearchQueryElementFactory<RangeAggregationBuilder.TypeSelector> {
+	public static class RangeFactory extends
+			AbstractStubSearchQueryElementFactory<RangeAggregationBuilder.TypeSelector> {
 		@Override
 		public RangeAggregationBuilder.TypeSelector create(StubSearchIndexScope scope,
-				StubSearchIndexSchemaElementContext element) {
+				StubSearchIndexNodeContext node) {
 			return new RangeTypeSelector();
 		}
 	}

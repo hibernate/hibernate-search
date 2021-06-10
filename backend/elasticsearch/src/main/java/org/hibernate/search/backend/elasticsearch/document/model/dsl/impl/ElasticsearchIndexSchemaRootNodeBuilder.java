@@ -13,15 +13,14 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexField;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldTemplate;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexValueField;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldTemplate;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexObjectField;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldTemplate;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaRootNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexRoot;
 import org.hibernate.search.backend.elasticsearch.index.DynamicMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.NamedDynamicTemplate;
@@ -105,17 +104,17 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 
 		mapping.setDynamic( resolveSelfDynamicType( defaultDynamicType ) );
 
-		Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticFields = new HashMap<>();
+		Map<String, AbstractElasticsearchIndexField> staticFields = new HashMap<>();
 		List<AbstractElasticsearchIndexSchemaFieldTemplate<?>> fieldTemplates = new ArrayList<>();
 
 		ElasticsearchIndexSchemaNodeCollector collector = new ElasticsearchIndexSchemaNodeCollector() {
 			@Override
-			public void collect(String absolutePath, ElasticsearchIndexSchemaObjectFieldNode node) {
+			public void collect(String absolutePath, ElasticsearchIndexObjectField node) {
 				staticFields.put( absolutePath, node );
 			}
 
 			@Override
-			public void collect(String absoluteFieldPath, ElasticsearchIndexSchemaValueFieldNode<?> node) {
+			public void collect(String absoluteFieldPath, ElasticsearchIndexValueField<?> node) {
 				staticFields.put( absoluteFieldPath, node );
 			}
 
@@ -135,8 +134,8 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 			}
 		};
 
-		Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByName = new TreeMap<>();
-		ElasticsearchIndexSchemaRootNode rootNode = new ElasticsearchIndexSchemaRootNode( staticChildrenByName,
+		Map<String, AbstractElasticsearchIndexField> staticChildrenByName = new TreeMap<>();
+		ElasticsearchIndexRoot rootNode = new ElasticsearchIndexRoot( staticChildrenByName,
 				buildQueryElementFactoryMap() );
 		contributeChildren( mapping, rootNode, collector, staticChildrenByName );
 

@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.search.sort.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilder;
 
 public abstract class AbstractLuceneSort implements LuceneSearchSort {

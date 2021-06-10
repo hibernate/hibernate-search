@@ -8,12 +8,12 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchCompositeIndexSchemaElementContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexSchemaElementContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCompositeNodeSearchQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexCompositeNodeContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexNodeContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 
@@ -41,23 +41,23 @@ public class ElasticsearchExistsPredicate extends AbstractElasticsearchSingleFie
 			extends AbstractElasticsearchValueFieldSearchQueryElementFactory<ExistsPredicateBuilder, F> {
 		@Override
 		public ExistsPredicateBuilder create(ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchValueFieldContext<F> field) {
+				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			return new Builder( scope, field );
 		}
 	}
 
 	public static class ObjectFieldFactory
-			extends AbstractElasticsearchSearchCompositeIndexSchemaElementQueryElementFactory<ExistsPredicateBuilder> {
+			extends AbstractElasticsearchCompositeNodeSearchQueryElementFactory<ExistsPredicateBuilder> {
 		@Override
 		public ExistsPredicateBuilder create(ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchCompositeIndexSchemaElementContext element) {
-			return new Builder( scope, element );
+				ElasticsearchSearchIndexCompositeNodeContext node) {
+			return new Builder( scope, node );
 		}
 	}
 
 	private static class Builder extends AbstractBuilder implements ExistsPredicateBuilder {
-		Builder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexSchemaElementContext field) {
-			super( scope, field );
+		Builder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexNodeContext node) {
+			super( scope, node );
 		}
 
 		@Override

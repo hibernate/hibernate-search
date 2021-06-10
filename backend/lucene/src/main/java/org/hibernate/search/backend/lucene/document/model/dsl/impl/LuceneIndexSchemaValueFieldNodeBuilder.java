@@ -10,11 +10,9 @@ import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldReference;
-import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldNode;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexField;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueField;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexValueFieldType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
@@ -71,12 +69,12 @@ class LuceneIndexSchemaValueFieldNodeBuilder<F>
 	}
 
 	@Override
-	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode,
-			Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByNameForParent) {
+	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexCompositeNode parentNode,
+			Map<String, AbstractLuceneIndexField> staticChildrenByNameForParent) {
 		if ( reference == null ) {
 			throw log.incompleteFieldDefinition( eventContext() );
 		}
-		LuceneIndexSchemaValueFieldNode<F> fieldNode = new LuceneIndexSchemaValueFieldNode<>(
+		LuceneIndexValueField<F> fieldNode = new LuceneIndexValueField<>(
 				parentNode, relativeFieldName, inclusion, multiValued, false, type
 		);
 

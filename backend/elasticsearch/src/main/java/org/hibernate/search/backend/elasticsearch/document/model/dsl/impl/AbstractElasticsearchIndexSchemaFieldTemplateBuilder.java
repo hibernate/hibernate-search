@@ -8,11 +8,9 @@ package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexField;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldTemplate;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexCompositeNode;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
@@ -66,8 +64,8 @@ abstract class AbstractElasticsearchIndexSchemaFieldTemplateBuilder<
 
 	@Override
 	public void contribute(ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchIndexSchemaObjectNode parentNode,
-			Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByNameForParent,
+			ElasticsearchIndexCompositeNode parentNode,
+			Map<String, AbstractElasticsearchIndexField> staticChildrenByNameForParent,
 			AbstractTypeMapping parentMapping) {
 		SimpleGlobPattern absolutePathGlob = FieldPaths.absolutize(
 				parent.getAbsolutePath(),
@@ -80,7 +78,7 @@ abstract class AbstractElasticsearchIndexSchemaFieldTemplateBuilder<
 	protected abstract S thisAsS();
 
 	protected abstract void doContribute(ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchIndexSchemaObjectNode parentNode,
+			ElasticsearchIndexCompositeNode parentNode,
 			IndexFieldInclusion inclusion,
 			SimpleGlobPattern absolutePathGlob,
 			boolean multiValued);

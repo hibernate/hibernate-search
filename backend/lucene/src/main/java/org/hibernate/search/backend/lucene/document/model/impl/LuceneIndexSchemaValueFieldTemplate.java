@@ -12,11 +12,11 @@ import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 
 public class LuceneIndexSchemaValueFieldTemplate
-		extends AbstractLuceneIndexSchemaFieldTemplate<LuceneIndexSchemaValueFieldNode<?>> {
+		extends AbstractLuceneIndexSchemaFieldTemplate<LuceneIndexValueField<?>> {
 
 	private final LuceneIndexValueFieldType<?> type;
 
-	public LuceneIndexSchemaValueFieldTemplate(LuceneIndexSchemaObjectNode declaringParent, IndexFieldInclusion inclusion,
+	public LuceneIndexSchemaValueFieldTemplate(LuceneIndexCompositeNode declaringParent, IndexFieldInclusion inclusion,
 			SimpleGlobPattern absolutePathGlob, boolean multiValued,
 			LuceneIndexValueFieldType<?> type) {
 		super( declaringParent, inclusion, absolutePathGlob, multiValued );
@@ -24,8 +24,8 @@ public class LuceneIndexSchemaValueFieldTemplate
 	}
 
 	@Override
-	protected LuceneIndexSchemaValueFieldNode<?> createNode(LuceneIndexSchemaObjectNode parent,
+	protected LuceneIndexValueField<?> createNode(LuceneIndexCompositeNode parent,
 			String relativePath, IndexFieldInclusion inclusion, boolean multiValued) {
-		return new LuceneIndexSchemaValueFieldNode<>( parent, relativePath, inclusion, multiValued, true, type );
+		return new LuceneIndexValueField<>( parent, relativePath, inclusion, multiValued, true, type );
 	}
 }

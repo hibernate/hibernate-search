@@ -20,7 +20,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.L
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexContext;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
@@ -40,18 +40,18 @@ public class ElasticsearchIndexModel implements ElasticsearchIndexDescriptor, El
 	private final RootTypeMapping mapping;
 
 	private final DocumentIdentifierValueConverter<?> idDslConverter;
-	private final ElasticsearchIndexSchemaRootNode rootNode;
-	private final Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticFields;
+	private final ElasticsearchIndexRoot rootNode;
+	private final Map<String, AbstractElasticsearchIndexField> staticFields;
 	private final List<IndexFieldDescriptor> includedStaticFields;
 	private final List<AbstractElasticsearchIndexSchemaFieldTemplate<?>> fieldTemplates;
-	private final ConcurrentMap<String, AbstractElasticsearchIndexSchemaFieldNode> dynamicFieldsCache = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, AbstractElasticsearchIndexField> dynamicFieldsCache = new ConcurrentHashMap<>();
 
 	public ElasticsearchIndexModel(IndexNames names,
 			String mappedTypeName,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, IndexSettings customIndexSettings,
 			RootTypeMapping mapping, DocumentIdentifierValueConverter<?> idDslConverter,
-			ElasticsearchIndexSchemaRootNode rootNode,
-			Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticFields,
+			ElasticsearchIndexRoot rootNode,
+			Map<String, AbstractElasticsearchIndexField> staticFields,
 			List<AbstractElasticsearchIndexSchemaFieldTemplate<?>> fieldTemplates) {
 		this.names = names;
 		this.mappedTypeName = mappedTypeName;
@@ -96,7 +96,7 @@ public class ElasticsearchIndexModel implements ElasticsearchIndexDescriptor, El
 	}
 
 	@Override
-	public ElasticsearchIndexSchemaRootNode root() {
+	public ElasticsearchIndexRoot root() {
 		return rootNode;
 	}
 
@@ -105,12 +105,12 @@ public class ElasticsearchIndexModel implements ElasticsearchIndexDescriptor, El
 		return Optional.ofNullable( fieldOrNull( absolutePath ) );
 	}
 
-	public AbstractElasticsearchIndexSchemaFieldNode fieldOrNull(String absolutePath) {
+	public AbstractElasticsearchIndexField fieldOrNull(String absolutePath) {
 		return fieldOrNull( absolutePath, IndexFieldFilter.INCLUDED_ONLY );
 	}
 
-	public AbstractElasticsearchIndexSchemaFieldNode fieldOrNull(String absolutePath, IndexFieldFilter filter) {
-		AbstractElasticsearchIndexSchemaFieldNode node = fieldOrNullIgnoringInclusion( absolutePath );
+	public AbstractElasticsearchIndexField fieldOrNull(String absolutePath, IndexFieldFilter filter) {
+		AbstractElasticsearchIndexField node = fieldOrNullIgnoringInclusion( absolutePath );
 		return node == null ? null : filter.filter( node, node.inclusion() );
 	}
 
@@ -139,8 +139,8 @@ public class ElasticsearchIndexModel implements ElasticsearchIndexDescriptor, El
 				.toString();
 	}
 
-	private AbstractElasticsearchIndexSchemaFieldNode fieldOrNullIgnoringInclusion(String absolutePath) {
-		AbstractElasticsearchIndexSchemaFieldNode field = staticFields.get( absolutePath );
+	private AbstractElasticsearchIndexField fieldOrNullIgnoringInclusion(String absolutePath) {
+		AbstractElasticsearchIndexField field = staticFields.get( absolutePath );
 		if ( field != null ) {
 			return field;
 		}
@@ -151,7 +151,7 @@ public class ElasticsearchIndexModel implements ElasticsearchIndexDescriptor, El
 		for ( AbstractElasticsearchIndexSchemaFieldTemplate<?> template : fieldTemplates ) {
 			field = template.createNodeIfMatching( this, absolutePath );
 			if ( field != null ) {
-				AbstractElasticsearchIndexSchemaFieldNode previous = dynamicFieldsCache.putIfAbsent( absolutePath, field );
+				AbstractElasticsearchIndexField previous = dynamicFieldsCache.putIfAbsent( absolutePath, field );
 				if ( previous != null ) {
 					// Some other thread created the node before us.
 					// Keep the first created node, discard ours: they are identical.

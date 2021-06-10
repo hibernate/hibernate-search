@@ -11,11 +11,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexObjectFieldReference;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldNode;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexField;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexObjectField;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexCompositeNode;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
@@ -77,15 +75,15 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 
 	@Override
 	public void contribute(ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchIndexSchemaObjectNode parentNode,
-			Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByNameForParent,
+			ElasticsearchIndexCompositeNode parentNode,
+			Map<String, AbstractElasticsearchIndexField> staticChildrenByNameForParent,
 			AbstractTypeMapping parentMapping) {
 		if ( reference == null ) {
 			throw log.incompleteFieldDefinition( eventContext() );
 		}
 
-		Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByName = new TreeMap<>();
-		ElasticsearchIndexSchemaObjectFieldNode fieldNode = new ElasticsearchIndexSchemaObjectFieldNode(
+		Map<String, AbstractElasticsearchIndexField> staticChildrenByName = new TreeMap<>();
+		ElasticsearchIndexObjectField fieldNode = new ElasticsearchIndexObjectField(
 				parentNode, relativeFieldName, inclusion, structure, multiValued,
 				staticChildrenByName, buildQueryElementFactoryMap()
 		);

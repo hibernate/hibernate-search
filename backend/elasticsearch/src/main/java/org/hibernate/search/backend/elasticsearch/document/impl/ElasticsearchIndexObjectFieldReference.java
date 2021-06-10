@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexObjectField;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 
 
 public class ElasticsearchIndexObjectFieldReference implements IndexObjectFieldReference {
 
-	private ElasticsearchIndexSchemaObjectFieldNode schemaNode;
+	private ElasticsearchIndexObjectField schemaNode;
 
 	@Override
 	public String toString() {
@@ -20,11 +20,11 @@ public class ElasticsearchIndexObjectFieldReference implements IndexObjectFieldR
 				+ "[absolutePath=" + ( schemaNode == null ? null : schemaNode.absolutePath() ) + "]";
 	}
 
-	public void setSchemaNode(ElasticsearchIndexSchemaObjectFieldNode schemaNode) {
+	public void setSchemaNode(ElasticsearchIndexObjectField schemaNode) {
 		this.schemaNode = schemaNode;
 	}
 
-	ElasticsearchIndexSchemaObjectFieldNode getSchemaNode() {
+	ElasticsearchIndexObjectField getSchemaNode() {
 		return schemaNode;
 	}
 }

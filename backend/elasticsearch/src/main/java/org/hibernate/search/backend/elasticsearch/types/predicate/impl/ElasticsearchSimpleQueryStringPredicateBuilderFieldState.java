@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 
 import com.google.gson.JsonPrimitive;
@@ -17,10 +17,11 @@ public final class ElasticsearchSimpleQueryStringPredicateBuilderFieldState
 		implements SimpleQueryStringPredicateBuilder.FieldState {
 	private static final String BOOST_OPERATOR = "^";
 
-	private final ElasticsearchSearchValueFieldContext<String> field;
+	private final ElasticsearchSearchIndexValueFieldContext<String> field;
 	private Float boost;
 
-	private ElasticsearchSimpleQueryStringPredicateBuilderFieldState(ElasticsearchSearchValueFieldContext<String> field) {
+	private ElasticsearchSimpleQueryStringPredicateBuilderFieldState(
+			ElasticsearchSearchIndexValueFieldContext<String> field) {
 		this.field = field;
 	}
 
@@ -47,7 +48,7 @@ public final class ElasticsearchSimpleQueryStringPredicateBuilderFieldState
 			AbstractElasticsearchValueFieldSearchQueryElementFactory<ElasticsearchSimpleQueryStringPredicateBuilderFieldState, String> {
 		@Override
 		public ElasticsearchSimpleQueryStringPredicateBuilderFieldState create(
-				ElasticsearchSearchIndexScope scope, ElasticsearchSearchValueFieldContext<String> field) {
+				ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<String> field) {
 			return new ElasticsearchSimpleQueryStringPredicateBuilderFieldState( field );
 		}
 	}

@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.sort.spi.SortTypeKeys;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.aggregation.impl.StubSearchAggregation;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchQueryElementFactory;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.AbstractStubSearchQueryElementFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl.StubSearchPredicate;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubDistanceToFieldSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubFieldSearchProjection;
@@ -26,16 +26,16 @@ public final class StubSearchQueryElementFactories {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> StubSearchQueryElementFactory<T> get(SearchQueryElementTypeKey<T> key) {
+	public static <T> AbstractStubSearchQueryElementFactory<T> get(SearchQueryElementTypeKey<T> key) {
 		if ( key.toString().startsWith( "predicate:named:" ) ) {
-			return (StubSearchQueryElementFactory<T>) new StubSearchPredicate.Factory();
+			return (AbstractStubSearchQueryElementFactory<T>) new StubSearchPredicate.Factory();
 		}
 		else {
-			return (StubSearchQueryElementFactory<T>) StubSearchQueryElementFactories.ALL.get( key );
+			return (AbstractStubSearchQueryElementFactory<T>) StubSearchQueryElementFactories.ALL.get( key );
 		}
 	}
 
-	private static final Map<SearchQueryElementTypeKey<?>, StubSearchQueryElementFactory<?>> ALL = new HashMap<>();
+	private static final Map<SearchQueryElementTypeKey<?>, AbstractStubSearchQueryElementFactory<?>> ALL = new HashMap<>();
 
 	static {
 		StubSearchQueryElementFactories.stubFactories(
@@ -67,14 +67,14 @@ public final class StubSearchQueryElementFactories {
 	}
 
 	@SafeVarargs
-	private static <T> void stubFactories(StubSearchQueryElementFactory<T> factory,
+	private static <T> void stubFactories(AbstractStubSearchQueryElementFactory<T> factory,
 			SearchQueryElementTypeKey<? super T>... keys) {
 		for ( SearchQueryElementTypeKey<? super T> key : keys ) {
 			factory( factory, key );
 		}
 	}
 
-	private static <T> void factory(StubSearchQueryElementFactory<? extends T> factory,
+	private static <T> void factory(AbstractStubSearchQueryElementFactory<? extends T> factory,
 			SearchQueryElementTypeKey<T> key) {
 		ALL.put( key, factory );
 	}

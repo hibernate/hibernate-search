@@ -19,9 +19,9 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.FacetsCollect
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
+import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
@@ -86,13 +86,14 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 	}
 
 	public static class Factory<F>
-			extends AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<RangeAggregationBuilder.TypeSelector, F, AbstractLuceneNumericFieldCodec<F, ?>> {
+			extends
+			AbstractLuceneCodecAwareSearchQueryElementFactory<RangeAggregationBuilder.TypeSelector, F, AbstractLuceneNumericFieldCodec<F, ?>> {
 		public Factory(AbstractLuceneNumericFieldCodec<F, ?> codec) {
 			super( codec );
 		}
 
 		@Override
-		public TypeSelector<?> create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+		public TypeSelector<?> create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
 			return new TypeSelector<>( codec, scope, field );
 		}
 	}
@@ -100,10 +101,10 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 	public static class TypeSelector<F> implements RangeAggregationBuilder.TypeSelector {
 		private final AbstractLuceneNumericFieldCodec<F, ?> codec;
 		private final LuceneSearchIndexScope scope;
-		private final LuceneSearchValueFieldContext<F> field;
+		private final LuceneSearchIndexValueFieldContext<F> field;
 
 		private TypeSelector(AbstractLuceneNumericFieldCodec<F, ?> codec,
-				LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+				LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
 			this.codec = codec;
 			this.scope = scope;
 			this.field = field;
@@ -127,7 +128,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		private final List<Range<E>> encodedRangesInOrder = new ArrayList<>();
 
 		public Builder(AbstractLuceneNumericFieldCodec<F, E> codec,
-				LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<?> field,
+				LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<?> field,
 				DslConverter<? super K, F> toFieldValueConverter) {
 			super( scope, field );
 			this.codec = codec;

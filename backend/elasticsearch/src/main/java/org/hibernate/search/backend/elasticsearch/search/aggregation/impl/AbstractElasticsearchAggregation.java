@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilder;
 
 public abstract class AbstractElasticsearchAggregation<A> implements ElasticsearchSearchAggregation<A> {

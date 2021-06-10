@@ -17,8 +17,8 @@ import java.util.Set;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.FacetsCollectorFactory;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
@@ -150,9 +150,9 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 
 	abstract static class AbstractTypeSelector<F> implements TermsAggregationBuilder.TypeSelector {
 		protected final LuceneSearchIndexScope scope;
-		protected final LuceneSearchValueFieldContext<F> field;
+		protected final LuceneSearchIndexValueFieldContext<F> field;
 
-		protected AbstractTypeSelector(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+		protected AbstractTypeSelector(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
 			this.scope = scope;
 			this.field = field;
 		}
@@ -171,7 +171,7 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		private int minDocCount = 1;
 		private int maxTermCount = 100;
 
-		AbstractBuilder(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field,
+		AbstractBuilder(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field,
 				ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
 			super( scope, field );
 			this.fromFieldValueConverter = fromFieldValueConverter;

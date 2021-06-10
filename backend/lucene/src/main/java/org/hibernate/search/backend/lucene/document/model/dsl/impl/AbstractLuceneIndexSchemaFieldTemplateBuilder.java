@@ -8,11 +8,9 @@ package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexField;
 import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldTemplate;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTemplateOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
@@ -64,8 +62,8 @@ abstract class AbstractLuceneIndexSchemaFieldTemplateBuilder<
 	}
 
 	@Override
-	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode,
-			Map<String, AbstractLuceneIndexSchemaFieldNode> staticChildrenByNameForParent) {
+	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexCompositeNode parentNode,
+			Map<String, AbstractLuceneIndexField> staticChildrenByNameForParent) {
 		SimpleGlobPattern absolutePathGlob = FieldPaths.absolutize(
 				parent.getAbsolutePath(),
 				prefix,
@@ -77,7 +75,7 @@ abstract class AbstractLuceneIndexSchemaFieldTemplateBuilder<
 	protected abstract S thisAsS();
 
 	protected abstract void doContribute(LuceneIndexSchemaNodeCollector collector,
-			LuceneIndexSchemaObjectNode parentNode,
+			LuceneIndexCompositeNode parentNode,
 			SimpleGlobPattern absolutePathGlob,
 			boolean multiValued);
 

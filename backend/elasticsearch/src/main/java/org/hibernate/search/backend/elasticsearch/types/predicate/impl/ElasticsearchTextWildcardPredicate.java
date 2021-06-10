@@ -8,9 +8,9 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.search.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchValueFieldContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -49,7 +49,7 @@ public class ElasticsearchTextWildcardPredicate extends AbstractElasticsearchSin
 			extends AbstractElasticsearchValueFieldSearchQueryElementFactory<WildcardPredicateBuilder, String> {
 		@Override
 		public WildcardPredicateBuilder create(ElasticsearchSearchIndexScope scope,
-				ElasticsearchSearchValueFieldContext<String> field) {
+				ElasticsearchSearchIndexValueFieldContext<String> field) {
 			return new Builder( scope, field );
 		}
 	}
@@ -57,7 +57,7 @@ public class ElasticsearchTextWildcardPredicate extends AbstractElasticsearchSin
 	private static class Builder extends AbstractBuilder implements WildcardPredicateBuilder {
 		private JsonPrimitive pattern;
 
-		private Builder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchValueFieldContext<String> field) {
+		private Builder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<String> field) {
 			super( scope, field );
 		}
 

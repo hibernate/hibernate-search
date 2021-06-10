@@ -12,9 +12,9 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
-import org.hibernate.search.backend.lucene.search.impl.AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
+import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
@@ -99,13 +99,14 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 	}
 
 	public static class Factory<F>
-			extends AbstractLuceneCodecAwareSearchValueFieldQueryElementFactory<TermsAggregationBuilder.TypeSelector, F, AbstractLuceneNumericFieldCodec<F, ?>> {
+			extends
+			AbstractLuceneCodecAwareSearchQueryElementFactory<TermsAggregationBuilder.TypeSelector, F, AbstractLuceneNumericFieldCodec<F, ?>> {
 		public Factory(AbstractLuceneNumericFieldCodec<F, ?> codec) {
 			super( codec );
 		}
 
 		@Override
-		public TypeSelector<?> create(LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+		public TypeSelector<?> create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
 			return new TypeSelector<>( codec, scope, field );
 		}
 	}
@@ -114,7 +115,7 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 		private final AbstractLuceneNumericFieldCodec<F, ?> codec;
 
 		private TypeSelector(AbstractLuceneNumericFieldCodec<F, ?> codec,
-				LuceneSearchIndexScope scope, LuceneSearchValueFieldContext<F> field) {
+				LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			this.codec = codec;
 		}
@@ -132,7 +133,7 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
 		public Builder(AbstractLuceneNumericFieldCodec<F, E> codec, LuceneSearchIndexScope scope,
-				LuceneSearchValueFieldContext<F> field, ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
+				LuceneSearchIndexValueFieldContext<F> field, ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
 			super( scope, field, fromFieldValueConverter );
 			this.codec = codec;
 		}

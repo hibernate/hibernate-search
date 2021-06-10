@@ -12,19 +12,19 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionAccumulator;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexSchemaElementContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexNodeContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchQueryElementFactory;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.AbstractStubSearchQueryElementFactory;
 
 public abstract class StubDistanceToFieldSearchProjection<T> implements StubSearchProjection<T> {
 
 	private StubDistanceToFieldSearchProjection() {
 	}
 
-	public static class Factory implements StubSearchQueryElementFactory<DistanceToFieldProjectionBuilder> {
+	public static class Factory extends AbstractStubSearchQueryElementFactory<DistanceToFieldProjectionBuilder> {
 		@Override
 		public DistanceToFieldProjectionBuilder create(StubSearchIndexScope scope,
-				StubSearchIndexSchemaElementContext element) {
+				StubSearchIndexNodeContext node) {
 			return new Builder();
 		}
 	}

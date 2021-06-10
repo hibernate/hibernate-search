@@ -10,11 +10,9 @@ import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldReference;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldNode;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexField;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexValueField;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexCompositeNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
@@ -73,14 +71,14 @@ class ElasticsearchIndexSchemaValueFieldNodeBuilder<F>
 
 	@Override
 	public void contribute(ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchIndexSchemaObjectNode parentNode,
-			Map<String, AbstractElasticsearchIndexSchemaFieldNode> staticChildrenByNameForParent,
+			ElasticsearchIndexCompositeNode parentNode,
+			Map<String, AbstractElasticsearchIndexField> staticChildrenByNameForParent,
 			AbstractTypeMapping parentMapping) {
 		if ( reference == null ) {
 			throw log.incompleteFieldDefinition( eventContext() );
 		}
 
-		ElasticsearchIndexSchemaValueFieldNode<F> fieldNode = new ElasticsearchIndexSchemaValueFieldNode<>(
+		ElasticsearchIndexValueField<F> fieldNode = new ElasticsearchIndexValueField<>(
 				parentNode, relativeFieldName, inclusion, multiValued, type
 		);
 

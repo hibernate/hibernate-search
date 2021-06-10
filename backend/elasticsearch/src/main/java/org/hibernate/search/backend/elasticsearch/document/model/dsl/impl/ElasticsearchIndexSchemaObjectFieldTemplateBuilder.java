@@ -6,9 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldTemplate;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexCompositeNode;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataMatchingTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicTemplate;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
@@ -38,7 +37,7 @@ class ElasticsearchIndexSchemaObjectFieldTemplateBuilder
 
 	@Override
 	protected void doContribute(ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchIndexSchemaObjectNode parentNode, IndexFieldInclusion inclusion,
+			ElasticsearchIndexCompositeNode parentNode, IndexFieldInclusion inclusion,
 			SimpleGlobPattern absolutePathGlob, boolean multiValued) {
 		ElasticsearchIndexSchemaObjectFieldTemplate fieldTemplate = new ElasticsearchIndexSchemaObjectFieldTemplate(
 				parentNode, absolutePathGlob, inclusion, multiValued, structure

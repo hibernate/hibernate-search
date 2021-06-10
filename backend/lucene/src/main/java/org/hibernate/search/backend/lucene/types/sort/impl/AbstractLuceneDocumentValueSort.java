@@ -10,8 +10,8 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchValueFieldContext;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneReversibleSort;
@@ -54,7 +54,7 @@ public abstract class AbstractLuceneDocumentValueSort extends AbstractLuceneReve
 		protected Query nestedFilter;
 
 		protected AbstractBuilder(LuceneSearchIndexScope scope,
-				LuceneSearchValueFieldContext<?> field) {
+				LuceneSearchIndexValueFieldContext<?> field) {
 			this( scope, field.absolutePath(), field.nestedDocumentPath() );
 		}
 

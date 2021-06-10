@@ -13,14 +13,14 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusio
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 
-public abstract class AbstractLuceneIndexSchemaFieldTemplate<N extends AbstractLuceneIndexSchemaFieldNode> {
+public abstract class AbstractLuceneIndexSchemaFieldTemplate<N extends AbstractLuceneIndexField> {
 
 	private final IndexFieldInclusion inclusion;
 
 	private final SimpleGlobPattern absolutePathGlob;
 	private final boolean multiValued;
 
-	AbstractLuceneIndexSchemaFieldTemplate(LuceneIndexSchemaObjectNode declaringParent, IndexFieldInclusion inclusion,
+	AbstractLuceneIndexSchemaFieldTemplate(LuceneIndexCompositeNode declaringParent, IndexFieldInclusion inclusion,
 			SimpleGlobPattern absolutePathGlob, boolean multiValued) {
 		this.inclusion = declaringParent.inclusion().compose( inclusion );
 		this.absolutePathGlob = absolutePathGlob;
@@ -33,14 +33,14 @@ public abstract class AbstractLuceneIndexSchemaFieldTemplate<N extends AbstractL
 		}
 
 		RelativizedPath relativizedPath = FieldPaths.relativize( absolutePath );
-		LuceneIndexSchemaObjectNode parent =
+		LuceneIndexCompositeNode parent =
 				relativizedPath.parentPath
-						.<LuceneIndexSchemaObjectNode>map( path -> model.fieldOrNull( path, IndexFieldFilter.ALL ).toObjectField() )
+						.<LuceneIndexCompositeNode>map( path -> model.fieldOrNull( path, IndexFieldFilter.ALL ).toObjectField() )
 						.orElseGet( model::root );
 
 		return createNode( parent, relativizedPath.relativePath, inclusion, multiValued );
 	}
 
-	protected abstract N createNode(LuceneIndexSchemaObjectNode parent, String relativePath,
+	protected abstract N createNode(LuceneIndexCompositeNode parent, String relativePath,
 			IndexFieldInclusion inclusion, boolean multiValued);
 }
