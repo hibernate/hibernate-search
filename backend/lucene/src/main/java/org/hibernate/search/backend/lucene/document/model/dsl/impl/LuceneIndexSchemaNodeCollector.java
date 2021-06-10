@@ -8,8 +8,8 @@ package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectField;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldTemplate;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldTemplate;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectFieldTemplate;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueFieldTemplate;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueField;
 
 public interface LuceneIndexSchemaNodeCollector {
@@ -17,7 +17,7 @@ public interface LuceneIndexSchemaNodeCollector {
 
 	void collect(String absoluteFieldPath, LuceneIndexValueField<?> node);
 
-	void collect(LuceneIndexSchemaObjectFieldTemplate template);
+	void collect(LuceneIndexObjectFieldTemplate template);
 
-	void collect(LuceneIndexSchemaValueFieldTemplate template);
+	void collect(LuceneIndexValueFieldTemplate template);
 }

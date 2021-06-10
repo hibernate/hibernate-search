@@ -13,13 +13,13 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexSchemaFieldTemplate;
+import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexFieldTemplate;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexRoot;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldTemplate;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaValueFieldTemplate;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectFieldTemplate;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueFieldTemplate;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueField;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactory;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIndexFieldTypeFactoryImpl;
@@ -77,7 +77,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 
 	public LuceneIndexModel build(String indexName) {
 		Map<String, LuceneIndexField> staticFields = new HashMap<>();
-		List<AbstractLuceneIndexSchemaFieldTemplate<?>> fieldTemplates = new ArrayList<>();
+		List<AbstractLuceneIndexFieldTemplate<?>> fieldTemplates = new ArrayList<>();
 		// Initializing a one-element array so that we can mutate the boolean below.
 		// Alternatively we could use AtomicBoolean, but we don't need concurrent access here.
 		boolean[] hasNestedDocument = new boolean[1];
@@ -97,7 +97,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 			}
 
 			@Override
-			public void collect(LuceneIndexSchemaObjectFieldTemplate template) {
+			public void collect(LuceneIndexObjectFieldTemplate template) {
 				fieldTemplates.add( template );
 				if ( template.type().nested() ) {
 					hasNestedDocument[0] = true;
@@ -105,7 +105,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 			}
 
 			@Override
-			public void collect(LuceneIndexSchemaValueFieldTemplate template) {
+			public void collect(LuceneIndexValueFieldTemplate template) {
 				fieldTemplates.add( template );
 			}
 		};

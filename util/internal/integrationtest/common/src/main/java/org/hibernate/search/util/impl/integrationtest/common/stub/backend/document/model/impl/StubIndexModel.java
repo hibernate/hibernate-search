@@ -25,7 +25,7 @@ public class StubIndexModel {
 		this.fields = fields;
 	}
 
-	public String hibernateSearchIndexName() {
+	public String hibernateSearchName() {
 		return hibernateSearchIndexName;
 	}
 

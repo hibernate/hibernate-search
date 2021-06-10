@@ -13,13 +13,13 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusio
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 
-public abstract class AbstractElasticsearchIndexSchemaFieldTemplate<N extends ElasticsearchIndexField> {
+public abstract class AbstractElasticsearchIndexFieldTemplate<N extends ElasticsearchIndexField> {
 
 	private final SimpleGlobPattern absolutePathGlob;
 	private final IndexFieldInclusion inclusion;
 	private final boolean multiValued;
 
-	AbstractElasticsearchIndexSchemaFieldTemplate(ElasticsearchIndexCompositeNode declaringParent,
+	AbstractElasticsearchIndexFieldTemplate(ElasticsearchIndexCompositeNode declaringParent,
 			SimpleGlobPattern absolutePathGlob, IndexFieldInclusion inclusion,
 			boolean multiValued) {
 		this.absolutePathGlob = absolutePathGlob;

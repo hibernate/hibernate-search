@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldTemplate;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexObjectFieldTemplate;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexCompositeNode;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataMatchingTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicTemplate;
@@ -20,7 +20,7 @@ import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 class ElasticsearchIndexSchemaObjectFieldTemplateBuilder
 		extends AbstractElasticsearchIndexSchemaFieldTemplateBuilder<
-				ElasticsearchIndexSchemaObjectFieldTemplateBuilder, ElasticsearchIndexSchemaObjectFieldTemplate
+				ElasticsearchIndexSchemaObjectFieldTemplateBuilder, ElasticsearchIndexObjectFieldTemplate
 		> {
 
 	protected final ElasticsearchIndexCompositeNodeType.Builder typeBuilder;
@@ -41,7 +41,7 @@ class ElasticsearchIndexSchemaObjectFieldTemplateBuilder
 			ElasticsearchIndexCompositeNode parentNode, IndexFieldInclusion inclusion,
 			SimpleGlobPattern absolutePathGlob, boolean multiValued) {
 		ElasticsearchIndexCompositeNodeType type = typeBuilder.build();
-		ElasticsearchIndexSchemaObjectFieldTemplate fieldTemplate = new ElasticsearchIndexSchemaObjectFieldTemplate(
+		ElasticsearchIndexObjectFieldTemplate fieldTemplate = new ElasticsearchIndexObjectFieldTemplate(
 				parentNode, absolutePathGlob, type, inclusion, multiValued );
 
 		PropertyMapping mapping = type.createMapping( DynamicType.TRUE );

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectFieldTemplate;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectFieldTemplate;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexCompositeNodeType;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
@@ -15,7 +15,7 @@ import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 class LuceneIndexSchemaObjectFieldTemplateBuilder
 		extends AbstractLuceneIndexSchemaFieldTemplateBuilder<
-						LuceneIndexSchemaObjectFieldTemplateBuilder, LuceneIndexSchemaObjectFieldTemplate
+						LuceneIndexSchemaObjectFieldTemplateBuilder, LuceneIndexObjectFieldTemplate
 				> {
 
 	private final LuceneIndexCompositeNodeType.Builder typeBuilder;
@@ -34,7 +34,7 @@ class LuceneIndexSchemaObjectFieldTemplateBuilder
 	@Override
 	protected void doContribute(LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexCompositeNode parentNode, SimpleGlobPattern absolutePathGlob, boolean multiValued) {
-		LuceneIndexSchemaObjectFieldTemplate fieldTemplate = new LuceneIndexSchemaObjectFieldTemplate(
+		LuceneIndexObjectFieldTemplate fieldTemplate = new LuceneIndexObjectFieldTemplate(
 				parentNode, absolutePathGlob, typeBuilder.build(), inclusion, multiValued );
 
 		collector.collect( fieldTemplate );
