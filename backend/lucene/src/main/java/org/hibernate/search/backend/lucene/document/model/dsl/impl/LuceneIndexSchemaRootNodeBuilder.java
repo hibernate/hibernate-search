@@ -114,12 +114,9 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 		LuceneIndexRoot rootNode = new LuceneIndexRoot( typeBuilder.build(), staticChildrenByName );
 		contributeChildren( rootNode, collector, staticChildrenByName );
 
-		return new LuceneIndexModel(
-				indexName,
-				mappedTypeName,
+		return new LuceneIndexModel( indexName, mappedTypeName,
 				idDslConverter == null ? new StringDocumentIdentifierValueConverter() : idDslConverter,
-				rootNode, staticFields, fieldTemplates, hasNestedDocument[0]
-		);
+				rootNode, staticFields, fieldTemplates, hasNestedDocument[0] );
 	}
 
 	@Override

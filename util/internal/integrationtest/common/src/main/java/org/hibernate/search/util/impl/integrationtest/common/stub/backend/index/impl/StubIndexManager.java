@@ -36,16 +36,14 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 
 	private final StubBackend backend;
 	private final String name;
-	private final String mappedTypeName;
 	private final StubIndexModel model;
 
 	private State state = State.STOPPED;
 
-	StubIndexManager(StubBackend backend, String name, String mappedTypeName, StubIndexModel model) {
+	StubIndexManager(StubBackend backend, String name, StubIndexModel model) {
 		StaticCounters.get().increment( INSTANCE_COUNTER_KEY );
 		this.backend = backend;
 		this.name = name;
-		this.mappedTypeName = mappedTypeName;
 		this.model = model;
 		backend.getBehavior().defineSchema( name, model );
 	}
@@ -96,7 +94,7 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		checkStarted();
 		return new StubIndexIndexingPlan(
-				name, mappedTypeName, backend.getBehavior(),
+				name, model.mappedTypeName(), backend.getBehavior(),
 				context, commitStrategy, refreshStrategy
 		);
 	}

@@ -12,20 +12,17 @@ import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 
 public class ElasticsearchIndexValueFieldTemplate
-		extends AbstractElasticsearchIndexFieldTemplate<ElasticsearchIndexValueField<?>> {
-
-	private final ElasticsearchIndexValueFieldType<?> type;
+		extends AbstractElasticsearchIndexFieldTemplate<ElasticsearchIndexValueFieldType<?>> {
 
 	public ElasticsearchIndexValueFieldTemplate(ElasticsearchIndexCompositeNode declaringParent,
 			SimpleGlobPattern absolutePathGlob, IndexFieldInclusion inclusion,
 			boolean multiValued, ElasticsearchIndexValueFieldType<?> type) {
-		super( declaringParent, absolutePathGlob, inclusion, multiValued );
-		this.type = type;
+		super( declaringParent, absolutePathGlob, type, inclusion, multiValued );
 	}
 
 	@Override
-	protected ElasticsearchIndexValueField<?> createNode(ElasticsearchIndexCompositeNode parent,
-			String relativePath, IndexFieldInclusion inclusion, boolean multiValued) {
+	protected ElasticsearchIndexField createNode(ElasticsearchIndexCompositeNode parent, String relativePath,
+			ElasticsearchIndexValueFieldType<?> type, IndexFieldInclusion inclusion, boolean multiValued) {
 		return new ElasticsearchIndexValueField<>( parent, relativePath, type, inclusion, multiValued );
 	}
 }

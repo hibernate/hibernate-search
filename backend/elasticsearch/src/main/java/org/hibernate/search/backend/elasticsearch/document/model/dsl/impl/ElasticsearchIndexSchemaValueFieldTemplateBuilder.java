@@ -42,7 +42,7 @@ class ElasticsearchIndexSchemaValueFieldTemplateBuilder
 
 		collector.collect( fieldTemplate );
 
-		if ( IndexFieldInclusion.INCLUDED.equals( fieldTemplate.getInclusion() ) ) {
+		if ( IndexFieldInclusion.INCLUDED.equals( fieldTemplate.inclusion() ) ) {
 			DynamicTemplate dynamicTemplate = new DynamicTemplate();
 			dynamicTemplate.setPathMatch( absolutePathGlob.toPatternString() );
 			dynamicTemplate.setMapping( type.mapping() );

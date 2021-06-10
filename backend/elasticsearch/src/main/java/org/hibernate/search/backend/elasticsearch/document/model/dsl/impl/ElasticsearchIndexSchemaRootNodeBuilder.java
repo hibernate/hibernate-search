@@ -141,14 +141,10 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 		ElasticsearchIndexRoot rootNode = new ElasticsearchIndexRoot( typeBuilder.build(), staticChildrenByName );
 		contributeChildren( mapping, rootNode, collector, staticChildrenByName );
 
-		return new ElasticsearchIndexModel(
-				indexNames,
-				mappedTypeName,
-				analysisDefinitionRegistry, customIndexSettings,
-				mapping,
+		return new ElasticsearchIndexModel( indexNames, mappedTypeName,
 				idDslConverter == null ? new StringDocumentIdentifierValueConverter() : idDslConverter,
-				rootNode, staticFields, fieldTemplates
-		);
+				rootNode, staticFields, fieldTemplates,
+				analysisDefinitionRegistry, customIndexSettings, mapping );
 	}
 
 	@Override
