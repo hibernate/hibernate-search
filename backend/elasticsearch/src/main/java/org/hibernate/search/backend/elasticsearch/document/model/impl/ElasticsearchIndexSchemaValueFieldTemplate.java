@@ -26,6 +26,6 @@ public class ElasticsearchIndexSchemaValueFieldTemplate
 	@Override
 	protected ElasticsearchIndexValueField<?> createNode(ElasticsearchIndexCompositeNode parent,
 			String relativePath, IndexFieldInclusion inclusion, boolean multiValued) {
-		return new ElasticsearchIndexValueField<>( parent, relativePath, inclusion, multiValued, type );
+		return new ElasticsearchIndexValueField<>( parent, relativePath, type, inclusion, multiValued );
 	}
 }

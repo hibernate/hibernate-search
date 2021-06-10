@@ -8,14 +8,15 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import java.util.Locale;
 
+import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
 import org.hibernate.search.util.common.SearchException;
 
-public abstract class AbstractStubSearchQueryElementFactory<T> {
+public abstract class AbstractStubSearchQueryElementFactory<T>
+		implements SearchQueryElementFactory<T, StubSearchIndexScope, StubSearchIndexNodeContext> {
 
-	public abstract T create(StubSearchIndexScope scope, StubSearchIndexNodeContext node);
-
-	public void checkCompatibleWith(AbstractStubSearchQueryElementFactory<?> other) {
-		if ( !equals( other ) ) {
+	@Override
+	public void checkCompatibleWith(SearchQueryElementFactory<?, ?, ?> other) {
+		if ( !getClass().equals( other.getClass() ) ) {
 			throw new SearchException(
 					String.format( Locale.ROOT, "Incompatible factories: '%s' vs. '%s'", this, other ) );
 		}

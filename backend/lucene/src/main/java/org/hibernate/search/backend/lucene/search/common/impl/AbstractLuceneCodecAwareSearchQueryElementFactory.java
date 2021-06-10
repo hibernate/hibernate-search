@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
+import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public abstract class AbstractLuceneCodecAwareSearchQueryElementFactory<T, F, C extends LuceneFieldCodec<F>>
@@ -24,7 +25,7 @@ public abstract class AbstractLuceneCodecAwareSearchQueryElementFactory<T, F, C 
 	}
 
 	@Override
-	public void checkCompatibleWith(LuceneSearchQueryElementFactory<?, ?> other) {
+	public void checkCompatibleWith(SearchQueryElementFactory<?, ?, ?> other) {
 		super.checkCompatibleWith( other );
 		AbstractLuceneCodecAwareSearchQueryElementFactory<?, ?, ?> castedOther =
 				(AbstractLuceneCodecAwareSearchQueryElementFactory<?, ?, ?>) other;

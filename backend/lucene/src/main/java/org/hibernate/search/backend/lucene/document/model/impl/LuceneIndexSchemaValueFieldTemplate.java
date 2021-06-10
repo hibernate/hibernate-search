@@ -16,9 +16,9 @@ public class LuceneIndexSchemaValueFieldTemplate
 
 	private final LuceneIndexValueFieldType<?> type;
 
-	public LuceneIndexSchemaValueFieldTemplate(LuceneIndexCompositeNode declaringParent, IndexFieldInclusion inclusion,
-			SimpleGlobPattern absolutePathGlob, boolean multiValued,
-			LuceneIndexValueFieldType<?> type) {
+	public LuceneIndexSchemaValueFieldTemplate(LuceneIndexCompositeNode declaringParent,
+			SimpleGlobPattern absolutePathGlob, LuceneIndexValueFieldType<?> type, IndexFieldInclusion inclusion,
+			boolean multiValued) {
 		super( declaringParent, inclusion, absolutePathGlob, multiValued );
 		this.type = type;
 	}
@@ -26,6 +26,6 @@ public class LuceneIndexSchemaValueFieldTemplate
 	@Override
 	protected LuceneIndexValueField<?> createNode(LuceneIndexCompositeNode parent,
 			String relativePath, IndexFieldInclusion inclusion, boolean multiValued) {
-		return new LuceneIndexValueField<>( parent, relativePath, inclusion, multiValued, true, type );
+		return new LuceneIndexValueField<>( parent, relativePath, type, inclusion, multiValued, true );
 	}
 }

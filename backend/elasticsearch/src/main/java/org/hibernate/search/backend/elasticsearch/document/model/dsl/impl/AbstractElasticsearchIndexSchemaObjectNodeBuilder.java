@@ -7,18 +7,16 @@
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexField;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexCompositeNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexField;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
-import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchCompositeNodeSearchQueryElementFactory;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchNamedPredicate;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexCompositeNodeType;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
 import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -30,7 +28,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObj
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -38,10 +35,17 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	protected final ElasticsearchIndexCompositeNodeType.Builder typeBuilder;
+
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, ElasticsearchIndexSchemaNodeContributor> fields = new LinkedHashMap<>();
 	private final Map<String, ElasticsearchIndexSchemaNodeContributor> templates = new LinkedHashMap<>();
 	private final Map<String, ElasticsearchIndexSchemaNamedPredicateOptions> namedPredicates = new LinkedHashMap<>();
+
+	protected AbstractElasticsearchIndexSchemaObjectNodeBuilder(
+			ElasticsearchIndexCompositeNodeType.Builder typeBuilder) {
+		this.typeBuilder = typeBuilder;
+	}
 
 	@Override
 	public String toString() {
@@ -73,11 +77,15 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	}
 
 	@Override
-	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String relativeNamedPredicateName,
-			IndexFieldInclusion inclusion, NamedPredicateProvider provider) {
+	public IndexSchemaNamedPredicateOptionsStep addNamedPredicate(String name, IndexFieldInclusion inclusion,
+			NamedPredicateProvider provider) {
 		ElasticsearchIndexSchemaNamedPredicateOptions options = new ElasticsearchIndexSchemaNamedPredicateOptions(
 			inclusion, provider );
-		putNamedPredicate( relativeNamedPredicateName, options );
+		putNamedPredicate( name, options );
+		if ( IndexFieldInclusion.INCLUDED.equals( inclusion ) ) {
+			typeBuilder.queryElementFactory( PredicateTypeKeys.named( name ),
+					new ElasticsearchNamedPredicate.Factory( options.provider, name ) );
+		}
 		return options;
 	}
 
@@ -107,27 +115,9 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 		return templateBuilder;
 	}
 
-	final Map<SearchQueryElementTypeKey<?>, AbstractElasticsearchCompositeNodeSearchQueryElementFactory<?>>
-			buildQueryElementFactoryMap() {
-		if ( namedPredicates.isEmpty() ) {
-			return Collections.emptyMap();
-		}
-		Map<SearchQueryElementTypeKey<?>, AbstractElasticsearchCompositeNodeSearchQueryElementFactory<?>>
-				result = new HashMap<>();
-		for ( Map.Entry<String, ElasticsearchIndexSchemaNamedPredicateOptions> entry : namedPredicates.entrySet() ) {
-			ElasticsearchIndexSchemaNamedPredicateOptions options = entry.getValue();
-			if ( IndexFieldInclusion.EXCLUDED.equals( options.inclusion ) ) {
-				continue;
-			}
-			result.put( PredicateTypeKeys.named( entry.getKey() ),
-					new ElasticsearchNamedPredicate.Factory( options.provider, entry.getKey() ) );
-		}
-		return result;
-	}
-
 	final void contributeChildren(AbstractTypeMapping mapping, ElasticsearchIndexCompositeNode node,
 			ElasticsearchIndexSchemaNodeCollector collector,
-			Map<String, AbstractElasticsearchIndexField> staticChildrenByNameForParent) {
+			Map<String, ElasticsearchIndexField> staticChildrenByNameForParent) {
 		for ( Map.Entry<String, ElasticsearchIndexSchemaNodeContributor> entry : fields.entrySet() ) {
 			ElasticsearchIndexSchemaNodeContributor propertyContributor = entry.getValue();
 			propertyContributor.contribute( collector, node, staticChildrenByNameForParent, mapping );

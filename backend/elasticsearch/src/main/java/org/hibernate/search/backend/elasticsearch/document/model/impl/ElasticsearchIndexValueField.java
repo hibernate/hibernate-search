@@ -6,82 +6,44 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
-import java.util.List;
+import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractElasticsearchValueFieldSearchQueryElementFactory;
-import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexCompositeNodeContext;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
+import org.hibernate.search.engine.backend.document.model.spi.AbstractIndexValueField;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
-import org.hibernate.search.engine.backend.metamodel.IndexValueFieldDescriptor;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
+import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
+public final class ElasticsearchIndexValueField<F>
+		extends AbstractIndexValueField<
+		ElasticsearchIndexValueField<F>,
+						ElasticsearchSearchIndexScope,
+						ElasticsearchIndexValueFieldType<F>,
+		ElasticsearchIndexCompositeNode,
+						F
+				>
+		implements ElasticsearchIndexField, ElasticsearchSearchIndexValueFieldContext<F> {
 
-public class ElasticsearchIndexValueField<F> extends AbstractElasticsearchIndexField
-		implements IndexValueFieldDescriptor, ElasticsearchSearchIndexValueFieldContext<F> {
-
-	private final List<String> nestedPathHierarchy;
-
-	private final ElasticsearchIndexValueFieldType<F> type;
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public ElasticsearchIndexValueField(ElasticsearchIndexCompositeNode parent, String relativeFieldName,
-			IndexFieldInclusion inclusion, boolean multiValued, ElasticsearchIndexValueFieldType<F> type) {
-		super( parent, relativeFieldName, inclusion, multiValued );
-		this.nestedPathHierarchy = parent.nestedPathHierarchy();
-		this.type = type;
+			ElasticsearchIndexValueFieldType<F> type, IndexFieldInclusion inclusion, boolean multiValued) {
+		super( parent, relativeFieldName, type, inclusion, multiValued );
 	}
 
 	@Override
-	public boolean isComposite() {
-		return false;
-	}
-
-	@Override
-	public boolean isObjectField() {
-		return false;
-	}
-
-	@Override
-	public boolean isValueField() {
-		return true;
-	}
-
-	@Override
-	public ElasticsearchSearchIndexCompositeNodeContext toComposite() {
-		throw log.invalidIndexElementTypeValueFieldIsNotObjectField( absolutePath );
-	}
-
-	@Override
-	public ElasticsearchIndexObjectField toObjectField() {
-		throw log.invalidIndexElementTypeValueFieldIsNotObjectField( absolutePath );
-	}
-
-	@Override
-	public ElasticsearchIndexValueField<F> toValueField() {
+	protected ElasticsearchIndexValueField<F> self() {
 		return this;
 	}
 
 	@Override
-	public List<String> nestedPathHierarchy() {
-		return nestedPathHierarchy;
-	}
-
-	@Override
-	public ElasticsearchIndexValueFieldType<F> type() {
-		return type;
-	}
-
-	@Override
-	public <T> T queryElement(SearchQueryElementTypeKey<T> key, ElasticsearchSearchIndexScope scope) {
-		AbstractElasticsearchValueFieldSearchQueryElementFactory<T, F> factory = type().queryElementFactory( key );
-		if ( factory == null ) {
-			throw log.cannotUseQueryElementForIndexElement( eventContext(), key.toString(),
-					log.missingSupportHintForValueField( key.toString() ), eventContext() );
-		}
-		return factory.create( scope, this );
+	public ElasticsearchIndexObjectField toObjectField() {
+		return SearchIndexSchemaElementContextHelper.throwingToObjectField( this );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -91,14 +53,5 @@ public class ElasticsearchIndexValueField<F> extends AbstractElasticsearchIndexF
 					eventContext.append( EventContexts.fromIndexFieldAbsolutePath( absolutePath ) ) );
 		}
 		return (ElasticsearchIndexValueField<? super T>) this;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder( getClass().getSimpleName() ).append( "[" )
-				.append( "parent=" ).append( parent )
-				.append( ", type=" ).append( type )
-				.append( "]" );
-		return sb.toString();
 	}
 }

@@ -9,12 +9,12 @@ package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexCompositeNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexField;
 
 public interface LuceneIndexSchemaNodeContributor {
 
 	void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexCompositeNode parentNode,
-			Map<String, AbstractLuceneIndexField> staticChildrenByNameForParent);
+			Map<String, LuceneIndexField> staticChildrenByNameForParent);
 
 }

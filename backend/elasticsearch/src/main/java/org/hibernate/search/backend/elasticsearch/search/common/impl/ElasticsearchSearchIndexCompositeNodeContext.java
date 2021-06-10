@@ -6,20 +6,15 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.common.impl;
 
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
+import org.hibernate.search.engine.search.common.spi.SearchIndexCompositeNodeContext;
 
-/**
- * Information about a composite index element targeted by search; either the index root or an object field.
- * <p>
- * For now this is only used in predicates.
- */
-public interface ElasticsearchSearchIndexCompositeNodeContext extends ElasticsearchSearchIndexNodeContext {
+public interface ElasticsearchSearchIndexCompositeNodeContext
+		extends SearchIndexCompositeNodeContext<
+						ElasticsearchSearchIndexScope
+				>,
+				ElasticsearchSearchIndexNodeContext {
 
-	String absolutePath(String relativeFieldName);
-
-	boolean nested();
-
-	<T> ElasticsearchSearchQueryElementFactory<T, ElasticsearchSearchIndexCompositeNodeContext>
-			queryElementFactory(SearchQueryElementTypeKey<T> key);
+	@Override
+	ElasticsearchSearchIndexCompositeNodeTypeContext type();
 
 }

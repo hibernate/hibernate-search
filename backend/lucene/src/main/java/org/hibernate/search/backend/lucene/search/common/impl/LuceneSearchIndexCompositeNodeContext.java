@@ -8,22 +8,20 @@ package org.hibernate.search.backend.lucene.search.common.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
+import org.hibernate.search.engine.search.common.spi.SearchIndexCompositeNodeContext;
 
 /**
  * Information about a composite index element targeted by search; either the index root or an object field.
  * <p>
  * For now this is only used in predicates.
  */
-public interface LuceneSearchIndexCompositeNodeContext extends LuceneSearchIndexNodeContext {
+public interface LuceneSearchIndexCompositeNodeContext
+		extends SearchIndexCompositeNodeContext<LuceneSearchIndexScope>,
+				LuceneSearchIndexNodeContext {
 
-	String absolutePath(String relativeFieldName);
+	@Override
+	LuceneSearchIndexCompositeNodeTypeContext type();
 
 	Map<String, ? extends LuceneSearchIndexNodeContext> staticChildrenByName();
-
-	boolean nested();
-
-	<T> LuceneSearchQueryElementFactory<T, LuceneSearchIndexCompositeNodeContext> queryElementFactory(
-			SearchQueryElementTypeKey<T> key);
 
 }

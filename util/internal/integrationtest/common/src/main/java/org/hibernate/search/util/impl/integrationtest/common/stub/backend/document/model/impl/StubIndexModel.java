@@ -14,11 +14,11 @@ public class StubIndexModel {
 
 	private final String hibernateSearchIndexName;
 	private final DocumentIdentifierValueConverter<?> idDslConverter;
-	private final StubIndexNode root;
-	private final Map<String, StubIndexNode> fields;
+	private final StubIndexRoot root;
+	private final Map<String, StubIndexField> fields;
 
 	public StubIndexModel(String hibernateSearchIndexName, DocumentIdentifierValueConverter<?> idDslConverter,
-			StubIndexNode root, Map<String, StubIndexNode> fields) {
+			StubIndexRoot root, Map<String, StubIndexField> fields) {
 		this.hibernateSearchIndexName = hibernateSearchIndexName;
 		this.idDslConverter = idDslConverter;
 		this.root = root;
@@ -33,11 +33,11 @@ public class StubIndexModel {
 		return idDslConverter;
 	}
 
-	public StubIndexNode root() {
+	public StubIndexRoot root() {
 		return root;
 	}
 
-	public StubIndexNode fieldOrNull(String name) {
+	public StubIndexField fieldOrNull(String name) {
 		return fields.get( name );
 	}
 }

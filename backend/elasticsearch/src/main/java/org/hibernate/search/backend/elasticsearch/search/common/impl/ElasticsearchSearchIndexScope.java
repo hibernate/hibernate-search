@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.search.common.impl;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
@@ -17,12 +16,13 @@ import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFie
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-public interface ElasticsearchSearchIndexScope {
+public interface ElasticsearchSearchIndexScope extends SearchIndexScope<ElasticsearchSearchIndexScope> {
 
 	ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext();
 
@@ -40,14 +40,14 @@ public interface ElasticsearchSearchIndexScope {
 
 	Collection<ElasticsearchSearchIndexContext> indexes();
 
-	Set<String> hibernateSearchIndexNames();
-
 	Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex();
 
 	DocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
 
+	@Override
 	ElasticsearchSearchIndexCompositeNodeContext root();
 
+	@Override
 	ElasticsearchSearchIndexNodeContext field(String absoluteFieldPath);
 
 	int maxResultWindow();

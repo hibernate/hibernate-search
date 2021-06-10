@@ -21,11 +21,13 @@ import org.hibernate.search.engine.environment.classpath.spi.ClassLoadingExcepti
 import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.DurationInSecondsAndFractionsFormatter;
+import org.hibernate.search.util.common.logging.impl.EventContextNoPrefixFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.SimpleNameClassFormatter;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -416,4 +418,68 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 97, value = "Different mappings trying to define default backends " +
 			"having different expectations on multi-tenancy.")
 	SearchException differentMultiTenancyDefaultBackend();
+
+	@Message(id = ID_OFFSET + 98,
+			value = "Invalid type: %1$s is not composite.")
+	SearchException invalidIndexNodeTypeNotComposite(
+			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext);
+
+	@Message(id = ID_OFFSET + 99,
+			value = "Invalid type: %1$s is not an object field.")
+	SearchException invalidIndexNodeTypeNotObjectField(
+			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext);
+
+	@Message(id = ID_OFFSET + 100,
+			value = "Invalid type: %1$s is not a value field.")
+	SearchException invalidIndexNodeTypeNotValueField(
+			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext);
+
+	@Message(id = ID_OFFSET + 101,
+			value = "Inconsistent configuration for %1$s in a search query across multiple indexes: %2$s")
+	SearchException inconsistentConfigurationForIndexNodeForSearch(
+			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext, String causeMessage,
+			@Param EventContext elementContextAsParam, @Cause SearchException cause);
+
+	@Message(id = ID_OFFSET + 102,
+			value = "Inconsistent support for '%1$s': %2$s")
+	SearchException inconsistentSupportForQueryElement(SearchQueryElementTypeKey<?> key,
+			String causeMessage, @Cause SearchException cause);
+
+	@Message(id = ID_OFFSET + 103,
+			value = "Attribute '%1$s' differs: '%2$s' vs. '%3$s'.")
+	SearchException differentIndexNodeAttribute(String attributeName, Object component1, Object component2);
+
+	@Message(id = ID_OFFSET + 104, value = "Cannot use '%2$s' on %1$s. %3$s" )
+	SearchException cannotUseQueryElementForIndexNode(
+			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext,
+			SearchQueryElementTypeKey<?> key, String hint, @Param EventContext context);
+
+	@Message(value = "Make sure the field is marked as searchable/sortable/projectable/aggregable (whichever is relevant)."
+			+ " If it already is, then '%1$s' is not available for fields of this type.")
+	String missingSupportHintForValueField(SearchQueryElementTypeKey<?> key);
+
+	@Message(value = "If you are trying to use the 'nested' predicate, set the field structure to 'NESTED' and reindex all your data."
+			+ " If you are trying to use another predicate, it probably isn't available for this field")
+	String missingSupportHintForCompositNode();
+
+	@Message(id = ID_OFFSET + 105, value = "Cannot use '%2$s' on %1$s: %3$s")
+	SearchException cannotUseQueryElementForIndexElementBecauseCreationException(
+			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext,
+			SearchQueryElementTypeKey<?> key, String causeMessage, @Cause SearchException cause,
+			@Param EventContext elementContextAsParam);
+
+	@Message(id = ID_OFFSET + 106,
+			value = "'%1$s' can be used in some of the targeted indexes, but not all of them. %2$s")
+	SearchException partialSupportForQueryElement(SearchQueryElementTypeKey<?> key, String hint);
+
+	@Message(value = "Make sure the field is marked as searchable/sortable/projectable/aggregable"
+			+ " (whichever is relevant) in all indexes,"
+			+ " and that the field has the same type in all indexes.")
+	String partialSupportHintForValueField();
+
+	@Message(value = "If you are trying to use the 'nested' predicate,"
+			+ " set the field structure is to 'NESTED' in all indexes, then reindex all your data.")
+	String partialSupportHintForCompositeNode();
+
+
 }

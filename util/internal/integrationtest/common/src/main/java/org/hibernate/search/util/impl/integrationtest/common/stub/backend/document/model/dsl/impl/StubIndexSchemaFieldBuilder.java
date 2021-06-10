@@ -8,10 +8,11 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.docum
 
 import java.util.function.BiConsumer;
 
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexCompositeNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexField;
 
 interface StubIndexSchemaFieldBuilder {
 
-	StubIndexNode build(BiConsumer<String, StubIndexNode> fieldCollector);
+	StubIndexField build(StubIndexCompositeNode parent, BiConsumer<String, StubIndexField> fieldCollector);
 
 }

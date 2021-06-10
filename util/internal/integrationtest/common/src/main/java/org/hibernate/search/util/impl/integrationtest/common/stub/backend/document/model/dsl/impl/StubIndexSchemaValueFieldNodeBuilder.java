@@ -13,21 +13,25 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOp
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubIndexFieldReference;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexCompositeNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexField;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexValueField;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.impl.StubIndexValueFieldType;
 
 class StubIndexSchemaValueFieldNodeBuilder<F>
 		implements IndexSchemaFieldOptionsStep<StubIndexSchemaValueFieldNodeBuilder<F>, IndexFieldReference<F>>,
-		StubIndexSchemaFieldBuilder {
+				StubIndexSchemaFieldBuilder {
 
 	private final StubIndexSchemaDataNode.Builder schemaDataNodeBuilder;
 	private final IndexFieldInclusion inclusion;
-	private final StubIndexValueFieldType<?> type;
+	private final StubIndexValueFieldType<F> type;
+
+	private boolean multiValued;
 
 	private IndexFieldReference<F> reference;
 
 	StubIndexSchemaValueFieldNodeBuilder(StubIndexSchemaDataNode.Builder schemaDataNodeBuilder, IndexFieldInclusion inclusion,
-			StubIndexValueFieldType<?> type) {
+			StubIndexValueFieldType<F> type) {
 		this.schemaDataNodeBuilder = schemaDataNodeBuilder;
 		this.inclusion = inclusion;
 		this.type = type;
@@ -35,6 +39,7 @@ class StubIndexSchemaValueFieldNodeBuilder<F>
 
 	@Override
 	public StubIndexSchemaValueFieldNodeBuilder<F> multiValued() {
+		this.multiValued = true;
 		schemaDataNodeBuilder.multiValued( true );
 		return this;
 	}
@@ -50,7 +55,8 @@ class StubIndexSchemaValueFieldNodeBuilder<F>
 	}
 
 	@Override
-	public StubIndexNode build(BiConsumer<String, StubIndexNode> fieldCollector) {
-		return new StubIndexNode( schemaDataNodeBuilder.build(), type, null );
+	public StubIndexField build(StubIndexCompositeNode parent, BiConsumer<String, StubIndexField> fieldCollector) {
+		return new StubIndexValueField<>( parent, schemaDataNodeBuilder.getRelativeName(), type, inclusion, multiValued,
+				schemaDataNodeBuilder.build() );
 	}
 }

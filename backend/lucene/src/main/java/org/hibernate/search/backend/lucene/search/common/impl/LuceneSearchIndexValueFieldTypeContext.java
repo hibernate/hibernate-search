@@ -6,51 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.search.common.impl;
 
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.spi.SearchIndexValueFieldTypeContext;
 
 import org.apache.lucene.analysis.Analyzer;
 
-/**
- * Information about the type of a value (non-object) field targeted by search,
- * be it in a projection, a predicate, a sort, ...
- *
- * @param <F> The indexed field value type.
- */
-public interface LuceneSearchIndexValueFieldTypeContext<F> {
-
-	DslConverter<?, F> dslConverter();
-
-	DslConverter<F, F> rawDslConverter();
-
-	default DslConverter<?, F> dslConverter(ValueConvert convert) {
-		switch ( convert ) {
-			case NO:
-				return rawDslConverter();
-			case YES:
-			default:
-				return dslConverter();
-		}
-	}
-
-	ProjectionConverter<F, ?> projectionConverter();
-
-	ProjectionConverter<F, F> rawProjectionConverter();
-
-	default ProjectionConverter<F, ?> projectionConverter(ValueConvert convert) {
-		switch ( convert ) {
-			case NO:
-				return rawProjectionConverter();
-			case YES:
-			default:
-				return projectionConverter();
-		}
-	}
-
-	<T> LuceneSearchQueryElementFactory<T, LuceneSearchIndexValueFieldContext<F>>
-			queryElementFactory(SearchQueryElementTypeKey<T> key);
+public interface LuceneSearchIndexValueFieldTypeContext<F>
+		extends SearchIndexValueFieldTypeContext<LuceneSearchIndexScope, LuceneSearchIndexValueFieldContext<F>, F> {
 
 	Analyzer searchAnalyzerOrNormalizer();
 

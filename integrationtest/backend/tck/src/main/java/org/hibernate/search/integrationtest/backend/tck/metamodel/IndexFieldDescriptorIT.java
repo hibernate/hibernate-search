@@ -92,7 +92,7 @@ public class IndexFieldDescriptorIT {
 		assertThatThrownBy( fieldDescriptor::toObjectField )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Invalid type: '" + getAbsoluteFieldPath() + "' is a value field, not an object field"
+						"Invalid type: field '" + getAbsoluteFieldPath() + "' is not an object field"
 				);
 
 		assertThat( fieldDescriptor )
@@ -124,7 +124,7 @@ public class IndexFieldDescriptorIT {
 			assertThatThrownBy( elementDescriptor::toObjectField )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining(
-							"Invalid type: the index root is not an object field"
+							"Invalid type: index schema root is not an object field"
 					);
 			assertThat( elementDescriptor ).isSameAs( indexDescriptor.root() );
 			assertThat( elementDescriptor.staticChildren() )
@@ -149,7 +149,7 @@ public class IndexFieldDescriptorIT {
 		assertThatThrownBy( fieldDescriptor::toValueField )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Invalid type: '" + getParentAbsoluteFieldPath() + "' is an object field, not a value field"
+						"Invalid type: field '" + getParentAbsoluteFieldPath() + "' is not a value field"
 				);
 
 		// Basic getters

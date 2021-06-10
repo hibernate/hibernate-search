@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import java.util.Collections;
 
-import org.hibernate.search.engine.backend.types.ObjectStructure;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexCompositeNodeType;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
@@ -16,21 +16,19 @@ import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 public class ElasticsearchIndexSchemaObjectFieldTemplate
 		extends AbstractElasticsearchIndexSchemaFieldTemplate<ElasticsearchIndexObjectField> {
 
-	private final ObjectStructure structure;
+	private final ElasticsearchIndexCompositeNodeType type;
 
 	public ElasticsearchIndexSchemaObjectFieldTemplate(ElasticsearchIndexCompositeNode declaringParent,
-			SimpleGlobPattern absolutePathGlob, IndexFieldInclusion inclusion,
-			boolean multiValued, ObjectStructure structure) {
+			SimpleGlobPattern absolutePathGlob, ElasticsearchIndexCompositeNodeType type,
+			IndexFieldInclusion inclusion, boolean multiValued) {
 		super( declaringParent, absolutePathGlob, inclusion, multiValued );
-		this.structure = structure;
+		this.type = type;
 	}
 
 	@Override
 	protected ElasticsearchIndexObjectField createNode(ElasticsearchIndexCompositeNode parent,
 			String relativePath, IndexFieldInclusion inclusion, boolean multiValued) {
-		return new ElasticsearchIndexObjectField(
-				parent, relativePath, inclusion, structure, multiValued,
-				Collections.emptyMap(), Collections.emptyMap()
-		);
+		return new ElasticsearchIndexObjectField( parent, relativePath, type, inclusion, multiValued,
+				Collections.emptyMap() );
 	}
 }

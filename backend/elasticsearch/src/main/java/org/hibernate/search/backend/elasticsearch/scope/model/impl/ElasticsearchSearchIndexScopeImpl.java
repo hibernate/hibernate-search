@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexField;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexField;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
@@ -221,10 +221,10 @@ public final class ElasticsearchSearchIndexScopeImpl implements ElasticsearchSea
 	private ElasticsearchSearchIndexNodeContext createMultiIndexFieldContext(String absoluteFieldPath) {
 		List<ElasticsearchSearchIndexNodeContext> fieldForEachIndex = new ArrayList<>();
 		ElasticsearchSearchIndexContext indexModelOfFirstField = null;
-		AbstractElasticsearchIndexField firstField = null;
+		ElasticsearchIndexField firstField = null;
 
 		for ( ElasticsearchIndexModel indexModel : indexModels ) {
-			AbstractElasticsearchIndexField fieldForCurrentIndex =
+			ElasticsearchIndexField fieldForCurrentIndex =
 					indexModel.fieldOrNull( absoluteFieldPath );
 			if ( fieldForCurrentIndex == null ) {
 				continue;

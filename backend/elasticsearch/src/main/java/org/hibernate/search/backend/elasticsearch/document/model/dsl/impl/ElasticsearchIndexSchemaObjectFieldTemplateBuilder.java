@@ -13,6 +13,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Dy
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.NamedDynamicTemplate;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexCompositeNodeType;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
@@ -22,12 +23,12 @@ class ElasticsearchIndexSchemaObjectFieldTemplateBuilder
 				ElasticsearchIndexSchemaObjectFieldTemplateBuilder, ElasticsearchIndexSchemaObjectFieldTemplate
 		> {
 
-	private final ObjectStructure structure;
+	protected final ElasticsearchIndexCompositeNodeType.Builder typeBuilder;
 
 	ElasticsearchIndexSchemaObjectFieldTemplateBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
 			String templateName, IndexFieldInclusion inclusion, ObjectStructure structure, String prefix) {
 		super( parent, templateName, inclusion, prefix );
-		this.structure = structure;
+		this.typeBuilder = new ElasticsearchIndexCompositeNodeType.Builder( structure );
 	}
 
 	@Override
@@ -39,12 +40,11 @@ class ElasticsearchIndexSchemaObjectFieldTemplateBuilder
 	protected void doContribute(ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexCompositeNode parentNode, IndexFieldInclusion inclusion,
 			SimpleGlobPattern absolutePathGlob, boolean multiValued) {
+		ElasticsearchIndexCompositeNodeType type = typeBuilder.build();
 		ElasticsearchIndexSchemaObjectFieldTemplate fieldTemplate = new ElasticsearchIndexSchemaObjectFieldTemplate(
-				parentNode, absolutePathGlob, inclusion, multiValued, structure
-		);
+				parentNode, absolutePathGlob, type, inclusion, multiValued );
 
-		PropertyMapping mapping =
-				ElasticsearchIndexSchemaObjectFieldNodeBuilder.createPropertyMapping( structure, DynamicType.TRUE );
+		PropertyMapping mapping = type.createMapping( DynamicType.TRUE );
 
 		collector.collect( fieldTemplate );
 

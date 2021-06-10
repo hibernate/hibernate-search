@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusio
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 
-public abstract class AbstractLuceneIndexSchemaFieldTemplate<N extends AbstractLuceneIndexField> {
+public abstract class AbstractLuceneIndexSchemaFieldTemplate<N extends LuceneIndexField> {
 
 	private final IndexFieldInclusion inclusion;
 

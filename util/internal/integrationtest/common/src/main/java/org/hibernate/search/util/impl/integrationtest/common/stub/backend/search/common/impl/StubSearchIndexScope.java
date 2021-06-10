@@ -14,10 +14,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexField;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexNode;
 
-public class StubSearchIndexScope {
+public class StubSearchIndexScope implements SearchIndexScope<StubSearchIndexScope> {
 	private final Set<String> indexNames;
 	private final Set<StubIndexModel> indexModels;
 
@@ -28,6 +30,7 @@ public class StubSearchIndexScope {
 		this.indexModels = indexModels;
 	}
 
+	@Override
 	public Set<String> hibernateSearchIndexNames() {
 		return indexNames;
 	}
@@ -44,17 +47,46 @@ public class StubSearchIndexScope {
 		return null;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
+	public StubSearchIndexCompositeNodeContext root() {
+		if ( indexModels.size() == 1 ) {
+			return indexModels.iterator().next().root();
+		}
+		else {
+			List<StubSearchIndexNodeContext> fieldForEachIndex = new ArrayList<>();
+			for ( StubIndexModel model : indexModels ) {
+				fieldForEachIndex.add( model.root() );
+			}
+			return new StubMultiIndexSearchIndexCompositeNodeContext( this, null, (List) fieldForEachIndex );
+		}
+	}
+
+	@Override
 	public StubSearchIndexNodeContext field(String absoluteFieldPath) {
+		StubSearchIndexNodeContext resultOrNull;
+		if ( indexModels.size() == 1 ) {
+			resultOrNull = indexModels.iterator().next().fieldOrNull( absoluteFieldPath );
+		}
+		else {
+			resultOrNull = createMultiIndexFieldContext( absoluteFieldPath );
+		}
+		if ( resultOrNull == null ) {
+			throw new SearchException( "Unknown field: " + absoluteFieldPath );
+		}
+		return resultOrNull;
+	}
+
+	@SuppressWarnings("unchecked")
+	private StubSearchIndexNodeContext createMultiIndexFieldContext(String absoluteFieldPath) {
 		List<StubSearchIndexNodeContext> fieldForEachIndex = new ArrayList<>();
 		StubSearchIndexNodeContext firstField = null;
 
 		for ( StubIndexModel model : indexModels ) {
-			StubIndexNode nodeForCurrentIndex = model.fieldOrNull( absoluteFieldPath );
-			if ( nodeForCurrentIndex == null ) {
+			StubIndexField fieldForCurrentIndex = model.fieldOrNull( absoluteFieldPath );
+			if ( fieldForCurrentIndex == null ) {
 				continue;
 			}
-			StubSearchIndexNodeContext fieldForCurrentIndex = nodeForCurrentIndex.toSearchContext();
 			if ( firstField == null ) {
 				firstField = fieldForCurrentIndex;
 			}

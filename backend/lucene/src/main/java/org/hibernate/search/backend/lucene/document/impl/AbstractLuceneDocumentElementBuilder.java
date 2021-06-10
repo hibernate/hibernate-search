@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexField;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectField;
@@ -77,7 +77,7 @@ abstract class AbstractLuceneDocumentElementBuilder implements DocumentElement {
 	@Override
 	public void addValue(String relativeFieldName, Object value) {
 		String absoluteFieldPath = schemaNode.absolutePath( relativeFieldName );
-		AbstractLuceneIndexField node = model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
+		LuceneIndexField node = model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( node == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
@@ -89,7 +89,7 @@ abstract class AbstractLuceneDocumentElementBuilder implements DocumentElement {
 	@Override
 	public DocumentElement addObject(String relativeFieldName) {
 		String absoluteFieldPath = schemaNode.absolutePath( relativeFieldName );
-		AbstractLuceneIndexField fieldSchemaNode = model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
+		LuceneIndexField fieldSchemaNode = model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
@@ -101,7 +101,7 @@ abstract class AbstractLuceneDocumentElementBuilder implements DocumentElement {
 	@Override
 	public void addNullObject(String relativeFieldName) {
 		String absoluteFieldPath = schemaNode.absolutePath( relativeFieldName );
-		AbstractLuceneIndexField fieldSchemaNode = model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
+		LuceneIndexField fieldSchemaNode = model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
 			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
@@ -199,17 +199,17 @@ abstract class AbstractLuceneDocumentElementBuilder implements DocumentElement {
 			return NoOpDocumentElement.get();
 		}
 
-		switch ( node.structure() ) {
-			case NESTED:
-				LuceneNestedObjectFieldBuilder nestedDocumentBuilder =
-						new LuceneNestedObjectFieldBuilder( model, node, this );
-				addNestedObjectDocumentBuilder( nestedDocumentBuilder );
-				return nestedDocumentBuilder;
-			default:
-				LuceneFlattenedObjectFieldBuilder flattenedDocumentBuilder =
-						new LuceneFlattenedObjectFieldBuilder( model, node, this, documentContent );
-				addFlattenedObjectDocumentBuilder( flattenedDocumentBuilder );
-				return flattenedDocumentBuilder;
+		if ( node.type().nested() ) {
+			LuceneNestedObjectFieldBuilder nestedDocumentBuilder =
+					new LuceneNestedObjectFieldBuilder( model, node, this );
+			addNestedObjectDocumentBuilder( nestedDocumentBuilder );
+			return nestedDocumentBuilder;
+		}
+		else {
+			LuceneFlattenedObjectFieldBuilder flattenedDocumentBuilder =
+					new LuceneFlattenedObjectFieldBuilder( model, node, this, documentContent );
+			addFlattenedObjectDocumentBuilder( flattenedDocumentBuilder );
+			return flattenedDocumentBuilder;
 		}
 	}
 

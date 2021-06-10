@@ -41,9 +41,9 @@ abstract class AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<
 				buildContext.getDefaultFieldFormatProvider();
 
 		// TODO HSEARCH-2354 add method to allow customization of the format and formatter
-		builder.mapping().setFormat( defaultFieldFormatProvider.getDefaultMappingFormat( builder.valueType() ) );
+		builder.mapping().setFormat( defaultFieldFormatProvider.getDefaultMappingFormat( builder.valueClass() ) );
 
-		DateTimeFormatter formatter = defaultFieldFormatProvider.getDefaultDateTimeFormatter( builder.valueType() );
+		DateTimeFormatter formatter = defaultFieldFormatProvider.getDefaultDateTimeFormatter( builder.valueClass() );
 
 		ElasticsearchFieldCodec<F> codec = createCodec( formatter );
 		builder.codec( codec );

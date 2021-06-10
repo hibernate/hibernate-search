@@ -6,18 +6,12 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl;
 
-import org.hibernate.search.engine.backend.common.spi.FieldPaths;
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
+import org.hibernate.search.engine.search.common.spi.SearchIndexCompositeNodeContext;
 
-public interface StubSearchIndexCompositeNodeContext extends StubSearchIndexNodeContext {
+public interface StubSearchIndexCompositeNodeContext
+		extends SearchIndexCompositeNodeContext<StubSearchIndexScope>, StubSearchIndexNodeContext {
 
-	default String absolutePath(String relativeFieldName) {
-		return FieldPaths.compose( absolutePath(), relativeFieldName );
-	}
-
-	boolean nested();
-
-	<T> AbstractStubSearchQueryElementFactory<T>
-			queryElementFactory(SearchQueryElementTypeKey<T> key);
+	@Override
+	StubSearchIndexCompositeNodeTypeContext type();
 
 }

@@ -6,18 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.search.common.impl;
 
-/**
- * Information about a value (non-object) field targeted by search,
- * be it in a projection, a predicate, a sort, ...
- *
- * @param <F> The indexed field value type.
- */
-public interface LuceneSearchIndexValueFieldContext<F> extends LuceneSearchIndexNodeContext {
+import org.hibernate.search.engine.search.common.spi.SearchIndexValueFieldContext;
 
-	String nestedDocumentPath();
+public interface LuceneSearchIndexValueFieldContext<F>
+		extends SearchIndexValueFieldContext<LuceneSearchIndexScope>, LuceneSearchIndexNodeContext {
 
-	boolean multiValuedInRoot();
-
+	@Override
 	LuceneSearchIndexValueFieldTypeContext<F> type();
 
 }

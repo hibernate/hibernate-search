@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneIndexField;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
@@ -190,11 +190,11 @@ public final class LuceneSearchIndexScopeImpl implements LuceneSearchIndexScope 
 	private LuceneSearchIndexNodeContext createMultiIndexFieldContext(String absoluteFieldPath) {
 		List<LuceneSearchIndexNodeContext> fieldForEachIndex = new ArrayList<>();
 		LuceneScopeIndexManagerContext indexOfFirstField = null;
-		AbstractLuceneIndexField firstField = null;
+		LuceneIndexField firstField = null;
 
 		for ( LuceneScopeIndexManagerContext index : indexes() ) {
 			LuceneIndexModel indexModel = index.model();
-			AbstractLuceneIndexField fieldForCurrentIndex = indexModel.fieldOrNull( absoluteFieldPath );
+			LuceneIndexField fieldForCurrentIndex = indexModel.fieldOrNull( absoluteFieldPath );
 			if ( fieldForCurrentIndex == null ) {
 				continue;
 			}

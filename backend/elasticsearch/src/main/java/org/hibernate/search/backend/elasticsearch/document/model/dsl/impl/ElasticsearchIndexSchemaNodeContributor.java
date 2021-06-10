@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.AbstractElasticsearchIndexField;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexField;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexCompositeNode;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
 
@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Ab
 public interface ElasticsearchIndexSchemaNodeContributor {
 
 	void contribute(ElasticsearchIndexSchemaNodeCollector collector, ElasticsearchIndexCompositeNode parentNode,
-			Map<String, AbstractElasticsearchIndexField> staticChildrenByNameForParent,
+			Map<String, ElasticsearchIndexField> staticChildrenByNameForParent,
 			AbstractTypeMapping parentMapping);
 
 }

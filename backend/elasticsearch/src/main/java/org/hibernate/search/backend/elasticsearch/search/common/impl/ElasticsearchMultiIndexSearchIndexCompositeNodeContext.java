@@ -6,23 +6,23 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.common.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.engine.backend.common.spi.FieldPaths;
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.engine.search.common.spi.AbstractMultiIndexSearchIndexCompositeNodeContext;
 
 public final class ElasticsearchMultiIndexSearchIndexCompositeNodeContext
-		extends AbstractElasticsearchMultiIndexSearchIndexNodeContext<ElasticsearchSearchIndexCompositeNodeContext>
-		implements ElasticsearchSearchIndexCompositeNodeContext {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+		extends AbstractMultiIndexSearchIndexCompositeNodeContext<
+						ElasticsearchSearchIndexCompositeNodeContext,
+						ElasticsearchSearchIndexScope,
+						ElasticsearchSearchIndexCompositeNodeTypeContext
+				>
+		implements ElasticsearchSearchIndexCompositeNodeContext,
+		ElasticsearchSearchIndexCompositeNodeTypeContext {
 
 	public ElasticsearchMultiIndexSearchIndexCompositeNodeContext(ElasticsearchSearchIndexScope scope,
 			String absolutePath,
-			List<ElasticsearchSearchIndexCompositeNodeContext> elementForEachIndex) {
-		super( scope, absolutePath, elementForEachIndex );
+			List<? extends ElasticsearchSearchIndexCompositeNodeContext> nodeForEachIndex) {
+		super( scope, absolutePath, nodeForEachIndex );
 	}
 
 	@Override
@@ -31,39 +31,14 @@ public final class ElasticsearchMultiIndexSearchIndexCompositeNodeContext
 	}
 
 	@Override
-	public boolean isComposite() {
-		return true;
-	}
-
-	@Override
-	public ElasticsearchSearchIndexCompositeNodeContext toComposite() {
+	protected ElasticsearchSearchIndexCompositeNodeTypeContext selfAsNodeType() {
 		return this;
 	}
 
 	@Override
-	public String absolutePath(String relativeFieldName) {
-		return FieldPaths.compose( absolutePath, relativeFieldName );
-	}
-
-	@Override
-	public boolean nested() {
-		return getFromElementIfCompatible( ElasticsearchSearchIndexCompositeNodeContext::nested, Object::equals, "nested" );
-	}
-
-	@Override
-	protected String missingSupportHint(String queryElementName) {
-		return log.missingSupportHintForCompositeIndexElement();
-	}
-
-	@Override
-	protected String partialSupportHint() {
-		return log.partialSupportHintForCompositeIndexElement();
-	}
-
-	@Override
-	protected <T> ElasticsearchSearchQueryElementFactory<T, ElasticsearchSearchIndexCompositeNodeContext> queryElementFactory(
-			ElasticsearchSearchIndexCompositeNodeContext indexElement, SearchQueryElementTypeKey<T> key) {
-		return indexElement.queryElementFactory( key );
+	protected ElasticsearchSearchIndexCompositeNodeTypeContext typeOf(
+			ElasticsearchSearchIndexCompositeNodeContext indexElement) {
+		return indexElement.type();
 	}
 
 }

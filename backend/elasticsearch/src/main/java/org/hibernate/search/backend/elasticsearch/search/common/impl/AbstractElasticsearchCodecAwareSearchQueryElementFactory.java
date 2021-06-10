@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public abstract class AbstractElasticsearchCodecAwareSearchQueryElementFactory<T, F>
@@ -24,7 +25,7 @@ public abstract class AbstractElasticsearchCodecAwareSearchQueryElementFactory<T
 	}
 
 	@Override
-	public void checkCompatibleWith(ElasticsearchSearchQueryElementFactory<?, ?> other) {
+	public void checkCompatibleWith(SearchQueryElementFactory<?, ?, ?> other) {
 		super.checkCompatibleWith( other );
 		AbstractElasticsearchCodecAwareSearchQueryElementFactory<?, ?> castedOther =
 				(AbstractElasticsearchCodecAwareSearchQueryElementFactory<?, ?>) other;

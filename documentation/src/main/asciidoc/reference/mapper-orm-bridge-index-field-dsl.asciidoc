@@ -8,9 +8,9 @@ or <<mapper-orm-bridge-typebridge,`TypeBinder`>>,
 it is necessary to declare the index fields that the bridge will contribute to.
 This declaration is performed using a dedicated DSL.
 
-The entry point to this DSL is the `IndexSchemaElement`,
+The entry point to this DSL is the `IndexNode`,
 which represents the part of the document structure that the binder will push data to.
-From the `IndexSchemaElement`, it is possible to declare fields.
+From the `IndexNode`, it is possible to declare fields.
 
 The declaration of each field yields a field _reference_.
 This reference is to be stored in the bridge,
@@ -26,7 +26,7 @@ and then write to that field in a property bridge.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/document/model/dsl/simple/ISBNBinder.java[tags=bind]
 ----
-<1> Get the `IndexSchemaElement`, the entry point to the index field declaration DSL.
+<1> Get the `IndexNode`, the entry point to the index field declaration DSL.
 <2> Declare a field.
 <3> Pass the name of the field.
 <4> Declare the type of the field.
@@ -185,7 +185,7 @@ but omits the field names.
 
 A field template is always declared in a binder: either in a <<mapper-orm-bridge-typebridge,type binder>>
 or in a <<mapper-orm-bridge-propertybridge,property binder>>.
-As for static fields, the entry point to declaring a template is the `IndexSchemaElement`
+As for static fields, the entry point to declaring a template is the `IndexNode`
 passed to the binder's `bind(...)` method
 A call to the `fieldTemplate` method on the schema element will declare a field template.
 

@@ -7,92 +7,35 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
+import org.hibernate.search.engine.search.common.spi.AbstractMultiIndexSearchIndexValueFieldContext;
 
 public class StubMultiIndexSearchIndexValueFieldContext<F>
-		extends AbstractStubMultiIndexSearchIndexNodeContext<StubSearchIndexValueFieldContext<F>>
-		implements StubSearchIndexValueFieldContext<F>, StubSearchValueFieldTypeContext<F> {
+		extends AbstractMultiIndexSearchIndexValueFieldContext<
+						StubSearchIndexValueFieldContext<F>,
+						StubSearchIndexScope,
+						StubSearchIndexValueFieldTypeContext<F>,
+						F
+				>
+		implements StubSearchIndexValueFieldContext<F>, StubSearchIndexValueFieldTypeContext<F> {
 
 	public StubMultiIndexSearchIndexValueFieldContext(StubSearchIndexScope scope, String absolutePath,
-			List<StubSearchIndexValueFieldContext<F>> elementForEachIndex) {
-		super( scope, absolutePath, elementForEachIndex );
+			List<? extends StubSearchIndexValueFieldContext<F>> fieldForEachIndex) {
+		super( scope, absolutePath, fieldForEachIndex );
 	}
 
 	@Override
-	public boolean isValueField() {
-		return true;
-	}
-
-	@Override
-	public StubSearchIndexValueFieldContext<?> toValueField() {
+	protected StubSearchIndexValueFieldContext<F> self() {
 		return this;
 	}
 
 	@Override
-	public StubSearchValueFieldTypeContext<F> type() {
+	protected StubSearchIndexValueFieldTypeContext<F> selfAsNodeType() {
 		return this;
 	}
 
 	@Override
-	public <T> T queryElement(SearchQueryElementTypeKey<T> key, StubSearchIndexScope scope) {
-		return queryElementFactory( key ).create( scope, this );
-	}
-
-	@Override
-	protected <T> AbstractStubSearchQueryElementFactory<T> queryElementFactory(
-			StubSearchIndexValueFieldContext<F> indexElement, SearchQueryElementTypeKey<T> key) {
-		return indexElement.type().queryElementFactory( key );
-	}
-
-	@Override
-	public Class<F> valueClass() {
-		return getFromTypeIfCompatible( StubSearchValueFieldTypeContext::valueClass, Objects::equals,
-				"valueClass" );
-	}
-
-	@Override
-	public DslConverter<?, F> dslConverter() {
-		return getFromTypeIfCompatible( StubSearchValueFieldTypeContext::dslConverter, DslConverter::isCompatibleWith,
-				"dslConverter" );
-	}
-
-	@Override
-	public DslConverter<F, F> rawDslConverter() {
-		return getFromTypeIfCompatible( StubSearchValueFieldTypeContext::rawDslConverter, DslConverter::isCompatibleWith,
-				"rawDslConverter" );
-	}
-
-	@Override
-	public ProjectionConverter<F, ?> projectionConverter() {
-		return getFromTypeIfCompatible( StubSearchValueFieldTypeContext::projectionConverter,
-				ProjectionConverter::isCompatibleWith, "projectionConverter" );
-	}
-
-	@Override
-	public ProjectionConverter<F, F> rawProjectionConverter() {
-		return getFromTypeIfCompatible( StubSearchValueFieldTypeContext::rawProjectionConverter,
-				ProjectionConverter::isCompatibleWith, "rawProjectionConverter" );
-	}
-
-	private <T> T getFromTypeIfCompatible(Function<StubSearchValueFieldTypeContext<F>, T> getter,
-			BiPredicate<T, T> compatiblityChecker, String attributeName) {
-		T attribute = null;
-		for ( StubSearchIndexValueFieldContext<F> indexElement : elementForEachIndex ) {
-			StubSearchValueFieldTypeContext<F> fieldType = indexElement.type();
-			T attributeForIndexElement = getter.apply( fieldType );
-			if ( attribute == null ) {
-				attribute = attributeForIndexElement;
-			}
-			else {
-				checkAttributeCompatibility( compatiblityChecker, attributeName, attribute, attributeForIndexElement );
-			}
-		}
-		return attribute;
+	protected StubSearchIndexValueFieldTypeContext<F> typeOf(StubSearchIndexValueFieldContext<F> indexElement) {
+		return indexElement.type();
 	}
 }

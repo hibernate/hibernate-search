@@ -129,7 +129,7 @@ but one thing that won't change is what mappers can do with the handles to the b
 These handles are instances of `IndexManagerBuildingState` and each one represents an index manager being built.
 As the mapper inspects the metadata, it will infer the required fields in the index,
 and will contribute this information to the backend using the dedicated SPI:
-`IndexModelBindingContext`, `IndexSchemaElement`, `IndexSchemaFieldContext` are the most important parts.
+`IndexModelBindingContext`, `IndexNode`, `IndexSchemaFieldContext` are the most important parts.
 
 All this information about the required fields and their options
 (field type, whether it's stored, how it is analyzed, ...) will be validated and will allow the backend

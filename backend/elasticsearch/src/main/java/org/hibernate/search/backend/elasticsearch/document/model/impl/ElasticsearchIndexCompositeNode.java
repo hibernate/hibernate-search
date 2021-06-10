@@ -6,32 +6,17 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexCompositeNodeContext;
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexCompositeNodeType;
+import org.hibernate.search.engine.backend.document.model.spi.IndexCompositeNode;
 
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
-import org.hibernate.search.engine.backend.metamodel.IndexCompositeElementDescriptor;
-
-
-public interface ElasticsearchIndexCompositeNode extends IndexCompositeElementDescriptor {
-
-	String absolutePath();
-
-	String absolutePath(String relativeFieldName);
-
-	IndexFieldInclusion inclusion();
-
-	List<String> nestedPathHierarchy();
-
-	@Override
-	default Collection<? extends AbstractElasticsearchIndexField> staticChildren() {
-		return staticChildrenByName().values();
-	}
-
-	@Override
-	Map<String, ? extends AbstractElasticsearchIndexField> staticChildrenByName();
-
-	boolean multiValuedInRoot();
+public interface ElasticsearchIndexCompositeNode
+		extends IndexCompositeNode<
+						ElasticsearchSearchIndexScope,
+						ElasticsearchIndexCompositeNodeType,
+						ElasticsearchIndexField
+				>,
+				ElasticsearchIndexNode, ElasticsearchSearchIndexCompositeNodeContext {
 
 }

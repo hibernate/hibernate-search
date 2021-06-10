@@ -19,8 +19,10 @@ import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaDataNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexField;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexRoot;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.dsl.impl.StubIndexFieldTypeFactory;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.impl.StubIndexCompositeNodeType;
 
 public class StubIndexSchemaRootNodeBuilder extends AbstractStubIndexSchemaObjectNodeBuilder
 		implements IndexSchemaRootNodeBuilder {
@@ -61,10 +63,13 @@ public class StubIndexSchemaRootNodeBuilder extends AbstractStubIndexSchemaObjec
 	}
 
 	public StubIndexModel buildModel() {
-		Map<String, StubIndexNode> fields = new LinkedHashMap<>();
-		StubIndexNode root = new StubIndexNode( schemaDataNodeBuilder.build(), null, ObjectStructure.FLATTENED );
-		contributeChildren( fields::put );
-		return new StubIndexModel( indexName, idDslConverter, root, fields );
+		Map<String, StubIndexField> allFields = new LinkedHashMap<>();
+		Map<String, StubIndexField> staticChildren = new LinkedHashMap<>();
+		StubIndexCompositeNodeType type = new StubIndexCompositeNodeType.Builder( ObjectStructure.DEFAULT ).build();
+		type.apply( schemaDataNodeBuilder );
+		StubIndexRoot root = new StubIndexRoot( type, staticChildren, schemaDataNodeBuilder.build() );
+		contributeChildren( root, staticChildren, allFields::put );
+		return new StubIndexModel( indexName, idDslConverter, root, allFields );
 	}
 
 	@Override
