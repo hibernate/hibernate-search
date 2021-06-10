@@ -6,38 +6,23 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl;
 
+import java.util.Collections;
 import java.util.Map;
 
+import org.hibernate.search.engine.backend.document.model.spi.AbstractIndexModel;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 
-public class StubIndexModel {
+public class StubIndexModel extends AbstractIndexModel<StubIndexModel, StubIndexRoot, StubIndexField> {
 
-	private final String hibernateSearchIndexName;
-	private final DocumentIdentifierValueConverter<?> idDslConverter;
-	private final StubIndexRoot root;
-	private final Map<String, StubIndexField> fields;
-
-	public StubIndexModel(String hibernateSearchIndexName, DocumentIdentifierValueConverter<?> idDslConverter,
+	public StubIndexModel(String hibernateSearchIndexName, String mappedTypeName,
+			DocumentIdentifierValueConverter<?> idDslConverter,
 			StubIndexRoot root, Map<String, StubIndexField> fields) {
-		this.hibernateSearchIndexName = hibernateSearchIndexName;
-		this.idDslConverter = idDslConverter;
-		this.root = root;
-		this.fields = fields;
+		super( hibernateSearchIndexName, mappedTypeName, idDslConverter, root, fields, Collections.emptyList() );
 	}
 
-	public String hibernateSearchName() {
-		return hibernateSearchIndexName;
+	@Override
+	protected StubIndexModel self() {
+		return this;
 	}
 
-	public DocumentIdentifierValueConverter<?> idDslConverter() {
-		return idDslConverter;
-	}
-
-	public StubIndexRoot root() {
-		return root;
-	}
-
-	public StubIndexField fieldOrNull(String name) {
-		return fields.get( name );
-	}
 }

@@ -29,17 +29,19 @@ public class StubIndexSchemaRootNodeBuilder extends AbstractStubIndexSchemaObjec
 
 	private final StubBackendBehavior backendBehavior;
 	private final String indexName;
+	private final String mappedTypeName;
 	private DocumentIdentifierValueConverter<?> idDslConverter;
 
-	public StubIndexSchemaRootNodeBuilder(StubBackendBehavior backendBehavior, String indexName) {
-		this( backendBehavior, indexName, StubIndexSchemaDataNode.schema() );
+	public StubIndexSchemaRootNodeBuilder(StubBackendBehavior backendBehavior, String indexName, String mappedTypeName) {
+		this( backendBehavior, indexName, mappedTypeName, StubIndexSchemaDataNode.schema() );
 	}
 
-	private StubIndexSchemaRootNodeBuilder(StubBackendBehavior backendBehavior, String indexName,
+	private StubIndexSchemaRootNodeBuilder(StubBackendBehavior backendBehavior, String indexName, String mappedTypeName,
 			StubIndexSchemaDataNode.Builder builder) {
 		super( builder );
 		this.backendBehavior = backendBehavior;
 		this.indexName = indexName;
+		this.mappedTypeName = mappedTypeName;
 	}
 
 	@Override
@@ -69,7 +71,7 @@ public class StubIndexSchemaRootNodeBuilder extends AbstractStubIndexSchemaObjec
 		type.apply( schemaDataNodeBuilder );
 		StubIndexRoot root = new StubIndexRoot( type, staticChildren, schemaDataNodeBuilder.build() );
 		contributeChildren( root, staticChildren, allFields::put );
-		return new StubIndexModel( indexName, idDslConverter, root, allFields );
+		return new StubIndexModel( indexName, mappedTypeName, idDslConverter, root, allFields );
 	}
 
 	@Override

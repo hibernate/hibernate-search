@@ -6,46 +6,22 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
-import org.hibernate.search.engine.backend.common.spi.FieldPaths;
-import org.hibernate.search.engine.backend.common.spi.FieldPaths.RelativizedPath;
-import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
+import org.hibernate.search.engine.backend.document.model.spi.AbstractIndexFieldTemplate;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusion;
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 
-public abstract class AbstractElasticsearchIndexFieldTemplate<N extends ElasticsearchIndexField> {
-
-	private final SimpleGlobPattern absolutePathGlob;
-	private final IndexFieldInclusion inclusion;
-	private final boolean multiValued;
+public abstract class AbstractElasticsearchIndexFieldTemplate<FT>
+		extends AbstractIndexFieldTemplate<
+						ElasticsearchIndexModel,
+						ElasticsearchIndexField,
+						ElasticsearchIndexCompositeNode,
+						FT
+				> {
 
 	AbstractElasticsearchIndexFieldTemplate(ElasticsearchIndexCompositeNode declaringParent,
-			SimpleGlobPattern absolutePathGlob, IndexFieldInclusion inclusion,
-			boolean multiValued) {
-		this.absolutePathGlob = absolutePathGlob;
-		this.inclusion = declaringParent.inclusion().compose( inclusion );
-		this.multiValued = multiValued;
+			SimpleGlobPattern absolutePathGlob, FT type, IndexFieldInclusion inclusion, boolean multiValued) {
+		super( declaringParent, absolutePathGlob, type, inclusion, multiValued );
 	}
 
-	public IndexFieldInclusion getInclusion() {
-		return inclusion;
-	}
-
-	N createNodeIfMatching(ElasticsearchIndexModel model, String absolutePath) {
-		if ( !absolutePathGlob.matches( absolutePath ) ) {
-			return null;
-		}
-
-		RelativizedPath relativizedPath = FieldPaths.relativize( absolutePath );
-		ElasticsearchIndexCompositeNode parent =
-				relativizedPath.parentPath
-						.<ElasticsearchIndexCompositeNode>map( path ->
-								model.fieldOrNull( path, IndexFieldFilter.ALL ).toObjectField() )
-						.orElseGet( model::root );
-
-		return createNode( parent, relativizedPath.relativePath, inclusion, multiValued );
-	}
-
-	protected abstract N createNode(ElasticsearchIndexCompositeNode parent, String relativePath,
-			IndexFieldInclusion inclusion, boolean multiValued);
 }
