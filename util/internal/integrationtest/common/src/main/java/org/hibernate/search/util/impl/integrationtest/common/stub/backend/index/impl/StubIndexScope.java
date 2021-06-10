@@ -33,7 +33,7 @@ public class StubIndexScope implements IndexScope<StubQueryElementCollector> {
 	private StubIndexScope(Builder builder) {
 		Set<StubIndexModel> immutableIndexModels =
 				Collections.unmodifiableSet( new LinkedHashSet<>( builder.indexModels ) );
-		StubSearchIndexScope scope = new StubSearchIndexScope( immutableIndexModels );
+		StubSearchIndexScope scope = new StubSearchIndexScope( builder.mappingContext, immutableIndexModels );
 		this.predicateFactory = new StubSearchPredicateBuilderFactory( scope );
 		this.sortFactory = new StubSearchSortBuilderFactory( scope );
 		this.projectionFactory = new StubSearchProjectionBuilderFactory( scope );
@@ -69,8 +69,6 @@ public class StubIndexScope implements IndexScope<StubQueryElementCollector> {
 	static class Builder implements IndexScopeBuilder {
 
 		private final StubBackend backend;
-		// In a real mapper, this should be used for some features; keeping this here in case we need to stub such feature
-		@SuppressWarnings("unused")
 		private final BackendMappingContext mappingContext;
 		private final Set<StubIndexModel> indexModels = new LinkedHashSet<>();
 

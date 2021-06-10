@@ -19,7 +19,6 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRespon
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.logging.spi.AggregationKeyFormatter;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
@@ -33,7 +32,6 @@ import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.DurationInSecondsAndFractionsFormatter;
-import org.hibernate.search.util.common.logging.impl.EventContextNoPrefixFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -230,10 +228,6 @@ public interface Log extends BasicLogger {
 	SearchException cannotMixElasticsearchScopeWithOtherBackend(IndexScopeBuilder baseScope,
 			ElasticsearchIndexManager indexFromOtherBackend, @Param EventContext context);
 
-	@Message(id = ID_OFFSET + 4,
-			value = "Unknown field '%1$s'.")
-	SearchException unknownFieldForSearch(String absoluteFieldPath, @Param EventContext context);
-
 	@Message(id = ID_OFFSET + 6,
 			value = "Invalid target for Elasticsearch extension: '%1$s'."
 					+ " This extension can only be applied to components created by an Elasticsearch backend.")
@@ -344,22 +338,11 @@ public interface Log extends BasicLogger {
 			value = "Invalid search projection: '%1$s'. You must build the projection from an Elasticsearch search scope.")
 	SearchException cannotMixElasticsearchSearchQueryWithOtherProjections(SearchProjection<?> projection);
 
-	@Message(id = ID_OFFSET + 41,
-			value = "Inconsistent configuration for %1$s in a search query across multiple indexes: %2$s")
-	SearchException inconsistentConfigurationForIndexElementForSearch(
-			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext, String causeMessage,
-			@Param EventContext elementContextAsParam, @Cause SearchException cause);
-
 	@Message(id = ID_OFFSET + 44, value = "Unable to shut down the Elasticsearch client: %1$s")
 	SearchException unableToShutdownClient(String causeMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET + 45, value = "No built-in index field type for class: '%1$s'.")
 	SearchException cannotGuessFieldType(@FormatWith(ClassFormatter.class) Class<?> inputType, @Param EventContext context);
-
-	@Message(id = ID_OFFSET + 49,
-			value = "Inconsistent configuration for the identifier in a search query across multiple indexes: converter differs: '%1$s' vs. '%2$s'.")
-	SearchException inconsistentConfigurationForIdentifierForSearch(DocumentIdentifierValueConverter<?> component1,
-			DocumentIdentifierValueConverter<?> component2, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 53,
 			value = "Full-text features (analysis, fuzziness) are not supported for fields of this type.")
@@ -620,10 +603,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 121, value = "Invalid dynamic type: '%1$s'."
 			+ " Valid values are: %2$s.")
 	SearchException invalidDynamicType(String invalidRepresentation, List<String> validRepresentations);
-
-	@Message(id = ID_OFFSET + 122,
-			value = "This field is a value field in some indexes, but an object field in other indexes.")
-	SearchException conflictingFieldModel();
 
 	@Message(id = ID_OFFSET + 125,
 			value = "Unable to update aliases for index '%1$s': %2$s")
