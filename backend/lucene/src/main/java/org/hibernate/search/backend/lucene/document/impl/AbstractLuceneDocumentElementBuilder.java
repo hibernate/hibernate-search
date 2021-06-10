@@ -80,7 +80,7 @@ abstract class AbstractLuceneDocumentElementBuilder implements DocumentElement {
 		LuceneIndexField node = model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( node == null ) {
-			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
+			throw log.unknownFieldForIndexing( absoluteFieldPath, model.eventContext() );
 		}
 
 		addValueUnknownType( node.toValueField(), value );
@@ -92,7 +92,7 @@ abstract class AbstractLuceneDocumentElementBuilder implements DocumentElement {
 		LuceneIndexField fieldSchemaNode = model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
-			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
+			throw log.unknownFieldForIndexing( absoluteFieldPath, model.eventContext() );
 		}
 
 		return addObject( fieldSchemaNode.toObjectField(), false );
@@ -104,7 +104,7 @@ abstract class AbstractLuceneDocumentElementBuilder implements DocumentElement {
 		LuceneIndexField fieldSchemaNode = model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
-			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
+			throw log.unknownFieldForIndexing( absoluteFieldPath, model.eventContext() );
 		}
 
 		addObject( fieldSchemaNode.toObjectField(), true );
@@ -221,7 +221,7 @@ abstract class AbstractLuceneDocumentElementBuilder implements DocumentElement {
 		else {
 			@SuppressWarnings("rawtypes")
 			LuceneIndexValueField typeCheckedNode =
-					node.withValueType( value.getClass(), model.getEventContext() );
+					node.withValueType( value.getClass(), model.eventContext() );
 			addValue( typeCheckedNode, value );
 		}
 	}

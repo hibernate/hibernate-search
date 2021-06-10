@@ -8,8 +8,8 @@ package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexObjectField;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectFieldTemplate;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldTemplate;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexObjectFieldTemplate;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexValueFieldTemplate;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexValueField;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.NamedDynamicTemplate;
 
@@ -19,9 +19,9 @@ public interface ElasticsearchIndexSchemaNodeCollector {
 
 	void collect(String absoluteFieldPath, ElasticsearchIndexValueField<?> node);
 
-	void collect(ElasticsearchIndexSchemaObjectFieldTemplate template);
+	void collect(ElasticsearchIndexObjectFieldTemplate template);
 
-	void collect(ElasticsearchIndexSchemaValueFieldTemplate template);
+	void collect(ElasticsearchIndexValueFieldTemplate template);
 
 	void collect(NamedDynamicTemplate templateForMapping);
 

@@ -81,7 +81,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 		ElasticsearchIndexField node = model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( node == null ) {
-			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
+			throw log.unknownFieldForIndexing( absoluteFieldPath, model.eventContext() );
 		}
 
 		addValueUnknownType( node.toValueField(), value );
@@ -94,7 +94,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 				model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
-			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
+			throw log.unknownFieldForIndexing( absoluteFieldPath, model.eventContext() );
 		}
 
 		ElasticsearchIndexObjectField objectFieldSchemaNode = fieldSchemaNode.toObjectField();
@@ -112,7 +112,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 				model.fieldOrNull( absoluteFieldPath, IndexFieldFilter.ALL );
 
 		if ( fieldSchemaNode == null ) {
-			throw log.unknownFieldForIndexing( absoluteFieldPath, model.getEventContext() );
+			throw log.unknownFieldForIndexing( absoluteFieldPath, model.eventContext() );
 		}
 
 		ElasticsearchIndexObjectField objectFieldSchemaNode = fieldSchemaNode.toObjectField();
@@ -149,7 +149,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 		else {
 			@SuppressWarnings("rawtypes")
 			ElasticsearchIndexValueField typeCheckedNode =
-					node.withValueType( value.getClass(), model.getEventContext() );
+					node.withValueType( value.getClass(), model.eventContext() );
 			addValue( typeCheckedNode, value );
 		}
 	}

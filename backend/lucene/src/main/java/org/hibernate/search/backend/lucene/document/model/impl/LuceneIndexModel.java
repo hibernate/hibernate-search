@@ -39,7 +39,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 	private final LuceneIndexRoot rootNode;
 	private final Map<String, LuceneIndexField> staticFields;
 	private final List<IndexFieldDescriptor> includedStaticFields;
-	private final List<AbstractLuceneIndexSchemaFieldTemplate<?>> fieldTemplates;
+	private final List<AbstractLuceneIndexFieldTemplate<?>> fieldTemplates;
 	private final boolean hasNestedDocuments;
 	private final ConcurrentMap<String, LuceneIndexField> dynamicFieldsCache = new ConcurrentHashMap<>();
 
@@ -51,7 +51,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 			DocumentIdentifierValueConverter<?> idDslConverter,
 			LuceneIndexRoot rootNode,
 			Map<String, LuceneIndexField> staticFields,
-			List<AbstractLuceneIndexSchemaFieldTemplate<?>> fieldTemplates,
+			List<AbstractLuceneIndexFieldTemplate<?>> fieldTemplates,
 			boolean hasNestedDocuments) {
 		this.indexName = indexName;
 		this.mappedTypeName = mappedTypeName;
@@ -105,7 +105,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 		return mappedTypeName;
 	}
 
-	public EventContext getEventContext() {
+	public EventContext eventContext() {
 		return EventContexts.fromIndexName( indexName );
 	}
 
@@ -143,7 +143,7 @@ public class LuceneIndexModel implements AutoCloseable, IndexDescriptor {
 		if ( field != null ) {
 			return field;
 		}
-		for ( AbstractLuceneIndexSchemaFieldTemplate<?> template : fieldTemplates ) {
+		for ( AbstractLuceneIndexFieldTemplate<?> template : fieldTemplates ) {
 			field = template.createNodeIfMatching( this, absolutePath );
 			if ( field != null ) {
 				LuceneIndexField previous = dynamicFieldsCache.putIfAbsent( absolutePath, field );

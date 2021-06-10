@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaValueFieldTemplate;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexValueFieldTemplate;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexCompositeNode;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicTemplate;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.NamedDynamicTemplate;
@@ -16,7 +16,7 @@ import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 class ElasticsearchIndexSchemaValueFieldTemplateBuilder
 		extends AbstractElasticsearchIndexSchemaFieldTemplateBuilder<
-				ElasticsearchIndexSchemaValueFieldTemplateBuilder, ElasticsearchIndexSchemaValueFieldTemplate
+				ElasticsearchIndexSchemaValueFieldTemplateBuilder, ElasticsearchIndexValueFieldTemplate
 		> {
 
 	private final ElasticsearchIndexValueFieldType<?> type;
@@ -36,7 +36,7 @@ class ElasticsearchIndexSchemaValueFieldTemplateBuilder
 	protected void doContribute(ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexCompositeNode parentNode, IndexFieldInclusion inclusion,
 			SimpleGlobPattern absolutePathGlob, boolean multiValued) {
-		ElasticsearchIndexSchemaValueFieldTemplate fieldTemplate = new ElasticsearchIndexSchemaValueFieldTemplate(
+		ElasticsearchIndexValueFieldTemplate fieldTemplate = new ElasticsearchIndexValueFieldTemplate(
 				parentNode, absolutePathGlob, inclusion, multiValued, type
 		);
 

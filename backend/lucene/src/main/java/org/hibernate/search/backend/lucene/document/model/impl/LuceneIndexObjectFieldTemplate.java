@@ -13,12 +13,12 @@ import org.hibernate.search.engine.backend.document.model.spi.IndexFieldInclusio
 import org.hibernate.search.util.common.pattern.spi.SimpleGlobPattern;
 
 
-public class LuceneIndexSchemaObjectFieldTemplate
-		extends AbstractLuceneIndexSchemaFieldTemplate<LuceneIndexObjectField> {
+public class LuceneIndexObjectFieldTemplate
+		extends AbstractLuceneIndexFieldTemplate<LuceneIndexObjectField> {
 
 	private final LuceneIndexCompositeNodeType type;
 
-	public LuceneIndexSchemaObjectFieldTemplate(LuceneIndexCompositeNode declaringParent,
+	public LuceneIndexObjectFieldTemplate(LuceneIndexCompositeNode declaringParent,
 			SimpleGlobPattern absolutePathGlob, LuceneIndexCompositeNodeType type, IndexFieldInclusion inclusion,
 			boolean multiValued) {
 		super( declaringParent, inclusion, absolutePathGlob, multiValued );

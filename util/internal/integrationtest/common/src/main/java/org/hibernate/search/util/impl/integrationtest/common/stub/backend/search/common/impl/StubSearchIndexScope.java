@@ -24,7 +24,7 @@ public class StubSearchIndexScope implements SearchIndexScope<StubSearchIndexSco
 	private final Set<StubIndexModel> indexModels;
 
 	public StubSearchIndexScope(Set<StubIndexModel> indexModels) {
-		Set<String> mutableIndexNames = indexModels.stream().map( StubIndexModel::hibernateSearchIndexName )
+		Set<String> mutableIndexNames = indexModels.stream().map( StubIndexModel::hibernateSearchName )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 		this.indexNames = Collections.unmodifiableSet( mutableIndexNames );
 		this.indexModels = indexModels;

@@ -43,7 +43,7 @@ public class ElasticsearchIndexModel implements ElasticsearchIndexDescriptor, El
 	private final ElasticsearchIndexRoot rootNode;
 	private final Map<String, ElasticsearchIndexField> staticFields;
 	private final List<IndexFieldDescriptor> includedStaticFields;
-	private final List<AbstractElasticsearchIndexSchemaFieldTemplate<?>> fieldTemplates;
+	private final List<AbstractElasticsearchIndexFieldTemplate<?>> fieldTemplates;
 	private final ConcurrentMap<String, ElasticsearchIndexField> dynamicFieldsCache = new ConcurrentHashMap<>();
 
 	public ElasticsearchIndexModel(IndexNames names,
@@ -52,7 +52,7 @@ public class ElasticsearchIndexModel implements ElasticsearchIndexDescriptor, El
 			RootTypeMapping mapping, DocumentIdentifierValueConverter<?> idDslConverter,
 			ElasticsearchIndexRoot rootNode,
 			Map<String, ElasticsearchIndexField> staticFields,
-			List<AbstractElasticsearchIndexSchemaFieldTemplate<?>> fieldTemplates) {
+			List<AbstractElasticsearchIndexFieldTemplate<?>> fieldTemplates) {
 		this.names = names;
 		this.mappedTypeName = mappedTypeName;
 		this.eventContext = EventContexts.fromIndexName( hibernateSearchName() );
@@ -119,7 +119,7 @@ public class ElasticsearchIndexModel implements ElasticsearchIndexDescriptor, El
 		return includedStaticFields;
 	}
 
-	public EventContext getEventContext() {
+	public EventContext eventContext() {
 		return eventContext;
 	}
 
@@ -148,7 +148,7 @@ public class ElasticsearchIndexModel implements ElasticsearchIndexDescriptor, El
 		if ( field != null ) {
 			return field;
 		}
-		for ( AbstractElasticsearchIndexSchemaFieldTemplate<?> template : fieldTemplates ) {
+		for ( AbstractElasticsearchIndexFieldTemplate<?> template : fieldTemplates ) {
 			field = template.createNodeIfMatching( this, absolutePath );
 			if ( field != null ) {
 				ElasticsearchIndexField previous = dynamicFieldsCache.putIfAbsent( absolutePath, field );
