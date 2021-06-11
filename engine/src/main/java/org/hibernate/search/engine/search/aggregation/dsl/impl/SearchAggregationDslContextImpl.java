@@ -15,15 +15,15 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryEx
 public class SearchAggregationDslContextImpl<F extends SearchAggregationBuilderFactory, PDF extends SearchPredicateFactory>
 		implements SearchAggregationDslContext<F, PDF> {
 	public static <F extends SearchAggregationBuilderFactory, PDF extends SearchPredicateFactory>
-			SearchAggregationDslContextImpl<F, PDF> root(SearchIndexScope<?> scope, F builderFactory, PDF predicateFactory) {
+			SearchAggregationDslContextImpl<F, PDF> root(SearchIndexScope scope, F builderFactory, PDF predicateFactory) {
 		return new SearchAggregationDslContextImpl<>( scope, builderFactory, predicateFactory );
 	}
 
-	private final SearchIndexScope<?> scope;
+	private final SearchIndexScope scope;
 	private final F builderFactory;
 	private final PDF predicateFactory;
 
-	private SearchAggregationDslContextImpl(SearchIndexScope<?> scope,
+	private SearchAggregationDslContextImpl(SearchIndexScope scope,
 			F builderFactory, PDF predicateFactory) {
 		this.scope = scope;
 		this.builderFactory = builderFactory;
@@ -31,7 +31,7 @@ public class SearchAggregationDslContextImpl<F extends SearchAggregationBuilderF
 	}
 
 	@Override
-	public SearchIndexScope<?> scope() {
+	public SearchIndexScope scope() {
 		return scope;
 	}
 

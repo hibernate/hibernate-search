@@ -24,22 +24,22 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 public final class SearchProjectionDslContextImpl<F extends SearchProjectionBuilderFactory>
 		implements SearchProjectionDslContext<F> {
 
-	public static <F extends SearchProjectionBuilderFactory> SearchProjectionDslContext root(SearchIndexScope<?> scope,
+	public static <F extends SearchProjectionBuilderFactory> SearchProjectionDslContext root(SearchIndexScope scope,
 			F builderFactory) {
 		return new SearchProjectionDslContextImpl<>( scope, builderFactory );
 	}
 
-	private final SearchIndexScope<?> scope;
+	private final SearchIndexScope scope;
 	private final F builderFactory;
 
-	private SearchProjectionDslContextImpl(SearchIndexScope<?> scope,
+	private SearchProjectionDslContextImpl(SearchIndexScope scope,
 			F builderFactory) {
 		this.scope = scope;
 		this.builderFactory = builderFactory;
 	}
 
 	@Override
-	public SearchIndexScope<?> scope() {
+	public SearchIndexScope scope() {
 		return scope;
 	}
 

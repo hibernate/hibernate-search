@@ -19,7 +19,7 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 public abstract class AbstractMultiIndexSearchIndexNodeContext<
 				S extends SearchIndexNodeContext<SC>,
-				SC extends SearchIndexScope<SC>,
+				SC extends SearchIndexScope,
 				NT extends SearchIndexNodeTypeContext<SC, S>
 		>
 		implements SearchIndexNodeContext<SC>, SearchIndexNodeTypeContext<SC, S> {

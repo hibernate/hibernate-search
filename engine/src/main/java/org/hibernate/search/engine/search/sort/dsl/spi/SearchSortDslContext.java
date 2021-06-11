@@ -29,7 +29,7 @@ public interface SearchSortDslContext<F extends SearchSortBuilderFactory, PDF ex
 	/**
 	 * @return The search scope.
 	 */
-	SearchIndexScope<?> scope();
+	SearchIndexScope scope();
 
 	/**
 	 * @return The sort builder factory. Will always return the exact same instance.

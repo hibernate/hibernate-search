@@ -32,12 +32,12 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public abstract class AbstractSearchIndexScope<
-				S extends SearchIndexScope<S>,
+				S extends SearchIndexScope,
 				M extends AbstractIndexModel<?, ? extends C, ? extends N>,
 				N extends SearchIndexNodeContext<S>,
 				C extends SearchIndexCompositeNodeContext<S>
 		>
-		implements SearchIndexScope<S> {
+		implements SearchIndexScope {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

@@ -93,7 +93,7 @@ class SpatialWithinPredicateFieldMoreStepImpl
 	}
 
 	private void generateWithinCircleQueryBuilders(GeoPoint center, double radius, DistanceUnit unit) {
-		SearchIndexScope<?> scope = commonState.scope();
+		SearchIndexScope scope = commonState.scope();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			SpatialWithinCirclePredicateBuilder predicateBuilder =
 					scope.fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.SPATIAL_WITHIN_CIRCLE );
@@ -103,7 +103,7 @@ class SpatialWithinPredicateFieldMoreStepImpl
 	}
 
 	private void generateWithinPolygonQueryBuilders(GeoPolygon polygon) {
-		SearchIndexScope<?> scope = commonState.scope();
+		SearchIndexScope scope = commonState.scope();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			SpatialWithinPolygonPredicateBuilder predicateBuilder =
 					scope.fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.SPATIAL_WITHIN_POLYGON );
@@ -113,7 +113,7 @@ class SpatialWithinPredicateFieldMoreStepImpl
 	}
 
 	private void generateWithinBoundingBoxQueryBuilders(GeoBoundingBox boundingBox) {
-		SearchIndexScope<?> scope = commonState.scope();
+		SearchIndexScope scope = commonState.scope();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			SpatialWithinBoundingBoxPredicateBuilder predicateBuilder =
 					scope.fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.SPATIAL_WITHIN_BOUNDING_BOX );

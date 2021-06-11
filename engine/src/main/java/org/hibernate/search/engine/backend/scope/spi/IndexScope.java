@@ -20,7 +20,7 @@ import org.hibernate.search.util.common.SearchException;
  */
 public interface IndexScope {
 
-	SearchIndexScope<?> searchScope();
+	SearchIndexScope searchScope();
 
 	SearchPredicateBuilderFactory searchPredicateBuilderFactory();
 

@@ -18,7 +18,7 @@ import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 import org.apache.lucene.search.Query;
 
-public interface LuceneSearchIndexScope extends SearchIndexScope<LuceneSearchIndexScope> {
+public interface LuceneSearchIndexScope extends SearchIndexScope {
 
 	ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext();
 
