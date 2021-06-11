@@ -6,15 +6,48 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
+import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 
 import com.google.gson.JsonObject;
 
-public interface ElasticsearchSearchPredicateBuilderFactory
-		extends SearchPredicateBuilderFactory {
+public class ElasticsearchSearchPredicateBuilderFactory implements SearchPredicateBuilderFactory {
 
-	ElasticsearchSearchPredicate fromJson(JsonObject jsonObject);
+	private final ElasticsearchSearchIndexScope scope;
 
-	ElasticsearchSearchPredicate fromJson(String jsonString);
+	public ElasticsearchSearchPredicateBuilderFactory(ElasticsearchSearchIndexScope scope) {
+		this.scope = scope;
+	}
 
+	@Override
+	public MatchAllPredicateBuilder matchAll() {
+		return new ElasticsearchMatchAllPredicate.Builder( scope );
+	}
+
+	@Override
+	public MatchIdPredicateBuilder id() {
+		return new ElasticsearchMatchIdPredicate.Builder( scope );
+	}
+
+	@Override
+	public BooleanPredicateBuilder bool() {
+		return new ElasticsearchBooleanPredicate.Builder( scope );
+	}
+
+	@Override
+	public SimpleQueryStringPredicateBuilder simpleQueryString() {
+		return new ElasticsearchSimpleQueryStringPredicate.Builder( scope );
+	}
+
+	public ElasticsearchSearchPredicate fromJson(JsonObject jsonObject) {
+		return new ElasticsearchUserProvidedJsonPredicate( scope, jsonObject );
+	}
+
+	public ElasticsearchSearchPredicate fromJson(String jsonString) {
+		return fromJson( scope.userFacingGson().fromJson( jsonString, JsonObject.class ) );
+	}
 }

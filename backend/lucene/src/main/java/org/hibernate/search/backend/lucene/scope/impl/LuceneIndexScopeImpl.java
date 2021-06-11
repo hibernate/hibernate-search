@@ -15,11 +15,11 @@ import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexMana
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactoryImpl;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilderFactory;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
-import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactoryImpl;
+import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactory;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
@@ -31,8 +31,8 @@ public class LuceneIndexScopeImpl
 		implements IndexScope, LuceneIndexScope {
 
 	private final LuceneSearchIndexScope searchScope;
-	private final LuceneSearchPredicateBuilderFactoryImpl searchPredicateFactory;
-	private final LuceneSearchSortBuilderFactoryImpl searchSortFactory;
+	private final LuceneSearchPredicateBuilderFactory searchPredicateFactory;
+	private final LuceneSearchSortBuilderFactory searchSortFactory;
 	private final LuceneSearchQueryBuilderFactory searchQueryFactory;
 	private final LuceneSearchProjectionBuilderFactory searchProjectionFactory;
 	private final LuceneSearchAggregationBuilderFactory searchAggregationFactory;
@@ -41,8 +41,8 @@ public class LuceneIndexScopeImpl
 			BackendMappingContext mappingContext,
 			Set<? extends LuceneScopeIndexManagerContext> indexManagerContexts) {
 		this.searchScope = backendContext.createSearchContext( mappingContext, indexManagerContexts );
-		this.searchPredicateFactory = new LuceneSearchPredicateBuilderFactoryImpl( searchScope );
-		this.searchSortFactory = new LuceneSearchSortBuilderFactoryImpl( searchScope );
+		this.searchPredicateFactory = new LuceneSearchPredicateBuilderFactory( searchScope );
+		this.searchSortFactory = new LuceneSearchSortBuilderFactory( searchScope );
 		this.searchProjectionFactory = new LuceneSearchProjectionBuilderFactory( searchScope );
 		this.searchAggregationFactory = new LuceneSearchAggregationBuilderFactory( searchScope );
 		this.searchQueryFactory = new LuceneSearchQueryBuilderFactory( backendContext, searchScope, this.searchProjectionFactory );
@@ -59,12 +59,12 @@ public class LuceneIndexScopeImpl
 	}
 
 	@Override
-	public LuceneSearchPredicateBuilderFactoryImpl searchPredicateBuilderFactory() {
+	public LuceneSearchPredicateBuilderFactory searchPredicateBuilderFactory() {
 		return searchPredicateFactory;
 	}
 
 	@Override
-	public LuceneSearchSortBuilderFactoryImpl searchSortBuilderFactory() {
+	public LuceneSearchSortBuilderFactory searchSortBuilderFactory() {
 		return searchSortFactory;
 	}
 
