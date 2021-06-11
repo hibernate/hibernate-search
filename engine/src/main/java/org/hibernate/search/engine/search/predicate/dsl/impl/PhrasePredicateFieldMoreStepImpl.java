@@ -39,7 +39,7 @@ class PhrasePredicateFieldMoreStepImpl
 	PhrasePredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
-		SearchIndexScope<?> scope = commonState.scope();
+		SearchIndexScope scope = commonState.scope();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			predicateBuilders.add( scope.fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.PHRASE ) );
 		}

@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 
 public abstract class AbstractMultiIndexSearchIndexCompositeNodeContext<
 				S extends SearchIndexCompositeNodeContext<SC>,
-				SC extends SearchIndexScope<SC>,
+				SC extends SearchIndexScope,
 				NT extends SearchIndexCompositeNodeTypeContext<SC, S>
 		>
 		extends AbstractMultiIndexSearchIndexNodeContext<S, SC, NT>

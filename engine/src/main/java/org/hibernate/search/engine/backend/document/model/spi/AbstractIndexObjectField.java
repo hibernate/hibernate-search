@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 
 public abstract class AbstractIndexObjectField<
 				S extends AbstractIndexObjectField<S, SC, NT, C, F>,
-				SC extends SearchIndexScope<SC>,
+				SC extends SearchIndexScope,
 				NT extends AbstractIndexCompositeNodeType<SC, ? super S>,
 				C extends IndexCompositeNode<SC, NT, F>,
 				F extends IndexField<SC, ?>

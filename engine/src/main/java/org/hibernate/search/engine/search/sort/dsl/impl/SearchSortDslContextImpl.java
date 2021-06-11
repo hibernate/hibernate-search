@@ -28,11 +28,11 @@ public final class SearchSortDslContextImpl<F extends SearchSortBuilderFactory, 
 		implements SearchSortDslContext<F, PDF> {
 
 	public static <F extends SearchSortBuilderFactory, PDF extends SearchPredicateFactory>
-			SearchSortDslContext<F, ?> root(SearchIndexScope<?> scope, F builderFactory, PDF predicateFactory) {
+			SearchSortDslContext<F, ?> root(SearchIndexScope scope, F builderFactory, PDF predicateFactory) {
 		return new SearchSortDslContextImpl<>( scope, builderFactory, null, null, predicateFactory );
 	}
 
-	private final SearchIndexScope<?> scope;
+	private final SearchIndexScope scope;
 	private final F builderFactory;
 	private final SearchSortDslContextImpl<F, ?> parent;
 	private final SearchSort sort;
@@ -40,7 +40,7 @@ public final class SearchSortDslContextImpl<F extends SearchSortBuilderFactory, 
 
 	private SearchSort compositeSort;
 
-	private SearchSortDslContextImpl(SearchIndexScope<?> scope,
+	private SearchSortDslContextImpl(SearchIndexScope scope,
 			F builderFactory, SearchSortDslContextImpl<F, ?> parent, SearchSort sort,
 			PDF predicateFactory) {
 		this.scope = scope;
@@ -51,7 +51,7 @@ public final class SearchSortDslContextImpl<F extends SearchSortBuilderFactory, 
 	}
 
 	@Override
-	public SearchIndexScope<?> scope() {
+	public SearchIndexScope scope() {
 		return scope;
 	}
 

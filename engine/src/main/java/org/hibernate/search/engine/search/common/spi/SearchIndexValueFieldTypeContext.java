@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.common.ValueConvert;
  * @param <F> The indexed field value type.
  */
 public interface SearchIndexValueFieldTypeContext<
-				SC extends SearchIndexScope<SC>,
+				SC extends SearchIndexScope,
 				N,
 				F
 		>

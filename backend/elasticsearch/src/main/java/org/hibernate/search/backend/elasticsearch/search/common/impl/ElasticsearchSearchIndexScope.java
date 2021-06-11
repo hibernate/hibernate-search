@@ -20,7 +20,7 @@ import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-public interface ElasticsearchSearchIndexScope extends SearchIndexScope<ElasticsearchSearchIndexScope> {
+public interface ElasticsearchSearchIndexScope extends SearchIndexScope {
 
 	ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext();
 

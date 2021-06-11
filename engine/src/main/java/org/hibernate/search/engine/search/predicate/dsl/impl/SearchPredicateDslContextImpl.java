@@ -24,20 +24,20 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 public final class SearchPredicateDslContextImpl<F extends SearchPredicateBuilderFactory>
 		implements SearchPredicateDslContext<F> {
 
-	public static <F extends SearchPredicateBuilderFactory> SearchPredicateDslContext<F> root(SearchIndexScope<?> scope, F builderFactory) {
+	public static <F extends SearchPredicateBuilderFactory> SearchPredicateDslContext<F> root(SearchIndexScope scope, F builderFactory) {
 		return new SearchPredicateDslContextImpl<>( scope, builderFactory );
 	}
 
-	private final SearchIndexScope<?> scope;
+	private final SearchIndexScope scope;
 	private final F builderFactory;
 
-	private SearchPredicateDslContextImpl(SearchIndexScope<?> scope, F builderFactory) {
+	private SearchPredicateDslContextImpl(SearchIndexScope scope, F builderFactory) {
 		this.scope = scope;
 		this.builderFactory = builderFactory;
 	}
 
 	@Override
-	public SearchIndexScope<?> scope() {
+	public SearchIndexScope scope() {
 		return scope;
 	}
 

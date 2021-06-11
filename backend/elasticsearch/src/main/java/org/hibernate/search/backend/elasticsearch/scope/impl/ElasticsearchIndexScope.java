@@ -52,7 +52,7 @@ public class ElasticsearchIndexScope
 	}
 
 	@Override
-	public SearchIndexScope<?> searchScope() {
+	public SearchIndexScope searchScope() {
 		return searchScope;
 	}
 

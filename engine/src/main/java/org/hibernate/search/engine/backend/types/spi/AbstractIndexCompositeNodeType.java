@@ -18,7 +18,7 @@ import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 
 public abstract class AbstractIndexCompositeNodeType<
-				SC extends SearchIndexScope<SC>,
+				SC extends SearchIndexScope,
 				N extends SearchIndexCompositeNodeContext<SC>
 		>
 		implements IndexObjectFieldTypeDescriptor, SearchIndexCompositeNodeTypeContext<SC, N> {
@@ -58,7 +58,7 @@ public abstract class AbstractIndexCompositeNodeType<
 	}
 
 	public abstract static class Builder<
-				SC extends SearchIndexScope<SC>,
+				SC extends SearchIndexScope,
 				N extends SearchIndexCompositeNodeContext<SC>
 			> {
 		private final ObjectStructure objectStructure;

@@ -25,7 +25,7 @@ public class NamedPredicateOptionsStepImpl
 	public NamedPredicateOptionsStepImpl(SearchPredicateFactory predicateFactory,
 			SearchPredicateDslContext<?> dslContext, String absoluteFieldPath, String predicateName) {
 		super( dslContext );
-		SearchIndexScope<?> scope = dslContext.scope();
+		SearchIndexScope scope = dslContext.scope();
 		SearchQueryElementTypeKey<NamedPredicateBuilder> key = PredicateTypeKeys.named( predicateName );
 		this.builder = absoluteFieldPath == null ? scope.rootQueryElement( key )
 				: scope.fieldQueryElement( absoluteFieldPath, key );

@@ -20,7 +20,7 @@ public interface SearchProjectionDslContext<F extends SearchProjectionBuilderFac
 	/**
 	 * @return The search scope.
 	 */
-	SearchIndexScope<?> scope();
+	SearchIndexScope scope();
 
 	/**
 	 * @return The aggregation builder factory. Will always return the exact same instance.

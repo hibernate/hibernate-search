@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexValueFieldContex
 
 public abstract class AbstractIndexValueField<
 				S extends AbstractIndexValueField<S, SC, FT, C, F>,
-				SC extends SearchIndexScope<SC>,
+				SC extends SearchIndexScope,
 				FT extends AbstractIndexValueFieldType<SC, ? super S, F>,
 				C extends IndexCompositeNode<SC, ?, ?>,
 				F

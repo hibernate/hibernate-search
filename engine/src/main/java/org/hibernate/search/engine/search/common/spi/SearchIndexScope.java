@@ -14,18 +14,16 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 /**
  * Information about indexes targeted by search,
  * be it in a projection, a predicate, a sort, ...
- *
- * @param <S> The self type, i.e. the type of the backend-specific search index scope.
  */
-public interface SearchIndexScope<S extends SearchIndexScope<S>> {
+public interface SearchIndexScope {
 
 	Set<String> hibernateSearchIndexNames();
 
 	DocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
 
-	SearchIndexCompositeNodeContext<S> root();
+	SearchIndexCompositeNodeContext<?> root();
 
-	SearchIndexNodeContext<S> field(String absoluteFieldPath);
+	SearchIndexNodeContext<?> field(String absoluteFieldPath);
 
 	<T> T rootQueryElement(SearchQueryElementTypeKey<T> key);
 

@@ -48,7 +48,7 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<
 		super( dslContext );
 	}
 
-	public SearchIndexScope<?> scope() {
+	public SearchIndexScope scope() {
 		return dslContext.scope();
 	}
 

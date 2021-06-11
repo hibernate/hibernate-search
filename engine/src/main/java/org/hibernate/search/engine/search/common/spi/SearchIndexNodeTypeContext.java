@@ -13,7 +13,7 @@ package org.hibernate.search.engine.search.common.spi;
  * @param <SC> The type of the backend-specific search scope.
  * @param <N> The type representing the targeted index node.
  */
-public interface SearchIndexNodeTypeContext<SC extends SearchIndexScope<SC>, N> {
+public interface SearchIndexNodeTypeContext<SC extends SearchIndexScope, N> {
 
 	<T> SearchQueryElementFactory<? extends T, ? super SC, ? super N>
 			queryElementFactory(SearchQueryElementTypeKey<T> key);
