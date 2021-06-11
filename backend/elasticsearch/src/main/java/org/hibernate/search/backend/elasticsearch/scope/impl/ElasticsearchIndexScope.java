@@ -41,8 +41,7 @@ public class ElasticsearchIndexScope
 		);
 		this.searchAggregationFactory = new ElasticsearchSearchAggregationBuilderFactory( searchScope );
 		this.searchQueryFactory = new ElasticsearchSearchQueryBuilderFactory(
-				backendContext, searchScope,
-				this.searchProjectionFactory
+				backendContext, searchScope
 		);
 	}
 

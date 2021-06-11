@@ -12,12 +12,12 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 
-public class ElasticsearchCompositeListProjection<P>
+class ElasticsearchCompositeListProjection<P>
 		extends AbstractElasticsearchCompositeProjection<P> {
 
 	private final Function<List<?>, P> transformer;
 
-	public ElasticsearchCompositeListProjection(ElasticsearchSearchIndexScope scope,
+	ElasticsearchCompositeListProjection(ElasticsearchSearchIndexScope scope,
 			Function<List<?>, P> transformer,
 			List<ElasticsearchSearchProjection<?, ?>> children) {
 		super( scope, children.toArray( new ElasticsearchSearchProjection<?, ?>[0] ) );

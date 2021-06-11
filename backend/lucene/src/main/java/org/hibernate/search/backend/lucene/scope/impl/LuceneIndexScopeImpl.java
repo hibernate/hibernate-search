@@ -45,7 +45,7 @@ public class LuceneIndexScopeImpl
 		this.searchSortFactory = new LuceneSearchSortBuilderFactory( searchScope );
 		this.searchProjectionFactory = new LuceneSearchProjectionBuilderFactory( searchScope );
 		this.searchAggregationFactory = new LuceneSearchAggregationBuilderFactory( searchScope );
-		this.searchQueryFactory = new LuceneSearchQueryBuilderFactory( backendContext, searchScope, this.searchProjectionFactory );
+		this.searchQueryFactory = new LuceneSearchQueryBuilderFactory( backendContext, searchScope );
 	}
 
 	@Override

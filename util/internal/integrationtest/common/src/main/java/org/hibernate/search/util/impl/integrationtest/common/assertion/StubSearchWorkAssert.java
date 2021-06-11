@@ -37,11 +37,8 @@ public class StubSearchWorkAssert {
 		StringBuilder builder = new StringBuilder( messageBase );
 
 		boolean hasAnyMismatch;
-		boolean mismatch = checkForMismatch( builder, "resultType", expected.getResultType(), actual.getResultType() );
+		boolean mismatch = checkForMismatch( builder, "routingKeys", expected.getRoutingKeys(), actual.getRoutingKeys() );
 		hasAnyMismatch = mismatch;
-
-		mismatch = checkForMismatch( builder, "routingKeys", expected.getRoutingKeys(), actual.getRoutingKeys() );
-		hasAnyMismatch = hasAnyMismatch || mismatch;
 
 		mismatch = checkForMismatch( builder, "truncateAfterTimeout", expected.getTruncateAfterTimeout(), actual.getTruncateAfterTimeout() );
 		hasAnyMismatch = hasAnyMismatch || mismatch;

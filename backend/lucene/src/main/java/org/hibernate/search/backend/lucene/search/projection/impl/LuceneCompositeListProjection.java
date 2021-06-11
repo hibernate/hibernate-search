@@ -12,12 +12,12 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 
-public class LuceneCompositeListProjection<P>
+class LuceneCompositeListProjection<P>
 		extends AbstractLuceneCompositeProjection<P> {
 
 	private final Function<List<?>, P> transformer;
 
-	public LuceneCompositeListProjection(LuceneSearchIndexScope scope, Function<List<?>, P> transformer,
+	LuceneCompositeListProjection(LuceneSearchIndexScope scope, Function<List<?>, P> transformer,
 			List<LuceneSearchProjection<?, ?>> children) {
 		super( scope, children.toArray( new LuceneSearchProjection<?, ?>[0] ) );
 		this.transformer = transformer;
