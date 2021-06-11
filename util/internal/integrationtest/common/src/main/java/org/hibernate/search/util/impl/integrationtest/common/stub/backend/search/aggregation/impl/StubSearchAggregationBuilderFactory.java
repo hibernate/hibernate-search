@@ -6,20 +6,9 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.aggregation.impl;
 
-import org.hibernate.search.engine.search.aggregation.AggregationKey;
-import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubQueryElementCollector;
 
 public class StubSearchAggregationBuilderFactory
-		implements SearchAggregationBuilderFactory<StubQueryElementCollector> {
-
-	@Override
-	public <A> void contribute(StubQueryElementCollector collector, AggregationKey<A> key,
-			SearchAggregation<A> aggregation) {
-		// Just check the type and simulate collection
-		((StubSearchAggregation) aggregation).simulateBuild();
-		collector.simulateCollectCall();
-	}
+		implements SearchAggregationBuilderFactory {
 
 }

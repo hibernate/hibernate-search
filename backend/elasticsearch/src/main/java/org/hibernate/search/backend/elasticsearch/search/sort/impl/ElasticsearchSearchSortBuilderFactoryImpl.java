@@ -22,12 +22,6 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 	}
 
 	@Override
-	public void contribute(ElasticsearchSearchSortCollector collector, SearchSort sort) {
-		ElasticsearchSearchSort elasticsearchSort = ElasticsearchSearchSort.from( scope, sort );
-		elasticsearchSort.toJsonSorts( collector );
-	}
-
-	@Override
 	public ScoreSortBuilder score() {
 		return new ElasticsearchScoreSort.Builder( scope );
 	}

@@ -44,7 +44,7 @@ public class ScopeExtensionIT {
 
 	@Test
 	public void test() {
-		IndexScope<?> indexScope = mapping.scope( IndexedEntity.class ).extension( original -> original );
+		IndexScope indexScope = mapping.scope( IndexedEntity.class ).extension( original -> original );
 		assertThat( indexScope ).isInstanceOf( StubIndexScope.class );
 	}
 

@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFa
  *
  * @param <F> The type of predicate builder factory.
  */
-public interface SearchPredicateDslContext<F extends SearchPredicateBuilderFactory<?>> {
+public interface SearchPredicateDslContext<F extends SearchPredicateBuilderFactory> {
 
 	/**
 	 * @return The search scope.

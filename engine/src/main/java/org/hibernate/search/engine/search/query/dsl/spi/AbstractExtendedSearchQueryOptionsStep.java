@@ -25,13 +25,12 @@ public abstract class AbstractExtendedSearchQueryOptionsStep<
 				LOS,
 				PDF extends SearchPredicateFactory,
 				SF extends SearchSortFactory,
-				AF extends SearchAggregationFactory,
-				C
+				AF extends SearchAggregationFactory
 		>
-		extends AbstractSearchQueryOptionsStep<S, H, LOS, PDF, SF, AF, C> {
+		extends AbstractSearchQueryOptionsStep<S, H, LOS, PDF, SF, AF> {
 
-	public AbstractExtendedSearchQueryOptionsStep(IndexScope<C> indexScope,
-			SearchQueryBuilder<H, C> searchQueryBuilder,
+	public AbstractExtendedSearchQueryOptionsStep(IndexScope indexScope,
+			SearchQueryBuilder<H> searchQueryBuilder,
 			SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
 		super( indexScope, searchQueryBuilder, loadingContextBuilder );
 	}

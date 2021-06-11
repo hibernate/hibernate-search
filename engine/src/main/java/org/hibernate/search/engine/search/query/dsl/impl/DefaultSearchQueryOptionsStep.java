@@ -16,20 +16,19 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
-final class DefaultSearchQueryOptionsStep<H, LOS, C>
+final class DefaultSearchQueryOptionsStep<H, LOS>
 		extends AbstractSearchQueryOptionsStep<
-						DefaultSearchQueryOptionsStep<H, LOS,C>,
+						DefaultSearchQueryOptionsStep<H, LOS>,
 						H,
 						LOS,
 						SearchPredicateFactory,
 						SearchSortFactory,
-						SearchAggregationFactory,
-						C
-				>
-		implements SearchQueryWhereStep<DefaultSearchQueryOptionsStep<H, LOS, C>, H, LOS, SearchPredicateFactory>,
-				SearchQueryOptionsStep<DefaultSearchQueryOptionsStep<H, LOS, C>, H, LOS, SearchSortFactory, SearchAggregationFactory> {
+						SearchAggregationFactory
+		>
+		implements SearchQueryWhereStep<DefaultSearchQueryOptionsStep<H, LOS>, H, LOS, SearchPredicateFactory>,
+				SearchQueryOptionsStep<DefaultSearchQueryOptionsStep<H, LOS>, H, LOS, SearchSortFactory, SearchAggregationFactory> {
 
-	DefaultSearchQueryOptionsStep(IndexScope<C> indexScope, SearchQueryBuilder<H, C> searchQueryBuilder,
+	DefaultSearchQueryOptionsStep(IndexScope indexScope, SearchQueryBuilder<H> searchQueryBuilder,
 			SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
 		super( indexScope, searchQueryBuilder, loadingContextBuilder );
 	}
@@ -54,7 +53,7 @@ final class DefaultSearchQueryOptionsStep<H, LOS, C>
 	}
 
 	@Override
-	protected DefaultSearchQueryOptionsStep<H, LOS, C> thisAsS() {
+	protected DefaultSearchQueryOptionsStep<H, LOS> thisAsS() {
 		return this;
 	}
 }

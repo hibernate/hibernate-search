@@ -15,7 +15,6 @@ import org.hibernate.search.backend.lucene.search.projection.dsl.LuceneSearchPro
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryOptionsStep;
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryWhereStep;
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQuerySelectStep;
-import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScopeImpl;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
@@ -33,8 +32,7 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 						E,
 						LOS,
 						LuceneSearchProjectionFactory<R, E>,
-						LuceneSearchPredicateFactory,
-						LuceneSearchQueryElementCollector
+						LuceneSearchPredicateFactory
 				>
 		implements LuceneSearchQuerySelectStep<R, E, LOS> {
 

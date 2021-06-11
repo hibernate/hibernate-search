@@ -7,17 +7,16 @@
 package org.hibernate.search.backend.lucene.search.query.dsl.impl;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
+import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScopeImpl;
 import org.hibernate.search.backend.lucene.search.aggregation.dsl.LuceneSearchAggregationFactory;
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
+import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
+import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchScroll;
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryOptionsStep;
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryWhereStep;
-import org.hibernate.search.backend.lucene.search.sort.dsl.LuceneSearchSortFactory;
-import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchQueryElementCollector;
-import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
-import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
-import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScopeImpl;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
+import org.hibernate.search.backend.lucene.search.sort.dsl.LuceneSearchSortFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -33,8 +32,7 @@ class LuceneSearchQueryOptionsStepImpl<H, LOS>
 						LOS,
 						LuceneSearchPredicateFactory,
 						LuceneSearchSortFactory,
-						LuceneSearchAggregationFactory,
-						LuceneSearchQueryElementCollector
+						LuceneSearchAggregationFactory
 				>
 		implements LuceneSearchQueryWhereStep<H, LOS>, LuceneSearchQueryOptionsStep<H, LOS> {
 

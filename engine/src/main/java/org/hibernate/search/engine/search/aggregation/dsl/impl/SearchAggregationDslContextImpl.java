@@ -12,9 +12,9 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
 
-public class SearchAggregationDslContextImpl<F extends SearchAggregationBuilderFactory<?>, PDF extends SearchPredicateFactory>
+public class SearchAggregationDslContextImpl<F extends SearchAggregationBuilderFactory, PDF extends SearchPredicateFactory>
 		implements SearchAggregationDslContext<F, PDF> {
-	public static <F extends SearchAggregationBuilderFactory<?>, PDF extends SearchPredicateFactory>
+	public static <F extends SearchAggregationBuilderFactory, PDF extends SearchPredicateFactory>
 			SearchAggregationDslContextImpl<F, PDF> root(SearchIndexScope<?> scope, F builderFactory, PDF predicateFactory) {
 		return new SearchAggregationDslContextImpl<>( scope, builderFactory, predicateFactory );
 	}

@@ -15,7 +15,6 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubQueryElementCollector;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubSearchQueryBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
@@ -24,7 +23,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubReferenceSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 
-class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQueryElementCollector> {
+class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory {
 	private final StubBackend backend;
 	private final StubSearchIndexScope scope;
 
@@ -34,7 +33,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	}
 
 	@Override
-	public <E> SearchQueryBuilder<E, StubQueryElementCollector> selectEntity(BackendSessionContext sessionContext,
+	public <E> SearchQueryBuilder<E> selectEntity(BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, E, ?> loadingContextBuilder) {
 		return new StubSearchQueryBuilder<>(
 				backend, scope, StubSearchWork.ResultType.OBJECTS,
@@ -45,7 +44,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	}
 
 	@Override
-	public <R> SearchQueryBuilder<R, StubQueryElementCollector> selectEntityReference(BackendSessionContext sessionContext,
+	public <R> SearchQueryBuilder<R> selectEntityReference(BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<R, ?, ?> loadingContextBuilder) {
 		return new StubSearchQueryBuilder<>(
 				backend, scope, StubSearchWork.ResultType.REFERENCES,
@@ -56,7 +55,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	}
 
 	@Override
-	public <P> SearchQueryBuilder<P, StubQueryElementCollector> select(BackendSessionContext sessionContext,
+	public <P> SearchQueryBuilder<P> select(BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<P> projection) {
 		return new StubSearchQueryBuilder<>(
 				backend, scope, StubSearchWork.ResultType.PROJECTIONS,
@@ -67,7 +66,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	}
 
 	@Override
-	public SearchQueryBuilder<List<?>, StubQueryElementCollector> select(BackendSessionContext sessionContext,
+	public SearchQueryBuilder<List<?>> select(BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<?>... projections) {
 		return new StubSearchQueryBuilder<>(
 				backend, scope, StubSearchWork.ResultType.PROJECTIONS,

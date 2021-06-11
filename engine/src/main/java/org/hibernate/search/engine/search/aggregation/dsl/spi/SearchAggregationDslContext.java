@@ -21,7 +21,7 @@ import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
  * @param <F> The type of aggregation factory.
  * @param <PDF> The type of factory used to create predicates in {@link FieldSortOptionsStep#filter(Function)}.
  */
-public interface SearchAggregationDslContext<F extends SearchAggregationBuilderFactory<?>, PDF extends SearchPredicateFactory> {
+public interface SearchAggregationDslContext<F extends SearchAggregationBuilderFactory, PDF extends SearchPredicateFactory> {
 
 	/**
 	 * @return The search scope.

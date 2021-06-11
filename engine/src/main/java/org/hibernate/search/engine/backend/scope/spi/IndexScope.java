@@ -17,22 +17,20 @@ import org.hibernate.search.util.common.SearchException;
 
 /**
  * The scope of an index-related operation, aware of the targeted indexes and of the underlying technology (backend).
- *
- * @param <C> The type of query element collector
  */
-public interface IndexScope<C> {
+public interface IndexScope {
 
 	SearchIndexScope<?> searchScope();
 
-	SearchPredicateBuilderFactory<? super C> searchPredicateBuilderFactory();
+	SearchPredicateBuilderFactory searchPredicateBuilderFactory();
 
-	SearchSortBuilderFactory<? super C> searchSortBuilderFactory();
+	SearchSortBuilderFactory searchSortBuilderFactory();
 
-	SearchQueryBuilderFactory<C> searchQueryBuilderFactory();
+	SearchQueryBuilderFactory searchQueryBuilderFactory();
 
 	SearchProjectionBuilderFactory searchProjectionFactory();
 
-	SearchAggregationBuilderFactory<? super C> searchAggregationFactory();
+	SearchAggregationBuilderFactory searchAggregationFactory();
 
 	/**
 	 * Extend the current index scope with the given extension,

@@ -45,7 +45,7 @@ class LuceneIndexScopeBuilder implements IndexScopeBuilder {
 	}
 
 	@Override
-	public IndexScope<?> build() {
+	public IndexScope build() {
 		return new LuceneIndexScopeImpl( backendContext, mappingContext, indexManagers );
 	}
 

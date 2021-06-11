@@ -7,18 +7,17 @@
 package org.hibernate.search.backend.elasticsearch.search.query.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
+import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.ElasticsearchSearchAggregationFactory;
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchScroll;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryOptionsStep;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryWhereStep;
-import org.hibernate.search.backend.elasticsearch.search.sort.dsl.ElasticsearchSearchSortFactory;
-import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchQueryElementCollector;
-import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
-import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
-import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
+import org.hibernate.search.backend.elasticsearch.search.sort.dsl.ElasticsearchSearchSortFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -34,8 +33,7 @@ class ElasticsearchSearchQueryOptionsStepImpl<H, LOS>
 						LOS,
 						ElasticsearchSearchPredicateFactory,
 						ElasticsearchSearchSortFactory,
-						ElasticsearchSearchAggregationFactory,
-						ElasticsearchSearchQueryElementCollector
+						ElasticsearchSearchAggregationFactory
 				>
 		implements ElasticsearchSearchQueryWhereStep<H, LOS>, ElasticsearchSearchQueryOptionsStep<H, LOS> {
 

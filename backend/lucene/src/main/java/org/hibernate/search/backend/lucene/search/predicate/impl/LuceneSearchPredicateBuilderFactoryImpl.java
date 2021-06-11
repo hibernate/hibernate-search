@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
-import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
@@ -22,12 +21,6 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	public LuceneSearchPredicateBuilderFactoryImpl(LuceneSearchIndexScope scope) {
 		this.scope = scope;
-	}
-
-	@Override
-	public void contribute(LuceneSearchPredicateCollector collector, SearchPredicate predicate) {
-		LuceneSearchPredicate lucenePredicate = LuceneSearchPredicate.from( scope, predicate );
-		collector.collectPredicate( lucenePredicate.toQuery( PredicateRequestContext.root() ) );
 	}
 
 	@Override

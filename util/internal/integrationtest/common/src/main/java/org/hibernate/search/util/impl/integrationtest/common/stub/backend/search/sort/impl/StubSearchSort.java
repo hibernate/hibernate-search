@@ -29,7 +29,7 @@ public class StubSearchSort implements SearchSort {
 	private StubSearchSort() {
 	}
 
-	void simulateBuild() {
+	public void simulateBuild() {
 		// No-op, just simulates a call on this object
 	}
 

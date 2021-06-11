@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
@@ -21,12 +20,6 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	public ElasticsearchSearchPredicateBuilderFactoryImpl(ElasticsearchSearchIndexScope scope) {
 		this.scope = scope;
-	}
-
-	@Override
-	public void contribute(ElasticsearchSearchPredicateCollector collector, SearchPredicate predicate) {
-		ElasticsearchSearchPredicate lucenePredicate = ElasticsearchSearchPredicate.from( scope, predicate );
-		collector.collectPredicate( lucenePredicate.toJsonQuery( collector.getRootPredicateContext() ) );
 	}
 
 	@Override

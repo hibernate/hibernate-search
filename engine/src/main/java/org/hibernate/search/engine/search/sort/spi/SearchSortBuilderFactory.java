@@ -13,19 +13,8 @@ import org.hibernate.search.engine.search.sort.SearchSort;
  * <p>
  * This is the main entry point for the engine
  * to ask the backend to build search sorts.
- *
- * @param <C> The type of query element collector
  */
-public interface SearchSortBuilderFactory<C> {
-
-	/**
-	 * Contribute a sort builder to a collector.
-	 * <p>
-	 * May be called multiple times per collector, if there are multiple sorts.
-	 *  @param collector The query element collector.
-	 * @param sort The sort builder implementation.
-	 */
-	void contribute(C collector, SearchSort sort);
+public interface SearchSortBuilderFactory {
 
 	ScoreSortBuilder score();
 

@@ -23,7 +23,7 @@ public class StubSearchAggregation<A> implements SearchAggregation<A> {
 	private StubSearchAggregation() {
 	}
 
-	void simulateBuild() {
+	public void simulateBuild() {
 		// No-op, just simulates a call on this object
 	}
 

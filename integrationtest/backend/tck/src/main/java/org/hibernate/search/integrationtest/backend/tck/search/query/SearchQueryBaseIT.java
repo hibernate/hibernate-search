@@ -248,7 +248,7 @@ public class SearchQueryBaseIT {
 			SearchQueryDslExtension<MyExtendedDslContext<R>, R, E, LOS> {
 		@Override
 		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
-				IndexScope<?> indexScope, BackendSessionContext sessionContext,
+				IndexScope indexScope, BackendSessionContext sessionContext,
 				SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 			assertThat( original ).isNotNull();
 			assertThat( indexScope ).isNotNull();
@@ -262,7 +262,7 @@ public class SearchQueryBaseIT {
 			SearchQueryDslExtension<MyExtendedDslContext<R>, R, E, LOS> {
 		@Override
 		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
-				IndexScope<?> indexScope, BackendSessionContext sessionContext,
+				IndexScope indexScope, BackendSessionContext sessionContext,
 				SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 			assertThat( original ).isNotNull();
 			assertThat( indexScope ).isNotNull();

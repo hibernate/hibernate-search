@@ -9,15 +9,22 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
+import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.aggregation.impl.StubSearchAggregation;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl.StubSearchPredicate;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.impl.StubSearchSort;
 
-public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H, StubQueryElementCollector> {
+public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H> {
 
 	private final StubBackend backend;
 	private final StubSearchIndexScope scope;
@@ -39,8 +46,21 @@ public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H, StubQuer
 	}
 
 	@Override
-	public StubQueryElementCollector toQueryElementCollector() {
-		return StubQueryElementCollector.get();
+	public void predicate(SearchPredicate predicate) {
+		// Just check the type and simulate building native constructs.
+		( (StubSearchPredicate) predicate ).simulateBuild();
+	}
+
+	@Override
+	public void sort(SearchSort sort) {
+		// Just check the type and simulate building native constructs.
+		( (StubSearchSort) sort ).simulateBuild();
+	}
+
+	@Override
+	public <A> void aggregation(AggregationKey<A> key, SearchAggregation<A> aggregation) {
+		// Just check the type and simulate building native constructs.
+		( (StubSearchAggregation) aggregation ).simulateBuild();
 	}
 
 	@Override
