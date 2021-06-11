@@ -50,16 +50,12 @@ public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 
 	@Override
 	public ElasticsearchSearchQueryWhereStep<E, LOS> selectEntity() {
-		ElasticsearchSearchQueryBuilder<E> builder = indexScope.searchQueryBuilderFactory()
-				.selectEntity( sessionContext, loadingContextBuilder );
-		return createSearchQueryContext( builder );
+		return select( indexScope.searchProjectionFactory().<E>entity().build() );
 	}
 
 	@Override
 	public ElasticsearchSearchQueryWhereStep<R, LOS> selectEntityReference() {
-		ElasticsearchSearchQueryBuilder<R> builder = indexScope.searchQueryBuilderFactory()
-				.selectEntityReference( sessionContext, loadingContextBuilder );
-		return createSearchQueryContext( builder );
+		return select( indexScope.searchProjectionFactory().<R>entityReference().build() );
 	}
 
 	@Override
@@ -80,9 +76,7 @@ public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 
 	@Override
 	public ElasticsearchSearchQueryWhereStep<List<?>, LOS> select(SearchProjection<?>... projections) {
-		ElasticsearchSearchQueryBuilder<List<?>> builder = indexScope.searchQueryBuilderFactory()
-				.select( sessionContext, loadingContextBuilder, projections );
-		return createSearchQueryContext( builder );
+		return select( indexScope.searchProjectionFactory().composite( Function.identity(), projections ).build() );
 	}
 
 	@Override

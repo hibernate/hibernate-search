@@ -50,16 +50,12 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 
 	@Override
 	public LuceneSearchQueryWhereStep<E, LOS> selectEntity() {
-		LuceneSearchQueryBuilder<E> builder = indexScope.searchQueryBuilderFactory()
-				.selectEntity( sessionContext, loadingContextBuilder );
-		return createSearchQueryContext( builder );
+		return select( indexScope.searchProjectionFactory().<E>entity().build() );
 	}
 
 	@Override
 	public LuceneSearchQueryWhereStep<R, LOS> selectEntityReference() {
-		LuceneSearchQueryBuilder<R> builder = indexScope.searchQueryBuilderFactory()
-				.selectEntityReference( sessionContext, loadingContextBuilder );
-		return createSearchQueryContext( builder );
+		return select( indexScope.searchProjectionFactory().<R>entityReference().build() );
 	}
 
 	@Override
@@ -75,14 +71,12 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 	public <P> LuceneSearchQueryWhereStep<P, LOS> select(SearchProjection<P> projection) {
 		LuceneSearchQueryBuilder<P> builder = indexScope.searchQueryBuilderFactory()
 				.select( sessionContext, loadingContextBuilder, projection );
-		return createSearchQueryContext( builder );
+		return new LuceneSearchQueryOptionsStepImpl<>( indexScope, builder, loadingContextBuilder );
 	}
 
 	@Override
 	public LuceneSearchQueryWhereStep<List<?>, LOS> select(SearchProjection<?>... projections) {
-		LuceneSearchQueryBuilder<List<?>> builder = indexScope.searchQueryBuilderFactory()
-				.select( sessionContext, loadingContextBuilder, projections );
-		return createSearchQueryContext( builder );
+		return select( indexScope.searchProjectionFactory().composite( Function.identity(), projections ).build() );
 	}
 
 	@Override
@@ -111,8 +105,5 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 		return loadingContextBuilder;
 	}
 
-	private <H> LuceneSearchQueryWhereStep<H, LOS> createSearchQueryContext(LuceneSearchQueryBuilder<H> builder) {
-		return new LuceneSearchQueryOptionsStepImpl<>( indexScope, builder, loadingContextBuilder );
-	}
 }
 

@@ -193,44 +193,42 @@ public class BackendMock implements TestRule {
 
 	public BackendMock expectSearchReferences(Collection<String> indexNames,
 			StubSearchWorkBehavior<DocumentReference> behavior) {
-		return expectSearch( indexNames, b -> {
-		}, StubSearchWork.ResultType.REFERENCES, behavior );
+		return expectSearch( indexNames, b -> { }, behavior );
 	}
 
 	public BackendMock expectSearchReferences(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
 			StubSearchWorkBehavior<DocumentReference> behavior) {
-		return expectSearch( indexNames, contributor, StubSearchWork.ResultType.REFERENCES, behavior );
+		return expectSearch( indexNames, contributor, behavior );
 	}
 
 	public BackendMock expectSearchIds(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
 			StubSearchWorkBehavior<DocumentReference> behavior) {
-		return expectSearch( indexNames, contributor, StubSearchWork.ResultType.PROJECTIONS, behavior );
+		return expectSearch( indexNames, contributor, behavior );
 	}
 
 	public BackendMock expectSearchObjects(String indexName, StubSearchWorkBehavior<DocumentReference> behavior) {
-		return expectSearch( Collections.singleton( indexName ), ignored -> { },
-				StubSearchWork.ResultType.OBJECTS, behavior );
+		return expectSearch( Collections.singleton( indexName ), ignored -> { }, behavior );
 	}
 
 	public BackendMock expectSearchObjects(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
 			StubSearchWorkBehavior<DocumentReference> behavior) {
-		return expectSearch( indexNames, contributor, StubSearchWork.ResultType.OBJECTS, behavior );
+		return expectSearch( indexNames, contributor, behavior );
 	}
 
 	public BackendMock expectSearchProjections(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
 			StubSearchWorkBehavior<List<?>> behavior) {
-		return expectSearch( indexNames, contributor, StubSearchWork.ResultType.PROJECTIONS, behavior );
+		return expectSearch( indexNames, contributor, behavior );
 	}
 
 	public BackendMock expectSearchProjection(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
 			StubSearchWorkBehavior<?> behavior) {
-		return expectSearch( indexNames, contributor, StubSearchWork.ResultType.PROJECTIONS, behavior );
+		return expectSearch( indexNames, contributor, behavior );
 	}
 
 	private BackendMock expectSearch(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
-			StubSearchWork.ResultType resultType, StubSearchWorkBehavior<?> behavior) {
+			StubSearchWorkBehavior<?> behavior) {
 		CallQueue<SearchWorkCall<?>> callQueue = backendBehavior().getSearchWorkCalls();
-		StubSearchWork.Builder builder = StubSearchWork.builder( resultType );
+		StubSearchWork.Builder builder = StubSearchWork.builder();
 		contributor.accept( builder );
 		callQueue.expectInOrder( new SearchWorkCall<>( new LinkedHashSet<>( indexNames ), builder.build(), behavior ) );
 		return this;
@@ -254,18 +252,18 @@ public class BackendMock implements TestRule {
 
 	public BackendMock expectScrollObjects(Collection<String> indexNames, int chunkSize,
 			Consumer<StubSearchWork.Builder> contributor) {
-		return expectScroll( indexNames, contributor, StubSearchWork.ResultType.OBJECTS, chunkSize );
+		return expectScroll( indexNames, contributor, chunkSize );
 	}
 
 	public BackendMock expectScrollProjections(Collection<String> indexNames, int chunkSize,
 			Consumer<StubSearchWork.Builder> contributor) {
-		return expectScroll( indexNames, contributor, StubSearchWork.ResultType.PROJECTIONS, chunkSize );
+		return expectScroll( indexNames, contributor, chunkSize );
 	}
 
 	private BackendMock expectScroll(Collection<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
-			StubSearchWork.ResultType resultType, int chunkSize) {
+			int chunkSize) {
 		CallQueue<ScrollWorkCall<?>> callQueue = backendBehavior().getScrollCalls();
-		StubSearchWork.Builder builder = StubSearchWork.builder( resultType );
+		StubSearchWork.Builder builder = StubSearchWork.builder();
 		contributor.accept( builder );
 		callQueue.expectInOrder( new ScrollWorkCall<>( new LinkedHashSet<>( indexNames ), builder.build(), chunkSize ) );
 		return this;

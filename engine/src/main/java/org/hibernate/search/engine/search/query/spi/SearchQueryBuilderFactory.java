@@ -6,11 +6,9 @@
  */
 package org.hibernate.search.engine.search.query.spi;
 
-import java.util.List;
-
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 
 /**
  * A factory for search query builders.
@@ -20,16 +18,7 @@ import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilde
  */
 public interface SearchQueryBuilderFactory {
 
-	<E> SearchQueryBuilder<E> selectEntity(BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<?, E, ?> loadingContextBuilder);
-
-	<R> SearchQueryBuilder<R> selectEntityReference(BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<R, ?, ?> loadingContextBuilder);
-
 	<P> SearchQueryBuilder<P> select(BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<P> projection);
-
-	SearchQueryBuilder<List<?>> select(BackendSessionContext sessionContext,
-			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<?>... projections);
 
 }

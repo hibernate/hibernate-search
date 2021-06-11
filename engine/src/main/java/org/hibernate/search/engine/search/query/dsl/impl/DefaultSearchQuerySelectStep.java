@@ -46,16 +46,12 @@ public final class DefaultSearchQuerySelectStep<R, E, LOS>
 
 	@Override
 	public DefaultSearchQueryOptionsStep<E, LOS> selectEntity() {
-		SearchQueryBuilder<E> builder = indexScope.searchQueryBuilderFactory()
-				.selectEntity( sessionContext, loadingContextBuilder );
-		return new DefaultSearchQueryOptionsStep<E, LOS>( indexScope, builder, loadingContextBuilder );
+		return select( indexScope.searchProjectionFactory().<E>entity().build() );
 	}
 
 	@Override
 	public DefaultSearchQueryOptionsStep<R, LOS> selectEntityReference() {
-		SearchQueryBuilder<R> builder = indexScope.searchQueryBuilderFactory()
-				.selectEntityReference( sessionContext, loadingContextBuilder );
-		return new DefaultSearchQueryOptionsStep<>( indexScope, builder, loadingContextBuilder );
+		return select( indexScope.searchProjectionFactory().<R>entityReference().build() );
 	}
 
 	@Override
@@ -75,9 +71,7 @@ public final class DefaultSearchQuerySelectStep<R, E, LOS>
 
 	@Override
 	public DefaultSearchQueryOptionsStep<List<?>, LOS> select(SearchProjection<?>... projections) {
-		SearchQueryBuilder<List<?>> builder = indexScope.searchQueryBuilderFactory()
-				.select( sessionContext, loadingContextBuilder, projections );
-		return new DefaultSearchQueryOptionsStep<>( indexScope, builder, loadingContextBuilder );
+		return select( indexScope.searchProjectionFactory().composite( Function.identity(), projections ).build() );
 	}
 
 	@Override

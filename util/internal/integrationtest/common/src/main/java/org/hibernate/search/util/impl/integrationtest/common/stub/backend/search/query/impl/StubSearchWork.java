@@ -14,17 +14,10 @@ import java.util.concurrent.TimeUnit;
 
 public class StubSearchWork {
 
-	public enum ResultType {
-		REFERENCES,
-		OBJECTS,
-		PROJECTIONS
+	public static Builder builder() {
+		return new Builder();
 	}
 
-	public static Builder builder(ResultType resultType) {
-		return new Builder( resultType );
-	}
-
-	private final ResultType resultType;
 	private final List<String> routingKeys;
 	private final Integer offset;
 	private final Integer limit;
@@ -34,7 +27,6 @@ public class StubSearchWork {
 	private final TimeUnit failAfterTimeUnit;
 
 	private StubSearchWork(Builder builder) {
-		this.resultType = builder.resultType;
 		this.routingKeys = Collections.unmodifiableList( new ArrayList<>( builder.routingKeys ) );
 		this.offset = builder.offset;
 		this.limit = builder.limit;
@@ -42,10 +34,6 @@ public class StubSearchWork {
 		this.truncateAfterTimeUnit = builder.truncateAfterTimeUnit;
 		this.failAfterTimeout = builder.failAfterTimeout;
 		this.failAfterTimeUnit = builder.failAfterTimeUnit;
-	}
-
-	public ResultType getResultType() {
-		return resultType;
 	}
 
 	public List<String> getRoutingKeys() {
@@ -79,7 +67,6 @@ public class StubSearchWork {
 	@Override
 	public String toString() {
 		return new StringJoiner( ", ", StubSearchWork.class.getSimpleName() + "[", "]" )
-				.add( "resultType=" + resultType )
 				.add( "routingKeys=" + routingKeys )
 				.add( "offset=" + offset )
 				.add( "limit=" + limit )
@@ -92,7 +79,6 @@ public class StubSearchWork {
 
 	public static class Builder {
 
-		private final ResultType resultType;
 		private final List<String> routingKeys = new ArrayList<>();
 		private Long truncateAfterTimeout;
 		private TimeUnit truncateAfterTimeUnit;
@@ -101,8 +87,7 @@ public class StubSearchWork {
 		private Integer offset;
 		private Integer limit;
 
-		private Builder(ResultType resultType) {
-			this.resultType = resultType;
+		private Builder() {
 		}
 
 		public Builder routingKey(String routingKey) {
