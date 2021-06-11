@@ -15,24 +15,29 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregation;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchQueryElementCollector;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicate;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DistanceSortKey;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSort;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
+import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.impl.CollectionHelper;
@@ -45,8 +50,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 public class ElasticsearchSearchQueryBuilder<H>
-		implements SearchQueryBuilder<H, ElasticsearchSearchQueryElementCollector>,
-		ElasticsearchSearchQueryElementCollector {
+		implements SearchQueryBuilder<H>, ElasticsearchSearchSortCollector {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -99,8 +103,37 @@ public class ElasticsearchSearchQueryBuilder<H>
 	}
 
 	@Override
-	public ElasticsearchSearchQueryElementCollector toQueryElementCollector() {
-		return this;
+	public void predicate(SearchPredicate predicate) {
+		ElasticsearchSearchPredicate elasticsearchPredicate = ElasticsearchSearchPredicate.from( scope, predicate );
+		this.jsonPredicate = elasticsearchPredicate.toJsonQuery( rootPredicateContext );
+	}
+
+	@Override
+	public void sort(SearchSort sort) {
+		ElasticsearchSearchSort elasticsearchSort = ElasticsearchSearchSort.from( scope, sort );
+		elasticsearchSort.toJsonSorts( this );
+	}
+
+	@Override
+	public <A> void aggregation(AggregationKey<A> key, SearchAggregation<A> aggregation) {
+		if ( !( aggregation instanceof ElasticsearchSearchAggregation ) ) {
+			throw log.cannotMixElasticsearchSearchQueryWithOtherAggregations( aggregation );
+		}
+
+		ElasticsearchSearchAggregation<A> casted = (ElasticsearchSearchAggregation<A>) aggregation;
+		if ( !scope.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
+			throw log.aggregationDefinedOnDifferentIndexes(
+					aggregation, casted.getIndexNames(), scope.hibernateSearchIndexNames()
+			);
+		}
+
+		if ( aggregations == null ) {
+			aggregations = new LinkedHashMap<>();
+		}
+		Object previous = aggregations.put( key, casted );
+		if ( previous != null ) {
+			throw log.duplicateAggregationKey( key );
+		}
 	}
 
 	@Override
@@ -135,11 +168,6 @@ public class ElasticsearchSearchQueryBuilder<H>
 	}
 
 	@Override
-	public void collectPredicate(JsonObject jsonQuery) {
-		this.jsonPredicate = jsonQuery;
-	}
-
-	@Override
 	public void collectSort(JsonElement sort) {
 		if ( jsonSort == null ) {
 			jsonSort = new JsonArray();
@@ -157,17 +185,6 @@ public class ElasticsearchSearchQueryBuilder<H>
 		}
 
 		distanceSorts.put( new DistanceSortKey( absoluteFieldPath, center ), index );
-	}
-
-	@Override
-	public <A> void collectAggregation(AggregationKey<A> key, ElasticsearchSearchAggregation<A> aggregation) {
-		if ( aggregations == null ) {
-			aggregations = new LinkedHashMap<>();
-		}
-		Object previous = aggregations.put( key, aggregation );
-		if ( previous != null ) {
-			throw log.duplicateAggregationKey( key );
-		}
 	}
 
 	public void requestTransformer(ElasticsearchSearchRequestTransformer transformer) {

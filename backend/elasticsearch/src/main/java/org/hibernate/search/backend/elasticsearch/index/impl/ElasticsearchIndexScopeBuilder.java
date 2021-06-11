@@ -47,7 +47,7 @@ class ElasticsearchIndexScopeBuilder implements IndexScopeBuilder {
 	}
 
 	@Override
-	public IndexScope<?> build() {
+	public IndexScope build() {
 		// Use LinkedHashSet to ensure stable order when generating requests
 		Set<ElasticsearchIndexModel> indexModels = indexManagers.stream().map( ElasticsearchIndexManagerImpl::model )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );

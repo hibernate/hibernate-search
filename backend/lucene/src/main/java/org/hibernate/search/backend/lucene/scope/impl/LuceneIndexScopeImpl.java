@@ -15,7 +15,6 @@ import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexMana
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactoryImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilderFactory;
@@ -29,7 +28,7 @@ import org.apache.lucene.index.IndexReader;
 
 
 public class LuceneIndexScopeImpl
-		implements IndexScope<LuceneSearchQueryElementCollector>, LuceneIndexScope {
+		implements IndexScope, LuceneIndexScope {
 
 	private final LuceneSearchIndexScope searchScope;
 	private final LuceneSearchPredicateBuilderFactoryImpl searchPredicateFactory;
@@ -80,7 +79,7 @@ public class LuceneIndexScopeImpl
 	}
 
 	@Override
-	public SearchAggregationBuilderFactory<? super LuceneSearchQueryElementCollector> searchAggregationFactory() {
+	public SearchAggregationBuilderFactory searchAggregationFactory() {
 		return searchAggregationFactory;
 	}
 

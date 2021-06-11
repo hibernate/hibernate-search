@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneCompositeListProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
@@ -21,7 +20,7 @@ import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilde
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
 
 public class LuceneSearchQueryBuilderFactory
-		implements SearchQueryBuilderFactory<LuceneSearchQueryElementCollector> {
+		implements SearchQueryBuilderFactory {
 
 	private final SearchBackendContext searchBackendContext;
 

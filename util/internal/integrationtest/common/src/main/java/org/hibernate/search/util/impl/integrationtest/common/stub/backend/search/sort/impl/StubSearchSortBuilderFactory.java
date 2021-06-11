@@ -10,16 +10,9 @@ import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.CompositeSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubQueryElementCollector;
 
 public class StubSearchSortBuilderFactory
-		implements SearchSortBuilderFactory<StubQueryElementCollector> {
-
-	@Override
-	public void contribute(StubQueryElementCollector collector, SearchSort sort) {
-		( (StubSearchSort) sort ).simulateBuild();
-		collector.simulateCollectCall();
-	}
+		implements SearchSortBuilderFactory {
 
 	@Override
 	public ScoreSortBuilder score() {

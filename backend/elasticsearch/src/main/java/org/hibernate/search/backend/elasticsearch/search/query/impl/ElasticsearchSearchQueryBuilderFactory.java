@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchCompositeListProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
@@ -21,7 +20,7 @@ import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilde
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
 
 public class ElasticsearchSearchQueryBuilderFactory
-		implements SearchQueryBuilderFactory<ElasticsearchSearchQueryElementCollector> {
+		implements SearchQueryBuilderFactory {
 
 	private final SearchBackendContext searchBackendContext;
 

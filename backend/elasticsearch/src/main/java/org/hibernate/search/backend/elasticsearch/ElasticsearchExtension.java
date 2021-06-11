@@ -118,7 +118,7 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	@Override
 	public Optional<ElasticsearchSearchQuerySelectStep<R, E, LOS>> extendOptional(
 			SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
-			IndexScope<?> indexScope,
+			IndexScope indexScope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		if ( indexScope instanceof ElasticsearchIndexScope ) {

@@ -26,11 +26,11 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.impl.DefaultSearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.impl.SearchSortDslContextImpl;
 
-class MappedIndexScopeImpl<C, R, E> implements MappedIndexScope<R, E> {
+class MappedIndexScopeImpl<R, E> implements MappedIndexScope<R, E> {
 
-	private final IndexScope<C> delegate;
+	private final IndexScope delegate;
 
-	MappedIndexScopeImpl(IndexScope<C> delegate) {
+	MappedIndexScopeImpl(IndexScope delegate) {
 		this.delegate = delegate;
 	}
 

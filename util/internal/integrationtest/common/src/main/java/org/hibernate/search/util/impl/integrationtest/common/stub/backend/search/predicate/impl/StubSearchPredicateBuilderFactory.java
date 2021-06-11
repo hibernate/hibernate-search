@@ -6,22 +6,14 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl;
 
-import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubQueryElementCollector;
 
 public class StubSearchPredicateBuilderFactory
-		implements SearchPredicateBuilderFactory<StubQueryElementCollector> {
-
-	@Override
-	public void contribute(StubQueryElementCollector collector, SearchPredicate predicate) {
-		( (StubSearchPredicate) predicate ).simulateBuild();
-		collector.simulateCollectCall();
-	}
+		implements SearchPredicateBuilderFactory {
 
 	@Override
 	public MatchIdPredicateBuilder id() {

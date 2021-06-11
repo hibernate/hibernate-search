@@ -11,7 +11,6 @@ import java.util.Set;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilderFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilderFactory;
@@ -23,7 +22,7 @@ import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuild
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 
 public class ElasticsearchIndexScope
-		implements IndexScope<ElasticsearchSearchQueryElementCollector> {
+		implements IndexScope {
 
 	private final ElasticsearchSearchIndexScope searchScope;
 	private final ElasticsearchSearchPredicateBuilderFactoryImpl searchPredicateFactory;
@@ -78,7 +77,7 @@ public class ElasticsearchIndexScope
 	}
 
 	@Override
-	public SearchAggregationBuilderFactory<? super ElasticsearchSearchQueryElementCollector> searchAggregationFactory() {
+	public SearchAggregationBuilderFactory searchAggregationFactory() {
 		return searchAggregationFactory;
 	}
 }

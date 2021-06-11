@@ -24,8 +24,7 @@ public abstract class AbstractSearchQuerySelectStep<
 				E,
 				LOS,
 				PJF extends SearchProjectionFactory<R, E>,
-				PDF extends SearchPredicateFactory,
-				C
+				PDF extends SearchPredicateFactory
 		>
 		implements SearchQuerySelectStep<N, R, E, LOS, PJF, PDF> {
 
@@ -45,7 +44,7 @@ public abstract class AbstractSearchQuerySelectStep<
 		);
 	}
 
-	protected abstract IndexScope<C> indexScope();
+	protected abstract IndexScope indexScope();
 
 	protected abstract BackendSessionContext sessionContext();
 

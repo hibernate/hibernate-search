@@ -24,17 +24,23 @@ import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchA
 import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
-import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchQueryElementCollector;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicate;
+import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionRequestContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
+import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSort;
+import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
+import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -45,8 +51,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
-public class LuceneSearchQueryBuilder<H>
-		implements SearchQueryBuilder<H, LuceneSearchQueryElementCollector>, LuceneSearchQueryElementCollector {
+public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, LuceneSearchSortCollector {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -89,8 +94,37 @@ public class LuceneSearchQueryBuilder<H>
 	}
 
 	@Override
-	public LuceneSearchQueryElementCollector toQueryElementCollector() {
-		return this;
+	public void predicate(SearchPredicate predicate) {
+		LuceneSearchPredicate lucenePredicate = LuceneSearchPredicate.from( scope, predicate );
+		this.luceneQuery = lucenePredicate.toQuery( PredicateRequestContext.root() );
+	}
+
+	@Override
+	public void sort(SearchSort sort) {
+		LuceneSearchSort luceneSort = LuceneSearchSort.from( scope, sort );
+		luceneSort.toSortFields( this );
+	}
+
+	@Override
+	public <A> void aggregation(AggregationKey<A> key, SearchAggregation<A> aggregation) {
+		if ( !(aggregation instanceof LuceneSearchAggregation) ) {
+			throw log.cannotMixLuceneSearchQueryWithOtherAggregations( aggregation );
+		}
+
+		LuceneSearchAggregation<A> casted = (LuceneSearchAggregation<A>) aggregation;
+		if ( !scope.hibernateSearchIndexNames().equals( casted.getIndexNames() ) ) {
+			throw log.aggregationDefinedOnDifferentIndexes(
+					aggregation, casted.getIndexNames(), scope.hibernateSearchIndexNames()
+			);
+		}
+
+		if ( aggregations == null ) {
+			aggregations = new LinkedHashMap<>();
+		}
+		Object previous = aggregations.put( key, casted );
+		if ( previous != null ) {
+			throw log.duplicateAggregationKey( key );
+		}
 	}
 
 	@Override
@@ -117,11 +151,6 @@ public class LuceneSearchQueryBuilder<H>
 	@Override
 	public void totalHitCountThreshold(long totalHitCountThreshold) {
 		this.totalHitCountThreshold = totalHitCountThreshold;
-	}
-
-	@Override
-	public void collectPredicate(Query luceneQuery) {
-		this.luceneQuery = luceneQuery;
 	}
 
 	@Override
@@ -155,17 +184,6 @@ public class LuceneSearchQueryBuilder<H>
 			this.sortFields = new ArrayList<>( sortFields.length );
 		}
 		Collections.addAll( this.sortFields, sortFields );
-	}
-
-	@Override
-	public <A> void collectAggregation(AggregationKey<A> key, LuceneSearchAggregation<A> aggregation) {
-		if ( aggregations == null ) {
-			aggregations = new LinkedHashMap<>();
-		}
-		Object previous = aggregations.put( key, aggregation );
-		if ( previous != null ) {
-			throw log.duplicateAggregationKey( key );
-		}
 	}
 
 	@Override

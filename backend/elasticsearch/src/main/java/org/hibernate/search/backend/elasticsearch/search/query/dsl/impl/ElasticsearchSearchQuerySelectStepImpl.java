@@ -15,7 +15,6 @@ import org.hibernate.search.backend.elasticsearch.search.projection.dsl.Elastics
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryOptionsStep;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryWhereStep;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQuerySelectStep;
-import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
@@ -33,8 +32,7 @@ public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 						E,
 						LOS,
 						ElasticsearchSearchProjectionFactory<R, E>,
-						ElasticsearchSearchPredicateFactory,
-						ElasticsearchSearchQueryElementCollector
+						ElasticsearchSearchPredicateFactory
 				>
 		implements ElasticsearchSearchQuerySelectStep<R, E, LOS> {
 

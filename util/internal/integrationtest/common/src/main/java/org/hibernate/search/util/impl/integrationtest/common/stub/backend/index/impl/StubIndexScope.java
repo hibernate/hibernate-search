@@ -20,10 +20,9 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl.StubSearchPredicateBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionBuilderFactory;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubQueryElementCollector;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.impl.StubSearchSortBuilderFactory;
 
-public class StubIndexScope implements IndexScope<StubQueryElementCollector> {
+public class StubIndexScope implements IndexScope {
 	private final StubSearchIndexScope searchScope;
 	private final StubSearchPredicateBuilderFactory predicateFactory;
 	private final StubSearchSortBuilderFactory sortFactory;
@@ -68,7 +67,7 @@ public class StubIndexScope implements IndexScope<StubQueryElementCollector> {
 	}
 
 	@Override
-	public SearchAggregationBuilderFactory<? super StubQueryElementCollector> searchAggregationFactory() {
+	public SearchAggregationBuilderFactory searchAggregationFactory() {
 		return aggregationFactory;
 	}
 

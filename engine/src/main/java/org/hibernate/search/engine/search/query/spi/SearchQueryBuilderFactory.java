@@ -17,21 +17,19 @@ import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilde
  * <p>
  * This is the main entry point for the engine
  * to ask the backend to build search queries.
- *
- * @param <C> The type of query element collector
  */
-public interface SearchQueryBuilderFactory<C> {
+public interface SearchQueryBuilderFactory {
 
-	<E> SearchQueryBuilder<E, C> selectEntity(BackendSessionContext sessionContext,
+	<E> SearchQueryBuilder<E> selectEntity(BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, E, ?> loadingContextBuilder);
 
-	<R> SearchQueryBuilder<R, C> selectEntityReference(BackendSessionContext sessionContext,
+	<R> SearchQueryBuilder<R> selectEntityReference(BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<R, ?, ?> loadingContextBuilder);
 
-	<P> SearchQueryBuilder<P, C> select(BackendSessionContext sessionContext,
+	<P> SearchQueryBuilder<P> select(BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<P> projection);
 
-	SearchQueryBuilder<List<?>, C> select(BackendSessionContext sessionContext,
+	SearchQueryBuilder<List<?>> select(BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<?>... projections);
 
 }

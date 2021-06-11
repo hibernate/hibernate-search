@@ -24,7 +24,7 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
  * @param <F> The type of sort factory.
  * @param <PDF> The type of factory used to create predicates in {@link FieldSortOptionsStep#filter(Function)}.
  */
-public interface SearchSortDslContext<F extends SearchSortBuilderFactory<?>, PDF extends SearchPredicateFactory> {
+public interface SearchSortDslContext<F extends SearchSortBuilderFactory, PDF extends SearchPredicateFactory> {
 
 	/**
 	 * @return The search scope.

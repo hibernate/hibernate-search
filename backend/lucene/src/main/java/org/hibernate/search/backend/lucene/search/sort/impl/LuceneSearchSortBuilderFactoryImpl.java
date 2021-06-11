@@ -24,12 +24,6 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 	}
 
 	@Override
-	public void contribute(LuceneSearchSortCollector collector, SearchSort sort) {
-		LuceneSearchSort luceneSort = LuceneSearchSort.from( scope, sort );
-		luceneSort.toSortFields( collector );
-	}
-
-	@Override
 	public ScoreSortBuilder score() {
 		return new LuceneScoreSort.Builder( scope );
 	}

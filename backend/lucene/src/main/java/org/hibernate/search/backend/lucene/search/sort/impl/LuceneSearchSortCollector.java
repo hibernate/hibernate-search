@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
-import org.hibernate.search.engine.search.sort.SearchSort;
 
 import org.apache.lucene.search.SortField;
 
@@ -17,8 +16,7 @@ import org.apache.lucene.search.SortField;
  * <p>
  * Used by Lucene-specific sort contributors.
  *
- * @see LuceneSearchSortBuilderFactoryImpl#contribute(LuceneSearchSortCollector, SearchSort)
- * @see LuceneSearchSortBuilder
+ * @see LuceneSearchSort#toSortFields(org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector)
  */
 public interface LuceneSearchSortCollector {
 

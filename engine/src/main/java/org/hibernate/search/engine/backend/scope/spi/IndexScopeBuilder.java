@@ -8,6 +8,6 @@ package org.hibernate.search.engine.backend.scope.spi;
 
 public interface IndexScopeBuilder {
 
-	IndexScope<?> build();
+	IndexScope build();
 
 }

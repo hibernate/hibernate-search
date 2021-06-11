@@ -48,7 +48,7 @@ public class StubSearchPredicate implements SearchPredicate {
 	private StubSearchPredicate() {
 	}
 
-	void simulateBuild() {
+	public void simulateBuild() {
 		// No-op, just simulates a call on this object
 	}
 
