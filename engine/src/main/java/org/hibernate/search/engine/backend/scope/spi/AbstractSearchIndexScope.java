@@ -105,7 +105,7 @@ public abstract class AbstractSearchIndexScope<
 	}
 
 	@Override
-	public C root() {
+	public final C root() {
 		if ( indexModels.size() == 1 ) {
 			return indexModels.iterator().next().root();
 		}
@@ -119,7 +119,7 @@ public abstract class AbstractSearchIndexScope<
 	}
 
 	@Override
-	public N field(String absoluteFieldPath) {
+	public final N field(String absoluteFieldPath) {
 		N resultOrNull;
 		if ( indexModels.size() == 1 ) {
 			resultOrNull = indexModels.iterator().next().fieldOrNull( absoluteFieldPath );
@@ -131,6 +131,11 @@ public abstract class AbstractSearchIndexScope<
 			throw log.unknownFieldForSearch( absoluteFieldPath, indexesEventContext() );
 		}
 		return resultOrNull;
+	}
+
+	@Override
+	public final N child(SearchIndexCompositeNodeContext<?> parent, String name) {
+		return field( parent.absolutePath( name ) );
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"}) // We check types using reflection

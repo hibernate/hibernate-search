@@ -25,6 +25,8 @@ public interface SearchIndexScope {
 
 	SearchIndexNodeContext<?> field(String absoluteFieldPath);
 
+	SearchIndexNodeContext<?> child(SearchIndexCompositeNodeContext<?> parent, String name);
+
 	<T> T rootQueryElement(SearchQueryElementTypeKey<T> key);
 
 	<T> T fieldQueryElement(String absoluteFieldPath, SearchQueryElementTypeKey<T> key);

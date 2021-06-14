@@ -22,6 +22,7 @@ public interface LuceneSearchIndexCompositeNodeContext
 	@Override
 	LuceneSearchIndexCompositeNodeTypeContext type();
 
+	@Override
 	Map<String, ? extends LuceneSearchIndexNodeContext> staticChildrenByName();
 
 }
