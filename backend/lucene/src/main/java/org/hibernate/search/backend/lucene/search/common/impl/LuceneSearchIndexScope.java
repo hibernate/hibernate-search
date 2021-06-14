@@ -23,10 +23,4 @@ public interface LuceneSearchIndexScope extends SearchIndexScope {
 
 	LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry();
 
-	@Override
-	LuceneSearchIndexCompositeNodeContext root();
-
-	@Override
-	LuceneSearchIndexNodeContext field(String absoluteFieldPath);
-
 }

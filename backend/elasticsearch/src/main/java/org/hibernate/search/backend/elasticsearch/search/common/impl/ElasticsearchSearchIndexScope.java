@@ -44,11 +44,5 @@ public interface ElasticsearchSearchIndexScope extends SearchIndexScope {
 
 	Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex();
 
-	@Override
-	ElasticsearchSearchIndexCompositeNodeContext root();
-
-	@Override
-	ElasticsearchSearchIndexNodeContext field(String absoluteFieldPath);
-
 	int maxResultWindow();
 }
