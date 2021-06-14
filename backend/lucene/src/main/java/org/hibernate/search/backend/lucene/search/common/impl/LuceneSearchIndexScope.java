@@ -7,8 +7,6 @@
 package org.hibernate.search.backend.lucene.search.common.impl;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.search.common.spi.SearchIndexCompositeNodeContext;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 
@@ -16,10 +14,6 @@ public interface LuceneSearchIndexScope extends SearchIndexScope {
 
 	@Override
 	LuceneSearchIndexNodeContext child(SearchIndexCompositeNodeContext<?> parent, String name);
-
-	ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext();
-
-	ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext();
 
 	LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry();
 
