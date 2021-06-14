@@ -12,9 +12,10 @@ import org.hibernate.search.engine.search.common.spi.AbstractMultiIndexSearchInd
 
 public final class StubMultiIndexSearchIndexCompositeNodeContext
 		extends AbstractMultiIndexSearchIndexCompositeNodeContext<
-		StubSearchIndexCompositeNodeContext,
+						StubSearchIndexCompositeNodeContext,
 						StubSearchIndexScope,
-						StubSearchIndexCompositeNodeTypeContext
+						StubSearchIndexCompositeNodeTypeContext,
+						StubSearchIndexNodeContext
 				>
 		implements StubSearchIndexCompositeNodeContext, StubSearchIndexCompositeNodeTypeContext {
 
@@ -42,5 +43,10 @@ public final class StubMultiIndexSearchIndexCompositeNodeContext
 	@Override
 	public StubSearchIndexValueFieldContext<?> toValueField() {
 		return (StubSearchIndexValueFieldContext<?>) super.toValueField();
+	}
+
+	@Override
+	protected StubSearchIndexNodeContext childInScope(String childRelativeName) {
+		return scope.child( this, childRelativeName );
 	}
 }

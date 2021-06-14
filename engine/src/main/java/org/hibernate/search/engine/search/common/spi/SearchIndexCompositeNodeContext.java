@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.common.spi;
 
+import java.util.Map;
+
 /**
  * Information about a composite index element targeted by search; either the index root or an object field.
  *
@@ -17,5 +19,7 @@ public interface SearchIndexCompositeNodeContext<SC extends SearchIndexScope>
 	String absolutePath(String relativeFieldName);
 
 	SearchIndexCompositeNodeTypeContext<SC, ?> type();
+
+	Map<String, ? extends SearchIndexNodeContext<SC>> staticChildrenByName();
 
 }

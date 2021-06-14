@@ -14,7 +14,8 @@ public final class ElasticsearchMultiIndexSearchIndexCompositeNodeContext
 		extends AbstractMultiIndexSearchIndexCompositeNodeContext<
 						ElasticsearchSearchIndexCompositeNodeContext,
 						ElasticsearchSearchIndexScope,
-						ElasticsearchSearchIndexCompositeNodeTypeContext
+						ElasticsearchSearchIndexCompositeNodeTypeContext,
+						ElasticsearchSearchIndexNodeContext
 				>
 		implements ElasticsearchSearchIndexCompositeNodeContext,
 		ElasticsearchSearchIndexCompositeNodeTypeContext {
@@ -41,4 +42,8 @@ public final class ElasticsearchMultiIndexSearchIndexCompositeNodeContext
 		return indexElement.type();
 	}
 
+	@Override
+	protected ElasticsearchSearchIndexNodeContext childInScope(String childRelativeName) {
+		return scope.child( this, childRelativeName );
+	}
 }

@@ -28,7 +28,6 @@ import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.EventContextFormatter;
-import org.hibernate.search.util.common.logging.impl.EventContextNoPrefixFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -299,12 +298,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET + 55,
 			value = "Invalid search projection: '%1$s'. You must build the projection from a Lucene search scope.")
 	SearchException cannotMixLuceneSearchQueryWithOtherProjections(SearchProjection<?> projection);
-
-	@Message(id = ID_OFFSET + 58,
-			value = "Inconsistent configuration for %1$s in a search query across multiple indexes: %2$s")
-	SearchException inconsistentConfigurationForIndexElementForSearch(
-			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext, String causeMessage,
-			@Param EventContext elementContextAsParam, @Cause SearchException cause);
 
 	@Message(id = ID_OFFSET + 61, value = "Unable to shut down index accessor: %1$s")
 	SearchException unableToShutdownIndexAccessor(String causeMessage, @Cause Exception cause);

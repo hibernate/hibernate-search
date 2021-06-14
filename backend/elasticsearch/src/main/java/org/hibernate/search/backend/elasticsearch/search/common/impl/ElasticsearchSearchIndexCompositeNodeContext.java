@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.common.impl;
 
+import java.util.Map;
+
 import org.hibernate.search.engine.search.common.spi.SearchIndexCompositeNodeContext;
 
 public interface ElasticsearchSearchIndexCompositeNodeContext
@@ -16,5 +18,8 @@ public interface ElasticsearchSearchIndexCompositeNodeContext
 
 	@Override
 	ElasticsearchSearchIndexCompositeNodeTypeContext type();
+
+	@Override
+	Map<String, ? extends ElasticsearchSearchIndexNodeContext> staticChildrenByName();
 
 }
