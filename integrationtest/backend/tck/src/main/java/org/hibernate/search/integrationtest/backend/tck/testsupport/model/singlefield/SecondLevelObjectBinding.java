@@ -43,6 +43,6 @@ public class SecondLevelObjectBinding extends AbstractObjectBinding {
 			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
 		super( parentBinding, relativeFieldName, objectField, supportedFieldTypes, additionalConfiguration );
 		self = objectField.toReference();
-		discriminator = objectField.field( "discriminator", f -> f.asString() ).toReference();
+		discriminator = objectField.field( DISCRIMINATOR_FIELD_NAME, f -> f.asString() ).toReference();
 	}
 }

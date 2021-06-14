@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +18,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.AbstractObjectBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -180,6 +182,28 @@ public class FieldSearchProjectionSingleValuedBaseIT<F> {
 						Arrays.asList( dataSet.getFieldValue( 2 ), dataSet.getFieldValue( 2 ) ),
 						Arrays.asList( dataSet.getFieldValue( 3 ), dataSet.getFieldValue( 3 ) ),
 						Arrays.asList( null, null ) // Empty document
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void factoryWithRoot() {
+		AbstractObjectBinding parentObjectBinding = index.binding().getParentObject( fieldStructure );
+
+		assumeTrue( "This test is only relevant when the field is located on an object field",
+				parentObjectBinding.absolutePath != null );
+
+		assertThatQuery( index.query()
+				.select( f -> f.withRoot( parentObjectBinding.absolutePath )
+						.field( parentObjectBinding.getRelativeFieldName( fieldStructure, fieldType ), fieldType.getJavaType() ) )
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.toQuery() )
+				.hasHitsAnyOrder(
+						dataSet.getFieldValue( 1 ),
+						dataSet.getFieldValue( 2 ),
+						dataSet.getFieldValue( 3 ),
+						null // Empty document
 				);
 	}
 

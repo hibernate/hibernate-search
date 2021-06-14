@@ -46,9 +46,9 @@ public class FirstLevelObjectBinding extends AbstractObjectBinding {
 			IndexObjectFieldCardinality nestedFieldCardinality) {
 		super( parentBinding, relativeFieldName, objectField, supportedFieldTypes, additionalConfiguration );
 		self = objectField.toReference();
-		discriminator = objectField.field( "discriminator", f -> f.asString() ).toReference();
+		discriminator = objectField.field( DISCRIMINATOR_FIELD_NAME, f -> f.asString() ).toReference();
 		nestedObject = SecondLevelObjectBinding.create(
-				parentBinding, "nestedObject", objectField, ObjectStructure.NESTED, supportedFieldTypes,
+				this, "nestedObject", objectField, ObjectStructure.NESTED, supportedFieldTypes,
 				additionalConfiguration, nestedFieldCardinality
 		);
 	}

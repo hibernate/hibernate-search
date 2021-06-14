@@ -6,10 +6,15 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+
+import org.junit.Test;
 
 public abstract class AbstractPredicateFieldInObjectFieldIT<V extends AbstractPredicateTestValues<?>>
 		extends AbstractPredicateInObjectFieldIT {
@@ -22,10 +27,33 @@ public abstract class AbstractPredicateFieldInObjectFieldIT<V extends AbstractPr
 		this.dataSet = dataSet;
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void factoryWithRoot_nested() {
+		assertThatQuery( mainIndex.query()
+				.where( f -> predicateWithRelativePath( f.withRoot( binding.nested.absolutePath ), binding.nested, 0 ) )
+				.routing( dataSet.routingKey ) )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void factoryWithRoot_flattened() {
+		assertThatQuery( mainIndex.query()
+				.where( f -> predicateWithRelativePath( f.withRoot( binding.flattened.absolutePath ), binding.flattened, 0 ) )
+				.routing( dataSet.routingKey ) )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
+	}
+
 	@Override
 	protected final PredicateFinalStep predicate(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding,
 			int matchingDocOrdinal) {
-		return predicate( f, objectFieldBinding.fieldPath( dataSet.fieldType ), matchingDocOrdinal );
+		return predicate( f, objectFieldBinding.absoluteFieldPath( dataSet.fieldType ), matchingDocOrdinal );
+	}
+
+	protected final PredicateFinalStep predicateWithRelativePath(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding,
+			int matchingDocOrdinal) {
+		return predicate( f, objectFieldBinding.relativeFieldPath( dataSet.fieldType ), matchingDocOrdinal );
 	}
 
 	protected abstract PredicateFinalStep predicate(SearchPredicateFactory f, String fieldPath, int matchingDocOrdinal);

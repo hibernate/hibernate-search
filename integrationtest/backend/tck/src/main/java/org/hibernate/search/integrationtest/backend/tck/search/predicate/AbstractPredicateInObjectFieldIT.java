@@ -29,10 +29,10 @@ public abstract class AbstractPredicateInObjectFieldIT {
 
 	static final int MISSING_FIELD_INDEX_DOC_ORDINAL = 42;
 
-	private final SimpleMappedIndex<IndexBinding> mainIndex;
-	private final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex;
-	private final IndexBinding binding;
-	private final AbstractPredicateDataSet dataSet;
+	protected final SimpleMappedIndex<IndexBinding> mainIndex;
+	protected final SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex;
+	protected final IndexBinding binding;
+	protected final AbstractPredicateDataSet dataSet;
 
 	public AbstractPredicateInObjectFieldIT(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
@@ -172,9 +172,13 @@ public abstract class AbstractPredicateInObjectFieldIT {
 			this.field = SimpleFieldModelsByType.mapAll( fieldTypes, self, "" );
 		}
 
-		String fieldPath(FieldTypeDescriptor<?> fieldType) {
+		String absoluteFieldPath(FieldTypeDescriptor<?> fieldType) {
 			String prefix = absolutePath == null ? "" : absolutePath + ".";
-			return prefix + field.get( fieldType ).relativeFieldName;
+			return prefix + relativeFieldPath( fieldType );
+		}
+
+		String relativeFieldPath(FieldTypeDescriptor<?> fieldType) {
+			return field.get( fieldType ).relativeFieldName;
 		}
 	}
 
@@ -261,6 +265,7 @@ public abstract class AbstractPredicateInObjectFieldIT {
 	static class ObjectFieldBinding extends AbstractObjectBinding {
 		private static final int MAX_DEPTH = 4;
 
+		final String relativeName;
 		final IndexObjectFieldReference reference;
 
 		final ObjectFieldBinding nested;
@@ -270,13 +275,13 @@ public abstract class AbstractPredicateInObjectFieldIT {
 				ObjectStructure structure, Collection<? extends FieldTypeDescriptor<?>> fieldTypes,
 				int depth) {
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, structure );
-			String absolutePath = parentAbsolutePath == null ? relativeFieldName : parentAbsolutePath + "." + relativeFieldName;
-			return new ObjectFieldBinding( objectField, absolutePath, fieldTypes, depth );
+			return new ObjectFieldBinding( objectField, parentAbsolutePath, relativeFieldName, fieldTypes, depth );
 		}
 
-		ObjectFieldBinding(IndexSchemaObjectField objectField, String absolutePath,
+		ObjectFieldBinding(IndexSchemaObjectField objectField, String parentAbsolutePath, String relativeFieldName,
 				Collection<? extends FieldTypeDescriptor<?>> fieldTypes, int depth) {
-			super( objectField, absolutePath, fieldTypes );
+			super( objectField, parentAbsolutePath == null ? relativeFieldName : parentAbsolutePath + "." + relativeFieldName, fieldTypes );
+			relativeName = relativeFieldName;
 			reference = objectField.toReference();
 			if ( depth < MAX_DEPTH ) {
 				nested = create( objectField, absolutePath, "nested", ObjectStructure.NESTED,

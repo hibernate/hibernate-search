@@ -13,6 +13,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Te
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators.APPROX_MILES_COMPARATOR;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.TestComparators.APPROX_M_COMPARATOR;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.AbstractObjectBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
@@ -324,6 +326,30 @@ public class DistanceSearchProjectionSingleValuedBaseIT {
 						dataSet.getFieldDistanceFromCenter1( 2 ) / 1000,
 						dataSet.getFieldDistanceFromCenter1( 3 ) / 1000,
 						null
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void factoryWithRoot() {
+		AbstractObjectBinding parentObjectBinding = mainIndex.binding().getParentObject( fieldStructure );
+
+		assumeTrue( "This test is only relevant when the field is located on an object field",
+				parentObjectBinding.absolutePath != null );
+
+		assertThatQuery( mainIndex.query()
+				.select( f -> f.withRoot( parentObjectBinding.absolutePath )
+						.distance( parentObjectBinding.getRelativeFieldName( fieldStructure, fieldType ), CENTER_POINT_1 ) )
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.toQuery() )
+				.hits().asIs()
+				.usingElementComparator( APPROX_M_COMPARATOR )
+				.containsExactlyInAnyOrder(
+						dataSet.getFieldDistanceFromCenter1( 1 ),
+						dataSet.getFieldDistanceFromCenter1( 2 ),
+						dataSet.getFieldDistanceFromCenter1( 3 ),
+						null // Empty document
 				);
 	}
 

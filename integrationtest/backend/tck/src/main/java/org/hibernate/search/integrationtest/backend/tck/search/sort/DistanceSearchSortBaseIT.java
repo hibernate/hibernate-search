@@ -27,6 +27,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.dsl.DistanceSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.AbstractObjectBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.GeoPointFieldTypeDescriptor;
@@ -37,7 +38,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.BeforeClass;
@@ -339,6 +339,39 @@ public class DistanceSearchSortBaseIT {
 				);
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void factoryWithRoot() {
+		assumeTestParametersWork();
+
+		AbstractObjectBinding parentObjectBinding = index.binding().getParentObject( fieldStructure );
+
+		assumeTrue( "This test is only relevant when the field is located on an object field",
+				parentObjectBinding.absolutePath != null );
+
+		DataSet dataSet = dataSetForAsc;
+		assertThatQuery( index.query()
+				.where( f -> f.matchAll() )
+				.routing( dataSet.routingKey )
+				.sort( ( (Function<SearchSortFactory, DistanceSortOptionsStep<?, ?>>)
+						f -> f.withRoot( parentObjectBinding.absolutePath )
+								.distance( parentObjectBinding.getRelativeFieldName( fieldStructure, fieldType ), CENTER_POINT ) )
+						.andThen( this::applySortMode )
+						// Don't call this.applyFilter: we need to use the relative name of the discriminator field.
+						.andThen( optionsStep -> {
+							if ( fieldStructure.isInNested() ) {
+								return optionsStep.filter( f -> f.match()
+										.field( AbstractObjectBinding.DISCRIMINATOR_FIELD_NAME )
+										.matching( "included" ) );
+							}
+							else {
+								return optionsStep;
+							}
+						} ) ) )
+				.hasDocRefHitsExactOrder( index.typeName(),
+						dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id, dataSet.emptyDoc1Id );
+	}
+
 	private void assumeTestParametersWork() {
 		assumeFalse(
 				"This combination is not expected to work",
@@ -356,8 +389,7 @@ public class DistanceSearchSortBaseIT {
 
 	private SearchQuery<DocumentReference> simpleQuery(DataSet dataSet,
 			Function<? super SearchSortFactory, ? extends DistanceSortOptionsStep<?, ?>> sortContributor) {
-		StubMappingScope scope = index.createScope();
-		return scope.query()
+		return index.query()
 				.where( f -> f.matchAll() )
 				.routing( dataSet.routingKey )
 				.sort( sortContributor.andThen( this::applySortMode ).andThen( this::applyFilter ) )

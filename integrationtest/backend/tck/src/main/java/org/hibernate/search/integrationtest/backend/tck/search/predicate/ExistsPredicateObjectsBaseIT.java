@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,6 +29,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.function.TriFunction;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -99,21 +102,43 @@ public class ExistsPredicateObjectsBaseIT {
 			this.dataSet = dataSet;
 		}
 
+		@Test
+		@TestForIssue(jiraKey = "HSEARCH-4162")
+		public void factoryWithRoot_nested() {
+			assertThatQuery( mainIndex.query()
+					.where( f -> predicateWithRelativePath( f.withRoot( binding.nested.absolutePath ), binding.nested ) )
+					.routing( dataSet.routingKey ) )
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
+		}
+
+		@Test
+		@TestForIssue(jiraKey = "HSEARCH-4162")
+		public void factoryWithRoot_flattened() {
+			assertThatQuery( mainIndex.query()
+					.where( f -> predicateWithRelativePath( f.withRoot( binding.flattened.absolutePath ), binding.flattened ) )
+					.routing( dataSet.routingKey ) )
+					.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
+		}
+
 		@Override
 		protected PredicateFinalStep predicate(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding,
 				int matchingDocOrdinal) {
 			if ( matchingDocOrdinal != 0 ) {
 				throw new IllegalStateException( "This predicate can only match the first document" );
 			}
-			return f.exists().field( fieldPath( objectFieldBinding ) );
+			return f.exists().field( targetField( objectFieldBinding ).absolutePath );
 		}
 
-		private String fieldPath(ObjectFieldBinding objectFieldBinding) {
+		protected PredicateFinalStep predicateWithRelativePath(SearchPredicateFactory f, ObjectFieldBinding objectFieldBinding) {
+			return f.exists().field( targetField( objectFieldBinding ).relativeName );
+		}
+
+		private ObjectFieldBinding targetField(ObjectFieldBinding objectFieldBinding) {
 			switch ( dataSet.structure ) {
 				case FLATTENED:
-					return objectFieldBinding.flattened.absolutePath;
+					return objectFieldBinding.flattened;
 				case NESTED:
-					return objectFieldBinding.nested.absolutePath;
+					return objectFieldBinding.nested;
 				default:
 					throw new IllegalStateException( "Unexpected structure: " + dataSet.structure );
 			}

@@ -33,6 +33,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.AbstractObjectBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.NormalizedStringFieldTypeDescriptor;
@@ -391,6 +392,40 @@ public class FieldSearchSortBaseIT<F> {
 		assertThatHits( docRefHits ).ordinals( 2, 3, 4, 5, 6 )
 				.hasDocRefHitsAnyOrder( index.typeName(), dataSet.doc3Id, dataSet.emptyDoc1Id,
 						dataSet.emptyDoc2Id, dataSet.emptyDoc3Id, dataSet.emptyDoc4Id );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void factoryWithRoot() {
+		assumeTestParametersWork();
+
+		AbstractObjectBinding parentObjectBinding = index.binding().getParentObject( fieldStructure );
+
+		assumeTrue( "This test is only relevant when the field is located on an object field",
+				parentObjectBinding.absolutePath != null );
+
+		DataSet dataSet = dataSetForAsc;
+		assertThatQuery( index.query()
+				.where( f -> f.matchAll().except( f.id().matchingAny( Arrays.asList(
+								dataSet.emptyDoc1Id, dataSet.emptyDoc2Id, dataSet.emptyDoc3Id, dataSet.emptyDoc4Id
+						) ) ) )
+				.routing( dataSet.routingKey )
+				.sort( ( (Function<SearchSortFactory, FieldSortOptionsStep<?, ?>>)
+						f -> f.withRoot( parentObjectBinding.absolutePath )
+								.field( parentObjectBinding.getRelativeFieldName( fieldStructure, fieldType ) ) )
+						.andThen( this::applySortMode )
+						// Don't call this.applyFilter: we need to use the relative name of the discriminator field.
+						.andThen( optionsStep -> {
+							if ( fieldStructure.isInNested() ) {
+								return optionsStep.filter( f -> f.match()
+										.field( AbstractObjectBinding.DISCRIMINATOR_FIELD_NAME )
+										.matching( "included" ) );
+							}
+							else {
+								return optionsStep;
+							}
+						} ) ) )
+				.hasDocRefHitsExactOrder( index.typeName(), dataSet.doc1Id, dataSet.doc2Id, dataSet.doc3Id );
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(DataSet<F> dataSet,
