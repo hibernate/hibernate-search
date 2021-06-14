@@ -11,4 +11,10 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexNodeContext;
 public interface ElasticsearchSearchIndexNodeContext
 		extends SearchIndexNodeContext<ElasticsearchSearchIndexScope> {
 
+	@Override
+	ElasticsearchSearchIndexCompositeNodeContext toComposite();
+
+	@Override
+	ElasticsearchSearchIndexValueFieldContext<?> toValueField();
+
 }

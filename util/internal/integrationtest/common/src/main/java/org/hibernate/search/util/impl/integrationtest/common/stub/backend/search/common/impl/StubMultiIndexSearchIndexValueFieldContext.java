@@ -9,6 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 import java.util.List;
 
 import org.hibernate.search.engine.search.common.spi.AbstractMultiIndexSearchIndexValueFieldContext;
+import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
 
 public class StubMultiIndexSearchIndexValueFieldContext<F>
 		extends AbstractMultiIndexSearchIndexValueFieldContext<
@@ -37,5 +38,10 @@ public class StubMultiIndexSearchIndexValueFieldContext<F>
 	@Override
 	protected StubSearchIndexValueFieldTypeContext<F> typeOf(StubSearchIndexValueFieldContext<F> indexElement) {
 		return indexElement.type();
+	}
+
+	@Override
+	public StubSearchIndexCompositeNodeContext toComposite() {
+		return SearchIndexSchemaElementContextHelper.throwingToComposite( this );
 	}
 }

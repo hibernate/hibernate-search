@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.engine.search.common.spi.AbstractMultiIndexSearchIndexValueFieldContext;
+import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
 
 import com.google.gson.JsonPrimitive;
 
@@ -41,6 +42,11 @@ public class ElasticsearchMultiIndexSearchIndexValueFieldContext<F>
 	protected ElasticsearchSearchIndexValueFieldTypeContext<F> typeOf(
 			ElasticsearchSearchIndexValueFieldContext<F> indexElement) {
 		return indexElement.type();
+	}
+
+	@Override
+	public ElasticsearchSearchIndexCompositeNodeContext toComposite() {
+		return SearchIndexSchemaElementContextHelper.throwingToComposite( this );
 	}
 
 	@Override
