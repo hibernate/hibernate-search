@@ -1,6 +1,27 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.4.Final (14-06-2021)
+-------------------------
+
+** Bug
+    * HSEARCH-4236 No cleanup of threads, if an connection exception during mass indexation happens
+
+** Improvement
+    * HSEARCH-4218 When mass indexing, wait for ID producing threads to finish
+    * HSEARCH-4214 hibernate.search.backend.version_check.enabled should be evaluated on backend startup
+    * HSEARCH-4213 Upgrade to Jackson 2.12.x
+    * HSEARCH-4204 Expose the Elasticsearch index names in the metamodel API
+
+** Task
+    * HSEARCH-4237 Work around Surefire clearing the interrupt status when forwarding stdout/stderr
+
+    * HSEARCH-4226 Stop testing against JDK15
+    * HSEARCH-4219 Upgrade to Hibernate ORM 5.4.31.Final
+    * HSEARCH-4195 Add continuous integration for Open Distro for Elasticsearch
+    * HSEARCH-4157 Investigate timeout error on IndexIndexerIT
+    * HSEARCH-4130 Use docker containers for Elasticsearch in integration tests
+
 6.0.3.Final (13-04-2021)
 -------------------------
 
