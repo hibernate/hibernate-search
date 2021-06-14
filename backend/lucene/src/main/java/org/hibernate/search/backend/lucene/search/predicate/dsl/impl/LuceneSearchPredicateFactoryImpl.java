@@ -18,7 +18,7 @@ import org.apache.lucene.search.Query;
 
 
 public class LuceneSearchPredicateFactoryImpl
-		extends DelegatingSearchPredicateFactory
+		extends DelegatingSearchPredicateFactory<LuceneSearchPredicateFactory>
 		implements LuceneSearchPredicateFactory {
 
 	private final SearchPredicateDslContext<LuceneSearchPredicateIndexScope> dslContext;

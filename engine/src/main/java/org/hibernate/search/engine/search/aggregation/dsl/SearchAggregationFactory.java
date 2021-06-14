@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.aggregation.dsl;
 
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A factory for search aggregations.
@@ -55,5 +56,21 @@ public interface SearchAggregationFactory {
 	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
 	<T> T extension(SearchAggregationFactoryExtension<T> extension);
+
+	/**
+	 * Create a new aggregation factory whose root for all paths passed to the DSL
+	 * will be the given object field.
+	 * <p>
+	 * This is used to call reusable methods that can apply the same aggregation
+	 * on different object fields that have same structure (same sub-fields).
+	 *
+	 * @param objectFieldPath The path from the current root to an object field that will become the new root.
+	 * @return A new aggregation factory using the given object field as root.
+	 */
+	@Incubating
+	// TODO implement and remove default
+	default SearchAggregationFactory withRoot(String objectFieldPath) {
+		return this;
+	}
 
 }

@@ -6,15 +6,16 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.dsl;
 
+import org.hibernate.search.engine.search.predicate.dsl.ExtendedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 import com.google.gson.JsonObject;
 
 /**
  * A factory for search predicates with some Elasticsearch-specific methods.
  */
-public interface ElasticsearchSearchPredicateFactory extends SearchPredicateFactory {
+public interface ElasticsearchSearchPredicateFactory
+		extends ExtendedSearchPredicateFactory<ElasticsearchSearchPredicateFactory> {
 
 	/**
 	 * Create a predicate from JSON.

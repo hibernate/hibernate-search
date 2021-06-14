@@ -21,7 +21,7 @@ import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 
 
 public class LuceneSearchSortFactoryImpl
-		extends DelegatingSearchSortFactory<LuceneSearchPredicateFactory>
+		extends DelegatingSearchSortFactory<LuceneSearchSortFactory, LuceneSearchPredicateFactory>
 		implements LuceneSearchSortFactory {
 
 	private final SearchSortDslContext<LuceneSearchSortIndexScope, LuceneSearchPredicateFactory> dslContext;

@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.aggregation.dsl.spi.DelegatingSearchAg
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 
 public class LuceneSearchAggregationFactoryImpl
-		extends DelegatingSearchAggregationFactory<LuceneSearchPredicateFactory>
+		extends DelegatingSearchAggregationFactory<LuceneSearchAggregationFactory, LuceneSearchPredicateFactory>
 		implements LuceneSearchAggregationFactory {
 
 	public LuceneSearchAggregationFactoryImpl(SearchAggregationFactory delegate,

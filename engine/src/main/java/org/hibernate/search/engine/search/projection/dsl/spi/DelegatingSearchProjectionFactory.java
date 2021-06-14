@@ -16,6 +16,7 @@ import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjecti
 import org.hibernate.search.engine.search.projection.dsl.DocumentReferenceProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.EntityProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.EntityReferenceProjectionOptionsStep;
+import org.hibernate.search.engine.search.projection.dsl.ExtendedSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.FieldProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.IdProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.ScoreProjectionOptionsStep;
@@ -26,7 +27,8 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.function.TriFunction;
 
-public class DelegatingSearchProjectionFactory<R, E> implements SearchProjectionFactory<R, E> {
+public class DelegatingSearchProjectionFactory<S extends ExtendedSearchProjectionFactory<S, R, E>, R, E>
+		implements ExtendedSearchProjectionFactory<S, R, E> {
 
 	private final SearchProjectionFactory<R, E> delegate;
 

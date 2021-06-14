@@ -20,8 +20,11 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
  * <p>
  * Mainly useful when implementing a {@link SearchAggregationFactoryExtension}.
  */
-public class DelegatingSearchAggregationFactory<PDF extends SearchPredicateFactory>
-		implements ExtendedSearchAggregationFactory<PDF> {
+public class DelegatingSearchAggregationFactory<
+				S extends ExtendedSearchAggregationFactory<S, PDF>,
+				PDF extends SearchPredicateFactory
+		>
+		implements ExtendedSearchAggregationFactory<S, PDF> {
 
 	private final SearchAggregationFactory delegate;
 	private final SearchAggregationDslContext<?, ? extends PDF> dslContext;

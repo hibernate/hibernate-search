@@ -6,8 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.dsl;
 
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.ExtendedSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 
 import com.google.gson.JsonObject;
 
@@ -18,7 +19,8 @@ import com.google.gson.JsonObject;
  * @param <E> The type of entities.
  * @see SearchProjectionFactory
  */
-public interface ElasticsearchSearchProjectionFactory<R, E> extends SearchProjectionFactory<R, E> {
+public interface ElasticsearchSearchProjectionFactory<R, E>
+		extends ExtendedSearchProjectionFactory<ElasticsearchSearchProjectionFactory<R, E>, R, E> {
 
 	/**
 	 * Project to a {@link JsonObject} representing the document as stored in Elasticsearch.

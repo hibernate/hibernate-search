@@ -6,8 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.dsl;
 
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.ExtendedSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Explanation;
@@ -19,7 +20,8 @@ import org.apache.lucene.search.Explanation;
  * @param <E> The type of entities.
  * @see SearchProjectionFactory
  */
-public interface LuceneSearchProjectionFactory<R, E> extends SearchProjectionFactory<R, E> {
+public interface LuceneSearchProjectionFactory<R, E>
+		extends ExtendedSearchProjectionFactory<LuceneSearchProjectionFactory<R, E>, R, E> {
 
 	/**
 	 * Project to a Lucene {@link Document} containing all the stored fields.

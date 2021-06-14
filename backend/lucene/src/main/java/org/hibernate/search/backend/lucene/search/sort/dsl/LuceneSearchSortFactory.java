@@ -16,7 +16,8 @@ import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
 /**
  * A factory for search sorts with some Lucene-specific methods.
  */
-public interface LuceneSearchSortFactory extends ExtendedSearchSortFactory<LuceneSearchPredicateFactory> {
+public interface LuceneSearchSortFactory
+		extends ExtendedSearchSortFactory<LuceneSearchSortFactory, LuceneSearchPredicateFactory> {
 
 	/**
 	 * Order elements by a given Lucene {@link SortField}.

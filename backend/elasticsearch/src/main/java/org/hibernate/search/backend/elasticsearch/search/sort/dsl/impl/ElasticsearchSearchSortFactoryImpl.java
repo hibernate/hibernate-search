@@ -20,7 +20,7 @@ import com.google.gson.JsonObject;
 
 
 public class ElasticsearchSearchSortFactoryImpl
-		extends DelegatingSearchSortFactory<ElasticsearchSearchPredicateFactory>
+		extends DelegatingSearchSortFactory<ElasticsearchSearchSortFactory, ElasticsearchSearchPredicateFactory>
 		implements ElasticsearchSearchSortFactory {
 
 	private final SearchSortDslContext<ElasticsearchSearchSortIndexScope, ElasticsearchSearchPredicateFactory> dslContext;

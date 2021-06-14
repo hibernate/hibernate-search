@@ -15,6 +15,7 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.annotation.Incubating;
 import org.hibernate.search.util.common.function.TriFunction;
 
 /**
@@ -315,4 +316,20 @@ public interface SearchProjectionFactory<R, E> {
 	 * @return A DSL step.
 	 */
 	<T> SearchProjectionFactoryExtensionIfSupportedStep<T, R, E> extension();
+
+	/**
+	 * Create a new projection factory whose root for all paths passed to the DSL
+	 * will be the given object field.
+	 * <p>
+	 * This is used to call reusable methods that can apply the same projection
+	 * on different object fields that have same structure (same sub-fields).
+	 *
+	 * @param objectFieldPath The path from the current root to an object field that will become the new root.
+	 * @return A new projection factory using the given object field as root.
+	 */
+	@Incubating
+	// TODO implement and remove default
+	default SearchProjectionFactory<R, E> withRoot(String objectFieldPath) {
+		return this;
+	}
 }

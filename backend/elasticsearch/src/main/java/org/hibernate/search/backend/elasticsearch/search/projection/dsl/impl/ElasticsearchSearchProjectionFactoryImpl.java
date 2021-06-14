@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.projection.dsl.spi.StaticProjectionFin
 import com.google.gson.JsonObject;
 
 public class ElasticsearchSearchProjectionFactoryImpl<R, E>
-		extends DelegatingSearchProjectionFactory<R, E>
+		extends DelegatingSearchProjectionFactory<ElasticsearchSearchProjectionFactory<R, E>, R, E>
 		implements ElasticsearchSearchProjectionFactory<R, E> {
 
 	private final SearchProjectionDslContext<ElasticsearchSearchProjectionIndexScope> dslContext;

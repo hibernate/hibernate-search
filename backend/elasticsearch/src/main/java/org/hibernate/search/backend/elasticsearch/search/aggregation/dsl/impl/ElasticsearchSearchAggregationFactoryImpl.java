@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationD
 import com.google.gson.JsonObject;
 
 public class ElasticsearchSearchAggregationFactoryImpl
-		extends DelegatingSearchAggregationFactory<ElasticsearchSearchPredicateFactory>
+		extends DelegatingSearchAggregationFactory<ElasticsearchSearchAggregationFactory, ElasticsearchSearchPredicateFactory>
 		implements ElasticsearchSearchAggregationFactory {
 
 	private final SearchAggregationDslContext<ElasticsearchSearchAggregationIndexScope, ElasticsearchSearchPredicateFactory> dslContext;

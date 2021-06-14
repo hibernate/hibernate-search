@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.predicate.dsl.spi;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.predicate.dsl.ExistsPredicateFieldStep;
+import org.hibernate.search.engine.search.predicate.dsl.ExtendedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.MatchAllPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchIdPredicateMatchingStep;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
@@ -32,7 +33,8 @@ import org.hibernate.search.engine.search.predicate.dsl.NamedPredicateOptionsSte
  * <p>
  * Mainly useful when implementing a {@link SearchPredicateFactoryExtension}.
  */
-public class DelegatingSearchPredicateFactory implements SearchPredicateFactory {
+public abstract class DelegatingSearchPredicateFactory<S extends ExtendedSearchPredicateFactory<S>>
+		implements ExtendedSearchPredicateFactory<S> {
 
 	private final SearchPredicateFactory delegate;
 

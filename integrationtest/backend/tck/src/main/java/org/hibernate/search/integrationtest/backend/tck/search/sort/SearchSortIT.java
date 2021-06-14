@@ -437,7 +437,7 @@ public class SearchSortIT {
 		}
 	}
 
-	private static class MyExtendedFactory extends DelegatingSearchSortFactory<SearchPredicateFactory> {
+	private static class MyExtendedFactory extends DelegatingSearchSortFactory<MyExtendedFactory, SearchPredicateFactory> {
 		MyExtendedFactory(SearchSortFactory delegate, SearchSortDslContext<?, ?> dslContext) {
 			super( delegate, dslContext );
 		}

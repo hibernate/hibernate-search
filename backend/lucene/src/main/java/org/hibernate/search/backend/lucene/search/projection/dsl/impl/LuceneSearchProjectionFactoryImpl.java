@@ -18,7 +18,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Explanation;
 
 public class LuceneSearchProjectionFactoryImpl<R, E>
-		extends DelegatingSearchProjectionFactory<R, E>
+		extends DelegatingSearchProjectionFactory<LuceneSearchProjectionFactory<R, E>, R, E>
 		implements LuceneSearchProjectionFactory<R, E> {
 
 	private final SearchProjectionDslContext<LuceneSearchProjectionIndexScope> dslContext;
