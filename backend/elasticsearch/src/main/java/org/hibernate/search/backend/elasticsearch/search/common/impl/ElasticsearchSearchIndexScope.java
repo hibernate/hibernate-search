@@ -12,8 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.search.common.spi.SearchIndexCompositeNodeContext;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
@@ -25,10 +23,6 @@ public interface ElasticsearchSearchIndexScope extends SearchIndexScope {
 
 	@Override
 	ElasticsearchSearchIndexNodeContext child(SearchIndexCompositeNodeContext<?> parent, String name);
-
-	ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext();
-
-	ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext();
 
 	Gson userFacingGson();
 

@@ -8,6 +8,10 @@ package org.hibernate.search.mapper.pojo.mapping.spi;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
@@ -33,11 +37,16 @@ public abstract class AbstractPojoMappingImplementor<M>
 
 	private boolean stopped = false;
 
+	private final ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext;
+	private final ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext;
 	private final IdentifierBridgeToDocumentIdentifierContext toDocumentIdentifierContext;
 	private final ValueBridgeToIndexedValueContext toIndexedValueContext;
 
 	public AbstractPojoMappingImplementor(PojoMappingDelegate delegate) {
 		this.delegate = delegate;
+		this.toDocumentIdentifierValueConvertContext =
+				new ToDocumentIdentifierValueConvertContextImpl( this );
+		this.toDocumentFieldValueConvertContext = new ToDocumentFieldValueConvertContextImpl( this );
 		this.toDocumentIdentifierContext = new IdentifierBridgeToDocumentIdentifierContextImpl( this );
 		this.toIndexedValueContext = new ValueBridgeToIndexedValueContextImpl( this );
 	}
@@ -64,6 +73,16 @@ public abstract class AbstractPojoMappingImplementor<M>
 				closer.push( AbstractPojoMappingImplementor::doStop, this );
 			}
 		}
+	}
+
+	@Override
+	public final ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext() {
+		return toDocumentIdentifierValueConvertContext;
+	}
+
+	@Override
+	public final ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext() {
+		return toDocumentFieldValueConvertContext;
 	}
 
 	@Override

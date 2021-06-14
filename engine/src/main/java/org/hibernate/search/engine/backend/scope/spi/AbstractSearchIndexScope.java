@@ -15,9 +15,7 @@ import java.util.Set;
 import org.hibernate.search.engine.backend.document.model.spi.AbstractIndexModel;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.StringDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.logging.impl.Log;
@@ -46,17 +44,14 @@ public abstract class AbstractSearchIndexScope<
 			new StringDocumentIdentifierValueConverter();
 
 	// Mapping context
-	private final ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext;
-	private final ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext;
+	private final BackendMappingContext mappingContext;
 
 	// Targeted indexes
 	private final Set<String> hibernateSearchIndexNames;
 	private final Set<? extends M> indexModels;
 
 	public AbstractSearchIndexScope(BackendMappingContext mappingContext, Set<? extends M> indexModels) {
-		this.toDocumentIdentifierValueConvertContext =
-				new ToDocumentIdentifierValueConvertContextImpl( mappingContext );
-		this.toDocumentFieldValueConvertContext = new ToDocumentFieldValueConvertContextImpl( mappingContext );
+		this.mappingContext = mappingContext;
 
 		// Use LinkedHashMap/LinkedHashSet to ensure stable order when generating requests
 		this.hibernateSearchIndexNames = new LinkedHashSet<>();
@@ -72,12 +67,14 @@ public abstract class AbstractSearchIndexScope<
 
 	protected abstract S self();
 
+	@Override
 	public final ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext() {
-		return toDocumentIdentifierValueConvertContext;
+		return mappingContext.toDocumentIdentifierValueConvertContext();
 	}
 
+	@Override
 	public final ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext() {
-		return toDocumentFieldValueConvertContext;
+		return mappingContext.toDocumentFieldValueConvertContext();
 	}
 
 	@Override
