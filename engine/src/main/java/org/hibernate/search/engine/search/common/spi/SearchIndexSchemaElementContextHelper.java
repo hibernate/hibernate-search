@@ -7,10 +7,13 @@
 package org.hibernate.search.engine.search.common.spi;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Objects;
 
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 public abstract class SearchIndexSchemaElementContextHelper {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -25,6 +28,21 @@ public abstract class SearchIndexSchemaElementContextHelper {
 
 	public static <T extends SearchIndexValueFieldContext<?>> T throwingToValueField(SearchIndexNodeContext<?> element) {
 		throw log.invalidIndexNodeTypeNotValueField( element.relativeEventContext() );
+	}
+
+	public static void checkNestedDocumentPathCompatibility(SearchIndexNodeContext<?> left, SearchIndexNodeContext<?> right) {
+		String leftNestedDocumentPathHierarchy = left.nestedDocumentPath();
+		String rightNestedDocumentPathHierarchy = right.nestedDocumentPath();
+
+		if ( !Objects.equals( leftNestedDocumentPathHierarchy, rightNestedDocumentPathHierarchy ) ) {
+			throw log.targetFieldsSpanningMultipleNestedPaths(
+					left.absolutePath(), pathEventContext( leftNestedDocumentPathHierarchy ),
+					right.absolutePath(), pathEventContext( rightNestedDocumentPathHierarchy ) );
+		}
+	}
+
+	private static EventContext pathEventContext(String path) {
+		return path == null ? EventContexts.indexSchemaRoot() : EventContexts.fromIndexFieldAbsolutePath( path );
 	}
 
 	private SearchIndexSchemaElementContextHelper() {

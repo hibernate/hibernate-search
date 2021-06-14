@@ -501,4 +501,12 @@ public interface Log extends BasicLogger {
 			value = "Unknown field '%1$s'.")
 	SearchException unknownFieldForSearch(String absoluteFieldPath, @Param EventContext context);
 
+	@Message(id = ID_OFFSET + 111,
+			value = "Invalid target fields:"
+					+ " fields [%1$s, %3$s] are in different nested documents (%2$s vs. %4$s)."
+					+ " All target fields must be in the same document.")
+	SearchException targetFieldsSpanningMultipleNestedPaths(String fieldPath1,
+			@FormatWith(EventContextNoPrefixFormatter.class) EventContext nestedPath1,
+			String fieldPath2, @FormatWith(EventContextNoPrefixFormatter.class) EventContext nestedPath2);
+
 }

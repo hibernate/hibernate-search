@@ -11,8 +11,6 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexS
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 
-import org.apache.lucene.analysis.Analyzer;
-
 public final class LuceneSimpleQueryStringPredicateBuilderFieldState
 	implements SimpleQueryStringPredicateBuilder.FieldState {
 
@@ -28,11 +26,11 @@ public final class LuceneSimpleQueryStringPredicateBuilderFieldState
 		this.boost = boost;
 	}
 
-	public Analyzer getAnalyzerOrNormalizer() {
-		return field.type().searchAnalyzerOrNormalizer();
+	public LuceneSearchIndexValueFieldContext<?> field() {
+		return field;
 	}
 
-	public Float getBoost() {
+	public Float boost() {
 		return boost;
 	}
 

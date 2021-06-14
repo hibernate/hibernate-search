@@ -18,11 +18,11 @@ import org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneDifferentNestedObjectCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.BooleanOperator;
+import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
@@ -44,8 +44,8 @@ public class LuceneSimpleQueryStringPredicate extends AbstractLuceneNestablePred
 
 	private LuceneSimpleQueryStringPredicate(Builder builder) {
 		super( builder );
-		nestedPathHierarchy = builder.nestedCompatibilityChecker.getNestedPathHierarchy();
-		fieldPaths = new ArrayList<>( builder.fields.keySet() );
+		nestedPathHierarchy = builder.firstFieldState.field().nestedPathHierarchy();
+		fieldPaths = new ArrayList<>( builder.fieldStates.keySet() );
 		query = builder.buildQuery();
 	}
 
@@ -67,18 +67,17 @@ public class LuceneSimpleQueryStringPredicate extends AbstractLuceneNestablePred
 	public static class Builder extends AbstractBuilder implements SimpleQueryStringPredicateBuilder {
 		private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
-		private final Map<String, LuceneSimpleQueryStringPredicateBuilderFieldState> fields = new LinkedHashMap<>();
+		private LuceneSimpleQueryStringPredicateBuilderFieldState firstFieldState;
+		private final Map<String, LuceneSimpleQueryStringPredicateBuilderFieldState> fieldStates = new LinkedHashMap<>();
 		private Occur defaultOperator = Occur.SHOULD;
 		private String simpleQueryString;
 		private Analyzer overrideAnalyzer;
 		private boolean ignoreAnalyzer = false;
 		private EnumSet<SimpleQueryFlag> flags;
-		private LuceneDifferentNestedObjectCompatibilityChecker nestedCompatibilityChecker;
 
 		Builder(LuceneSearchIndexScope scope) {
 			super( scope );
 			this.analysisDefinitionRegistry = scope.analysisDefinitionRegistry();
-			this.nestedCompatibilityChecker = LuceneDifferentNestedObjectCompatibilityChecker.empty( scope );
 		}
 
 		@Override
@@ -100,13 +99,18 @@ public class LuceneSimpleQueryStringPredicate extends AbstractLuceneNestablePred
 
 		@Override
 		public FieldState field(String absoluteFieldPath) {
-			LuceneSimpleQueryStringPredicateBuilderFieldState field = fields.get( absoluteFieldPath );
-			if ( field == null ) {
-				field = scope.fieldQueryElement( absoluteFieldPath, LucenePredicateTypeKeys.SIMPLE_QUERY_STRING );
-				nestedCompatibilityChecker = nestedCompatibilityChecker.combineAndCheck( absoluteFieldPath );
-				fields.put( absoluteFieldPath, field );
+			LuceneSimpleQueryStringPredicateBuilderFieldState fieldState = fieldStates.get( absoluteFieldPath );
+			if ( fieldState == null ) {
+				fieldState = scope.fieldQueryElement( absoluteFieldPath, LucenePredicateTypeKeys.SIMPLE_QUERY_STRING );
+				if ( firstFieldState == null ) {
+					firstFieldState = fieldState;
+				}
+				else {
+					SearchIndexSchemaElementContextHelper.checkNestedDocumentPathCompatibility( firstFieldState.field(), fieldState.field() );
+				}
+				fieldStates.put( absoluteFieldPath, fieldState );
 			}
-			return field;
+			return fieldState;
 		}
 
 		@Override
@@ -145,8 +149,8 @@ public class LuceneSimpleQueryStringPredicate extends AbstractLuceneNestablePred
 			if ( overrideAnalyzer != null ) {
 				return overrideAnalyzer;
 			}
-			if ( fields.size() == 1 ) {
-				return fields.values().iterator().next().getAnalyzerOrNormalizer();
+			if ( fieldStates.size() == 1 ) {
+				return fieldStates.values().iterator().next().field().type().searchAnalyzerOrNormalizer();
 			}
 
 			/*
@@ -164,17 +168,17 @@ public class LuceneSimpleQueryStringPredicate extends AbstractLuceneNestablePred
 			 * would pick the first analyzer returned by any of the scoped analyzers in its list.
 			 */
 			ScopedAnalyzer.Builder builder = new ScopedAnalyzer.Builder();
-			for ( Map.Entry<String, LuceneSimpleQueryStringPredicateBuilderFieldState> entry : fields.entrySet() ) {
-				builder.setAnalyzer( entry.getKey(), entry.getValue().getAnalyzerOrNormalizer() );
+			for ( Map.Entry<String, LuceneSimpleQueryStringPredicateBuilderFieldState> entry : fieldStates.entrySet() ) {
+				builder.setAnalyzer( entry.getKey(), entry.getValue().field().type().searchAnalyzerOrNormalizer() );
 			}
 			return builder.build();
 		}
 
 		private Map<String, Float> buildWeights() {
 			Map<String, Float> weights = new LinkedHashMap<>();
-			for ( Map.Entry<String, LuceneSimpleQueryStringPredicateBuilderFieldState> entry : fields.entrySet() ) {
+			for ( Map.Entry<String, LuceneSimpleQueryStringPredicateBuilderFieldState> entry : fieldStates.entrySet() ) {
 				LuceneSimpleQueryStringPredicateBuilderFieldState state = entry.getValue();
-				Float boost = state.getBoost();
+				Float boost = state.boost();
 				if ( boost == null ) {
 					boost = 1f;
 				}
