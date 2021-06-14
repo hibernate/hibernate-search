@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.search.predicate.dsl.impl;
 
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateIndexScope;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.DelegatingSearchPredicateFactory;
@@ -21,16 +21,16 @@ public class LuceneSearchPredicateFactoryImpl
 		extends DelegatingSearchPredicateFactory
 		implements LuceneSearchPredicateFactory {
 
-	private final SearchPredicateDslContext<LuceneSearchPredicateBuilderFactory> dslContext;
+	private final SearchPredicateDslContext<LuceneSearchPredicateIndexScope> dslContext;
 
 	public LuceneSearchPredicateFactoryImpl(SearchPredicateFactory delegate,
-			SearchPredicateDslContext<LuceneSearchPredicateBuilderFactory> dslContext) {
+			SearchPredicateDslContext<LuceneSearchPredicateIndexScope> dslContext) {
 		super( delegate );
 		this.dslContext = dslContext;
 	}
 
 	@Override
 	public PredicateFinalStep fromLuceneQuery(Query luceneQuery) {
-		return new StaticPredicateFinalStep( dslContext.builderFactory().fromLuceneQuery( luceneQuery ) );
+		return new StaticPredicateFinalStep( dslContext.scope().predicateBuilders().fromLuceneQuery( luceneQuery ) );
 	}
 }

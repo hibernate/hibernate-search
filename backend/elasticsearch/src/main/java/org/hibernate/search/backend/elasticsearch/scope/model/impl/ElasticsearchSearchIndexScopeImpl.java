@@ -17,15 +17,26 @@ import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchMultiIndexSearchIndexCompositeNodeContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchMultiIndexSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexCompositeNodeContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexNodeContext;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryIndexScope;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactory;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.AbstractSearchIndexScope;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 import com.google.gson.Gson;
@@ -38,9 +49,10 @@ public final class ElasticsearchSearchIndexScopeImpl
 						ElasticsearchSearchIndexNodeContext,
 						ElasticsearchSearchIndexCompositeNodeContext
 				>
-		implements ElasticsearchSearchIndexScope {
+		implements ElasticsearchSearchIndexScope, ElasticsearchSearchQueryIndexScope {
 
 	// Backend context
+	private final SearchBackendContext backendContext;
 	private final Gson userFacingGson;
 	private final ElasticsearchSearchSyntax searchSyntax;
 	private final MultiTenancyStrategy multiTenancyStrategy;
@@ -50,12 +62,20 @@ public final class ElasticsearchSearchIndexScopeImpl
 	private final Map<String, ElasticsearchSearchIndexContext> mappedTypeNameToIndex;
 	private final int maxResultWindow;
 
+	// Query support
+	private final ElasticsearchSearchPredicateBuilderFactory predicateBuilderFactory;
+	private final ElasticsearchSearchSortBuilderFactory sortBuilderFactory;
+	private final ElasticsearchSearchProjectionBuilderFactory projectionBuilderFactory;
+	private final ElasticsearchSearchAggregationBuilderFactory aggregationFactory;
+
 	public ElasticsearchSearchIndexScopeImpl(BackendMappingContext mappingContext,
+			SearchBackendContext backendContext,
 			Gson userFacingGson, ElasticsearchSearchSyntax searchSyntax,
 			MultiTenancyStrategy multiTenancyStrategy,
 			TimingSource timingSource,
 			Set<ElasticsearchIndexModel> indexModels) {
 		super( mappingContext, indexModels );
+		this.backendContext = backendContext;
 		this.userFacingGson = userFacingGson;
 		this.searchSyntax = searchSyntax;
 		this.multiTenancyStrategy = multiTenancyStrategy;
@@ -75,11 +95,44 @@ public final class ElasticsearchSearchIndexScopeImpl
 			}
 		}
 		this.maxResultWindow = currentMaxResultWindow;
+
+		this.predicateBuilderFactory = new ElasticsearchSearchPredicateBuilderFactory( this );
+		this.sortBuilderFactory = new ElasticsearchSearchSortBuilderFactory( this );
+		this.projectionBuilderFactory = new ElasticsearchSearchProjectionBuilderFactory(
+				backendContext.getSearchProjectionBackendContext(), this );
+		this.aggregationFactory = new ElasticsearchSearchAggregationBuilderFactory( this );
 	}
 
 	@Override
 	protected ElasticsearchSearchIndexScope self() {
 		return this;
+	}
+
+	@Override
+	public ElasticsearchSearchPredicateBuilderFactory predicateBuilders() {
+		return predicateBuilderFactory;
+	}
+
+	@Override
+	public ElasticsearchSearchSortBuilderFactory sortBuilders() {
+		return sortBuilderFactory;
+	}
+
+	@Override
+	public ElasticsearchSearchProjectionBuilderFactory projectionBuilders() {
+		return projectionBuilderFactory;
+	}
+
+	@Override
+	public ElasticsearchSearchAggregationBuilderFactory aggregationBuilders() {
+		return aggregationFactory;
+	}
+
+	@Override
+	public <P> ElasticsearchSearchQueryBuilder<P> select(BackendSessionContext sessionContext,
+			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<P> projection) {
+		return backendContext.createSearchQueryBuilder( this, sessionContext, loadingContextBuilder,
+				ElasticsearchSearchProjection.from( this, projection ) );
 	}
 
 	@Override
@@ -153,4 +206,5 @@ public final class ElasticsearchSearchIndexScopeImpl
 		return new ElasticsearchMultiIndexSearchIndexCompositeNodeContext( this, absolutePath,
 				(List) fieldForEachIndex );
 	}
+
 }

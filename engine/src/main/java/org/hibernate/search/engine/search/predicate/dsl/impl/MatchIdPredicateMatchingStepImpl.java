@@ -24,7 +24,7 @@ class MatchIdPredicateMatchingStepImpl
 
 	MatchIdPredicateMatchingStepImpl(SearchPredicateDslContext<?> dslContext) {
 		super( dslContext );
-		this.matchIdBuilder = dslContext.builderFactory().id();
+		this.matchIdBuilder = dslContext.scope().predicateBuilders().id();
 	}
 
 	@Override

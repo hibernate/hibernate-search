@@ -20,7 +20,6 @@ import java.util.Optional;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
@@ -33,6 +32,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
+import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -248,10 +248,10 @@ public class SearchQueryBaseIT {
 			SearchQueryDslExtension<MyExtendedDslContext<R>, R, E, LOS> {
 		@Override
 		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
-				IndexScope indexScope, BackendSessionContext sessionContext,
+				SearchQueryIndexScope scope, BackendSessionContext sessionContext,
 				SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 			assertThat( original ).isNotNull();
-			assertThat( indexScope ).isNotNull();
+			assertThat( scope ).isNotNull();
 			assertThat( sessionContext ).isNotNull();
 			assertThat( loadingContextBuilder ).isNotNull();
 			return Optional.of( new MyExtendedDslContext<R>( original.selectEntityReference() ) );
@@ -262,10 +262,10 @@ public class SearchQueryBaseIT {
 			SearchQueryDslExtension<MyExtendedDslContext<R>, R, E, LOS> {
 		@Override
 		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
-				IndexScope indexScope, BackendSessionContext sessionContext,
+				SearchQueryIndexScope scope, BackendSessionContext sessionContext,
 				SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 			assertThat( original ).isNotNull();
-			assertThat( indexScope ).isNotNull();
+			assertThat( scope ).isNotNull();
 			assertThat( sessionContext ).isNotNull();
 			assertThat( loadingContextBuilder ).isNotNull();
 			return Optional.empty();

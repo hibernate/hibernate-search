@@ -8,33 +8,27 @@ package org.hibernate.search.engine.search.sort.dsl.spi;
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
-import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
+import org.hibernate.search.engine.search.sort.spi.SearchSortIndexScope;
 
 /**
  * Represents the current context in the search DSL,
  * including in particular the search scope, the sort builder factory
  * and the knowledge of previous sorts chained using {@link SortThenStep#then()}.
  *
- * @param <F> The type of sort factory.
+ * @param <SC> The type of the backend-specific search scope.
  * @param <PDF> The type of factory used to create predicates in {@link FieldSortOptionsStep#filter(Function)}.
  */
-public interface SearchSortDslContext<F extends SearchSortBuilderFactory, PDF extends SearchPredicateFactory> {
+public interface SearchSortDslContext<SC extends SearchSortIndexScope, PDF extends SearchPredicateFactory> {
 
 	/**
 	 * @return The search scope.
 	 */
-	SearchIndexScope scope();
-
-	/**
-	 * @return The sort builder factory. Will always return the exact same instance.
-	 */
-	F builderFactory();
+	SC scope();
 
 	/**
 	 * Create a new context with a sort appended.
@@ -54,7 +48,7 @@ public interface SearchSortDslContext<F extends SearchSortBuilderFactory, PDF ex
 	 * @param <PDF2> The type of the new predicate factory.
 	 * @return A new context, identical to {@code this} except for the predicate factory which is extended.
 	 */
-	<PDF2 extends SearchPredicateFactory> SearchSortDslContext<F, PDF2> withExtendedPredicateFactory(
+	<PDF2 extends SearchPredicateFactory> SearchSortDslContext<SC, PDF2> withExtendedPredicateFactory(
 			SearchPredicateFactoryExtension<PDF2> extension);
 
 	/**

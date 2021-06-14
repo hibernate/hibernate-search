@@ -27,6 +27,7 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexCompositeNodeCon
 import org.hibernate.search.engine.search.common.spi.SearchIndexNodeContext;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
+import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -37,7 +38,7 @@ public abstract class AbstractSearchIndexScope<
 				N extends SearchIndexNodeContext<S>,
 				C extends SearchIndexCompositeNodeContext<S>
 		>
-		implements SearchIndexScope {
+		implements SearchIndexScope, SearchQueryIndexScope {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

@@ -62,7 +62,7 @@ class SimpleQueryStringPredicateFieldMoreStepImpl
 
 		CommonState(SearchPredicateDslContext<?> dslContext) {
 			super( dslContext );
-			this.builder = dslContext.builderFactory().simpleQueryString();
+			this.builder = dslContext.scope().predicateBuilders().simpleQueryString();
 		}
 
 		@Override

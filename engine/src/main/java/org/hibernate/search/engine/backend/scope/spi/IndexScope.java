@@ -7,12 +7,7 @@
 package org.hibernate.search.engine.backend.scope.spi;
 
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
-import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
-import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
-import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
-import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
+import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 import org.hibernate.search.util.common.SearchException;
 
 /**
@@ -20,17 +15,7 @@ import org.hibernate.search.util.common.SearchException;
  */
 public interface IndexScope {
 
-	SearchIndexScope searchScope();
-
-	SearchPredicateBuilderFactory searchPredicateBuilderFactory();
-
-	SearchSortBuilderFactory searchSortBuilderFactory();
-
-	SearchQueryBuilderFactory searchQueryBuilderFactory();
-
-	SearchProjectionBuilderFactory searchProjectionFactory();
-
-	SearchAggregationBuilderFactory searchAggregationFactory();
+	SearchQueryIndexScope searchScope();
 
 	/**
 	 * Extend the current index scope with the given extension,

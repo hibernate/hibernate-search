@@ -18,7 +18,7 @@ public class ScoreProjectionOptionsStepImpl
 	private final ScoreProjectionBuilder scoreProjectionBuilder;
 
 	ScoreProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext) {
-		this.scoreProjectionBuilder = dslContext.builderFactory().score();
+		this.scoreProjectionBuilder = dslContext.scope().projectionBuilders().score();
 	}
 
 	@Override

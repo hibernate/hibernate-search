@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateIndexScope;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.DelegatingSearchPredicateFactory;
@@ -21,21 +21,21 @@ public class ElasticsearchSearchPredicateFactoryImpl
 		extends DelegatingSearchPredicateFactory
 		implements ElasticsearchSearchPredicateFactory {
 
-	private final SearchPredicateDslContext<ElasticsearchSearchPredicateBuilderFactory> dslContext;
+	private final SearchPredicateDslContext<ElasticsearchSearchPredicateIndexScope> dslContext;
 
 	public ElasticsearchSearchPredicateFactoryImpl(SearchPredicateFactory delegate,
-			SearchPredicateDslContext<ElasticsearchSearchPredicateBuilderFactory> dslContext) {
+			SearchPredicateDslContext<ElasticsearchSearchPredicateIndexScope> dslContext) {
 		super( delegate );
 		this.dslContext = dslContext;
 	}
 
 	@Override
 	public PredicateFinalStep fromJson(String jsonString) {
-		return new StaticPredicateFinalStep( dslContext.builderFactory().fromJson( jsonString ) );
+		return new StaticPredicateFinalStep( dslContext.scope().predicateBuilders().fromJson( jsonString ) );
 	}
 
 	@Override
 	public PredicateFinalStep fromJson(JsonObject jsonObject) {
-		return new StaticPredicateFinalStep( dslContext.builderFactory().fromJson( jsonObject ) );
+		return new StaticPredicateFinalStep( dslContext.scope().predicateBuilders().fromJson( jsonObject ) );
 	}
 }

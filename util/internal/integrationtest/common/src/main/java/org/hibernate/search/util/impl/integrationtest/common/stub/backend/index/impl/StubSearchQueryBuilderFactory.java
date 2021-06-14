@@ -15,7 +15,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubSearchQueryBuilder;
 
-class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory {
+public class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory {
 	private final StubBackend backend;
 	private final StubSearchIndexScope scope;
 

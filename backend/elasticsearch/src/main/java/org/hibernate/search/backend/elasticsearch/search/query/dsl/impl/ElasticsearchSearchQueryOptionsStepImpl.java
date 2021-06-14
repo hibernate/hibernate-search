@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.search.query.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
-import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.ElasticsearchSearchAggregationFactory;
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
@@ -17,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSear
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryOptionsStep;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryWhereStep;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.sort.dsl.ElasticsearchSearchSortFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
@@ -39,10 +39,10 @@ class ElasticsearchSearchQueryOptionsStepImpl<H, LOS>
 
 	private final ElasticsearchSearchQueryBuilder<H> searchQueryBuilder;
 
-	ElasticsearchSearchQueryOptionsStepImpl(ElasticsearchIndexScope indexSearchScope,
+	ElasticsearchSearchQueryOptionsStepImpl(ElasticsearchSearchQueryIndexScope scope,
 			ElasticsearchSearchQueryBuilder<H> searchQueryBuilder,
 			SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
-		super( indexSearchScope, searchQueryBuilder, loadingContextBuilder );
+		super( scope, searchQueryBuilder, loadingContextBuilder );
 		this.searchQueryBuilder = searchQueryBuilder;
 	}
 

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.aggregation.dsl.impl;
 
-import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.search.aggregation.dsl.LuceneSearchAggregationFactory;
+import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregationIndexScope;
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.DelegatingSearchAggregationFactory;
@@ -18,7 +18,7 @@ public class LuceneSearchAggregationFactoryImpl
 		implements LuceneSearchAggregationFactory {
 
 	public LuceneSearchAggregationFactoryImpl(SearchAggregationFactory delegate,
-			SearchAggregationDslContext<LuceneSearchAggregationBuilderFactory, LuceneSearchPredicateFactory> dslContext) {
+			SearchAggregationDslContext<LuceneSearchAggregationIndexScope, LuceneSearchPredicateFactory> dslContext) {
 		super( delegate, dslContext );
 	}
 

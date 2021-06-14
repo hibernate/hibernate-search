@@ -21,7 +21,7 @@ class ScoreSortOptionsStepImpl
 
 	ScoreSortOptionsStepImpl(SearchSortDslContext<?, ?> dslContext) {
 		super( dslContext );
-		this.builder = dslContext.builderFactory().score();
+		this.builder = dslContext.scope().sortBuilders().score();
 	}
 
 	@Override

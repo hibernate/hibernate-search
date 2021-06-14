@@ -6,38 +6,29 @@
  */
 package org.hibernate.search.engine.search.aggregation.dsl.impl;
 
-import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
-import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
+import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationIndexScope;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
 
-public class SearchAggregationDslContextImpl<F extends SearchAggregationBuilderFactory, PDF extends SearchPredicateFactory>
-		implements SearchAggregationDslContext<F, PDF> {
-	public static <F extends SearchAggregationBuilderFactory, PDF extends SearchPredicateFactory>
-			SearchAggregationDslContextImpl<F, PDF> root(SearchIndexScope scope, F builderFactory, PDF predicateFactory) {
-		return new SearchAggregationDslContextImpl<>( scope, builderFactory, predicateFactory );
+public class SearchAggregationDslContextImpl<SC extends SearchAggregationIndexScope, PDF extends SearchPredicateFactory>
+		implements SearchAggregationDslContext<SC, PDF> {
+	public static <SC extends SearchAggregationIndexScope, PDF extends SearchPredicateFactory>
+			SearchAggregationDslContextImpl<SC, PDF> root(SC scope, PDF predicateFactory) {
+		return new SearchAggregationDslContextImpl<>( scope, predicateFactory );
 	}
 
-	private final SearchIndexScope scope;
-	private final F builderFactory;
+	private final SC scope;
 	private final PDF predicateFactory;
 
-	private SearchAggregationDslContextImpl(SearchIndexScope scope,
-			F builderFactory, PDF predicateFactory) {
+	private SearchAggregationDslContextImpl(SC scope, PDF predicateFactory) {
 		this.scope = scope;
-		this.builderFactory = builderFactory;
 		this.predicateFactory = predicateFactory;
 	}
 
 	@Override
-	public SearchIndexScope scope() {
+	public SC scope() {
 		return scope;
-	}
-
-	@Override
-	public F builderFactory() {
-		return builderFactory;
 	}
 
 	@Override
@@ -46,10 +37,10 @@ public class SearchAggregationDslContextImpl<F extends SearchAggregationBuilderF
 	}
 
 	@Override
-	public <PDF2 extends SearchPredicateFactory> SearchAggregationDslContext<F, PDF2> withExtendedPredicateFactory(
+	public <PDF2 extends SearchPredicateFactory> SearchAggregationDslContext<SC, PDF2> withExtendedPredicateFactory(
 			SearchPredicateFactoryExtension<PDF2> extension) {
 		return new SearchAggregationDslContextImpl<>(
-				scope, builderFactory,
+				scope,
 				predicateFactory.extension( extension )
 		);
 	}

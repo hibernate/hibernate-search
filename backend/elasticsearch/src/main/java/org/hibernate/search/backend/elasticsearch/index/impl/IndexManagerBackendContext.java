@@ -27,6 +27,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionBackendContext;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.ElasticsearchIndexIndexer;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.ElasticsearchIndexIndexingPlan;
@@ -138,10 +139,11 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	}
 
 	@Override
-	public ElasticsearchSearchIndexScope createSearchContext(BackendMappingContext mappingContext,
+	public ElasticsearchSearchQueryIndexScope createSearchContext(BackendMappingContext mappingContext,
 			Set<ElasticsearchIndexModel> indexModels) {
 		return new ElasticsearchSearchIndexScopeImpl(
 				mappingContext,
+				this,
 				userFacingGson, link.getSearchSyntax(),
 				multiTenancyStrategy,
 				timingSource,

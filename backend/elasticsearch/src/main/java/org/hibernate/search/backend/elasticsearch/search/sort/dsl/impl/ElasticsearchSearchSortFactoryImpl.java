@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.sort.dsl.impl;
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.sort.dsl.ElasticsearchSearchSortFactory;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSort;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortIndexScope;
 import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.spi.DelegatingSearchSortFactory;
@@ -23,22 +23,22 @@ public class ElasticsearchSearchSortFactoryImpl
 		extends DelegatingSearchSortFactory<ElasticsearchSearchPredicateFactory>
 		implements ElasticsearchSearchSortFactory {
 
-	private final SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ?> dslContext;
+	private final SearchSortDslContext<ElasticsearchSearchSortIndexScope, ElasticsearchSearchPredicateFactory> dslContext;
 
 	public ElasticsearchSearchSortFactoryImpl(SearchSortFactory delegate,
-			SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ElasticsearchSearchPredicateFactory> dslContext) {
+			SearchSortDslContext<ElasticsearchSearchSortIndexScope, ElasticsearchSearchPredicateFactory> dslContext) {
 		super( delegate, dslContext );
 		this.dslContext = dslContext;
 	}
 
 	@Override
 	public SortThenStep fromJson(JsonObject jsonObject) {
-		return staticThenStep( dslContext.builderFactory().fromJson( jsonObject ) );
+		return staticThenStep( dslContext.scope().sortBuilders().fromJson( jsonObject ) );
 	}
 
 	@Override
 	public SortThenStep fromJson(String jsonString) {
-		return staticThenStep( dslContext.builderFactory().fromJson( jsonString ) );
+		return staticThenStep( dslContext.scope().sortBuilders().fromJson( jsonString ) );
 	}
 
 	private SortThenStep staticThenStep(ElasticsearchSearchSort sort) {

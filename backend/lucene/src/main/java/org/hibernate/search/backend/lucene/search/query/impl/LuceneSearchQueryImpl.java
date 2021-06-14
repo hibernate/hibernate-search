@@ -15,17 +15,16 @@ import java.util.concurrent.TimeUnit;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HibernateSearchMultiReader;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestrator;
-import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchScroll;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.backend.lucene.work.impl.ReadWork;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
@@ -46,7 +45,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	private final LuceneSyncWorkOrchestrator queryOrchestrator;
 	private final LuceneWorkFactory workFactory;
-	private final LuceneSearchIndexScope scope;
+	private final LuceneSearchQueryIndexScope scope;
 	private final BackendSessionContext sessionContext;
 	private final SearchLoadingContext<?, ?> loadingContext;
 	private final Set<String> routingKeys;
@@ -58,7 +57,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private TimeoutManager timeoutManager;
 
 	LuceneSearchQueryImpl(LuceneSyncWorkOrchestrator queryOrchestrator,
-			LuceneWorkFactory workFactory, LuceneSearchIndexScope scope,
+			LuceneWorkFactory workFactory, LuceneSearchQueryIndexScope scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContext<?, ?> loadingContext,
 			Set<String> routingKeys,

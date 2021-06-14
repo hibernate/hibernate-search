@@ -13,33 +13,30 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.DefaultSearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.SearchAggregationDslContextImpl;
-import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.impl.DefaultSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.impl.SearchPredicateDslContextImpl;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.SearchScroll;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
+import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.engine.search.sort.dsl.impl.DefaultSearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.impl.SearchSortDslContextImpl;
-import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 public abstract class AbstractSearchQueryOptionsStep<
 				S extends SearchQueryOptionsStep<S, H, LOS, SF, AF>,
@@ -51,14 +48,14 @@ public abstract class AbstractSearchQueryOptionsStep<
 		>
 		implements SearchQueryWhereStep<S, H, LOS, PDF>, SearchQueryOptionsStep<S, H, LOS, SF, AF> {
 
-	private final IndexScope indexScope;
+	private final SearchQueryIndexScope scope;
 	private final SearchQueryBuilder<H> searchQueryBuilder;
 	private final SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder;
 
-	public AbstractSearchQueryOptionsStep(IndexScope indexScope,
+	public AbstractSearchQueryOptionsStep(SearchQueryIndexScope scope,
 			SearchQueryBuilder<H> searchQueryBuilder,
 			SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
-		this.indexScope = indexScope;
+		this.scope = scope;
 		this.searchQueryBuilder = searchQueryBuilder;
 		this.loadingContextBuilder = loadingContextBuilder;
 	}
@@ -71,9 +68,8 @@ public abstract class AbstractSearchQueryOptionsStep<
 
 	@Override
 	public S where(Function<? super PDF, ? extends PredicateFinalStep> predicateContributor) {
-		SearchPredicateBuilderFactory builderFactory = indexScope.searchPredicateBuilderFactory();
 		SearchPredicateFactory factory = new DefaultSearchPredicateFactory(
-				SearchPredicateDslContextImpl.root( indexScope.searchScope(), builderFactory )
+				SearchPredicateDslContextImpl.root( scope )
 		);
 		SearchPredicate predicate = predicateContributor.apply( extendPredicateFactory( factory ) ).toPredicate();
 		searchQueryBuilder.predicate( predicate );
@@ -124,13 +120,11 @@ public abstract class AbstractSearchQueryOptionsStep<
 
 	@Override
 	public S sort(Function<? super SF, ? extends SortFinalStep> sortContributor) {
-		SearchSortBuilderFactory builderFactory = indexScope.searchSortBuilderFactory();
-		SearchPredicateBuilderFactory predicateBuilderFactory = indexScope.searchPredicateBuilderFactory();
 		SearchPredicateFactory predicateFactory = new DefaultSearchPredicateFactory(
-				SearchPredicateDslContextImpl.root( indexScope.searchScope(), predicateBuilderFactory )
+				SearchPredicateDslContextImpl.root( scope )
 		);
 		SearchSortFactory factory = new DefaultSearchSortFactory(
-				SearchSortDslContextImpl.root( indexScope.searchScope(), builderFactory, predicateFactory )
+				SearchSortDslContextImpl.root( scope, predicateFactory )
 		);
 		SearchSort sort = sortContributor.apply( extendSortFactory( factory ) ).toSort();
 		searchQueryBuilder.sort( sort );
@@ -145,13 +139,11 @@ public abstract class AbstractSearchQueryOptionsStep<
 
 	@Override
 	public <A> S aggregation(AggregationKey<A> key, Function<? super AF, ? extends AggregationFinalStep<A>> aggregationContributor) {
-		SearchAggregationBuilderFactory builderFactory = indexScope.searchAggregationFactory();
-		SearchPredicateBuilderFactory predicateBuilderFactory = indexScope.searchPredicateBuilderFactory();
 		SearchPredicateFactory predicateFactory = new DefaultSearchPredicateFactory(
-				SearchPredicateDslContextImpl.root( indexScope.searchScope(), predicateBuilderFactory )
+				SearchPredicateDslContextImpl.root( scope )
 		);
 		AF factory = extendAggregationFactory( new DefaultSearchAggregationFactory(
-				SearchAggregationDslContextImpl.root( indexScope.searchScope(), builderFactory, predicateFactory )
+				SearchAggregationDslContextImpl.root( scope, predicateFactory )
 		) );
 		SearchAggregation<A> aggregation = aggregationContributor.apply( factory ).toAggregation();
 		searchQueryBuilder.aggregation( key, aggregation );

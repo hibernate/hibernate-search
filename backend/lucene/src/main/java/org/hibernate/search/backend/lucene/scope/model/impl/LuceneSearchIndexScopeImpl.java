@@ -18,15 +18,26 @@ import java.util.stream.Collectors;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
+import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneMultiIndexSearchIndexCompositeNodeContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneMultiIndexSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexCompositeNodeContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexNodeContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
+import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
+import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryIndexScope;
+import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
+import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactory;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.AbstractSearchIndexScope;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 import org.apache.lucene.search.Query;
@@ -38,9 +49,10 @@ public final class LuceneSearchIndexScopeImpl
 						LuceneSearchIndexNodeContext,
 						LuceneSearchIndexCompositeNodeContext
 				>
-		implements LuceneSearchIndexScope {
+		implements LuceneSearchIndexScope, LuceneSearchQueryIndexScope {
 
 	// Backend context
+	private final SearchBackendContext backendContext;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
@@ -50,12 +62,20 @@ public final class LuceneSearchIndexScopeImpl
 	// Targeted indexes
 	private final Map<String, LuceneScopeIndexManagerContext> mappedTypeNameToIndex;
 
+	// Query support
+	private final LuceneSearchPredicateBuilderFactory predicateBuilderFactory;
+	private final LuceneSearchSortBuilderFactory sortBuilderFactory;
+	private final LuceneSearchProjectionBuilderFactory projectionBuilderFactory;
+	private final LuceneSearchAggregationBuilderFactory aggregationBuilderFactory;
+
 	public LuceneSearchIndexScopeImpl(BackendMappingContext mappingContext,
+			SearchBackendContext backendContext,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy,
 			TimingSource timingSource,
 			Set<? extends LuceneScopeIndexManagerContext> indexManagerContexts) {
 		super( mappingContext, toModels( indexManagerContexts ) );
+		this.backendContext = backendContext;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.timingSource = timingSource;
@@ -64,6 +84,11 @@ public final class LuceneSearchIndexScopeImpl
 		for ( LuceneScopeIndexManagerContext indexManager : indexManagerContexts ) {
 			this.mappedTypeNameToIndex.put( indexManager.model().mappedTypeName(), indexManager );
 		}
+
+		this.predicateBuilderFactory = new LuceneSearchPredicateBuilderFactory( this );
+		this.sortBuilderFactory = new LuceneSearchSortBuilderFactory( this );
+		this.projectionBuilderFactory = new LuceneSearchProjectionBuilderFactory( this );
+		this.aggregationBuilderFactory = new LuceneSearchAggregationBuilderFactory( this );
 	}
 
 	private static Set<? extends LuceneIndexModel> toModels(
@@ -75,6 +100,33 @@ public final class LuceneSearchIndexScopeImpl
 	@Override
 	protected LuceneSearchIndexScope self() {
 		return this;
+	}
+
+	@Override
+	public LuceneSearchPredicateBuilderFactory predicateBuilders() {
+		return predicateBuilderFactory;
+	}
+
+	@Override
+	public LuceneSearchSortBuilderFactory sortBuilders() {
+		return sortBuilderFactory;
+	}
+
+	@Override
+	public LuceneSearchProjectionBuilderFactory projectionBuilders() {
+		return projectionBuilderFactory;
+	}
+
+	@Override
+	public LuceneSearchAggregationBuilderFactory aggregationBuilders() {
+		return aggregationBuilderFactory;
+	}
+
+	@Override
+	public <P> LuceneSearchQueryBuilder<P> select(BackendSessionContext sessionContext,
+			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<P> projection) {
+		return backendContext.createSearchQueryBuilder( this, sessionContext, loadingContextBuilder,
+				LuceneSearchProjection.from( this, projection ) );
 	}
 
 	@Override

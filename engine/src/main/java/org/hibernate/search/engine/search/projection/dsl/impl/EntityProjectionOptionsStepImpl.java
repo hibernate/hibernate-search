@@ -18,7 +18,7 @@ public class EntityProjectionOptionsStepImpl<E>
 	private final EntityProjectionBuilder<E> entityProjectionBuilder;
 
 	EntityProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext) {
-		this.entityProjectionBuilder = dslContext.builderFactory().entity();
+		this.entityProjectionBuilder = dslContext.scope().projectionBuilders().entity();
 	}
 
 	@Override

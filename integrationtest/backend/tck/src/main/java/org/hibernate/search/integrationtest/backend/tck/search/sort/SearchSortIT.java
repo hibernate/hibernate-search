@@ -421,7 +421,7 @@ public class SearchSortIT {
 				SearchSortDslContext<?, ?> dslContext) {
 			assertThat( original ).isNotNull();
 			assertThat( dslContext ).isNotNull();
-			assertThat( dslContext.builderFactory() ).isNotNull();
+			assertThat( dslContext.scope().sortBuilders() ).isNotNull();
 			return Optional.of( new MyExtendedFactory( original, dslContext ) );
 		}
 	}
@@ -432,7 +432,7 @@ public class SearchSortIT {
 				SearchSortDslContext<?, ?> dslContext) {
 			assertThat( original ).isNotNull();
 			assertThat( dslContext ).isNotNull();
-			assertThat( dslContext.builderFactory() ).isNotNull();
+			assertThat( dslContext.scope().sortBuilders() ).isNotNull();
 			return Optional.empty();
 		}
 	}

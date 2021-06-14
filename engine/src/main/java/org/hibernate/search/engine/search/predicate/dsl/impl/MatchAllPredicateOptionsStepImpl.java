@@ -34,7 +34,7 @@ class MatchAllPredicateOptionsStepImpl
 			SearchPredicateFactory factory) {
 		super( dslContext );
 		this.factory = factory;
-		this.matchAllBuilder = dslContext.builderFactory().matchAll();
+		this.matchAllBuilder = dslContext.scope().predicateBuilders().matchAll();
 	}
 
 	@Override
@@ -92,7 +92,7 @@ class MatchAllPredicateOptionsStepImpl
 		private final BooleanPredicateBuilder booleanBuilder;
 
 		MatchAllExceptState() {
-			this.booleanBuilder = dslContext.builderFactory().bool();
+			this.booleanBuilder = dslContext.scope().predicateBuilders().bool();
 		}
 
 		void addClause(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {

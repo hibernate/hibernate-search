@@ -12,9 +12,9 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractSearchQueryOptionsStep;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
+import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 
 final class DefaultSearchQueryOptionsStep<H, LOS>
 		extends AbstractSearchQueryOptionsStep<
@@ -28,9 +28,9 @@ final class DefaultSearchQueryOptionsStep<H, LOS>
 		implements SearchQueryWhereStep<DefaultSearchQueryOptionsStep<H, LOS>, H, LOS, SearchPredicateFactory>,
 				SearchQueryOptionsStep<DefaultSearchQueryOptionsStep<H, LOS>, H, LOS, SearchSortFactory, SearchAggregationFactory> {
 
-	DefaultSearchQueryOptionsStep(IndexScope indexScope, SearchQueryBuilder<H> searchQueryBuilder,
+	DefaultSearchQueryOptionsStep(SearchQueryIndexScope scope, SearchQueryBuilder<H> searchQueryBuilder,
 			SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
-		super( indexScope, searchQueryBuilder, loadingContextBuilder );
+		super( scope, searchQueryBuilder, loadingContextBuilder );
 	}
 
 	@Override

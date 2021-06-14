@@ -8,8 +8,7 @@ package org.hibernate.search.engine.search.aggregation.dsl.spi;
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
-import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
+import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationIndexScope;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
@@ -18,20 +17,15 @@ import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
  * Represents the current context in the search DSL,
  * including in particular the search scope and the aggregation builder factory.
  *
- * @param <F> The type of aggregation factory.
+ * @param <SC> The type of the backend-specific search scope.
  * @param <PDF> The type of factory used to create predicates in {@link FieldSortOptionsStep#filter(Function)}.
  */
-public interface SearchAggregationDslContext<F extends SearchAggregationBuilderFactory, PDF extends SearchPredicateFactory> {
+public interface SearchAggregationDslContext<SC extends SearchAggregationIndexScope, PDF extends SearchPredicateFactory> {
 
 	/**
 	 * @return The search scope.
 	 */
-	SearchIndexScope scope();
-
-	/**
-	 * @return The aggregation builder factory. Will always return the exact same instance.
-	 */
-	F builderFactory();
+	SC scope();
 
 	/**
 	 * @return The predicate factory. Will always return the exact same instance.
@@ -43,6 +37,6 @@ public interface SearchAggregationDslContext<F extends SearchAggregationBuilderF
 	 * @param <PDF2> The type of the new predicate factory.
 	 * @return A new context, identical to {@code this} except for the predicate factory which is extended.
 	 */
-	<PDF2 extends SearchPredicateFactory> SearchAggregationDslContext<F, PDF2> withExtendedPredicateFactory(
+	<PDF2 extends SearchPredicateFactory> SearchAggregationDslContext<SC, PDF2> withExtendedPredicateFactory(
 			SearchPredicateFactoryExtension<PDF2> extension);
 }

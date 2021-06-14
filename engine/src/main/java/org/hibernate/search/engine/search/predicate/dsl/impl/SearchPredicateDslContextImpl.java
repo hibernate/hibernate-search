@@ -9,10 +9,9 @@ package org.hibernate.search.engine.search.predicate.dsl.impl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
-import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateIndexScope;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 
 /**
@@ -21,28 +20,21 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
  * or when calling {@link SearchQueryOptionsStep#sort(Function)} to build the sort using a lambda
  * (in which case the lambda may retrieve the resulting {@link SearchPredicate} object and cache it).
  */
-public final class SearchPredicateDslContextImpl<F extends SearchPredicateBuilderFactory>
-		implements SearchPredicateDslContext<F> {
+public final class SearchPredicateDslContextImpl<SC extends SearchPredicateIndexScope>
+		implements SearchPredicateDslContext<SC> {
 
-	public static <F extends SearchPredicateBuilderFactory> SearchPredicateDslContext<F> root(SearchIndexScope scope, F builderFactory) {
-		return new SearchPredicateDslContextImpl<>( scope, builderFactory );
+	public static <SC extends SearchPredicateIndexScope> SearchPredicateDslContext<?> root(SC scope) {
+		return new SearchPredicateDslContextImpl<>( scope );
 	}
 
-	private final SearchIndexScope scope;
-	private final F builderFactory;
-
-	private SearchPredicateDslContextImpl(SearchIndexScope scope, F builderFactory) {
+	private final SC scope;
+	private SearchPredicateDslContextImpl(SC scope) {
 		this.scope = scope;
-		this.builderFactory = builderFactory;
 	}
 
 	@Override
-	public SearchIndexScope scope() {
+	public SC scope() {
 		return scope;
 	}
 
-	@Override
-	public F builderFactory() {
-		return builderFactory;
-	}
 }

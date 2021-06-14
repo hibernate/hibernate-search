@@ -28,11 +28,11 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrch
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.backend.lucene.schema.management.impl.LuceneIndexSchemaManager;
 import org.hibernate.search.backend.lucene.schema.management.impl.SchemaManagementIndexManagerContext;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSearchIndexScopeImpl;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexManagerContext;
-import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSearchIndexScopeImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
+import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryIndexScope;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexIndexer;
 import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexIndexingPlan;
@@ -48,8 +48,8 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
-import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
@@ -146,18 +146,15 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	}
 
 	@Override
-	public LuceneSearchIndexScope createSearchContext(BackendMappingContext mappingContext,
+	public LuceneSearchQueryIndexScope createSearchContext(BackendMappingContext mappingContext,
 			Set<? extends LuceneScopeIndexManagerContext> indexManagerContexts) {
-		return new LuceneSearchIndexScopeImpl(
-				mappingContext, analysisDefinitionRegistry, multiTenancyStrategy,
-				timingSource,
-				indexManagerContexts
-		);
+		return new LuceneSearchIndexScopeImpl( mappingContext, this, analysisDefinitionRegistry,
+				multiTenancyStrategy, timingSource, indexManagerContexts );
 	}
 
 	@Override
 	public <H> LuceneSearchQueryBuilder<H> createSearchQueryBuilder(
-			LuceneSearchIndexScope scope,
+			LuceneSearchQueryIndexScope scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			LuceneSearchProjection<?, H> rootProjection) {

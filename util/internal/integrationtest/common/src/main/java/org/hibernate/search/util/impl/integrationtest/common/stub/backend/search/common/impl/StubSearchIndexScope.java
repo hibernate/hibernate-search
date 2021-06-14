@@ -11,7 +11,22 @@ import java.util.Set;
 
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.AbstractSearchIndexScope;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
+import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
+import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.aggregation.impl.StubSearchAggregationBuilderFactory;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl.StubSearchPredicateBuilderFactory;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionBuilderFactory;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubSearchQueryBuilder;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.impl.StubSearchSortBuilderFactory;
 
 public class StubSearchIndexScope
 		extends AbstractSearchIndexScope<
@@ -20,13 +35,51 @@ public class StubSearchIndexScope
 						StubSearchIndexNodeContext,
 						StubSearchIndexCompositeNodeContext
 				> {
-	public StubSearchIndexScope(BackendMappingContext mappingContext, Set<StubIndexModel> indexModels) {
+	private final StubBackend backend;
+	private final StubSearchPredicateBuilderFactory predicateFactory;
+	private final StubSearchSortBuilderFactory sortFactory;
+	private final StubSearchProjectionBuilderFactory projectionFactory;
+	private final StubSearchAggregationBuilderFactory aggregationFactory;
+
+	public StubSearchIndexScope(BackendMappingContext mappingContext, StubBackend backend, Set<StubIndexModel> indexModels) {
 		super( mappingContext, indexModels );
+		this.backend = backend;
+		this.predicateFactory = new StubSearchPredicateBuilderFactory();
+		this.sortFactory = new StubSearchSortBuilderFactory();
+		this.projectionFactory = new StubSearchProjectionBuilderFactory( this );
+		this.aggregationFactory = new StubSearchAggregationBuilderFactory();
 	}
 
 	@Override
 	protected StubSearchIndexScope self() {
 		return this;
+	}
+
+	@Override
+	public SearchPredicateBuilderFactory predicateBuilders() {
+		return predicateFactory;
+	}
+
+	@Override
+	public SearchProjectionBuilderFactory projectionBuilders() {
+		return projectionFactory;
+	}
+
+	@Override
+	public SearchSortBuilderFactory sortBuilders() {
+		return sortFactory;
+	}
+
+	@Override
+	public SearchAggregationBuilderFactory aggregationBuilders() {
+		return aggregationFactory;
+	}
+
+	@Override
+	public <P> SearchQueryBuilder<P> select(BackendSessionContext sessionContext,
+			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<P> projection) {
+		return new StubSearchQueryBuilder<>( backend, this, sessionContext, loadingContextBuilder,
+				(StubSearchProjection<P>) projection );
 	}
 
 	@Override

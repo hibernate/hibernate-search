@@ -16,7 +16,7 @@ public class IdProjectionOptionsStepImpl<I> implements IdProjectionOptionsStep<I
 	private final IdProjectionBuilder<I> idProjectionBuilder;
 
 	public IdProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext, Class<I> identifierType) {
-		idProjectionBuilder = dslContext.builderFactory().id( identifierType );
+		idProjectionBuilder = dslContext.scope().projectionBuilders().id( identifierType );
 	}
 
 	@Override

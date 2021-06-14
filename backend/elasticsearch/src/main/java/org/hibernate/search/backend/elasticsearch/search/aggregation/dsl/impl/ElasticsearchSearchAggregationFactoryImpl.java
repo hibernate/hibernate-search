@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.ElasticsearchSearchAggregationFactory;
+import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregationIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
@@ -20,10 +20,10 @@ public class ElasticsearchSearchAggregationFactoryImpl
 		extends DelegatingSearchAggregationFactory<ElasticsearchSearchPredicateFactory>
 		implements ElasticsearchSearchAggregationFactory {
 
-	private final SearchAggregationDslContext<ElasticsearchSearchAggregationBuilderFactory, ?> dslContext;
+	private final SearchAggregationDslContext<ElasticsearchSearchAggregationIndexScope, ElasticsearchSearchPredicateFactory> dslContext;
 
 	public ElasticsearchSearchAggregationFactoryImpl(SearchAggregationFactory delegate,
-			SearchAggregationDslContext<ElasticsearchSearchAggregationBuilderFactory, ElasticsearchSearchPredicateFactory> dslContext) {
+			SearchAggregationDslContext<ElasticsearchSearchAggregationIndexScope, ElasticsearchSearchPredicateFactory> dslContext) {
 		super( delegate, dslContext );
 		this.dslContext = dslContext;
 	}
@@ -31,14 +31,14 @@ public class ElasticsearchSearchAggregationFactoryImpl
 	@Override
 	public AggregationFinalStep<JsonObject> fromJson(JsonObject jsonObject) {
 		return new ElasticsearchJsonAggregationFinalStep(
-				dslContext.builderFactory().fromJson( jsonObject )
+				dslContext.scope().aggregationBuilders().fromJson( jsonObject )
 		);
 	}
 
 	@Override
 	public AggregationFinalStep<JsonObject> fromJson(String jsonString) {
 		return new ElasticsearchJsonAggregationFinalStep(
-				dslContext.builderFactory().fromJson( jsonString )
+				dslContext.scope().aggregationBuilders().fromJson( jsonString )
 		);
 	}
 

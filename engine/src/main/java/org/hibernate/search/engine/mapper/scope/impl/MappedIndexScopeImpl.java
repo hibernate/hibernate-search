@@ -36,45 +36,41 @@ class MappedIndexScopeImpl<R, E> implements MappedIndexScope<R, E> {
 
 	@Override
 	public String toString() {
-		return new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "delegate=" ).append( delegate )
-				.append( "]" )
-				.toString();
+		return getClass().getSimpleName() + "[delegate=" + delegate + "]";
 	}
 
 	@Override
 	public <LOS> SearchQuerySelectStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
-		return new DefaultSearchQuerySelectStep<>( delegate, sessionContext, loadingContextBuilder );
+		return new DefaultSearchQuerySelectStep<>( delegate.searchScope(), sessionContext, loadingContextBuilder );
 	}
 
 	@Override
 	public SearchPredicateFactory predicate() {
 		return new DefaultSearchPredicateFactory(
-				SearchPredicateDslContextImpl.root( delegate.searchScope(), delegate.searchPredicateBuilderFactory() )
+				SearchPredicateDslContextImpl.root( delegate.searchScope() )
 		);
 	}
 
 	@Override
 	public SearchSortFactory sort() {
 		return new DefaultSearchSortFactory(
-				SearchSortDslContextImpl.root( delegate.searchScope(), delegate.searchSortBuilderFactory(), predicate() )
+				SearchSortDslContextImpl.root( delegate.searchScope(), predicate() )
 		);
 	}
 
 	@Override
 	public SearchProjectionFactory<R, E> projection() {
 		return new DefaultSearchProjectionFactory<>(
-				SearchProjectionDslContextImpl.root( delegate.searchScope(), delegate.searchProjectionFactory() )
+				SearchProjectionDslContextImpl.root( delegate.searchScope() )
 		);
 	}
 
 	@Override
 	public SearchAggregationFactory aggregation() {
 		return new DefaultSearchAggregationFactory(
-				SearchAggregationDslContextImpl.root( delegate.searchScope(), delegate.searchAggregationFactory(), predicate() )
+				SearchAggregationDslContextImpl.root( delegate.searchScope(), predicate() )
 		);
 	}
 

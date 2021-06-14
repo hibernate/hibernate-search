@@ -25,20 +25,20 @@ public class CompositeProjectionOptionsStepImpl<T>
 	public CompositeProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext,
 			Function<List<?>, T> transformer,
 			SearchProjection<?>[] projections) {
-		this.compositeProjectionBuilder = dslContext.builderFactory().composite( transformer, projections );
+		this.compositeProjectionBuilder = dslContext.scope().projectionBuilders().composite( transformer, projections );
 	}
 
 	public <P> CompositeProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext,
 			Function<P, T> transformer,
 			SearchProjection<P> projection) {
-		this.compositeProjectionBuilder = dslContext.builderFactory().composite( transformer, projection );
+		this.compositeProjectionBuilder = dslContext.scope().projectionBuilders().composite( transformer, projection );
 	}
 
 	public <P1, P2> CompositeProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext,
 			BiFunction<P1, P2, T> transformer,
 			SearchProjection<P1> projection1,
 			SearchProjection<P2> projection2) {
-		this.compositeProjectionBuilder = dslContext.builderFactory()
+		this.compositeProjectionBuilder = dslContext.scope().projectionBuilders()
 				.composite( transformer, projection1, projection2 );
 	}
 
@@ -47,7 +47,7 @@ public class CompositeProjectionOptionsStepImpl<T>
 			SearchProjection<P1> projection1,
 			SearchProjection<P2> projection2,
 			SearchProjection<P3> projection3) {
-		this.compositeProjectionBuilder = dslContext.builderFactory()
+		this.compositeProjectionBuilder = dslContext.scope().projectionBuilders()
 				.composite( transformer, projection1, projection2, projection3 );
 	}
 
