@@ -17,6 +17,8 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleF
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TestedFieldStructure;
 
 public class AbstractObjectBinding {
+	public static final String DISCRIMINATOR_FIELD_NAME = "discriminator";
+
 	public final String absolutePath;
 	public final String relativeFieldName;
 
@@ -35,7 +37,7 @@ public class AbstractObjectBinding {
 				"multiValued_", additionalConfiguration );
 	}
 
-	protected final String getRelativeFieldName(TestedFieldStructure fieldStructure, FieldTypeDescriptor<?> fieldType) {
+	public final String getRelativeFieldName(TestedFieldStructure fieldStructure, FieldTypeDescriptor<?> fieldType) {
 		SimpleFieldModelsByType fieldModelsByType;
 		if ( fieldStructure.isSingleValued() ) {
 			fieldModelsByType = fieldWithSingleValueModels;

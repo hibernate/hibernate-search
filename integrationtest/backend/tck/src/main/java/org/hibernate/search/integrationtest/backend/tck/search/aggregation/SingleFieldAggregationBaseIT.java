@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThatQuery;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.documentProvider;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +28,7 @@ import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.AbstractObjectBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.model.singlefield.SingleFieldIndexBinding;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.AggregationScenario;
@@ -138,38 +140,8 @@ public class SingleFieldAggregationBaseIT<F> {
 			"org.hibernate.search.test.query.facet.MultiValuedFacetingTest"
 	})
 	public void simple() {
-		// Need a separate method to handle the scenario generics
-		doTest_simple( getSimpleScenario() );
-	}
-
-	private <A> void doTest_simple(AggregationScenario<A> scenario) {
-		StubMappingScope scope = mainIndex.createScope();
-		String fieldPath = getFieldPath( mainIndex.binding() );
-		AggregationKey<A> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
-
-		assertThatQuery(
-				scope.query()
-						.where( f -> f.matchAll() )
-						.aggregation( aggregationKey, f -> scenario.setup( f, fieldPath, getFilterOrNull( mainIndex.binding() ) ) )
-						.routing( dataSet.routingKey )
-						.toQuery()
-		)
-				.aggregation(
-						aggregationKey,
-						a -> assertThat( a ).isNotNull().satisfies( scenario::check )
-				);
-	}
-
-	private Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> getFilterOrNull(
-			SingleFieldIndexBinding binding) {
-		if ( fieldStructure.isInNested() ) {
-			return pf -> pf.match()
-					.field( binding.getDiscriminatorFieldPath( fieldStructure ) )
-					.matching( SingleFieldIndexBinding.DISCRIMINATOR_VALUE_INCLUDED );
-		}
-		else {
-			return null;
-		}
+		testValidAggregation( getSimpleScenario(), mainIndex.createScope(),
+				getFieldPath( mainIndex.binding() ), getFilterOrNull( mainIndex.binding() ) );
 	}
 
 	@Test
@@ -248,6 +220,25 @@ public class SingleFieldAggregationBaseIT<F> {
 		);
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void factoryWithRoot() {
+		AbstractObjectBinding parentObjectBinding = mainIndex.binding().getParentObject( fieldStructure );
+
+		assumeTrue( "This test is only relevant when the field is located on an object field",
+				parentObjectBinding.absolutePath != null );
+
+		testValidAggregation(
+				getSimpleScenario(), mainIndex.createScope(),
+				f -> f.matchAll(),
+				(f, e) -> e.setup(
+						f.withRoot( parentObjectBinding.absolutePath ),
+						parentObjectBinding.getRelativeFieldName( fieldStructure, fieldType ),
+						getFilterOrNull( AbstractObjectBinding.DISCRIMINATOR_FIELD_NAME )
+				)
+		);
+	}
+
 	private <A> void testValidAggregation(AggregationScenario<A> scenario, StubMappingScope scope,
 			String fieldPath, Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> filterOrNull) {
 		testValidAggregation(
@@ -287,6 +278,23 @@ public class SingleFieldAggregationBaseIT<F> {
 
 	private String getFieldPath(SingleFieldIndexBinding indexBinding) {
 		return indexBinding.getFieldPath( fieldStructure, fieldType );
+	}
+
+	private Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> getFilterOrNull(
+			SingleFieldIndexBinding binding) {
+		return getFilterOrNull( binding.getDiscriminatorFieldPath( fieldStructure ) );
+	}
+
+	private Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> getFilterOrNull(
+			String discriminatorPath) {
+		if ( fieldStructure.isInNested() ) {
+			return pf -> pf.match()
+					.field( discriminatorPath )
+					.matching( SingleFieldIndexBinding.DISCRIMINATOR_VALUE_INCLUDED );
+		}
+		else {
+			return null;
+		}
 	}
 
 	private static class DataSet<F> {

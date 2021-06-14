@@ -64,10 +64,10 @@ public class SingleFieldIndexBinding extends AbstractObjectBinding {
 	}
 
 	public final String getDiscriminatorFieldPath(TestedFieldStructure fieldStructure) {
-		return FieldPaths.compose( getParentObject( fieldStructure ).absolutePath, "discriminator" );
+		return FieldPaths.compose( getParentObject( fieldStructure ).absolutePath, DISCRIMINATOR_FIELD_NAME );
 	}
 
-	private AbstractObjectBinding getParentObject(TestedFieldStructure fieldStructure) {
+	public final AbstractObjectBinding getParentObject(TestedFieldStructure fieldStructure) {
 		switch ( fieldStructure.location ) {
 			case ROOT:
 				return this;
