@@ -77,7 +77,7 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<
 			fieldSetState.contributePredicates( predicates::add );
 		}
 		if ( predicates.size() > 1 ) {
-			BooleanPredicateBuilder boolBuilder = dslContext.builderFactory().bool();
+			BooleanPredicateBuilder boolBuilder = dslContext.scope().predicateBuilders().bool();
 			for ( SearchPredicate predicate : predicates ) {
 				boolBuilder.should( predicate );
 			}

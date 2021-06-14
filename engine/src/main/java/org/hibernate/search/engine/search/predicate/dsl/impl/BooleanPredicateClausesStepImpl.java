@@ -33,7 +33,7 @@ class BooleanPredicateClausesStepImpl
 			SearchPredicateFactory factory) {
 		super( dslContext );
 		this.factory = factory;
-		this.builder = dslContext.builderFactory().bool();
+		this.builder = dslContext.scope().predicateBuilders().bool();
 		this.minimumShouldMatchStep = new MinimumShouldMatchConditionStepImpl<>( builder, this );
 	}
 

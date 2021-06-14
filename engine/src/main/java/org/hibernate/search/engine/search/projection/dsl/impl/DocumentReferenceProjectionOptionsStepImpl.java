@@ -19,7 +19,7 @@ public class DocumentReferenceProjectionOptionsStepImpl
 	private final DocumentReferenceProjectionBuilder documentReferenceProjectionBuilder;
 
 	DocumentReferenceProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext) {
-		this.documentReferenceProjectionBuilder = dslContext.builderFactory().documentReference();
+		this.documentReferenceProjectionBuilder = dslContext.scope().projectionBuilders().documentReference();
 	}
 
 	@Override

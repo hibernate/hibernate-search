@@ -6,17 +6,17 @@
  */
 package org.hibernate.search.engine.search.query.dsl.spi;
 
-import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.impl.DefaultSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.impl.SearchProjectionDslContextImpl;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.engine.backend.scope.spi.IndexScope;
-import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
+import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 
 public abstract class AbstractSearchQuerySelectStep<
 				N extends SearchQueryOptionsStep<?, E, LOS, ?, ?>,
@@ -32,19 +32,17 @@ public abstract class AbstractSearchQuerySelectStep<
 	public <T> T extension(SearchQueryDslExtension<T, R, E, LOS> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension,
-				extension.extendOptional(
-						this, indexScope(), sessionContext(), loadingContextBuilder()
-				)
+				extension.extendOptional( this, scope(), sessionContext(), loadingContextBuilder() )
 		);
 	}
 
 	protected final SearchProjectionFactory<R, E> createDefaultProjectionFactory() {
 		return new DefaultSearchProjectionFactory<>(
-				SearchProjectionDslContextImpl.root( indexScope().searchScope(), indexScope().searchProjectionFactory() )
+				SearchProjectionDslContextImpl.root( scope() )
 		);
 	}
 
-	protected abstract IndexScope indexScope();
+	protected abstract SearchQueryIndexScope scope();
 
 	protected abstract BackendSessionContext sessionContext();
 

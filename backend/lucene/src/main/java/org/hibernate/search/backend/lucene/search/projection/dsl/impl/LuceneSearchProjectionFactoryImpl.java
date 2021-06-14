@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.search.projection.dsl.impl;
 
 import org.hibernate.search.backend.lucene.search.projection.dsl.LuceneSearchProjectionFactory;
-import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionIndexScope;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.DelegatingSearchProjectionFactory;
@@ -21,21 +21,21 @@ public class LuceneSearchProjectionFactoryImpl<R, E>
 		extends DelegatingSearchProjectionFactory<R, E>
 		implements LuceneSearchProjectionFactory<R, E> {
 
-	private final SearchProjectionDslContext<LuceneSearchProjectionBuilderFactory> dslContext;
+	private final SearchProjectionDslContext<LuceneSearchProjectionIndexScope> dslContext;
 
 	public LuceneSearchProjectionFactoryImpl(SearchProjectionFactory<R, E> delegate,
-			SearchProjectionDslContext<LuceneSearchProjectionBuilderFactory> dslContext) {
+			SearchProjectionDslContext<LuceneSearchProjectionIndexScope> dslContext) {
 		super( delegate );
 		this.dslContext = dslContext;
 	}
 
 	@Override
 	public ProjectionFinalStep<Document> document() {
-		return new StaticProjectionFinalStep<>( dslContext.builderFactory().document() );
+		return new StaticProjectionFinalStep<>( dslContext.scope().projectionBuilders().document() );
 	}
 
 	@Override
 	public ProjectionFinalStep<Explanation> explanation() {
-		return new StaticProjectionFinalStep<>( dslContext.builderFactory().explanation() );
+		return new StaticProjectionFinalStep<>( dslContext.scope().projectionBuilders().explanation() );
 	}
 }

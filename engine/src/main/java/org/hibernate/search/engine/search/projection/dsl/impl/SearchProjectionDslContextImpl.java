@@ -9,10 +9,9 @@ package org.hibernate.search.engine.search.projection.dsl.impl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
-import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
+import org.hibernate.search.engine.search.projection.spi.SearchProjectionIndexScope;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 
 /**
@@ -21,30 +20,22 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
  * or when calling {@link SearchQueryOptionsStep#sort(Function)} to build the sort using a lambda
  * (in which case the lambda may retrieve the resulting {@link SearchProjection} object and cache it).
  */
-public final class SearchProjectionDslContextImpl<F extends SearchProjectionBuilderFactory>
-		implements SearchProjectionDslContext<F> {
+public final class SearchProjectionDslContextImpl<SC extends SearchProjectionIndexScope>
+		implements SearchProjectionDslContext<SC> {
 
-	public static <F extends SearchProjectionBuilderFactory> SearchProjectionDslContext root(SearchIndexScope scope,
-			F builderFactory) {
-		return new SearchProjectionDslContextImpl<>( scope, builderFactory );
+	public static <SC extends SearchProjectionIndexScope> SearchProjectionDslContext<SC> root(SC scope) {
+		return new SearchProjectionDslContextImpl<>( scope );
 	}
 
-	private final SearchIndexScope scope;
-	private final F builderFactory;
+	private final SC scope;
 
-	private SearchProjectionDslContextImpl(SearchIndexScope scope,
-			F builderFactory) {
+	private SearchProjectionDslContextImpl(SC scope) {
 		this.scope = scope;
-		this.builderFactory = builderFactory;
 	}
 
 	@Override
-	public SearchIndexScope scope() {
+	public SC scope() {
 		return scope;
 	}
 
-	@Override
-	public F builderFactory() {
-		return builderFactory;
-	}
 }

@@ -10,17 +10,17 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.projection.SearchProjection;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractSearchQuerySelectStep;
-import org.hibernate.search.engine.backend.scope.spi.IndexScope;
-import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
+import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 
 public final class DefaultSearchQuerySelectStep<R, E, LOS>
 		extends AbstractSearchQuerySelectStep<
@@ -32,26 +32,25 @@ public final class DefaultSearchQuerySelectStep<R, E, LOS>
 								SearchPredicateFactory
 						> {
 
-	private final IndexScope indexScope;
+	private final SearchQueryIndexScope scope;
 	private final BackendSessionContext sessionContext;
 	private final SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder;
 
-	public DefaultSearchQuerySelectStep(IndexScope indexScope,
-			BackendSessionContext sessionContext,
+	public DefaultSearchQuerySelectStep(SearchQueryIndexScope scope, BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
-		this.indexScope = indexScope;
+		this.scope = scope;
 		this.sessionContext = sessionContext;
 		this.loadingContextBuilder = loadingContextBuilder;
 	}
 
 	@Override
 	public DefaultSearchQueryOptionsStep<E, LOS> selectEntity() {
-		return select( indexScope.searchProjectionFactory().<E>entity().build() );
+		return select( scope.projectionBuilders().<E>entity().build() );
 	}
 
 	@Override
 	public DefaultSearchQueryOptionsStep<R, LOS> selectEntityReference() {
-		return select( indexScope.searchProjectionFactory().<R>entityReference().build() );
+		return select( scope.projectionBuilders().<R>entityReference().build() );
 	}
 
 	@Override
@@ -64,14 +63,13 @@ public final class DefaultSearchQuerySelectStep<R, E, LOS>
 
 	@Override
 	public <P> DefaultSearchQueryOptionsStep<P, LOS> select(SearchProjection<P> projection) {
-		SearchQueryBuilder<P> builder = indexScope.searchQueryBuilderFactory()
-				.select( sessionContext, loadingContextBuilder, projection );
-		return new DefaultSearchQueryOptionsStep<>( indexScope, builder, loadingContextBuilder );
+		SearchQueryBuilder<P> builder = scope.select( sessionContext, loadingContextBuilder, projection );
+		return new DefaultSearchQueryOptionsStep<>( scope, builder, loadingContextBuilder );
 	}
 
 	@Override
 	public DefaultSearchQueryOptionsStep<List<?>, LOS> select(SearchProjection<?>... projections) {
-		return select( indexScope.searchProjectionFactory().composite( Function.identity(), projections ).build() );
+		return select( scope.projectionBuilders().composite( Function.identity(), projections ).build() );
 	}
 
 	@Override
@@ -86,8 +84,8 @@ public final class DefaultSearchQuerySelectStep<R, E, LOS>
 	}
 
 	@Override
-	protected IndexScope indexScope() {
-		return indexScope;
+	protected SearchQueryIndexScope scope() {
+		return scope;
 	}
 
 	@Override

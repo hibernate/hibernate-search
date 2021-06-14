@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.projection.dsl.ElasticsearchSearchProjectionFactory;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionIndexScope;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.DelegatingSearchProjectionFactory;
@@ -20,26 +20,26 @@ public class ElasticsearchSearchProjectionFactoryImpl<R, E>
 		extends DelegatingSearchProjectionFactory<R, E>
 		implements ElasticsearchSearchProjectionFactory<R, E> {
 
-	private final SearchProjectionDslContext<ElasticsearchSearchProjectionBuilderFactory> dslContext;
+	private final SearchProjectionDslContext<ElasticsearchSearchProjectionIndexScope> dslContext;
 
 	public ElasticsearchSearchProjectionFactoryImpl(SearchProjectionFactory<R, E> delegate,
-			SearchProjectionDslContext<ElasticsearchSearchProjectionBuilderFactory> dslContext) {
+			SearchProjectionDslContext<ElasticsearchSearchProjectionIndexScope> dslContext) {
 		super( delegate );
 		this.dslContext = dslContext;
 	}
 
 	@Override
 	public ProjectionFinalStep<JsonObject> source() {
-		return new StaticProjectionFinalStep<>( dslContext.builderFactory().source() );
+		return new StaticProjectionFinalStep<>( dslContext.scope().projectionBuilders().source() );
 	}
 
 	@Override
 	public ProjectionFinalStep<JsonObject> explanation() {
-		return new StaticProjectionFinalStep<>( dslContext.builderFactory().explanation() );
+		return new StaticProjectionFinalStep<>( dslContext.scope().projectionBuilders().explanation() );
 	}
 
 	@Override
 	public ProjectionFinalStep<JsonObject> jsonHit() {
-		return new StaticProjectionFinalStep<>( dslContext.builderFactory().jsonHit() );
+		return new StaticProjectionFinalStep<>( dslContext.scope().projectionBuilders().jsonHit() );
 	}
 }

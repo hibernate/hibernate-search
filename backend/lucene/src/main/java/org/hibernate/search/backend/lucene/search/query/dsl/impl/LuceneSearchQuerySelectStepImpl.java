@@ -13,17 +13,17 @@ import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.projection.dsl.LuceneSearchProjectionFactory;
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryOptionsStep;
-import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryWhereStep;
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQuerySelectStep;
-import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScopeImpl;
+import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryWhereStep;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
+import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryIndexScope;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractSearchQuerySelectStep;
-import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 
 public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 		extends AbstractSearchQuerySelectStep<
@@ -36,26 +36,26 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 				>
 		implements LuceneSearchQuerySelectStep<R, E, LOS> {
 
-	private final LuceneIndexScopeImpl indexScope;
+	private final LuceneSearchQueryIndexScope scope;
 	private final BackendSessionContext sessionContext;
 	private final SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder;
 
-	public LuceneSearchQuerySelectStepImpl(LuceneIndexScopeImpl indexScope,
+	public LuceneSearchQuerySelectStepImpl(LuceneSearchQueryIndexScope scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
-		this.indexScope = indexScope;
+		this.scope = scope;
 		this.sessionContext = sessionContext;
 		this.loadingContextBuilder = loadingContextBuilder;
 	}
 
 	@Override
 	public LuceneSearchQueryWhereStep<E, LOS> selectEntity() {
-		return select( indexScope.searchProjectionFactory().<E>entity().build() );
+		return select( scope.projectionBuilders().<E>entity().build() );
 	}
 
 	@Override
 	public LuceneSearchQueryWhereStep<R, LOS> selectEntityReference() {
-		return select( indexScope.searchProjectionFactory().<R>entityReference().build() );
+		return select( scope.projectionBuilders().<R>entityReference().build() );
 	}
 
 	@Override
@@ -69,14 +69,14 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 
 	@Override
 	public <P> LuceneSearchQueryWhereStep<P, LOS> select(SearchProjection<P> projection) {
-		LuceneSearchQueryBuilder<P> builder = indexScope.searchQueryBuilderFactory()
-				.select( sessionContext, loadingContextBuilder, projection );
-		return new LuceneSearchQueryOptionsStepImpl<>( indexScope, builder, loadingContextBuilder );
+		LuceneSearchQueryBuilder<P> builder =
+				scope.select( sessionContext, loadingContextBuilder, projection );
+		return new LuceneSearchQueryOptionsStepImpl<>( scope, builder, loadingContextBuilder );
 	}
 
 	@Override
 	public LuceneSearchQueryWhereStep<List<?>, LOS> select(SearchProjection<?>... projections) {
-		return select( indexScope.searchProjectionFactory().composite( Function.identity(), projections ).build() );
+		return select( scope.projectionBuilders().composite( Function.identity(), projections ).build() );
 	}
 
 	@Override
@@ -91,8 +91,8 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 	}
 
 	@Override
-	protected LuceneIndexScopeImpl indexScope() {
-		return indexScope;
+	protected LuceneSearchQueryIndexScope scope() {
+		return scope;
 	}
 
 	@Override

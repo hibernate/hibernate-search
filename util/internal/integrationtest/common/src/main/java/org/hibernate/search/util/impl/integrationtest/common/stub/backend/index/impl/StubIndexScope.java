@@ -13,62 +13,21 @@ import java.util.Set;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
-import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.aggregation.impl.StubSearchAggregationBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.common.impl.StubSearchIndexScope;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl.StubSearchPredicateBuilderFactory;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionBuilderFactory;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.impl.StubSearchSortBuilderFactory;
 
 public class StubIndexScope implements IndexScope {
 	private final StubSearchIndexScope searchScope;
-	private final StubSearchPredicateBuilderFactory predicateFactory;
-	private final StubSearchSortBuilderFactory sortFactory;
-	private final StubSearchProjectionBuilderFactory projectionFactory;
-	private final StubSearchAggregationBuilderFactory aggregationFactory;
-	private final StubSearchQueryBuilderFactory queryFactory;
 
 	private StubIndexScope(Builder builder) {
 		Set<StubIndexModel> immutableIndexModels =
 				Collections.unmodifiableSet( new LinkedHashSet<>( builder.indexModels ) );
-		searchScope = new StubSearchIndexScope( builder.mappingContext, immutableIndexModels );
-		this.predicateFactory = new StubSearchPredicateBuilderFactory();
-		this.sortFactory = new StubSearchSortBuilderFactory();
-		this.projectionFactory = new StubSearchProjectionBuilderFactory( searchScope );
-		this.aggregationFactory = new StubSearchAggregationBuilderFactory();
-		this.queryFactory = new StubSearchQueryBuilderFactory( builder.backend, searchScope );
+		searchScope = new StubSearchIndexScope( builder.mappingContext, builder.backend, immutableIndexModels );
 	}
 
 	@Override
 	public StubSearchIndexScope searchScope() {
 		return searchScope;
-	}
-
-	@Override
-	public StubSearchPredicateBuilderFactory searchPredicateBuilderFactory() {
-		return predicateFactory;
-	}
-
-	@Override
-	public StubSearchSortBuilderFactory searchSortBuilderFactory() {
-		return sortFactory;
-	}
-
-	@Override
-	public StubSearchQueryBuilderFactory searchQueryBuilderFactory() {
-		return queryFactory;
-	}
-
-	@Override
-	public SearchProjectionBuilderFactory searchProjectionFactory() {
-		return projectionFactory;
-	}
-
-	@Override
-	public SearchAggregationBuilderFactory searchAggregationFactory() {
-		return aggregationFactory;
 	}
 
 	static class Builder implements IndexScopeBuilder {

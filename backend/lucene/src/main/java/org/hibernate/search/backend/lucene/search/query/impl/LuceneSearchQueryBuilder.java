@@ -18,12 +18,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
-import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
-import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicate;
 import org.hibernate.search.backend.lucene.search.predicate.impl.PredicateRequestContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
@@ -58,7 +57,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 	private final LuceneWorkFactory workFactory;
 	private final LuceneSyncWorkOrchestrator queryOrchestrator;
 
-	private final LuceneSearchIndexScope scope;
+	private final LuceneSearchQueryIndexScope scope;
 	private final BackendSessionContext sessionContext;
 	private final Set<String> routingKeys;
 
@@ -78,7 +77,7 @@ public class LuceneSearchQueryBuilder<H> implements SearchQueryBuilder<H>, Lucen
 	public LuceneSearchQueryBuilder(
 			LuceneWorkFactory workFactory,
 			LuceneSyncWorkOrchestrator queryOrchestrator,
-			LuceneSearchIndexScope scope,
+			LuceneSearchQueryIndexScope scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			LuceneSearchProjection<?, H> rootProjection) {

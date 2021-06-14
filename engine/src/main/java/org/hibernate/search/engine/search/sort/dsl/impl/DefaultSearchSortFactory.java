@@ -39,7 +39,7 @@ public class DefaultSearchSortFactory implements SearchSortFactory {
 
 	@Override
 	public SortThenStep indexOrder() {
-		return staticThenStep( dslContext.builderFactory().indexOrder() );
+		return staticThenStep( dslContext.scope().sortBuilders().indexOrder() );
 	}
 
 	@Override
