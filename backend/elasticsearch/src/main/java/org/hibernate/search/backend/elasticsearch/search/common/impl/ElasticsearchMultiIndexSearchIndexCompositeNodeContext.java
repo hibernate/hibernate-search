@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.common.impl;
 import java.util.List;
 
 import org.hibernate.search.engine.search.common.spi.AbstractMultiIndexSearchIndexCompositeNodeContext;
+import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
 
 public final class ElasticsearchMultiIndexSearchIndexCompositeNodeContext
 		extends AbstractMultiIndexSearchIndexCompositeNodeContext<
@@ -45,5 +46,10 @@ public final class ElasticsearchMultiIndexSearchIndexCompositeNodeContext
 	@Override
 	protected ElasticsearchSearchIndexNodeContext childInScope(String childRelativeName) {
 		return scope.child( this, childRelativeName );
+	}
+
+	@Override
+	public ElasticsearchSearchIndexValueFieldContext<?> toValueField() {
+		return SearchIndexSchemaElementContextHelper.throwingToValueField( this );
 	}
 }

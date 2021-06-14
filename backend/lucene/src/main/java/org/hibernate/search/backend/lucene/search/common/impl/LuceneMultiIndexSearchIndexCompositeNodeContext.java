@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.common.impl;
 import java.util.List;
 
 import org.hibernate.search.engine.search.common.spi.AbstractMultiIndexSearchIndexCompositeNodeContext;
+import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
 
 public final class LuceneMultiIndexSearchIndexCompositeNodeContext
 		extends AbstractMultiIndexSearchIndexCompositeNodeContext<
@@ -42,5 +43,10 @@ public final class LuceneMultiIndexSearchIndexCompositeNodeContext
 	@Override
 	protected LuceneSearchIndexNodeContext childInScope(String childRelativeName) {
 		return scope.child( this, childRelativeName );
+	}
+
+	@Override
+	public LuceneSearchIndexValueFieldContext<?> toValueField() {
+		return SearchIndexSchemaElementContextHelper.throwingToValueField( this );
 	}
 }

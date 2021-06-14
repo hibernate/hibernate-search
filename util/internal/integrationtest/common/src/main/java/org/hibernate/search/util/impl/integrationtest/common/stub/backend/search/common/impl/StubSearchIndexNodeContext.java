@@ -12,6 +12,9 @@ public interface StubSearchIndexNodeContext
 		extends SearchIndexNodeContext<StubSearchIndexScope> {
 
 	@Override
+	StubSearchIndexCompositeNodeContext toComposite();
+
+	@Override
 	StubSearchIndexValueFieldContext<?> toValueField();
 
 }
