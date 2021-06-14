@@ -53,7 +53,7 @@ public class PhrasePredicateBaseIT {
 		setupHelper.start()
 				.withIndexes(
 						SingleFieldIT.index, MultiFieldIT.index,
-						NestingIT.mainIndex, NestingIT.missingFieldIndex,
+						InObjectFieldIT.mainIndex, InObjectFieldIT.missingFieldIndex,
 						AnalysisIT.index, AnalysisIT.compatibleIndex, AnalysisIT.incompatibleIndex,
 						ScoreIT.index,
 						InvalidFieldIT.index, UnsupportedTypeIT.index,
@@ -71,10 +71,10 @@ public class PhrasePredicateBaseIT {
 		final BulkIndexer multiFieldIndexer = MultiFieldIT.index.bulkIndexer();
 		MultiFieldIT.dataSets.forEach( d -> d.contribute( MultiFieldIT.index, multiFieldIndexer ) );
 
-		final BulkIndexer nestingMainIndexer = NestingIT.mainIndex.bulkIndexer();
-		final BulkIndexer nestingMissingFieldIndexer = NestingIT.missingFieldIndex.bulkIndexer();
-		NestingIT.dataSets.forEach( d -> d.contribute( NestingIT.mainIndex, nestingMainIndexer,
-				NestingIT.missingFieldIndex, nestingMissingFieldIndexer ) );
+		final BulkIndexer inObjectFieldMainIndexer = InObjectFieldIT.mainIndex.bulkIndexer();
+		final BulkIndexer inObjectFieldMissingFieldIndexer = InObjectFieldIT.missingFieldIndex.bulkIndexer();
+		InObjectFieldIT.dataSets.forEach( d -> d.contribute( InObjectFieldIT.mainIndex, inObjectFieldMainIndexer,
+				InObjectFieldIT.missingFieldIndex, inObjectFieldMissingFieldIndexer ) );
 
 		final BulkIndexer analysisMainIndexIndexer = AnalysisIT.index.bulkIndexer();
 		final BulkIndexer analysisCompatibleIndexIndexer = AnalysisIT.compatibleIndex.bulkIndexer();
@@ -96,7 +96,7 @@ public class PhrasePredicateBaseIT {
 				TypeCheckingNoConversionIT.missingFieldIndex, typeCheckingMissingFieldIndexer ) );
 
 		singleFieldIndexer.join(
-				multiFieldIndexer, nestingMainIndexer, nestingMissingFieldIndexer,
+				multiFieldIndexer, inObjectFieldMainIndexer, inObjectFieldMissingFieldIndexer,
 				analysisMainIndexIndexer, analysisCompatibleIndexIndexer, analysisIncompatibleIndexIndexer,
 				scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer,
@@ -190,7 +190,7 @@ public class PhrasePredicateBaseIT {
 	}
 
 	@RunWith(Parameterized.class)
-	public static class NestingIT extends AbstractPredicateFieldNestingIT<PhrasePredicateTestValues> {
+	public static class InObjectFieldIT extends AbstractPredicateFieldInObjectFieldIT<PhrasePredicateTestValues> {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Object[]> parameters = new ArrayList<>();
 		static {
@@ -214,7 +214,7 @@ public class PhrasePredicateBaseIT {
 			return parameters;
 		}
 
-		public NestingIT(DataSet<String, PhrasePredicateTestValues> dataSet) {
+		public InObjectFieldIT(DataSet<String, PhrasePredicateTestValues> dataSet) {
 			super( mainIndex, missingFieldIndex, dataSet );
 		}
 

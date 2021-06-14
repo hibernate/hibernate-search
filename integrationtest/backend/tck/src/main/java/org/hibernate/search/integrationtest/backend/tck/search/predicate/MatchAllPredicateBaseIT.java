@@ -35,19 +35,19 @@ public class MatchAllPredicateBaseIT {
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						NestingIT.mainIndex, NestingIT.missingFieldIndex,
+						InObjectFieldIT.mainIndex, InObjectFieldIT.missingFieldIndex,
 						ScoreIT.index
 				)
 				.setup();
 
-		final BulkIndexer nestingMainIndexer = NestingIT.mainIndex.bulkIndexer();
-		final BulkIndexer nestingMissingFieldIndexer = NestingIT.missingFieldIndex.bulkIndexer();
-		NestingIT.dataSet.contribute( nestingMainIndexer, nestingMissingFieldIndexer );
+		final BulkIndexer inObjectFieldMainIndexer = InObjectFieldIT.mainIndex.bulkIndexer();
+		final BulkIndexer inObjectFieldMissingFieldIndexer = InObjectFieldIT.missingFieldIndex.bulkIndexer();
+		InObjectFieldIT.dataSet.contribute( inObjectFieldMainIndexer, inObjectFieldMissingFieldIndexer );
 
 		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
 		ScoreIT.dataSet.contribute( scoreIndexer );
 
-		nestingMainIndexer.join( nestingMissingFieldIndexer, scoreIndexer );
+		inObjectFieldMainIndexer.join( inObjectFieldMissingFieldIndexer, scoreIndexer );
 	}
 
 	@Test
@@ -55,7 +55,7 @@ public class MatchAllPredicateBaseIT {
 		// Workaround to get Takari-CPSuite to run this test.
 	}
 
-	public static class NestingIT extends AbstractPredicateNestingIT {
+	public static class InObjectFieldIT extends AbstractPredicateInObjectFieldIT {
 		private static final DataSet dataSet = new DataSet();
 
 		private static final SimpleMappedIndex<IndexBinding> mainIndex =
@@ -66,7 +66,7 @@ public class MatchAllPredicateBaseIT {
 				SimpleMappedIndex.of( root -> new MissingFieldIndexBinding( root, FieldTypeDescriptor.getAll() ) )
 						.name( "nesting_missingField" );
 
-		public NestingIT() {
+		public InObjectFieldIT() {
 			super( mainIndex, missingFieldIndex, dataSet );
 		}
 

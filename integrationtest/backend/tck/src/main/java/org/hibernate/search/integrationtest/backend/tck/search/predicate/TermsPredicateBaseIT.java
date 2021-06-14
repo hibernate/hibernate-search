@@ -54,7 +54,7 @@ public class TermsPredicateBaseIT {
 				.withIndexes(
 						SingleFieldIT.index, MultiFieldIT.index,
 						MultipleArgumentIT.index,
-						NestingIT.mainIndex, NestingIT.missingFieldIndex,
+						InObjectFieldIT.mainIndex, InObjectFieldIT.missingFieldIndex,
 						ScoreIT.index,
 						InvalidFieldIT.index, UnsupportedTypeIT.index,
 						SearchableIT.searchableYesIndex, SearchableIT.searchableNoIndex,
@@ -76,10 +76,10 @@ public class TermsPredicateBaseIT {
 		final BulkIndexer multipleArgumentIndexer = MultipleArgumentIT.index.bulkIndexer();
 		MultipleArgumentIT.dataSets.forEach( d -> d.contribute( MultipleArgumentIT.index, multipleArgumentIndexer ) );
 
-		final BulkIndexer nestingMainIndexer = NestingIT.mainIndex.bulkIndexer();
-		final BulkIndexer nestingMissingFieldIndexer = NestingIT.missingFieldIndex.bulkIndexer();
-		NestingIT.dataSets.forEach( d -> d.contribute( NestingIT.mainIndex, nestingMainIndexer,
-				NestingIT.missingFieldIndex, nestingMissingFieldIndexer
+		final BulkIndexer inObjectFieldMainIndexer = InObjectFieldIT.mainIndex.bulkIndexer();
+		final BulkIndexer inObjectFieldMissingFieldIndexer = InObjectFieldIT.missingFieldIndex.bulkIndexer();
+		InObjectFieldIT.dataSets.forEach( d -> d.contribute( InObjectFieldIT.mainIndex, inObjectFieldMainIndexer,
+				InObjectFieldIT.missingFieldIndex, inObjectFieldMissingFieldIndexer
 		) );
 
 		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
@@ -104,7 +104,7 @@ public class TermsPredicateBaseIT {
 		);
 
 		singleFieldIndexer.join(
-				multiFieldIndexer, multipleArgumentIndexer, nestingMainIndexer, nestingMissingFieldIndexer,
+				multiFieldIndexer, multipleArgumentIndexer, inObjectFieldMainIndexer, inObjectFieldMissingFieldIndexer,
 				scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer,
 				typeCheckingRawFieldCompatibleIndexer, typeCheckingMissingFieldIndexer,
@@ -240,7 +240,7 @@ public class TermsPredicateBaseIT {
 	}
 
 	@RunWith(Parameterized.class)
-	public static class NestingIT<F> extends AbstractPredicateFieldNestingIT<TermsPredicateTestValues<F>> {
+	public static class InObjectFieldIT<F> extends AbstractPredicateFieldInObjectFieldIT<TermsPredicateTestValues<F>> {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Object[]> parameters = new ArrayList<>();
 
@@ -265,7 +265,7 @@ public class TermsPredicateBaseIT {
 			return parameters;
 		}
 
-		public NestingIT(DataSet<F, TermsPredicateTestValues<F>> dataSet) {
+		public InObjectFieldIT(DataSet<F, TermsPredicateTestValues<F>> dataSet) {
 			super( mainIndex, missingFieldIndex, dataSet );
 		}
 

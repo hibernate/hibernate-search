@@ -25,7 +25,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Test;
 
-public abstract class AbstractPredicateNestingIT {
+public abstract class AbstractPredicateInObjectFieldIT {
 
 	static final int MISSING_FIELD_INDEX_DOC_ORDINAL = 42;
 
@@ -34,7 +34,7 @@ public abstract class AbstractPredicateNestingIT {
 	private final IndexBinding binding;
 	private final AbstractPredicateDataSet dataSet;
 
-	public AbstractPredicateNestingIT(SimpleMappedIndex<IndexBinding> mainIndex,
+	public AbstractPredicateInObjectFieldIT(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex,
 			AbstractPredicateDataSet dataSet) {
 		this.mainIndex = mainIndex;
