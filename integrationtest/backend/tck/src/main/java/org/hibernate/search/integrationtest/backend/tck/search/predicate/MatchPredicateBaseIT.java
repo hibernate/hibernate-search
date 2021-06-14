@@ -51,7 +51,7 @@ public class MatchPredicateBaseIT {
 		setupHelper.start()
 				.withIndexes(
 						SingleFieldIT.index, MultiFieldIT.index,
-						NestingIT.mainIndex, NestingIT.missingFieldIndex,
+						InObjectFieldIT.mainIndex, InObjectFieldIT.missingFieldIndex,
 						AnalysisIT.index, AnalysisIT.compatibleIndex, AnalysisIT.incompatibleIndex,
 						ScoreIT.index,
 						InvalidFieldIT.index, UnsupportedTypeIT.index,
@@ -70,10 +70,10 @@ public class MatchPredicateBaseIT {
 		final BulkIndexer multiFieldIndexer = MultiFieldIT.index.bulkIndexer();
 		MultiFieldIT.dataSets.forEach( d -> d.contribute( MultiFieldIT.index, multiFieldIndexer ) );
 
-		final BulkIndexer nestingMainIndexer = NestingIT.mainIndex.bulkIndexer();
-		final BulkIndexer nestingMissingFieldIndexer = NestingIT.missingFieldIndex.bulkIndexer();
-		NestingIT.dataSets.forEach( d -> d.contribute( NestingIT.mainIndex, nestingMainIndexer,
-				NestingIT.missingFieldIndex, nestingMissingFieldIndexer ) );
+		final BulkIndexer inObjectFieldMainIndexer = InObjectFieldIT.mainIndex.bulkIndexer();
+		final BulkIndexer inObjectFieldMissingFieldIndexer = InObjectFieldIT.missingFieldIndex.bulkIndexer();
+		InObjectFieldIT.dataSets.forEach( d -> d.contribute( InObjectFieldIT.mainIndex, inObjectFieldMainIndexer,
+				InObjectFieldIT.missingFieldIndex, inObjectFieldMissingFieldIndexer ) );
 
 		final BulkIndexer analysisMainIndexIndexer = AnalysisIT.index.bulkIndexer();
 		final BulkIndexer analysisCompatibleIndexIndexer = AnalysisIT.compatibleIndex.bulkIndexer();
@@ -100,7 +100,7 @@ public class MatchPredicateBaseIT {
 				ScaleCheckingIT.compatibleIndex, scaleCheckingCompatibleIndexer );
 
 		singleFieldIndexer.join(
-				multiFieldIndexer, nestingMainIndexer, nestingMissingFieldIndexer,
+				multiFieldIndexer, inObjectFieldMainIndexer, inObjectFieldMissingFieldIndexer,
 				analysisMainIndexIndexer, analysisCompatibleIndexIndexer, analysisIncompatibleIndexIndexer,
 				scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer,
@@ -195,7 +195,7 @@ public class MatchPredicateBaseIT {
 	}
 
 	@RunWith(Parameterized.class)
-	public static class NestingIT<F> extends AbstractPredicateFieldNestingIT<MatchPredicateTestValues<F>> {
+	public static class InObjectFieldIT<F> extends AbstractPredicateFieldInObjectFieldIT<MatchPredicateTestValues<F>> {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Object[]> parameters = new ArrayList<>();
 		static {
@@ -219,7 +219,7 @@ public class MatchPredicateBaseIT {
 			return parameters;
 		}
 
-		public NestingIT(DataSet<F, MatchPredicateTestValues<F>> dataSet) {
+		public InObjectFieldIT(DataSet<F, MatchPredicateTestValues<F>> dataSet) {
 			super( mainIndex, missingFieldIndex, dataSet );
 		}
 

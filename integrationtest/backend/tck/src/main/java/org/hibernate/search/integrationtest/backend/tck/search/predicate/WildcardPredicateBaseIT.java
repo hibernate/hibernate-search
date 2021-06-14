@@ -49,7 +49,7 @@ public class WildcardPredicateBaseIT {
 		setupHelper.start()
 				.withIndexes(
 						SingleFieldIT.index, MultiFieldIT.index,
-						NestingIT.mainIndex, NestingIT.missingFieldIndex,
+						InObjectFieldIT.mainIndex, InObjectFieldIT.missingFieldIndex,
 						ScoreIT.index,
 						InvalidFieldIT.index, UnsupportedTypeIT.index,
 						SearchableIT.searchableYesIndex, SearchableIT.searchableNoIndex,
@@ -66,10 +66,10 @@ public class WildcardPredicateBaseIT {
 		final BulkIndexer multiFieldIndexer = MultiFieldIT.index.bulkIndexer();
 		MultiFieldIT.dataSets.forEach( d -> d.contribute( MultiFieldIT.index, multiFieldIndexer ) );
 
-		final BulkIndexer nestingMainIndexer = NestingIT.mainIndex.bulkIndexer();
-		final BulkIndexer nestingMissingFieldIndexer = NestingIT.missingFieldIndex.bulkIndexer();
-		NestingIT.dataSets.forEach( d -> d.contribute( NestingIT.mainIndex, nestingMainIndexer,
-				NestingIT.missingFieldIndex, nestingMissingFieldIndexer ) );
+		final BulkIndexer inObjectFieldMainIndexer = InObjectFieldIT.mainIndex.bulkIndexer();
+		final BulkIndexer inObjectFieldMissingFieldIndexer = InObjectFieldIT.missingFieldIndex.bulkIndexer();
+		InObjectFieldIT.dataSets.forEach( d -> d.contribute( InObjectFieldIT.mainIndex, inObjectFieldMainIndexer,
+				InObjectFieldIT.missingFieldIndex, inObjectFieldMissingFieldIndexer ) );
 
 		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
 		ScoreIT.dataSets.forEach( d -> d.contribute( ScoreIT.index, scoreIndexer ) );
@@ -85,7 +85,7 @@ public class WildcardPredicateBaseIT {
 
 
 		singleFieldIndexer.join(
-				multiFieldIndexer, nestingMainIndexer, nestingMissingFieldIndexer,
+				multiFieldIndexer, inObjectFieldMainIndexer, inObjectFieldMissingFieldIndexer,
 				scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer,
 				typeCheckingRawFieldCompatibleIndexer, typeCheckingMissingFieldIndexer
@@ -178,7 +178,7 @@ public class WildcardPredicateBaseIT {
 	}
 
 	@RunWith(Parameterized.class)
-	public static class NestingIT extends AbstractPredicateFieldNestingIT<WildcardPredicateTestValues> {
+	public static class InObjectFieldIT extends AbstractPredicateFieldInObjectFieldIT<WildcardPredicateTestValues> {
 		private static final List<DataSet<?, ?>> dataSets = new ArrayList<>();
 		private static final List<Object[]> parameters = new ArrayList<>();
 		static {
@@ -202,7 +202,7 @@ public class WildcardPredicateBaseIT {
 			return parameters;
 		}
 
-		public NestingIT(DataSet<String, WildcardPredicateTestValues> dataSet) {
+		public InObjectFieldIT(DataSet<String, WildcardPredicateTestValues> dataSet) {
 			super( mainIndex, missingFieldIndex, dataSet );
 		}
 

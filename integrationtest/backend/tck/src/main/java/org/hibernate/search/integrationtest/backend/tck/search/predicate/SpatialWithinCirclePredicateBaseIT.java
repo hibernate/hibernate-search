@@ -51,7 +51,7 @@ public class SpatialWithinCirclePredicateBaseIT {
 		setupHelper.start()
 				.withIndexes(
 						SingleFieldIT.index, MultiFieldIT.index,
-						NestingIT.mainIndex, NestingIT.missingFieldIndex,
+						InObjectFieldIT.mainIndex, InObjectFieldIT.missingFieldIndex,
 						ScoreIT.index,
 						InvalidFieldIT.index, UnsupportedTypeIT.index,
 						SearchableIT.searchableYesIndex, SearchableIT.searchableNoIndex,
@@ -68,10 +68,10 @@ public class SpatialWithinCirclePredicateBaseIT {
 		final BulkIndexer multiFieldIndexer = MultiFieldIT.index.bulkIndexer();
 		MultiFieldIT.dataSet.contribute( MultiFieldIT.index, multiFieldIndexer );
 
-		final BulkIndexer nestingMainIndexer = NestingIT.mainIndex.bulkIndexer();
-		final BulkIndexer nestingMissingFieldIndexer = NestingIT.missingFieldIndex.bulkIndexer();
-		NestingIT.dataSet.contribute( NestingIT.mainIndex, nestingMainIndexer,
-				NestingIT.missingFieldIndex, nestingMissingFieldIndexer );
+		final BulkIndexer inObjectFieldMainIndexer = InObjectFieldIT.mainIndex.bulkIndexer();
+		final BulkIndexer inObjectFieldMissingFieldIndexer = InObjectFieldIT.missingFieldIndex.bulkIndexer();
+		InObjectFieldIT.dataSet.contribute( InObjectFieldIT.mainIndex, inObjectFieldMainIndexer,
+				InObjectFieldIT.missingFieldIndex, inObjectFieldMissingFieldIndexer );
 
 		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
 		ScoreIT.dataSet.contribute( ScoreIT.index, scoreIndexer );
@@ -86,7 +86,7 @@ public class SpatialWithinCirclePredicateBaseIT {
 				TypeCheckingNoConversionIT.missingFieldIndex, typeCheckingMissingFieldIndexer );
 
 		singleFieldIndexer.join(
-				multiFieldIndexer, nestingMainIndexer, nestingMissingFieldIndexer,
+				multiFieldIndexer, inObjectFieldMainIndexer, inObjectFieldMissingFieldIndexer,
 				scoreIndexer,
 				typeCheckingMainIndexer, typeCheckingCompatibleIndexer,
 				typeCheckingRawFieldCompatibleIndexer, typeCheckingMissingFieldIndexer
@@ -156,7 +156,8 @@ public class SpatialWithinCirclePredicateBaseIT {
 		}
 	}
 
-	public static class NestingIT extends AbstractPredicateFieldNestingIT<SpatialWithinCirclePredicateTestValues> {
+	public static class InObjectFieldIT
+			extends AbstractPredicateFieldInObjectFieldIT<SpatialWithinCirclePredicateTestValues> {
 		private static final DataSet<GeoPoint, SpatialWithinCirclePredicateTestValues> dataSet =
 				new DataSet<>( testValues() );
 
@@ -168,7 +169,7 @@ public class SpatialWithinCirclePredicateBaseIT {
 				SimpleMappedIndex.of( root -> new MissingFieldIndexBinding( root, supportedFieldTypes ) )
 						.name( "nesting_missingField" );
 
-		public NestingIT() {
+		public InObjectFieldIT() {
 			super( mainIndex, missingFieldIndex, dataSet );
 		}
 

@@ -11,12 +11,12 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 
-public abstract class AbstractPredicateFieldNestingIT<V extends AbstractPredicateTestValues<?>>
-		extends AbstractPredicateNestingIT {
+public abstract class AbstractPredicateFieldInObjectFieldIT<V extends AbstractPredicateTestValues<?>>
+		extends AbstractPredicateInObjectFieldIT {
 
 	protected final DataSet<?, V> dataSet;
 
-	public AbstractPredicateFieldNestingIT(SimpleMappedIndex<IndexBinding> mainIndex,
+	public AbstractPredicateFieldInObjectFieldIT(SimpleMappedIndex<IndexBinding> mainIndex,
 			SimpleMappedIndex<MissingFieldIndexBinding> missingFieldIndex, DataSet<?, V> dataSet) {
 		super( mainIndex, missingFieldIndex, dataSet );
 		this.dataSet = dataSet;

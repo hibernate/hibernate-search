@@ -47,19 +47,19 @@ public class ExistsPredicateObjectsBaseIT {
 	public static void setup() {
 		setupHelper.start()
 				.withIndexes(
-						NestingIT.mainIndex, NestingIT.missingFieldIndex,
+						InObjectFieldIT.mainIndex, InObjectFieldIT.missingFieldIndex,
 						ScoreIT.index
 				)
 				.setup();
 
-		final BulkIndexer nestingMainIndexer = NestingIT.mainIndex.bulkIndexer();
-		final BulkIndexer nestingMissingFieldIndexer = NestingIT.missingFieldIndex.bulkIndexer();
-		NestingIT.dataSets.forEach( d -> d.contribute( nestingMainIndexer, nestingMissingFieldIndexer ) );
+		final BulkIndexer inObjectFieldMainIndexer = InObjectFieldIT.mainIndex.bulkIndexer();
+		final BulkIndexer inObjectFieldMissingFieldIndexer = InObjectFieldIT.missingFieldIndex.bulkIndexer();
+		InObjectFieldIT.dataSets.forEach( d -> d.contribute( inObjectFieldMainIndexer, inObjectFieldMissingFieldIndexer ) );
 
 		final BulkIndexer scoreIndexer = ScoreIT.index.bulkIndexer();
 		ScoreIT.dataSets.forEach( d -> d.contribute( scoreIndexer ) );
 
-		nestingMainIndexer.join( nestingMissingFieldIndexer, scoreIndexer );
+		inObjectFieldMainIndexer.join( inObjectFieldMissingFieldIndexer, scoreIndexer );
 	}
 
 	@Test
@@ -68,7 +68,7 @@ public class ExistsPredicateObjectsBaseIT {
 	}
 
 	@RunWith(Parameterized.class)
-	public static class NestingIT extends AbstractPredicateNestingIT {
+	public static class InObjectFieldIT extends AbstractPredicateInObjectFieldIT {
 		private static final List<DataSet> dataSets = new ArrayList<>();
 		private static final List<Object[]> parameters = new ArrayList<>();
 		static {
@@ -94,7 +94,7 @@ public class ExistsPredicateObjectsBaseIT {
 
 		private final DataSet dataSet;
 
-		public NestingIT(DataSet dataSet) {
+		public InObjectFieldIT(DataSet dataSet) {
 			super( mainIndex, missingFieldIndex, dataSet );
 			this.dataSet = dataSet;
 		}
