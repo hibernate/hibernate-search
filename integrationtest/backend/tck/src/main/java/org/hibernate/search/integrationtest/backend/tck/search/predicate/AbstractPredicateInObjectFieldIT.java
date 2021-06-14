@@ -44,6 +44,39 @@ public abstract class AbstractPredicateInObjectFieldIT {
 	}
 
 	@Test
+	public void flattenedX1() {
+		assertThatQuery( mainIndex.query()
+				.where( f -> predicate( f, binding.flattened, 0 ) )
+				.routing( dataSet.routingKey ) )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
+	}
+
+	@Test
+	public void flattenedX2() {
+		assertThatQuery( mainIndex.query()
+				.where( f -> predicate( f, binding.flattened.flattened, 0 ) )
+				.routing( dataSet.routingKey ) )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
+	}
+
+	@Test
+	public void nestedX1_explicit() {
+		assertThatQuery( mainIndex.query()
+				.where( f -> f.nested().objectField( binding.nested.absolutePath )
+						.nest( predicate( f, binding.nested, 0 ) ) )
+				.routing( dataSet.routingKey ) )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
+	}
+
+	@Test
+	public void nestedX1_implicit() {
+		assertThatQuery( mainIndex.query()
+				.where( f -> predicate( f, binding.nested, 0 ) )
+				.routing( dataSet.routingKey ) )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
+	}
+
+	@Test
 	public void nestedX2_explicit() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> f.nested().objectField( binding.nested.absolutePath )
@@ -159,6 +192,12 @@ public abstract class AbstractPredicateInObjectFieldIT {
 		}
 
 		protected <F> void initDocument(DocumentElement document, FieldTypeDescriptor<F> fieldType, F fieldValue) {
+			DocumentElement flattenedDocument = document.addObject( flattened.reference );
+			addValue( flattenedDocument, flattened, fieldType, fieldValue );
+
+			DocumentElement flattenedX2Document = flattenedDocument.addObject( flattened.flattened.reference );
+			addValue( flattenedX2Document, flattened.flattened, fieldType, fieldValue );
+
 			DocumentElement nestedDocument = document.addObject( nested.reference );
 			addValue( nestedDocument, nested, fieldType, fieldValue );
 
@@ -168,11 +207,23 @@ public abstract class AbstractPredicateInObjectFieldIT {
 			DocumentElement nestedX3Document = nestedX2Document.addObject( nested.nested.nested.reference );
 			addValue( nestedX3Document, nested.nested.nested, fieldType, fieldValue );
 
-			DocumentElement nestedFlattenedNestedDocument = nestedDocument.addObject( nested.flattened.reference )
+			DocumentElement nestedFlattenedDocument = nestedDocument.addObject( nested.flattened.reference );
+
+			DocumentElement nestedFlattenedNestedDocument = nestedFlattenedDocument
 					.addObject( nested.flattened.nested.reference );
 			addValue( nestedFlattenedNestedDocument, nested.flattened.nested, fieldType, fieldValue );
 
 			// Also add some "leaf" objects inside the documents, for tests of the exists() predicate on object fields
+			DocumentElement flattenedNestedDocument = flattenedDocument.addObject( flattened.nested.reference );
+			addValue( flattenedNestedDocument, flattened.nested, fieldType, fieldValue );
+
+			DocumentElement flattenedX2NestedDocument = flattenedX2Document.addObject( flattened.flattened.nested.reference );
+			addValue( flattenedX2NestedDocument, flattened.flattened.nested, fieldType, fieldValue );
+
+			DocumentElement flattenedX3Document = flattenedX2Document.addObject( flattened.flattened.flattened.reference );
+			addValue( flattenedX3Document, flattened.flattened.flattened, fieldType, fieldValue );
+
+			addValue( nestedFlattenedDocument, nested.flattened, fieldType, fieldValue );
 
 			DocumentElement nestedX2FlattenedDocument = nestedX2Document.addObject( nested.nested.flattened.reference );
 			addValue( nestedX2FlattenedDocument, nested.nested.flattened, fieldType, fieldValue );
