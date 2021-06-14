@@ -16,10 +16,10 @@ import java.util.Set;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchDifferentNestedObjectCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.engine.search.common.BooleanOperator;
+import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementContextHelper;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
@@ -53,10 +53,10 @@ public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsear
 
 	ElasticsearchSimpleQueryStringPredicate(Builder builder) {
 		super( builder );
-		nestedPathHierarchy = builder.nestedCompatibilityChecker.getNestedPathHierarchy();
-		fieldPaths = new ArrayList<>( builder.fields.keySet() );
+		nestedPathHierarchy = builder.firstFieldState.field().nestedPathHierarchy();
+		fieldPaths = new ArrayList<>( builder.fieldStates.keySet() );
 		fieldNameAndBoosts = new ArrayList<>();
-		for ( ElasticsearchSimpleQueryStringPredicateBuilderFieldState fieldContext : builder.fields.values() ) {
+		for ( ElasticsearchSimpleQueryStringPredicateBuilderFieldState fieldContext : builder.fieldStates.values() ) {
 			fieldNameAndBoosts.add( fieldContext.build() );
 		}
 		defaultOperator = builder.defaultOperator;
@@ -141,16 +141,15 @@ public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsear
 
 	public static class Builder extends AbstractBuilder implements SimpleQueryStringPredicateBuilder {
 
-		private final Map<String, ElasticsearchSimpleQueryStringPredicateBuilderFieldState> fields = new LinkedHashMap<>();
+		private ElasticsearchSimpleQueryStringPredicateBuilderFieldState firstFieldState;
+		private final Map<String, ElasticsearchSimpleQueryStringPredicateBuilderFieldState> fieldStates = new LinkedHashMap<>();
 		private JsonPrimitive defaultOperator = OR_OPERATOR_KEYWORD_JSON;
 		private String simpleQueryString;
 		private String analyzer;
 		private EnumSet<SimpleQueryFlag> flags;
-		private ElasticsearchDifferentNestedObjectCompatibilityChecker nestedCompatibilityChecker;
 
 		Builder(ElasticsearchSearchIndexScope scope) {
 			super( scope );
-			this.nestedCompatibilityChecker = ElasticsearchDifferentNestedObjectCompatibilityChecker.empty( scope );
 		}
 
 		@Override
@@ -172,13 +171,19 @@ public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsear
 
 		@Override
 		public FieldState field(String absoluteFieldPath) {
-			ElasticsearchSimpleQueryStringPredicateBuilderFieldState field = fields.get( absoluteFieldPath );
-			if ( field == null ) {
-				field = scope.fieldQueryElement( absoluteFieldPath, ElasticsearchPredicateTypeKeys.SIMPLE_QUERY_STRING );
-				nestedCompatibilityChecker = nestedCompatibilityChecker.combineAndCheck( absoluteFieldPath );
-				fields.put( absoluteFieldPath, field );
+			ElasticsearchSimpleQueryStringPredicateBuilderFieldState fieldState = fieldStates.get( absoluteFieldPath );
+			if ( fieldState == null ) {
+				fieldState = scope.fieldQueryElement( absoluteFieldPath, ElasticsearchPredicateTypeKeys.SIMPLE_QUERY_STRING );
+				if ( firstFieldState == null ) {
+					firstFieldState = fieldState;
+				}
+				else {
+					SearchIndexSchemaElementContextHelper.checkNestedDocumentPathCompatibility(
+							firstFieldState.field(), fieldState.field() );
+				}
+				fieldStates.put( absoluteFieldPath, fieldState );
 			}
-			return field;
+			return fieldState;
 		}
 
 		@Override
@@ -199,7 +204,7 @@ public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsear
 		@Override
 		public SearchPredicate build() {
 			if ( analyzer == null ) {
-				for ( ElasticsearchSimpleQueryStringPredicateBuilderFieldState field : fields.values() ) {
+				for ( ElasticsearchSimpleQueryStringPredicateBuilderFieldState field : fieldStates.values() ) {
 					field.checkAnalyzerOrNormalizerCompatibleAcrossIndexes();
 				}
 			}

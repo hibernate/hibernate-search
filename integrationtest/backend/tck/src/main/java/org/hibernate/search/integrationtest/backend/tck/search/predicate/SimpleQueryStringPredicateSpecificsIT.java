@@ -431,10 +431,10 @@ public class SimpleQueryStringPredicateSpecificsIT {
 				.predicate().simpleQueryString().field( fieldInNestedPath ).field( fieldInRootPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Invalid target fields for simple-query-string predicate:",
+						"Invalid target fields:",
 						"fields [" + fieldInNestedPath + ", " + fieldInRootPath +
-								"] are in different nested documents [nested, <<root>>]",
-						"All fields targeted by a simple-query-string predicate must be in the same document"
+								"] are in different nested documents (field 'nested' vs. index schema root)",
+						"All target fields must be in the same document"
 				);
 	}
 

@@ -30,6 +30,10 @@ public final class ElasticsearchSimpleQueryStringPredicateBuilderFieldState
 		this.boost = boost;
 	}
 
+	public ElasticsearchSearchIndexValueFieldContext<String> field() {
+		return field;
+	}
+
 	public void checkAnalyzerOrNormalizerCompatibleAcrossIndexes() {
 		field.type().searchAnalyzerName();
 		field.type().normalizerName();

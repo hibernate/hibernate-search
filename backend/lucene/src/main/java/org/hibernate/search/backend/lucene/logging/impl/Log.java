@@ -468,13 +468,6 @@ public interface Log extends BasicLogger {
 	SearchException unableToDropIndexDirectory(String causeMessage,
 			@Param EventContext context, @Cause Exception cause);
 
-	@Message(id = ID_OFFSET + 113,
-			value = "Invalid target fields for simple-query-string predicate:"
-					+ " fields [%1$s, %3$s] are in different nested documents [%2$s, %4$s]."
-					+ " All fields targeted by a simple-query-string predicate must be in the same document.")
-	SearchException simpleQueryStringSpanningMultipleNestedPaths(String fieldPath1, String nestedPath1,
-			String fieldPath2, String nestedPath2);
-
 	@Message(id = ID_OFFSET + 114,
 			value = "Invalid sort mode: %1$s. This sort mode is not supported for fields in nested documents.")
 	SearchException invalidSortModeAcrossNested(SortMode mode, @Param EventContext context);
