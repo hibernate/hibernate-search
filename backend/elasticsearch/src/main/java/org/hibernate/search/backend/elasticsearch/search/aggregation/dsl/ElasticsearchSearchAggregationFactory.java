@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.aggregation.dsl.ExtendedSearchAggregat
 import com.google.gson.JsonObject;
 
 public interface ElasticsearchSearchAggregationFactory
-		extends ExtendedSearchAggregationFactory<ElasticsearchSearchPredicateFactory> {
+		extends ExtendedSearchAggregationFactory<ElasticsearchSearchAggregationFactory, ElasticsearchSearchPredicateFactory> {
 
 	/**
 	 * Create an aggregation from JSON.

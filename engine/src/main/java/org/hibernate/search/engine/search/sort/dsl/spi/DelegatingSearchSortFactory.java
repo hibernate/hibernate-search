@@ -27,7 +27,11 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  * <p>
  * Mainly useful when implementing a {@link SearchSortFactoryExtension}.
  */
-public class DelegatingSearchSortFactory<PDF extends SearchPredicateFactory> implements ExtendedSearchSortFactory<PDF> {
+public class DelegatingSearchSortFactory<
+				S extends ExtendedSearchSortFactory<S, PDF>,
+				PDF extends SearchPredicateFactory
+		>
+		implements ExtendedSearchSortFactory<S, PDF> {
 
 	private final SearchSortFactory delegate;
 	private final SearchSortDslContext<?, ? extends PDF> dslContext;

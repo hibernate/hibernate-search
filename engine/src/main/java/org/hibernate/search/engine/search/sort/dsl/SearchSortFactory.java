@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A factory for search sorts.
@@ -130,4 +131,19 @@ public interface SearchSortFactory {
 	 */
 	SearchSortFactoryExtensionIfSupportedStep extension();
 
+	/**
+	 * Create a new sort factory whose root for all paths passed to the DSL
+	 * will be the given object field.
+	 * <p>
+	 * This is used to call reusable methods that can apply the same sort
+	 * on different object fields that have same structure (same sub-fields).
+	 *
+	 * @param objectFieldPath The path from the current root to an object field that will become the new root.
+	 * @return A new sort factory using the given object field as root.
+	 */
+	@Incubating
+	// TODO implement and remove default
+	default SearchSortFactory withRoot(String objectFieldPath) {
+		return this;
+	}
 }

@@ -188,4 +188,20 @@ public interface SearchPredicateFactory {
 	 */
 	SearchPredicateFactoryExtensionIfSupportedStep extension();
 
+	/**
+	 * Create a new predicate factory whose root for all paths passed to the DSL
+	 * will be the given object field.
+	 * <p>
+	 * This is used to call reusable methods that apply the same predicate
+	 * on different object fields that have same structure (same sub-fields).
+	 *
+	 * @param objectFieldPath The path from the current root to an object field that will become the new root.
+	 * @return A new predicate factory using the given object field as root.
+	 */
+	@Incubating
+	// TODO implement and remove default
+	default SearchPredicateFactory withRoot(String objectFieldPath) {
+		return this;
+	}
+
 }

@@ -18,7 +18,7 @@ import com.google.gson.JsonObject;
 
 
 public class ElasticsearchSearchPredicateFactoryImpl
-		extends DelegatingSearchPredicateFactory
+		extends DelegatingSearchPredicateFactory<ElasticsearchSearchPredicateFactory>
 		implements ElasticsearchSearchPredicateFactory {
 
 	private final SearchPredicateDslContext<ElasticsearchSearchPredicateIndexScope> dslContext;

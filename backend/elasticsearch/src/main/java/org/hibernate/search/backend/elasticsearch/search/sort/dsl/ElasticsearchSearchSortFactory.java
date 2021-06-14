@@ -15,7 +15,8 @@ import com.google.gson.JsonObject;
 /**
  * A factory for search sorts with some Elasticsearch-specific methods.
  */
-public interface ElasticsearchSearchSortFactory extends ExtendedSearchSortFactory<ElasticsearchSearchPredicateFactory> {
+public interface ElasticsearchSearchSortFactory
+		extends ExtendedSearchSortFactory<ElasticsearchSearchSortFactory, ElasticsearchSearchPredicateFactory> {
 
 	/**
 	 * Order elements according to a JSON sort definition.

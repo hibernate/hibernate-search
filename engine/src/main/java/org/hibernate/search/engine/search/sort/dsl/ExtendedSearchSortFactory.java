@@ -13,15 +13,22 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
  * A base interface for subtypes of {@link SearchSortFactory} allowing to
- * easily override the predicate factory type for all relevant methods.
+ * easily override the self type and predicate factory type for all relevant methods.
  * <p>
  * <strong>Warning:</strong> Generic parameters of this type are subject to change,
- * so this type should not be referenced directtly in user code.
+ * so this type should not be referenced directly in user code.
  *
+ * @param <S> The self type, i.e. the exposed type of this factory.
  * @param <PDF> The type of factory used to create predicates in {@link FieldSortOptionsStep#filter(Function)}.
  */
-public interface ExtendedSearchSortFactory<PDF extends SearchPredicateFactory>
+public interface ExtendedSearchSortFactory<S extends ExtendedSearchSortFactory<?, PDF>, PDF extends SearchPredicateFactory>
 		extends SearchSortFactory {
+
+	@Override
+	// TODO implement and remove default
+	default S withRoot(String objectFieldPath) {
+		return (S) this;
+	}
 
 	@Override
 	FieldSortOptionsStep<?, PDF> field(String absoluteFieldPath);
