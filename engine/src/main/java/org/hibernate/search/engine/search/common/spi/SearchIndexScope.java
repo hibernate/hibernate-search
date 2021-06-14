@@ -21,10 +21,6 @@ public interface SearchIndexScope {
 
 	DocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
 
-	SearchIndexCompositeNodeContext<?> root();
-
-	SearchIndexNodeContext<?> field(String absoluteFieldPath);
-
 	SearchIndexNodeContext<?> child(SearchIndexCompositeNodeContext<?> parent, String name);
 
 	<T> T rootQueryElement(SearchQueryElementTypeKey<T> key);

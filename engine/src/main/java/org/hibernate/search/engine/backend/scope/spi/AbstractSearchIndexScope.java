@@ -104,8 +104,7 @@ public abstract class AbstractSearchIndexScope<
 		return converter;
 	}
 
-	@Override
-	public final C root() {
+	private C root() {
 		if ( indexModels.size() == 1 ) {
 			return indexModels.iterator().next().root();
 		}
@@ -118,8 +117,7 @@ public abstract class AbstractSearchIndexScope<
 		}
 	}
 
-	@Override
-	public final N field(String absoluteFieldPath) {
+	private N field(String absoluteFieldPath) {
 		N resultOrNull;
 		if ( indexModels.size() == 1 ) {
 			resultOrNull = indexModels.iterator().next().fieldOrNull( absoluteFieldPath );
