@@ -10,8 +10,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
@@ -48,40 +48,35 @@ public class SingleFieldIndexBinding extends AbstractObjectBinding {
 	private SingleFieldIndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> supportedFieldTypes,
 			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration,
 			IndexObjectFieldCardinality nestedFieldCardinality) {
-		super( root, supportedFieldTypes, additionalConfiguration );
+		super( null, null, root, supportedFieldTypes, additionalConfiguration );
 		flattenedObject = FirstLevelObjectBinding.create(
-				root, "flattenedObject", ObjectStructure.FLATTENED,
+				this, "flattenedObject", root, ObjectStructure.FLATTENED,
 				supportedFieldTypes, additionalConfiguration, nestedFieldCardinality
 		);
 		nestedObject = FirstLevelObjectBinding.create(
-				root, "nestedObject", ObjectStructure.NESTED,
+				this, "nestedObject", root, ObjectStructure.NESTED,
 				supportedFieldTypes, additionalConfiguration, nestedFieldCardinality
 		);
 	}
 
 	public final String getFieldPath(TestedFieldStructure fieldStructure, FieldTypeDescriptor<?> fieldType) {
-		return getFieldPath( fieldStructure, binding -> binding.getRelativeFieldName( fieldStructure, fieldType ) );
+		return getParentObject( fieldStructure ).getAbsoluteFieldPath( fieldStructure, fieldType );
 	}
 
 	public final String getDiscriminatorFieldPath(TestedFieldStructure fieldStructure) {
-		return getFieldPath( fieldStructure, binding -> "discriminator" );
+		return FieldPaths.compose( getParentObject( fieldStructure ).absolutePath, "discriminator" );
 	}
 
-	private String getFieldPath(TestedFieldStructure fieldStructure,
-			Function<AbstractObjectBinding, String> relativeFieldNameFunction) {
+	private AbstractObjectBinding getParentObject(TestedFieldStructure fieldStructure) {
 		switch ( fieldStructure.location ) {
 			case ROOT:
-				return relativeFieldNameFunction.apply( this );
+				return this;
 			case IN_FLATTENED:
-				return flattenedObject.relativeFieldName
-						+ "." + relativeFieldNameFunction.apply( flattenedObject );
+				return flattenedObject;
 			case IN_NESTED:
-				return nestedObject.relativeFieldName
-						+ "." + relativeFieldNameFunction.apply( nestedObject );
+				return nestedObject;
 			case IN_NESTED_TWICE:
-				return nestedObject.relativeFieldName
-						+ "." + nestedObject.nestedObject.relativeFieldName
-						+ "." + relativeFieldNameFunction.apply( nestedObject.nestedObject );
+				return nestedObject.nestedObject;
 			default:
 				throw new IllegalStateException( "Unexpected value: " + fieldStructure.location );
 		}
