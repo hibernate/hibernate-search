@@ -10,6 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.factories.NamedPredicateProvider;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.BulkIndexer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -41,6 +42,30 @@ public abstract class AbstractPredicateFieldInObjectFieldIT<V extends AbstractPr
 	public void factoryWithRoot_flattened() {
 		assertThatQuery( mainIndex.query()
 				.where( f -> predicateWithRelativePath( f.withRoot( binding.flattened.absolutePath ), binding.flattened, 0 ) )
+				.routing( dataSet.routingKey ) )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void inNamedPredicate_nested() {
+		assertThatQuery( mainIndex.query()
+				.where( f -> f.named( binding.nested.absolutePath + "." + StubPredicateProvider.NAME )
+						.param( StubPredicateProvider.IMPL_PARAM_NAME, (NamedPredicateProvider) context ->
+								predicateWithRelativePath( context.predicate(), binding.nested, 0 )
+										.toPredicate() ) )
+				.routing( dataSet.routingKey ) )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void inNamedPredicate_flattened() {
+		assertThatQuery( mainIndex.query()
+				.where( f -> f.named( binding.flattened.absolutePath + "." + StubPredicateProvider.NAME )
+						.param( StubPredicateProvider.IMPL_PARAM_NAME, (NamedPredicateProvider) context ->
+								predicateWithRelativePath( context.predicate(), binding.flattened, 0 )
+										.toPredicate() ) )
 				.routing( dataSet.routingKey ) )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), dataSet.docId( 0 ) );
 	}
