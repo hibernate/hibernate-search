@@ -168,7 +168,7 @@ public class StubSearchPredicate implements SearchPredicate {
 		}
 
 		@Override
-		public FieldState field(String absoluteFieldPath) {
+		public FieldState field(String fieldPath) {
 			return new StubFieldState();
 		}
 

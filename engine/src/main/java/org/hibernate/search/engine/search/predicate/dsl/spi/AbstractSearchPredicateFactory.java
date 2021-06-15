@@ -134,18 +134,18 @@ public abstract class AbstractSearchPredicateFactory<
 	@Override
 	public NamedPredicateOptionsStep named(String path) {
 		Contracts.assertNotNull( path, "path" );
-		String absoluteFieldPath;
+		String fieldPath;
 		String predicateName;
 		int dotIndex = path.lastIndexOf( FieldPaths.PATH_SEPARATOR );
 		if ( dotIndex >= 0 ) {
-			absoluteFieldPath = path.substring( 0, dotIndex );
+			fieldPath = path.substring( 0, dotIndex );
 			predicateName = path.substring( dotIndex + 1 );
 		}
 		else {
-			absoluteFieldPath = null;
+			fieldPath = null;
 			predicateName = path;
 		}
-		return new NamedPredicateOptionsStepImpl( this, dslContext, absoluteFieldPath, predicateName );
+		return new NamedPredicateOptionsStepImpl( this, dslContext, fieldPath, predicateName );
 	}
 
 	@Override

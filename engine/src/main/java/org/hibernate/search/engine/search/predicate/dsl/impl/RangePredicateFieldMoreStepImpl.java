@@ -37,24 +37,24 @@ class RangePredicateFieldMoreStepImpl
 
 	private final CommonState commonState;
 
-	private final List<String> absoluteFieldPaths;
+	private final List<String> fieldPaths;
 	private final List<RangePredicateBuilder> predicateBuilders = new ArrayList<>();
 
 	private Float fieldSetBoost;
 
-	RangePredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
+	RangePredicateFieldMoreStepImpl(CommonState commonState, List<String> fieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
-		this.absoluteFieldPaths = absoluteFieldPaths;
+		this.fieldPaths = fieldPaths;
 		SearchIndexScope<?> scope = commonState.scope();
-		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			predicateBuilders.add( scope.fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.RANGE ) );
+		for ( String fieldPath : fieldPaths ) {
+			predicateBuilders.add( scope.fieldQueryElement( fieldPath, PredicateTypeKeys.RANGE ) );
 		}
 	}
 
 	@Override
-	public RangePredicateFieldMoreStepImpl fields(String... absoluteFieldPaths) {
-		return new RangePredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
+	public RangePredicateFieldMoreStepImpl fields(String... fieldPaths) {
+		return new RangePredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
 	}
 
 	@Override
@@ -108,7 +108,7 @@ class RangePredicateFieldMoreStepImpl
 
 		protected final EventContext getEventContext() {
 			return EventContexts.fromIndexFieldAbsolutePaths(
-					getFieldSetStates().stream().flatMap( f -> f.absoluteFieldPaths.stream() )
+					getFieldSetStates().stream().flatMap( f -> f.fieldPaths.stream() )
 							.collect( Collectors.toList() )
 			);
 		}

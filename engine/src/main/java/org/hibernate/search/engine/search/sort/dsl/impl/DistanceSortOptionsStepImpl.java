@@ -31,10 +31,10 @@ public class DistanceSortOptionsStepImpl<PDF extends SearchPredicateFactory>
 	private final SearchSortDslContext<?, ? extends PDF> dslContext;
 
 	public DistanceSortOptionsStepImpl(SearchSortDslContext<?, ? extends PDF> dslContext,
-			String absoluteFieldPath, GeoPoint center) {
+			String fieldPath, GeoPoint center) {
 		super( dslContext );
 		this.dslContext = dslContext;
-		this.builder = dslContext.scope().fieldQueryElement( absoluteFieldPath, SortTypeKeys.DISTANCE );
+		this.builder = dslContext.scope().fieldQueryElement( fieldPath, SortTypeKeys.DISTANCE );
 		builder.center( center );
 	}
 

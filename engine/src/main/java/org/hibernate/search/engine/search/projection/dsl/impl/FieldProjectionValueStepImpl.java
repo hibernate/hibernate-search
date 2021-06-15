@@ -22,10 +22,10 @@ public final class FieldProjectionValueStepImpl<T>
 		extends FieldProjectionOptionsStepImpl<T, T>
 		implements FieldProjectionValueStep<FieldProjectionOptionsStepImpl<T, T>, T> {
 
-	public FieldProjectionValueStepImpl(SearchProjectionDslContext<?> dslContext, String absoluteFieldPath,
+	public FieldProjectionValueStepImpl(SearchProjectionDslContext<?> dslContext, String fieldPath,
 			Class<T> clazz,
 			ValueConvert convert) {
-		super( dslContext.scope().fieldQueryElement( absoluteFieldPath, ProjectionTypeKeys.FIELD )
+		super( dslContext.scope().fieldQueryElement( fieldPath, ProjectionTypeKeys.FIELD )
 						.type( clazz, convert ),
 				SingleValuedProjectionAccumulator.provider() );
 	}

@@ -59,14 +59,14 @@ public abstract class AbstractSearchProjectionFactory<
 	}
 
 	@Override
-	public <T> FieldProjectionValueStep<?, T> field(String absoluteFieldPath, Class<T> clazz, ValueConvert convert) {
+	public <T> FieldProjectionValueStep<?, T> field(String fieldPath, Class<T> clazz, ValueConvert convert) {
 		Contracts.assertNotNull( clazz, "clazz" );
-		return new FieldProjectionValueStepImpl<>( dslContext, absoluteFieldPath, clazz, convert );
+		return new FieldProjectionValueStepImpl<>( dslContext, fieldPath, clazz, convert );
 	}
 
 	@Override
-	public FieldProjectionValueStep<?, Object> field(String absoluteFieldPath, ValueConvert convert) {
-		return field( absoluteFieldPath, Object.class, convert );
+	public FieldProjectionValueStep<?, Object> field(String fieldPath, ValueConvert convert) {
+		return field( fieldPath, Object.class, convert );
 	}
 
 	@Override
@@ -91,9 +91,9 @@ public abstract class AbstractSearchProjectionFactory<
 	}
 
 	@Override
-	public DistanceToFieldProjectionValueStep<?, Double> distance(String absoluteFieldPath, GeoPoint center) {
+	public DistanceToFieldProjectionValueStep<?, Double> distance(String fieldPath, GeoPoint center) {
 		Contracts.assertNotNull( center, "center" );
-		return new DistanceToFieldProjectionValueStepImpl( dslContext, absoluteFieldPath, center );
+		return new DistanceToFieldProjectionValueStepImpl( dslContext, fieldPath, center );
 	}
 
 	@Override

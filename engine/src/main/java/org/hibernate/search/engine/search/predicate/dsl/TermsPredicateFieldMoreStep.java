@@ -29,13 +29,14 @@ public interface TermsPredicateFieldMoreStep<
 	 * <p>
 	 * See {@link TermsPredicateFieldStep#field(String)} for more information on targeted fields.
 	 *
-	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
+	 * @param fieldPath The <a href="SearchPredicateFactory.html#field-paths">path</a> to the index field
+	 * to apply the predicate on.
 	 * @return The next step.
 	 *
 	 * @see TermsPredicateFieldStep#field(String)
 	 */
-	default S field(String absoluteFieldPath) {
-		return fields( absoluteFieldPath );
+	default S field(String fieldPath) {
+		return fields( fieldPath );
 	}
 
 	/**
@@ -46,11 +47,12 @@ public interface TermsPredicateFieldMoreStep<
 	 * <p>
 	 * See {@link TermsPredicateFieldStep#fields(String...)} for more information on targeted fields.
 	 *
-	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
+	 * @param fieldPaths The <a href="SearchPredicateFactory.html#field-paths">paths</a> to the index fields
+	 * to apply the predicate on.
 	 * @return The next step.
 	 *
 	 * @see TermsPredicateFieldStep#fields(String...)
 	 */
-	S fields(String... absoluteFieldPaths);
+	S fields(String... fieldPaths);
 
 }

@@ -22,7 +22,7 @@ public final class MatchPredicateFieldStepImpl implements MatchPredicateFieldSte
 	}
 
 	@Override
-	public MatchPredicateFieldMoreStep<?, ?> fields(String ... absoluteFieldPaths) {
-		return new MatchPredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
+	public MatchPredicateFieldMoreStep<?, ?> fields(String ... fieldPaths) {
+		return new MatchPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
 	}
 }

@@ -24,11 +24,12 @@ public interface PhrasePredicateFieldStep<N extends PhrasePredicateFieldMoreStep
 	 * When targeting multiple fields, those fields must have compatible types.
 	 * Please refer to the reference documentation for more information.
 	 *
-	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
+	 * @param fieldPath The <a href="SearchPredicateFactory.html#field-paths">path</a> to the index field
+	 * to apply the predicate on.
 	 * @return The next step.
 	 */
-	default N field(String absoluteFieldPath) {
-		return fields( absoluteFieldPath );
+	default N field(String fieldPath) {
+		return fields( fieldPath );
 	}
 
 	/**
@@ -42,11 +43,12 @@ public interface PhrasePredicateFieldStep<N extends PhrasePredicateFieldMoreStep
 	 * and other field-specific settings on the returned step will only need to be done once
 	 * and will apply to all the fields passed to this method.
 	 *
-	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
+	 * @param fieldPaths The <a href="SearchPredicateFactory.html#field-paths">paths</a> to the index fields
+	 * to apply the predicate on.
 	 * @return The next step.
 	 *
 	 * @see #field(String)
 	 */
-	N fields(String... absoluteFieldPaths);
+	N fields(String... fieldPaths);
 
 }

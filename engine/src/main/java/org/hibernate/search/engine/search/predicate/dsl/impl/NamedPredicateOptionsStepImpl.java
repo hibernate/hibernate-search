@@ -23,13 +23,13 @@ public class NamedPredicateOptionsStepImpl
 	private final NamedPredicateBuilder builder;
 
 	public NamedPredicateOptionsStepImpl(SearchPredicateFactory predicateFactory,
-			SearchPredicateDslContext<?> dslContext, String absoluteFieldPath, String predicateName) {
+			SearchPredicateDslContext<?> dslContext, String fieldPath, String predicateName) {
 		super( dslContext );
 		SearchIndexScope<?> scope = dslContext.scope();
 		SearchQueryElementTypeKey<NamedPredicateBuilder> key = PredicateTypeKeys.named( predicateName );
-		this.builder = absoluteFieldPath == null ? scope.rootQueryElement( key )
-				: scope.fieldQueryElement( absoluteFieldPath, key );
-		builder.factory( absoluteFieldPath == null ? predicateFactory : predicateFactory.withRoot( absoluteFieldPath ) );
+		this.builder = fieldPath == null ? scope.rootQueryElement( key )
+				: scope.fieldQueryElement( fieldPath, key );
+		builder.factory( fieldPath == null ? predicateFactory : predicateFactory.withRoot( fieldPath ) );
 	}
 
 	@Override

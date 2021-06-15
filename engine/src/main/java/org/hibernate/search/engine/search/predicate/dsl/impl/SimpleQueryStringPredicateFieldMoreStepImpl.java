@@ -32,16 +32,16 @@ class SimpleQueryStringPredicateFieldMoreStepImpl
 
 	private final List<SimpleQueryStringPredicateBuilder.FieldState> fieldStates = new ArrayList<>();
 
-	SimpleQueryStringPredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
+	SimpleQueryStringPredicateFieldMoreStepImpl(CommonState commonState, List<String> fieldPaths) {
 		this.commonState = commonState;
-		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			fieldStates.add( commonState.field( absoluteFieldPath ) );
+		for ( String fieldPath : fieldPaths ) {
+			fieldStates.add( commonState.field( fieldPath ) );
 		}
 	}
 
 	@Override
-	public SimpleQueryStringPredicateFieldMoreStepImpl fields(String... absoluteFieldPaths) {
-		return new SimpleQueryStringPredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
+	public SimpleQueryStringPredicateFieldMoreStepImpl fields(String... fieldPaths) {
+		return new SimpleQueryStringPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
 	}
 
 	@Override
@@ -70,8 +70,8 @@ class SimpleQueryStringPredicateFieldMoreStepImpl
 			return builder.build();
 		}
 
-		SimpleQueryStringPredicateBuilder.FieldState field(String absoluteFieldPath) {
-			return builder.field( absoluteFieldPath );
+		SimpleQueryStringPredicateBuilder.FieldState field(String fieldPath) {
+			return builder.field( fieldPath );
 		}
 
 		private SimpleQueryStringPredicateOptionsStep<?> matching(String simpleQueryString) {

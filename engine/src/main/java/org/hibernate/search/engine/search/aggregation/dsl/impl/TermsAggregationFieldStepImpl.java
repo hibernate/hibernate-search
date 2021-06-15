@@ -25,12 +25,12 @@ public class TermsAggregationFieldStepImpl<PDF extends SearchPredicateFactory> i
 	}
 
 	@Override
-	public <F> TermsAggregationOptionsStep<?, PDF, F, Map<F, Long>> field(String absoluteFieldPath, Class<F> type,
+	public <F> TermsAggregationOptionsStep<?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type,
 			ValueConvert convert) {
-		Contracts.assertNotNull( absoluteFieldPath, "absoluteFieldPath" );
+		Contracts.assertNotNull( fieldPath, "fieldPath" );
 		Contracts.assertNotNull( type, "type" );
 		TermsAggregationBuilder<F> builder = dslContext.scope()
-				.fieldQueryElement( absoluteFieldPath, AggregationTypeKeys.TERMS ).type( type, convert );
+				.fieldQueryElement( fieldPath, AggregationTypeKeys.TERMS ).type( type, convert );
 		return new TermsAggregationOptionsStepImpl<>( builder, dslContext );
 	}
 }

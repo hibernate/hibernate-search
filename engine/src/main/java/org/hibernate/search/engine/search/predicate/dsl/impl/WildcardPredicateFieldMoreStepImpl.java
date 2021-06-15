@@ -31,18 +31,18 @@ class WildcardPredicateFieldMoreStepImpl
 
 	private Float fieldSetBoost;
 
-	WildcardPredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
+	WildcardPredicateFieldMoreStepImpl(CommonState commonState, List<String> fieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		SearchIndexScope<?> scope = commonState.scope();
-		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			predicateBuilders.add( scope.fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.WILDCARD ) );
+		for ( String fieldPath : fieldPaths ) {
+			predicateBuilders.add( scope.fieldQueryElement( fieldPath, PredicateTypeKeys.WILDCARD ) );
 		}
 	}
 
 	@Override
-	public WildcardPredicateFieldMoreStepImpl fields(String... absoluteFieldPaths) {
-		return new WildcardPredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
+	public WildcardPredicateFieldMoreStepImpl fields(String... fieldPaths) {
+		return new WildcardPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
 	}
 
 	@Override

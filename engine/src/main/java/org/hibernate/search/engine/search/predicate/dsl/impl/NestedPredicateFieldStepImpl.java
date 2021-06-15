@@ -35,8 +35,8 @@ public final class NestedPredicateFieldStepImpl
 	}
 
 	@Override
-	public NestedPredicateNestStep<?> objectField(String absoluteFieldPath) {
-		this.builder = dslContext.scope().fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.NESTED );
+	public NestedPredicateNestStep<?> objectField(String fieldPath) {
+		this.builder = dslContext.scope().fieldQueryElement( fieldPath, PredicateTypeKeys.NESTED );
 		return this;
 	}
 

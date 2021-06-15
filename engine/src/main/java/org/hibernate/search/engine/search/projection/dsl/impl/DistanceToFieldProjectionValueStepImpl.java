@@ -20,9 +20,9 @@ public final class DistanceToFieldProjectionValueStepImpl
 		extends DistanceToFieldProjectionOptionsStepImpl<Double>
 		implements DistanceToFieldProjectionValueStep<DistanceToFieldProjectionOptionsStepImpl<Double>, Double> {
 
-	public DistanceToFieldProjectionValueStepImpl(SearchProjectionDslContext<?> dslContext, String absoluteFieldPath,
+	public DistanceToFieldProjectionValueStepImpl(SearchProjectionDslContext<?> dslContext, String fieldPath,
 			GeoPoint center) {
-		super( dslContext.scope().fieldQueryElement( absoluteFieldPath, ProjectionTypeKeys.DISTANCE ),
+		super( dslContext.scope().fieldQueryElement( fieldPath, ProjectionTypeKeys.DISTANCE ),
 				SingleValuedProjectionAccumulator.provider() );
 		distanceFieldProjectionBuilder.center( center );
 	}
