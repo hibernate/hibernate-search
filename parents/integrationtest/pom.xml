@@ -560,11 +560,11 @@
             </properties>
         </profile>
 
-        <!-- The MySQL test environment test environment on ci.hibernate.org (v. 10.0.19-MariaDB)-->
+        <!-- The MySQL test environment test environment on ci.hibernate.org (v. 10.2.19-MariaDB)-->
         <profile>
             <id>ci-mariadb</id>
             <properties>
-                <db.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</db.dialect>
+                <db.dialect>org.hibernate.dialect.MariaDB102Dialect</db.dialect>
                 <jdbc.driver.groupId>org.mariadb.jdbc</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mariadb-java-client</jdbc.driver.artifactId>
                 <jdbc.driver.version>2.2.4</jdbc.driver.version>
