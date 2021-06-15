@@ -12,6 +12,20 @@ import org.hibernate.search.util.common.annotation.Incubating;
 /**
  * A factory for search aggregations.
  *
+ * <h2 id="field-paths">Field paths</h2>
+ *
+ * By default, field paths passed to this DSL are interpreted as absolute,
+ * i.e. relative to the index root.
+ * <p>
+ * However, a new, "relative" factory can be created with {@link #withRoot(String)}:
+ * the new factory interprets paths as relative to the object field passed as argument to the method.
+ * <p>
+ * This can be useful when calling reusable methods that can apply the same aggregation
+ * on different object fields that have same structure (same sub-fields).
+ * <p>
+ * Such a factory can also transform relative paths into absolute paths using {@link #toAbsolutePath(String)};
+ * this can be useful for native aggregations in particular.
+ *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
 public interface SearchAggregationFactory {
@@ -61,8 +75,7 @@ public interface SearchAggregationFactory {
 	 * Create a new aggregation factory whose root for all paths passed to the DSL
 	 * will be the given object field.
 	 * <p>
-	 * This is used to call reusable methods that can apply the same aggregation
-	 * on different object fields that have same structure (same sub-fields).
+	 * See <a href="#field-paths">here</a> for more information.
 	 *
 	 * @param objectFieldPath The path from the current root to an object field that will become the new root.
 	 * @return A new aggregation factory using the given object field as root.

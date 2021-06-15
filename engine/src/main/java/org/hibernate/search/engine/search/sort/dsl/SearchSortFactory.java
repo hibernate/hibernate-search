@@ -16,6 +16,20 @@ import org.hibernate.search.util.common.annotation.Incubating;
 /**
  * A factory for search sorts.
  *
+ * <h2 id="field-paths">Field paths</h2>
+ *
+ * By default, field paths passed to this DSL are interpreted as absolute,
+ * i.e. relative to the index root.
+ * <p>
+ * However, a new, "relative" factory can be created with {@link #withRoot(String)}:
+ * the new factory interprets paths as relative to the object field passed as argument to the method.
+ * <p>
+ * This can be useful when calling reusable methods that can apply the same sort
+ * on different object fields that have same structure (same sub-fields).
+ * <p>
+ * Such a factory can also transform relative paths into absolute paths using {@link #toAbsolutePath(String)};
+ * this can be useful for native sorts in particular.
+ *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
 public interface SearchSortFactory {
@@ -41,37 +55,39 @@ public interface SearchSortFactory {
 	 * <p>
 	 * The default order is <strong>ascending</strong>.
 	 *
-	 * @param absoluteFieldPath The absolute path of the index field to sort by
+	 * @param fieldPath The <a href="#field-paths">path</a> to the index field to sort by.
 	 * @return A DSL step where the "field" sort can be defined in more details.
 	 * @throws SearchException If the field doesn't exist or cannot be sorted on.
 	 */
-	FieldSortOptionsStep<?, ? extends SearchPredicateFactory> field(String absoluteFieldPath);
+	FieldSortOptionsStep<?, ? extends SearchPredicateFactory> field(String fieldPath);
 
 	/**
 	 * Order elements by the distance from the location stored in the specified field to the location specified.
 	 * <p>
 	 * The default order is <strong>ascending</strong>.
 	 *
-	 * @param absoluteFieldPath The absolute path of the indexed location field to sort by.
+	 * @param fieldPath The <a href="#field-paths">path</a> to the index field
+	 * containing the location to compute the distance from.
 	 * @param location The location to which we want to compute the distance.
 	 * @return A DSL step where the "distance" sort can be defined in more details.
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
-	DistanceSortOptionsStep<?, ? extends SearchPredicateFactory> distance(String absoluteFieldPath, GeoPoint location);
+	DistanceSortOptionsStep<?, ? extends SearchPredicateFactory> distance(String fieldPath, GeoPoint location);
 
 	/**
 	 * Order elements by the distance from the location stored in the specified field to the location specified.
 	 * <p>
 	 * The default order is <strong>ascending</strong>.
 	 *
-	 * @param absoluteFieldPath The absolute path of the indexed location field to sort by.
+	 * @param fieldPath The <a href="#field-paths">path</a> to the index field
+	 * containing the location to compute the distance from.
 	 * @param latitude The latitude of the location to which we want to compute the distance.
 	 * @param longitude The longitude of the location to which we want to compute the distance.
 	 * @return A DSL step where the "distance" sort can be defined in more details.
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
-	default DistanceSortOptionsStep<?, ? extends SearchPredicateFactory> distance(String absoluteFieldPath, double latitude, double longitude) {
-		return distance( absoluteFieldPath, GeoPoint.of( latitude, longitude ) );
+	default DistanceSortOptionsStep<?, ? extends SearchPredicateFactory> distance(String fieldPath, double latitude, double longitude) {
+		return distance( fieldPath, GeoPoint.of( latitude, longitude ) );
 	}
 
 	/**

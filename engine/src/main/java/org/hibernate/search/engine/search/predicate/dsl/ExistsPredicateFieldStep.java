@@ -17,9 +17,10 @@ public interface ExistsPredicateFieldStep<N extends ExistsPredicateOptionsStep<?
 	/**
 	 * Target the given field in the "exists" predicate.
 	 *
-	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
+	 * @param fieldPath The <a href="SearchPredicateFactory.html#field-paths">path</a> to the index field
+	 * to apply the predicate on.
 	 * @return The next step.
 	 */
-	N field(String absoluteFieldPath);
+	N field(String fieldPath);
 
 }

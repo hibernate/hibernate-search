@@ -21,6 +21,20 @@ import org.hibernate.search.util.common.function.TriFunction;
 /**
  * A factory for search projections.
  *
+ * <h2 id="field-paths">Field paths</h2>
+ *
+ * By default, field paths passed to this DSL are interpreted as absolute,
+ * i.e. relative to the index root.
+ * <p>
+ * However, a new, "relative" factory can be created with {@link #withRoot(String)}:
+ * the new factory interprets paths as relative to the object field passed as argument to the method.
+ * <p>
+ * This can be useful when calling reusable methods that can apply the same projection
+ * on different object fields that have same structure (same sub-fields).
+ * <p>
+ * Such a factory can also transform relative paths into absolute paths using {@link #toAbsolutePath(String)};
+ * this can be useful for native projections in particular.
+ *
  * @param <R> The type of entity references, i.e. the type of objects returned for
  * {@link #entityReference() entity reference projections}.
  * @param <E> The type of entities, i.e. the type of objects returned for
@@ -83,26 +97,26 @@ public interface SearchProjectionFactory<R, E> {
 	 * This method will apply projection converters on data fetched from the backend.
 	 * See {@link ValueConvert#YES}.
 	 *
-	 * @param absoluteFieldPath The absolute path of the field.
+	 * @param fieldPath The <a href="#field-paths">path</a> to the index field whose value will be extracted.
 	 * @param type The resulting type of the projection.
 	 * @param <T> The resulting type of the projection.
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
-	default <T> FieldProjectionValueStep<?, T> field(String absoluteFieldPath, Class<T> type) {
-		return field( absoluteFieldPath, type, ValueConvert.YES );
+	default <T> FieldProjectionValueStep<?, T> field(String fieldPath, Class<T> type) {
+		return field( fieldPath, type, ValueConvert.YES );
 	}
 
 	/**
 	 * Project to the value of a field in the indexed document.
 	 *
-	 * @param absoluteFieldPath The absolute path of the field.
+	 * @param fieldPath The <a href="#field-paths">path</a> to the index field whose value will be extracted.
 	 * @param type The resulting type of the projection.
 	 * @param <T> The resulting type of the projection.
 	 * @param convert Controls how the data fetched from the backend should be converted.
 	 * See {@link ValueConvert}.
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
-	<T> FieldProjectionValueStep<?, T> field(String absoluteFieldPath, Class<T> type, ValueConvert convert);
+	<T> FieldProjectionValueStep<?, T> field(String fieldPath, Class<T> type, ValueConvert convert);
 
 	/**
 	 * Project to the value of a field in the indexed document, without specifying a type.
@@ -110,22 +124,22 @@ public interface SearchProjectionFactory<R, E> {
 	 * This method will apply projection converters on data fetched from the backend.
 	 * See {@link ValueConvert#YES}.
 	 *
-	 * @param absoluteFieldPath The absolute path of the field.
+	 * @param fieldPath The <a href="#field-paths">path</a> to the index field whose value will be extracted.
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
-	default FieldProjectionValueStep<?, Object> field(String absoluteFieldPath) {
-		return field( absoluteFieldPath, ValueConvert.YES );
+	default FieldProjectionValueStep<?, Object> field(String fieldPath) {
+		return field( fieldPath, ValueConvert.YES );
 	}
 
 	/**
 	 * Project to the value of a field in the indexed document, without specifying a type.
 	 *
-	 * @param absoluteFieldPath The absolute path of the field.
+	 * @param fieldPath The <a href="#field-paths">path</a> to the index field whose value will be extracted.
 	 * @param convert Controls how the data fetched from the backend should be converted.
 	 * See {@link ValueConvert}.
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
-	FieldProjectionValueStep<?, Object> field(String absoluteFieldPath, ValueConvert convert);
+	FieldProjectionValueStep<?, Object> field(String fieldPath, ValueConvert convert);
 
 	/**
 	 * Project on the score of the hit.
@@ -137,11 +151,12 @@ public interface SearchProjectionFactory<R, E> {
 	/**
 	 * Project on the distance from the center to a {@link GeoPoint} field.
 	 *
-	 * @param absoluteFieldPath The absolute path of the field.
+	 * @param fieldPath The <a href="#field-paths">path</a> to the index field containing the location
+	 * to compute the distance from.
 	 * @param center The center to compute the distance from.
 	 * @return A DSL step where the "distance" projection can be defined in more details.
 	 */
-	DistanceToFieldProjectionValueStep<?, Double> distance(String absoluteFieldPath, GeoPoint center);
+	DistanceToFieldProjectionValueStep<?, Double> distance(String fieldPath, GeoPoint center);
 
 	/**
 	 * Create a projection that will compose a {@link List} based on the given projections.

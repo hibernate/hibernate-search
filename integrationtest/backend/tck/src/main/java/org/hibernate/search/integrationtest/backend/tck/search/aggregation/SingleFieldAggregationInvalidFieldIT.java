@@ -93,7 +93,7 @@ public class SingleFieldAggregationInvalidFieldIT<F> {
 
 		assertThatThrownBy( () -> scenario.setup( index.createScope().aggregation(), null ) )
 				.isInstanceOf( IllegalArgumentException.class )
-				.hasMessageContaining( "'absoluteFieldPath'" )
+				.hasMessageContaining( "'fieldPath'" )
 				.hasMessageContaining( "must not be null" );
 	}
 

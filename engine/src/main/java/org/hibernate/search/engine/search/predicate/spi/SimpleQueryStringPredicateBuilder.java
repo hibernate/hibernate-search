@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.common.BooleanOperator;
 
 public interface SimpleQueryStringPredicateBuilder extends SearchPredicateBuilder {
 
-	FieldState field(String absoluteFieldPath);
+	FieldState field(String fieldPath);
 
 	void defaultOperator(BooleanOperator operator);
 

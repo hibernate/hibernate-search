@@ -36,18 +36,18 @@ class PhrasePredicateFieldMoreStepImpl
 
 	private Float fieldSetBoost;
 
-	PhrasePredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
+	PhrasePredicateFieldMoreStepImpl(CommonState commonState, List<String> fieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		SearchIndexScope<?> scope = commonState.scope();
-		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			predicateBuilders.add( scope.fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.PHRASE ) );
+		for ( String fieldPath : fieldPaths ) {
+			predicateBuilders.add( scope.fieldQueryElement( fieldPath, PredicateTypeKeys.PHRASE ) );
 		}
 	}
 
 	@Override
-	public PhrasePredicateFieldMoreStepImpl fields(String... absoluteFieldPaths) {
-		return new PhrasePredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
+	public PhrasePredicateFieldMoreStepImpl fields(String... fieldPaths) {
+		return new PhrasePredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
 	}
 
 	@Override

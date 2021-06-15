@@ -98,17 +98,17 @@ public class LuceneSimpleQueryStringPredicate extends AbstractLuceneNestablePred
 		}
 
 		@Override
-		public FieldState field(String absoluteFieldPath) {
-			LuceneSimpleQueryStringPredicateBuilderFieldState fieldState = fieldStates.get( absoluteFieldPath );
+		public FieldState field(String fieldPath) {
+			LuceneSimpleQueryStringPredicateBuilderFieldState fieldState = fieldStates.get( fieldPath );
 			if ( fieldState == null ) {
-				fieldState = scope.fieldQueryElement( absoluteFieldPath, LucenePredicateTypeKeys.SIMPLE_QUERY_STRING );
+				fieldState = scope.fieldQueryElement( fieldPath, LucenePredicateTypeKeys.SIMPLE_QUERY_STRING );
 				if ( firstFieldState == null ) {
 					firstFieldState = fieldState;
 				}
 				else {
 					SearchIndexSchemaElementContextHelper.checkNestedDocumentPathCompatibility( firstFieldState.field(), fieldState.field() );
 				}
-				fieldStates.put( absoluteFieldPath, fieldState );
+				fieldStates.put( fieldPath, fieldState );
 			}
 			return fieldState;
 		}

@@ -52,14 +52,14 @@ public abstract class AbstractSearchSortFactory<
 	}
 
 	@Override
-	public FieldSortOptionsStep<?, PDF> field(String absoluteFieldPath) {
-		return new FieldSortOptionsStepImpl<>( dslContext, absoluteFieldPath );
+	public FieldSortOptionsStep<?, PDF> field(String fieldPath) {
+		return new FieldSortOptionsStepImpl<>( dslContext, fieldPath );
 	}
 
 	@Override
-	public DistanceSortOptionsStep<?, PDF> distance(String absoluteFieldPath, GeoPoint location) {
+	public DistanceSortOptionsStep<?, PDF> distance(String fieldPath, GeoPoint location) {
 		return new DistanceSortOptionsStepImpl<>(
-				dslContext, absoluteFieldPath, location
+				dslContext, fieldPath, location
 		);
 	}
 

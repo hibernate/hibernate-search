@@ -31,18 +31,18 @@ class RegexpPredicateFieldMoreStepImpl
 
 	private Float fieldSetBoost;
 
-	RegexpPredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
+	RegexpPredicateFieldMoreStepImpl(CommonState commonState, List<String> fieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		SearchIndexScope<?> scope = commonState.scope();
-		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			predicateBuilders.add( scope.fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.REGEXP ) );
+		for ( String fieldPath : fieldPaths ) {
+			predicateBuilders.add( scope.fieldQueryElement( fieldPath, PredicateTypeKeys.REGEXP ) );
 		}
 	}
 
 	@Override
-	public RegexpPredicateFieldMoreStepImpl fields(String... absoluteFieldPaths) {
-		return new RegexpPredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
+	public RegexpPredicateFieldMoreStepImpl fields(String... fieldPaths) {
+		return new RegexpPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
 	}
 
 	@Override

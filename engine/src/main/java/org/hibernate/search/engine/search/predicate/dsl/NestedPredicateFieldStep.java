@@ -21,9 +21,9 @@ public interface NestedPredicateFieldStep<N extends NestedPredicateNestStep<?>> 
 	 * <p>
 	 * The selected field must have a {@link ObjectStructure#NESTED nested structure} in the targeted indexes.
 	 *
-	 * @param absoluteFieldPath The path to the object.
+	 * @param fieldPath The <a href="SearchPredicateFactory.html#field-paths">path</a> to the object field.
 	 * @return The next step.
 	 */
-	N objectField(String absoluteFieldPath);
+	N objectField(String fieldPath);
 
 }

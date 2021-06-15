@@ -22,26 +22,26 @@ public interface TermsAggregationFieldStep<PDF extends SearchPredicateFactory> {
 	/**
 	 * Target the given field in the terms aggregation.
 	 *
-	 * @param absoluteFieldPath The absolute path of the field.
+	 * @param fieldPath The <a href="SearchAggregationFactory.html#field-paths">path</a> to the index field to aggregate.
 	 * @param type The type of field values.
 	 * @param <F> The type of field values.
 	 * @return The next step.
 	 */
-	default <F> TermsAggregationOptionsStep<?, PDF, F, Map<F, Long>> field(String absoluteFieldPath, Class<F> type) {
-		return field( absoluteFieldPath, type, ValueConvert.YES );
+	default <F> TermsAggregationOptionsStep<?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type) {
+		return field( fieldPath, type, ValueConvert.YES );
 	}
 
 	/**
 	 * Target the given field in the terms aggregation.
 	 *
-	 * @param absoluteFieldPath The absolute path of the field.
+	 * @param fieldPath The <a href="SearchAggregationFactory.html#field-paths">path</a> to the index field to aggregate.
 	 * @param type The type of field values.
 	 * @param <F> The type of field values.
 	 * @param convert Controls how the ranges passed to the next steps and fetched from the backend should be converted.
 	 * See {@link ValueConvert}.
 	 * @return The next step.
 	 */
-	<F> TermsAggregationOptionsStep<?, PDF, F, Map<F, Long>> field(String absoluteFieldPath, Class<F> type,
+	<F> TermsAggregationOptionsStep<?, PDF, F, Map<F, Long>> field(String fieldPath, Class<F> type,
 			ValueConvert convert);
 
 }

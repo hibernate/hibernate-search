@@ -30,10 +30,10 @@ public class FieldSortOptionsStepImpl<PDF extends SearchPredicateFactory>
 	private final SearchSortDslContext<?, ? extends PDF> dslContext;
 	private final FieldSortBuilder builder;
 
-	public FieldSortOptionsStepImpl(SearchSortDslContext<?, ? extends PDF> dslContext, String absoluteFieldPath) {
+	public FieldSortOptionsStepImpl(SearchSortDslContext<?, ? extends PDF> dslContext, String fieldPath) {
 		super( dslContext );
 		this.dslContext = dslContext;
-		this.builder = dslContext.scope().fieldQueryElement( absoluteFieldPath, SortTypeKeys.FIELD );
+		this.builder = dslContext.scope().fieldQueryElement( fieldPath, SortTypeKeys.FIELD );
 	}
 
 	@Override

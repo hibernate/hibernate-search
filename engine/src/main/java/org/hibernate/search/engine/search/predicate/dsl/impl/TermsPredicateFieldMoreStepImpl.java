@@ -33,18 +33,18 @@ class TermsPredicateFieldMoreStepImpl
 
 	private Float fieldSetBoost;
 
-	TermsPredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
+	TermsPredicateFieldMoreStepImpl(CommonState commonState, List<String> fieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		SearchIndexScope<?> scope = commonState.scope();
-		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			predicateBuilders.add( scope.fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.TERMS ) );
+		for ( String fieldPath : fieldPaths ) {
+			predicateBuilders.add( scope.fieldQueryElement( fieldPath, PredicateTypeKeys.TERMS ) );
 		}
 	}
 
 	@Override
-	public TermsPredicateFieldMoreStepImpl fields(String... absoluteFieldPaths) {
-		return new TermsPredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
+	public TermsPredicateFieldMoreStepImpl fields(String... fieldPaths) {
+		return new TermsPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
 	}
 
 	@Override

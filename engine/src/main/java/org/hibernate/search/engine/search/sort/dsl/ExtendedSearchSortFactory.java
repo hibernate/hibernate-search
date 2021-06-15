@@ -28,13 +28,13 @@ public interface ExtendedSearchSortFactory<S extends ExtendedSearchSortFactory<?
 	S withRoot(String objectFieldPath);
 
 	@Override
-	FieldSortOptionsStep<?, PDF> field(String absoluteFieldPath);
+	FieldSortOptionsStep<?, PDF> field(String fieldPath);
 
 	@Override
-	DistanceSortOptionsStep<?, PDF> distance(String absoluteFieldPath, GeoPoint location);
+	DistanceSortOptionsStep<?, PDF> distance(String fieldPath, GeoPoint location);
 
 	@Override
-	default DistanceSortOptionsStep<?, PDF> distance(String absoluteFieldPath, double latitude, double longitude) {
-		return distance( absoluteFieldPath, GeoPoint.of( latitude, longitude ) );
+	default DistanceSortOptionsStep<?, PDF> distance(String fieldPath, double latitude, double longitude) {
+		return distance( fieldPath, GeoPoint.of( latitude, longitude ) );
 	}
 }

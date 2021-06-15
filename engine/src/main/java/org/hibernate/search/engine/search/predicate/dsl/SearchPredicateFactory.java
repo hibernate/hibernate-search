@@ -18,6 +18,20 @@ import org.hibernate.search.util.common.annotation.Incubating;
  * A factory for search predicates.
  * <p>
  * This is the main entry point to the predicate DSL.
+ *
+ * <h2 id="field-paths">Field paths</h2>
+ *
+ * By default, field paths passed to this DSL are interpreted as absolute,
+ * i.e. relative to the index root.
+ * <p>
+ * However, a new, "relative" factory can be created with {@link #withRoot(String)}:
+ * the new factory interprets paths as relative to the object field passed as argument to the method.
+ * <p>
+ * This can be useful when calling reusable methods that can apply the same predicate
+ * on different object fields that have same structure (same sub-fields).
+ * <p>
+ * Such a factory can also transform relative paths into absolute paths using {@link #toAbsolutePath(String)};
+ * this can be useful for native predicates in particular.
  */
 public interface SearchPredicateFactory {
 
@@ -158,7 +172,8 @@ public interface SearchPredicateFactory {
 	/**
 	 * Match documents if they match a combination of defined named predicate clauses.
 	 *
-	 * @param path the path to the named predicate, formatted as {@code <object field path>.<predicate name>},
+	 * @param path The <a href="#field-paths">path</a> to the named predicate,
+	 * formatted as {@code <object field path>.<predicate name>},
 	 * or just {@code <predicate name>} if the predicate was declared at the root.
 	 * @return The initial step of a DSL where named predicate predicates can be defined.
 	 * @see NamedPredicateOptionsStep

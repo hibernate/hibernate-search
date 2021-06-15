@@ -22,7 +22,7 @@ public final class PhrasePredicateFieldStepImpl implements PhrasePredicateFieldS
 	}
 
 	@Override
-	public PhrasePredicateFieldMoreStep<?, ?> fields(String ... absoluteFieldPaths) {
-		return new PhrasePredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
+	public PhrasePredicateFieldMoreStep<?, ?> fields(String ... fieldPaths) {
+		return new PhrasePredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
 	}
 }

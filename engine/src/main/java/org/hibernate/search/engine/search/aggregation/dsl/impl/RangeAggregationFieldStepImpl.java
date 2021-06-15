@@ -23,11 +23,11 @@ public class RangeAggregationFieldStepImpl<PDF extends SearchPredicateFactory> i
 	}
 
 	@Override
-	public <F> RangeAggregationRangeStep<?, PDF, F> field(String absoluteFieldPath, Class<F> type, ValueConvert convert) {
-		Contracts.assertNotNull( absoluteFieldPath, "absoluteFieldPath" );
+	public <F> RangeAggregationRangeStep<?, PDF, F> field(String fieldPath, Class<F> type, ValueConvert convert) {
+		Contracts.assertNotNull( fieldPath, "fieldPath" );
 		Contracts.assertNotNull( type, "type" );
 		RangeAggregationBuilder<F> builder = dslContext.scope()
-				.fieldQueryElement( absoluteFieldPath, AggregationTypeKeys.RANGE ).type( type, convert );
+				.fieldQueryElement( fieldPath, AggregationTypeKeys.RANGE ).type( type, convert );
 		return new RangeAggregationRangeStepImpl<>( builder, dslContext );
 	}
 }

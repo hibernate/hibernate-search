@@ -174,10 +174,10 @@ public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsear
 		}
 
 		@Override
-		public FieldState field(String absoluteFieldPath) {
-			ElasticsearchSimpleQueryStringPredicateBuilderFieldState fieldState = fieldStates.get( absoluteFieldPath );
+		public FieldState field(String fieldPath) {
+			ElasticsearchSimpleQueryStringPredicateBuilderFieldState fieldState = fieldStates.get( fieldPath );
 			if ( fieldState == null ) {
-				fieldState = scope.fieldQueryElement( absoluteFieldPath, ElasticsearchPredicateTypeKeys.SIMPLE_QUERY_STRING );
+				fieldState = scope.fieldQueryElement( fieldPath, ElasticsearchPredicateTypeKeys.SIMPLE_QUERY_STRING );
 				if ( firstFieldState == null ) {
 					firstFieldState = fieldState;
 				}
@@ -185,7 +185,7 @@ public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsear
 					SearchIndexSchemaElementContextHelper.checkNestedDocumentPathCompatibility(
 							firstFieldState.field(), fieldState.field() );
 				}
-				fieldStates.put( absoluteFieldPath, fieldState );
+				fieldStates.put( fieldPath, fieldState );
 			}
 			return fieldState;
 		}

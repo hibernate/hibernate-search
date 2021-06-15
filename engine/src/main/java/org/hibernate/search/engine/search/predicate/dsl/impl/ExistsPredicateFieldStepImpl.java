@@ -27,8 +27,8 @@ public final class ExistsPredicateFieldStepImpl
 	}
 
 	@Override
-	public ExistsPredicateOptionsStep<?> field(String absoluteFieldPath) {
-		this.builder = dslContext.scope().fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.EXISTS );
+	public ExistsPredicateOptionsStep<?> field(String fieldPath) {
+		this.builder = dslContext.scope().fieldQueryElement( fieldPath, PredicateTypeKeys.EXISTS );
 		return this;
 	}
 

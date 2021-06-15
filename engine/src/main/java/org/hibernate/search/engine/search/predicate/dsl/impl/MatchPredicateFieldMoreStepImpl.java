@@ -37,18 +37,18 @@ class MatchPredicateFieldMoreStepImpl
 
 	private Float fieldSetBoost;
 
-	MatchPredicateFieldMoreStepImpl(CommonState commonState, List<String> absoluteFieldPaths) {
+	MatchPredicateFieldMoreStepImpl(CommonState commonState, List<String> fieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		SearchIndexScope<?> scope = commonState.scope();
-		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			predicateBuilders.add( scope.fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.MATCH ) );
+		for ( String fieldPath : fieldPaths ) {
+			predicateBuilders.add( scope.fieldQueryElement( fieldPath, PredicateTypeKeys.MATCH ) );
 		}
 	}
 
 	@Override
-	public MatchPredicateFieldMoreStepImpl fields(String... absoluteFieldPaths) {
-		return new MatchPredicateFieldMoreStepImpl( commonState, Arrays.asList( absoluteFieldPaths ) );
+	public MatchPredicateFieldMoreStepImpl fields(String... fieldPaths) {
+		return new MatchPredicateFieldMoreStepImpl( commonState, Arrays.asList( fieldPaths ) );
 	}
 
 	@Override
