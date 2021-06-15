@@ -24,10 +24,10 @@ import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 import org.apache.lucene.search.Query;
 
-public interface LuceneSearchQueryIndexScope
-		extends SearchQueryIndexScope, LuceneSearchIndexScope,
-				LuceneSearchPredicateIndexScope, LuceneSearchSortIndexScope,
-				LuceneSearchProjectionIndexScope, LuceneSearchAggregationIndexScope {
+public interface LuceneSearchQueryIndexScope<S extends LuceneSearchQueryIndexScope<?>>
+		extends SearchQueryIndexScope<S>, LuceneSearchIndexScope<S>,
+				LuceneSearchPredicateIndexScope<S>, LuceneSearchSortIndexScope<S>,
+				LuceneSearchProjectionIndexScope<S>, LuceneSearchAggregationIndexScope<S> {
 
 	@Override
 	<P> LuceneSearchQueryBuilder<P> select(BackendSessionContext sessionContext,

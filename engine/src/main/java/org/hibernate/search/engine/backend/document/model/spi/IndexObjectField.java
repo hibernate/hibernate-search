@@ -11,7 +11,7 @@ import org.hibernate.search.engine.backend.types.spi.AbstractIndexCompositeNodeT
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 
 public interface IndexObjectField<
-				SC extends SearchIndexScope,
+				SC extends SearchIndexScope<?>,
 				NT extends AbstractIndexCompositeNodeType<SC, ?>,
 				C extends IndexCompositeNode<SC, NT, F>,
 				F extends IndexField<SC, ?>

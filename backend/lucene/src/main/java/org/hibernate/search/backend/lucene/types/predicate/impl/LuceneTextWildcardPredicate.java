@@ -29,7 +29,7 @@ public class LuceneTextWildcardPredicate extends AbstractLuceneLeafSingleFieldPr
 	public static class Factory<F>
 			extends AbstractLuceneValueFieldSearchQueryElementFactory<WildcardPredicateBuilder, F> {
 		@Override
-		public Builder<F> create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
+		public Builder<F> create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			return new Builder<>( scope, field );
 		}
 	}
@@ -40,7 +40,7 @@ public class LuceneTextWildcardPredicate extends AbstractLuceneLeafSingleFieldPr
 
 		private String pattern;
 
-		private Builder(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
+		private Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			this.analyzerOrNormalizer = field.type().searchAnalyzerOrNormalizer();
 		}

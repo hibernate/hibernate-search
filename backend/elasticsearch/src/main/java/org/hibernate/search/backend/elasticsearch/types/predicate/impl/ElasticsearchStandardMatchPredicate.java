@@ -62,7 +62,7 @@ public class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSi
 		}
 
 		@Override
-		public MatchPredicateBuilder create(ElasticsearchSearchIndexScope scope,
+		public MatchPredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			return new Builder<>( codec, scope, field );
 		}
@@ -75,7 +75,7 @@ public class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSi
 
 		private JsonElement value;
 
-		Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
+		Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			this.field = field;

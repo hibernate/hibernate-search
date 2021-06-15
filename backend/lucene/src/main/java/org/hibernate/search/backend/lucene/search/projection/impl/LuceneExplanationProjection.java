@@ -17,7 +17,7 @@ import org.apache.lucene.search.Explanation;
 
 class LuceneExplanationProjection extends AbstractLuceneProjection<Explanation, Explanation> {
 
-	private LuceneExplanationProjection(LuceneSearchIndexScope scope) {
+	private LuceneExplanationProjection(LuceneSearchIndexScope<?> scope) {
 		super( scope );
 	}
 
@@ -46,7 +46,7 @@ class LuceneExplanationProjection extends AbstractLuceneProjection<Explanation, 
 	public static class Builder extends AbstractLuceneProjection.AbstractBuilder<Explanation>
 			implements SearchProjectionBuilder<Explanation> {
 
-		public Builder(LuceneSearchIndexScope scope) {
+		public Builder(LuceneSearchIndexScope<?> scope) {
 			super( scope );
 		}
 

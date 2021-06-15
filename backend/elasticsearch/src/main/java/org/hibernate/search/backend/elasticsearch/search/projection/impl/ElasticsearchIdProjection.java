@@ -21,7 +21,7 @@ public class ElasticsearchIdProjection<I> extends AbstractElasticsearchProjectio
 	private final ProjectionExtractionHelper<String> extractionHelper;
 	private final DocumentIdentifierValueConverter<? extends I> identifierValueConverter;
 
-	private ElasticsearchIdProjection(ElasticsearchSearchIndexScope scope,
+	private ElasticsearchIdProjection(ElasticsearchSearchIndexScope<?> scope,
 			ProjectionExtractionHelper<String> extractionHelper,
 			DocumentIdentifierValueConverter<? extends I> identifierValueConverter) {
 		super( scope );
@@ -56,7 +56,7 @@ public class ElasticsearchIdProjection<I> extends AbstractElasticsearchProjectio
 
 		private final ElasticsearchIdProjection<I> projection;
 
-		Builder(ElasticsearchSearchIndexScope scope, ProjectionExtractionHelper<String> extractionHelper,
+		Builder(ElasticsearchSearchIndexScope<?> scope, ProjectionExtractionHelper<String> extractionHelper,
 				Class<I> identifierType) {
 			super( scope );
 

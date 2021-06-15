@@ -80,7 +80,7 @@ public class ElasticsearchRangeAggregation<F, K>
 		}
 
 		@Override
-		public TypeSelector<?> create(ElasticsearchSearchIndexScope scope,
+		public TypeSelector<?> create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			return new TypeSelector<>( codec, scope, field );
 		}
@@ -88,11 +88,11 @@ public class ElasticsearchRangeAggregation<F, K>
 
 	private static class TypeSelector<F> implements RangeAggregationBuilder.TypeSelector {
 		private final ElasticsearchFieldCodec<F> codec;
-		private final ElasticsearchSearchIndexScope scope;
+		private final ElasticsearchSearchIndexScope<?> scope;
 		private final ElasticsearchSearchIndexValueFieldContext<F> field;
 
 		private TypeSelector(ElasticsearchFieldCodec<F> codec,
-				ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<F> field) {
+				ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<F> field) {
 			this.codec = codec;
 			this.scope = scope;
 			this.field = field;
@@ -114,7 +114,7 @@ public class ElasticsearchRangeAggregation<F, K>
 		private final List<Range<K>> rangesInOrder = new ArrayList<>();
 		private final JsonArray rangesJson = new JsonArray();
 
-		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
+		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field, DslConverter<? super K, F> toFieldValueConverter) {
 			super( scope, field );
 			this.codec = codec;

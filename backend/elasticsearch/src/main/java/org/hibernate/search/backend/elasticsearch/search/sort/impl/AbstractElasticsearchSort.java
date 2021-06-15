@@ -19,7 +19,7 @@ public abstract class AbstractElasticsearchSort implements ElasticsearchSearchSo
 		this( builder.scope );
 	}
 
-	protected AbstractElasticsearchSort(ElasticsearchSearchIndexScope scope) {
+	protected AbstractElasticsearchSort(ElasticsearchSearchIndexScope<?> scope) {
 		indexNames = scope.hibernateSearchIndexNames();
 	}
 
@@ -30,9 +30,9 @@ public abstract class AbstractElasticsearchSort implements ElasticsearchSearchSo
 
 	public abstract static class AbstractBuilder implements SearchSortBuilder {
 
-		protected final ElasticsearchSearchIndexScope scope;
+		protected final ElasticsearchSearchIndexScope<?> scope;
 
-		protected AbstractBuilder(ElasticsearchSearchIndexScope scope) {
+		protected AbstractBuilder(ElasticsearchSearchIndexScope<?> scope) {
 			this.scope = scope;
 		}
 	}

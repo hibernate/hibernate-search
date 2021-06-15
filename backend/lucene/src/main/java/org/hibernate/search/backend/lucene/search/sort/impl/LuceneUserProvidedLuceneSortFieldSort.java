@@ -15,7 +15,7 @@ class LuceneUserProvidedLuceneSortFieldSort extends AbstractLuceneSort {
 
 	private final SortField luceneSortField;
 
-	LuceneUserProvidedLuceneSortFieldSort(LuceneSearchIndexScope scope, SortField luceneSortField) {
+	LuceneUserProvidedLuceneSortFieldSort(LuceneSearchIndexScope<?> scope, SortField luceneSortField) {
 		super( scope );
 		this.luceneSortField = luceneSortField;
 	}

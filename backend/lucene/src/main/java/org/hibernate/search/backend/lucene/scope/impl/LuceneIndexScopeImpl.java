@@ -24,7 +24,7 @@ import org.apache.lucene.index.IndexReader;
 public class LuceneIndexScopeImpl
 		implements IndexScope, LuceneIndexScope {
 
-	private final LuceneSearchQueryIndexScope searchScope;
+	private final LuceneSearchQueryIndexScope<?> searchScope;
 
 	public LuceneIndexScopeImpl(SearchBackendContext backendContext,
 			BackendMappingContext mappingContext,
@@ -38,7 +38,7 @@ public class LuceneIndexScopeImpl
 	}
 
 	@Override
-	public LuceneSearchQueryIndexScope searchScope() {
+	public LuceneSearchQueryIndexScope<?> searchScope() {
 		return searchScope;
 	}
 

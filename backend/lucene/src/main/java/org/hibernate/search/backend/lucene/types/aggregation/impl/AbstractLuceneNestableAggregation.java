@@ -44,12 +44,12 @@ public abstract class AbstractLuceneNestableAggregation<A> implements LuceneSear
 
 	public abstract static class AbstractBuilder<A> implements SearchAggregationBuilder<A> {
 
-		protected final LuceneSearchIndexScope scope;
+		protected final LuceneSearchIndexScope<?> scope;
 		protected final LuceneSearchIndexValueFieldContext<?> field;
 		private final String nestedDocumentPath;
 		private Query nestedFilter;
 
-		public AbstractBuilder(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<?> field) {
+		public AbstractBuilder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<?> field) {
 			this.scope = scope;
 			this.field = field;
 			this.nestedDocumentPath = field.nestedDocumentPath();

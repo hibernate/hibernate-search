@@ -14,7 +14,7 @@ class ElasticsearchCompositeTriFunctionProjection<P1, P2, P3, P>
 
 	private final TriFunction<P1, P2, P3, P> transformer;
 
-	ElasticsearchCompositeTriFunctionProjection(ElasticsearchSearchIndexScope scope, TriFunction<P1, P2, P3, P> transformer,
+	ElasticsearchCompositeTriFunctionProjection(ElasticsearchSearchIndexScope<?> scope, TriFunction<P1, P2, P3, P> transformer,
 			ElasticsearchSearchProjection<?, P1> projection1, ElasticsearchSearchProjection<?, P2> projection2,
 			ElasticsearchSearchProjection<?, P3> projection3) {
 		super( scope, projection1, projection2, projection3 );

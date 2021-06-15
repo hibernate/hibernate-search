@@ -8,8 +8,8 @@ package org.hibernate.search.engine.search.projection.spi;
 
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 
-public interface SearchProjectionIndexScope
-		extends SearchIndexScope {
+public interface SearchProjectionIndexScope<S extends SearchProjectionIndexScope<?>>
+		extends SearchIndexScope<S> {
 
 	SearchProjectionBuilderFactory projectionBuilders();
 

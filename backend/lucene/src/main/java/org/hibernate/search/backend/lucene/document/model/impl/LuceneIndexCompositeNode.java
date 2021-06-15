@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.types.impl.LuceneIndexCompositeNodeTy
 import org.hibernate.search.engine.backend.document.model.spi.IndexCompositeNode;
 
 public interface LuceneIndexCompositeNode
-		extends IndexCompositeNode<LuceneSearchIndexScope, LuceneIndexCompositeNodeType, LuceneIndexField>,
+		extends IndexCompositeNode<LuceneSearchIndexScope<?>, LuceneIndexCompositeNodeType, LuceneIndexField>,
 				LuceneIndexNode, LuceneSearchIndexCompositeNodeContext {
 
 }

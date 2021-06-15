@@ -19,7 +19,8 @@ import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-public interface ElasticsearchSearchIndexScope extends SearchIndexScope {
+public interface ElasticsearchSearchIndexScope<S extends ElasticsearchSearchIndexScope<?>>
+		extends SearchIndexScope<S> {
 
 	@Override
 	ElasticsearchSearchIndexNodeContext child(SearchIndexCompositeNodeContext<?> parent, String name);

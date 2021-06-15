@@ -20,7 +20,7 @@ public class LuceneIdProjection<I> extends AbstractLuceneProjection<String, I> {
 
 	private final DocumentIdentifierValueConverter<? extends I> identifierValueConverter;
 
-	private LuceneIdProjection(LuceneSearchIndexScope scope,
+	private LuceneIdProjection(LuceneSearchIndexScope<?> scope,
 			DocumentIdentifierValueConverter<? extends I> identifierValueConverter) {
 		super( scope );
 		this.identifierValueConverter = identifierValueConverter;
@@ -54,7 +54,7 @@ public class LuceneIdProjection<I> extends AbstractLuceneProjection<String, I> {
 
 		private final LuceneIdProjection<I> projection;
 
-		public Builder(LuceneSearchIndexScope scope, Class<I> identifierType) {
+		public Builder(LuceneSearchIndexScope<?> scope, Class<I> identifierType) {
 			super( scope );
 
 			DocumentIdentifierValueConverter<?> identifierValueConverter =

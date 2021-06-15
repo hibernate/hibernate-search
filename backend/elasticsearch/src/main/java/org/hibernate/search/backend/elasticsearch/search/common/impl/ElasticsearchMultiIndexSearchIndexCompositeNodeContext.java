@@ -14,14 +14,14 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementCon
 public final class ElasticsearchMultiIndexSearchIndexCompositeNodeContext
 		extends AbstractMultiIndexSearchIndexCompositeNodeContext<
 						ElasticsearchSearchIndexCompositeNodeContext,
-						ElasticsearchSearchIndexScope,
+						ElasticsearchSearchIndexScope<?>,
 						ElasticsearchSearchIndexCompositeNodeTypeContext,
 						ElasticsearchSearchIndexNodeContext
 				>
 		implements ElasticsearchSearchIndexCompositeNodeContext,
 		ElasticsearchSearchIndexCompositeNodeTypeContext {
 
-	public ElasticsearchMultiIndexSearchIndexCompositeNodeContext(ElasticsearchSearchIndexScope scope,
+	public ElasticsearchMultiIndexSearchIndexCompositeNodeContext(ElasticsearchSearchIndexScope<?> scope,
 			String absolutePath,
 			List<? extends ElasticsearchSearchIndexCompositeNodeContext> nodeForEachIndex) {
 		super( scope, absolutePath, nodeForEachIndex );

@@ -10,5 +10,5 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexS
 import org.hibernate.search.engine.backend.document.model.spi.IndexField;
 
 public interface LuceneIndexField
-		extends IndexField<LuceneSearchIndexScope, LuceneIndexCompositeNode>, LuceneIndexNode {
+		extends IndexField<LuceneSearchIndexScope<?>, LuceneIndexCompositeNode>, LuceneIndexNode {
 }

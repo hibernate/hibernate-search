@@ -15,7 +15,7 @@ class ElasticsearchCompositeBiFunctionProjection<P1, P2, P>
 
 	private final BiFunction<P1, P2, P> transformer;
 
-	ElasticsearchCompositeBiFunctionProjection(ElasticsearchSearchIndexScope scope,
+	ElasticsearchCompositeBiFunctionProjection(ElasticsearchSearchIndexScope<?> scope,
 			BiFunction<P1, P2, P> transformer,
 			ElasticsearchSearchProjection<?, P1> projection1, ElasticsearchSearchProjection<?, P2> projection2) {
 		super( scope, projection1, projection2 );

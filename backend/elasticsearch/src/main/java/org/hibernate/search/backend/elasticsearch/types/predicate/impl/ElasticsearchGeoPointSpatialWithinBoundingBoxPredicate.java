@@ -68,7 +68,7 @@ public class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicate extends Abst
 		}
 
 		@Override
-		public Builder create(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
+		public Builder create(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
 			return new Builder( codec, scope, field );
 		}
 	}
@@ -79,7 +79,7 @@ public class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicate extends Abst
 		private JsonElement topLeft;
 		private JsonElement bottomRight;
 
-		private Builder(ElasticsearchFieldCodec<GeoPoint> codec, ElasticsearchSearchIndexScope scope,
+		private Builder(ElasticsearchFieldCodec<GeoPoint> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
 			super( scope, field );
 			this.codec = codec;

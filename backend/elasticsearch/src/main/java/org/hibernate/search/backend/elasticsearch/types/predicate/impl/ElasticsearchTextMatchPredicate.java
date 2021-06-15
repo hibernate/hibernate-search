@@ -64,7 +64,7 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 		}
 
 		@Override
-		public MatchPredicateBuilder create(ElasticsearchSearchIndexScope scope,
+		public MatchPredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<String> field) {
 			return new Builder( codec, scope, field );
 		}
@@ -75,7 +75,7 @@ public class ElasticsearchTextMatchPredicate extends ElasticsearchStandardMatchP
 		private Integer prefixLength;
 		private String analyzer;
 
-		private Builder(ElasticsearchFieldCodec<String> codec, ElasticsearchSearchIndexScope scope,
+		private Builder(ElasticsearchFieldCodec<String> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<String> field) {
 			super( codec, scope, field );
 		}

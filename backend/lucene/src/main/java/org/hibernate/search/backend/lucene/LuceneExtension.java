@@ -122,12 +122,12 @@ public final class LuceneExtension<H, R, E, LOS>
 	@Override
 	public Optional<LuceneSearchQuerySelectStep<R, E, LOS>> extendOptional(
 			SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
-			SearchQueryIndexScope scope,
+			SearchQueryIndexScope<?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		if ( scope instanceof LuceneSearchQueryIndexScope ) {
 			return Optional.of( new LuceneSearchQuerySelectStepImpl<>(
-					(LuceneSearchQueryIndexScope) scope, sessionContext, loadingContextBuilder
+					(LuceneSearchQueryIndexScope<?>) scope, sessionContext, loadingContextBuilder
 			) );
 		}
 		else {
@@ -159,7 +159,7 @@ public final class LuceneExtension<H, R, E, LOS>
 		if ( dslContext.scope() instanceof LuceneSearchPredicateIndexScope ) {
 			return Optional.of( new LuceneSearchPredicateFactoryImpl(
 					original,
-					(SearchPredicateDslContext<LuceneSearchPredicateIndexScope>) dslContext
+					(SearchPredicateDslContext<LuceneSearchPredicateIndexScope<?>>) dslContext
 			) );
 		}
 		else {
@@ -177,7 +177,7 @@ public final class LuceneExtension<H, R, E, LOS>
 		if ( dslContext.scope() instanceof LuceneSearchSortIndexScope ) {
 			return Optional.of( new LuceneSearchSortFactoryImpl(
 					original,
-					((SearchSortDslContext<LuceneSearchSortIndexScope, ?>) dslContext)
+					((SearchSortDslContext<LuceneSearchSortIndexScope<?>, ?>) dslContext)
 							.withExtendedPredicateFactory( this )
 			) );
 		}
@@ -196,7 +196,7 @@ public final class LuceneExtension<H, R, E, LOS>
 		if ( dslContext.scope() instanceof LuceneSearchProjectionIndexScope ) {
 			return Optional.of( new LuceneSearchProjectionFactoryImpl<>(
 					original,
-					(SearchProjectionDslContext<LuceneSearchProjectionIndexScope>) dslContext
+					(SearchProjectionDslContext<LuceneSearchProjectionIndexScope<?>>) dslContext
 			) );
 		}
 		else {
@@ -214,7 +214,7 @@ public final class LuceneExtension<H, R, E, LOS>
 		if ( dslContext.scope() instanceof LuceneSearchAggregationIndexScope ) {
 			return Optional.of( new LuceneSearchAggregationFactoryImpl(
 					original,
-					((SearchAggregationDslContext<LuceneSearchAggregationIndexScope, ?>) dslContext)
+					((SearchAggregationDslContext<LuceneSearchAggregationIndexScope<?>, ?>) dslContext)
 							.withExtendedPredicateFactory( this )
 			) );
 		}

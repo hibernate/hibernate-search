@@ -11,7 +11,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.engine.backend.document.model.spi.IndexNode;
 
 public interface ElasticsearchIndexNode
-		extends IndexNode<ElasticsearchSearchIndexScope>, ElasticsearchSearchIndexNodeContext {
+		extends IndexNode<ElasticsearchSearchIndexScope<?>>, ElasticsearchSearchIndexNodeContext {
 
 	@Override
 	ElasticsearchIndexCompositeNode toComposite();

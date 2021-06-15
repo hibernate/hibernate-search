@@ -23,10 +23,10 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortIndexScope;
  * or when calling {@link SearchQueryOptionsStep#sort(Function)} to build the sort using a lambda
  * (in which case the lambda may retrieve the resulting {@link SearchSort} object and cache it).
  */
-public final class SearchSortDslContextImpl<SC extends SearchSortIndexScope, PDF extends SearchPredicateFactory>
+public final class SearchSortDslContextImpl<SC extends SearchSortIndexScope<?>, PDF extends SearchPredicateFactory>
 		implements SearchSortDslContext<SC, PDF> {
 
-	public static <SC extends SearchSortIndexScope, PDF extends SearchPredicateFactory>
+	public static <SC extends SearchSortIndexScope<?>, PDF extends SearchPredicateFactory>
 			SearchSortDslContext<?, ?> root(SC scope, PDF predicateFactory) {
 		return new SearchSortDslContextImpl<>( scope, null, null, predicateFactory );
 	}

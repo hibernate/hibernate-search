@@ -42,7 +42,7 @@ public abstract class AbstractSearchQuerySelectStep<
 		);
 	}
 
-	protected abstract SearchQueryIndexScope scope();
+	protected abstract SearchQueryIndexScope<?> scope();
 
 	protected abstract BackendSessionContext sessionContext();
 

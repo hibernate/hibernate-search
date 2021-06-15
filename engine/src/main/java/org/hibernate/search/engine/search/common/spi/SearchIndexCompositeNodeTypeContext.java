@@ -14,7 +14,7 @@ package org.hibernate.search.engine.search.common.spi;
  * @param <N> The type representing the targeted index node.
  */
 public interface SearchIndexCompositeNodeTypeContext<
-				SC extends SearchIndexScope,
+				SC extends SearchIndexScope<?>,
 				N extends SearchIndexCompositeNodeContext<SC>
 		>
 		extends SearchIndexNodeTypeContext<SC, N> {

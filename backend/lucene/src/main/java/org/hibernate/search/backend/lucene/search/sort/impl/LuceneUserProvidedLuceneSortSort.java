@@ -15,7 +15,7 @@ class LuceneUserProvidedLuceneSortSort extends AbstractLuceneSort {
 
 	private final Sort luceneSort;
 
-	LuceneUserProvidedLuceneSortSort(LuceneSearchIndexScope scope, Sort luceneSort) {
+	LuceneUserProvidedLuceneSortSort(LuceneSearchIndexScope<?> scope, Sort luceneSort) {
 		super( scope );
 		this.luceneSort = luceneSort;
 	}

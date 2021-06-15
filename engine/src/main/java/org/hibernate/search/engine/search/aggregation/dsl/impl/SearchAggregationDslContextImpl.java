@@ -11,9 +11,9 @@ import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationIndex
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
 
-public class SearchAggregationDslContextImpl<SC extends SearchAggregationIndexScope, PDF extends SearchPredicateFactory>
+public class SearchAggregationDslContextImpl<SC extends SearchAggregationIndexScope<?>, PDF extends SearchPredicateFactory>
 		implements SearchAggregationDslContext<SC, PDF> {
-	public static <SC extends SearchAggregationIndexScope, PDF extends SearchPredicateFactory>
+	public static <SC extends SearchAggregationIndexScope<?>, PDF extends SearchPredicateFactory>
 			SearchAggregationDslContextImpl<SC, PDF> root(SC scope, PDF predicateFactory) {
 		return new SearchAggregationDslContextImpl<>( scope, predicateFactory );
 	}

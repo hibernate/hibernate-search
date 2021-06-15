@@ -62,7 +62,7 @@ public class LuceneNestedPredicate extends AbstractLuceneSingleFieldPredicate {
 		}
 
 		@Override
-		public NestedPredicateBuilder create(LuceneSearchIndexScope scope, LuceneSearchIndexCompositeNodeContext node) {
+		public NestedPredicateBuilder create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexCompositeNodeContext node) {
 			return new Builder( scope, node );
 		}
 	}
@@ -70,7 +70,7 @@ public class LuceneNestedPredicate extends AbstractLuceneSingleFieldPredicate {
 	private static class Builder extends AbstractBuilder implements NestedPredicateBuilder {
 		private LuceneSearchPredicate nestedPredicate;
 
-		Builder(LuceneSearchIndexScope scope, LuceneSearchIndexCompositeNodeContext node) {
+		Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexCompositeNodeContext node) {
 			super( scope, node.absolutePath(),
 					// nestedPathHierarchy includes absoluteFieldPath at the end, but here we don't want it to be included.
 					node.nestedPathHierarchy().subList( 0, node.nestedPathHierarchy().size() - 1 ) );

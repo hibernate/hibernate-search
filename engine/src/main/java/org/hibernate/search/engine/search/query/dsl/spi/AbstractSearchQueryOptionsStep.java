@@ -48,11 +48,11 @@ public abstract class AbstractSearchQueryOptionsStep<
 		>
 		implements SearchQueryWhereStep<S, H, LOS, PDF>, SearchQueryOptionsStep<S, H, LOS, SF, AF> {
 
-	private final SearchQueryIndexScope scope;
+	private final SearchQueryIndexScope<?> scope;
 	private final SearchQueryBuilder<H> searchQueryBuilder;
 	private final SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder;
 
-	public AbstractSearchQueryOptionsStep(SearchQueryIndexScope scope,
+	public AbstractSearchQueryOptionsStep(SearchQueryIndexScope<?> scope,
 			SearchQueryBuilder<H> searchQueryBuilder,
 			SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
 		this.scope = scope;

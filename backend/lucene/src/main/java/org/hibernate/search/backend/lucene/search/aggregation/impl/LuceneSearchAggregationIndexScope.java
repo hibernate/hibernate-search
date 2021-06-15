@@ -9,8 +9,8 @@ package org.hibernate.search.backend.lucene.search.aggregation.impl;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationIndexScope;
 
-public interface LuceneSearchAggregationIndexScope
-		extends SearchAggregationIndexScope, LuceneSearchIndexScope {
+public interface LuceneSearchAggregationIndexScope<S extends LuceneSearchAggregationIndexScope<?>>
+		extends SearchAggregationIndexScope<S>, LuceneSearchIndexScope<S> {
 
 	@Override
 	LuceneSearchAggregationBuilderFactory aggregationBuilders();

@@ -26,7 +26,7 @@ public interface LuceneSearchPredicate extends SearchPredicate {
 
 	Query toQuery(PredicateRequestContext context);
 
-	static LuceneSearchPredicate from(LuceneSearchIndexScope scope, SearchPredicate predicate) {
+	static LuceneSearchPredicate from(LuceneSearchIndexScope<?> scope, SearchPredicate predicate) {
 		if ( !( predicate instanceof LuceneSearchPredicate ) ) {
 			throw log.cannotMixLuceneSearchQueryWithOtherPredicates( predicate );
 		}

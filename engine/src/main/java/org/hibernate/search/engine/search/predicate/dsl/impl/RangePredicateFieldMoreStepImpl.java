@@ -46,7 +46,7 @@ class RangePredicateFieldMoreStepImpl
 		this.commonState = commonState;
 		this.commonState.add( this );
 		this.absoluteFieldPaths = absoluteFieldPaths;
-		SearchIndexScope scope = commonState.scope();
+		SearchIndexScope<?> scope = commonState.scope();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			predicateBuilders.add( scope.fieldQueryElement( absoluteFieldPath, PredicateTypeKeys.RANGE ) );
 		}

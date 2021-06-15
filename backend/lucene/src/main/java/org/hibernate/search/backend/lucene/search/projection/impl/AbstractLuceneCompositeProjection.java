@@ -20,7 +20,7 @@ abstract class AbstractLuceneCompositeProjection<P>
 
 	private final LuceneSearchProjection<?, ?>[] children;
 
-	AbstractLuceneCompositeProjection(LuceneSearchIndexScope scope,
+	AbstractLuceneCompositeProjection(LuceneSearchIndexScope<?> scope,
 			LuceneSearchProjection<?, ?> ... children) {
 		super( scope );
 		this.children = children;

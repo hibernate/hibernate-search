@@ -19,7 +19,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public abstract class AbstractMultiIndexSearchIndexCompositeNodeContext<
 				S extends SearchIndexCompositeNodeContext<SC>,
-				SC extends SearchIndexScope,
+				SC extends SearchIndexScope<?>,
 				NT extends SearchIndexCompositeNodeTypeContext<SC, S>,
 				F extends SearchIndexNodeContext<SC>
 		>

@@ -75,7 +75,7 @@ public class LuceneSimpleQueryStringPredicate extends AbstractLuceneNestablePred
 		private boolean ignoreAnalyzer = false;
 		private EnumSet<SimpleQueryFlag> flags;
 
-		Builder(LuceneSearchIndexScope scope) {
+		Builder(LuceneSearchIndexScope<?> scope) {
 			super( scope );
 			this.analysisDefinitionRegistry = scope.analysisDefinitionRegistry();
 		}

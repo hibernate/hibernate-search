@@ -47,7 +47,7 @@ public class LuceneMatchIdPredicate extends AbstractLuceneSearchPredicate {
 	static class Builder extends AbstractBuilder implements MatchIdPredicateBuilder {
 		private List<String> values = new ArrayList<>();
 
-		Builder(LuceneSearchIndexScope scope) {
+		Builder(LuceneSearchIndexScope<?> scope) {
 			super( scope );
 		}
 

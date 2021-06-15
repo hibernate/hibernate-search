@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 public class ElasticsearchIndexScope
 		implements IndexScope {
 
-	private final ElasticsearchSearchQueryIndexScope searchScope;
+	private final ElasticsearchSearchQueryIndexScope<?> searchScope;
 
 	public ElasticsearchIndexScope(BackendMappingContext mappingContext, SearchBackendContext backendContext,
 			Set<ElasticsearchIndexModel> indexModels) {
@@ -30,7 +30,7 @@ public class ElasticsearchIndexScope
 	}
 
 	@Override
-	public ElasticsearchSearchQueryIndexScope searchScope() {
+	public ElasticsearchSearchQueryIndexScope<?> searchScope() {
 		return searchScope;
 	}
 

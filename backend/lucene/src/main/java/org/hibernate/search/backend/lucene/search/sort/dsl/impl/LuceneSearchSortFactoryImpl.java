@@ -24,10 +24,10 @@ public class LuceneSearchSortFactoryImpl
 		extends DelegatingSearchSortFactory<LuceneSearchSortFactory, LuceneSearchPredicateFactory>
 		implements LuceneSearchSortFactory {
 
-	private final SearchSortDslContext<LuceneSearchSortIndexScope, LuceneSearchPredicateFactory> dslContext;
+	private final SearchSortDslContext<LuceneSearchSortIndexScope<?>, LuceneSearchPredicateFactory> dslContext;
 
 	public LuceneSearchSortFactoryImpl(SearchSortFactory delegate,
-			SearchSortDslContext<LuceneSearchSortIndexScope, LuceneSearchPredicateFactory> dslContext) {
+			SearchSortDslContext<LuceneSearchSortIndexScope<?>, LuceneSearchPredicateFactory> dslContext) {
 		super( delegate, dslContext );
 		this.dslContext = dslContext;
 	}

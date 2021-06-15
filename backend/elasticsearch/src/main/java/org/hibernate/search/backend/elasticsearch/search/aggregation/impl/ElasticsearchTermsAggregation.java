@@ -86,7 +86,7 @@ public class ElasticsearchTermsAggregation<F, K>
 		}
 
 		@Override
-		public TypeSelector<?> create(ElasticsearchSearchIndexScope scope,
+		public TypeSelector<?> create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			return new TypeSelector<>( codec, scope, field );
 		}
@@ -94,11 +94,11 @@ public class ElasticsearchTermsAggregation<F, K>
 
 	private static class TypeSelector<F> implements TermsAggregationBuilder.TypeSelector {
 		private final ElasticsearchFieldCodec<F> codec;
-		private final ElasticsearchSearchIndexScope scope;
+		private final ElasticsearchSearchIndexScope<?> scope;
 		private final ElasticsearchSearchIndexValueFieldContext<F> field;
 
 		private TypeSelector(ElasticsearchFieldCodec<F> codec,
-				ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<F> field) {
+				ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<F> field) {
 			this.codec = codec;
 			this.scope = scope;
 			this.field = field;
@@ -121,7 +121,7 @@ public class ElasticsearchTermsAggregation<F, K>
 		private int minDocCount = 1;
 		private int size = 100;
 
-		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
+		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field,
 				ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
 			super( scope, field );

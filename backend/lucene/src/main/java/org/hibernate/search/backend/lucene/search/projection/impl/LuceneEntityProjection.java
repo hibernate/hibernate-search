@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder
 
 public class LuceneEntityProjection<E> extends AbstractLuceneProjection<Object, E> {
 
-	private LuceneEntityProjection(LuceneSearchIndexScope scope) {
+	private LuceneEntityProjection(LuceneSearchIndexScope<?> scope) {
 		super( scope );
 	}
 
@@ -53,7 +53,7 @@ public class LuceneEntityProjection<E> extends AbstractLuceneProjection<Object, 
 	public static class Builder<E> extends AbstractLuceneProjection.AbstractBuilder<E>
 			implements EntityProjectionBuilder<E> {
 
-		public Builder(LuceneSearchIndexScope scope) {
+		public Builder(LuceneSearchIndexScope<?> scope) {
 			super( scope );
 		}
 

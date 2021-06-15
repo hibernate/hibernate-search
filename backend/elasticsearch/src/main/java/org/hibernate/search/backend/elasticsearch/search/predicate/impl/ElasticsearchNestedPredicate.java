@@ -59,7 +59,7 @@ public class ElasticsearchNestedPredicate extends AbstractElasticsearchSingleFie
 	public static class Factory
 			extends AbstractElasticsearchCompositeNodeSearchQueryElementFactory<NestedPredicateBuilder> {
 		@Override
-		public NestedPredicateBuilder create(ElasticsearchSearchIndexScope scope,
+		public NestedPredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexCompositeNodeContext node) {
 			return new Builder( scope, node );
 		}
@@ -68,7 +68,7 @@ public class ElasticsearchNestedPredicate extends AbstractElasticsearchSingleFie
 	private static class Builder extends AbstractBuilder implements NestedPredicateBuilder {
 		private ElasticsearchSearchPredicate nestedPredicate;
 
-		Builder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexCompositeNodeContext field) {
+		Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexCompositeNodeContext field) {
 			super( scope, field.absolutePath(),
 					// nestedPathHierarchy includes absoluteFieldPath at the end, but here we don't want it to be included.
 					field.nestedPathHierarchy().subList( 0, field.nestedPathHierarchy().size() - 1 ) );

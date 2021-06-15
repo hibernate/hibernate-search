@@ -123,7 +123,7 @@ class LuceneBooleanPredicate extends AbstractLuceneSearchPredicate {
 
 		private NavigableMap<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
-		Builder(LuceneSearchIndexScope scope) {
+		Builder(LuceneSearchIndexScope<?> scope) {
 			super( scope );
 		}
 

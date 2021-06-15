@@ -44,12 +44,13 @@ import org.apache.lucene.search.Query;
 
 public final class LuceneSearchIndexScopeImpl
 		extends AbstractSearchIndexScope<
-						LuceneSearchIndexScope,
+						LuceneSearchIndexScopeImpl,
 						LuceneIndexModel,
 						LuceneSearchIndexNodeContext,
 						LuceneSearchIndexCompositeNodeContext
 				>
-		implements LuceneSearchIndexScope, LuceneSearchQueryIndexScope {
+		implements LuceneSearchIndexScope<LuceneSearchIndexScopeImpl>,
+				LuceneSearchQueryIndexScope<LuceneSearchIndexScopeImpl> {
 
 	// Backend context
 	private final SearchBackendContext backendContext;
@@ -98,7 +99,7 @@ public final class LuceneSearchIndexScopeImpl
 	}
 
 	@Override
-	protected LuceneSearchIndexScope self() {
+	protected LuceneSearchIndexScopeImpl self() {
 		return this;
 	}
 

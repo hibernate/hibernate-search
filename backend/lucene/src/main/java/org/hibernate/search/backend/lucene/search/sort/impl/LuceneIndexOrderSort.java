@@ -12,7 +12,7 @@ import org.apache.lucene.search.SortField;
 
 class LuceneIndexOrderSort extends AbstractLuceneSort {
 
-	LuceneIndexOrderSort(LuceneSearchIndexScope scope) {
+	LuceneIndexOrderSort(LuceneSearchIndexScope<?> scope) {
 		super( scope );
 	}
 

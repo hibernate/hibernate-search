@@ -64,12 +64,12 @@ public abstract class AbstractElasticsearchPredicate implements ElasticsearchSea
 	}
 
 	protected abstract static class AbstractBuilder implements SearchPredicateBuilder {
-		protected final ElasticsearchSearchIndexScope scope;
+		protected final ElasticsearchSearchIndexScope<?> scope;
 
 		private Float boost;
 		private boolean withConstantScore = false;
 
-		AbstractBuilder(ElasticsearchSearchIndexScope scope) {
+		AbstractBuilder(ElasticsearchSearchIndexScope<?> scope) {
 			this.scope = scope;
 		}
 

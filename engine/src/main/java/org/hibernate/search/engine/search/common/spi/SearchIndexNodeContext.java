@@ -19,7 +19,7 @@ import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
  *
  * @param <SC> The type of the backend-specific search scope.
  */
-public interface SearchIndexNodeContext<SC extends SearchIndexScope>
+public interface SearchIndexNodeContext<SC extends SearchIndexScope<?>>
 		extends EventContextProvider {
 
 	EventContext relativeEventContext();

@@ -40,7 +40,7 @@ public abstract class AbstractLuceneLeafSingleFieldPredicate extends AbstractLuc
 			extends AbstractLuceneSingleFieldPredicate.AbstractBuilder {
 		protected final LuceneSearchIndexValueFieldContext<F> field;
 
-		protected AbstractBuilder(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
+		protected AbstractBuilder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			this.field = field;
 		}

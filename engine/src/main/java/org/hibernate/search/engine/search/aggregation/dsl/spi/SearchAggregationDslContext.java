@@ -20,7 +20,7 @@ import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
  * @param <SC> The type of the backend-specific search scope.
  * @param <PDF> The type of factory used to create predicates in {@link FieldSortOptionsStep#filter(Function)}.
  */
-public interface SearchAggregationDslContext<SC extends SearchAggregationIndexScope, PDF extends SearchPredicateFactory> {
+public interface SearchAggregationDslContext<SC extends SearchAggregationIndexScope<?>, PDF extends SearchPredicateFactory> {
 
 	/**
 	 * @return The search scope.

@@ -20,7 +20,7 @@ import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 
 public class ElasticsearchIndexCompositeNodeType
 		extends AbstractIndexCompositeNodeType<
-						ElasticsearchSearchIndexScope, ElasticsearchSearchIndexCompositeNodeContext
+						ElasticsearchSearchIndexScope<?>, ElasticsearchSearchIndexCompositeNodeContext
 				>
 		implements ElasticsearchSearchIndexCompositeNodeTypeContext {
 
@@ -37,7 +37,7 @@ public class ElasticsearchIndexCompositeNodeType
 
 	public static class Builder
 			extends AbstractIndexCompositeNodeType.Builder<
-							ElasticsearchSearchIndexScope, ElasticsearchSearchIndexCompositeNodeContext
+							ElasticsearchSearchIndexScope<?>, ElasticsearchSearchIndexCompositeNodeContext
 					> {
 		public Builder(ObjectStructure objectStructure) {
 			super( objectStructure );

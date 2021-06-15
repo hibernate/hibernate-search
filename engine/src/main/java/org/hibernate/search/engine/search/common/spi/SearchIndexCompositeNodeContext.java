@@ -13,7 +13,7 @@ import java.util.Map;
  *
  * @param <SC> The type of the backend-specific search scope.
  */
-public interface SearchIndexCompositeNodeContext<SC extends SearchIndexScope>
+public interface SearchIndexCompositeNodeContext<SC extends SearchIndexScope<?>>
 		extends SearchIndexNodeContext<SC> {
 
 	String absolutePath(String relativeFieldName);

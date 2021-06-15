@@ -68,7 +68,7 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 		}
 
 		@Override
-		public NamedPredicateBuilder create(LuceneSearchIndexScope scope,
+		public NamedPredicateBuilder create(LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexCompositeNodeContext node) {
 			return new Builder( provider, predicateName, scope, node );
 		}
@@ -81,7 +81,7 @@ public class LuceneNamedPredicate extends AbstractLuceneSingleFieldPredicate {
 		private SearchPredicateFactory factory;
 		private final Map<String, Object> params = new LinkedHashMap<>();
 
-		Builder(NamedPredicateProvider provider, String predicateName, LuceneSearchIndexScope scope,
+		Builder(NamedPredicateProvider provider, String predicateName, LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexCompositeNodeContext node) {
 			super( scope, node );
 			this.provider = provider;

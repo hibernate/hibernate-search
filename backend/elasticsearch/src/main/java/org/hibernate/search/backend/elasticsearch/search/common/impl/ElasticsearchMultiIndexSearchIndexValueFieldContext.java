@@ -17,13 +17,13 @@ import com.google.gson.JsonPrimitive;
 public class ElasticsearchMultiIndexSearchIndexValueFieldContext<F>
 		extends AbstractMultiIndexSearchIndexValueFieldContext<
 						ElasticsearchSearchIndexValueFieldContext<F>,
-						ElasticsearchSearchIndexScope,
+						ElasticsearchSearchIndexScope<?>,
 						ElasticsearchSearchIndexValueFieldTypeContext<F>,
 						F
 				>
 		implements ElasticsearchSearchIndexValueFieldContext<F>, ElasticsearchSearchIndexValueFieldTypeContext<F> {
 
-	public ElasticsearchMultiIndexSearchIndexValueFieldContext(ElasticsearchSearchIndexScope scope, String absolutePath,
+	public ElasticsearchMultiIndexSearchIndexValueFieldContext(ElasticsearchSearchIndexScope<?> scope, String absolutePath,
 			List<? extends ElasticsearchSearchIndexValueFieldContext<F>> fieldForEachIndex) {
 		super( scope, absolutePath, fieldForEachIndex );
 	}

@@ -36,7 +36,7 @@ class ElasticsearchMatchAllPredicate extends AbstractElasticsearchPredicate {
 	}
 
 	static class Builder extends AbstractElasticsearchPredicate.AbstractBuilder implements MatchAllPredicateBuilder {
-		Builder(ElasticsearchSearchIndexScope scope) {
+		Builder(ElasticsearchSearchIndexScope<?> scope) {
 			super( scope );
 		}
 

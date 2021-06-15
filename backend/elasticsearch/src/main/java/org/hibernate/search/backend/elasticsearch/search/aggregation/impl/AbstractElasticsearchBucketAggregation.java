@@ -87,7 +87,7 @@ public abstract class AbstractElasticsearchBucketAggregation<K, V>
 	public abstract static class AbstractBuilder<K, V>
 			extends AbstractElasticsearchNestableAggregation.AbstractBuilder<Map<K, V>> {
 
-		public AbstractBuilder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<?> field) {
+		public AbstractBuilder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<?> field) {
 			super( scope, field );
 		}
 

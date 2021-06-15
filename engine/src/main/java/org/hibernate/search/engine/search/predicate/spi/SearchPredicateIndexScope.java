@@ -8,8 +8,8 @@ package org.hibernate.search.engine.search.predicate.spi;
 
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 
-public interface SearchPredicateIndexScope
-		extends SearchIndexScope {
+public interface SearchPredicateIndexScope<S extends SearchPredicateIndexScope<?>>
+		extends SearchIndexScope<S> {
 
 	SearchPredicateBuilderFactory predicateBuilders();
 

@@ -37,11 +37,11 @@ public abstract class AbstractLuceneSingleFieldPredicate extends AbstractLuceneN
 		protected final String absoluteFieldPath;
 		private final List<String> nestedPathHierarchy;
 
-		protected AbstractBuilder(LuceneSearchIndexScope scope, LuceneSearchIndexNodeContext node) {
+		protected AbstractBuilder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexNodeContext node) {
 			this( scope, node.absolutePath(), node.nestedPathHierarchy() );
 		}
 
-		protected AbstractBuilder(LuceneSearchIndexScope scope, String absoluteFieldPath,
+		protected AbstractBuilder(LuceneSearchIndexScope<?> scope, String absoluteFieldPath,
 				List<String> nestedPathHierarchy) {
 			super( scope );
 			this.absoluteFieldPath = absoluteFieldPath;

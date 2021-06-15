@@ -34,14 +34,14 @@ import com.google.gson.JsonObject;
  */
 class ElasticsearchSearchQueryRequestContext implements SearchProjectionRequestContext, AggregationRequestContext {
 
-	private final ElasticsearchSearchIndexScope scope;
+	private final ElasticsearchSearchIndexScope<?> scope;
 	private final BackendSessionContext sessionContext;
 	private final SearchLoadingContext<?, ?> loadingContext;
 	private final PredicateRequestContext rootPredicateContext;
 	private final Map<DistanceSortKey, Integer> distanceSorts;
 
 	ElasticsearchSearchQueryRequestContext(
-			ElasticsearchSearchIndexScope scope,
+			ElasticsearchSearchIndexScope<?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContext<?, ?> loadingContext,
 			PredicateRequestContext rootPredicateContext,

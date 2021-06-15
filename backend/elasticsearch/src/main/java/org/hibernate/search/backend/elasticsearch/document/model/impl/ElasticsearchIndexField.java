@@ -10,5 +10,5 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.engine.backend.document.model.spi.IndexField;
 
 public interface ElasticsearchIndexField
-		extends IndexField<ElasticsearchSearchIndexScope, ElasticsearchIndexCompositeNode>, ElasticsearchIndexNode {
+		extends IndexField<ElasticsearchSearchIndexScope<?>, ElasticsearchIndexCompositeNode>, ElasticsearchIndexNode {
 }

@@ -19,7 +19,7 @@ public abstract class AbstractElasticsearchProjection<E, P> implements Elasticse
 		this( builder.scope );
 	}
 
-	protected AbstractElasticsearchProjection(ElasticsearchSearchIndexScope scope) {
+	protected AbstractElasticsearchProjection(ElasticsearchSearchIndexScope<?> scope) {
 		indexNames = scope.hibernateSearchIndexNames();
 	}
 
@@ -30,9 +30,9 @@ public abstract class AbstractElasticsearchProjection<E, P> implements Elasticse
 
 	public abstract static class AbstractBuilder<P> implements SearchProjectionBuilder<P> {
 
-		protected final ElasticsearchSearchIndexScope scope;
+		protected final ElasticsearchSearchIndexScope<?> scope;
 
-		protected AbstractBuilder(ElasticsearchSearchIndexScope scope) {
+		protected AbstractBuilder(ElasticsearchSearchIndexScope<?> scope) {
 			this.scope = scope;
 		}
 	}

@@ -33,7 +33,7 @@ class LuceneCompositeSort extends AbstractLuceneSort {
 	static class Builder extends AbstractBuilder implements CompositeSortBuilder {
 		private List<LuceneSearchSort> elements = new ArrayList<>();
 
-		Builder(LuceneSearchIndexScope scope) {
+		Builder(LuceneSearchIndexScope<?> scope) {
 			super( scope );
 		}
 

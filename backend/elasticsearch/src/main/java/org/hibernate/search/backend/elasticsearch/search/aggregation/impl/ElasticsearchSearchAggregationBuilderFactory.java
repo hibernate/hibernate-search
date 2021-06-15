@@ -15,9 +15,9 @@ import com.google.gson.JsonObject;
 public class ElasticsearchSearchAggregationBuilderFactory
 		implements SearchAggregationBuilderFactory {
 
-	private final ElasticsearchSearchIndexScope scope;
+	private final ElasticsearchSearchIndexScope<?> scope;
 
-	public ElasticsearchSearchAggregationBuilderFactory(ElasticsearchSearchIndexScope scope) {
+	public ElasticsearchSearchAggregationBuilderFactory(ElasticsearchSearchIndexScope<?> scope) {
 		this.scope = scope;
 	}
 

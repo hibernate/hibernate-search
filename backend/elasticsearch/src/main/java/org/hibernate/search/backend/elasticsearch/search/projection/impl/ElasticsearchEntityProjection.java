@@ -18,7 +18,7 @@ public class ElasticsearchEntityProjection<E> extends AbstractElasticsearchProje
 
 	private final DocumentReferenceExtractionHelper helper;
 
-	private ElasticsearchEntityProjection(ElasticsearchSearchIndexScope scope,
+	private ElasticsearchEntityProjection(ElasticsearchSearchIndexScope<?> scope,
 			DocumentReferenceExtractionHelper helper) {
 		super( scope );
 		this.helper = helper;
@@ -56,7 +56,7 @@ public class ElasticsearchEntityProjection<E> extends AbstractElasticsearchProje
 
 		private final ElasticsearchEntityProjection<E> projection;
 
-		Builder(ElasticsearchSearchIndexScope scope, DocumentReferenceExtractionHelper helper) {
+		Builder(ElasticsearchSearchIndexScope<?> scope, DocumentReferenceExtractionHelper helper) {
 			super( scope );
 			this.projection = new ElasticsearchEntityProjection<>( scope, helper );
 		}

@@ -18,9 +18,9 @@ import org.apache.lucene.search.Query;
 
 public class LuceneSearchPredicateBuilderFactory implements SearchPredicateBuilderFactory {
 
-	private final LuceneSearchIndexScope scope;
+	private final LuceneSearchIndexScope<?> scope;
 
-	public LuceneSearchPredicateBuilderFactory(LuceneSearchIndexScope scope) {
+	public LuceneSearchPredicateBuilderFactory(LuceneSearchIndexScope<?> scope) {
 		this.scope = scope;
 	}
 

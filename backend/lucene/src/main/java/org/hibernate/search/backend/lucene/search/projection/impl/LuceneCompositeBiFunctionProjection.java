@@ -15,7 +15,7 @@ class LuceneCompositeBiFunctionProjection<P1, P2, P>
 
 	private final BiFunction<P1, P2, P> transformer;
 
-	LuceneCompositeBiFunctionProjection(LuceneSearchIndexScope scope, BiFunction<P1, P2, P> transformer,
+	LuceneCompositeBiFunctionProjection(LuceneSearchIndexScope<?> scope, BiFunction<P1, P2, P> transformer,
 			LuceneSearchProjection<?, P1> projection1, LuceneSearchProjection<?, P2> projection2) {
 		super( scope, projection1, projection2 );
 		this.transformer = transformer;

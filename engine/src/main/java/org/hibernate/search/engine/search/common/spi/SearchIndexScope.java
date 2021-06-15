@@ -16,8 +16,10 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 /**
  * Information about indexes targeted by search,
  * be it in a projection, a predicate, a sort, ...
+ *
+ * @param <S> The self type, i.e. the exposed type of this scope.
  */
-public interface SearchIndexScope {
+public interface SearchIndexScope<S extends SearchIndexScope<?>> {
 
 	Set<String> hibernateSearchIndexNames();
 

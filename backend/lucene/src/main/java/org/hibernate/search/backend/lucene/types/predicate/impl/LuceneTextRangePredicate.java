@@ -36,7 +36,7 @@ public class LuceneTextRangePredicate extends AbstractLuceneLeafSingleFieldPredi
 		}
 
 		@Override
-		public Builder<F> create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
+		public Builder<F> create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			return new Builder<>( codec, scope, field );
 		}
 	}
@@ -46,7 +46,7 @@ public class LuceneTextRangePredicate extends AbstractLuceneLeafSingleFieldPredi
 
 		private Range<String> range;
 
-		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchIndexScope scope,
+		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			this.codec = codec;

@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexValueFieldContex
  * @param <F> The indexed field value type.
  */
 public interface ElasticsearchSearchIndexValueFieldContext<F>
-		extends SearchIndexValueFieldContext<ElasticsearchSearchIndexScope>,
+		extends SearchIndexValueFieldContext<ElasticsearchSearchIndexScope<?>>,
 				ElasticsearchSearchIndexNodeContext {
 
 	@Override

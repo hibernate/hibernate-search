@@ -52,7 +52,7 @@ public final class ElasticsearchSimpleQueryStringPredicateBuilderFieldState
 			AbstractElasticsearchValueFieldSearchQueryElementFactory<ElasticsearchSimpleQueryStringPredicateBuilderFieldState, String> {
 		@Override
 		public ElasticsearchSimpleQueryStringPredicateBuilderFieldState create(
-				ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<String> field) {
+				ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<String> field) {
 			return new ElasticsearchSimpleQueryStringPredicateBuilderFieldState( field );
 		}
 	}

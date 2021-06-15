@@ -46,7 +46,7 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 		}
 
 		@Override
-		public Builder<F> create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
+		public Builder<F> create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			return new Builder<>( codec, scope, field );
 		}
 	}
@@ -62,7 +62,7 @@ public class LuceneTextMatchPredicate extends AbstractLuceneLeafSingleFieldPredi
 
 		private Analyzer overrideAnalyzerOrNormalizer;
 
-		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
+		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			this.codec = codec;
 			this.analysisDefinitionRegistry = scope.analysisDefinitionRegistry();

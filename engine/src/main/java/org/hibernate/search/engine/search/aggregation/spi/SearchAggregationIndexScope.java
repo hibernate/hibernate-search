@@ -8,8 +8,8 @@ package org.hibernate.search.engine.search.aggregation.spi;
 
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 
-public interface SearchAggregationIndexScope
-		extends SearchIndexScope {
+public interface SearchAggregationIndexScope<S extends SearchAggregationIndexScope<?>>
+		extends SearchIndexScope<S> {
 
 	SearchAggregationBuilderFactory aggregationBuilders();
 

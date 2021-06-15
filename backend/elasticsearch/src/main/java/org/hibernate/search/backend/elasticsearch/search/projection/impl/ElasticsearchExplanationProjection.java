@@ -20,7 +20,7 @@ class ElasticsearchExplanationProjection extends AbstractElasticsearchProjection
 	private static final JsonAccessor<Boolean> REQUEST_EXPLAIN_ACCESSOR = JsonAccessor.root().property( "explain" ).asBoolean();
 	private static final JsonObjectAccessor HIT_EXPLANATION_ACCESSOR = JsonAccessor.root().property( "_explanation" ).asObject();
 
-	private ElasticsearchExplanationProjection(ElasticsearchSearchIndexScope scope) {
+	private ElasticsearchExplanationProjection(ElasticsearchSearchIndexScope<?> scope) {
 		super( scope );
 	}
 
@@ -51,7 +51,7 @@ class ElasticsearchExplanationProjection extends AbstractElasticsearchProjection
 
 		private final ElasticsearchExplanationProjection projection;
 
-		Builder(ElasticsearchSearchIndexScope scope) {
+		Builder(ElasticsearchSearchIndexScope<?> scope) {
 			super( scope );
 			this.projection = new ElasticsearchExplanationProjection( scope );
 		}

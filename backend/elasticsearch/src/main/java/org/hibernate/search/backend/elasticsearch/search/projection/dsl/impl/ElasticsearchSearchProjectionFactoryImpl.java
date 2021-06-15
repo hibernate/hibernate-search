@@ -20,10 +20,10 @@ public class ElasticsearchSearchProjectionFactoryImpl<R, E>
 		extends DelegatingSearchProjectionFactory<ElasticsearchSearchProjectionFactory<R, E>, R, E>
 		implements ElasticsearchSearchProjectionFactory<R, E> {
 
-	private final SearchProjectionDslContext<ElasticsearchSearchProjectionIndexScope> dslContext;
+	private final SearchProjectionDslContext<ElasticsearchSearchProjectionIndexScope<?>> dslContext;
 
 	public ElasticsearchSearchProjectionFactoryImpl(SearchProjectionFactory<R, E> delegate,
-			SearchProjectionDslContext<ElasticsearchSearchProjectionIndexScope> dslContext) {
+			SearchProjectionDslContext<ElasticsearchSearchProjectionIndexScope<?>> dslContext) {
 		super( delegate );
 		this.dslContext = dslContext;
 	}

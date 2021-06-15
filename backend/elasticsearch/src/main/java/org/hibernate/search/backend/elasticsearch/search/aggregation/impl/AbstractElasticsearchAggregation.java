@@ -26,9 +26,9 @@ public abstract class AbstractElasticsearchAggregation<A> implements Elasticsear
 
 	public abstract static class AbstractBuilder<A> implements SearchAggregationBuilder<A> {
 
-		protected final ElasticsearchSearchIndexScope scope;
+		protected final ElasticsearchSearchIndexScope<?> scope;
 
-		public AbstractBuilder(ElasticsearchSearchIndexScope scope) {
+		public AbstractBuilder(ElasticsearchSearchIndexScope<?> scope) {
 			this.scope = scope;
 		}
 

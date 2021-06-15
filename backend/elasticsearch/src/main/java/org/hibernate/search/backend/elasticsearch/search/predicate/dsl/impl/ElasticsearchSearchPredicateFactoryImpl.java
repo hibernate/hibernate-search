@@ -21,10 +21,10 @@ public class ElasticsearchSearchPredicateFactoryImpl
 		extends DelegatingSearchPredicateFactory<ElasticsearchSearchPredicateFactory>
 		implements ElasticsearchSearchPredicateFactory {
 
-	private final SearchPredicateDslContext<ElasticsearchSearchPredicateIndexScope> dslContext;
+	private final SearchPredicateDslContext<ElasticsearchSearchPredicateIndexScope<?>> dslContext;
 
 	public ElasticsearchSearchPredicateFactoryImpl(SearchPredicateFactory delegate,
-			SearchPredicateDslContext<ElasticsearchSearchPredicateIndexScope> dslContext) {
+			SearchPredicateDslContext<ElasticsearchSearchPredicateIndexScope<?>> dslContext) {
 		super( delegate );
 		this.dslContext = dslContext;
 	}

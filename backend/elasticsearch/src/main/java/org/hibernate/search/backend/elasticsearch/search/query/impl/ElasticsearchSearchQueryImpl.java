@@ -52,7 +52,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final ElasticsearchParallelWorkOrchestrator queryOrchestrator;
-	private final ElasticsearchSearchIndexScope scope;
+	private final ElasticsearchSearchIndexScope<?> scope;
 	private final BackendSessionContext sessionContext;
 	private final SearchLoadingContext<?, ?> loadingContext;
 	private final Set<String> routingKeys;
@@ -71,7 +71,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 	ElasticsearchSearchQueryImpl(ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchParallelWorkOrchestrator queryOrchestrator,
-			ElasticsearchSearchIndexScope scope,
+			ElasticsearchSearchIndexScope<?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContext<?, ?> loadingContext,
 			Set<String> routingKeys,

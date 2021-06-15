@@ -44,12 +44,13 @@ import com.google.gson.JsonObject;
 
 public final class ElasticsearchSearchIndexScopeImpl
 		extends AbstractSearchIndexScope<
-						ElasticsearchSearchIndexScope,
+						ElasticsearchSearchIndexScopeImpl,
 						ElasticsearchIndexModel,
 						ElasticsearchSearchIndexNodeContext,
 						ElasticsearchSearchIndexCompositeNodeContext
 				>
-		implements ElasticsearchSearchIndexScope, ElasticsearchSearchQueryIndexScope {
+		implements ElasticsearchSearchIndexScope<ElasticsearchSearchIndexScopeImpl>,
+				ElasticsearchSearchQueryIndexScope<ElasticsearchSearchIndexScopeImpl> {
 
 	// Backend context
 	private final SearchBackendContext backendContext;
@@ -104,7 +105,7 @@ public final class ElasticsearchSearchIndexScopeImpl
 	}
 
 	@Override
-	protected ElasticsearchSearchIndexScope self() {
+	protected ElasticsearchSearchIndexScopeImpl self() {
 		return this;
 	}
 

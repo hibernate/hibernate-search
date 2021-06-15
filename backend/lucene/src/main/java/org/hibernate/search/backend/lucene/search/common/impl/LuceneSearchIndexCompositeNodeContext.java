@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexCompositeNodeCon
  * For now this is only used in predicates.
  */
 public interface LuceneSearchIndexCompositeNodeContext
-		extends SearchIndexCompositeNodeContext<LuceneSearchIndexScope>,
+		extends SearchIndexCompositeNodeContext<LuceneSearchIndexScope<?>>,
 				LuceneSearchIndexNodeContext {
 
 	@Override

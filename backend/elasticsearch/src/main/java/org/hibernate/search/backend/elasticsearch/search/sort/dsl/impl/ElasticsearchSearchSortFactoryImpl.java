@@ -23,10 +23,10 @@ public class ElasticsearchSearchSortFactoryImpl
 		extends DelegatingSearchSortFactory<ElasticsearchSearchSortFactory, ElasticsearchSearchPredicateFactory>
 		implements ElasticsearchSearchSortFactory {
 
-	private final SearchSortDslContext<ElasticsearchSearchSortIndexScope, ElasticsearchSearchPredicateFactory> dslContext;
+	private final SearchSortDslContext<ElasticsearchSearchSortIndexScope<?>, ElasticsearchSearchPredicateFactory> dslContext;
 
 	public ElasticsearchSearchSortFactoryImpl(SearchSortFactory delegate,
-			SearchSortDslContext<ElasticsearchSearchSortIndexScope, ElasticsearchSearchPredicateFactory> dslContext) {
+			SearchSortDslContext<ElasticsearchSearchSortIndexScope<?>, ElasticsearchSearchPredicateFactory> dslContext) {
 		super( delegate, dslContext );
 		this.dslContext = dslContext;
 	}

@@ -61,7 +61,7 @@ public class ElasticsearchTextPhrasePredicate extends AbstractElasticsearchSingl
 	public static class Factory
 			extends AbstractElasticsearchValueFieldSearchQueryElementFactory<PhrasePredicateBuilder, String> {
 		@Override
-		public PhrasePredicateBuilder create(ElasticsearchSearchIndexScope scope,
+		public PhrasePredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<String> field) {
 			return new Builder( scope, field );
 		}
@@ -73,7 +73,7 @@ public class ElasticsearchTextPhrasePredicate extends AbstractElasticsearchSingl
 		private JsonElement phrase;
 		private String analyzer;
 
-		private Builder(ElasticsearchSearchIndexScope scope,
+		private Builder(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<String> field) {
 			super( scope, field );
 			this.field = field;

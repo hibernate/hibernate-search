@@ -21,10 +21,10 @@ public class LuceneSearchPredicateFactoryImpl
 		extends DelegatingSearchPredicateFactory<LuceneSearchPredicateFactory>
 		implements LuceneSearchPredicateFactory {
 
-	private final SearchPredicateDslContext<LuceneSearchPredicateIndexScope> dslContext;
+	private final SearchPredicateDslContext<LuceneSearchPredicateIndexScope<?>> dslContext;
 
 	public LuceneSearchPredicateFactoryImpl(SearchPredicateFactory delegate,
-			SearchPredicateDslContext<LuceneSearchPredicateIndexScope> dslContext) {
+			SearchPredicateDslContext<LuceneSearchPredicateIndexScope<?>> dslContext) {
 		super( delegate );
 		this.dslContext = dslContext;
 	}

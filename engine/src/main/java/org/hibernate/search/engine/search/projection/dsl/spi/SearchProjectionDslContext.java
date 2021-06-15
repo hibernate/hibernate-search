@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionIndexSc
  *
  * @param <SC> The type of the backend-specific search scope.
  */
-public interface SearchProjectionDslContext<SC extends SearchProjectionIndexScope> {
+public interface SearchProjectionDslContext<SC extends SearchProjectionIndexScope<?>> {
 
 	/**
 	 * @return The search scope. Will always return the exact same instance for a given DSL context.

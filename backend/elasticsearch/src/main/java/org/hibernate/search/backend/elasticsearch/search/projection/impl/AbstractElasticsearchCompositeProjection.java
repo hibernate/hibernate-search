@@ -21,7 +21,7 @@ abstract class AbstractElasticsearchCompositeProjection<P>
 
 	private final ElasticsearchSearchProjection<?, ?>[] children;
 
-	AbstractElasticsearchCompositeProjection(ElasticsearchSearchIndexScope scope,
+	AbstractElasticsearchCompositeProjection(ElasticsearchSearchIndexScope<?> scope,
 			ElasticsearchSearchProjection<?, ?> ... children) {
 		super( scope );
 		this.children = children;

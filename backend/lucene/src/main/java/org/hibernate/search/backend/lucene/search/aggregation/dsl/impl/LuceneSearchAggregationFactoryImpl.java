@@ -18,7 +18,7 @@ public class LuceneSearchAggregationFactoryImpl
 		implements LuceneSearchAggregationFactory {
 
 	public LuceneSearchAggregationFactoryImpl(SearchAggregationFactory delegate,
-			SearchAggregationDslContext<LuceneSearchAggregationIndexScope, LuceneSearchPredicateFactory> dslContext) {
+			SearchAggregationDslContext<LuceneSearchAggregationIndexScope<?>, LuceneSearchPredicateFactory> dslContext) {
 		super( delegate, dslContext );
 	}
 

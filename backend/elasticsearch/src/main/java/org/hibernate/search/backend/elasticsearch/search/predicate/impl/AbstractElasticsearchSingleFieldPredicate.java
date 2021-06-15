@@ -37,11 +37,11 @@ public abstract class AbstractElasticsearchSingleFieldPredicate extends Abstract
 		protected final String absoluteFieldPath;
 		private final List<String> nestedPathHierarchy;
 
-		protected AbstractBuilder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexNodeContext node) {
+		protected AbstractBuilder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexNodeContext node) {
 			this( scope, node.absolutePath(), node.nestedPathHierarchy() );
 		}
 
-		protected AbstractBuilder(ElasticsearchSearchIndexScope scope, String absoluteFieldPath,
+		protected AbstractBuilder(ElasticsearchSearchIndexScope<?> scope, String absoluteFieldPath,
 				List<String> nestedPathHierarchy) {
 			super( scope );
 			this.absoluteFieldPath = absoluteFieldPath;

@@ -64,7 +64,7 @@ public class ElasticsearchGeoPointSpatialWithinCirclePredicate extends AbstractE
 		}
 
 		@Override
-		public Builder create(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
+		public Builder create(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
 			return new Builder( codec, scope, field );
 		}
 	}
@@ -75,7 +75,7 @@ public class ElasticsearchGeoPointSpatialWithinCirclePredicate extends AbstractE
 		private double distanceInMeters;
 		private JsonElement center;
 
-		private Builder(ElasticsearchFieldCodec<GeoPoint> codec, ElasticsearchSearchIndexScope scope,
+		private Builder(ElasticsearchFieldCodec<GeoPoint> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
 			super( scope, field );
 			this.codec = codec;

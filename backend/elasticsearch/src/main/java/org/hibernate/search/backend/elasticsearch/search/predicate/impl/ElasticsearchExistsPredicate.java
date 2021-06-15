@@ -40,7 +40,7 @@ public class ElasticsearchExistsPredicate extends AbstractElasticsearchSingleFie
 	public static class Factory<F>
 			extends AbstractElasticsearchValueFieldSearchQueryElementFactory<ExistsPredicateBuilder, F> {
 		@Override
-		public ExistsPredicateBuilder create(ElasticsearchSearchIndexScope scope,
+		public ExistsPredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			return new Builder( scope, field );
 		}
@@ -49,14 +49,14 @@ public class ElasticsearchExistsPredicate extends AbstractElasticsearchSingleFie
 	public static class ObjectFieldFactory
 			extends AbstractElasticsearchCompositeNodeSearchQueryElementFactory<ExistsPredicateBuilder> {
 		@Override
-		public ExistsPredicateBuilder create(ElasticsearchSearchIndexScope scope,
+		public ExistsPredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexCompositeNodeContext node) {
 			return new Builder( scope, node );
 		}
 	}
 
 	private static class Builder extends AbstractBuilder implements ExistsPredicateBuilder {
-		Builder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexNodeContext node) {
+		Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexNodeContext node) {
 			super( scope, node );
 		}
 

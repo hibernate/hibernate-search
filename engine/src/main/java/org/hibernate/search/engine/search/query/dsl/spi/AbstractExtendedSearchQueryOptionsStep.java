@@ -29,7 +29,7 @@ public abstract class AbstractExtendedSearchQueryOptionsStep<
 		>
 		extends AbstractSearchQueryOptionsStep<S, H, LOS, PDF, SF, AF> {
 
-	public AbstractExtendedSearchQueryOptionsStep(SearchQueryIndexScope scope,
+	public AbstractExtendedSearchQueryOptionsStep(SearchQueryIndexScope<?> scope,
 			SearchQueryBuilder<H> searchQueryBuilder,
 			SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
 		super( scope, searchQueryBuilder, loadingContextBuilder );

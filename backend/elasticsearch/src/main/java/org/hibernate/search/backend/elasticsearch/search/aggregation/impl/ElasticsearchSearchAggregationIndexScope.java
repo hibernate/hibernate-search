@@ -8,8 +8,8 @@ package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationIndexScope;
 
-public interface ElasticsearchSearchAggregationIndexScope
-		extends SearchAggregationIndexScope {
+public interface ElasticsearchSearchAggregationIndexScope<S extends ElasticsearchSearchAggregationIndexScope<?>>
+		extends SearchAggregationIndexScope<S> {
 
 	@Override
 	ElasticsearchSearchAggregationBuilderFactory aggregationBuilders();

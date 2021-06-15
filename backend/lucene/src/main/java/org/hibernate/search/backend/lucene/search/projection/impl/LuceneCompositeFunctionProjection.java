@@ -15,7 +15,7 @@ class LuceneCompositeFunctionProjection<P1, P>
 
 	private final Function<P1, P> transformer;
 
-	LuceneCompositeFunctionProjection(LuceneSearchIndexScope scope, Function<P1, P> transformer,
+	LuceneCompositeFunctionProjection(LuceneSearchIndexScope<?> scope, Function<P1, P> transformer,
 			LuceneSearchProjection<?, P1> projection) {
 		super( scope, projection );
 		this.transformer = transformer;

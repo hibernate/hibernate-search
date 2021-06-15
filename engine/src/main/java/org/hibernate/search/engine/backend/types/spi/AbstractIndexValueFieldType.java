@@ -25,7 +25,7 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexValueFieldContex
 import org.hibernate.search.engine.search.common.spi.SearchIndexValueFieldTypeContext;
 
 public abstract class AbstractIndexValueFieldType<
-				SC extends SearchIndexScope,
+				SC extends SearchIndexScope<?>,
 				N extends SearchIndexValueFieldContext<SC>,
 				F
 		>
@@ -152,7 +152,7 @@ public abstract class AbstractIndexValueFieldType<
 	}
 
 	public abstract static class Builder<
-					SC extends SearchIndexScope,
+					SC extends SearchIndexScope<?>,
 					N extends SearchIndexValueFieldContext<SC>,
 					F
 			> {

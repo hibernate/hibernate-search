@@ -18,7 +18,7 @@ class ElasticsearchUserProvidedJsonPredicate implements ElasticsearchSearchPredi
 	private final Set<String> indexNames;
 	private final JsonObject json;
 
-	ElasticsearchUserProvidedJsonPredicate(ElasticsearchSearchIndexScope scope,
+	ElasticsearchUserProvidedJsonPredicate(ElasticsearchSearchIndexScope<?> scope,
 			JsonObject json) {
 		indexNames = scope.hibernateSearchIndexNames();
 		this.json = json;

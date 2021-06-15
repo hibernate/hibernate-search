@@ -10,7 +10,8 @@ import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDef
 import org.hibernate.search.engine.search.common.spi.SearchIndexCompositeNodeContext;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 
-public interface LuceneSearchIndexScope extends SearchIndexScope {
+public interface LuceneSearchIndexScope<S extends LuceneSearchIndexScope<?>>
+		extends SearchIndexScope<S> {
 
 	@Override
 	LuceneSearchIndexNodeContext child(SearchIndexCompositeNodeContext<?> parent, String name);

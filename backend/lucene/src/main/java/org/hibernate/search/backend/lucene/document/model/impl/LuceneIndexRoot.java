@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementCon
 public final class LuceneIndexRoot
 		extends AbstractIndexRoot<
 						LuceneIndexRoot,
-						LuceneSearchIndexScope,
+						LuceneSearchIndexScope<?>,
 						LuceneIndexCompositeNodeType,
 						LuceneIndexField
 				>

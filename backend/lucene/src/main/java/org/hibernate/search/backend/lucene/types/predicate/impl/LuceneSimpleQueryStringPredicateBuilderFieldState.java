@@ -38,7 +38,7 @@ public final class LuceneSimpleQueryStringPredicateBuilderFieldState
 			extends
 			AbstractLuceneValueFieldSearchQueryElementFactory<LuceneSimpleQueryStringPredicateBuilderFieldState, String> {
 		@Override
-		public LuceneSimpleQueryStringPredicateBuilderFieldState create(LuceneSearchIndexScope scope,
+		public LuceneSimpleQueryStringPredicateBuilderFieldState create(LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<String> field) {
 			return new LuceneSimpleQueryStringPredicateBuilderFieldState( field );
 		}

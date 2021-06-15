@@ -118,12 +118,12 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	@Override
 	public Optional<ElasticsearchSearchQuerySelectStep<R, E, LOS>> extendOptional(
 			SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
-			SearchQueryIndexScope scope,
+			SearchQueryIndexScope<?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		if ( scope instanceof ElasticsearchSearchQueryIndexScope ) {
 			return Optional.of( new ElasticsearchSearchQuerySelectStepImpl<>(
-					(ElasticsearchSearchQueryIndexScope) scope, sessionContext, loadingContextBuilder
+					(ElasticsearchSearchQueryIndexScope<?>) scope, sessionContext, loadingContextBuilder
 			) );
 		}
 		else {
@@ -155,7 +155,7 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 		if ( dslContext.scope() instanceof ElasticsearchSearchPredicateIndexScope ) {
 			return Optional.of( new ElasticsearchSearchPredicateFactoryImpl(
 					original,
-					(SearchPredicateDslContext<ElasticsearchSearchPredicateIndexScope>) dslContext
+					(SearchPredicateDslContext<ElasticsearchSearchPredicateIndexScope<?>>) dslContext
 			) );
 		}
 		else {
@@ -173,7 +173,7 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 		if ( dslContext.scope() instanceof ElasticsearchSearchSortIndexScope ) {
 			return Optional.of( new ElasticsearchSearchSortFactoryImpl(
 					original,
-					((SearchSortDslContext<ElasticsearchSearchSortIndexScope, ?>) dslContext)
+					((SearchSortDslContext<ElasticsearchSearchSortIndexScope<?>, ?>) dslContext)
 							.withExtendedPredicateFactory( this )
 			) );
 		}
@@ -192,7 +192,7 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 		if ( dslContext.scope() instanceof ElasticsearchSearchProjectionIndexScope ) {
 			return Optional.of( new ElasticsearchSearchProjectionFactoryImpl<>(
 					original,
-					(SearchProjectionDslContext<ElasticsearchSearchProjectionIndexScope>) dslContext
+					(SearchProjectionDslContext<ElasticsearchSearchProjectionIndexScope<?>>) dslContext
 			) );
 		}
 		else {
@@ -210,7 +210,7 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 		if ( dslContext.scope() instanceof ElasticsearchSearchAggregationIndexScope ) {
 			return Optional.of( new ElasticsearchSearchAggregationFactoryImpl(
 					original,
-					((SearchAggregationDslContext<ElasticsearchSearchAggregationIndexScope, ?>) dslContext)
+					((SearchAggregationDslContext<ElasticsearchSearchAggregationIndexScope<?>, ?>) dslContext)
 							.withExtendedPredicateFactory( this )
 			) );
 		}

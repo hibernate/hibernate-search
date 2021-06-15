@@ -86,7 +86,7 @@ public class ElasticsearchMatchIdPredicate extends AbstractElasticsearchPredicat
 
 		private List<String> values = new ArrayList<>();
 
-		Builder(ElasticsearchSearchIndexScope scope) {
+		Builder(ElasticsearchSearchIndexScope<?> scope) {
 			super( scope );
 		}
 
