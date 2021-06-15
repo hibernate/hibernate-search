@@ -42,6 +42,6 @@ public class ElasticsearchSearchAggregationFactoryImpl
 		);
 	}
 
-	// TODO HSEARCH-3661/HSEARCH-3662 implement extensions to the aggregation DSL for Elasticsearch
+	// TODO HSEARCH-3661 implement extensions to the aggregation DSL for Elasticsearch
 
 }
