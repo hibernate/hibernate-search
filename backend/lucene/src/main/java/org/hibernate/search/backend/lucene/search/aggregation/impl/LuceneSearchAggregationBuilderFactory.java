@@ -12,9 +12,9 @@ import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuild
 public class LuceneSearchAggregationBuilderFactory
 		implements SearchAggregationBuilderFactory {
 
-	private final LuceneSearchIndexScope scope;
+	private final LuceneSearchIndexScope<?> scope;
 
-	public LuceneSearchAggregationBuilderFactory(LuceneSearchIndexScope scope) {
+	public LuceneSearchAggregationBuilderFactory(LuceneSearchIndexScope<?> scope) {
 		this.scope = scope;
 	}
 

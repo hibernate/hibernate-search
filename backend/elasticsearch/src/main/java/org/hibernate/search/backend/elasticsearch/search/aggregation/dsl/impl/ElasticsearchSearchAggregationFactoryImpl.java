@@ -20,10 +20,10 @@ public class ElasticsearchSearchAggregationFactoryImpl
 		extends DelegatingSearchAggregationFactory<ElasticsearchSearchAggregationFactory, ElasticsearchSearchPredicateFactory>
 		implements ElasticsearchSearchAggregationFactory {
 
-	private final SearchAggregationDslContext<ElasticsearchSearchAggregationIndexScope, ElasticsearchSearchPredicateFactory> dslContext;
+	private final SearchAggregationDslContext<ElasticsearchSearchAggregationIndexScope<?>, ElasticsearchSearchPredicateFactory> dslContext;
 
 	public ElasticsearchSearchAggregationFactoryImpl(SearchAggregationFactory delegate,
-			SearchAggregationDslContext<ElasticsearchSearchAggregationIndexScope, ElasticsearchSearchPredicateFactory> dslContext) {
+			SearchAggregationDslContext<ElasticsearchSearchAggregationIndexScope<?>, ElasticsearchSearchPredicateFactory> dslContext) {
 		super( delegate, dslContext );
 		this.dslContext = dslContext;
 	}

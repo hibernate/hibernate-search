@@ -21,7 +21,7 @@ public abstract class AbstractLuceneReversibleSort extends AbstractLuceneSort {
 	public abstract static class AbstractBuilder extends AbstractLuceneSort.AbstractBuilder {
 		protected SortOrder order;
 
-		protected AbstractBuilder(LuceneSearchIndexScope scope) {
+		protected AbstractBuilder(LuceneSearchIndexScope<?> scope) {
 			super( scope );
 		}
 

@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementCon
 public final class ElasticsearchIndexObjectField
 		extends AbstractIndexObjectField<
 						ElasticsearchIndexObjectField,
-						ElasticsearchSearchIndexScope,
+						ElasticsearchSearchIndexScope<?>,
 						ElasticsearchIndexCompositeNodeType,
 						ElasticsearchIndexCompositeNode,
 						ElasticsearchIndexField

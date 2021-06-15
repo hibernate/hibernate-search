@@ -69,7 +69,7 @@ public class LuceneObjectExistsPredicate extends AbstractLuceneSingleFieldPredic
 		}
 
 		@Override
-		public ExistsPredicateBuilder create(LuceneSearchIndexScope scope, LuceneSearchIndexCompositeNodeContext node) {
+		public ExistsPredicateBuilder create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexCompositeNodeContext node) {
 			Builder builder = new Builder( scope, node );
 			for ( LuceneSearchIndexNodeContext child : node.staticChildrenByName().values() ) {
 				builder.addChild( child );
@@ -81,7 +81,7 @@ public class LuceneObjectExistsPredicate extends AbstractLuceneSingleFieldPredic
 	private static class Builder extends AbstractBuilder implements ExistsPredicateBuilder {
 		private List<LuceneSearchPredicate> children = new ArrayList<>();
 
-		public Builder(LuceneSearchIndexScope scope, LuceneSearchIndexCompositeNodeContext node) {
+		public Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexCompositeNodeContext node) {
 			super( scope, node );
 		}
 

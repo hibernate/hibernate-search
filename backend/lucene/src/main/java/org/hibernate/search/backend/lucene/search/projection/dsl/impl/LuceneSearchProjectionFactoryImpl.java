@@ -21,10 +21,10 @@ public class LuceneSearchProjectionFactoryImpl<R, E>
 		extends DelegatingSearchProjectionFactory<LuceneSearchProjectionFactory<R, E>, R, E>
 		implements LuceneSearchProjectionFactory<R, E> {
 
-	private final SearchProjectionDslContext<LuceneSearchProjectionIndexScope> dslContext;
+	private final SearchProjectionDslContext<LuceneSearchProjectionIndexScope<?>> dslContext;
 
 	public LuceneSearchProjectionFactoryImpl(SearchProjectionFactory<R, E> delegate,
-			SearchProjectionDslContext<LuceneSearchProjectionIndexScope> dslContext) {
+			SearchProjectionDslContext<LuceneSearchProjectionIndexScope<?>> dslContext) {
 		super( delegate );
 		this.dslContext = dslContext;
 	}

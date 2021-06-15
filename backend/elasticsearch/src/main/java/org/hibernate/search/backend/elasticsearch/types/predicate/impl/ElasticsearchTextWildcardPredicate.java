@@ -48,7 +48,7 @@ public class ElasticsearchTextWildcardPredicate extends AbstractElasticsearchSin
 	public static class Factory
 			extends AbstractElasticsearchValueFieldSearchQueryElementFactory<WildcardPredicateBuilder, String> {
 		@Override
-		public WildcardPredicateBuilder create(ElasticsearchSearchIndexScope scope,
+		public WildcardPredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<String> field) {
 			return new Builder( scope, field );
 		}
@@ -57,7 +57,7 @@ public class ElasticsearchTextWildcardPredicate extends AbstractElasticsearchSin
 	private static class Builder extends AbstractBuilder implements WildcardPredicateBuilder {
 		private JsonPrimitive pattern;
 
-		private Builder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<String> field) {
+		private Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<String> field) {
 			super( scope, field );
 		}
 

@@ -93,18 +93,18 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		}
 
 		@Override
-		public TypeSelector<?> create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
+		public TypeSelector<?> create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			return new TypeSelector<>( codec, scope, field );
 		}
 	}
 
 	public static class TypeSelector<F> implements RangeAggregationBuilder.TypeSelector {
 		private final AbstractLuceneNumericFieldCodec<F, ?> codec;
-		private final LuceneSearchIndexScope scope;
+		private final LuceneSearchIndexScope<?> scope;
 		private final LuceneSearchIndexValueFieldContext<F> field;
 
 		private TypeSelector(AbstractLuceneNumericFieldCodec<F, ?> codec,
-				LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
+				LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			this.codec = codec;
 			this.scope = scope;
 			this.field = field;
@@ -128,7 +128,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		private final List<Range<E>> encodedRangesInOrder = new ArrayList<>();
 
 		public Builder(AbstractLuceneNumericFieldCodec<F, E> codec,
-				LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<?> field,
+				LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<?> field,
 				DslConverter<? super K, F> toFieldValueConverter) {
 			super( scope, field );
 			this.codec = codec;

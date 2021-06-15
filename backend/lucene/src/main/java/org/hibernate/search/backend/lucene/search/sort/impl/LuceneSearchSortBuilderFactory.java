@@ -18,9 +18,9 @@ import org.apache.lucene.search.SortField;
 
 public class LuceneSearchSortBuilderFactory implements SearchSortBuilderFactory {
 
-	private final LuceneSearchIndexScope scope;
+	private final LuceneSearchIndexScope<?> scope;
 
-	public LuceneSearchSortBuilderFactory(LuceneSearchIndexScope scope) {
+	public LuceneSearchSortBuilderFactory(LuceneSearchIndexScope<?> scope) {
 		this.scope = scope;
 	}
 

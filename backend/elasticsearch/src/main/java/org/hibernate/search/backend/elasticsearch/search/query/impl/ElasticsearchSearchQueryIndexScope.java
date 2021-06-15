@@ -15,10 +15,10 @@ import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilde
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 
-public interface ElasticsearchSearchQueryIndexScope
-		extends SearchQueryIndexScope,
-				ElasticsearchSearchPredicateIndexScope, ElasticsearchSearchSortIndexScope,
-				ElasticsearchSearchProjectionIndexScope, ElasticsearchSearchAggregationIndexScope {
+public interface ElasticsearchSearchQueryIndexScope<S extends ElasticsearchSearchQueryIndexScope<?>>
+		extends SearchQueryIndexScope<S>,
+				ElasticsearchSearchPredicateIndexScope<S>, ElasticsearchSearchSortIndexScope<S>,
+				ElasticsearchSearchProjectionIndexScope<S>, ElasticsearchSearchAggregationIndexScope<S> {
 
 	@Override
 	<P> ElasticsearchSearchQueryBuilder<P> select(BackendSessionContext sessionContext,

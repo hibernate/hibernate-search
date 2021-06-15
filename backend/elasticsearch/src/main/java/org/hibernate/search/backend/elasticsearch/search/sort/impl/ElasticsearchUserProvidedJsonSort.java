@@ -15,7 +15,7 @@ class ElasticsearchUserProvidedJsonSort extends AbstractElasticsearchSort {
 
 	private final JsonObject json;
 
-	ElasticsearchUserProvidedJsonSort(ElasticsearchSearchIndexScope scope, JsonObject json) {
+	ElasticsearchUserProvidedJsonSort(ElasticsearchSearchIndexScope<?> scope, JsonObject json) {
 		super( scope );
 		this.json = json;
 	}

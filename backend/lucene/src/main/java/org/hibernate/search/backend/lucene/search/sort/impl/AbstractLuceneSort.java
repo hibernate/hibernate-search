@@ -19,7 +19,7 @@ public abstract class AbstractLuceneSort implements LuceneSearchSort {
 		this( builder.scope );
 	}
 
-	protected AbstractLuceneSort(LuceneSearchIndexScope scope) {
+	protected AbstractLuceneSort(LuceneSearchIndexScope<?> scope) {
 		indexNames = scope.hibernateSearchIndexNames();
 	}
 
@@ -29,9 +29,9 @@ public abstract class AbstractLuceneSort implements LuceneSearchSort {
 	}
 
 	public abstract static class AbstractBuilder implements SearchSortBuilder {
-		protected final LuceneSearchIndexScope scope;
+		protected final LuceneSearchIndexScope<?> scope;
 
-		protected AbstractBuilder(LuceneSearchIndexScope scope) {
+		protected AbstractBuilder(LuceneSearchIndexScope<?> scope) {
 			this.scope = scope;
 		}
 	}

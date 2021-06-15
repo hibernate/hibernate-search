@@ -37,11 +37,11 @@ public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 				>
 		implements ElasticsearchSearchQuerySelectStep<R, E, LOS> {
 
-	private final ElasticsearchSearchQueryIndexScope scope;
+	private final ElasticsearchSearchQueryIndexScope<?> scope;
 	private final BackendSessionContext sessionContext;
 	private final SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder;
 
-	public ElasticsearchSearchQuerySelectStepImpl(ElasticsearchSearchQueryIndexScope scope,
+	public ElasticsearchSearchQuerySelectStepImpl(ElasticsearchSearchQueryIndexScope<?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		this.scope = scope;
@@ -92,7 +92,7 @@ public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 	}
 
 	@Override
-	protected SearchQueryIndexScope scope() {
+	protected SearchQueryIndexScope<?> scope() {
 		return scope;
 	}
 

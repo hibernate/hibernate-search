@@ -11,7 +11,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexS
 import org.hibernate.search.engine.backend.document.model.spi.IndexNode;
 
 public interface LuceneIndexNode
-		extends IndexNode<LuceneSearchIndexScope>, LuceneSearchIndexNodeContext {
+		extends IndexNode<LuceneSearchIndexScope<?>>, LuceneSearchIndexNodeContext {
 
 	@Override
 	LuceneIndexCompositeNode toComposite();

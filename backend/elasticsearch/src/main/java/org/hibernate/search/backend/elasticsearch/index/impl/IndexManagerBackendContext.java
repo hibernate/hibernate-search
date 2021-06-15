@@ -139,7 +139,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	}
 
 	@Override
-	public ElasticsearchSearchQueryIndexScope createSearchContext(BackendMappingContext mappingContext,
+	public ElasticsearchSearchQueryIndexScope<?> createSearchContext(BackendMappingContext mappingContext,
 			Set<ElasticsearchIndexModel> indexModels) {
 		return new ElasticsearchSearchIndexScopeImpl(
 				mappingContext,
@@ -153,7 +153,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 
 	@Override
 	public <H> ElasticsearchSearchQueryBuilder<H> createSearchQueryBuilder(
-			ElasticsearchSearchIndexScope scope,
+			ElasticsearchSearchIndexScope<?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<?, H> rootProjection) {

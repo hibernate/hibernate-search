@@ -20,7 +20,7 @@ class ElasticsearchDocumentReferenceProjection
 
 	private final DocumentReferenceExtractionHelper helper;
 
-	private ElasticsearchDocumentReferenceProjection(ElasticsearchSearchIndexScope scope,
+	private ElasticsearchDocumentReferenceProjection(ElasticsearchSearchIndexScope<?> scope,
 			DocumentReferenceExtractionHelper helper) {
 		super( scope );
 		this.helper = helper;
@@ -53,7 +53,7 @@ class ElasticsearchDocumentReferenceProjection
 
 		private final ElasticsearchDocumentReferenceProjection projection;
 
-		Builder(ElasticsearchSearchIndexScope scope, DocumentReferenceExtractionHelper helper) {
+		Builder(ElasticsearchSearchIndexScope<?> scope, DocumentReferenceExtractionHelper helper) {
 			super( scope );
 			this.projection = new ElasticsearchDocumentReferenceProjection( scope, helper );
 		}

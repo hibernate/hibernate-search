@@ -31,7 +31,7 @@ class LuceneMatchAllPredicate extends AbstractLuceneSearchPredicate {
 	}
 
 	static class Builder extends AbstractBuilder implements MatchAllPredicateBuilder {
-		Builder(LuceneSearchIndexScope scope) {
+		Builder(LuceneSearchIndexScope<?> scope) {
 			super( scope );
 		}
 

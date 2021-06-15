@@ -146,7 +146,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	}
 
 	@Override
-	public LuceneSearchQueryIndexScope createSearchContext(BackendMappingContext mappingContext,
+	public LuceneSearchQueryIndexScope<?> createSearchContext(BackendMappingContext mappingContext,
 			Set<? extends LuceneScopeIndexManagerContext> indexManagerContexts) {
 		return new LuceneSearchIndexScopeImpl( mappingContext, this, analysisDefinitionRegistry,
 				multiTenancyStrategy, timingSource, indexManagerContexts );
@@ -154,7 +154,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 
 	@Override
 	public <H> LuceneSearchQueryBuilder<H> createSearchQueryBuilder(
-			LuceneSearchQueryIndexScope scope,
+			LuceneSearchQueryIndexScope<?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			LuceneSearchProjection<?, H> rootProjection) {

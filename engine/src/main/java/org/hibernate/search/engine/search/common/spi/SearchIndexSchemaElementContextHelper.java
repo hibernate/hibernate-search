@@ -73,7 +73,7 @@ public abstract class SearchIndexSchemaElementContextHelper {
 		}
 	};
 
-	public <T, SC extends SearchIndexScope, N extends SearchIndexNodeContext<SC>>
+	public <T, SC extends SearchIndexScope<?>, N extends SearchIndexNodeContext<SC>>
 			T queryElement(SearchQueryElementTypeKey<T> key,
 					SearchQueryElementFactory<? extends T, ? super SC, ? super N> factory, SC scope, N node) {
 		if ( factory == null ) {

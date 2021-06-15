@@ -22,7 +22,7 @@ import org.hibernate.search.util.common.reporting.EventContext;
 public final class LuceneIndexValueField<F>
 		extends AbstractIndexValueField<
 						LuceneIndexValueField<F>,
-						LuceneSearchIndexScope,
+						LuceneSearchIndexScope<?>,
 						LuceneIndexValueFieldType<F>,
 						LuceneIndexCompositeNode,
 						F

@@ -99,13 +99,13 @@ public class LuceneTextTermsAggregation<K>
 	public static class Factory
 			extends AbstractLuceneValueFieldSearchQueryElementFactory<TermsAggregationBuilder.TypeSelector, String> {
 		@Override
-		public TypeSelector create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<String> field) {
+		public TypeSelector create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<String> field) {
 			return new TypeSelector( scope, field );
 		}
 	}
 
 	private static class TypeSelector extends AbstractTypeSelector<String> {
-		private TypeSelector(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<String> field) {
+		private TypeSelector(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<String> field) {
 			super( scope, field );
 		}
 
@@ -119,7 +119,7 @@ public class LuceneTextTermsAggregation<K>
 	private static class Builder<K>
 			extends AbstractBuilder<String, String, K> {
 
-		private Builder(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<String> field,
+		private Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<String> field,
 				ProjectionConverter<String, ? extends K> fromFieldValueConverter) {
 			super( scope, field, fromFieldValueConverter );
 		}

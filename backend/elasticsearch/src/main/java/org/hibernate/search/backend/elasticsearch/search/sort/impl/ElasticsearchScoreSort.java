@@ -36,7 +36,7 @@ class ElasticsearchScoreSort extends AbstractElasticsearchReversibleSort {
 
 	static class Builder extends AbstractBuilder implements ScoreSortBuilder {
 
-		Builder(ElasticsearchSearchIndexScope scope) {
+		Builder(ElasticsearchSearchIndexScope<?> scope) {
 			super( scope );
 		}
 

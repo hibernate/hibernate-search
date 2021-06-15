@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
 
 public abstract class AbstractMultiIndexSearchIndexValueFieldContext<
 				S extends SearchIndexValueFieldContext<SC>,
-				SC extends SearchIndexScope,
+				SC extends SearchIndexScope<?>,
 				FT extends SearchIndexValueFieldTypeContext<SC, S, F>,
 				F
 		>

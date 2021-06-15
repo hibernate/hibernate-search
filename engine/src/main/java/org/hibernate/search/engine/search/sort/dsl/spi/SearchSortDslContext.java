@@ -23,7 +23,7 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortIndexScope;
  * @param <SC> The type of the backend-specific search scope.
  * @param <PDF> The type of factory used to create predicates in {@link FieldSortOptionsStep#filter(Function)}.
  */
-public interface SearchSortDslContext<SC extends SearchSortIndexScope, PDF extends SearchPredicateFactory> {
+public interface SearchSortDslContext<SC extends SearchSortIndexScope<?>, PDF extends SearchPredicateFactory> {
 
 	/**
 	 * @return The search scope.

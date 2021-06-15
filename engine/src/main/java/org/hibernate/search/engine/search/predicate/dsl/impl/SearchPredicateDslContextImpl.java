@@ -20,10 +20,10 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
  * or when calling {@link SearchQueryOptionsStep#sort(Function)} to build the sort using a lambda
  * (in which case the lambda may retrieve the resulting {@link SearchPredicate} object and cache it).
  */
-public final class SearchPredicateDslContextImpl<SC extends SearchPredicateIndexScope>
+public final class SearchPredicateDslContextImpl<SC extends SearchPredicateIndexScope<?>>
 		implements SearchPredicateDslContext<SC> {
 
-	public static <SC extends SearchPredicateIndexScope> SearchPredicateDslContext<?> root(SC scope) {
+	public static <SC extends SearchPredicateIndexScope<?>> SearchPredicateDslContext<?> root(SC scope) {
 		return new SearchPredicateDslContextImpl<>( scope );
 	}
 

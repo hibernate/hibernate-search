@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 
 public class LuceneIndexCompositeNodeType
 		extends AbstractIndexCompositeNodeType<
-						LuceneSearchIndexScope, LuceneSearchIndexCompositeNodeContext
+						LuceneSearchIndexScope<?>, LuceneSearchIndexCompositeNodeContext
 				>
 		implements LuceneSearchIndexCompositeNodeTypeContext {
 
@@ -27,7 +27,7 @@ public class LuceneIndexCompositeNodeType
 
 	public static class Builder
 			extends AbstractIndexCompositeNodeType.Builder<
-							LuceneSearchIndexScope, LuceneSearchIndexCompositeNodeContext
+							LuceneSearchIndexScope<?>, LuceneSearchIndexCompositeNodeContext
 					> {
 		public Builder(ObjectStructure objectStructure) {
 			super( objectStructure );

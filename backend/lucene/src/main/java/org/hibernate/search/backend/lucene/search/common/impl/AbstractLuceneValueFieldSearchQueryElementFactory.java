@@ -13,12 +13,12 @@ import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public abstract class AbstractLuceneValueFieldSearchQueryElementFactory<T, F>
-		implements SearchQueryElementFactory<T, LuceneSearchIndexScope, LuceneSearchIndexValueFieldContext<F>> {
+		implements SearchQueryElementFactory<T, LuceneSearchIndexScope<?>, LuceneSearchIndexValueFieldContext<F>> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
-	public abstract T create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field);
+	public abstract T create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field);
 
 	@Override
 	public void checkCompatibleWith(SearchQueryElementFactory<?, ?, ?> other) {

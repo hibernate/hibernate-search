@@ -17,9 +17,9 @@ import com.google.gson.JsonObject;
 
 public class ElasticsearchSearchPredicateBuilderFactory implements SearchPredicateBuilderFactory {
 
-	private final ElasticsearchSearchIndexScope scope;
+	private final ElasticsearchSearchIndexScope<?> scope;
 
-	public ElasticsearchSearchPredicateBuilderFactory(ElasticsearchSearchIndexScope scope) {
+	public ElasticsearchSearchPredicateBuilderFactory(ElasticsearchSearchIndexScope<?> scope) {
 		this.scope = scope;
 	}
 

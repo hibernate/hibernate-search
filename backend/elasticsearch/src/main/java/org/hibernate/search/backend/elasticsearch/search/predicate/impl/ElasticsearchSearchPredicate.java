@@ -26,7 +26,7 @@ public interface ElasticsearchSearchPredicate extends SearchPredicate {
 
 	JsonObject toJsonQuery(PredicateRequestContext context);
 
-	static ElasticsearchSearchPredicate from(ElasticsearchSearchIndexScope scope, SearchPredicate predicate) {
+	static ElasticsearchSearchPredicate from(ElasticsearchSearchIndexScope<?> scope, SearchPredicate predicate) {
 		if ( !( predicate instanceof ElasticsearchSearchPredicate ) ) {
 			throw log.cannotMixElasticsearchSearchQueryWithOtherPredicates( predicate );
 		}

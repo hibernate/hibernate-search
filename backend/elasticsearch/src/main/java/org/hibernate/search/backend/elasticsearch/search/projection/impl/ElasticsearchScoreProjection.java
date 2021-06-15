@@ -20,7 +20,7 @@ class ElasticsearchScoreProjection extends AbstractElasticsearchProjection<Float
 	private static final JsonAccessor<Boolean> TRACK_SCORES_ACCESSOR = JsonAccessor.root().property( "track_scores" )
 			.asBoolean();
 
-	private ElasticsearchScoreProjection(ElasticsearchSearchIndexScope scope) {
+	private ElasticsearchScoreProjection(ElasticsearchSearchIndexScope<?> scope) {
 		super( scope );
 	}
 
@@ -51,7 +51,7 @@ class ElasticsearchScoreProjection extends AbstractElasticsearchProjection<Float
 
 		private final ElasticsearchScoreProjection projection;
 
-		Builder(ElasticsearchSearchIndexScope scope) {
+		Builder(ElasticsearchSearchIndexScope<?> scope) {
 			super( scope );
 			this.projection = new ElasticsearchScoreProjection( scope );
 		}

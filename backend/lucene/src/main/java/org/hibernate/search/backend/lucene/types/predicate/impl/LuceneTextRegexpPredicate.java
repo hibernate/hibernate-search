@@ -26,7 +26,7 @@ public class LuceneTextRegexpPredicate extends AbstractLuceneLeafSingleFieldPred
 	public static class Factory<F>
 			extends AbstractLuceneValueFieldSearchQueryElementFactory<RegexpPredicateBuilder, F> {
 		@Override
-		public Builder<F> create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
+		public Builder<F> create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			return new Builder<>( scope, field );
 		}
 	}
@@ -35,7 +35,7 @@ public class LuceneTextRegexpPredicate extends AbstractLuceneLeafSingleFieldPred
 
 		private String pattern;
 
-		private Builder(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
+		private Builder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 		}
 

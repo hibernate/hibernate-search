@@ -52,12 +52,12 @@ public abstract class AbstractLuceneSearchPredicate implements LuceneSearchPredi
 	protected abstract Query doToQuery(PredicateRequestContext context);
 
 	public abstract static class AbstractBuilder implements SearchPredicateBuilder {
-		protected final LuceneSearchIndexScope scope;
+		protected final LuceneSearchIndexScope<?> scope;
 
 		private Float boost;
 		private boolean constantScore;
 
-		protected AbstractBuilder(LuceneSearchIndexScope scope) {
+		protected AbstractBuilder(LuceneSearchIndexScope<?> scope) {
 			this.scope = scope;
 		}
 

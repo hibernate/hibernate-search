@@ -83,7 +83,7 @@ abstract class AbstractElasticsearchDocumentValueSort extends AbstractElasticsea
 		private JsonPrimitive mode;
 		private ElasticsearchSearchPredicate filter;
 
-		AbstractBuilder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<F> field) {
+		AbstractBuilder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<F> field) {
 			super( scope );
 			this.searchSyntax = scope.searchSyntax();
 			this.field = field;

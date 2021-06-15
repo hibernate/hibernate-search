@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 
 class LuceneScoreProjection extends AbstractLuceneProjection<Float, Float> {
 
-	private LuceneScoreProjection(LuceneSearchIndexScope scope) {
+	private LuceneScoreProjection(LuceneSearchIndexScope<?> scope) {
 		super( scope );
 	}
 
@@ -44,7 +44,7 @@ class LuceneScoreProjection extends AbstractLuceneProjection<Float, Float> {
 	public static class Builder extends AbstractLuceneProjection.AbstractBuilder<Float>
 			implements ScoreProjectionBuilder {
 
-		public Builder(LuceneSearchIndexScope scope) {
+		public Builder(LuceneSearchIndexScope<?> scope) {
 			super( scope );
 		}
 

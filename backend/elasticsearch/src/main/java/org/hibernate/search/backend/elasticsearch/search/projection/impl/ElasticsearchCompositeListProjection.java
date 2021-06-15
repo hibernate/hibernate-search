@@ -17,7 +17,7 @@ class ElasticsearchCompositeListProjection<P>
 
 	private final Function<List<?>, P> transformer;
 
-	ElasticsearchCompositeListProjection(ElasticsearchSearchIndexScope scope,
+	ElasticsearchCompositeListProjection(ElasticsearchSearchIndexScope<?> scope,
 			Function<List<?>, P> transformer,
 			List<ElasticsearchSearchProjection<?, ?>> children) {
 		super( scope, children.toArray( new ElasticsearchSearchProjection<?, ?>[0] ) );

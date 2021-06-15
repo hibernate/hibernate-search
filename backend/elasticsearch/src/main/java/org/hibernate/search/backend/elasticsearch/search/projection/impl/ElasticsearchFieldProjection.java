@@ -60,7 +60,7 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 				builder.codec::decode, builder.converter, accumulator );
 	}
 
-	ElasticsearchFieldProjection(ElasticsearchSearchIndexScope scope,
+	ElasticsearchFieldProjection(ElasticsearchSearchIndexScope<?> scope,
 			String absoluteFieldPath, String[] absoluteFieldPathComponents,
 			Function<JsonElement, F> decodeFunction, ProjectionConverter<? super F, ? extends V> converter,
 			ProjectionAccumulator<F, V, E, P> accumulator) {
@@ -164,7 +164,7 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 		}
 
 		@Override
-		public TypeSelector<?> create(ElasticsearchSearchIndexScope scope,
+		public TypeSelector<?> create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			// Check the compatibility of nested structure in the case of multi-index search.
 			field.nestedPathHierarchy();
@@ -174,11 +174,11 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 
 	public static class TypeSelector<F> implements FieldProjectionBuilder.TypeSelector {
 		private final ElasticsearchFieldCodec<F> codec;
-		private final ElasticsearchSearchIndexScope scope;
+		private final ElasticsearchSearchIndexScope<?> scope;
 		private final ElasticsearchSearchIndexValueFieldContext<F> field;
 
 		private TypeSelector(ElasticsearchFieldCodec<F> codec,
-				ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<F> field) {
+				ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<F> field) {
 			this.codec = codec;
 			this.scope = scope;
 			this.field = field;
@@ -197,12 +197,12 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 
 		private final ElasticsearchFieldCodec<F> codec;
 
-		private final ElasticsearchSearchIndexScope scope;
+		private final ElasticsearchSearchIndexScope<?> scope;
 		private final ElasticsearchSearchIndexValueFieldContext<F> field;
 
 		private final ProjectionConverter<F, ? extends V> converter;
 
-		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
+		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field, ProjectionConverter<F, ? extends V> converter) {
 			this.codec = codec;
 			this.scope = scope;

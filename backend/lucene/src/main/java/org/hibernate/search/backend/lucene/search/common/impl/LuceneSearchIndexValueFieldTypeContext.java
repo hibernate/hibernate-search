@@ -11,7 +11,7 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexValueFieldTypeCo
 import org.apache.lucene.analysis.Analyzer;
 
 public interface LuceneSearchIndexValueFieldTypeContext<F>
-		extends SearchIndexValueFieldTypeContext<LuceneSearchIndexScope, LuceneSearchIndexValueFieldContext<F>, F> {
+		extends SearchIndexValueFieldTypeContext<LuceneSearchIndexScope<?>, LuceneSearchIndexValueFieldContext<F>, F> {
 
 	Analyzer searchAnalyzerOrNormalizer();
 

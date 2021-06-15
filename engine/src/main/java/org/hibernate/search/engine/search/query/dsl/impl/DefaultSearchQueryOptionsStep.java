@@ -28,7 +28,7 @@ final class DefaultSearchQueryOptionsStep<H, LOS>
 		implements SearchQueryWhereStep<DefaultSearchQueryOptionsStep<H, LOS>, H, LOS, SearchPredicateFactory>,
 				SearchQueryOptionsStep<DefaultSearchQueryOptionsStep<H, LOS>, H, LOS, SearchSortFactory, SearchAggregationFactory> {
 
-	DefaultSearchQueryOptionsStep(SearchQueryIndexScope scope, SearchQueryBuilder<H> searchQueryBuilder,
+	DefaultSearchQueryOptionsStep(SearchQueryIndexScope<?> scope, SearchQueryBuilder<H> searchQueryBuilder,
 			SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
 		super( scope, searchQueryBuilder, loadingContextBuilder );
 	}

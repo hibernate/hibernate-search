@@ -34,7 +34,7 @@ class ElasticsearchUserProvidedJsonAggregation extends AbstractElasticsearchAggr
 
 		private final JsonObject json;
 
-		Builder(ElasticsearchSearchIndexScope scope, JsonObject json) {
+		Builder(ElasticsearchSearchIndexScope<?> scope, JsonObject json) {
 			super( scope );
 			this.json = json;
 		}

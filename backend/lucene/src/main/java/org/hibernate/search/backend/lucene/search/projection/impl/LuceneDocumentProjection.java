@@ -17,7 +17,7 @@ import org.apache.lucene.document.Document;
 
 class LuceneDocumentProjection extends AbstractLuceneProjection<Document, Document> {
 
-	private LuceneDocumentProjection(LuceneSearchIndexScope scope) {
+	private LuceneDocumentProjection(LuceneSearchIndexScope<?> scope) {
 		super( scope );
 	}
 
@@ -46,7 +46,7 @@ class LuceneDocumentProjection extends AbstractLuceneProjection<Document, Docume
 	public static class Builder extends AbstractLuceneProjection.AbstractBuilder<Document>
 			implements SearchProjectionBuilder<Document> {
 
-		public Builder(LuceneSearchIndexScope scope) {
+		public Builder(LuceneSearchIndexScope<?> scope) {
 			super( scope );
 		}
 

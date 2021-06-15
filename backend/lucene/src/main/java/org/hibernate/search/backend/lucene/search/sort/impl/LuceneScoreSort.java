@@ -33,7 +33,7 @@ class LuceneScoreSort extends AbstractLuceneReversibleSort {
 	}
 
 	static class Builder extends AbstractBuilder implements ScoreSortBuilder {
-		Builder(LuceneSearchIndexScope scope) {
+		Builder(LuceneSearchIndexScope<?> scope) {
 			super( scope );
 		}
 

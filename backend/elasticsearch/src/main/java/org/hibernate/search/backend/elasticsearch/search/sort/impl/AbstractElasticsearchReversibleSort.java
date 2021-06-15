@@ -54,7 +54,7 @@ public abstract class AbstractElasticsearchReversibleSort extends AbstractElasti
 
 		protected SortOrder order;
 
-		protected AbstractBuilder(ElasticsearchSearchIndexScope scope) {
+		protected AbstractBuilder(ElasticsearchSearchIndexScope<?> scope) {
 			super( scope );
 		}
 

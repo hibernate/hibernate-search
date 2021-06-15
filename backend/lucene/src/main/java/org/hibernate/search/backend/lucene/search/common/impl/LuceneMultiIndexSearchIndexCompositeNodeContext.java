@@ -14,13 +14,13 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexSchemaElementCon
 public final class LuceneMultiIndexSearchIndexCompositeNodeContext
 		extends AbstractMultiIndexSearchIndexCompositeNodeContext<
 						LuceneSearchIndexCompositeNodeContext,
-						LuceneSearchIndexScope,
+						LuceneSearchIndexScope<?>,
 						LuceneSearchIndexCompositeNodeTypeContext,
 						LuceneSearchIndexNodeContext
 				>
 		implements LuceneSearchIndexCompositeNodeContext, LuceneSearchIndexCompositeNodeTypeContext {
 
-	public LuceneMultiIndexSearchIndexCompositeNodeContext(LuceneSearchIndexScope scope,
+	public LuceneMultiIndexSearchIndexCompositeNodeContext(LuceneSearchIndexScope<?> scope,
 			String absolutePath, List<? extends LuceneSearchIndexCompositeNodeContext> nodeForEachIndex) {
 		super( scope, absolutePath, nodeForEachIndex );
 	}

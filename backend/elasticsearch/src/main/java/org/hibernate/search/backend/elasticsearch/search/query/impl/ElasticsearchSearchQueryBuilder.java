@@ -60,7 +60,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private final ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory;
 	private final ElasticsearchParallelWorkOrchestrator queryOrchestrator;
 
-	private final ElasticsearchSearchIndexScope scope;
+	private final ElasticsearchSearchIndexScope<?> scope;
 	private final BackendSessionContext sessionContext;
 
 	private final PredicateRequestContext rootPredicateContext;
@@ -83,7 +83,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 			ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory,
 			ElasticsearchParallelWorkOrchestrator queryOrchestrator,
-			ElasticsearchSearchIndexScope scope,
+			ElasticsearchSearchIndexScope<?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<?, H> rootProjection,

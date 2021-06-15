@@ -16,9 +16,9 @@ import com.google.gson.JsonObject;
 
 public class ElasticsearchSearchSortBuilderFactory implements SearchSortBuilderFactory {
 
-	private final ElasticsearchSearchIndexScope scope;
+	private final ElasticsearchSearchIndexScope<?> scope;
 
-	public ElasticsearchSearchSortBuilderFactory(ElasticsearchSearchIndexScope scope) {
+	public ElasticsearchSearchSortBuilderFactory(ElasticsearchSearchIndexScope<?> scope) {
 		this.scope = scope;
 	}
 

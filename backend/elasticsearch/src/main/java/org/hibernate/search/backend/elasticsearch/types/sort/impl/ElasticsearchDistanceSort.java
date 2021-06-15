@@ -55,7 +55,7 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 	public static class Factory
 			extends AbstractElasticsearchValueFieldSearchQueryElementFactory<DistanceSortBuilder, GeoPoint> {
 		@Override
-		public DistanceSortBuilder create(ElasticsearchSearchIndexScope scope,
+		public DistanceSortBuilder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
 			return new Builder( scope, field );
 		}
@@ -67,7 +67,7 @@ public class ElasticsearchDistanceSort extends AbstractElasticsearchDocumentValu
 		private boolean missingFirst = false;
 		private boolean missingLast = false;
 
-		private Builder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
+		private Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
 			super( scope, field );
 		}
 

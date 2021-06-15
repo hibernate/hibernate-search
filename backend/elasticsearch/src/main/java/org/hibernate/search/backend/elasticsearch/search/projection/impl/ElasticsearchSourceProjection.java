@@ -25,7 +25,7 @@ class ElasticsearchSourceProjection extends AbstractElasticsearchProjection<Json
 	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
 	private static final JsonPrimitive WILDCARD_ALL = new JsonPrimitive( "*" );
 
-	private ElasticsearchSourceProjection(ElasticsearchSearchIndexScope scope) {
+	private ElasticsearchSourceProjection(ElasticsearchSearchIndexScope<?> scope) {
 		super( scope );
 	}
 
@@ -61,7 +61,7 @@ class ElasticsearchSourceProjection extends AbstractElasticsearchProjection<Json
 
 		private final ElasticsearchSourceProjection projection;
 
-		Builder(ElasticsearchSearchIndexScope scope) {
+		Builder(ElasticsearchSearchIndexScope<?> scope) {
 			super( scope );
 			this.projection = new ElasticsearchSourceProjection( scope );
 		}

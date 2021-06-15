@@ -18,7 +18,7 @@ import com.google.gson.JsonPrimitive;
 
 public class ElasticsearchIndexValueFieldType<F>
 		extends AbstractIndexValueFieldType<
-						ElasticsearchSearchIndexScope,
+						ElasticsearchSearchIndexScope<?>,
 						ElasticsearchSearchIndexValueFieldContext<F>,
 						F
 				>
@@ -54,7 +54,7 @@ public class ElasticsearchIndexValueFieldType<F>
 
 	public static class Builder<F>
 			extends AbstractIndexValueFieldType.Builder<
-							ElasticsearchSearchIndexScope,
+							ElasticsearchSearchIndexScope<?>,
 							ElasticsearchSearchIndexValueFieldContext<F>,
 							F
 					> {

@@ -14,7 +14,7 @@ import com.google.gson.JsonPrimitive;
 
 public interface ElasticsearchSearchIndexValueFieldTypeContext<F>
 		extends
-		SearchIndexValueFieldTypeContext<ElasticsearchSearchIndexScope, ElasticsearchSearchIndexValueFieldContext<F>, F> {
+		SearchIndexValueFieldTypeContext<ElasticsearchSearchIndexScope<?>, ElasticsearchSearchIndexValueFieldContext<F>, F> {
 
 	JsonPrimitive elasticsearchTypeAsJson();
 

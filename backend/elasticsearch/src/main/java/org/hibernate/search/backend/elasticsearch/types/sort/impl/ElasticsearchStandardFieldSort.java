@@ -83,7 +83,7 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 		}
 
 		@Override
-		public Builder<F> create(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<F> field) {
+		public Builder<F> create(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<F> field) {
 			return new Builder<>( codec, scope, field );
 		}
 	}
@@ -93,7 +93,7 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 
 		private JsonElement missing;
 
-		protected Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
+		protected Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			this.codec = codec;
@@ -133,14 +133,14 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 		}
 
 		@Override
-		public TemporalFieldBuilder<F> create(ElasticsearchSearchIndexScope scope,
+		public TemporalFieldBuilder<F> create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			return new TemporalFieldBuilder<>( codec, scope, field );
 		}
 	}
 
 	private static class TemporalFieldBuilder<F extends TemporalAccessor> extends Builder<F> {
-		private TemporalFieldBuilder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
+		private TemporalFieldBuilder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			super( codec, scope, field );
 		}
@@ -167,14 +167,14 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 		}
 
 		@Override
-		public TextFieldBuilder create(ElasticsearchSearchIndexScope scope,
+		public TextFieldBuilder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<String> field) {
 			return new TextFieldBuilder( codec, scope, field );
 		}
 	}
 
 	private static class TextFieldBuilder extends Builder<String> {
-		private TextFieldBuilder(ElasticsearchFieldCodec<String> codec, ElasticsearchSearchIndexScope scope,
+		private TextFieldBuilder(ElasticsearchFieldCodec<String> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<String> field) {
 			super( codec, scope, field );
 		}

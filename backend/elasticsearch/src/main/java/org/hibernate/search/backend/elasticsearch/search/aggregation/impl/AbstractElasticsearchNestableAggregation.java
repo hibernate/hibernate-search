@@ -121,7 +121,7 @@ public abstract class AbstractElasticsearchNestableAggregation<A> extends Abstra
 		protected final List<String> nestedPathHierarchy;
 		private ElasticsearchSearchPredicate filter;
 
-		public AbstractBuilder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<?> field) {
+		public AbstractBuilder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<?> field) {
 			super( scope );
 			this.field = field;
 			this.nestedPathHierarchy = field.nestedPathHierarchy();

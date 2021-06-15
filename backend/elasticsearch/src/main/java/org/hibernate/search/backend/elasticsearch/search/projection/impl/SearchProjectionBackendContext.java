@@ -23,7 +23,7 @@ public final class SearchProjectionBackendContext {
 	}
 
 	DocumentReferenceExtractionHelper createDocumentReferenceExtractionHelper(
-			ElasticsearchSearchIndexScope scope) {
+			ElasticsearchSearchIndexScope<?> scope) {
 		Set<String> mappedTypeNames = scope.mappedTypeNameToIndex().keySet();
 		ProjectionExtractionHelper<String> mappedTypeNameHelper;
 		if ( mappedTypeNames.size() == 1 ) {

@@ -182,7 +182,7 @@ public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProject
 		}
 
 		@Override
-		public Builder create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<GeoPoint> field) {
+		public Builder create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<GeoPoint> field) {
 			// Fail early if the nested structure differs in the case of multi-index search.
 			field.nestedPathHierarchy();
 			return new Builder( codec, scope, field );
@@ -201,7 +201,7 @@ public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProject
 		private GeoPoint center;
 		private DistanceUnit unit = DistanceUnit.METERS;
 
-		private Builder(LuceneFieldCodec<GeoPoint> codec, LuceneSearchIndexScope scope,
+		private Builder(LuceneFieldCodec<GeoPoint> codec, LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<GeoPoint> field) {
 			super( scope );
 			this.codec = codec;

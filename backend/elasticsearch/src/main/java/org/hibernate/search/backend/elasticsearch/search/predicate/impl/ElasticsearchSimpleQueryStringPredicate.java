@@ -148,7 +148,7 @@ public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsear
 		private String analyzer;
 		private EnumSet<SimpleQueryFlag> flags;
 
-		Builder(ElasticsearchSearchIndexScope scope) {
+		Builder(ElasticsearchSearchIndexScope<?> scope) {
 			super( scope );
 		}
 

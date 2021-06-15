@@ -16,7 +16,7 @@ import com.google.gson.JsonObject;
 
 class ElasticsearchJsonHitProjection extends AbstractElasticsearchProjection<JsonObject, JsonObject> {
 
-	private ElasticsearchJsonHitProjection(ElasticsearchSearchIndexScope scope) {
+	private ElasticsearchJsonHitProjection(ElasticsearchSearchIndexScope<?> scope) {
 		super( scope );
 	}
 
@@ -46,7 +46,7 @@ class ElasticsearchJsonHitProjection extends AbstractElasticsearchProjection<Jso
 
 		private final ElasticsearchJsonHitProjection projection;
 
-		Builder(ElasticsearchSearchIndexScope scope) {
+		Builder(ElasticsearchSearchIndexScope<?> scope) {
 			this.projection = new ElasticsearchJsonHitProjection( scope );
 		}
 

@@ -225,7 +225,7 @@ public class ElasticsearchDistanceToFieldProjection<E, P> extends AbstractElasti
 			extends
 			AbstractElasticsearchValueFieldSearchQueryElementFactory<DistanceToFieldProjectionBuilder, GeoPoint> {
 		@Override
-		public Builder create(ElasticsearchSearchIndexScope scope,
+		public Builder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
 			// Check the compatibility of nested structure in the case of multi-index search.
 			field.nestedPathHierarchy();
@@ -241,7 +241,7 @@ public class ElasticsearchDistanceToFieldProjection<E, P> extends AbstractElasti
 		private GeoPoint center;
 		private DistanceUnit unit = DistanceUnit.METERS;
 
-		private Builder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
+		private Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<GeoPoint> field) {
 			super( scope );
 			this.field = field;
 		}

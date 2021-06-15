@@ -48,7 +48,7 @@ public class ElasticsearchTextRegexpPredicate extends AbstractElasticsearchSingl
 	public static class Factory
 			extends AbstractElasticsearchValueFieldSearchQueryElementFactory<RegexpPredicateBuilder, String> {
 		@Override
-		public RegexpPredicateBuilder create(ElasticsearchSearchIndexScope scope,
+		public RegexpPredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<String> field) {
 			return new Builder( scope, field );
 		}
@@ -57,7 +57,7 @@ public class ElasticsearchTextRegexpPredicate extends AbstractElasticsearchSingl
 	private static class Builder extends AbstractBuilder implements RegexpPredicateBuilder {
 		private JsonPrimitive pattern;
 
-		private Builder(ElasticsearchSearchIndexScope scope, ElasticsearchSearchIndexValueFieldContext<String> field) {
+		private Builder(ElasticsearchSearchIndexScope<?> scope, ElasticsearchSearchIndexValueFieldContext<String> field) {
 			super( scope, field );
 		}
 

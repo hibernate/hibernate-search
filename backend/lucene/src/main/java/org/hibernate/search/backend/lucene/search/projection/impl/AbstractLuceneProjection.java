@@ -19,7 +19,7 @@ abstract class AbstractLuceneProjection<E, P> implements LuceneSearchProjection<
 		this( builder.scope );
 	}
 
-	AbstractLuceneProjection(LuceneSearchIndexScope scope) {
+	AbstractLuceneProjection(LuceneSearchIndexScope<?> scope) {
 		this.indexNames = scope.hibernateSearchIndexNames();
 	}
 
@@ -29,9 +29,9 @@ abstract class AbstractLuceneProjection<E, P> implements LuceneSearchProjection<
 	}
 
 	abstract static class AbstractBuilder<P> implements SearchProjectionBuilder<P> {
-		protected final LuceneSearchIndexScope scope;
+		protected final LuceneSearchIndexScope<?> scope;
 
-		AbstractBuilder(LuceneSearchIndexScope scope) {
+		AbstractBuilder(LuceneSearchIndexScope<?> scope) {
 			this.scope = scope;
 		}
 	}

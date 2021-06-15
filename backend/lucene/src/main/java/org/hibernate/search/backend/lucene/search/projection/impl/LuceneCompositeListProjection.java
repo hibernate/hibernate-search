@@ -17,7 +17,7 @@ class LuceneCompositeListProjection<P>
 
 	private final Function<List<?>, P> transformer;
 
-	LuceneCompositeListProjection(LuceneSearchIndexScope scope, Function<List<?>, P> transformer,
+	LuceneCompositeListProjection(LuceneSearchIndexScope<?> scope, Function<List<?>, P> transformer,
 			List<LuceneSearchProjection<?, ?>> children) {
 		super( scope, children.toArray( new LuceneSearchProjection<?, ?>[0] ) );
 		this.transformer = transformer;

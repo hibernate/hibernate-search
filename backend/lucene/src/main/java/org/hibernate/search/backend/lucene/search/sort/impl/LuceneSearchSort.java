@@ -21,7 +21,7 @@ public interface LuceneSearchSort extends SearchSort {
 
 	void toSortFields(LuceneSearchSortCollector collector);
 
-	static LuceneSearchSort from(LuceneSearchIndexScope scope, SearchSort sort) {
+	static LuceneSearchSort from(LuceneSearchIndexScope<?> scope, SearchSort sort) {
 		if ( !( sort instanceof LuceneSearchSort ) ) {
 			throw log.cannotMixLuceneSearchSortWithOtherSorts( sort );
 		}

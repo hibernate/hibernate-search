@@ -53,12 +53,12 @@ public abstract class AbstractLuceneDocumentValueSort extends AbstractLuceneReve
 		private SortMode mode;
 		protected Query nestedFilter;
 
-		protected AbstractBuilder(LuceneSearchIndexScope scope,
+		protected AbstractBuilder(LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<?> field) {
 			this( scope, field.absolutePath(), field.nestedDocumentPath() );
 		}
 
-		protected AbstractBuilder(LuceneSearchIndexScope scope,
+		protected AbstractBuilder(LuceneSearchIndexScope<?> scope,
 				String absoluteFieldPath, String nestedDocumentPath) {
 			super( scope );
 			this.absoluteFieldPath = absoluteFieldPath;

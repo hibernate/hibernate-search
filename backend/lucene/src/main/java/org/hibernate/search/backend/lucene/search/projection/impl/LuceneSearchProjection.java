@@ -63,7 +63,7 @@ public interface LuceneSearchProjection<E, P> extends SearchProjection<P> {
 	P transform(LoadingResult<?, ?> loadingResult, E extractedData,
 			SearchProjectionTransformContext context);
 
-	static <P> LuceneSearchProjection<?, P> from(LuceneSearchIndexScope scope, SearchProjection<P> projection) {
+	static <P> LuceneSearchProjection<?, P> from(LuceneSearchIndexScope<?> scope, SearchProjection<P> projection) {
 		if ( !( projection instanceof LuceneSearchProjection ) ) {
 			throw log.cannotMixLuceneSearchQueryWithOtherProjections( projection );
 		}

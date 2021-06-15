@@ -27,12 +27,12 @@ import com.google.gson.JsonObject;
 
 public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
 
-	private final ElasticsearchSearchIndexScope scope;
+	private final ElasticsearchSearchIndexScope<?> scope;
 	private final DocumentReferenceExtractionHelper documentReferenceExtractionHelper;
 	private final ProjectionExtractionHelper<String> idProjectionExtractionHelper;
 
 	public ElasticsearchSearchProjectionBuilderFactory(SearchProjectionBackendContext searchProjectionBackendContext,
-			ElasticsearchSearchIndexScope scope) {
+			ElasticsearchSearchIndexScope<?> scope) {
 		this.scope = scope;
 		this.documentReferenceExtractionHelper = searchProjectionBackendContext.createDocumentReferenceExtractionHelper( scope );
 		this.idProjectionExtractionHelper = searchProjectionBackendContext.idProjectionExtractionHelper();

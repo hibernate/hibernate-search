@@ -12,7 +12,7 @@ package org.hibernate.search.engine.search.common.spi;
  *
  * @param <SC> The type of the backend-specific search scope.
  */
-public interface SearchIndexValueFieldContext<SC extends SearchIndexScope>
+public interface SearchIndexValueFieldContext<SC extends SearchIndexScope<?>>
 		extends SearchIndexNodeContext<SC> {
 
 	boolean multiValuedInRoot();

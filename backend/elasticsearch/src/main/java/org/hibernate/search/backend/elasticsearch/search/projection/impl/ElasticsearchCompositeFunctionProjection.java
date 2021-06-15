@@ -15,7 +15,7 @@ class ElasticsearchCompositeFunctionProjection<P1, P>
 
 	private final Function<P1, P> transformer;
 
-	ElasticsearchCompositeFunctionProjection(ElasticsearchSearchIndexScope scope,
+	ElasticsearchCompositeFunctionProjection(ElasticsearchSearchIndexScope<?> scope,
 			Function<P1, P> transformer,
 			ElasticsearchSearchProjection<?, P1> projection) {
 		super( scope, projection );

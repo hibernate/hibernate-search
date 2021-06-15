@@ -149,10 +149,10 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 	}
 
 	abstract static class AbstractTypeSelector<F> implements TermsAggregationBuilder.TypeSelector {
-		protected final LuceneSearchIndexScope scope;
+		protected final LuceneSearchIndexScope<?> scope;
 		protected final LuceneSearchIndexValueFieldContext<F> field;
 
-		protected AbstractTypeSelector(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
+		protected AbstractTypeSelector(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			this.scope = scope;
 			this.field = field;
 		}
@@ -171,7 +171,7 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		private int minDocCount = 1;
 		private int maxTermCount = 100;
 
-		AbstractBuilder(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field,
+		AbstractBuilder(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field,
 				ProjectionConverter<F, ? extends K> fromFieldValueConverter) {
 			super( scope, field );
 			this.fromFieldValueConverter = fromFieldValueConverter;

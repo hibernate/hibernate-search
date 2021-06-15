@@ -36,11 +36,11 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 				>
 		implements LuceneSearchQuerySelectStep<R, E, LOS> {
 
-	private final LuceneSearchQueryIndexScope scope;
+	private final LuceneSearchQueryIndexScope<?> scope;
 	private final BackendSessionContext sessionContext;
 	private final SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder;
 
-	public LuceneSearchQuerySelectStepImpl(LuceneSearchQueryIndexScope scope,
+	public LuceneSearchQuerySelectStepImpl(LuceneSearchQueryIndexScope<?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		this.scope = scope;
@@ -91,7 +91,7 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 	}
 
 	@Override
-	protected LuceneSearchQueryIndexScope scope() {
+	protected LuceneSearchQueryIndexScope<?> scope() {
 		return scope;
 	}
 

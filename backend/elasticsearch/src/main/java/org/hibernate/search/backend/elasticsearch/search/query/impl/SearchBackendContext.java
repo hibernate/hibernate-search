@@ -31,11 +31,11 @@ public interface SearchBackendContext {
 
 	SearchProjectionBackendContext getSearchProjectionBackendContext();
 
-	ElasticsearchSearchQueryIndexScope createSearchContext(BackendMappingContext mappingContext,
+	ElasticsearchSearchQueryIndexScope<?> createSearchContext(BackendMappingContext mappingContext,
 			Set<ElasticsearchIndexModel> indexModels);
 
 	<H> ElasticsearchSearchQueryBuilder<H> createSearchQueryBuilder(
-			ElasticsearchSearchIndexScope scope,
+			ElasticsearchSearchIndexScope<?> scope,
 			BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<?, H> rootProjection);

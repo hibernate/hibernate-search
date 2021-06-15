@@ -70,7 +70,7 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 		}
 
 		@Override
-		public NamedPredicateBuilder create(ElasticsearchSearchIndexScope scope,
+		public NamedPredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexCompositeNodeContext node) {
 			return new Builder( provider, predicateName, scope, node );
 		}
@@ -84,7 +84,7 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 		private final Map<String, Object> params = new LinkedHashMap<>();
 
 		Builder(NamedPredicateProvider provider, String predicateName,
-				ElasticsearchSearchIndexScope scope,
+				ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexCompositeNodeContext node) {
 			super( scope, node );
 			this.provider = provider;

@@ -34,7 +34,7 @@ public class ElasticsearchCompositeSort extends AbstractElasticsearchSort {
 	public static class Builder extends AbstractBuilder implements CompositeSortBuilder {
 		private List<ElasticsearchSearchSort> elements = new ArrayList<>();
 
-		protected Builder(ElasticsearchSearchIndexScope scope) {
+		protected Builder(ElasticsearchSearchIndexScope<?> scope) {
 			super( scope );
 		}
 

@@ -32,11 +32,11 @@ public final class DefaultSearchQuerySelectStep<R, E, LOS>
 								SearchPredicateFactory
 						> {
 
-	private final SearchQueryIndexScope scope;
+	private final SearchQueryIndexScope<?> scope;
 	private final BackendSessionContext sessionContext;
 	private final SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder;
 
-	public DefaultSearchQuerySelectStep(SearchQueryIndexScope scope, BackendSessionContext sessionContext,
+	public DefaultSearchQuerySelectStep(SearchQueryIndexScope<?> scope, BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		this.scope = scope;
 		this.sessionContext = sessionContext;
@@ -84,7 +84,7 @@ public final class DefaultSearchQuerySelectStep<R, E, LOS>
 	}
 
 	@Override
-	protected SearchQueryIndexScope scope() {
+	protected SearchQueryIndexScope<?> scope() {
 		return scope;
 	}
 

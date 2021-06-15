@@ -42,7 +42,7 @@ public class LuceneTextTermsPredicate extends AbstractLuceneLeafSingleFieldPredi
 		}
 
 		@Override
-		public Builder<F> create(LuceneSearchIndexScope scope, LuceneSearchIndexValueFieldContext<F> field) {
+		public Builder<F> create(LuceneSearchIndexScope<?> scope, LuceneSearchIndexValueFieldContext<F> field) {
 			return new Builder<>( codec, scope, field );
 		}
 	}
@@ -54,7 +54,7 @@ public class LuceneTextTermsPredicate extends AbstractLuceneLeafSingleFieldPredi
 		private List<String> terms;
 		private boolean allMatch;
 
-		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchIndexScope scope,
+		private Builder(LuceneStandardFieldCodec<F, String> codec, LuceneSearchIndexScope<?> scope,
 				LuceneSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			// Score is always constant for this query

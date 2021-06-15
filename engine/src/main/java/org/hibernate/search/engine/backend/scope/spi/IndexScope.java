@@ -15,7 +15,7 @@ import org.hibernate.search.util.common.SearchException;
  */
 public interface IndexScope {
 
-	SearchQueryIndexScope searchScope();
+	SearchQueryIndexScope<?> searchScope();
 
 	/**
 	 * Extend the current index scope with the given extension,

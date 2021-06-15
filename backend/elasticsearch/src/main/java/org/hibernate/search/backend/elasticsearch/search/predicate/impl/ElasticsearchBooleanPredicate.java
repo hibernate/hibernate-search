@@ -144,7 +144,7 @@ class ElasticsearchBooleanPredicate extends AbstractElasticsearchPredicate {
 
 		private Map<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
-		Builder(ElasticsearchSearchIndexScope scope) {
+		Builder(ElasticsearchSearchIndexScope<?> scope) {
 			super( scope );
 		}
 

@@ -76,7 +76,7 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 		}
 
 		@Override
-		public RangePredicateBuilder create(ElasticsearchSearchIndexScope scope,
+		public RangePredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			return new Builder<>( codec, scope, field );
 		}
@@ -89,7 +89,7 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 
 		private Range<JsonElement> range;
 
-		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
+		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			this.codec = codec;

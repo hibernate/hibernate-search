@@ -22,7 +22,7 @@ public interface ElasticsearchSearchSort extends SearchSort {
 
 	void toJsonSorts(ElasticsearchSearchSortCollector collector);
 
-	static ElasticsearchSearchSort from(ElasticsearchSearchIndexScope scope, SearchSort sort) {
+	static ElasticsearchSearchSort from(ElasticsearchSearchIndexScope<?> scope, SearchSort sort) {
 		if ( !( sort instanceof ElasticsearchSearchSort ) ) {
 			throw log.cannotMixElasticsearchSearchSortWithOtherSorts( sort );
 		}

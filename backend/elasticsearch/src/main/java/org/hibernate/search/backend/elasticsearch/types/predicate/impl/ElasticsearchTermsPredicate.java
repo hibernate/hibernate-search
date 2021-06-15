@@ -103,7 +103,7 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 		}
 
 		@Override
-		public TermsPredicateBuilder create(ElasticsearchSearchIndexScope scope,
+		public TermsPredicateBuilder create(ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			return new Builder<>( codec, scope, field );
 		}
@@ -118,7 +118,7 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 		private JsonElement[] terms;
 		private boolean allMatch;
 
-		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope scope,
+		private Builder(ElasticsearchFieldCodec<F> codec, ElasticsearchSearchIndexScope<?> scope,
 				ElasticsearchSearchIndexValueFieldContext<F> field) {
 			super( scope, field );
 			// Score is always constant for this query
