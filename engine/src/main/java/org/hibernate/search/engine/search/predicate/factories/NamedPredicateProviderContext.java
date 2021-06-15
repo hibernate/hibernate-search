@@ -22,6 +22,8 @@ public interface NamedPredicateProviderContext {
 
 	/**
 	 * @return A predicate factory.
+	 * If the named predicate was registered on an object field,
+	 * this factory expects field paths to be provided relative to that same object field.
 	 * This factory is only valid in the present context and must not be used after
 	 * {@link NamedPredicateProvider#create(NamedPredicateProviderContext)} returns.
 	 * @see SearchPredicateFactory
@@ -44,9 +46,4 @@ public interface NamedPredicateProviderContext {
 	 */
 	Optional<Object> paramOptional(String name);
 
-	/**
-	 * @param relativeFieldPath The path a field, relative to the element to which the named predicate was assigned.
-	 * @return The absolute path of the field. Note the path is returned even if the field doesn't exist.
-	 */
-	String absolutePath(String relativeFieldPath);
 }

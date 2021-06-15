@@ -19,7 +19,7 @@ import org.junit.runner.RunWith;
 @RunWith(ClasspathSuite.class)
 @ClasspathSuite.ClassnameFilters({
 		"!.*\\$.*", // Exclude nested tests, typically used with the Enclosed runner
-		".*\\.tck\\..*"
+		".*\\.tck\\..*search.*"
 })
 public class LuceneTckTestRunner {
 }

@@ -55,9 +55,9 @@ Alternatively it is possible to use `paramOptional` to get the `java.util.Option
 <4> The provider uses the predicate factory to create predicates.
 In this example, this implementation transforms a pattern with a custom format into three patterns,
 one for each field populated by the bridge.
-<5> Be careful: the search predicate factory expects absolute paths.
-The context can turn relative paths into absolute paths;
-here the path `departmentCode` will be transformed to `<path to the object field>.departmentCode`.
+<5> Be careful: the search predicate factory expects paths
+relative to the object field where the named predicate was registered.
+Here the path `departmentCode` will be understood as `<path to the object field>.departmentCode`.
 <6> Do not forget to call `toPredicate()` to return a `SearchPredicate` instance.
 
 [source, JAVA, indent=0, subs="+callouts"]

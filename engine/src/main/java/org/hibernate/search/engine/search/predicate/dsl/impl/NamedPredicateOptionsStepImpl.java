@@ -29,7 +29,7 @@ public class NamedPredicateOptionsStepImpl
 		SearchQueryElementTypeKey<NamedPredicateBuilder> key = PredicateTypeKeys.named( predicateName );
 		this.builder = absoluteFieldPath == null ? scope.rootQueryElement( key )
 				: scope.fieldQueryElement( absoluteFieldPath, key );
-		builder.factory( predicateFactory );
+		builder.factory( absoluteFieldPath == null ? predicateFactory : predicateFactory.withRoot( absoluteFieldPath ) );
 	}
 
 	@Override

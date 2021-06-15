@@ -237,14 +237,12 @@ public class NamedPredicateBaseIT {
 
 		@Override
 		public SearchPredicate create(NamedPredicateProviderContext context) {
-			String field1Path = context.absolutePath( field1Name );
-			String field2Path = context.absolutePath( field2Name );
 			String word1 = (String) context.param( "value1" );
 			String word2 = (String) context.param( "value2" );
 			SearchPredicateFactory f = context.predicate();
 			return f.bool()
-					.must( f.match().field( field1Path ).matching( word1 ) )
-					.must( f.match().field( field2Path ).matching( word2 ) )
+					.must( f.match().field( field1Name ).matching( word1 ) )
+					.must( f.match().field( field2Name ).matching( word2 ) )
 					.toPredicate();
 		}
 	}
