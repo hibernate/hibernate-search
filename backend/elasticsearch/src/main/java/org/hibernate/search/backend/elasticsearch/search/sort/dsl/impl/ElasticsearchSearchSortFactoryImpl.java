@@ -31,6 +31,13 @@ public class ElasticsearchSearchSortFactoryImpl
 	}
 
 	@Override
+	public ElasticsearchSearchSortFactory withRoot(String objectFieldPath) {
+		return new ElasticsearchSearchSortFactoryImpl( dslContext.rescope(
+				dslContext.scope().withRoot( objectFieldPath ),
+				dslContext.predicateFactory().withRoot( objectFieldPath ) ) );
+	}
+
+	@Override
 	public SortThenStep fromJson(JsonObject jsonObject) {
 		return staticThenStep( dslContext.scope().sortBuilders().fromJson( jsonObject ) );
 	}

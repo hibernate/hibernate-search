@@ -25,6 +25,13 @@ public class LuceneSearchAggregationFactoryImpl
 		super( dslContext );
 	}
 
+	@Override
+	public LuceneSearchAggregationFactory withRoot(String objectFieldPath) {
+		return new LuceneSearchAggregationFactoryImpl( dslContext.rescope(
+				dslContext.scope().withRoot( objectFieldPath ),
+				dslContext.predicateFactory().withRoot( objectFieldPath ) ) );
+	}
+
 	// Empty: no extension at the moment.
 
 }

@@ -17,4 +17,10 @@ public class StubSearchAggregationFactory
 			SearchAggregationDslContext<SearchAggregationIndexScope<?>, SearchPredicateFactory> dslContext) {
 		super( dslContext );
 	}
+
+	@Override
+	public StubSearchAggregationFactory withRoot(String objectFieldPath) {
+		return new StubSearchAggregationFactory( dslContext.rescope( dslContext.scope().withRoot( objectFieldPath ),
+				dslContext.predicateFactory().withRoot( objectFieldPath ) ) );
+	}
 }

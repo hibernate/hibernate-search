@@ -29,10 +29,12 @@ public interface SearchIndexScope<S extends SearchIndexScope<?>> {
 
 	DocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
 
+	S withRoot(String objectFieldPath);
+
 	SearchIndexNodeContext<?> child(SearchIndexCompositeNodeContext<?> parent, String name);
 
 	<T> T rootQueryElement(SearchQueryElementTypeKey<T> key);
 
-	<T> T fieldQueryElement(String absoluteFieldPath, SearchQueryElementTypeKey<T> key);
+	<T> T fieldQueryElement(String fieldPath, SearchQueryElementTypeKey<T> key);
 
 }

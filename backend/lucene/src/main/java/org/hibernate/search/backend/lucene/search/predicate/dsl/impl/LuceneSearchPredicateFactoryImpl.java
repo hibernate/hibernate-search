@@ -28,6 +28,12 @@ public class LuceneSearchPredicateFactoryImpl
 	}
 
 	@Override
+	public LuceneSearchPredicateFactory withRoot(String objectFieldPath) {
+		return new LuceneSearchPredicateFactoryImpl( dslContext.rescope(
+				dslContext.scope().withRoot( objectFieldPath ) ) );
+	}
+
+	@Override
 	public PredicateFinalStep fromLuceneQuery(Query luceneQuery) {
 		return new StaticPredicateFinalStep( dslContext.scope().predicateBuilders().fromLuceneQuery( luceneQuery ) );
 	}

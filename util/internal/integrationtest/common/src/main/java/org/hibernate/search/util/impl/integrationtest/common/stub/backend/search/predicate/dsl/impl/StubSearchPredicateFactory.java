@@ -16,4 +16,9 @@ public class StubSearchPredicateFactory
 			SearchPredicateDslContext<SearchPredicateIndexScope<?>> dslContext) {
 		super( dslContext );
 	}
+
+	@Override
+	public StubSearchPredicateFactory withRoot(String objectFieldPath) {
+		return new StubSearchPredicateFactory( dslContext.rescope( dslContext.scope().withRoot( objectFieldPath ) ) );
+	}
 }

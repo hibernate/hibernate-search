@@ -53,9 +53,19 @@ public class StubSearchIndexScope
 	private final StubSearchProjectionBuilderFactory projectionFactory;
 	private final StubSearchAggregationBuilderFactory aggregationFactory;
 
-	public StubSearchIndexScope(BackendMappingContext mappingContext, StubBackend backend, Set<StubIndexModel> indexModels) {
+	public StubSearchIndexScope(BackendMappingContext mappingContext, StubBackend backend,
+				Set<StubIndexModel> indexModels) {
 		super( mappingContext, indexModels );
 		this.backend = backend;
+		this.predicateFactory = new StubSearchPredicateBuilderFactory();
+		this.sortFactory = new StubSearchSortBuilderFactory();
+		this.projectionFactory = new StubSearchProjectionBuilderFactory( this );
+		this.aggregationFactory = new StubSearchAggregationBuilderFactory();
+	}
+
+	private StubSearchIndexScope(StubSearchIndexScope parentScope, StubSearchIndexCompositeNodeContext overriddenRoot) {
+		super( parentScope, overriddenRoot );
+		this.backend = parentScope.backend;
 		this.predicateFactory = new StubSearchPredicateBuilderFactory();
 		this.sortFactory = new StubSearchSortBuilderFactory();
 		this.projectionFactory = new StubSearchProjectionBuilderFactory( this );
@@ -65,6 +75,11 @@ public class StubSearchIndexScope
 	@Override
 	protected StubSearchIndexScope self() {
 		return this;
+	}
+
+	@Override
+	public StubSearchIndexScope withRoot(String objectFieldPath) {
+		return new StubSearchIndexScope( this, field( objectFieldPath ).toComposite() );
 	}
 
 	@Override

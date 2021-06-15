@@ -168,22 +168,25 @@ public class LuceneSimpleQueryStringPredicate extends AbstractLuceneNestablePred
 			 * would pick the first analyzer returned by any of the scoped analyzers in its list.
 			 */
 			ScopedAnalyzer.Builder builder = new ScopedAnalyzer.Builder();
-			for ( Map.Entry<String, LuceneSimpleQueryStringPredicateBuilderFieldState> entry : fieldStates.entrySet() ) {
-				builder.setAnalyzer( entry.getKey(), entry.getValue().field().type().searchAnalyzerOrNormalizer() );
+			for ( LuceneSimpleQueryStringPredicateBuilderFieldState state : fieldStates.values() ) {
+				// Warning: we must use field().absolutePath(), not the key in the map,
+				// because that key may be a relative path when using SearchPredicateFactory.withRoot(...)
+				builder.setAnalyzer( state.field().absolutePath(), state.field().type().searchAnalyzerOrNormalizer() );
 			}
 			return builder.build();
 		}
 
 		private Map<String, Float> buildWeights() {
 			Map<String, Float> weights = new LinkedHashMap<>();
-			for ( Map.Entry<String, LuceneSimpleQueryStringPredicateBuilderFieldState> entry : fieldStates.entrySet() ) {
-				LuceneSimpleQueryStringPredicateBuilderFieldState state = entry.getValue();
+			for ( LuceneSimpleQueryStringPredicateBuilderFieldState state : fieldStates.values() ) {
 				Float boost = state.boost();
 				if ( boost == null ) {
 					boost = 1f;
 				}
 
-				weights.put( entry.getKey(), boost );
+				// Warning: we must use field().absolutePath(), not the key in the map,
+				// because that key may be a relative path when using SearchPredicateFactory.withRoot(...)
+				weights.put( state.field().absolutePath(), boost );
 			}
 			return weights;
 		}

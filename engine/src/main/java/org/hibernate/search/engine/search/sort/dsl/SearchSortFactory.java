@@ -142,8 +142,5 @@ public interface SearchSortFactory {
 	 * @return A new sort factory using the given object field as root.
 	 */
 	@Incubating
-	// TODO implement and remove default
-	default SearchSortFactory withRoot(String objectFieldPath) {
-		return this;
-	}
+	SearchSortFactory withRoot(String objectFieldPath);
 }

@@ -33,4 +33,12 @@ public final class SearchProjectionDslContext<SC extends SearchProjectionIndexSc
 		return scope;
 	}
 
+	/**
+	 * @param newScope The new scope for the new DSL context.
+	 * @return A copy of this DSL context with its scope and predicate factory replaced with the given ones.
+	 */
+	public SearchProjectionDslContext<SC> rescope(SC newScope) {
+		return new SearchProjectionDslContext<>( newScope );
+	}
+
 }

@@ -54,7 +54,12 @@ public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsear
 	ElasticsearchSimpleQueryStringPredicate(Builder builder) {
 		super( builder );
 		nestedPathHierarchy = builder.firstFieldState.field().nestedPathHierarchy();
-		fieldPaths = new ArrayList<>( builder.fieldStates.keySet() );
+		// Warning: we must use field().absolutePath(), not the keys in the map,
+		// because that key may be a relative path when using SearchPredicateFactory.withRoot(...)
+		fieldPaths = new ArrayList<>( builder.fieldStates.size() );
+		for ( ElasticsearchSimpleQueryStringPredicateBuilderFieldState state : builder.fieldStates.values() ) {
+			fieldPaths.add( state.field().absolutePath() );
+		}
 		fieldNameAndBoosts = new ArrayList<>();
 		for ( ElasticsearchSimpleQueryStringPredicateBuilderFieldState fieldContext : builder.fieldStates.values() ) {
 			fieldNameAndBoosts.add( fieldContext.build() );
@@ -64,7 +69,6 @@ public class ElasticsearchSimpleQueryStringPredicate extends AbstractElasticsear
 		analyzer = builder.analyzer;
 		flags = builder.flags;
 	}
-
 
 	@Override
 	protected JsonObject doToJsonQuery(PredicateRequestContext context, JsonObject outerObject,
