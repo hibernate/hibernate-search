@@ -11,36 +11,25 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.ElasticsearchSearchAggregationFactory;
-import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.impl.ElasticsearchSearchAggregationFactoryImpl;
-import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregationIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
-import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.impl.ElasticsearchSearchPredicateFactoryImpl;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.projection.dsl.ElasticsearchSearchProjectionFactory;
-import org.hibernate.search.backend.elasticsearch.search.projection.dsl.impl.ElasticsearchSearchProjectionFactoryImpl;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQuerySelectStep;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.impl.ElasticsearchSearchQuerySelectStepImpl;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.sort.dsl.ElasticsearchSearchSortFactory;
-import org.hibernate.search.backend.elasticsearch.search.sort.dsl.impl.ElasticsearchSearchSortFactoryImpl;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortIndexScope;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryExtension;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactoryExtension;
-import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
-import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
-import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
@@ -48,7 +37,6 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
-import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -149,14 +137,9 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked") // If the factory is an instance of ElasticsearchSearchPredicateBuilderFactory, the cast is safe
-	public Optional<ElasticsearchSearchPredicateFactory> extendOptional(
-			SearchPredicateFactory original, SearchPredicateDslContext<?> dslContext) {
-		if ( dslContext.scope() instanceof ElasticsearchSearchPredicateIndexScope ) {
-			return Optional.of( new ElasticsearchSearchPredicateFactoryImpl(
-					original,
-					(SearchPredicateDslContext<ElasticsearchSearchPredicateIndexScope<?>>) dslContext
-			) );
+	public Optional<ElasticsearchSearchPredicateFactory> extendOptional(SearchPredicateFactory original) {
+		if ( original instanceof ElasticsearchSearchPredicateFactory ) {
+			return Optional.of( (ElasticsearchSearchPredicateFactory) original );
 		}
 		else {
 			return Optional.empty();
@@ -167,15 +150,10 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked") // If the scope is an instance of ElasticsearchSearchSortIndexScope, the cast is safe
 	public Optional<ElasticsearchSearchSortFactory> extendOptional(
-			SearchSortFactory original, SearchSortDslContext<?, ?> dslContext) {
-		if ( dslContext.scope() instanceof ElasticsearchSearchSortIndexScope ) {
-			return Optional.of( new ElasticsearchSearchSortFactoryImpl(
-					original,
-					((SearchSortDslContext<ElasticsearchSearchSortIndexScope<?>, ?>) dslContext)
-							.withExtendedPredicateFactory( this )
-			) );
+			SearchSortFactory original) {
+		if ( original instanceof ElasticsearchSearchSortFactory ) {
+			return Optional.of( (ElasticsearchSearchSortFactory) original );
 		}
 		else {
 			return Optional.empty();
@@ -186,14 +164,9 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked") // If the scope is an instance of ElasticsearchSearchProjectionIndexScope, the cast is safe
-	public Optional<ElasticsearchSearchProjectionFactory<R, E>> extendOptional(SearchProjectionFactory<R, E> original,
-			SearchProjectionDslContext<?> dslContext) {
-		if ( dslContext.scope() instanceof ElasticsearchSearchProjectionIndexScope ) {
-			return Optional.of( new ElasticsearchSearchProjectionFactoryImpl<>(
-					original,
-					(SearchProjectionDslContext<ElasticsearchSearchProjectionIndexScope<?>>) dslContext
-			) );
+	public Optional<ElasticsearchSearchProjectionFactory<R, E>> extendOptional(SearchProjectionFactory<R, E> original) {
+		if ( original instanceof ElasticsearchSearchProjectionFactory ) {
+			return Optional.of( (ElasticsearchSearchProjectionFactory<R, E>) original );
 		}
 		else {
 			return Optional.empty();
@@ -204,15 +177,10 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked") // If the scope is an instance of ElasticsearchSearchAggregationIndexScope, the cast is safe
 	public Optional<ElasticsearchSearchAggregationFactory> extendOptional(
-			SearchAggregationFactory original, SearchAggregationDslContext<?, ?> dslContext) {
-		if ( dslContext.scope() instanceof ElasticsearchSearchAggregationIndexScope ) {
-			return Optional.of( new ElasticsearchSearchAggregationFactoryImpl(
-					original,
-					((SearchAggregationDslContext<ElasticsearchSearchAggregationIndexScope<?>, ?>) dslContext)
-							.withExtendedPredicateFactory( this )
-			) );
+			SearchAggregationFactory original) {
+		if ( original instanceof ElasticsearchSearchAggregationFactory ) {
+			return Optional.of( (ElasticsearchSearchAggregationFactory) original );
 		}
 		else {
 			return Optional.empty();

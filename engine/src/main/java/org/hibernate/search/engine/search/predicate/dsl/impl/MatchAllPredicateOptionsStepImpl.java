@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 
 
-class MatchAllPredicateOptionsStepImpl
+public final class MatchAllPredicateOptionsStepImpl
 		extends AbstractPredicateFinalStep
 		implements MatchAllPredicateOptionsStep<MatchAllPredicateOptionsStep<?>> {
 
@@ -30,7 +30,7 @@ class MatchAllPredicateOptionsStepImpl
 	private Float boost;
 	private boolean constantScore = false;
 
-	MatchAllPredicateOptionsStepImpl(SearchPredicateDslContext<?> dslContext,
+	public MatchAllPredicateOptionsStepImpl(SearchPredicateDslContext<?> dslContext,
 			SearchPredicateFactory factory) {
 		super( dslContext );
 		this.factory = factory;

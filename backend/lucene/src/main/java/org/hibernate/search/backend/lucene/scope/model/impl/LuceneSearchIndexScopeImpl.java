@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
+import org.hibernate.search.backend.lucene.search.aggregation.dsl.LuceneSearchAggregationFactory;
+import org.hibernate.search.backend.lucene.search.aggregation.dsl.impl.LuceneSearchAggregationFactoryImpl;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneMultiIndexSearchIndexCompositeNodeContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneMultiIndexSearchIndexValueFieldContext;
@@ -25,19 +27,29 @@ import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexC
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexNodeContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
+import org.hibernate.search.backend.lucene.search.predicate.dsl.impl.LuceneSearchPredicateFactoryImpl;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.search.projection.dsl.LuceneSearchProjectionFactory;
+import org.hibernate.search.backend.lucene.search.projection.dsl.impl.LuceneSearchProjectionFactoryImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryIndexScope;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
+import org.hibernate.search.backend.lucene.search.sort.dsl.LuceneSearchSortFactory;
+import org.hibernate.search.backend.lucene.search.sort.dsl.impl.LuceneSearchSortFactoryImpl;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactory;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.AbstractSearchIndexScope;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.common.timing.spi.TimingSource;
+import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
+import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.timeout.spi.TimeoutManager;
 
 import org.apache.lucene.search.Query;
@@ -128,6 +140,27 @@ public final class LuceneSearchIndexScopeImpl
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<P> projection) {
 		return backendContext.createSearchQueryBuilder( this, sessionContext, loadingContextBuilder,
 				LuceneSearchProjection.from( this, projection ) );
+	}
+
+	@Override
+	public LuceneSearchPredicateFactory predicateFactory() {
+		return new LuceneSearchPredicateFactoryImpl( SearchPredicateDslContext.root( this ) );
+	}
+
+	@Override
+	public LuceneSearchSortFactory sortFactory() {
+		return new LuceneSearchSortFactoryImpl( SearchSortDslContext
+				.root( this, LuceneSearchSortFactoryImpl::new, predicateFactory() ) );
+	}
+
+	@Override
+	public <R, E> LuceneSearchProjectionFactory<R, E> projectionFactory() {
+		return new LuceneSearchProjectionFactoryImpl<>( SearchProjectionDslContext.root( this ) );
+	}
+
+	@Override
+	public LuceneSearchAggregationFactory aggregationFactory() {
+		return new LuceneSearchAggregationFactoryImpl( SearchAggregationDslContext.root( this, predicateFactory() ) );
 	}
 
 	@Override

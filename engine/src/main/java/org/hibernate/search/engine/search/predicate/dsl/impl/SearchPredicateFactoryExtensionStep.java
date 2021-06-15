@@ -14,29 +14,25 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtensionIfSupportedMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtensionIfSupportedStep;
-import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
 
-final class SearchPredicateFactoryExtensionStep
+public final class SearchPredicateFactoryExtensionStep
 		implements SearchPredicateFactoryExtensionIfSupportedStep,
 				SearchPredicateFactoryExtensionIfSupportedMoreStep {
 
 	private final SearchPredicateFactory parent;
-	private final SearchPredicateDslContext<?> dslContext;
 
 	private final DslExtensionState<PredicateFinalStep> state = new DslExtensionState<>();
 
-	SearchPredicateFactoryExtensionStep(SearchPredicateFactory parent,
-			SearchPredicateDslContext<?> dslContext) {
+	public SearchPredicateFactoryExtensionStep(SearchPredicateFactory parent) {
 		this.parent = parent;
-		this.dslContext = dslContext;
 	}
 
 	@Override
 	public <T> SearchPredicateFactoryExtensionIfSupportedMoreStep ifSupported(
 			SearchPredicateFactoryExtension<T> extension,
 			Function<T, ? extends PredicateFinalStep> predicateContributor) {
-		state.ifSupported( extension, extension.extendOptional( parent, dslContext ), predicateContributor );
+		state.ifSupported( extension, extension.extendOptional( parent ), predicateContributor );
 		return this;
 	}
 

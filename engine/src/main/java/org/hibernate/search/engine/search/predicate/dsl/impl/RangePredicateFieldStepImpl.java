@@ -12,11 +12,11 @@ import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
-class RangePredicateFieldStepImpl implements RangePredicateFieldStep<RangePredicateFieldMoreStep<?, ?>> {
+public final class RangePredicateFieldStepImpl implements RangePredicateFieldStep<RangePredicateFieldMoreStep<?, ?>> {
 
 	private final RangePredicateFieldMoreStepImpl.CommonState commonState;
 
-	RangePredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
+	public RangePredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
 		this.commonState = new RangePredicateFieldMoreStepImpl.CommonState( dslContext );
 	}
 

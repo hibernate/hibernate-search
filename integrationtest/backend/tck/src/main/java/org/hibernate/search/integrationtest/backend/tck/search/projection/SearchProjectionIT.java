@@ -34,7 +34,6 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
-import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -669,10 +668,8 @@ public class SearchProjectionIT {
 	private static class SupportedExtension<R, E>
 			implements SearchProjectionFactoryExtension<MyExtendedFactory<R, E>, R, E> {
 		@Override
-		public Optional<MyExtendedFactory<R, E>> extendOptional(SearchProjectionFactory<R, E> original,
-				SearchProjectionDslContext<?> dslContext) {
+		public Optional<MyExtendedFactory<R, E>> extendOptional(SearchProjectionFactory<R, E> original) {
 			assertThat( original ).isNotNull();
-			assertThat( dslContext ).isNotNull();
 			return Optional.of( new MyExtendedFactory<>( original ) );
 		}
 	}
@@ -680,10 +677,8 @@ public class SearchProjectionIT {
 	private static class UnSupportedExtension<R, E>
 			implements SearchProjectionFactoryExtension<MyExtendedFactory<R, E>, R, E> {
 		@Override
-		public Optional<MyExtendedFactory<R, E>> extendOptional(SearchProjectionFactory<R, E> original,
-				SearchProjectionDslContext<?> dslContext) {
+		public Optional<MyExtendedFactory<R, E>> extendOptional(SearchProjectionFactory<R, E> original) {
 			assertThat( original ).isNotNull();
-			assertThat( dslContext ).isNotNull();
 			return Optional.empty();
 		}
 	}

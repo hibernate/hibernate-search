@@ -6,30 +6,27 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.dsl.impl;
 
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
-
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.sort.dsl.LuceneSearchSortFactory;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortIndexScope;
-import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.engine.search.sort.dsl.spi.DelegatingSearchSortFactory;
-import org.hibernate.search.engine.search.sort.dsl.spi.StaticSortThenStep;
+import org.hibernate.search.engine.search.sort.dsl.spi.AbstractSearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
+
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 
 
 public class LuceneSearchSortFactoryImpl
-		extends DelegatingSearchSortFactory<LuceneSearchSortFactory, LuceneSearchPredicateFactory>
+		extends AbstractSearchSortFactory<
+						LuceneSearchSortFactory,
+						LuceneSearchSortIndexScope<?>,
+						LuceneSearchPredicateFactory
+				>
 		implements LuceneSearchSortFactory {
 
-	private final SearchSortDslContext<LuceneSearchSortIndexScope<?>, LuceneSearchPredicateFactory> dslContext;
-
-	public LuceneSearchSortFactoryImpl(SearchSortFactory delegate,
-			SearchSortDslContext<LuceneSearchSortIndexScope<?>, LuceneSearchPredicateFactory> dslContext) {
-		super( delegate, dslContext );
-		this.dslContext = dslContext;
+	public LuceneSearchSortFactoryImpl(SearchSortDslContext<LuceneSearchSortIndexScope<?>, LuceneSearchPredicateFactory> dslContext) {
+		super( dslContext );
 	}
 
 	@Override
@@ -42,7 +39,4 @@ public class LuceneSearchSortFactoryImpl
 		return staticThenStep( dslContext.scope().sortBuilders().fromLuceneSort( luceneSort ) );
 	}
 
-	private SortThenStep staticThenStep(SearchSort sort) {
-		return new StaticSortThenStep( dslContext, sort );
-	}
 }

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.search.query.dsl.impl;
 
-import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.backend.lucene.search.aggregation.dsl.LuceneSearchAggregationFactory;
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
@@ -17,11 +16,8 @@ import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryWhe
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryIndexScope;
 import org.hibernate.search.backend.lucene.search.sort.dsl.LuceneSearchSortFactory;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractExtendedSearchQueryOptionsStep;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 
 class LuceneSearchQueryOptionsStepImpl<H, LOS>
 		extends AbstractExtendedSearchQueryOptionsStep<
@@ -32,7 +28,8 @@ class LuceneSearchQueryOptionsStepImpl<H, LOS>
 						LOS,
 						LuceneSearchPredicateFactory,
 						LuceneSearchSortFactory,
-						LuceneSearchAggregationFactory
+						LuceneSearchAggregationFactory,
+						LuceneSearchQueryIndexScope<?>
 				>
 		implements LuceneSearchQueryWhereStep<H, LOS>, LuceneSearchQueryOptionsStep<H, LOS> {
 
@@ -56,19 +53,17 @@ class LuceneSearchQueryOptionsStepImpl<H, LOS>
 	}
 
 	@Override
-	protected LuceneSearchPredicateFactory extendPredicateFactory(
-			SearchPredicateFactory predicateFactory) {
-		return predicateFactory.extension( LuceneExtension.get() );
+	protected LuceneSearchPredicateFactory predicateFactory() {
+		return scope.predicateFactory();
 	}
 
 	@Override
-	protected LuceneSearchSortFactory extendSortFactory(
-			SearchSortFactory sortFactory) {
-		return sortFactory.extension( LuceneExtension.get() );
+	protected LuceneSearchSortFactory sortFactory() {
+		return scope.sortFactory();
 	}
 
 	@Override
-	protected LuceneSearchAggregationFactory extendAggregationFactory(SearchAggregationFactory aggregationFactory) {
-		return aggregationFactory.extension( LuceneExtension.get() );
+	protected LuceneSearchAggregationFactory aggregationFactory() {
+		return scope.aggregationFactory();
 	}
 }

@@ -21,22 +21,23 @@ public abstract class AbstractExtendedSearchQueryOptionsStep<
 				S extends SearchQueryOptionsStep<S, H, LOS, SF, AF>,
 				H,
 				R extends SearchResult<H>,
-				SC extends SearchScroll<H>,
+				SCR extends SearchScroll<H>,
 				LOS,
 				PDF extends SearchPredicateFactory,
 				SF extends SearchSortFactory,
-				AF extends SearchAggregationFactory
+				AF extends SearchAggregationFactory,
+				SC extends SearchQueryIndexScope<?>
 		>
-		extends AbstractSearchQueryOptionsStep<S, H, LOS, PDF, SF, AF> {
+		extends AbstractSearchQueryOptionsStep<S, H, LOS, PDF, SF, AF, SC> {
 
-	public AbstractExtendedSearchQueryOptionsStep(SearchQueryIndexScope<?> scope,
+	public AbstractExtendedSearchQueryOptionsStep(SC scope,
 			SearchQueryBuilder<H> searchQueryBuilder,
 			SearchLoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
 		super( scope, searchQueryBuilder, loadingContextBuilder );
 	}
 
 	@Override
-	public abstract ExtendedSearchQuery<H, R, SC> toQuery();
+	public abstract ExtendedSearchQuery<H, R, SCR> toQuery();
 
 	@Override
 	public R fetchAll() {
@@ -54,7 +55,7 @@ public abstract class AbstractExtendedSearchQueryOptionsStep<
 	}
 
 	@Override
-	public SC scroll(int chunkSize) {
+	public SCR scroll(int chunkSize) {
 		return toQuery().scroll( chunkSize );
 	}
 }

@@ -9,31 +9,27 @@ package org.hibernate.search.engine.search.projection.dsl.impl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
+import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtensionIfSupportedMoreStep;
-import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
-import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 
-public class SearchProjectionFactoryExtensionStep<P, R, E> implements
+public final class SearchProjectionFactoryExtensionStep<P, R, E> implements
 		SearchProjectionFactoryExtensionIfSupportedMoreStep<P, R, E> {
 
 	private final SearchProjectionFactory<R, E> parent;
-	private final SearchProjectionDslContext<?> dslContext;
 
 	private final DslExtensionState<ProjectionFinalStep<P>> state = new DslExtensionState<>();
 
-	SearchProjectionFactoryExtensionStep(SearchProjectionFactory<R, E> parent,
-			SearchProjectionDslContext<?> dslContext) {
+	public SearchProjectionFactoryExtensionStep(SearchProjectionFactory<R, E> parent) {
 		this.parent = parent;
-		this.dslContext = dslContext;
 	}
 
 	@Override
 	public <T> SearchProjectionFactoryExtensionIfSupportedMoreStep<P, R, E> ifSupported(
 			SearchProjectionFactoryExtension<T, R, E> extension,
 			Function<T, ? extends ProjectionFinalStep<P>> projectionContributor) {
-		state.ifSupported( extension, extension.extendOptional( parent, dslContext ), projectionContributor );
+		state.ifSupported( extension, extension.extendOptional( parent ), projectionContributor );
 		return this;
 	}
 

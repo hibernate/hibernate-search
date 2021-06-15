@@ -13,11 +13,11 @@ import org.hibernate.search.engine.search.predicate.dsl.TermsPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
 
-class TermsPredicateFieldStepImpl implements TermsPredicateFieldStep<TermsPredicateFieldMoreStep<?, ?>> {
+public final class TermsPredicateFieldStepImpl implements TermsPredicateFieldStep<TermsPredicateFieldMoreStep<?, ?>> {
 
 	private final TermsPredicateFieldMoreStepImpl.CommonState commonState;
 
-	TermsPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
+	public TermsPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
 		this.commonState = new TermsPredicateFieldMoreStepImpl.CommonState( dslContext );
 	}
 

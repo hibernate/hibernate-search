@@ -13,11 +13,11 @@ import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldMoreS
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
 
-class MatchPredicateFieldStepImpl implements MatchPredicateFieldStep<MatchPredicateFieldMoreStep<?, ?>> {
+public final class MatchPredicateFieldStepImpl implements MatchPredicateFieldStep<MatchPredicateFieldMoreStep<?, ?>> {
 
 	private final MatchPredicateFieldMoreStepImpl.CommonState commonState;
 
-	MatchPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
+	public MatchPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
 		this.commonState = new MatchPredicateFieldMoreStepImpl.CommonState( dslContext );
 	}
 

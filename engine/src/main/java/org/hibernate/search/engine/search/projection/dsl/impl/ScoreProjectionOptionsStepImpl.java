@@ -12,12 +12,12 @@ import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDsl
 import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 
 
-public class ScoreProjectionOptionsStepImpl
+public final class ScoreProjectionOptionsStepImpl
 		implements ScoreProjectionOptionsStep<ScoreProjectionOptionsStepImpl> {
 
 	private final ScoreProjectionBuilder scoreProjectionBuilder;
 
-	ScoreProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext) {
+	public ScoreProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext) {
 		this.scoreProjectionBuilder = dslContext.scope().projectionBuilders().score();
 	}
 

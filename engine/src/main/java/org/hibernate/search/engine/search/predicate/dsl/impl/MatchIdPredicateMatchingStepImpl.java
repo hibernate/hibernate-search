@@ -15,14 +15,14 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFin
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 
-class MatchIdPredicateMatchingStepImpl
+public final class MatchIdPredicateMatchingStepImpl
 		extends AbstractPredicateFinalStep
 		implements MatchIdPredicateMatchingStep<MatchIdPredicateMatchingStepImpl>,
 				MatchIdPredicateMatchingMoreStep<MatchIdPredicateMatchingStepImpl, MatchIdPredicateOptionsStep<?>> {
 
 	private final MatchIdPredicateBuilder matchIdBuilder;
 
-	MatchIdPredicateMatchingStepImpl(SearchPredicateDslContext<?> dslContext) {
+	public MatchIdPredicateMatchingStepImpl(SearchPredicateDslContext<?> dslContext) {
 		super( dslContext );
 		this.matchIdBuilder = dslContext.scope().predicateBuilders().id();
 	}

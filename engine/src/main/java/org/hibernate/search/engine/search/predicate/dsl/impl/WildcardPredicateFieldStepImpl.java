@@ -13,12 +13,12 @@ import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldMo
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
 
-class WildcardPredicateFieldStepImpl
+public final class WildcardPredicateFieldStepImpl
 		implements WildcardPredicateFieldStep<WildcardPredicateFieldMoreStep<?, ?>> {
 
 	private final WildcardPredicateFieldMoreStepImpl.CommonState commonState;
 
-	WildcardPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
+	public WildcardPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
 		this.commonState = new WildcardPredicateFieldMoreStepImpl.CommonState( dslContext );
 	}
 

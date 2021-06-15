@@ -10,7 +10,6 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationIndexScope;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 
 /**
@@ -20,23 +19,32 @@ import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
  * @param <SC> The type of the backend-specific search scope.
  * @param <PDF> The type of factory used to create predicates in {@link FieldSortOptionsStep#filter(Function)}.
  */
-public interface SearchAggregationDslContext<SC extends SearchAggregationIndexScope<?>, PDF extends SearchPredicateFactory> {
+public class SearchAggregationDslContext<SC extends SearchAggregationIndexScope<?>, PDF extends SearchPredicateFactory> {
+	public static <SC extends SearchAggregationIndexScope<?>, PDF extends SearchPredicateFactory>
+			SearchAggregationDslContext<SC, PDF> root(SC scope, PDF predicateFactory) {
+		return new SearchAggregationDslContext<>( scope, predicateFactory );
+	}
+
+	private final SC scope;
+	private final PDF predicateFactory;
+
+	private SearchAggregationDslContext(SC scope, PDF predicateFactory) {
+		this.scope = scope;
+		this.predicateFactory = predicateFactory;
+	}
 
 	/**
 	 * @return The search scope.
 	 */
-	SC scope();
+	public SC scope() {
+		return scope;
+	}
 
 	/**
 	 * @return The predicate factory. Will always return the exact same instance.
 	 */
-	PDF predicateFactory();
+	public PDF predicateFactory() {
+		return predicateFactory;
+	}
 
-	/**
-	 * @param extension The extension to apply to the predicate factory.
-	 * @param <PDF2> The type of the new predicate factory.
-	 * @return A new context, identical to {@code this} except for the predicate factory which is extended.
-	 */
-	<PDF2 extends SearchPredicateFactory> SearchAggregationDslContext<SC, PDF2> withExtendedPredicateFactory(
-			SearchPredicateFactoryExtension<PDF2> extension);
 }

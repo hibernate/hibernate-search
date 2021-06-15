@@ -56,8 +56,7 @@ public final class DefaultSearchQuerySelectStep<R, E, LOS>
 	@Override
 	public <P> DefaultSearchQueryOptionsStep<P, LOS> select(
 			Function<? super SearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
-		SearchProjectionFactory<R, E> factory = createDefaultProjectionFactory();
-		SearchProjection<P> projection = projectionContributor.apply( factory ).toProjection();
+		SearchProjection<P> projection = projectionContributor.apply( scope.projectionFactory() ).toProjection();
 		return select( projection );
 	}
 

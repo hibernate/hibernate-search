@@ -11,8 +11,6 @@ import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
-import org.hibernate.search.engine.search.projection.dsl.impl.DefaultSearchProjectionFactory;
-import org.hibernate.search.engine.search.projection.dsl.impl.SearchProjectionDslContextImpl;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
@@ -33,12 +31,6 @@ public abstract class AbstractSearchQuerySelectStep<
 		return DslExtensionState.returnIfSupported(
 				extension,
 				extension.extendOptional( this, scope(), sessionContext(), loadingContextBuilder() )
-		);
-	}
-
-	protected final SearchProjectionFactory<R, E> createDefaultProjectionFactory() {
-		return new DefaultSearchProjectionFactory<>(
-				SearchProjectionDslContextImpl.root( scope() )
 		);
 	}
 

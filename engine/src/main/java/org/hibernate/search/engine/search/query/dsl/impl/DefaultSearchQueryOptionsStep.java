@@ -23,8 +23,9 @@ final class DefaultSearchQueryOptionsStep<H, LOS>
 						LOS,
 						SearchPredicateFactory,
 						SearchSortFactory,
-						SearchAggregationFactory
-		>
+						SearchAggregationFactory,
+						SearchQueryIndexScope<?>
+				>
 		implements SearchQueryWhereStep<DefaultSearchQueryOptionsStep<H, LOS>, H, LOS, SearchPredicateFactory>,
 				SearchQueryOptionsStep<DefaultSearchQueryOptionsStep<H, LOS>, H, LOS, SearchSortFactory, SearchAggregationFactory> {
 
@@ -34,22 +35,18 @@ final class DefaultSearchQueryOptionsStep<H, LOS>
 	}
 
 	@Override
-	protected SearchPredicateFactory extendPredicateFactory(
-			SearchPredicateFactory predicateFactory) {
-		// We don't extend anything.
-		return predicateFactory;
+	protected SearchPredicateFactory predicateFactory() {
+		return scope.predicateFactory();
 	}
 
 	@Override
-	protected SearchSortFactory extendSortFactory(SearchSortFactory sortFactory) {
-		// We don't extend anything.
-		return sortFactory;
+	protected SearchSortFactory sortFactory() {
+		return scope.sortFactory();
 	}
 
 	@Override
-	protected SearchAggregationFactory extendAggregationFactory(SearchAggregationFactory aggregationFactory) {
-		// We don't extend anything.
-		return aggregationFactory;
+	protected SearchAggregationFactory aggregationFactory() {
+		return scope.aggregationFactory();
 	}
 
 	@Override

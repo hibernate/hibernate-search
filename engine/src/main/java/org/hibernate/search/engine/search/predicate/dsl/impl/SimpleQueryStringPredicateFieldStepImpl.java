@@ -13,12 +13,12 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredica
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
 
-class SimpleQueryStringPredicateFieldStepImpl
+public final class SimpleQueryStringPredicateFieldStepImpl
 		implements SimpleQueryStringPredicateFieldStep<SimpleQueryStringPredicateFieldMoreStep<?, ?>> {
 
 	private final SimpleQueryStringPredicateFieldMoreStepImpl.CommonState commonState;
 
-	SimpleQueryStringPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
+	public SimpleQueryStringPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
 		this.commonState = new SimpleQueryStringPredicateFieldMoreStepImpl.CommonState( dslContext );
 	}
 

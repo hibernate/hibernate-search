@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.search.sort.dsl.impl;
+package org.hibernate.search.engine.search.sort.dsl.spi;
 
 import java.util.function.Consumer;
 
@@ -13,22 +13,31 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.CompositeSortComponentsStep;
 import org.hibernate.search.engine.search.sort.dsl.DistanceSortOptionsStep;
+import org.hibernate.search.engine.search.sort.dsl.ExtendedSearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.ScoreSortOptionsStep;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
-import org.hibernate.search.engine.search.sort.dsl.spi.StaticSortThenStep;
-import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
+import org.hibernate.search.engine.search.sort.dsl.impl.CompositeSortComponentsStepImpl;
+import org.hibernate.search.engine.search.sort.dsl.impl.DistanceSortOptionsStepImpl;
+import org.hibernate.search.engine.search.sort.dsl.impl.FieldSortOptionsStepImpl;
+import org.hibernate.search.engine.search.sort.dsl.impl.ScoreSortOptionsStepImpl;
+import org.hibernate.search.engine.search.sort.dsl.impl.SearchSortFactoryExtensionStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtensionIfSupportedStep;
+import org.hibernate.search.engine.search.sort.spi.SearchSortIndexScope;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 
-public class DefaultSearchSortFactory implements SearchSortFactory {
+public class AbstractSearchSortFactory<
+				S extends ExtendedSearchSortFactory<S, PDF>,
+				SC extends SearchSortIndexScope<?>,
+				PDF extends SearchPredicateFactory
+		>
+		implements ExtendedSearchSortFactory<S, PDF> {
 
-	private final SearchSortDslContext<?, ?> dslContext;
+	protected final SearchSortDslContext<SC, PDF> dslContext;
 
-	public DefaultSearchSortFactory(SearchSortDslContext<?, ?> dslContext) {
+	public AbstractSearchSortFactory(SearchSortDslContext<SC, PDF> dslContext) {
 		this.dslContext = dslContext;
 	}
 
@@ -43,12 +52,12 @@ public class DefaultSearchSortFactory implements SearchSortFactory {
 	}
 
 	@Override
-	public FieldSortOptionsStep<?, ? extends SearchPredicateFactory> field(String absoluteFieldPath) {
+	public FieldSortOptionsStep<?, PDF> field(String absoluteFieldPath) {
 		return new FieldSortOptionsStepImpl<>( dslContext, absoluteFieldPath );
 	}
 
 	@Override
-	public DistanceSortOptionsStep<?, ? extends SearchPredicateFactory> distance(String absoluteFieldPath, GeoPoint location) {
+	public DistanceSortOptionsStep<?, PDF> distance(String absoluteFieldPath, GeoPoint location) {
 		return new DistanceSortOptionsStepImpl<>(
 				dslContext, absoluteFieldPath, location
 		);
@@ -69,7 +78,7 @@ public class DefaultSearchSortFactory implements SearchSortFactory {
 	@Override
 	public <T> T extension(SearchSortFactoryExtension<T> extension) {
 		return DslExtensionState.returnIfSupported(
-				extension, extension.extendOptional( this, dslContext )
+				extension, extension.extendOptional( this )
 		);
 	}
 
@@ -78,7 +87,7 @@ public class DefaultSearchSortFactory implements SearchSortFactory {
 		return new SearchSortFactoryExtensionStep( this, dslContext );
 	}
 
-	private SortThenStep staticThenStep(SearchSort sort) {
+	protected final SortThenStep staticThenStep(SearchSort sort) {
 		return new StaticSortThenStep( dslContext, sort );
 	}
 

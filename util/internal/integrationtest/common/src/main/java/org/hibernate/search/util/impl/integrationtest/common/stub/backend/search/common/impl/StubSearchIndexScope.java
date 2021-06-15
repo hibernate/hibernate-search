@@ -12,20 +12,32 @@ import java.util.Set;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.scope.spi.AbstractSearchIndexScope;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexModel;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.aggregation.dsl.impl.StubSearchAggregationFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.aggregation.impl.StubSearchAggregationBuilderFactory;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.dsl.impl.StubSearchPredicateFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl.StubSearchPredicateBuilderFactory;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.dsl.impl.StubSearchProjectionFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.impl.StubSearchQueryBuilder;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.dsl.impl.StubSearchSortFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.impl.StubSearchSortBuilderFactory;
 
 public class StubSearchIndexScope
@@ -80,6 +92,26 @@ public class StubSearchIndexScope
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<P> projection) {
 		return new StubSearchQueryBuilder<>( backend, this, sessionContext, loadingContextBuilder,
 				(StubSearchProjection<P>) projection );
+	}
+
+	@Override
+	public SearchPredicateFactory predicateFactory() {
+		return new StubSearchPredicateFactory( SearchPredicateDslContext.root( this ) );
+	}
+
+	@Override
+	public SearchSortFactory sortFactory() {
+		return new StubSearchSortFactory( SearchSortDslContext.root( this, StubSearchSortFactory::new, predicateFactory() ) );
+	}
+
+	@Override
+	public <R, E> SearchProjectionFactory<R, E> projectionFactory() {
+		return new StubSearchProjectionFactory<>( SearchProjectionDslContext.root( this ) );
+	}
+
+	@Override
+	public SearchAggregationFactory aggregationFactory() {
+		return new StubSearchAggregationFactory( SearchAggregationDslContext.root( this, predicateFactory() ) );
 	}
 
 	@Override

@@ -11,24 +11,23 @@ import org.hibernate.search.backend.elasticsearch.search.sort.dsl.ElasticsearchS
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSort;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortIndexScope;
 import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.engine.search.sort.dsl.spi.DelegatingSearchSortFactory;
-import org.hibernate.search.engine.search.sort.dsl.spi.StaticSortThenStep;
+import org.hibernate.search.engine.search.sort.dsl.spi.AbstractSearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
+import org.hibernate.search.engine.search.sort.dsl.spi.StaticSortThenStep;
 
 import com.google.gson.JsonObject;
 
 
 public class ElasticsearchSearchSortFactoryImpl
-		extends DelegatingSearchSortFactory<ElasticsearchSearchSortFactory, ElasticsearchSearchPredicateFactory>
+		extends AbstractSearchSortFactory<
+						ElasticsearchSearchSortFactory,
+						ElasticsearchSearchSortIndexScope<?>,
+						ElasticsearchSearchPredicateFactory
+				>
 		implements ElasticsearchSearchSortFactory {
 
-	private final SearchSortDslContext<ElasticsearchSearchSortIndexScope<?>, ElasticsearchSearchPredicateFactory> dslContext;
-
-	public ElasticsearchSearchSortFactoryImpl(SearchSortFactory delegate,
-			SearchSortDslContext<ElasticsearchSearchSortIndexScope<?>, ElasticsearchSearchPredicateFactory> dslContext) {
-		super( delegate, dslContext );
-		this.dslContext = dslContext;
+	public ElasticsearchSearchSortFactoryImpl(SearchSortDslContext<ElasticsearchSearchSortIndexScope<?>, ElasticsearchSearchPredicateFactory> dslContext) {
+		super( dslContext );
 	}
 
 	@Override

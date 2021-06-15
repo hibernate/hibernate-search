@@ -10,11 +10,11 @@ import org.hibernate.search.engine.search.predicate.dsl.SpatialPredicateInitialS
 import org.hibernate.search.engine.search.predicate.dsl.SpatialWithinPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
-class SpatialPredicateInitialStepImpl implements SpatialPredicateInitialStep {
+public final class SpatialPredicateInitialStepImpl implements SpatialPredicateInitialStep {
 
 	private final SearchPredicateDslContext<?> dslContext;
 
-	SpatialPredicateInitialStepImpl(SearchPredicateDslContext<?> dslContext) {
+	public SpatialPredicateInitialStepImpl(SearchPredicateDslContext<?> dslContext) {
 		this.dslContext = dslContext;
 	}
 

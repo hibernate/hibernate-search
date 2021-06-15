@@ -8,24 +8,24 @@ package org.hibernate.search.backend.elasticsearch.search.projection.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.projection.dsl.ElasticsearchSearchProjectionFactory;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionIndexScope;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
-import org.hibernate.search.engine.search.projection.dsl.spi.DelegatingSearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.spi.AbstractSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.projection.dsl.spi.StaticProjectionFinalStep;
 
 import com.google.gson.JsonObject;
 
 public class ElasticsearchSearchProjectionFactoryImpl<R, E>
-		extends DelegatingSearchProjectionFactory<ElasticsearchSearchProjectionFactory<R, E>, R, E>
+		extends AbstractSearchProjectionFactory<
+						ElasticsearchSearchProjectionFactory<R, E>,
+						ElasticsearchSearchProjectionIndexScope<?>,
+						R,
+						E
+				>
 		implements ElasticsearchSearchProjectionFactory<R, E> {
 
-	private final SearchProjectionDslContext<ElasticsearchSearchProjectionIndexScope<?>> dslContext;
-
-	public ElasticsearchSearchProjectionFactoryImpl(SearchProjectionFactory<R, E> delegate,
-			SearchProjectionDslContext<ElasticsearchSearchProjectionIndexScope<?>> dslContext) {
-		super( delegate );
-		this.dslContext = dslContext;
+	public ElasticsearchSearchProjectionFactoryImpl(SearchProjectionDslContext<ElasticsearchSearchProjectionIndexScope<?>> dslContext) {
+		super( dslContext );
 	}
 
 	@Override

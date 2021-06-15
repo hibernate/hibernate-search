@@ -13,12 +13,12 @@ import org.hibernate.search.engine.search.predicate.dsl.RegexpPredicateFieldStep
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 
 
-class RegexpPredicateFieldStepImpl
+public final class RegexpPredicateFieldStepImpl
 		implements RegexpPredicateFieldStep<RegexpPredicateFieldMoreStep<?, ?>> {
 
 	private final RegexpPredicateFieldMoreStepImpl.CommonState commonState;
 
-	RegexpPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
+	public RegexpPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
 		this.commonState = new RegexpPredicateFieldMoreStepImpl.CommonState( dslContext );
 	}
 

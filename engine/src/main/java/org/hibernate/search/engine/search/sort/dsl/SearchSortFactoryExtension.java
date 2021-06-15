@@ -9,9 +9,6 @@ package org.hibernate.search.engine.search.sort.dsl;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.search.sort.dsl.spi.DelegatingSearchSortFactory;
-import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
-
 /**
  * An extension to the search sort DSL, allowing the use of non-standard sorts in a query.
  * <p>
@@ -24,7 +21,7 @@ import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
  * {@link SearchSortFactory}.
  *
  * @see SearchSortFactory#extension(SearchSortFactoryExtension)
- * @see DelegatingSearchSortFactory
+ * @see ExtendedSearchSortFactory
  */
 public interface SearchSortFactoryExtension<T> {
 
@@ -34,10 +31,9 @@ public interface SearchSortFactoryExtension<T> {
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
 	 * @param original The original, non-extended {@link SearchSortFactory}.
-	 * @param dslContext A {@link SearchSortDslContext}.
 	 * @return An optional containing the extended sort factory ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchSortFactory original, SearchSortDslContext<?, ?> dslContext);
+	Optional<T> extendOptional(SearchSortFactory original);
 
 }

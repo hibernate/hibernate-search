@@ -13,12 +13,12 @@ import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDsl
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
 
 
-public class DocumentReferenceProjectionOptionsStepImpl
+public final class DocumentReferenceProjectionOptionsStepImpl
 		implements DocumentReferenceProjectionOptionsStep<DocumentReferenceProjectionOptionsStepImpl> {
 
 	private final DocumentReferenceProjectionBuilder documentReferenceProjectionBuilder;
 
-	DocumentReferenceProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext) {
+	public DocumentReferenceProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext) {
 		this.documentReferenceProjectionBuilder = dslContext.scope().projectionBuilders().documentReference();
 	}
 

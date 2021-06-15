@@ -12,12 +12,12 @@ import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDsl
 import org.hibernate.search.engine.search.projection.spi.EntityProjectionBuilder;
 
 
-public class EntityProjectionOptionsStepImpl<E>
+public final class EntityProjectionOptionsStepImpl<E>
 		implements EntityProjectionOptionsStep<EntityProjectionOptionsStepImpl<E>, E> {
 
 	private final EntityProjectionBuilder<E> entityProjectionBuilder;
 
-	EntityProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext) {
+	public EntityProjectionOptionsStepImpl(SearchProjectionDslContext<?> dslContext) {
 		this.entityProjectionBuilder = dslContext.scope().projectionBuilders().entity();
 	}
 

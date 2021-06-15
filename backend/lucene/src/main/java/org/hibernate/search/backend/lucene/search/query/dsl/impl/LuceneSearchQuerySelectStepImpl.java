@@ -9,7 +9,6 @@ package org.hibernate.search.backend.lucene.search.query.dsl.impl;
 import java.util.List;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.projection.dsl.LuceneSearchProjectionFactory;
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryOptionsStep;
@@ -61,9 +60,7 @@ public class LuceneSearchQuerySelectStepImpl<R, E, LOS>
 	@Override
 	public <P> LuceneSearchQueryWhereStep<P, LOS> select(
 			Function<? super LuceneSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
-		LuceneSearchProjectionFactory<R, E> factoryContext =
-				createDefaultProjectionFactory().extension( LuceneExtension.get() );
-		SearchProjection<P> projection = projectionContributor.apply( factoryContext ).toProjection();
+		SearchProjection<P> projection = projectionContributor.apply( scope.projectionFactory() ).toProjection();
 		return select( projection );
 	}
 
