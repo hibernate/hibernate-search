@@ -19,12 +19,12 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexObjectFieldCardinality;
 
 public class SecondLevelObjectBinding extends AbstractObjectBinding {
-	public final String relativeFieldName;
 	public final IndexObjectFieldReference self;
 
 	public final IndexFieldReference<String> discriminator;
 
-	public static SecondLevelObjectBinding create(IndexSchemaElement parent, String relativeFieldName,
+	public static SecondLevelObjectBinding create(AbstractObjectBinding parentBinding, String relativeFieldName,
+			IndexSchemaElement parent,
 			ObjectStructure structure, Collection<? extends FieldTypeDescriptor<?>> supportedFieldTypes,
 			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration,
 			IndexObjectFieldCardinality nestedFieldCardinality) {
@@ -33,15 +33,15 @@ public class SecondLevelObjectBinding extends AbstractObjectBinding {
 				&& IndexObjectFieldCardinality.MULTI_VALUED.equals( nestedFieldCardinality ) ) {
 			objectField.multiValued();
 		}
-		return new SecondLevelObjectBinding( relativeFieldName, objectField,
+		return new SecondLevelObjectBinding( parentBinding, relativeFieldName, objectField,
 				supportedFieldTypes, additionalConfiguration );
 	}
 
-	SecondLevelObjectBinding(String relativeFieldName, IndexSchemaObjectField objectField,
+	SecondLevelObjectBinding(AbstractObjectBinding parentBinding, String relativeFieldName,
+			IndexSchemaObjectField objectField,
 			Collection<? extends FieldTypeDescriptor<?>> supportedFieldTypes,
 			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
-		super( objectField, supportedFieldTypes, additionalConfiguration );
-		this.relativeFieldName = relativeFieldName;
+		super( parentBinding, relativeFieldName, objectField, supportedFieldTypes, additionalConfiguration );
 		self = objectField.toReference();
 		discriminator = objectField.field( "discriminator", f -> f.asString() ).toReference();
 	}
