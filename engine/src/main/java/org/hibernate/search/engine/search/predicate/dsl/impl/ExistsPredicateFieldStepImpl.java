@@ -15,14 +15,14 @@ import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 
 
-final class ExistsPredicateFieldStepImpl
+public final class ExistsPredicateFieldStepImpl
 		extends AbstractPredicateFinalStep
 		implements ExistsPredicateFieldStep<ExistsPredicateOptionsStep<?>>,
 				ExistsPredicateOptionsStep<ExistsPredicateOptionsStep<?>> {
 
 	private ExistsPredicateBuilder builder;
 
-	ExistsPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
+	public ExistsPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext) {
 		super( dslContext );
 	}
 

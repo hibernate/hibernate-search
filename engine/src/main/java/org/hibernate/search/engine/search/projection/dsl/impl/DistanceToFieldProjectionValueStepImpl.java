@@ -16,11 +16,11 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.SingleValuedProjectionAccumulator;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-public class DistanceToFieldProjectionValueStepImpl
+public final class DistanceToFieldProjectionValueStepImpl
 		extends DistanceToFieldProjectionOptionsStepImpl<Double>
 		implements DistanceToFieldProjectionValueStep<DistanceToFieldProjectionOptionsStepImpl<Double>, Double> {
 
-	DistanceToFieldProjectionValueStepImpl(SearchProjectionDslContext<?> dslContext, String absoluteFieldPath,
+	public DistanceToFieldProjectionValueStepImpl(SearchProjectionDslContext<?> dslContext, String absoluteFieldPath,
 			GeoPoint center) {
 		super( dslContext.scope().fieldQueryElement( absoluteFieldPath, ProjectionTypeKeys.DISTANCE ),
 				SingleValuedProjectionAccumulator.provider() );

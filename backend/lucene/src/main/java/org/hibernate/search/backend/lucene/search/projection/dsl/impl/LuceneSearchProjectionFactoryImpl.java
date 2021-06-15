@@ -8,9 +8,8 @@ package org.hibernate.search.backend.lucene.search.projection.dsl.impl;
 
 import org.hibernate.search.backend.lucene.search.projection.dsl.LuceneSearchProjectionFactory;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionIndexScope;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
-import org.hibernate.search.engine.search.projection.dsl.spi.DelegatingSearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.spi.AbstractSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.projection.dsl.spi.StaticProjectionFinalStep;
 
@@ -18,15 +17,16 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Explanation;
 
 public class LuceneSearchProjectionFactoryImpl<R, E>
-		extends DelegatingSearchProjectionFactory<LuceneSearchProjectionFactory<R, E>, R, E>
+		extends AbstractSearchProjectionFactory<
+						LuceneSearchProjectionFactory<R, E>,
+						LuceneSearchProjectionIndexScope<?>,
+						R,
+						E
+				>
 		implements LuceneSearchProjectionFactory<R, E> {
 
-	private final SearchProjectionDslContext<LuceneSearchProjectionIndexScope<?>> dslContext;
-
-	public LuceneSearchProjectionFactoryImpl(SearchProjectionFactory<R, E> delegate,
-			SearchProjectionDslContext<LuceneSearchProjectionIndexScope<?>> dslContext) {
-		super( delegate );
-		this.dslContext = dslContext;
+	public LuceneSearchProjectionFactoryImpl(SearchProjectionDslContext<LuceneSearchProjectionIndexScope<?>> dslContext) {
+		super( dslContext );
 	}
 
 	@Override

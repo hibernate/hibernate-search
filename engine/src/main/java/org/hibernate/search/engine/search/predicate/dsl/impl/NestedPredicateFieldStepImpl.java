@@ -20,7 +20,7 @@ import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PredicateTypeKeys;
 
 
-class NestedPredicateFieldStepImpl
+public final class NestedPredicateFieldStepImpl
 		extends AbstractPredicateFinalStep
 		implements NestedPredicateFieldStep<NestedPredicateNestStep<?>>,
 				NestedPredicateNestStep<NestedPredicateOptionsStep<?>>,
@@ -29,7 +29,7 @@ class NestedPredicateFieldStepImpl
 	private final SearchPredicateFactory factory;
 	private NestedPredicateBuilder builder;
 
-	NestedPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext, SearchPredicateFactory factory) {
+	public NestedPredicateFieldStepImpl(SearchPredicateDslContext<?> dslContext, SearchPredicateFactory factory) {
 		super( dslContext );
 		this.factory = factory;
 	}

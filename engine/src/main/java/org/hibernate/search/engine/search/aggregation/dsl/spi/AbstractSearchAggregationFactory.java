@@ -6,32 +6,26 @@
  */
 package org.hibernate.search.engine.search.aggregation.dsl.spi;
 
+import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.aggregation.dsl.ExtendedSearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationFieldStep;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactoryExtension;
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationFieldStep;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.RangeAggregationFieldStepImpl;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.TermsAggregationFieldStepImpl;
+import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationIndexScope;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
-/**
- * A delegating {@link SearchAggregationFactory}.
- * <p>
- * Mainly useful when implementing a {@link SearchAggregationFactoryExtension}.
- */
-public class DelegatingSearchAggregationFactory<
+public abstract class AbstractSearchAggregationFactory<
 				S extends ExtendedSearchAggregationFactory<S, PDF>,
+				SC extends SearchAggregationIndexScope<?>,
 				PDF extends SearchPredicateFactory
 		>
 		implements ExtendedSearchAggregationFactory<S, PDF> {
 
-	private final SearchAggregationFactory delegate;
-	private final SearchAggregationDslContext<?, ? extends PDF> dslContext;
+	protected final SearchAggregationDslContext<SC, PDF> dslContext;
 
-	public DelegatingSearchAggregationFactory(SearchAggregationFactory delegate,
-			SearchAggregationDslContext<?, ? extends PDF> dslContext) {
-		this.delegate = delegate;
+	public AbstractSearchAggregationFactory(SearchAggregationDslContext<SC, PDF> dslContext) {
 		this.dslContext = dslContext;
 	}
 
@@ -47,10 +41,6 @@ public class DelegatingSearchAggregationFactory<
 
 	@Override
 	public <T> T extension(SearchAggregationFactoryExtension<T> extension) {
-		return delegate.extension( extension );
-	}
-
-	protected SearchAggregationFactory delegate() {
-		return delegate;
+		return DslExtensionState.returnIfSupported( extension, extension.extendOptional( this ) );
 	}
 }

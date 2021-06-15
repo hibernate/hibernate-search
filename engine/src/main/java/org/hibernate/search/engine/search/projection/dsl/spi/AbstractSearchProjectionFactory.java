@@ -4,37 +4,52 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.search.projection.dsl.impl;
+package org.hibernate.search.engine.search.projection.dsl.spi;
 
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.CompositeProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.DistanceToFieldProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.DocumentReferenceProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.EntityProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.EntityReferenceProjectionOptionsStep;
+import org.hibernate.search.engine.search.projection.dsl.ExtendedSearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.FieldProjectionValueStep;
 import org.hibernate.search.engine.search.projection.dsl.IdProjectionOptionsStep;
 import org.hibernate.search.engine.search.projection.dsl.ScoreProjectionOptionsStep;
-import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtensionIfSupportedStep;
-import org.hibernate.search.engine.search.common.ValueConvert;
-import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
+import org.hibernate.search.engine.search.projection.dsl.impl.CompositeProjectionOptionsStepImpl;
+import org.hibernate.search.engine.search.projection.dsl.impl.DistanceToFieldProjectionValueStepImpl;
+import org.hibernate.search.engine.search.projection.dsl.impl.DocumentReferenceProjectionOptionsStepImpl;
+import org.hibernate.search.engine.search.projection.dsl.impl.EntityProjectionOptionsStepImpl;
+import org.hibernate.search.engine.search.projection.dsl.impl.EntityReferenceProjectionOptionsStepImpl;
+import org.hibernate.search.engine.search.projection.dsl.impl.FieldProjectionValueStepImpl;
+import org.hibernate.search.engine.search.projection.dsl.impl.IdProjectionOptionsStepImpl;
+import org.hibernate.search.engine.search.projection.dsl.impl.ScoreProjectionOptionsStepImpl;
+import org.hibernate.search.engine.search.projection.dsl.impl.SearchProjectionFactoryExtensionStep;
+import org.hibernate.search.engine.search.projection.spi.SearchProjectionIndexScope;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.function.TriFunction;
 import org.hibernate.search.util.common.impl.Contracts;
 
 
-public class DefaultSearchProjectionFactory<R, E> implements SearchProjectionFactory<R, E> {
+public abstract class AbstractSearchProjectionFactory<
+				S extends ExtendedSearchProjectionFactory<S, R, E>,
+				SC extends SearchProjectionIndexScope<?>,
+				R,
+				E
+		>
+		implements ExtendedSearchProjectionFactory<S, R, E> {
 
-	private final SearchProjectionDslContext<?> dslContext;
+	protected final SearchProjectionDslContext<SC> dslContext;
 
-	public DefaultSearchProjectionFactory(SearchProjectionDslContext<?> dslContext) {
+	public AbstractSearchProjectionFactory(SearchProjectionDslContext<SC> dslContext) {
 		this.dslContext = dslContext;
 	}
 
@@ -62,7 +77,7 @@ public class DefaultSearchProjectionFactory<R, E> implements SearchProjectionFac
 	@Override
 	public <I> IdProjectionOptionsStep<?, I> id(Class<I> identifierType) {
 		Contracts.assertNotNull( identifierType, "identifierType" );
-		return new IdProjectionOptionsStepImpl( dslContext, identifierType );
+		return new IdProjectionOptionsStepImpl<>( dslContext, identifierType );
 	}
 
 	@Override
@@ -122,12 +137,12 @@ public class DefaultSearchProjectionFactory<R, E> implements SearchProjectionFac
 	@Override
 	public <T> T extension(SearchProjectionFactoryExtension<T, R, E> extension) {
 		return DslExtensionState.returnIfSupported(
-				extension, extension.extendOptional( this, dslContext )
+				extension, extension.extendOptional( this )
 		);
 	}
 
 	@Override
 	public <T> SearchProjectionFactoryExtensionIfSupportedStep<T, R, E> extension() {
-		return new SearchProjectionFactoryExtensionStep<>( this, dslContext );
+		return new SearchProjectionFactoryExtensionStep<>( this );
 	}
 }

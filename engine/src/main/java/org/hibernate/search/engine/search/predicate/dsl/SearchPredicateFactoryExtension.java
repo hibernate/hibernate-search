@@ -9,9 +9,6 @@ package org.hibernate.search.engine.search.predicate.dsl;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.search.predicate.dsl.spi.DelegatingSearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
-
 /**
  * An extension to the search predicate DSL, allowing the use of non-standard predicates in a query.
  * <p>
@@ -24,7 +21,7 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslCo
  * {@link SearchPredicateFactory}.
  *
  * @see SearchPredicateFactory#extension(SearchPredicateFactoryExtension)
- * @see DelegatingSearchPredicateFactory
+ * @see ExtendedSearchPredicateFactory
  */
 public interface SearchPredicateFactoryExtension<T> {
 
@@ -34,10 +31,9 @@ public interface SearchPredicateFactoryExtension<T> {
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
 	 * @param original The original, non-extended {@link SearchPredicateFactory}.
-	 * @param dslContext A {@link SearchPredicateDslContext}.
 	 * @return An optional containing the extended search predicate factory ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchPredicateFactory original, SearchPredicateDslContext<?> dslContext);
+	Optional<T> extendOptional(SearchPredicateFactory original);
 
 }

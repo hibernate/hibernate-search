@@ -18,7 +18,7 @@ import org.hibernate.search.engine.search.sort.dsl.spi.StaticSortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 
 
-final class SearchSortFactoryExtensionStep
+public final class SearchSortFactoryExtensionStep
 		implements SearchSortFactoryExtensionIfSupportedMoreStep {
 
 	private final SearchSortFactory parent;
@@ -26,7 +26,7 @@ final class SearchSortFactoryExtensionStep
 
 	private final DslExtensionState<SortFinalStep> state = new DslExtensionState<>();
 
-	SearchSortFactoryExtensionStep(SearchSortFactory parent,
+	public SearchSortFactoryExtensionStep(SearchSortFactory parent,
 			SearchSortDslContext<?, ?> dslContext) {
 		this.parent = parent;
 		this.dslContext = dslContext;
@@ -36,7 +36,7 @@ final class SearchSortFactoryExtensionStep
 	public <T> SearchSortFactoryExtensionIfSupportedMoreStep ifSupported(
 			SearchSortFactoryExtension<T> extension,
 			Function<T, ? extends SortFinalStep> sortContributor) {
-		state.ifSupported( extension, extension.extendOptional( parent, dslContext ), sortContributor );
+		state.ifSupported( extension, extension.extendOptional( parent ), sortContributor );
 		return this;
 	}
 

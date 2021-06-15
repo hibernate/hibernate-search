@@ -10,11 +10,15 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.hibernate.search.backend.lucene.search.aggregation.dsl.LuceneSearchAggregationFactory;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregationIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateIndexScope;
+import org.hibernate.search.backend.lucene.search.projection.dsl.LuceneSearchProjectionFactory;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionIndexScope;
+import org.hibernate.search.backend.lucene.search.sort.dsl.LuceneSearchSortFactory;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortIndexScope;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
@@ -32,6 +36,18 @@ public interface LuceneSearchQueryIndexScope<S extends LuceneSearchQueryIndexSco
 	@Override
 	<P> LuceneSearchQueryBuilder<P> select(BackendSessionContext sessionContext,
 			SearchLoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<P> projection);
+
+	@Override
+	LuceneSearchPredicateFactory predicateFactory();
+
+	@Override
+	LuceneSearchSortFactory sortFactory();
+
+	@Override
+	<R, E> LuceneSearchProjectionFactory<R, E> projectionFactory();
+
+	@Override
+	LuceneSearchAggregationFactory aggregationFactory();
 
 	Query filterOrNull(String tenantId);
 

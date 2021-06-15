@@ -18,11 +18,12 @@ import org.hibernate.search.engine.search.projection.spi.ProjectionTypeKeys;
 import org.hibernate.search.engine.search.projection.spi.SingleValuedProjectionAccumulator;
 
 
-public class FieldProjectionValueStepImpl<T>
+public final class FieldProjectionValueStepImpl<T>
 		extends FieldProjectionOptionsStepImpl<T, T>
 		implements FieldProjectionValueStep<FieldProjectionOptionsStepImpl<T, T>, T> {
 
-	FieldProjectionValueStepImpl(SearchProjectionDslContext<?> dslContext, String absoluteFieldPath, Class<T> clazz,
+	public FieldProjectionValueStepImpl(SearchProjectionDslContext<?> dslContext, String absoluteFieldPath,
+			Class<T> clazz,
 			ValueConvert convert) {
 		super( dslContext.scope().fieldQueryElement( absoluteFieldPath, ProjectionTypeKeys.FIELD )
 						.type( clazz, convert ),

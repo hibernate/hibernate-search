@@ -22,7 +22,6 @@ import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactoryExtension;
-import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -107,20 +106,16 @@ public class AggregationBaseIT {
 
 	private static class SupportedExtension implements SearchAggregationFactoryExtension<MyExtendedFactory> {
 		@Override
-		public Optional<MyExtendedFactory> extendOptional(SearchAggregationFactory original,
-				SearchAggregationDslContext<?, ?> dslContext) {
+		public Optional<MyExtendedFactory> extendOptional(SearchAggregationFactory original) {
 			assertThat( original ).isNotNull();
-			assertThat( dslContext ).isNotNull();
 			return Optional.of( new MyExtendedFactory( original ) );
 		}
 	}
 
 	private static class UnSupportedExtension implements SearchAggregationFactoryExtension<MyExtendedFactory> {
 		@Override
-		public Optional<MyExtendedFactory> extendOptional(SearchAggregationFactory original,
-				SearchAggregationDslContext<?, ?> dslContext) {
+		public Optional<MyExtendedFactory> extendOptional(SearchAggregationFactory original) {
 			assertThat( original ).isNotNull();
-			assertThat( dslContext ).isNotNull();
 			return Optional.empty();
 		}
 	}

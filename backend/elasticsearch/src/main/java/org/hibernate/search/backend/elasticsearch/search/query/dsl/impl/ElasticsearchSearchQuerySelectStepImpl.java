@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.search.query.dsl.impl;
 import java.util.List;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.projection.dsl.ElasticsearchSearchProjectionFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryOptionsStep;
@@ -62,9 +61,7 @@ public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
 	@Override
 	public <P> ElasticsearchSearchQueryWhereStep<P, LOS> select(
 			Function<? super ElasticsearchSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
-		ElasticsearchSearchProjectionFactory<R, E> factoryContext =
-				createDefaultProjectionFactory().extension( ElasticsearchExtension.get() );
-		SearchProjection<P> projection = projectionContributor.apply( factoryContext ).toProjection();
+		SearchProjection<P> projection = projectionContributor.apply( scope.projectionFactory() ).toProjection();
 		return select( projection );
 	}
 

@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.search.predicate.dsl.impl;
+package org.hibernate.search.engine.search.predicate.dsl.spi;
 
 import java.util.function.Consumer;
 
@@ -12,6 +12,7 @@ import org.hibernate.search.engine.backend.common.spi.FieldPaths;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.predicate.dsl.BooleanPredicateClausesStep;
 import org.hibernate.search.engine.search.predicate.dsl.ExistsPredicateFieldStep;
+import org.hibernate.search.engine.search.predicate.dsl.ExtendedSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.MatchAllPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchIdPredicateMatchingStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchPredicateFieldStep;
@@ -20,7 +21,6 @@ import org.hibernate.search.engine.search.predicate.dsl.NestedPredicateFieldStep
 import org.hibernate.search.engine.search.predicate.dsl.PhrasePredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.RegexpPredicateFieldStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtensionIfSupportedStep;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
@@ -28,15 +28,34 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredica
 import org.hibernate.search.engine.search.predicate.dsl.SpatialPredicateInitialStep;
 import org.hibernate.search.engine.search.predicate.dsl.TermsPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldStep;
-import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
+import org.hibernate.search.engine.search.predicate.dsl.impl.BooleanPredicateClausesStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.ExistsPredicateFieldStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.MatchAllPredicateOptionsStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.MatchIdPredicateMatchingStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.MatchPredicateFieldStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.NamedPredicateOptionsStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.NestedPredicateFieldStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.PhrasePredicateFieldStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.RangePredicateFieldStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.RegexpPredicateFieldStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.SearchPredicateFactoryExtensionStep;
+import org.hibernate.search.engine.search.predicate.dsl.impl.SimpleQueryStringPredicateFieldStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.SpatialPredicateInitialStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.TermsPredicateFieldStepImpl;
+import org.hibernate.search.engine.search.predicate.dsl.impl.WildcardPredicateFieldStepImpl;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateIndexScope;
 import org.hibernate.search.util.common.impl.Contracts;
 
 
-public class DefaultSearchPredicateFactory implements SearchPredicateFactory {
+public abstract class AbstractSearchPredicateFactory<
+				S extends ExtendedSearchPredicateFactory<S>,
+				SC extends SearchPredicateIndexScope<?>
+		>
+		implements ExtendedSearchPredicateFactory<S> {
 
-	private final SearchPredicateDslContext<?> dslContext;
+	protected final SearchPredicateDslContext<SC> dslContext;
 
-	public DefaultSearchPredicateFactory(SearchPredicateDslContext<?> dslContext) {
+	public AbstractSearchPredicateFactory(SearchPredicateDslContext<SC> dslContext) {
 		this.dslContext = dslContext;
 	}
 
@@ -131,14 +150,12 @@ public class DefaultSearchPredicateFactory implements SearchPredicateFactory {
 
 	@Override
 	public <T> T extension(SearchPredicateFactoryExtension<T> extension) {
-		return DslExtensionState.returnIfSupported(
-				extension, extension.extendOptional( this, dslContext )
-		);
+		return DslExtensionState.returnIfSupported( extension, extension.extendOptional( this ) );
 	}
 
 	@Override
 	public SearchPredicateFactoryExtensionIfSupportedStep extension() {
-		return new SearchPredicateFactoryExtensionStep( this, dslContext );
+		return new SearchPredicateFactoryExtensionStep( this );
 	}
 
 }

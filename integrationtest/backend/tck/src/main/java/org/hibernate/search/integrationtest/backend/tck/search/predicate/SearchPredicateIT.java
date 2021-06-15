@@ -20,7 +20,6 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
-import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -334,20 +333,16 @@ public class SearchPredicateIT {
 
 	private static class SupportedExtension implements SearchPredicateFactoryExtension<MyExtendedFactory> {
 		@Override
-		public Optional<MyExtendedFactory> extendOptional(SearchPredicateFactory original,
-				SearchPredicateDslContext<?> dslContext) {
+		public Optional<MyExtendedFactory> extendOptional(SearchPredicateFactory original) {
 			assertThat( original ).isNotNull();
-			assertThat( dslContext ).isNotNull();
 			return Optional.of( new MyExtendedFactory( original ) );
 		}
 	}
 
 	private static class UnSupportedExtension implements SearchPredicateFactoryExtension<MyExtendedFactory> {
 		@Override
-		public Optional<MyExtendedFactory> extendOptional(SearchPredicateFactory original,
-				SearchPredicateDslContext<?> dslContext) {
+		public Optional<MyExtendedFactory> extendOptional(SearchPredicateFactory original) {
 			assertThat( original ).isNotNull();
-			assertThat( dslContext ).isNotNull();
 			return Optional.empty();
 		}
 	}

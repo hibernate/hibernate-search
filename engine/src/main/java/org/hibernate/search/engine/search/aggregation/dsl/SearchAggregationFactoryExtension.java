@@ -9,9 +9,6 @@ package org.hibernate.search.engine.search.aggregation.dsl;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.search.aggregation.dsl.spi.DelegatingSearchAggregationFactory;
-import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
-
 /**
  * An extension to the search aggregation DSL, allowing the use of non-standard aggregations in a query.
  * <p>
@@ -24,7 +21,7 @@ import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationD
  * {@link SearchAggregationFactory}.
  *
  * @see SearchAggregationFactory#extension(SearchAggregationFactoryExtension)
- * @see DelegatingSearchAggregationFactory
+ * @see ExtendedSearchAggregationFactory
  */
 public interface SearchAggregationFactoryExtension<T> {
 
@@ -34,10 +31,9 @@ public interface SearchAggregationFactoryExtension<T> {
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
 	 * @param original The original, non-extended {@link SearchAggregationFactory}.
-	 * @param dslContext A {@link SearchAggregationDslContext}.
 	 * @return An optional containing the extended aggregation factory ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchAggregationFactory original, SearchAggregationDslContext<?, ?> dslContext);
+	Optional<T> extendOptional(SearchAggregationFactory original);
 
 }

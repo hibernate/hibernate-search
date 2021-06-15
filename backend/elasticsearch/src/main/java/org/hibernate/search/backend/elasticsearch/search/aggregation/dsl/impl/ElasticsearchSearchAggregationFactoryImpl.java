@@ -10,22 +10,22 @@ import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.Elastic
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregationIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
-import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
-import org.hibernate.search.engine.search.aggregation.dsl.spi.DelegatingSearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.spi.AbstractSearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 
 import com.google.gson.JsonObject;
 
 public class ElasticsearchSearchAggregationFactoryImpl
-		extends DelegatingSearchAggregationFactory<ElasticsearchSearchAggregationFactory, ElasticsearchSearchPredicateFactory>
+		extends AbstractSearchAggregationFactory<
+						ElasticsearchSearchAggregationFactory,
+						ElasticsearchSearchAggregationIndexScope<?>,
+						ElasticsearchSearchPredicateFactory
+				>
 		implements ElasticsearchSearchAggregationFactory {
 
-	private final SearchAggregationDslContext<ElasticsearchSearchAggregationIndexScope<?>, ElasticsearchSearchPredicateFactory> dslContext;
-
-	public ElasticsearchSearchAggregationFactoryImpl(SearchAggregationFactory delegate,
+	public ElasticsearchSearchAggregationFactoryImpl(
 			SearchAggregationDslContext<ElasticsearchSearchAggregationIndexScope<?>, ElasticsearchSearchPredicateFactory> dslContext) {
-		super( delegate, dslContext );
-		this.dslContext = dslContext;
+		super( dslContext );
 	}
 
 	@Override

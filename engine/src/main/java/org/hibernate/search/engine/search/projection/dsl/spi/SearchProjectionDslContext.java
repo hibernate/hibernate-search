@@ -14,11 +14,23 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionIndexSc
  *
  * @param <SC> The type of the backend-specific search scope.
  */
-public interface SearchProjectionDslContext<SC extends SearchProjectionIndexScope<?>> {
+public final class SearchProjectionDslContext<SC extends SearchProjectionIndexScope<?>> {
+
+	public static <SC extends SearchProjectionIndexScope<?>> SearchProjectionDslContext<SC> root(SC scope) {
+		return new SearchProjectionDslContext<>( scope );
+	}
+
+	private final SC scope;
+
+	private SearchProjectionDslContext(SC scope) {
+		this.scope = scope;
+	}
 
 	/**
 	 * @return The search scope. Will always return the exact same instance for a given DSL context.
 	 */
-	SC scope();
+	public SC scope() {
+		return scope;
+	}
 
 }

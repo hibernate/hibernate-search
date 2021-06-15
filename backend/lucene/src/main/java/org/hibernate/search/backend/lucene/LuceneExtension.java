@@ -12,21 +12,13 @@ import java.util.Optional;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.LuceneIndexScope;
 import org.hibernate.search.backend.lucene.search.aggregation.dsl.LuceneSearchAggregationFactory;
-import org.hibernate.search.backend.lucene.search.aggregation.dsl.impl.LuceneSearchAggregationFactoryImpl;
-import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregationIndexScope;
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
-import org.hibernate.search.backend.lucene.search.predicate.dsl.impl.LuceneSearchPredicateFactoryImpl;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateIndexScope;
 import org.hibernate.search.backend.lucene.search.projection.dsl.LuceneSearchProjectionFactory;
-import org.hibernate.search.backend.lucene.search.projection.dsl.impl.LuceneSearchProjectionFactoryImpl;
-import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionIndexScope;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQuerySelectStep;
 import org.hibernate.search.backend.lucene.search.query.dsl.impl.LuceneSearchQuerySelectStepImpl;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryIndexScope;
 import org.hibernate.search.backend.lucene.search.sort.dsl.LuceneSearchSortFactory;
-import org.hibernate.search.backend.lucene.search.sort.dsl.impl.LuceneSearchSortFactoryImpl;
-import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortIndexScope;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.scope.IndexScopeExtension;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
@@ -35,15 +27,12 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryExtension;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactoryExtension;
-import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryExtension;
-import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
-import org.hibernate.search.engine.search.projection.dsl.spi.SearchProjectionDslContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
@@ -51,7 +40,6 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
-import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -153,14 +141,9 @@ public final class LuceneExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked") // If the scope is an instance of LuceneSearchPredicateBuilderFactory, the cast is safe
-	public Optional<LuceneSearchPredicateFactory> extendOptional(SearchPredicateFactory original,
-			SearchPredicateDslContext<?> dslContext) {
-		if ( dslContext.scope() instanceof LuceneSearchPredicateIndexScope ) {
-			return Optional.of( new LuceneSearchPredicateFactoryImpl(
-					original,
-					(SearchPredicateDslContext<LuceneSearchPredicateIndexScope<?>>) dslContext
-			) );
+	public Optional<LuceneSearchPredicateFactory> extendOptional(SearchPredicateFactory original) {
+		if ( original instanceof LuceneSearchPredicateFactory ) {
+			return Optional.of( (LuceneSearchPredicateFactory) original );
 		}
 		else {
 			return Optional.empty();
@@ -171,15 +154,10 @@ public final class LuceneExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked") // If the scope is an instance of LuceneSearchSortIndexScope, the cast is safe
 	public Optional<LuceneSearchSortFactory> extendOptional(
-			SearchSortFactory original, SearchSortDslContext<?, ?> dslContext) {
-		if ( dslContext.scope() instanceof LuceneSearchSortIndexScope ) {
-			return Optional.of( new LuceneSearchSortFactoryImpl(
-					original,
-					((SearchSortDslContext<LuceneSearchSortIndexScope<?>, ?>) dslContext)
-							.withExtendedPredicateFactory( this )
-			) );
+			SearchSortFactory original) {
+		if ( original instanceof LuceneSearchSortFactory ) {
+			return Optional.of( (LuceneSearchSortFactory) original );
 		}
 		else {
 			return Optional.empty();
@@ -190,14 +168,9 @@ public final class LuceneExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked") // If the scope is an instance of LuceneSearchProjectionIndexScope, the cast is safe
-	public Optional<LuceneSearchProjectionFactory<R, E>> extendOptional(SearchProjectionFactory<R, E> original,
-			SearchProjectionDslContext<?> dslContext) {
-		if ( dslContext.scope() instanceof LuceneSearchProjectionIndexScope ) {
-			return Optional.of( new LuceneSearchProjectionFactoryImpl<>(
-					original,
-					(SearchProjectionDslContext<LuceneSearchProjectionIndexScope<?>>) dslContext
-			) );
+	public Optional<LuceneSearchProjectionFactory<R, E>> extendOptional(SearchProjectionFactory<R, E> original) {
+		if ( original instanceof LuceneSearchProjectionFactory ) {
+			return Optional.of( (LuceneSearchProjectionFactory<R, E>) original );
 		}
 		else {
 			return Optional.empty();
@@ -208,15 +181,9 @@ public final class LuceneExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked") // If the scope is an instance of LuceneSearchAggregationIndexScope, the cast is safe
-	public Optional<LuceneSearchAggregationFactory> extendOptional(
-			SearchAggregationFactory original, SearchAggregationDslContext<?, ?> dslContext) {
-		if ( dslContext.scope() instanceof LuceneSearchAggregationIndexScope ) {
-			return Optional.of( new LuceneSearchAggregationFactoryImpl(
-					original,
-					((SearchAggregationDslContext<LuceneSearchAggregationIndexScope<?>, ?>) dslContext)
-							.withExtendedPredicateFactory( this )
-			) );
+	public Optional<LuceneSearchAggregationFactory> extendOptional(SearchAggregationFactory original) {
+		if ( original instanceof LuceneSearchAggregationFactory ) {
+			return Optional.of( (LuceneSearchAggregationFactory) original );
 		}
 		else {
 			return Optional.empty();

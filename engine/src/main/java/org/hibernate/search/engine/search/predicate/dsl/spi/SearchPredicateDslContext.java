@@ -14,11 +14,23 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateIndexScop
  *
  * @param <SC> The type of the backend-specific search scope.
  */
-public interface SearchPredicateDslContext<SC extends SearchPredicateIndexScope<?>> {
+public final class SearchPredicateDslContext<SC extends SearchPredicateIndexScope<?>> {
+
+	public static <SC extends SearchPredicateIndexScope<?>> SearchPredicateDslContext<SC> root(SC scope) {
+		return new SearchPredicateDslContext<>( scope );
+	}
+
+	private final SC scope;
+
+	private SearchPredicateDslContext(SC scope) {
+		this.scope = scope;
+	}
 
 	/**
 	 * @return The search scope.
 	 */
-	SC scope();
+	public SC scope() {
+		return scope;
+	}
 
 }

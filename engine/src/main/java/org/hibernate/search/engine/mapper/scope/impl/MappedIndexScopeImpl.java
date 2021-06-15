@@ -11,20 +11,12 @@ import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
-import org.hibernate.search.engine.search.aggregation.dsl.impl.DefaultSearchAggregationFactory;
-import org.hibernate.search.engine.search.aggregation.dsl.impl.SearchAggregationDslContextImpl;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.dsl.impl.DefaultSearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.dsl.impl.SearchPredicateDslContextImpl;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
-import org.hibernate.search.engine.search.projection.dsl.impl.DefaultSearchProjectionFactory;
-import org.hibernate.search.engine.search.projection.dsl.impl.SearchProjectionDslContextImpl;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.query.dsl.impl.DefaultSearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.engine.search.sort.dsl.impl.DefaultSearchSortFactory;
-import org.hibernate.search.engine.search.sort.dsl.impl.SearchSortDslContextImpl;
 
 class MappedIndexScopeImpl<R, E> implements MappedIndexScope<R, E> {
 
@@ -48,30 +40,22 @@ class MappedIndexScopeImpl<R, E> implements MappedIndexScope<R, E> {
 
 	@Override
 	public SearchPredicateFactory predicate() {
-		return new DefaultSearchPredicateFactory(
-				SearchPredicateDslContextImpl.root( delegate.searchScope() )
-		);
+		return delegate.searchScope().predicateFactory();
 	}
 
 	@Override
 	public SearchSortFactory sort() {
-		return new DefaultSearchSortFactory(
-				SearchSortDslContextImpl.root( delegate.searchScope(), predicate() )
-		);
+		return delegate.searchScope().sortFactory();
 	}
 
 	@Override
 	public SearchProjectionFactory<R, E> projection() {
-		return new DefaultSearchProjectionFactory<>(
-				SearchProjectionDslContextImpl.root( delegate.searchScope() )
-		);
+		return delegate.searchScope().projectionFactory();
 	}
 
 	@Override
 	public SearchAggregationFactory aggregation() {
-		return new DefaultSearchAggregationFactory(
-				SearchAggregationDslContextImpl.root( delegate.searchScope(), predicate() )
-		);
+		return delegate.searchScope().aggregationFactory();
 	}
 
 	@Override

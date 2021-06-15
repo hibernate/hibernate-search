@@ -9,8 +9,7 @@ package org.hibernate.search.backend.lucene.search.predicate.dsl.impl;
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateIndexScope;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
-import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.dsl.spi.DelegatingSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractSearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.dsl.spi.StaticPredicateFinalStep;
 
@@ -18,15 +17,14 @@ import org.apache.lucene.search.Query;
 
 
 public class LuceneSearchPredicateFactoryImpl
-		extends DelegatingSearchPredicateFactory<LuceneSearchPredicateFactory>
+		extends AbstractSearchPredicateFactory<
+						LuceneSearchPredicateFactory,
+						LuceneSearchPredicateIndexScope<?>
+				>
 		implements LuceneSearchPredicateFactory {
 
-	private final SearchPredicateDslContext<LuceneSearchPredicateIndexScope<?>> dslContext;
-
-	public LuceneSearchPredicateFactoryImpl(SearchPredicateFactory delegate,
-			SearchPredicateDslContext<LuceneSearchPredicateIndexScope<?>> dslContext) {
-		super( delegate );
-		this.dslContext = dslContext;
+	public LuceneSearchPredicateFactoryImpl(SearchPredicateDslContext<LuceneSearchPredicateIndexScope<?>> dslContext) {
+		super( dslContext );
 	}
 
 	@Override

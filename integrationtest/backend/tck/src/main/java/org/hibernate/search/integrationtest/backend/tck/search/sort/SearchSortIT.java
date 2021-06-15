@@ -25,11 +25,10 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.sort.SearchSort;
+import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
-import org.hibernate.search.engine.search.sort.dsl.spi.DelegatingSearchSortFactory;
-import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -253,12 +252,12 @@ public class SearchSortIT {
 
 		// Mandatory extension, supported
 		query = simpleQuery( c -> c
-				.extension( new SupportedExtension() ).field( "string" ).missing().last()
+				.extension( new SupportedExtension() ).extendedSort( "string" ).missing().last()
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		query = simpleQuery( b -> b
-				.extension( new SupportedExtension() ).field( "string" ).desc().missing().last()
+				.extension( new SupportedExtension() ).extendedSort( "string" ).desc().missing().last()
 		);
 		assertThatQuery( query )
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
@@ -274,7 +273,7 @@ public class SearchSortIT {
 				.extension()
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.field( "string" ).missing().last()
+								c -> c.extendedSort( "string" ).missing().last()
 						)
 						.ifSupported(
 								new SupportedExtension(),
@@ -288,7 +287,7 @@ public class SearchSortIT {
 				.extension()
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.field( "string" ).desc().missing().last()
+								c -> c.extendedSort( "string" ).desc().missing().last()
 						)
 						.ifSupported(
 								new SupportedExtension(),
@@ -308,7 +307,7 @@ public class SearchSortIT {
 						)
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.field( "string" ).missing().last()
+								c -> c.extendedSort( "string" ).missing().last()
 						)
 						.orElse( ignored -> fail( "This should not be called" ) )
 		);
@@ -322,7 +321,7 @@ public class SearchSortIT {
 						)
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.field( "string" ).desc().missing().last()
+								c -> c.extendedSort( "string" ).desc().missing().last()
 						)
 						.orElse( ignored -> fail( "This should not be called" ) )
 		);
@@ -417,29 +416,29 @@ public class SearchSortIT {
 
 	private static class SupportedExtension implements SearchSortFactoryExtension<MyExtendedFactory> {
 		@Override
-		public Optional<MyExtendedFactory> extendOptional(SearchSortFactory original,
-				SearchSortDslContext<?, ?> dslContext) {
+		public Optional<MyExtendedFactory> extendOptional(SearchSortFactory original) {
 			assertThat( original ).isNotNull();
-			assertThat( dslContext ).isNotNull();
-			assertThat( dslContext.scope().sortBuilders() ).isNotNull();
-			return Optional.of( new MyExtendedFactory( original, dslContext ) );
+			return Optional.of( new MyExtendedFactory( original ) );
 		}
 	}
 
 	private static class UnSupportedExtension implements SearchSortFactoryExtension<MyExtendedFactory> {
 		@Override
-		public Optional<MyExtendedFactory> extendOptional(SearchSortFactory original,
-				SearchSortDslContext<?, ?> dslContext) {
+		public Optional<MyExtendedFactory> extendOptional(SearchSortFactory original) {
 			assertThat( original ).isNotNull();
-			assertThat( dslContext ).isNotNull();
-			assertThat( dslContext.scope().sortBuilders() ).isNotNull();
 			return Optional.empty();
 		}
 	}
 
-	private static class MyExtendedFactory extends DelegatingSearchSortFactory<MyExtendedFactory, SearchPredicateFactory> {
-		MyExtendedFactory(SearchSortFactory delegate, SearchSortDslContext<?, ?> dslContext) {
-			super( delegate, dslContext );
+	private static class MyExtendedFactory {
+		private final SearchSortFactory delegate;
+
+		MyExtendedFactory(SearchSortFactory delegate) {
+			this.delegate = delegate;
+		}
+
+		public FieldSortOptionsStep<?, ? extends SearchPredicateFactory> extendedSort(String absoluteFieldPath) {
+			return delegate.field( absoluteFieldPath );
 		}
 	}
 }

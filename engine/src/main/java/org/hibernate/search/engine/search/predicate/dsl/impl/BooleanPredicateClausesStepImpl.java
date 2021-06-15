@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.predicate.dsl.spi.SearchPredicateDslCo
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 
 
-class BooleanPredicateClausesStepImpl
+public final class BooleanPredicateClausesStepImpl
 		extends AbstractPredicateFinalStep
 		implements BooleanPredicateClausesStep<BooleanPredicateClausesStep<?>> {
 
@@ -29,7 +29,7 @@ class BooleanPredicateClausesStepImpl
 
 	private final MinimumShouldMatchConditionStepImpl<BooleanPredicateClausesStep<?>> minimumShouldMatchStep;
 
-	BooleanPredicateClausesStepImpl(SearchPredicateDslContext<?> dslContext,
+	public BooleanPredicateClausesStepImpl(SearchPredicateDslContext<?> dslContext,
 			SearchPredicateFactory factory) {
 		super( dslContext );
 		this.factory = factory;
