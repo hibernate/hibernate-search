@@ -43,6 +43,7 @@ import org.apache.lucene.search.TopDocs;
 
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
+import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchScroll;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchScrollResult;
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryOptionsStep;
@@ -51,6 +52,7 @@ import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQuerySel
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
+import org.hibernate.search.backend.lucene.search.sort.dsl.LuceneSearchSortFactory;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -364,6 +366,22 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void predicate_fromLuceneQuery_withRoot() {
+		SearchQuery<DocumentReference> query = mainIndex.query()
+				.where( f -> {
+					LuceneSearchPredicateFactory f2 = f.extension( LuceneExtension.get() ).withRoot( "flattenedObject" );
+					return f2.bool()
+							.should( f2.fromLuceneQuery( new TermQuery( new Term( f2.toAbsolutePath( "stringInObject" ), "text 2" ) ) ) )
+							.should( f2.fromLuceneQuery( IntPoint.newExactQuery( f2.toAbsolutePath( "integerInObject" ), 3 ) ) );
+				} )
+				.toQuery();
+		assertThatQuery( query )
+				.hasDocRefHitsAnyOrder( mainIndex.typeName(), FIRST_ID, SECOND_ID )
+				.hasTotalHitCount( 2 );
+	}
+
+	@Test
 	public void sort_fromLuceneSortField() {
 		StubMappingScope scope = mainIndex.createScope();
 
@@ -448,6 +466,28 @@ public class LuceneExtensionIT {
 				.toQuery();
 		assertThatQuery( query )
 				.hasDocRefHitsExactOrder( mainIndex.typeName(), THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void sort_fromLuceneSortField_withRoot() {
+		assertThatQuery( mainIndex.query()
+				.where( f -> f.matchAll() )
+				.sort( f -> {
+					LuceneSearchSortFactory f2 = f.extension( LuceneExtension.get() ).withRoot( "flattenedObject" );
+					return f2.fromLuceneSortField( new SortedSetSortField( f2.toAbsolutePath( "sortInObject" ), false ) );
+				} ) )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(),
+						FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID );
+
+		assertThatQuery( mainIndex.query()
+				.where( f -> f.matchAll() )
+				.sort( f -> {
+					LuceneSearchSortFactory f2 = f.extension( LuceneExtension.get() ).withRoot( "flattenedObject" );
+					return f2.fromLuceneSortField( new SortedSetSortField( f2.toAbsolutePath( "sortInObject" ), true ) );
+				} ) )
+				.hasDocRefHitsExactOrder( mainIndex.typeName(),
+						FIFTH_ID, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID );
 	}
 
 	@Test
@@ -661,6 +701,7 @@ public class LuceneExtensionIT {
 								.hasField( "nativeField", "37" )
 								.hasField( "nativeField_converted", "37" )
 								.hasField( "nativeField_unsupportedProjection", "37" )
+								.hasField( "flattenedObject.stringInObject", "text 2" )
 								.andOnlyInternalFields()
 				) )
 				.satisfies( containsDocument(
@@ -668,6 +709,7 @@ public class LuceneExtensionIT {
 								.hasField( "nativeField", "78" )
 								.hasField( "nativeField_converted", "78" )
 								.hasField( "nativeField_unsupportedProjection", "78" )
+								.hasField( "flattenedObject.integerInObject", 3 )
 								.andOnlyInternalFields()
 				) )
 				.satisfies( containsDocument(
@@ -719,6 +761,7 @@ public class LuceneExtensionIT {
 								.hasField( "nativeField", "37" )
 								.hasField( "nativeField_converted", "37" )
 								.hasField( "nativeField_unsupportedProjection", "37" )
+								.hasField( "flattenedObject.stringInObject", "text 2" )
 								.andOnlyInternalFields()
 				) );
 	}
@@ -882,6 +925,10 @@ public class LuceneExtensionIT {
 					nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
 					nestedObject2.addValue( index.binding().nestedObject.sort1, "b" );
 					nestedObject2.addValue( index.binding().nestedObject.aggregation1, "fifty-one" );
+
+					DocumentElement flattenedObject1 = document.addObject( index.binding().flattenedObject.self );
+					flattenedObject1.addValue( index.binding().flattenedObject.stringInObject, "text 2" );
+					flattenedObject1.addValue( index.binding().flattenedObject.sortInObject, "1" );
 				} )
 				.add( SECOND_ID, document -> {
 					document.addValue( index.binding().integer, 2 );
@@ -902,6 +949,10 @@ public class LuceneExtensionIT {
 					nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
 					nestedObject2.addValue( index.binding().nestedObject.sort1, "a" );
 					nestedObject2.addValue( index.binding().nestedObject.aggregation1, "fifty-two" );
+
+					DocumentElement flattenedObject1 = document.addObject( index.binding().flattenedObject.self );
+					flattenedObject1.addValue( index.binding().flattenedObject.integerInObject, 3 );
+					flattenedObject1.addValue( index.binding().flattenedObject.sortInObject, "2" );
 				} )
 				.add( THIRD_ID, document -> {
 					document.addValue( index.binding().geoPoint, GeoPoint.of( 40.12, -71.34 ) );
@@ -922,6 +973,9 @@ public class LuceneExtensionIT {
 					nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
 					nestedObject2.addValue( index.binding().nestedObject.sort1, "b" );
 					nestedObject2.addValue( index.binding().nestedObject.aggregation1, "fifty-three" );
+
+					DocumentElement flattenedObject1 = document.addObject( index.binding().flattenedObject.self );
+					flattenedObject1.addValue( index.binding().flattenedObject.sortInObject, "3" );
 				} )
 				.add( FOURTH_ID, document -> {
 					document.addValue( index.binding().nativeField, 89 );
@@ -940,6 +994,9 @@ public class LuceneExtensionIT {
 					nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
 					nestedObject2.addValue( index.binding().nestedObject.sort1, "c" );
 					nestedObject2.addValue( index.binding().nestedObject.aggregation1, "fifty-four" );
+
+					DocumentElement flattenedObject1 = document.addObject( index.binding().flattenedObject.self );
+					flattenedObject1.addValue( index.binding().flattenedObject.sortInObject, "4" );
 				} )
 				.add( FIFTH_ID, document -> {
 					// This document should not match any query
@@ -959,6 +1016,9 @@ public class LuceneExtensionIT {
 					nestedObject2.addValue( index.binding().nestedObject.discriminator, "excluded" );
 					nestedObject2.addValue( index.binding().nestedObject.sort1, "a" );
 					nestedObject2.addValue( index.binding().nestedObject.aggregation1, "fifty-five" );
+
+					DocumentElement flattenedObject1 = document.addObject( index.binding().flattenedObject.self );
+					flattenedObject1.addValue( index.binding().flattenedObject.sortInObject, "5" );
 				} )
 				.join();
 	}
@@ -977,6 +1037,7 @@ public class LuceneExtensionIT {
 		final IndexFieldReference<String> sort3;
 
 		final ObjectMapping nestedObject;
+		final ObjectMapping flattenedObject;
 
 		IndexBinding(IndexSchemaElement root) {
 			integer = root.field(
@@ -1028,6 +1089,7 @@ public class LuceneExtensionIT {
 					.toReference();
 
 			nestedObject = ObjectMapping.create( root, "nestedObject", ObjectStructure.NESTED, true );
+			flattenedObject = ObjectMapping.create( root, "flattenedObject", ObjectStructure.FLATTENED, true );
 		}
 	}
 
@@ -1036,8 +1098,12 @@ public class LuceneExtensionIT {
 		final IndexObjectFieldReference self;
 
 		final IndexFieldReference<String> discriminator;
+		// Use different names from the root, otherwise the tests might miss some bugs.
 		final IndexFieldReference<String> sort1;
 		final IndexFieldReference<String> aggregation1;
+		final IndexFieldReference<Integer> integerInObject;
+		final IndexFieldReference<String> stringInObject;
+		final IndexFieldReference<String> sortInObject;
 
 		public static ObjectMapping create(IndexSchemaElement parent, String relativeFieldName,
 				ObjectStructure structure,
@@ -1058,6 +1124,12 @@ public class LuceneExtensionIT {
 			sort1 = objectField.field( "sort1", f -> f.asString().sortable( Sortable.YES ) )
 					.toReference();
 			aggregation1 = objectField.field( "aggregation1", f -> f.asString().aggregable( Aggregable.YES ) )
+					.toReference();
+			integerInObject = objectField.field( "integerInObject", f -> f.asInteger().projectable( Projectable.YES ) )
+					.toReference();
+			stringInObject = objectField.field( "stringInObject", f -> f.asString().projectable( Projectable.YES ) )
+					.toReference();
+			sortInObject = objectField.field( "sortInObject", f -> f.asString().sortable( Sortable.YES ) )
 					.toReference();
 		}
 	}

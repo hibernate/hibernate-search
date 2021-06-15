@@ -15,7 +15,10 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -25,6 +28,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -305,6 +309,36 @@ public class SearchPredicateIT {
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), DOCUMENT_1 );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void toAbsolutePath() {
+		assertThat( mainIndex.createScope().predicate().toAbsolutePath( "string" ) )
+				.isEqualTo( "string" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void toAbsolutePath_withRoot() {
+		assertThat( mainIndex.createScope().predicate().withRoot( "flattened" ).toAbsolutePath( "string" ) )
+				.isEqualTo( "flattened.string" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void toAbsolutePath_null() {
+		assertThatThrownBy( () -> mainIndex.createScope().predicate().toAbsolutePath( null ) )
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "'relativeFieldPath' must not be null" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void toAbsolutePath_withRoot_null() {
+		assertThatThrownBy( () -> mainIndex.createScope().predicate().withRoot( "flattened" ).toAbsolutePath( null ) )
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "'relativeFieldPath' must not be null" );
+	}
+
 	private void initData() {
 		mainIndex.bulkIndexer()
 				.add( DOCUMENT_1, document -> {
@@ -325,9 +359,21 @@ public class SearchPredicateIT {
 
 	private static class IndexBinding {
 		final IndexFieldReference<String> string;
+		final ObjectFieldBinding flattened;
 
 		IndexBinding(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString() ).toReference();
+			flattened = new ObjectFieldBinding( root.objectField( "flattened", ObjectStructure.FLATTENED ) );
+		}
+	}
+
+	private static class ObjectFieldBinding {
+		final IndexObjectFieldReference self;
+		final IndexFieldReference<String> string;
+
+		ObjectFieldBinding(IndexSchemaObjectField objectField) {
+			string = objectField.field( "string", f -> f.asString() ).toReference();
+			self = objectField.toReference();
 		}
 	}
 

@@ -16,8 +16,11 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.Aggregable;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
@@ -27,6 +30,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -80,6 +84,36 @@ public class AggregationBaseIT {
 				.isInstanceOf( SearchException.class );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void toAbsolutePath() {
+		assertThat( index.createScope().aggregation().toAbsolutePath( "string" ) )
+				.isEqualTo( "string" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void toAbsolutePath_withRoot() {
+		assertThat( index.createScope().aggregation().withRoot( "flattened" ).toAbsolutePath( "string" ) )
+				.isEqualTo( "flattened.string" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void toAbsolutePath_null() {
+		assertThatThrownBy( () -> index.createScope().aggregation().toAbsolutePath( null ) )
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "'relativeFieldPath' must not be null" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void toAbsolutePath_withRoot_null() {
+		assertThatThrownBy( () -> index.createScope().aggregation().withRoot( "flattened" ).toAbsolutePath( null ) )
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "'relativeFieldPath' must not be null" );
+	}
+
 	private void initData() {
 		index.bulkIndexer()
 				.add( DOCUMENT_1, document -> {
@@ -97,10 +131,23 @@ public class AggregationBaseIT {
 
 	private static class IndexBinding {
 		final IndexFieldReference<String> string;
+		final ObjectFieldBinding flattened;
 
 		IndexBinding(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString().aggregable( Aggregable.YES ) )
 					.toReference();
+
+			flattened = new ObjectFieldBinding( root.objectField( "flattened", ObjectStructure.FLATTENED ) );
+		}
+	}
+
+	private static class ObjectFieldBinding {
+		final IndexObjectFieldReference self;
+		final IndexFieldReference<String> string;
+
+		ObjectFieldBinding(IndexSchemaObjectField objectField) {
+			string = objectField.field( "string", f -> f.asString() ).toReference();
+			self = objectField.toReference();
 		}
 	}
 

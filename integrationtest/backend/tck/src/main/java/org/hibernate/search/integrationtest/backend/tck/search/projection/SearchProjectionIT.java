@@ -512,6 +512,36 @@ public class SearchProjectionIT {
 				.hasHitsAnyOrder( mainIndex.binding().string1Field.document1Value.indexedValue );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void toAbsolutePath() {
+		assertThat( mainIndex.createScope().projection().toAbsolutePath( "string" ) )
+				.isEqualTo( "string" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void toAbsolutePath_withRoot() {
+		assertThat( mainIndex.createScope().projection().withRoot( "nested" ).toAbsolutePath( "inner" ) )
+				.isEqualTo( "nested.inner" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void toAbsolutePath_null() {
+		assertThatThrownBy( () -> mainIndex.createScope().projection().toAbsolutePath( null ) )
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "'relativeFieldPath' must not be null" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void toAbsolutePath_withRoot_null() {
+		assertThatThrownBy( () -> mainIndex.createScope().projection().withRoot( "nested" ).toAbsolutePath( null ) )
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "'relativeFieldPath' must not be null" );
+	}
+
 	private void initData() {
 		mainIndex.bulkIndexer()
 				.add( DOCUMENT_1, document -> {

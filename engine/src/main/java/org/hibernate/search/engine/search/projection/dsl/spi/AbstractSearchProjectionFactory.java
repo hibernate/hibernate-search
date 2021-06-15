@@ -145,4 +145,9 @@ public abstract class AbstractSearchProjectionFactory<
 	public <T> SearchProjectionFactoryExtensionIfSupportedStep<T, R, E> extension() {
 		return new SearchProjectionFactoryExtensionStep<>( this );
 	}
+
+	@Override
+	public final String toAbsolutePath(String relativeFieldPath) {
+		return dslContext.scope().toAbsolutePath( relativeFieldPath );
+	}
 }
