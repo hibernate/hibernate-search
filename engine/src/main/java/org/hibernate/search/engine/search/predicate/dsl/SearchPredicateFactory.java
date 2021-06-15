@@ -201,4 +201,12 @@ public interface SearchPredicateFactory {
 	@Incubating
 	SearchPredicateFactory withRoot(String objectFieldPath);
 
+	/**
+	 * @param relativeFieldPath The path to a field, relative to the {@link #withRoot(String) root} of this factory.
+	 * @return The absolute path of the field, for use in native predicates for example.
+	 * Note the path is returned even if the field doesn't exist.
+	 */
+	@Incubating
+	String toAbsolutePath(String relativeFieldPath);
+
 }

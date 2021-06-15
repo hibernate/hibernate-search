@@ -27,6 +27,7 @@ import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.query.spi.SearchQueryIndexScope;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -117,6 +118,12 @@ public abstract class AbstractSearchIndexScope<
 			}
 		}
 		return converter;
+	}
+
+	@Override
+	public String toAbsolutePath(String relativeFieldPath) {
+		Contracts.assertNotNull( relativeFieldPath, "relativeFieldPath" );
+		return overriddenRoot == null ? relativeFieldPath : overriddenRoot.absolutePath( relativeFieldPath );
 	}
 
 	protected C root() {

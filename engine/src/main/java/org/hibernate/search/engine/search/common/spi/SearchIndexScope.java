@@ -31,6 +31,8 @@ public interface SearchIndexScope<S extends SearchIndexScope<?>> {
 
 	S withRoot(String objectFieldPath);
 
+	String toAbsolutePath(String relativeFieldPath);
+
 	SearchIndexNodeContext<?> child(SearchIndexCompositeNodeContext<?> parent, String name);
 
 	<T> T rootQueryElement(SearchQueryElementTypeKey<T> key);

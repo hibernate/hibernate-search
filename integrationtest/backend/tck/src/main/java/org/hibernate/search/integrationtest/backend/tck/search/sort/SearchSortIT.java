@@ -18,7 +18,10 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -34,6 +37,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -363,6 +367,36 @@ public class SearchSortIT {
 				.hasDocRefHitsAnyOrder( mainIndex.typeName(), THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void toAbsolutePath() {
+		assertThat( mainIndex.createScope().sort().toAbsolutePath( "string" ) )
+				.isEqualTo( "string" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void toAbsolutePath_withRoot() {
+		assertThat( mainIndex.createScope().sort().withRoot( "flattened" ).toAbsolutePath( "string" ) )
+				.isEqualTo( "flattened.string" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void toAbsolutePath_null() {
+		assertThatThrownBy( () -> mainIndex.createScope().sort().toAbsolutePath( null ) )
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "'relativeFieldPath' must not be null" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4162")
+	public void toAbsolutePath_withRoot_null() {
+		assertThatThrownBy( () -> mainIndex.createScope().sort().withRoot( "flattened" ).toAbsolutePath( null ) )
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContaining( "'relativeFieldPath' must not be null" );
+	}
+
 	private void initData() {
 		mainIndex.bulkIndexer()
 		// Important: do not index the documents in the expected order after sorts
@@ -393,6 +427,7 @@ public class SearchSortIT {
 		final IndexFieldReference<String> string_analyzed_forScore;
 		final IndexFieldReference<String> string_analyzed_forScore_reversed;
 		final IndexFieldReference<String> unsortable;
+		final ObjectFieldBinding flattened;
 
 		IndexBinding(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString().sortable( Sortable.YES ) )
@@ -411,6 +446,18 @@ public class SearchSortIT {
 					.toReference();
 			unsortable = root.field( "unsortable", f -> f.asString().sortable( Sortable.NO ) )
 					.toReference();
+
+			flattened = new ObjectFieldBinding( root.objectField( "flattened", ObjectStructure.FLATTENED ) );
+		}
+	}
+
+	private static class ObjectFieldBinding {
+		final IndexObjectFieldReference self;
+		final IndexFieldReference<String> string;
+
+		ObjectFieldBinding(IndexSchemaObjectField objectField) {
+			string = objectField.field( "string", f -> f.asString() ).toReference();
+			self = objectField.toReference();
 		}
 	}
 

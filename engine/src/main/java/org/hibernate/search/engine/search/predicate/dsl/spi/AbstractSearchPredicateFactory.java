@@ -158,4 +158,8 @@ public abstract class AbstractSearchPredicateFactory<
 		return new SearchPredicateFactoryExtensionStep( this );
 	}
 
+	@Override
+	public final String toAbsolutePath(String relativeFieldPath) {
+		return dslContext.scope().toAbsolutePath( relativeFieldPath );
+	}
 }

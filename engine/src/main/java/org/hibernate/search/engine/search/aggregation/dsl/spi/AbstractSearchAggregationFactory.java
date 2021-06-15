@@ -43,4 +43,9 @@ public abstract class AbstractSearchAggregationFactory<
 	public <T> T extension(SearchAggregationFactoryExtension<T> extension) {
 		return DslExtensionState.returnIfSupported( extension, extension.extendOptional( this ) );
 	}
+
+	@Override
+	public final String toAbsolutePath(String relativeFieldPath) {
+		return dslContext.scope().toAbsolutePath( relativeFieldPath );
+	}
 }

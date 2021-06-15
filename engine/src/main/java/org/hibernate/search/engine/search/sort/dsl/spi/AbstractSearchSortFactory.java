@@ -87,6 +87,11 @@ public abstract class AbstractSearchSortFactory<
 		return new SearchSortFactoryExtensionStep( this, dslContext );
 	}
 
+	@Override
+	public final String toAbsolutePath(String relativeFieldPath) {
+		return dslContext.scope().toAbsolutePath( relativeFieldPath );
+	}
+
 	protected final SortThenStep staticThenStep(SearchSort sort) {
 		return new StaticSortThenStep( dslContext, sort );
 	}
