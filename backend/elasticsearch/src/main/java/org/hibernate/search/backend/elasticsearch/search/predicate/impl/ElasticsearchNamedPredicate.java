@@ -151,11 +151,5 @@ public class ElasticsearchNamedPredicate extends AbstractElasticsearchSingleFiel
 			Contracts.assertNotNull( name, "name" );
 			return Optional.ofNullable( params.get( name ) );
 		}
-
-		@Override
-		public String absolutePath(String relativeFieldPath) {
-			Contracts.assertNotNull( relativeFieldPath, "relativeFieldPath" );
-			return field.absolutePath( relativeFieldPath );
-		}
 	}
 }

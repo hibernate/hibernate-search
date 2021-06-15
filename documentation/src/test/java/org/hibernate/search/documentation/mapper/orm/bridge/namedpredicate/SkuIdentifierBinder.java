@@ -101,17 +101,17 @@ public class SkuIdentifierBinder implements PropertyBinder {
 				String[] patternParts = pattern.split( "\\." );
 				if ( patternParts.length > 0 ) {
 					b.must( f.wildcard()
-							.field( context.absolutePath( "departmentCode" ) ) // <5>
+							.field( "departmentCode" ) // <5>
 							.matching( patternParts[0] ) );
 				}
 				if ( patternParts.length > 1 ) {
 					b.must( f.wildcard()
-							.field( context.absolutePath( "collectionCode" ) )
+							.field( "collectionCode" )
 							.matching( patternParts[1] ) );
 				}
 				if ( patternParts.length > 2 ) {
 					b.must( f.wildcard()
-							.field( context.absolutePath( "itemCode" ) )
+							.field( "itemCode" )
 							.matching( patternParts[2] ) );
 				}
 			} ).toPredicate(); // <6>
