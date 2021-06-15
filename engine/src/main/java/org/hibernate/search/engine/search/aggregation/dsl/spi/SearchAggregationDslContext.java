@@ -41,6 +41,15 @@ public class SearchAggregationDslContext<SC extends SearchAggregationIndexScope<
 	}
 
 	/**
+	 * @param newScope The new scope for the new DSL context.
+	 * @param newPredicateFactory The new predicate factory for the new DSL context.
+	 * @return A copy of this DSL context with its scope and predicate factory replaced with the given ones.
+	 */
+	public SearchAggregationDslContext<SC, PDF> rescope(SC newScope, PDF newPredicateFactory) {
+		return new SearchAggregationDslContext<>( newScope, newPredicateFactory );
+	}
+
+	/**
 	 * @return The predicate factory. Will always return the exact same instance.
 	 */
 	public PDF predicateFactory() {

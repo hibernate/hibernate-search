@@ -67,6 +67,15 @@ public final class SearchSortDslContext<SC extends SearchSortIndexScope<?>, PDF 
 	}
 
 	/**
+	 * @param newScope The new scope for the new DSL context.
+	 * @param newPredicateFactory The new predicate factory for the new DSL context.
+	 * @return A copy of this DSL context with its scope and predicate factory replaced with the given ones.
+	 */
+	public SearchSortDslContext<SC, PDF> rescope(SC newScope, PDF newPredicateFactory) {
+		return new SearchSortDslContext<>( newScope, factoryProvider, parent, sort, newPredicateFactory );
+	}
+
+	/**
 	 * Create a new context with a sort appended.
 	 *
 	 * @param sort The sort to add.

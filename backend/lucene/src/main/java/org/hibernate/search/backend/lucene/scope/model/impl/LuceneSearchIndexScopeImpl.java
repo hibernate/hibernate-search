@@ -104,6 +104,21 @@ public final class LuceneSearchIndexScopeImpl
 		this.aggregationBuilderFactory = new LuceneSearchAggregationBuilderFactory( this );
 	}
 
+	private LuceneSearchIndexScopeImpl(LuceneSearchIndexScopeImpl parentScope,
+			LuceneSearchIndexCompositeNodeContext overriddenRoot) {
+		super( parentScope, overriddenRoot );
+		this.backendContext = parentScope.backendContext;
+		this.analysisDefinitionRegistry = parentScope.analysisDefinitionRegistry;
+		this.multiTenancyStrategy = parentScope.multiTenancyStrategy;
+		this.timingSource = parentScope.timingSource;
+		this.mappedTypeNameToIndex = parentScope.mappedTypeNameToIndex;
+
+		this.predicateBuilderFactory = new LuceneSearchPredicateBuilderFactory( this );
+		this.sortBuilderFactory = new LuceneSearchSortBuilderFactory( this );
+		this.projectionBuilderFactory = new LuceneSearchProjectionBuilderFactory( this );
+		this.aggregationBuilderFactory = new LuceneSearchAggregationBuilderFactory( this );
+	}
+
 	private static Set<? extends LuceneIndexModel> toModels(
 			Set<? extends LuceneScopeIndexManagerContext> indexManagerContexts) {
 		return indexManagerContexts.stream().map( LuceneScopeIndexManagerContext::model )
@@ -113,6 +128,11 @@ public final class LuceneSearchIndexScopeImpl
 	@Override
 	protected LuceneSearchIndexScopeImpl self() {
 		return this;
+	}
+
+	@Override
+	public LuceneSearchIndexScopeImpl withRoot(String objectFieldPath) {
+		return new LuceneSearchIndexScopeImpl( this, field( objectFieldPath ).toComposite() );
 	}
 
 	@Override

@@ -50,6 +50,9 @@ public abstract class AbstractSearchIndexScope<
 	private final Set<String> hibernateSearchIndexNames;
 	private final Set<? extends M> indexModels;
 
+	// withRoot(...)
+	private final C overriddenRoot;
+
 	public AbstractSearchIndexScope(BackendMappingContext mappingContext, Set<? extends M> indexModels) {
 		this.mappingContext = mappingContext;
 
@@ -59,10 +62,25 @@ public abstract class AbstractSearchIndexScope<
 			hibernateSearchIndexNames.add( model.hibernateSearchName() );
 		}
 		this.indexModels = indexModels;
+
+		this.overriddenRoot = null;
 	}
 
-	protected final EventContext indexesEventContext() {
-		return EventContexts.fromIndexNames( hibernateSearchIndexNames );
+	protected AbstractSearchIndexScope(AbstractSearchIndexScope<S, M, N, C> parentScope, C overriddenRoot) {
+		this.mappingContext = parentScope.mappingContext;
+		this.hibernateSearchIndexNames = parentScope.hibernateSearchIndexNames;
+		this.indexModels = parentScope.indexModels;
+		this.overriddenRoot = overriddenRoot;
+	}
+
+	protected final EventContext eventContext() {
+		EventContext indexes = EventContexts.fromIndexNames( hibernateSearchIndexNames );
+		if ( overriddenRoot == null ) {
+			return indexes;
+		}
+		else {
+			return indexes.append( overriddenRoot.relativeEventContext() );
+		}
 	}
 
 	protected abstract S self();
@@ -95,13 +113,16 @@ public abstract class AbstractSearchIndexScope<
 			}
 			else if ( !converter.isCompatibleWith( converterForIndex ) ) {
 				throw log.inconsistentConfigurationForIdentifierForSearch( converter, converterForIndex,
-						indexesEventContext() );
+						eventContext() );
 			}
 		}
 		return converter;
 	}
 
-	private C root() {
+	protected C root() {
+		if ( overriddenRoot != null ) {
+			return overriddenRoot;
+		}
 		if ( indexModels.size() == 1 ) {
 			return indexModels.iterator().next().root();
 		}
@@ -114,7 +135,14 @@ public abstract class AbstractSearchIndexScope<
 		}
 	}
 
-	private N field(String absoluteFieldPath) {
+	protected N field(String fieldPath) {
+		if ( overriddenRoot != null ) {
+			return fieldInternal( overriddenRoot.absolutePath( fieldPath ) );
+		}
+		return fieldInternal( fieldPath );
+	}
+
+	private N fieldInternal(String absoluteFieldPath) {
 		N resultOrNull;
 		if ( indexModels.size() == 1 ) {
 			resultOrNull = indexModels.iterator().next().fieldOrNull( absoluteFieldPath );
@@ -123,14 +151,14 @@ public abstract class AbstractSearchIndexScope<
 			resultOrNull = createMultiIndexFieldContext( absoluteFieldPath );
 		}
 		if ( resultOrNull == null ) {
-			throw log.unknownFieldForSearch( absoluteFieldPath, indexesEventContext() );
+			throw log.unknownFieldForSearch( absoluteFieldPath, eventContext() );
 		}
 		return resultOrNull;
 	}
 
 	@Override
 	public final N child(SearchIndexCompositeNodeContext<?> parent, String name) {
-		return field( parent.absolutePath( name ) );
+		return fieldInternal( parent.absolutePath( name ) );
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"}) // We check types using reflection
@@ -177,8 +205,8 @@ public abstract class AbstractSearchIndexScope<
 	}
 
 	@Override
-	public final <T> T fieldQueryElement(String absoluteFieldPath, SearchQueryElementTypeKey<T> key) {
-		return field( absoluteFieldPath ).queryElement( key, self() );
+	public final <T> T fieldQueryElement(String fieldPath, SearchQueryElementTypeKey<T> key) {
+		return field( fieldPath ).queryElement( key, self() );
 	}
 
 	protected abstract C createMultiIndexSearchRootContext(List<C> rootForEachIndex);

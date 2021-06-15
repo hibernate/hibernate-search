@@ -116,9 +116,32 @@ public final class ElasticsearchSearchIndexScopeImpl
 		this.aggregationFactory = new ElasticsearchSearchAggregationBuilderFactory( this );
 	}
 
+	private ElasticsearchSearchIndexScopeImpl(ElasticsearchSearchIndexScopeImpl parentScope,
+			ElasticsearchSearchIndexCompositeNodeContext overriddenRoot) {
+		super( parentScope, overriddenRoot );
+		this.backendContext = parentScope.backendContext;
+		this.userFacingGson = parentScope.userFacingGson;
+		this.searchSyntax = parentScope.searchSyntax;
+		this.multiTenancyStrategy = parentScope.multiTenancyStrategy;
+		this.timingSource = parentScope.timingSource;
+		this.mappedTypeNameToIndex = parentScope.mappedTypeNameToIndex;
+		this.maxResultWindow = parentScope.maxResultWindow;
+
+		this.predicateBuilderFactory = new ElasticsearchSearchPredicateBuilderFactory( this );
+		this.sortBuilderFactory = new ElasticsearchSearchSortBuilderFactory( this );
+		this.projectionBuilderFactory = new ElasticsearchSearchProjectionBuilderFactory(
+				backendContext.getSearchProjectionBackendContext(), this );
+		this.aggregationFactory = new ElasticsearchSearchAggregationBuilderFactory( this );
+	}
+
 	@Override
 	protected ElasticsearchSearchIndexScopeImpl self() {
 		return this;
+	}
+
+	@Override
+	public ElasticsearchSearchIndexScopeImpl withRoot(String objectFieldPath) {
+		return new ElasticsearchSearchIndexScopeImpl( this, field( objectFieldPath ).toComposite() );
 	}
 
 	@Override

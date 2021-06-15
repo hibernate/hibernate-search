@@ -30,6 +30,13 @@ public class LuceneSearchSortFactoryImpl
 	}
 
 	@Override
+	public LuceneSearchSortFactory withRoot(String objectFieldPath) {
+		return new LuceneSearchSortFactoryImpl( dslContext.rescope(
+				dslContext.scope().withRoot( objectFieldPath ),
+				dslContext.predicateFactory().withRoot( objectFieldPath ) ) );
+	}
+
+	@Override
 	public SortThenStep fromLuceneSortField(SortField luceneSortField) {
 		return staticThenStep( dslContext.scope().sortBuilders().fromLuceneSortField( luceneSortField ) );
 	}

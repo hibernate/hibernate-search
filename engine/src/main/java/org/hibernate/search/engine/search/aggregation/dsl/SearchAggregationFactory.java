@@ -68,9 +68,6 @@ public interface SearchAggregationFactory {
 	 * @return A new aggregation factory using the given object field as root.
 	 */
 	@Incubating
-	// TODO implement and remove default
-	default SearchAggregationFactory withRoot(String objectFieldPath) {
-		return this;
-	}
+	SearchAggregationFactory withRoot(String objectFieldPath);
 
 }

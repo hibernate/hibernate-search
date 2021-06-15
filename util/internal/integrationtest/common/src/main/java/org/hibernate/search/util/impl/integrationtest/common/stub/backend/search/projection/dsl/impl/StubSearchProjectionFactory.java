@@ -15,4 +15,9 @@ public class StubSearchProjectionFactory<R, E>
 	public StubSearchProjectionFactory(SearchProjectionDslContext<SearchProjectionIndexScope<?>> dslContext) {
 		super( dslContext );
 	}
+
+	@Override
+	public StubSearchProjectionFactory<R, E> withRoot(String objectFieldPath) {
+		return new StubSearchProjectionFactory<>( dslContext.rescope( dslContext.scope().withRoot( objectFieldPath ) ) );
+	}
 }

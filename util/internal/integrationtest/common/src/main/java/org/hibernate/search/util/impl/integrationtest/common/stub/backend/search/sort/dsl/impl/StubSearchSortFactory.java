@@ -16,4 +16,10 @@ public class StubSearchSortFactory
 	public StubSearchSortFactory(SearchSortDslContext<SearchSortIndexScope<?>, SearchPredicateFactory> dslContext) {
 		super( dslContext );
 	}
+
+	@Override
+	public StubSearchSortFactory withRoot(String objectFieldPath) {
+		return new StubSearchSortFactory( dslContext.rescope( dslContext.scope().withRoot( objectFieldPath ),
+				dslContext.predicateFactory().withRoot( objectFieldPath ) ) );
+	}
 }

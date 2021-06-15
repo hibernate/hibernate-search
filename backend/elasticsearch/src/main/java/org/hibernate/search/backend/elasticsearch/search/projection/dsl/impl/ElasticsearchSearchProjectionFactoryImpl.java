@@ -29,6 +29,12 @@ public class ElasticsearchSearchProjectionFactoryImpl<R, E>
 	}
 
 	@Override
+	public ElasticsearchSearchProjectionFactory<R, E> withRoot(String objectFieldPath) {
+		return new ElasticsearchSearchProjectionFactoryImpl<>( dslContext.rescope(
+				dslContext.scope().withRoot( objectFieldPath ) ) );
+	}
+
+	@Override
 	public ProjectionFinalStep<JsonObject> source() {
 		return new StaticProjectionFinalStep<>( dslContext.scope().projectionBuilders().source() );
 	}

@@ -30,6 +30,12 @@ public class LuceneSearchProjectionFactoryImpl<R, E>
 	}
 
 	@Override
+	public LuceneSearchProjectionFactory<R, E> withRoot(String objectFieldPath) {
+		return new LuceneSearchProjectionFactoryImpl<>( dslContext.rescope(
+				dslContext.scope().withRoot( objectFieldPath ) ) );
+	}
+
+	@Override
 	public ProjectionFinalStep<Document> document() {
 		return new StaticProjectionFinalStep<>( dslContext.scope().projectionBuilders().document() );
 	}

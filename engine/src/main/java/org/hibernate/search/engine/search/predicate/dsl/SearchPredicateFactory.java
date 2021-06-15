@@ -199,9 +199,6 @@ public interface SearchPredicateFactory {
 	 * @return A new predicate factory using the given object field as root.
 	 */
 	@Incubating
-	// TODO implement and remove default
-	default SearchPredicateFactory withRoot(String objectFieldPath) {
-		return this;
-	}
+	SearchPredicateFactory withRoot(String objectFieldPath);
 
 }

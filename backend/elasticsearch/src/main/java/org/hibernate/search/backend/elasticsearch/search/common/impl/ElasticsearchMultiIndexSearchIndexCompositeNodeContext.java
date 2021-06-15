@@ -44,12 +44,12 @@ public final class ElasticsearchMultiIndexSearchIndexCompositeNodeContext
 	}
 
 	@Override
-	protected ElasticsearchSearchIndexNodeContext childInScope(String childRelativeName) {
-		return scope.child( this, childRelativeName );
+	public ElasticsearchSearchIndexValueFieldContext<?> toValueField() {
+		return SearchIndexSchemaElementContextHelper.throwingToValueField( this );
 	}
 
 	@Override
-	public ElasticsearchSearchIndexValueFieldContext<?> toValueField() {
-		return SearchIndexSchemaElementContextHelper.throwingToValueField( this );
+	protected ElasticsearchSearchIndexNodeContext childInScope(String childRelativeName) {
+		return scope.child( this, childRelativeName );
 	}
 }

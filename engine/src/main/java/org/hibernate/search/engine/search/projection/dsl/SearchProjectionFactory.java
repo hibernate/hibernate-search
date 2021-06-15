@@ -328,8 +328,5 @@ public interface SearchProjectionFactory<R, E> {
 	 * @return A new projection factory using the given object field as root.
 	 */
 	@Incubating
-	// TODO implement and remove default
-	default SearchProjectionFactory<R, E> withRoot(String objectFieldPath) {
-		return this;
-	}
+	SearchProjectionFactory<R, E> withRoot(String objectFieldPath);
 }

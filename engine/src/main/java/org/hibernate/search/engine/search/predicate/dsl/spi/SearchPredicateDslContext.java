@@ -33,4 +33,12 @@ public final class SearchPredicateDslContext<SC extends SearchPredicateIndexScop
 		return scope;
 	}
 
+	/**
+	 * @param newScope The new scope for the new DSL context.
+	 * @return A copy of this DSL context with its scope and predicate factory replaced with the given ones.
+	 */
+	public SearchPredicateDslContext<SC> rescope(SC newScope) {
+		return new SearchPredicateDslContext<>( newScope );
+	}
+
 }

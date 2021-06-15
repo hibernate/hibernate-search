@@ -27,10 +27,7 @@ public interface ExtendedSearchAggregationFactory<
 		extends SearchAggregationFactory {
 
 	@Override
-	// TODO implement and remove default
-	default S withRoot(String objectFieldPath) {
-		return (S) this;
-	}
+	S withRoot(String objectFieldPath);
 
 	@Override
 	RangeAggregationFieldStep<PDF> range();

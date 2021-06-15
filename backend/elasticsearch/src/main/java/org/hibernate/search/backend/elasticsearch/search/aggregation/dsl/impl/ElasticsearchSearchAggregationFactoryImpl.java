@@ -29,6 +29,13 @@ public class ElasticsearchSearchAggregationFactoryImpl
 	}
 
 	@Override
+	public ElasticsearchSearchAggregationFactory withRoot(String objectFieldPath) {
+		return new ElasticsearchSearchAggregationFactoryImpl( dslContext.rescope(
+				dslContext.scope().withRoot( objectFieldPath ),
+				dslContext.predicateFactory().withRoot( objectFieldPath ) ) );
+	}
+
+	@Override
 	public AggregationFinalStep<JsonObject> fromJson(JsonObject jsonObject) {
 		return new ElasticsearchJsonAggregationFinalStep(
 				dslContext.scope().aggregationBuilders().fromJson( jsonObject )
