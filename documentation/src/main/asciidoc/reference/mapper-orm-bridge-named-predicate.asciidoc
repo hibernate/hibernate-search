@@ -58,6 +58,7 @@ one for each field populated by the bridge.
 <5> Be careful: the search predicate factory expects paths
 relative to the object field where the named predicate was registered.
 Here the path `departmentCode` will be understood as `<path to the object field>.departmentCode`.
+See also <<search-dsl-paths>>.
 <6> Do not forget to call `toPredicate()` to return a `SearchPredicate` instance.
 
 [source, JAVA, indent=0, subs="+callouts"]
