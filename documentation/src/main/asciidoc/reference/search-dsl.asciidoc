@@ -24,4 +24,6 @@ include::search-dsl-aggregation.asciidoc[]
 
 include::search-dsl-type-compatibility.asciidoc[]
 
+include::search-dsl-paths.asciidoc[]
+
 :leveloffset: -1
