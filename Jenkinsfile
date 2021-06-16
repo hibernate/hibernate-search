@@ -244,7 +244,10 @@ stage('Configure') {
 					new EsLocalBuildEnvironment(versionRange: '[7.10,7.11)', mavenProfile: 'elasticsearch-7.10',
 							condition: TestCondition.BEFORE_MERGE,
 							isDefault: true),
-					new EsLocalBuildEnvironment(versionRange: '[7.11,7.x)', mavenProfile: 'elasticsearch-7.11',
+					// Not testing 7.11 to make the build quicker.
+					new EsLocalBuildEnvironment(versionRange: '[7.11,7.12)', mavenProfile: 'elasticsearch-7.11',
+							condition: TestCondition.ON_DEMAND),
+					new EsLocalBuildEnvironment(versionRange: '[7.12,7.x)', mavenProfile: 'elasticsearch-7.12',
 							condition: TestCondition.AFTER_MERGE),
 
 					// --------------------------------------------
