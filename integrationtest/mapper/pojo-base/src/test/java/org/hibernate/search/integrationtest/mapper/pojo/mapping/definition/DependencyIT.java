@@ -100,8 +100,7 @@ public class DependencyIT {
 			session.indexingPlan().add( entity );
 
 			backendMock.expectWorks( indexName )
-					.add( "1", b -> b.field( "derived", "init1 init2" ) )
-					.createdThenExecuted();
+					.add( "1", b -> b.field( "derived", "init1 init2" ) );
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -120,8 +119,7 @@ public class DependencyIT {
 			session.indexingPlan().addOrUpdate( entity, "source1" );
 
 			backendMock.expectWorks( indexName )
-					.addOrUpdate( "1", b -> b.field( "derived", "updated1 init2" ) )
-					.createdThenExecuted();
+					.addOrUpdate( "1", b -> b.field( "derived", "updated1 init2" ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -199,11 +197,9 @@ public class DependencyIT {
 			session.indexingPlan().add( entity2 );
 
 			backendMock.expectWorks( index1Name )
-					.add( "1", b -> b.field( "derived", "init1 init2 init4" ) )
-					.createdThenExecuted();
+					.add( "1", b -> b.field( "derived", "init1 init2 init4" ) );
 			backendMock.expectWorks( index2Name )
-					.add( "2", b -> b.field( "derived", "init1 init3 init5" ) )
-					.createdThenExecuted();
+					.add( "2", b -> b.field( "derived", "init1 init3 init5" ) );
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -226,11 +222,9 @@ public class DependencyIT {
 			session.indexingPlan().addOrUpdate( entity2, "source1" );
 
 			backendMock.expectWorks( index1Name )
-					.addOrUpdate( "1", b -> b.field( "derived", "updated1 init2 init4" ) )
-					.createdThenExecuted();
+					.addOrUpdate( "1", b -> b.field( "derived", "updated1 init2 init4" ) );
 			backendMock.expectWorks( index2Name )
-					.addOrUpdate( "2", b -> b.field( "derived", "updated1 init3 init5" ) )
-					.createdThenExecuted();
+					.addOrUpdate( "2", b -> b.field( "derived", "updated1 init3 init5" ) );
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -243,11 +237,9 @@ public class DependencyIT {
 			session.indexingPlan().addOrUpdate( entity2, "source3" );
 
 			backendMock.expectWorks( index1Name )
-					.addOrUpdate( "1", b -> b.field( "derived", "updated1 updated2 init4" ) )
-					.createdThenExecuted();
+					.addOrUpdate( "1", b -> b.field( "derived", "updated1 updated2 init4" ) );
 			backendMock.expectWorks( index2Name )
-					.addOrUpdate( "2", b -> b.field( "derived", "updated1 updated3 init5" ) )
-					.createdThenExecuted();
+					.addOrUpdate( "2", b -> b.field( "derived", "updated1 updated3 init5" ) );
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -260,11 +252,9 @@ public class DependencyIT {
 			session.indexingPlan().addOrUpdate( entity2, "source5" );
 
 			backendMock.expectWorks( index1Name )
-					.addOrUpdate( "1", b -> b.field( "derived", "updated1 updated2 updated4" ) )
-					.createdThenExecuted();
+					.addOrUpdate( "1", b -> b.field( "derived", "updated1 updated2 updated4" ) );
 			backendMock.expectWorks( index2Name )
-					.addOrUpdate( "2", b -> b.field( "derived", "updated1 updated3 updated5" ) )
-					.createdThenExecuted();
+					.addOrUpdate( "2", b -> b.field( "derived", "updated1 updated3 updated5" ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -373,8 +363,7 @@ public class DependencyIT {
 					.add( "1", b -> b.objectField( "contained", b2 -> b2
 							.field( "derived", "init1 init2 init4" ) ) )
 					.add( "2", b -> b.objectField( "contained", b2 -> b2
-							.field( "derived", "init1 init3 init5" ) ) )
-					.createdThenExecuted();
+							.field( "derived", "init1 init3 init5" ) ) );
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -400,8 +389,7 @@ public class DependencyIT {
 					.addOrUpdate( "1", b -> b.objectField( "contained", b2 -> b2
 							.field( "derived", "updated1 init2 init4" ) ) )
 					.addOrUpdate( "2", b -> b.objectField( "contained", b2 -> b2
-							.field( "derived", "updated1 init3 init5" ) ) )
-					.createdThenExecuted();
+							.field( "derived", "updated1 init3 init5" ) ) );
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -417,8 +405,7 @@ public class DependencyIT {
 					.addOrUpdate( "1", b -> b.objectField( "contained", b2 -> b2
 							.field( "derived", "updated1 updated2 init4" ) ) )
 					.addOrUpdate( "2", b -> b.objectField( "contained", b2 -> b2
-							.field( "derived", "updated1 updated3 init5" ) ) )
-					.createdThenExecuted();
+							.field( "derived", "updated1 updated3 init5" ) ) );
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -434,8 +421,7 @@ public class DependencyIT {
 					.addOrUpdate( "1", b -> b.objectField( "contained", b2 -> b2
 							.field( "derived", "updated1 updated2 updated4" ) ) )
 					.addOrUpdate( "2", b -> b.objectField( "contained", b2 -> b2
-							.field( "derived", "updated1 updated3 updated5" ) ) )
-					.createdThenExecuted();
+							.field( "derived", "updated1 updated3 updated5" ) ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -551,8 +537,7 @@ public class DependencyIT {
 					.add( "1", b -> b.objectField( "contained", b2 -> b2
 							.field( "derived", "init1 init2" ) ) )
 					.add( "2", b -> b.objectField( "contained", b2 -> b2
-							.field( "derived", "init1 init3" ) ) )
-					.createdThenExecuted();
+							.field( "derived", "init1 init3" ) ) );
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -578,8 +563,7 @@ public class DependencyIT {
 					.addOrUpdate( "1", b -> b.objectField( "contained", b2 -> b2
 							.field( "derived", "updated1 init2" ) ) )
 					.addOrUpdate( "2", b -> b.objectField( "contained", b2 -> b2
-							.field( "derived", "updated1 init3" ) ) )
-					.createdThenExecuted();
+							.field( "derived", "updated1 init3" ) ) );
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -595,8 +579,7 @@ public class DependencyIT {
 					.addOrUpdate( "1", b -> b.objectField( "contained", b2 -> b2
 							.field( "derived", "updated1 updated2" ) ) )
 					.addOrUpdate( "2", b -> b.objectField( "contained", b2 -> b2
-							.field( "derived", "updated1 updated3" ) ) )
-					.createdThenExecuted();
+							.field( "derived", "updated1 updated3" ) ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}

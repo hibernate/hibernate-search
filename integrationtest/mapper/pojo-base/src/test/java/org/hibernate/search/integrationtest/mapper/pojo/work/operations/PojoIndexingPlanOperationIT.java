@@ -227,9 +227,9 @@ public class PojoIndexingPlanOperationIT extends AbstractPojoIndexingOperationIT
 			if ( !isAdd() ) {
 				// For operations other than add, expect a delete for the previous route.
 				backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
+						.createAndExecute( futureFromBackend )
 						.delete( b -> addWorkInfo( b, tenantId, "1",
-								MyRoutingBridge.toRoutingKey( tenantId, 1, "1" ) ) )
-						.createdThenExecuted( futureFromBackend );
+								MyRoutingBridge.toRoutingKey( tenantId, 1, "1" ) ) );
 			}
 			// However, we don't expect the actual operation, which should be skipped because the entity is not indexed.
 			operation.addTo( indexingPlan, null, IndexedEntity.of( 1 ) );
@@ -254,13 +254,13 @@ public class PojoIndexingPlanOperationIT extends AbstractPojoIndexingOperationIT
 			if ( !isAdd() ) {
 				// For operations other than add, expect a delete for every previous route.
 				backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
+						.createAndExecute( futureFromBackend )
 						.delete( b -> addWorkInfo( b, tenantId, "1",
 								MyRoutingBridge.toRoutingKey( tenantId, 1, "1" ) ) )
 						.delete( b -> addWorkInfo( b, tenantId, "1",
 								MyRoutingBridge.toRoutingKey( tenantId, 1, "foo" ) ) )
 						.delete( b -> addWorkInfo( b, tenantId, "1",
-								MyRoutingBridge.toRoutingKey( tenantId, 1, "3" ) ) )
-						.createdThenExecuted( futureFromBackend );
+								MyRoutingBridge.toRoutingKey( tenantId, 1, "3" ) ) );
 			}
 			// However, we don't expect the actual operation, which should be skipped because the entity is not indexed.
 			operation.addTo( indexingPlan, null, IndexedEntity.of( 1 ) );

@@ -96,8 +96,7 @@ public class BindingUsingPropertyMarkerAccessIT<TIndexed> {
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b
 							.field( "location", GeoPoint.of( 42.0, 42.0 ) )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}

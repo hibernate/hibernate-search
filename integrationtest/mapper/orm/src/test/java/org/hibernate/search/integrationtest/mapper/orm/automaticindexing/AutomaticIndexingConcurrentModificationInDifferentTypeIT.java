@@ -79,16 +79,13 @@ public class AutomaticIndexingConcurrentModificationInDifferentTypeIT {
 							.field( "name", "yann" )
 							.objectField( "child", b2 -> b2
 									.field( "name", "edouard" )
-							) )
-					.createdThenExecuted();
+							) );
 			backendMock.expectWorks( ChildEntity.NAME )
 					.add( String.valueOf( 1 ), b -> b
-							.field( "name", "edouard" ) )
-					.createdThenExecuted();
+							.field( "name", "edouard" ) );
 			backendMock.expectWorks( OtherEntity.NAME )
 					.add( String.valueOf( 3 ), b -> b
-							.field( "name", "king" ) )
-					.createdThenExecuted();
+							.field( "name", "king" ) );
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -109,16 +106,13 @@ public class AutomaticIndexingConcurrentModificationInDifferentTypeIT {
 							.field( "name", "yann" )
 							.objectField( "child", b2 -> b2
 									.field( "name", "updated" )
-							) )
-					.createdThenExecuted();
+							) );
 			backendMock.expectWorks( ChildEntity.NAME )
 					.addOrUpdate( String.valueOf( 1 ), b -> b
-							.field( "name", "updated" ) )
-					.createdThenExecuted();
+							.field( "name", "updated" ) );
 			backendMock.expectWorks( OtherEntity.NAME )
 					.addOrUpdate( String.valueOf( 3 ), b -> b
-							.field( "name", "updated" ) )
-					.createdThenExecuted();
+							.field( "name", "updated" ) );
 		} );
 		backendMock.verifyExpectationsMet();
 	}

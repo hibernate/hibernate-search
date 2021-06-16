@@ -92,8 +92,7 @@ public class BackRefPropertyIT {
 									.field( "text", "theText" ) ) )
 					.add( "1", b -> b
 							.objectField( "contained", b2 -> b2
-									.field( "text", "theText" ) ) )
-					.createdThenExecuted();
+									.field( "text", "theText" ) ) );
 		} );
 	}
 

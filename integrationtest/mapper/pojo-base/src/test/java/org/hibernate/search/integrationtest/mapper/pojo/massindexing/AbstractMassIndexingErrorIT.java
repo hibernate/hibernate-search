@@ -442,18 +442,17 @@ public abstract class AbstractMassIndexingErrorIT {
 							Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 					)
 							.add( "1", b -> b
-							.field( "title", TITLE_1 )
-							.field( "author", AUTHOR_1 )
+									.field( "title", TITLE_1 )
+									.field( "author", AUTHOR_1 )
 							)
 							.add( "2", b -> b
-							.field( "title", TITLE_2 )
-							.field( "author", AUTHOR_2 )
+									.field( "title", TITLE_2 )
+									.field( "author", AUTHOR_2 )
 							)
 							.add( "3", b -> b
-							.field( "title", TITLE_3 )
-							.field( "author", AUTHOR_3 )
-							)
-							.createdThenExecuted();
+									.field( "title", TITLE_3 )
+									.field( "author", AUTHOR_3 )
+							);
 					break;
 				case ERROR:
 					CompletableFuture<?> failingFuture = new CompletableFuture<>();
@@ -462,32 +461,27 @@ public abstract class AbstractMassIndexingErrorIT {
 							Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 					)
 							.add( "1", b -> b
-							.field( "title", TITLE_1 )
-							.field( "author", AUTHOR_1 )
+									.field( "title", TITLE_1 )
+									.field( "author", AUTHOR_1 )
 							)
 							.add( "3", b -> b
-							.field( "title", TITLE_3 )
-							.field( "author", AUTHOR_3 )
+									.field( "title", TITLE_3 )
+									.field( "author", AUTHOR_3 )
 							)
-							.createdThenExecuted();
-					backendMock.expectWorks(
-							Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
-					)
+							.createAndExecute( failingFuture )
 							.add( "2", b -> b
-							.field( "title", TITLE_2 )
-							.field( "author", AUTHOR_2 )
-							)
-							.createdThenExecuted( failingFuture );
+									.field( "title", TITLE_2 )
+									.field( "author", AUTHOR_2 )
+							);
 					break;
 				case STOP:
 					backendMock.expectWorks(
 							Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 					)
 							.add( "1", b -> b
-							.field( "title", TITLE_1 )
-							.field( "author", AUTHOR_1 )
-							)
-							.createdThenExecuted();
+									.field( "title", TITLE_1 )
+									.field( "author", AUTHOR_1 )
+							);
 					break;
 			}
 		};

@@ -56,8 +56,7 @@ public class OutboxPollingAutomaticIndexingStrategyRoutingIT {
 				.add( b -> b.identifier( "1" ).routingKey( "FIRST" )
 						.document( StubDocumentNode.document()
 								.field( "text", "first" )
-								.build() ) )
-				.createdThenExecuted();
+								.build() ) );
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 
@@ -96,8 +95,7 @@ public class OutboxPollingAutomaticIndexingStrategyRoutingIT {
 				.addOrUpdate( b -> b.identifier( "1" ).routingKey( "THIRD" )
 						.document( StubDocumentNode.document()
 								.field( "text", "third" )
-								.build() ) )
-				.createdThenExecuted();
+								.build() ) );
 		outboxEventFinder.showOnlyEvents( eventIdsAtSecondStatus );
 		backendMock.verifyExpectationsMet();
 
@@ -107,8 +105,7 @@ public class OutboxPollingAutomaticIndexingStrategyRoutingIT {
 				.addOrUpdate( b -> b.identifier( "1" ).routingKey( "THIRD" )
 						.document( StubDocumentNode.document()
 								.field( "text", "third" )
-								.build() ) )
-				.createdThenExecuted();
+								.build() ) );
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 	}

@@ -111,8 +111,7 @@ public class PojoIndexingPlanBaseIT {
 							)
 					)
 					.delete( b -> b.identifier( "3" ) )
-					.delete( b -> b.identifier( "4" ) )
-					.createdThenExecuted();
+					.delete( b -> b.identifier( "4" ) );
 		}
 	}
 
@@ -188,8 +187,6 @@ public class PojoIndexingPlanBaseIT {
 			session.indexingPlan().add( entity );
 			session.indexingPlan().addOrUpdate( entity );
 			expectations.addOrUpdate( "10", b -> b.field( "value", "val10" ) );
-
-			expectations.createdThenExecuted();
 		}
 	}
 
@@ -201,8 +198,7 @@ public class PojoIndexingPlanBaseIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			session.indexingPlan().addOrUpdate( indexed, "value" );
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.addOrUpdate( "1", b -> b.field( "value", "val1" ) )
-					.createdThenExecuted();
+					.addOrUpdate( "1", b -> b.field( "value", "val1" ) );
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -216,8 +212,7 @@ public class PojoIndexingPlanBaseIT {
 		try ( SearchSession session = mapping.createSession() ) {
 			session.indexingPlan().addOrUpdate( indexed, "value", "notIndexed" );
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.addOrUpdate( "1", b -> b.field( "value", "val1" ) )
-					.createdThenExecuted();
+					.addOrUpdate( "1", b -> b.field( "value", "val1" ) );
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -226,8 +221,7 @@ public class PojoIndexingPlanBaseIT {
 			session.indexingPlan().addOrUpdate( null, null, indexed,
 					true, false, "notIndexed" );
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.addOrUpdate( "1", b -> b.field( "value", "val1" ) )
-					.createdThenExecuted();
+					.addOrUpdate( "1", b -> b.field( "value", "val1" ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -248,8 +242,7 @@ public class PojoIndexingPlanBaseIT {
 					.addOrUpdate( "1", b -> b
 							.field( "value", "val1" )
 							.objectField( "contained", b2 -> b2
-									.field( "value", "val3" ) ) )
-					.createdThenExecuted();
+									.field( "value", "val3" ) ) );
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -270,8 +263,7 @@ public class PojoIndexingPlanBaseIT {
 					.addOrUpdate( "1", b -> b
 							.field( "value", "val1" )
 							.objectField( "contained", b2 -> b2
-									.field( "value", "val4" ) ) )
-					.createdThenExecuted();
+									.field( "value", "val4" ) ) );
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -285,8 +277,7 @@ public class PojoIndexingPlanBaseIT {
 					.addOrUpdate( "1", b -> b
 							.field( "value", "val1" )
 							.objectField( "contained", b2 -> b2
-									.field( "value", "val4" ) ) )
-					.createdThenExecuted();
+									.field( "value", "val4" ) ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -324,8 +315,7 @@ public class PojoIndexingPlanBaseIT {
 							)
 					)
 					.delete( b -> b.identifier( "3" ) )
-					.delete( b -> b.identifier( "4" ) )
-					.createdThenExecuted();
+					.delete( b -> b.identifier( "4" ) );
 		}
 	}
 
@@ -418,8 +408,6 @@ public class PojoIndexingPlanBaseIT {
 			expectations.addOrUpdate( "10", b -> b.field( "value", "val10" ) );
 
 			when( loaderMock.load( idsToLoad, null ) ).thenReturn( loadedEntities );
-
-			expectations.createdThenExecuted();
 		}
 
 		verify( loaderMock ).load( any(), any() );
@@ -438,14 +426,14 @@ public class PojoIndexingPlanBaseIT {
 				session.indexingPlan().add( entity1 );
 
 				backendMock.expectWorks( IndexedEntity.INDEX )
+						.createAndExecute( failingFuture )
 						.add( b -> b
 								.identifier( "1" )
 								.document( StubDocumentNode.document()
 										.field( "value", entity1.value )
 										.build()
 								)
-						)
-						.createdThenExecuted( failingFuture );
+						);
 			}
 		} )
 				.isSameAs( simulatedFailure );

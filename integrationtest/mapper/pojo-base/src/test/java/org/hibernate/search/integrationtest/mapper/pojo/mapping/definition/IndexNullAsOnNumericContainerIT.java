@@ -62,8 +62,7 @@ public class IndexNullAsOnNumericContainerIT {
 					.add( "1", b -> b
 							// Check that null values are forwarded as null to the backend (not as a String)
 							.field( "integerList", 1, null, 2 )
-					)
-					.createdThenExecuted();
+					);
 		}
 	}
 

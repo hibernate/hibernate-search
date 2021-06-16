@@ -139,8 +139,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 		} );
 
 		backendMock.expectWorks( IndexedEntity.INDEX )
-				.add( "1", b -> b.field( "indexedField", "value for the field" ) )
-				.createdThenExecuted();
+				.add( "1", b -> b.field( "indexedField", "value for the field" ) );
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 
@@ -156,8 +155,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 		} );
 
 		backendMock.expectWorks( IndexedEntity.INDEX )
-				.addOrUpdate( "1", b -> b.field( "indexedField", "value for the field" ) )
-				.createdThenExecuted();
+				.addOrUpdate( "1", b -> b.field( "indexedField", "value for the field" ) );
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 	}
@@ -177,8 +175,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 		} );
 
 		backendMock.expectWorks( IndexedEntity.INDEX )
-				.add( "1", b -> b.field( "indexedField", "value for the field" ) )
-				.createdThenExecuted();
+				.add( "1", b -> b.field( "indexedField", "value for the field" ) );
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 
@@ -217,8 +214,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 		} );
 
 		backendMock.expectWorks( IndexedEntity.INDEX )
-				.addOrUpdate( "1", b -> b.field( "indexedField", "value for the field" ) )
-				.createdThenExecuted();
+				.addOrUpdate( "1", b -> b.field( "indexedField", "value for the field" ) );
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 	}
@@ -237,8 +233,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 				.add( b -> b.identifier( "1" ).routingKey( "FIRST" )
 						.document( StubDocumentNode.document()
 								.field( "text", "first" )
-								.build() ) )
-				.createdThenExecuted();
+								.build() ) );
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 
@@ -262,8 +257,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 				.addOrUpdate( b -> b.identifier( "1" ).routingKey( "THIRD" )
 						.document( StubDocumentNode.document()
 								.field( "text", "third" )
-								.build() ) )
-				.createdThenExecuted();
+								.build() ) );
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 	}
@@ -283,8 +277,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 				.add( b -> b.identifier( "1" ).routingKey( "FIRST" )
 						.document( StubDocumentNode.document()
 								.field( "text", "first" )
-								.build() ) )
-				.createdThenExecuted();
+								.build() ) );
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 
@@ -341,8 +334,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 				.addOrUpdate( b -> b.identifier( "1" ).routingKey( "THIRD" )
 						.document( StubDocumentNode.document()
 								.field( "text", "third" )
-								.build() ) )
-				.createdThenExecuted();
+								.build() ) );
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 	}

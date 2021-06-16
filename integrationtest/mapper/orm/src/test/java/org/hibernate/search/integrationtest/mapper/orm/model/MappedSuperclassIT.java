@@ -61,9 +61,8 @@ public class MappedSuperclassIT {
 			IndexedEntity indexedPojo = new IndexedEntity( 1, "Using some text here" );
 			session.save( indexedPojo );
 
-			backendMock.expectWorks( IndexedEntity.class.getSimpleName() ).add( "1", b -> b
-					.field( "text", "Using some text here" )
-			).createdThenExecuted();
+			backendMock.expectWorks( IndexedEntity.class.getSimpleName() )
+					.add( "1", b -> b.field( "text", "Using some text here" ) );
 		} );
 	}
 

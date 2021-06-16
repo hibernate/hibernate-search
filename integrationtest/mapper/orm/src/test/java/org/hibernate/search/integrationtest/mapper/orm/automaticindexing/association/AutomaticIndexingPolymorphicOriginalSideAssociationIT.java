@@ -130,8 +130,7 @@ public class AutomaticIndexingPolymorphicOriginalSideAssociationIT {
 											.field( "includedInSingle", "initialValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -154,8 +153,7 @@ public class AutomaticIndexingPolymorphicOriginalSideAssociationIT {
 											.field( "includedInSingle", "updatedValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}

@@ -84,8 +84,7 @@ public class AutomaticIndexingConcurrentModificationInSameTypeIT {
 									.field( "firstName", "zobocare" ) ) )
 					.add( String.valueOf( 3 ), b -> b
 							.field( "name", "antoine" )
-							.field( "firstName", "owl" ) )
-					.createdThenExecuted();
+							.field( "firstName", "owl" ) );
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -113,8 +112,7 @@ public class AutomaticIndexingConcurrentModificationInSameTypeIT {
 									.field( "firstName", "zobocare" ) ) )
 					.addOrUpdate( String.valueOf( 3 ), b -> b
 							.field( "name", "updated" )
-							.field( "firstName", "owl" ) )
-					.createdThenExecuted();
+							.field( "firstName", "owl" ) );
 		} );
 
 		backendMock.verifyExpectationsMet();

@@ -112,8 +112,7 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 					)
 					.add( "3", b -> b
 							.field( "indexedField", "initialValue III" )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -143,7 +142,6 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 
 					context.add( index + "", b -> b.field( "indexedField", "indexed value: " + index ) );
 				}
-				context.createdThenExecuted();
 			} );
 			backendMock.verifyExpectationsMet();
 		}
@@ -174,26 +172,22 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 			failingFuture.completeExceptionally( new SimulatedFailure( "Indexing work #2 failed!" ) );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
+					.createAndExecute()
 					.add( "1", b -> b
 							.field( "indexedField", "initialValue" )
 					)
 					.add( "3", b -> b
 							.field( "indexedField", "initialValue" )
 					)
-					.createdThenExecuted();
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
+					.createAndExecute( failingFuture )
 					.add( "2", b -> b
 							.field( "indexedField", "initialValue" )
 					)
-					.createdThenExecuted( failingFuture );
-
-			// retry:
-			backendMock.expectWorks( IndexedEntity.INDEX )
+					// retry (succeeds):
+					.createAndExecute()
 					.addOrUpdate( "2", b -> b
 							.field( "indexedField", "initialValue" )
-					)
-					.createdThenExecuted();
+					);
 
 		} );
 		backendMock.verifyExpectationsMet();
@@ -218,8 +212,7 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
-							.field( "indexedField", "initialValue" ) )
-					.createdThenExecuted();
+							.field( "indexedField", "initialValue" ) );
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -254,8 +247,8 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 		CompletableFuture<?> failingFuture = new CompletableFuture<>();
 		failingFuture.completeExceptionally( new SimulatedFailure( "Delete work on #1 failed!" ) );
 		backendMock.expectWorks( IndexedEntity.INDEX )
-				.delete( "1" )
-				.createdThenExecuted( failingFuture );
+				.createAndExecute( failingFuture )
+				.delete( "1" );
 		outboxEventFinder.showOnlyEvents( eventIdsUpToDelete );
 		backendMock.verifyExpectationsMet();
 
@@ -265,8 +258,7 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 		// Delete retry + add
 		backendMock.expectWorks( IndexedEntity.INDEX )
 				.addOrUpdate( "1", b -> b
-						.field( "indexedField", "updatedValue" ) )
-				.createdThenExecuted();
+						.field( "indexedField", "updatedValue" ) );
 		outboxEventFinder.enableFilter( false );
 		backendMock.verifyExpectationsMet();
 	}
@@ -299,27 +291,20 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 					.add( "3", b -> b
 							.field( "indexedField", "initialValue" )
 					)
-					.createdThenExecuted();
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
+					.createAndExecute( failingFuture )
 					.add( "2", b -> b
 							.field( "indexedField", "initialValue" )
 					)
-					.createdThenExecuted( failingFuture );
-
-			// retry:
-			backendMock.expectWorks( IndexedEntity.INDEX )
+					// retry (fails too):
 					.addOrUpdate( "2", b -> b
 							.field( "indexedField", "initialValue" )
-					)
-					.createdThenExecuted( failingFuture );
+					);
 
 			// finally it works:
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.addOrUpdate( "2", b -> b
 							.field( "indexedField", "initialValue" )
-					)
-					.createdThenExecuted();
+					);
 
 		} );
 		backendMock.verifyExpectationsMet();
@@ -364,25 +349,20 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 					.add( "3", b -> b
 							.field( "indexedField", "initialValue" )
 					)
-					.createdThenExecuted();
-
-			backendMock.expectWorks( IndexedEntity.INDEX )
+					.createAndExecute( failingFuture )
 					.add( "2", b -> b
 							.field( "indexedField", "initialValue" )
 					)
-					.createdThenExecuted( failingFuture );
-
-			// retry:
-			backendMock.expectWorks( IndexedEntity.INDEX )
+					// retry (fails too):
+					.createAndExecute( failingFuture )
 					.addOrUpdate( "2", b -> b
 							.field( "indexedField", "initialValue" )
 					)
-					.createdThenExecuted( failingFuture );
-			backendMock.expectWorks( IndexedEntity.INDEX )
+					// retry (fails too):
+					.createAndExecute( failingFuture )
 					.addOrUpdate( "2", b -> b
 							.field( "indexedField", "initialValue" )
-					)
-					.createdThenExecuted( failingFuture );
+					);
 
 			// no more retry
 		} );

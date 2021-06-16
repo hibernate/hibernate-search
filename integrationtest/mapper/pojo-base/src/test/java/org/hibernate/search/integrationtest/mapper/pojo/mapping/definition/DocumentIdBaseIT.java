@@ -355,8 +355,7 @@ public class DocumentIdBaseIT {
 			session.indexingPlan().add( entity );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.add( "fixed-prefix-1", b -> b.field( "value", "bla-bla-bla" ) )
-					.createdThenExecuted();
+					.add( "fixed-prefix-1", b -> b.field( "value", "bla-bla-bla" ) );
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -469,8 +468,7 @@ public class DocumentIdBaseIT {
 			session.indexingPlan().add( entity );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.add( "fixed-prefix-1", b -> b.field( "value", "bla-bla-bla" ) )
-					.createdThenExecuted();
+					.add( "fixed-prefix-1", b -> b.field( "value", "bla-bla-bla" ) );
 		}
 		backendMock.verifyExpectationsMet();
 

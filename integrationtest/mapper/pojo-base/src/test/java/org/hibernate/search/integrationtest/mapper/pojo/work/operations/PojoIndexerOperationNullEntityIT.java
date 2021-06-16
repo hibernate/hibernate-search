@@ -108,9 +108,7 @@ public class PojoIndexerOperationNullEntityIT extends AbstractPojoIndexingOperat
 							// For operations other than add, expect a delete for the previous routes (if different).
 							worksBefore
 									.delete( b -> addWorkInfo( b, tenantId, "42", "UE-121" ) )
-									.createdThenExecuted( futureFromBackend )
-									.delete( b -> addWorkInfo( b, tenantId, "42", "UE-122" ) )
-									.createdThenExecuted( futureFromBackend );
+									.delete( b -> addWorkInfo( b, tenantId, "42", "UE-122" ) );
 						}
 					},
 					// And only then, expect the actual operation.

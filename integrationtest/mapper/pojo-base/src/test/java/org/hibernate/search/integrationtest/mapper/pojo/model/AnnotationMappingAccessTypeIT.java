@@ -83,8 +83,7 @@ public class AnnotationMappingAccessTypeIT {
 							.field( "propertyWithGetterAndField", entity1.propertyWithGetterAndField )
 							.field( "propertyWithFieldOnly", entity1.propertyWithFieldOnly )
 							.field( "propertyWithGetterAndDifferentlyNamedField", entity1.internalFieldForPropertyWithGetterAndDifferentlyNamedField )
-					)
-					.createdThenExecuted();
+					);
 		}
 	}
 
