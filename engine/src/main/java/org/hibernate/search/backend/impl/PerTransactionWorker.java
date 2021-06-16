@@ -54,6 +54,10 @@ public class PerTransactionWorker implements Worker {
 	private boolean transactionExpected;
 	private boolean enlistInTransaction;
 
+	public ConcurrentMap<Object, WorkQueueSynchronization> synchronizationPerTransactionForTests() {
+		return synchronizationPerTransaction;
+	}
+
 	@Override
 	public void performWork(Work work, TransactionContext transactionContext) {
 		final IndexedTypeIdentifier entityType = instanceInitializer.getIndexedTypeIdFromWork( work );

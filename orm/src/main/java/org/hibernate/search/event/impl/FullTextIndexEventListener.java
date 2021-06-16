@@ -70,6 +70,10 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 	// make sure the Synchronization doesn't contain references to Session, otherwise we'll leak memory.
 	private final Map<Session, Synchronization> flushSynch = Maps.createIdentityWeakKeyConcurrentMap( 64, 32 );
 
+	public Map<Session, Synchronization> flushSynchForTests() {
+		return flushSynch;
+	}
+
 	@Override
 	public void onPostDelete(PostDeleteEvent event) {
 		if ( state.eventsDisabled() ) {
