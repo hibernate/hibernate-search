@@ -178,7 +178,7 @@
              Version to be used as baseline for API/SPI change reports,
              and for the migration guide
           -->
-        <version.org.hibernate.search.previous-stable>5.11.5.Final</version.org.hibernate.search.previous-stable>
+        <version.org.hibernate.search.previous-stable>6.0.4.Final</version.org.hibernate.search.previous-stable>
 
         <!-- Main dependencies -->
 
