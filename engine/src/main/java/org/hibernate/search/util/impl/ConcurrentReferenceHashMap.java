@@ -131,7 +131,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Doug Lea
  * @author Jason T. Greene
  */
-class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V>
+public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V>
 		implements java.util.concurrent.ConcurrentMap<K, V>, Serializable {
 	private static final long serialVersionUID = 7249069246763182397L;
 
