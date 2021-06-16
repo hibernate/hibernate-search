@@ -7,6 +7,7 @@
 
 package org.hibernate.search.backend.impl;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.ConcurrentMap;
 
 import org.hibernate.search.backend.spi.Work;
@@ -35,7 +36,7 @@ public class InTransactionWorkQueueSynchronization implements WorkQueueSynchroni
 	private boolean prepared;
 	private final ConcurrentMap<Object, WorkQueueSynchronization> queuePerTransaction;
 	private final WorkQueue queue;
-	private final Object transactionIdentifier;
+	private final WeakReference<Object> transactionIdentifier;
 
 	/**
 	 * In transaction work
@@ -48,7 +49,8 @@ public class InTransactionWorkQueueSynchronization implements WorkQueueSynchroni
 	public InTransactionWorkQueueSynchronization(Object transactionIdentifier, QueueingProcessor queueingProcessor,
 												ConcurrentMap<Object, WorkQueueSynchronization> queuePerTransaction,
 												ExtendedSearchIntegrator extendedIntegrator) {
-		this.transactionIdentifier = transactionIdentifier;
+		// This must be a weak reference, otherwise we may leak memory in some edge cases. See HSEARCH-4225.
+		this.transactionIdentifier = new WeakReference<>( transactionIdentifier );
 		this.queueingProcessor = queueingProcessor;
 		this.queuePerTransaction = queuePerTransaction;
 		queue = new WorkQueue( extendedIntegrator );
@@ -89,7 +91,10 @@ public class InTransactionWorkQueueSynchronization implements WorkQueueSynchroni
 			//clean the Synchronization per Transaction
 			//not needed stricto sensus but a cleaner approach and faster than the GC
 			if ( queuePerTransaction != null ) {
-				queuePerTransaction.remove( transactionIdentifier );
+				Object id = transactionIdentifier.get();
+				if ( id != null ) {
+					queuePerTransaction.remove( id );
+				}
 			}
 		}
 	}
