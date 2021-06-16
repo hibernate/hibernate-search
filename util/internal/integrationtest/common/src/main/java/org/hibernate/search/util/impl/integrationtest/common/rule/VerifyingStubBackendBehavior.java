@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -55,7 +56,9 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	private final Map<String, CallQueue<SchemaManagementWorkCall>> schemaManagementWorkCall = new HashMap<>();
 
-	private final Map<DocumentKey, CallQueue<DocumentWorkCall>> documentWorkCalls = new HashMap<>();
+	private final Map<DocumentKey, CallQueue<DocumentWorkCreateCall>> documentWorkCreateCalls = new LinkedHashMap<>();
+	private final Map<DocumentKey, CallQueue<DocumentWorkDiscardCall>> documentWorkDiscardCalls = new LinkedHashMap<>();
+	private final Map<DocumentKey, CallQueue<DocumentWorkExecuteCall>> documentWorkExecuteCalls = new LinkedHashMap<>();
 
 	private final CallQueue<SearchWorkCall<?>> searchCalls = new CallQueue<>();
 
@@ -99,8 +102,16 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		return schemaManagementWorkCall.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
 	}
 
-	CallQueue<DocumentWorkCall> getDocumentWorkCalls(DocumentKey documentKey) {
-		return documentWorkCalls.computeIfAbsent( documentKey, ignored -> new CallQueue<>() );
+	CallQueue<DocumentWorkCreateCall> getDocumentWorkCreateCalls(DocumentKey documentKey) {
+		return documentWorkCreateCalls.computeIfAbsent( documentKey, ignored -> new CallQueue<>() );
+	}
+
+	CallQueue<DocumentWorkDiscardCall> getDocumentWorkDiscardCalls(DocumentKey documentKey) {
+		return documentWorkDiscardCalls.computeIfAbsent( documentKey, ignored -> new CallQueue<>() );
+	}
+
+	CallQueue<DocumentWorkExecuteCall> getDocumentWorkExecuteCalls(DocumentKey documentKey) {
+		return documentWorkExecuteCalls.computeIfAbsent( documentKey, ignored -> new CallQueue<>() );
 	}
 
 	CallQueue<IndexScaleWorkCall> getIndexScaleWorkCalls(String indexName) {
@@ -134,7 +145,9 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		schemaDefinitionCalls.clear();
 		indexScaleWorkCalls.clear();
 		schemaManagementWorkCall.clear();
-		documentWorkCalls.clear();
+		documentWorkCreateCalls.clear();
+		documentWorkDiscardCalls.clear();
+		documentWorkExecuteCalls.clear();
 		searchCalls.reset();
 		countCalls.reset();
 		scrollCalls.reset();
@@ -150,7 +163,9 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		schemaDefinitionCalls.values().forEach( CallQueue::verifyExpectationsMet );
 		indexScaleWorkCalls.values().forEach( CallQueue::verifyExpectationsMet );
 		schemaManagementWorkCall.values().forEach( CallQueue::verifyExpectationsMet );
-		documentWorkCalls.values().forEach( CallQueue::verifyExpectationsMet );
+		documentWorkCreateCalls.values().forEach( CallQueue::verifyExpectationsMet );
+		documentWorkDiscardCalls.values().forEach( CallQueue::verifyExpectationsMet );
+		documentWorkExecuteCalls.values().forEach( CallQueue::verifyExpectationsMet );
 		searchCalls.verifyExpectationsMet();
 		countCalls.verifyExpectationsMet();
 		scrollCalls.verifyExpectationsMet();
@@ -209,25 +224,23 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	@Override
 	public void createDocumentWork(String indexName, StubDocumentWork work) {
-		DocumentWorkCall call = new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.CREATE, work );
-		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( call.documentKey() );
-		callQueue.verify( call, DocumentWorkCall::verify,
-				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) ) );
+		DocumentWorkCreateCall call = new DocumentWorkCreateCall( indexName, work );
+		CallQueue<DocumentWorkCreateCall> callQueue = getDocumentWorkCreateCalls( call.documentKey() );
+		callQueue.verify( call, DocumentWorkCreateCall::verify, noExpectationsBehavior( () -> null ) );
 	}
 
 	@Override
 	public void discardDocumentWork(String indexName, StubDocumentWork work) {
-		DocumentWorkCall call = new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.DISCARD, work );
-		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( call.documentKey() );
-		callQueue.verify( call, DocumentWorkCall::verify,
-				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) ) );
+		DocumentWorkDiscardCall call = new DocumentWorkDiscardCall( indexName, work );
+		CallQueue<DocumentWorkDiscardCall> callQueue = getDocumentWorkDiscardCalls( call.documentKey() );
+		callQueue.verify( call, DocumentWorkDiscardCall::verify, noExpectationsBehavior( () -> null ) );
 	}
 
 	@Override
 	public CompletableFuture<?> executeDocumentWork(String indexName, StubDocumentWork work) {
-		DocumentWorkCall call = new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work );
-		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( call.documentKey() );
-		return callQueue.verify( call, DocumentWorkCall::verify,
+		DocumentWorkExecuteCall call = new DocumentWorkExecuteCall( indexName, work );
+		CallQueue<DocumentWorkExecuteCall> callQueue = getDocumentWorkExecuteCalls( call.documentKey() );
+		return callQueue.verify( call, DocumentWorkExecuteCall::verify,
 				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) ) );
 	}
 

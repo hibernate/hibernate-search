@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
@@ -354,15 +353,8 @@ public class BackendMock implements TestRule {
 		}
 
 		public DocumentWorkCallListContext createdThenExecuted(CompletableFuture<?> future) {
-			log.debugf( "Expecting %d works to be created, then executed", works.size() );
-			// First expect all works to be created, then expect all works to be executed
-			Stream.concat(
-					works.stream()
-							.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.CREATE, work ) ),
-					works.stream()
-							.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work, future ) )
-			)
-					.forEach( call -> expect( call ) );
+			created();
+			executed( future );
 			works.clear();
 			return this;
 		}
@@ -374,7 +366,7 @@ public class BackendMock implements TestRule {
 		public DocumentWorkCallListContext created() {
 			log.debugf( "Expecting %d works to be created", works.size() );
 			works.stream()
-					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.CREATE, work ) )
+					.map( work -> new DocumentWorkCreateCall( indexName, work ) )
 					.forEach( this::expect );
 			return this;
 		}
@@ -382,7 +374,7 @@ public class BackendMock implements TestRule {
 		public DocumentWorkCallListContext executed(CompletableFuture<?> future) {
 			log.debugf( "Expecting %d works to be executed", works.size() );
 			works.stream()
-					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work, future ) )
+					.map( work -> new DocumentWorkExecuteCall( indexName, work, future ) )
 					.forEach( this::expect );
 			works.clear();
 			return this;
@@ -395,13 +387,21 @@ public class BackendMock implements TestRule {
 		public DocumentWorkCallListContext discarded() {
 			log.debugf( "Expecting %d works to be discarded", works.size() );
 			works.stream()
-					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.DISCARD, work ) )
+					.map( work -> new DocumentWorkDiscardCall( indexName, work ) )
 					.forEach( this::expect );
 			return this;
 		}
 
-		private void expect(DocumentWorkCall call) {
-			backendBehavior().getDocumentWorkCalls( call.documentKey() ).expectInOrder( call );
+		private void expect(DocumentWorkCreateCall call) {
+			backendBehavior().getDocumentWorkCreateCalls( call.documentKey() ).expectInOrder( call );
+		}
+
+		private void expect(DocumentWorkDiscardCall call) {
+			backendBehavior().getDocumentWorkDiscardCalls( call.documentKey() ).expectInOrder( call );
+		}
+
+		private void expect(DocumentWorkExecuteCall call) {
+			backendBehavior().getDocumentWorkExecuteCalls( call.documentKey() ).expectInOrder( call );
 		}
 	}
 
