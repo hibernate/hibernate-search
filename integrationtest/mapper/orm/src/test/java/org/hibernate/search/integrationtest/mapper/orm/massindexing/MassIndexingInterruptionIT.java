@@ -188,12 +188,12 @@ public class MassIndexingInterruptionIT {
 		backendMock.expectWorks(
 				Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 		)
+				// Return a CompletableFuture that will never complete
+				.createAndExecute( new CompletableFuture<>() )
 				.add( "1", b -> b
 						.field( "title", TITLE_1 )
 						.field( "author", AUTHOR_1 )
-				)
-				// Return a CompletableFuture that will never complete
-				.createdThenExecuted( new CompletableFuture<>() );
+				);
 
 		return indexer;
 	}

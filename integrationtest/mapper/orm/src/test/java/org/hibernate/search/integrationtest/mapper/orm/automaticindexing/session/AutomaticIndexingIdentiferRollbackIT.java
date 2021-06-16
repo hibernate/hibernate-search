@@ -65,8 +65,7 @@ public class AutomaticIndexingIdentiferRollbackIT {
 			entity1Id.set( entity1.getId() );
 
 			backendMock.expectWorks( EntityWithJpaIdAsDocumentId.NAME )
-					.add( entity1.getId().toString(), b -> { } )
-					.createdThenExecuted();
+					.add( entity1.getId().toString(), b -> { } );
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -82,8 +81,7 @@ public class AutomaticIndexingIdentiferRollbackIT {
 			// ... but this should work regardless,
 			// because we rely on the entity ID supplied by the delete event.
 			backendMock.expectWorks( EntityWithJpaIdAsDocumentId.NAME )
-					.delete( entity1Id.get().toString() )
-					.createdThenExecuted();
+					.delete( entity1Id.get().toString() );
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -101,8 +99,7 @@ public class AutomaticIndexingIdentiferRollbackIT {
 			entity1Id.set( entity1.getId() );
 
 			backendMock.expectWorks( EntityWithNonJpaIdAsDocumentId.NAME )
-					.add( "document1", b -> { } )
-					.createdThenExecuted();
+					.add( "document1", b -> { } );
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -118,8 +115,7 @@ public class AutomaticIndexingIdentiferRollbackIT {
 			// ... but this should work regardless,
 			// because we only rely on the document ID.
 			backendMock.expectWorks( EntityWithNonJpaIdAsDocumentId.NAME )
-					.delete( "document1" )
-					.createdThenExecuted();
+					.delete( "document1" );
 		} );
 		backendMock.verifyExpectationsMet();
 	}

@@ -79,8 +79,7 @@ public class GenericPropertyIT {
 									.field( "arrayContent", genericEntity.arrayContent[0] )
 									.field( "arrayContent", genericEntity.arrayContent[1] )
 							)
-					)
-					.createdThenExecuted();
+					);
 		}
 	}
 

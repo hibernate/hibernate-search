@@ -86,8 +86,7 @@ public class ReindexingResolverProxiedAssociatedEntityIT {
 											.field( "text", "initialValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -106,8 +105,7 @@ public class ReindexingResolverProxiedAssociatedEntityIT {
 											.field( "text", "updatedValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -140,8 +138,7 @@ public class ReindexingResolverProxiedAssociatedEntityIT {
 											.field( "text", "initialValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -165,8 +162,7 @@ public class ReindexingResolverProxiedAssociatedEntityIT {
 											.field( "text", "updatedValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}

@@ -238,8 +238,7 @@ public class OutboxPollingEventSendingIT {
 				.add( "1", b -> b
 						.field( "text", "initial" )
 						.objectField( "contained", b2 -> b2
-								.field( "text", "initial" ) ) )
-				.createdThenExecuted();
+								.field( "text", "initial" ) ) );
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 		// Processing the insert events shouldn't yield more events
@@ -284,13 +283,11 @@ public class OutboxPollingEventSendingIT {
 				.add( "1", b -> b
 						.field( "text", "initial" )
 						.objectField( "indexedAndContained", b2 -> b2
-								.field( "text", "initial" ) ) )
-				.createdThenExecuted();
+								.field( "text", "initial" ) ) );
 		backendMock.expectWorks( IndexedAndContainedEntity.NAME )
 				.add( "2", b -> b
 						.field( "text", "initial" )
-						.field( "nonIndexedEmbeddedText", "initial" ) )
-				.createdThenExecuted();
+						.field( "nonIndexedEmbeddedText", "initial" ) );
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 		// Processing the insert events shouldn't yield more events
@@ -310,8 +307,7 @@ public class OutboxPollingEventSendingIT {
 		backendMock.expectWorks( IndexedAndContainedEntity.NAME )
 				.addOrUpdate( "2", b -> b
 						.field( "text", "updated" )
-						.field( "nonIndexedEmbeddedText", "initial" ) )
-				.createdThenExecuted();
+						.field( "nonIndexedEmbeddedText", "initial" ) );
 		backendMock.verifyExpectationsMet();
 		// Processing the update event should yield more events for containing entities
 		backendMock.indexingWorkThreadingExpectations().awaitIndexingAssertions( () -> {
@@ -341,8 +337,7 @@ public class OutboxPollingEventSendingIT {
 				.add( "1", b -> b
 						.field( "text", "initial" )
 						.objectField( "contained", b2 -> b2
-								.field( "text", "initial" ) ) )
-				.createdThenExecuted();
+								.field( "text", "initial" ) ) );
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 		// Processing the insert events shouldn't yield more events
@@ -386,13 +381,11 @@ public class OutboxPollingEventSendingIT {
 				.add( "1", b -> b
 						.field( "text", "initial" )
 						.objectField( "indexedAndContained", b2 -> b2
-								.field( "text", "initial" ) ) )
-				.createdThenExecuted();
+								.field( "text", "initial" ) ) );
 		backendMock.expectWorks( IndexedAndContainedEntity.NAME )
 				.add( "2", b -> b
 						.field( "text", "initial" )
-						.field( "nonIndexedEmbeddedText", "initial" ) )
-				.createdThenExecuted();
+						.field( "nonIndexedEmbeddedText", "initial" ) );
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 		// Processing the insert events shouldn't yield more events
@@ -412,8 +405,7 @@ public class OutboxPollingEventSendingIT {
 		backendMock.expectWorks( IndexedAndContainedEntity.NAME )
 				.addOrUpdate( "2", b -> b
 						.field( "text", "initial" )
-						.field( "nonIndexedEmbeddedText", "updated" ) )
-				.createdThenExecuted();
+						.field( "nonIndexedEmbeddedText", "updated" ) );
 		backendMock.verifyExpectationsMet();
 		// Processing this update event shouldn't yield more events,
 		// because the changed field is not indexed-embedded.

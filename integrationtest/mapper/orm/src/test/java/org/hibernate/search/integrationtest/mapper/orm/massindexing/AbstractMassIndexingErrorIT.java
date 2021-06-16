@@ -449,8 +449,7 @@ public abstract class AbstractMassIndexingErrorIT {
 							.add( "3", b -> b
 									.field( "title", TITLE_3 )
 									.field( "author", AUTHOR_3 )
-							)
-							.createdThenExecuted();
+							);
 					break;
 				case ERROR:
 					CompletableFuture<?> failingFuture = new CompletableFuture<>();
@@ -466,15 +465,11 @@ public abstract class AbstractMassIndexingErrorIT {
 									.field( "title", TITLE_3 )
 									.field( "author", AUTHOR_3 )
 							)
-							.createdThenExecuted();
-					backendMock.expectWorks(
-							Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
-					)
+							.createAndExecute( failingFuture )
 							.add( "2", b -> b
 									.field( "title", TITLE_2 )
 									.field( "author", AUTHOR_2 )
-							)
-							.createdThenExecuted( failingFuture );
+							);
 					break;
 				case STOP:
 					backendMock.expectWorks(
@@ -483,8 +478,7 @@ public abstract class AbstractMassIndexingErrorIT {
 							.add( "1", b -> b
 									.field( "title", TITLE_1 )
 									.field( "author", AUTHOR_1 )
-							)
-							.createdThenExecuted();
+							);
 					break;
 			}
 		};

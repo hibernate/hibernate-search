@@ -131,8 +131,7 @@ public class PropertyBindingBaseIT {
 					.add( "2", b -> {
 						b.field( "sum", 0 );
 						b.field( "diff", -14 );
-					} )
-					.createdThenExecuted();
+					} );
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -200,8 +199,7 @@ public class PropertyBindingBaseIT {
 					.add( "2", b -> {
 						b.field( "sum", 0 );
 						b.field( "diff", -14 );
-					} )
-					.createdThenExecuted();
+					} );
 		}
 		backendMock.verifyExpectationsMet();
 	}

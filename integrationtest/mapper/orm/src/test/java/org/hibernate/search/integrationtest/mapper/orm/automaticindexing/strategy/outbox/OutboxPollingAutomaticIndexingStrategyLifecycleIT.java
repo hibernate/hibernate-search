@@ -63,7 +63,6 @@ public class OutboxPollingAutomaticIndexingStrategyLifecycleIT {
 			for ( int i = 1; i <= 1000; i++ ) {
 				context.add( i + "", b -> b.field( "indexedField", "value for the field" ) );
 			}
-			context.createdThenExecuted();
 		} );
 
 		// wait for the first call is processed (partial progressing)

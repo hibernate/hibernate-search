@@ -115,8 +115,7 @@ public class AutomaticIndexingEmbeddableIT {
 									.objectField( "containedEmbeddedList", b3 -> { } )
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -143,8 +142,7 @@ public class AutomaticIndexingEmbeddableIT {
 									.objectField( "containedEmbeddedList", b3 -> { } )
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -172,8 +170,7 @@ public class AutomaticIndexingEmbeddableIT {
 									.objectField( "containedEmbeddedList", b3 -> { } )
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -196,8 +193,7 @@ public class AutomaticIndexingEmbeddableIT {
 									b2.objectField( "containedEmbeddedSingle", b3 -> { } );
 								}
 							} )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -234,8 +230,7 @@ public class AutomaticIndexingEmbeddableIT {
 									.objectField( "containedEmbeddedList", b3 -> { } )
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -263,8 +258,7 @@ public class AutomaticIndexingEmbeddableIT {
 									.objectField( "containedEmbeddedList", b3 -> { } )
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -281,8 +275,7 @@ public class AutomaticIndexingEmbeddableIT {
 									.objectField( "containedEmbeddedList", b3 -> { } )
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -319,8 +312,7 @@ public class AutomaticIndexingEmbeddableIT {
 									.objectField( "containedEmbeddedList", b3 -> { } )
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -340,8 +332,7 @@ public class AutomaticIndexingEmbeddableIT {
 									.objectField( "containedEmbeddedList", b3 -> { } )
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -376,8 +367,7 @@ public class AutomaticIndexingEmbeddableIT {
 									.objectField( "containedEmbeddedList", b3 -> { } )
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -404,8 +394,7 @@ public class AutomaticIndexingEmbeddableIT {
 									)
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -433,8 +422,7 @@ public class AutomaticIndexingEmbeddableIT {
 									)
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -457,8 +445,7 @@ public class AutomaticIndexingEmbeddableIT {
 									b2.objectField( "containedEmbeddedList", b3 -> { } );
 								}
 							} )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -484,8 +471,7 @@ public class AutomaticIndexingEmbeddableIT {
 									.objectField( "containedEmbeddedList", b3 -> { } )
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -512,8 +498,7 @@ public class AutomaticIndexingEmbeddableIT {
 									)
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -543,8 +528,7 @@ public class AutomaticIndexingEmbeddableIT {
 									)
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -566,8 +550,7 @@ public class AutomaticIndexingEmbeddableIT {
 									)
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -604,8 +587,7 @@ public class AutomaticIndexingEmbeddableIT {
 									)
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -625,8 +607,7 @@ public class AutomaticIndexingEmbeddableIT {
 									)
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -661,8 +642,7 @@ public class AutomaticIndexingEmbeddableIT {
 									.objectField( "containedEmbeddedList", b3 -> { } )
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -690,8 +670,7 @@ public class AutomaticIndexingEmbeddableIT {
 									)
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -724,8 +703,7 @@ public class AutomaticIndexingEmbeddableIT {
 									)
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -748,8 +726,7 @@ public class AutomaticIndexingEmbeddableIT {
 									)
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -783,8 +760,7 @@ public class AutomaticIndexingEmbeddableIT {
 									.objectField( "containedElementCollection", b3 -> { } )
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -812,8 +788,7 @@ public class AutomaticIndexingEmbeddableIT {
 									)
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -843,8 +818,7 @@ public class AutomaticIndexingEmbeddableIT {
 									)
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -863,8 +837,7 @@ public class AutomaticIndexingEmbeddableIT {
 									.objectField( "containedElementCollection", b3 -> { } )
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -902,8 +875,7 @@ public class AutomaticIndexingEmbeddableIT {
 									)
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -924,8 +896,7 @@ public class AutomaticIndexingEmbeddableIT {
 									)
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -970,8 +941,7 @@ public class AutomaticIndexingEmbeddableIT {
 									)
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -999,8 +969,7 @@ public class AutomaticIndexingEmbeddableIT {
 									)
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1018,8 +987,7 @@ public class AutomaticIndexingEmbeddableIT {
 									.objectField( "containedEmbeddedList", b3 -> { } )
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -1055,8 +1023,7 @@ public class AutomaticIndexingEmbeddableIT {
 									)
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1075,8 +1042,7 @@ public class AutomaticIndexingEmbeddableIT {
 									)
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1111,8 +1077,7 @@ public class AutomaticIndexingEmbeddableIT {
 									.objectField( "containedEmbeddedList", b3 -> { } )
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1139,8 +1104,7 @@ public class AutomaticIndexingEmbeddableIT {
 											)
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1169,8 +1133,7 @@ public class AutomaticIndexingEmbeddableIT {
 											)
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1194,8 +1157,7 @@ public class AutomaticIndexingEmbeddableIT {
 									b2.objectField( "containedBidirectionalEmbedded", b3 -> { } );
 								}
 							} )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -1232,8 +1194,7 @@ public class AutomaticIndexingEmbeddableIT {
 											)
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1262,8 +1223,7 @@ public class AutomaticIndexingEmbeddableIT {
 											)
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1281,8 +1241,7 @@ public class AutomaticIndexingEmbeddableIT {
 									.objectField( "containedEmbeddedList", b3 -> { } )
 									.objectField( "containedBidirectionalEmbedded", b3 -> { } )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -1319,8 +1278,7 @@ public class AutomaticIndexingEmbeddableIT {
 											)
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1340,8 +1298,7 @@ public class AutomaticIndexingEmbeddableIT {
 											)
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 

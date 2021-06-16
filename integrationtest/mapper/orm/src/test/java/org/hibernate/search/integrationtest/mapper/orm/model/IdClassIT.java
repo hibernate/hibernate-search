@@ -69,8 +69,7 @@ public class IdClassIT {
 			session.persist( entity );
 
 			backendMock.expectWorks( NonIdClassIndexed.NAME )
-					.add( "1", b -> { } )
-					.createdThenExecuted();
+					.add( "1", b -> { } );
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -95,8 +94,7 @@ public class IdClassIT {
 			session.persist( entity );
 
 			backendMock.expectWorks( IdClassIndexedWithDocumentId.NAME )
-					.add( "8", b -> { } )
-					.createdThenExecuted();
+					.add( "8", b -> { } );
 		} );
 		backendMock.verifyExpectationsMet();
 	}

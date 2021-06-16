@@ -128,8 +128,7 @@ public class ProgrammaticMappingAccessTypeIT {
 							.objectField( "nonManaged", b2 -> b2
 									.field( "field", nonManaged.getField() )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 	}
 

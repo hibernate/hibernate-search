@@ -311,8 +311,7 @@ public class ScaledNumberFieldIT {
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "wrap", new BigDecimal( new BigInteger( "1512" ), 2 ) ) )
 					.add( "2", b -> b.field( "wrap", new BigDecimal( new BigInteger( "1106" ), 2 ) ) )
-					.add( "3", b -> b.field( "wrap", new BigDecimal( BigInteger.ZERO, 2 ) ) )
-					.createdThenExecuted();
+					.add( "3", b -> b.field( "wrap", new BigDecimal( BigInteger.ZERO, 2 ) ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -361,8 +360,7 @@ public class ScaledNumberFieldIT {
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "wrap", new BigDecimal( new BigInteger( "1512" ), 2 ) ) )
 					.add( "2", b -> b.field( "wrap", new BigDecimal( new BigInteger( "1106" ), 2 ) ) )
-					.add( "3", b -> b.field( "wrap", new BigDecimal( BigInteger.ZERO, 2 ) ) )
-					.createdThenExecuted();
+					.add( "3", b -> b.field( "wrap", new BigDecimal( BigInteger.ZERO, 2 ) ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}

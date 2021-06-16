@@ -131,8 +131,7 @@ public class TypeBindingBaseIT {
 					.add( "2", b -> {
 						b.field( "quotient", 13 );
 						b.field( "reminder", 1 );
-					} )
-					.createdThenExecuted();
+					} );
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -198,8 +197,7 @@ public class TypeBindingBaseIT {
 					.add( "2", b -> {
 						b.field( "quotient", 13 );
 						b.field( "reminder", 1 );
-					} )
-					.createdThenExecuted();
+					} );
 		}
 		backendMock.verifyExpectationsMet();
 	}

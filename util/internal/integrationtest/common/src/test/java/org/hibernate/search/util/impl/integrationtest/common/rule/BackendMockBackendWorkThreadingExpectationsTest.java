@@ -31,7 +31,7 @@ public class BackendMockBackendWorkThreadingExpectationsTest {
 	@Test
 	public void workSubmittedFromExpectedThread() {
 		backendMock.indexingWorkThreadingExpectations( BackendWorkThreadingExpectations.async( "matching.*" ) );
-		backendMock.expectWorks( INDEX_NAME ).add( b -> { } ).executed();
+		backendMock.expectWorks( INDEX_NAME ).execute().add( b -> { } );
 		assertThatThrownByCodeRunningInThreadWithName( "matchingFoo",
 				() -> {
 					backendMock.backendBehavior().executeDocumentWork( INDEX_NAME,
@@ -46,7 +46,7 @@ public class BackendMockBackendWorkThreadingExpectationsTest {
 	@Test
 	public void workSubmittedFromUnexpectedThread() {
 		backendMock.indexingWorkThreadingExpectations( BackendWorkThreadingExpectations.async( "matching.*" ) );
-		backendMock.expectWorks( INDEX_NAME ).add( b -> { } ).executed();
+		backendMock.expectWorks( INDEX_NAME ).execute().add( b -> { } );
 		assertThatThrownByCodeRunningInThreadWithName( "wrongName",
 				() -> {
 					backendMock.backendBehavior().executeDocumentWork( INDEX_NAME,

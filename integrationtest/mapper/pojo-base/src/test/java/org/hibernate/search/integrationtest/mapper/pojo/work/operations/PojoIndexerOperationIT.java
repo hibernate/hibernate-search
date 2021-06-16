@@ -78,17 +78,14 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 								// If implicit routing is enabled, the provided current route
 								// is assumed out-of-date and turned into a previous route.
 								worksBeforeInSamePlan
-										.delete( b -> addWorkInfo( b, tenantId, "42", "UE-123" ) )
-										.createdThenExecuted( futureFromBackend );
+										.delete( b -> addWorkInfo( b, tenantId, "42", "UE-123" ) );
 
 								// If implicit routing is enabled, previous routes are also taken from the routing bridge.
 								MyRoutingBridge.previousValues = Arrays.asList( "1", "foo", "3" );
 								worksBeforeInSamePlan
 										// "1" is ignored as it's the current value
 										.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "foo" ) ) )
-										.createdThenExecuted( futureFromBackend )
-										.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "3" ) ) )
-										.createdThenExecuted( futureFromBackend );
+										.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "3" ) ) );
 							}
 							// else: if implicit routing is disabled,
 							// since we don't provide any previous routes, we don't expect additional deletes.
@@ -119,24 +116,19 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 							// For operations other than add, expect a delete for the previous routes (if different).
 							worksBefore
 									.delete( b -> addWorkInfo( b, tenantId, "42", "UE-121" ) )
-									.createdThenExecuted( futureFromBackend )
-									.delete( b -> addWorkInfo( b, tenantId, "42", "UE-122" ) )
-									.createdThenExecuted( futureFromBackend );
+									.delete( b -> addWorkInfo( b, tenantId, "42", "UE-122" ) );
 							if ( isImplicitRoutingEnabled() ) {
 								// If implicit routing is enabled, the provided current route
 								// is assumed out-of-date and turned into a previous route.
 								worksBefore
-										.delete( b -> addWorkInfo( b, tenantId, "42", "UE-123" ) )
-										.createdThenExecuted( futureFromBackend );
+										.delete( b -> addWorkInfo( b, tenantId, "42", "UE-123" ) );
 
 								// If implicit routing is enabled, previous routes are also taken from the routing bridge.
 								MyRoutingBridge.previousValues = Arrays.asList( "1", "foo", "3" );
 								worksBefore
 										// "1" is ignored as it's the current value
 										.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "foo" ) ) )
-										.createdThenExecuted( futureFromBackend )
-										.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "3" ) ) )
-										.createdThenExecuted( futureFromBackend );
+										.delete( b -> addWorkInfo( b, tenantId, "42", MyRoutingBridge.toRoutingKey( tenantId, 42, "3" ) ) );
 							}
 						}
 					},
@@ -172,9 +164,7 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 							// For operations other than add, expect a delete for the previous route.
 							worksBefore
 									.delete( b -> addWorkInfo( b, tenantId, "1",
-											MyRoutingBridge
-													.toRoutingKey( tenantId, 1, "foo" ) ) )
-									.createdThenExecuted( futureFromBackend );
+											MyRoutingBridge.toRoutingKey( tenantId, 1, "foo" ) ) );
 						}
 					},
 					// And only then, expect the actual operation.
@@ -206,13 +196,11 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 							backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
 									.delete( b -> addWorkInfo( b, tenantId, "1",
 											MyRoutingBridge
-													.toRoutingKey( tenantId, 1, "foo" ) ) )
-									.createdThenExecuted();
+													.toRoutingKey( tenantId, 1, "foo" ) ) );
 							backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
 									.delete( b -> addWorkInfo( b, tenantId, "1",
 											MyRoutingBridge
-													.toRoutingKey( tenantId, 1, "3" ) ) )
-									.createdThenExecuted();
+													.toRoutingKey( tenantId, 1, "3" ) ) );
 						}
 					},
 					// And only then, expect the actual operation.
@@ -258,8 +246,7 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 				// For operations other than add, expect a delete for the previous route.
 				backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
 						.delete( b -> addWorkInfo( b, tenantId, "1",
-								MyRoutingBridge.toRoutingKey( tenantId, 1, "1" ) ) )
-						.createdThenExecuted();
+								MyRoutingBridge.toRoutingKey( tenantId, 1, "1" ) ) );
 			}
 			// However, we don't expect the actual operation, which should be skipped because the entity is not indexed.
 			CompletionStage<?> returnedFuture = operation.execute( indexer, null, IndexedEntity.of( 1 ) );
@@ -283,16 +270,13 @@ public class PojoIndexerOperationIT extends AbstractPojoIndexingOperationIT {
 				// For operations other than add, expect a delete for every previous route.
 				backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
 						.delete( b -> addWorkInfo( b, tenantId, "1",
-								MyRoutingBridge.toRoutingKey( tenantId, 1, "1" ) ) )
-						.createdThenExecuted();
+								MyRoutingBridge.toRoutingKey( tenantId, 1, "1" ) ) );
 				backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
 						.delete( b -> addWorkInfo( b, tenantId, "1",
-								MyRoutingBridge.toRoutingKey( tenantId, 1, "foo" ) ) )
-						.createdThenExecuted();
+								MyRoutingBridge.toRoutingKey( tenantId, 1, "foo" ) ) );
 				backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
 						.delete( b -> addWorkInfo( b, tenantId, "1",
-								MyRoutingBridge.toRoutingKey( tenantId, 1, "3" ) ) )
-						.createdThenExecuted();
+								MyRoutingBridge.toRoutingKey( tenantId, 1, "3" ) ) );
 			}
 			// However, we don't expect the actual operation, which should be skipped because the entity is not indexed.
 			CompletionStage<?> returnedFuture = operation.execute( indexer, null, IndexedEntity.of( 1 ) );

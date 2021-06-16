@@ -361,8 +361,7 @@ public class FullTextFieldIT {
 			session.indexingPlan().add( entity );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.add( "1", b -> b.field( "wrap", "fixed-prefix-bla-bla-bla" ) )
-					.createdThenExecuted();
+					.add( "1", b -> b.field( "wrap", "fixed-prefix-bla-bla-bla" ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -402,8 +401,7 @@ public class FullTextFieldIT {
 			session.indexingPlan().add( entity );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.add( "1", b -> b.field( "wrap", "fixed-prefix-bla-bla-bla" ) )
-					.createdThenExecuted();
+					.add( "1", b -> b.field( "wrap", "fixed-prefix-bla-bla-bla" ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -540,8 +538,7 @@ public class FullTextFieldIT {
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b
 							.field( "myProperty", indexedFieldValue )
-					)
-					.createdThenExecuted();
+					);
 		}
 		backendMock.verifyExpectationsMet();
 	}

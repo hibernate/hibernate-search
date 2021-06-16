@@ -94,11 +94,9 @@ public class LoadingStrategyInheritanceIT {
 				.flush()
 				.refresh();
 		backendMock.expectWorks( rootEntityName, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
-				.add( "1", b -> b.field( "name", "name1" ) )
-				.createdThenExecuted();
+				.add( "1", b -> b.field( "name", "name1" ) );
 		backendMock.expectWorks( derivedEntityName, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
-				.add( "2", b -> b.field( "name", "name2" ) )
-				.createdThenExecuted();
+				.add( "2", b -> b.field( "name", "name2" ) );
 		mapping.scope( Object.class ).massIndexer().startAndWait();
 		backendMock.verifyExpectationsMet();
 
@@ -150,11 +148,9 @@ public class LoadingStrategyInheritanceIT {
 				.flush()
 				.refresh();
 		backendMock.expectWorks( rootEntityName, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
-				.add( "1", b -> b.field( "name", "name1" ) )
-				.createdThenExecuted();
+				.add( "1", b -> b.field( "name", "name1" ) );
 		backendMock.expectWorks( derivedEntityName, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
-				.add( "2", b -> b.field( "name", "name2" ) )
-				.createdThenExecuted();
+				.add( "2", b -> b.field( "name", "name2" ) );
 		mapping.scope( Object.class ).massIndexer().startAndWait();
 		backendMock.verifyExpectationsMet();
 

@@ -224,8 +224,7 @@ public class GenericFieldIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "value", "1" ) )
-					.add( "2", b -> b.field( "value", "4" ) )
-					.createdThenExecuted();
+					.add( "2", b -> b.field( "value", "4" ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -324,8 +323,7 @@ public class GenericFieldIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "value", "1" ) )
-					.add( "2", b -> b.field( "value", "4" ) )
-					.createdThenExecuted();
+					.add( "2", b -> b.field( "value", "4" ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}

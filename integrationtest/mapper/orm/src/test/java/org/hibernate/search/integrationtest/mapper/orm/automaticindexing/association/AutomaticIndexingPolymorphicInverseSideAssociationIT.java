@@ -112,8 +112,7 @@ public class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 											.field( "includedInSingle", "initialValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -129,8 +128,7 @@ public class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 											.field( "includedInSingle", "updatedValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -197,8 +195,7 @@ public class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 											.field( "includedInSingle", "initialValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -221,8 +218,7 @@ public class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 											.field( "includedInSingle", "updatedValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}

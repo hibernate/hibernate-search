@@ -64,8 +64,7 @@ public class TransactionOutboxIT {
 
 		backendMock.expectWorks( IndexedEntity.NAME )
 				.add( id.toString(), b -> {
-				} )
-				.createdThenExecuted();
+				} );
 
 		helperService.persist( id );
 	}

@@ -78,8 +78,7 @@ public class FieldContainerExtractorBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					// Stub backend is not supposed to use 'indexNullAs' option
-					.add( "1", b -> b.field( "text", "value1", "value2" ) )
-					.createdThenExecuted();
+					.add( "1", b -> b.field( "text", "value1", "value2" ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}

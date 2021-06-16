@@ -70,8 +70,7 @@ public class ProxyIT {
 			backendMock.expectWorks( EntityWithPropertyAccessTypeForId.INDEX )
 					.add( "1", b -> b
 							.field( "text", entity1.text )
-					)
-					.createdThenExecuted();
+					);
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -90,8 +89,7 @@ public class ProxyIT {
 			backendMock.expectWorks( EntityWithPropertyAccessTypeForId.INDEX )
 					.addOrUpdate( "1", b -> b
 							.field( "text", proxy.getText() )
-					)
-					.createdThenExecuted();
+					);
 		} );
 	}
 

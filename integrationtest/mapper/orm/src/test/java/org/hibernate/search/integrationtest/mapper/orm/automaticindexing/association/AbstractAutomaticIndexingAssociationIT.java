@@ -211,8 +211,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											.field( "indexedField", "initialValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -228,8 +227,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											.field( "indexedField", "updatedValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -270,8 +268,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											.field( "indexedField", "initialValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -289,8 +286,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											.field( "indexedField", "updatedValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -326,8 +322,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											.field( "indexedField", null )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -381,8 +376,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											)
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -402,8 +396,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											)
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -423,8 +416,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											)
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -487,8 +479,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											)
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -510,8 +501,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											)
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -558,8 +548,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											.field( "indexedField", null )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -616,8 +605,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											.field( "indexedField", null )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -636,8 +624,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											.field( "indexedField", null )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -673,8 +660,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											)
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -694,8 +680,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											)
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -715,8 +700,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											)
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -753,8 +737,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											"field1_initialValue field2_initialValue"
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -771,8 +754,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											"field1_updatedValue field2_initialValue"
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -789,8 +771,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											"field1_updatedValue field2_updatedValue"
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -820,8 +801,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											.field( "indexedField", "initialValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -870,8 +850,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											)
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -932,8 +911,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											)
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -974,8 +952,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											.field( "indexedField", "initialValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1024,8 +1001,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											)
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1086,8 +1062,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											)
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1140,8 +1115,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											.field( "indexedField", "initialValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1157,8 +1131,7 @@ public abstract class AbstractAutomaticIndexingAssociationIT<
 											.field( "indexedField", "updatedValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 

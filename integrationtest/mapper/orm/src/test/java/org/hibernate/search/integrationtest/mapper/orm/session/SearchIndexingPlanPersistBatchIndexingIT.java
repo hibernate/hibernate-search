@@ -53,15 +53,13 @@ public class SearchIndexingPlanPersistBatchIndexingIT {
 		SessionFactory sessionFactory = setup();
 
 		withinTransaction( sessionFactory, session -> {
-			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
-
 			// This is for test only and wouldn't be present in real code
 			int firstIdOfThisBatch = 0;
 
 			for ( int i = 0; i < ENTITY_COUNT; i++ ) {
 				if ( i > 0 && i % BATCH_SIZE == 0 ) {
 					// For test only: register expectations regarding processing
-					expectAddWorks( firstIdOfThisBatch, i ).created();
+					expectCreateAddWorks( firstIdOfThisBatch, i );
 					firstIdOfThisBatch = i;
 
 					session.flush();
@@ -78,9 +76,9 @@ public class SearchIndexingPlanPersistBatchIndexingIT {
 
 			// For test only: check on-commit creations/execution of works
 			// If the last batch was smaller, there are still some works created on commit
-			expectAddWorks( firstIdOfThisBatch, ENTITY_COUNT ).created();
+			expectCreateAddWorks( firstIdOfThisBatch, ENTITY_COUNT );
 			// Finally, the works will be executed on commit
-			expectAddWorks( 0, ENTITY_COUNT ).executed();
+			expectExecuteAddWorks( 0, ENTITY_COUNT );
 		} );
 		// This is for test only and wouldn't be present in real code
 		backendMock.verifyExpectationsMet();
@@ -103,12 +101,12 @@ public class SearchIndexingPlanPersistBatchIndexingIT {
 
 			for ( int i = 0; i < ENTITY_COUNT; i++ ) {
 				if ( i > 0 && i % BATCH_SIZE == 0 ) {
-					expectAddWorks( firstIdOfThisBatch, i ).created();
+					expectCreateAddWorks( firstIdOfThisBatch, i );
 					session.flush();
 					backendMock.verifyExpectationsMet();
 
 					// For test only: register expectations regarding execution
-					expectAddWorks( firstIdOfThisBatch, i ).executed();
+					expectExecuteAddWorks( firstIdOfThisBatch, i );
 					firstIdOfThisBatch = i;
 
 					indexingPlan.execute();
@@ -125,19 +123,29 @@ public class SearchIndexingPlanPersistBatchIndexingIT {
 
 			// For test only: check on-commit processing/execution of works
 			// If the last batch was smaller, there is still some indexing that will occur on commit
-			expectAddWorks( firstIdOfThisBatch, ENTITY_COUNT ).createdThenExecuted();
+			expectCreateAddWorks( firstIdOfThisBatch, ENTITY_COUNT );
+			expectExecuteAddWorks( firstIdOfThisBatch, ENTITY_COUNT );
 		} );
 		// This is for test only and wouldn't be present in real code
 		backendMock.verifyExpectationsMet();
 	}
 
-	private BackendMock.DocumentWorkCallListContext expectAddWorks(int firstId, int afterLastId) {
-		BackendMock.DocumentWorkCallListContext expectations = backendMock.expectWorks( IndexedEntity.INDEX_NAME );
+	private void expectCreateAddWorks(int firstId, int afterLastId) {
+		BackendMock.DocumentWorkCallListContext expectations = backendMock.expectWorks( IndexedEntity.INDEX_NAME )
+				.create();
 		for ( int i = firstId; i < afterLastId; ++i ) {
 			final int id = i;
 			expectations.add( String.valueOf( id ), b -> b.field( "text", "number" + id ) );
 		}
-		return expectations;
+	}
+
+	private void expectExecuteAddWorks(int firstId, int afterLastId) {
+		BackendMock.DocumentWorkCallListContext expectations = backendMock.expectWorks( IndexedEntity.INDEX_NAME )
+				.execute();
+		for ( int i = firstId; i < afterLastId; ++i ) {
+			final int id = i;
+			expectations.add( String.valueOf( id ), b -> b.field( "text", "number" + id ) );
+		}
 	}
 
 	private SessionFactory setup() {
