@@ -457,13 +457,23 @@
             </properties>
         </profile>
 
-        <!-- Elasticsearch 7.11+ test environment -->
+        <!-- Elasticsearch 7.11 test environment -->
         <profile>
             <id>elasticsearch-7.11</id>
             <properties>
                 <test.elasticsearch.run.elastic.skip>false</test.elasticsearch.run.elastic.skip>
-                <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.13}</test.elasticsearch.connection.version>
+                <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.11}</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch710TestDialect</test.elasticsearch.testdialect>
+            </properties>
+        </profile>
+
+        <!-- Elasticsearch 7.12+ test environment -->
+        <profile>
+            <id>elasticsearch-7.12</id>
+            <properties>
+                <test.elasticsearch.run.elastic.skip>false</test.elasticsearch.run.elastic.skip>
+                <test.elasticsearch.connection.version>${version.org.elasticsearch.latest-7.13}</test.elasticsearch.connection.version>
+                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch712TestDialect</test.elasticsearch.testdialect>
             </properties>
         </profile>
 
