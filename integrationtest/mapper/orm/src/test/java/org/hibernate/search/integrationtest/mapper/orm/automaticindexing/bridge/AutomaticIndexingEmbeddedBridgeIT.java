@@ -107,8 +107,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 											.field( "value", "initialValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -124,8 +123,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 											.field( "value", "updatedValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 

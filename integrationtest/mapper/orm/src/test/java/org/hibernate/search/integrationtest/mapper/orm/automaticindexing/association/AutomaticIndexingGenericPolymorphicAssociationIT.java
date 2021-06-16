@@ -98,8 +98,7 @@ public class AutomaticIndexingGenericPolymorphicAssociationIT {
 											.field( "includedInSingle", "initialValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -116,8 +115,7 @@ public class AutomaticIndexingGenericPolymorphicAssociationIT {
 											.field( "includedInSingle", "updatedValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}

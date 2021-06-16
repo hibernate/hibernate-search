@@ -124,8 +124,7 @@ public class ToJpaQueryIT {
 							.objectField( "containedLazy", b2 -> b2
 									.field( "text", contained2_2.getText() )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}

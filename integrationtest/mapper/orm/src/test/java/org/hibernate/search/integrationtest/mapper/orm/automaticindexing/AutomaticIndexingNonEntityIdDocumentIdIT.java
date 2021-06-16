@@ -73,8 +73,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -89,8 +88,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -100,8 +98,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 			session.delete( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.delete( "42" )
-					.createdThenExecuted();
+					.delete( "42" );
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -124,8 +121,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -142,8 +138,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 									entity1.getIndexedElementCollectionField().get( 0 ),
 									entity1.getIndexedElementCollectionField().get( 1 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -159,8 +154,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -190,8 +184,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -209,8 +202,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 									entity1.getIndexedElementCollectionField().get( 0 ),
 									entity1.getIndexedElementCollectionField().get( 1 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}

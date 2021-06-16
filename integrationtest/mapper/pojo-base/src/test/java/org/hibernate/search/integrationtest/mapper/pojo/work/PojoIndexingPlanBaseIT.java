@@ -82,8 +82,7 @@ public class PojoIndexingPlanBaseIT {
 							)
 					)
 					.delete( b -> b.identifier( "3" ) )
-					.delete( b -> b.identifier( "4" ) )
-					.createdThenExecuted();
+					.delete( b -> b.identifier( "4" ) );
 		}
 	}
 
@@ -159,8 +158,6 @@ public class PojoIndexingPlanBaseIT {
 			session.indexingPlan().add( entity );
 			session.indexingPlan().addOrUpdate( entity );
 			expectations.addOrUpdate( "10", b -> b.field( "value", "val10" ) );
-
-			expectations.createdThenExecuted();
 		}
 	}
 
@@ -177,14 +174,14 @@ public class PojoIndexingPlanBaseIT {
 				session.indexingPlan().add( entity1 );
 
 				backendMock.expectWorks( IndexedEntity.INDEX )
+						.createAndExecute( failingFuture )
 						.add( b -> b
 								.identifier( "1" )
 								.document( StubDocumentNode.document()
 										.field( "value", entity1.value )
 										.build()
 								)
-						)
-						.createdThenExecuted( failingFuture );
+						);
 			}
 		} )
 				.isSameAs( simulatedFailure );

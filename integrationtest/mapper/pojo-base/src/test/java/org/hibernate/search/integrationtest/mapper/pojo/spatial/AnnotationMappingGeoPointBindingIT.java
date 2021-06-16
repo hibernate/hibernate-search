@@ -104,14 +104,12 @@ public class AnnotationMappingGeoPointBindingIT {
 							.field( "workLocation", GeoPoint.of(
 									entity1.workLatitude, entity1.workLongitude
 							) )
-					)
-					.createdThenExecuted();
+					);
 			backendMock.expectWorks( GeoPointOnCoordinatesPropertyEntity.INDEX )
 					.add( "2", b -> b
 							.field( "coord", entity2.coord )
 							.field( "location", entity2.coord )
-					)
-					.createdThenExecuted();
+					);
 			backendMock.expectWorks( GeoPointOnCustomCoordinatesPropertyEntity.INDEX )
 					.add( "3", b -> b
 							.field( "coord", GeoPoint.of(
@@ -120,8 +118,7 @@ public class AnnotationMappingGeoPointBindingIT {
 							.field( "location", GeoPoint.of(
 									entity3.coord.lat, entity3.coord.lon
 							) )
-					)
-					.createdThenExecuted();
+					);
 		}
 	}
 

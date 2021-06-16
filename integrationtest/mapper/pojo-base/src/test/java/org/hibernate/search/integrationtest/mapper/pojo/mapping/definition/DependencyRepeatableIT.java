@@ -69,8 +69,7 @@ public class DependencyRepeatableIT {
 					.add( "1", b -> b
 							.objectField( "keys", b2 -> b2.field( "text", "bla" ) )
 							.objectField( "values", b2 -> b2.field( "text", "blabla" ) )
-					)
-					.createdThenExecuted();
+					);
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -103,8 +102,7 @@ public class DependencyRepeatableIT {
 					.add( "1", b -> b
 							.objectField( "keys", b2 -> b2.field( "text", "bla" ) )
 							.objectField( "values", b2 -> b2.field( "text", "blabla" ) )
-					)
-					.createdThenExecuted();
+					);
 		}
 		backendMock.verifyExpectationsMet();
 	}

@@ -51,8 +51,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			session.persist( entity1 );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.add( "1", b -> { } )
-					.createdThenExecuted();
+					.add( "1", b -> { } );
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -73,8 +72,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 							.objectField( "containedIndexedEmbedded", b2 -> b2
 									.field( "indexedField", VALUE_1 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -98,8 +96,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 							.objectField( "containedIndexedEmbedded", b2 -> b2
 									.field( "indexedField", VALUE_2 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -117,8 +114,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 							.objectField( "containedIndexedEmbedded", b2 -> b2
 									.field( "indexedField", VALUE_2 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -150,8 +146,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 							.objectField( "containedIndexedEmbedded", b2 -> b2
 									.field( "indexedField", VALUE_1 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -178,8 +173,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 							.objectField( "containedIndexedEmbedded", b2 -> b2
 									.field( "indexedField", VALUE_2 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -198,8 +192,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			session.persist( entity1 );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.add( "1", b -> { } )
-					.createdThenExecuted();
+					.add( "1", b -> { } );
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -273,8 +266,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			session.persist( entity1 );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.add( "1", b -> { } )
-					.createdThenExecuted();
+					.add( "1", b -> { } );
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -295,8 +287,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 
 			// TODO HSEARCH-3204: remove the statement below to not expect any work
 			backendMock.expectWorks( primitives.getIndexName() )
-					.addOrUpdate( "1", b -> { } )
-					.createdThenExecuted();
+					.addOrUpdate( "1", b -> { } );
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -315,8 +306,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			session.persist( entity1 );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.add( "1", b -> { } )
-					.createdThenExecuted();
+					.add( "1", b -> { } );
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -336,8 +326,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 							.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b2 -> b2
 									.field( "indexedField", VALUE_1 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -360,8 +349,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 							.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b2 -> b2
 									.field( "indexedField", VALUE_2 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -378,8 +366,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 							.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b2 -> b2
 									.field( "indexedField", VALUE_2 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -411,8 +398,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 							.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b2 -> b2
 									.field( "indexedField", VALUE_1 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -438,8 +424,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 							.objectField( "containedIndexedEmbeddedShallowReindexOnUpdate", b2 -> b2
 									.field( "indexedField", VALUE_2 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -458,8 +443,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			session.persist( entity1 );
 
 			backendMock.expectWorks( primitives.getIndexName() )
-					.add( "1", b -> { } )
-					.createdThenExecuted();
+					.add( "1", b -> { } );
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -533,8 +517,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 							.objectField( "containedIndexedEmbeddedNoReindexOnUpdate", b2 -> b2
 									.field( "indexedField", VALUE_1 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -561,8 +544,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 							.objectField( "containedIndexedEmbeddedNoReindexOnUpdate", b2 -> b2
 									.field( "indexedField", VALUE_2 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -587,8 +569,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			backendMock.expectWorks( primitives.getIndexName() )
 					.add( "1", b -> b
 							.objectField( "child", b2 -> { } )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -611,8 +592,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 											.field( "indexedField", VALUE_1 )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -638,8 +618,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 											.field( "indexedField", VALUE_2 )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -675,8 +654,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 											.field( "indexedField", VALUE_2 )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -715,8 +693,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 											.field( "indexedField", VALUE_1 )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -745,8 +722,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 											.field( "indexedField", VALUE_2 )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -772,8 +748,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			backendMock.expectWorks( primitives.getIndexName() )
 					.add( "1", b -> b
 							.objectField( "child", b2 -> { } )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -853,8 +828,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			backendMock.expectWorks( primitives.getIndexName() )
 					.add( "1", b -> b
 							.objectField( "child", b2 -> { } )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -877,8 +851,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			backendMock.expectWorks( primitives.getIndexName() )
 					.addOrUpdate( "1", b -> b
 							.objectField( "child", b2 -> { } )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -905,8 +878,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			backendMock.expectWorks( primitives.getIndexName() )
 					.add( "1", b -> b
 							.objectField( "child", b2 -> { } )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -928,8 +900,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 											.field( "indexedField", VALUE_1 )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -954,8 +925,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 											.field( "indexedField", VALUE_2 )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -974,8 +944,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 											.field( "indexedField", VALUE_2 )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 
 			// Do not expect any work
 		} );
@@ -1016,8 +985,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 											.field( "indexedField", VALUE_1 )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1045,8 +1013,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 											.field( "indexedField", VALUE_2 )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -1073,8 +1040,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 			backendMock.expectWorks( primitives.getIndexName() )
 					.add( "1", b -> b
 							.objectField( "child", b2 -> { } )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1155,8 +1121,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 											.field( "indexedField", VALUE_1 )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1185,8 +1150,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 											.field( "indexedField", VALUE_2 )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -1227,8 +1191,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 											.field( "indexedField", "initialValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1244,8 +1207,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 											.field( "indexedField", "updatedValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -1284,8 +1246,7 @@ public abstract class AbstractAutomaticIndexingMultiAssociationIT<
 											.field( "indexedField", "initialValue" )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 

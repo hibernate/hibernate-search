@@ -86,8 +86,7 @@ public class AutomaticIndexingBasicIT {
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -104,8 +103,7 @@ public class AutomaticIndexingBasicIT {
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -115,8 +113,7 @@ public class AutomaticIndexingBasicIT {
 			session.delete( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.delete( "1" )
-					.createdThenExecuted();
+					.delete( "1" );
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -133,6 +130,7 @@ public class AutomaticIndexingBasicIT {
 			session.persist( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
+					.create()
 					.add( "1", b -> b
 							.field( "indexedField", entity1.getIndexedField() )
 							.field( "shallowReindexOnUpdateField", null )
@@ -141,13 +139,13 @@ public class AutomaticIndexingBasicIT {
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 )
 							)
-					)
-					.created();
+					);
 
 			session.flush();
 			backendMock.verifyExpectationsMet();
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
+					.discard()
 					.add( "1", b -> b
 							.field( "indexedField", entity1.getIndexedField() )
 							.field( "shallowReindexOnUpdateField", null )
@@ -156,8 +154,7 @@ public class AutomaticIndexingBasicIT {
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 )
 							)
-					)
-					.discarded();
+					);
 
 			trx.rollback();
 			backendMock.verifyExpectationsMet();
@@ -182,8 +179,7 @@ public class AutomaticIndexingBasicIT {
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -202,8 +198,7 @@ public class AutomaticIndexingBasicIT {
 									entity1.getIndexedElementCollectionField().get( 0 ),
 									entity1.getIndexedElementCollectionField().get( 1 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -221,8 +216,7 @@ public class AutomaticIndexingBasicIT {
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -253,8 +247,7 @@ public class AutomaticIndexingBasicIT {
 									"indexedElementCollectionField",
 									entity1.getIndexedElementCollectionField().get( 0 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -274,8 +267,7 @@ public class AutomaticIndexingBasicIT {
 									entity1.getIndexedElementCollectionField().get( 0 ),
 									entity1.getIndexedElementCollectionField().get( 1 )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -299,8 +291,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "indexedField", entity1.getIndexedField() )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -340,8 +331,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "indexedField", null )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -386,8 +376,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "indexedField", null )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -403,8 +392,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "indexedField", null )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -431,8 +419,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "indexedField", null )
 							.field( "shallowReindexOnUpdateField", entity1.getShallowReindexOnUpdateField() )
 							.field( "noReindexOnUpdateField", null )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -445,8 +432,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "indexedField", null )
 							.field( "shallowReindexOnUpdateField", entity1.getShallowReindexOnUpdateField() )
 							.field( "noReindexOnUpdateField", null )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -459,8 +445,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "indexedField", null )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -488,8 +473,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
 							.field( "shallowReindexOnUpdateElementCollectionField", "firstValue" )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -505,8 +489,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "noReindexOnUpdateField", null )
 							.field( "shallowReindexOnUpdateElementCollectionField",
 									"firstValue", "secondValue" )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -521,8 +504,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
 							.field( "shallowReindexOnUpdateElementCollectionField", "firstValue" )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -553,8 +535,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
 							.field( "shallowReindexOnUpdateElementCollectionField", "firstValue" )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -571,8 +552,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "noReindexOnUpdateField", null )
 							.field( "shallowReindexOnUpdateElementCollectionField",
 									"newFirstValue", "newSecondValue" )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -596,8 +576,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "indexedField", null )
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", entity1.getNoReindexOnUpdateField() )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -638,8 +617,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateElementCollectionField", "firstValue" )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -685,8 +663,7 @@ public class AutomaticIndexingBasicIT {
 							.field( "shallowReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateField", null )
 							.field( "noReindexOnUpdateElementCollectionField", "firstValue" )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -706,8 +683,7 @@ public class AutomaticIndexingBasicIT {
 									"noReindexOnUpdateElementCollectionField",
 									"newFirstValue", "newSecondValue"
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -727,9 +703,9 @@ public class AutomaticIndexingBasicIT {
 					.field( "noReindexOnUpdateField", null );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
+					.create()
 					.add( "1", expectedValue( "number1" ) )
-					.add( "2", expectedValue( "number2" ) )
-					.created();
+					.add( "2", expectedValue( "number2" ) );
 
 			session.flush();
 
@@ -744,16 +720,16 @@ public class AutomaticIndexingBasicIT {
 
 			// without clear the session
 			backendMock.expectWorks( IndexedEntity.INDEX )
+					.create()
 					.add( "3", expectedValue( "number3" ) )
-					.add( "4", expectedValue( "number4" ) )
-					.created();
+					.add( "4", expectedValue( "number4" ) );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
+					.execute()
 					.add( "1", expectedValue( "number1" ) )
 					.add( "2", expectedValue( "number2" ) )
 					.add( "3", expectedValue( "number3" ) )
-					.add( "4", expectedValue( "number4" ) )
-					.executed();
+					.add( "4", expectedValue( "number4" ) );
 		} );
 		// Works should be executed on transaction commit
 		backendMock.verifyExpectationsMet();
@@ -767,9 +743,9 @@ public class AutomaticIndexingBasicIT {
 
 			// flush triggers the prepare of the current indexing plan
 			backendMock.expectWorks( IndexedEntity.INDEX )
+					.create()
 					.add( "5", expectedValue( "number5" ) )
-					.add( "6", expectedValue( "number6" ) )
-					.created();
+					.add( "6", expectedValue( "number6" ) );
 
 			session.flush();
 
@@ -793,9 +769,9 @@ public class AutomaticIndexingBasicIT {
 			session.clear();
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
+					.execute()
 					.add( "5", expectedValue( "number5" ) )
-					.add( "6", expectedValue( "number6" ) )
-					.executed();
+					.add( "6", expectedValue( "number6" ) );
 		} );
 		// Works should be executed on transaction commit
 		backendMock.verifyExpectationsMet();

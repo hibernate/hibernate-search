@@ -97,8 +97,7 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 			session.indexingPlan().add( entity );
 
 			backendMock.expectWorks( DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME )
-					.add( getDocumentIdentifierValue(), b -> { } )
-					.createdThenExecuted();
+					.add( getDocumentIdentifierValue(), b -> { } );
 		}
 		backendMock.verifyExpectationsMet();
 	}

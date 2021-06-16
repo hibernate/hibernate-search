@@ -91,8 +91,7 @@ public class EnversIT {
 							.objectField( "contained", b2 -> b2
 									.field( "text", "initial" )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 		checkEnversAuditedCorrectly( IndexedEntity.class,
@@ -112,8 +111,7 @@ public class EnversIT {
 							.objectField( "contained", b2 -> b2
 									.field( "text", "initial" )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 		checkEnversAuditedCorrectly( IndexedEntity.class,
@@ -133,8 +131,7 @@ public class EnversIT {
 							.objectField( "contained", b2 -> b2
 									.field( "text", "updated" )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 		checkEnversAuditedCorrectly( IndexedEntity.class,
@@ -149,8 +146,7 @@ public class EnversIT {
 			session.delete( indexed );
 
 			backendMock.expectWorks( IndexedEntity.NAME )
-					.delete( "1" )
-					.createdThenExecuted();
+					.delete( "1" );
 		} );
 		backendMock.verifyExpectationsMet();
 		checkEnversAuditedCorrectly( IndexedEntity.class,

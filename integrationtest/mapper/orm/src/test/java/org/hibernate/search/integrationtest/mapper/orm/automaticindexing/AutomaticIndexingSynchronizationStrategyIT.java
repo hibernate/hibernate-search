@@ -528,13 +528,13 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 				session.persist( entity2 );
 
 				backendMock.expectWorks( IndexedEntity.NAME, expectedCommitStrategy, expectedRefreshStrategy )
+						.createAndExecute( indexingWorkFuture )
 						.add( "1", b -> b
 								.field( "indexedField", entity1.getIndexedField() )
 						)
 						.add( "2", b -> b
 								.field( "indexedField", entity2.getIndexedField() )
-						)
-						.createdThenExecuted( indexingWorkFuture );
+						);
 				justBeforeTransactionCommitFuture.complete( null );
 			} );
 			backendMock.verifyExpectationsMet();

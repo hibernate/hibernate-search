@@ -108,8 +108,7 @@ public class TypeBridgeBaseIT {
 			session.indexingPlan().add( entity );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.add( "1", b -> b.field( "someField", entity.stringProperty ) )
-					.createdThenExecuted();
+					.add( "1", b -> b.field( "someField", entity.stringProperty ) );
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -118,8 +117,7 @@ public class TypeBridgeBaseIT {
 			session.indexingPlan().addOrUpdate( entity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.addOrUpdate( "1", b -> b.field( "someField", entity.stringProperty ) )
-					.createdThenExecuted();
+					.addOrUpdate( "1", b -> b.field( "someField", entity.stringProperty ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -174,8 +172,7 @@ public class TypeBridgeBaseIT {
 			session.indexingPlan().add( entity );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.add( "1", b -> b.field( "someField", entity.stringProperty ) )
-					.createdThenExecuted();
+					.add( "1", b -> b.field( "someField", entity.stringProperty ) );
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -184,8 +181,7 @@ public class TypeBridgeBaseIT {
 			session.indexingPlan().addOrUpdate( entity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.addOrUpdate( "1", b -> b.field( "someField", entity.stringProperty ) )
-					.createdThenExecuted();
+					.addOrUpdate( "1", b -> b.field( "someField", entity.stringProperty ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -283,8 +279,7 @@ public class TypeBridgeBaseIT {
 			session.indexingPlan().add( containedEntity );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.add( "1", b -> b.field( "someField", "constant" ) )
-					.createdThenExecuted();
+					.add( "1", b -> b.field( "someField", "constant" ) );
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -294,8 +289,7 @@ public class TypeBridgeBaseIT {
 			session.indexingPlan().addOrUpdate( containedEntity, new String[] { "stringProperty" } );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.addOrUpdate( "1", b -> b.field( "someField", "constant" ) )
-					.createdThenExecuted();
+					.addOrUpdate( "1", b -> b.field( "someField", "constant" ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -618,8 +612,7 @@ public class TypeBridgeBaseIT {
 							.objectField( "enumProperty", b2 -> b2
 									.field( "someField", entity.enumProperty.stringProperty )
 							)
-					)
-					.createdThenExecuted();
+					);
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -633,8 +626,7 @@ public class TypeBridgeBaseIT {
 							.objectField( "enumProperty", b2 -> b2
 									.field( "someField", entity.enumProperty.stringProperty )
 							)
-					)
-					.createdThenExecuted();
+					);
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -945,8 +937,7 @@ public class TypeBridgeBaseIT {
 			session.indexingPlan().add( entity );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.add( "739", b -> b.field( "someField", "739" ) )
-					.createdThenExecuted();
+					.add( "739", b -> b.field( "someField", "739" ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}

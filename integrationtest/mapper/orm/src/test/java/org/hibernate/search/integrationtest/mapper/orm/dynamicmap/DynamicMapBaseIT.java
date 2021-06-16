@@ -99,8 +99,7 @@ public class DynamicMapBaseIT {
 							.field( "title", entity1.get( "title" ) )
 							.field( "pageCount", entity1.get( "pageCount" ) )
 							.field( "publicationDate", entity1.get( "publicationDate" ) )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -160,8 +159,7 @@ public class DynamicMapBaseIT {
 			backendMock.expectWorks( INDEX1_NAME )
 					.add( "1", b -> b
 							.field( "title", entity1.get( "title" ) )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -268,8 +266,7 @@ public class DynamicMapBaseIT {
 			backendMock.expectWorks( INDEX1_NAME )
 					.add( "Hyperion", b -> b
 							.field( "title", entity1.get( "title" ) )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -350,14 +347,12 @@ public class DynamicMapBaseIT {
 					.add( "1", b -> b
 							.field( "propertyOfA", entity1.get( "propertyOfA" ) )
 							.field( "propertyOfB", entity1.get( "propertyOfB" ) )
-					)
-					.createdThenExecuted();
+					);
 			backendMock.expectWorks( INDEX2_NAME )
 					.add( "2", b -> b
 							.field( "propertyOfA", entity2.get( "propertyOfA" ) )
 							.field( "propertyOfC", entity2.get( "propertyOfC" ) )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -438,8 +433,7 @@ public class DynamicMapBaseIT {
 									.field( "author", quote1.get( "author" ) )
 									.field( "content", quote1.get( "content" ) )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -494,8 +488,7 @@ public class DynamicMapBaseIT {
 									.field( "author", quote1.author )
 									.field( "content", quote1.content )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -562,8 +555,7 @@ public class DynamicMapBaseIT {
 									.field( "author", quote2.author )
 									.field( "content", quote2.content )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -610,8 +602,7 @@ public class DynamicMapBaseIT {
 					.add( "1", b -> b
 							.field( "title", book.get( "title" ) )
 							.field( "quotes", quote1 , quote2 )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -670,8 +661,7 @@ public class DynamicMapBaseIT {
 									.field( "author", quote1.get( "author" ) )
 									.field( "content", quote1.get( "content" ) )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -748,8 +738,7 @@ public class DynamicMapBaseIT {
 									.field( "author", quote2.get( "author" ) )
 									.field( "content", quote2.get( "content" ) )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -826,8 +815,7 @@ public class DynamicMapBaseIT {
 									.field( "author", quote2.get( "author" ) )
 									.field( "content", quote2.get( "content" ) )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -904,8 +892,7 @@ public class DynamicMapBaseIT {
 									.field( "author", quote2.get( "author" ) )
 									.field( "content", quote2.get( "content" ) )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -984,8 +971,7 @@ public class DynamicMapBaseIT {
 									.field( "author", quote2.get( "author" ) )
 									.field( "content", quote2.get( "content" ) )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -1062,8 +1048,7 @@ public class DynamicMapBaseIT {
 									.field( "author", quote2.get( "author" ) )
 									.field( "content", quote2.get( "content" ) )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}

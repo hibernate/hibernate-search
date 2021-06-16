@@ -62,8 +62,7 @@ public class ProvidedIdIT {
 			session.indexingPlan().add( "42", null, entity1 );
 
 			backendMock.expectWorks( entityAndIndexName )
-					.add( "42", b -> { } )
-					.createdThenExecuted();
+					.add( "42", b -> { } );
 		}
 		backendMock.verifyExpectationsMet();
 

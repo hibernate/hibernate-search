@@ -410,8 +410,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 									"myProperty",
 									firstIndexedFieldValues, (Object[]) otherIndexedFieldValues
 							)
-					)
-					.createdThenExecuted();
+					);
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -422,8 +421,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 			session.indexingPlan().add( entity1 );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.add( "2", b -> { } )
-					.createdThenExecuted();
+					.add( "2", b -> { } );
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -449,8 +447,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 			session.indexingPlan().add( entity1 );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.add( "1", b -> { } )
-					.createdThenExecuted();
+					.add( "1", b -> { } );
 		}
 		backendMock.verifyExpectationsMet();
 

@@ -133,8 +133,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 			session.indexingPlan().add( entity1 );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.add( "1", b -> b.field( "myProperty", STRING_VALUE_1 ) )
-					.createdThenExecuted();
+					.add( "1", b -> b.field( "myProperty", STRING_VALUE_1 ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}

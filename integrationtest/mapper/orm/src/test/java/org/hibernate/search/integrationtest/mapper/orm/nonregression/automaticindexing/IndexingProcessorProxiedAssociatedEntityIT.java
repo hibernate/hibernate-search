@@ -79,8 +79,7 @@ public class IndexingProcessorProxiedAssociatedEntityIT {
 							.objectField( "containedSingle", b2 -> b2
 									.field( "text", "initialValue" )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -98,8 +97,7 @@ public class IndexingProcessorProxiedAssociatedEntityIT {
 							.objectField( "containedSingle", b2 -> b2
 									.field( "text", "initialValue" )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -122,8 +120,7 @@ public class IndexingProcessorProxiedAssociatedEntityIT {
 							.objectField( "containedList", b2 -> b2
 									.field( "text", "initialValue1" )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -146,8 +143,7 @@ public class IndexingProcessorProxiedAssociatedEntityIT {
 							.objectField( "containedList", b2 -> b2
 									.field( "text", "initialValue1" )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}

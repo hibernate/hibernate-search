@@ -130,16 +130,14 @@ public class AutomaticIndexingOverReindexingIT {
 			backendMock.expectWorks( Level1Entity.INDEX )
 					.add( "1", b -> b
 							.field( "property1FromBridge", "initialValue" )
-					)
-					.createdThenExecuted();
+					);
 
 			backendMock.expectWorks( Level2Entity.INDEX )
 					.add( "2", b -> b
 							.objectField( "level3", b2 -> b2
 									.field( "property2", "initialValue" )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -153,8 +151,7 @@ public class AutomaticIndexingOverReindexingIT {
 							.objectField( "level3", b2 -> b2
 									.field( "property2", "updatedValue" )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -167,8 +164,7 @@ public class AutomaticIndexingOverReindexingIT {
 			backendMock.expectWorks( Level1Entity.INDEX )
 					.addOrUpdate( "1", b -> b
 							.field( "property1FromBridge", "updatedValue" )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}

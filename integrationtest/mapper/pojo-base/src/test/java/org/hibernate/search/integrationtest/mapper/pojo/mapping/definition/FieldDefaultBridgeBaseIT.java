@@ -133,7 +133,6 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 				} );
 				++id;
 			}
-			expectationSetter.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}

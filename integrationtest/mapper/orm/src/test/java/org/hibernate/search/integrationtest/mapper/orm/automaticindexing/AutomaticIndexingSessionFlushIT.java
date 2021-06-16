@@ -57,15 +57,15 @@ public class AutomaticIndexingSessionFlushIT {
 			session.persist( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX_NAME )
-					.add( "1", b -> b.field( "text", "number1" ) )
-					.created();
+					.create()
+					.add( "1", b -> b.field( "text", "number1" ) );
 
 			session.flush();
 			backendMock.verifyExpectationsMet();
 
 			backendMock.expectWorks( IndexedEntity.INDEX_NAME )
-					.add( "1", b -> b.field( "text", "number1" ) )
-					.executed();
+					.execute()
+					.add( "1", b -> b.field( "text", "number1" ) );
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -78,8 +78,8 @@ public class AutomaticIndexingSessionFlushIT {
 			session.persist( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX_NAME )
-					.add( "1", b -> b.field( "text", "number1" ) )
-					.created();
+					.create()
+					.add( "1", b -> b.field( "text", "number1" ) );
 
 			// An auto flush is performed on query invocation
 			List<?> resultList = session.createQuery( "select i from IndexedEntity i" )
@@ -91,8 +91,8 @@ public class AutomaticIndexingSessionFlushIT {
 			assertEquals( 1, resultList.size() );
 
 			backendMock.expectWorks( IndexedEntity.INDEX_NAME )
-					.add( "1", b -> b.field( "text", "number1" ) )
-					.executed();
+					.execute()
+					.add( "1", b -> b.field( "text", "number1" ) );
 		} );
 		backendMock.verifyExpectationsMet();
 	}

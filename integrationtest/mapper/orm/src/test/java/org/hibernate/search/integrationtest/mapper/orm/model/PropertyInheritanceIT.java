@@ -89,8 +89,7 @@ public class PropertyInheritanceIT {
 									.field( "parentDeclaredProperty", entity2.getParentDeclaredProperty() )
 									.field( "childDeclaredProperty", entity2.getChildDeclaredProperty() )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 	}
 
