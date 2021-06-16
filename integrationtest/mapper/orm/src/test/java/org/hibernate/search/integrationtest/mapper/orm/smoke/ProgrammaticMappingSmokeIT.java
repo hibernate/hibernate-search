@@ -249,14 +249,12 @@ public class ProgrammaticMappingSmokeIT {
 									.field( "text", entity6.getText() )
 									.field( "date", entity6.getLocalDate() )
 							)
-					)
-					.createdThenExecuted();
+					);
 			backendMock.expectWorks( OtherIndexedEntity.NAME )
 					.add( "4", b -> b
 							.field( "numeric", entity4.getNumeric() )
 							.field( "numericAsString", String.valueOf( entity4.getNumeric() ) )
-					)
-					.createdThenExecuted();
+					);
 			backendMock.expectWorks( YetAnotherIndexedEntity.NAME )
 					.add( "5", b -> b
 							.field( "myLocalDateField", entity5.getLocalDate() )
@@ -287,8 +285,7 @@ public class ProgrammaticMappingSmokeIT {
 											.field( "myLocalDateField", entity2.getEmbedded().getLocalDate() )
 									)
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 	}
 

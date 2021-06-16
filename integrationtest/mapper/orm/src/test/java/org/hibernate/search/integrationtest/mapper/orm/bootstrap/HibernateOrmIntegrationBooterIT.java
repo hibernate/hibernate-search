@@ -136,8 +136,7 @@ public class HibernateOrmIntegrationBooterIT {
 				when( textValueReadHandleMock.get( entity ) ).thenReturn( entity.text );
 
 				backendMock.expectWorks( INDEX_NAME )
-						.add( "1", b -> b.field( "text", "someText" ) )
-						.createdThenExecuted();
+						.add( "1", b -> b.field( "text", "someText" ) );
 			} );
 			// If the entity was indexed, it means Hibernate Search booted correctly
 			backendMock.verifyExpectationsMet();

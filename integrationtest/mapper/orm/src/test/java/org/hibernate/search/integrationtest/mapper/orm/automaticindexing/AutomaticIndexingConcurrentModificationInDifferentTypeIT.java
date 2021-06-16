@@ -107,22 +107,19 @@ public class AutomaticIndexingConcurrentModificationInDifferentTypeIT {
 							.objectField( "child", b2 -> b2
 									.field( "name", entity1.getName() )
 							)
-					)
-					.createdThenExecuted();
+					);
 			backendMock.expectWorks(
 					ChildEntity.NAME, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE
 			)
 					.addOrUpdate( entity1.getId().toString(), b -> b
 							.field( "name", entity1.getName() )
-					)
-					.createdThenExecuted();
+					);
 			backendMock.expectWorks(
 					OtherEntity.NAME, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE
 			)
 					.addOrUpdate( entity3.getId().toString(), b -> b
 							.field( "name", entity3.getName() )
-					)
-					.createdThenExecuted();
+					);
 		} );
 
 		backendMock.verifyExpectationsMet();

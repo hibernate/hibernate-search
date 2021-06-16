@@ -84,8 +84,7 @@ public class TransientPropertyIT {
 			backendMock.expectWorks( EntityWithDerivedFrom.INDEX )
 					.add( "1", b -> b
 							.field( "APlusB", 7 )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -100,8 +99,7 @@ public class TransientPropertyIT {
 			backendMock.expectWorks( EntityWithDerivedFrom.INDEX )
 					.addOrUpdate( "1", b -> b
 							.field( "APlusB", 9 )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -135,8 +133,7 @@ public class TransientPropertyIT {
 			backendMock.expectWorks( EntityWithDerivedFromAndBridge.INDEX )
 					.add( "1", b -> b
 							.field( "APlusB", 7 )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -151,8 +148,7 @@ public class TransientPropertyIT {
 			backendMock.expectWorks( EntityWithDerivedFromAndBridge.INDEX )
 					.addOrUpdate( "1", b -> b
 							.field( "APlusB", 9 )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 

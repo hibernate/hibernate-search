@@ -70,8 +70,7 @@ public class JpaIdAsDocumentIdIT {
 							.objectField( "contained", b2 -> b2
 									.field( "id", 1 ) )
 							.objectField( "contained", b2 -> b2
-									.field( "id", 2 ) ) )
-					.createdThenExecuted();
+									.field( "id", 2 ) ) );
 		} );
 	}
 

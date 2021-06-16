@@ -100,12 +100,8 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 					DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME
 			);
 			for ( String expectedDocumentIdentifierValue : expectations.getDocumentIdentifierValues() ) {
-				expectationSetter.add(
-						expectedDocumentIdentifierValue,
-						b -> { }
-				);
+				expectationSetter.add( expectedDocumentIdentifierValue, b -> { } );
 			}
-			expectationSetter.createdThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}

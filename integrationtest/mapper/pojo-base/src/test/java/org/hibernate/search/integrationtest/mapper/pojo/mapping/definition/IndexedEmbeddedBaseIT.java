@@ -1365,8 +1365,7 @@ public class IndexedEmbeddedBaseIT {
 			session.indexingPlan().add( entity1 );
 
 			backendMock.expectWorks( INDEX_NAME )
-					.add( "1", expectedDocumentContributor )
-					.createdThenExecuted();
+					.add( "1", expectedDocumentContributor );
 		}
 		backendMock.verifyExpectationsMet();
 	}

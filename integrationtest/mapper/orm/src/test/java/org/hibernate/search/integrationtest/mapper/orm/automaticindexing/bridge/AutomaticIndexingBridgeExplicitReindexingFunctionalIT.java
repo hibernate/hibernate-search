@@ -91,8 +91,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b
 							.objectField( "typeBridge", b2 -> { } )
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -109,8 +108,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 							.objectField( "typeBridge", b2 -> b2
 									.field( "includedInTypeBridge", "value1" )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -132,8 +130,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 							.objectField( "typeBridge", b2 -> b2
 									.field( "includedInTypeBridge", "value1" )
 							)
-					)
-					.createdThenExecuted();
+					);
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -150,8 +147,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 								.objectField( "typeBridge", b2 -> b2
 										.field( "includedInTypeBridge", "value1", "value2" )
 								)
-						)
-						.createdThenExecuted();
+						);
 			} );
 			backendMock.verifyExpectationsMet();
 
@@ -167,12 +163,11 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 
 			// TODO HSEARCH-3567 this does not trigger any work because we do not handle asymmetric association updates
 //			backendMock.expectWorks( IndexedEntity.INDEX )
-//					.update( "1", b -> b
+//					.addOrUpdate( "1", b -> b
 //							.objectField( "typeBridge", b2 -> b2
 //									.field( "includedInTypeBridge", "value1" )
 //							)
-//					)
-//					.preparedThenExecuted();
+//					);
 		} );
 		backendMock.verifyExpectationsMet();
 	}

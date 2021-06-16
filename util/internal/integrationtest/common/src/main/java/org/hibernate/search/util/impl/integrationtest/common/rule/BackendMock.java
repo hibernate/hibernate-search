@@ -7,7 +7,6 @@
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -158,7 +157,8 @@ public class BackendMock implements TestRule {
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return new DocumentWorkCallListContext(
 				indexName, tenantId,
-				commitStrategy, refreshStrategy
+				commitStrategy, refreshStrategy,
+				DocumentWorkCallKind.CREATE_AND_EXECUTE, CompletableFuture.completedFuture( null )
 		);
 	}
 
@@ -287,20 +287,71 @@ public class BackendMock implements TestRule {
 		}
 	}
 
+	private enum DocumentWorkCallKind {
+		CREATE,
+		DISCARD,
+		EXECUTE,
+		CREATE_AND_DISCARD,
+		CREATE_AND_EXECUTE;
+	}
+
 	public class DocumentWorkCallListContext {
 		private final String indexName;
 		private final String tenantId;
 		private final DocumentCommitStrategy commitStrategyForDocumentWorks;
 		private final DocumentRefreshStrategy refreshStrategyForDocumentWorks;
-		private final List<StubDocumentWork> works = new ArrayList<>();
+
+		private final DocumentWorkCallKind kind;
+		private final CompletableFuture<?> executionFuture;
 
 		private DocumentWorkCallListContext(String indexName, String tenantId,
 				DocumentCommitStrategy commitStrategyForDocumentWorks,
-				DocumentRefreshStrategy refreshStrategyForDocumentWorks) {
+				DocumentRefreshStrategy refreshStrategyForDocumentWorks,
+				DocumentWorkCallKind kind, CompletableFuture<?> executionFuture) {
 			this.indexName = indexName;
 			this.tenantId = tenantId;
 			this.commitStrategyForDocumentWorks = commitStrategyForDocumentWorks;
 			this.refreshStrategyForDocumentWorks = refreshStrategyForDocumentWorks;
+			this.kind = kind;
+			this.executionFuture = executionFuture;
+		}
+
+		public DocumentWorkCallListContext create() {
+			return newContext( DocumentWorkCallKind.CREATE );
+		}
+
+		public DocumentWorkCallListContext discard() {
+			return newContext( DocumentWorkCallKind.DISCARD );
+		}
+
+		public DocumentWorkCallListContext execute() {
+			return newContext( DocumentWorkCallKind.EXECUTE );
+		}
+
+		public DocumentWorkCallListContext execute(CompletableFuture<?> executionFuture) {
+			return newContext( DocumentWorkCallKind.EXECUTE, executionFuture );
+		}
+
+		public DocumentWorkCallListContext createAndExecute() {
+			return newContext( DocumentWorkCallKind.CREATE_AND_EXECUTE );
+		}
+
+		public DocumentWorkCallListContext createAndExecute(CompletableFuture<?> executionFuture) {
+			return newContext( DocumentWorkCallKind.CREATE_AND_EXECUTE, executionFuture );
+		}
+
+		public DocumentWorkCallListContext createAndDiscard() {
+			return newContext( DocumentWorkCallKind.CREATE_AND_DISCARD );
+		}
+
+		private DocumentWorkCallListContext newContext(DocumentWorkCallKind kind) {
+			return newContext( kind, CompletableFuture.completedFuture( null ) );
+		}
+
+		private DocumentWorkCallListContext newContext(DocumentWorkCallKind kind, CompletableFuture<?> executionFuture) {
+			return new DocumentWorkCallListContext( indexName, tenantId,
+					commitStrategyForDocumentWorks, refreshStrategyForDocumentWorks,
+					kind, executionFuture );
 		}
 
 		public DocumentWorkCallListContext add(Consumer<StubDocumentWork.Builder> contributor) {
@@ -348,59 +399,40 @@ public class BackendMock implements TestRule {
 		}
 
 		public DocumentWorkCallListContext work(StubDocumentWork work) {
-			works.add( work );
-			return this;
-		}
-
-		public DocumentWorkCallListContext createdThenExecuted(CompletableFuture<?> future) {
-			created();
-			executed( future );
-			works.clear();
-			return this;
-		}
-
-		public DocumentWorkCallListContext createdThenExecuted() {
-			return createdThenExecuted( CompletableFuture.completedFuture( null ) );
-		}
-
-		public DocumentWorkCallListContext created() {
-			log.debugf( "Expecting %d works to be created", works.size() );
-			works.stream()
-					.map( work -> new DocumentWorkCreateCall( indexName, work ) )
-					.forEach( this::expect );
-			return this;
-		}
-
-		public DocumentWorkCallListContext executed(CompletableFuture<?> future) {
-			log.debugf( "Expecting %d works to be executed", works.size() );
-			works.stream()
-					.map( work -> new DocumentWorkExecuteCall( indexName, work, future ) )
-					.forEach( this::expect );
-			works.clear();
-			return this;
-		}
-
-		public DocumentWorkCallListContext executed() {
-			return executed( CompletableFuture.completedFuture( null ) );
-		}
-
-		public DocumentWorkCallListContext discarded() {
-			log.debugf( "Expecting %d works to be discarded", works.size() );
-			works.stream()
-					.map( work -> new DocumentWorkDiscardCall( indexName, work ) )
-					.forEach( this::expect );
+			switch ( kind ) {
+				case CREATE:
+					expect( new DocumentWorkCreateCall( indexName, work ) );
+					break;
+				case DISCARD:
+					expect( new DocumentWorkDiscardCall( indexName, work ) );
+					break;
+				case EXECUTE:
+					expect( new DocumentWorkExecuteCall( indexName, work, executionFuture ) );
+					break;
+				case CREATE_AND_DISCARD:
+					expect( new DocumentWorkCreateCall( indexName, work ) );
+					expect( new DocumentWorkDiscardCall( indexName, work ) );
+					break;
+				case CREATE_AND_EXECUTE:
+					expect( new DocumentWorkCreateCall( indexName, work ) );
+					expect( new DocumentWorkExecuteCall( indexName, work, executionFuture ) );
+					break;
+			}
 			return this;
 		}
 
 		private void expect(DocumentWorkCreateCall call) {
+			log.debugf( "Expecting %s", call );
 			backendBehavior().getDocumentWorkCreateCalls( call.documentKey() ).expectInOrder( call );
 		}
 
 		private void expect(DocumentWorkDiscardCall call) {
+			log.debugf( "Expecting %s", call );
 			backendBehavior().getDocumentWorkDiscardCalls( call.documentKey() ).expectInOrder( call );
 		}
 
 		private void expect(DocumentWorkExecuteCall call) {
+			log.debugf( "Expecting %s", call );
 			backendBehavior().getDocumentWorkExecuteCalls( call.documentKey() ).expectInOrder( call );
 		}
 	}

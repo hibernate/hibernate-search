@@ -63,8 +63,7 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 			backendMock.expectWorks( primitives.getIndexName() )
 					.add( "1", b -> b.field( "serializedArray",
 							primitives.getExpectedIndexFieldValue( array1, 0 ),
-							primitives.getExpectedIndexFieldValue( array1, 1 ) ) )
-					.createdThenExecuted();
+							primitives.getExpectedIndexFieldValue( array1, 1 ) ) );
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -82,8 +81,7 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 					.addOrUpdate( "1", b -> b.field( "serializedArray",
 							primitives.getExpectedIndexFieldValue( array2, 0 ),
 							primitives.getExpectedIndexFieldValue( array2, 1 ),
-							primitives.getExpectedIndexFieldValue( array2, 2 ) ) )
-					.createdThenExecuted();
+							primitives.getExpectedIndexFieldValue( array2, 2 ) ) );
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -103,8 +101,7 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 			backendMock.expectWorks( primitives.getIndexName() )
 					.add( "1", b -> b.field( "serializedArray",
 							primitives.getExpectedIndexFieldValue( array, 0 ),
-							primitives.getExpectedIndexFieldValue( array, 1 ) ) )
-					.createdThenExecuted();
+							primitives.getExpectedIndexFieldValue( array, 1 ) ) );
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -118,8 +115,7 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 			backendMock.expectWorks( primitives.getIndexName() )
 					.addOrUpdate( "1", b -> b.field( "serializedArray",
 							primitives.getExpectedIndexFieldValue( array, 0 ),
-							primitives.getExpectedIndexFieldValue( array, 1 ) ) )
-					.createdThenExecuted();
+							primitives.getExpectedIndexFieldValue( array, 1 ) ) );
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -139,8 +135,7 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 			backendMock.expectWorks( primitives.getIndexName() )
 					.add( "1", b -> b.field( "elementCollectionArray",
 							primitives.getExpectedIndexFieldValue( array1, 0 ),
-							primitives.getExpectedIndexFieldValue( array1, 1 ) ) )
-					.createdThenExecuted();
+							primitives.getExpectedIndexFieldValue( array1, 1 ) ) );
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -158,8 +153,7 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 					.addOrUpdate( "1", b -> b.field( "elementCollectionArray",
 							primitives.getExpectedIndexFieldValue( array2, 0 ),
 							primitives.getExpectedIndexFieldValue( array2, 1 ),
-							primitives.getExpectedIndexFieldValue( array2, 2 ) ) )
-					.createdThenExecuted();
+							primitives.getExpectedIndexFieldValue( array2, 2 ) ) );
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -179,8 +173,7 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 			backendMock.expectWorks( primitives.getIndexName() )
 					.add( "1", b -> b.field( "elementCollectionArray",
 							primitives.getExpectedIndexFieldValue( array, 0 ),
-							primitives.getExpectedIndexFieldValue( array, 1 ) ) )
-					.createdThenExecuted();
+							primitives.getExpectedIndexFieldValue( array, 1 ) ) );
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -194,8 +187,7 @@ public abstract class AbstractAutomaticIndexingArrayIT<TIndexed, TArray, TIndexF
 			backendMock.expectWorks( primitives.getIndexName() )
 					.addOrUpdate( "1", b -> b.field( "elementCollectionArray",
 							primitives.getExpectedIndexFieldValue( array, 0 ),
-							primitives.getExpectedIndexFieldValue( array, 1 ) ) )
-					.createdThenExecuted();
+							primitives.getExpectedIndexFieldValue( array, 1 ) ) );
 		} );
 		backendMock.verifyExpectationsMet();
 	}

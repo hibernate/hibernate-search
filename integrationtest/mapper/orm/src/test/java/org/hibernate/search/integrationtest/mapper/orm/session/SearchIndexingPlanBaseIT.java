@@ -77,8 +77,7 @@ public class SearchIndexingPlanBaseIT {
 					.addOrUpdate( "1", b -> b.field( "text", "number1" ) )
 					.addOrUpdate( "2", b -> b.field( "text", "number2" ) )
 					.delete( "3" )
-					.delete( "42" )
-					.createdThenExecuted();
+					.delete( "42" );
 		} );
 		defaultBackendMock.verifyExpectationsMet();
 	}
@@ -153,8 +152,7 @@ public class SearchIndexingPlanBaseIT {
 					// addOrUpdate then purge => delete
 					.delete( "7" )
 					// purge then addOrUpdate => update
-					.addOrUpdate( "8", b -> b.field( "text", "number8" ) )
-					.createdThenExecuted();
+					.addOrUpdate( "8", b -> b.field( "text", "number8" ) );
 		} );
 		defaultBackendMock.verifyExpectationsMet();
 	}
@@ -206,8 +204,7 @@ public class SearchIndexingPlanBaseIT {
 			indexingPlan.purge( IndexedEntity1.NAME, 42, null ); // Does not exist in database, but may exist in the index
 
 			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
-					.delete( "42" )
-					.createdThenExecuted();
+					.delete( "42" );
 		} );
 		defaultBackendMock.verifyExpectationsMet();
 	}
@@ -253,9 +250,9 @@ public class SearchIndexingPlanBaseIT {
 
 			// flush triggers the prepare of the current indexing plan
 			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
+					.create()
 					.add( "1", b -> b.field( "text", "number1" ) )
-					.add( "2", b -> b.field( "text", "number2" ) )
-					.created();
+					.add( "2", b -> b.field( "text", "number2" ) );
 
 			session.flush();
 
@@ -274,9 +271,9 @@ public class SearchIndexingPlanBaseIT {
 			entity2.text = "WRONG";
 
 			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
+					.execute()
 					.add( "1", b -> b.field( "text", "number1" ) )
-					.add( "2", b -> b.field( "text", "number2" ) )
-					.executed();
+					.add( "2", b -> b.field( "text", "number2" ) );
 		} );
 		// Works should be executed on transaction commit
 		defaultBackendMock.verifyExpectationsMet();
@@ -294,9 +291,9 @@ public class SearchIndexingPlanBaseIT {
 			session.persist( entity2 );
 
 			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
+					.create()
 					.add( "1", b -> b.field( "text", "number1" ) )
-					.add( "2", b -> b.field( "text", "number2" ) )
-					.created();
+					.add( "2", b -> b.field( "text", "number2" ) );
 
 			session.flush();
 			defaultBackendMock.verifyExpectationsMet();
@@ -304,9 +301,9 @@ public class SearchIndexingPlanBaseIT {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 
 			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
+					.execute()
 					.add( "1", b -> b.field( "text", "number1" ) )
-					.add( "2", b -> b.field( "text", "number2" ) )
-					.executed();
+					.add( "2", b -> b.field( "text", "number2" ) );
 
 			indexingPlan.execute();
 
@@ -330,8 +327,7 @@ public class SearchIndexingPlanBaseIT {
 
 			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
-					.add( "2", b -> b.field( "text", "number2" ) )
-					.createdThenExecuted();
+					.add( "2", b -> b.field( "text", "number2" ) );
 		} );
 		defaultBackendMock.verifyExpectationsMet();
 
@@ -351,8 +347,7 @@ public class SearchIndexingPlanBaseIT {
 					.addOrUpdate( "1", b -> b.field( "text", "number1" ) )
 					.delete( "2" )
 					// Automatic on persist
-					.add( "3", b -> b.field( "text", "number3" ) )
-					.createdThenExecuted();
+					.add( "3", b -> b.field( "text", "number3" ) );
 		} );
 		defaultBackendMock.verifyExpectationsMet();
 	}
@@ -377,11 +372,9 @@ public class SearchIndexingPlanBaseIT {
 
 			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.addOrUpdate( "1", b -> b.field( "text", "number1" ) )
-					.delete( "3" )
-					.createdThenExecuted();
+					.delete( "3" );
 			backend2Mock.expectWorks( IndexedEntity2.INDEX_NAME )
-					.addOrUpdate( "2", b -> b.field( "text", "number2" ) )
-					.createdThenExecuted();
+					.addOrUpdate( "2", b -> b.field( "text", "number2" ) );
 		} );
 		defaultBackendMock.verifyExpectationsMet();
 		backend2Mock.verifyExpectationsMet();

@@ -110,8 +110,7 @@ public class FieldDefaultBridgeOverridingIT<V, F> {
 							// The stub backend does not implement the 'indexNullAs' option
 							b.field( FIELD_INDEXNULLAS_NAME, new FieldTypeForOverridingDefaultBridge( null ) );
 						}
-					} )
-					.createdThenExecuted();
+					} );
 		}
 		backendMock.verifyExpectationsMet();
 	}

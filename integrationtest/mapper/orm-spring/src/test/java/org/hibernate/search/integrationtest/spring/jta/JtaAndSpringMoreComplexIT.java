@@ -67,8 +67,7 @@ public class JtaAndSpringMoreComplexIT {
 
 		backendMock.expectWorks( "Box" )
 				.add( "1", b -> b
-						.field( "color", "red-and-white" ) )
-				.createdThenExecuted();
+						.field( "color", "red-and-white" ) );
 		boxDAO.persist( box );
 		backendMock.verifyExpectationsMet();
 
@@ -83,8 +82,7 @@ public class JtaAndSpringMoreComplexIT {
 				.addOrUpdate( "1", b -> b
 						.field( "color", "red-and-white" )
 						.objectField( "muffinSet", b2 -> b2
-								.field( "kind", "blueberry" ) ) )
-				.createdThenExecuted();
+								.field( "kind", "blueberry" ) ) );
 		boxDAO.merge( box );
 		backendMock.verifyExpectationsMet();
 
@@ -93,8 +91,7 @@ public class JtaAndSpringMoreComplexIT {
 				.addOrUpdate( "1", b -> b
 						.field( "color", "blue" )
 						.objectField( "muffinSet", b2 -> b2
-								.field( "kind", "blueberry" ) ) )
-				.createdThenExecuted();
+								.field( "kind", "blueberry" ) ) );
 		boxDAO.changeColor( box.getContainerId(), "blue" );
 		backendMock.verifyExpectationsMet();
 	}
@@ -107,8 +104,7 @@ public class JtaAndSpringMoreComplexIT {
 
 		backendMock.expectWorks( "Box" )
 				.add( "2", b -> b
-						.field( "color", "red-and-white" ) )
-				.createdThenExecuted();
+						.field( "color", "red-and-white" ) );
 		boxDAO.persist( box );
 		backendMock.verifyExpectationsMet();
 
@@ -120,14 +116,12 @@ public class JtaAndSpringMoreComplexIT {
 		box.addDoughnut( doughnut );
 
 		backendMock.expectWorks( "Doughnut" )
-				.add( "2", b -> b.field( "kind", "glazed" ) )
-				.createdThenExecuted();
+				.add( "2", b -> b.field( "kind", "glazed" ) );
 		backendMock.expectWorks( "Box" )
 				.addOrUpdate( "2", b -> b
 						.field( "color", "red-and-white" )
 						.objectField( "doughnutSet", b2 -> b2
-								.field( "kind", "glazed" ) ) )
-				.createdThenExecuted();
+								.field( "kind", "glazed" ) ) );
 		boxDAO.merge( box );
 		backendMock.verifyExpectationsMet();
 
@@ -136,8 +130,7 @@ public class JtaAndSpringMoreComplexIT {
 				.addOrUpdate( "2", b -> b
 						.field( "color", "blue" )
 						.objectField( "doughnutSet", b2 -> b2
-								.field( "kind", "glazed" ) ) )
-				.createdThenExecuted();
+								.field( "kind", "glazed" ) ) );
 		boxDAO.changeColor( box.getContainerId(), "blue" );
 		backendMock.verifyExpectationsMet();
 	}
