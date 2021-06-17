@@ -559,6 +559,78 @@ public class ElasticsearchDialectFactoryTest {
 		);
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4212")
+	public void openSearch_1() {
+		testSuccess(
+				ElasticsearchDistributionName.OPENSEARCH, "1", "1.0.0-rc1",
+				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4212")
+	public void openSearch_1_0() {
+		testSuccess(
+				ElasticsearchDistributionName.OPENSEARCH, "1.0", "1.0.0-rc1",
+				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4212")
+	public void openSearch_1_0_0_rc1() {
+		testSuccess(
+				ElasticsearchDistributionName.OPENSEARCH, "1.0.0-rc1", "1.0.0-rc1",
+				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4212")
+	public void openSearch_1_0_0() {
+		testSuccess(
+				ElasticsearchDistributionName.OPENSEARCH, "1.0.0", "1.0.0",
+				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4212")
+	public void openSearch_1_0_1() {
+		testSuccess(
+				ElasticsearchDistributionName.OPENSEARCH, "1.0.1", "1.0.1",
+				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4212")
+	public void openSearch_2() {
+		testSuccessWithWarning(
+				ElasticsearchDistributionName.OPENSEARCH, "2", "2.0.0",
+				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4212")
+	public void openSearch_2_0() {
+		testSuccessWithWarning(
+				ElasticsearchDistributionName.OPENSEARCH, "2.0", "2.0.0",
+				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-4212")
+	public void openSearch_2_0_0() {
+		testSuccessWithWarning(
+				ElasticsearchDistributionName.OPENSEARCH, "2.0.0", "2.0.0",
+				Elasticsearch7ModelDialect.class, Elasticsearch70ProtocolDialect.class
+		);
+	}
+
 	private void testUnsupported(ElasticsearchDistributionName distributionName,
 			String unsupportedVersionString) {
 		assertThatThrownBy(
