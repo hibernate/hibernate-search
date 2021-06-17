@@ -26,20 +26,31 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
- * Allows to create an Elasticsearch dialect by detecting the version of a remote cluster.
+ * Creates an Elasticsearch dialect for a given Elasticsearch version.
  */
 public class ElasticsearchDialectFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public ElasticsearchModelDialect createModelDialect(ElasticsearchVersion version) {
+		switch ( version.distribution() ) {
+			case ELASTIC:
+				return createModelDialectElastic( version );
+			case OPENSEARCH:
+				return createModelDialectOpenSearch( version );
+			default:
+				throw new AssertionFailure( "Unrecognized Elasticsearch distribution: " + version.distribution() );
+		}
+	}
+
+	private ElasticsearchModelDialect createModelDialectElastic(ElasticsearchVersion version) {
 		int major = version.major();
 
 		if ( major < 5 ) {
 			throw log.unsupportedElasticsearchVersion( version );
 		}
 		else if ( major == 5 ) {
-			return createModelDialectV5( version );
+			return createModelDialectElasticV5( version );
 		}
 		else if ( major == 6 ) {
 			return new Elasticsearch6ModelDialect();
@@ -49,36 +60,7 @@ public class ElasticsearchDialectFactory {
 		}
 	}
 
-	public ElasticsearchProtocolDialect createProtocolDialect(ElasticsearchVersion version) {
-		int major = version.major();
-		OptionalInt minorOptional = version.minor();
-		if ( !minorOptional.isPresent() ) {
-			// The version is supposed to be fetched from the cluster itself, so it should be complete
-			throw new AssertionFailure(
-					"The Elasticsearch version is incomplete when creating the protocol dialect."
-			);
-		}
-		int minor = minorOptional.getAsInt();
-
-		if ( major < 5 ) {
-			throw log.unsupportedElasticsearchVersion( version );
-		}
-		else if ( major == 5 ) {
-			return createProtocolDialectV5( version, minor );
-		}
-		else if ( major == 6 ) {
-			return createProtocolDialectV6( version, minor );
-		}
-		else {
-			// Either the latest supported version, or a newer/unknown one
-			if ( major != 7 ) {
-				log.unknownElasticsearchVersion( version );
-			}
-			return new Elasticsearch70ProtocolDialect();
-		}
-	}
-
-	private ElasticsearchModelDialect createModelDialectV5(ElasticsearchVersion version) {
+	private ElasticsearchModelDialect createModelDialectElasticV5(ElasticsearchVersion version) {
 		OptionalInt minorOptional = version.minor();
 		if ( !minorOptional.isPresent() ) {
 			throw log.ambiguousElasticsearchVersion( version );
@@ -90,7 +72,56 @@ public class ElasticsearchDialectFactory {
 		return new Elasticsearch56ModelDialect();
 	}
 
-	private ElasticsearchProtocolDialect createProtocolDialectV5(ElasticsearchVersion version, int minor) {
+	private ElasticsearchModelDialect createModelDialectOpenSearch(ElasticsearchVersion version) {
+		int major = version.major();
+
+		if ( major < 1 ) {
+			throw log.unsupportedElasticsearchVersion( version );
+		}
+		else {
+			return new Elasticsearch7ModelDialect();
+		}
+	}
+
+	public ElasticsearchProtocolDialect createProtocolDialect(ElasticsearchVersion version) {
+		switch ( version.distribution() ) {
+			case ELASTIC:
+				return createProtocolDialectElastic( version );
+			case OPENSEARCH:
+				return createProtocolDialectOpenSearch( version );
+			default:
+				throw new AssertionFailure( "Unrecognized Elasticsearch distribution: " + version.distribution() );
+		}
+	}
+
+	private ElasticsearchProtocolDialect createProtocolDialectElastic(ElasticsearchVersion version) {
+		int major = version.major();
+		OptionalInt minorOptional = version.minor();
+		if ( !minorOptional.isPresent() ) {
+			// The version is supposed to be fetched from the cluster itself, so it should be complete
+			throw new AssertionFailure( "The Elasticsearch version is incomplete when creating the protocol dialect." );
+		}
+		int minor = minorOptional.getAsInt();
+
+		if ( major < 5 ) {
+			throw log.unsupportedElasticsearchVersion( version );
+		}
+		else if ( major == 5 ) {
+			return createProtocolDialectElasticV5( version, minor );
+		}
+		else if ( major == 6 ) {
+			return createProtocolDialectElasticV6( version, minor );
+		}
+		else {
+			// Either the latest supported version, or a newer/unknown one
+			if ( major != 7 ) {
+				log.unknownElasticsearchVersion( version );
+			}
+			return new Elasticsearch70ProtocolDialect();
+		}
+	}
+
+	private ElasticsearchProtocolDialect createProtocolDialectElasticV5(ElasticsearchVersion version, int minor) {
 		if ( minor < 6 ) {
 			throw log.unsupportedElasticsearchVersion( version );
 		}
@@ -101,7 +132,7 @@ public class ElasticsearchDialectFactory {
 		return new Elasticsearch56ProtocolDialect();
 	}
 
-	private ElasticsearchProtocolDialect createProtocolDialectV6(ElasticsearchVersion version, int minor) {
+	private ElasticsearchProtocolDialect createProtocolDialectElasticV6(ElasticsearchVersion version, int minor) {
 		if ( minor < 3 ) {
 			return new Elasticsearch60ProtocolDialect();
 		}
@@ -116,6 +147,21 @@ public class ElasticsearchDialectFactory {
 			log.unknownElasticsearchVersion( version );
 		}
 		return new Elasticsearch67ProtocolDialect();
+	}
+
+	private ElasticsearchProtocolDialect createProtocolDialectOpenSearch(ElasticsearchVersion version) {
+		int major = version.major();
+
+		if ( major < 1 ) {
+			throw log.unsupportedElasticsearchVersion( version );
+		}
+		else {
+			// Either the latest supported version, or a newer/unknown one
+			if ( major != 1 ) {
+				log.unknownElasticsearchVersion( version );
+			}
+			return new Elasticsearch70ProtocolDialect();
+		}
 	}
 
 }
