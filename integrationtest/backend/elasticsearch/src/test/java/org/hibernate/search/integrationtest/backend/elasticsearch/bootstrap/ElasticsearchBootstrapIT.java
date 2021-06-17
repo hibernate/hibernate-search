@@ -220,8 +220,8 @@ public class ElasticsearchBootstrapIT {
 								"Invalid value for configuration property 'hibernate.search.backend.version': '"
 										+ incompatibleVersionWithMajorAndMinorOnly + "'",
 								"Incompatible Elasticsearch version:"
-										+ " version '" + incompatibleVersionWithMajorAndMinorOnly
-										+ "' does not match version '" + versionWithMajorOnly + "' that was provided "
+										+ " version 'elastic:" + incompatibleVersionWithMajorAndMinorOnly
+										+ "' does not match version 'elastic:" + versionWithMajorOnly + "' that was provided"
 										+ " when the backend was created.",
 								"You can provide a more precise version on startup,"
 										+ " but you cannot override the version that was provided when the backend was created." )

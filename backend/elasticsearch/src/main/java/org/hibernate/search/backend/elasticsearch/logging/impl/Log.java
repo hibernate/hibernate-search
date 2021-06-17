@@ -359,10 +359,24 @@ public interface Log extends BasicLogger {
 	SearchException cannotCreateReferenceMultipleTimes(@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 56, value = "Invalid Elasticsearch version: '%1$s'."
-			+ " The version must be in the form 'x.y.z-qualifier', where 'x', 'y' and 'z' are integers,"
+			+ " Expected format is 'x.y.z-qualifier', where 'x', 'y' and 'z' are integers,"
 			+ " and 'qualifier' is an string of word characters (alphanumeric or '_')."
 			+ " Incomplete versions are allowed, for example '7.0' or just '7'.")
-	SearchException invalidElasticsearchVersion(String versionString);
+	SearchException invalidElasticsearchVersionWithoutDistribution(String invalidRepresentation,
+			@Cause Throwable cause);
+
+	@Message(id = ID_OFFSET + 57, value = "Invalid Elasticsearch version: '%1$s'."
+			+ " Expected format is 'x.y.z-qualifier' or '<distribution>:x.y.z-qualifier',"
+			+ " where '<distribution>' is one of %2$s (defaults to '%3$s'),"
+			+ " 'x', 'y' and 'z' are integers,"
+			+ " and 'qualifier' is an string of word characters (alphanumeric or '_')."
+			+ " Incomplete versions are allowed, for example 'elastic:7.0', '7.0' or just '7'.")
+	SearchException invalidElasticsearchVersionWithOptionalDistribution(String invalidRepresentation,
+			List<String> validDistributions, String defaultDistribution, @Cause Throwable cause);
+
+	@Message(id = ID_OFFSET + 58, value = "Invalid Elasticsearch distribution name: '%1$s'."
+			+ " Valid names are: %2$s.")
+	SearchException invalidElasticsearchDistributionName(String invalidRepresentation, List<String> validRepresentations);
 
 	@Message(id = ID_OFFSET + 59, value = "Unexpected Elasticsearch version running on the cluster: '%2$s'."
 			+ " Hibernate Search was configured for Elasticsearch '%1$s'.")
@@ -663,7 +677,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 141,
 			value = "Incompatible Elasticsearch version:"
-					+ " version '%2$s' does not match version '%1$s' that was provided "
+					+ " version '%2$s' does not match version '%1$s' that was provided"
 					+ " when the backend was created."
 					+ " You can provide a more precise version on startup,"
 					+ " but you cannot override the version that was provided when the backend was created.")

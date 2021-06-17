@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchDistributionName;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
@@ -29,6 +30,8 @@ public class ElasticsearchClientUtils {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private static final JsonAccessor<String> DISTRIBUTION_ACCESSOR =
+			JsonAccessor.root().property( "version" ).property( "distribution" ).asString();
 	private static final JsonAccessor<String> VERSION_ACCESSOR =
 			JsonAccessor.root().property( "version" ).property( "number" ).asString();
 
@@ -67,9 +70,14 @@ public class ElasticsearchClientUtils {
 				throw log.elasticsearchResponseIndicatesFailure();
 			}
 
-			return VERSION_ACCESSOR.get( response.body() )
-					.map( ElasticsearchVersion::of )
+			ElasticsearchDistributionName distributionOptional = DISTRIBUTION_ACCESSOR.get( response.body() )
+					.map( ElasticsearchDistributionName::of )
+					// Only the Elastic distribution doesn't mention what it is.
+					.orElse( ElasticsearchDistributionName.ELASTIC );
+			String version = VERSION_ACCESSOR.get( response.body() )
 					.orElseThrow( () -> new AssertionFailure( "Missing version number in JSON response" ) );
+
+			return ElasticsearchVersion.of( distributionOptional, version );
 		}
 		catch (RuntimeException e) {
 			throw log.elasticsearchRequestFailed( request, response, e.getMessage(), e );

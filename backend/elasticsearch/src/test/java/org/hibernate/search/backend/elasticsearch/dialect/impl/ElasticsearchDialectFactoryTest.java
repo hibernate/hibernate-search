@@ -567,7 +567,7 @@ public class ElasticsearchDialectFactoryTest {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "HSEARCH400081" )
-				.hasMessageContaining( "'" + unsupportedVersionString + "'" );
+				.hasMessageContaining( "'elastic:" + unsupportedVersionString + "'" );
 	}
 
 	private void testAmbiguous(String versionString) {
@@ -579,7 +579,7 @@ public class ElasticsearchDialectFactoryTest {
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "HSEARCH400561" )
-				.hasMessageContaining( "Ambiguous Elasticsearch version: '" + versionString + "'." )
+				.hasMessageContaining( "Ambiguous Elasticsearch version: 'elastic:" + versionString + "'." )
 				.hasMessageContaining( "Please use a more precise version to remove the ambiguity" );
 	}
 
