@@ -6,8 +6,10 @@ text search capabilities to applications. However, Lucene suffers several mismat
 with object domain models. Amongst other things indexes have to be kept up to date and mismatches
 between index structure and domain model as well as query mismatches have to be avoided.
 
-Hibernate Search addresses these shortcomings - it indexes your domain model with the help of a few
+Hibernate Search addresses these shortcomings: it indexes your domain model with the help of a few
 annotations, takes care of database/index synchronization and brings back regular managed objects
-from free text queries. To achieve this Hibernate Search is combining the power of
+from free text queries.
+
+To achieve this, Hibernate Search combines the power of
 link:$$http://www.hibernate.org/orm$$[Hibernate ORM] and
-link:$$http://lucene.apache.org$$[Apache Lucene]/link:https://www.elastic.co/[Elasticsearch].
+link:{luceneUrl}[Apache Lucene]/link:{elasticsearchUrl}[Elasticsearch]/link:{openSearchUrl}[OpenSearch].
