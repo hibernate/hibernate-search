@@ -6,7 +6,9 @@
 [[backend-elasticsearch-compatibility]]
 == Compatibility
 
-Hibernate Search expects an Elasticsearch cluster running version 5.6, 6.x or 7.x.
+Hibernate Search expects an link:{elasticsearchUrl}[Elasticsearch] cluster running version 5.6, 6.x or 7.x,
+or an link:{openSearchUrl}[OpenSearch] cluster running version 1.x.
+
 The version running on your cluster will be automatically detected on startup,
 and Hibernate Search will adapt based on the detected version;
 see <<backend-elasticsearch-configuration-version>> for details.
@@ -14,7 +16,7 @@ see <<backend-elasticsearch-configuration-version>> for details.
 [TIP]
 ====
 For information about which versions of Hibernate Search you can upgrade to,
-while retaining backward compatibility with a given version of Elasticsearch,
+while retaining backward compatibility with a given version of Elasticsearch/OpenSearch,
 refer to the https://hibernate.org/community/compatibility-policy/#compatibility-third-party-hsearch-elasticsearch[compatibility policy].
 ====
 
@@ -23,11 +25,12 @@ but there are a few differences in how Hibernate Search behaves depending
 on the Elasticsearch version that may affect you.
 The following table details those differences.
 
-[cols="h,3*",options="header"]
+[cols="h,4*",options="header"]
 |===============
-||5.6|6.x|7.x
-|Formats for date fields in the Elasticsearch schema 3+|Formats changed in ES 7, see <<backend-elasticsearch-field-types>>
-|`indexNullAs` on `geo_point` fields |Not available 2+|Available
+| 3+|Elasticsearch|OpenSearch
+||5.6|6.x|7.x|1.x
+|Formats for date fields in the Elasticsearch schema 4+|Formats changed in ES 7, see <<backend-elasticsearch-field-types>>
+|`indexNullAs` on `geo_point` fields |Not available 3+|Available
 |===============
 
 === Upgrading Elasticsearch
@@ -36,8 +39,8 @@ When upgrading your Elasticsearch cluster, some
 https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-upgrade.html[administrative tasks]
 are still required on your cluster: Hibernate Search will not take care of those.
 
-On top of that, there are some fundamental differences between some versions of Elasticsearch:
-for example date formats changed in Elasticsearch 7,
+On top of that, there are some fundamental differences between some versions of Elasticsearch.
+For example date formats changed in Elasticsearch 7,
 meaning the schema defined in Elasticsearch 6 may not be compatible
 with the one expected by Hibernate Search for Elasticsearch 7.
 
@@ -594,43 +597,43 @@ See <<backend-elasticsearch-field-types-extension>>.
  |`scaled_float` with a `scaling_factor` equal to 10^(`decimalScale`)
  |-
 |java.time.Instant
- |`date` with format `uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ` (ES7 and above)
+ |`date` with format `uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ` (ES7 and above, OpenSearch)
  or `yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS'Z'` (ES6 and below)
  |<<backend-elasticsearch-field-types-date-time>>
 |java.time.LocalDate
- |`date` with format `uuuu-MM-dd` (ES7 and above)
+ |`date` with format `uuuu-MM-dd` (ES7 and above, OpenSearch)
  or `yyyy-MM-dd\|\|yyyyyyyyy-MM-dd` (ES6 and below)
  |<<backend-elasticsearch-field-types-date-time>>
 |java.time.LocalTime
- |`date` with format `HH:mm:ss.SSSSSSSSS` (ES7 and above)
+ |`date` with format `HH:mm:ss.SSSSSSSSS` (ES7 and above, OpenSearch)
  or `HH:mm:ss.SSS\|\|HH:mm:ss.SSSSSSSSS` (ES6 and below)
  |<<backend-elasticsearch-field-types-date-time>>
 |java.time.LocalDateTime
- |`date` with format `uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS` (ES7 and above)
+ |`date` with format `uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS` (ES7 and above, OpenSearch)
  or `yyyy-MM-dd'T'HH:mm:ss.SSS\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS` (ES6 and below)
  |<<backend-elasticsearch-field-types-date-time>>
 |java.time.ZonedDateTime
- |`date` with format `uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ'['VV']'` (ES7 and above)
+ |`date` with format `uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ'['VV']'` (ES7 and above, OpenSearch)
  or `yyyy-MM-dd'T'HH:mm:ss.SSSZZ'['ZZZ']'\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZZ']'\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZ']'` (ES6 and below)
  |<<backend-elasticsearch-field-types-date-time>>
 |java.time.OffsetDateTime
- |`date` with format `uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ` (ES7 and above)
+ |`date` with format `uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ` (ES7 and above, OpenSearch)
  or `yyyy-MM-dd'T'HH:mm:ss.SSSZZ\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ` (ES6 and below)
  |<<backend-elasticsearch-field-types-date-time>>
 |java.time.OffsetTime
- |`date` with format `HH:mm:ss.SSSSSSSSSZZZZZ` (ES7 and above)
+ |`date` with format `HH:mm:ss.SSSSSSSSSZZZZZ` (ES7 and above, OpenSearch)
  or `HH:mm:ss.SSSZZ\|\|HH:mm:ss.SSSSSSSSSZZ` (ES6 and below)
  |<<backend-elasticsearch-field-types-date-time>>
 |java.time.Year
- |`date` with format `uuuu` (ES7 and above)
+ |`date` with format `uuuu` (ES7 and above, OpenSearch)
  or `yyyy\|\|yyyyyyyyy` (ES6 and below)
  |<<backend-elasticsearch-field-types-date-time>>
 |java.time.YearMonth
- |`date` with format `uuuu-MM` (ES7 and above)
+ |`date` with format `uuuu-MM` (ES7 and above, OpenSearch)
  or `yyyy-MM\|\|yyyyyyyyy-MM` (ES6 and below)
  |<<backend-elasticsearch-field-types-date-time>>
 |java.time.MonthDay
- |`date` with format `uuuu-MM-dd` (ES7 and above)
+ |`date` with format `uuuu-MM-dd` (ES7 and above, OpenSearch)
  or `yyyy-MM-dd` (ES6 and below).
  **The year is always set to 0**.
  |-

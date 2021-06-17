@@ -323,11 +323,15 @@
                         <hibernateDocUrl>${documentation.org.hibernate.url}</hibernateDocUrl>
                         <jpaVersion>${parsed-version.javax.persistence.majorVersion}.${parsed-version.javax.persistence.minorVersion}</jpaVersion>
                         <luceneVersion>${version.org.apache.lucene}</luceneVersion>
+                        <luceneUrl>https://lucene.apache.org</luceneUrl>
                         <luceneJavadocUrl>${javadoc.org.apache.lucene.core.url}</luceneJavadocUrl>
+                        <elasticsearchUrl>https://www.elastic.co/elasticsearch</elasticsearchUrl>
                         <elasticsearchDocUrl>${documentation.org.elasticsearch.url}</elasticsearchDocUrl>
                         <elasticsearchClientVersions>${version.org.elasticsearch.client}</elasticsearchClientVersions>
                         <elasticsearchCompatibleVersions>${version.org.elasticsearch.compatible.regularly-tested.text}</elasticsearchCompatibleVersions>
                         <elasticsearchOtherPotentiallyCompatibleVersions>${version.org.elasticsearch.compatible.not-regularly-tested.text}</elasticsearchOtherPotentiallyCompatibleVersions>
+                        <openSearchUrl>https://www.opensearch.org</openSearchUrl>
+                        <openSearchCompatibleVersions>${version.org.opensearch.compatible.regularly-tested.text}</openSearchCompatibleVersions>
                         <wildflyUrl>https://wildfly.org/</wildflyUrl>
                         <quarkusUrl>https://quarkus.io/</quarkusUrl>
                         <springUrl>https://spring.io/</springUrl>

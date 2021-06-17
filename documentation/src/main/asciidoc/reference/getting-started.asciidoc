@@ -23,6 +23,10 @@ to integrate Hibernate Search into your application.
 |Elasticsearch *{elasticsearchCompatibleVersions}*.
 Other minor versions (e.g. {elasticsearchOtherPotentiallyCompatibleVersions}) may work
 but are not given priority for bugfixes and new features.
+|OpenSearch server (for the Elasticsearch backend)
+|OpenSearch *{openSearchCompatibleVersions}*.
+Other minor versions may work
+but are not given priority for bugfixes and new features.
 |===============
 
 [TIP]
@@ -41,6 +45,16 @@ be aware that Elasticsearch 7.11 and later are distributed under the Elastic Lic
 which are https://opensource.org/node/1099[not considered open-source by the Open Source Initiative].
 
 Only the low-level Java REST client, which Hibernate Search depends on, remains open-source.
+====
+
+[NOTE]
+.OpenSearch
+====
+While it historically targeted link:{elasticsearchUrl}[Elastic's Elasticsearch distribution],
+Hibernate Search is also compatible with link:{openSearchUrl}[OpenSearch] and regularly tested against it.
+
+Every section of this documentation referring to Elasticsearch
+is also relevant for the OpenSearch distribution.
 ====
 
 [[getting-started-migrating]]
@@ -168,9 +182,9 @@ If you get Hibernate Search from Maven, use these dependencies:
 If you get Hibernate Search from the distribution bundle,
 copy the JARs from `dist/engine`, `dist/mapper/orm`, `dist/backend/lucene`,
 and their respective `lib` subdirectories.
-Hibernate ORM + Elasticsearch::
+Hibernate ORM + link:{elasticsearchUrl}[Elasticsearch] (or link:{openSearchUrl}[OpenSearch])::
 Allows indexing of ORM entities on multiple application nodes,
-storing the index on a remote Elasticsearch cluster (to be configured separately).
+storing the index on a remote Elasticsearch or OpenSearch cluster (to be configured separately).
 +
 If you get Hibernate Search from Maven, use these dependencies:
 +
@@ -225,7 +239,7 @@ include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configurati
 By default, the backend will store indexes in the current working directory.
 ====
 
-.Hibernate Search properties in `persistence.xml` for a "Hibernate ORM + Elasticsearch" setup
+.Hibernate Search properties in `persistence.xml` for a "Hibernate ORM + Elasticsearch/OpenSearch" setup
 ====
 [source, XML, indent=0]
 ----
@@ -533,7 +547,7 @@ as it is unlikely to lead to useful results on proper nouns.
 For more information about the format of bean references, see <<configuration-bean-reference-parsing>>.
 ====
 
-.Analysis configurer implementation and configuration in `persistence.xml` for a "Hibernate ORM + Elasticsearch" setup
+.Analysis configurer implementation and configuration in `persistence.xml` for a "Hibernate ORM + Elasticsearch/OpenSearch" setup
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
