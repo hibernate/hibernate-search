@@ -28,7 +28,7 @@ public interface ElasticsearchTestDialect {
 		catch (Exception | LinkageError e) {
 			throw new IllegalStateException(
 					"Unexpected error while initializing the ElasticsearchTestDialect with name '" + dialectClassName + "'."
-							+ " Did you properly set the appropriate elasticsearch-x.x profile?",
+							+ " Did you properly set the appropriate elasticsearch-x.x/opensearch-x.x profile?",
 					e
 			);
 		}

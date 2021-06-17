@@ -255,6 +255,11 @@ stage('Configure') {
 					// --------------------------------------------
 					// Open Distro for Elasticsearch
 					new OpenDistroEsLocalBuildEnvironment(version: '1.13.2', mavenProfile: 'opendistro-elasticsearch-1.13',
+							condition: TestCondition.AFTER_MERGE),
+
+					// --------------------------------------------
+					// OpenSearch
+					new OpenSearchEsLocalBuildEnvironment(version: '1.0.0-rc1', mavenProfile: 'opensearch-1.0',
 							condition: TestCondition.AFTER_MERGE)
 			],
 			// Note that each of these environments will only be tested if the appropriate
@@ -821,6 +826,14 @@ class OpenDistroEsLocalBuildEnvironment extends EsLocalBuildEnvironment {
 	String getTag() { "opendistro-elasticsearch-local-$version" }
 	@Override
 	String getDockerHubImage() { "amazon/opendistro-for-elasticsearch:$version" }
+}
+
+class OpenSearchEsLocalBuildEnvironment extends EsLocalBuildEnvironment {
+	String version
+	@Override
+	String getTag() { "opensearch-elasticsearch-local-$version" }
+	@Override
+	String getDockerHubImage() { "opensearchproject/opensearch:$version" }
 }
 
 class EsAwsBuildEnvironment extends BuildEnvironment {
