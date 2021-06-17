@@ -8,6 +8,8 @@ package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import java.util.Objects;
 
+import org.hibernate.search.util.impl.test.logging.TestEscapers;
+
 class DocumentKey {
 	private final String indexName;
 	private final String tenantIdentifier;
@@ -22,9 +24,9 @@ class DocumentKey {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append( indexName ).append( '#' ).append( documentIdentifier );
+		builder.append( indexName ).append( '#' ).append( TestEscapers.escape( documentIdentifier ) );
 		if ( tenantIdentifier != null ) {
-			builder.append( "(tenant:" ).append( tenantIdentifier ).append( ')' );
+			builder.append( "(tenant:" ).append( TestEscapers.escape( tenantIdentifier ) ).append( ')' );
 		}
 		return builder.toString();
 	}
