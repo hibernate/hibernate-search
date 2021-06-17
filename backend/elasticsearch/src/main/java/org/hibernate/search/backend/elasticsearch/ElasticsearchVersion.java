@@ -115,6 +115,24 @@ public class ElasticsearchVersion {
 	}
 
 	/**
+	 * @return The version string, i.e. the version without the distribution prefix.
+	 */
+	public String versionString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append( major );
+		if ( minor != null ) {
+			builder.append( "." ).append( minor );
+		}
+		if ( micro != null ) {
+			builder.append( "." ).append( micro );
+		}
+		if ( qualifier != null ) {
+			builder.append( "-" ).append( qualifier );
+		}
+		return builder.toString();
+	}
+
+	/**
 	 * @return The distribution to which this version applies, e.g. {@link ElasticsearchDistributionName#ELASTIC}
 	 * or {@link ElasticsearchDistributionName#OPENSEARCH}.
 	 */

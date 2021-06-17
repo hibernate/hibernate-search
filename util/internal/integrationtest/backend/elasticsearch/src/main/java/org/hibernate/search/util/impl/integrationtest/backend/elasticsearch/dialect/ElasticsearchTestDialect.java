@@ -9,6 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dia
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
@@ -33,8 +34,8 @@ public interface ElasticsearchTestDialect {
 		}
 	}
 
-	static String getClusterVersion() {
-		return System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.version" );
+	static ElasticsearchVersion getActualVersion() {
+		return ElasticsearchVersion.of( System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.version" ) );
 	}
 
 	boolean isEmptyMappingPossible();

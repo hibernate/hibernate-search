@@ -1087,7 +1087,7 @@ public class ElasticsearchClientFactoryImplIT {
 	private JsonObject dummyNodeInfo(int port) {
 		JsonObject node = new JsonObject();
 		node.addProperty( "name", "nodeForPort" + port );
-		node.addProperty( "version", ElasticsearchTestDialect.getClusterVersion() );
+		node.addProperty( "version", ElasticsearchTestDialect.getActualVersion().versionString() );
 
 		JsonObject http = new JsonObject();
 		node.add( "http", http );
