@@ -232,6 +232,7 @@
         <!-- WARNING: Don't forget to update the version of container images in the Jenkinsfile if you update versions here -->
         <version.io.github.opendistro.elasticsearch.latest-1.13>1.13.2</version.io.github.opendistro.elasticsearch.latest-1.13>
         <version.io.github.opendistro.elasticsearch.latest-1.13.reported>7.10.2</version.io.github.opendistro.elasticsearch.latest-1.13.reported>
+        <version.org.opensearch.latest-1.0>1.0.0-rc1</version.org.opensearch.latest-1.0>
         <version.com.google.code.gson>2.8.5</version.com.google.code.gson>
         <version.software.amazon.awssdk>2.14.18</version.software.amazon.awssdk>
         <!-- Jackson: used by the Elasticsearch REST client, the AWS SDK and in tests (wiremock, ...) -->
@@ -500,6 +501,9 @@
              even when we disable the OpenDistro run,
              so we need to put *something* here that matches the regexp. -->
         <test.elasticsearch.run.opendistro.image.tag>none</test.elasticsearch.run.opendistro.image.tag>
+        <test.elasticsearch.run.opensearch.skip>true</test.elasticsearch.run.opensearch.skip>
+        <test.elasticsearch.run.opensearch.image.name>opensearchproject/opensearch</test.elasticsearch.run.opensearch.image.name>
+        <test.elasticsearch.run.opensearch.image.tag>${test.elasticsearch.connection.version}</test.elasticsearch.run.opensearch.image.tag>
         <!--
              These properties are transparently passed as system properties to integration tests,
              and retrieved by a test utility:

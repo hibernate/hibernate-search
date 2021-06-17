@@ -209,6 +209,8 @@ The following profiles are available:
   * `elasticsearch-7.10` for 7.10 (**the default**)
   * `elasticsearch-7.11` for 7.11 ([not open-source](https://opensource.org/node/1099))
   * `elasticsearch-7.12` for 7.12+ ([not open-source](https://opensource.org/node/1099))
+* [OpenSearch](https://www.opensearch.org/)
+  * `opensearch-1.0` for 1.0+
 * [Open Distro for Elasticsearch](https://opendistro.github.io/for-elasticsearch/):
   * `opendistro-elasticsearch-1.13` for 1.13+
 

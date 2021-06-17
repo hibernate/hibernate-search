@@ -277,6 +277,16 @@
                 </failsafe.excludedGroups.elasticsearch.version>
             </properties>
         </profile>
+
+        <!-- OpenSearch 1.0+ test environment -->
+        <profile>
+            <id>opensearch-1.0</id>
+            <properties>
+                <failsafe.excludedGroups.elasticsearch.version>
+                    <!-- Nothing here -->
+                </failsafe.excludedGroups.elasticsearch.version>
+            </properties>
+        </profile>
     </profiles>
 
 </project>
