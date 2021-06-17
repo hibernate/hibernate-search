@@ -1,6 +1,8 @@
 [[mapper-orm-bridge-named-predicate]]
 = Defining named predicates
 
+include::components/incubating-warning.asciidoc[]
+
 When implementing a <<mapper-orm-bridge-propertybridge,`PropertyBinder`>>
 or <<mapper-orm-bridge-typebridge,`TypeBinder`>>,
 it is possible to assign "named predicates"
