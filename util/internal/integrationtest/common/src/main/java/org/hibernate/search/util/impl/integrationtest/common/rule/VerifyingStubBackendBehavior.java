@@ -169,16 +169,6 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		nextScrollCalls.verifyExpectationsMet();
 	}
 
-	void awaitFirstDocumentWorkCall() {
-		if ( documentWorkCalls.isEmpty() ) {
-			return;
-		}
-
-		CallQueue<DocumentWorkCall> firstCall = documentWorkCalls.values().iterator().next();
-		indexingWorkThreadingExpectationsSupplier.get().awaitIndexingAssertions(
-				() -> firstCall.verifyExpectationsMet() );
-	}
-
 	@Override
 	public void onCreateBackend(BackendBuildContext context) {
 		for ( ParameterizedCallBehavior<BackendBuildContext, Void> behavior : createBackendBehaviors ) {

@@ -20,7 +20,11 @@ import org.hibernate.boot.jaxb.spi.Binding;
 import org.hibernate.boot.model.source.internal.hbm.MappingDocument;
 import org.hibernate.boot.spi.MetadataBuildingContext;
 import org.hibernate.boot.spi.MetadataImplementor;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.dialect.MySQLDialect;
+import org.hibernate.dialect.function.SQLFunction;
 import org.hibernate.engine.config.spi.ConfigurationService;
+import org.hibernate.engine.jdbc.spi.JdbcServices;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
@@ -36,6 +40,13 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 
 	private static final String OUTBOX_TABLE_NAME = "HIBERNATE_SEARCH_OUTBOX_TABLE";
 
+	private static final String DEFAULT_CURRENT_TIMESTAMP = "CURRENT_TIMESTAMP";
+	private static final String DEFAULT_TYPE_TIMESTAMP = "TIMESTAMP";
+	private static final String MYSQL_TYPE_TIMESTAMP = "TIMESTAMP(6)";
+
+	private static final String TYPE_TIMESTAMP_PLACEHOLDER = "{{type_timestamp}}";
+	private static final String CURRENT_TIMESTAMP_PLACEHOLDER = "{{current_timestamp}}";
+
 	private static final String OUTBOX_ENTITY_DEFINITION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 	"\n" +
 	"<hibernate-mapping>\n" +
@@ -48,6 +59,9 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 	"                <param name=\"increment_size\">1</param>\n" +
 	"            </generator>\n" +
 	"        </id>\n" +
+	" 		 <property name=\"moment\" generated=\"insert\" index=\"moment\">\n" +
+	"     		 <column sql-type=\"" + TYPE_TIMESTAMP_PLACEHOLDER + "\" updatable=\"false\" default=\"" + CURRENT_TIMESTAMP_PLACEHOLDER + "\" />\n" +
+	" 		 </property>\n" +
 	"		 <property name=\"type\" >\n" +
 	" 			 <type name=\"org.hibernate.type.EnumType\">\n" +
 	" 				 <param name=\"enumClass\">" + OutboxEvent.Type.class.getName() + "</param>\n" +
@@ -65,16 +79,29 @@ public class OutboxAdditionalJaxbMappingProducer implements org.hibernate.boot.s
 			IndexView jandexIndex, final MappingBinder mappingBinder, final MetadataBuildingContext buildingContext) {
 		ServiceRegistry serviceRegistry = metadata.getMetadataBuildingOptions().getServiceRegistry();
 		ConfigurationService service = serviceRegistry.getService( ConfigurationService.class );
+		JdbcServices jdbcServices = serviceRegistry.getService( JdbcServices.class );
 
 		Object customIndexingStrategy = service.getSettings().get( HibernateOrmMapperSettings.AUTOMATIC_INDEXING_STRATEGY );
 		if ( !AutomaticIndexingStrategyNames.OUTBOX_POLLING.equals( customIndexingStrategy ) ) {
 			return Collections.emptyList();
 		}
 
-		log.outboxGeneratedEntityMapping( OUTBOX_ENTITY_DEFINITION );
+		Dialect dialect = jdbcServices.getJdbcEnvironment().getDialect();
+		SQLFunction timestampFunction = dialect.getFunctions().get( "current_timestamp" );
+
+		// TODO HSEARCH-4242 Maybe other DBs need that exception
+		String typeTimestamp = ( dialect instanceof MySQLDialect ) ? MYSQL_TYPE_TIMESTAMP : DEFAULT_TYPE_TIMESTAMP;
+		String currentTimestamp = ( timestampFunction == null ) ? DEFAULT_CURRENT_TIMESTAMP :
+				timestampFunction.render( null, Collections.emptyList(), null );
+
+		String outboxSchema = OUTBOX_ENTITY_DEFINITION
+				.replace( TYPE_TIMESTAMP_PLACEHOLDER, typeTimestamp )
+				.replace( CURRENT_TIMESTAMP_PLACEHOLDER, currentTimestamp );
+
+		log.outboxGeneratedEntityMapping( outboxSchema );
 		Origin origin = new Origin( SourceType.OTHER, "search" );
 
-		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream( OUTBOX_ENTITY_DEFINITION.getBytes() );
+		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream( outboxSchema.getBytes() );
 		BufferedInputStream bufferedInputStream = new BufferedInputStream( byteArrayInputStream );
 		Binding binding = mappingBinder.bind( bufferedInputStream, origin );
 

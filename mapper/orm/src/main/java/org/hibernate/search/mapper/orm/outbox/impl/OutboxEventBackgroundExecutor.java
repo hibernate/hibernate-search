@@ -114,8 +114,8 @@ public class OutboxEventBackgroundExecutor {
 					// calling ensureScheduled() will lead to immediate re-execution right after we're done
 					ensureScheduled();
 
-					log.tracef( "Processing %d outbox events for '%s'", events.size(),
-							OutboxPollingAutomaticIndexingStrategy.NAME );
+					log.tracef( "Processing %d outbox events for '%s': '%s'", events.size(),
+							OutboxPollingAutomaticIndexingStrategy.NAME, events );
 
 					// Process the events
 					OutboxEventProcessingPlan eventProcessing = new OutboxEventProcessingPlan(
@@ -124,6 +124,7 @@ public class OutboxEventBackgroundExecutor {
 					updateOrDeleteEvents( failureHandler, session, eventProcessing );
 				}
 				catch (Exception e) {
+					log.tracef( e, e.getMessage() );
 					try {
 						transactionHelper.rollback( session );
 					}

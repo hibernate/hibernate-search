@@ -35,7 +35,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -91,7 +90,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 		} );
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterById( session );
 			assertThat( events ).hasSize( 3 );
 			// right order
 			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD, null );
@@ -107,7 +106,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 		} );
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterById( session );
 			assertThat( events ).hasSize( 3 );
 			// out-of-order now
 			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.DELETE, null );
@@ -163,7 +162,6 @@ public class OutboxPollingOutOfOrderIdsIT {
 	}
 
 	@Test
-	@Ignore("HSEARCH-4228 Ensure correct processing of events even if their IDs are out of order")
 	public void processDeleteRecreate_outOfOrder() {
 		// An entity is deleted, then re-created in separate transactions,
 		// but the add event has ID 1, the and the delete event has ID 2.
@@ -194,7 +192,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 		} );
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterById( session );
 			assertThat( events ).hasSize( 2 );
 			// right order
 			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.DELETE, null );
@@ -209,7 +207,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 		} );
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterById( session );
 			assertThat( events ).hasSize( 2 );
 			// out-of-order now
 			verifyOutboxEntry( events.get( 0 ), IndexedEntity.INDEX, "1", OutboxEvent.Type.ADD, null );
@@ -256,14 +254,19 @@ public class OutboxPollingOutOfOrderIdsIT {
 			entity.setText( "third" );
 		} );
 
+		// Both orders FIRST then SECOND and SECOND then FIRST are reasonable
 		backendMock.expectWorks( RoutedIndexedEntity.NAME )
 				.delete( b -> b.identifier( "1" ).routingKey( "FIRST" ) )
 				.delete( b -> b.identifier( "1" ).routingKey( "SECOND" ) )
+				.createdThenExecutedOutOfOrder();
+
+		backendMock.expectWorks( RoutedIndexedEntity.NAME )
 				.addOrUpdate( b -> b.identifier( "1" ).routingKey( "THIRD" )
 						.document( StubDocumentNode.document()
 								.field( "text", "third" )
 								.build() ) )
 				.createdThenExecuted();
+
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 	}
@@ -303,7 +306,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 		} );
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterById( session );
 			assertThat( events ).hasSize( 2 );
 			// right order
 			verifyOutboxEntry( events.get( 0 ), RoutedIndexedEntity.NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE,
@@ -322,7 +325,7 @@ public class OutboxPollingOutOfOrderIdsIT {
 		} );
 
 		OrmUtils.withinSession( sessionFactory, session -> {
-			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilter( session );
+			List<OutboxEvent> events = outboxEventFinder.findOutboxEventsNoFilterById( session );
 			assertThat( events ).hasSize( 2 );
 			// out-of-order now
 			verifyOutboxEntry( events.get( 0 ), RoutedIndexedEntity.NAME, "1", OutboxEvent.Type.ADD_OR_UPDATE,
@@ -333,16 +336,19 @@ public class OutboxPollingOutOfOrderIdsIT {
 			);
 		} );
 
+		// Both orders FIRST then SECOND and SECOND then FIRST are reasonable
 		backendMock.expectWorks( RoutedIndexedEntity.NAME )
-				// Compared with the in-order test we have just this change SECOND <--> FIRST.
-				// That seems to be reasonable.
-				.delete( b -> b.identifier( "1" ).routingKey( "SECOND" ) )
 				.delete( b -> b.identifier( "1" ).routingKey( "FIRST" ) )
+				.delete( b -> b.identifier( "1" ).routingKey( "SECOND" ) )
+				.createdThenExecutedOutOfOrder();
+
+		backendMock.expectWorks( RoutedIndexedEntity.NAME )
 				.addOrUpdate( b -> b.identifier( "1" ).routingKey( "THIRD" )
 						.document( StubDocumentNode.document()
 								.field( "text", "third" )
 								.build() ) )
 				.createdThenExecuted();
+
 		outboxEventFinder.showAllEventsUpToNow( sessionFactory );
 		backendMock.verifyExpectationsMet();
 	}
@@ -353,10 +359,16 @@ public class OutboxPollingOutOfOrderIdsIT {
 
 			JdbcCoordinator jdbc = implementor.getJdbcCoordinator();
 			JdbcEnvironment env = implementor.getJdbcServices().getJdbcEnvironment();
-			assumeTrue(
-					"This test uses SQL directly which can currently only be set up with H2",
-					env.getDialect() instanceof H2Dialect
-			);
+
+			String javaVersionString = System.getProperty( "java.version" );
+			if ( javaVersionString != null && !javaVersionString.trim().isEmpty() ) {
+				boolean oldJavaVersion = javaVersionString.startsWith( "1." );
+				assumeTrue(
+						"The H2 actual maximum available precision depends on operating system and JVM and can be 3 (milliseconds) or higher. " +
+								"Higher precision is not available before Java 9.",
+						!(oldJavaVersion && env.getDialect() instanceof H2Dialect)
+				);
+			}
 
 			try ( PreparedStatement ps = jdbc.getStatementPreparer().prepareStatement( OUTBOX_TABLE_UPDATE_ID ) ) {
 				ps.setInt( 1, newId );
