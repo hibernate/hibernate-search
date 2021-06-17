@@ -53,7 +53,7 @@ public class ElasticsearchBootstrapIT {
 	public void explicitModelDialect() {
 		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start()
 				.withBackendProperty(
-						ElasticsearchBackendSettings.VERSION, ElasticsearchTestDialect.getClusterVersion()
+						ElasticsearchBackendSettings.VERSION, ElasticsearchTestDialect.getActualVersion().toString()
 				)
 				.withBackendProperty(
 						ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
@@ -116,8 +116,8 @@ public class ElasticsearchBootstrapIT {
 	@Category(RequiresSingleModelDialectForMajorVersion.class)
 	@TestForIssue(jiraKey = "HSEARCH-3841")
 	public void noVersionCheck_incompleteVersion() {
-		ElasticsearchVersion clusterVersion = ElasticsearchVersion.of( ElasticsearchTestDialect.getClusterVersion() );
-		String versionWithMajorOnly = String.valueOf( clusterVersion.major() );
+		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
+		String versionWithMajorOnly = actualVersion.distribution() + ":" + actualVersion.major();
 
 		assertThatThrownBy(
 				() -> setupHelper.start()
@@ -154,8 +154,9 @@ public class ElasticsearchBootstrapIT {
 	@Test
 	@TestForIssue(jiraKey = {"HSEARCH-3841", "HSEARCH-4214"})
 	public void noVersionCheck_completeVersion() {
-		ElasticsearchVersion clusterVersion = ElasticsearchVersion.of( ElasticsearchTestDialect.getClusterVersion() );
-		String versionWithMajorAndMinorOnly = clusterVersion.major() + "." + clusterVersion.minor().getAsInt();
+		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
+		String versionWithMajorAndMinorOnly = actualVersion.distribution() + ":"
+				+ actualVersion.major() + "." + actualVersion.minor().getAsInt();
 
 		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start()
 				.withBackendProperty(
@@ -190,9 +191,10 @@ public class ElasticsearchBootstrapIT {
 	@Category(RequiresSingleModelDialectForMajorVersion.class)
 	@TestForIssue(jiraKey = "HSEARCH-4214")
 	public void noVersionCheck_versionOverrideOnStart_incompatibleVersion() {
-		ElasticsearchVersion clusterVersion = ElasticsearchVersion.of( ElasticsearchTestDialect.getClusterVersion() );
-		String versionWithMajorOnly = String.valueOf( clusterVersion.major() );
-		String incompatibleVersionWithMajorAndMinorOnly = "2." + clusterVersion.minor().getAsInt();
+		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
+		String versionWithMajorOnly = actualVersion.distribution() + ":" + actualVersion.major();
+		String incompatibleVersionWithMajorAndMinorOnly = actualVersion.distribution() + ":"
+				+ ( actualVersion.major() == 2 ? "42." : "2." ) + actualVersion.minor().getAsInt();
 
 		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start()
 				.withBackendProperty(
@@ -220,8 +222,8 @@ public class ElasticsearchBootstrapIT {
 								"Invalid value for configuration property 'hibernate.search.backend.version': '"
 										+ incompatibleVersionWithMajorAndMinorOnly + "'",
 								"Incompatible Elasticsearch version:"
-										+ " version 'elastic:" + incompatibleVersionWithMajorAndMinorOnly
-										+ "' does not match version 'elastic:" + versionWithMajorOnly + "' that was provided"
+										+ " version '" + incompatibleVersionWithMajorAndMinorOnly
+										+ "' does not match version '" + versionWithMajorOnly + "' that was provided"
 										+ " when the backend was created.",
 								"You can provide a more precise version on startup,"
 										+ " but you cannot override the version that was provided when the backend was created." )
@@ -237,9 +239,10 @@ public class ElasticsearchBootstrapIT {
 	@Category(RequiresSingleModelDialectForMajorVersion.class)
 	@TestForIssue(jiraKey = "HSEARCH-4214")
 	public void noVersionCheck_versionOverrideOnStart_compatibleVersion() {
-		ElasticsearchVersion clusterVersion = ElasticsearchVersion.of( ElasticsearchTestDialect.getClusterVersion() );
-		String versionWithMajorOnly = String.valueOf( clusterVersion.major() );
-		String versionWithMajorAndMinorOnly = clusterVersion.major() + "." + clusterVersion.minor().getAsInt();
+		ElasticsearchVersion actualVersion = ElasticsearchTestDialect.getActualVersion();
+		String versionWithMajorOnly = actualVersion.distribution() + ":" + actualVersion.major();
+		String versionWithMajorAndMinorOnly = actualVersion.distribution() + ":"
+				+ actualVersion.major() + "." + actualVersion.minor().getAsInt();
 
 		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start()
 				.withBackendProperty(
