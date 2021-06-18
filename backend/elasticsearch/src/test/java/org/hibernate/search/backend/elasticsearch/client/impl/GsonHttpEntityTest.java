@@ -17,6 +17,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -41,39 +42,45 @@ import org.apache.http.nio.ContentEncoder;
 public class GsonHttpEntityTest {
 
 	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] params() {
+	public static List<Object[]> params() {
 		JsonObject bodyPart1 = new JsonParser().parse( "{ \"foo\": \"bar\" }" ).getAsJsonObject();
 		JsonObject bodyPart2 = new JsonParser().parse( "{ \"foobar\": 235 }" ).getAsJsonObject();
 		JsonObject bodyPart3 = new JsonParser().parse( "{ \"obj1\": " + bodyPart1.toString()
 				+ ", \"obj2\": " + bodyPart2.toString() + "}" ).getAsJsonObject();
-		return new Object[][] {
-				{ Collections.emptyList() },
-				{ Collections.singletonList( bodyPart1 ) },
-				{ Collections.singletonList( bodyPart2 ) },
-				{ Collections.singletonList( bodyPart3 ) },
-				{ Arrays.asList( bodyPart1, bodyPart2, bodyPart3 ) },
-				{ Arrays.asList( bodyPart3, bodyPart2, bodyPart1 ) },
-				{
-						Stream.generate( () -> Arrays.asList( bodyPart1, bodyPart2, bodyPart3 ) )
-								.flatMap( List::stream ).limit( 50 ).collect( Collectors.toList() )
-				},
-				{
-						Stream.generate( () -> Arrays.asList( bodyPart1, bodyPart2, bodyPart3 ) )
-								.flatMap( List::stream ).limit( 200 ).collect( Collectors.toList() )
-				},
-				{
-						Stream.generate( () -> Arrays.asList( bodyPart1, bodyPart2, bodyPart3 ) )
-								.flatMap( List::stream ).limit( 10_000 ).collect( Collectors.toList() )
-				}
-		};
-	}
+		List<Object[]> params = new ArrayList<>();
 
+		for ( @SuppressWarnings("unchecked") List<JsonObject> jsonObjects: new List[] {
+				Collections.emptyList(),
+				Collections.singletonList( bodyPart1 ),
+				Collections.singletonList( bodyPart2 ),
+				Collections.singletonList( bodyPart3 ),
+				Arrays.asList( bodyPart1, bodyPart2, bodyPart3 ),
+				Arrays.asList( bodyPart3, bodyPart2, bodyPart1 )
+		} ) {
+			params.add( new Object[] { jsonObjects.toString(), jsonObjects } );
+		}
+		params.add( new Object[] {
+				"50 small objects",
+				Stream.generate( () -> Arrays.asList( bodyPart1, bodyPart2, bodyPart3 ) )
+						.flatMap( List::stream ).limit( 50 ).collect( Collectors.toList() ) } );
+		params.add( new Object[] {
+				"200 small objects",
+				Stream.generate( () -> Arrays.asList( bodyPart1, bodyPart2, bodyPart3 ) )
+						.flatMap( List::stream ).limit( 200 ).collect( Collectors.toList() ) } );
+		params.add( new Object[] {
+				"10,000 small objects",
+				Stream.generate( () -> Arrays.asList( bodyPart1, bodyPart2, bodyPart3 ) )
+						.flatMap( List::stream ).limit( 10_000 ).collect( Collectors.toList() ) } );
+
+		return params;
+	}
 
 	private final GsonHttpEntity gsonEntity;
 	private final String expectedPayloadString;
 	private final int expectedContentLength;
 
-	public GsonHttpEntityTest(List<JsonObject> payload) throws IOException {
+	@SuppressWarnings("unused")
+	public GsonHttpEntityTest(String ignoredLabel, List<JsonObject> payload) throws IOException {
 		Gson gson = GsonProvider.create( GsonBuilder::new, true ).getGson();
 		this.gsonEntity = new GsonHttpEntity( gson, payload );
 		StringBuilder builder = new StringBuilder();
