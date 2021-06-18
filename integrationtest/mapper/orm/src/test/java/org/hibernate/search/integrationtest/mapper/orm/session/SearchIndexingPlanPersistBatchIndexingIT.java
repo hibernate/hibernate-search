@@ -132,7 +132,7 @@ public class SearchIndexingPlanPersistBatchIndexingIT {
 
 	private void expectCreateAddWorks(int firstId, int afterLastId) {
 		BackendMock.DocumentWorkCallListContext expectations = backendMock.expectWorks( IndexedEntity.INDEX_NAME )
-				.create();
+				.createFollowingWorks();
 		for ( int i = firstId; i < afterLastId; ++i ) {
 			final int id = i;
 			expectations.add( String.valueOf( id ), b -> b.field( "text", "number" + id ) );
@@ -141,7 +141,7 @@ public class SearchIndexingPlanPersistBatchIndexingIT {
 
 	private void expectExecuteAddWorks(int firstId, int afterLastId) {
 		BackendMock.DocumentWorkCallListContext expectations = backendMock.expectWorks( IndexedEntity.INDEX_NAME )
-				.execute();
+				.executeFollowingWorks();
 		for ( int i = firstId; i < afterLastId; ++i ) {
 			final int id = i;
 			expectations.add( String.valueOf( id ), b -> b.field( "text", "number" + id ) );
