@@ -472,7 +472,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 			if ( !isAdd() ) {
 				// For operations other than add, expect a delete for the previous route.
 				backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
-						.createAndExecute( futureFromBackend )
+						.createAndExecuteFollowingWorks( futureFromBackend )
 						.delete( b -> addWorkInfo( b, tenantId, "1",
 								MyRoutingBridge.toRoutingKey( tenantId, 1, "1" ) ) );
 
@@ -500,7 +500,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 			if ( !isAdd() ) {
 				// For operations other than add, expect a delete for every previous route.
 				backendMock.expectWorks( IndexedEntity.INDEX, commitStrategy, refreshStrategy )
-						.createAndExecute( futureFromBackend )
+						.createAndExecuteFollowingWorks( futureFromBackend )
 						.delete( b -> addWorkInfo( b, tenantId, "1",
 								MyRoutingBridge.toRoutingKey( tenantId, 1, "1" ) ) )
 						.delete( b -> addWorkInfo( b, tenantId, "1",
@@ -620,7 +620,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 		BackendMock.DocumentWorkCallListContext context = backendMock.expectWorks(
 				IndexedEntity.INDEX, commitStrategy, refreshStrategy
 		)
-				.createAndExecute( futureFromBackend );
+				.createAndExecuteFollowingWorks( futureFromBackend );
 		worksBefore.accept( context );
 		String expectedRoutingKey;
 		if ( providedRoutingKey != null ) {

@@ -192,7 +192,7 @@ public class MassIndexingInterruptionIT {
 				Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 		)
 				// Return a CompletableFuture that will never complete
-				.createAndExecute( new CompletableFuture<>() )
+				.createAndExecuteFollowingWorks( new CompletableFuture<>() )
 				.add( "1", b -> b
 						.field( "title", TITLE_1 )
 						.field( "author", AUTHOR_1 )

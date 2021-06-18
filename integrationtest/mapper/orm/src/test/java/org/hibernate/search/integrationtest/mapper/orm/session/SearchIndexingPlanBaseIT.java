@@ -250,7 +250,7 @@ public class SearchIndexingPlanBaseIT {
 
 			// flush triggers the prepare of the current indexing plan
 			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
-					.create()
+					.createFollowingWorks()
 					.add( "1", b -> b.field( "text", "number1" ) )
 					.add( "2", b -> b.field( "text", "number2" ) );
 
@@ -271,7 +271,7 @@ public class SearchIndexingPlanBaseIT {
 			entity2.text = "WRONG";
 
 			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
-					.execute()
+					.executeFollowingWorks()
 					.add( "1", b -> b.field( "text", "number1" ) )
 					.add( "2", b -> b.field( "text", "number2" ) );
 		} );
@@ -291,7 +291,7 @@ public class SearchIndexingPlanBaseIT {
 			session.persist( entity2 );
 
 			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
-					.create()
+					.createFollowingWorks()
 					.add( "1", b -> b.field( "text", "number1" ) )
 					.add( "2", b -> b.field( "text", "number2" ) );
 
@@ -301,7 +301,7 @@ public class SearchIndexingPlanBaseIT {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 
 			defaultBackendMock.expectWorks( IndexedEntity1.INDEX_NAME )
-					.execute()
+					.executeFollowingWorks()
 					.add( "1", b -> b.field( "text", "number1" ) )
 					.add( "2", b -> b.field( "text", "number2" ) );
 

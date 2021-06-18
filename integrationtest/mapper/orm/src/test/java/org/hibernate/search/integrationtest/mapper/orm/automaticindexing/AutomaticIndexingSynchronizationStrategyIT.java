@@ -528,7 +528,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 				session.persist( entity2 );
 
 				backendMock.expectWorks( IndexedEntity.NAME, expectedCommitStrategy, expectedRefreshStrategy )
-						.createAndExecute( indexingWorkFuture )
+						.createAndExecuteFollowingWorks( indexingWorkFuture )
 						.add( "1", b -> b
 								.field( "indexedField", entity1.getIndexedField() )
 						)

@@ -316,31 +316,31 @@ public class BackendMock implements TestRule {
 			this.executionFuture = executionFuture;
 		}
 
-		public DocumentWorkCallListContext create() {
+		public DocumentWorkCallListContext createFollowingWorks() {
 			return newContext( DocumentWorkCallKind.CREATE );
 		}
 
-		public DocumentWorkCallListContext discard() {
+		public DocumentWorkCallListContext discardFollowingWorks() {
 			return newContext( DocumentWorkCallKind.DISCARD );
 		}
 
-		public DocumentWorkCallListContext execute() {
+		public DocumentWorkCallListContext executeFollowingWorks() {
 			return newContext( DocumentWorkCallKind.EXECUTE );
 		}
 
-		public DocumentWorkCallListContext execute(CompletableFuture<?> executionFuture) {
+		public DocumentWorkCallListContext executeFollowingWorks(CompletableFuture<?> executionFuture) {
 			return newContext( DocumentWorkCallKind.EXECUTE, executionFuture );
 		}
 
-		public DocumentWorkCallListContext createAndExecute() {
+		public DocumentWorkCallListContext createAndExecuteFollowingWorks() {
 			return newContext( DocumentWorkCallKind.CREATE_AND_EXECUTE );
 		}
 
-		public DocumentWorkCallListContext createAndExecute(CompletableFuture<?> executionFuture) {
+		public DocumentWorkCallListContext createAndExecuteFollowingWorks(CompletableFuture<?> executionFuture) {
 			return newContext( DocumentWorkCallKind.CREATE_AND_EXECUTE, executionFuture );
 		}
 
-		public DocumentWorkCallListContext createAndDiscard() {
+		public DocumentWorkCallListContext createAndDiscardFollowingWorks() {
 			return newContext( DocumentWorkCallKind.CREATE_AND_DISCARD );
 		}
 
