@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
+import java.util.List;
+
 import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface LoadingTypeContext<E> {
 
@@ -21,5 +24,7 @@ public interface LoadingTypeContext<E> {
 	EntityPersister entityPersister();
 
 	HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy();
+
+	List<PojoRawTypeIdentifier<? super E>> ascendingSuperTypes();
 
 }

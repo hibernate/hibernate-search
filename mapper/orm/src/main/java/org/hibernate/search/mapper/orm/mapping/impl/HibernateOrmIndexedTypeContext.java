@@ -14,7 +14,7 @@ import org.hibernate.search.mapper.orm.entity.SearchIndexedEntity;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<E>
 		implements SearchIndexedEntity<E>, HibernateOrmSessionIndexedTypeContext<E>,
@@ -43,11 +43,10 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 	}
 
 	static class Builder<E> extends AbstractBuilder<E> implements PojoIndexedTypeExtendedMappingCollector {
-
 		private MappedIndexManager indexManager;
 
-		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String jpaEntityName, String hibernateOrmEntityName) {
-			super( typeIdentifier, jpaEntityName, hibernateOrmEntityName );
+		Builder(PojoRawTypeModel<E> typeModel, String jpaEntityName, String hibernateOrmEntityName) {
+			super( typeModel, jpaEntityName, hibernateOrmEntityName );
 		}
 
 		@Override
