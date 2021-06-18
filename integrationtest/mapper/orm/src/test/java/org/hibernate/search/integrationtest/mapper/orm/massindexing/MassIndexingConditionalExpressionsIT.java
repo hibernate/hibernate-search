@@ -6,8 +6,9 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
-import static org.assertj.core.api.Fail.fail;
+import static org.junit.Assert.fail;
 
+import java.time.Instant;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -29,11 +30,17 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-/**
- * Test that the {@link MassIndexer} correctly indexes even complex entity hierarchies
- * where superclasses are indexed but not all of their subclasses, and vice-versa.
- */
 public class MassIndexingConditionalExpressionsIT {
+
+	// where T0 < T1 < T2
+	private static final Instant T0 = Instant.ofEpochMilli( 1_000_000 );
+	private static final Instant T1 = Instant.ofEpochMilli( 1_500_000 );
+	private static final Instant T2 = Instant.ofEpochMilli( 2_000_000 );
+
+	// where I0 < I1 < I2
+	private static final int I0 = 0;
+	private static final int I1 = 1;
+	private static final int I2 = 2;
 
 	@Rule
 	public BackendMock backendMock = new BackendMock();
@@ -45,32 +52,91 @@ public class MassIndexingConditionalExpressionsIT {
 
 	@Before
 	public void setup() {
+		backendMock.expectAnySchema( H0_Indexed.NAME );
 		backendMock.expectAnySchema( H1_B_Indexed.NAME );
 		backendMock.expectAnySchema( H2_Root_Indexed.NAME );
 		backendMock.expectAnySchema( H2_A_C_Indexed.NAME );
 		backendMock.expectAnySchema( H2_B_Indexed.NAME );
-
 		sessionFactory = ormSetupHelper.start()
-				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY,
-						AutomaticIndexingStrategyNames.NONE )
+				.withPropertyRadical(
+						HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY,
+						AutomaticIndexingStrategyNames.NONE
+				)
 				.setup(
+						H0_Indexed.class,
 						H1_Root_NotIndexed.class, H1_A_NotIndexed.class, H1_B_Indexed.class,
 						H2_Root_Indexed.class,
 						H2_A_NotIndexed.class, H2_A_C_Indexed.class,
 						H2_B_Indexed.class, H2_B_D_NotIndexed.class
 				);
-
 		backendMock.verifyExpectationsMet();
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			session.persist( new H1_Root_NotIndexed( 1 ) );
-			session.persist( new H1_A_NotIndexed( 2 ) );
-			session.persist( new H1_B_Indexed( 3 ) );
-			session.persist( new H2_Root_Indexed( 1 ) );
-			session.persist( new H2_A_NotIndexed( 2 ) );
-			session.persist( new H2_A_C_Indexed( 3 ) );
-			session.persist( new H2_B_Indexed( 4 ) );
-			session.persist( new H2_B_D_NotIndexed( 5 ) );
+			session.persist( new H0_Indexed( 1, T0, I0 ) );
+			session.persist( new H0_Indexed( 2, T0, I2 ) );
+			session.persist( new H0_Indexed( 3, T2, I0 ) );
+			session.persist( new H0_Indexed( 4, T2, I2 ) );
+
+			session.persist( new H1_Root_NotIndexed( 1, T0, I0 ) );
+			session.persist( new H1_Root_NotIndexed( 2, T0, I2 ) );
+			session.persist( new H1_Root_NotIndexed( 3, T2, I0 ) );
+			session.persist( new H1_Root_NotIndexed( 4, T2, I2 ) );
+			session.persist( new H1_A_NotIndexed( 5, T0, I0 ) );
+			session.persist( new H1_A_NotIndexed( 6, T0, I2 ) );
+			session.persist( new H1_A_NotIndexed( 7, T2, I0 ) );
+			session.persist( new H1_A_NotIndexed( 8, T2, I2 ) );
+			session.persist( new H1_B_Indexed( 9, T0, I0 ) );
+			session.persist( new H1_B_Indexed( 10, T0, I2 ) );
+			session.persist( new H1_B_Indexed( 11, T2, I0 ) );
+			session.persist( new H1_B_Indexed( 12, T2, I2 ) );
+
+			session.persist( new H2_Root_Indexed( 1, T0, I0 ) );
+			session.persist( new H2_Root_Indexed( 2, T0, I2 ) );
+			session.persist( new H2_Root_Indexed( 3, T2, I0 ) );
+			session.persist( new H2_Root_Indexed( 4, T2, I2 ) );
+			session.persist( new H2_A_NotIndexed( 5, T0, I0 ) );
+			session.persist( new H2_A_NotIndexed( 6, T0, I2 ) );
+			session.persist( new H2_A_NotIndexed( 7, T2, I0 ) );
+			session.persist( new H2_A_NotIndexed( 8, T2, I2 ) );
+			session.persist( new H2_A_C_Indexed( 9, T0, I0 ) );
+			session.persist( new H2_A_C_Indexed( 10, T0, I2 ) );
+			session.persist( new H2_A_C_Indexed( 11, T2, I0 ) );
+			session.persist( new H2_A_C_Indexed( 12, T2, I2 ) );
+			session.persist( new H2_B_Indexed( 13, T0, I0 ) );
+			session.persist( new H2_B_Indexed( 14, T0, I2 ) );
+			session.persist( new H2_B_Indexed( 15, T2, I0 ) );
+			session.persist( new H2_B_Indexed( 16, T2, I2 ) );
+			session.persist( new H2_B_D_NotIndexed( 17, T0, I0 ) );
+			session.persist( new H2_B_D_NotIndexed( 18, T0, I2 ) );
+			session.persist( new H2_B_D_NotIndexed( 19, T2, I0 ) );
+			session.persist( new H2_B_D_NotIndexed( 20, T2, I2 ) );
+		} );
+	}
+
+	@Test
+	public void noHierarchy() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			MassIndexer indexer = searchSession.massIndexer( H0_Indexed.class );
+
+			backendMock.expectWorks( H0_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+					.add( "1", b -> b.field( "text", "text1" ) )
+					.add( "2", b -> b.field( "text", "text2" ) )
+					.add( "3", b -> b.field( "text", "text3" ) )
+					.add( "4", b -> b.field( "text", "text4" ) );
+
+			backendMock.expectIndexScaleWorks( H0_Indexed.NAME, session.getTenantIdentifier() )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
+
+			try {
+				indexer.startAndWait();
+			}
+			catch (InterruptedException e) {
+				fail( "Unexpected InterruptedException: " + e.getMessage() );
+			}
 		} );
 	}
 
@@ -81,8 +147,14 @@ public class MassIndexingConditionalExpressionsIT {
 			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
 
 			backendMock.expectWorks( H1_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
-					.add( "3", b -> b.field( "rootText", "text3" )
-							.field( "bText", "text3" ) );
+					.add( "9", b -> b.field( "rootText", "text9" )
+							.field( "bText", "text9" ) )
+					.add( "10", b -> b.field( "rootText", "text10" )
+							.field( "bText", "text10" ) )
+					.add( "11", b -> b.field( "rootText", "text11" )
+							.field( "bText", "text11" ) )
+					.add( "12", b -> b.field( "rootText", "text12" )
+							.field( "bText", "text12" ) );
 
 			backendMock.expectIndexScaleWorks( H1_B_Indexed.NAME, session.getTenantIdentifier() )
 					.purge()
@@ -108,8 +180,14 @@ public class MassIndexingConditionalExpressionsIT {
 			MassIndexer indexer = searchSession.massIndexer( H1_B_Indexed.class );
 
 			backendMock.expectWorks( H1_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
-					.add( "3", b -> b.field( "rootText", "text3" )
-							.field( "bText", "text3" ) );
+					.add( "9", b -> b.field( "rootText", "text9" )
+							.field( "bText", "text9" ) )
+					.add( "10", b -> b.field( "rootText", "text10" )
+							.field( "bText", "text10" ) )
+					.add( "11", b -> b.field( "rootText", "text11" )
+							.field( "bText", "text11" ) )
+					.add( "12", b -> b.field( "rootText", "text12" )
+							.field( "bText", "text12" ) );
 
 			backendMock.expectIndexScaleWorks( H1_B_Indexed.NAME, session.getTenantIdentifier() )
 					.purge()
@@ -135,14 +213,36 @@ public class MassIndexingConditionalExpressionsIT {
 			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );
 
 			backendMock.expectWorks( H2_Root_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
-					.add( "1", b -> b.field( "rootText", "text1" ) );
+					.add( "1", b -> b.field( "rootText", "text1" ) )
+					.add( "2", b -> b.field( "rootText", "text2" ) )
+					.add( "3", b -> b.field( "rootText", "text3" ) )
+					.add( "4", b -> b.field( "rootText", "text4" ) );
 			backendMock.expectWorks( H2_A_C_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
-					.add( "3", b -> b.field( "rootText", "text3" )
-							.field( "aText", "text3" )
-							.field( "cText", "text3" ) );
+					.add( "9", b -> b.field( "rootText", "text9" )
+							.field( "aText", "text9" )
+							.field( "cText", "text9" ) )
+					.add( "10", b -> b.field( "rootText", "text10" )
+							.field( "aText", "text10" )
+							.field( "cText", "text10" ) )
+					.add( "11", b -> b.field( "rootText", "text11" )
+							.field( "aText", "text11" )
+							.field( "cText", "text11" ) )
+					.add( "12", b -> b.field( "rootText", "text12" )
+							.field( "aText", "text12" )
+							.field( "cText", "text12" ) );
 			backendMock.expectWorks( H2_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
-					.add( "4", b -> b.field( "rootText", "text4" )
-							.field( "bText", "text4" ) );
+					.add( "13", b -> b
+							.field( "rootText", "text13" )
+							.field( "bText", "text13" ) )
+					.add( "14", b -> b
+							.field( "rootText", "text14" )
+							.field( "bText", "text14" ) )
+					.add( "15", b -> b
+							.field( "rootText", "text15" )
+							.field( "bText", "text15" ) )
+					.add( "16", b -> b
+							.field( "rootText", "text16" )
+							.field( "bText", "text16" ) );
 
 			backendMock.expectIndexScaleWorks( H2_Root_Indexed.NAME, session.getTenantIdentifier() )
 					.purge()
@@ -178,8 +278,18 @@ public class MassIndexingConditionalExpressionsIT {
 			MassIndexer indexer = searchSession.massIndexer( H2_B_Indexed.class );
 
 			backendMock.expectWorks( H2_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
-					.add( "4", b -> b.field( "rootText", "text4" )
-							.field( "bText", "text4" ) );
+					.add( "13", b -> b
+							.field( "rootText", "text13" )
+							.field( "bText", "text13" ) )
+					.add( "14", b -> b
+							.field( "rootText", "text14" )
+							.field( "bText", "text14" ) )
+					.add( "15", b -> b
+							.field( "rootText", "text15" )
+							.field( "bText", "text15" ) )
+					.add( "16", b -> b
+							.field( "rootText", "text16" )
+							.field( "bText", "text16" ) );
 
 			backendMock.expectIndexScaleWorks( H2_B_Indexed.NAME, session.getTenantIdentifier() )
 					.purge()
@@ -198,6 +308,32 @@ public class MassIndexingConditionalExpressionsIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@Entity(name = H0_Indexed.NAME)
+	@Indexed
+	public static class H0_Indexed {
+		public static final String NAME = "H0";
+
+		@Id
+		private Integer id;
+
+		@GenericField
+		private String text;
+
+		private Instant moment;
+
+		private Integer number;
+
+		public H0_Indexed() {
+		}
+
+		public H0_Indexed(Integer id, Instant moment, Integer number) {
+			this.id = id;
+			this.text = "text" + id;
+			this.moment = moment;
+			this.number = number;
+		}
+	}
+
 	@Entity(name = H1_Root_NotIndexed.NAME)
 	public static class H1_Root_NotIndexed {
 
@@ -209,12 +345,18 @@ public class MassIndexingConditionalExpressionsIT {
 		@GenericField
 		private String rootText;
 
+		private Instant rootMoment;
+
+		private Integer rootNumber;
+
 		public H1_Root_NotIndexed() {
 		}
 
-		public H1_Root_NotIndexed(Integer id) {
+		public H1_Root_NotIndexed(Integer id, Instant moment, Integer number) {
 			this.id = id;
 			this.rootText = "text" + id;
+			this.rootMoment = moment;
+			this.rootNumber = number;
 		}
 	}
 
@@ -226,12 +368,18 @@ public class MassIndexingConditionalExpressionsIT {
 		@GenericField
 		private String aText;
 
+		private Instant aMoment;
+
+		private Integer aNumber;
+
 		public H1_A_NotIndexed() {
 		}
 
-		public H1_A_NotIndexed(Integer id) {
-			super( id );
+		public H1_A_NotIndexed(Integer id, Instant moment, Integer number) {
+			super( id, moment, number );
 			this.aText = "text" + id;
+			this.aMoment = moment;
+			this.aNumber = number;
 		}
 	}
 
@@ -244,12 +392,18 @@ public class MassIndexingConditionalExpressionsIT {
 		@GenericField
 		private String bText;
 
+		private Instant bMoment;
+
+		private Integer bNumber;
+
 		public H1_B_Indexed() {
 		}
 
-		public H1_B_Indexed(Integer id) {
-			super( id );
+		public H1_B_Indexed(Integer id, Instant moment, Integer number) {
+			super( id, moment, number );
 			this.bText = "text" + id;
+			this.bMoment = moment;
+			this.bNumber = number;
 		}
 	}
 
@@ -265,12 +419,18 @@ public class MassIndexingConditionalExpressionsIT {
 		@GenericField
 		private String rootText;
 
+		private Instant rootMoment;
+
+		private Integer rootNumber;
+
 		public H2_Root_Indexed() {
 		}
 
-		public H2_Root_Indexed(Integer id) {
+		public H2_Root_Indexed(Integer id, Instant moment, Integer number) {
 			this.id = id;
 			this.rootText = "text" + id;
+			this.rootMoment = moment;
+			this.rootNumber = number;
 		}
 	}
 
@@ -283,12 +443,18 @@ public class MassIndexingConditionalExpressionsIT {
 		@GenericField
 		private String aText;
 
+		private Instant aMoment;
+
+		private Integer aNumber;
+
 		public H2_A_NotIndexed() {
 		}
 
-		public H2_A_NotIndexed(Integer id) {
-			super( id );
+		public H2_A_NotIndexed(Integer id, Instant moment, Integer number) {
+			super( id, moment, number );
 			this.aText = "text" + id;
+			this.aMoment = moment;
+			this.aNumber = number;
 		}
 	}
 
@@ -300,12 +466,18 @@ public class MassIndexingConditionalExpressionsIT {
 		@GenericField
 		private String bText;
 
+		private Instant bMoment;
+
+		private Integer bNumber;
+
 		public H2_B_Indexed() {
 		}
 
-		public H2_B_Indexed(Integer id) {
-			super( id );
+		public H2_B_Indexed(Integer id, Instant moment, Integer number) {
+			super( id, moment, number );
 			this.bText = "text" + id;
+			this.bMoment = moment;
+			this.bNumber = number;
 		}
 	}
 
@@ -318,12 +490,18 @@ public class MassIndexingConditionalExpressionsIT {
 		@GenericField
 		private String cText;
 
+		private Instant cMoment;
+
+		private Integer cNumber;
+
 		public H2_A_C_Indexed() {
 		}
 
-		public H2_A_C_Indexed(Integer id) {
-			super( id );
+		public H2_A_C_Indexed(Integer id, Instant moment, Integer number) {
+			super( id, moment, number );
 			this.cText = "text" + id;
+			this.cMoment = moment;
+			this.cNumber = number;
 		}
 	}
 
@@ -336,12 +514,18 @@ public class MassIndexingConditionalExpressionsIT {
 		@GenericField
 		private String dText;
 
+		private Instant dMoment;
+
+		private Integer dNumber;
+
 		public H2_B_D_NotIndexed() {
 		}
 
-		public H2_B_D_NotIndexed(Integer id) {
-			super( id );
+		public H2_B_D_NotIndexed(Integer id, Instant moment, Integer number) {
+			super( id, moment, number );
 			this.dText = "text" + id;
+			this.dMoment = moment;
+			this.dNumber = number;
 		}
 	}
 }
