@@ -27,7 +27,6 @@ import org.hibernate.search.spi.SearchIntegrator;
 import org.hibernate.search.test.Document;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestForIssue;
-import org.hibernate.search.util.impl.ConcurrentReferenceHashMap;
 
 import org.junit.After;
 import org.junit.Test;
@@ -105,18 +104,14 @@ public class NoTransactionTest extends SearchTestBase {
 	public void checkMemory() {
 		System.gc();
 		// Check there are no memory leaks
-		assertThat( purgeStaleEntries( getPerTransactionWorker().synchronizationPerTransactionForTests() ) )
+		assertThat( getPerTransactionWorker().synchronizationPerTransactionForTests().entrySet().iterator() )
+				// We need to check an iterator instead of the map,
+				// because ConcurrentReferenceHashMap.isEmpty()/size() sometimes rely on out-of-date information
+				// that ignores garbage-collected keys.
 				.isEmpty();
-		assertThat( purgeStaleEntries( getFullTextIndexEventListener().flushSynchForTests() ) )
+		assertThat( getFullTextIndexEventListener().flushSynchForTests().entrySet().iterator() )
+				// Same as above: check an iterator here, not the map.
 				.isEmpty();
-	}
-
-	// Instances of ConcurrentReferenceHashMap only discover that weak references
-	// are no longer valid when we actually access content, not when we access the size.
-	// This forces the map to purge all entries whose weak reference has been GC'd so that the size is up to date.
-	private <T extends Map<?, ?>> T purgeStaleEntries(T map) {
-		( (ConcurrentReferenceHashMap<?, ?>) map ).purgeStaleEntries();
-		return map;
 	}
 
 	private void purgeIndex() {
