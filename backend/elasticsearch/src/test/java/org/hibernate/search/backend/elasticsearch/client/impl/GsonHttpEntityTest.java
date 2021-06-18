@@ -32,6 +32,7 @@ import org.junit.runners.Parameterized;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.commons.codec.Charsets;
@@ -71,16 +72,43 @@ public class GsonHttpEntityTest {
 				"10,000 small objects",
 				Stream.generate( () -> Arrays.asList( bodyPart1, bodyPart2, bodyPart3 ) )
 						.flatMap( List::stream ).limit( 10_000 ).collect( Collectors.toList() ) } );
+		params.add( new Object[] {
+				"200 large objects",
+				Stream.generate( () -> {
+					// Generate one large object
+					JsonObject object = new JsonObject();
+					JsonArray array = new JsonArray();
+					object.add( "array", array );
+					Stream.generate( () -> Arrays.asList( bodyPart1, bodyPart2, bodyPart3 ) )
+							.flatMap( List::stream ).limit( 1_000 ).forEach( array::add );
+					return object;
+				} )
+						// Reproduce the large object multiple times
+						.limit( 200 ).collect( Collectors.toList() ) } );
+		params.add( new Object[] {
+				"1 very large object",
+				Stream.generate( () -> {
+					JsonObject object = new JsonObject();
+					JsonArray array = new JsonArray();
+					object.add( "array", array );
+					Stream.generate( () -> Arrays.asList( bodyPart1, bodyPart2, bodyPart3 ) )
+							.flatMap( List::stream ).limit( 100_000 ).forEach( array::add );
+					return object;
+				} )
+						// Reproduce the large object multiple times
+						.limit( 1 ).collect( Collectors.toList() ) } );
 
 		return params;
 	}
 
+	private final List<JsonObject> payload;
 	private final GsonHttpEntity gsonEntity;
 	private final String expectedPayloadString;
 	private final int expectedContentLength;
 
 	@SuppressWarnings("unused")
 	public GsonHttpEntityTest(String ignoredLabel, List<JsonObject> payload) throws IOException {
+		this.payload = payload;
 		Gson gson = GsonProvider.create( GsonBuilder::new, true ).getGson();
 		this.gsonEntity = new GsonHttpEntity( gson, payload );
 		StringBuilder builder = new StringBuilder();
@@ -94,8 +122,8 @@ public class GsonHttpEntityTest {
 
 	@Test
 	public void initialContentLength() {
-		// The content length cannot be known from the start for large payloads
-		assumeTrue( expectedContentLength < 1024 );
+		// The content length cannot be known from the start for large, multi-object payloads
+		assumeTrue( payload.size() <= 1 || expectedContentLength < 1024 );
 
 		assertThat( gsonEntity.getContentLength() ).isEqualTo( expectedContentLength );
 	}
