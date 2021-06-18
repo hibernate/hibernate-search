@@ -6,6 +6,11 @@
  */
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -36,6 +41,7 @@ public final class HibernateOrmMassIndexingContext
 	private final HibernateOrmSessionTypeContextProvider typeContextProvider;
 	private final DetachedBackendSessionContext sessionContext;
 
+	private final Map<Class<?>, String> conditionalExpressions = new HashMap<>();
 	private CacheMode cacheMode;
 	private Integer idLoadingTransactionTimeout;
 	private int idFetchSize = 100; //reasonable default as we only load IDs
@@ -53,7 +59,8 @@ public final class HibernateOrmMassIndexingContext
 	@Override
 	public <T> PojoMassIndexingLoadingStrategy<? super T, ?> loadingStrategy(PojoRawTypeIdentifier<T> expectedType) {
 		LoadingTypeContext<T> typeContext = typeContextProvider.forExactType( expectedType );
-		return new HibernateOrmMassIndexingLoadingStrategy<>( typeContext.loadingStrategy() );
+		return new HibernateOrmMassIndexingLoadingStrategy<>( typeContext.loadingStrategy(),
+				conditionalExpression( typeContext.jpaEntityName() ) );
 	}
 
 	public void idLoadingTransactionTimeout(int timeoutInSeconds) {
@@ -106,12 +113,35 @@ public final class HibernateOrmMassIndexingContext
 		return idFetchSize;
 	}
 
+	void reindexOnly(Class<?> type, String jpqlConditionalExpression) {
+		conditionalExpressions.put( type, jpqlConditionalExpression );
+	}
+
+	private Optional<String> conditionalExpression(String jpaEntityName) {
+		if ( conditionalExpressions.isEmpty() ) {
+			return Optional.empty();
+		}
+		LoadingTypeContext<?> typeContext = typeContextProvider.forExactType(
+				typeContextProvider.typeIdentifierForEntityName( jpaEntityName )
+		);
+
+		return typeContext.ascendingSuperTypes()
+				.stream()
+				.map( type -> conditionalExpressions.get( type.javaClass() ) )
+				.filter( Objects::nonNull )
+				.findFirst();
+	}
+
 	private final class HibernateOrmMassIndexingLoadingStrategy<E, I> implements PojoMassIndexingLoadingStrategy<E, I> {
 
 		private final HibernateOrmEntityLoadingStrategy<E, I> delegate;
+		// TODO-499 Use the {@code conditionalExpression}
+		private final Optional<String> conditionalExpression;
 
-		public HibernateOrmMassIndexingLoadingStrategy(HibernateOrmEntityLoadingStrategy<E, I> delegate) {
+		public HibernateOrmMassIndexingLoadingStrategy(HibernateOrmEntityLoadingStrategy<E, I> delegate,
+				Optional<String> conditionalExpression) {
 			this.delegate = delegate;
+			this.conditionalExpression = conditionalExpression;
 		}
 
 		@Override
@@ -123,12 +153,17 @@ public final class HibernateOrmMassIndexingContext
 				return false;
 			}
 			HibernateOrmMassIndexingLoadingStrategy<?, ?> that = (HibernateOrmMassIndexingLoadingStrategy<?, ?>) o;
-			return delegate.equals( that.delegate );
+			if ( conditionalExpression.isPresent() || that.conditionalExpression.isPresent() ) {
+				// Never merge strategies with conditional expressions, it's too complicated to apply a condition to multiple types
+				// TODO-4252 Verify if there is a good way to do that
+				return false;
+			}
+			return Objects.equals( delegate, that.delegate );
 		}
 
 		@Override
 		public int hashCode() {
-			return delegate.hashCode();
+			return Objects.hash( delegate, conditionalExpression );
 		}
 
 		@Override

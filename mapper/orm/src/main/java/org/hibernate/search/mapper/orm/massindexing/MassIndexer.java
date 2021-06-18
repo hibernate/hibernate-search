@@ -25,6 +25,14 @@ import org.hibernate.search.util.common.annotation.Incubating;
 public interface MassIndexer {
 
 	/**
+	 * Define a filter on a given {@code type} for entities to be re-indexed
+	 *
+	 * @param type The type on which the filter will be applied
+	 * @return The step allowing to define the filter
+	 */
+	MassIndexerFilteringTypeStep type(Class<?> type);
+
+	/**
 	 * Sets the number of entity types to be indexed in parallel.
 	 * <p>
 	 * Defaults to {@code 1}.
