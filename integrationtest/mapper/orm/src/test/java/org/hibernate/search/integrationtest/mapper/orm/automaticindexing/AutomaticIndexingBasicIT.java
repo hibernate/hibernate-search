@@ -117,7 +117,7 @@ public class AutomaticIndexingBasicIT {
 			session.persist( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.create()
+					.createFollowingWorks()
 					.add( "1", b -> b
 							.field( "indexedField", entity1.getIndexedField() )
 							.field( "shallowReindexOnUpdateField", null )
@@ -129,7 +129,7 @@ public class AutomaticIndexingBasicIT {
 			backendMock.verifyExpectationsMet();
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.discard()
+					.discardFollowingWorks()
 					.add( "1", b -> b
 							.field( "indexedField", entity1.getIndexedField() )
 							.field( "shallowReindexOnUpdateField", null )
@@ -284,7 +284,7 @@ public class AutomaticIndexingBasicIT {
 			session.persist( entity2 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.create()
+					.createFollowingWorks()
 					.add( "1", expectedValue( "number1" ) )
 					.add( "2", expectedValue( "number2" ) );
 
@@ -302,12 +302,12 @@ public class AutomaticIndexingBasicIT {
 
 			// without clear the session
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.create()
+					.createFollowingWorks()
 					.add( "3", expectedValue( "number3" ) )
 					.add( "4", expectedValue( "number4" ) );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.execute()
+					.executeFollowingWorks()
 					.add( "1", expectedValue( "number1" ) )
 					.add( "2", expectedValue( "number2" ) )
 					.add( "3", expectedValue( "number3" ) )
@@ -325,7 +325,7 @@ public class AutomaticIndexingBasicIT {
 
 			// flush triggers the prepare of the current indexing plan
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.create()
+					.createFollowingWorks()
 					.add( "5", expectedValue( "number5" ) )
 					.add( "6", expectedValue( "number6" ) );
 
@@ -352,7 +352,7 @@ public class AutomaticIndexingBasicIT {
 			session.clear();
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.execute()
+					.executeFollowingWorks()
 					.add( "5", expectedValue( "number5" ) )
 					.add( "6", expectedValue( "number6" ) );
 		} );

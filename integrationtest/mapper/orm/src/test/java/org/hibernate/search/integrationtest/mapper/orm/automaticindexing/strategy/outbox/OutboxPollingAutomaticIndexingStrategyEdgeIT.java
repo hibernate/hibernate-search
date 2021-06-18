@@ -172,19 +172,19 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 			failingFuture.completeExceptionally( new SimulatedFailure( "Indexing work #2 failed!" ) );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
-					.createAndExecute()
+					.createAndExecuteFollowingWorks()
 					.add( "1", b -> b
 							.field( "indexedField", "initialValue" )
 					)
 					.add( "3", b -> b
 							.field( "indexedField", "initialValue" )
 					)
-					.createAndExecute( failingFuture )
+					.createAndExecuteFollowingWorks( failingFuture )
 					.add( "2", b -> b
 							.field( "indexedField", "initialValue" )
 					)
 					// retry (succeeds):
-					.createAndExecute()
+					.createAndExecuteFollowingWorks()
 					.addOrUpdate( "2", b -> b
 							.field( "indexedField", "initialValue" )
 					);
@@ -247,7 +247,7 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 		CompletableFuture<?> failingFuture = new CompletableFuture<>();
 		failingFuture.completeExceptionally( new SimulatedFailure( "Delete work on #1 failed!" ) );
 		backendMock.expectWorks( IndexedEntity.INDEX )
-				.createAndExecute( failingFuture )
+				.createAndExecuteFollowingWorks( failingFuture )
 				.delete( "1" );
 		outboxEventFinder.showOnlyEvents( eventIdsUpToDelete );
 		backendMock.verifyExpectationsMet();
@@ -291,7 +291,7 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 					.add( "3", b -> b
 							.field( "indexedField", "initialValue" )
 					)
-					.createAndExecute( failingFuture )
+					.createAndExecuteFollowingWorks( failingFuture )
 					.add( "2", b -> b
 							.field( "indexedField", "initialValue" )
 					)
@@ -349,17 +349,17 @@ public class OutboxPollingAutomaticIndexingStrategyEdgeIT {
 					.add( "3", b -> b
 							.field( "indexedField", "initialValue" )
 					)
-					.createAndExecute( failingFuture )
+					.createAndExecuteFollowingWorks( failingFuture )
 					.add( "2", b -> b
 							.field( "indexedField", "initialValue" )
 					)
 					// retry (fails too):
-					.createAndExecute( failingFuture )
+					.createAndExecuteFollowingWorks( failingFuture )
 					.addOrUpdate( "2", b -> b
 							.field( "indexedField", "initialValue" )
 					)
 					// retry (fails too):
-					.createAndExecute( failingFuture )
+					.createAndExecuteFollowingWorks( failingFuture )
 					.addOrUpdate( "2", b -> b
 							.field( "indexedField", "initialValue" )
 					);

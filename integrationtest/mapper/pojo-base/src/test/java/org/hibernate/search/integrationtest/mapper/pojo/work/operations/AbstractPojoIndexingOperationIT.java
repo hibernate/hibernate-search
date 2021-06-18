@@ -177,7 +177,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 		BackendMock.DocumentWorkCallListContext context = backendMock.expectWorks(
 				IndexedEntity.INDEX, commitStrategy, refreshStrategy
 		)
-				.createAndExecute( futureFromBackend );
+				.createAndExecuteFollowingWorks( futureFromBackend );
 		worksBefore.accept( context );
 		String expectedRoutingKey;
 		if ( isImplicitRoutingEnabled() ) {
@@ -209,7 +209,7 @@ public abstract class AbstractPojoIndexingOperationIT {
 		else {
 			expectedRoutingKey = null;
 		}
-		PojoIndexingOperation.ADD_OR_UPDATE.expect( context.createAndExecute( futureFromBackend ),
+		PojoIndexingOperation.ADD_OR_UPDATE.expect( context.createAndExecuteFollowingWorks( futureFromBackend ),
 				tenantId, String.valueOf( id ), expectedRoutingKey, value, containedValue );
 	}
 
