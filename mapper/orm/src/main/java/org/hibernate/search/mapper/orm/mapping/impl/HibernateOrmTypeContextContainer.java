@@ -120,7 +120,7 @@ class HibernateOrmTypeContextContainer
 
 		<E> HibernateOrmIndexedTypeContext.Builder<E> addIndexed(PojoRawTypeModel<E> typeModel, String jpaEntityName) {
 			HibernateOrmIndexedTypeContext.Builder<E> builder = new HibernateOrmIndexedTypeContext.Builder<>(
-					typeModel.typeIdentifier(),
+					typeModel,
 					jpaEntityName, basicTypeMetadataProvider.getHibernateOrmEntityNameByJpaEntityName( jpaEntityName )
 			);
 			indexedTypeContextBuilders.add( builder );
@@ -129,7 +129,7 @@ class HibernateOrmTypeContextContainer
 
 		<E> HibernateOrmContainedTypeContext.Builder<E> addContained(PojoRawTypeModel<E> typeModel, String jpaEntityName) {
 			HibernateOrmContainedTypeContext.Builder<E> builder = new HibernateOrmContainedTypeContext.Builder<>(
-					typeModel.typeIdentifier(),
+					typeModel,
 					jpaEntityName, basicTypeMetadataProvider.getHibernateOrmEntityNameByJpaEntityName( jpaEntityName )
 			);
 			containedTypeContextBuilders.add( builder );

@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
@@ -20,6 +23,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeExtendedMap
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 abstract class AbstractHibernateOrmTypeContext<E>
@@ -32,6 +36,7 @@ abstract class AbstractHibernateOrmTypeContext<E>
 	private final HibernateOrmEntityLoadingStrategy<? super E, ?> loadingStrategy;
 	private final IdentifierMapping identifierMapping;
 	private final PojoPathFilter dirtyFilter;
+	private final List<PojoRawTypeIdentifier<? super E>> ascendingSuperTypes;
 
 	// Casts are safe because the loading strategy will target either "E" or "? super E", by contract
 	@SuppressWarnings("unchecked")
@@ -41,6 +46,7 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
 		this.entityPersister = metamodel.entityPersister( builder.hibernateOrmEntityName );
 		this.identifierMapping = builder.identifierMapping;
+		this.ascendingSuperTypes = builder.ascendingSuperTypes;
 		if ( builder.documentIdSourcePropertyName != null ) {
 			if ( builder.documentIdSourcePropertyName.equals( entityPersister().getIdentifierPropertyName() ) ) {
 				documentIdIsEntityId = true;
@@ -98,6 +104,10 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		return loadingStrategy;
 	}
 
+	public List<PojoRawTypeIdentifier<? super E>> ascendingSuperTypes() {
+		return ascendingSuperTypes;
+	}
+
 	@Override
 	public Object toIndexingPlanProvidedId(Object entityId) {
 		if ( documentIdIsEntityId ) {
@@ -123,11 +133,15 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		private ValueReadHandle<?> documentIdSourcePropertyHandle;
 		private IdentifierMapping identifierMapping;
 		private PojoPathFilter dirtyFilter;
+		private final List<PojoRawTypeIdentifier<? super E>> ascendingSuperTypes;
 
-		AbstractBuilder(PojoRawTypeIdentifier<E> typeIdentifier, String jpaEntityName, String hibernateOrmEntityName) {
-			this.typeIdentifier = typeIdentifier;
+		AbstractBuilder(PojoRawTypeModel<E> typeModel, String jpaEntityName, String hibernateOrmEntityName) {
+			this.typeIdentifier = typeModel.typeIdentifier();
 			this.jpaEntityName = jpaEntityName;
 			this.hibernateOrmEntityName = hibernateOrmEntityName;
+			this.ascendingSuperTypes = typeModel.ascendingSuperTypes()
+					.map( PojoRawTypeModel::typeIdentifier )
+					.collect( Collectors.toList() );
 		}
 
 		@Override
