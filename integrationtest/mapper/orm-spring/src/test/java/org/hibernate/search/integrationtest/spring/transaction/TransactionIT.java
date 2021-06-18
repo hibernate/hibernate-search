@@ -56,7 +56,7 @@ public class TransactionIT {
 
 		// Check that inner transaction data is NOT pushed to the index (processed, but discarded).
 		backendMock.expectWorks( IndexedEntity.NAME )
-				.createAndDiscard()
+				.createAndDiscardFollowingWorks()
 				.add( innerId.toString(), b -> { } );
 		// Check that outer transaction data is pushed to the index.
 		backendMock.expectWorks( IndexedEntity.NAME )
@@ -75,15 +75,15 @@ public class TransactionIT {
 
 		// Check that outer transaction data is processed.
 		backendMock.expectWorks( IndexedEntity.NAME )
-				.create()
+				.createFollowingWorks()
 				.add( outerId.toString(), b -> { } );
 		// Check that inner transaction data is NOT pushed to the index (processed, but discarded).
 		backendMock.expectWorks( IndexedEntity.NAME )
-				.createAndDiscard()
+				.createAndDiscardFollowingWorks()
 				.add( innerId.toString(), b -> { } );
 		// Check that outer transaction data is pushed to the index.
 		backendMock.expectWorks( IndexedEntity.NAME )
-				.execute()
+				.executeFollowingWorks()
 				.add( outerId.toString(), b -> { } );
 
 		helperService.doOuterFlushBeforeInner( outerId, innerId );

@@ -96,7 +96,7 @@ public class MassIndexingMonitorIT {
 							.field( "title", TITLE_3 )
 							.field( "author", AUTHOR_3 )
 					)
-					.createAndExecute( indexingFuture )
+					.createAndExecuteFollowingWorks( indexingFuture )
 					.add( "2", b -> b
 							.field( "title", TITLE_2 )
 							.field( "author", AUTHOR_2 )

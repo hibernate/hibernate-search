@@ -426,7 +426,7 @@ public class PojoIndexingPlanBaseIT {
 				session.indexingPlan().add( entity1 );
 
 				backendMock.expectWorks( IndexedEntity.INDEX )
-						.createAndExecute( failingFuture )
+						.createAndExecuteFollowingWorks( failingFuture )
 						.add( b -> b
 								.identifier( "1" )
 								.document( StubDocumentNode.document()

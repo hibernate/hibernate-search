@@ -69,7 +69,7 @@ public class FlushClearEvictAllIT {
 			assertNotNull( postId );
 
 			backendMock.expectWorks( Post.NAME )
-					.create()
+					.createFollowingWorks()
 					.add( post.getId().toString(), b -> b.field( "name", "This is a post" ) );
 			entityManager.flush();
 			if ( ormSetupHelper.areEntitiesProcessedInSession() ) {
@@ -81,7 +81,7 @@ public class FlushClearEvictAllIT {
 			sessionFactory.getCache().evictAll();
 
 			backendMock.expectWorks( Post.NAME )
-					.execute()
+					.executeFollowingWorks()
 					.add( post.getId().toString(), b -> b.field( "name", "This is a post" ) );
 			trx.commit();
 			backendMock.verifyExpectationsMet();
@@ -96,7 +96,7 @@ public class FlushClearEvictAllIT {
 			reloaded.getComments().add( comment );
 
 			backendMock.expectWorks( Comment.NAME )
-					.create()
+					.createFollowingWorks()
 					.add( "2", b -> b.field( "name", "This is a comment" ) );
 
 			entityManager.flush();
@@ -109,7 +109,7 @@ public class FlushClearEvictAllIT {
 			sessionFactory.getCache().evictAll();
 
 			backendMock.expectWorks( Comment.NAME )
-					.execute()
+					.executeFollowingWorks()
 					.add( "2", b -> b.field( "name", "This is a comment" ) );
 			trx.commit();
 			backendMock.verifyExpectationsMet();
