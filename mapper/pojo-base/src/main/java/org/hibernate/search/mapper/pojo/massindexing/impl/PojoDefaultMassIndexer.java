@@ -29,8 +29,10 @@ import org.hibernate.search.util.common.impl.Futures;
  */
 public class PojoDefaultMassIndexer implements PojoMassIndexer {
 
+	private final PojoMassIndexingContext indexingContext;
 	private final PojoMassIndexingMappingContext mappingContext;
-
+	private final PojoMassIndexingTypeContextProvider typeContextProvider;
+	private final Set<? extends PojoMassIndexingIndexedTypeContext<?>> targetedIndexedTypes;
 	private final PojoScopeSchemaManager scopeSchemaManager;
 	private final PojoScopeWorkspace scopeWorkspace;
 
@@ -44,7 +46,6 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 
 	private MassIndexingFailureHandler failureHandler;
 	private MassIndexingMonitor monitor;
-	private final List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex;
 
 	public PojoDefaultMassIndexer(PojoMassIndexingContext indexingContext,
 			PojoMassIndexingMappingContext mappingContext,
@@ -52,9 +53,10 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 			Set<? extends PojoMassIndexingIndexedTypeContext<?>> targetedIndexedTypes,
 			PojoScopeSchemaManager scopeSchemaManager,
 			PojoScopeWorkspace scopeWorkspace) {
+		this.indexingContext = indexingContext;
 		this.mappingContext = mappingContext;
-		this.typeGroupsToIndex = PojoMassIndexingIndexedTypeGroup.disjoint( indexingContext,
-				mappingContext, typeContextProvider, targetedIndexedTypes );
+		this.typeContextProvider = typeContextProvider;
+		this.targetedIndexedTypes = targetedIndexedTypes;
 		this.scopeSchemaManager = scopeSchemaManager;
 		this.scopeWorkspace = scopeWorkspace;
 	}
@@ -64,7 +66,7 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 		if ( numberOfThreads < 1 ) {
 			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
 		}
-		this.typesToIndexInParallel = Math.min( numberOfThreads, typeGroupsToIndex.size() );
+		this.typesToIndexInParallel = numberOfThreads;
 		return this;
 	}
 
@@ -141,6 +143,10 @@ public class PojoDefaultMassIndexer implements PojoMassIndexer {
 	}
 
 	private PojoMassIndexingBatchCoordinator createCoordinator() {
+		List<PojoMassIndexingIndexedTypeGroup<?>> typeGroupsToIndex = PojoMassIndexingIndexedTypeGroup.disjoint(
+				indexingContext, mappingContext, typeContextProvider, targetedIndexedTypes
+		);
+		typesToIndexInParallel = Math.min( typesToIndexInParallel, typeGroupsToIndex.size() );
 		PojoMassIndexingNotifier notifier = new PojoMassIndexingNotifier(
 				getOrCreateFailureHandler(),
 				getOrCreateMonitor()
