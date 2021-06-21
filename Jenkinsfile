@@ -293,9 +293,11 @@ stage('Configure') {
 							condition: TestCondition.AFTER_MERGE),
 					new EsAwsBuildEnvironment(version: '7.8', mavenProfile: 'elasticsearch-7.8',
 							condition: TestCondition.AFTER_MERGE),
+					new EsAwsBuildEnvironment(version: '7.10', mavenProfile: 'elasticsearch-7.10',
+							condition: TestCondition.AFTER_MERGE),
 
 					// Also test static credentials, but only for the latest version
-					new EsAwsBuildEnvironment(version: '7.8', mavenProfile: 'elasticsearch-7.8',
+					new EsAwsBuildEnvironment(version: '7.10', mavenProfile: 'elasticsearch-7.10',
 							staticCredentials: true,
 							condition: TestCondition.AFTER_MERGE)
 			]
