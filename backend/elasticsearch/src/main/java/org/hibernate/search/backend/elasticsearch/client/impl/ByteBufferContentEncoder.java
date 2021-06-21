@@ -24,7 +24,7 @@ final class ByteBufferContentEncoder implements ContentEncoder {
 	@Override
 	public int write(ByteBuffer src) {
 		int toWrite = Math.min( src.remaining(), buffer.remaining() );
-		src.get( buffer.array(), buffer.arrayOffset(), toWrite );
+		src.get( buffer.array(), buffer.arrayOffset() + buffer.position(), toWrite );
 		buffer.position( buffer.position() + toWrite );
 		return toWrite;
 	}
