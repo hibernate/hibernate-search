@@ -232,8 +232,8 @@ Equivalent to leaving out the prefix in most cases. Only useful if the arbitrary
 * `builtin:` followed by the name of a built-in bean,
 e.g. `simple` for the <<backend-elasticsearch-indexlayout,Elasticsearch index layout strategies>>.
 This will not fall back to Spring/CDI or a direct constructor call.
-* `constructor:` followed by the fully-qualified name of a class, to be instantiated through Spring/CDI if available,
-or through its public, no-argument constructor otherwise.
+* `constructor:` followed by the fully-qualified name of a class,
+to be instantiated through its public, no-argument constructor.
 This will ignore built-in beans and will not try to instantiate the class through Spring/CDI.
 
 [[configuration-bean-resolution]]
