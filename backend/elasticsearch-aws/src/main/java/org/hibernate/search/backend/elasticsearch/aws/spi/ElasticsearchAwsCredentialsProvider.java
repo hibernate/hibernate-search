@@ -10,11 +10,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 
-/**
- * @deprecated Implement {@link ElasticsearchAwsCredentialsProvider} instead.
- */
-@Deprecated
-public interface ElasticsearcAwsCredentialsProvider extends ElasticsearchAwsCredentialsProvider {
+public interface ElasticsearchAwsCredentialsProvider {
 
 	AwsCredentialsProvider create(ConfigurationPropertySource propertySource);
 

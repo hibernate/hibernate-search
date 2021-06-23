@@ -11,7 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsBackendSettings;
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsCredentialsTypeNames;
 import org.hibernate.search.backend.elasticsearch.aws.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.aws.spi.ElasticsearcAwsCredentialsProvider;
+import org.hibernate.search.backend.elasticsearch.aws.spi.ElasticsearchAwsCredentialsProvider;
 import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -40,10 +40,10 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 					.asString()
 					.build();
 
-	private static final ConfigurationProperty<BeanReference<? extends ElasticsearcAwsCredentialsProvider>> CREDENTIALS_TYPE =
+	private static final ConfigurationProperty<BeanReference<? extends ElasticsearchAwsCredentialsProvider>> CREDENTIALS_TYPE =
 			ConfigurationProperty.forKey( ElasticsearchAwsBackendSettings.CREDENTIALS_TYPE )
-					.asBeanReference( ElasticsearcAwsCredentialsProvider.class )
-					.withDefault( BeanReference.of( ElasticsearcAwsCredentialsProvider.class, ElasticsearchAwsBackendSettings.Defaults.CREDENTIALS_TYPE ) )
+					.asBeanReference( ElasticsearchAwsCredentialsProvider.class )
+					.withDefault( BeanReference.of( ElasticsearchAwsCredentialsProvider.class, ElasticsearchAwsBackendSettings.Defaults.CREDENTIALS_TYPE ) )
 					.build();
 
 	private static final OptionalConfigurationProperty<String> LEGACY_ACCESS_KEY =
@@ -90,7 +90,7 @@ public class ElasticsearchAwsHttpClientConfigurer implements ElasticsearchHttpCl
 					ElasticsearchAwsStaticCredentialsProvider.CREDENTIALS_SECRET_ACCESS_KEY.resolveOrRaw( propertySource ) );
 		}
 
-		try ( BeanHolder<? extends ElasticsearcAwsCredentialsProvider> credentialsProviderHolder =
+		try ( BeanHolder<? extends ElasticsearchAwsCredentialsProvider> credentialsProviderHolder =
 				CREDENTIALS_TYPE.getAndTransform( propertySource, beanResolver::resolve ) ) {
 			return credentialsProviderHolder.get().create( propertySource );
 		}
