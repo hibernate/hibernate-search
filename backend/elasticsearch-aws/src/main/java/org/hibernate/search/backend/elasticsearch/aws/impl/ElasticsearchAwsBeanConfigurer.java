@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.aws.impl;
 
 import org.hibernate.search.backend.elasticsearch.aws.cfg.ElasticsearchAwsCredentialsTypeNames;
-import org.hibernate.search.backend.elasticsearch.aws.spi.ElasticsearcAwsCredentialsProvider;
+import org.hibernate.search.backend.elasticsearch.aws.spi.ElasticsearchAwsCredentialsProvider;
 import org.hibernate.search.backend.elasticsearch.client.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
@@ -23,11 +23,11 @@ public class ElasticsearchAwsBeanConfigurer implements BeanConfigurer {
 				beanResolver -> BeanHolder.of( new ElasticsearchAwsHttpClientConfigurer() )
 		);
 		context.define(
-				ElasticsearcAwsCredentialsProvider.class, ElasticsearchAwsCredentialsTypeNames.DEFAULT,
+				ElasticsearchAwsCredentialsProvider.class, ElasticsearchAwsCredentialsTypeNames.DEFAULT,
 				beanResolver -> BeanHolder.of( ignored -> DefaultCredentialsProvider.create() )
 		);
 		context.define(
-				ElasticsearcAwsCredentialsProvider.class, ElasticsearchAwsCredentialsTypeNames.STATIC,
+				ElasticsearchAwsCredentialsProvider.class, ElasticsearchAwsCredentialsTypeNames.STATIC,
 				beanResolver -> BeanHolder.of( new ElasticsearchAwsStaticCredentialsProvider() )
 		);
 	}
