@@ -1,6 +1,17 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.5.Final (23-06-2021)
+-------------------------
+
+** Bug
+    * HSEARCH-4239 Credentials error while mass indexing on AWS ES with static credentials: "The request signature we calculated does not match the signature you provided."
+
+** Task
+    * HSEARCH-4251 Clarify in the docs that Spring Boot requires that you prefix Hibernate Search properties with "spring.jpa.properties."
+    * HSEARCH-4249 Test AWS Elasticsearch Service 7.10
+    * HSEARCH-4241 Upgrade to Hibernate ORM 5.4.32.Final
+
 6.0.4.Final (14-06-2021)
 -------------------------
 
