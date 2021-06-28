@@ -118,11 +118,10 @@ public class MassIndexingConditionalExpressionsIT {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H0_Indexed.class );
+			indexer.type( H0_Indexed.class ).reindexOnly( "e.number = 2" );
 
 			backendMock.expectWorks( H0_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
-					.add( "1", b -> b.field( "text", "text1" ) )
 					.add( "2", b -> b.field( "text", "text2" ) )
-					.add( "3", b -> b.field( "text", "text3" ) )
 					.add( "4", b -> b.field( "text", "text4" ) );
 
 			backendMock.expectIndexScaleWorks( H0_Indexed.NAME, session.getTenantIdentifier() )
@@ -141,18 +140,75 @@ public class MassIndexingConditionalExpressionsIT {
 	}
 
 	@Test
-	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot() {
+	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot_conditionOnRoot() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
+			indexer.type( H1_Root_NotIndexed.class ).reindexOnly( "e.rootNumber = 2" );
 
 			backendMock.expectWorks( H1_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
-					.add( "9", b -> b.field( "rootText", "text9" )
-							.field( "bText", "text9" ) )
 					.add( "10", b -> b.field( "rootText", "text10" )
 							.field( "bText", "text10" ) )
-					.add( "11", b -> b.field( "rootText", "text11" )
-							.field( "bText", "text11" ) )
+					.add( "12", b -> b.field( "rootText", "text12" )
+							.field( "bText", "text12" ) );
+
+			backendMock.expectIndexScaleWorks( H1_B_Indexed.NAME, session.getTenantIdentifier() )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
+
+			try {
+				indexer.startAndWait();
+			}
+			catch (InterruptedException e) {
+				fail( "Unexpected InterruptedException: " + e.getMessage() );
+			}
+		} );
+
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot_conditionOnSubclass_rootField() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
+			indexer.type( H1_B_Indexed.class ).reindexOnly( "e.rootNumber = 2" );
+
+			backendMock.expectWorks( H1_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+					.add( "10", b -> b.field( "rootText", "text10" )
+							.field( "bText", "text10" ) )
+					.add( "12", b -> b.field( "rootText", "text12" )
+							.field( "bText", "text12" ) );
+
+			backendMock.expectIndexScaleWorks( H1_B_Indexed.NAME, session.getTenantIdentifier() )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
+
+			try {
+				indexer.startAndWait();
+			}
+			catch (InterruptedException e) {
+				fail( "Unexpected InterruptedException: " + e.getMessage() );
+			}
+		} );
+
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot_conditionOnSubclass_subclassField() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			MassIndexer indexer = searchSession.massIndexer( H1_Root_NotIndexed.class );
+			indexer.type( H1_B_Indexed.class ).reindexOnly( "e.bNumber = 2" );
+
+			backendMock.expectWorks( H1_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+					.add( "10", b -> b.field( "rootText", "text10" )
+							.field( "bText", "text10" ) )
 					.add( "12", b -> b.field( "rootText", "text12" )
 							.field( "bText", "text12" ) );
 
@@ -178,14 +234,11 @@ public class MassIndexingConditionalExpressionsIT {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H1_B_Indexed.class );
+			indexer.type( H1_B_Indexed.class ).reindexOnly( "e.bNumber = 2" );
 
 			backendMock.expectWorks( H1_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
-					.add( "9", b -> b.field( "rootText", "text9" )
-							.field( "bText", "text9" ) )
 					.add( "10", b -> b.field( "rootText", "text10" )
 							.field( "bText", "text10" ) )
-					.add( "11", b -> b.field( "rootText", "text11" )
-							.field( "bText", "text11" ) )
 					.add( "12", b -> b.field( "rootText", "text12" )
 							.field( "bText", "text12" ) );
 
@@ -211,22 +264,16 @@ public class MassIndexingConditionalExpressionsIT {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );
+			indexer.type( H2_Root_Indexed.class ).reindexOnly( "e.rootNumber = 2" );
+			indexer.type( H2_B_Indexed.class ).reindexOnly( "e.rootNumber = 0" );
 
 			backendMock.expectWorks( H2_Root_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
-					.add( "1", b -> b.field( "rootText", "text1" ) )
 					.add( "2", b -> b.field( "rootText", "text2" ) )
-					.add( "3", b -> b.field( "rootText", "text3" ) )
 					.add( "4", b -> b.field( "rootText", "text4" ) );
 			backendMock.expectWorks( H2_A_C_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
-					.add( "9", b -> b.field( "rootText", "text9" )
-							.field( "aText", "text9" )
-							.field( "cText", "text9" ) )
 					.add( "10", b -> b.field( "rootText", "text10" )
 							.field( "aText", "text10" )
 							.field( "cText", "text10" ) )
-					.add( "11", b -> b.field( "rootText", "text11" )
-							.field( "aText", "text11" )
-							.field( "cText", "text11" ) )
 					.add( "12", b -> b.field( "rootText", "text12" )
 							.field( "aText", "text12" )
 							.field( "cText", "text12" ) );
@@ -234,15 +281,9 @@ public class MassIndexingConditionalExpressionsIT {
 					.add( "13", b -> b
 							.field( "rootText", "text13" )
 							.field( "bText", "text13" ) )
-					.add( "14", b -> b
-							.field( "rootText", "text14" )
-							.field( "bText", "text14" ) )
 					.add( "15", b -> b
 							.field( "rootText", "text15" )
-							.field( "bText", "text15" ) )
-					.add( "16", b -> b
-							.field( "rootText", "text16" )
-							.field( "bText", "text16" ) );
+							.field( "bText", "text15" ) );
 
 			backendMock.expectIndexScaleWorks( H2_Root_Indexed.NAME, session.getTenantIdentifier() )
 					.purge()
@@ -276,17 +317,12 @@ public class MassIndexingConditionalExpressionsIT {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H2_B_Indexed.class );
+			indexer.type( H2_B_Indexed.class ).reindexOnly( "e.rootNumber = 2" );
 
 			backendMock.expectWorks( H2_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
-					.add( "13", b -> b
-							.field( "rootText", "text13" )
-							.field( "bText", "text13" ) )
 					.add( "14", b -> b
 							.field( "rootText", "text14" )
 							.field( "bText", "text14" ) )
-					.add( "15", b -> b
-							.field( "rootText", "text15" )
-							.field( "bText", "text15" ) )
 					.add( "16", b -> b
 							.field( "rootText", "text16" )
 							.field( "bText", "text16" ) );
