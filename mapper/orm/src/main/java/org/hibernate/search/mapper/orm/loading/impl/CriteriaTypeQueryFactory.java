@@ -20,11 +20,11 @@ import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
 import org.hibernate.query.Query;
 
-class CriteriaTypeQueryFactory<E, I> implements TypeQueryFactory<E, I> {
+class CriteriaTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> {
 
 	public static <E> CriteriaTypeQueryFactory<E, ?> create(EntityTypeDescriptor<E> typeDescriptor,
 			String uniquePropertyName) {
-		return new CriteriaTypeQueryFactory<>( typeDescriptor,
+		return new CriteriaTypeQueryFactory<>( typeDescriptor, uniquePropertyName,
 				typeDescriptor.getSingularAttribute( uniquePropertyName ) );
 	}
 
@@ -32,7 +32,8 @@ class CriteriaTypeQueryFactory<E, I> implements TypeQueryFactory<E, I> {
 	private final SingularAttribute<? super E, I> uniqueProperty;
 
 	private CriteriaTypeQueryFactory(EntityTypeDescriptor<E> typeDescriptor,
-			SingularAttribute<? super E, I> uniqueProperty) {
+			String uniquePropertyName, SingularAttribute<? super E, I> uniqueProperty) {
+		super( uniquePropertyName );
 		this.typeDescriptor = typeDescriptor;
 		this.uniqueProperty = uniqueProperty;
 	}

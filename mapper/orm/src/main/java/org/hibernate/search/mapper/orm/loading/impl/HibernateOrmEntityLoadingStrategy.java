@@ -7,6 +7,8 @@
 package org.hibernate.search.mapper.orm.loading.impl;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
@@ -38,6 +40,7 @@ public interface HibernateOrmEntityLoadingStrategy<E, I> {
 			LoadingSessionContext sessionContext, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions);
 
-	HibernateOrmQueryLoader<E, I> createQueryLoader(Collection<PojoRawTypeIdentifier<? extends E>> targetEntityTypes);
+	HibernateOrmQueryLoader<E, I> createQueryLoader(Collection<PojoRawTypeIdentifier<? extends E>> targetEntityTypes,
+			List<LoadingTypeContext<? extends E>> typeContexts, Optional<String> conditionalExpression);
 
 }

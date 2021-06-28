@@ -39,6 +39,12 @@ public interface TypeQueryFactory<E, I> {
 	Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session,
 			Set<? extends Class<? extends E>> includedTypesFilter);
 
+	Query<Long> createQueryForCount(SharedSessionContractImplementor session, EntityPersister persister,
+			Set<? extends Class<? extends E>> includedTypesFilter, String conditionalExpression);
+
+	Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session, EntityPersister persister,
+			Set<? extends Class<? extends E>> includedTypesFilter, String conditionalExpression);
+
 	Query<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName);
 
 }
