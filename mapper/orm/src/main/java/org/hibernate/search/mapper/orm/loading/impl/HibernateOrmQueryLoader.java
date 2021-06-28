@@ -10,24 +10,45 @@ import java.util.Set;
 
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
 
 public class HibernateOrmQueryLoader<E, I> {
 	private final TypeQueryFactory<E, I> queryFactory;
 	private final Set<Class<? extends E>> includedTypesFilter;
+	private final EntityPersister persister;
+	private final String conditionalExpression;
 
 	public HibernateOrmQueryLoader(TypeQueryFactory<E, I> queryFactory,
 			Set<Class<? extends E>> includedTypesFilter) {
 		this.queryFactory = queryFactory;
 		this.includedTypesFilter = includedTypesFilter;
+		this.persister = null;
+		this.conditionalExpression = null;
+	}
+
+	public HibernateOrmQueryLoader(TypeQueryFactory<E, I> queryFactory,
+			EntityPersister persister, Set<Class<? extends E>> includedTypesFilter, String conditionalExpression) {
+		this.queryFactory = queryFactory;
+		this.includedTypesFilter = includedTypesFilter;
+		this.persister = persister;
+		this.conditionalExpression = conditionalExpression;
 	}
 
 	public Query<Long> createCountQuery(SharedSessionContractImplementor session) {
-		return queryFactory.createQueryForCount( session, includedTypesFilter );
+		return ( conditionalExpression == null ) ?
+				queryFactory.createQueryForCount( session, includedTypesFilter ) :
+				queryFactory.createQueryForCount(
+						session, persister, includedTypesFilter, conditionalExpression
+				);
 	}
 
 	public Query<I> createIdentifiersQuery(SharedSessionContractImplementor session) {
-		return queryFactory.createQueryForIdentifierListing( session, includedTypesFilter );
+		return ( conditionalExpression == null ) ?
+				queryFactory.createQueryForIdentifierListing( session, includedTypesFilter ) :
+				queryFactory.createQueryForIdentifierListing(
+						session, persister, includedTypesFilter, conditionalExpression
+				);
 	}
 
 	public Query<E> createLoadingQuery(SessionImplementor session, String idParameterName) {

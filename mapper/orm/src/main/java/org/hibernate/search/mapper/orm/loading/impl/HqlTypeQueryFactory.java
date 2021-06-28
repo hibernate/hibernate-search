@@ -13,14 +13,13 @@ import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
 
-class HqlTypeQueryFactory<E, I> implements TypeQueryFactory<E, I> {
+class HqlTypeQueryFactory<E, I> extends ConditionalExpressionQueryFactory<E, I> {
 
 	private final EntityPersister entityPersister;
-	private final String uniquePropertyName;
 
 	HqlTypeQueryFactory(EntityPersister entityPersister, String uniquePropertyName) {
+		super( uniquePropertyName );
 		this.entityPersister = entityPersister;
-		this.uniquePropertyName = uniquePropertyName;
 	}
 
 	@Override

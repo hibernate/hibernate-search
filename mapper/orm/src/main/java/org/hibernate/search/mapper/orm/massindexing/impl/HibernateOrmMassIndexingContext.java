@@ -7,9 +7,11 @@
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
@@ -60,7 +62,7 @@ public final class HibernateOrmMassIndexingContext
 	public <T> PojoMassIndexingLoadingStrategy<? super T, ?> loadingStrategy(PojoRawTypeIdentifier<T> expectedType) {
 		LoadingTypeContext<T> typeContext = typeContextProvider.forExactType( expectedType );
 		return new HibernateOrmMassIndexingLoadingStrategy<>( typeContext.loadingStrategy(),
-				conditionalExpression( typeContext.jpaEntityName() ) );
+				conditionalExpression( typeContext.jpaEntityName() ), typeContextProvider );
 	}
 
 	public void idLoadingTransactionTimeout(int timeoutInSeconds) {
@@ -135,13 +137,14 @@ public final class HibernateOrmMassIndexingContext
 	private final class HibernateOrmMassIndexingLoadingStrategy<E, I> implements PojoMassIndexingLoadingStrategy<E, I> {
 
 		private final HibernateOrmEntityLoadingStrategy<E, I> delegate;
-		// TODO-499 Use the {@code conditionalExpression}
 		private final Optional<String> conditionalExpression;
+		private final HibernateOrmSessionTypeContextProvider typeContextProvider;
 
 		public HibernateOrmMassIndexingLoadingStrategy(HibernateOrmEntityLoadingStrategy<E, I> delegate,
-				Optional<String> conditionalExpression) {
+				Optional<String> conditionalExpression, HibernateOrmSessionTypeContextProvider typeContextProvider) {
 			this.delegate = delegate;
 			this.conditionalExpression = conditionalExpression;
+			this.typeContextProvider = typeContextProvider;
 		}
 
 		@Override
@@ -169,7 +172,12 @@ public final class HibernateOrmMassIndexingContext
 		@Override
 		public PojoMassIdentifierLoader createIdentifierLoader(PojoMassIndexingIdentifierLoadingContext<E, I> context) {
 			SessionFactoryImplementor sessionFactory = mappingContext.sessionFactory();
-			HibernateOrmQueryLoader<E, I> typeQueryLoader = delegate.createQueryLoader( context.includedTypes() );
+			List<LoadingTypeContext<? extends E>> typeContexts = context.includedTypes().stream()
+					.map( typeContextProvider::forExactType )
+					.collect( Collectors.toList() );
+
+			HibernateOrmQueryLoader<E, I> typeQueryLoader = delegate.createQueryLoader(
+					context.includedTypes(), typeContexts, conditionalExpression );
 			SharedSessionContractImplementor session = (SharedSessionContractImplementor) sessionFactory
 					.withStatelessOptions()
 					.tenantIdentifier( sessionContext.tenantIdentifier() )
@@ -188,7 +196,12 @@ public final class HibernateOrmMassIndexingContext
 		@Override
 		public PojoMassEntityLoader<I> createEntityLoader(PojoMassIndexingEntityLoadingContext<E> context) {
 			SessionFactoryImplementor sessionFactory = mappingContext.sessionFactory();
-			HibernateOrmQueryLoader<E, ?> typeQueryLoader = delegate.createQueryLoader( context.includedTypes() );
+			List<LoadingTypeContext<? extends E>> typeContexts = context.includedTypes().stream()
+					.map( typeContextProvider::forExactType )
+					.collect( Collectors.toList() );
+
+			HibernateOrmQueryLoader<E, ?> typeQueryLoader = delegate.createQueryLoader(
+					context.includedTypes(), typeContexts, conditionalExpression );
 			SessionImplementor session = (SessionImplementor) sessionFactory
 					.withOptions()
 					.tenantIdentifier( sessionContext.tenantIdentifier() )

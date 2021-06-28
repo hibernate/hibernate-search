@@ -9,12 +9,15 @@ package org.hibernate.search.mapper.orm.loading.impl;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.util.common.AssertionFailure;
 
 public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 		implements HibernateOrmEntityLoadingStrategy<E, I> {
@@ -32,7 +35,8 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 
 	@Override
 	public HibernateOrmQueryLoader<E, I> createQueryLoader(
-			Collection<PojoRawTypeIdentifier<? extends E>> targetEntityTypes) {
+			Collection<PojoRawTypeIdentifier<? extends E>> targetEntityTypes,
+			List<LoadingTypeContext<? extends E>> typeContexts, Optional<String> conditionalExpression) {
 		Set<Class<? extends E>> includedTypesFilter;
 		if ( HibernateOrmUtils.targetsAllConcreteSubTypes( sessionFactory, rootEntityPersister, targetEntityTypes ) ) {
 			// All concrete types are included, no need to filter by type.
@@ -43,6 +47,16 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 			for ( PojoRawTypeIdentifier<? extends E> targetEntityType : targetEntityTypes ) {
 				includedTypesFilter.add( targetEntityType.javaClass() );
 			}
+		}
+
+		if ( conditionalExpression.isPresent() ) {
+			if ( typeContexts.size() != 1 ) {
+				throw new AssertionFailure( "conditional expression is always defined on a single type" );
+			}
+
+			EntityPersister entityPersister = typeContexts.get( 0 ).entityPersister();
+			return new HibernateOrmQueryLoader<>(
+					queryFactory, entityPersister, includedTypesFilter, conditionalExpression.get() );
 		}
 		return new HibernateOrmQueryLoader<>( queryFactory, includedTypesFilter );
 	}
