@@ -56,7 +56,7 @@ class HqlTypeQueryFactory<E, I> implements TypeQueryFactory<E, I> {
 			String hql, Class<T> returnedType, String entityAlias,
 			Set<? extends Class<? extends E>> includedTypesFilter) {
 		if ( !includedTypesFilter.isEmpty() ) {
-			hql += " where " + entityAlias + " .type() in (:types)";
+			hql += " where type(" + entityAlias + ") in (:types)";
 		}
 		Query<T> query = session.createQuery( hql, returnedType );
 		if ( !includedTypesFilter.isEmpty() ) {
