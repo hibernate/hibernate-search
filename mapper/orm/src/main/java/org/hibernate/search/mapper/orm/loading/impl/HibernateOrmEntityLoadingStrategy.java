@@ -6,14 +6,13 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.loading.spi.PojoSelectionEntityLoader;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 /**
  * @param <E> The type of loaded entities.
@@ -40,7 +39,7 @@ public interface HibernateOrmEntityLoadingStrategy<E, I> {
 			LoadingSessionContext sessionContext, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions);
 
-	HibernateOrmQueryLoader<E, I> createQueryLoader(Collection<PojoRawTypeIdentifier<? extends E>> targetEntityTypes,
-			List<LoadingTypeContext<? extends E>> typeContexts, Optional<String> conditionalExpression);
+	HibernateOrmQueryLoader<E, I> createQueryLoader(
+			List<LoadingTypeContext<? extends E>> typeContexts, Optional<ConditionalExpression> conditionalExpression);
 
 }

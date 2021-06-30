@@ -18,6 +18,8 @@ public interface LoadingTypeContext<E> {
 	 */
 	String jpaEntityName();
 
+	PojoRawTypeIdentifier<E> typeIdentifier();
+
 	/**
 	 * @return The entity persister, giving access to a representation of the entity type in the Hibernate ORM metamodel.
 	 */
