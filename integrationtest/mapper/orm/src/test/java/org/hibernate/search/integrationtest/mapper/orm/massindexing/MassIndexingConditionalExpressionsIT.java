@@ -140,6 +140,34 @@ public class MassIndexingConditionalExpressionsIT {
 	}
 
 	@Test
+	public void noHierarchy_withParams() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			MassIndexer indexer = searchSession.massIndexer( H0_Indexed.class );
+			indexer.type( H0_Indexed.class ).reindexOnly( "e.number < :number and e.moment > :moment", query -> {
+				query.setParameter( "moment", T1 );
+				query.setParameter( "number", I1 );
+			} );
+
+			backendMock.expectWorks( H0_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+					.add( "3", b -> b.field( "text", "text3" ) );
+
+			backendMock.expectIndexScaleWorks( H0_Indexed.NAME, session.getTenantIdentifier() )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
+
+			try {
+				indexer.startAndWait();
+			}
+			catch (InterruptedException e) {
+				fail( "Unexpected InterruptedException: " + e.getMessage() );
+			}
+		} );
+	}
+
+	@Test
 	public void rootNotIndexed_someSubclassesIndexed_requestMassIndexingOnRoot_conditionOnRoot() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
@@ -284,6 +312,60 @@ public class MassIndexingConditionalExpressionsIT {
 					.add( "15", b -> b
 							.field( "rootText", "text15" )
 							.field( "bText", "text15" ) );
+
+			backendMock.expectIndexScaleWorks( H2_Root_Indexed.NAME, session.getTenantIdentifier() )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
+			backendMock.expectIndexScaleWorks( H2_A_C_Indexed.NAME, session.getTenantIdentifier() )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
+			backendMock.expectIndexScaleWorks( H2_B_Indexed.NAME, session.getTenantIdentifier() )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
+
+			try {
+				indexer.startAndWait();
+			}
+			catch (InterruptedException e) {
+				fail( "Unexpected InterruptedException: " + e.getMessage() );
+			}
+		} );
+
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void rootIndexed_someSubclassesIndexed_requestMassIndexingOnRoot_withParams() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );
+			indexer.type( H2_Root_Indexed.class ).reindexOnly( "e.rootNumber = :number and e.rootMoment > :moment",
+					query -> {
+				query.setParameter( "number", I2 );
+				query.setParameter( "moment", T0 );
+			} );
+			indexer.type( H2_B_Indexed.class ).reindexOnly( "e.bNumber = :number and e.rootMoment < :moment",
+					query -> {
+				query.setParameter( "number", I0 );
+				query.setParameter( "moment", T1 );
+			} );
+
+			backendMock.expectWorks( H2_Root_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+					.add( "4", b -> b.field( "rootText", "text4" ) );
+			backendMock.expectWorks( H2_A_C_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+					.add( "12", b -> b.field( "rootText", "text12" )
+							.field( "aText", "text12" )
+							.field( "cText", "text12" ) );
+			backendMock.expectWorks( H2_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+					.add( "13", b -> b
+							.field( "rootText", "text13" )
+							.field( "bText", "text13" ) );
 
 			backendMock.expectIndexScaleWorks( H2_Root_Indexed.NAME, session.getTenantIdentifier() )
 					.purge()
