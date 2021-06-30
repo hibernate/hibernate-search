@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -16,7 +15,7 @@ import java.util.Set;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
 import org.hibernate.search.util.common.AssertionFailure;
 
 public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
@@ -35,17 +34,16 @@ public abstract class AbstractHibernateOrmLoadingStrategy<E, I>
 
 	@Override
 	public HibernateOrmQueryLoader<E, I> createQueryLoader(
-			Collection<PojoRawTypeIdentifier<? extends E>> targetEntityTypes,
-			List<LoadingTypeContext<? extends E>> typeContexts, Optional<String> conditionalExpression) {
+			List<LoadingTypeContext<? extends E>> typeContexts, Optional<ConditionalExpression> conditionalExpression) {
 		Set<Class<? extends E>> includedTypesFilter;
-		if ( HibernateOrmUtils.targetsAllConcreteSubTypes( sessionFactory, rootEntityPersister, targetEntityTypes ) ) {
+		if ( HibernateOrmUtils.targetsAllConcreteSubTypes( sessionFactory, rootEntityPersister, typeContexts ) ) {
 			// All concrete types are included, no need to filter by type.
 			includedTypesFilter = Collections.emptySet();
 		}
 		else {
-			includedTypesFilter = new HashSet<>( targetEntityTypes.size() );
-			for ( PojoRawTypeIdentifier<? extends E> targetEntityType : targetEntityTypes ) {
-				includedTypesFilter.add( targetEntityType.javaClass() );
+			includedTypesFilter = new HashSet<>( typeContexts.size() );
+			for ( LoadingTypeContext<? extends E> typeContext : typeContexts ) {
+				includedTypesFilter.add( typeContext.typeIdentifier().javaClass() );
 			}
 		}
 

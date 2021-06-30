@@ -12,12 +12,13 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
+import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
 
 public class HibernateOrmQueryLoader<E, I> {
 	private final TypeQueryFactory<E, I> queryFactory;
 	private final Set<Class<? extends E>> includedTypesFilter;
 	private final EntityPersister persister;
-	private final String conditionalExpression;
+	private final ConditionalExpression conditionalExpression;
 
 	public HibernateOrmQueryLoader(TypeQueryFactory<E, I> queryFactory,
 			Set<Class<? extends E>> includedTypesFilter) {
@@ -28,7 +29,8 @@ public class HibernateOrmQueryLoader<E, I> {
 	}
 
 	public HibernateOrmQueryLoader(TypeQueryFactory<E, I> queryFactory,
-			EntityPersister persister, Set<Class<? extends E>> includedTypesFilter, String conditionalExpression) {
+			EntityPersister persister, Set<Class<? extends E>> includedTypesFilter,
+			ConditionalExpression conditionalExpression) {
 		this.queryFactory = queryFactory;
 		this.includedTypesFilter = includedTypesFilter;
 		this.persister = persister;

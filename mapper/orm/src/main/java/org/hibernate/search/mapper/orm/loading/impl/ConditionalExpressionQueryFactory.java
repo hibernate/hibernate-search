@@ -11,25 +11,29 @@ import java.util.Set;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
+import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
 
 public abstract class ConditionalExpressionQueryFactory<E, I> implements TypeQueryFactory<E, I> {
 
+	private static final String TYPES_PARAM_NAME = "HIBERNATE_SEARCH_INCLUDED_TYPES_FILTER";
 	protected final String uniquePropertyName;
 
 	public ConditionalExpressionQueryFactory(String uniquePropertyName) {
 		this.uniquePropertyName = uniquePropertyName;
 	}
 
+	@Override
 	public Query<Long> createQueryForCount(SharedSessionContractImplementor session, EntityPersister persister,
-			Set<? extends Class<? extends E>> includedTypesFilter, String conditionalExpression) {
+			Set<? extends Class<? extends E>> includedTypesFilter, ConditionalExpression conditionalExpression) {
 		return createQueryWithConditionalExpression( session,
 				"select count(e) from " + persister.getEntityName() + " e",
 				Long.class, "e", includedTypesFilter, conditionalExpression
 		);
 	}
 
+	@Override
 	public Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session, EntityPersister persister,
-			Set<? extends Class<? extends E>> includedTypesFilter, String conditionalExpression) {
+			Set<? extends Class<? extends E>> includedTypesFilter, ConditionalExpression conditionalExpression) {
 		return createQueryWithConditionalExpression( session,
 				"select e. " + uniquePropertyName + " from " + persister.getEntityName() + " e",
 				(Class<I>) persister.getIdentifierType().getReturnedClass(), "e",
@@ -39,21 +43,23 @@ public abstract class ConditionalExpressionQueryFactory<E, I> implements TypeQue
 
 	private <T> Query<T> createQueryWithConditionalExpression(SharedSessionContractImplementor session,
 			String hql, Class<T> returnedType, String entityAlias,
-			Set<? extends Class<? extends E>> includedTypesFilter, String conditionalExpression) {
+			Set<? extends Class<? extends E>> includedTypesFilter, ConditionalExpression conditionalExpression) {
 		if ( includedTypesFilter.isEmpty() ) {
 			return createQueryWithConditionalExpression( session, hql, returnedType, conditionalExpression );
 		}
 
-		hql += " where type(" + entityAlias + ") in (:types) and " + conditionalExpression;
+		hql += " where type(" + entityAlias + ") in (:" + TYPES_PARAM_NAME + ") and " + conditionalExpression.hql();
 		Query<T> query = session.createQuery( hql, returnedType );
-		query.setParameterList( "types", includedTypesFilter );
+		query.setParameterList( TYPES_PARAM_NAME, includedTypesFilter );
+		conditionalExpression.applyQueryConsumer( query );
 		return query;
 	}
 
 	private <T> Query<T> createQueryWithConditionalExpression(SharedSessionContractImplementor session,
-			String hql, Class<T> returnedType, String conditionalExpression) {
-		hql += " where " + conditionalExpression;
+			String hql, Class<T> returnedType, ConditionalExpression conditionalExpression) {
+		hql += " where " + conditionalExpression.hql();
 		Query<T> query = session.createQuery( hql, returnedType );
+		conditionalExpression.applyQueryConsumer( query );
 		return query;
 	}
 }

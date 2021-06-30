@@ -119,7 +119,7 @@ public class HibernateOrmMassIndexer implements MassIndexer {
 		return this;
 	}
 
-	void reindexOnly(Class<?> type, String jpqlConditionalExpression) {
-		context.reindexOnly( type, jpqlConditionalExpression );
+	ConditionalExpression reindexOnly(Class<?> type, String conditionalExpression) {
+		return context.reindexOnly( type, conditionalExpression );
 	}
 }

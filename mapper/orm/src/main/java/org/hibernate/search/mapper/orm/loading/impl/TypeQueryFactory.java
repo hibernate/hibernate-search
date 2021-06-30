@@ -15,6 +15,7 @@ import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
+import org.hibernate.search.mapper.orm.massindexing.impl.ConditionalExpression;
 
 public interface TypeQueryFactory<E, I> {
 
@@ -40,10 +41,10 @@ public interface TypeQueryFactory<E, I> {
 			Set<? extends Class<? extends E>> includedTypesFilter);
 
 	Query<Long> createQueryForCount(SharedSessionContractImplementor session, EntityPersister persister,
-			Set<? extends Class<? extends E>> includedTypesFilter, String conditionalExpression);
+			Set<? extends Class<? extends E>> includedTypesFilter, ConditionalExpression conditionalExpression);
 
 	Query<I> createQueryForIdentifierListing(SharedSessionContractImplementor session, EntityPersister persister,
-			Set<? extends Class<? extends E>> includedTypesFilter, String conditionalExpression);
+			Set<? extends Class<? extends E>> includedTypesFilter, ConditionalExpression conditionalExpression);
 
 	Query<E> createQueryForLoadByUniqueProperty(SessionImplementor session, String parameterName);
 

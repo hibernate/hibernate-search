@@ -43,7 +43,7 @@ public final class HibernateOrmMassIndexingContext
 	private final HibernateOrmSessionTypeContextProvider typeContextProvider;
 	private final DetachedBackendSessionContext sessionContext;
 
-	private final Map<Class<?>, String> conditionalExpressions = new HashMap<>();
+	private final Map<Class<?>, ConditionalExpression> conditionalExpressions = new HashMap<>();
 	private CacheMode cacheMode;
 	private Integer idLoadingTransactionTimeout;
 	private int idFetchSize = 100; //reasonable default as we only load IDs
@@ -62,7 +62,7 @@ public final class HibernateOrmMassIndexingContext
 	public <T> PojoMassIndexingLoadingStrategy<? super T, ?> loadingStrategy(PojoRawTypeIdentifier<T> expectedType) {
 		LoadingTypeContext<T> typeContext = typeContextProvider.forExactType( expectedType );
 		return new HibernateOrmMassIndexingLoadingStrategy<>( typeContext.loadingStrategy(),
-				conditionalExpression( typeContext.jpaEntityName() ), typeContextProvider );
+				conditionalExpression( typeContext ), typeContextProvider );
 	}
 
 	public void idLoadingTransactionTimeout(int timeoutInSeconds) {
@@ -115,17 +115,16 @@ public final class HibernateOrmMassIndexingContext
 		return idFetchSize;
 	}
 
-	void reindexOnly(Class<?> type, String jpqlConditionalExpression) {
-		conditionalExpressions.put( type, jpqlConditionalExpression );
+	ConditionalExpression reindexOnly(Class<?> type, String conditionalExpression) {
+		ConditionalExpression expression = new ConditionalExpression( conditionalExpression );
+		conditionalExpressions.put( type, expression );
+		return expression;
 	}
 
-	private Optional<String> conditionalExpression(String jpaEntityName) {
+	private Optional<ConditionalExpression> conditionalExpression(LoadingTypeContext<?> typeContext) {
 		if ( conditionalExpressions.isEmpty() ) {
 			return Optional.empty();
 		}
-		LoadingTypeContext<?> typeContext = typeContextProvider.forExactType(
-				typeContextProvider.typeIdentifierForEntityName( jpaEntityName )
-		);
 
 		return typeContext.ascendingSuperTypes()
 				.stream()
@@ -137,11 +136,11 @@ public final class HibernateOrmMassIndexingContext
 	private final class HibernateOrmMassIndexingLoadingStrategy<E, I> implements PojoMassIndexingLoadingStrategy<E, I> {
 
 		private final HibernateOrmEntityLoadingStrategy<E, I> delegate;
-		private final Optional<String> conditionalExpression;
+		private final Optional<ConditionalExpression> conditionalExpression;
 		private final HibernateOrmSessionTypeContextProvider typeContextProvider;
 
 		public HibernateOrmMassIndexingLoadingStrategy(HibernateOrmEntityLoadingStrategy<E, I> delegate,
-				Optional<String> conditionalExpression, HibernateOrmSessionTypeContextProvider typeContextProvider) {
+				Optional<ConditionalExpression> conditionalExpression, HibernateOrmSessionTypeContextProvider typeContextProvider) {
 			this.delegate = delegate;
 			this.conditionalExpression = conditionalExpression;
 			this.typeContextProvider = typeContextProvider;
@@ -177,7 +176,7 @@ public final class HibernateOrmMassIndexingContext
 					.collect( Collectors.toList() );
 
 			HibernateOrmQueryLoader<E, I> typeQueryLoader = delegate.createQueryLoader(
-					context.includedTypes(), typeContexts, conditionalExpression );
+					typeContexts, conditionalExpression );
 			SharedSessionContractImplementor session = (SharedSessionContractImplementor) sessionFactory
 					.withStatelessOptions()
 					.tenantIdentifier( sessionContext.tenantIdentifier() )
@@ -201,7 +200,7 @@ public final class HibernateOrmMassIndexingContext
 					.collect( Collectors.toList() );
 
 			HibernateOrmQueryLoader<E, ?> typeQueryLoader = delegate.createQueryLoader(
-					context.includedTypes(), typeContexts, conditionalExpression );
+					typeContexts, conditionalExpression );
 			SessionImplementor session = (SessionImplementor) sessionFactory
 					.withOptions()
 					.tenantIdentifier( sessionContext.tenantIdentifier() )
