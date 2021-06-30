@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.documentation.mapper.orm.indexing;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
@@ -30,6 +31,8 @@ public class Author {
 
 	@OneToMany(mappedBy = "author")
 	private List<Book> books = new ArrayList<>();
+
+	private LocalDate birthDate;
 
 	public Author() {
 	}
@@ -64,5 +67,13 @@ public class Author {
 
 	public void setBooks(List<Book> books) {
 		this.books = books;
+	}
+
+	public LocalDate getBirthDate() {
+		return birthDate;
+	}
+
+	public void setBirthDate(LocalDate birthDate) {
+		this.birthDate = birthDate;
 	}
 }

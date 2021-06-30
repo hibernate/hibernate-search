@@ -77,6 +77,30 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 <2> Start the mass indexing process for the selected types and return when it is over.
 ====
 
+You can also select a subset of target entities to be reindexed.
+
+.Partial reindexing
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmMassIndexerIT.java[tags=reindexOnly]
+----
+<1> Get the `SearchSession`.
+<2> Create a `MassIndexer` targeting every indexed entity type.
+<3> Reindex only the books having year less or equals to 2100.
+<4> Reindex only the author having birthday less of a given local date.
+<5> For this case the date is passed as query parameter.
+<6> Start the mass indexing process and return when it is over.
+====
+
+[WARNING]
+====
+Even if the reindexing is applied on a subset of entities, by default *all entities* will be purged at the start.
+At the moment there is no way to filter the entities that will be purged.
+
+See https://hibernate.atlassian.net/browse/HSEARCH-3304[HSEARCH-3304] for more information.
+====
+
 It is possible to run the mass indexer asynchronously,
 because, the mass indexer does not rely on the original Hibernate ORM session.
 When used asynchronously, the mass indexer will return a completion stage
