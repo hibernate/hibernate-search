@@ -11,6 +11,7 @@ import static org.awaitility.Awaitility.await;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThatFuture;
 
 import java.lang.invoke.MethodHandles;
+import java.time.LocalDate;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 import javax.persistence.EntityManager;
@@ -21,6 +22,7 @@ import org.hibernate.search.documentation.testsupport.DocumentationSetupHelper;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -72,6 +74,28 @@ public class HibernateOrmMassIndexerIT {
 			}
 			assertBookCount( entityManager, NUMBER_OF_BOOKS );
 			assertAuthorCount( entityManager, NUMBER_OF_BOOKS );
+		} );
+	}
+
+	@Test
+	public void reindexOnly() {
+		OrmUtils.withinEntityManager( entityManagerFactory, entityManager -> {
+			try {
+				// tag::reindexOnly[]
+				SearchSession searchSession = Search.session( entityManager ); // <1>
+				MassIndexer massIndexer = searchSession.massIndexer(); // <2>
+				massIndexer.type( Book.class ).reindexOnly( "e.year <= 2100" ); // <3>
+				massIndexer.type( Author.class ).reindexOnly( "e.birthday < :birthday", query -> { // <4>
+					query.setParameter( "birthday", LocalDate.ofYearDay( 2100, 77 ) ); // <5>
+				} );
+				massIndexer.startAndWait(); // <6>
+				// end::reindexOnly[]
+			}
+			catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+			assertBookCount( entityManager, 651 );
+			assertAuthorCount( entityManager, 651 );
 		} );
 	}
 
@@ -205,6 +229,7 @@ public class HibernateOrmMassIndexerIT {
 		Book book = new Book();
 		book.setId( id );
 		book.setTitle( "This is the title of book #" + id );
+		book.setPublicationYear( 1450 + id );
 		return book;
 	}
 
@@ -213,6 +238,7 @@ public class HibernateOrmMassIndexerIT {
 		author.setId( id );
 		author.setFirstName( "John" + id );
 		author.setLastName( "Smith" + id );
+		author.setBirthDate( LocalDate.ofYearDay( 1450 + id, 33 ) );
 		return author;
 	}
 }

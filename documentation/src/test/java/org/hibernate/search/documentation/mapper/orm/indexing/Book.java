@@ -28,6 +28,8 @@ public class Book {
 	@IndexedEmbedded
 	private Author author;
 
+	private int publicationYear;
+
 	public Book() {
 	}
 
@@ -53,5 +55,13 @@ public class Book {
 
 	public void setAuthor(Author author) {
 		this.author = author;
+	}
+
+	public int getPublicationYear() {
+		return publicationYear;
+	}
+
+	public void setPublicationYear(int publicationYear) {
+		this.publicationYear = publicationYear;
 	}
 }
