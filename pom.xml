@@ -474,13 +474,15 @@
          -->
         <surefire.environment>default</surefire.environment>
 
+        <!-- Containers executions tests properties -->
+        <test.containers.run.skip>false</test.containers.run.skip>
+
         <!-- Elasticsearch tests properties -->
 
         <!-- Control how an Elasticsearch instance is run automatically during tests -->
         <!-- By default, the plugin is not skipped, but each container (elastic, etc.) is skipped;
              Maven profiles will re-enable the right container depending on configuration.
           -->
-        <test.elasticsearch.run.skip>false</test.elasticsearch.run.skip>
         <test.elasticsearch.run.elastic.skip>true</test.elasticsearch.run.elastic.skip>
         <test.elasticsearch.run.elastic.image.name>docker.elastic.co/elasticsearch/elasticsearch</test.elasticsearch.run.elastic.image.name>
         <test.elasticsearch.run.elastic.image.tag>${test.elasticsearch.connection.version}</test.elasticsearch.run.elastic.image.tag>

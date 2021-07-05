@@ -144,7 +144,7 @@
                     <artifactId>docker-maven-plugin</artifactId>
                     <version>${version.docker.maven.plugin}</version>
                     <configuration>
-                        <skip>${test.elasticsearch.run.skip}</skip>
+                        <skip>${test.containers.run.skip}</skip>
                         <images>
                             <image>
                                 <name>${test.elasticsearch.run.elastic.image.name}:${test.elasticsearch.run.elastic.image.tag}</name>
@@ -284,8 +284,8 @@
                 </property>
             </activation>
             <properties>
-                <!-- This is to avoid starting an Elasticsearch node for each module needing integration test -->
-                <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
+                <!-- This is to avoid starting containers for each module needing integration test -->
+                <test.containers.run.skip>true</test.containers.run.skip>
             </properties>
         </profile>
         <profile>
@@ -296,8 +296,8 @@
                 </property>
             </activation>
             <properties>
-                <!-- This is to avoid starting an Elasticsearch node for each module needing integration test -->
-                <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
+                <!-- This is to avoid starting containers for each module needing integration test -->
+                <test.containers.run.skip>true</test.containers.run.skip>
             </properties>
         </profile>
 
@@ -334,7 +334,9 @@
                 </property>
             </activation>
             <properties>
-                <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
+                <!-- Skipping to start all containers here -->
+                <!-- When the uris property is set, usually we don't need any container (neither ES nor others). -->
+                <test.containers.run.skip>true</test.containers.run.skip>
             </properties>
         </profile>
 
