@@ -539,36 +539,38 @@
             </properties>
         </profile>
 
-        <!-- The PostgreSQL test environment on ci.hibernate.org (v. 9.3.9)-->
+        <!-- PostgreSQL Docker container for tests -->
+        <!-- See test.database.run.postgresql.image.tag for the server version in use -->
         <profile>
             <id>ci-postgresql</id>
             <properties>
                 <test.database.run.postgres.skip>false</test.database.run.postgres.skip>
-                <db.dialect>org.hibernate.dialect.PostgreSQL92Dialect</db.dialect>
+                <db.dialect>org.hibernate.dialect.PostgreSQL10Dialect</db.dialect>
                 <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
-                <jdbc.driver.version>42.1.1</jdbc.driver.version>
+                <jdbc.driver.version>42.2.19</jdbc.driver.version>
                 <jdbc.driver>org.postgresql.Driver</jdbc.driver>
-                <jdbc.url>jdbc:postgresql://localhost:5432/testingdb</jdbc.url>
-                <jdbc.user>hibernate_user</jdbc.user>
-                <jdbc.pass>hibernate_password</jdbc.pass>
+                <jdbc.url>jdbc:postgresql://localhost:5432/hibernate_orm_test</jdbc.url>
+                <jdbc.user>hibernate_orm_test</jdbc.user>
+                <jdbc.pass>hibernate_orm_test</jdbc.pass>
                 <jdbc.isolation />
             </properties>
         </profile>
 
-        <!-- The MySQL test environment test environment on ci.hibernate.org (v. 10.0.19-MariaDB)-->
+        <!-- MariaDB Docker container for tests -->
+        <!-- See test.database.run.mariadb.image.tag for the server version in use -->
         <profile>
             <id>ci-mariadb</id>
             <properties>
                 <test.database.run.mariadb.skip>false</test.database.run.mariadb.skip>
-                <db.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</db.dialect>
+                <db.dialect>org.hibernate.dialect.MariaDB103Dialect</db.dialect>
                 <jdbc.driver.groupId>org.mariadb.jdbc</jdbc.driver.groupId>
                 <jdbc.driver.artifactId>mariadb-java-client</jdbc.driver.artifactId>
                 <jdbc.driver.version>2.2.4</jdbc.driver.version>
                 <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
-                <jdbc.url>jdbc:mariadb://localhost/testingdb</jdbc.url>
-                <jdbc.user>hibernate_user</jdbc.user>
-                <jdbc.pass>hibernate_password</jdbc.pass>
+                <jdbc.url>jdbc:mariadb://localhost/hibernate_orm_test</jdbc.url>
+                <jdbc.user>hibernate_orm_test</jdbc.user>
+                <jdbc.pass>hibernate_orm_test</jdbc.pass>
                 <jdbc.isolation />
             </properties>
         </profile>
