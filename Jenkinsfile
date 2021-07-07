@@ -198,12 +198,12 @@ stage('Configure') {
 			],
 			database: [
 					new DatabaseBuildEnvironment(dbName: 'h2', mavenProfile: 'h2',
-							condition: TestCondition.BEFORE_MERGE,
+							condition: TestCondition.BEFORE_MERGE, dockerHubImage: null,
 							isDefault: true),
-					new DatabaseBuildEnvironment(dbName: 'mariadb', mavenProfile: 'ci-mariadb',
-							condition: TestCondition.AFTER_MERGE),
 					new DatabaseBuildEnvironment(dbName: 'postgresql', mavenProfile: 'ci-postgresql',
-							condition: TestCondition.AFTER_MERGE)
+							condition: TestCondition.AFTER_MERGE, dockerHubImage: "postgres:13.1"),
+					new DatabaseBuildEnvironment(dbName: 'mariadb', mavenProfile: 'ci-mariadb',
+							condition: TestCondition.AFTER_MERGE, dockerHubImage: "mariadb:10.5.8")
 			],
 			esLocal: [
 					new EsLocalBuildEnvironment(versionRange: '[5.6,6.0)', mavenProfile: 'elasticsearch-5.6',
@@ -555,6 +555,12 @@ stage('Non-default environments') {
 	environments.content.database.enabled.each { DatabaseBuildEnvironment buildEnv ->
 		executions.put(buildEnv.tag, {
 			runBuildOnNode(NODE_PATTERN_BASE + '&&LegacyDBInstall') {
+				if ( buildEnv.dockerHubImage ) {
+					// Authenticated pull, to avoid failure due to throttling.
+					docker.withRegistry('https://index.docker.io/v1/', 'hibernateci.hub.docker.com') {
+						docker.image(buildEnv.dockerHubImage).pull()
+					}
+				}
 				helper.withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install \
@@ -798,6 +804,7 @@ class CompilerBuildEnvironment extends BuildEnvironment {
 class DatabaseBuildEnvironment extends BuildEnvironment {
 	String dbName
 	String mavenProfile
+	String dockerHubImage
 	@Override
 	String getTag() { "database-$dbName" }
 }
