@@ -9,6 +9,8 @@ package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 import static org.junit.Assert.fail;
 
 import java.time.Instant;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -22,6 +24,7 @@ import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
@@ -32,15 +35,20 @@ import org.junit.Test;
 
 public class MassIndexingConditionalExpressionsIT {
 
-	// where T0 < T1 < T2
+	// where INSTANT_0 < INSTANT_1 < INSTANT_2
 	private static final Instant INSTANT_0 = Instant.ofEpochMilli( 1_000_000 );
 	private static final Instant INSTANT_1 = Instant.ofEpochMilli( 1_500_000 );
 	private static final Instant INSTANT_2 = Instant.ofEpochMilli( 2_000_000 );
 
-	// where I0 < I1 < I2
+	// where INT_0 < INT_1 < INT_2
 	private static final int INT_0 = 0;
 	private static final int INT_1 = 1;
 	private static final int INT_2 = 2;
+
+	private static final String KEYWORD_A_1 = "a-1";
+	private static final String KEYWORD_A_2 = "a-2";
+	private static final String KEYWORD_B_1 = "b-1";
+	private static final String KEYWORD_B_2 = "b-2";
 
 	@Rule
 	public BackendMock backendMock = new BackendMock();
@@ -57,6 +65,8 @@ public class MassIndexingConditionalExpressionsIT {
 		backendMock.expectAnySchema( H2_Root_Indexed.NAME );
 		backendMock.expectAnySchema( H2_A_C_Indexed.NAME );
 		backendMock.expectAnySchema( H2_B_Indexed.NAME );
+		backendMock.expectAnySchema( H3_A_Indexed.NAME );
+		backendMock.expectAnySchema( H3_B_Indexed.NAME );
 		sessionFactory = ormSetupHelper.start()
 				.withPropertyRadical(
 						HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY,
@@ -67,7 +77,8 @@ public class MassIndexingConditionalExpressionsIT {
 						H1_Root_NotIndexed.class, H1_A_NotIndexed.class, H1_B_Indexed.class,
 						H2_Root_Indexed.class,
 						H2_A_NotIndexed.class, H2_A_C_Indexed.class,
-						H2_B_Indexed.class, H2_B_D_NotIndexed.class
+						H2_B_Indexed.class, H2_B_D_NotIndexed.class,
+						H3_Root.class, H3_A_Indexed.class, H3_B_Indexed.class
 				);
 		backendMock.verifyExpectationsMet();
 
@@ -110,6 +121,11 @@ public class MassIndexingConditionalExpressionsIT {
 			session.persist( new H2_B_D_NotIndexed( 18, INSTANT_0, INT_2 ) );
 			session.persist( new H2_B_D_NotIndexed( 19, INSTANT_2, INT_0 ) );
 			session.persist( new H2_B_D_NotIndexed( 20, INSTANT_2, INT_2 ) );
+
+			session.persist( new H3_A_Indexed( 1L, KEYWORD_A_1 ) );
+			session.persist( new H3_A_Indexed( 2L, KEYWORD_A_2 ) );
+			session.persist( new H3_B_Indexed( 3L, KEYWORD_B_1 ) );
+			session.persist( new H3_B_Indexed( 4L, KEYWORD_B_2 ) );
 		} );
 	}
 
@@ -423,6 +439,77 @@ public class MassIndexingConditionalExpressionsIT {
 		backendMock.verifyExpectationsMet();
 	}
 
+	@Test
+	public void sameFieldName_targetingEachClass() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			MassIndexer indexer = searchSession.massIndexer( H3_Root.class );
+
+			indexer.type( H3_A_Indexed.class ).reindexOnly( "e.myProperty = :myProperty" )
+					.param( "myProperty", KEYWORD_A_1 );
+			indexer.type( H3_B_Indexed.class ).reindexOnly( "e.myProperty = :myProperty" )
+					.param( "myProperty", KEYWORD_B_1 );
+
+			backendMock.expectWorks( H3_A_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+					.add( "1", b -> b.field( "myProperty", KEYWORD_A_1 ) );
+			backendMock.expectWorks( H3_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+					.add( "3", b -> b.field( "myProperty", KEYWORD_B_1 ) );
+
+			backendMock.expectIndexScaleWorks( H3_A_Indexed.NAME, session.getTenantIdentifier() )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
+			backendMock.expectIndexScaleWorks( H3_B_Indexed.NAME, session.getTenantIdentifier() )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
+
+			try {
+				indexer.startAndWait();
+			}
+			catch (InterruptedException e) {
+				fail( "Unexpected InterruptedException: " + e.getMessage() );
+			}
+		} );
+	}
+
+	@Test
+	public void sameFieldName_targetingInterface() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			MassIndexer indexer = searchSession.massIndexer( H3_Root.class );
+
+			indexer.type( H3_I.class ).reindexOnly( "e.myProperty = :p1 or e.myProperty = :p2" )
+					.param( "p1", KEYWORD_A_1 )
+					.param( "p2", KEYWORD_B_1 );
+
+			backendMock.expectWorks( H3_A_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+					.add( "1", b -> b.field( "myProperty", KEYWORD_A_1 ) );
+			backendMock.expectWorks( H3_B_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
+					.add( "3", b -> b.field( "myProperty", KEYWORD_B_1 ) );
+
+			backendMock.expectIndexScaleWorks( H3_A_Indexed.NAME, session.getTenantIdentifier() )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
+			backendMock.expectIndexScaleWorks( H3_B_Indexed.NAME, session.getTenantIdentifier() )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
+
+			try {
+				indexer.startAndWait();
+			}
+			catch (InterruptedException e) {
+				fail( "Unexpected InterruptedException: " + e.getMessage() );
+			}
+		} );
+	}
+
 	@Entity(name = H0_Indexed.NAME)
 	@Indexed
 	public static class H0_Indexed {
@@ -641,6 +728,91 @@ public class MassIndexingConditionalExpressionsIT {
 			this.dText = "text" + id;
 			this.dMoment = moment;
 			this.dNumber = number;
+		}
+	}
+
+	public interface H3_I {
+		String getMyProperty();
+	}
+
+	@Entity(name = H3_Root.NAME)
+	@Access(AccessType.PROPERTY)
+	public abstract static class H3_Root {
+
+		public static final String NAME = "H3_Root";
+
+		private Long id;
+
+		public H3_Root() {
+		}
+
+		public H3_Root(Long id) {
+			this.id = id;
+		}
+
+		@Id
+		public Long getId() {
+			return id;
+		}
+
+		public void setId(Long id) {
+			this.id = id;
+		}
+	}
+
+	@Entity(name = H3_A_Indexed.NAME)
+	@Access(AccessType.PROPERTY)
+	@Indexed
+	public static class H3_A_Indexed extends H3_Root implements H3_I {
+
+		public static final String NAME = "H3_A";
+
+		private String myProperty;
+
+		public H3_A_Indexed() {
+		}
+
+		public H3_A_Indexed(Long id, String myProperty) {
+			super( id );
+			this.myProperty = myProperty;
+		}
+
+		@Override
+		@KeywordField
+		public String getMyProperty() {
+			return myProperty;
+		}
+
+		public void setMyProperty(String myProperty) {
+			this.myProperty = myProperty;
+		}
+	}
+
+	@Entity(name = H3_B_Indexed.NAME)
+	@Access(AccessType.PROPERTY)
+	@Indexed
+	public static class H3_B_Indexed extends H3_Root implements H3_I {
+
+		public static final String NAME = "H3_B";
+
+		private String myProperty;
+
+		public H3_B_Indexed() {
+		}
+
+		public H3_B_Indexed(Long id, String myProperty) {
+			super( id );
+			this.myProperty = myProperty;
+		}
+
+		@Override
+		@KeywordField
+		public String getMyProperty() {
+			return myProperty;
+		}
+
+		public void setMyProperty(String myProperty) {
+			this.myProperty = myProperty;
 		}
 	}
 }
