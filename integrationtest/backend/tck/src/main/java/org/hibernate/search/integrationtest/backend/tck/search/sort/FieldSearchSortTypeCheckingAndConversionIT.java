@@ -547,7 +547,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 					supportedFieldTypes, root, "converted_",
 					c -> c.sortable( Sortable.YES ),
 					additionalConfiguration.andThen(
-							c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
+							c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() )
 					)
 			);
 			nonSortableFieldModels = SimpleFieldModelsByType.mapAll(
@@ -607,7 +607,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 			fieldWithDslConverterModels = SimpleFieldModelsByType.mapAll(
 					supportedFieldTypes, root, "converted_", (fieldType, c) -> {
 						c.sortable( Sortable.YES );
-						c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() );
+						c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() );
 						addIrrelevantOptions( fieldType, c );
 					}
 			);
@@ -629,7 +629,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 			 * Add fields with the same name as the fieldModels from IndexBinding,
 			 * but with an incompatible DSL converter.
 			 */
-			super( root, c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ) );
+			super( root, c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() ) );
 		}
 	}
 

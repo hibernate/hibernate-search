@@ -1065,7 +1065,7 @@ public class LuceneExtensionIT {
 					"nativeField_converted",
 					f -> f.extension( LuceneExtension.get() )
 							.asNative( Integer.class, LuceneExtensionIT::contributeNativeField, LuceneExtensionIT::fromNativeField )
-							.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() )
+							.projectionConverter( ValueWrapper.class, ValueWrapper.fromDocumentValueConverter() )
 			)
 					.toReference();
 			nativeField_unsupportedProjection = root.field(

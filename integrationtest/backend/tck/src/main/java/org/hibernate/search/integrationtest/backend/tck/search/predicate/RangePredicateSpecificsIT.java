@@ -324,7 +324,7 @@ public class RangePredicateSpecificsIT<F> {
 			defaultDslConverterField = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
 					"defaultDslConverterField_" );
 			customDslConverterField = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
-					"customDslConverterField_", c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ) );
+					"customDslConverterField_", c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() ) );
 		}
 	}
 

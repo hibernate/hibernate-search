@@ -1252,8 +1252,8 @@ public class ElasticsearchExtensionIT {
 					"nativeField_integer_converted",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asNative().mapping( "{'type': 'integer'}" )
-							.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
-							.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() )
+							.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() )
+							.projectionConverter( ValueWrapper.class, ValueWrapper.fromDocumentValueConverter() )
 			)
 					.toReference();
 			nativeField_string = root.field(

@@ -187,9 +187,9 @@ public class IndexValueFieldTypeDescriptorBaseIT {
 		IndexBinding(IndexSchemaElement root) {
 			mapper( fieldType, ignored -> { } ).map( root, "default" );
 
-			mapper( fieldType, c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ) )
+			mapper( fieldType, c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() ) )
 					.map( root, "dslConverter" );
-			mapper( fieldType, c -> c.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() ) )
+			mapper( fieldType, c -> c.projectionConverter( ValueWrapper.class, ValueWrapper.fromDocumentValueConverter() ) )
 					.map( root, "projectionConverter" );
 
 			mapper( fieldType, c -> c.searchable( Searchable.YES ) ).map( root, "searchable" );

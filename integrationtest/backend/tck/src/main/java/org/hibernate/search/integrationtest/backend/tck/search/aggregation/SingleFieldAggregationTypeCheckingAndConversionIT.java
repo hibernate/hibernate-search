@@ -26,10 +26,10 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
@@ -573,8 +573,8 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 					"", c -> c.aggregable( Aggregable.YES ) );
 			fieldWithConverterModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
 					"converted_", c -> c.aggregable( Aggregable.YES )
-							.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
-							.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() ) );
+							.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() )
+							.projectionConverter( ValueWrapper.class, ValueWrapper.fromDocumentValueConverter() ) );
 			fieldWithAggregationDisabledModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
 					"nonAggregable_", c -> c.aggregable( Aggregable.NO ) );
 
@@ -607,8 +607,8 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 			fieldWithConverterModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
 					"converted_", (fieldType, c) -> {
 						c.aggregable( Aggregable.YES )
-								.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
-								.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() );
+								.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() )
+								.projectionConverter( ValueWrapper.class, ValueWrapper.fromDocumentValueConverter() );
 						addIrrelevantOptions( fieldType, c );
 					} );
 		}
@@ -639,18 +639,18 @@ public class SingleFieldAggregationTypeCheckingAndConversionIT<F> {
 
 		@SuppressWarnings("rawtypes")
 		private static class IncompatibleDslConverter<F>
-				implements ToDocumentFieldValueConverter<ValueWrapper, F> {
+				implements ToDocumentValueConverter<ValueWrapper, F> {
 			@Override
-			public F convert(ValueWrapper value, ToDocumentFieldValueConvertContext context) {
+			public F toDocumentValue(ValueWrapper value, ToDocumentValueConvertContext context) {
 				return null;
 			}
 		}
 
 		@SuppressWarnings("rawtypes")
 		private static class IncompatibleProjectionConverter
-				implements FromDocumentFieldValueConverter<Object, ValueWrapper> {
+				implements FromDocumentValueConverter<Object, ValueWrapper> {
 			@Override
-			public ValueWrapper convert(Object value, FromDocumentFieldValueConvertContext context) {
+			public ValueWrapper fromDocumentValue(Object value, FromDocumentValueConvertContext context) {
 				return null;
 			}
 		}

@@ -401,9 +401,9 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 		public IndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
 			defaultDslConverterField0 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "defaultDslConverterField0_" );
 			customDslConverterField0 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "customDslConverterField0_",
-					c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ) );
+					c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() ) );
 			customDslConverterField1 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "customDslConverterField1_",
-					c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ) );
+					c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() ) );
 		}
 	}
 
@@ -417,12 +417,12 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 					this::addIrrelevantOptions );
 			customDslConverterField0 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "customDslConverterField0_",
 					(fieldType, c) -> {
-						c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() );
+						c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() );
 						addIrrelevantOptions( fieldType, c );
 					} );
 			customDslConverterField1 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "customDslConverterField1_",
 					(fieldType, c) -> {
-						c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() );
+						c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() );
 						addIrrelevantOptions( fieldType, c );
 					} );
 		}
@@ -444,7 +444,7 @@ public abstract class AbstractPredicateTypeCheckingAndConversionIT<V extends Abs
 
 		public RawFieldCompatibleIndexBinding(IndexSchemaElement root, Collection<? extends FieldTypeDescriptor<?>> fieldTypes) {
 			defaultDslConverterField0 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "defaultDslConverterField0_",
-					c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ) );
+					c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() ) );
 			customDslConverterField0 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "customDslConverterField0_" );
 			customDslConverterField1 = SimpleFieldModelsByType.mapAll( fieldTypes, root, "customDslConverterField1_" );
 		}

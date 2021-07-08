@@ -16,8 +16,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
@@ -178,15 +178,15 @@ public abstract class AbstractPredicateTypeCheckingNoConversionIT<V extends Abst
 	}
 
 	// These DSL converters should not be used, since no conversion takes place.
-	private static <T> ToDocumentFieldValueConverter<ValueWrapper, T> unusedDslConverter() {
-		return new ToDocumentFieldValueConverter<ValueWrapper, T>() {
+	private static <T> ToDocumentValueConverter<ValueWrapper, T> unusedDslConverter() {
+		return new ToDocumentValueConverter<ValueWrapper, T>() {
 			@Override
-			public T convert(ValueWrapper value, ToDocumentFieldValueConvertContext context) {
+			public T toDocumentValue(ValueWrapper value, ToDocumentValueConvertContext context) {
 				throw new UnsupportedOperationException( "Should not be called" );
 			}
 
 			@Override
-			public boolean isCompatibleWith(ToDocumentFieldValueConverter<?, ?> other) {
+			public boolean isCompatibleWith(ToDocumentValueConverter<?, ?> other) {
 				throw new UnsupportedOperationException( "Should not be called" );
 			}
 		};
