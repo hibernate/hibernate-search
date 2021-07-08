@@ -314,7 +314,7 @@ public class DistanceSearchSortTypeCheckingAndConversionIT {
 					.map(
 							root, "converted", c -> c.sortable( Sortable.YES ),
 							additionalConfiguration.andThen(
-									c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ) )
+									c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() ) )
 					);
 			nonSortableFieldModel = SimpleFieldModel.mapper( fieldType )
 					.map(
@@ -380,7 +380,7 @@ public class DistanceSearchSortTypeCheckingAndConversionIT {
 								addIrrelevantOptions( c );
 							},
 							additionalConfiguration.andThen(
-									c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ) )
+									c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() ) )
 					);
 		}
 
@@ -398,7 +398,7 @@ public class DistanceSearchSortTypeCheckingAndConversionIT {
 			 * Add fields with the same name as the fieldModel from IndexBinding,
 			 * but with an incompatible DSL converter.
 			 */
-			super( root, c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ) );
+			super( root, c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() ) );
 		}
 	}
 

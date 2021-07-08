@@ -8,12 +8,10 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
 import java.util.Objects;
 
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterStep;
 import org.hibernate.search.util.impl.integrationtest.common.Normalizable;
 import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
@@ -24,30 +22,30 @@ import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
  * and {@link IndexFieldTypeConverterStep#projectionConverter(Class, FromDocumentValueConverter)  projection converters}.
  */
 public final class ValueWrapper<T> implements Normalizable<ValueWrapper<T>> {
-	public static <T> ToDocumentFieldValueConverter<ValueWrapper, T> toIndexFieldConverter() {
-		return new ToDocumentFieldValueConverter<ValueWrapper, T>() {
+	public static <T> ToDocumentValueConverter<ValueWrapper, T> toDocumentValueConverter() {
+		return new ToDocumentValueConverter<ValueWrapper, T>() {
 			@Override
 			@SuppressWarnings("unchecked")
-			public T convert(ValueWrapper value, ToDocumentFieldValueConvertContext context) {
+			public T toDocumentValue(ValueWrapper value, ToDocumentValueConvertContext context) {
 				return (T) value.getValue();
 			}
 
 			@Override
-			public boolean isCompatibleWith(ToDocumentFieldValueConverter<?, ?> other) {
+			public boolean isCompatibleWith(ToDocumentValueConverter<?, ?> other) {
 				return getClass().equals( other.getClass() );
 			}
 		};
 	}
 
-	public static <T> FromDocumentFieldValueConverter<T, ValueWrapper> fromIndexFieldConverter() {
-		return new FromDocumentFieldValueConverter<T, ValueWrapper>() {
+	public static <T> FromDocumentValueConverter<T, ValueWrapper> fromDocumentValueConverter() {
+		return new FromDocumentValueConverter<T, ValueWrapper>() {
 			@Override
-			public ValueWrapper<T> convert(T indexedValue, FromDocumentFieldValueConvertContext context) {
+			public ValueWrapper<T> fromDocumentValue(T indexedValue, FromDocumentValueConvertContext context) {
 				return new ValueWrapper<>( indexedValue );
 			}
 
 			@Override
-			public boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
+			public boolean isCompatibleWith(FromDocumentValueConverter<?, ?> other) {
 				return getClass().equals( other.getClass() );
 			}
 		};

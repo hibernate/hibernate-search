@@ -553,8 +553,8 @@ public class RangeAggregationSpecificsIT<F> {
 			);
 			fieldWithConverterModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
 					"converted_", c -> c.aggregable( Aggregable.YES )
-							.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
-							.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() )
+							.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() )
+							.projectionConverter( ValueWrapper.class, ValueWrapper.fromDocumentValueConverter() )
 			);
 			fieldWithAggregationDisabledModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
 					"nonAggregable_", c -> c.aggregable( Aggregable.NO )

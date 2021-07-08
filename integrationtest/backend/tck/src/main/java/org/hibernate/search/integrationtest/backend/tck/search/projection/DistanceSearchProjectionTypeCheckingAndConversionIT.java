@@ -19,8 +19,8 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -329,8 +329,8 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 					.map( root, "unconverted", c -> c.projectable( Projectable.YES ) );
 			fieldWithConverterModel = SimpleFieldModel.mapper( fieldType )
 					.map( root, "converted", c -> c.projectable( Projectable.YES )
-							.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
-							.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() ) );
+							.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() )
+							.projectionConverter( ValueWrapper.class, ValueWrapper.fromDocumentValueConverter() ) );
 			fieldWithProjectionDisabledModel = SimpleFieldModel.mapper( fieldType )
 					.map( root, "nonProjectable", c -> c.projectable( Projectable.NO ) );
 			fieldWithMultipleValuesModel = SimpleFieldModel.mapper( fieldType )
@@ -377,8 +377,8 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 			fieldWithConverterModel = SimpleFieldModel.mapper( fieldType )
 					.map( root, "converted", c -> {
 						c.projectable( Projectable.YES )
-								.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
-								.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() );
+								.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() )
+								.projectionConverter( ValueWrapper.class, ValueWrapper.fromDocumentValueConverter() );
 						addIrrelevantOptions( c );
 					} );
 		}
@@ -406,9 +406,9 @@ public class DistanceSearchProjectionTypeCheckingAndConversionIT {
 
 		@SuppressWarnings("rawtypes")
 		private static class IncompatibleProjectionConverter
-				implements FromDocumentFieldValueConverter<Object, ValueWrapper> {
+				implements FromDocumentValueConverter<Object, ValueWrapper> {
 			@Override
-			public ValueWrapper convert(Object value, FromDocumentFieldValueConvertContext context) {
+			public ValueWrapper fromDocumentValue(Object value, FromDocumentValueConvertContext context) {
 				return null;
 			}
 		}

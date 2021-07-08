@@ -21,8 +21,8 @@ import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -524,8 +524,8 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 					"", c -> c.projectable( Projectable.YES ) );
 			fieldWithConverterModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
 					"converted_", c -> c.projectable( Projectable.YES )
-							.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
-							.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() ) );
+							.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() )
+							.projectionConverter( ValueWrapper.class, ValueWrapper.fromDocumentValueConverter() ) );
 			fieldWithProjectionDisabledModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
 					"nonProjectable_", c -> c.projectable( Projectable.NO ) );
 			fieldWithMultipleValuesModels = SimpleFieldModelsByType.mapAllMultiValued( supportedFieldTypes, root,
@@ -572,8 +572,8 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 			fieldWithConverterModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
 					"converted_", (fieldType, c) -> {
 							c.projectable( Projectable.YES )
-								.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
-								.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() );
+								.dslConverter( ValueWrapper.class, ValueWrapper.toDocumentValueConverter() )
+								.projectionConverter( ValueWrapper.class, ValueWrapper.fromDocumentValueConverter() );
 							addIrrelevantOptions( fieldType, c );
 					} );
 		}
@@ -603,9 +603,9 @@ public class FieldSearchProjectionTypeCheckingAndConversionIT<F> {
 
 		@SuppressWarnings("rawtypes")
 		private static class IncompatibleProjectionConverter
-				implements FromDocumentFieldValueConverter<Object, ValueWrapper> {
+				implements FromDocumentValueConverter<Object, ValueWrapper> {
 			@Override
-			public ValueWrapper convert(Object value, FromDocumentFieldValueConvertContext context) {
+			public ValueWrapper fromDocumentValue(Object value, FromDocumentValueConvertContext context) {
 				return null;
 			}
 		}

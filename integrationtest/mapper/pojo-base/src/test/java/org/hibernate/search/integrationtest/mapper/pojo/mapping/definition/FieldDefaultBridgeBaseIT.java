@@ -18,11 +18,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentValueConvertContextImpl;
@@ -173,7 +171,7 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 		DslConverter<?, ?> compatibleDslConverter =
 				index2Field.toValueField().type().dslConverter();
 		DslConverter<?, ?> incompatibleDslConverter =
-				new DslConverter<>( typeDescriptor.getJavaType(), new IncompatibleToDocumentFieldValueConverter<>() );
+				new DslConverter<>( typeDescriptor.getJavaType(), new IncompatibleToDocumentValueConverter<>() );
 		ToDocumentValueConvertContext toDocumentConvertContext =
 				new ToDocumentValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
 
@@ -222,7 +220,7 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 		ProjectionConverter<?, ?> compatibleProjectionConverter =
 				index2Field.toValueField().type().projectionConverter();
 		ProjectionConverter<?, ?> incompatibleProjectionConverter =
-				new ProjectionConverter<>( typeDescriptor.getJavaType(), new IncompatibleFromDocumentFieldValueConverter<>() );
+				new ProjectionConverter<>( typeDescriptor.getJavaType(), new IncompatibleFromDocumentValueConverter<>() );
 
 		// isCompatibleWith must return true when appropriate
 		assertThat( projectionConverter.isCompatibleWith( projectionConverter ) ).isTrue();
@@ -297,23 +295,23 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 	private static final class IncompatibleType {
 	}
 
-	private static class IncompatibleToDocumentFieldValueConverter<V>
-			implements ToDocumentFieldValueConverter<V, Object> {
+	private static class IncompatibleToDocumentValueConverter<V>
+			implements ToDocumentValueConverter<V, Object> {
 		@Override
-		public Object convert(V value, ToDocumentFieldValueConvertContext context) {
+		public Object toDocumentValue(V value, ToDocumentValueConvertContext context) {
 			throw new UnsupportedOperationException();
 		}
 	}
 
-	private static class IncompatibleFromDocumentFieldValueConverter<V>
-			implements FromDocumentFieldValueConverter<Object, V> {
+	private static class IncompatibleFromDocumentValueConverter<V>
+			implements FromDocumentValueConverter<Object, V> {
 		@Override
-		public V convert(Object value, FromDocumentFieldValueConvertContext context) {
+		public V fromDocumentValue(Object value, FromDocumentValueConvertContext context) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
+		public boolean isCompatibleWith(FromDocumentValueConverter<?, ?> other) {
 			throw new UnsupportedOperationException();
 		}
 	}
