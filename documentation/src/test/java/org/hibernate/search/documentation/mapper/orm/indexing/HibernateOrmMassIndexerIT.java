@@ -84,10 +84,9 @@ public class HibernateOrmMassIndexerIT {
 				// tag::reindexOnly[]
 				SearchSession searchSession = Search.session( entityManager ); // <1>
 				MassIndexer massIndexer = searchSession.massIndexer(); // <2>
-				massIndexer.type( Book.class ).reindexOnly( "e.year <= 2100" ); // <3>
-				massIndexer.type( Author.class ).reindexOnly( "e.birthday < :birthday", query -> { // <4>
-					query.setParameter( "birthday", LocalDate.ofYearDay( 2100, 77 ) ); // <5>
-				} );
+				massIndexer.type( Book.class ).reindexOnly( "e.publicationYear <= 2100" ); // <3>
+				massIndexer.type( Author.class ).reindexOnly( "e.birthDate < :birthDate" ) // <4>
+						.param( "birthDate", LocalDate.ofYearDay( 2100, 77 ) ); // <5>
 				massIndexer.startAndWait(); // <6>
 				// end::reindexOnly[]
 			}

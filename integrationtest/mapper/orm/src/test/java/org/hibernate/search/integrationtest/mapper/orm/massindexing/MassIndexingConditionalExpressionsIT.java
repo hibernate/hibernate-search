@@ -33,14 +33,14 @@ import org.junit.Test;
 public class MassIndexingConditionalExpressionsIT {
 
 	// where T0 < T1 < T2
-	private static final Instant T0 = Instant.ofEpochMilli( 1_000_000 );
-	private static final Instant T1 = Instant.ofEpochMilli( 1_500_000 );
-	private static final Instant T2 = Instant.ofEpochMilli( 2_000_000 );
+	private static final Instant INSTANT_0 = Instant.ofEpochMilli( 1_000_000 );
+	private static final Instant INSTANT_1 = Instant.ofEpochMilli( 1_500_000 );
+	private static final Instant INSTANT_2 = Instant.ofEpochMilli( 2_000_000 );
 
 	// where I0 < I1 < I2
-	private static final int I0 = 0;
-	private static final int I1 = 1;
-	private static final int I2 = 2;
+	private static final int INT_0 = 0;
+	private static final int INT_1 = 1;
+	private static final int INT_2 = 2;
 
 	@Rule
 	public BackendMock backendMock = new BackendMock();
@@ -72,44 +72,44 @@ public class MassIndexingConditionalExpressionsIT {
 		backendMock.verifyExpectationsMet();
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			session.persist( new H0_Indexed( 1, T0, I0 ) );
-			session.persist( new H0_Indexed( 2, T0, I2 ) );
-			session.persist( new H0_Indexed( 3, T2, I0 ) );
-			session.persist( new H0_Indexed( 4, T2, I2 ) );
+			session.persist( new H0_Indexed( 1, INSTANT_0, INT_0 ) );
+			session.persist( new H0_Indexed( 2, INSTANT_0, INT_2 ) );
+			session.persist( new H0_Indexed( 3, INSTANT_2, INT_0 ) );
+			session.persist( new H0_Indexed( 4, INSTANT_2, INT_2 ) );
 
-			session.persist( new H1_Root_NotIndexed( 1, T0, I0 ) );
-			session.persist( new H1_Root_NotIndexed( 2, T0, I2 ) );
-			session.persist( new H1_Root_NotIndexed( 3, T2, I0 ) );
-			session.persist( new H1_Root_NotIndexed( 4, T2, I2 ) );
-			session.persist( new H1_A_NotIndexed( 5, T0, I0 ) );
-			session.persist( new H1_A_NotIndexed( 6, T0, I2 ) );
-			session.persist( new H1_A_NotIndexed( 7, T2, I0 ) );
-			session.persist( new H1_A_NotIndexed( 8, T2, I2 ) );
-			session.persist( new H1_B_Indexed( 9, T0, I0 ) );
-			session.persist( new H1_B_Indexed( 10, T0, I2 ) );
-			session.persist( new H1_B_Indexed( 11, T2, I0 ) );
-			session.persist( new H1_B_Indexed( 12, T2, I2 ) );
+			session.persist( new H1_Root_NotIndexed( 1, INSTANT_0, INT_0 ) );
+			session.persist( new H1_Root_NotIndexed( 2, INSTANT_0, INT_2 ) );
+			session.persist( new H1_Root_NotIndexed( 3, INSTANT_2, INT_0 ) );
+			session.persist( new H1_Root_NotIndexed( 4, INSTANT_2, INT_2 ) );
+			session.persist( new H1_A_NotIndexed( 5, INSTANT_0, INT_0 ) );
+			session.persist( new H1_A_NotIndexed( 6, INSTANT_0, INT_2 ) );
+			session.persist( new H1_A_NotIndexed( 7, INSTANT_2, INT_0 ) );
+			session.persist( new H1_A_NotIndexed( 8, INSTANT_2, INT_2 ) );
+			session.persist( new H1_B_Indexed( 9, INSTANT_0, INT_0 ) );
+			session.persist( new H1_B_Indexed( 10, INSTANT_0, INT_2 ) );
+			session.persist( new H1_B_Indexed( 11, INSTANT_2, INT_0 ) );
+			session.persist( new H1_B_Indexed( 12, INSTANT_2, INT_2 ) );
 
-			session.persist( new H2_Root_Indexed( 1, T0, I0 ) );
-			session.persist( new H2_Root_Indexed( 2, T0, I2 ) );
-			session.persist( new H2_Root_Indexed( 3, T2, I0 ) );
-			session.persist( new H2_Root_Indexed( 4, T2, I2 ) );
-			session.persist( new H2_A_NotIndexed( 5, T0, I0 ) );
-			session.persist( new H2_A_NotIndexed( 6, T0, I2 ) );
-			session.persist( new H2_A_NotIndexed( 7, T2, I0 ) );
-			session.persist( new H2_A_NotIndexed( 8, T2, I2 ) );
-			session.persist( new H2_A_C_Indexed( 9, T0, I0 ) );
-			session.persist( new H2_A_C_Indexed( 10, T0, I2 ) );
-			session.persist( new H2_A_C_Indexed( 11, T2, I0 ) );
-			session.persist( new H2_A_C_Indexed( 12, T2, I2 ) );
-			session.persist( new H2_B_Indexed( 13, T0, I0 ) );
-			session.persist( new H2_B_Indexed( 14, T0, I2 ) );
-			session.persist( new H2_B_Indexed( 15, T2, I0 ) );
-			session.persist( new H2_B_Indexed( 16, T2, I2 ) );
-			session.persist( new H2_B_D_NotIndexed( 17, T0, I0 ) );
-			session.persist( new H2_B_D_NotIndexed( 18, T0, I2 ) );
-			session.persist( new H2_B_D_NotIndexed( 19, T2, I0 ) );
-			session.persist( new H2_B_D_NotIndexed( 20, T2, I2 ) );
+			session.persist( new H2_Root_Indexed( 1, INSTANT_0, INT_0 ) );
+			session.persist( new H2_Root_Indexed( 2, INSTANT_0, INT_2 ) );
+			session.persist( new H2_Root_Indexed( 3, INSTANT_2, INT_0 ) );
+			session.persist( new H2_Root_Indexed( 4, INSTANT_2, INT_2 ) );
+			session.persist( new H2_A_NotIndexed( 5, INSTANT_0, INT_0 ) );
+			session.persist( new H2_A_NotIndexed( 6, INSTANT_0, INT_2 ) );
+			session.persist( new H2_A_NotIndexed( 7, INSTANT_2, INT_0 ) );
+			session.persist( new H2_A_NotIndexed( 8, INSTANT_2, INT_2 ) );
+			session.persist( new H2_A_C_Indexed( 9, INSTANT_0, INT_0 ) );
+			session.persist( new H2_A_C_Indexed( 10, INSTANT_0, INT_2 ) );
+			session.persist( new H2_A_C_Indexed( 11, INSTANT_2, INT_0 ) );
+			session.persist( new H2_A_C_Indexed( 12, INSTANT_2, INT_2 ) );
+			session.persist( new H2_B_Indexed( 13, INSTANT_0, INT_0 ) );
+			session.persist( new H2_B_Indexed( 14, INSTANT_0, INT_2 ) );
+			session.persist( new H2_B_Indexed( 15, INSTANT_2, INT_0 ) );
+			session.persist( new H2_B_Indexed( 16, INSTANT_2, INT_2 ) );
+			session.persist( new H2_B_D_NotIndexed( 17, INSTANT_0, INT_0 ) );
+			session.persist( new H2_B_D_NotIndexed( 18, INSTANT_0, INT_2 ) );
+			session.persist( new H2_B_D_NotIndexed( 19, INSTANT_2, INT_0 ) );
+			session.persist( new H2_B_D_NotIndexed( 20, INSTANT_2, INT_2 ) );
 		} );
 	}
 
@@ -144,10 +144,9 @@ public class MassIndexingConditionalExpressionsIT {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H0_Indexed.class );
-			indexer.type( H0_Indexed.class ).reindexOnly( "e.number < :number and e.moment > :moment", query -> {
-				query.setParameter( "moment", T1 );
-				query.setParameter( "number", I1 );
-			} );
+			indexer.type( H0_Indexed.class ).reindexOnly( "e.number < :number and e.moment > :moment" )
+					.param( "moment", INSTANT_1 )
+					.param( "number", INT_1 );
 
 			backendMock.expectWorks( H0_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "3", b -> b.field( "text", "text3" ) );
@@ -345,16 +344,14 @@ public class MassIndexingConditionalExpressionsIT {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 			MassIndexer indexer = searchSession.massIndexer( H2_Root_Indexed.class );
-			indexer.type( H2_Root_Indexed.class ).reindexOnly( "e.rootNumber = :number and e.rootMoment > :moment",
-					query -> {
-				query.setParameter( "number", I2 );
-				query.setParameter( "moment", T0 );
-			} );
-			indexer.type( H2_B_Indexed.class ).reindexOnly( "e.bNumber = :number and e.rootMoment < :moment",
-					query -> {
-				query.setParameter( "number", I0 );
-				query.setParameter( "moment", T1 );
-			} );
+
+			indexer.type( H2_Root_Indexed.class ).reindexOnly( "e.rootNumber = :number and e.rootMoment > :moment" )
+					.param( "number", INT_2 )
+					.param( "moment", INSTANT_0 );
+
+			indexer.type( H2_B_Indexed.class ).reindexOnly( "e.bNumber = :number and e.rootMoment < :moment" )
+					.param( "number", INT_0 )
+					.param( "moment", INSTANT_1 );
 
 			backendMock.expectWorks( H2_Root_Indexed.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE )
 					.add( "4", b -> b.field( "rootText", "text4" ) );
