@@ -176,7 +176,7 @@ The mass indexing job allows you to define your own entities to be indexed -- yo
 indexing or a partial indexing through 2 different methods: selecting the desired entity types,
 or using HQL.
 
-.Partial reindexing using a `restrictedBy` HQL parameter
+.Conditional reindexing using a `restrictedBy` HQL parameter
 ====
 [source, JAVA, indent=0]
 ----
