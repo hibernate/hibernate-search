@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
-import java.util.function.Consumer;
-
-import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexerFilteringTypeStep;
+import org.hibernate.search.mapper.orm.massindexing.MassIndexerReindexParameterStep;
 
 public class HibernateOrmMassIndexerFilteringTypeStep implements MassIndexerFilteringTypeStep {
 
@@ -22,15 +20,8 @@ public class HibernateOrmMassIndexerFilteringTypeStep implements MassIndexerFilt
 	}
 
 	@Override
-	public MassIndexerFilteringTypeStep reindexOnly(String conditionalExpression) {
-		massIndexer.reindexOnly( type, conditionalExpression );
-		return this;
-	}
-
-	@Override
-	public MassIndexerFilteringTypeStep reindexOnly(String conditionalExpression, Consumer<Query<?>> queryConsumer) {
+	public MassIndexerReindexParameterStep reindexOnly(String conditionalExpression) {
 		ConditionalExpression expression = massIndexer.reindexOnly( type, conditionalExpression );
-		expression.defineQueryConsumer( queryConsumer );
-		return this;
+		return new HibernateOrmMassIndexerReindexParameterStep( massIndexer, type, expression );
 	}
 }

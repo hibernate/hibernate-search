@@ -6,15 +6,15 @@
  */
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
-import java.util.function.Consumer;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.hibernate.query.Query;
 
 public class ConditionalExpression {
 
 	private final String hql;
-
-	private Consumer<Query<?>> queryConsumer;
+	private final Map<String, Object> params = new HashMap<>();
 
 	public ConditionalExpression(String hql) {
 		this.hql = hql;
@@ -24,13 +24,13 @@ public class ConditionalExpression {
 		return hql;
 	}
 
-	public void defineQueryConsumer(Consumer<Query<?>> queryConsumer) {
-		this.queryConsumer = queryConsumer;
+	public void param(String name, Object value) {
+		params.put( name, value );
 	}
 
-	public void applyQueryConsumer(Query<?> query) {
-		if ( queryConsumer != null ) {
-			queryConsumer.accept( query );
+	public void applyParams(Query<?> query) {
+		for ( Map.Entry<String, Object> entry : params.entrySet() ) {
+			query.setParameter( entry.getKey(), entry.getValue() );
 		}
 	}
 }
