@@ -79,7 +79,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 
 You can also select a subset of target entities to be reindexed.
 
-.Partial reindexing
+.Conditional reindexing
 ====
 [source, JAVA, indent=0]
 ----
