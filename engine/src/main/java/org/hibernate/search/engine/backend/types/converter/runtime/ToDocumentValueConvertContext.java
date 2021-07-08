@@ -8,12 +8,8 @@ package org.hibernate.search.engine.backend.types.converter.runtime;
 
 import org.hibernate.search.util.common.SearchException;
 
-/**
- * @deprecated Use {@link org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter}
- * with {@link ToDocumentValueConvertContext} instead.
- */
-@Deprecated
-public interface ToDocumentFieldValueConvertContext {
+@SuppressWarnings("deprecation")
+public interface ToDocumentValueConvertContext extends ToDocumentFieldValueConvertContext {
 
 	/**
 	 * Extend the current context with the given extension,
@@ -24,6 +20,6 @@ public interface ToDocumentFieldValueConvertContext {
 	 * @return The extended context.
 	 * @throws SearchException If the extension cannot be applied (wrong underlying technology, ...).
 	 */
-	<T> T extension(ToDocumentFieldValueConvertContextExtension<T> extension);
+	<T> T extension(ToDocumentValueConvertContextExtension<T> extension);
 
 }

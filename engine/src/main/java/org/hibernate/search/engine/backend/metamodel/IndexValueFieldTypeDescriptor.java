@@ -48,14 +48,14 @@ public interface IndexValueFieldTypeDescriptor {
 	/**
 	 * @return The expected raw Java type of arguments passed to the DSL for this field.
 	 * @see org.hibernate.search.engine.search.common.ValueConvert#YES
-	 * @see org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter
+	 * @see org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter
 	 */
 	Class<?> dslArgumentClass();
 
 	/**
 	 * @return The raw Java type of projected values for this field.
 	 * @see org.hibernate.search.engine.search.common.ValueConvert#YES
-	 * @see org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter
+	 * @see org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter
 	 */
 	Class<?> projectedValueClass();
 

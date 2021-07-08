@@ -12,7 +12,7 @@ import java.util.Optional;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
 /**
- * An extension to {@link FromDocumentFieldValueConvertContext}, allowing to access non-standard context
+ * An extension to {@link FromDocumentValueConvertContext}, allowing to access non-standard context
  * specific to a given mapper.
  * <p>
  * <strong>WARNING:</strong> while this type is API, because instances should be manipulated by users,
@@ -22,28 +22,20 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
  *
  * @param <T> The type of extended contexts.
  *
- * @see FromDocumentFieldValueConvertContext#extension(FromDocumentFieldValueConvertContextExtension)
- * @deprecated Use {@link org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter}
- * with {@link FromDocumentValueConvertContext} and {@link FromDocumentValueConvertContextExtension} instead.
+ * @see FromDocumentValueConvertContext#extension(FromDocumentValueConvertContextExtension)
  */
-@Deprecated
-public interface FromDocumentFieldValueConvertContextExtension<T> extends FromDocumentValueConvertContextExtension<T> {
-
-	@Override
-	default Optional<T> extendOptional(FromDocumentValueConvertContext original, BackendSessionContext sessionContext) {
-		return extendOptional( (FromDocumentFieldValueConvertContext) original, sessionContext );
-	}
+public interface FromDocumentValueConvertContextExtension<T> {
 
 	/**
 	 * Attempt to extend a given context, returning an empty {@link Optional} in case of failure.
 	 * <p>
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
-	 * @param original The original, non-extended {@link FromDocumentFieldValueConvertContext}.
+	 * @param original The original, non-extended {@link FromDocumentValueConvertContext}.
 	 * @param sessionContext A {@link BackendSessionContext}.
 	 * @return An optional containing the extended context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(FromDocumentFieldValueConvertContext original, BackendSessionContext sessionContext);
+	Optional<T> extendOptional(FromDocumentValueConvertContext original, BackendSessionContext sessionContext);
 
 }

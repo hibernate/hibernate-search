@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 
 public interface AggregationExtractContext {
 
-	FromDocumentFieldValueConvertContext getFieldConvertContext();
+	FromDocumentValueConvertContext fromDocumentValueConvertContext();
 
 }

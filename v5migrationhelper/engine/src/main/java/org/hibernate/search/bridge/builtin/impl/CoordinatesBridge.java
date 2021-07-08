@@ -18,10 +18,10 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
@@ -214,20 +214,20 @@ public class CoordinatesBridge implements TypeBridge<Object>, PropertyBridge<Obj
 	}
 
 	private static class CoordinatesConverter
-			implements ToDocumentFieldValueConverter<Coordinates, GeoPoint>,
-					FromDocumentFieldValueConverter<GeoPoint, Coordinates> {
+			implements ToDocumentValueConverter<Coordinates, GeoPoint>,
+					FromDocumentValueConverter<GeoPoint, Coordinates> {
 		static final CoordinatesConverter INSTANCE = new CoordinatesConverter();
 
 		private CoordinatesConverter() {
 		}
 
 		@Override
-		public Coordinates convert(GeoPoint value, FromDocumentFieldValueConvertContext context) {
+		public Coordinates fromDocumentValue(GeoPoint value, FromDocumentValueConvertContext context) {
 			return value == null ? null : Point.fromDegrees( value.latitude(), value.longitude() );
 		}
 
 		@Override
-		public GeoPoint convert(Coordinates value, ToDocumentFieldValueConvertContext context) {
+		public GeoPoint toDocumentValue(Coordinates value, ToDocumentValueConvertContext context) {
 			return Coordinates.toGeoPoint( value );
 		}
 	}

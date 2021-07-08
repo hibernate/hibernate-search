@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.util.impl.SloppyMath;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -147,7 +147,7 @@ public class ElasticsearchDistanceToFieldProjection<E, P> extends AbstractElasti
 	@Override
 	public P transform(LoadingResult<?, ?> loadingResult, E extractedData,
 			SearchProjectionTransformContext context) {
-		FromDocumentFieldValueConvertContext convertContext = context.fromDocumentFieldValueConvertContext();
+		FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 		return accumulator.finish( extractedData, NO_OP_DOUBLE_CONVERTER, convertContext );
 	}
 

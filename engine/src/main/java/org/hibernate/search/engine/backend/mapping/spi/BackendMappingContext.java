@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.backend.mapping.spi;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 
 /**
@@ -17,6 +17,6 @@ public interface BackendMappingContext {
 
 	ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext();
 
-	ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext();
+	ToDocumentValueConvertContext toDocumentValueConvertContext();
 
 }

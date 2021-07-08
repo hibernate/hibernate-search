@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.engine.backend.types.dsl;
 
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
 
 /**
  * The step in an index field type definition where DSL converters (applied when using the search DSL)
@@ -28,7 +28,7 @@ public interface IndexFieldTypeConverterStep<S extends IndexFieldTypeConverterSt
 	 * @param <V> The type of values that can be passed to the DSL.
 	 * @return {@code this}, for method chaining.
 	 */
-	<V> S dslConverter(Class<V> valueType, ToDocumentFieldValueConverter<V, ? extends F> toIndexConverter);
+	<V> S dslConverter(Class<V> valueType, ToDocumentValueConverter<V, ? extends F> toIndexConverter);
 
 	/**
 	 * Define how values returned when projecting on fields of this type
@@ -41,6 +41,6 @@ public interface IndexFieldTypeConverterStep<S extends IndexFieldTypeConverterSt
 	 * @param <V> The type of values that will be returned when projecting on fields of this type.
 	 * @return {@code this}, for method chaining.
 	 */
-	<V> S projectionConverter(Class<V> valueType, FromDocumentFieldValueConverter<? super F, V> fromIndexConverter);
+	<V> S projectionConverter(Class<V> valueType, FromDocumentValueConverter<? super F, V> fromIndexConverter);
 
 }

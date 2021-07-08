@@ -21,7 +21,7 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractEla
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
@@ -97,7 +97,7 @@ public class ElasticsearchFieldProjection<E, P, F, V> extends AbstractElasticsea
 
 	@Override
 	public P transform(LoadingResult<?, ?> loadingResult, E extractedData, SearchProjectionTransformContext context) {
-		FromDocumentFieldValueConvertContext convertContext = context.fromDocumentFieldValueConvertContext();
+		FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 		return accumulator.finish( extractedData, converter, convertContext );
 	}
 

@@ -8,9 +8,9 @@ package org.hibernate.search.engine.backend.types.converter.spi;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContextExtension;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContextExtension;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -27,9 +27,9 @@ public final class ProjectionConverter<F, V> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Class<V> valueType;
-	private final FromDocumentFieldValueConverter<? super F, V> delegate;
+	private final FromDocumentValueConverter<? super F, V> delegate;
 
-	public ProjectionConverter(Class<V> valueType, FromDocumentFieldValueConverter<? super F, V> delegate) {
+	public ProjectionConverter(Class<V> valueType, FromDocumentValueConverter<? super F, V> delegate) {
 		Contracts.assertNotNull( valueType, "valueType" );
 		Contracts.assertNotNull( delegate, "delegate" );
 		this.valueType = valueType;
@@ -48,12 +48,12 @@ public final class ProjectionConverter<F, V> {
 	/**
 	 * @param value The index field value to convert.
 	 * @param context A context that can be
-	 * {@link FromDocumentFieldValueConvertContext#extension(FromDocumentFieldValueConvertContextExtension) extended}
+	 * {@link FromDocumentValueConvertContext#extension(FromDocumentValueConvertContextExtension) extended}
 	 * to a more useful type, giving access to such things as a Hibernate ORM Session (if using the Hibernate ORM mapper).
 	 * @return The converted value.
 	 */
-	public V convert(F value, FromDocumentFieldValueConvertContext context) {
-		return delegate.convert( value, context );
+	public V fromDocumentValue(F value, FromDocumentValueConvertContext context) {
+		return delegate.fromDocumentValue( value, context );
 	}
 
 	/**
@@ -78,7 +78,7 @@ public final class ProjectionConverter<F, V> {
 	/**
 	 * @param other Another {@link DslConverter}, never {@code null}.
 	 * @return {@code true} if the given object behaves exactly the same as this object,
-	 * i.e. its {@link #withConvertedType(Class, EventContextProvider)} and {@link #convert(Object, FromDocumentFieldValueConvertContext)}
+	 * i.e. its {@link #withConvertedType(Class, EventContextProvider)} and {@link #fromDocumentValue(Object, FromDocumentValueConvertContext)}
 	 * methods are guaranteed to always return the same value as this object's
 	 * when given the same input. {@code false} otherwise, or when in doubt.
 	 */

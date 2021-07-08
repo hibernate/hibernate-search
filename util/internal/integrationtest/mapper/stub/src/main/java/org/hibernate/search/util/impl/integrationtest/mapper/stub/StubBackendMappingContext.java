@@ -7,20 +7,20 @@
 package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentValueConvertContextImpl;
 
 public class StubBackendMappingContext implements BackendMappingContext {
 
 	private final ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext;
-	private final ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext;
+	private final ToDocumentValueConvertContext toDocumentFieldValueConvertContext;
 
 	public StubBackendMappingContext() {
 		this.toDocumentIdentifierValueConvertContext =
 				new ToDocumentIdentifierValueConvertContextImpl( this );
-		this.toDocumentFieldValueConvertContext = new ToDocumentFieldValueConvertContextImpl( this );
+		this.toDocumentFieldValueConvertContext = new ToDocumentValueConvertContextImpl( this );
 	}
 
 	@Override
@@ -29,7 +29,7 @@ public class StubBackendMappingContext implements BackendMappingContext {
 	}
 
 	@Override
-	public final ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext() {
+	public final ToDocumentValueConvertContext toDocumentValueConvertContext() {
 		return toDocumentFieldValueConvertContext;
 	}
 }

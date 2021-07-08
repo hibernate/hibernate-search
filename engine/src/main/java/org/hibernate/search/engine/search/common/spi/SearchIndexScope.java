@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.common.spi;
 
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -25,7 +25,7 @@ public interface SearchIndexScope<S extends SearchIndexScope<?>> {
 
 	ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext();
 
-	ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext();
+	ToDocumentValueConvertContext toDocumentValueConvertContext();
 
 	DocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert);
 

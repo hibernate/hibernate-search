@@ -6,24 +6,24 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContext;
 
 public class SearchProjectionTransformContext {
 
-	private final FromDocumentFieldValueConvertContext fromDocumentFieldValueConvertContext;
+	private final FromDocumentValueConvertContext fromDocumentValueConvertContext;
 	private final FromDocumentIdentifierValueConvertContext fromDocumentIdentifierValueConvertContext;
 
 	private boolean hasFailedLoad = false;
 
-	public SearchProjectionTransformContext(FromDocumentFieldValueConvertContext fieldConverterContext,
+	public SearchProjectionTransformContext(FromDocumentValueConvertContext fromDocumentValueConvertContext,
 			FromDocumentIdentifierValueConvertContext identifierConvertContext) {
-		this.fromDocumentFieldValueConvertContext = fieldConverterContext;
+		this.fromDocumentValueConvertContext = fromDocumentValueConvertContext;
 		this.fromDocumentIdentifierValueConvertContext = identifierConvertContext;
 	}
 
-	FromDocumentFieldValueConvertContext fromDocumentFieldValueConvertContext() {
-		return fromDocumentFieldValueConvertContext;
+	FromDocumentValueConvertContext fromDocumentValueConvertContext() {
+		return fromDocumentValueConvertContext;
 	}
 
 	public FromDocumentIdentifierValueConvertContext fromDocumentIdentifierValueConvertContext() {

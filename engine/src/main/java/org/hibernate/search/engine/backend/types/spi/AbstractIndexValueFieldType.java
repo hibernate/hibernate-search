@@ -12,17 +12,17 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.metamodel.IndexValueFieldTypeDescriptor;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
-import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 import org.hibernate.search.engine.search.common.spi.SearchIndexValueFieldContext;
 import org.hibernate.search.engine.search.common.spi.SearchIndexValueFieldTypeContext;
+import org.hibernate.search.engine.search.common.spi.SearchQueryElementFactory;
+import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
 
 public abstract class AbstractIndexValueFieldType<
 				SC extends SearchIndexScope<?>,
@@ -178,19 +178,19 @@ public abstract class AbstractIndexValueFieldType<
 
 		public Builder(Class<F> valueClass) {
 			this.valueClass = valueClass;
-			this.rawDslConverter = new DslConverter<>( valueClass, new PassThroughToDocumentFieldValueConverter<>() );
-			this.rawProjectionConverter = new ProjectionConverter<>( valueClass, new PassThroughFromDocumentFieldValueConverter<>() );
+			this.rawDslConverter = new DslConverter<>( valueClass, new PassThroughToDocumentValueConverter<>() );
+			this.rawProjectionConverter = new ProjectionConverter<>( valueClass, new PassThroughFromDocumentValueConverter<>() );
 		}
 
 		public final Class<F> valueClass() {
 			return valueClass;
 		}
 
-		public final <V> void dslConverter(Class<V> valueType, ToDocumentFieldValueConverter<V, ? extends F> toIndexConverter) {
+		public final <V> void dslConverter(Class<V> valueType, ToDocumentValueConverter<V, ? extends F> toIndexConverter) {
 			this.dslConverter = new DslConverter<>( valueType, toIndexConverter );
 		}
 
-		public final <V> void projectionConverter(Class<V> valueType, FromDocumentFieldValueConverter<? super F, V> fromIndexConverter) {
+		public final <V> void projectionConverter(Class<V> valueType, FromDocumentValueConverter<? super F, V> fromIndexConverter) {
 			this.projectionConverter = new ProjectionConverter<>( valueType, fromIndexConverter );
 		}
 

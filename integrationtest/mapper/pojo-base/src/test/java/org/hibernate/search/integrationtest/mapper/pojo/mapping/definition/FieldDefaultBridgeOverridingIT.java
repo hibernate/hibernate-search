@@ -14,8 +14,8 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.PropertyTypeDescriptor;
@@ -142,13 +142,13 @@ public class FieldDefaultBridgeOverridingIT<V, F> {
 		@SuppressWarnings("unchecked")
 		DslConverter<V, ?> dslConverter =
 				(DslConverter<V, ?>) indexField.toValueField().type().dslConverter();
-		ToDocumentFieldValueConvertContext toDocumentConvertContext =
-				new ToDocumentFieldValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
+		ToDocumentValueConvertContext toDocumentConvertContext =
+				new ToDocumentValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
 
 		// The overriden default bridge must be used by the DSL converter
-		assertThat( dslConverter.convert( getPropertyValue(), toDocumentConvertContext ) )
+		assertThat( dslConverter.toDocumentValue( getPropertyValue(), toDocumentConvertContext ) )
 				.isEqualTo( getFieldValue() );
-		assertThat( dslConverter.convertUnknown( getPropertyValue(), toDocumentConvertContext ) )
+		assertThat( dslConverter.unknownTypeToDocumentValue( getPropertyValue(), toDocumentConvertContext ) )
 				.isEqualTo( getFieldValue() );
 	}
 

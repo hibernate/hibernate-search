@@ -8,9 +8,9 @@ package org.hibernate.search.engine.backend.types.converter.spi;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContextExtension;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContextExtension;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -27,9 +27,9 @@ public final class DslConverter<V, F> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Class<V> valueType;
-	private final ToDocumentFieldValueConverter<V, ? extends F> delegate;
+	private final ToDocumentValueConverter<V, ? extends F> delegate;
 
-	public DslConverter(Class<V> valueType, ToDocumentFieldValueConverter<V, ? extends F> delegate) {
+	public DslConverter(Class<V> valueType, ToDocumentValueConverter<V, ? extends F> delegate) {
 		Contracts.assertNotNull( valueType, "valueType" );
 		Contracts.assertNotNull( delegate, "delegate" );
 		this.valueType = valueType;
@@ -48,12 +48,12 @@ public final class DslConverter<V, F> {
 	/**
 	 * @param value The source value to convert.
 	 * @param context A context that can be
-	 * {@link ToDocumentFieldValueConvertContext#extension(ToDocumentFieldValueConvertContextExtension) extended}
+	 * {@link ToDocumentValueConvertContext#extension(ToDocumentValueConvertContextExtension) extended}
 	 * to a more useful type, giving access to such things as a Hibernate ORM SessionFactory (if using the Hibernate ORM mapper).
 	 * @return The converted index field value.
 	 */
-	public F convert(V value, ToDocumentFieldValueConvertContext context) {
-		return delegate.convert( value, context );
+	public F toDocumentValue(V value, ToDocumentValueConvertContext context) {
+		return delegate.toDocumentValue( value, context );
 	}
 
 	/**
@@ -63,13 +63,13 @@ public final class DslConverter<V, F> {
 	 *
 	 * @param value The value to convert.
 	 * @param context A context that can be
-	 * {@link ToDocumentFieldValueConvertContext#extension(ToDocumentFieldValueConvertContextExtension) extended}
+	 * {@link ToDocumentValueConvertContext#extension(ToDocumentValueConvertContextExtension) extended}
 	 * to a more useful type, giving access to such things as a Hibernate ORM SessionFactory (if using the Hibernate ORM mapper).
 	 * @return The converted index field value.
 	 * @throws RuntimeException If the value does not match the expected type.
 	 */
-	public F convertUnknown(Object value, ToDocumentFieldValueConvertContext context) {
-		return delegate.convert( valueType.cast( value ), context );
+	public F unknownTypeToDocumentValue(Object value, ToDocumentValueConvertContext context) {
+		return delegate.toDocumentValue( valueType.cast( value ), context );
 	}
 
 	/**
@@ -94,7 +94,7 @@ public final class DslConverter<V, F> {
 	/**
 	 * @param other Another {@link DslConverter}, never {@code null}.
 	 * @return {@code true} if the given object behaves exactly the same as this object,
-	 * i.e. its {@link #convert(Object, ToDocumentFieldValueConvertContext)} and {@link #convertUnknown(Object, ToDocumentFieldValueConvertContext)}
+	 * i.e. its {@link #toDocumentValue(Object, ToDocumentValueConvertContext)} and {@link #unknownTypeToDocumentValue(Object, ToDocumentValueConvertContext)}
 	 * methods are guaranteed to always return the same value as this object's
 	 * when given the same input. {@code false} otherwise, or when in doubt.
 	 */

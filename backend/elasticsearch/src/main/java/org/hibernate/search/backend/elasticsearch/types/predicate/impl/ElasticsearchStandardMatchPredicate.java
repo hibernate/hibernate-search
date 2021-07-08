@@ -101,7 +101,7 @@ public class ElasticsearchStandardMatchPredicate extends AbstractElasticsearchSi
 		public void value(Object value, ValueConvert convert) {
 			DslConverter<?, ? extends F> dslToIndexConverter = field.type().dslConverter( convert );
 			try {
-				F converted = dslToIndexConverter.convertUnknown( value, scope.toDocumentFieldValueConvertContext() );
+				F converted = dslToIndexConverter.unknownTypeToDocumentValue( value, scope.toDocumentValueConvertContext() );
 				this.value = codec.encode( converted );
 			}
 			catch (RuntimeException e) {

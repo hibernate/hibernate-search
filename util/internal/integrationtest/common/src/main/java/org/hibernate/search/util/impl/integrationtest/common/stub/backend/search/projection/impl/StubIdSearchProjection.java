@@ -33,7 +33,7 @@ public class StubIdSearchProjection<I> implements StubSearchProjection<I> {
 			StubSearchProjectionContext context) {
 		DocumentReference documentReference = (DocumentReference) extractedData;
 
-		context.fromDocumentFieldValueConvertContext();
+		context.fromDocumentValueConvertContext();
 		return identifierValueConverter.convertToSource(
 				documentReference.id(), context.fromDocumentIdentifierValueConvertContext() );
 	}

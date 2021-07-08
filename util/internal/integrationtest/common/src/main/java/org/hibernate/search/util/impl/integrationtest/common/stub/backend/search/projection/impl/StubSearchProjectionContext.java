@@ -6,25 +6,25 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentValueConvertContextImpl;
 
 public class StubSearchProjectionContext {
 
-	private final FromDocumentFieldValueConvertContext fromDocumentFieldValueConvertContext;
+	private final FromDocumentValueConvertContext fromDocumentValueConvertContext;
 	private final FromDocumentIdentifierValueConvertContextImpl fromDocumentIdentifierValueConvertContext;
 
 	private boolean hasFailedLoad = false;
 
 	public StubSearchProjectionContext(BackendSessionContext sessionContext) {
-		fromDocumentFieldValueConvertContext = new FromDocumentFieldValueConvertContextImpl( sessionContext );
+		fromDocumentValueConvertContext = new FromDocumentValueConvertContextImpl( sessionContext );
 		fromDocumentIdentifierValueConvertContext = new FromDocumentIdentifierValueConvertContextImpl( sessionContext );
 	}
 
-	FromDocumentFieldValueConvertContext fromDocumentFieldValueConvertContext() {
-		return fromDocumentFieldValueConvertContext;
+	FromDocumentValueConvertContext fromDocumentValueConvertContext() {
+		return fromDocumentValueConvertContext;
 	}
 
 	FromDocumentIdentifierValueConvertContextImpl fromDocumentIdentifierValueConvertContext() {

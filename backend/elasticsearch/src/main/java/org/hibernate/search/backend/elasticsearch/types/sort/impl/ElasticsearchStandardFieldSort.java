@@ -113,7 +113,7 @@ public class ElasticsearchStandardFieldSort extends AbstractElasticsearchDocumen
 		public void missingAs(Object value, ValueConvert convert) {
 			DslConverter<?, ? extends F> dslToIndexConverter = field.type().dslConverter( convert );
 			try {
-				F converted = dslToIndexConverter.convertUnknown( value, scope.toDocumentFieldValueConvertContext() );
+				F converted = dslToIndexConverter.unknownTypeToDocumentValue( value, scope.toDocumentValueConvertContext() );
 				this.missing = codec.encodeForMissing( converted );
 			}
 			catch (RuntimeException e) {

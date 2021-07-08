@@ -8,27 +8,27 @@ package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContextExtension;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContextExtension;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContextExtension;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 
 public final class PojoValueBridgeContextExtension
-		implements ToDocumentFieldValueConvertContextExtension<ValueBridgeToIndexedValueContext>,
-		FromDocumentFieldValueConvertContextExtension<ValueBridgeFromIndexedValueContext> {
+		implements ToDocumentValueConvertContextExtension<ValueBridgeToIndexedValueContext>,
+				FromDocumentValueConvertContextExtension<ValueBridgeFromIndexedValueContext> {
 	public static final PojoValueBridgeContextExtension INSTANCE = new PojoValueBridgeContextExtension();
 
 	private PojoValueBridgeContextExtension() {
 	}
 
 	@Override
-	public Optional<ValueBridgeToIndexedValueContext> extendOptional(ToDocumentFieldValueConvertContext original,
+	public Optional<ValueBridgeToIndexedValueContext> extendOptional(ToDocumentValueConvertContext original,
 		BackendMappingContext mappingContext) {
 		if ( mappingContext instanceof BridgeMappingContext ) {
 			BridgeMappingContext pojoMappingContext = (BridgeMappingContext) mappingContext;
@@ -40,7 +40,7 @@ public final class PojoValueBridgeContextExtension
 	}
 
 	@Override
-	public Optional<ValueBridgeFromIndexedValueContext> extendOptional(FromDocumentFieldValueConvertContext original,
+	public Optional<ValueBridgeFromIndexedValueContext> extendOptional(FromDocumentValueConvertContext original,
 			BackendSessionContext sessionContext) {
 		if ( sessionContext instanceof BridgeSessionContext ) {
 			BridgeSessionContext pojoSessionContext = (BridgeSessionContext) sessionContext;

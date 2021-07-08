@@ -23,8 +23,16 @@ import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
  * @param <T> The type of extended contexts.
  *
  * @see ToDocumentFieldValueConvertContext#extension(ToDocumentFieldValueConvertContextExtension)
+ * @deprecated Use {@link org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter}
+ * with {@link ToDocumentValueConvertContext} and {@link ToDocumentValueConvertContextExtension} instead.
  */
-public interface ToDocumentFieldValueConvertContextExtension<T> {
+@Deprecated
+public interface ToDocumentFieldValueConvertContextExtension<T> extends ToDocumentValueConvertContextExtension<T> {
+
+	@Override
+	default Optional<T> extendOptional(ToDocumentValueConvertContext original, BackendMappingContext mappingContext) {
+		return extendOptional( (ToDocumentFieldValueConvertContext) original, mappingContext );
+	}
 
 	/**
 	 * Attempt to extend a given context, returning an empty {@link Optional} in case of failure.

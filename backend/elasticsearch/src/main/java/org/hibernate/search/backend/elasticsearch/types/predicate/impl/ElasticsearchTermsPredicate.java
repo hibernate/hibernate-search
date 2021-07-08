@@ -170,7 +170,7 @@ public class ElasticsearchTermsPredicate extends AbstractElasticsearchSingleFiel
 
 		private JsonElement encode(Object term, DslConverter<?, F> dslConverter) {
 			try {
-				F converted = dslConverter.convertUnknown( term, scope.toDocumentFieldValueConvertContext() );
+				F converted = dslConverter.unknownTypeToDocumentValue( term, scope.toDocumentValueConvertContext() );
 				return codec.encode( converted );
 			}
 			catch (RuntimeException e) {

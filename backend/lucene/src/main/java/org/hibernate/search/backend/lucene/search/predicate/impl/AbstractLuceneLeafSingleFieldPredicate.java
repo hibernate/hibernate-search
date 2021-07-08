@@ -50,8 +50,8 @@ public abstract class AbstractLuceneLeafSingleFieldPredicate extends AbstractLuc
 		protected <E> E convertAndEncode(LuceneStandardFieldCodec<F, E> codec, Object value, ValueConvert convert) {
 			DslConverter<?, ? extends F> toFieldValueConverter = field.type().dslConverter( convert );
 			try {
-				F converted = toFieldValueConverter.convertUnknown( value,
-						scope.toDocumentFieldValueConvertContext() );
+				F converted = toFieldValueConverter.unknownTypeToDocumentValue( value,
+						scope.toDocumentValueConvertContext() );
 				return codec.encode( converted );
 			}
 			catch (RuntimeException e) {

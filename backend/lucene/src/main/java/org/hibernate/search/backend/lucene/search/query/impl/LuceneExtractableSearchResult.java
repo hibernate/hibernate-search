@@ -20,9 +20,9 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollecto
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentValueConvertContextImpl;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.SearchResultTotal;
@@ -36,7 +36,7 @@ import org.apache.lucene.search.TopDocs;
 public class LuceneExtractableSearchResult<H> {
 
 	private final LuceneSearchQueryRequestContext requestContext;
-	private final FromDocumentFieldValueConvertContext fieldConvertContext;
+	private final FromDocumentValueConvertContext fromDocumentValueConvertContext;
 	private final FromDocumentIdentifierValueConvertContextImpl identifierConvertContext;
 	private final IndexSearcher indexSearcher;
 	private final LuceneCollectors luceneCollectors;
@@ -50,7 +50,7 @@ public class LuceneExtractableSearchResult<H> {
 			LuceneSearchProjection<?, H> rootProjection,
 			Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations, TimeoutManager timeoutManager) {
 		this.requestContext = requestContext;
-		this.fieldConvertContext = new FromDocumentFieldValueConvertContextImpl( requestContext.getSessionContext() );
+		this.fromDocumentValueConvertContext = new FromDocumentValueConvertContextImpl( requestContext.getSessionContext() );
 		this.identifierConvertContext = new FromDocumentIdentifierValueConvertContextImpl(
 				requestContext.getSessionContext() );
 		this.indexSearcher = indexSearcher;
@@ -85,7 +85,7 @@ public class LuceneExtractableSearchResult<H> {
 				Collections.emptyMap() : extractAggregations();
 
 		return new LuceneLoadableSearchResult<>(
-				fieldConvertContext, identifierConvertContext, rootProjection,
+				fromDocumentValueConvertContext, identifierConvertContext, rootProjection,
 				luceneCollectors.getResultTotal(), luceneCollectors.getTopDocs(),
 				extractedData, extractedAggregations, projectionHitMapper,
 				timeoutManager.tookTime(),
@@ -141,7 +141,7 @@ public class LuceneExtractableSearchResult<H> {
 	private Map<AggregationKey<?>, ?> extractAggregations() throws IOException {
 		AggregationExtractContext aggregationExtractContext = new AggregationExtractContext(
 				indexSearcher.getIndexReader(), requestContext.getLuceneQuery(),
-				fieldConvertContext,
+				fromDocumentValueConvertContext,
 				luceneCollectors.getCollectorsForAllMatchingDocs()
 		);
 

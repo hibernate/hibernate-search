@@ -9,7 +9,9 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 import java.util.Objects;
 
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterStep;
@@ -18,8 +20,8 @@ import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
 
 /**
  * A value wrapper used when testing
- * {@link IndexFieldTypeConverterStep#dslConverter(Class, ToDocumentFieldValueConverter)  DSL converters}
- * and {@link IndexFieldTypeConverterStep#projectionConverter(Class, FromDocumentFieldValueConverter)  projection converters}.
+ * {@link IndexFieldTypeConverterStep#dslConverter(Class, ToDocumentValueConverter)  DSL converters}
+ * and {@link IndexFieldTypeConverterStep#projectionConverter(Class, FromDocumentValueConverter)  projection converters}.
  */
 public final class ValueWrapper<T> implements Normalizable<ValueWrapper<T>> {
 	public static <T> ToDocumentFieldValueConverter<ValueWrapper, T> toIndexFieldConverter() {

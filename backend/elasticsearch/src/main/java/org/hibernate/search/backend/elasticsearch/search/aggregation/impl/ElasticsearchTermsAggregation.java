@@ -12,8 +12,8 @@ import org.hibernate.search.backend.elasticsearch.search.common.impl.AbstractEla
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexValueFieldContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.util.common.impl.CollectionHelper;
@@ -64,12 +64,12 @@ public class ElasticsearchTermsAggregation<F, K>
 	protected Map<K, Long> doExtract(AggregationExtractContext context, JsonElement buckets) {
 		JsonArray bucketArray = buckets.getAsJsonArray();
 		Map<K, Long> result = CollectionHelper.newLinkedHashMap( bucketArray.size() );
-		FromDocumentFieldValueConvertContext convertContext = context.getFieldConvertContext();
+		FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 		for ( JsonElement bucketElement : bucketArray ) {
 			JsonObject bucket = bucketElement.getAsJsonObject();
 			JsonElement keyJson = bucket.get( "key" );
 			JsonElement keyAsStringJson = bucket.get( "key_as_string" );
-			K key = fromFieldValueConverter.convert(
+			K key = fromFieldValueConverter.fromDocumentValue(
 					codec.decodeAggregationKey( keyJson, keyAsStringJson ),
 					convertContext
 			);
