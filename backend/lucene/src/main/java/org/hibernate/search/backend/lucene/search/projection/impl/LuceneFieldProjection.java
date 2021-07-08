@@ -9,12 +9,12 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCodecAwareSearchQueryElementFactory;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
@@ -81,7 +81,7 @@ public class LuceneFieldProjection<E, P, F, V> extends AbstractLuceneProjection<
 	@Override
 	public P transform(LoadingResult<?, ?> loadingResult, E extractedData,
 			SearchProjectionTransformContext context) {
-		FromDocumentFieldValueConvertContext convertContext = context.fromDocumentFieldValueConvertContext();
+		FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 		return accumulator.finish( extractedData, converter, convertContext );
 	}
 

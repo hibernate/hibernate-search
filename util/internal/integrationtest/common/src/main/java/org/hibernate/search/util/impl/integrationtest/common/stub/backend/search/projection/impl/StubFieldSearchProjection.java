@@ -32,8 +32,8 @@ public class StubFieldSearchProjection<F, V> implements StubSearchProjection<V> 
 	@Override
 	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Object projectionFromIndex,
 			StubSearchProjectionContext context) {
-		return converter.convert( valueClass.cast( projectionFromIndex ),
-				context.fromDocumentFieldValueConvertContext() );
+		return converter.fromDocumentValue( valueClass.cast( projectionFromIndex ),
+				context.fromDocumentValueConvertContext() );
 	}
 
 	@Override

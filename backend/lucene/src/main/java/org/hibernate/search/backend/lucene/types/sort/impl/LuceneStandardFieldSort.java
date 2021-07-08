@@ -85,7 +85,7 @@ public class LuceneStandardFieldSort extends AbstractLuceneDocumentValueSort {
 		public void missingAs(Object value, ValueConvert convert) {
 			DslConverter<?, ? extends F> dslToIndexConverter = field.type().dslConverter( convert );
 			try {
-				F converted = dslToIndexConverter.convertUnknown( value, scope.toDocumentFieldValueConvertContext() );
+				F converted = dslToIndexConverter.unknownTypeToDocumentValue( value, scope.toDocumentValueConvertContext() );
 				missingValue = encodeMissingAs( converted );
 			}
 			catch (RuntimeException e) {

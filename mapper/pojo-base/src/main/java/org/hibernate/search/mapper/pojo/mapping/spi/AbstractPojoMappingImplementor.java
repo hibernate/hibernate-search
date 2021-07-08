@@ -8,10 +8,10 @@ package org.hibernate.search.mapper.pojo.mapping.spi;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentValueConvertContextImpl;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
@@ -21,12 +21,12 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumen
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierBridgeToDocumentIdentifierContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.ValueBridgeToIndexedValueContextImpl;
-import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
-import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeMappingContext;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionMappingContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventProcessingPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingQueueEventSendingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.impl.Closer;
 
@@ -38,7 +38,7 @@ public abstract class AbstractPojoMappingImplementor<M>
 	private boolean stopped = false;
 
 	private final ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext;
-	private final ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext;
+	private final ToDocumentValueConvertContext toDocumentValueConvertContext;
 	private final IdentifierBridgeToDocumentIdentifierContext toDocumentIdentifierContext;
 	private final ValueBridgeToIndexedValueContext toIndexedValueContext;
 
@@ -46,7 +46,7 @@ public abstract class AbstractPojoMappingImplementor<M>
 		this.delegate = delegate;
 		this.toDocumentIdentifierValueConvertContext =
 				new ToDocumentIdentifierValueConvertContextImpl( this );
-		this.toDocumentFieldValueConvertContext = new ToDocumentFieldValueConvertContextImpl( this );
+		this.toDocumentValueConvertContext = new ToDocumentValueConvertContextImpl( this );
 		this.toDocumentIdentifierContext = new IdentifierBridgeToDocumentIdentifierContextImpl( this );
 		this.toIndexedValueContext = new ValueBridgeToIndexedValueContextImpl( this );
 	}
@@ -81,8 +81,8 @@ public abstract class AbstractPojoMappingImplementor<M>
 	}
 
 	@Override
-	public final ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext() {
-		return toDocumentFieldValueConvertContext;
+	public final ToDocumentValueConvertContext toDocumentValueConvertContext() {
+		return toDocumentValueConvertContext;
 	}
 
 	@Override

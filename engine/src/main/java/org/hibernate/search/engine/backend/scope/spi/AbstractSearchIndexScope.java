@@ -14,7 +14,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.model.spi.AbstractIndexModel;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.StringDocumentIdentifierValueConverter;
@@ -92,8 +92,8 @@ public abstract class AbstractSearchIndexScope<
 	}
 
 	@Override
-	public final ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext() {
-		return mappingContext.toDocumentFieldValueConvertContext();
+	public final ToDocumentValueConvertContext toDocumentValueConvertContext() {
+		return mappingContext.toDocumentValueConvertContext();
 	}
 
 	@Override

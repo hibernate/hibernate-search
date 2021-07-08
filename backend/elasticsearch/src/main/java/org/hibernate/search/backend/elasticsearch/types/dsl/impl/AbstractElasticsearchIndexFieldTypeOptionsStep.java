@@ -8,8 +8,8 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexValueFieldType;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.util.common.impl.Contracts;
 
@@ -25,7 +25,7 @@ abstract class AbstractElasticsearchIndexFieldTypeOptionsStep<S extends Abstract
 	}
 
 	@Override
-	public <V> S dslConverter(Class<V> valueType, ToDocumentFieldValueConverter<V, ? extends F> toIndexConverter) {
+	public <V> S dslConverter(Class<V> valueType, ToDocumentValueConverter<V, ? extends F> toIndexConverter) {
 		Contracts.assertNotNull( valueType, "valueType" );
 		Contracts.assertNotNull( toIndexConverter, "toIndexConverter" );
 		builder.dslConverter( valueType, toIndexConverter );
@@ -33,7 +33,7 @@ abstract class AbstractElasticsearchIndexFieldTypeOptionsStep<S extends Abstract
 	}
 
 	@Override
-	public <V> S projectionConverter(Class<V> valueType, FromDocumentFieldValueConverter<? super F, V> fromIndexConverter) {
+	public <V> S projectionConverter(Class<V> valueType, FromDocumentValueConverter<? super F, V> fromIndexConverter) {
 		Contracts.assertNotNull( valueType, "valueType" );
 		Contracts.assertNotNull( fromIndexConverter, "fromIndexConverter" );
 		builder.projectionConverter( valueType, fromIndexConverter );

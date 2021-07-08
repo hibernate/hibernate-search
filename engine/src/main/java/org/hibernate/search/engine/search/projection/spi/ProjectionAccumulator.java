@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
 /**
@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConvert
  * <ul>
  *     <li>There is no concept of parallel execution.</li>
  *     <li>All operations are expected to be non-blocking,
- *     except for {@link #finish(Object, ProjectionConverter, FromDocumentFieldValueConvertContext)}</li>
+ *     except for {@link #finish(Object, ProjectionConverter, FromDocumentValueConvertContext)}</li>
  * </ul>
  *
  * @param <F> The type of (unconverted) field values.
@@ -61,7 +61,7 @@ public interface ProjectionAccumulator<F, V, U, R> {
 	 * @return The final result of the collecting.
 	 */
 	R finish(U accumulated, ProjectionConverter<? super F, ? extends V> converter,
-			FromDocumentFieldValueConvertContext context);
+			FromDocumentValueConvertContext context);
 
 	/**
 	 * Provides an accumulator for a given underlying field type ({@code F}).

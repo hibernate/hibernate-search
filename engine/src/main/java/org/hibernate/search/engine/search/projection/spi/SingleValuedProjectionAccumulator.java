@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.projection.spi;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -63,7 +63,7 @@ public final class SingleValuedProjectionAccumulator<F, V> implements Projection
 
 	@Override
 	public V finish(F accumulated, ProjectionConverter<? super F, ? extends V> converter,
-			FromDocumentFieldValueConvertContext context) {
-		return converter.convert( accumulated, context );
+			FromDocumentValueConvertContext context) {
+		return converter.fromDocumentValue( accumulated, context );
 	}
 }

@@ -10,10 +10,10 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContextExtension;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContextExtension;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContextExtension;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContextExtension;
 import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
 import org.hibernate.search.mapper.orm.session.context.HibernateOrmSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
@@ -51,8 +51,10 @@ public final class HibernateOrmExtension
 				PropertyBridgeWriteContextExtension<HibernateOrmSessionContext>,
 				ValueBridgeToIndexedValueContextExtension<HibernateOrmMappingContext>,
 				ValueBridgeFromIndexedValueContextExtension<HibernateOrmSessionContext>,
-				ToDocumentFieldValueConvertContextExtension<HibernateOrmMappingContext>,
-				FromDocumentFieldValueConvertContextExtension<HibernateOrmSessionContext> {
+				org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContextExtension<HibernateOrmMappingContext>,
+				ToDocumentValueConvertContextExtension<HibernateOrmMappingContext>,
+				org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContextExtension<HibernateOrmSessionContext>,
+				FromDocumentValueConvertContextExtension<HibernateOrmSessionContext> {
 
 	private static final HibernateOrmExtension INSTANCE = new HibernateOrmExtension();
 
@@ -129,9 +131,14 @@ public final class HibernateOrmExtension
 
 	/**
 	 * {@inheritDoc}
+	 *
+	 * @deprecated Use {@link org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter}
+	 * and {@link org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext} instead.
 	 */
 	@Override
-	public Optional<HibernateOrmMappingContext> extendOptional(ToDocumentFieldValueConvertContext original,
+	@Deprecated
+	public Optional<HibernateOrmMappingContext> extendOptional(
+			org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext original,
 			BackendMappingContext mappingContext) {
 		return extendToOrmMappingContext( mappingContext );
 	}
@@ -140,7 +147,30 @@ public final class HibernateOrmExtension
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<HibernateOrmSessionContext> extendOptional(FromDocumentFieldValueConvertContext original,
+	public Optional<HibernateOrmMappingContext> extendOptional(ToDocumentValueConvertContext original,
+			BackendMappingContext mappingContext) {
+		return extendToOrmMappingContext( mappingContext );
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @deprecated Use {@link org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter}
+	 * and {@link org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext} instead.
+	 */
+	@Override
+	@Deprecated
+	public Optional<HibernateOrmSessionContext> extendOptional(
+			org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext original,
+			BackendSessionContext sessionContext) {
+		return extendToOrmSessionContext( sessionContext );
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Optional<HibernateOrmSessionContext> extendOptional(FromDocumentValueConvertContext original,
 			BackendSessionContext sessionContext) {
 		return extendToOrmSessionContext( sessionContext );
 	}

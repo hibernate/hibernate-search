@@ -21,9 +21,11 @@ import java.util.Optional;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -172,39 +174,39 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 				index2Field.toValueField().type().dslConverter();
 		DslConverter<?, ?> incompatibleDslConverter =
 				new DslConverter<>( typeDescriptor.getJavaType(), new IncompatibleToDocumentFieldValueConverter<>() );
-		ToDocumentFieldValueConvertContext toDocumentConvertContext =
-				new ToDocumentFieldValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
+		ToDocumentValueConvertContext toDocumentConvertContext =
+				new ToDocumentValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
 
 		// isCompatibleWith must return true when appropriate
 		assertThat( dslConverter.isCompatibleWith( dslConverter ) ).isTrue();
 		assertThat( dslConverter.isCompatibleWith( compatibleDslConverter ) ).isTrue();
 		assertThat( dslConverter.isCompatibleWith( incompatibleDslConverter ) ).isFalse();
 
-		// convert and convertUnknown must behave appropriately on valid input
+		// conversion methods must behave appropriately on valid input
 		assertThat(
-				dslConverter.convert( null, toDocumentConvertContext )
+				dslConverter.toDocumentValue( null, toDocumentConvertContext )
 		)
 				.isNull();
 		assertThat(
-				dslConverter.convertUnknown( null, toDocumentConvertContext )
+				dslConverter.unknownTypeToDocumentValue( null, toDocumentConvertContext )
 		)
 				.isNull();
 		Iterator<F> fieldValuesIterator = getDocumentFieldValues().iterator();
 		for ( V propertyValue : getPropertyValues() ) {
 			F fieldValue = fieldValuesIterator.next();
 			assertThat(
-					dslConverter.convert( propertyValue, toDocumentConvertContext )
+					dslConverter.toDocumentValue( propertyValue, toDocumentConvertContext )
 			)
 					.isEqualTo( fieldValue );
 			assertThat(
-					dslConverter.convertUnknown( propertyValue, toDocumentConvertContext )
+					dslConverter.unknownTypeToDocumentValue( propertyValue, toDocumentConvertContext )
 			)
 					.isEqualTo( fieldValue );
 		}
 
-		// convertUnknown must throw a runtime exception on invalid input
+		// conversion methods must throw a runtime exception on invalid input
 		assertThatThrownBy(
-				() -> dslConverter.convertUnknown( new Object(), toDocumentConvertContext ),
+				() -> dslConverter.unknownTypeToDocumentValue( new Object(), toDocumentConvertContext ),
 				"convertUnknown on invalid input"
 		)
 				.isInstanceOf( RuntimeException.class );
@@ -212,29 +214,29 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 
 	// Test behavior that backends expect from our bridges when using projections
 	@Test
-	public void indexToProjectionConverter() {
+	public void projectionConverter() {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
-		ProjectionConverter<F, V> indexToProjectionConverter =
+		ProjectionConverter<F, V> projectionConverter =
 				(ProjectionConverter<F, V>) index1Field.toValueField().type().projectionConverter();
-		ProjectionConverter<?, ?> compatibleIndexToProjectionConverter =
+		ProjectionConverter<?, ?> compatibleProjectionConverter =
 				index2Field.toValueField().type().projectionConverter();
-		ProjectionConverter<?, ?> incompatibleIndexToProjectionConverter =
+		ProjectionConverter<?, ?> incompatibleProjectionConverter =
 				new ProjectionConverter<>( typeDescriptor.getJavaType(), new IncompatibleFromDocumentFieldValueConverter<>() );
 
 		// isCompatibleWith must return true when appropriate
-		assertThat( indexToProjectionConverter.isCompatibleWith( indexToProjectionConverter ) ).isTrue();
-		assertThat( indexToProjectionConverter.isCompatibleWith( compatibleIndexToProjectionConverter ) )
+		assertThat( projectionConverter.isCompatibleWith( projectionConverter ) ).isTrue();
+		assertThat( projectionConverter.isCompatibleWith( compatibleProjectionConverter ) )
 				.isTrue();
-		assertThat( indexToProjectionConverter.isCompatibleWith( incompatibleIndexToProjectionConverter ) ).isFalse();
+		assertThat( projectionConverter.isCompatibleWith( incompatibleProjectionConverter ) ).isFalse();
 
-		// isConvertedTypeAssignableTo must return true for compatible types and false for clearly incompatible types
-		assertThatCode( () -> indexToProjectionConverter.withConvertedType( Object.class,
+		// withConvertedType must return the same converter for compatible types and throw an exception for clearly incompatible types
+		assertThatCode( () -> projectionConverter.withConvertedType( Object.class,
 				() -> EventContexts.fromIndexFieldAbsolutePath( "foo" ) ) )
 				.doesNotThrowAnyException();
-		assertThatCode( () -> indexToProjectionConverter.withConvertedType( expectations.getProjectionType(), () -> EventContexts.fromIndexFieldAbsolutePath( "foo" ) ) )
+		assertThatCode( () -> projectionConverter.withConvertedType( expectations.getProjectionType(), () -> EventContexts.fromIndexFieldAbsolutePath( "foo" ) ) )
 				.doesNotThrowAnyException();
-		assertThatThrownBy( () -> indexToProjectionConverter.withConvertedType( IncompatibleType.class,
+		assertThatThrownBy( () -> projectionConverter.withConvertedType( IncompatibleType.class,
 				() -> EventContexts.fromIndexFieldAbsolutePath( "foo" ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
@@ -243,22 +245,22 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 						"Context: field 'foo'"
 				);
 
-		// convert must behave appropriately on valid input
+		// conversion methods must behave appropriately on valid input
 		try ( SearchSession searchSession = mapping.createSession() ) {
-			FromDocumentFieldValueConvertContext fromDocumentConvertContext =
-					new FromDocumentFieldValueConvertContextImpl(
+			FromDocumentValueConvertContext fromDocumentConvertContext =
+					new FromDocumentValueConvertContextImpl(
 							BridgeTestUtils.toBackendSessionContext( searchSession )
 					);
-			new FromDocumentFieldValueConvertContextImpl( null );
+			new FromDocumentValueConvertContextImpl( null );
 			assertThat(
-					indexToProjectionConverter.convert( null, fromDocumentConvertContext )
+					projectionConverter.fromDocumentValue( null, fromDocumentConvertContext )
 			)
 					.isNull();
 			Iterator<V> projectionValuesIterator = getProjectionValues().iterator();
 			for ( F fieldValue : getDocumentFieldValues() ) {
 				V projectionValue = projectionValuesIterator.next();
 				assertThat(
-						indexToProjectionConverter.convert( fieldValue, fromDocumentConvertContext )
+						projectionConverter.fromDocumentValue( fieldValue, fromDocumentConvertContext )
 				)
 						.isEqualTo( projectionValue );
 			}

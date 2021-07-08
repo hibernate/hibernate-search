@@ -122,8 +122,8 @@ public class ElasticsearchRangePredicate extends AbstractElasticsearchSingleFiel
 			Object value = valueOptional.get();
 			DslConverter<?, ? extends F> toFieldValueConverter = field.type().dslConverter( convert );
 			try {
-				F converted = toFieldValueConverter.convertUnknown(
-						value, scope.toDocumentFieldValueConvertContext()
+				F converted = toFieldValueConverter.unknownTypeToDocumentValue(
+						value, scope.toDocumentValueConvertContext()
 				);
 				return codec.encode( converted );
 			}

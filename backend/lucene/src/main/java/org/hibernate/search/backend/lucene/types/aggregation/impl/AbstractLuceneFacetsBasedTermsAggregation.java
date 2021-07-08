@@ -15,20 +15,20 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.FacetsCollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
+import org.hibernate.search.engine.search.common.ValueConvert;
 
 import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.LabelAndValue;
 import org.apache.lucene.index.IndexReader;
-import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
-import org.hibernate.search.engine.search.common.ValueConvert;
 
 /**
  * @param <F> The type of field values exposed to the mapper.
@@ -60,7 +60,7 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 
 	@Override
 	public final Map<K, Long> extract(AggregationExtractContext context) throws IOException {
-		FromDocumentFieldValueConvertContext convertContext = context.getConvertContext();
+		FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 
 		List<Bucket<T>> buckets = getTopBuckets( context );
 
@@ -138,11 +138,11 @@ public abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		return buckets;
 	}
 
-	private Map<K, Long> toMap(FromDocumentFieldValueConvertContext convertContext, List<Bucket<T>> buckets) {
+	private Map<K, Long> toMap(FromDocumentValueConvertContext convertContext, List<Bucket<T>> buckets) {
 		Map<K, Long> result = new LinkedHashMap<>(); // LinkedHashMap to preserve ordering
 		for ( Bucket<T> bucket : buckets ) {
 			F decoded = termToFieldValue( bucket.term );
-			K key = fromFieldValueConverter.convert( decoded, convertContext );
+			K key = fromFieldValueConverter.fromDocumentValue( decoded, convertContext );
 			result.put( key, bucket.count );
 		}
 		return result;

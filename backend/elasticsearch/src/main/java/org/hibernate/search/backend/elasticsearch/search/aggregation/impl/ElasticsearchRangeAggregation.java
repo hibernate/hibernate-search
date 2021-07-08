@@ -152,7 +152,7 @@ public class ElasticsearchRangeAggregation<F, K>
 
 		private JsonElement convertToFieldValue(K value) {
 			try {
-				F converted = toFieldValueConverter.convert( value, scope.toDocumentFieldValueConvertContext() );
+				F converted = toFieldValueConverter.toDocumentValue( value, scope.toDocumentValueConvertContext() );
 				return codec.encode( converted );
 			}
 			catch (RuntimeException e) {

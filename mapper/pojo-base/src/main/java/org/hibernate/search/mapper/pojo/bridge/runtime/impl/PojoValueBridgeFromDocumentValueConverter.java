@@ -6,16 +6,16 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 
-public final class PojoValueBridgeFromDocumentFieldValueConverter<F, V>
-		implements FromDocumentFieldValueConverter<F, V> {
+public final class PojoValueBridgeFromDocumentValueConverter<F, V>
+		implements FromDocumentValueConverter<F, V> {
 
 	private final ValueBridge<V, F> bridge;
 
-	public PojoValueBridgeFromDocumentFieldValueConverter(ValueBridge<V, F> bridge) {
+	public PojoValueBridgeFromDocumentValueConverter(ValueBridge<V, F> bridge) {
 		this.bridge = bridge;
 	}
 
@@ -25,17 +25,17 @@ public final class PojoValueBridgeFromDocumentFieldValueConverter<F, V>
 	}
 
 	@Override
-	public V convert(F value, FromDocumentFieldValueConvertContext context) {
+	public V fromDocumentValue(F value, FromDocumentValueConvertContext context) {
 		return bridge.fromIndexedValue( value, context.extension( PojoValueBridgeContextExtension.INSTANCE ) );
 	}
 
 	@Override
-	public boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
+	public boolean isCompatibleWith(FromDocumentValueConverter<?, ?> other) {
 		if ( other == null || !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
-		PojoValueBridgeFromDocumentFieldValueConverter<?, ?> castedOther =
-				(PojoValueBridgeFromDocumentFieldValueConverter<?, ?>) other;
+		PojoValueBridgeFromDocumentValueConverter<?, ?> castedOther =
+				(PojoValueBridgeFromDocumentValueConverter<?, ?>) other;
 		return bridge.isCompatibleWith( castedOther.bridge );
 	}
 }

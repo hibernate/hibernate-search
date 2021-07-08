@@ -148,7 +148,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 		private E convertAndEncode(K value) {
 			try {
-				F converted = toFieldValueConverter.convert( value, scope.toDocumentFieldValueConvertContext() );
+				F converted = toFieldValueConverter.toDocumentValue( value, scope.toDocumentValueConvertContext() );
 				return codec.encode( converted );
 			}
 			catch (RuntimeException e) {

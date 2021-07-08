@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
 /**
@@ -60,14 +60,14 @@ public final class ListProjectionAccumulator<F, V> implements ProjectionAccumula
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<V> finish(List<F> accumulated, ProjectionConverter<? super F, ? extends V> converter,
-			FromDocumentFieldValueConvertContext context) {
+			FromDocumentValueConvertContext context) {
 		// Hack to avoid instantiating another list: we convert a List<F> into a List<V> just by replacing its elements.
 		// It works *only* because we know the actual underlying type of the list,
 		// and we know it can work just as well with V as with F.
 		ListIterator<F> iterator = accumulated.listIterator();
 		while ( iterator.hasNext() ) {
 			F fieldValue = iterator.next();
-			V convertedValue = converter.convert( fieldValue, context );
+			V convertedValue = converter.fromDocumentValue( fieldValue, context );
 			( (ListIterator) iterator ).set( convertedValue );
 		}
 		return (List<V>) (List) accumulated;

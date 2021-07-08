@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.search.common.impl.AbstractLuceneCode
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexValueFieldContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -124,7 +124,7 @@ public class LuceneDistanceToFieldProjection<E, P> extends AbstractLuceneProject
 	@Override
 	public P transform(LoadingResult<?, ?> loadingResult, E extractedData,
 			SearchProjectionTransformContext context) {
-		FromDocumentFieldValueConvertContext convertContext = context.fromDocumentFieldValueConvertContext();
+		FromDocumentValueConvertContext convertContext = context.fromDocumentValueConvertContext();
 		return accumulator.finish( extractedData, NO_OP_DOUBLE_CONVERTER, convertContext );
 	}
 

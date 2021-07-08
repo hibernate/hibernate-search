@@ -10,10 +10,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentValueConvertContextImpl;
 import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
 import org.hibernate.search.mapper.orm.session.context.HibernateOrmSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
@@ -85,14 +85,30 @@ public class HibernateOrmExtensionTest {
 	}
 
 	@Test
-	public void toIndexValueConverter() {
-		ToDocumentFieldValueConvertContext context = new ToDocumentFieldValueConvertContextImpl( mappingContext );
+	@SuppressWarnings("deprecation")
+	public void toDocumentFieldValueConverter() {
+		org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext context =
+				new ToDocumentValueConvertContextImpl( mappingContext );
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
 	}
 
 	@Test
-	public void fromIndexValueConverter() {
-		FromDocumentFieldValueConvertContext context = new FromDocumentFieldValueConvertContextImpl( sessionContext );
+	public void toDocumentValueConverter() {
+		ToDocumentValueConvertContext context = new ToDocumentValueConvertContextImpl( mappingContext );
+		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
+	}
+
+	@Test
+	@SuppressWarnings("deprecation")
+	public void fromDocumentFieldValueConverter() {
+		org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext context =
+				new FromDocumentValueConvertContextImpl( sessionContext );
+		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
+	}
+
+	@Test
+	public void fromDocumentValueConverter() {
+		FromDocumentValueConvertContext context = new FromDocumentValueConvertContextImpl( sessionContext );
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
 	}
 
