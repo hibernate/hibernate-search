@@ -77,30 +77,6 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 <2> Start the mass indexing process for the selected types and return when it is over.
 ====
 
-You can also select a subset of target entities to be reindexed.
-
-.Conditional reindexing
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmMassIndexerIT.java[tags=reindexOnly]
-----
-<1> Get the `SearchSession`.
-<2> Create a `MassIndexer` targeting every indexed entity type.
-<3> Reindex only the books published before year 2100.
-<4> Reindex only the authors born prior to a given local date.
-<5> In this example the date is passed as a query parameter.
-<6> Start the mass indexing process and return when it is over.
-====
-
-[WARNING]
-====
-Even if the reindexing is applied on a subset of entities, by default *all entities* will be purged at the start.
-At the moment there is no way to filter the entities that will be purged.
-
-See https://hibernate.atlassian.net/browse/HSEARCH-3304[HSEARCH-3304] for more information.
-====
-
 It is possible to run the mass indexer asynchronously,
 because, the mass indexer does not rely on the original Hibernate ORM session.
 When used asynchronously, the mass indexer will return a completion stage
@@ -145,6 +121,33 @@ If you don't have a sufficiently large connection pool, the `MassIndexer` itself
 applications could starve and be unable to serve other requests:
 make sure you size your connection pool according to the mass indexing parameters,
 as explained in <<mapper-orm-indexing-massindexer-tuning-threads>>.
+====
+
+[[mapper-orm-indexing-massindexer-conditional]]
+== Conditional reindexing
+You can also select a subset of target entities to be reindexed.
+
+.Use of Conditional reindexing
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/HibernateOrmMassIndexerIT.java[tags=reindexOnly]
+----
+<1> Get the `SearchSession`.
+<2> Create a `MassIndexer` targeting every indexed entity type.
+<3> Reindex only the books published before year 2100.
+<4> Reindex only the authors born prior to a given local date.
+<5> In this example the date is passed as a query parameter.
+<6> Start the mass indexing process and return when it is over.
+====
+
+[WARNING]
+====
+Even if the reindexing is applied on a subset of entities, by default *all entities* will be purged at the start.
+The purge <<mapper-orm-indexing-massindexer-parameters,can be disabled completely>>,
+but when enabled there is no way to filter the entities that will be purged.
+
+See https://hibernate.atlassian.net/browse/HSEARCH-3304[HSEARCH-3304] for more information.
 ====
 
 [[mapper-orm-indexing-massindexer-parameters]]
