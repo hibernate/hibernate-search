@@ -23,8 +23,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDef
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
-import org.hibernate.search.mapper.pojo.bridge.runtime.impl.PojoValueBridgeFromDocumentValueConverter;
-import org.hibernate.search.mapper.pojo.bridge.runtime.impl.PojoValueBridgeToDocumentValueConverter;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.PojoValueBridgeDocumentValueConverter;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
@@ -160,15 +159,13 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 			fieldTypeOptionsStep = inferFieldType( bridge );
 		}
 
+		PojoValueBridgeDocumentValueConverter<V2, F> converter = new PojoValueBridgeDocumentValueConverter<>( bridge );
+
 		// Then register the bridge itself as a converter to use in the DSL
-		fieldTypeOptionsStep.dslConverter(
-				expectedValueType, new PojoValueBridgeToDocumentValueConverter<>( bridge )
-		);
+		fieldTypeOptionsStep.dslConverter( expectedValueType, converter );
 
 		// Then register the bridge itself as a converter to use in projections
-		fieldTypeOptionsStep.projectionConverter(
-				expectedValueType, new PojoValueBridgeFromDocumentValueConverter<>( bridge )
-		);
+		fieldTypeOptionsStep.projectionConverter( expectedValueType, converter );
 
 		// Then give the mapping a chance to override some of the model (make projectable, ...)
 		contributor.contribute(
