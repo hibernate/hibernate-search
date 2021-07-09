@@ -249,7 +249,6 @@ public class FieldDefaultBridgeBaseIT<V, F> {
 					new FromDocumentValueConvertContextImpl(
 							BridgeTestUtils.toBackendSessionContext( searchSession )
 					);
-			new FromDocumentValueConvertContextImpl( null );
 			assertThat(
 					projectionConverter.fromDocumentValue( null, fromDocumentConvertContext )
 			)
