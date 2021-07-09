@@ -339,6 +339,45 @@
                                     </wait>
                                 </run>
                             </image>
+                            <image>
+                                <name>${test.database.run.db2.image.name}:${test.database.run.db2.image.tag}</name>
+                                <alias>db2</alias>
+                                <run>
+                                    <skip>${test.database.run.db2.skip}</skip>
+                                    <env>
+                                        <DB2INSTANCE>hreact</DB2INSTANCE>
+                                        <DB2INST1_PASSWORD>hreact</DB2INST1_PASSWORD>
+                                        <DBNAME>hreact</DBNAME>
+                                        <LICENSE>accept</LICENSE>
+                                        <!-- These help the DB2 container start faster -->
+                                        <AUTOCONFIG>false</AUTOCONFIG>
+                                        <ARCHIVE_LOGS>false</ARCHIVE_LOGS>
+                                        <PERSISTENT_HOME>false</PERSISTENT_HOME>
+                                    </env>
+                                    <ports>
+                                        <port>50005:50000</port>
+                                    </ports>
+                                    <log>
+                                        <prefix>DB2:</prefix>
+                                        <date>default</date>
+                                        <color>blue</color>
+                                    </log>
+                                    <network>
+                                        <mode>bridge</mode>
+                                    </network>
+                                    <privileged>true</privileged>
+                                    <wait>
+                                        <!-- good docs found at: http://dmp.fabric8.io/#build-healthcheck -->
+                                        <log>.*INSTANCE.*</log>
+                                        <!-- Unfortunately booting DB2 is slow, needs to set a generous (15m) timeout;
+                                         it generally starts in 2-3 minutes, but it's been occasionally slightly above 10m -->
+                                        <time>900000</time>
+                                        <!-- Kill the container, if it doesn't stop before this given time
+                                         duration since a graceful stop was issued -->
+                                        <kill>300000</kill>
+                                    </wait>
+                                </run>
+                            </image>
                         </images>
                         <!--Stops all images currently running, not just those we just started.
                           Useful to stop processes still running from a previously failed integration test run -->
@@ -750,6 +789,24 @@
                 <jdbc.url>jdbc:mysql://localhost/hibernate_orm_test</jdbc.url>
                 <jdbc.user>hibernate_orm_test</jdbc.user>
                 <jdbc.pass>hibernate_orm_test</jdbc.pass>
+                <jdbc.isolation />
+            </properties>
+        </profile>
+
+        <!-- DB2 Docker container for tests -->
+        <!-- See test.database.run.db2.image.tag for the server version in use -->
+        <profile>
+            <id>ci-db2</id>
+            <properties>
+                <test.database.run.db2.skip>false</test.database.run.db2.skip>
+                <db.dialect>org.hibernate.dialect.DB297Dialect</db.dialect>
+                <jdbc.driver.groupId>com.ibm.db2</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>jcc</jdbc.driver.artifactId>
+                <jdbc.driver.version>11.5.5.0</jdbc.driver.version>
+                <jdbc.driver>com.ibm.db2.jcc.DB2Driver</jdbc.driver>
+                <jdbc.url>jdbc:db2://localhost:50005/hreact</jdbc.url>
+                <jdbc.user>hreact</jdbc.user>
+                <jdbc.pass>hreact</jdbc.pass>
                 <jdbc.isolation />
             </properties>
         </profile>

@@ -548,6 +548,10 @@
         <test.database.run.mysql.skip>true</test.database.run.mysql.skip>
         <test.database.run.mysql.image.name>mysql</test.database.run.mysql.image.name>
         <test.database.run.mysql.image.tag>8.0.22</test.database.run.mysql.image.tag>
+        <!-- DB2 -->
+        <test.database.run.db2.skip>true</test.database.run.db2.skip>
+        <test.database.run.db2.image.name>ibmcom/db2</test.database.run.db2.image.name>
+        <test.database.run.db2.image.tag>11.5.5.0</test.database.run.db2.image.tag>
 
         <!-- Eclipse plugin options -->
 
