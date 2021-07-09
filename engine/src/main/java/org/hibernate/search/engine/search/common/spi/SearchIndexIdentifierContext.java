@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.engine.search.common.spi;
 
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.StringDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
@@ -19,20 +19,23 @@ import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
  */
 public interface SearchIndexIdentifierContext extends EventContextProvider {
 
-	StringDocumentIdentifierValueConverter RAW_ID_CONVERTER = new StringDocumentIdentifierValueConverter();
+	DslConverter<String, String> RAW_DSL_CONVERTER = DslConverter.passThrough( String.class );
+	ProjectionConverter<String, String> RAW_PROJECTION_CONVERTER = ProjectionConverter.passThrough( String.class );
 
 	EventContext relativeEventContext();
 
-	default DocumentIdentifierValueConverter<?> dslConverter(ValueConvert convert) {
+	default DslConverter<?, String> dslConverter(ValueConvert convert) {
 		switch ( convert ) {
 			case NO:
-				return RAW_ID_CONVERTER;
+				return RAW_DSL_CONVERTER;
 			case YES:
 			default:
 				return dslConverter();
 		}
 	}
 
-	DocumentIdentifierValueConverter<?> dslConverter();
+	DslConverter<?, String> dslConverter();
+
+	ProjectionConverter<String, ?> projectionConverter();
 
 }

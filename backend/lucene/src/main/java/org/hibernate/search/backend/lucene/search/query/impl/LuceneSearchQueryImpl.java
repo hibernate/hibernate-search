@@ -23,8 +23,8 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.backend.lucene.work.impl.ReadWork;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
@@ -220,9 +220,8 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	}
 
 	private String toDocumentId(LuceneSearchIndexContext index, Object id) {
-		DocumentIdentifierValueConverter<?> converter = index.identifier().dslConverter();
-		ToDocumentIdentifierValueConvertContext convertContext =
-				scope.toDocumentIdentifierValueConvertContext();
-		return converter.convertToDocumentUnknown( id, convertContext );
+		DslConverter<?, String> converter = index.identifier().dslConverter();
+		ToDocumentValueConvertContext context = scope.toDocumentValueConvertContext();
+		return converter.unknownTypeToDocumentValue( id, context );
 	}
 }

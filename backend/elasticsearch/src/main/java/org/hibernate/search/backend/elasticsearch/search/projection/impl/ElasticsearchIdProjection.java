@@ -7,8 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -19,14 +18,14 @@ import com.google.gson.JsonObject;
 public class ElasticsearchIdProjection<I> extends AbstractElasticsearchProjection<String, I> {
 
 	private final ProjectionExtractionHelper<String> extractionHelper;
-	private final DocumentIdentifierValueConverter<? extends I> identifierValueConverter;
+	private final ProjectionConverter<String, ? extends I> converter;
 
 	private ElasticsearchIdProjection(ElasticsearchSearchIndexScope<?> scope,
 			ProjectionExtractionHelper<String> extractionHelper,
-			DocumentIdentifierValueConverter<? extends I> identifierValueConverter) {
+			ProjectionConverter<String, ? extends I> converter) {
 		super( scope );
 		this.extractionHelper = extractionHelper;
-		this.identifierValueConverter = identifierValueConverter;
+		this.converter = converter;
 	}
 
 	@Override
@@ -48,8 +47,7 @@ public class ElasticsearchIdProjection<I> extends AbstractElasticsearchProjectio
 	@Override
 	public I transform(LoadingResult<?, ?> loadingResult, String extractedData,
 			SearchProjectionTransformContext context) {
-		return identifierValueConverter.convertToSource(
-				extractedData, context.fromDocumentIdentifierValueConvertContext() );
+		return converter.fromDocumentValue( extractedData, context.fromDocumentValueConvertContext() );
 	}
 
 	static class Builder<I> extends AbstractBuilder<I> implements IdProjectionBuilder<I> {
@@ -57,18 +55,9 @@ public class ElasticsearchIdProjection<I> extends AbstractElasticsearchProjectio
 		private final ElasticsearchIdProjection<I> projection;
 
 		Builder(ElasticsearchSearchIndexScope<?> scope, ProjectionExtractionHelper<String> extractionHelper,
-				Class<I> identifierType) {
+				ProjectionConverter<String, I> converter) {
 			super( scope );
-
-			DocumentIdentifierValueConverter<?> identifierValueConverter = scope.identifier()
-					.dslConverter( ValueConvert.YES );
-
-			// check expected identifier type:
-			identifierValueConverter.checkSourceTypeAssignableTo( identifierType );
-			@SuppressWarnings("uncheked") // just checked
-			DocumentIdentifierValueConverter<? extends I> casted = (DocumentIdentifierValueConverter<? extends I>) identifierValueConverter;
-
-			this.projection = new ElasticsearchIdProjection<>( scope, extractionHelper, casted );
+			this.projection = new ElasticsearchIdProjection<>( scope, extractionHelper, converter );
 		}
 
 		@Override

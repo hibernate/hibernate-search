@@ -13,8 +13,8 @@ import org.hibernate.search.backend.elasticsearch.common.impl.DocumentIdHelper;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
@@ -92,11 +92,9 @@ public class ElasticsearchMatchIdPredicate extends AbstractElasticsearchPredicat
 
 		@Override
 		public void value(Object value, ValueConvert valueConvert) {
-			DocumentIdentifierValueConverter<?> dslToDocumentIdConverter =
-					scope.identifier().dslConverter( valueConvert );
-			ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext =
-					scope.toDocumentIdentifierValueConvertContext();
-			values.add( dslToDocumentIdConverter.convertToDocumentUnknown( value, toDocumentIdentifierValueConvertContext ) );
+			DslConverter<?, String> converter = scope.identifier().dslConverter( valueConvert );
+			ToDocumentValueConvertContext context = scope.toDocumentValueConvertContext();
+			values.add( converter.unknownTypeToDocumentValue( value, context ) );
 		}
 
 		@Override

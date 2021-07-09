@@ -74,7 +74,7 @@ public final class ProjectionConverter<F, V> {
 	public <T> ProjectionConverter<F, ? extends T> withConvertedType(Class<T> expectedType,
 			EventContextProvider eventContextProvider) {
 		if ( !expectedType.isAssignableFrom( valueType ) ) {
-			throw log.invalidOutputTypeForField( expectedType, valueType, eventContextProvider.eventContext() );
+			throw log.invalidReturnType( expectedType, valueType, eventContextProvider.eventContext() );
 		}
 		return (ProjectionConverter<F, ? extends T>) this;
 	}

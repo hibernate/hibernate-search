@@ -26,6 +26,11 @@ public class StringPropertyTypeDescriptor extends PropertyTypeDescriptor<String>
 	public Optional<DefaultIdentifierBridgeExpectations<String>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<String>() {
 			@Override
+			public Class<String> getProjectionType() {
+				return String.class;
+			}
+
+			@Override
 			public List<String> getEntityIdentifierValues() {
 				return Arrays.asList( "", "a", "AaaA", "Some words", "\000", "http://foo", "yop@yopmail.com" );
 			}

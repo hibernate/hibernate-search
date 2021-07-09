@@ -26,6 +26,11 @@ public class PrimitiveLongPropertyTypeDescriptor extends PropertyTypeDescriptor<
 	public Optional<DefaultIdentifierBridgeExpectations<Long>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Long>() {
 			@Override
+			public Class<Long> getProjectionType() {
+				return Long.class;
+			}
+
+			@Override
 			public List<Long> getEntityIdentifierValues() {
 				return Arrays.asList( Long.MIN_VALUE, -1L, 0L, 1L, 42L, Long.MAX_VALUE );
 			}

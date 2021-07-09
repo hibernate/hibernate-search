@@ -30,8 +30,8 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchR
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExplainResult;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.loading.spi.SearchLoadingContext;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
@@ -288,10 +288,9 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	}
 
 	private URLEncodedString toElasticsearchId(ElasticsearchSearchIndexContext index, Object id) {
-		DocumentIdentifierValueConverter<?> converter = index.identifier().dslConverter();
-		ToDocumentIdentifierValueConvertContext convertContext =
-				scope.toDocumentIdentifierValueConvertContext();
-		String documentId = converter.convertToDocumentUnknown( id, convertContext );
+		DslConverter<?, String> converter = index.identifier().dslConverter();
+		ToDocumentValueConvertContext convertContext = scope.toDocumentValueConvertContext();
+		String documentId = converter.unknownTypeToDocumentValue( id, convertContext );
 		return URLEncodedString.fromString( scope.documentIdHelper()
 				.toElasticsearchId( sessionContext.tenantIdentifier(), documentId ) );
 	}

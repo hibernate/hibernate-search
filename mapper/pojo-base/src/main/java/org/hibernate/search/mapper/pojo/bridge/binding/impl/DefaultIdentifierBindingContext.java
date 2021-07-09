@@ -16,7 +16,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBind
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
-import org.hibernate.search.mapper.pojo.bridge.runtime.impl.PojoIdentifierBridgeDocumentIdentifierValueConverter;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.PojoIdentifierBridgeDocumentValueConverter;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelValueElement;
@@ -125,11 +125,10 @@ public class DefaultIdentifierBindingContext<I> extends AbstractBindingContext
 
 		BoundIdentifierBridge<I> complete(Optional<IndexedEntityBindingContext> indexedEntityBindingContext) {
 			if ( indexedEntityBindingContext.isPresent() ) {
-				indexedEntityBindingContext.get().idDslConverter(
-						new PojoIdentifierBridgeDocumentIdentifierValueConverter<>(
-								bridgeHolder.get(), expectedValueType
-						)
-				);
+				PojoIdentifierBridgeDocumentValueConverter<I> converter =
+						new PojoIdentifierBridgeDocumentValueConverter<>( bridgeHolder.get() );
+				indexedEntityBindingContext.get().idDslConverter( expectedValueType, converter );
+				indexedEntityBindingContext.get().idProjectionConverter( expectedValueType, converter );
 			}
 
 			return new BoundIdentifierBridge<>( bridgeHolder );

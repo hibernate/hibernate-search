@@ -358,7 +358,7 @@ public interface Log extends BasicLogger {
 			@Param EventContext context);
 
 	@Message(id = ID_OFFSET + 84, value = "Invalid type for returned values: '%1$s'. Expected '%2$s' or a supertype.")
-	SearchException invalidOutputTypeForField(@FormatWith(ClassFormatter.class) Class<?> type,
+	SearchException invalidReturnType(@FormatWith(ClassFormatter.class) Class<?> type,
 			@FormatWith(ClassFormatter.class) Class<?> correctType,
 			@Param EventContext context);
 
@@ -404,12 +404,6 @@ public interface Log extends BasicLogger {
 		+ " Remove the dot from your named predicate name.")
 	SearchException relativeNamedPredicateNameCannotContainDot(String relativeNamedPredicateName,
 		@Param EventContext context);
-
-	@Message(id = ID_OFFSET + 95, value = "The required identifier type '%1$s'"
-			+ " does not match the actual identifier type '%2$s':"
-			+ " the required identifier must be a superclass of the actual identifier.")
-	SearchException wrongRequiredIdentifierType(@FormatWith(ClassFormatter.class) Class<?> requiredIdentifierType,
-			@FormatWith(ClassFormatter.class) Class<?> actualIdentifierType);
 
 	@Message(id = ID_OFFSET + 96, value = "Different mappings trying to define two backends " +
 			"with the same name '%1$s' but having different expectations on multi-tenancy.")

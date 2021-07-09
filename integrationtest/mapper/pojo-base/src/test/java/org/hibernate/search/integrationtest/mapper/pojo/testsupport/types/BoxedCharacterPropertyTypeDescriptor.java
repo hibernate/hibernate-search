@@ -26,6 +26,11 @@ public class BoxedCharacterPropertyTypeDescriptor extends PropertyTypeDescriptor
 	public Optional<DefaultIdentifierBridgeExpectations<Character>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Character>() {
 			@Override
+			public Class<Character> getProjectionType() {
+				return Character.class;
+			}
+
+			@Override
 			public List<Character> getEntityIdentifierValues() {
 				return Arrays.asList( Character.MIN_VALUE, '7', 'A', 'a', 'f', Character.MAX_VALUE );
 			}

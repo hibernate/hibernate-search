@@ -27,6 +27,11 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 	public Optional<DefaultIdentifierBridgeExpectations<UUID>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<UUID>() {
 			@Override
+			public Class<UUID> getProjectionType() {
+				return UUID.class;
+			}
+
+			@Override
 			public List<UUID> getEntityIdentifierValues() {
 				return getSequence();
 			}

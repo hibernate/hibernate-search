@@ -17,7 +17,6 @@ import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchPr
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionTransformContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContextImpl;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -39,7 +38,6 @@ import org.apache.lucene.search.TopDocs;
  */
 public class LuceneLoadableSearchResult<H> {
 	private final FromDocumentValueConvertContext fromDocumentValueConvertContext;
-	private final FromDocumentIdentifierValueConvertContextImpl identifierConvertContext;
 	private final LuceneSearchProjection<?, H> rootProjection;
 
 	private final SearchResultTotal resultTotal;
@@ -53,14 +51,12 @@ public class LuceneLoadableSearchResult<H> {
 	private final TimeoutManager timeoutManager;
 
 	LuceneLoadableSearchResult(FromDocumentValueConvertContext fromDocumentValueConvertContext,
-			FromDocumentIdentifierValueConvertContextImpl identifierConvertContext,
 			LuceneSearchProjection<?, H> rootProjection,
 			SearchResultTotal resultTotal, TopDocs topDocs, List<Object> extractedData,
 			Map<AggregationKey<?>, ?> extractedAggregations,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
 			Duration took, boolean timedOut, TimeoutManager timeoutManager) {
 		this.fromDocumentValueConvertContext = fromDocumentValueConvertContext;
-		this.identifierConvertContext = identifierConvertContext;
 		this.rootProjection = rootProjection;
 		this.resultTotal = resultTotal;
 		this.topDocs = topDocs;
@@ -74,7 +70,7 @@ public class LuceneLoadableSearchResult<H> {
 
 	LuceneSearchResult<H> loadBlocking() {
 		SearchProjectionTransformContext transformContext = new SearchProjectionTransformContext(
-				fromDocumentValueConvertContext, identifierConvertContext );
+				fromDocumentValueConvertContext );
 		LoadingResult<?, ?> loadingResult = projectionHitMapper.loadBlocking( timeoutManager.hardDeadlineOrNull() );
 
 		int readIndex = 0;
