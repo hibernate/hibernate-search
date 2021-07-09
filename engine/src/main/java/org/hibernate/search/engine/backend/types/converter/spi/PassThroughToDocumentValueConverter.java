@@ -9,7 +9,7 @@ package org.hibernate.search.engine.backend.types.converter.spi;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 
-public final class PassThroughToDocumentValueConverter<F> implements ToDocumentValueConverter<F, F> {
+final class PassThroughToDocumentValueConverter<F> implements ToDocumentValueConverter<F, F> {
 
 	@Override
 	public F toDocumentValue(F value, ToDocumentValueConvertContext context) {

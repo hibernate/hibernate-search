@@ -26,6 +26,10 @@ public final class ProjectionConverter<F, V> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	public static <F> ProjectionConverter<F, F> passThrough(Class<F> fieldAndValueType) {
+		return new ProjectionConverter<>( fieldAndValueType, new PassThroughFromDocumentValueConverter<>() );
+	}
+
 	private final Class<V> valueType;
 	private final FromDocumentValueConverter<? super F, V> delegate;
 
