@@ -70,7 +70,7 @@ public abstract class AbstractMultiIndexSearchIndexNodeContext<
 	}
 
 	protected final EventContext indexesEventContext() {
-		return EventContexts.fromIndexNames( scope.hibernateSearchIndexNames() );
+		return scope.eventContext();
 	}
 
 	@Override

@@ -74,13 +74,17 @@ public abstract class AbstractSearchIndexScope<
 		this.overriddenRoot = overriddenRoot;
 	}
 
-	protected final EventContext eventContext() {
-		EventContext indexes = EventContexts.fromIndexNames( hibernateSearchIndexNames );
+	@Override
+	public EventContext eventContext() {
+		return EventContexts.fromIndexNames( hibernateSearchIndexNames );
+	}
+
+	protected final EventContext indexesAndRootEventContext() {
 		if ( overriddenRoot == null ) {
-			return indexes;
+			return eventContext();
 		}
 		else {
-			return indexes.append( overriddenRoot.relativeEventContext() );
+			return eventContext().append( overriddenRoot.relativeEventContext() );
 		}
 	}
 
@@ -158,7 +162,7 @@ public abstract class AbstractSearchIndexScope<
 			resultOrNull = createMultiIndexFieldContext( absoluteFieldPath );
 		}
 		if ( resultOrNull == null ) {
-			throw log.unknownFieldForSearch( absoluteFieldPath, eventContext() );
+			throw log.unknownFieldForSearch( absoluteFieldPath, indexesAndRootEventContext() );
 		}
 		return resultOrNull;
 	}
