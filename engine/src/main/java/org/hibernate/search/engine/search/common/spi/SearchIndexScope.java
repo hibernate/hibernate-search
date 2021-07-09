@@ -12,6 +12,7 @@ import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentVal
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
 
 /**
  * Information about indexes targeted by search,
@@ -19,7 +20,8 @@ import org.hibernate.search.engine.search.common.ValueConvert;
  *
  * @param <S> The self type, i.e. the exposed type of this scope.
  */
-public interface SearchIndexScope<S extends SearchIndexScope<?>> {
+public interface SearchIndexScope<S extends SearchIndexScope<?>>
+		extends EventContextProvider {
 
 	Set<String> hibernateSearchIndexNames();
 
