@@ -402,6 +402,30 @@
                                     </wait>
                                 </run>
                             </image>
+                            <image>
+                                <name>${test.database.run.mssql.image.name}:${test.database.run.mssql.image.tag}</name>
+                                <alias>mssql</alias>
+                                <run>
+                                    <skip>${test.database.run.mssql.skip}</skip>
+                                    <env>
+                                        <ACCEPT_EULA>Y</ACCEPT_EULA>
+                                        <SA_PASSWORD>ActuallyRequired11Complexity</SA_PASSWORD>
+                                    </env>
+                                    <ports>
+                                        <port>1433:1433</port>
+                                    </ports>
+                                    <log>
+                                        <prefix>MS SQL Server: </prefix>
+                                        <date>default</date>
+                                        <color>blue</color>
+                                    </log>
+                                    <wait>
+                                        <log>SQL Server is now ready for client connections</log>
+                                        <!-- Unfortunately booting this is slow, needs to set a generous timeout: -->
+                                        <time>40000</time>
+                                    </wait>
+                                </run>
+                            </image>
                         </images>
                         <!--Stops all images currently running, not just those we just started.
                           Useful to stop processes still running from a previously failed integration test run -->
@@ -850,6 +874,23 @@
                 <jdbc.user>SYSTEM</jdbc.user>
                 <jdbc.pass>hibernate_orm_test</jdbc.pass>
                 <jdbc.isolation />
+            </properties>
+        </profile>
+
+        <!-- SQL Server Docker container for tests -->
+        <!-- See test.database.run.mssql.image.tag for the server version in use -->
+        <profile>
+            <id>ci-mssql</id>
+            <properties>
+                <test.database.run.mssql.skip>false</test.database.run.mssql.skip>
+                <db.dialect>org.hibernate.dialect.SQLServer2012Dialect</db.dialect>
+                <jdbc.driver.groupId>com.microsoft.sqlserver</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>mssql-jdbc</jdbc.driver.artifactId>
+                <jdbc.driver.version>9.2.1.jre11</jdbc.driver.version>
+                <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
+                <jdbc.url>jdbc:sqlserver://localhost:1433;databaseName=tempdb</jdbc.url>
+                <jdbc.user>sa</jdbc.user>
+                <jdbc.pass>ActuallyRequired11Complexity</jdbc.pass>
             </properties>
         </profile>
 

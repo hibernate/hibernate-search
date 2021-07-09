@@ -211,7 +211,9 @@ stage('Configure') {
                     new DatabaseBuildEnvironment(dbName: 'db2', mavenProfile: 'ci-db2',
                             condition: TestCondition.AFTER_MERGE, dockerHubImage: "ibmcom/db2:11.5.5.0"),
                     new DatabaseBuildEnvironment(dbName: 'oracle', mavenProfile: 'ci-oracle',
-                            condition: TestCondition.AFTER_MERGE, dockerHubImage: "gvenzl/oracle-xe:11-slim")
+                            condition: TestCondition.AFTER_MERGE, dockerHubImage: "gvenzl/oracle-xe:11-slim"),
+                    new DatabaseBuildEnvironment(dbName: 'mssql', mavenProfile: 'ci-mssql',
+                            condition: TestCondition.AFTER_MERGE, dockerHubImage: "mcr.microsoft.com/mssql/server:2019-CU8-ubuntu-16.04")
 			],
 			esLocal: [
 					// --------------------------------------------
