@@ -544,6 +544,10 @@
         <test.database.run.mariadb.skip>true</test.database.run.mariadb.skip>
         <test.database.run.mariadb.image.name>mariadb</test.database.run.mariadb.image.name>
         <test.database.run.mariadb.image.tag>10.5.8</test.database.run.mariadb.image.tag>
+        <!-- MySQL -->
+        <test.database.run.mysql.skip>true</test.database.run.mysql.skip>
+        <test.database.run.mysql.image.name>mysql</test.database.run.mysql.image.name>
+        <test.database.run.mysql.image.tag>8.0.22</test.database.run.mysql.image.tag>
 
         <!-- Eclipse plugin options -->
 

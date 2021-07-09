@@ -310,6 +310,35 @@
                                     </wait>
                                 </run>
                             </image>
+                            <image>
+                                <name>${test.database.run.mysql.image.name}:${test.database.run.mysql.image.tag}</name>
+                                <alias>mysql</alias>
+                                <run>
+                                    <skip>${test.database.run.mysql.skip}</skip>
+                                    <env>
+                                        <MYSQL_USER>hibernate_orm_test</MYSQL_USER>
+                                        <MYSQL_PASSWORD>hibernate_orm_test</MYSQL_PASSWORD>
+                                        <MYSQL_DATABASE>hibernate_orm_test</MYSQL_DATABASE>
+                                        <MYSQL_RANDOM_ROOT_PASSWORD>true</MYSQL_RANDOM_ROOT_PASSWORD>
+                                    </env>
+                                    <ports>
+                                        <port>3306:3306</port>
+                                    </ports>
+                                    <log>
+                                        <prefix>MySQL:</prefix>
+                                        <date>default</date>
+                                        <color>blue</color>
+                                    </log>
+                                    <!-- Speed things up a bit by not actually flushing writes to disk -->
+                                    <tmpfs>/var/lib/mysql</tmpfs>
+                                    <wait>
+                                        <time>20000</time>
+                                        <exec>
+                                            <postStart>mysqladmin ping -h localhost -u hibernate_orm_test -phibernate_orm_test</postStart>
+                                        </exec>
+                                    </wait>
+                                </run>
+                            </image>
                         </images>
                         <!--Stops all images currently running, not just those we just started.
                           Useful to stop processes still running from a previously failed integration test run -->
@@ -701,6 +730,24 @@
                 <jdbc.driver.version>2.2.4</jdbc.driver.version>
                 <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
                 <jdbc.url>jdbc:mariadb://localhost/hibernate_orm_test</jdbc.url>
+                <jdbc.user>hibernate_orm_test</jdbc.user>
+                <jdbc.pass>hibernate_orm_test</jdbc.pass>
+                <jdbc.isolation />
+            </properties>
+        </profile>
+
+        <!-- MySQL Docker container for tests -->
+        <!-- See test.database.run.mysql.image.tag for the server version in use -->
+        <profile>
+            <id>ci-mysql</id>
+            <properties>
+                <test.database.run.mysql.skip>false</test.database.run.mysql.skip>
+                <db.dialect>org.hibernate.dialect.MySQL8Dialect</db.dialect>
+                <jdbc.driver.groupId>mysql</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>mysql-connector-java</jdbc.driver.artifactId>
+                <jdbc.driver.version>8.0.17</jdbc.driver.version>
+                <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
+                <jdbc.url>jdbc:mysql://localhost/hibernate_orm_test</jdbc.url>
                 <jdbc.user>hibernate_orm_test</jdbc.user>
                 <jdbc.pass>hibernate_orm_test</jdbc.pass>
                 <jdbc.isolation />

@@ -205,7 +205,9 @@ stage('Configure') {
 					new DatabaseBuildEnvironment(dbName: 'postgresql', mavenProfile: 'ci-postgresql',
 							condition: TestCondition.AFTER_MERGE, dockerHubImage: "postgres:13.1"),
 					new DatabaseBuildEnvironment(dbName: 'mariadb', mavenProfile: 'ci-mariadb',
-							condition: TestCondition.AFTER_MERGE, dockerHubImage: "mariadb:10.5.8")
+							condition: TestCondition.AFTER_MERGE, dockerHubImage: "mariadb:10.5.8"),
+					new DatabaseBuildEnvironment(dbName: 'mysql', mavenProfile: 'ci-mysql',
+                    		condition: TestCondition.AFTER_MERGE, dockerHubImage: "mysql:8.0.22")
 			],
 			esLocal: [
 					// --------------------------------------------
