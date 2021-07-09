@@ -15,8 +15,6 @@ import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentValueConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocumentValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.common.spi.SearchIndexValueFieldContext;
@@ -178,8 +176,8 @@ public abstract class AbstractIndexValueFieldType<
 
 		public Builder(Class<F> valueClass) {
 			this.valueClass = valueClass;
-			this.rawDslConverter = new DslConverter<>( valueClass, new PassThroughToDocumentValueConverter<>() );
-			this.rawProjectionConverter = new ProjectionConverter<>( valueClass, new PassThroughFromDocumentValueConverter<>() );
+			this.rawDslConverter = DslConverter.passThrough( valueClass );
+			this.rawProjectionConverter = ProjectionConverter.passThrough( valueClass );
 		}
 
 		public final Class<F> valueClass() {

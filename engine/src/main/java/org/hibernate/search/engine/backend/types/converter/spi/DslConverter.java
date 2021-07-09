@@ -26,6 +26,10 @@ public final class DslConverter<V, F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	public static <F> DslConverter<F, F> passThrough(Class<F> fieldAndValueType) {
+		return new DslConverter<>( fieldAndValueType, new PassThroughToDocumentValueConverter<>() );
+	}
+
 	private final Class<V> valueType;
 	private final ToDocumentValueConverter<V, ? extends F> delegate;
 
