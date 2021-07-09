@@ -10,14 +10,13 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.hibernate.search.engine.backend.document.model.spi.AbstractIndexModel;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.document.model.spi.IndexIdentifier;
 
 public class StubIndexModel extends AbstractIndexModel<StubIndexModel, StubIndexRoot, StubIndexField> {
 
 	public StubIndexModel(String hibernateSearchIndexName, String mappedTypeName,
-			DocumentIdentifierValueConverter<?> idDslConverter,
-			StubIndexRoot root, Map<String, StubIndexField> fields) {
-		super( hibernateSearchIndexName, mappedTypeName, idDslConverter, root, fields, Collections.emptyList() );
+			IndexIdentifier identifier, StubIndexRoot root, Map<String, StubIndexField> fields) {
+		super( hibernateSearchIndexName, mappedTypeName, identifier, root, fields, Collections.emptyList() );
 	}
 
 	@Override

@@ -17,18 +17,18 @@ import org.hibernate.search.backend.lucene.document.model.impl.AbstractLuceneInd
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectField;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexRoot;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexObjectFieldTemplate;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueFieldTemplate;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexRoot;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueField;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexValueFieldTemplate;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactory;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIndexFieldTypeFactoryImpl;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexCompositeNodeType;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
+import org.hibernate.search.engine.backend.document.model.spi.IndexIdentifier;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.StringDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -76,6 +76,8 @@ public class LuceneIndexRootBuilder extends AbstractLuceneIndexCompositeNodeBuil
 	}
 
 	public LuceneIndexModel build(String indexName) {
+		IndexIdentifier identifier = new IndexIdentifier( idDslConverter );
+
 		Map<String, LuceneIndexField> staticFields = new HashMap<>();
 		List<AbstractLuceneIndexFieldTemplate<?>> fieldTemplates = new ArrayList<>();
 		// Initializing a one-element array so that we can mutate the boolean below.
@@ -114,8 +116,7 @@ public class LuceneIndexRootBuilder extends AbstractLuceneIndexCompositeNodeBuil
 		LuceneIndexRoot rootNode = new LuceneIndexRoot( typeBuilder.build(), staticChildrenByName );
 		contributeChildren( rootNode, collector, staticChildrenByName );
 
-		return new LuceneIndexModel( indexName, mappedTypeName,
-				idDslConverter == null ? new StringDocumentIdentifierValueConverter() : idDslConverter,
+		return new LuceneIndexModel( indexName, mappedTypeName, identifier,
 				rootNode, staticFields, fieldTemplates, hasNestedDocument[0] );
 	}
 

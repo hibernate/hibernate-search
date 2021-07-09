@@ -150,7 +150,7 @@ public abstract class AbstractMultiIndexSearchIndexNodeContext<
 		}
 		catch (SearchException e) {
 			SearchException inconsistentSupportException = log.inconsistentSupportForQueryElement( key, e.getMessage(), e );
-			throw log.inconsistentConfigurationForIndexNodeForSearch( relativeEventContext(),
+			throw log.inconsistentConfigurationInContextForSearch( relativeEventContext(),
 					inconsistentSupportException.getMessage(), indexesEventContext(), inconsistentSupportException );
 		}
 	}
@@ -159,11 +159,11 @@ public abstract class AbstractMultiIndexSearchIndexNodeContext<
 			T attribute1, T attribute2) {
 		try {
 			if ( !compatibilityChecker.test( attribute1, attribute2 ) ) {
-				throw log.differentIndexNodeAttribute( attributeName, attribute1, attribute2 );
+				throw log.differentAttribute( attributeName, attribute1, attribute2 );
 			}
 		}
 		catch (SearchException e) {
-			throw log.inconsistentConfigurationForIndexNodeForSearch( relativeEventContext(), e.getMessage(),
+			throw log.inconsistentConfigurationInContextForSearch( relativeEventContext(), e.getMessage(),
 					indexesEventContext(), e );
 		}
 	}

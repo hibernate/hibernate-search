@@ -32,9 +32,9 @@ import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFi
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexCompositeNodeType;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
+import org.hibernate.search.engine.backend.document.model.spi.IndexIdentifier;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.StringDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -96,6 +96,8 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 	}
 
 	public ElasticsearchIndexModel build() {
+		IndexIdentifier identifier = new IndexIdentifier( idDslConverter );
+
 		RootTypeMapping mapping = new RootTypeMapping();
 		if ( routing != null ) {
 			mapping.setRouting( routing );
@@ -141,8 +143,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 		ElasticsearchIndexRoot rootNode = new ElasticsearchIndexRoot( typeBuilder.build(), staticChildrenByName );
 		contributeChildren( mapping, rootNode, collector, staticChildrenByName );
 
-		return new ElasticsearchIndexModel( indexNames, mappedTypeName,
-				idDslConverter == null ? new StringDocumentIdentifierValueConverter() : idDslConverter,
+		return new ElasticsearchIndexModel( indexNames, mappedTypeName, identifier,
 				rootNode, staticFields, fieldTemplates,
 				analysisDefinitionRegistry, customIndexSettings, mapping );
 	}

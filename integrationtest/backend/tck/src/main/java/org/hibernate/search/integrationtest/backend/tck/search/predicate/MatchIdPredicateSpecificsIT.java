@@ -137,8 +137,8 @@ public class MatchIdPredicateSpecificsIT {
 		assertThatThrownBy( () -> f.id().matching( new Object() /* Value does not matter */ ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Inconsistent configuration for the identifier in a search query across multiple indexes",
-						"converter differs:", " vs. "
+						"Inconsistent configuration for identifier in a search query across multiple indexes",
+						"Attribute 'dslConverter' differs:", " vs. "
 				)
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( mainIndex.name(), incompatibleIdConverterIndex.name() )

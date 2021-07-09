@@ -146,8 +146,8 @@ public class IdentifierSearchProjectionBaseIT {
 		assertThatThrownBy( () -> scope.projection().id() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"Inconsistent configuration for the identifier in a search query across multiple indexes",
-						"converter differs"
+						"Inconsistent configuration for identifier in a search query across multiple indexes",
+						"Attribute 'projectionConverter' differs"
 				);
 	}
 

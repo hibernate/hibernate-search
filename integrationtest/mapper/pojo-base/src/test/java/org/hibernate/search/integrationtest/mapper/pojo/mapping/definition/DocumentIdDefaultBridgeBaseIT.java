@@ -180,9 +180,9 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		DocumentIdentifierValueConverter<I> dslToIndexConverter =
-				(DocumentIdentifierValueConverter<I>) index1Model.idDslConverter();
+				(DocumentIdentifierValueConverter<I>) index1Model.identifier().dslConverter();
 		DocumentIdentifierValueConverter<?> compatibleDslToIndexConverter =
-				index2Model.idDslConverter();
+				index2Model.identifier().dslConverter();
 		ToDocumentIdentifierValueConvertContextImpl convertContext =
 				new ToDocumentIdentifierValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
 
@@ -220,7 +220,7 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		DocumentIdentifierValueConverter<I> documentIdentifierValueConverter =
-				(DocumentIdentifierValueConverter<I>) index1Model.idDslConverter();
+				(DocumentIdentifierValueConverter<I>) index1Model.identifier().dslConverter();
 
 		// convert must behave appropriately on valid input
 		try ( SearchSession searchSession = mapping.createSession() ) {

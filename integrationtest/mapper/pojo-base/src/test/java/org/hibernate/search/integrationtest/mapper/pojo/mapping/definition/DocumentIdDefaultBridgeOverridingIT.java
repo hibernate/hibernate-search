@@ -163,7 +163,7 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		DocumentIdentifierValueConverter<I> dslToIndexConverter =
-				(DocumentIdentifierValueConverter<I>) indexModel.idDslConverter();
+				(DocumentIdentifierValueConverter<I>) indexModel.identifier().dslConverter();
 		ToDocumentIdentifierValueConvertContextImpl convertContext =
 				new ToDocumentIdentifierValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
 

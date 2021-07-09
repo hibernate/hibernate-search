@@ -75,6 +75,9 @@ public interface EngineEventContextMessages {
 	@Message(value = "index schema root")
 	String indexSchemaRoot();
 
+	@Message(value = "identifier")
+	String indexSchemaIdentifier();
+
 	@Message(value = "field '%1$s'")
 	String indexFieldAbsolutePath(String absolutePath);
 

@@ -60,8 +60,8 @@ public class ElasticsearchIdProjection<I> extends AbstractElasticsearchProjectio
 				Class<I> identifierType) {
 			super( scope );
 
-			DocumentIdentifierValueConverter<?> identifierValueConverter = scope.idDslConverter(
-					ValueConvert.YES );
+			DocumentIdentifierValueConverter<?> identifierValueConverter = scope.identifier()
+					.dslConverter( ValueConvert.YES );
 
 			// check expected identifier type:
 			identifierValueConverter.checkSourceTypeAssignableTo( identifierType );

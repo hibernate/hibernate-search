@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanNotFoundException;
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoadingException;
@@ -437,7 +436,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 101,
 			value = "Inconsistent configuration for %1$s in a search query across multiple indexes: %2$s")
-	SearchException inconsistentConfigurationForIndexNodeForSearch(
+	SearchException inconsistentConfigurationInContextForSearch(
 			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext, String causeMessage,
 			@Param EventContext elementContextAsParam, @Cause SearchException cause);
 
@@ -448,7 +447,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET + 103,
 			value = "Attribute '%1$s' differs: '%2$s' vs. '%3$s'.")
-	SearchException differentIndexNodeAttribute(String attributeName, Object component1, Object component2);
+	SearchException differentAttribute(String attributeName, Object component1, Object component2);
 
 	@Message(id = ID_OFFSET + 104, value = "Cannot use '%2$s' on %1$s. %3$s" )
 	SearchException cannotUseQueryElementForIndexNode(
@@ -481,11 +480,6 @@ public interface Log extends BasicLogger {
 	@Message(value = "If you are trying to use the 'nested' predicate,"
 			+ " set the field structure is to 'NESTED' in all indexes, then reindex all your data.")
 	String partialSupportHintForCompositeNode();
-
-	@Message(id = ID_OFFSET + 107,
-			value = "Inconsistent configuration for the identifier in a search query across multiple indexes: converter differs: '%1$s' vs. '%2$s'.")
-	SearchException inconsistentConfigurationForIdentifierForSearch(DocumentIdentifierValueConverter<?> component1,
-			DocumentIdentifierValueConverter<?> component2, @Param EventContext context);
 
 	@Message(id = ID_OFFSET + 109,
 			value = "This field is a value field in some indexes, but an object field in other indexes.")

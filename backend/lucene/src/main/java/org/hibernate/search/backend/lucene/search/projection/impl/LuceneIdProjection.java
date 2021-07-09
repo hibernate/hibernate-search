@@ -58,7 +58,7 @@ public class LuceneIdProjection<I> extends AbstractLuceneProjection<String, I> {
 			super( scope );
 
 			DocumentIdentifierValueConverter<?> identifierValueConverter =
-					scope.idDslConverter( ValueConvert.YES );
+					scope.identifier().dslConverter( ValueConvert.YES );
 
 			// check expected identifier type:
 			identifierValueConverter.checkSourceTypeAssignableTo( identifierType );
