@@ -210,6 +210,8 @@ stage('Configure') {
                     		condition: TestCondition.AFTER_MERGE, dockerHubImage: "mysql:8.0.22"),
                     new DatabaseBuildEnvironment(dbName: 'db2', mavenProfile: 'ci-db2',
                             condition: TestCondition.AFTER_MERGE, dockerHubImage: "ibmcom/db2:11.5.5.0"),
+                    new DatabaseBuildEnvironment(dbName: 'oracle', mavenProfile: 'ci-oracle',
+                            condition: TestCondition.AFTER_MERGE, dockerHubImage: "gvenzl/oracle-xe:11-slim")
 			],
 			esLocal: [
 					// --------------------------------------------

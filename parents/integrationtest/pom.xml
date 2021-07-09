@@ -378,6 +378,30 @@
                                     </wait>
                                 </run>
                             </image>
+                            <image>
+                                <name>${test.database.run.oracle.image.name}:${test.database.run.oracle.image.tag}</name>
+                                <alias>oracle</alias>
+                                <run>
+                                    <skip>${test.database.run.oracle.skip}</skip>
+                                    <env>
+                                        <ORACLE_PASSWORD>hibernate_orm_test</ORACLE_PASSWORD>
+                                    </env>
+                                    <ports>
+                                        <port>1521:1521</port>
+                                    </ports>
+                                    <log>
+                                        <prefix>Oracle Database: </prefix>
+                                        <date>default</date>
+                                        <color>blue</color>
+                                    </log>
+                                    <wait>
+                                        <!-- good docs found at: http://dmp.fabric8.io/#build-healthcheck -->
+                                        <!-- Unfortunately booting this is slow, needs to set a generous timeout: -->
+                                        <time>60000</time>
+                                        <log>DATABASE IS READY TO USE!</log>
+                                    </wait>
+                                </run>
+                            </image>
                         </images>
                         <!--Stops all images currently running, not just those we just started.
                           Useful to stop processes still running from a previously failed integration test run -->
@@ -807,6 +831,24 @@
                 <jdbc.url>jdbc:db2://localhost:50005/hreact</jdbc.url>
                 <jdbc.user>hreact</jdbc.user>
                 <jdbc.pass>hreact</jdbc.pass>
+                <jdbc.isolation />
+            </properties>
+        </profile>
+
+        <!-- Oracle Docker container for tests -->
+        <!-- See test.database.run.oracle.image.tag for the server version in use -->
+        <profile>
+            <id>ci-oracle</id>
+            <properties>
+                <test.database.run.oracle.skip>false</test.database.run.oracle.skip>
+                <db.dialect>org.hibernate.dialect.Oracle10gDialect</db.dialect>
+                <jdbc.driver.groupId>com.oracle.database.jdbc</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>ojdbc8</jdbc.driver.artifactId>
+                <jdbc.driver.version>21.1.0.0</jdbc.driver.version>
+                <jdbc.driver>oracle.jdbc.OracleDriver</jdbc.driver>
+                <jdbc.url>jdbc:oracle:thin:@localhost:1521/XE</jdbc.url>
+                <jdbc.user>SYSTEM</jdbc.user>
+                <jdbc.pass>hibernate_orm_test</jdbc.pass>
                 <jdbc.isolation />
             </properties>
         </profile>
