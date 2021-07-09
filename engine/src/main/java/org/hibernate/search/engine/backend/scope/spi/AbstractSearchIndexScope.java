@@ -16,12 +16,11 @@ import org.hibernate.search.engine.backend.document.model.spi.AbstractIndexModel
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.StringDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.common.spi.SearchIndexCompositeNodeContext;
+import org.hibernate.search.engine.search.common.spi.SearchIndexIdentifierContext;
+import org.hibernate.search.engine.search.common.spi.MultiIndexSearchIndexIdentifierContext;
 import org.hibernate.search.engine.search.common.spi.SearchIndexNodeContext;
 import org.hibernate.search.engine.search.common.spi.SearchIndexScope;
 import org.hibernate.search.engine.search.common.spi.SearchQueryElementTypeKey;
@@ -40,9 +39,6 @@ public abstract class AbstractSearchIndexScope<
 		implements SearchIndexScope<S>, SearchQueryIndexScope<S> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private static final StringDocumentIdentifierValueConverter RAW_ID_CONVERTER =
-			new StringDocumentIdentifierValueConverter();
 
 	// Mapping context
 	private final BackendMappingContext mappingContext;
@@ -106,28 +102,23 @@ public abstract class AbstractSearchIndexScope<
 	}
 
 	@Override
-	public final DocumentIdentifierValueConverter<?> idDslConverter(ValueConvert valueConvert) {
-		if ( ValueConvert.NO.equals( valueConvert ) ) {
-			return RAW_ID_CONVERTER;
-		}
-		DocumentIdentifierValueConverter<?> converter = null;
-		for ( M model : indexModels ) {
-			DocumentIdentifierValueConverter<?> converterForIndex = model.idDslConverter();
-			if ( converter == null ) {
-				converter = converterForIndex;
-			}
-			else if ( !converter.isCompatibleWith( converterForIndex ) ) {
-				throw log.inconsistentConfigurationForIdentifierForSearch( converter, converterForIndex,
-						eventContext() );
-			}
-		}
-		return converter;
-	}
-
-	@Override
 	public String toAbsolutePath(String relativeFieldPath) {
 		Contracts.assertNotNull( relativeFieldPath, "relativeFieldPath" );
 		return overriddenRoot == null ? relativeFieldPath : overriddenRoot.absolutePath( relativeFieldPath );
+	}
+
+	@Override
+	public SearchIndexIdentifierContext identifier() {
+		if ( indexModels.size() == 1 ) {
+			return indexModels.iterator().next().identifier();
+		}
+		else {
+			List<SearchIndexIdentifierContext> identifierForEachIndex = new ArrayList<>();
+			for ( M model : indexModels ) {
+				identifierForEachIndex.add( model.identifier() );
+			}
+			return new MultiIndexSearchIndexIdentifierContext( this, identifierForEachIndex );
+		}
 	}
 
 	protected C root() {
@@ -189,7 +180,7 @@ public abstract class AbstractSearchIndexScope<
 			}
 			else if ( firstField.isComposite() != fieldForCurrentIndex.isComposite() ) {
 				SearchException cause = log.conflictingFieldModel();
-				throw log.inconsistentConfigurationForIndexNodeForSearch(
+				throw log.inconsistentConfigurationInContextForSearch(
 						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ), cause.getMessage(),
 						EventContexts.fromIndexNames( modelOfFirstField.hibernateSearchName(),
 								model.hibernateSearchName() ),

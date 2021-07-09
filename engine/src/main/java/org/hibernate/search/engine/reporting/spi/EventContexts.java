@@ -28,6 +28,8 @@ public class EventContexts {
 
 	private static final EventContext INDEX_SCHEMA_ROOT = singleton( MESSAGES::indexSchemaRoot );
 
+	private static final EventContext INDEX_SCHEMA_IDENTIFIER = singleton( MESSAGES::indexSchemaIdentifier );
+
 	private EventContexts() {
 	}
 
@@ -144,6 +146,10 @@ public class EventContexts {
 		} );
 	}
 
+	public static EventContext indexSchemaIdentifier() {
+		return INDEX_SCHEMA_IDENTIFIER;
+	}
+
 	public static EventContext fromIndexFieldAbsolutePaths(List<String> absolutePaths) {
 		return EventContext.create( new AbstractSimpleEventContextElement<List<String>>( absolutePaths ) {
 			@Override
@@ -211,5 +217,4 @@ public class EventContexts {
 			}
 		} );
 	}
-
 }

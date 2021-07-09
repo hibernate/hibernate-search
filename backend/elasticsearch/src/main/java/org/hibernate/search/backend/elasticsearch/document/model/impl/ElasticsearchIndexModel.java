@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.I
 import org.hibernate.search.backend.elasticsearch.metamodel.ElasticsearchIndexDescriptor;
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexContext;
 import org.hibernate.search.engine.backend.document.model.spi.AbstractIndexModel;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.document.model.spi.IndexIdentifier;
 
 public class ElasticsearchIndexModel
 		extends AbstractIndexModel<ElasticsearchIndexModel, ElasticsearchIndexRoot, ElasticsearchIndexField>
@@ -30,12 +30,12 @@ public class ElasticsearchIndexModel
 	private final RootTypeMapping mapping;
 
 	public ElasticsearchIndexModel(IndexNames names, String mappedTypeName,
-			DocumentIdentifierValueConverter<?> idDslConverter,
+			IndexIdentifier identifier,
 			ElasticsearchIndexRoot rootNode, Map<String, ElasticsearchIndexField> staticFields,
 			List<AbstractElasticsearchIndexFieldTemplate<?>> fieldTemplates,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry, IndexSettings customIndexSettings,
 			RootTypeMapping mapping) {
-		super( names.hibernateSearchIndex(), mappedTypeName, idDslConverter, rootNode, staticFields, fieldTemplates );
+		super( names.hibernateSearchIndex(), mappedTypeName, identifier, rootNode, staticFields, fieldTemplates );
 		this.names = names;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.customIndexSettings = customIndexSettings;

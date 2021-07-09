@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.common.impl;
 
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.search.common.spi.SearchIndexIdentifierContext;
 
 /**
  * Information about an index targeted by search,
@@ -19,7 +19,7 @@ public interface ElasticsearchSearchIndexContext {
 
 	String mappedTypeName();
 
-	DocumentIdentifierValueConverter<?> idDslConverter();
+	SearchIndexIdentifierContext identifier();
 
 	int maxResultWindow();
 

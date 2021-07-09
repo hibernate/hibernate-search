@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
 import org.hibernate.search.engine.backend.metamodel.IndexFieldDescriptor;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -35,8 +34,7 @@ public abstract class AbstractIndexModel<
 
 	private final String mappedTypeName;
 
-	private final DocumentIdentifierValueConverter<?> idDslConverter;
-
+	private final IndexIdentifier identifier;
 	private final R root;
 	private final Map<String, F> staticFields;
 	private final List<IndexFieldDescriptor> includedStaticFields;
@@ -45,13 +43,13 @@ public abstract class AbstractIndexModel<
 
 	public AbstractIndexModel(String hibernateSearchIndexName,
 			String mappedTypeName,
-			DocumentIdentifierValueConverter<?> idDslConverter,
+			IndexIdentifier identifier,
 			R root, Map<String, F> staticFields,
 			List<? extends AbstractIndexFieldTemplate<? super S, ? extends F, ? super R, ?>> fieldTemplates) {
 		this.hibernateSearchIndexName = hibernateSearchIndexName;
 		this.eventContext = EventContexts.fromIndexName( hibernateSearchIndexName );
 		this.mappedTypeName = mappedTypeName;
-		this.idDslConverter = idDslConverter;
+		this.identifier = identifier;
 		this.root = root;
 		this.staticFields = CollectionHelper.toImmutableMap( staticFields );
 		this.includedStaticFields = CollectionHelper.toImmutableList( staticFields.values().stream()
@@ -75,6 +73,10 @@ public abstract class AbstractIndexModel<
 	@Override
 	public final String hibernateSearchName() {
 		return hibernateSearchIndexName;
+	}
+
+	public IndexIdentifier identifier() {
+		return identifier;
 	}
 
 	@Override
@@ -103,10 +105,6 @@ public abstract class AbstractIndexModel<
 
 	public final String mappedTypeName() {
 		return mappedTypeName;
-	}
-
-	public final DocumentIdentifierValueConverter<?> idDslConverter() {
-		return idDslConverter;
 	}
 
 	private F fieldOrNullIgnoringInclusion(String absolutePath) {

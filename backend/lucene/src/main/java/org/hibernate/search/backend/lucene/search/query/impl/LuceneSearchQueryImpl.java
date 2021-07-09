@@ -220,7 +220,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	}
 
 	private String toDocumentId(LuceneSearchIndexContext index, Object id) {
-		DocumentIdentifierValueConverter<?> converter = index.idDslConverter();
+		DocumentIdentifierValueConverter<?> converter = index.identifier().dslConverter();
 		ToDocumentIdentifierValueConvertContext convertContext =
 				scope.toDocumentIdentifierValueConvertContext();
 		return converter.convertToDocumentUnknown( id, convertContext );

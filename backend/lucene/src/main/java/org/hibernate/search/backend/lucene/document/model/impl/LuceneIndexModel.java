@@ -12,8 +12,8 @@ import java.util.Map;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.engine.backend.document.model.spi.AbstractIndexModel;
 import org.hibernate.search.engine.backend.document.model.spi.IndexFieldFilter;
+import org.hibernate.search.engine.backend.document.model.spi.IndexIdentifier;
 import org.hibernate.search.engine.backend.metamodel.IndexDescriptor;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.DelegatingAnalyzerWrapper;
@@ -28,11 +28,11 @@ public class LuceneIndexModel extends AbstractIndexModel<LuceneIndexModel, Lucen
 	private final SearchScopedAnalyzer searchAnalyzer;
 
 	public LuceneIndexModel(String hibernateSearchName, String mappedTypeName,
-			DocumentIdentifierValueConverter<?> idDslConverter,
+			IndexIdentifier identifier,
 			LuceneIndexRoot rootNode, Map<String, LuceneIndexField> staticFields,
 			List<? extends AbstractLuceneIndexFieldTemplate<?>> fieldTemplates,
 			boolean hasNestedDocuments) {
-		super( hibernateSearchName, mappedTypeName, idDslConverter, rootNode, staticFields, fieldTemplates );
+		super( hibernateSearchName, mappedTypeName, identifier, rootNode, staticFields, fieldTemplates );
 		this.indexingAnalyzer = new IndexingScopedAnalyzer();
 		this.searchAnalyzer = new SearchScopedAnalyzer();
 		this.hasNestedDocuments = hasNestedDocuments;

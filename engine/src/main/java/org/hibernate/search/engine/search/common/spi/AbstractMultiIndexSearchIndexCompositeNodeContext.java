@@ -89,7 +89,7 @@ public abstract class AbstractMultiIndexSearchIndexCompositeNodeContext<
 					result.computeIfAbsent( childRelativeName, createChildFieldContext );
 				}
 				catch (SearchException e) {
-					throw log.inconsistentConfigurationForIndexNodeForSearch( relativeEventContext(), e.getMessage(),
+					throw log.inconsistentConfigurationInContextForSearch( relativeEventContext(), e.getMessage(),
 							indexesEventContext(), e );
 				}
 			}

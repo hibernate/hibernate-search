@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
+import org.hibernate.search.engine.backend.document.model.spi.IndexIdentifier;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
 import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
@@ -65,13 +66,14 @@ public class StubIndexRootBuilder extends AbstractStubIndexCompositeNodeBuilder
 	}
 
 	public StubIndexModel buildModel() {
+		IndexIdentifier identifier = new IndexIdentifier( idDslConverter );
 		Map<String, StubIndexField> allFields = new LinkedHashMap<>();
 		Map<String, StubIndexField> staticChildren = new LinkedHashMap<>();
 		StubIndexCompositeNodeType type = new StubIndexCompositeNodeType.Builder( ObjectStructure.DEFAULT ).build();
 		type.apply( schemaDataNodeBuilder );
 		StubIndexRoot root = new StubIndexRoot( type, staticChildren, schemaDataNodeBuilder.build() );
 		contributeChildren( root, staticChildren, allFields::put );
-		return new StubIndexModel( indexName, mappedTypeName, idDslConverter, root, allFields );
+		return new StubIndexModel( indexName, mappedTypeName, identifier, root, allFields );
 	}
 
 	@Override
