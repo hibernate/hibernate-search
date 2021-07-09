@@ -185,7 +185,7 @@ public abstract class AbstractSearchIndexScope<
 			}
 			else if ( firstField.isComposite() != fieldForCurrentIndex.isComposite() ) {
 				SearchException cause = log.conflictingFieldModel();
-				throw log.inconsistentConfigurationForIndexElementForSearch(
+				throw log.inconsistentConfigurationForIndexNodeForSearch(
 						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ), cause.getMessage(),
 						EventContexts.fromIndexNames( modelOfFirstField.hibernateSearchName(),
 								model.hibernateSearchName() ),

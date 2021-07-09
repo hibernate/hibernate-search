@@ -487,12 +487,6 @@ public interface Log extends BasicLogger {
 	SearchException inconsistentConfigurationForIdentifierForSearch(DocumentIdentifierValueConverter<?> component1,
 			DocumentIdentifierValueConverter<?> component2, @Param EventContext context);
 
-	@Message(id = ID_OFFSET + 108,
-			value = "Inconsistent configuration for %1$s in a search query across multiple indexes: %2$s")
-	SearchException inconsistentConfigurationForIndexElementForSearch(
-			@FormatWith(EventContextNoPrefixFormatter.class) EventContext elementContext, String causeMessage,
-			@Param EventContext elementContextAsParam, @Cause SearchException cause);
-
 	@Message(id = ID_OFFSET + 109,
 			value = "This field is a value field in some indexes, but an object field in other indexes.")
 	SearchException conflictingFieldModel();
