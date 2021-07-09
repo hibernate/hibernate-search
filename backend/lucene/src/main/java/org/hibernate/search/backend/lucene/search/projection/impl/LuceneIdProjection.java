@@ -9,8 +9,7 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.IdentifierCollector;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -18,12 +17,11 @@ import org.hibernate.search.engine.search.projection.spi.IdProjectionBuilder;
 
 public class LuceneIdProjection<I> extends AbstractLuceneProjection<String, I> {
 
-	private final DocumentIdentifierValueConverter<? extends I> identifierValueConverter;
+	private final ProjectionConverter<String, I> converter;
 
-	private LuceneIdProjection(LuceneSearchIndexScope<?> scope,
-			DocumentIdentifierValueConverter<? extends I> identifierValueConverter) {
+	private LuceneIdProjection(LuceneSearchIndexScope<?> scope, ProjectionConverter<String, I> converter) {
 		super( scope );
-		this.identifierValueConverter = identifierValueConverter;
+		this.converter = converter;
 	}
 
 	@Override
@@ -36,7 +34,6 @@ public class LuceneIdProjection<I> extends AbstractLuceneProjection<String, I> {
 		context.requireCollector( IdentifierCollector.FACTORY );
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public String extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExtractContext context) {
@@ -46,26 +43,16 @@ public class LuceneIdProjection<I> extends AbstractLuceneProjection<String, I> {
 	@Override
 	public I transform(LoadingResult<?, ?> loadingResult, String extractedData,
 			SearchProjectionTransformContext context) {
-		return identifierValueConverter.convertToSource(
-				extractedData, context.fromDocumentIdentifierValueConvertContext() );
+		return converter.fromDocumentValue( extractedData, context.fromDocumentValueConvertContext() );
 	}
 
 	public static class Builder<I> extends AbstractBuilder<I> implements IdProjectionBuilder<I> {
 
 		private final LuceneIdProjection<I> projection;
 
-		public Builder(LuceneSearchIndexScope<?> scope, Class<I> identifierType) {
+		public Builder(LuceneSearchIndexScope<?> scope, ProjectionConverter<String, I> converter) {
 			super( scope );
-
-			DocumentIdentifierValueConverter<?> identifierValueConverter =
-					scope.identifier().dslConverter( ValueConvert.YES );
-
-			// check expected identifier type:
-			identifierValueConverter.checkSourceTypeAssignableTo( identifierType );
-			@SuppressWarnings("uncheked") // just checked
-			DocumentIdentifierValueConverter<? extends I> casted = (DocumentIdentifierValueConverter<? extends I>) identifierValueConverter;
-
-			projection = new LuceneIdProjection<>( scope, casted );
+			projection = new LuceneIdProjection<>( scope, converter );
 		}
 
 		@Override

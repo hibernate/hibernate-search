@@ -12,6 +12,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.search.common.impl.ElasticsearchSearchIndexScope;
+import org.hibernate.search.engine.search.common.spi.SearchIndexIdentifierContext;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
@@ -55,7 +56,9 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 	@Override
 	public <I> IdProjectionBuilder<I> id(Class<I> identifierType) {
-		return new ElasticsearchIdProjection.Builder<>( scope, idProjectionExtractionHelper, identifierType );
+		SearchIndexIdentifierContext identifier = scope.identifier();
+		return new ElasticsearchIdProjection.Builder<>( scope, idProjectionExtractionHelper,
+				identifier.projectionConverter().withConvertedType( identifierType, identifier ) );
 	}
 
 	@Override

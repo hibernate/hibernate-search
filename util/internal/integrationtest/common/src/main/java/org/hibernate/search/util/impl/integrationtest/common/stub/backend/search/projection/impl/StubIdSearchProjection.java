@@ -7,7 +7,7 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -15,10 +15,10 @@ import org.hibernate.search.engine.search.projection.spi.IdProjectionBuilder;
 
 public class StubIdSearchProjection<I> implements StubSearchProjection<I> {
 
-	private final DocumentIdentifierValueConverter<? extends I> identifierValueConverter;
+	private final ProjectionConverter<String, ? extends I> converter;
 
-	private StubIdSearchProjection(DocumentIdentifierValueConverter<? extends I> identifierValueConverter) {
-		this.identifierValueConverter = identifierValueConverter;
+	private StubIdSearchProjection(ProjectionConverter<String, ? extends I> converter) {
+		this.converter = converter;
 	}
 
 	@Override
@@ -34,21 +34,16 @@ public class StubIdSearchProjection<I> implements StubSearchProjection<I> {
 		DocumentReference documentReference = (DocumentReference) extractedData;
 
 		context.fromDocumentValueConvertContext();
-		return identifierValueConverter.convertToSource(
-				documentReference.id(), context.fromDocumentIdentifierValueConvertContext() );
+		return converter.fromDocumentValue( documentReference.id(),
+				context.fromDocumentValueConvertContext() );
 	}
 
 	public static class Builder<I> implements IdProjectionBuilder<I> {
 
 		private final StubSearchProjection<I> projection;
 
-		public Builder(DocumentIdentifierValueConverter<?> identifierValueConverter, Class<I> identifierType) {
-			// check expected identifier type:
-			identifierValueConverter.checkSourceTypeAssignableTo( identifierType );
-			@SuppressWarnings("uncheked") // just checked
-			DocumentIdentifierValueConverter<? extends I> casted = (DocumentIdentifierValueConverter<? extends I>) identifierValueConverter;
-
-			projection = new StubIdSearchProjection( casted );
+		public Builder(ProjectionConverter<String, ? extends I> converter) {
+			projection = new StubIdSearchProjection( converter );
 		}
 
 		@Override

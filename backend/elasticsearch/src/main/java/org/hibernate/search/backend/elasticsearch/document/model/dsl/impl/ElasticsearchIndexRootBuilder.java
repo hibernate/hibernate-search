@@ -34,7 +34,10 @@ import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexC
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 import org.hibernate.search.engine.backend.document.model.spi.IndexIdentifier;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -53,7 +56,8 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 	private final DynamicType defaultDynamicType;
 
 	private RoutingType routing = null;
-	private DocumentIdentifierValueConverter<?> idDslConverter;
+	private DslConverter<?, String> idDslConverter;
+	private ProjectionConverter<String, ?> idProjectionConverter;
 
 	public ElasticsearchIndexRootBuilder(ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
 			EventContext indexEventContext,
@@ -87,8 +91,13 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 	}
 
 	@Override
-	public void idDslConverter(DocumentIdentifierValueConverter<?> idDslConverter) {
-		this.idDslConverter = idDslConverter;
+	public <I> void idDslConverter(Class<I> valueType, ToDocumentValueConverter<I, String> converter) {
+		this.idDslConverter = new DslConverter<>( valueType, converter );
+	}
+
+	@Override
+	public <I> void idProjectionConverter(Class<I> valueType, FromDocumentValueConverter<String, I> converter) {
+		this.idProjectionConverter = new ProjectionConverter<>( valueType, converter );
 	}
 
 	public void addSchemaRootContributor(IndexSchemaRootContributor schemaRootContributor) {
@@ -96,7 +105,7 @@ public class ElasticsearchIndexRootBuilder extends AbstractElasticsearchIndexCom
 	}
 
 	public ElasticsearchIndexModel build() {
-		IndexIdentifier identifier = new IndexIdentifier( idDslConverter );
+		IndexIdentifier identifier = new IndexIdentifier( idDslConverter, idProjectionConverter );
 
 		RootTypeMapping mapping = new RootTypeMapping();
 		if ( routing != null ) {

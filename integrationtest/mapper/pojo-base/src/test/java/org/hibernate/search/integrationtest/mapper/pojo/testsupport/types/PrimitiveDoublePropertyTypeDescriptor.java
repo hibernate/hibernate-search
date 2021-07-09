@@ -26,6 +26,11 @@ public class PrimitiveDoublePropertyTypeDescriptor extends PropertyTypeDescripto
 	public Optional<DefaultIdentifierBridgeExpectations<Double>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Double>() {
 			@Override
+			public Class<Double> getProjectionType() {
+				return Double.class;
+			}
+
+			@Override
 			public List<Double> getEntityIdentifierValues() {
 				return Arrays.asList( Double.MIN_VALUE, -1.0, 0.0, 1.0, 42.0, Double.MAX_VALUE );
 			}

@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
 
 /**
  * The binding context associated to the root node in the entity tree.
@@ -22,11 +23,8 @@ public interface IndexedEntityBindingContext extends IndexBindingContext {
 	 */
 	void explicitRouting();
 
-	/**
-	 * Order the backend to use the given converter to convert IDs passed to the predicate DSL.
-	 *
-	 * @param idConverter The ID converter to use in the predicate DSL.
-	 */
-	void idDslConverter(DocumentIdentifierValueConverter<?> idConverter);
+	<I> void idDslConverter(Class<I> valueType, ToDocumentValueConverter<I, String> converter);
+
+	<I> void idProjectionConverter(Class<I> valueType, FromDocumentValueConverter<String, I> converter);
 
 }

@@ -13,9 +13,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -49,7 +48,8 @@ public class MatchIdPredicateSpecificsIT {
 	private static final StubMappedIndex compatibleIdConverterIndex =
 			StubMappedIndex.withoutFields().name( "compatibleIdConverter" );
 	private static final StubMappedIndex incompatibleIdConverterIndex =
-			StubMappedIndex.ofAdvancedNonRetrievable( ctx -> ctx.idDslConverter( new IncompatibleIdConverter() ) )
+			StubMappedIndex.ofAdvancedNonRetrievable( ctx -> ctx
+					.idDslConverter( Object.class, new IncompatibleIdConverter() ) )
 					.name( "incompatibleIdConverter" );
 
 	// only one of which is matching
@@ -170,24 +170,9 @@ public class MatchIdPredicateSpecificsIT {
 		mainIndexer.join( compatibleIdConverterIndexer, incompatibleIdConverterIndexer );
 	}
 
-	private static class IncompatibleIdConverter implements DocumentIdentifierValueConverter<String> {
+	private static class IncompatibleIdConverter implements ToDocumentValueConverter<Object, String> {
 		@Override
-		public String convertToDocument(String value, ToDocumentIdentifierValueConvertContext context) {
-			throw new UnsupportedOperationException( "Should not be called" );
-		}
-
-		@Override
-		public String convertToDocumentUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
-			throw new UnsupportedOperationException( "Should not be called" );
-		}
-
-		@Override
-		public void checkSourceTypeAssignableTo(Class<?> requiredType) {
-			throw new UnsupportedOperationException( "Should not be called" );
-		}
-
-		@Override
-		public String convertToSource(String documentId, FromDocumentIdentifierValueConvertContext context) {
+		public String toDocumentValue(Object value, ToDocumentValueConvertContext context) {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
 	}

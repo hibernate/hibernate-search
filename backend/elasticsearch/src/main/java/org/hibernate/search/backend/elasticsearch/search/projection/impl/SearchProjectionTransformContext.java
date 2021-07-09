@@ -7,27 +7,19 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContext;
 
 public class SearchProjectionTransformContext {
 
 	private final FromDocumentValueConvertContext fromDocumentValueConvertContext;
-	private final FromDocumentIdentifierValueConvertContext fromDocumentIdentifierValueConvertContext;
 
 	private boolean hasFailedLoad = false;
 
-	public SearchProjectionTransformContext(FromDocumentValueConvertContext fromDocumentValueConvertContext,
-			FromDocumentIdentifierValueConvertContext identifierConvertContext) {
+	public SearchProjectionTransformContext(FromDocumentValueConvertContext fromDocumentValueConvertContext) {
 		this.fromDocumentValueConvertContext = fromDocumentValueConvertContext;
-		this.fromDocumentIdentifierValueConvertContext = identifierConvertContext;
 	}
 
 	FromDocumentValueConvertContext fromDocumentValueConvertContext() {
 		return fromDocumentValueConvertContext;
-	}
-
-	public FromDocumentIdentifierValueConvertContext fromDocumentIdentifierValueConvertContext() {
-		return fromDocumentIdentifierValueConvertContext;
 	}
 
 	void reportFailedLoad() {

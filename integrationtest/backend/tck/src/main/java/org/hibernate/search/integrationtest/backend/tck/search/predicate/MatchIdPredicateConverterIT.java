@@ -10,11 +10,9 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 
 import java.util.Arrays;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
+
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -32,32 +30,11 @@ public class MatchIdPredicateConverterIT {
 	private static final String DOCUMENT_2 = "document2";
 	private static final String DOCUMENT_3 = "document3";
 
-	private static final DocumentIdentifierValueConverter<Integer> ID_CONVERTER = new DocumentIdentifierValueConverter<Integer>() {
-		@Override
-		public String convertToDocument(Integer value, ToDocumentIdentifierValueConvertContext context) {
-			return "document" + value;
-		}
-
-		@Override
-		public String convertToDocumentUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
-			return convertToDocument( (Integer) value, context );
-		}
-
-		@Override
-		public void checkSourceTypeAssignableTo(Class<?> requiredType) {
-			throw new UnsupportedOperationException( "Should not be called" );
-		}
-
-		@Override
-		public Integer convertToSource(String documentId, FromDocumentIdentifierValueConvertContext context) {
-			throw new UnsupportedOperationException( "Should not be called" );
-		}
-	};
-
 	@ClassRule
 	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static final StubMappedIndex index = StubMappedIndex.ofAdvancedNonRetrievable( ctx -> ctx.idDslConverter( ID_CONVERTER ) );
+	private static final StubMappedIndex index = StubMappedIndex.ofAdvancedNonRetrievable( ctx -> ctx
+			.idDslConverter( Integer.class, (value, context) -> "document" + value ) );
 
 	@BeforeClass
 	public static void setup() {

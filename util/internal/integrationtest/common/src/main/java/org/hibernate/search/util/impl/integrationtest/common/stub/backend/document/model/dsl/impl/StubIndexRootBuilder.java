@@ -12,7 +12,10 @@ import java.util.Map;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuilder;
 import org.hibernate.search.engine.backend.document.model.spi.IndexIdentifier;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -31,7 +34,9 @@ public class StubIndexRootBuilder extends AbstractStubIndexCompositeNodeBuilder
 	private final StubBackendBehavior backendBehavior;
 	private final String indexName;
 	private final String mappedTypeName;
-	private DocumentIdentifierValueConverter<?> idDslConverter;
+
+	private DslConverter<?, String> idDslConverter;
+	private ProjectionConverter<String, ?> idProjectionConverter;
 
 	public StubIndexRootBuilder(StubBackendBehavior backendBehavior, String indexName, String mappedTypeName) {
 		this( backendBehavior, indexName, mappedTypeName, StubIndexSchemaDataNode.schema() );
@@ -56,8 +61,13 @@ public class StubIndexRootBuilder extends AbstractStubIndexCompositeNodeBuilder
 	}
 
 	@Override
-	public void idDslConverter(DocumentIdentifierValueConverter<?> idDslConverter) {
-		this.idDslConverter = idDslConverter;
+	public <I> void idDslConverter(Class<I> valueType, ToDocumentValueConverter<I, String> converter) {
+		this.idDslConverter = new DslConverter<>( valueType, converter );
+	}
+
+	@Override
+	public <I> void idProjectionConverter(Class<I> valueType, FromDocumentValueConverter<String, I> converter) {
+		this.idProjectionConverter = new ProjectionConverter<>( valueType, converter );
 	}
 
 	@Override
@@ -66,7 +76,7 @@ public class StubIndexRootBuilder extends AbstractStubIndexCompositeNodeBuilder
 	}
 
 	public StubIndexModel buildModel() {
-		IndexIdentifier identifier = new IndexIdentifier( idDslConverter );
+		IndexIdentifier identifier = new IndexIdentifier( idDslConverter, idProjectionConverter );
 		Map<String, StubIndexField> allFields = new LinkedHashMap<>();
 		Map<String, StubIndexField> staticChildren = new LinkedHashMap<>();
 		StubIndexCompositeNodeType type = new StubIndexCompositeNodeType.Builder( ObjectStructure.DEFAULT ).build();

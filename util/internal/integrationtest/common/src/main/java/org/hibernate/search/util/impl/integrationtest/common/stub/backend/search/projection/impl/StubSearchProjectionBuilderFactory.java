@@ -13,7 +13,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.spi.SearchIndexIdentifierContext;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
@@ -56,7 +56,9 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 
 	@Override
 	public <I> IdProjectionBuilder<I> id(Class<I> identifierType) {
-		return new StubIdSearchProjection.Builder<>( scope.identifier().dslConverter( ValueConvert.YES ), identifierType );
+		SearchIndexIdentifierContext identifier = scope.identifier();
+		return new StubIdSearchProjection.Builder<>(
+				identifier.projectionConverter().withConvertedType( identifierType, identifier ) );
 	}
 
 	@Override

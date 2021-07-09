@@ -7,15 +7,12 @@
 package org.hibernate.search.engine.backend.mapping.spi;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 
 /**
  * Provides visibility from the lower layers of Hibernate Search (engine, backend)
  * to the mapping defined in the upper layers.
  */
 public interface BackendMappingContext {
-
-	ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext();
 
 	ToDocumentValueConvertContext toDocumentValueConvertContext();
 

@@ -13,8 +13,9 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.PropertyTypeDescriptor;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
@@ -162,15 +163,15 @@ public class DocumentIdDefaultBridgeOverridingIT<I> {
 	public void dslToIndexConverter() {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
-		DocumentIdentifierValueConverter<I> dslToIndexConverter =
-				(DocumentIdentifierValueConverter<I>) indexModel.identifier().dslConverter();
-		ToDocumentIdentifierValueConvertContextImpl convertContext =
-				new ToDocumentIdentifierValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
+		DslConverter<I, ?> dslConverter =
+				(DslConverter<I, ?>) indexModel.identifier().dslConverter();
+		ToDocumentValueConvertContext convertContext =
+				new ToDocumentValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
 
 		// The overriden default bridge must be used by the DSL converter
-		assertThat( dslToIndexConverter.convertToDocument( getEntityIdentifierValue(), convertContext ) )
+		assertThat( dslConverter.toDocumentValue( getEntityIdentifierValue(), convertContext ) )
 				.isEqualTo( getDocumentIdentifierValue() );
-		assertThat( dslToIndexConverter.convertToDocumentUnknown( getEntityIdentifierValue(), convertContext ) )
+		assertThat( dslConverter.unknownTypeToDocumentValue( getEntityIdentifierValue(), convertContext ) )
 				.isEqualTo( getDocumentIdentifierValue() );
 	}
 

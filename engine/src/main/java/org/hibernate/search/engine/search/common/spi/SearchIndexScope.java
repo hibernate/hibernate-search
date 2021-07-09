@@ -9,7 +9,6 @@ package org.hibernate.search.engine.search.common.spi;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.util.common.reporting.spi.EventContextProvider;
 
 /**
@@ -22,8 +21,6 @@ public interface SearchIndexScope<S extends SearchIndexScope<?>>
 		extends EventContextProvider {
 
 	Set<String> hibernateSearchIndexNames();
-
-	ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext();
 
 	ToDocumentValueConvertContext toDocumentValueConvertContext();
 

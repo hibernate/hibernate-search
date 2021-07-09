@@ -17,9 +17,8 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -43,7 +42,7 @@ public class IdentifierSearchProjectionBaseIT {
 			.name( "my-compatible-index" );
 
 	private final StubMappedIndex incompatibleIndex = StubMappedIndex.ofAdvancedNonRetrievable( ctx -> ctx
-			.idDslConverter( INCOMPATIBLE_ID_CONVERTER ) );
+			.idProjectionConverter( Integer.class, INCOMPATIBLE_ID_CONVERTER ) );
 
 	private final String[] ids = new String[7];
 	private final String[] names = new String[7];
@@ -118,8 +117,7 @@ public class IdentifierSearchProjectionBaseIT {
 		assertThatThrownBy( () -> scope.projection().id( Integer.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						"The required identifier type 'java.lang.Integer' does not match the actual identifier type 'java.lang.String'",
-						"the required identifier must be a superclass of the actual identifier"
+						"Invalid type for returned values: 'java.lang.Integer'. Expected 'java.lang.String' or a supertype"
 				);
 	}
 
@@ -204,26 +202,11 @@ public class IdentifierSearchProjectionBaseIT {
 		}
 	}
 
-	private static final DocumentIdentifierValueConverter<Integer> INCOMPATIBLE_ID_CONVERTER =
-			new DocumentIdentifierValueConverter<Integer>() {
+	private static final FromDocumentValueConverter<String, Integer> INCOMPATIBLE_ID_CONVERTER =
+			new FromDocumentValueConverter<String, Integer>() {
 				@Override
-				public String convertToDocument(Integer value, ToDocumentIdentifierValueConvertContext context) {
-					throw new UnsupportedOperationException( "Should not be called" );
-				}
-
-				@Override
-				public String convertToDocumentUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
-					throw new UnsupportedOperationException( "Should not be called" );
-				}
-
-				@Override
-				public void checkSourceTypeAssignableTo(Class<?> requiredType) {
-					throw new UnsupportedOperationException( "Should not be called" );
-				}
-
-				@Override
-				public Integer convertToSource(String documentId, FromDocumentIdentifierValueConvertContext context) {
-					return documentId.hashCode();
+				public Integer fromDocumentValue(String value, FromDocumentValueConvertContext context) {
+					return value.hashCode();
 				}
 			};
 }

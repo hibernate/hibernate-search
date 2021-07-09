@@ -11,7 +11,6 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchP
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionTransformContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentValueConvertContextImpl;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
@@ -26,7 +25,6 @@ class ElasticsearchSearchQueryExtractContext implements AggregationExtractContex
 	private final ElasticsearchSearchQueryRequestContext requestContext;
 	private final ProjectionHitMapper<?, ?> projectionHitMapper;
 	private final FromDocumentValueConvertContext fromDocumentValueConvertContext;
-	private final FromDocumentIdentifierValueConvertContextImpl identifierConvertContext;
 
 	private final JsonObject responseBody;
 
@@ -37,7 +35,6 @@ class ElasticsearchSearchQueryExtractContext implements AggregationExtractContex
 		this.requestContext = requestContext;
 		this.projectionHitMapper = projectionHitMapper;
 		this.fromDocumentValueConvertContext = new FromDocumentValueConvertContextImpl( sessionContext );
-		this.identifierConvertContext = new FromDocumentIdentifierValueConvertContextImpl( sessionContext );
 		this.responseBody = responseBody;
 	}
 
@@ -59,7 +56,7 @@ class ElasticsearchSearchQueryExtractContext implements AggregationExtractContex
 	}
 
 	SearchProjectionTransformContext createProjectionTransformContext() {
-		return new SearchProjectionTransformContext( fromDocumentValueConvertContext, identifierConvertContext );
+		return new SearchProjectionTransformContext( fromDocumentValueConvertContext );
 	}
 
 }

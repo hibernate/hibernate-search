@@ -26,6 +26,11 @@ public class PrimitiveBooleanPropertyTypeDescriptor extends PropertyTypeDescript
 	public Optional<DefaultIdentifierBridgeExpectations<Boolean>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Boolean>() {
 			@Override
+			public Class<Boolean> getProjectionType() {
+				return Boolean.class;
+			}
+
+			@Override
 			public List<Boolean> getEntityIdentifierValues() {
 				return Arrays.asList( true, false );
 			}

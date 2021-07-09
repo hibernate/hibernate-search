@@ -26,6 +26,11 @@ public class PrimitiveBytePropertyTypeDescriptor extends PropertyTypeDescriptor<
 	public Optional<DefaultIdentifierBridgeExpectations<Byte>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Byte>() {
 			@Override
+			public Class<Byte> getProjectionType() {
+				return Byte.class;
+			}
+
+			@Override
 			public List<Byte> getEntityIdentifierValues() {
 				return Arrays.asList( Byte.MIN_VALUE, (byte)-1, (byte)0, (byte)1, (byte)42, Byte.MAX_VALUE );
 			}

@@ -12,6 +12,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.search.common.impl.LuceneSearchIndexScope;
+import org.hibernate.search.engine.search.common.spi.SearchIndexIdentifierContext;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
@@ -51,7 +52,9 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	@Override
 	public <I> IdProjectionBuilder<I> id(Class<I> identifierType) {
-		return new LuceneIdProjection.Builder<>( scope, identifierType );
+		SearchIndexIdentifierContext identifier = scope.identifier();
+		return new LuceneIdProjection.Builder<>( scope,
+				identifier.projectionConverter().withConvertedType( identifierType, identifier ) );
 	}
 
 	@Override

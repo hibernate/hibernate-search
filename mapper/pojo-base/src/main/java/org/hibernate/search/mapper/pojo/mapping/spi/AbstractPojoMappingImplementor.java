@@ -9,8 +9,6 @@ package org.hibernate.search.mapper.pojo.mapping.spi;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentValueConvertContextImpl;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -37,15 +35,12 @@ public abstract class AbstractPojoMappingImplementor<M>
 
 	private boolean stopped = false;
 
-	private final ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext;
 	private final ToDocumentValueConvertContext toDocumentValueConvertContext;
 	private final IdentifierBridgeToDocumentIdentifierContext toDocumentIdentifierContext;
 	private final ValueBridgeToIndexedValueContext toIndexedValueContext;
 
 	public AbstractPojoMappingImplementor(PojoMappingDelegate delegate) {
 		this.delegate = delegate;
-		this.toDocumentIdentifierValueConvertContext =
-				new ToDocumentIdentifierValueConvertContextImpl( this );
 		this.toDocumentValueConvertContext = new ToDocumentValueConvertContextImpl( this );
 		this.toDocumentIdentifierContext = new IdentifierBridgeToDocumentIdentifierContextImpl( this );
 		this.toIndexedValueContext = new ValueBridgeToIndexedValueContextImpl( this );
@@ -73,11 +68,6 @@ public abstract class AbstractPojoMappingImplementor<M>
 				closer.push( AbstractPojoMappingImplementor::doStop, this );
 			}
 		}
-	}
-
-	@Override
-	public final ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext() {
-		return toDocumentIdentifierValueConvertContext;
 	}
 
 	@Override

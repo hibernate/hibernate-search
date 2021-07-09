@@ -26,6 +26,11 @@ public class EnumPropertyTypeDescriptor extends PropertyTypeDescriptor<EnumPrope
 	public Optional<DefaultIdentifierBridgeExpectations<MyEnum>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<MyEnum>() {
 			@Override
+			public Class<MyEnum> getProjectionType() {
+				return MyEnum.class;
+			}
+
+			@Override
 			public List<MyEnum> getEntityIdentifierValues() {
 				return Arrays.asList( MyEnum.VALUE1, MyEnum.VALUE2 );
 			}

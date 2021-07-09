@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assume.assumeTrue;
 
@@ -15,11 +16,15 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentIdentifierValueConvertContextImpl;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.PropertyTypeDescriptor;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
@@ -28,6 +33,7 @@ import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
@@ -58,6 +64,7 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = JavaBeanMappingSetupHelper.withBackendMock( MethodHandles.lookup(), backendMock );
 
+	private final PropertyTypeDescriptor<I> typeDescriptor;
 	private final DefaultIdentifierBridgeExpectations<I> expectations;
 	private SearchMapping mapping;
 	private StubIndexModel index1Model;
@@ -68,6 +75,7 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 		assumeTrue(
 				"Type " + typeDescriptor + " does not have a default identifier bridge", expectations.isPresent()
 		);
+		this.typeDescriptor = typeDescriptor;
 		this.expectations = expectations.get();
 	}
 
@@ -176,39 +184,40 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 
 	// Test behavior that backends expect from our bridges when using the DSLs
 	@Test
-	public void dslToIndexConverter() {
+	public void dslConverter() {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
-		DocumentIdentifierValueConverter<I> dslToIndexConverter =
-				(DocumentIdentifierValueConverter<I>) index1Model.identifier().dslConverter();
-		DocumentIdentifierValueConverter<?> compatibleDslToIndexConverter =
+		DslConverter<I, ?> dslConverter =
+				(DslConverter<I, ?>) index1Model.identifier().dslConverter();
+		DslConverter<?, ?> compatibleDslConverter =
 				index2Model.identifier().dslConverter();
-		ToDocumentIdentifierValueConvertContextImpl convertContext =
-				new ToDocumentIdentifierValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
+		DslConverter<?, ?> incompatibleDslConverter =
+				new DslConverter<>( typeDescriptor.getJavaType(), new IncompatibleToDocumentValueConverter<>() );
+		ToDocumentValueConvertContext convertContext =
+				new ToDocumentValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
 
 		// isCompatibleWith must return true when appropriate
-		assertThat( dslToIndexConverter.isCompatibleWith( dslToIndexConverter ) ).isTrue();
-		assertThat( dslToIndexConverter.isCompatibleWith( compatibleDslToIndexConverter ) ).isTrue();
-		assertThat( dslToIndexConverter.isCompatibleWith( new IncompatibleDocumentIdentifierValueConverter() ) )
-				.isFalse();
+		assertThat( dslConverter.isCompatibleWith( dslConverter ) ).isTrue();
+		assertThat( dslConverter.isCompatibleWith( compatibleDslConverter ) ).isTrue();
+		assertThat( dslConverter.isCompatibleWith( incompatibleDslConverter ) ).isFalse();
 
-		// convert and convertUnknown must behave appropriately on valid input
+		// conversion methods must behave appropriately on valid input
 		Iterator<String> documentIdentifierIterator = expectations.getDocumentIdentifierValues().iterator();
 		for ( I entityIdentifierValue : expectations.getEntityIdentifierValues() ) {
 			String documentIdentifierValue = documentIdentifierIterator.next();
 			assertThat(
-					dslToIndexConverter.convertToDocument( entityIdentifierValue, convertContext )
+					dslConverter.toDocumentValue( entityIdentifierValue, convertContext )
 			)
 					.isEqualTo( documentIdentifierValue );
 			assertThat(
-					dslToIndexConverter.convertToDocumentUnknown( entityIdentifierValue, convertContext )
+					dslConverter.unknownTypeToDocumentValue( entityIdentifierValue, convertContext )
 			)
 					.isEqualTo( documentIdentifierValue );
 		}
 
-		// convertUnknown must throw a runtime exception on invalid input
+		// conversion methods must throw a runtime exception on invalid input
 		assertThatThrownBy(
-				() -> dslToIndexConverter.convertToDocumentUnknown( new Object(), convertContext ),
+				() -> dslConverter.unknownTypeToDocumentValue( new Object(), convertContext ),
 				"convertUnknown on invalid input"
 		)
 				.isInstanceOf( RuntimeException.class );
@@ -216,50 +225,77 @@ public class DocumentIdDefaultBridgeBaseIT<I> {
 
 	// Test behavior that backends expect from our bridges when using the identifier projections
 	@Test
-	public void convertToSource() {
+	public void projectionConverter() {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
-		DocumentIdentifierValueConverter<I> documentIdentifierValueConverter =
-				(DocumentIdentifierValueConverter<I>) index1Model.identifier().dslConverter();
+		ProjectionConverter<String, I> projectionConverter =
+				(ProjectionConverter<String, I>) index1Model.identifier().projectionConverter();
+		ProjectionConverter<String, ?> compatibleProjectionConverter =
+				index2Model.identifier().projectionConverter();
+		ProjectionConverter<String, ?> incompatibleProjectionConverter =
+				new ProjectionConverter<>( typeDescriptor.getJavaType(), new IncompatibleFromDocumentValueConverter<>() );
 
-		// convert must behave appropriately on valid input
+		// isCompatibleWith must return true when appropriate
+		assertThat( projectionConverter.isCompatibleWith( projectionConverter ) ).isTrue();
+		assertThat( projectionConverter.isCompatibleWith( compatibleProjectionConverter ) )
+				.isTrue();
+		assertThat( projectionConverter.isCompatibleWith( incompatibleProjectionConverter ) ).isFalse();
+
+		// withConvertedType must return the same converter for compatible types and throw an exception for clearly incompatible types
+		assertThatCode( () -> projectionConverter.withConvertedType( Object.class,
+				() -> EventContexts.fromIndexFieldAbsolutePath( "foo" ) ) )
+				.doesNotThrowAnyException();
+		assertThatCode( () -> projectionConverter.withConvertedType( expectations.getProjectionType(), () -> EventContexts.fromIndexFieldAbsolutePath( "foo" ) ) )
+				.doesNotThrowAnyException();
+		assertThatThrownBy( () -> projectionConverter.withConvertedType( IncompatibleType.class,
+				() -> EventContexts.fromIndexFieldAbsolutePath( "foo" ) ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Invalid type for returned values: '" + IncompatibleType.class.getName() + "'",
+						"Expected '" + expectations.getProjectionType().getName() + "' or a supertype",
+						"Context: field 'foo'"
+				);
+
+		// conversion methods must behave appropriately on valid input
 		try ( SearchSession searchSession = mapping.createSession() ) {
-			FromDocumentIdentifierValueConvertContextImpl convertContext =
-					new FromDocumentIdentifierValueConvertContextImpl(
-							BridgeTestUtils.toBackendSessionContext( searchSession ) );
-
-			Iterator<I> entityIdentifierIterator = expectations.getEntityIdentifierValues().iterator();
-			for ( String documentId : expectations.getDocumentIdentifierValues() ) {
-				assertThat( documentIdentifierValueConverter.convertToSource( documentId, convertContext ) )
-						.isEqualTo( entityIdentifierIterator.next() );
+			FromDocumentValueConvertContext fromDocumentConvertContext =
+					new FromDocumentValueConvertContextImpl(
+							BridgeTestUtils.toBackendSessionContext( searchSession )
+					);
+			Iterator<I> projectionValuesIterator = expectations.getEntityIdentifierValues().iterator();
+			for ( String documentIdentifierValue : expectations.getDocumentIdentifierValues() ) {
+				I projectionValue = projectionValuesIterator.next();
+				assertThat(
+						projectionConverter.fromDocumentValue( documentIdentifierValue, fromDocumentConvertContext )
+				)
+						.isEqualTo( projectionValue );
 			}
 		}
 	}
 
-	private static class IncompatibleDocumentIdentifierValueConverter
-			implements DocumentIdentifierValueConverter<Object> {
+	/**
+	 * A type that is clearly not a supertype of any type with a default bridge.
+	 */
+	private static final class IncompatibleType {
+	}
+
+	private static class IncompatibleToDocumentValueConverter<V>
+			implements ToDocumentValueConverter<V, Object> {
 		@Override
-		public String convertToDocument(Object value, ToDocumentIdentifierValueConvertContext context) {
+		public Object toDocumentValue(V value, ToDocumentValueConvertContext context) {
+			throw new UnsupportedOperationException();
+		}
+	}
+
+	private static class IncompatibleFromDocumentValueConverter<V>
+			implements FromDocumentValueConverter<Object, V> {
+		@Override
+		public V fromDocumentValue(Object value, FromDocumentValueConvertContext context) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public String convertToDocumentUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public void checkSourceTypeAssignableTo(Class<?> requiredType) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Object convertToSource(String documentId, FromDocumentIdentifierValueConvertContext context) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public boolean isCompatibleWith(DocumentIdentifierValueConverter<?> other) {
+		public boolean isCompatibleWith(FromDocumentValueConverter<?, ?> other) {
 			throw new UnsupportedOperationException();
 		}
 	}

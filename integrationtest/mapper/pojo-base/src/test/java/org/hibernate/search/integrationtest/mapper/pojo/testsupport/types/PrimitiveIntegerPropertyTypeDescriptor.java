@@ -26,6 +26,11 @@ public class PrimitiveIntegerPropertyTypeDescriptor extends PropertyTypeDescript
 	public Optional<DefaultIdentifierBridgeExpectations<Integer>> getDefaultIdentifierBridgeExpectations() {
 		return Optional.of( new DefaultIdentifierBridgeExpectations<Integer>() {
 			@Override
+			public Class<Integer> getProjectionType() {
+				return Integer.class;
+			}
+
+			@Override
 			public List<Integer> getEntityIdentifierValues() {
 				return Arrays.asList( Integer.MIN_VALUE, -1, 0, 1, 42, Integer.MAX_VALUE );
 			}

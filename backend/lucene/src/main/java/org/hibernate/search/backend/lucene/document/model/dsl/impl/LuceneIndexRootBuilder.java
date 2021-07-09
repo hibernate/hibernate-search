@@ -28,7 +28,10 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexRootBuild
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.model.spi.IndexIdentifier;
 import org.hibernate.search.engine.backend.types.ObjectStructure;
-import org.hibernate.search.engine.backend.types.converter.spi.DocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -40,7 +43,8 @@ public class LuceneIndexRootBuilder extends AbstractLuceneIndexCompositeNodeBuil
 	private final String mappedTypeName;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
-	private DocumentIdentifierValueConverter<?> idDslConverter;
+	private DslConverter<?, String> idDslConverter;
+	private ProjectionConverter<String, ?> idProjectionConverter;
 
 	public LuceneIndexRootBuilder(EventContext indexEventContext,
 			String mappedTypeName, LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry) {
@@ -66,8 +70,13 @@ public class LuceneIndexRootBuilder extends AbstractLuceneIndexCompositeNodeBuil
 	}
 
 	@Override
-	public void idDslConverter(DocumentIdentifierValueConverter<?> idDslConverter) {
-		this.idDslConverter = idDslConverter;
+	public <I> void idDslConverter(Class<I> valueType, ToDocumentValueConverter<I, String> converter) {
+		this.idDslConverter = new DslConverter<>( valueType, converter );
+	}
+
+	@Override
+	public <I> void idProjectionConverter(Class<I> valueType, FromDocumentValueConverter<String, I> converter) {
+		this.idProjectionConverter = new ProjectionConverter<>( valueType, converter );
 	}
 
 	@Override
@@ -76,7 +85,7 @@ public class LuceneIndexRootBuilder extends AbstractLuceneIndexCompositeNodeBuil
 	}
 
 	public LuceneIndexModel build(String indexName) {
-		IndexIdentifier identifier = new IndexIdentifier( idDslConverter );
+		IndexIdentifier identifier = new IndexIdentifier( idDslConverter, idProjectionConverter );
 
 		Map<String, LuceneIndexField> staticFields = new HashMap<>();
 		List<AbstractLuceneIndexFieldTemplate<?>> fieldTemplates = new ArrayList<>();
