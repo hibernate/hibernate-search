@@ -39,12 +39,11 @@ final class HttpAsyncContentProducerInputStream extends InputStream {
 	public int read(byte[] b, int off, int len) throws IOException {
 		int offset = off;
 		int length = len;
-		while ( length > 0 && !contentEncoder.isCompleted() ) {
-			int bytesRead = readFromBuffer( b, offset, length );
-			if ( bytesRead == 0 ) {
+		while ( length > 0 && ( buffer.remaining() > 0 || !contentEncoder.isCompleted() ) ) {
+			if ( buffer.remaining() == 0 ) {
 				writeToBuffer();
-				bytesRead = readFromBuffer( b, offset, length );
 			}
+			int bytesRead = readFromBuffer( b, offset, length );
 			offset += bytesRead;
 			length -= bytesRead;
 		}
