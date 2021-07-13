@@ -3,6 +3,7 @@
 // Search 5 anchors backward compatibility
 [[spatial]]
 
+[[mapper-orm-geopoint-basics]]
 == Basics
 
 Hibernate Search provides a variety of spatial features

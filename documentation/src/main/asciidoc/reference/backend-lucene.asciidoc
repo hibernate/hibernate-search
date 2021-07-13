@@ -439,7 +439,7 @@ See <<backend-lucene-field-types-extension>>.
 |java.time.Year|<<backend-lucene-field-types-date-time>>
 |java.time.YearMonth|<<backend-lucene-field-types-date-time>>
 |java.time.MonthDay|-
-|org.hibernate.search.engine.spatial.GeoPoint|<<backend-lucene-field-types-geopoint>>
+|org.hibernate.search.<wbr>engine.<wbr>spatial.<wbr>GeoPoint|<<backend-lucene-field-types-geopoint>>
 |====
 
 [[backend-lucene-field-types-date-time,Lower range/resolution]]

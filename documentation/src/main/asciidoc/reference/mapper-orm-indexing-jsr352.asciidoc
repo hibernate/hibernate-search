@@ -56,114 +56,90 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 
 The following table contains all the job parameters you can use to customize the mass-indexing job.
 
+[cols="2,1,3a",options="header"]
 .Job Parameters in JSR 352 Integration
 |===
-|Parameter Name |Builder Method |Requirement |Default value |Description
+|Parameter Name / Builder Method |Default value |Description
 
-|`entityTypes`
-|`forEntity(Class<?>)`, `forEntities(Class<?>, Class<?>...)`
-|Required
+|`entityTypes` / `.forEntity(Class<?>)`, `.forEntities(Class<?>, Class<?>...)`
 |-
-|The entity types to index in this job execution, comma-separated.
+|**This parameter is always required**.
 
-|`purgeAllOnStart`
-|`purgeAllOnStart(boolean)`
-|Optional
+The entity types to index in this job execution, comma-separated.
+
+|`purgeAllOnStart` / `.purgeAllOnStart(boolean)`
 |True
 |Specify whether the existing index should be purged at the beginning of the job. This operation
 takes place before indexing.
 
-|`mergeSegmentsAfterPurge`
-|`mergeSegmentsAfterPurge(boolean)`
-|Optional
+|`mergeSegmentsAfterPurge` / `.mergeSegmentsAfterPurge(boolean)`
 |True
 |Specify whether the mass indexer should merge segments at the beginning of the job. This operation
 takes place after the purge operation and before indexing.
 
-|`mergeSegmentsOnFinish`
-|`mergeSegmentsOnFinish(boolean)`
-|Optional
+|`mergeSegmentsOnFinish` / `.mergeSegmentsOnFinish(boolean)`
 |True
 |Specify whether the mass indexer should merge segments at the end of the job. This operation takes
 place after indexing.
 
-|`cacheMode`
-|`cacheMode(CacheMode)`
-|Optional
+|`cacheMode` / `.cacheMode(CacheMode)`
 |`IGNORE`
 |Specify the Hibernate `CacheMode` when loading entities.
 The default is `IGNORE`, and it will be the most efficient choice in most cases,
 but using another mode such as `GET` may be more efficient if many of the entities being indexed
 refer to a small set of other entities.
 
-|`idFetchSize`
-|`idFetchSize(int)`
-|Optional
+|`idFetchSize` / `.idFetchSize(int)`
 |1000
 |Specifies the fetch size to be used when loading primary keys. Some databases
 accept special values, for example MySQL might benefit from using `Integer#MIN_VALUE`, otherwise it
 will attempt to preload everything in memory.
 
-|`entityFetchSize`
-|`entityFetchSize(int)`
-|Optional
+|`entityFetchSize` / `.entityFetchSize(int)`
 |The value of `sessionClearInterval`
 |Specifies the fetch size to be used when loading entities from database. Some databases
 accept special values, for example MySQL might benefit from using `Integer#MIN_VALUE`, otherwise it
 will attempt to preload everything in memory.
 
-|`customQueryHQL`
-|`restrictedBy(String)`
-|Optional
+|`customQueryHQL` / `.restrictedBy(String)`
 |-
 |Use HQL / JPQL to index entities of a target entity type. Your query should contain only one entity
 type. Mixing this approach with the criteria restriction is not allowed. Please notice that there's
 no query validation for your input. See <<jsr-352-indexing-mode>> for more detail and limitations.
 
-|`maxResultsPerEntity`
-|`maxResultsPerEntity(int)`
-|Optional
+|`maxResultsPerEntity` / `.maxResultsPerEntity(int)`
 |-
 |The maximum number of results to load per entity type. This parameter let you define a threshold
 value to avoid loading too many entities accidentally. The value defined must be greater than 0.
 The parameter is not used by default. It is equivalent to keyword `LIMIT` in SQL.
-|`rowsPerPartition`
-|`rowsPerPartition(int)`
-|Optional
+|`rowsPerPartition` / `.rowsPerPartition(int)`
 |20,000
 |The maximum number of rows to process per partition. The value defined must be greater than 0, and
 equal to or greater than the value of `checkpointInterval`.
 
-|`maxThreads`
-|`maxThreads(int)`
-|Optional
+|`maxThreads` / `.maxThreads(int)`
 |The number of partitions
 |The maximum number of threads to use for processing the job. Note the batch runtime cannot
 guarantee the request number of threads are available; it will use as many as it can up to the
 request maximum.
 
-|`checkpointInterval`
-|`checkpointInterval(int)`
-|Optional
+|`checkpointInterval` / `.checkpointInterval(int)`
 |2,000, or the value of `rowsPerPartition` if it is smaller
 |The number of entities to process before triggering a checkpoint. The value defined must be greater
 than 0, and equal to or less than the value of `rowsPerPartition`.
 
-|`sessionClearInterval`
-|`sessionClearInterval(int)`
-|Optional
+|`sessionClearInterval` / `.sessionClearInterval(int)`
 |200, or the value of `checkpointInterval` if it is smaller
 |The number of entities to process before clearing the session. The value defined must be greater
 than 0, and equal to or less than the value of `checkpointInterval`.
 
-|`entityManagerFactoryReference`
-|`entityManagerFactoryReference(String)`
-|Required if there's more than one persistence unit
+|`entityManagerFactoryReference` / `.entityManagerFactoryReference(String)`
 |-
-|The string that will identify the `EntityManagerFactory`.
+|**This parameter is required** when there is more than one persistence unit.
 
-|`entityManagerFactoryNamespace`
-|`entityManagerFactoryNamespace(String)`
+The string that will identify the `EntityManagerFactory`.
+
+|`entityManagerFactoryNamespace` / `.entityManagerFactoryNamespace(String)`
 |-
 |-
 |See <<jsr-352-emf,Selecting the persistence unit (EntityManagerFactory)>>

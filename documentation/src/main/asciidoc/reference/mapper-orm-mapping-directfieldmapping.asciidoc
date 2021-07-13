@@ -295,7 +295,7 @@ see <<backend-lucene-field-types,Lucene field types>>
 or <<backend-elasticsearch-field-types,Elasticsearch field types>> depending on your backend.
 ====
 
-[cols="l,1,1,1",options="header"]
+[cols="m,1,1,1",options="header"]
 .Property types with built-in value bridges
 |===
 |Property type|Value of index field (if different)|Limitations|Parsing method for 'indexNullAs'
@@ -378,7 +378,7 @@ or <<backend-elasticsearch-field-types,Elasticsearch field types>> depending on 
  |`Instant.ofEpochMilli(long)` as a `java.time.Instant`.
  |See <<mapper-orm-legacy-date-time-apis>>.
  |`Instant.parse(String)`
-|org.hibernate.search.engine.spatial.GeoPoint and subtypes|-|-|Latitude as double and longitude as double, separated by a comma. Ex: `41.8919, 12.51133`.
+|<<mapper-orm-geopoint-basics,GeoPoint>> and subtypes|-|-|Latitude as double and longitude as double, separated by a comma. Ex: `41.8919, 12.51133`.
 |===
 
 [[mapper-orm-directfieldmapping-supported-types-date-time,Possibly lower range/resolution]]
