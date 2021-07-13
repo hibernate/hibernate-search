@@ -578,7 +578,7 @@ you will need a bridge that defines a native field type.
 See <<backend-elasticsearch-field-types-extension>>.
 ====
 
-[cols="l,1,1",options="header"]
+[cols="m,1,1",options="header"]
 .Field types supported by the Elasticsearch backend
 |====
 |Field type|link:{elasticsearchDocUrl}/mapping-types.html[Data type] in Elasticsearch|Limitations
@@ -637,7 +637,7 @@ See <<backend-elasticsearch-field-types-extension>>.
  or `yyyy-MM-dd` (ES6 and below).
  **The year is always set to 0**.
  |-
-|org.hibernate.search.engine.spatial.GeoPoint
+|<<mapper-orm-geopoint-basics,GeoPoint>>
  |`geo_point`
  |-
 |====
